@@ -11,9 +11,13 @@ import React from 'react';
 
 function RootError({ error, reset }: ErrorBoundaryPageProps) {
 	return (
+		// eslint-disable-next-line prettier/prettier
 		<section className='border-primary_border flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border p-8'>
 			<h2 className='font-semibold'>There was a problem :(</h2>
-			<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>
+			{
+				// eslint-disable-next-line prettier/prettier
+				<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>
+			}
 			<small>
 				Please try again or{' '}
 				<a

@@ -19,6 +19,7 @@
 		"@nextui-org/react": "^2.4.6",
 		"@nextui-org/spinner": "^2.0.33",
 		"@nextui-org/system": "^2.2.5",
+		"@nextui-org/theme": "^2.2.9",
 		"framer-motion": "^11.3.28",
 		"next": "14.2.5",
 		"next-themes": "^0.3.0",
@@ -55,8 +56,13 @@
 		"typescript": "^5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
-		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
+		"**/*.(ts|tsx|js|jsx)": [
+			"yarn eslint --fix",
+			"yarn prettier --write"
+		],
+		"**/*.(md|css|scss|html)": [
+			"yarn prettier --write"
+		]
 	},
 	"husky": {
 		"hooks": {

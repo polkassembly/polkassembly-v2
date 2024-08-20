@@ -128,6 +128,15 @@
 			"error",
 			20
 		],
-		"no-restricted-globals": "off"
-	}
+		"no-restricted-globals": "off",
+		"import/no-default-export": "error"
+	},
+	"overrides": [
+		{
+			"files": ["*.tsx", "./*.ts"],
+			"rules": {
+				"import/no-default-export": "off"
+			}
+		}
+	]
 }
