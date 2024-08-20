@@ -27,7 +27,8 @@
 	},
 	"plugins": [
 		"@typescript-eslint",
-		"header"
+		"header",
+		"import"
 	],
 	"extends": [
 		"next/core-web-vitals",
