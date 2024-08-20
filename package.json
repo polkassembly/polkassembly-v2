@@ -53,16 +53,11 @@
 		"sass": "^1.77.8",
 		"tailwindcss": "^3.4.1",
 		"tw-colors": "^3.3.1",
-		"typescript": "^5"
+		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": [
-			"yarn eslint --fix",
-			"yarn prettier --write"
-		],
-		"**/*.(md|css|scss|html)": [
-			"yarn prettier --write"
-		]
+		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
+		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
 	},
 	"husky": {
 		"hooks": {
