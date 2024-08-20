@@ -1,0 +1,66 @@
+{
+	"name": "polkassembly",
+	"version": "2.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"lint:fix": "next lint --fix",
+		"format": "prettier --check --ignore-path .gitignore .",
+		"format:fix": "prettier --write --ignore-path .gitignore ."
+	},
+	"engines": {
+		"node": "20"
+	},
+	"dependencies": {
+		"@nextui-org/button": "^2.0.37",
+		"@nextui-org/react": "^2.4.6",
+		"@nextui-org/spinner": "^2.0.33",
+		"@nextui-org/system": "^2.2.5",
+		"framer-motion": "^11.3.28",
+		"next": "14.2.5",
+		"next-themes": "^0.3.0",
+		"react": "^18",
+		"react-dom": "^18",
+		"react-toastify": "^10.0.5"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"@typescript-eslint/eslint-plugin": "^8.2.0",
+		"autoprefixer": "^10.4.20",
+		"eslint": "^8",
+		"eslint-config-airbnb": "^19",
+		"eslint-config-next": "^14",
+		"eslint-config-prettier": "^9",
+		"eslint-plugin-header": "^3",
+		"eslint-plugin-jsx-a11y": "^6",
+		"eslint-plugin-prettier": "^5",
+		"eslint-plugin-react": "^7",
+		"eslint-plugin-react-hooks": "^4",
+		"eslint-plugin-security": "^1",
+		"eslint-plugin-simple-import-sort": "^12",
+		"eslint-plugin-sonarjs": "^0",
+		"husky": "^9.1.5",
+		"lint-staged": "^15.2.9",
+		"postcss": "^8",
+		"prettier": "^3.3.3",
+		"prettier-plugin-tailwindcss": "^0.6.6",
+		"sass": "^1.77.8",
+		"tailwindcss": "^3.4.1",
+		"tw-colors": "^3.3.1",
+		"typescript": "^5"
+	},
+	"lint-staged": {
+		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
+		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	}
+}
