@@ -5,13 +5,13 @@
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { IAuthToken, IUser, IUserAddress, JWTPayloadType, Role, Wallet } from '@shared/types';
-import { cryptoWaitReady, signatureVerify } from '@polkadot/util-crypto';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { APIError } from '@app/api/_api-utils/apiError';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS } from '@app/api/_api-constants/jwt';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { JWT_KEY_PASSPHRASE, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY } from '@api/_api-constants/apiEnvVars';
 import getSubstrateAddress from '@shared/_utils/getSubstrateAddress';
-import { SIGN_MESSAGE } from '@shared/_constants/signMessage';
+import { isValidWalletSignature } from '@api/_api-utils/isValidWalletSignature';
 
 export class AuthService {
 	/**
@@ -85,7 +85,7 @@ export class AuthService {
 	static async GetUserWithJWT(token: string): Promise<IUser | null> {
 		const userId = await this.GetUserIdFromJWT(token);
 
-		// TODO: fetch from firestore
+		// TODO: fetch from DB Service class
 		const user = {};
 
 		if (!user) {
@@ -143,90 +143,10 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
 
-		await cryptoWaitReady();
-		const { isValid } = verifySignature(substrateAddress, signature);
+		const isValid = await isValidWalletSignature(substrateAddress, signature);
 
 		if (!isValid) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
-		}
-
-		let userId = '';
-		let userAddresses: IUserAddress[] = [];
-
-		const userAddress = await prisma.userAddress.findFirst({
-			where: {
-				address: substrateAddress
-			},
-			include: {
-				user: {
-					include: {
-						addresses: true
-					}
-				}
-			}
-		});
-
-		userId = userAddress?.userId || '';
-		userAddresses =
-			userAddress?.user.addresses.map((addressObj) => {
-				return {
-					address: addressObj.address,
-					wallet: addressObj.wallet,
-					userId: addressObj.userId,
-					createdAt: addressObj.createdAt,
-					updatedAt: addressObj.updatedAt
-				} as IUserAddress;
-			}) || [];
-
-		if (!userAddress) {
-			const newUser = await prisma.userAddress.create({
-				data: {
-					address: substrateAddress,
-					wallet,
-					user: {
-						create: {
-							roles: [Role.USER]
-						}
-					}
-				}
-			});
-			userId = newUser.userId;
-			userAddresses = [
-				{
-					address: newUser.address,
-					wallet: newUser.wallet,
-					userId: newUser.userId,
-					createdAt: newUser.createdAt,
-					updatedAt: newUser.updatedAt
-				} as IUserAddress
-			];
-		}
-
-		// update wallet if it is saved as OTHER
-		const currentAddressObj = userAddresses.find((addressObj) => addressObj.address === address);
-		if (currentAddressObj?.wallet === Wallet.OTHER) {
-			await prisma.userAddress.update({
-				where: {
-					address
-				},
-				data: {
-					wallet
-				}
-			});
-
-			// update wallet in userAddresses array
-			userAddresses = userAddresses.map((addressObj) => {
-				if (addressObj.address === address) {
-					return {
-						address: addressObj.address,
-						wallet,
-						userId: addressObj.userId,
-						createdAt: addressObj.createdAt,
-						updatedAt: addressObj.updatedAt
-					} as IUserAddress;
-				}
-				return addressObj;
-			});
 		}
 
 		return {
@@ -256,56 +176,16 @@ export class AuthService {
 
 		// eslint-disable-next-line sonarjs/no-small-switch
 		switch (wallet) {
-			case Wallet.METAMASK || Wallet.SOLANA: {
+			case Wallet.METAMASK: {
 				await cryptoWaitReady();
-				const { isValid } = verifySignature(substrateAddress, signature);
+				const isValid = await isValidWalletSignature(substrateAddress, signature);
 
 				if (!isValid) {
 					throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 				}
 
-				// Check if the address already exists for this user
-				const existingAddress = await prisma.userAddress.findUnique({
-					where: { address }
-				});
-
-				if (existingAddress) {
-					throw new APIError(ERROR_CODES.ALREADY_PROCESSED, StatusCodes.CONFLICT);
-				}
-
-				// Create a new UserAddress
-				const newUserAddress = await prisma.userAddress.create({
-					data: {
-						address,
-						wallet,
-						userId: id
-					}
-				});
-
-				// Update the user's addresses array
-				const user = await prisma.user.update({
-					where: { id },
-					data: {
-						addresses: {
-							connect: { id: newUserAddress.id }
-						}
-					},
-					include: {
-						addresses: true
-					}
-				});
-
 				return {
 					token: await this.GetSignedJWT({
-						addresses: user.addresses.map((addressObj) => {
-							return {
-								address: addressObj.address,
-								wallet: addressObj.wallet,
-								userId: addressObj.userId,
-								createdAt: addressObj.createdAt,
-								updatedAt: addressObj.updatedAt
-							} as IUserAddress;
-						}),
 						id: user.id,
 						roles: [Role.USER],
 						createdAt: new Date(),
@@ -315,51 +195,7 @@ export class AuthService {
 			}
 
 			default: {
-				const substrateAddress = getSubstrateAddress(address);
-
-				if (!substrateAddress) {
-					console.log('Invalid address: ', address);
-					throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
-				}
-
-				await cryptoWaitReady();
-				const { isValid } = signatureVerify(SIGN_MESSAGE, signature, substrateAddress);
-
-				if (!isValid) {
-					console.log('Invalid signature for address: ', address);
-					throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
-				}
-
-				// Check if the address already exists for this user
-				const existingAddress = await prisma.userAddress.findUnique({
-					where: { address }
-				});
-
-				if (existingAddress) {
-					throw new APIError(ERROR_CODES.ALREADY_PROCESSED, StatusCodes.CONFLICT);
-				}
-
-				// Create a new UserAddress
-				const newUserAddress = await prisma.userAddress.create({
-					data: {
-						address,
-						wallet,
-						userId: id
-					}
-				});
-
-				// Update the user's addresses array
-				const user = await prisma.user.update({
-					where: { id },
-					data: {
-						addresses: {
-							connect: { id: newUserAddress.id }
-						}
-					},
-					include: {
-						addresses: true
-					}
-				});
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Not implemented');
 
 				return {
 					token: await this.GetSignedJWT({
@@ -402,7 +238,7 @@ export class AuthService {
 		}
 
 		await cryptoWaitReady();
-		const { isValid } = verifySignature(substrateAddress, signature);
+		const isValid = await isValidWalletSignature(substrateAddress, signature);
 
 		if (!isValid) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
