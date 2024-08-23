@@ -4,19 +4,18 @@
 
 'use client';
 
-import { ErrorBoundaryPageProps } from '@/global/types';
 import { Button } from '@nextui-org/button';
 import Link from 'next/link';
 import React from 'react';
 
-function RootError({ error, reset }: ErrorBoundaryPageProps) {
+function RootError({ error, reset }: { error: Error; reset: () => void }) {
 	return (
 		// eslint-disable-next-line prettier/prettier
-		<section className='border-primary_border flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border p-8'>
+		<section className='flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border border-primary_border p-8'>
 			<h2 className='font-semibold'>There was a problem :(</h2>
 			{
 				// eslint-disable-next-line prettier/prettier
-				<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>
+				<p className='py-4 text-danger'>{error.message || 'Please try again.'}</p>
 			}
 			<small>
 				Please try again or{' '}

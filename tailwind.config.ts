@@ -6,7 +6,7 @@ import { nextui } from '@nextui-org/theme/plugin';
 import type { Config } from 'tailwindcss';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { createThemes } from 'tw-colors';
-import { THEME_COLORS } from './src/global/theme';
+import { THEME_COLORS } from './src/style/theme';
 
 const config: Config = {
 	content: [

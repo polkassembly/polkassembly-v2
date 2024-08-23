@@ -20,7 +20,10 @@
 		"@nextui-org/spinner": "^2.0.33",
 		"@nextui-org/system": "^2.2.5",
 		"@nextui-org/theme": "^2.2.9",
+		"@polkadot/util-crypto": "^13.0.2",
 		"framer-motion": "^11.3.28",
+		"http-status-codes": "^2.3.0",
+		"jsonwebtoken": "^9.0.2",
 		"next": "14.2.5",
 		"next-themes": "^0.3.0",
 		"react": "^18",
@@ -28,6 +31,7 @@
 		"react-toastify": "^10.0.5"
 	},
 	"devDependencies": {
+		"@types/jsonwebtoken": "^9.0.6",
 		"@types/node": "^20",
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
@@ -56,8 +60,13 @@
 		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
-		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
+		"**/*.(ts|tsx|js|jsx)": [
+			"yarn eslint --fix",
+			"yarn prettier --write"
+		],
+		"**/*.(md|css|scss|html)": [
+			"yarn prettier --write"
+		]
 	},
 	"husky": {
 		"hooks": {
