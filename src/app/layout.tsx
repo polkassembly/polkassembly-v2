@@ -8,6 +8,8 @@ import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
+import { Initializer } from './Initializers';
+import Layout from './_shared-components/Layout';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -23,7 +25,8 @@ export default function RootLayout({
 		<html lang='en'>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<main>{children}</main>
+					<Initializer />
+					<Layout>{children}</Layout>
 					<NotificationsContainer />
 				</Providers>
 			</body>

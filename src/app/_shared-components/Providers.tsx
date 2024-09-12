@@ -7,6 +7,8 @@
 import { NextUIProvider } from '@nextui-org/system';
 import { ThemeProvider } from 'next-themes';
 import { ReactNode } from 'react';
+import { Provider } from 'jotai';
+import QueryProvider from './QueryProvider';
 
 export function Providers({ children }: { children: ReactNode }) {
 	return (
@@ -16,7 +18,9 @@ export function Providers({ children }: { children: ReactNode }) {
 				defaultTheme='light'
 				themes={['light', 'dark']}
 			>
-				{children}
+				<Provider>
+					<QueryProvider>{children}</QueryProvider>
+				</Provider>
 			</ThemeProvider>
 		</NextUIProvider>
 	);
