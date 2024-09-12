@@ -8,4 +8,4 @@ export const JWT_PUBLIC_KEY = (process.env.JWT_PUBLIC_KEY || '').replace(/\\n/gm
 export const REFRESH_TOKEN_PRIVATE_KEY = (process.env.REFRESH_TOKEN_PRIVATE_KEY || '').replace(/\\n/gm, '\n');
 export const REFRESH_TOKEN_PUBLIC_KEY = (process.env.REFRESH_TOKEN_PUBLIC_KEY || '').replace(/\\n/gm, '\n');
 
-export const { REDIS_URL = '', FIREBASE_SERVICE_ACC_CONFIG = '', JWT_KEY_PASSPHRASE = '', REFRESH_TOKEN_PASSPHRASE = '' } = process.env;
+export const { REDIS_URL = '', FIREBASE_SERVICE_ACC_CONFIG = '', JWT_KEY_PASSPHRASE = '', REFRESH_TOKEN_PASSPHRASE = '', NOTIFICATION_ENGINE_API_KEY = '' } = process.env;
