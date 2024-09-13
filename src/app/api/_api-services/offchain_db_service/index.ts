@@ -7,6 +7,7 @@
 import { FIREBASE_SERVICE_ACC_CONFIG } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
+import { ValidatorService } from '@shared/_services/validator_service';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@shared/types';
 import * as firebaseAdmin from 'firebase-admin';
@@ -44,11 +45,11 @@ export class OffChainDbService {
 	// document reference methods
 	private static getUserDocRefById = (userId: string) => this.usersCollection.doc(userId);
 	private static getAddressDocRefByAddress = (address: string) => {
-		const substrateAddress = address.startsWith('0x') ? address : getSubstrateAddress(address);
-		if (!substrateAddress) {
+		const formattedAddress = ValidatorService.isValidSubstrateAddress(address) ? address : getSubstrateAddress(address);
+		if (!formattedAddress) {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Internal Error: Invalid substrate address.');
 		}
-		return this.addressesCollection.doc(substrateAddress);
+		return this.addressesCollection.doc(formattedAddress);
 	};
 
 	// Business Logic methods
@@ -116,6 +117,17 @@ export class OffChainDbService {
 			createdAt: userData.created_at?.toDate(),
 			updatedAt: userData.updated_at?.toDate()
 		} as IUser;
+	}
+
+	static async GetUserByAddress(address: string): Promise<IUser | null> {
+		const addressDocSnapshot = await this.getAddressDocRefByAddress(address).get();
+		if (!addressDocSnapshot.exists) {
+			return null;
+		}
+
+		const addressData = addressDocSnapshot.data() as IUserAddress;
+
+		return this.GetUserById(addressData.userId);
 	}
 
 	static async GetAddressesForUserId(userId: number, fetchOnlyVerified?: boolean) {

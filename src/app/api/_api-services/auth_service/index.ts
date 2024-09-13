@@ -15,6 +15,7 @@ import { ENetwork, ERole, EWallet, IHashedPassword, IAuthResponse, IRefreshToken
 import { ValidatorService } from '@shared/_services/validator_service';
 import { randomBytes } from 'crypto';
 import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetails';
+import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { OffChainDbService } from '../offchain_db_service';
 import { redisSetex } from '../redis_service';
 import { get2FAKey, getEmailVerificationTokenKey } from '../redis_service/redisKeys';
@@ -277,5 +278,73 @@ export class AuthService {
 
 	static async GetAccessTokenCookie(accessToken: string) {
 		return serialize(EAuthCookieNames.ACCESS_TOKEN, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+	}
+
+	static async Web3LoginOrRegister({ address, wallet, signature, network }: { address: string; wallet: EWallet; signature: string; network: ENetwork }): Promise<IAuthResponse> {
+		if (!ValidatorService.isValidNetwork(network)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
+		}
+
+		if (!ValidatorService.isValidWallet(wallet)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid wallet');
+		}
+
+		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
+
+		if (!isEvmAddress || !ValidatorService.isValidSubstrateAddress(address)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid address');
+		}
+
+		// verify signature
+		const isValidSignature = isEvmAddress ? ValidatorService.isValidEVMSignature(address, signature) : ValidatorService.isValidSubstrateSignature(address, signature);
+
+		if (!isValidSignature) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid signature');
+		}
+
+		const formattedAddress = isEvmAddress ? address : getSubstrateAddress(address)!;
+
+		// find if user exists
+		const user = await OffChainDbService.GetUserByAddress(formattedAddress);
+
+		// if user exists, login
+		if (user) {
+			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
+
+			if (isTFAEnabled) {
+				const tfaToken = createCuid();
+				await redisSetex(get2FAKey(Number(user.id)), FIVE_MIN, tfaToken);
+
+				return {
+					isTFAEnabled,
+					tfaToken,
+					userId: user.id
+				};
+			}
+
+			return {
+				isTFAEnabled,
+				refreshToken: await this.GetRefreshToken({ userId: user.id }),
+				accessToken: await this.GetSignedAccessToken(user)
+			};
+		}
+
+		// user does not exist, register
+		const username = `${formattedAddress.substring(0, 6)}...${formattedAddress.substring(formattedAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
+		const password = createCuid();
+
+		const newUser = await this.CreateUser({
+			email: '',
+			newPassword: password,
+			username,
+			isWeb3Signup: true,
+			network,
+			isCustomUsername: false
+		});
+
+		return {
+			accessToken: await this.GetSignedAccessToken(newUser),
+			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
+		};
 	}
 }

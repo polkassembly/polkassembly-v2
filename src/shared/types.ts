@@ -163,11 +163,9 @@ export interface IUserAddress {
 	address: string;
 	default: boolean;
 	network: string;
-	publicKey: string;
-	signMessage: string;
 	userId: number;
-	verified: boolean;
-	isErc20?: boolean;
+	createdAt: Date;
+	updatedAt: Date;
 	wallet?: string;
 	isMultisig?: boolean;
 	proxyFor?: IAddressProxyForEntry[];

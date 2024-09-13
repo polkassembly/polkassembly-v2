@@ -15,12 +15,14 @@
 		"node": "20"
 	},
 	"dependencies": {
+		"@metamask/eth-sig-util": "^7.0.3",
 		"@nextui-org/button": "^2.0.37",
 		"@nextui-org/react": "^2.4.6",
 		"@nextui-org/spinner": "^2.0.33",
 		"@nextui-org/system": "^2.2.5",
 		"@nextui-org/theme": "^2.2.9",
 		"@paralleldrive/cuid2": "^2.2.2",
+		"@polkadot/util": "^13.0.2",
 		"@polkadot/util-crypto": "^13.0.2",
 		"@urql/core": "^5.0.6",
 		"@urql/exchange-graphcache": "^7.1.3",
