@@ -24,4 +24,17 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_PROPOSALS_LISTING_BY_TYPE = `
+		query GetProposalsListingByType($limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq}) {
+				createdAt
+				description
+				index
+				origin
+				proposer
+				status
+			}
+		}
+	`;
 }

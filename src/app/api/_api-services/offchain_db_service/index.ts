@@ -33,6 +33,7 @@ try {
 
 const db = firebaseAdmin.firestore();
 
+// TODO: add fallback for subsquare
 export class OffChainDbService {
 	// collection references
 	private static usersCollection = db.collection('users');
@@ -164,6 +165,28 @@ export class OffChainDbService {
 			createdAt: postData.created_at?.toDate(),
 			updatedAt: postData.updated_at?.toDate()
 		} as IOffChainPost;
+	}
+
+	static async GetOffChainPostsListing({
+		network,
+		proposalType,
+		limit,
+		page
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		limit: number;
+		page: number;
+	}): Promise<IOffChainPost[]> {
+		const postsQuery = this.postsCollection
+			.where('proposalType', '==', proposalType)
+			.where('network', '==', network)
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const postsQuerySnapshot = await postsQuery.get();
+
+		return postsQuerySnapshot.docs.map((doc) => doc.data() as IOffChainPost);
 	}
 
 	// Write methods

@@ -11,6 +11,7 @@ import { getSubstrateAddressPublicKey } from '@shared/_utils/getSubstrateAddress
 import { ENetwork, EProposalType, EWallet } from '@shared/types';
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
+import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -41,6 +42,10 @@ export class ValidatorService {
 
 	static isValidOffChainProposalType(proposalType: string): boolean {
 		return OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType as EProposalType);
+	}
+
+	static isValidOnChainProposalType(proposalType: string): boolean {
+		return ON_CHAIN_PROPOSAL_TYPES.includes(proposalType as EProposalType);
 	}
 
 	static isValidWallet(wallet: string): boolean {

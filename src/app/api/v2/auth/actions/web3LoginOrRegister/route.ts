@@ -16,10 +16,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const network = getNetworkFromHeaders(headers());
 
-	if (!network) {
-		throw new APIError(ERROR_CODES.MISSING_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, 'Invalid network in request headers');
-	}
-
 	const { address = '', wallet = '', signature = '' } = await getReqBody(req);
 
 	if (!address || !wallet || !signature) {

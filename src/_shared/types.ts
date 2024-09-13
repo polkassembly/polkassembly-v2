@@ -232,6 +232,7 @@ export interface IOffChainPost {
 }
 
 export enum EProposalStatus {
+	UNKNOWN = 'Unknown',
 	Noted = 'Noted',
 	Proposed = 'Proposed',
 	Tabled = 'Tabled',
@@ -282,4 +283,19 @@ export interface IOnChainPostInfo {
 
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
+}
+
+export interface IOnChainPostListing {
+	createdAt: Date;
+	description: string;
+	index: number;
+	origin: string;
+	proposer: string;
+	status: EProposalStatus;
+	type: EProposalType;
+	hash: string;
+}
+
+export interface IPostListing extends IOffChainPost {
+	onChainInfo?: IOnChainPostListing;
 }
