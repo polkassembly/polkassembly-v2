@@ -56,6 +56,7 @@ export class OnChainDbService extends SubsquidQueries {
 
 		// TODO: fallback to fetch from subsquare
 		// TODO: fallback to fetch from subscan
+		// TODO: fallback to fetch from polkadot api
 
 		return null;
 	}

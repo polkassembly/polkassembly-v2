@@ -19,7 +19,7 @@
     ],
     "paths": {
       "@public/*": ["./public/*"],
-      "@shared/*": ["./src/shared/*"],    
+      "@shared/*": ["./src/_shared/*"],    
       "@api/*": ["./src/app/api/*"],
       "@app/*": ["./src/app/*"],
     }
