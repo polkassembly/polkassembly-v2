@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { DbService } from '@api/_api-services/db_service';
+import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 
@@ -18,7 +18,12 @@ export async function storeApiKeyUsage(req: NextRequest) {
 		const apiKey = headers().get('x-api-key') || 'unknown';
 		const apiRoute = req.url?.split('?')[0] || 'unknown';
 
-		await DbService.UpdateApiKeyUsage(apiKey, apiRoute);
+		// do not call for localhost
+		if (req.nextUrl.hostname === 'localhost') {
+			return;
+		}
+		// do not await this as it is fire-and-forget
+		OffChainDbService.UpdateApiKeyUsage(apiKey, apiRoute);
 	} catch (e) {
 		console.error('Error in storeApiKeyUsage : ', e);
 	}

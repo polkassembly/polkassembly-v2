@@ -10,12 +10,12 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { JWT_KEY_PASSPHRASE, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, REFRESH_TOKEN_PASSPHRASE, REFRESH_TOKEN_PRIVATE_KEY } from '@api/_api-constants/apiEnvVars';
 import { serialize } from 'cookie';
 import * as argon2 from 'argon2';
-import { v4 as uuidv4 } from 'uuid';
+import { createId as createCuid } from '@paralleldrive/cuid2';
 import { ENetwork, ERole, EWallet, IHashedPassword, IAuthResponse, IRefreshTokenPayload, IUser, IAccessTokenPayload, EAuthCookieNames } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { randomBytes } from 'crypto';
 import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetails';
-import { DbService } from '../db_service';
+import { OffChainDbService } from '../offchain_db_service';
 import { redisSetex } from '../redis_service';
 import { get2FAKey, getEmailVerificationTokenKey } from '../redis_service/redisKeys';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
@@ -32,7 +32,7 @@ if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PASSPHRASE) {
 export class AuthService {
 	private static async CreateAndSendEmailVerificationToken(user: IUser): Promise<void> {
 		if (user.email) {
-			const verifyToken = uuidv4();
+			const verifyToken = createCuid();
 			await redisSetex(getEmailVerificationTokenKey(verifyToken), ONE_DAY, user.email);
 
 			// send verification email in background
@@ -67,7 +67,7 @@ export class AuthService {
 	}): Promise<IUser> {
 		const { password, salt } = await this.GetSaltAndHashedPassword(newPassword);
 
-		const newUserId = (await DbService.GetTotalUsersCount()) + 1;
+		const newUserId = (await OffChainDbService.GetTotalUsersCount()) + 1;
 		const newUser: IUser = {
 			createdAt: new Date(),
 			isCustomUsername,
@@ -83,7 +83,7 @@ export class AuthService {
 			primaryNetwork: network
 		};
 
-		await DbService.AddNewUser(newUser);
+		await OffChainDbService.AddNewUser(newUser);
 
 		return newUser;
 	}
@@ -125,7 +125,7 @@ export class AuthService {
 	static async GetUserWithJWT(token: string): Promise<IUser | null> {
 		const userId = await this.GetUserIdFromJWT(token);
 
-		const user = await DbService.GetUserById(userId);
+		const user = await OffChainDbService.GetUserById(userId);
 		if (!user) return null;
 
 		return user;
@@ -146,7 +146,7 @@ export class AuthService {
 		let addresses: string[] = [];
 
 		try {
-			const userAddresses = await DbService.GetAddressesForUserId(id);
+			const userAddresses = await OffChainDbService.GetAddressesForUserId(id);
 			addresses = userAddresses.map((a) => a.address);
 			defaultAddress = userAddresses.find((a) => a.default);
 		} catch {
@@ -207,7 +207,7 @@ export class AuthService {
 		}
 
 		// fetch user from db
-		const user = isEmail ? await DbService.GetUserByEmail(emailOrUsername) : await DbService.GetUserByUsername(emailOrUsername);
+		const user = isEmail ? await OffChainDbService.GetUserByEmail(emailOrUsername) : await OffChainDbService.GetUserByUsername(emailOrUsername);
 
 		if (!user) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, `User not found: ${emailOrUsername}`);
@@ -222,7 +222,7 @@ export class AuthService {
 		const isTFAEnabled = user.twoFactorAuth?.enabled || false;
 
 		if (isTFAEnabled) {
-			const tfaToken = uuidv4();
+			const tfaToken = createCuid();
 			await redisSetex(get2FAKey(Number(user.id)), FIVE_MIN, tfaToken);
 
 			return {
@@ -246,12 +246,12 @@ export class AuthService {
 		}
 
 		// find if email is already in use
-		if (await DbService.IsEmailInUse(email)) {
+		if (await OffChainDbService.IsEmailInUse(email)) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Email is already in use.');
 		}
 
 		// find if username is already in use
-		if (await DbService.IsUsernameInUse(username)) {
+		if (await OffChainDbService.IsUsernameInUse(username)) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Username is already in use.');
 		}
 

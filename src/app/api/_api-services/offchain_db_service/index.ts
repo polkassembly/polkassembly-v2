@@ -8,7 +8,7 @@ import { FIREBASE_SERVICE_ACC_CONFIG } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
-import { IUser, IUserAddress } from '@shared/types';
+import { ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@shared/types';
 import * as firebaseAdmin from 'firebase-admin';
 import { StatusCodes } from 'http-status-codes';
 
@@ -23,16 +23,16 @@ try {
 			credential: firebaseAdmin.credential.cert(JSON.parse(FIREBASE_SERVICE_ACC_CONFIG))
 		});
 
-		console.log('============= firebase-admin Initialised. =============');
+		console.log('\n============= firebase-admin Initialised. =============\n');
 	}
 } catch (error: unknown) {
-	console.error('Error in initialising firebase-admin: ', error);
+	console.error('\nError in initialising firebase-admin: ', error, '\n');
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error in initialising firebase-admin.');
 }
 
 const db = firebaseAdmin.firestore();
 
-export class DbService {
+export class OffChainDbService {
 	// collection references
 	private static usersCollection = db.collection('users');
 	private static addressesCollection = db.collection('addresses');
@@ -126,6 +126,32 @@ export class DbService {
 		const addressesQuerySnapshot = await addressesQuery.get();
 
 		return addressesQuerySnapshot.docs.map((doc) => doc.data() as IUserAddress);
+	}
+
+	static async GetOffChainPostData({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IOffChainPost | null> {
+		let postDocSnapshot = await this.postsCollection
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', Number(indexOrHash))
+			.where('network', '==', network)
+			.limit(1)
+			.get();
+
+		// if proposal type is tip then index is hash
+		if (proposalType === EProposalType.TIP) {
+			postDocSnapshot = await this.postsCollection.where('proposalType', '==', proposalType).where('hash', '==', indexOrHash).where('network', '==', network).limit(1).get();
+		}
+
+		if (postDocSnapshot.empty) {
+			return null;
+		}
+
+		const postData = postDocSnapshot.docs[0].data();
+
+		return {
+			...postData,
+			createdAt: postData.created_at?.toDate(),
+			updatedAt: postData.updated_at?.toDate()
+		} as IOffChainPost;
 	}
 
 	// Write methods

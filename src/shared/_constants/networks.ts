@@ -4,14 +4,14 @@
 
 import { ENetwork } from '@shared/types';
 
-export const networks = {
+export const NETWORKS_DETAILS = {
 	[ENetwork.ROCOCO]: {
 		disabled: false,
 		key: ENetwork.ROCOCO,
 		name: 'Rococo',
 		blockTime: 6000,
 		ss58Format: 42,
-		subsquidUrl: '',
+		subsquidUrl: 'https://squid.subsquid.io/rococo-polkassembly/graphql',
 		tokenDecimals: 12,
 		tokenSymbol: 'ROC',
 		blockExplorerUrl: 'https://rococo.subscan.io/',

@@ -4,7 +4,7 @@
 
 import { cryptoWaitReady, signatureVerify } from '@polkadot/util-crypto';
 import { SIGN_MESSAGE } from '@shared/_constants/signMessage';
-import { isValidSubstrateAddress } from '@shared/_utils/isValidSubstrateAddress';
+import { ValidatorService } from '@shared/_services/validator_service';
 import { recoverPersonalSignature } from 'eth-sig-util';
 
 export async function isValidWalletSignature(address: string, signature: string) {
@@ -19,7 +19,7 @@ export async function isValidWalletSignature(address: string, signature: string)
 	}
 
 	// Substrate
-	if (isValidSubstrateAddress(address)) {
+	if (ValidatorService.isValidSubstrateAddress(address)) {
 		await cryptoWaitReady();
 		return signatureVerify(SIGN_MESSAGE, signature, address).isValid;
 	}

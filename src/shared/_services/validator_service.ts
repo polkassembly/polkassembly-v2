@@ -3,8 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BLACKLISTED_USERNAMES } from '@shared/_constants/blacklistedUsernames';
+import { OFF_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/offChainProposalTypes';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
-import { ENetwork } from '@shared/types';
+import { ENetwork, EProposalType } from '@shared/types';
 import validator from 'validator';
 
 export class ValidatorService {
@@ -28,5 +29,13 @@ export class ValidatorService {
 
 	static isValidSubstrateAddress(address: string): boolean {
 		return getSubstrateAddress(address) !== null;
+	}
+
+	static isValidProposalType(proposalType: string): boolean {
+		return Object.values(EProposalType).includes(proposalType as EProposalType);
+	}
+
+	static isValidOffChainProposalType(proposalType: string): boolean {
+		return OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType as EProposalType);
 	}
 }

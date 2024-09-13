@@ -189,7 +189,7 @@ export interface NotificationSettings {
 	post_participated: boolean;
 }
 
-export enum ProposalType {
+export enum EProposalType {
 	ALLIANCE_MOTION = 'AllianceMotion',
 	ANNOUNCEMENT = 'Announcement',
 	DEMOCRACY_PROPOSAL = 'DemocracyProposal',
@@ -206,7 +206,8 @@ export enum ProposalType {
 	COMMUNITY = 'Community',
 	UPGRADE_COMMITTEE = 'UpgradeCommittee',
 	ADVISORY_COMMITTEE = 'AdvisoryCommittee',
-	DISCUSSION = 'Discussion'
+	DISCUSSION = 'Discussion',
+	GRANT = 'Grant'
 }
 
 export enum EAuthCookieNames {
@@ -216,4 +217,71 @@ export enum EAuthCookieNames {
 
 export enum ENotificationTrigger {
 	VERIFY_EMAIL = 'verifyEmail'
+}
+
+export interface IOffChainPost {
+	id?: string;
+	index?: number;
+	hash?: string;
+	userId?: number;
+	title?: string;
+	content?: string;
+	createdAt?: Date;
+	updatedAt?: Date;
+	tags?: string[];
+	proposalType: EProposalType;
+	network: ENetwork;
+}
+
+export enum EProposalStatus {
+	Noted = 'Noted',
+	Proposed = 'Proposed',
+	Tabled = 'Tabled',
+	Started = 'Started',
+	Passed = 'Passed',
+	NotPassed = 'NotPassed',
+	Cancelled = 'Cancelled',
+	CuratorProposed = 'CuratorProposed',
+	CuratorAssigned = 'CuratorAssigned',
+	CuratorUnassigned = 'CuratorUnassigned',
+	Executed = 'Executed',
+	ExecutionFailed = 'ExecutionFailed',
+	Used = 'Used',
+	Invalid = 'Invalid',
+	Missing = 'Missing',
+	Reaped = 'Reaped',
+	Approved = 'Approved',
+	Disapproved = 'Disapproved',
+	Closed = 'Closed',
+	Awarded = 'Awarded',
+	Added = 'Added',
+	Rejected = 'Rejected',
+	Retracted = 'Retracted',
+	Slashed = 'Slashed',
+	Active = 'Active',
+	Extended = 'Extended',
+	Claimed = 'Claimed',
+	Unrequested = 'Unrequested',
+	Requested = 'Requested',
+	Submitted = 'Submitted',
+	Killed = 'Killed',
+	Cleared = 'Cleared',
+	Deciding = 'Deciding',
+	ConfirmStarted = 'ConfirmStarted',
+	ConfirmAborted = 'ConfirmAborted',
+	Confirmed = 'Confirmed',
+	DecisionDepositPlaced = 'DecisionDepositPlaced',
+	TimedOut = 'TimedOut',
+	Opened = 'Opened'
+}
+
+export interface IOnChainPostInfo {
+	proposer: string;
+	status: EProposalStatus;
+	description: string;
+	createdAt: Date;
+}
+
+export interface IPost extends IOffChainPost {
+	onChainInfo?: IOnChainPostInfo;
 }
