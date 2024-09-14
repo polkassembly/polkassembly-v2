@@ -30,14 +30,19 @@ export class PolkadotApiService {
 		const api = await ApiPromise.create({
 			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].rpcEndpoints[0].url)
 		});
+
 		return new PolkadotApiService(network, api);
+	}
+
+	async disconnect(): Promise<void> {
+		await this.api.disconnect();
 	}
 
 	getCurrentRpcIndex(): number {
 		return this.currentRpcEndpointIndex;
 	}
 
-	async switchRpcEndpoint(index?: number): Promise<void> {
+	async switchToNewRpcEndpoint(index?: number): Promise<void> {
 		if (index) {
 			// check if valid index
 			if (index < 0 || index >= NETWORKS_DETAILS[this.network].rpcEndpoints.length) {
@@ -57,5 +62,9 @@ export class PolkadotApiService {
 	async getBlockHeight(): Promise<number> {
 		const header = await this.api.rpc.chain.getHeader();
 		return header.number.toNumber();
+	}
+
+	async keepAlive(): Promise<void> {
+		await this.getBlockHeight();
 	}
 }
