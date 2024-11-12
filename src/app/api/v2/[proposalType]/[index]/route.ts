@@ -21,7 +21,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 	}
 
-	const network = getNetworkFromHeaders(headers());
+	const network = getNetworkFromHeaders(await headers());
 
 	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
 

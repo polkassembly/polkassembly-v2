@@ -14,7 +14,7 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const network = headers().get('x-network') || '';
+	const network = (await headers()).get('x-network') || '';
 	if (!ValidatorService.isValidNetwork(network)) {
 		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 	}

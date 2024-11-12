@@ -14,7 +14,7 @@ export const withErrorHandling = (handler: { (req: NextRequest, options?: any): 
 	return async (req: NextRequest, options: object) => {
 		try {
 			// check if network header is valid, throws error if not
-			getNetworkFromHeaders(headers());
+			getNetworkFromHeaders(await headers());
 			storeApiKeyUsage(req);
 			return await handler(req, options);
 		} catch (error) {

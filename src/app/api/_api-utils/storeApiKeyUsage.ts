@@ -15,7 +15,7 @@ import { NextRequest } from 'next/server';
  */
 export async function storeApiKeyUsage(req: NextRequest) {
 	try {
-		const apiKey = headers().get('x-api-key') || 'unknown';
+		const apiKey = (await headers()).get('x-api-key') || 'unknown';
 		const apiRoute = req.url?.split('?')[0] || 'unknown';
 
 		// do not call for localhost

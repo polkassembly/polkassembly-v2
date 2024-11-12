@@ -34,7 +34,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid page or limit');
 	}
 
-	const network = getNetworkFromHeaders(headers());
+	const network = getNetworkFromHeaders(await headers());
 
 	let posts: IPostListing[] = [];
 
