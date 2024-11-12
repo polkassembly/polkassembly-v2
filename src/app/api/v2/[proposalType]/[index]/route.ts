@@ -14,8 +14,8 @@ import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
-	const { proposalType = '', index = '' } = params;
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType = '', index = '' } = await params;
 
 	if (!proposalType || !index || !ValidatorService.isValidProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
