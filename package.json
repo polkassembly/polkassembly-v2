@@ -22,8 +22,9 @@
 		"@polkadot/types": "^13.0.1",
 		"@polkadot/util": "^13.0.2",
 		"@polkadot/util-crypto": "^13.0.2",
-		"@tanstack/react-query": "^5.61.3",
 		"@radix-ui/react-slot": "^1.1.0",
+		"@tanstack/react-query": "^5.61.3",
+		"@tanstack/react-query-devtools": "^5.61.3",
 		"@urql/core": "^5.0.6",
 		"@urql/exchange-graphcache": "^7.1.3",
 		"argon2": "^0.41.1",
@@ -80,8 +81,13 @@
 		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
-		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
+		"**/*.(ts|tsx|js|jsx)": [
+			"yarn eslint --fix",
+			"yarn prettier --write"
+		],
+		"**/*.(md|css|scss|html)": [
+			"yarn prettier --write"
+		]
 	},
 	"husky": {
 		"hooks": {
