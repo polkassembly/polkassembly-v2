@@ -1,17 +1,45 @@
-// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
-// This software may be modified and distributed under the terms
-// of the Apache-2.0 license. See the LICENSE file for details.
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { VariantProps, cva } from 'class-variance-authority';
+import { Loader2 } from 'lucide-react';
 
-// TODO: Replace this Spinner import with Shadcn Ui's Spinner component
-// import { Spinner } from '@nextui-org/spinner';
+const spinnerVariants = cva('flex-col items-center justify-center', {
+	variants: {
+		show: {
+			true: 'flex',
+			false: 'hidden'
+		}
+	},
+	defaultVariants: {
+		show: true
+	}
+});
 
-function LoadingSpinner({ className = '', message = 'Loading...', size = 'md' }: { className?: string; message?: string; size?: 'sm' | 'md' | 'lg' }) {
-	return (
-		<div className={`${className} flex flex-col items-center justify-center gap-3`}>
-			{/* <Spinner size={size} /> */}
-			{message && <span className='text-xs'>{message}</span>}
-		</div>
-	);
+const loaderVariants = cva('animate-spin text-primary', {
+	variants: {
+		size: {
+			small: 'size-6',
+			medium: 'size-8',
+			large: 'size-12'
+		}
+	},
+	defaultVariants: {
+		size: 'medium'
+	}
+});
+
+interface SpinnerContentProps extends VariantProps<typeof spinnerVariants>, VariantProps<typeof loaderVariants> {
+	className?: string;
+	children?: React.ReactNode;
+	message?: string;
 }
 
-export default LoadingSpinner;
+export function LoadingSpinner({ size, show, children, className, message }: SpinnerContentProps) {
+	return (
+		<span className={spinnerVariants({ show })}>
+			<Loader2 className={cn(loaderVariants({ size }), className)} />
+			{message && <span className='mt-2 text-xs text-gray-500'>{message}</span>}
+			{children}
+		</span>
+	);
+}
