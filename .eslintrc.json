@@ -18,18 +18,11 @@
 		},
 		"import/resolver": {
 			"node": {
-				"extensions": [
-					".ts",
-					".tsx"
-				]
+				"extensions": [".ts", ".tsx"]
 			}
 		}
 	},
-	"plugins": [
-		"@typescript-eslint",
-		"header",
-		"import"
-	],
+	"plugins": ["@typescript-eslint", "header", "import"],
 	"extends": [
 		"next/core-web-vitals",
 		"plugin:@typescript-eslint/recommended",
@@ -49,12 +42,7 @@
 		"react/jsx-filename-extension": [
 			1,
 			{
-				"extensions": [
-					".ts",
-					".tsx",
-					".js",
-					".jsx"
-				]
+				"extensions": [".ts", ".tsx", ".js", ".jsx"]
 			}
 		],
 		"react/jsx-props-no-spreading": "off",
@@ -71,38 +59,22 @@
 		"jsx-a11y/anchor-is-valid": [
 			"error",
 			{
-				"components": [
-					"Link"
-				],
-				"specialLink": [
-					"hrefLeft",
-					"hrefRight"
-				],
-				"aspects": [
-					"invalidHref",
-					"preferButton"
-				]
+				"components": ["Link"],
+				"specialLink": ["hrefLeft", "hrefRight"],
+				"aspects": ["invalidHref", "preferButton"]
 			}
 		],
 		"no-nested-ternary": "off",
 		"import/prefer-default-export": "off",
-		"header/header": [
-			2,
-			"./header.js"
-		],
+		"header/header": [2, "./header.js"],
 		"no-tabs": [
 			"error",
 			{
 				"allowIndentationTabs": true
 			}
 		],
-		"no-trailing-spaces": [
-			"warn"
-		],
-		"object-curly-spacing": [
-			"error",
-			"always"
-		],
+		"no-trailing-spaces": ["warn"],
+		"object-curly-spacing": ["error", "always"],
 		"quotes": [
 			"error",
 			"single",
@@ -112,10 +84,7 @@
 		],
 		"react-hooks/rules-of-hooks": "error",
 		"react-hooks/exhaustive-deps": "warn",
-		"semi": [
-			2,
-			"always"
-		],
+		"semi": [2, "always"],
 		"switch-colon-spacing": [
 			"error",
 			{
@@ -126,10 +95,7 @@
 		"react/require-default-props": "off",
 		"no-shadow": "off",
 		"@typescript-eslint/no-shadow": "warn",
-		"sonarjs/cognitive-complexity": [
-			"error",
-			20
-		],
+		"sonarjs/cognitive-complexity": ["error", 20],
 		"no-restricted-globals": "off",
 		"import/no-default-export": "error"
 	},
