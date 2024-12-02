@@ -4,20 +4,15 @@
 
 'use client';
 
-// TODO: Replace this Button import with Shadcn Ui's Button component
-// import { Button } from '@nextui-org/button';
+import { Button } from '@/app/_shared-components/Button';
 import Link from 'next/link';
 import React from 'react';
 
 function RootError({ error, reset }: { error: Error; reset: () => void }) {
 	return (
-		// eslint-disable-next-line prettier/prettier
 		<section className='flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border border-primary_border p-8'>
 			<h2 className='font-semibold'>There was a problem :(</h2>
-			{
-				// eslint-disable-next-line prettier/prettier
-				<p className='py-4 text-danger'>{error.message || 'Please try again.'}</p>
-			}
+			{<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>}
 			<small>
 				Please try again or{' '}
 				<a
@@ -29,13 +24,13 @@ function RootError({ error, reset }: { error: Error; reset: () => void }) {
 				if the problem persists.
 			</small>
 			<div className='flex flex-col items-center gap-3'>
-				{/* <Button
+				<Button
 					onClick={reset}
 					color='primary'
 					size='sm'
 				>
 					Try again
-				</Button> */}
+				</Button>
 				<Link
 					href='/'
 					className='text-sm underline'

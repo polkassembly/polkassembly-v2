@@ -1,17 +1,26 @@
-// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
-// This software may be modified and distributed under the terms
-// of the Apache-2.0 license. See the LICENSE file for details.
+import React from 'react';
+import { Loader2 } from 'lucide-react';
 
-// TODO: Replace this Spinner import with Shadcn Ui's Spinner component
-// import { Spinner } from '@nextui-org/spinner';
-
-function LoadingSpinner({ className = '', message = 'Loading...', size = 'md' }: { className?: string; message?: string; size?: 'sm' | 'md' | 'lg' }) {
-	return (
-		<div className={`${className} flex flex-col items-center justify-center gap-3`}>
-			{/* <Spinner size={size} /> */}
-			{message && <span className='text-xs'>{message}</span>}
-		</div>
-	);
+interface LoadingSpinnerProps {
+	size?: 'small' | 'medium' | 'large';
+	show?: boolean;
+	className?: string;
+	children?: React.ReactNode;
+	message?: string;
 }
 
-export default LoadingSpinner;
+export function LoadingSpinner({ size = 'medium', show = true, className, children, message }: LoadingSpinnerProps) {
+	const sizeClasses = {
+		small: 'size-6',
+		medium: 'size-8',
+		large: 'size-12'
+	};
+
+	return show ? (
+		<span className={`flex flex-col items-center justify-center ${className}`}>
+			<Loader2 className={`animate-spin text-primary ${sizeClasses[size]}`} />
+			{message && <span className='mt-2 text-xs text-gray-500'>{message}</span>}
+			{children}
+		</span>
+	) : null;
+}
