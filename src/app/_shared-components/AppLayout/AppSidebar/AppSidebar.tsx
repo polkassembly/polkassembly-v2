@@ -1,21 +1,22 @@
 import React from 'react'
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader } from '../sidebar'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader } from '@ui/sidebar'
 import Image from 'next/image'
 import polkassemblyLogo from '@assets/logos/Polkassembly-logo.png';
-import { Separator } from '../separator';
+import { Separator } from '../../separator';
+import classes from './AppSidebar.module.scss';
 
 const AppSidebar = () => {
   return (
     <Sidebar>
-      <SidebarHeader className='px-6 justify-center h-[60px]'>
+      <SidebarHeader className={classes.sidebar_header}>
         <Image src={polkassemblyLogo} width={110} alt='polkassembly logo' />
       </SidebarHeader>
-      <Separator className='bg-border_grey' />
+      <Separator className={classes.separator} />
       <SidebarContent>
         <SidebarGroup />
         <SidebarGroup />
       </SidebarContent>
-      <SidebarFooter />s
+      <SidebarFooter />
     </Sidebar>
   )
 }

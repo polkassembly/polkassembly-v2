@@ -9,8 +9,8 @@ import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
 import { SidebarProvider } from './_shared-components/sidebar';
-import AppSidebar from './_shared-components/AppLayout/AppSidebar';
-import Navbar from './_shared-components/AppLayout/Navbar';
+import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
+import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
