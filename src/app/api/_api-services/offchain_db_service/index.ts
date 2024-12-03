@@ -66,7 +66,9 @@ export class OffChainDbService {
 		const posts = await FirestoreService.GetOffChainPostsListing({ network, proposalType, limit, page });
 		if (posts.length) return posts;
 
-		// TODO: add fallback for subsquare
+		const subsquarePosts = await SubsquareOffChainService.GetOffChainPostsListing({ network, proposalType, limit, page });
+		if (subsquarePosts.length) return subsquarePosts;
+
 		return [];
 	}
 

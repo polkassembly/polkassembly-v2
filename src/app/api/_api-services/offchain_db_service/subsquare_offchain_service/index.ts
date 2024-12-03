@@ -7,8 +7,11 @@ import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { ENetwork, EProposalType, IOffChainPost } from '@/_shared/types';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+// TODO: IMPLEMENT THIS
 export class SubsquareOffChainService {
-	private static urlMap = {
+	private static postDetailsUrlMap = {
 		[EProposalType.BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/bounties/${id}`,
 		[EProposalType.CHILD_BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/child-bounties/${id}`,
 		[EProposalType.COUNCIL_MOTION]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/motions/${id}`,
@@ -22,7 +25,7 @@ export class SubsquareOffChainService {
 	};
 
 	static async GetOffChainPostData({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IOffChainPost | null> {
-		const mappedUrl = this.urlMap[proposalType as keyof typeof this.urlMap]?.(indexOrHash, network);
+		const mappedUrl = this.postDetailsUrlMap[proposalType as keyof typeof this.postDetailsUrlMap]?.(indexOrHash, network);
 
 		if (!mappedUrl) {
 			return null;
@@ -61,5 +64,19 @@ export class SubsquareOffChainService {
 		};
 
 		return offChainPost;
+	}
+
+	static async GetOffChainPostsListing({
+		network,
+		proposalType,
+		limit,
+		page
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		limit: number;
+		page: number;
+	}): Promise<IOffChainPost[]> {
+		return [];
 	}
 }
