@@ -31,8 +31,7 @@
 		"plugin:jsx-a11y/recommended",
 		"plugin:prettier/recommended",
 		"plugin:sonarjs/recommended",
-		"plugin:security/recommended",
-		"plugin:react-hooks/recommended"
+		"plugin:security/recommended"
 	],
 	"rules": {
 		"@typescript-eslint/no-duplicate-enum-values": "off",
@@ -97,7 +96,8 @@
 		"@typescript-eslint/no-shadow": "warn",
 		"sonarjs/cognitive-complexity": ["error", 20],
 		"no-restricted-globals": "off",
-		"import/no-default-export": "error"
+		"import/no-default-export": "error",
+		"react/prop-types": "off"
 	},
 	"overrides": [
 		{
