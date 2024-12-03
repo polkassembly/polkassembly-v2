@@ -26,14 +26,13 @@ export default function RootLayout({
 		<html lang='en'>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<SidebarProvider open={true}>
+					<SidebarProvider open>
 						<AppSidebar />
 						<main className='w-full'>
 							<Navbar />
 							{children}
 						</main>
 						<NotificationsContainer />
-
 					</SidebarProvider>
 				</Providers>
 			</body>
