@@ -4,6 +4,7 @@
 
 import { ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@shared/types';
 import { FirestoreService } from './firestore_service';
+import { SubsquareOffChainService } from './subsquare_offchain_service';
 
 export class OffChainDbService {
 	// Read methods
@@ -45,7 +46,8 @@ export class OffChainDbService {
 		const post = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		if (post) return post;
 
-		// TODO: add fallback for subsquare
+		const subsquarePost = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
+		if (subsquarePost) return subsquarePost;
 
 		return null;
 	}
