@@ -7,7 +7,7 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { OnChainSubsquidService } from './onchain_subsquid_service';
+import { SubsquidService } from './subsquid_service';
 
 // TODO: implement fallbacks with onchain subsquare service, onchain subscan service, etc
 
@@ -18,7 +18,7 @@ export class OnChainDbService {
 		}
 
 		// fetch from subsquid
-		const subsquidOnChainPostInfo = await OnChainSubsquidService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
+		const subsquidOnChainPostInfo = await SubsquidService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
 		if (subsquidOnChainPostInfo) return subsquidOnChainPostInfo;
 
 		return null;
@@ -30,7 +30,7 @@ export class OnChainDbService {
 		}
 
 		// fetch from subsquid
-		const subsquidOnChainPostsListing = await OnChainSubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page });
+		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page });
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
 		return null;

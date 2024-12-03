@@ -10,7 +10,7 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidQueries } from './subsquidQueries';
 
-export class OnChainSubsquidService extends SubsquidQueries {
+export class SubsquidService extends SubsquidQueries {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
 

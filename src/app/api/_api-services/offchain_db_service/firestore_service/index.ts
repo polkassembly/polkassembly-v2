@@ -5,7 +5,7 @@
 import { ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@/_shared/types';
 import { FirestoreRefs } from './firestoreRefs';
 
-export class OffChainFirestoreService extends FirestoreRefs {
+export class FirestoreService extends FirestoreRefs {
 	// Read methods
 	static async GetTotalUsersCount(): Promise<number> {
 		const userDocSnapshot = await FirestoreRefs.usersCollectionRef().get();

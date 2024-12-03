@@ -20,8 +20,6 @@ try {
 		firebaseAdmin.initializeApp({
 			credential: firebaseAdmin.credential.cert(JSON.parse(FIREBASE_SERVICE_ACC_CONFIG))
 		});
-
-		console.log('\n============= firebase-admin Initialised. =============\n');
 	}
 } catch (error: unknown) {
 	console.error('\nError in initialising firebase-admin: ', error, '\n');
