@@ -1,3 +1,7 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
@@ -58,8 +62,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			<Comp
 				className={cn(
 					'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-					buttonVariants[variant],
-					buttonSizes[size],
+					buttonVariants[variant as keyof typeof buttonVariants],
+					buttonSizes[size as keyof typeof buttonSizes],
 					fullWidth && 'w-full',
 					isLoading && 'cursor-not-allowed opacity-70',
 					className
