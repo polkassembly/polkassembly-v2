@@ -2,15 +2,17 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = {
-	default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
+	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
 	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
 	outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-	secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
+	secondary: 'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border shadow-sm hover:bg-btn_secondary_background/80',
 	ghost: 'hover:bg-accent hover:text-accent-foreground',
 	link: 'text-primary underline-offset-4 hover:underline'
 };
