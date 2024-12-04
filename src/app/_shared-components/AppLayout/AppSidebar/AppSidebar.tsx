@@ -21,7 +21,7 @@ import Foot4 from '../../../../_assets/sidebar/foot4.svg';
 import Home from '../../../../_assets/sidebar/homeicon-selected.svg';
 
 import DynamicImageGrid from '../DynamicImageGrid';
-import { NavMain } from '../../nav-main';
+import { NavMain } from '../../NavItems';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
