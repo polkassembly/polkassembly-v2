@@ -1,104 +1,57 @@
-// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
-// This software may be modified and distributed under the terms
-// of the Apache-2.0 license. See the LICENSE file for details.
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-'use client';
+import { cn } from "@/lib/utils"
 
-import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { cn } from '@/lib/utils';
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "h-9 w-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
-const buttonVariants = {
-	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
-	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-	outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-	secondary: 'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border shadow-sm hover:bg-btn_secondary_background/80',
-	ghost: 'hover:bg-accent hover:text-accent-foreground',
-	link: 'text-primary underline-offset-4 hover:underline'
-};
-
-const buttonSizes = {
-	default: 'h-9 px-4 py-2',
-	sm: 'h-8 rounded-md px-3 text-xs',
-	lg: 'h-10 rounded-md px-8',
-	icon: 'h-9 w-9'
-};
-
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: keyof typeof buttonVariants;
-	size?: keyof typeof buttonSizes;
-	asChild?: boolean;
-	isLoading?: boolean;
-	leftIcon?: React.ReactNode;
-	rightIcon?: React.ReactNode;
-	fullWidth?: boolean;
-	disabledTooltip?: string;
-	ariaLabel?: string;
-	loadingText?: string;
-	onClick?: React.MouseEventHandler<HTMLButtonElement>;
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	(
-		{
-			className,
-			variant = 'default',
-			size = 'default',
-			asChild = false,
-			isLoading = false,
-			leftIcon,
-			rightIcon,
-			fullWidth = false,
-			disabledTooltip = 'This action is disabled',
-			ariaLabel,
-			loadingText,
-			onClick,
-			children,
-			...props
-		},
-		ref
-	) => {
-		const Comp = asChild ? Slot : 'button';
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
 
-		return (
-			<Comp
-				className={cn(
-					'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-					buttonVariants[variant as keyof typeof buttonVariants],
-					buttonSizes[size as keyof typeof buttonSizes],
-					fullWidth && 'w-full',
-					isLoading && 'cursor-not-allowed opacity-70',
-					className
-				)}
-				ref={ref}
-				disabled={isLoading || props.disabled}
-				aria-disabled={isLoading || props.disabled}
-				aria-label={ariaLabel || children?.toString() || 'Button'}
-				data-tooltip={props.disabled && disabledTooltip}
-				onClick={(event) => {
-					if (!isLoading && onClick) {
-						onClick(event);
-					}
-				}}
-				{...props}
-			>
-				{isLoading ? (
-					<>
-						<span className='loader h-4 w-4 animate-spin rounded-full border-2 border-t-transparent' />
-						{loadingText && <span>{loadingText}</span>}
-					</>
-				) : (
-					<>
-						{leftIcon && <span className='mr-2'>{leftIcon}</span>}
-						{children}
-						{rightIcon && <span className='ml-2'>{rightIcon}</span>}
-					</>
-				)}
-			</Comp>
-		);
-	}
-);
-
-Button.displayName = 'Button';
-
-export { Button };
+export { Button, buttonVariants }

@@ -6,11 +6,13 @@
 
 import * as React from 'react';
 import { AudioWaveform, BookOpen, Bot, Command, Frame, GalleryVerticalEnd, Map, PieChart, Settings2, SquareTerminal } from 'lucide-react';
-import { NavMain } from '../../nav-main';
-import { NavProjects } from '../../nav-projects';
-import { NavUser } from '../../nav-user';
-import { TeamSwitcher } from '../../team-switcher';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '../../sidebar';
+
+import { NavMain } from '@/app/_shared-components//nav-main';
+import { NavProjects } from '@/app/_shared-components//nav-projects';
+import { NavUser } from '@/app/_shared-components//nav-user';
+import { TeamSwitcher } from '@/app/_shared-components//team-switcher';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/app/_shared-components//sidebar';
+
 // This is sample data.
 const data = {
 	user: {
@@ -140,6 +142,7 @@ const data = {
 		}
 	]
 };
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar

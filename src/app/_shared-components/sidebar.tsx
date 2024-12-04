@@ -24,8 +24,9 @@ const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
+const COLLAPSIBLE_ICON_HIDDEN = 'group-data-[collapsible=icon]:hidden';
 
-type SidebarContext = {
+type SidebarContextType = {
 	state: 'expanded' | 'collapsed';
 	open: boolean;
 	setOpen: (open: boolean) => void;
@@ -35,8 +36,7 @@ type SidebarContext = {
 	toggleSidebar: () => void;
 };
 
-// eslint-disable-next-line no-redeclare
-const SidebarContext = React.createContext<SidebarContext | null>(null);
+const SidebarContext = React.createContext<SidebarContextType | null>(null);
 
 function useSidebar() {
 	const context = React.useContext(SidebarContext);
@@ -79,7 +79,7 @@ const SidebarProvider = React.forwardRef<
 
 	// Helper to toggle the sidebar.
 	const toggleSidebar = React.useCallback(() => {
-		return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
+		return isMobile ? setOpenMobile((mobileOpen) => !mobileOpen) : setOpen((sidebarOpen) => !sidebarOpen);
 	}, [isMobile, setOpen, setOpenMobile]);
 
 	// Adds a keyboard shortcut to toggle the sidebar.
@@ -99,7 +99,7 @@ const SidebarProvider = React.forwardRef<
 	// This makes it easier to style the sidebar with Tailwind classes.
 	const state = open ? 'expanded' : 'collapsed';
 
-	const contextValue = React.useMemo<SidebarContext>(
+	const contextValue = React.useMemo<SidebarContextType>(
 		() => ({
 			state,
 			open,
@@ -210,7 +210,7 @@ const Sidebar = React.forwardRef<
 					// Adjust the padding for floating and inset variants.
 					variant === 'floating' || variant === 'inset'
 						? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]'
-						: 'border-border_grey group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l',
+						: 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l',
 					className
 				)}
 				{...props}
@@ -237,6 +237,7 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
 			variant='ghost'
 			size='icon'
 			className={cn('h-7 w-7', className)}
+			type='button'
 			onClick={(event) => {
 				onClick?.(event);
 				toggleSidebar();
@@ -254,7 +255,6 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<'bu
 	const { toggleSidebar } = useSidebar();
 
 	return (
-		// eslint-disable-next-line react/button-has-type
 		<button
 			ref={ref}
 			data-sidebar='rail'
@@ -262,6 +262,7 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<'bu
 			tabIndex={-1}
 			onClick={toggleSidebar}
 			title='Toggle Sidebar'
+			type='button'
 			className={cn(
 				'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
 				'[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
@@ -392,9 +393,7 @@ const SidebarGroupAction = React.forwardRef<HTMLButtonElement, React.ComponentPr
 			className={cn(
 				'absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
 				// Increases the hit area of the button on mobile.
-				'after:absolute after:-inset-2 after:md:hidden',
-				// eslint-disable-next-line sonarjs/no-duplicate-string
-				'group-data-[collapsible=icon]:hidden',
+				COLLAPSIBLE_ICON_HIDDEN,
 				className
 			)}
 			{...props}
@@ -481,12 +480,7 @@ const SidebarMenuButton = React.forwardRef<
 		return button;
 	}
 
-	if (typeof tooltip === 'string') {
-		// eslint-disable-next-line no-param-reassign
-		tooltip = {
-			children: tooltip
-		};
-	}
+	const tooltipProps = typeof tooltip === 'string' ? { children: tooltip } : tooltip;
 
 	return (
 		<Tooltip>
@@ -495,7 +489,7 @@ const SidebarMenuButton = React.forwardRef<
 				side='right'
 				align='center'
 				hidden={state !== 'collapsed' || isMobile}
-				{...tooltip}
+				{...tooltipProps}
 			/>
 		</Tooltip>
 	);
@@ -522,7 +516,7 @@ const SidebarMenuAction = React.forwardRef<
 				'peer-data-[size=sm]/menu-button:top-1',
 				'peer-data-[size=default]/menu-button:top-1.5',
 				'peer-data-[size=lg]/menu-button:top-2.5',
-				'group-data-[collapsible=icon]:hidden',
+				COLLAPSIBLE_ICON_HIDDEN,
 				showOnHover &&
 					'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0',
 				className
@@ -543,7 +537,7 @@ const SidebarMenuBadge = React.forwardRef<HTMLDivElement, React.ComponentProps<'
 			'peer-data-[size=sm]/menu-button:top-1',
 			'peer-data-[size=default]/menu-button:top-1.5',
 			'peer-data-[size=lg]/menu-button:top-2.5',
-			'group-data-[collapsible=icon]:hidden',
+			COLLAPSIBLE_ICON_HIDDEN,
 			className
 		)}
 		{...props}
@@ -593,7 +587,7 @@ const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'
 	<ul
 		ref={ref}
 		data-sidebar='menu-sub'
-		className={cn('mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5', 'group-data-[collapsible=icon]:hidden', className)}
+		className={cn('mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5', COLLAPSIBLE_ICON_HIDDEN, className)}
 		{...props}
 	/>
 ));
@@ -628,7 +622,7 @@ const SidebarMenuSubButton = React.forwardRef<
 				'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
 				size === 'sm' && 'text-xs',
 				size === 'md' && 'text-sm',
-				'group-data-[collapsible=icon]:hidden',
+				COLLAPSIBLE_ICON_HIDDEN,
 				className
 			)}
 			{...props}
