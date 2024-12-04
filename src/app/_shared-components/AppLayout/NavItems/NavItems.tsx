@@ -23,7 +23,7 @@ export function NavMain({
 }: {
 	sections: {
 		initalItems?: {
-			title: string;
+			title?: string;
 			url: string;
 			icon?: string;
 			isActive?: boolean;

@@ -68,9 +68,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					],
 					count: 8
 				}
-			]
-		},
-		{
+			],
 			title: 'Main',
 			items: [
 				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
@@ -82,15 +80,24 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					url: '/bounty',
 					icon: Foot1,
 					items: [
-						{ title: 'Bounty Dashboard', url: '/bounty/dashboard' },
+						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 1 },
 						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
 					],
 					count: 8
 				}
+			],
+			endItems: [
+				{
+					title: 'Settings',
+					url: '/settings',
+					icon: '/icons/settings.svg'
+				},
+				{
+					title: 'Help',
+					url: '/help',
+					icon: '/icons/help.svg'
+				}
 			]
-		},
-		{
-			endItems: [{ title: 'End', url: '/end', icon: Home, isActive: true, count: 5 }]
 		}
 	];
 	const headerData = [
