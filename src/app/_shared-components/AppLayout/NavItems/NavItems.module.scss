@@ -1,0 +1,25 @@
+/* Hide scrollbar but allow scrolling */
+.hide_scrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+	overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.hide_scrollbar::-webkit-scrollbar {
+	width: 0; /* Chrome/Brave */
+	height: 0;
+}
+
+/* Optional: Custom scrollbars */
+.custom_scrollbar::-webkit-scrollbar {
+	width: 8px;
+}
+
+.custom_scrollbar::-webkit-scrollbar-thumb {
+	background: #ccc; /* Thumb color */
+	border-radius: 10px; /* Rounded corners */
+}
+
+.custom_scrollbar::-webkit-scrollbar-track {
+	background: transparent; /* Track background */
+}

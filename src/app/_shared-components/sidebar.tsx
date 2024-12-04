@@ -323,7 +323,8 @@ const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentProps<'di
 		<div
 			ref={ref}
 			data-sidebar='content'
-			className={cn('flex min-h-0 flex-1 flex-col items-center gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden', className)}
+			className={cn('hide_scrollbar my-2 flex min-h-0 flex-1 flex-col items-center gap-2', className)}
+			style={{ height: 'calc(100vh - 60px)' }}
 			{...props}
 		/>
 	);

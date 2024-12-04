@@ -27,7 +27,7 @@
 }
 
 @layer base {
-  :root {
+	:root {
 		--sidebar-background: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;
 		--sidebar-primary: 240 5.9% 10%;
@@ -37,7 +37,7 @@
 		--sidebar-border: 220 13% 91%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
 	}
-  .dark {
+	.dark {
 		--sidebar-background: 240 5.9% 10%;
 		--sidebar-foreground: 240 4.8% 95.9%;
 		--sidebar-primary: 224.3 76.3% 48%;
@@ -50,10 +50,30 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+	* {
+		@apply border-border;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
 	}
+}
+
+.hide_scrollbar {
+	overflow-y: auto; /* Enable vertical scrolling */
+	overflow-x: hidden; /* Prevent horizontal scrolling */
+	-ms-overflow-style: none; /* IE/Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+.hide_scrollbar::-webkit-scrollbar {
+	width: 0; /* Chrome/Brave */
+	height: 0;
+}
+
+.collapsed-sidebar .menu-item span {
+	display: none; /* Hide text in collapsed state */
+}
+
+.collapsed-sidebar img {
+	margin: auto; /* Center align icons */
 }

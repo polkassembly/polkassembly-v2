@@ -8,16 +8,29 @@ import AppSidebar from '@/app/_shared-components/AppLayout/AppSidebar/AppSidebar
 import { SidebarInset, SidebarTrigger, useSidebar } from '@/app/_shared-components/sidebar';
 import Navbar from '@/app/_shared-components/AppLayout/Navbar/Navbar';
 import React from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
 	const { state } = useSidebar();
+	const isMobile = useIsMobile();
 	return (
 		<div className='relative flex flex-1'>
 			{/* Sidebar */}
 			<AppSidebar />
 
 			{/* Sidebar Trigger */}
-			<div className={`absolute ${state === 'collapsed' ? 'left-16' : 'left-60'} top-10 z-50`}>
+			<div
+				className={cn(
+					'', // Base styles
+					!isMobile
+						? state === 'collapsed'
+							? 'absolute left-16 top-10 z-50 transition-all duration-200 ease-in-out'
+							: 'absolute left-60 top-10 z-50 transition-all duration-200 ease-in-out'
+						: 'ml-4 mt-4'
+				)}
+			>
+				{' '}
 				<SidebarTrigger />
 			</div>
 

@@ -1,7 +1,19 @@
 .sidebar_header {
-    @apply px-6 justify-center h-[60px];
+	@apply h-[60px] justify-center px-6;
+	background-color: black;
 }
 
 .separator {
-    @apply bg-border_grey;
+	@apply bg-border_grey;
+}
+
+.hide_scrollbar {
+	-ms-overflow-style: none; /* For Internet Explorer and Edge */
+	scrollbar-width: none; /* For Firefox */
+	overflow-y: auto; /* Enables vertical scrolling */
+}
+
+.hide_scrollbar::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
 }

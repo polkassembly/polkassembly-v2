@@ -21,7 +21,7 @@ import Foot4 from '../../../../_assets/sidebar/foot4.svg';
 import Home from '../../../../_assets/sidebar/homeicon-selected.svg';
 
 import DynamicImageGrid from '../DynamicImageGrid';
-import { NavMain } from '../../NavItems';
+import { NavMain } from '../NavItems/NavItems';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -65,8 +65,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				{ title: 'On-chain Bounties', url: '/bounty/onchain' }
 			],
 			count: 8
-		},
-		{ title: 'Batch Voting', url: '/batch-voting', icon: Foot1 }
+		}
 	];
 	const headerData = [
 		{ src: Head1, alt: 'Head 1', bgColor: 'bg-[#F3F9D7]', tooltip: 'Tooltip 1' },
@@ -94,20 +93,10 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 			<hr className='text-[#D2D8E0]' />
 
-			<SidebarContent className='mt-5'>
-				{generateGridData(headerData)}
+			<div className='mt-5'>{generateGridData(headerData)}</div>
+
+			<SidebarContent>
 				<NavMain items={data} />
-				<div className='w-full px-5'>
-					<div
-						style={{
-							borderTop: '2px dotted #ccc',
-							paddingTop: '15px'
-						}}
-						className='flex items-center dark:border-[#4B4B4B]'
-					>
-						<span className='text-lightBlue dark:text-icon-dark-inactive text-xs font-medium uppercase'>Tracks</span>
-					</div>
-				</div>
 			</SidebarContent>
 
 			<SidebarFooter className='mb-3'>{generateGridData(footerData)}</SidebarFooter>
