@@ -6,7 +6,16 @@
 
 import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/collapsible';
-import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/app/_shared-components/sidebar';
+import {
+	SidebarGroup,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
+	useSidebar
+} from '@/app/_shared-components/sidebar';
 import Image from 'next/image';
 
 export function NavMain({
@@ -24,6 +33,7 @@ export function NavMain({
 		}[];
 	}[];
 }) {
+	const { state } = useSidebar();
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
@@ -36,7 +46,10 @@ export function NavMain({
 					>
 						<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
 							<CollapsibleTrigger asChild>
-								<SidebarMenuButton tooltip={item.title}>
+								<SidebarMenuButton
+									size={state === 'collapsed' ? 'lg' : 'default'}
+									tooltip={item.title}
+								>
 									{item.icon && (
 										<Image
 											src={item.icon}
