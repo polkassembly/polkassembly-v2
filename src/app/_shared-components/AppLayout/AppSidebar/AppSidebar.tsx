@@ -124,6 +124,8 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className='flex items-center justify-center'>{getLogo()}</div>
 			</SidebarHeader>
 
+			<hr className='text-[#D2D8E0]' />
+
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
 			<SidebarContent>
