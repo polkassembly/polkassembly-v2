@@ -2,10 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader } from '@/app/_shared-components/Sidebar';
 import Image from 'next/image';
 import polkassemblyLogo from '@assets/logos/Polkassembly-logo.png';
 import { Separator } from '@ui/Separator';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader } from '@ui/Sidebar';
 import classes from './AppSidebar.module.scss';
 
 function AppSidebar() {
