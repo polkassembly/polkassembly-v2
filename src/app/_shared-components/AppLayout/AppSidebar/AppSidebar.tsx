@@ -4,159 +4,115 @@
 
 'use client';
 
-import * as React from 'react';
-import { AudioWaveform, BookOpen, Bot, Command, Frame, GalleryVerticalEnd, Map, PieChart, Settings2, SquareTerminal } from 'lucide-react';
+import Image from 'next/image';
+import React from 'react';
+import { useTheme } from 'next-themes';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '../../sidebar';
+import PaLogo from '../PaLogo';
+import PaLogoDark from '../../../../_assets/logos/PALogoDark.svg';
+import Head1 from '../../../../_assets/sidebar/head1.svg';
+import Head2 from '../../../../_assets/sidebar/head2.svg';
+import Head3 from '../../../../_assets/sidebar/head3.svg';
+import Head4 from '../../../../_assets/sidebar/head4.svg';
+import Foot1 from '../../../../_assets/sidebar/foot1.svg';
+import Foot2 from '../../../../_assets/sidebar/foot2.svg';
+import Foot3 from '../../../../_assets/sidebar/foot3.svg';
+import Foot4 from '../../../../_assets/sidebar/foot4.svg';
+import Home from '../../../../_assets/sidebar/homeicon-selected.svg';
+
+import DynamicImageGrid from '../DynamicImageGrid';
 import { NavMain } from '../../nav-main';
-import { NavProjects } from '../../nav-projects';
-import { NavUser } from '../../nav-user';
-import { TeamSwitcher } from '../../team-switcher';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '../../sidebar';
-// This is sample data.
-const data = {
-	user: {
-		name: 'shadcn',
-		email: 'm@example.com',
-		avatar: '/avatars/shadcn.jpg'
-	},
-	teams: [
-		{
-			name: 'Acme Inc',
-			logo: GalleryVerticalEnd,
-			plan: 'Enterprise'
-		},
-		{
-			name: 'Acme Corp.',
-			logo: AudioWaveform,
-			plan: 'Startup'
-		},
-		{
-			name: 'Evil Corp.',
-			logo: Command,
-			plan: 'Free'
+
+function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+	const { state } = useSidebar();
+	const { resolvedTheme: theme } = useTheme();
+
+	const getLogo = () => {
+		if (theme === 'light') {
+			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
 		}
-	],
-	navMain: [
-		{
-			title: 'Playground',
-			url: '#',
-			icon: SquareTerminal,
-			isActive: true,
-			items: [
-				{
-					title: 'History',
-					url: '#'
-				},
-				{
-					title: 'Starred',
-					url: '#'
-				},
-				{
-					title: 'Settings',
-					url: '#'
-				}
-			]
-		},
-		{
-			title: 'Models',
-			url: '#',
-			icon: Bot,
-			items: [
-				{
-					title: 'Genesis',
-					url: '#'
-				},
-				{
-					title: 'Explorer',
-					url: '#'
-				},
-				{
-					title: 'Quantum',
-					url: '#'
-				}
-			]
-		},
-		{
-			title: 'Documentation',
-			url: '#',
-			icon: BookOpen,
-			items: [
-				{
-					title: 'Introduction',
-					url: '#'
-				},
-				{
-					title: 'Get Started',
-					url: '#'
-				},
-				{
-					title: 'Tutorials',
-					url: '#'
-				},
-				{
-					title: 'Changelog',
-					url: '#'
-				}
-			]
-		},
-		{
-			title: 'Settings',
-			url: '#',
-			icon: Settings2,
-			items: [
-				{
-					title: 'General',
-					url: '#'
-				},
-				{
-					title: 'Team',
-					url: '#'
-				},
-				{
-					title: 'Billing',
-					url: '#'
-				},
-				{
-					title: 'Limits',
-					url: '#'
-				}
-			]
+		if (state === 'expanded') {
+			return (
+				<Image
+					src={PaLogoDark}
+					alt='Polkassembly Logo'
+				/>
+			);
 		}
-	],
-	projects: [
+		return <PaLogo variant='compact' />;
+	};
+
+	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (
+		<DynamicImageGrid
+			items={data}
+			rowSize={2}
+			tooltipPosition='top'
+			isExpanded={state === 'expanded'}
+		/>
+	);
+
+	const data = [
+		{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
+		{ title: 'Discussions', url: '/discussions', icon: Foot1 },
+		{ title: 'Preimages', url: '/preimages', icon: Foot1, count: 2 },
+		{ title: 'Delegation', url: '/delegation', icon: Foot1 },
 		{
-			name: 'Design Engineering',
-			url: '#',
-			icon: Frame
+			title: 'Bounty',
+			url: '/bounty',
+			icon: Foot1,
+			items: [
+				{ title: 'Bounty Dashboard', url: '/bounty/dashboard' },
+				{ title: 'On-chain Bounties', url: '/bounty/onchain' }
+			],
+			count: 8
 		},
-		{
-			name: 'Sales & Marketing',
-			url: '#',
-			icon: PieChart
-		},
-		{
-			name: 'Travel',
-			url: '#',
-			icon: Map
-		}
-	]
-};
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+		{ title: 'Batch Voting', url: '/batch-voting', icon: Foot1 }
+	];
+	const headerData = [
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-[#F3F9D7]', tooltip: 'Tooltip 1' },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-[#fdf8e1]', tooltip: 'Tooltip 2' },
+		{ src: Head3, alt: 'Head 3', bgColor: 'bg-[#ffede5]', tooltip: 'Tooltip 3' },
+		{ src: Head4, alt: 'Head 4', bgColor: 'bg-[#dff4ff]', tooltip: 'Tooltip 4' }
+	];
+
+	const bgColor = 'bg-[#F3F4F6]';
+	const footerData = [
+		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'Tooltip 1' },
+		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Tooltip 2' },
+		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Tooltip 3' },
+		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Tooltip 4' }
+	];
+
 	return (
 		<Sidebar
 			collapsible='icon'
 			{...props}
 		>
 			<SidebarHeader>
-				<TeamSwitcher teams={data.teams} />
+				<div className='flex items-center justify-center'>{getLogo()}</div>
 			</SidebarHeader>
-			<SidebarContent>
-				<NavMain items={data.navMain} />
-				<NavProjects projects={data.projects} />
+
+			<hr className='text-[#D2D8E0]' />
+
+			<SidebarContent className='mt-5'>
+				{generateGridData(headerData)}
+				<NavMain items={data} />
+				<div className='w-full px-5'>
+					<div
+						style={{
+							borderTop: '2px dotted #ccc',
+							paddingTop: '15px'
+						}}
+						className='flex items-center dark:border-[#4B4B4B]'
+					>
+						<span className='text-lightBlue dark:text-icon-dark-inactive text-xs font-medium uppercase'>Tracks</span>
+					</div>
+				</div>
 			</SidebarContent>
-			<SidebarFooter>
-				<NavUser user={data.user} />
-			</SidebarFooter>
-			<SidebarRail />
+
+			<SidebarFooter className='mb-3'>{generateGridData(footerData)}</SidebarFooter>
 		</Sidebar>
 	);
 }
+
+export default AppSidebar;

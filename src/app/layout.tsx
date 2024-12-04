@@ -8,9 +8,7 @@ import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { SidebarProvider, SidebarInset } from './_shared-components/sidebar';
-import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
-import { AppSidebar } from './_shared-components/AppLayout/AppSidebar/AppSidebar';
+import { SidebarProvider } from './_shared-components/sidebar';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -27,18 +25,7 @@ export default function RootLayout({
 			<body className={`${poppinsFont.className} flex min-h-screen flex-col`}>
 				<Providers>
 					<SidebarProvider>
-						<div className='flex flex-1'>
-							{/* Sidebar */}
-							<AppSidebar />
-							{/* Main Content Area */}
-							<SidebarInset>
-								{/* Navbar */}
-								<Navbar />
-								{/* Main Content */}
-								<main className='flex flex-1 flex-col p-4'>{children}</main>
-							</SidebarInset>
-						</div>
-						{/* Notifications */}
+						{children}
 						<NotificationsContainer />
 					</SidebarProvider>
 				</Providers>

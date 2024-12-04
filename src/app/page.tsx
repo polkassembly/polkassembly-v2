@@ -3,11 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Button } from '@ui/Button';
+import Dashboard from './_shared-components/AppLayout/Dashboard/page';
 
 export default function Home() {
 	return (
-		<div className='text-center leading-10'>
-			Polkassembly <Button variant='secondary'>hello</Button>{' '}
-		</div>
+		<Dashboard>
+			<div className='text-center'>
+				Polkassembly <Button variant='secondary'>hello</Button>{' '}
+			</div>
+		</Dashboard>
 	);
 }
