@@ -5,7 +5,7 @@ import React from 'react';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader } from '@/app/_shared-components/Sidebar';
 import Image from 'next/image';
 import polkassemblyLogo from '@assets/logos/Polkassembly-logo.png';
-import { Separator } from '@/app/_shared-components/Separator';
+import { Separator } from '@ui/Separator';
 import classes from './AppSidebar.module.scss';
 
 function AppSidebar() {
