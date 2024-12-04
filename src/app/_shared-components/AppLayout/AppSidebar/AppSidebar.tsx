@@ -52,19 +52,45 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	);
 
 	const data = [
-		{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
-		{ title: 'Discussions', url: '/discussions', icon: Foot1 },
-		{ title: 'Preimages', url: '/preimages', icon: Foot1, count: 2 },
-		{ title: 'Delegation', url: '/delegation', icon: Foot1 },
 		{
-			title: 'Bounty',
-			url: '/bounty',
-			icon: Foot1,
+			initalItems: [
+				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
+				{ title: 'Discussions', url: '/discussions', icon: Foot1 },
+				{ title: 'Preimages', url: '/preimages', icon: Foot1, count: 2 },
+				{ title: 'Delegation', url: '/delegation', icon: Foot1 },
+				{
+					title: 'Bounty',
+					url: '/bounty',
+					icon: Foot1,
+					items: [
+						{ title: 'Bounty Dashboard', url: '/bounty/dashboard' },
+						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
+					],
+					count: 8
+				}
+			]
+		},
+		{
+			title: 'Main',
 			items: [
-				{ title: 'Bounty Dashboard', url: '/bounty/dashboard' },
-				{ title: 'On-chain Bounties', url: '/bounty/onchain' }
-			],
-			count: 8
+				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
+				{ title: 'Discussions', url: '/discussions', icon: Foot1 },
+				{ title: 'Preimages', url: '/preimages', icon: Foot1, count: 2 },
+				{ title: 'Delegation', url: '/delegation', icon: Foot1 },
+				{
+					title: 'Bounty',
+					url: '/bounty',
+					icon: Foot1,
+					items: [
+						{ title: 'Bounty Dashboard', url: '/bounty/dashboard' },
+						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
+					],
+					count: 8
+				}
+			]
+		},
+		{
+			endItems: [{ title: 'End', url: '/end', icon: Home, isActive: true, count: 5 }]
 		}
 	];
 	const headerData = [
@@ -91,12 +117,10 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className='flex items-center justify-center'>{getLogo()}</div>
 			</SidebarHeader>
 
-			<hr className='text-[#D2D8E0]' />
-
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
 			<SidebarContent>
-				<NavMain items={data} />
+				<NavMain sections={data} />
 			</SidebarContent>
 
 			<SidebarFooter className='mb-3'>{generateGridData(footerData)}</SidebarFooter>
