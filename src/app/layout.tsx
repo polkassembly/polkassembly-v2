@@ -8,7 +8,7 @@ import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { SidebarProvider } from './_shared-components/sidebar';
+import { SidebarProvider } from './_shared-components/Sidebar';
 import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
 import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 

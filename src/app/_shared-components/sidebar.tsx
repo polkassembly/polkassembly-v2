@@ -12,11 +12,11 @@ import { PanelLeft } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Button } from '@/app/_shared-components//Button';
-import { Input } from '@/app/_shared-components//input';
-import { Separator } from '@/app/_shared-components//separator';
-import { Sheet, SheetContent } from '@/app/_shared-components//sheet';
-import { Skeleton } from '@/app/_shared-components//skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components//tooltip';
+import { Input } from '@/app/_shared-components//Input';
+import { Separator } from '@/app/_shared-components/Separator';
+import { Sheet, SheetContent } from '@/app/_shared-components/Sheet';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
