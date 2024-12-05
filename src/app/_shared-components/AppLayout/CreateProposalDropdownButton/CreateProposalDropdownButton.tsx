@@ -7,7 +7,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { FileText, ClipboardList, MessageCircle, ChevronDown } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover';
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import style from './CreateProposalDropdownButton.module.scss';
 
