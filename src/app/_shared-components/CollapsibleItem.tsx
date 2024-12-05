@@ -4,70 +4,123 @@
 
 'use client';
 
+import React, { useState } from 'react';
 import Image from 'next/image';
-import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from './sidebar';
 
 interface Item {
-	title: string;
+	title?: string;
+	url?: string;
 	icon?: string;
+	isActive?: boolean;
 	count?: number;
-	items?: { title: string; url: string; count?: number }[];
+	items?: Item[];
 }
 
-function CollapsibleItem({ item }: { item: Item }) {
-	const [isOpen, setIsOpen] = React.useState(false);
+type State = 'collapsed' | 'expanded';
+
+function CollapsibleItem({ item, state }: { item: Item; state: State }) {
+	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<Collapsible
-			asChild
-			open={isOpen}
-			onOpenChange={setIsOpen} // Update local state on change
-			className='group/collapsible'
-		>
-			<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
-				<CollapsibleTrigger asChild>
-					<SidebarMenuButton
-						size='default'
-						tooltip={item.title}
-					>
-						{item.icon && (
-							<Image
-								src={item.icon}
-								alt={item.icon}
-								className='h-6 w-6'
-								width={5}
-								height={5}
-							/>
+		<SidebarMenuItem>
+			{state === 'collapsed' ? (
+				<div className='flex flex-col items-center'>
+					<Popover>
+						<PopoverTrigger asChild>
+							<SidebarMenuButton
+								size='lg'
+								tooltip={item.title}
+							>
+								{item.icon && (
+									<Image
+										src={item.icon}
+										alt={item.icon}
+										className='h-6 w-6'
+										width={5}
+										height={5}
+									/>
+								)}
+							</SidebarMenuButton>
+						</PopoverTrigger>
+						{item.items && (
+							<PopoverContent
+								side='right'
+								sideOffset={10}
+								className='w-60 rounded-md border-none bg-white shadow-md'
+							>
+								<div>
+									{item.items.map((subItem) => (
+										<div key={subItem.title}>
+											<SidebarMenuSubButton asChild>
+												<a
+													href={subItem.url}
+													className='my-2 block rounded-md py-2 hover:bg-gray-100'
+												>
+													<span className='whitespace-nowrap'>{subItem.title}</span>
+													{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
+												</a>
+											</SidebarMenuSubButton>
+										</div>
+									))}
+								</div>
+							</PopoverContent>
 						)}
-						<span className='flex-1 whitespace-nowrap'>{item.title}</span>
-						{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
-						{item.items && <ChevronRight className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />}
-					</SidebarMenuButton>
-				</CollapsibleTrigger>
-				{item.items && (
-					<CollapsibleContent>
-						<SidebarMenuSub>
-							{item.items.map((subItem) => (
-								<SidebarMenuSubItem key={subItem.title}>
-									<SidebarMenuSubButton asChild>
-										<a
-											href={subItem.url}
-											className='my-2 block rounded-md py-2 hover:bg-gray-100'
-										>
-											<span className='whitespace-nowrap'>{subItem.title}</span>
-											{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
-										</a>
-									</SidebarMenuSubButton>
-								</SidebarMenuSubItem>
-							))}
-						</SidebarMenuSub>
-					</CollapsibleContent>
-				)}
-			</SidebarMenuItem>
-		</Collapsible>
+					</Popover>
+				</div>
+			) : (
+				<Collapsible
+					asChild
+					open={isOpen}
+					onOpenChange={setIsOpen}
+					className='group/collapsible'
+				>
+					<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
+						<CollapsibleTrigger asChild>
+							<SidebarMenuButton
+								size='default'
+								tooltip={item.title}
+							>
+								{item.icon && (
+									<Image
+										src={item.icon}
+										alt={item.icon}
+										className='h-6 w-6'
+										width={5}
+										height={5}
+									/>
+								)}
+								<span className='flex-1 whitespace-nowrap'>{item.title}</span>
+								{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
+								{item.items && <ChevronRight className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />}
+							</SidebarMenuButton>
+						</CollapsibleTrigger>
+						{item.items && (
+							<CollapsibleContent>
+								<SidebarMenuSub>
+									{item.items.map((subItem) => (
+										<SidebarMenuSubItem key={subItem.title}>
+											<SidebarMenuSubButton asChild>
+												<a
+													href={subItem.url}
+													className='my-2 block rounded-md py-2 hover:bg-gray-100'
+												>
+													<span className='whitespace-nowrap'>{subItem.title}</span>
+													{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
+												</a>
+											</SidebarMenuSubButton>
+										</SidebarMenuSubItem>
+									))}
+								</SidebarMenuSub>
+							</CollapsibleContent>
+						)}
+					</SidebarMenuItem>
+				</Collapsible>
+			)}
+		</SidebarMenuItem>
 	);
 }
 
