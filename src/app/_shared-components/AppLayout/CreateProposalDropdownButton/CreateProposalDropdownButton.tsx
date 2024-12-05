@@ -7,8 +7,8 @@
 import React from 'react';
 import Image from 'next/image';
 import { FileText, ClipboardList, MessageCircle, ChevronDown } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
-import PencilIcon from '../../../../_assets/sidebar/create-pencil-icon.svg';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover';
+import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {

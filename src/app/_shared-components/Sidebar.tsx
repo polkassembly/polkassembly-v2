@@ -12,10 +12,10 @@ import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Button } from '@/app/_shared-components/Button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/_shared-components/sheet';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/tooltip';
-import LeftIcon from '../../_assets/sidebar/lefticon-light.svg';
-import RightIcon from '../../_assets/sidebar/righticon-light.svg';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
+import LeftIcon from '@assets/sidebar/lefticon-light.svg';
+import RightIcon from '@assets/sidebar/righticon-light.svg';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

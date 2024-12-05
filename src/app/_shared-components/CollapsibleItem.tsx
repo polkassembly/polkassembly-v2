@@ -7,9 +7,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from './sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible';
+import { Popover, PopoverContent, PopoverTrigger } from './Popover';
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from './Sidebar';
 
 interface Item {
 	title?: string;

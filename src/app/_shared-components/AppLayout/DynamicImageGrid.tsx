@@ -6,7 +6,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 
 interface ImageGridItem {
 	src: string;
