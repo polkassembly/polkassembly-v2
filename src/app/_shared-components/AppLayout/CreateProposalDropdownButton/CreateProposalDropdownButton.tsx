@@ -44,7 +44,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 				<PopoverContent
 					side={state === 'collapsed' ? 'right' : 'bottom'}
 					sideOffset={10}
-					className='dark:bg-section-dark-background w-56 rounded-md border-none bg-white shadow-2xl'
+					className='w-54 rounded-md border-[1px] border-solid border-[#000000] border-opacity-[10%] bg-white shadow-md'
 				>
 					<ul className='space-y-2'>
 						{menuItems.map((item) => (

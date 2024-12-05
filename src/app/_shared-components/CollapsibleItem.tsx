@@ -33,8 +33,8 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 					<div className='relative flex flex-col items-center'>
 						<Popover>
 							<PopoverTrigger asChild>
-								<div className='relative'>
-									{item.isNew && <span className='absolute right-[-16px] top-[-3px] rounded-full bg-blue-500 px-1.5 text-[10px] text-white'>New</span>}
+								<div className='relative py-0.5'>
+									{item.isNew && <span className='absolute right-[-12px] top-[1px] rounded-full bg-blue-500 px-1.5 text-[10px] text-white'>New</span>}
 									<SidebarMenuButton
 										size='lg'
 										tooltip={item.title}
@@ -55,7 +55,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 								<PopoverContent
 									side='right'
 									sideOffset={10}
-									className='w-64 rounded-md border-none bg-white shadow-md'
+									className='w-64 rounded-md border-[1px] border-solid border-[#000000] border-opacity-[10%] bg-white shadow-md'
 								>
 									<div>
 										{item.items.map((subItem) => (

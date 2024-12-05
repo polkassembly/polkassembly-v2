@@ -14,8 +14,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/app/_shared-components/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
-import LeftIcon from '@assets/sidebar/lefticon-light.svg';
-import RightIcon from '@assets/sidebar/righticon-light.svg';
+import LeftIcon from '@assets/sidebar/lefticon.svg';
+import RightIcon from '@assets/sidebar/righticon.svg';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

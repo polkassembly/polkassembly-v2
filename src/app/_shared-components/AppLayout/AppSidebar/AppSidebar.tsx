@@ -19,8 +19,20 @@ import Foot1 from '@assets/sidebar/foot1.svg';
 import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
-import Home from '@assets/sidebar/homeicon-selected.svg';
+import Home from '@assets/sidebar/homeicon.svg';
+import Discussion from '@assets/sidebar/discussion.svg';
+import Preimages from '@assets/sidebar/preimages.svg';
+import Delegation from '@assets/sidebar/delegation.svg';
+import Bounty from '@assets/sidebar/bounty.svg';
+import BatchVoting from '@assets/sidebar/batch-voting.svg';
+import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
+import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
+import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
+import CommunityIcon from '@assets/sidebar/community-icon.svg';
+import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
+import ArchivedIcon from '@assets/sidebar/archived-icon.svg';
+import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@ui/Sidebar';
 import DynamicImageGrid from '../DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
@@ -57,48 +69,56 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const data = [
 		{
 			initalItems: [
-				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
-				{ title: 'Discussions', url: '/discussions', icon: Head4 },
-				{ title: 'Preimages', url: '/preimages', icon: Head4, count: 2 },
-				{ title: 'Delegation', url: '/delegation', icon: Head2 },
+				{ title: 'Home', url: '/home', icon: Home, isActive: true },
+				{ title: 'Discussions', url: '/discussions', icon: Discussion },
+				{ title: 'Preimages', url: '/preimages', icon: Preimages },
+				{ title: 'Delegation', url: '/delegation', icon: Delegation },
 				{
 					title: 'Bounty',
 					url: '/bounty',
-					icon: Head4,
+					icon: Bounty,
 					isNew: true,
 					items: [
 						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
 						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
 					]
+				},
+				{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true },
+				{
+					title: 'Gov Analytics',
+					url: '/gov-analytics',
+					icon: GovAnalytics,
+					isNew: true
 				}
 			],
 			mainItems: [
 				{
 					heading: 'Tracks',
-					title: 'Home',
-					url: '/home',
-					icon: Head4,
-					isActive: true,
-					count: 5,
-					items: [{ title: 'Overview', url: '/home/overview', icon: Head4, count: 2 }]
-				},
-				{
-					heading: 'Origins',
-					title: 'Discussions',
-					url: '/discussions',
+					title: 'Tracks',
+					url: '',
 					icon: Head4,
 					items: [
 						{
-							title: 'Topics',
-							url: '/discussions/topics',
-							icon: Head4,
+							title: 'Treasury',
+							url: '',
+							icon: TreasuryIcon,
 							items: [
-								{
-									title: 'Trending',
-									url: '/discussions/topics/trending',
-									icon: Head4,
-									count: 1
-								}
+								{ title: 'Big Spender', url: '/big-spender', count: 5 },
+								{ title: 'Medium Spender', url: '/medium-spender', count: 5 },
+								{ title: 'Small Spender', url: '/small-spender', count: 5 },
+								{ title: 'Big Tipper', url: '/big-tipper', count: 5 },
+								{ title: 'Small Tipper', url: '/small-tipper', count: 5 }
+							]
+						},
+						{
+							title: 'Administration',
+							url: '',
+							icon: AdministrationIcon,
+							items: [
+								{ title: 'Auction Admin', url: '/big-spender', count: 10 },
+								{ title: 'General Admin', url: '/medium-spender', count: 10 },
+								{ title: 'Lease Admin', url: '/small-spender', count: 10 },
+								{ title: 'Staking Admin', url: '/big-tipper', count: 10 }
 							]
 						}
 					]
@@ -108,17 +128,17 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				{
 					title: 'Gov Analytics',
 					url: '/gov-analytics',
-					icon: Head4
+					icon: GovAnalytics
 				},
 				{
 					title: 'Calendar',
 					url: '/calendar',
-					icon: Head4
+					icon: CalendarIcon
 				},
 				{
 					title: 'Community',
 					url: '/community',
-					icon: Head4,
+					icon: CommunityIcon,
 					items: [
 						{ title: 'Members', url: '/Members' },
 						{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
@@ -127,12 +147,12 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				{
 					title: 'Parachains',
 					url: '/parachains',
-					icon: Head4
+					icon: ParachainsIcon
 				},
 				{
 					title: 'Archived',
 					url: '/archived',
-					icon: Head4
+					icon: ArchivedIcon
 				}
 			]
 		}
