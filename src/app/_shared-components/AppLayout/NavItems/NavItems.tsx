@@ -17,6 +17,9 @@ import {
 	useSidebar
 } from '@/app/_shared-components/sidebar';
 import Image from 'next/image';
+import React from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
+import CollapsibleItem from '../../CollapsibleItem';
 
 export function NavMain({
 	sections
@@ -73,6 +76,7 @@ export function NavMain({
 	}[];
 }) {
 	const { state } = useSidebar();
+	const [isItemOpen, setIsItemOpen] = React.useState(false);
 
 	return (
 		<SidebarGroup>
@@ -91,41 +95,53 @@ export function NavMain({
 										defaultOpen={false}
 										className='group/collapsible'
 									>
-										<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
-											<CollapsibleTrigger asChild>
-												<SidebarMenuButton
-													size={state === 'collapsed' ? 'lg' : 'default'}
-													tooltip={item.title}
-												>
-													{item.icon && (
-														<Image
-															src={item.icon}
-															alt={item.icon}
-															className='h-6 w-6'
-															width={5}
-															height={5}
-														/>
-													)}
-													<span className='flex-1 whitespace-nowrap'>{item.title}</span>
-													{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
-													{item.items && <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />}
-												</SidebarMenuButton>
-											</CollapsibleTrigger>
-											{item.items && (
-												<CollapsibleContent>
-													<SidebarMenuSub>
-														{item.items?.map((subItem) => (
-															<SidebarMenuSubItem key={subItem.title}>
-																<SidebarMenuSubButton asChild>
-																	<a href={subItem.url}>
-																		<span className='whitespace-nowrap'>{subItem.title}</span>
-																		{subItem.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
-																	</a>
-																</SidebarMenuSubButton>
-															</SidebarMenuSubItem>
-														))}
-													</SidebarMenuSub>
-												</CollapsibleContent>
+										<SidebarMenuItem>
+											{state === 'collapsed' ? (
+												<div className='flex flex-col items-center'>
+													<Popover>
+														<PopoverTrigger asChild>
+															<SidebarMenuButton
+																size='lg'
+																tooltip={item.title}
+															>
+																{item.icon && (
+																	<Image
+																		src={item.icon}
+																		alt={item.icon}
+																		className='h-6 w-6'
+																		width={5}
+																		height={5}
+																	/>
+																)}
+															</SidebarMenuButton>
+														</PopoverTrigger>
+														{item.items && (
+															<PopoverContent
+																side='right'
+																sideOffset={10}
+																className='w-60 rounded-md border-none bg-white shadow-md'
+															>
+																<div>
+																	{item.items.map((subItem) => (
+																		<div key={subItem.title}>
+																			<SidebarMenuSubButton asChild>
+																				<a
+																					href={subItem.url}
+																					className='my-2 block rounded-md py-2 hover:bg-gray-100'
+																				>
+																					<span className='whitespace-nowrap'>{subItem.title}</span>
+																					{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
+																				</a>
+																			</SidebarMenuSubButton>
+																		</div>
+																	))}
+																</div>
+															</PopoverContent>
+														)}
+													</Popover>
+												</div>
+											) : (
+												<CollapsibleItem item={{ ...item, title: item.title || '' }} />
 											)}
 										</SidebarMenuItem>
 									</Collapsible>
@@ -137,7 +153,7 @@ export function NavMain({
 						<div>
 							{section.mainItems.map((mainItem, index) => (
 								<Collapsible
-									key={mainItem.heading || `mainItem-${index}`} // Unique key for each mainItem
+									key={mainItem.heading || `mainItem-${index}`}
 									defaultOpen
 									className='group/collapsible mt-4'
 								>
@@ -160,52 +176,57 @@ export function NavMain({
 									<CollapsibleContent>
 										<SidebarMenu>
 											{mainItem.items &&
-												mainItem.items.map((item) => (
-													<Collapsible
-														key={item.title}
-														asChild
-														defaultOpen={item.isActive}
-														className='group/collapsible'
-													>
-														<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
-															<CollapsibleTrigger asChild>
-																<SidebarMenuButton
-																	size={state === 'collapsed' ? 'lg' : 'default'}
-																	tooltip={item.title}
-																>
-																	{item.icon && (
-																		<Image
-																			src={item.icon}
-																			alt={item.icon}
-																			className='h-6 w-6'
-																			width={5}
-																			height={5}
-																		/>
-																	)}
-																	<span className='flex-1 whitespace-nowrap'>{item.title}</span>
-																	{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
-																	{item.items && <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />}
-																</SidebarMenuButton>
-															</CollapsibleTrigger>
-															<CollapsibleContent>
-																<SidebarMenuSub>
-																	{item.items?.map((subItem) => (
-																		<SidebarMenuSubItem key={subItem.title}>
-																			<SidebarMenuSubButton asChild>
-																				<a href={subItem.url}>
-																					<span className='whitespace-nowrap'>{subItem.title}</span>
-																					{subItem.count !== undefined && (
-																						<span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>
-																					)}
-																				</a>
-																			</SidebarMenuSubButton>
-																		</SidebarMenuSubItem>
-																	))}
-																</SidebarMenuSub>
-															</CollapsibleContent>
-														</SidebarMenuItem>
-													</Collapsible>
-												))}
+												mainItem.items.map((item) => {
+													return (
+														<Collapsible
+															key={item.title}
+															asChild
+															defaultOpen={item.isActive}
+															className='group/collapsible'
+															onOpenChange={(open) => setIsItemOpen(open)}
+														>
+															<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
+																<CollapsibleTrigger asChild>
+																	<SidebarMenuButton
+																		size={state === 'collapsed' ? 'lg' : 'default'}
+																		tooltip={item.title}
+																	>
+																		{item.icon && (
+																			<Image
+																				src={item.icon}
+																				alt={item.icon}
+																				className='h-6 w-6'
+																				width={5}
+																				height={5}
+																			/>
+																		)}
+																		<span className='flex-1 whitespace-nowrap'>{item.title}</span>
+																		{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
+																		{item.items && <ChevronRight className={`ml-auto transition-transform duration-200 ${isItemOpen ? 'rotate-90' : ''}`} />}
+																	</SidebarMenuButton>
+																</CollapsibleTrigger>
+																{item.items && (
+																	<CollapsibleContent>
+																		<SidebarMenuSub>
+																			{item.items?.map((subItem) => (
+																				<SidebarMenuSubItem key={subItem.title}>
+																					<SidebarMenuSubButton asChild>
+																						<a href={subItem.url}>
+																							<span className='whitespace-nowrap'>{subItem.title}</span>
+																							{subItem.count !== undefined && (
+																								<span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>
+																							)}
+																						</a>
+																					</SidebarMenuSubButton>
+																				</SidebarMenuSubItem>
+																			))}
+																		</SidebarMenuSub>
+																	</CollapsibleContent>
+																)}
+															</SidebarMenuItem>
+														</Collapsible>
+													);
+												})}
 										</SidebarMenu>
 									</CollapsibleContent>
 								</Collapsible>
