@@ -32,11 +32,12 @@ export function NavMain({
 				title: string;
 				url: string;
 				icon?: string;
+				isActive?: boolean;
 				count?: number;
 			}[];
 		}[];
-		title?: string;
-		items: {
+		mainItems: {
+			heading?: string; // title pushed here
 			title: string;
 			url: string;
 			icon?: string;
@@ -46,7 +47,14 @@ export function NavMain({
 				title: string;
 				url: string;
 				icon?: string;
+				isActive?: boolean;
 				count?: number;
+				items?: {
+					title: string;
+					url: string;
+					icon?: string;
+					count?: number;
+				}[];
 			}[];
 		}[];
 		endItems?: {
@@ -70,7 +78,7 @@ export function NavMain({
 		<SidebarGroup>
 			{sections.map((section) => (
 				<div
-					key={section.title}
+					key={section.initalItems?.[0]?.title}
 					className='section-wrapper'
 				>
 					{section.initalItems && (
@@ -80,7 +88,7 @@ export function NavMain({
 									<Collapsible
 										key={item.title}
 										asChild
-										defaultOpen={item.isActive}
+										defaultOpen={false}
 										className='group/collapsible'
 									>
 										<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
@@ -106,7 +114,7 @@ export function NavMain({
 											{item.items && (
 												<CollapsibleContent>
 													<SidebarMenuSub>
-														{item.items.map((subItem) => (
+														{item.items?.map((subItem) => (
 															<SidebarMenuSubItem key={subItem.title}>
 																<SidebarMenuSubButton asChild>
 																	<a href={subItem.url}>
@@ -125,79 +133,86 @@ export function NavMain({
 							</SidebarMenu>
 						</div>
 					)}
-					{section.title && (
-						<Collapsible
-							defaultOpen
-							className='group/collapsible'
-						>
-							<CollapsibleTrigger asChild>
-								<div>
-									<div
-										style={{
-											borderTop: '2px dotted #ccc',
-											paddingTop: '15px'
-										}}
-										className='flex items-center dark:border-[#4B4B4B]'
-									>
-										<span className={`text-lightBlue ${state === 'collapsed' ? '' : 'px-5'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>{section.title}</span>
-										<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-									</div>
-								</div>
-							</CollapsibleTrigger>
-							<CollapsibleContent>
-								<SidebarMenu>
-									{section.items.map((item) => (
-										<Collapsible
-											key={item.title}
-											asChild
-											defaultOpen={item.isActive}
-											className='group/collapsible'
-										>
-											<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
-												<CollapsibleTrigger asChild>
-													<SidebarMenuButton
-														size={state === 'collapsed' ? 'lg' : 'default'}
-														tooltip={item.title}
+					{section.mainItems && (
+						<div>
+							{section.mainItems.map((mainItem, index) => (
+								<Collapsible
+									key={mainItem.heading || `mainItem-${index}`} // Unique key for each mainItem
+									defaultOpen
+									className='group/collapsible mt-4'
+								>
+									<CollapsibleTrigger asChild>
+										<div>
+											<div
+												style={{
+													borderTop: '2px dotted #ccc',
+													paddingTop: '15px'
+												}}
+												className='flex items-center dark:border-[#4B4B4B]'
+											>
+												<span className={`text-lightBlue ${state === 'collapsed' ? '' : 'px-5'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
+													{mainItem.heading}
+												</span>
+												<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+											</div>
+										</div>
+									</CollapsibleTrigger>
+									<CollapsibleContent>
+										<SidebarMenu>
+											{mainItem.items &&
+												mainItem.items.map((item) => (
+													<Collapsible
+														key={item.title}
+														asChild
+														defaultOpen={item.isActive}
+														className='group/collapsible'
 													>
-														{item.icon && (
-															<Image
-																src={item.icon}
-																alt={item.icon}
-																className='h-6 w-6'
-																width={5}
-																height={5}
-															/>
-														)}
-														<span className='flex-1 whitespace-nowrap'>{item.title}</span>
-														{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
-														{item.items && <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />}
-													</SidebarMenuButton>
-												</CollapsibleTrigger>
-												{item.items && (
-													<CollapsibleContent>
-														<SidebarMenuSub>
-															{item.items.map((subItem) => (
-																<SidebarMenuSubItem key={subItem.title}>
-																	<SidebarMenuSubButton asChild>
-																		<a href={subItem.url}>
-																			<span className='whitespace-nowrap'>{subItem.title}</span>
-																			{subItem.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
-																		</a>
-																	</SidebarMenuSubButton>
-																</SidebarMenuSubItem>
-															))}
-														</SidebarMenuSub>
-													</CollapsibleContent>
-												)}
-											</SidebarMenuItem>
-										</Collapsible>
-									))}
-								</SidebarMenu>
-							</CollapsibleContent>
-						</Collapsible>
+														<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
+															<CollapsibleTrigger asChild>
+																<SidebarMenuButton
+																	size={state === 'collapsed' ? 'lg' : 'default'}
+																	tooltip={item.title}
+																>
+																	{item.icon && (
+																		<Image
+																			src={item.icon}
+																			alt={item.icon}
+																			className='h-6 w-6'
+																			width={5}
+																			height={5}
+																		/>
+																	)}
+																	<span className='flex-1 whitespace-nowrap'>{item.title}</span>
+																	{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
+																	{item.items && <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />}
+																</SidebarMenuButton>
+															</CollapsibleTrigger>
+															<CollapsibleContent>
+																<SidebarMenuSub>
+																	{item.items?.map((subItem) => (
+																		<SidebarMenuSubItem key={subItem.title}>
+																			<SidebarMenuSubButton asChild>
+																				<a href={subItem.url}>
+																					<span className='whitespace-nowrap'>{subItem.title}</span>
+																					{subItem.count !== undefined && (
+																						<span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>
+																					)}
+																				</a>
+																			</SidebarMenuSubButton>
+																		</SidebarMenuSubItem>
+																	))}
+																</SidebarMenuSub>
+															</CollapsibleContent>
+														</SidebarMenuItem>
+													</Collapsible>
+												))}
+										</SidebarMenu>
+									</CollapsibleContent>
+								</Collapsible>
+							))}
+						</div>
 					)}
 
-					{/* End Items with Dotted Lines */}
 					{section.endItems && (
 						<div className='mt-4'>
 							<div

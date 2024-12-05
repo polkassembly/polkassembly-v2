@@ -55,51 +55,85 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 		{
 			initalItems: [
 				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
-				{ title: 'Discussions', url: '/discussions', icon: Foot1 },
-				{ title: 'Preimages', url: '/preimages', icon: Foot1, count: 2 },
-				{ title: 'Delegation', url: '/delegation', icon: Foot1 },
+				{ title: 'Discussions', url: '/discussions', icon: Head4 },
+				{ title: 'Preimages', url: '/preimages', icon: Head4, count: 2 },
+				{ title: 'Delegation', url: '/delegation', icon: Head4 },
 				{
 					title: 'Bounty',
 					url: '/bounty',
-					icon: Foot1,
+					icon: Head4,
 					items: [
-						{ title: 'Bounty Dashboard', url: '/bounty/dashboard' },
+						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
 						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
-					],
-					count: 8
+					]
 				}
 			],
-			title: 'Main',
-			items: [
-				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
-				{ title: 'Discussions', url: '/discussions', icon: Foot1 },
-				{ title: 'Preimages', url: '/preimages', icon: Foot1, count: 2 },
-				{ title: 'Delegation', url: '/delegation', icon: Foot1 },
+			mainItems: [
 				{
-					title: 'Bounty',
-					url: '/bounty',
-					icon: Foot1,
+					heading: 'Tracks',
+					title: 'Home',
+					url: '/home',
+					icon: Head4,
+					isActive: true,
+					count: 5,
+					items: [{ title: 'Overview', url: '/home/overview', icon: Head4, count: 2 }]
+				},
+				{
+					heading: 'Origins',
+					title: 'Discussions',
+					url: '/discussions',
+					icon: Head4,
 					items: [
-						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 1 },
-						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
-					],
-					count: 8
+						{
+							title: 'Topics',
+							url: '/discussions/topics',
+							icon: Head4,
+							items: [
+								{
+									title: 'Trending',
+									url: '/discussions/topics/trending',
+									icon: Head4,
+									count: 1
+								}
+							]
+						}
+					]
 				}
 			],
 			endItems: [
 				{
-					title: 'Settings',
-					url: '/settings',
-					icon: '/icons/settings.svg'
+					title: 'Gov Analytics',
+					url: '/gov-analytics',
+					icon: Head4
 				},
 				{
-					title: 'Help',
-					url: '/help',
-					icon: '/icons/help.svg'
+					title: 'Calendar',
+					url: '/calendar',
+					icon: Head4
+				},
+				{
+					title: 'Community',
+					url: '/community',
+					icon: Head4,
+					items: [
+						{ title: 'Members', url: '/Members' },
+						{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
+					]
+				},
+				{
+					title: 'Parachains',
+					url: '/parachains',
+					icon: Head4
+				},
+				{
+					title: 'Archived',
+					url: '/archived',
+					icon: Head4
 				}
 			]
 		}
 	];
+
 	const headerData = [
 		{ src: Head1, alt: 'Head 1', bgColor: 'bg-[#F3F9D7]', tooltip: 'Tooltip 1' },
 		{ src: Head2, alt: 'Head 2', bgColor: 'bg-[#fdf8e1]', tooltip: 'Tooltip 2' },
