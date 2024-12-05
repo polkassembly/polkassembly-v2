@@ -7,6 +7,8 @@
 import Image from 'next/image';
 import React from 'react';
 import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '../../sidebar';
 import PaLogo from '../PaLogo';
 import PaLogoDark from '../../../../_assets/logos/PALogoDark.svg';
@@ -19,9 +21,10 @@ import Foot2 from '../../../../_assets/sidebar/foot2.svg';
 import Foot3 from '../../../../_assets/sidebar/foot3.svg';
 import Foot4 from '../../../../_assets/sidebar/foot4.svg';
 import Home from '../../../../_assets/sidebar/homeicon-selected.svg';
-
+import CautionIcon from '../../../../_assets/sidebar/caution-icon.svg';
 import DynamicImageGrid from '../DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
+import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -57,11 +60,12 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				{ title: 'Home', url: '/home', icon: Home, isActive: true, count: 5 },
 				{ title: 'Discussions', url: '/discussions', icon: Head4 },
 				{ title: 'Preimages', url: '/preimages', icon: Head4, count: 2 },
-				{ title: 'Delegation', url: '/delegation', icon: Head4 },
+				{ title: 'Delegation', url: '/delegation', icon: Head2 },
 				{
 					title: 'Bounty',
 					url: '/bounty',
 					icon: Head4,
+					isNew: true,
 					items: [
 						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
 						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
@@ -162,11 +166,40 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
+			<div className='px-5'>
+				<CreateProposalDropdownButton state={state} />
+			</div>
 			<SidebarContent>
 				<NavMain sections={data} />
 			</SidebarContent>
 
-			<SidebarFooter className='mb-3'>{generateGridData(footerData)}</SidebarFooter>
+			<SidebarFooter className='mb-3'>
+				{state === 'expanded' && (
+					<Link
+						href='https://polkassembly.hellonext.co/'
+						target='_blank'
+						rel='noreferrer'
+					>
+						<div className='dark:border-separatorDark dark:bg-section-dark-background mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-solid border-[#D2D8E0] bg-[#F8F9FC] px-[6px] py-2'>
+							<Image
+								src={CautionIcon}
+								alt=''
+								width={30}
+								height={30}
+							/>
+							<div className='flex flex-col'>
+								<div className='flex gap-1'>
+									<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>Report an issue</span>
+									<ChevronRight className='h-5 w-5' />
+								</div>
+								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>Need help with something?</span>
+							</div>
+						</div>
+					</Link>
+				)}
+
+				{generateGridData(footerData)}
+			</SidebarFooter>
 		</Sidebar>
 	);
 }

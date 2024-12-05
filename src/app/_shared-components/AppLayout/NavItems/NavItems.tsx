@@ -20,30 +20,35 @@ export function NavMain({
 			icon?: string;
 			isActive?: boolean;
 			count?: number;
+			isNew?: boolean;
 			items?: {
 				title: string;
 				url: string;
+				isNew?: boolean;
 				icon?: string;
 				isActive?: boolean;
 				count?: number;
 			}[];
 		}[];
 		mainItems: {
-			heading?: string; // title pushed here
+			heading?: string;
 			title: string;
 			url: string;
 			icon?: string;
+			isNew?: boolean;
 			isActive?: boolean;
 			count?: number;
 			items?: {
 				title: string;
 				url: string;
+				isNew?: boolean;
 				icon?: string;
 				isActive?: boolean;
 				count?: number;
 				items?: {
 					title: string;
 					url: string;
+					isNew?: boolean;
 					icon?: string;
 					count?: number;
 				}[];
@@ -54,10 +59,12 @@ export function NavMain({
 			url: string;
 			icon?: string;
 			isActive?: boolean;
+			isNew?: boolean;
 			count?: number;
 			items?: {
 				title: string;
 				url: string;
+				isNew?: boolean;
 				icon?: string;
 				count?: number;
 			}[];

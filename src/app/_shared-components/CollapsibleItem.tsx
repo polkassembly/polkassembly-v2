@@ -16,6 +16,7 @@ interface Item {
 	url?: string;
 	icon?: string;
 	isActive?: boolean;
+	isNew?: boolean;
 	count?: number;
 	items?: Item[];
 }
@@ -29,23 +30,26 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 		<SidebarMenuItem>
 			<ul>
 				{state === 'collapsed' ? (
-					<div className='flex flex-col items-center'>
+					<div className='relative flex flex-col items-center'>
 						<Popover>
 							<PopoverTrigger asChild>
-								<SidebarMenuButton
-									size='lg'
-									tooltip={item.title}
-								>
-									{item.icon && (
-										<Image
-											src={item.icon}
-											alt={item.icon}
-											className='h-6 w-6'
-											width={5}
-											height={5}
-										/>
-									)}
-								</SidebarMenuButton>
+								<div className='relative'>
+									{item.isNew && <span className='absolute right-[-16px] top-[-3px] rounded-full bg-blue-500 px-1.5 text-[10px] text-white'>New</span>}
+									<SidebarMenuButton
+										size='lg'
+										tooltip={item.title}
+									>
+										{item.icon && (
+											<Image
+												src={item.icon}
+												alt={item.icon}
+												className='h-6 w-6'
+												width={5}
+												height={5}
+											/>
+										)}
+									</SidebarMenuButton>
+								</div>
 							</PopoverTrigger>
 							{item.items && (
 								<PopoverContent
@@ -94,7 +98,10 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 											height={5}
 										/>
 									)}
-									<span className='flex-1 whitespace-nowrap'>{item.title}</span>
+									<span className='flex-1 whitespace-nowrap'>
+										{item.title}
+										{item.isNew && <span className='ml-2 rounded-full bg-blue-500 px-1.5 text-xs text-white'>New</span>}
+									</span>
 									{item.count !== undefined && <span className='ml-auto mr-2 rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{item.count}</span>}
 									{item.items && <ChevronRight className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />}
 								</SidebarMenuButton>
