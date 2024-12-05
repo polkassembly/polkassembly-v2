@@ -17,3 +17,21 @@
 	width: 0px;
 	height: 0px;
 }
+
+.create_proposal_button {
+	border: 1px solid #d2d8e0; /* Border */
+	background-color: #f8f9fc; /* Light background */
+	padding: 0.5rem 0.375rem; /* Padding: py-2 px-[6px] */
+	border-radius: 0.75rem; /* Rounded corners: rounded-xl */
+	display: flex; /* Flexbox container */
+	align-items: center; /* Center items vertically */
+	justify-content: center; /* Center items horizontally */
+	gap: 6px; /* Gap between items */
+	cursor: pointer; /* Pointer cursor */
+	margin: 0 0.75rem; /* Margin: mx-3 */
+}
+
+.dark .create_proposal_button {
+	background-color: var(--section-dark-background, #1f2937); /* Dark background */
+	border-color: var(--separator-dark, #2d3748); /* Dark border */
+}

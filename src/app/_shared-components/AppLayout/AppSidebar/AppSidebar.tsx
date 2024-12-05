@@ -37,6 +37,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } fro
 import DynamicImageGrid from '../DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
+import style from './AppSidebar.module.scss';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -182,7 +183,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className='flex items-center justify-center'>{getLogo()}</div>
 			</SidebarHeader>
 
-			<hr className='text-[#D2D8E0]' />
+			<hr className='text-btn_secondary_border' />
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
@@ -200,7 +201,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						target='_blank'
 						rel='noreferrer'
 					>
-						<div className='dark:border-separatorDark dark:bg-section-dark-background mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-solid border-[#D2D8E0] bg-[#F8F9FC] px-[6px] py-2'>
+						<div className={style.create_proposal_button}>
 							<Image
 								src={CautionIcon}
 								alt=''
