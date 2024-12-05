@@ -8,7 +8,7 @@ import { Button } from '@ui/Button';
 
 export default function Home() {
 	return (
-		<div className='text-center'>
+		<div className='text-center leading-10'>
 			Polkassembly <Button variant='secondary'>hello</Button>{' '}
 		</div>
 	);
