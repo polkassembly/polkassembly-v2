@@ -28,7 +28,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						} dark:bg-section-dark-background cursor-pointer`}
 					>
 						<Image
-							src={PencilIcon} // Ensure this path is correct
+							src={PencilIcon}
 							alt='Create Pencil Icon'
 							width={20}
 							height={20}
