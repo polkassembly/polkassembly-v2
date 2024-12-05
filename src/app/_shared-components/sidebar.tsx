@@ -427,37 +427,6 @@ const SidebarMenuButton = React.forwardRef<
 });
 SidebarMenuButton.displayName = 'SidebarMenuButton';
 
-const SidebarMenuAction = React.forwardRef<
-	HTMLButtonElement,
-	React.ComponentProps<'button'> & {
-		asChild?: boolean;
-		showOnHover?: boolean;
-	}
->(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
-	const Comp = asChild ? Slot : 'button';
-
-	return (
-		<Comp
-			ref={ref}
-			data-sidebar='menu-action'
-			className={cn(
-				'hover:bg-white-accent absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:text-sidebar-accent-foreground focus-visible:ring-2 peer-hover/menu-button:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0',
-				// Increases the hit area of the button on mobile.
-				'after:absolute after:-inset-2 after:md:hidden',
-				'peer-data-[size=sm]/menu-button:top-1',
-				'peer-data-[size=default]/menu-button:top-1.5',
-				'peer-data-[size=lg]/menu-button:top-2.5',
-				COLLAPSIBLE_ICON_HIDDEN,
-				showOnHover &&
-					'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0',
-				className
-			)}
-			{...props}
-		/>
-	);
-});
-SidebarMenuAction.displayName = 'SidebarMenuAction';
-
 const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(({ className, ...props }, ref) => (
 	<ul
 		ref={ref}
@@ -514,7 +483,6 @@ export {
 	SidebarHeader,
 	SidebarInset,
 	SidebarMenu,
-	SidebarMenuAction,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarMenuSub,
