@@ -23,10 +23,14 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 	];
 
 	return (
-		<div className={`${style.card} ${state === 'collapsed' ? style.cardCollapsed : style.cardExpanded}`}>
+		<div className={`${style.card} mt-4 p-[2px] ${state === 'collapsed' ? 'w-full' : 'mx-4 w-[200px]'}`}>
 			<Popover>
 				<PopoverTrigger asChild>
-					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}>
+					<div
+						className={`flex items-center justify-center gap-[6px] rounded-[10.5px] bg-white ${
+							state !== 'collapsed' ? 'py-[2px]' : 'p-[5px]'
+						} dark:bg-section-dark-background cursor-pointer`}
+					>
 						<Image
 							src={PencilIcon}
 							alt='Create Pencil Icon'
@@ -35,8 +39,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						/>
 						{state !== 'collapsed' && (
 							<>
-								<span className={style.triggerText}>Create</span>
-								<ChevronDown className={style.triggerIcon} />
+								<span className='py-[6px] font-medium leading-4 text-create_proposal_btn_create dark:text-create_proposal_btn_create'>Create</span>
+								<ChevronDown className='ml-1 text-sm text-create_proposal_btn_create dark:text-create_proposal_btn_create' />
 							</>
 						)}
 					</div>
@@ -44,13 +48,13 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 				<PopoverContent
 					side={state === 'collapsed' ? 'right' : 'bottom'}
 					sideOffset={10}
-					className={style.popoverContent}
+					className='w-56 rounded-xl border-[1px] border-solid border-white border-opacity-[10%] bg-white p-1.5 shadow-md'
 				>
-					<ul className={style.menuList}>
+					<ul className='space-y-2'>
 						{menuItems.map((item) => (
 							<li
 								key={item.title}
-								className={style.menuItem}
+								className='flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800'
 							>
 								<Image
 									src={item.icon}
@@ -58,9 +62,10 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 									width={20}
 									height={20}
 								/>
+
 								<a
 									href={item.url}
-									className={style.menuLink}
+									className='text-sm font-medium text-gray-700 dark:text-gray-200'
 								>
 									{item.title}
 								</a>
