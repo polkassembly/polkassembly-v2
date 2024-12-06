@@ -181,18 +181,18 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	];
 
 	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'Tooltip 1' },
-		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: 'Tooltip 2' },
-		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: 'Tooltip 3' },
-		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: 'Tooltip 4' }
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: 'Leaderboard' },
+		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: 'Delegation' },
+		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: 'Profile' }
 	];
 
 	const bgColor = 'bg-sidebar_footer';
 	const footerData = [
-		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'Tooltip 1' },
-		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Tooltip 2' },
-		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Tooltip 3' },
-		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Tooltip 4' }
+		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'TownHall', url: 'https://townhallgov.com/' },
+		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Polkasafe', url: 'https://polkasafe.xyz/' },
+		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Fellowship', url: 'https://collectives.polkassembly.io/' },
+		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Staking', url: 'https://staking.polkadot.cloud/#/overview' }
 	];
 
 	return (
