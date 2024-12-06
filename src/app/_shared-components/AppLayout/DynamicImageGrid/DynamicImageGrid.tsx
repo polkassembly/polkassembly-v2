@@ -8,6 +8,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
+import style from './DynamicImageGrid.module.scss';
 
 interface ImageGridItem {
 	src: string;
@@ -35,7 +36,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 	return (
 		<TooltipProvider>
 			<div
-				className={` ${isExpanded ? 'flex flex-row' : 'flex flex-col'} items-center justify-center gap-3`}
+				className={`${isExpanded ? style.flexRow : style.flexCol}`}
 				style={{
 					gridTemplateColumns: isExpanded ? `repeat(${rowSize}, 1fr)` : undefined
 				}}
@@ -46,11 +47,11 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 							<TooltipTrigger asChild>
 								{item.url ? (
 									<Link href={item.url}>
-										<div className={`rounded-lg ${item.bgColor} flex h-10 w-10 cursor-pointer items-center justify-center p-2`}>
+										<div className={`${style.iconWrapper} ${item.bgColor}`}>
 											<Image
 												src={item.src}
 												alt={item.alt}
-												className='h-full w-full rounded-md'
+												className={style.image}
 												width={40}
 												height={40}
 											/>
@@ -58,7 +59,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 									</Link>
 								) : (
 									<div
-										className={`rounded-lg ${item.bgColor} flex h-10 w-10 cursor-pointer items-center justify-center p-2`}
+										className={`${style.iconWrapper} ${item.bgColor}`}
 										onClick={() => handleClick(item)}
 										role='button'
 										tabIndex={0}
@@ -69,7 +70,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 										<Image
 											src={item.src}
 											alt={item.alt}
-											className='h-full w-full rounded-md'
+											className={style.image}
 											width={40}
 											height={40}
 										/>
@@ -78,20 +79,20 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 							</TooltipTrigger>
 							<TooltipContent
 								side={isExpanded ? tooltipPosition : 'right'}
-								className='relative rounded-md bg-[#363636] px-2 py-1 text-white shadow-lg'
+								className={style.tooltipContent}
 							>
-								<span className='text-sm'>{item.tooltip}</span>
+								<span className={style.tooltipText}>{item.tooltip}</span>
 								<div
-									className={`absolute h-2 w-2 rotate-45 bg-[#363636] ${
+									className={`${style.tooltipArrow} ${
 										isExpanded
 											? tooltipPosition === 'top'
-												? '-bottom-1 left-1/2 -translate-x-1/2'
+												? style.arrowTop
 												: tooltipPosition === 'bottom'
-													? '-top-1 left-1/2 -translate-x-1/2'
+													? style.arrowBottom
 													: tooltipPosition === 'left'
-														? '-right-1 top-1/2 -translate-y-1/2'
-														: '-left-1 top-1/2 -translate-y-1/2'
-											: '-left-1 top-1/2 -translate-y-1/2' // Tooltip on the right when collapsed
+														? style.arrowLeft
+														: style.arrowRight
+											: style.arrowRight
 									}`}
 								/>
 							</TooltipContent>
