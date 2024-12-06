@@ -7,6 +7,7 @@
 import Image from 'next/image';
 import React from 'react';
 import { useTheme } from 'next-themes';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
@@ -49,6 +50,7 @@ import style from './AppSidebar.module.scss';
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const { resolvedTheme: theme } = useTheme();
+	const pathname = usePathname();
 
 	const getLogo = () => {
 		if (theme === 'light') {
@@ -74,10 +76,29 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 		/>
 	);
 
+	interface Item {
+		title: string;
+		url: string;
+		icon?: string;
+		isNew?: boolean;
+		count?: number;
+		items?: Item[];
+		heading?: string;
+	}
+
+	const setActiveItems = (items: Item[]): Item[] => {
+		return items.map((item) => ({
+			...item,
+			isActive: pathname === item.url,
+			items: item.items ? setActiveItems(item.items) : undefined
+		}));
+	};
+
 	const data = [
 		{
-			initalItems: [
-				{ title: 'Home', url: '/home', icon: Home, isActive: true },
+			heading: 'Main',
+			initalItems: setActiveItems([
+				{ title: 'Home', url: '/open-gov', icon: Home },
 				{ title: 'Discussions', url: '/discussions', icon: Discussion },
 				{ title: 'Preimages', url: '/preimages', icon: Preimages },
 				{ title: 'Delegation', url: '/delegation', icon: Delegation },
@@ -86,57 +107,51 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					url: '/bounty',
 					icon: Bounty,
 					isNew: true,
-					items: [
+					items: setActiveItems([
 						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
 						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
-					]
+					])
 				},
-				{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true },
-				{
-					title: 'Gov Analytics',
-					url: '/gov-analytics',
-					icon: GovAnalytics,
-					isNew: true
-				}
-			],
-			mainItems: [
+				{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
+			]),
+			mainItems: setActiveItems([
 				{
 					heading: 'TRACKS',
 					title: 'TRACKS',
 					url: '',
 					icon: Head4,
-					items: [
+					items: setActiveItems([
 						{
 							title: 'Treasury',
 							url: '',
 							icon: TreasuryIcon,
-							items: [
+							items: setActiveItems([
 								{ title: 'Big Spender', url: '/big-spender', count: 5 },
 								{ title: 'Medium Spender', url: '/medium-spender', count: 5 },
 								{ title: 'Small Spender', url: '/small-spender', count: 5 },
 								{ title: 'Big Tipper', url: '/big-tipper', count: 5 },
 								{ title: 'Small Tipper', url: '/small-tipper', count: 5 }
-							]
+							])
 						},
 						{
 							title: 'Administration',
 							url: '',
 							icon: AdministrationIcon,
-							items: [
+							items: setActiveItems([
 								{ title: 'Auction Admin', url: '/big-spender', count: 10 },
 								{ title: 'General Admin', url: '/medium-spender', count: 10 },
 								{ title: 'Lease Admin', url: '/small-spender', count: 10 },
 								{ title: 'Staking Admin', url: '/big-tipper', count: 10 }
-							]
+							])
 						}
-					]
+					])
 				},
 				{
 					heading: 'ORIGINS',
 					title: 'ORIGINS',
 					url: '',
 					icon: Head4,
-					items: [
+					items: setActiveItems([
 						{ title: 'Root', url: '/root', count: 5, icon: RootIcon },
 						{ title: 'Treasurer', url: '/treasurer', count: 5, icon: TreasurerIcon },
 						{ title: 'Wish for change', url: '/wish-for-change', count: 5, icon: WishForChangeIcon },
@@ -144,40 +159,24 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						{ title: 'Referendum Killer', url: '/referendum-killer', count: 5, icon: ReferendumKillerIcon },
 						{ title: 'Whitelisted Caller', url: '/whitelist-caller', count: 5, icon: WhitelistedCallerIcon },
 						{ title: 'Fellowship Admin', url: '/fellowship-admin', count: 5, icon: FellowshipAdminIcon }
-					]
+					])
 				}
-			],
-			endItems: [
-				{
-					title: 'Gov Analytics',
-					url: '/gov-analytics',
-					icon: GovAnalytics
-				},
-				{
-					title: 'Calendar',
-					url: '/calendar',
-					icon: CalendarIcon
-				},
+			]),
+			endItems: setActiveItems([
+				{ title: 'Gov Analytics', url: '/gov-analytics', icon: GovAnalytics },
+				{ title: 'Calendar', url: '/calendar', icon: CalendarIcon },
 				{
 					title: 'Community',
 					url: '/community',
 					icon: CommunityIcon,
-					items: [
+					items: setActiveItems([
 						{ title: 'Members', url: '/Members' },
 						{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
-					]
+					])
 				},
-				{
-					title: 'Parachains',
-					url: '/parachains',
-					icon: ParachainsIcon
-				},
-				{
-					title: 'Archived',
-					url: '/archived',
-					icon: ArchivedIcon
-				}
-			]
+				{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
+				{ title: 'Archived', url: '/archived', icon: ArchivedIcon }
+			])
 		}
 	];
 

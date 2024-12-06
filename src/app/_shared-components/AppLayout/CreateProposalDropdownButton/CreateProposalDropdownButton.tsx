@@ -39,8 +39,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						/>
 						{state !== 'collapsed' && (
 							<>
-								<span className='text-create_proposal_btn_create dark:text-create_proposal_btn_create py-[6px] font-medium leading-4'>Create</span>
-								<ChevronDown className='text-create_proposal_btn_create dark:text-create_proposal_btn_create ml-1 text-sm' />
+								<span className='py-[6px] font-medium leading-4 text-create_proposal_btn_create dark:text-create_proposal_btn_create'>Create</span>
+								<ChevronDown className='ml-1 text-sm text-create_proposal_btn_create dark:text-create_proposal_btn_create' />
 							</>
 						)}
 					</div>
@@ -65,7 +65,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 
 								<a
 									href={item.url}
-									className='text-sm font-medium text-gray-700 dark:text-gray-200'
+									className='text-sidebar_text text-sm font-medium dark:text-gray-200'
 								>
 									{item.title}
 								</a>

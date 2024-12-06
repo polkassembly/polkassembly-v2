@@ -8,7 +8,7 @@ import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/Collapsible';
 import { SidebarGroup, SidebarMenu, useSidebar } from '@ui/Sidebar';
 import React from 'react';
-import CollapsibleItem from '../../CollapsibleItem';
+import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
 
 export function NavMain({
 	sections

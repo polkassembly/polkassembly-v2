@@ -20,6 +20,9 @@ export const THEME_COLORS = {
 		sidebar_head3: '#ffede5',
 		sidebar_head4: '#dff4ff',
 		sidebar_footer: '#F3F4F6',
+		sidebar_text: '#485F7D',
+		sidebar_menu_text: '#ff0080',
+		sidebar_menu_bg: '#fce6f1',
 		create_proposal_btn_create: '#0A3EAF'
 	},
 	dark: {

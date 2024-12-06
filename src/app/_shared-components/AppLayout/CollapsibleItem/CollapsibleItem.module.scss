@@ -1,0 +1,49 @@
+.newBadge {
+	position: absolute;
+	right: -12px;
+	top: 1px;
+	border-radius: 9999px;
+	background-color: #3b82f6; /* blue-500 */
+	padding: 0 0.375rem;
+	font-size: 10px;
+	color: #fff;
+}
+
+.sidebarButton {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	border-radius: 0.5rem;
+	padding: 0.5rem 0.5rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.sidebarButtonHover {
+	&:hover {
+		background-color: #e5e7eb; /* gray-200 */
+	}
+}
+
+.sidebarActive {
+	background-color: #fce6f1;
+	color: #ff0080;
+}
+
+.popoverContent {
+	width: 16rem;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	background-color: #ffffff;
+	border-radius: 0.75rem;
+	padding: 0.625rem 1rem;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.iconWrapper {
+	height: 1.5rem;
+	width: 1.5rem;
+}
+
+.sidebar_selected_icon {
+	filter: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%);
+}

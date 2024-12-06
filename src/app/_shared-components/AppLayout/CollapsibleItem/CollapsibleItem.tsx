@@ -7,9 +7,11 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible';
-import { Popover, PopoverContent, PopoverTrigger } from './Popover';
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from './Sidebar';
+import Link from 'next/link';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
+import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar';
+import style from './CollapsibleItem.module.scss';
 
 interface Item {
 	title?: string;
@@ -28,25 +30,33 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 
 	return (
 		<SidebarMenuItem>
-			<ul>
+			<ul className='text-sidebar_text'>
 				{state === 'collapsed' ? (
 					<div className='relative flex flex-col items-center'>
 						<Popover>
 							<PopoverTrigger asChild>
-								<div className='relative py-0.5'>
-									{item.isNew && <span className='absolute right-[-12px] top-[1px] rounded-full bg-blue-500 px-1.5 text-[10px] text-white'>New</span>}
+								<div className='relative'>
+									{item.isNew && <span className={style.newBadge}>New</span>}
 									<SidebarMenuButton
 										size='lg'
 										tooltip={item.title}
+										className={`${style.sidebarButton} ${item.isActive ? style.sidebarActive : style.sidebarButtonHover}`}
+										onClick={() => {
+											if (!item.items || item.items.length === 0) {
+												window.location.href = item.url || '#';
+											}
+										}}
 									>
 										{item.icon && (
-											<Image
-												src={item.icon}
-												alt={item.icon}
-												className='h-6 w-6'
-												width={5}
-												height={5}
-											/>
+											<div className={style.iconWrapper}>
+												<Image
+													src={item.icon}
+													alt={item.title || 'icon'}
+													className={item.isActive ? style.sidebar_selected_icon : ''}
+													width={24}
+													height={24}
+												/>
+											</div>
 										)}
 									</SidebarMenuButton>
 								</div>
@@ -55,22 +65,31 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 								<PopoverContent
 									side='right'
 									sideOffset={10}
-									className='w-64 rounded-xl border-[1px] border-solid border-[#000000] border-opacity-[10%] bg-white p-1.5 py-2.5 shadow-md'
+									className={style.popoverContent}
 								>
 									<ul className='space-y-2'>
 										{item.items.map((subItem) => (
 											<li
-												key={item.title}
-												className='flex cursor-pointer items-center gap-2 rounded-md py-1 pl-4 hover:bg-gray-100 dark:hover:bg-gray-800'
+												key={subItem.title}
+												className={`${style.sidebarButton} ${style.sidebarButtonHover}`}
 											>
 												<SidebarMenuSubButton asChild>
-													<a
-														href={subItem.url}
-														className='block rounded-md hover:bg-gray-100'
+													<Link
+														href={subItem.url || '#'}
+														className={subItem.isActive ? style.sidebarActive : ''}
 													>
+														<div className={style.iconWrapper}>
+															<Image
+																src={subItem.icon || ''}
+																alt={subItem.title || 'icon'}
+																className={subItem.isActive ? style.sidebar_selected_icon : ''}
+																width={24}
+																height={24}
+															/>
+														</div>
 														<span className='whitespace-nowrap'>{subItem.title}</span>
 														{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
-													</a>
+													</Link>
 												</SidebarMenuSubButton>
 											</li>
 										))}
@@ -86,20 +105,28 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 						onOpenChange={setIsOpen}
 						className='group/collapsible'
 					>
-						<SidebarMenuItem className='flex flex-col items-center py-1 pl-2'>
+						<SidebarMenuItem className='flex flex-col items-center pl-2'>
 							<CollapsibleTrigger asChild>
 								<SidebarMenuButton
 									size='default'
 									tooltip={item.title}
+									className={`${style.sidebarButton} ${item.isActive ? style.sidebarActive : style.sidebarButtonHover}`}
+									onClick={() => {
+										if (!item.items || item.items.length === 0) {
+											window.location.href = item.url || '#';
+										}
+									}}
 								>
 									{item.icon && (
-										<Image
-											src={item.icon}
-											alt={item.icon}
-											className='h-6 w-6'
-											width={5}
-											height={5}
-										/>
+										<div className={style.iconWrapper}>
+											<Image
+												src={item.icon}
+												alt={item.title || 'icon'}
+												className={item.isActive ? style.sidebar_selected_icon : ''}
+												width={24}
+												height={24}
+											/>
+										</div>
 									)}
 									<span className='flex-1 whitespace-nowrap'>
 										{item.title}
@@ -116,13 +143,13 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 											{item.items.map((subItem) => (
 												<SidebarMenuSubItem key={subItem.title}>
 													<SidebarMenuSubButton asChild>
-														<a
-															href={subItem.url}
-															className='my-2 block rounded-md py-2 hover:bg-gray-100'
+														<Link
+															href={subItem.url || '#'}
+															className={`${style.sidebarButton} ${subItem.isActive ? style.sidebarActive : style.sidebarButtonHover} py-5`}
 														>
 															<span className='whitespace-nowrap'>{subItem.title}</span>
 															{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
-														</a>
+														</Link>
 													</SidebarMenuSubButton>
 												</SidebarMenuSubItem>
 											))}
