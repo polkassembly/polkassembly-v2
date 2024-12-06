@@ -3,6 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@/_shared/types';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -168,5 +172,15 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async AddNewUser(user: IUser) {
 		await FirestoreRefs.usersCollectionRef().doc(user.id.toString()).set(user);
+	}
+
+	static async AddNewAddress(addressEntry: IUserAddress) {
+		const substrateAddress = getSubstrateAddress(addressEntry.address);
+
+		if (!substrateAddress) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
+		}
+
+		await FirestoreRefs.addressesCollectionRef().doc(substrateAddress).set(addressEntry);
 	}
 }

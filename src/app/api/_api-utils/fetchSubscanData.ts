@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { SUBSCAN_API_KEY, SUBSCAN_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
 import { redisGet, redisSetex } from '@/app/api/_api-services/redis_service';
 import { getSubscanDataKey } from '@/app/api/_api-services/redis_service/redisKeys';
@@ -32,7 +33,7 @@ export const fetchSubscanData = async (url: string | URL, network: string, body?
 		const validURL = new URL(`https://${network}.api.subscan.io/${filteredUrl}`);
 
 		const data = await (
-			await fetch(validURL, {
+			await fetchPF(validURL, {
 				body: JSON.stringify(body),
 				headers: SUBSCAN_API_HEADERS,
 				method: body ? 'POST' : method || 'GET'

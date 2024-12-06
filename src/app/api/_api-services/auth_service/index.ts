@@ -57,7 +57,9 @@ export class AuthService {
 		username,
 		isWeb3Signup,
 		network,
-		isCustomUsername = false
+		isCustomUsername = false,
+		address,
+		wallet
 	}: {
 		email: string;
 		newPassword: string;
@@ -65,7 +67,13 @@ export class AuthService {
 		isWeb3Signup: boolean;
 		network: ENetwork;
 		isCustomUsername: boolean;
+		address?: string;
+		wallet?: EWallet;
 	}): Promise<IUser> {
+		if (isWeb3Signup && !address) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
+		}
+
 		const { password, salt } = await this.GetSaltAndHashedPassword(newPassword);
 
 		const newUserId = (await OffChainDbService.GetTotalUsersCount()) + 1;
@@ -85,6 +93,16 @@ export class AuthService {
 		};
 
 		await OffChainDbService.AddNewUser(newUser);
+
+		if (isWeb3Signup && address) {
+			await OffChainDbService.AddNewAddress({
+				address,
+				isDefault: true,
+				network,
+				userId: newUserId,
+				wallet: wallet || EWallet.OTHER
+			});
+		}
 
 		return newUser;
 	}
@@ -325,8 +343,12 @@ export class AuthService {
 
 			return {
 				isTFAEnabled,
-				refreshToken: await this.GetRefreshToken({ userId: user.id }),
-				accessToken: await this.GetSignedAccessToken(user)
+				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: formattedAddress, loginWallet: wallet }),
+				accessToken: await this.GetSignedAccessToken({
+					...user,
+					loginAddress: formattedAddress,
+					loginWallet: wallet
+				})
 			};
 		}
 
@@ -340,7 +362,9 @@ export class AuthService {
 			username,
 			isWeb3Signup: true,
 			network,
-			isCustomUsername: false
+			isCustomUsername: false,
+			address: formattedAddress,
+			wallet
 		});
 
 		return {

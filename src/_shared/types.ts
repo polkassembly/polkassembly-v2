@@ -2,6 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+export enum ENetwork {
+	ROCOCO = 'rococo'
+}
+
 export enum ESocial {
 	EMAIL = 'email',
 	RIOT = 'riot',
@@ -101,7 +105,7 @@ export interface IUser {
 	profileDetails: IProfileDetails;
 	username: string;
 	isWeb3Signup: boolean;
-	primaryNetwork?: string;
+	primaryNetwork?: ENetwork;
 	notificationPreferences?: IUserNotificationSettings;
 	twoFactorAuth?: IUser2FADetails;
 	roles?: ERole[];
@@ -156,23 +160,19 @@ export interface IAccessTokenPayload {
 
 export interface IAddressProxyForEntry {
 	address: string;
-	network: string;
+	network: ENetwork;
 }
 
 export interface IUserAddress {
 	address: string;
 	default: boolean;
-	network: string;
+	network: ENetwork;
 	userId: number;
 	createdAt: Date;
 	updatedAt: Date;
 	wallet?: string;
 	isMultisig?: boolean;
 	proxyFor?: IAddressProxyForEntry[];
-}
-
-export enum ENetwork {
-	ROCOCO = 'rococo'
 }
 
 export interface IHashedPassword {

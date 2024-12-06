@@ -16,7 +16,7 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
-	const { proposalType = '' } = params;
+	const { proposalType = '' } = await params;
 
 	if (!proposalType || !ValidatorService.isValidProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
@@ -42,16 +42,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	if (ValidatorService.isValidOnChainProposalType(proposalType)) {
 		const onChainPosts = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page });
 
-		if (!onChainPosts) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to fetch on-chain posts');
-		}
-
 		// Fetch off-chain data
 		const offChainDataPromises = onChainPosts.map((post) => {
 			return OffChainDbService.GetOffChainPostData({
 				network,
-				indexOrHash: proposalType === EProposalType.TIP ? post.index.toString() : post.hash,
-				proposalType
+				indexOrHash: proposalType !== EProposalType.TIP ? post.index.toString() : post.hash,
+				proposalType,
+				proposer: post.proposer || ''
 			});
 		});
 

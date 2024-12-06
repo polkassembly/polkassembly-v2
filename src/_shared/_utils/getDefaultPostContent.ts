@@ -11,5 +11,5 @@ export function getDefaultPostContent(proposalType: EProposalType, proposerAddre
 
 	const address = isValidProposerAddress ? proposerAddress : '';
 
-	return `This is a ${proposalType} post. It can only be edited by the proposer of the post ${address.toLowerCase().startsWith('0x') ? proposerAddress : getSubstrateAddress(address)}.`;
+	return `This is a ${proposalType} post. It can only be edited by the proposer of the post ${address.toLowerCase().startsWith('0x') ? proposerAddress : getSubstrateAddress(address) || ''}.`;
 }

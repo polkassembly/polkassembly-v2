@@ -31,44 +31,47 @@ export class SubsquareOffChainService {
 			return null;
 		}
 
-		const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
+		try {
+			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-		if (data.dataSource === EDataSource.POLKASSEMBLY) {
+			if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
+				return null;
+			}
+
+			let title = data?.title || '';
+
+			if (title.includes('Untitled')) {
+				title = '';
+			}
+
+			if (title && title.includes('[Root] Referendum #')) {
+				title = title.replace(/\[Root\] Referendum #\d+: /, '');
+			}
+
+			const content = data?.content || '';
+
+			if (!title && !content) {
+				return null;
+			}
+
+			const offChainPost: IOffChainPost = {
+				id: '',
+				index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
+				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
+				title: title || DEFAULT_POST_TITLE,
+				content: content || getDefaultPostContent(proposalType, data?.proposer),
+				createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
+				updatedAt: data?.updatedAt ? new Date(data.updatedAt) : undefined,
+				tags: [],
+				proposalType,
+				network,
+				dataSource: EDataSource.SUBSQUARE
+			};
+
+			return offChainPost;
+		} catch {
 			return null;
 		}
-
-		let title = data?.title || '';
-
-		if (title.includes('Untitled')) {
-			title = '';
-		}
-
-		if (title && title.includes('[Root] Referendum #')) {
-			title = title.replace(/\[Root\] Referendum #\d+: /, '');
-		}
-
-		const content = data?.content || '';
-
-		if (!title && !content) {
-			return null;
-		}
-
-		const offChainPost: IOffChainPost = {
-			// eslint-disable-next-line no-underscore-dangle
-			id: data?._id || '',
-			index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
-			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
-			title: title || DEFAULT_POST_TITLE,
-			content: content || getDefaultPostContent(proposalType, data?.proposer),
-			createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
-			updatedAt: data?.updatedAt ? new Date(data.updatedAt) : undefined,
-			tags: [],
-			proposalType,
-			network,
-			dataSource: EDataSource.SUBSQUARE
-		};
-
-		return offChainPost;
 	}
 
 	static async GetOffChainPostsListing({
