@@ -35,12 +35,12 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 					<div className='relative flex flex-col items-center'>
 						<Popover>
 							<PopoverTrigger asChild>
-								<div className='relative'>
+								<div className={`${style.sidebarTrigger} relative`}>
 									{item.isNew && <span className={style.newBadge}>New</span>}
 									<SidebarMenuButton
 										size='lg'
 										tooltip={item.title}
-										className={`${style.sidebarButton} ${item.isActive ? style.sidebarActive : style.sidebarButtonHover}`}
+										className={`${style.sidebarButtonCollapse} ${item.isActive ? style.sidebarActive : style.sidebarButtonHover}`}
 										onClick={() => {
 											if (!item.items || item.items.length === 0) {
 												window.location.href = item.url || '#';
@@ -48,7 +48,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 										}}
 									>
 										{item.icon && (
-											<div className={style.iconWrapper}>
+											<div className={`${style.iconWrapper} flex items-center justify-center`}>
 												<Image
 													src={item.icon}
 													alt={item.title || 'icon'}
@@ -61,6 +61,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 									</SidebarMenuButton>
 								</div>
 							</PopoverTrigger>
+
 							{item.items && (
 								<PopoverContent
 									side='right'
