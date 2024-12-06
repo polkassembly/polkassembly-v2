@@ -77,17 +77,19 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 												<SidebarMenuSubButton asChild>
 													<Link
 														href={subItem.url || '#'}
-														className={subItem.isActive ? style.sidebarActive : ''}
+														className={subItem.isActive ? style.sidebarActive : 'flex justify-between px-3 py-2'}
 													>
-														<div className={style.iconWrapper}>
-															<Image
-																src={subItem.icon || ''}
-																alt={subItem.title || 'icon'}
-																className={subItem.isActive ? style.sidebar_selected_icon : ''}
-																width={24}
-																height={24}
-															/>
-														</div>
+														{subItem?.icon && (
+															<div className={style.iconWrapper}>
+																<Image
+																	src={subItem.icon || ''}
+																	alt={subItem.title || 'icon'}
+																	className={subItem.isActive ? style.sidebar_selected_icon : ''}
+																	width={24}
+																	height={24}
+																/>
+															</div>
+														)}
 														<span className='whitespace-nowrap'>{subItem.title}</span>
 														{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
 													</Link>

@@ -19,6 +19,7 @@
 .sidebarButtonHover {
 	&:hover {
 		background-color: #e5e7eb; /* Tailwind gray-200 */
+		border-radius: 4;
 	}
 }
 
@@ -48,4 +49,9 @@
 	padding: 0.1rem 0.4rem;
 	font-size: 0.625rem; /* Tailwind text-xs */
 	color: #fff;
+}
+
+.popoverContent {
+	@apply bg-white;
+	border-color: #d2d8e0;
 }
