@@ -14,7 +14,13 @@ export const THEME_COLORS = {
 		btn_secondary_border: '#D2D8E0',
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
-		border_grey: '#D2D8E0'
+		border_grey: '#D2D8E0',
+		sidebar_head1: '#F3F9D7',
+		sidebar_head2: '#fdf8e1',
+		sidebar_head3: '#ffede5',
+		sidebar_head4: '#dff4ff',
+		sidebar_footer: '#F3F4F6',
+		create_proposal_btn_create: '#0A3EAF'
 	},
 	dark: {
 		navbar_border: '#E5007A',
@@ -27,6 +33,7 @@ export const THEME_COLORS = {
 		btn_secondary_border: '#D2D8E0',
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
-		border_grey: '#D2D8E0'
+		border_grey: '#D2D8E0',
+		create_proposal_btn_create: '#49CFFC'
 	}
 };

@@ -10,7 +10,7 @@ function Navbar() {
 	return (
 		<header className='flex h-16 shrink-0 items-center gap-2 px-4 transition-[width,height] ease-linear'>
 			<div>
-				<p className='ml-5 text-lg font-medium text-[#243A57]'>OpenGov</p>
+				<p className='ml-5 text-lg font-medium text-btn_secondary_text'>OpenGov</p>
 			</div>
 		</header>
 	);

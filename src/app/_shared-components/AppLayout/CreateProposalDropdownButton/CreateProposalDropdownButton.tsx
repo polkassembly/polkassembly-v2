@@ -39,8 +39,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						/>
 						{state !== 'collapsed' && (
 							<>
-								<span className='py-[6px] font-medium leading-4 text-[#0A3EAF] dark:text-[#49CFFC]'>Create</span>
-								<ChevronDown className='ml-1 text-sm text-[#0A3EAF] dark:text-[#49CFFC]' />
+								<span className='text-create_proposal_btn_create dark:text-create_proposal_btn_create py-[6px] font-medium leading-4'>Create</span>
+								<ChevronDown className='text-create_proposal_btn_create dark:text-create_proposal_btn_create ml-1 text-sm' />
 							</>
 						)}
 					</div>
@@ -48,7 +48,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 				<PopoverContent
 					side={state === 'collapsed' ? 'right' : 'bottom'}
 					sideOffset={10}
-					className='w-56 rounded-xl border-[1px] border-solid border-[#000000] border-opacity-[10%] bg-white p-1.5 shadow-md'
+					className='w-56 rounded-xl border-[1px] border-solid border-white border-opacity-[10%] bg-white p-1.5 shadow-md'
 				>
 					<ul className='space-y-2'>
 						{menuItems.map((item) => (
