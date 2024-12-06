@@ -6,16 +6,20 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { FileText, ClipboardList, MessageCircle, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover';
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
+import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
+import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
+import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
+
 import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const menuItems = [
-		{ title: 'Treasury Proposal', icon: <FileText />, url: '/treasury-proposal' },
-		{ title: 'Proposal', icon: <ClipboardList />, url: '/proposal' },
-		{ title: 'Discussion Post', icon: <MessageCircle />, url: '/discussion-post' }
+		{ title: 'Treasury Proposal', icon: TreasuryProposalIcon, url: '/treasury-proposal' },
+		{ title: 'Proposal', icon: ProposalIcon, url: '/proposal' },
+		{ title: 'Discussion Post', icon: DiscussionIcon, url: '/discussion-post' }
 	];
 
 	return (
@@ -44,7 +48,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 				<PopoverContent
 					side={state === 'collapsed' ? 'right' : 'bottom'}
 					sideOffset={10}
-					className='w-54 rounded-md border-[1px] border-solid border-[#000000] border-opacity-[10%] bg-white shadow-md'
+					className='w-56 rounded-xl border-[1px] border-solid border-[#000000] border-opacity-[10%] bg-white p-1.5 shadow-md'
 				>
 					<ul className='space-y-2'>
 						{menuItems.map((item) => (
@@ -52,7 +56,13 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 								key={item.title}
 								className='flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800'
 							>
-								{item.icon}
+								<Image
+									src={item.icon}
+									alt='Dropdown Icon'
+									width={20}
+									height={20}
+								/>
+
 								<a
 									href={item.url}
 									className='text-sm font-medium text-gray-700 dark:text-gray-200'
