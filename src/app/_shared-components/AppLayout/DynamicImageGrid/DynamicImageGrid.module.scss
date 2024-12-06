@@ -1,0 +1,79 @@
+.flexRow {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem; /* Tailwind's gap-3 */
+}
+
+.flexCol {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem; /* Tailwind's gap-3 */
+}
+
+.iconWrapper {
+	display: flex;
+	height: 2.5rem; /* Tailwind's h-10 */
+	width: 2.5rem; /* Tailwind's w-10 */
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.5rem; /* Tailwind's rounded-lg */
+	padding: 0.5rem; /* Tailwind's p-2 */
+	cursor: pointer;
+}
+
+.image {
+	height: 100%; /* Tailwind's h-full */
+	width: 100%; /* Tailwind's w-full */
+	border-radius: 0.375rem; /* Tailwind's rounded-md */
+}
+
+.tooltipContent {
+	border-radius: 0.375rem; /* Tailwind's rounded-md */
+	background-color: #363636;
+	padding: 0.5rem; /* Tailwind's px-2 py-1 */
+	color: #fff;
+	box-shadow:
+		0 10px 15px -3px rgba(0, 0, 0, 0.1),
+		0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Tailwind's shadow-lg */
+	position: relative;
+}
+
+.tooltipText {
+	font-size: 0.875rem; /* Tailwind's text-sm */
+}
+
+.tooltipArrow {
+	position: absolute;
+	height: 0.5rem; /* Tailwind's h-2 */
+	width: 0.5rem; /* Tailwind's w-2 */
+	background-color: #363636;
+	transform: rotate(45deg); /* Tailwind's rotate-45 */
+}
+
+.arrowTop {
+	bottom: -0.25rem; /* Tailwind's -bottom-1 */
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.arrowBottom {
+	top: -0.25rem; /* Tailwind's -top-1 */
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.arrowLeft {
+	right: -0.25rem; /* Tailwind's -right-1 */
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.arrowRight {
+	left: -0.25rem; /* Tailwind's -left-1 */
+	top: 50%;
+	transform: translateY(-50%);
+}

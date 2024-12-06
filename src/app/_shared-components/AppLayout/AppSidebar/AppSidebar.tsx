@@ -42,7 +42,7 @@ import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@ui/Sidebar';
-import DynamicImageGrid from '../DynamicImageGrid';
+import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import style from './AppSidebar.module.scss';

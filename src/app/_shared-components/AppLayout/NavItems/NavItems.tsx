@@ -110,7 +110,7 @@ export function NavMain({
 												}}
 												className='flex items-center dark:border-[#4B4B4B]'
 											>
-												<span className={`text-lightBlue ${state === 'collapsed' ? '' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
+												<span className={`text-lightBlue ${state === 'collapsed' ? 'pl-2' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
 													{mainItem.heading}
 												</span>
 												<ChevronRight className='ml-auto mr-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
