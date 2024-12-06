@@ -217,6 +217,11 @@ export enum ENotificationTrigger {
 	VERIFY_EMAIL = 'verifyEmail'
 }
 
+export enum EDataSource {
+	POLKASSEMBLY = 'polkassembly',
+	SUBSQUARE = 'subsquare'
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -227,12 +232,13 @@ export interface IOffChainPost {
 	createdAt?: Date;
 	updatedAt?: Date;
 	tags?: string[];
+	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
 }
 
 export enum EProposalStatus {
-	UNKNOWN = 'Unknown',
+	Unknown = 'Unknown',
 	Noted = 'Noted',
 	Proposed = 'Proposed',
 	Tabled = 'Tabled',
@@ -277,8 +283,7 @@ export enum EProposalStatus {
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
-	description: string;
-	createdAt: Date;
+	createdAt?: Date;
 }
 
 export interface IPost extends IOffChainPost {

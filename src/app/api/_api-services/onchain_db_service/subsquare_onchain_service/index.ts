@@ -2,15 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
-import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EDataSource, ENetwork, EProposalType, IOffChainPost } from '@/_shared/types';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { ENetwork, EProposalStatus, EProposalType, IOnChainPostInfo } from '@/_shared/types';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-// TODO: IMPLEMENT THIS
-export class SubsquareOffChainService {
+export class SubsquareOnChainService {
 	private static postDetailsUrlMap = {
 		[EProposalType.BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/bounties/${id}`,
 		[EProposalType.CHILD_BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/child-bounties/${id}`,
@@ -24,7 +21,15 @@ export class SubsquareOffChainService {
 		[EProposalType.TREASURY_PROPOSAL]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/proposals/${id}`
 	};
 
-	static async GetOffChainPostData({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IOffChainPost | null> {
+	static async GetOnChainPostInfo({
+		network,
+		indexOrHash,
+		proposalType
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+	}): Promise<IOnChainPostInfo | null> {
 		const mappedUrl = this.postDetailsUrlMap[proposalType as keyof typeof this.postDetailsUrlMap]?.(indexOrHash, network);
 
 		if (!mappedUrl) {
@@ -33,55 +38,14 @@ export class SubsquareOffChainService {
 
 		const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-		if (data.dataSource === EDataSource.POLKASSEMBLY) {
-			return null;
-		}
+		const proposer = data?.proposer || data?.onchainData?.proposer || '';
 
-		let title = data?.title || '';
-
-		if (title.includes('Untitled')) {
-			title = '';
-		}
-
-		if (title && title.includes('[Root] Referendum #')) {
-			title = title.replace(/\[Root\] Referendum #\d+: /, '');
-		}
-
-		const content = data?.content || '';
-
-		if (!title && !content) {
-			return null;
-		}
-
-		const offChainPost: IOffChainPost = {
-			// eslint-disable-next-line no-underscore-dangle
-			id: data?._id || '',
-			index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
-			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
-			title: title || DEFAULT_POST_TITLE,
-			content: content || getDefaultPostContent(proposalType, data?.proposer),
-			createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
-			updatedAt: data?.updatedAt ? new Date(data.updatedAt) : undefined,
-			tags: [],
-			proposalType,
-			network,
-			dataSource: EDataSource.SUBSQUARE
+		const onChainPostInfo: IOnChainPostInfo = {
+			proposer: ValidatorService.isValidSubstrateAddress(proposer) ? getSubstrateAddress(proposer) || '' : '',
+			status: data?.state?.name || data?.onchainData?.state?.name || EProposalStatus.Unknown,
+			createdAt: data?.createdAt ? new Date(data?.createdAt) : undefined
 		};
 
-		return offChainPost;
-	}
-
-	static async GetOffChainPostsListing({
-		network,
-		proposalType,
-		limit,
-		page
-	}: {
-		network: ENetwork;
-		proposalType: EProposalType;
-		limit: number;
-		page: number;
-	}): Promise<IOffChainPost[]> {
-		return [];
+		return onChainPostInfo;
 	}
 }

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@/_shared/types';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -110,6 +110,7 @@ export class FirestoreService extends FirestoreRefs {
 
 		return {
 			...postData,
+			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate()
 		} as IOffChainPost;
