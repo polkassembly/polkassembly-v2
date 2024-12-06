@@ -106,7 +106,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 						onOpenChange={setIsOpen}
 						className='group/collapsible'
 					>
-						<SidebarMenuItem className='flex flex-col items-center pl-2'>
+						<SidebarMenuItem className='flex flex-col items-center px-2'>
 							<CollapsibleTrigger asChild>
 								<SidebarMenuButton
 									size='default'

@@ -208,7 +208,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
-			<div className='px-5'>
+			<div className='px-4'>
 				<CreateProposalDropdownButton state={state} />
 			</div>
 			<SidebarContent>
