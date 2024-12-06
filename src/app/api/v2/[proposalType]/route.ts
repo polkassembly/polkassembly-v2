@@ -10,7 +10,7 @@ import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EProposalType, IPostListing } from '@shared/types';
+import { EDataSource, EProposalType, IPostListing } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -60,6 +60,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		// Merge on-chain and off-chain data
 		posts = onChainPosts.map((post, index) => ({
 			...offChainData[Number(index)],
+			dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 			network,
 			proposalType,
 			onChainInfo: post
