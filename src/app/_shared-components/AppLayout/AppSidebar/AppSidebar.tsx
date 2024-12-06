@@ -33,6 +33,13 @@ import CommunityIcon from '@assets/sidebar/community-icon.svg';
 import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
 import ArchivedIcon from '@assets/sidebar/archived-icon.svg';
 import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
+import RootIcon from '@assets/sidebar/root-icon.svg';
+import TreasurerIcon from '@assets/sidebar/treasurer-icon.svg';
+import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
+import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.svg';
+import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
+import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
+import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@ui/Sidebar';
 import DynamicImageGrid from '../DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
@@ -94,8 +101,8 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			],
 			mainItems: [
 				{
-					heading: 'Tracks',
-					title: 'Tracks',
+					heading: 'TRACKS',
+					title: 'TRACKS',
 					url: '',
 					icon: Head4,
 					items: [
@@ -122,6 +129,21 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 								{ title: 'Staking Admin', url: '/big-tipper', count: 10 }
 							]
 						}
+					]
+				},
+				{
+					heading: 'ORIGINS',
+					title: 'ORIGINS',
+					url: '',
+					icon: Head4,
+					items: [
+						{ title: 'Root', url: '/root', count: 5, icon: RootIcon },
+						{ title: 'Treasurer', url: '/treasurer', count: 5, icon: TreasurerIcon },
+						{ title: 'Wish for change', url: '/wish-for-change', count: 5, icon: WishForChangeIcon },
+						{ title: 'Referendum Cancellor', url: '/referendum-cancellor', icon: ReferendumCancellorIcon },
+						{ title: 'Referendum Killer', url: '/referendum-killer', count: 5, icon: ReferendumKillerIcon },
+						{ title: 'Whitelisted Caller', url: '/whitelist-caller', count: 5, icon: WhitelistedCallerIcon },
+						{ title: 'Fellowship Admin', url: '/fellowship-admin', count: 5, icon: FellowshipAdminIcon }
 					]
 				}
 			],

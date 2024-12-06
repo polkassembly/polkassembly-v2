@@ -61,7 +61,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 										{item.items.map((subItem) => (
 											<li
 												key={item.title}
-												className='flex cursor-pointer items-center gap-2 rounded-md px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-800'
+												className='flex cursor-pointer items-center gap-2 rounded-md py-1 pl-4 hover:bg-gray-100 dark:hover:bg-gray-800'
 											>
 												<SidebarMenuSubButton asChild>
 													<a
@@ -86,7 +86,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 						onOpenChange={setIsOpen}
 						className='group/collapsible'
 					>
-						<SidebarMenuItem className='flex flex-col items-center px-5 py-1'>
+						<SidebarMenuItem className='flex flex-col items-center py-1 pl-2'>
 							<CollapsibleTrigger asChild>
 								<SidebarMenuButton
 									size='default'
