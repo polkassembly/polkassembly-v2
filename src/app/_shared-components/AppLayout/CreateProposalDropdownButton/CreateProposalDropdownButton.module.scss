@@ -1,5 +1,5 @@
 .card {
-	@apply relative z-10 ml-3 rounded-[11.5px] bg-[var(--sidebar-background)] text-center;
+	@apply relative z-10 rounded-[11.5px] bg-[var(--sidebar-background)] text-center;
 }
 
 @property --angle {
