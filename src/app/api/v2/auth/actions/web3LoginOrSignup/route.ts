@@ -10,11 +10,10 @@ import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
 import { EAuthCookieNames } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const network = getNetworkFromHeaders(await headers());
+	const network = await getNetworkFromHeaders();
 
 	const { address = '', wallet = '', signature = '' } = await getReqBody(req);
 

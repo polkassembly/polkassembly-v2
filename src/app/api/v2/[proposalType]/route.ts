@@ -12,7 +12,6 @@ import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/lis
 import { ValidatorService } from '@shared/_services/validator_service';
 import { EDataSource, EProposalType, IPostListing } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
@@ -34,7 +33,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid page or limit');
 	}
 
-	const network = getNetworkFromHeaders(await headers());
+	const network = await getNetworkFromHeaders();
 
 	let posts: IPostListing[] = [];
 
