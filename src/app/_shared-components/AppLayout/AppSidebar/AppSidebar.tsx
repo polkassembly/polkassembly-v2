@@ -86,18 +86,18 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 		heading?: string;
 	}
 
-	const setActiveItems = (items: Item[]): Item[] => {
+	const ActiveItems = (items: Item[]): Item[] => {
 		return items.map((item) => ({
 			...item,
 			isActive: pathname === item.url,
-			items: item.items ? setActiveItems(item.items) : undefined
+			items: item.items ? ActiveItems(item.items) : undefined
 		}));
 	};
 
 	const data = [
 		{
 			heading: 'Main',
-			initalItems: setActiveItems([
+			initalItems: ActiveItems([
 				{ title: 'Home', url: '/open-gov', icon: Home },
 				{ title: 'Discussions', url: '/discussions', icon: Discussion },
 				{ title: 'Preimages', url: '/preimages', icon: Preimages },
@@ -107,25 +107,25 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					url: '/bounty',
 					icon: Bounty,
 					isNew: true,
-					items: setActiveItems([
+					items: ActiveItems([
 						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
 						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
 					])
 				},
 				{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
 			]),
-			mainItems: setActiveItems([
+			mainItems: ActiveItems([
 				{
 					heading: 'TRACKS',
 					title: 'TRACKS',
 					url: '',
 					icon: Head4,
-					items: setActiveItems([
+					items: ActiveItems([
 						{
 							title: 'Treasury',
 							url: '',
 							icon: TreasuryIcon,
-							items: setActiveItems([
+							items: ActiveItems([
 								{ title: 'Big Spender', url: '/big-spender', count: 5 },
 								{ title: 'Medium Spender', url: '/medium-spender', count: 5 },
 								{ title: 'Small Spender', url: '/small-spender', count: 5 },
@@ -137,7 +137,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 							title: 'Administration',
 							url: '',
 							icon: AdministrationIcon,
-							items: setActiveItems([
+							items: ActiveItems([
 								{ title: 'Auction Admin', url: '/big-spender', count: 10 },
 								{ title: 'General Admin', url: '/medium-spender', count: 10 },
 								{ title: 'Lease Admin', url: '/small-spender', count: 10 },
@@ -151,7 +151,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					title: 'ORIGINS',
 					url: '',
 					icon: Head4,
-					items: setActiveItems([
+					items: ActiveItems([
 						{ title: 'Root', url: '/root', count: 5, icon: RootIcon },
 						{ title: 'Treasurer', url: '/treasurer', count: 5, icon: TreasurerIcon },
 						{ title: 'Wish for change', url: '/wish-for-change', count: 5, icon: WishForChangeIcon },
@@ -162,14 +162,14 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					])
 				}
 			]),
-			endItems: setActiveItems([
+			endItems: ActiveItems([
 				{ title: 'Gov Analytics', url: '/gov-analytics', icon: GovAnalytics },
 				{ title: 'Calendar', url: '/calendar', icon: CalendarIcon },
 				{
 					title: 'Community',
 					url: '/community',
 					icon: CommunityIcon,
-					items: setActiveItems([
+					items: ActiveItems([
 						{ title: 'Members', url: '/Members' },
 						{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
 					])

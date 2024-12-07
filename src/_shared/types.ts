@@ -1,6 +1,8 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+import { StaticImageData } from 'next/image';
+import { tokenSymbol } from './_constants/networkConstants';
 
 export enum ESocial {
 	EMAIL = 'email',
@@ -298,4 +300,100 @@ export interface IOnChainPostListing {
 
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
+}
+
+export type TokenSymbol = (typeof tokenSymbol)[keyof typeof tokenSymbol];
+
+export type TRPCEndpoint = {
+	key: string;
+	label: string;
+};
+
+export enum EAssets {
+	DED = 'ded',
+	USDT = 'usdt',
+	USDC = 'usdc'
+}
+
+export interface IAssets {
+	tokenDecimal: number;
+	name: string;
+	img: string;
+	symbol: EAssets;
+	genralIndex: string;
+}
+
+interface Asset {
+	label: string;
+	assetId: number;
+}
+export interface ChainProps {
+	peopleChainRpcEndpoint?: string;
+	peopleChainParachain?: string;
+	preImageBaseDeposit?: string;
+	palletInstance?: string;
+	parachain?: string;
+	blockTime: number;
+	logo?: StaticImageData;
+	ss58Format: number;
+	tokenDecimals: number;
+	tokenSymbol: TokenSymbol;
+	chainId: number;
+	rpcEndpoint: string;
+	category: string;
+	subsquidUrl: string;
+	treasuryAddress?: string;
+	treasuryProposalBondPercent: string | null;
+	treasuryProposalMinBond: string | null;
+	treasuryProposalMaxBond: string | null;
+	externalLinks: string;
+	assethubExternalLinks?: string;
+	rpcEndpoints: TRPCEndpoint[];
+	relayRpcEndpoints?: TRPCEndpoint[];
+	gTag: string | null;
+	assetHubRpcEndpoint?: string;
+	assetHubTreasuryAddress?: string;
+	supportedAssets?: IAssets[];
+	hydrationTreasuryAddress?: string;
+	hydrationEndpoints?: string[];
+	hydrationAssets?: Asset[];
+	tracks: {
+		[x: string]: {
+			trackId: number;
+			description: string;
+			group: string;
+			name: string;
+			maxDeciding: number;
+			decisionDeposit: number;
+			preparePeriod: number;
+			decisionPeriod: number;
+			confirmPeriod: number;
+			minEnactmentPeriod: number;
+			minApproval: {
+				linearDecreasing?: {
+					length: number;
+					floor: number;
+					ceil: number;
+				};
+				reciprocal?: {
+					factor: number;
+					xOffset: number;
+					yOffset: number;
+				};
+			};
+			minSupport: {
+				linearDecreasing?: {
+					length: number;
+					floor: number;
+					ceil: number;
+				};
+				reciprocal?: {
+					factor: number;
+					xOffset: number;
+					yOffset: number;
+				};
+			};
+			maxSpend?: number;
+		};
+	};
 }
