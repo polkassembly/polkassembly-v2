@@ -1,37 +1,23 @@
-.sidebar_header {
-	@apply h-[60px] justify-center px-6;
-	background-color: black;
-}
-
 .separator {
 	@apply bg-border_grey;
 }
 
 .hide_scrollbar {
-	-ms-overflow-style: none; /* For Internet Explorer and Edge */
-	scrollbar-width: none; /* For Firefox */
-	overflow-y: auto; /* Enables vertical scrolling */
+	@apply overflow-y-auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
 
 .hide_scrollbar::-webkit-scrollbar {
-	width: 0px;
-	height: 0px;
+	@apply hidden;
 }
 
 .create_proposal_button {
-	border: 1px solid #d2d8e0; /* Border */
-	background-color: #f8f9fc; /* Light background */
-	padding: 0.5rem 0.375rem; /* Padding: py-2 px-[6px] */
-	border-radius: 0.75rem; /* Rounded corners: rounded-xl */
-	display: flex; /* Flexbox container */
-	align-items: center; /* Center items vertically */
-	justify-content: center; /* Center items horizontally */
-	gap: 6px; /* Gap between items */
-	cursor: pointer; /* Pointer cursor */
-	margin: 0 0.75rem; /* Margin: mx-3 */
+	@apply mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border px-[6px] py-2;
+	background-color: var(--sidebar-background, #f8f9fc);
+	border-color: var(--sidebar-border, #d2d8e0);
 }
 
 .dark .create_proposal_button {
-	background-color: var(--section-dark-background, #1f2937); /* Dark background */
-	border-color: var(--separator-dark, #2d3748); /* Dark border */
+	@apply border-[var(--separator-dark)] bg-[var(--section-dark-background)];
 }

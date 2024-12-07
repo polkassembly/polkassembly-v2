@@ -1,39 +1,21 @@
 .sidebarTrigger {
-	position: relative;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	@apply relative flex items-center justify-center;
 }
 
 .sidebarButtonCollapse {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 10rem;
-	padding: 0.5rem 0.75rem;
-	border-radius: 0.5rem;
-	cursor: pointer;
-	transition: background-color 0.2s;
+	@apply flex w-40 cursor-pointer items-center justify-center rounded-md px-3 py-2 transition-colors duration-200;
 }
 
 .sidebarButtonHover {
-	&:hover {
-		background-color: #e5e7eb; /* Tailwind gray-200 */
-		border-radius: 4;
-	}
+	@apply rounded-md hover:bg-gray-200;
 }
 
 .sidebarActive {
-	background-color: #fce6f1;
-	color: #ff0080;
+	@apply bg-pink-50 text-pink-600;
 }
 
 .iconWrapper {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 2rem;
-	height: 2rem;
+	@apply flex h-8 w-8 items-center justify-center;
 }
 
 .sidebar_selected_icon {
@@ -41,17 +23,9 @@
 }
 
 .newBadge {
-	position: absolute;
-	right: -12px;
-	top: -5px;
-	border-radius: 9999px;
-	background-color: #3b82f6; /* Tailwind blue-500 */
-	padding: 0.1rem 0.4rem;
-	font-size: 0.625rem; /* Tailwind text-xs */
-	color: #fff;
+	@apply absolute -right-3 -top-1 rounded-full bg-blue-500 px-2 py-[0.1rem] text-[0.625rem] text-white;
 }
 
 .popoverContent {
-	@apply bg-white;
-	border-color: #d2d8e0;
+	@apply border border-gray-300 bg-white;
 }

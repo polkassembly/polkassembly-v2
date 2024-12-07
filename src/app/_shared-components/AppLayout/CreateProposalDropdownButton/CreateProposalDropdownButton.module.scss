@@ -1,9 +1,5 @@
 .card {
-	background: #0b0d15 !important;
-	text-align: center;
-	border-radius: 11.5px;
-	position: relative;
-	z-index: 10;
+	@apply relative z-10 rounded-[11.5px] bg-[var(--sidebar-background)] text-center;
 }
 
 @property --angle {
@@ -15,18 +11,12 @@
 .card::after,
 .card::before {
 	content: '';
-	position: absolute;
-	height: 100%;
-	width: 100%;
+	@apply absolute left-1/2 top-1/2 z-[-10] h-full w-full -translate-x-1/2 -translate-y-1/2 rounded-[11.5px] p-[2px];
 	background-image: conic-gradient(from var(--angle), #4ffaff, #3c76f4, #0437a7, #4ffaff);
-	top: 50%;
-	left: 50%;
-	translate: -50% -50%;
-	z-index: -10;
-	padding: 2px;
-	border-radius: 11.5px;
-	animation: 3s spin linear infinite;
+
+	animation: spin 3s linear infinite;
 }
+
 @keyframes spin {
 	from {
 		--angle: 0deg;
@@ -37,89 +27,62 @@
 }
 
 .cardCollapsed {
-	width: 100%;
-	margin-top: 1rem;
-	padding: 2px;
+	@apply mt-4 w-full p-[2px];
 }
 
 .cardExpanded {
-	margin-top: 1rem;
-	margin-left: 0.5rem;
-	width: 200px;
-	padding: 2px;
+	@apply ml-2 mt-4 w-[200px] p-[2px];
 }
 
 .trigger {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	border-radius: 10.5px;
-	background-color: white;
-	cursor: pointer;
-	transition: background-color 0.2s ease;
+	@apply flex cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
 }
 
 .triggerCollapsed {
-	padding: 5px;
+	@apply p-[5px];
 }
 
 .triggerExpanded {
-	padding: 2px;
+	@apply p-[2px];
 }
 
 .triggerText {
-	font-weight: 500;
-	font-size: 0.875rem; /* Tailwind's text-sm */
-	line-height: 1rem;
-	color: var(--text-create-proposal-btn);
+	@apply text-sm font-medium leading-4 text-[var(--sidebar-foreground)];
 }
 
 .triggerIcon {
-	margin-left: 0.25rem; /* Tailwind's ml-1 */
-	font-size: 0.875rem; /* Tailwind's text-sm */
-	color: var(--text-create-proposal-btn);
+	@apply ml-1 text-sm text-[var(--sidebar-foreground)];
 }
 
 .popoverContent {
-	width: 14rem; /* Tailwind's w-56 */
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	background-color: white;
-	border-radius: 0.75rem; /* Tailwind's rounded-xl */
-	padding: 0.375rem; /* Tailwind's p-1.5 */
-	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Tailwind's shadow-md */
+	@apply w-56 rounded-xl border border-solid border-opacity-10 bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md;
+	border-color: var(--sidebar-border, #d2d8e0) !important;
 }
 
 .menuList {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem; /* Tailwind's space-y-2 */
+	@apply flex flex-col gap-2;
 }
 
 .menuItem {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem; /* Tailwind's gap-2 */
-	padding: 0.5rem 1rem; /* Tailwind's px-4 py-2 */
-	border-radius: 0.375rem; /* Tailwind's rounded-md */
-	cursor: pointer;
-	transition: background-color 0.2s ease;
+	@apply flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 transition-colors ease-in-out;
 
 	&:hover {
-		background-color: #f3f4f6; /* Tailwind's gray-100 */
+		@apply bg-[var(--sidebar-accent)];
 	}
 
 	&:hover.dark {
-		background-color: #1f2937; /* Tailwind's gray-800 */
+		@apply bg-[var(--sidebar-background)];
 	}
 }
 
 .menuLink {
-	font-size: 0.875rem; /* Tailwind's text-sm */
-	font-weight: 500; /* Tailwind's font-medium */
-	color: #485f7d;
+	@apply text-sm font-medium text-[var(--sidebar-accent-foreground)];
 
 	.dark & {
-		color: #e5e7eb; /* Tailwind's gray-200 */
+		@apply text-[var(--sidebar-foreground)];
 	}
+}
+
+.newBadge {
+	@apply absolute right-[-12px] top-[-5px] rounded-full bg-[var(--sidebar-ring)] px-[0.4rem] py-[0.1rem] text-xs text-[var(--sidebar-primary-foreground)];
 }
