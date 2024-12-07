@@ -35,7 +35,6 @@
 	],
 	"rules": {
 		"@typescript-eslint/no-duplicate-enum-values": "off",
-		"import/no-cycle": "error",
 		"@typescript-eslint/no-unused-vars": "error",
 		"@typescript-eslint/no-explicit-any": "error",
 		"react/react-in-jsx-scope": "off",
