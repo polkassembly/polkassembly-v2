@@ -154,7 +154,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 															className={`${style.sidebarButton} ${subItem.isActive ? style.sidebarActive : style.sidebarButtonHover} px-1 py-1.5`}
 														>
 															<span className='whitespace-nowrap'>{subItem.title}</span>
-															{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
+															{subItem.count !== undefined && <span className={style.subItemCount}>{subItem.count}</span>}
 														</Link>
 													</SidebarMenuSubButton>
 												</SidebarMenuSubItem>
