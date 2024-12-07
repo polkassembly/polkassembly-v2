@@ -3,7 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import westendLogo from '@assets/parachain-logos/westend-logo.jpg';
-import { ChainProps, EAssets } from '../types';
+import { ChainProps } from '../types';
+import { EAssets } from './sharedConstants';
 
 export const network = {
 	ROCOCO: 'rococo'

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { StaticImageData } from 'next/image';
-import { tokenSymbol } from './_constants/networkConstants';
+import { EAssets, tokenSymbol } from './_constants/sharedConstants';
 
 export enum ESocial {
 	EMAIL = 'email',
@@ -317,12 +317,6 @@ export interface Item {
 	count?: number;
 	items?: Item[];
 	heading?: string;
-}
-
-export enum EAssets {
-	DED = 'ded',
-	USDT = 'usdt',
-	USDC = 'usdc'
 }
 
 export interface IAssets {
