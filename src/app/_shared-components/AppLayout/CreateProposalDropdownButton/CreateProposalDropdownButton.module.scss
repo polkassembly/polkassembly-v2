@@ -55,8 +55,7 @@
 }
 
 .popoverContent {
-	@apply w-56 rounded-xl border border-solid border-opacity-10 bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md;
-	border-color: var(--sidebar-border, #d2d8e0) !important;
+	@apply w-56 rounded-xl border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md;
 }
 
 .menuList {

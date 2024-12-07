@@ -66,7 +66,7 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 								<PopoverContent
 									side='right'
 									sideOffset={10}
-									className={style.popoverContent}
+									className={`${style.popoverContent} bg-white shadow-lg`}
 								>
 									<ul className='space-y-2'>
 										{item.items.map((subItem) => (
