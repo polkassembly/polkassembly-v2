@@ -78,7 +78,6 @@ const getOriginsItems = () => {
 		title: capitalizeWords(key),
 		url: `/${key.toLowerCase().replace(/_/g, '-')}`,
 		// eslint-disable-next-line
-		count: chainProperties[network.ROCOCO]?.tracks?.[key]?.maxDeciding ?? 0,
 		icon
 	}));
 };
