@@ -140,15 +140,18 @@ function CollapsibleItem({ item, state }: { item: Item; state: State }) {
 								</SidebarMenuButton>
 							</CollapsibleTrigger>
 							{item.items && (
-								<CollapsibleContent>
+								<CollapsibleContent className='w-full'>
 									<SidebarMenuSub>
 										<ul>
 											{item.items.map((subItem) => (
 												<SidebarMenuSubItem key={subItem.title}>
-													<SidebarMenuSubButton asChild>
+													<SidebarMenuSubButton
+														asChild
+														className='flex w-full items-center justify-between'
+													>
 														<Link
 															href={subItem.url || '#'}
-															className={`${style.sidebarButton} ${subItem.isActive ? style.sidebarActive : style.sidebarButtonHover} py-5`}
+															className={`${style.sidebarButton} ${subItem.isActive ? style.sidebarActive : style.sidebarButtonHover} px-1 py-1.5`}
 														>
 															<span className='whitespace-nowrap'>{subItem.title}</span>
 															{subItem.count !== undefined && <span className='ml-auto rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium'>{subItem.count}</span>}
