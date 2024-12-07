@@ -7,7 +7,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
@@ -44,7 +44,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 				<PopoverContent
 					side={state === 'collapsed' ? 'right' : 'bottom'}
 					sideOffset={10}
-					className='w-56 rounded-xl border-[1px] border-solid border-white border-opacity-[10%] bg-white p-1.5 shadow-md'
+					className={style.popoverContent}
 				>
 					<ul className='space-y-2'>
 						{menuItems.map((item) => (

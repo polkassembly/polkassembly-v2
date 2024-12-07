@@ -13,9 +13,7 @@
 }
 
 .create_proposal_button {
-	@apply mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border px-[6px] py-2;
-	background-color: var(--sidebar-background, #f8f9fc);
-	border-color: var(--sidebar-border, #d2d8e0);
+	@apply mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-gray-300 bg-gray-50 px-[6px] py-2;
 }
 
 .dark .create_proposal_button {

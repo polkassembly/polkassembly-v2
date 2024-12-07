@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Button } from '@/app/_shared-components/Button';
+import { Button } from '@/app/_shared-components/Button/Button';
 import Link from 'next/link';
 import React from 'react';
 

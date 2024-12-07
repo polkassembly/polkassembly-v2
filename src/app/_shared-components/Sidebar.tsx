@@ -11,7 +11,7 @@ import Image from 'next/image';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Button } from '@/app/_shared-components/Button';
+import { Button } from '@/app/_shared-components/Button/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import LeftIcon from '@assets/sidebar/lefticon.svg';
@@ -256,7 +256,7 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
 			data-sidebar='trigger'
 			variant='normal'
 			size='icon'
-			className={cn('h-8 w-8 rounded-lg border border-[#d2d8e0] bg-white p-2', className)}
+			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2', className)}
 			type='button'
 			onClick={(event) => {
 				onClick?.(event);

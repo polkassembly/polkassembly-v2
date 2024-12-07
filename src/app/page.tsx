@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Button } from '@ui/Button';
+import { Button } from '@/app/_shared-components/Button/Button';
 
 export default function Home() {
 	return (

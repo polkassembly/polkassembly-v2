@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
-import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar';
 import style from './CollapsibleItem.module.scss';
 

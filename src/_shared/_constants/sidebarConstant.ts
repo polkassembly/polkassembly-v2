@@ -22,8 +22,8 @@ import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.s
 import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
-import { chainProperties, network } from './networkConstants';
 import { Item } from '../types';
+import { NETWORKS_DETAILS } from './networks';
 
 const capitalizeWords = (text: string) =>
 	text
@@ -39,8 +39,8 @@ const ActiveItems = (items: Item[], pathname: string): Item[] => {
 	}));
 };
 
-const getTrackItems = (trackGroup: string) => {
-	const tracks = chainProperties[network.ROCOCO]?.tracks || {};
+const getTrackItems = (networkKey: keyof typeof NETWORKS_DETAILS, trackGroup: string) => {
+	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 
 	return (
 		Object.entries(tracks)
@@ -118,13 +118,13 @@ export const getSidebarData = (pathname: string) => {
 									title: 'Treasury',
 									url: '',
 									icon: TreasuryIcon,
-									items: getTrackItems('Treasury')
+									items: getTrackItems('Treasury' as keyof typeof NETWORKS_DETAILS, 'Treasury')
 								},
 								{
 									title: 'Administration',
 									url: '',
 									icon: AdministrationIcon,
-									items: getTrackItems('Main')
+									items: getTrackItems('Main' as keyof typeof NETWORKS_DETAILS, 'Main')
 								}
 							],
 							pathname

@@ -37,6 +37,7 @@
 		--sidebar-border: hsl(220 13% 91%);
 		--sidebar-ring: hsl(217.2 91.2% 59.8%);
 	}
+
 	.dark {
 		--sidebar-background: hsl(240 5.9% 10%);
 		--sidebar-foreground: hsl(240 4.8% 95.9%);
@@ -59,21 +60,11 @@
 }
 
 .hide_scrollbar {
-	overflow-y: auto; /* Enable vertical scrolling */
-	overflow-x: hidden; /* Prevent horizontal scrolling */
-	-ms-overflow-style: none; /* IE/Edge */
-	scrollbar-width: none; /* Firefox */
+	@apply overflow-y-auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
 
 .hide_scrollbar::-webkit-scrollbar {
-	width: 0; /* Chrome/Brave */
-	height: 0;
-}
-
-.collapsed-sidebar .menu-item span {
-	display: none; /* Hide text in collapsed state */
-}
-
-.collapsed-sidebar img {
-	margin: auto; /* Center align icons */
+	@apply hidden;
 }
