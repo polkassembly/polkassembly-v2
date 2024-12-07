@@ -4,6 +4,8 @@
 
 export const THEME_COLORS = {
 	light: {
+		wallet_btn_text: '#485F7D',
+		bg_modal: '#FFF',
 		navbar_border: '#E5007A',
 		btn_primary_background: '#E5007A',
 		primary_border: '#D2D8E0',
@@ -14,9 +16,14 @@ export const THEME_COLORS = {
 		btn_secondary_border: '#D2D8E0',
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
-		border_grey: '#D2D8E0'
+		border_grey: '#D2D8E0',
+		text_primary: '#243A57',
+		text_pink: '#E5007A',
+		placeholder: '#576D8BCC'
 	},
 	dark: {
+		wallet_btn_text: '#485F7D',
+		bg_modal: '#000',
 		navbar_border: '#E5007A',
 		btn_primary_background: '#E5007A',
 		primary_border: '#3F3F46',
@@ -27,6 +34,9 @@ export const THEME_COLORS = {
 		btn_secondary_border: '#D2D8E0',
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
-		border_grey: '#D2D8E0'
+		border_grey: '#D2D8E0',
+		text_primary: '#FFF',
+		text_pink: '#E5007A',
+		placeholder: '#576D8BCC'
 	}
 };

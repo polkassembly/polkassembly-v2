@@ -3,7 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 export enum ENetwork {
-	ROCOCO = 'rococo'
+	ROCOCO = 'rococo',
+	POLKADOT = 'polkadot'
 }
 
 export enum ESocial {
@@ -303,4 +304,11 @@ export interface IOnChainPostListing {
 
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
+}
+
+export interface IUserAtom {
+	userId: string;
+	username: string;
+	address: string;
+	wallet?: EWallet;
 }

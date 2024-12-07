@@ -1,0 +1,11 @@
+.rootClass {
+    @apply flex h-full w-full items-start justify-center p-20
+}
+
+.loginComp {
+    @apply w-[600px] rounded-lg shadow-lg
+}
+
+.header {
+    @apply border-b border-border_grey px-4 py-2
+}

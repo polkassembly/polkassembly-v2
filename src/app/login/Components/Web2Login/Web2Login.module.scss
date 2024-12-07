@@ -1,0 +1,11 @@
+.header {
+    @apply flex w-full flex-col gap-y-4
+}
+
+.switchToSignup {
+    @apply mt-4 flex items-center justify-center gap-x-1 text-text_primary
+}
+
+.footer {
+    @apply my-6 flex w-full justify-center
+}

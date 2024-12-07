@@ -260,7 +260,7 @@ export class AuthService {
 
 	static async Web2SignUp(email: string, password: string, username: string, network: ENetwork): Promise<IAuthResponse> {
 		// find if username is in blacklisted usernames
-		if (ValidatorService.isValidUsername(username)) {
+		if (!ValidatorService.isValidUsername(username)) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Username is not allowed.');
 		}
 
@@ -310,7 +310,7 @@ export class AuthService {
 
 		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
 
-		if (!isEvmAddress || !ValidatorService.isValidSubstrateAddress(address)) {
+		if (!isEvmAddress && !ValidatorService.isValidSubstrateAddress(address)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid address');
 		}
 

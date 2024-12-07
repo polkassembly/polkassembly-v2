@@ -1,0 +1,15 @@
+.header {
+    @apply mb-2 flex w-full items-center justify-center gap-x-6
+}
+
+.formFields {
+    @apply flex w-full flex-col gap-y-4
+}
+
+.switchToLogin {
+    @apply my-4 flex items-center justify-center gap-x-1 text-text_primary
+}
+
+.footer {
+    @apply flex justify-end border-t border-border_grey pt-4
+}

@@ -11,23 +11,31 @@ import NotificationsContainer from './_shared-components/NotificationsContainer'
 import { SidebarProvider } from './_shared-components/Sidebar';
 import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
 import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
+import Initializers from './Initializers';
+import { getUserFromCookie } from './_client-utils/getUserFromCookie';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
 	description: 'Polkassembly but so much better'
 };
 
-export default function RootLayout({
-	children
+export default async function RootLayout({
+	children,
+	modal
 }: Readonly<{
 	children: ReactNode;
+	modal: ReactNode;
 }>) {
+	const user = await getUserFromCookie();
+
 	return (
 		<html lang='en'>
 			<body className={poppinsFont.className}>
 				<Providers>
+					<Initializers userData={user ? { address: user?.defaultAddress || '', userId: String(user?.id), wallet: user?.loginWallet, username: user?.username || '' } : null} />
 					<SidebarProvider open>
 						<AppSidebar />
+						{modal}
 						<main className='w-full'>
 							<Navbar />
 							{children}

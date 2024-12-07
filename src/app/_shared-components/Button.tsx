@@ -12,7 +12,7 @@ const buttonVariants = {
 	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
 	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
 	outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-	secondary: 'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border shadow-sm hover:bg-btn_secondary_background/80',
+	secondary: 'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-border_grey hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	ghost: 'hover:bg-accent hover:text-accent-foreground',
 	link: 'text-primary underline-offset-4 hover:underline'
 };
@@ -21,7 +21,7 @@ const buttonSizes = {
 	default: 'h-9 px-4 py-2',
 	sm: 'h-8 rounded-md px-3 text-xs',
 	lg: 'h-10 rounded-md px-8',
-	icon: 'h-9 w-9'
+	icon: 'px-4 py-1'
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
