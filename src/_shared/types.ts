@@ -309,6 +309,16 @@ export type TRPCEndpoint = {
 	label: string;
 };
 
+export interface Item {
+	title: string;
+	url: string;
+	icon?: string;
+	isNew?: boolean;
+	count?: number;
+	items?: Item[];
+	heading?: string;
+}
+
 export enum EAssets {
 	DED = 'ded',
 	USDT = 'usdt',

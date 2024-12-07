@@ -20,28 +20,29 @@ import Foot1 from '@assets/sidebar/foot1.svg';
 import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
-import Home from '@assets/sidebar/homeicon.svg';
-import Discussion from '@assets/sidebar/discussion.svg';
-import Preimages from '@assets/sidebar/preimages.svg';
-import Delegation from '@assets/sidebar/delegation.svg';
-import Bounty from '@assets/sidebar/bounty.svg';
-import BatchVoting from '@assets/sidebar/batch-voting.svg';
-import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
+// import Home from '@assets/sidebar/homeicon.svg';
+// import Discussion from '@assets/sidebar/discussion.svg';
+// import Preimages from '@assets/sidebar/preimages.svg';
+// import Delegation from '@assets/sidebar/delegation.svg';
+// import Bounty from '@assets/sidebar/bounty.svg';
+// import BatchVoting from '@assets/sidebar/batch-voting.svg';
+// import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
-import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
-import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
-import CommunityIcon from '@assets/sidebar/community-icon.svg';
-import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
-import ArchivedIcon from '@assets/sidebar/archived-icon.svg';
-import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
-import RootIcon from '@assets/sidebar/root-icon.svg';
-import TreasurerIcon from '@assets/sidebar/treasurer-icon.svg';
-import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
-import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.svg';
-import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
-import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
-import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
+// import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
+// import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
+// import CommunityIcon from '@assets/sidebar/community-icon.svg';
+// import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
+// import ArchivedIcon from '@assets/sidebar/archived-icon.svg';
+// import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
+// import RootIcon from '@assets/sidebar/root-icon.svg';
+// import TreasurerIcon from '@assets/sidebar/treasurer-icon.svg';
+// import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
+// import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.svg';
+// import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
+// import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
+// import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@ui/Sidebar';
+import { getSidebarData } from '@/_shared/_constants/networkConstants';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
@@ -76,109 +77,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 		/>
 	);
 
-	interface Item {
-		title: string;
-		url: string;
-		icon?: string;
-		isNew?: boolean;
-		count?: number;
-		items?: Item[];
-		heading?: string;
-	}
-
-	const ActiveItems = (items: Item[]): Item[] => {
-		return items.map((item) => ({
-			...item,
-			isActive: pathname === item.url,
-			items: item.items ? ActiveItems(item.items) : undefined
-		}));
-	};
-
-	const data = [
-		{
-			heading: 'Main',
-			initalItems: ActiveItems([
-				{ title: 'Home', url: '/open-gov', icon: Home },
-				{ title: 'Discussions', url: '/discussions', icon: Discussion },
-				{ title: 'Preimages', url: '/preimages', icon: Preimages },
-				{ title: 'Delegation', url: '/delegation', icon: Delegation },
-				{
-					title: 'Bounty',
-					url: '/bounty',
-					icon: Bounty,
-					isNew: true,
-					items: ActiveItems([
-						{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
-						{ title: 'On-chain Bounties', url: '/bounty/onchain' }
-					])
-				},
-				{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
-			]),
-			mainItems: ActiveItems([
-				{
-					heading: 'TRACKS',
-					title: 'TRACKS',
-					url: '',
-					icon: Head4,
-					items: ActiveItems([
-						{
-							title: 'Treasury',
-							url: '',
-							icon: TreasuryIcon,
-							items: ActiveItems([
-								{ title: 'Big Spender', url: '/big-spender', count: 5 },
-								{ title: 'Medium Spender', url: '/medium-spender', count: 5 },
-								{ title: 'Small Spender', url: '/small-spender', count: 5 },
-								{ title: 'Big Tipper', url: '/big-tipper', count: 5 },
-								{ title: 'Small Tipper', url: '/small-tipper', count: 5 }
-							])
-						},
-						{
-							title: 'Administration',
-							url: '',
-							icon: AdministrationIcon,
-							items: ActiveItems([
-								{ title: 'Auction Admin', url: '/big-spender', count: 10 },
-								{ title: 'General Admin', url: '/medium-spender', count: 10 },
-								{ title: 'Lease Admin', url: '/small-spender', count: 10 },
-								{ title: 'Staking Admin', url: '/big-tipper', count: 10 }
-							])
-						}
-					])
-				},
-				{
-					heading: 'ORIGINS',
-					title: 'ORIGINS',
-					url: '',
-					icon: Head4,
-					items: ActiveItems([
-						{ title: 'Root', url: '/root', count: 5, icon: RootIcon },
-						{ title: 'Treasurer', url: '/treasurer', count: 5, icon: TreasurerIcon },
-						{ title: 'Wish for change', url: '/wish-for-change', count: 5, icon: WishForChangeIcon },
-						{ title: 'Referendum Cancellor', url: '/referendum-cancellor', icon: ReferendumCancellorIcon },
-						{ title: 'Referendum Killer', url: '/referendum-killer', count: 5, icon: ReferendumKillerIcon },
-						{ title: 'Whitelisted Caller', url: '/whitelist-caller', count: 5, icon: WhitelistedCallerIcon },
-						{ title: 'Fellowship Admin', url: '/fellowship-admin', count: 5, icon: FellowshipAdminIcon }
-					])
-				}
-			]),
-			endItems: ActiveItems([
-				{ title: 'Gov Analytics', url: '/gov-analytics', icon: GovAnalytics },
-				{ title: 'Calendar', url: '/calendar', icon: CalendarIcon },
-				{
-					title: 'Community',
-					url: '/community',
-					icon: CommunityIcon,
-					items: ActiveItems([
-						{ title: 'Members', url: '/Members' },
-						{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
-					])
-				},
-				{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
-				{ title: 'Archived', url: '/archived', icon: ArchivedIcon }
-			])
-		}
-	];
+	const data = getSidebarData(pathname);
 
 	const headerData = [
 		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },
