@@ -23,6 +23,7 @@ import Foot4 from '@assets/sidebar/foot4.svg';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@ui/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
+import { ENetwork } from '@/_shared/types';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
@@ -56,8 +57,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			isExpanded={state === 'expanded'}
 		/>
 	);
-
-	const data = getSidebarData(pathname);
+	const data = getSidebarData(ENetwork.ROCOCO, pathname);
 
 	const headerData = [
 		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },

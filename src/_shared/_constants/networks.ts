@@ -26,7 +26,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.ROOT]: {
 				trackId: 0,
 				description: 'Origin for General network-wide improvements',
-				group: 'Main',
+				group: 'Origin',
 				name: 'root',
 				maxDeciding: 1,
 				decisionDeposit: 1000000000000000,
@@ -187,7 +187,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.TREASURER]: {
 				trackId: 11,
 				description: 'Origin for spending (any amount of) funds until the upper limit of  10,000,000 DOT',
-				group: 'Treasury',
+				group: 'Origin',
 				name: 'treasurer',
 				maxSpend: 10000000,
 				maxDeciding: 10,
@@ -214,7 +214,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.WHITELISTED_CALLER]: {
 				trackId: 1,
 				description: 'Origin commanded by any members of the Polkadot Fellowship (no Dan grade needed)',
-				group: 'Whitelist',
+				group: 'Origin',
 				name: 'whitelisted_caller',
 				maxDeciding: 100,
 				decisionDeposit: 100000000000000,
@@ -266,7 +266,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.LEASE_ADMIN]: {
 				trackId: 12,
 				description: 'Origin able to force slot leases',
-				group: 'Governance',
+				group: 'Main',
 				name: 'lease_admin',
 				maxDeciding: 10,
 				decisionDeposit: 50000000000000,
@@ -292,7 +292,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.FELLOWSHIP_ADMIN]: {
 				trackId: 13,
 				description: 'Origin for managing the composition of the fellowship',
-				group: 'Whitelist',
+				group: 'Origin',
 				name: 'fellowship_admin',
 				maxDeciding: 10,
 				decisionDeposit: 50000000000000,
@@ -318,7 +318,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.GENERAL_ADMIN]: {
 				trackId: 14,
 				description: 'Origin for managing the registrar',
-				group: 'Governance',
+				group: 'Main',
 				name: 'general_admin',
 				maxDeciding: 10,
 				decisionDeposit: 50000000000000,
@@ -370,7 +370,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.REFERENDUM_CANCELLER]: {
 				trackId: 20,
 				description: 'Origin able to cancel referenda.',
-				group: 'Governance',
+				group: 'Origin',
 				name: 'referendum_canceller',
 				maxDeciding: 1000,
 				decisionDeposit: 100000000000000,
@@ -396,7 +396,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.REFERENDUM_KILLER]: {
 				trackId: 21,
 				description: 'Origin able to kill referenda.',
-				group: 'Governance',
+				group: 'Origin',
 				name: 'referendum_killer',
 				maxDeciding: 1000,
 				decisionDeposit: 500000000000000,

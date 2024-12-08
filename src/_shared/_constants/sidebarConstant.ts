@@ -31,58 +31,65 @@ const capitalizeWords = (text: string) =>
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 		.join(' ');
 
-const ActiveItems = (items: Item[], pathname: string): Item[] => {
-	return items.map((item) => ({
+const ActiveItems = (items: Item[], pathname: string): Item[] =>
+	items.map((item) => ({
 		...item,
 		isActive: pathname === item.url,
 		items: item.items ? ActiveItems(item.items, pathname) : undefined
 	}));
-};
-
 const getTrackItems = (networkKey: keyof typeof NETWORKS_DETAILS, trackGroup: string) => {
+	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
-
-	return (
-		Object.entries(tracks)
-			.filter(([key, track]) => {
-				if (trackGroup === 'Main') {
-					return (track.group === trackGroup || key === 'GENERAL_ADMIN' || key === 'LEASE_ADMIN') && key !== 'ROOT';
-				}
-				if (trackGroup === 'Treasury') {
-					return track.group === trackGroup && key !== 'TREASURER';
-				}
-				return track.group === trackGroup;
-			})
-			// eslint-disable-next-line
-			.map(([key, track]) => ({
-				title: capitalizeWords(track.name),
-				url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
-				count: track.maxDeciding,
-				icon: undefined
-			}))
-	);
+	return Object.entries(tracks)
+		.filter(([, track]) => track.group === trackGroup)
+		.map(([, track]) => ({
+			title: capitalizeWords(track.name),
+			url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
+			count: track.maxDeciding,
+			icon: undefined
+		}));
 };
 
-const getOriginsItems = () => {
-	const origins = [
-		{ key: 'ROOT', icon: RootIcon },
-		{ key: 'TREASURER', icon: TreasurerIcon },
-		{ key: 'WISH_FOR_CHANGE', icon: WishForChangeIcon },
-		{ key: 'REFERENDUM_CANCELLER', icon: ReferendumCancellorIcon },
-		{ key: 'REFERENDUM_KILLER', icon: ReferendumKillerIcon },
-		{ key: 'WHITELISTED_CALLER', icon: WhitelistedCallerIcon },
-		{ key: 'FELLOWSHIP_ADMIN', icon: FellowshipAdminIcon }
-	];
-
-	return origins.map(({ key, icon }) => ({
-		title: capitalizeWords(key),
-		url: `/${key.toLowerCase().replace(/_/g, '-')}`,
-		// eslint-disable-next-line
-		icon
-	}));
+const getOriginIcon = (key: string) => {
+	switch (key) {
+		case 'root':
+			return RootIcon;
+		case 'Treasurer':
+			return TreasurerIcon;
+		case 'WISH_FOR_CHANGE':
+			return WishForChangeIcon;
+		case 'ReferendumCanceller':
+			return ReferendumCancellorIcon;
+		case 'ReferendumKiller':
+			return ReferendumKillerIcon;
+		case 'WhitelistedCaller':
+			return WhitelistedCallerIcon;
+		case 'FellowshipAdmin':
+			return FellowshipAdminIcon;
+		default:
+			return null;
+	}
 };
 
-export const getSidebarData = (pathname: string) => {
+const getOriginsItems = (networkKey: keyof typeof NETWORKS_DETAILS) => {
+	// eslint-disable-next-line
+	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
+	return Object.entries(tracks)
+		.filter(([, track]) => track.group === 'Origin')
+		.map(([key, track]) => ({
+			title: capitalizeWords(track.name),
+			url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
+			icon: getOriginIcon(key)
+		}));
+};
+
+export const getSidebarData = (networkKey: keyof typeof NETWORKS_DETAILS, pathname: string) => {
+	// eslint-disable-next-line
+	const network = NETWORKS_DETAILS[networkKey];
+	if (!network) {
+		throw new Error(`Network ${networkKey} not found`);
+	}
+
 	return [
 		{
 			heading: 'Main',
@@ -118,13 +125,13 @@ export const getSidebarData = (pathname: string) => {
 									title: 'Treasury',
 									url: '',
 									icon: TreasuryIcon,
-									items: getTrackItems('Treasury' as keyof typeof NETWORKS_DETAILS, 'Treasury')
+									items: getTrackItems(networkKey, 'Treasury')
 								},
 								{
 									title: 'Administration',
 									url: '',
 									icon: AdministrationIcon,
-									items: getTrackItems('Main' as keyof typeof NETWORKS_DETAILS, 'Main')
+									items: getTrackItems(networkKey, 'Main')
 								}
 							],
 							pathname
@@ -134,7 +141,7 @@ export const getSidebarData = (pathname: string) => {
 						heading: 'ORIGINS',
 						title: 'ORIGINS',
 						url: '',
-						items: ActiveItems(getOriginsItems(), pathname)
+						items: ActiveItems(getOriginsItems(networkKey), pathname)
 					}
 				],
 				pathname
@@ -148,7 +155,7 @@ export const getSidebarData = (pathname: string) => {
 						url: '/community',
 						icon: CommunityIcon,
 						items: [
-							{ title: 'Members', url: '/Members' },
+							{ title: 'Members', url: '/members' },
 							{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
 						]
 					},

@@ -312,6 +312,7 @@ export interface Item {
 	isNew?: boolean;
 	count?: number;
 	items?: Item[];
+	key?: string;
 	heading?: string;
 }
 
