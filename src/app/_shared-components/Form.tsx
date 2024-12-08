@@ -10,7 +10,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from 'react-hook-form';
 
 import { cn } from '@/lib/utils';
-import { Label } from '@/app/_shared-components//label';
+import { Label } from '@/app/_shared-components/Label';
 
 const Form = FormProvider;
 

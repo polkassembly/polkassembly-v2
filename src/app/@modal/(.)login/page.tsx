@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog';
 import LoginComponent from '@/app/login/Components/Login';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import HeaderLabel from '@/app/login/Components/HeaderLabel';
 import classes from './Login.module.scss';
 
 function Login() {
@@ -25,10 +26,12 @@ function Login() {
 		>
 			<DialogContent className={classes.content}>
 				<DialogHeader>
-					<DialogTitle className={classes.title}>Login to Polkassembly</DialogTitle>
+					<DialogTitle>
+						<HeaderLabel />
+					</DialogTitle>
 				</DialogHeader>
 				<div className='px-4'>
-					<LoginComponent />
+					<LoginComponent isModal />
 				</div>
 			</DialogContent>
 		</Dialog>

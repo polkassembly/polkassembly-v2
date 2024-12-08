@@ -20,6 +20,7 @@ import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useSetAtom } from 'jotai';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import classes from './Web3Login.module.scss';
+import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const initAuthResponse: IAuthResponse = {
@@ -31,8 +32,10 @@ const initAuthResponse: IAuthResponse = {
 
 function Web3Login({
 	switchToWeb2,
+	switchToSignup,
 	onWalletChange,
 	accounts,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	setAccounts,
 	address,
 	onAccountChange,
@@ -41,6 +44,7 @@ function Web3Login({
 	address: string;
 	selectedWallet: EWallet | null;
 	switchToWeb2: () => void;
+	switchToSignup: () => void;
 	accounts: InjectedAccount[];
 	setAccounts: React.Dispatch<React.SetStateAction<InjectedAccount[]>>;
 	onAccountChange: (a: string) => void;
@@ -144,19 +148,10 @@ function Web3Login({
 				onWalletChange={onWalletChange}
 				selectedWallet={selectedWallet || undefined}
 			/>
-			<div className={classes.switchToWeb2}>
-				Or
-				<Button
-					variant='ghost'
-					className='px-0 text-text_pink'
-					onClick={switchToWeb2}
-				>
-					Login with Account
-				</Button>
-			</div>
-			{address && (
-				<div className={classes.footer}>
-					<Button
+			<div>
+				{address && (
+					<div className={classes.footer}>
+						{/* <Button
 						variant='secondary'
 						disabled={loading}
 						onClick={() => {
@@ -165,15 +160,36 @@ function Web3Login({
 						}}
 					>
 						Go Back
-					</Button>
+					</Button> */}
+						<Button
+							isLoading={loading}
+							onClick={handleLogin}
+							size='lg'
+							className={classes.loginButton}
+						>
+							Login
+						</Button>
+					</div>
+				)}
+				<div className={classes.switchToWeb2}>
+					Or
 					<Button
-						isLoading={loading}
-						onClick={handleLogin}
+						variant='ghost'
+						className='px-0 text-text_pink'
+						onClick={switchToWeb2}
 					>
-						Login
+						Login with Username
 					</Button>
 				</div>
-			)}
+				{address && (
+					<SwitchToWeb2Signup
+						switchToSignup={() => {
+							switchToWeb2();
+							switchToSignup();
+						}}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }

@@ -13,8 +13,10 @@ import { isWeb3Injected } from '@polkadot/extension-dapp';
 import Web2Signup from './Web2Signup/Web2Signup';
 import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
+import classes from './Login.module.scss';
+import HeaderLabel from './HeaderLabel';
 
-function Login({ userId }: { userId?: string }) {
+function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 	const router = useRouter();
 
 	useEffect(() => {
@@ -102,32 +104,44 @@ function Login({ userId }: { userId?: string }) {
 		switchToWeb3();
 	};
 
-	return !isWeb2Login ? (
-		<Web3Login
-			address={address}
-			selectedWallet={selectedWallet}
-			accounts={accounts}
-			setAccounts={setAccounts}
-			onWalletChange={onWalletChange}
-			onAccountChange={onAccountChange}
-			switchToWeb2={switchToWeb2}
-		/>
-	) : !isWeb2Signup ? (
-		<Web2Login
-			accounts={accounts}
-			address={address}
-			onAccountChange={onAccountChange}
-			onWalletChange={onWalletChange}
-			switchToSignup={switchWeb2LoginType}
-		/>
-	) : (
-		<Web2Signup
-			accounts={accounts}
-			address={address}
-			onAccountChange={onAccountChange}
-			onWalletChange={onWalletChange}
-			switchToLogin={switchWeb2LoginType}
-		/>
+	return (
+		<>
+			{!isModal && (
+				<div className={classes.header}>
+					<HeaderLabel />
+				</div>
+			)}
+			<div className={!isModal ? 'px-12 py-6' : ''}>
+				{!isWeb2Login ? (
+					<Web3Login
+						address={address}
+						selectedWallet={selectedWallet}
+						accounts={accounts}
+						setAccounts={setAccounts}
+						onWalletChange={onWalletChange}
+						onAccountChange={onAccountChange}
+						switchToWeb2={switchToWeb2}
+						switchToSignup={switchWeb2LoginType}
+					/>
+				) : !isWeb2Signup ? (
+					<Web2Login
+						accounts={accounts}
+						address={address}
+						onAccountChange={onAccountChange}
+						onWalletChange={onWalletChange}
+						switchToSignup={switchWeb2LoginType}
+					/>
+				) : (
+					<Web2Signup
+						accounts={accounts}
+						address={address}
+						onAccountChange={onAccountChange}
+						onWalletChange={onWalletChange}
+						switchToLogin={switchWeb2LoginType}
+					/>
+				)}
+			</div>
+		</>
 	);
 }
 

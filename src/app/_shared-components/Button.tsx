@@ -11,8 +11,9 @@ import { cn } from '@/lib/utils';
 const buttonVariants = {
 	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
 	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-	outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-	secondary: 'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-border_grey hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
+	outline:
+		'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
+	secondary: 'bg-btn_secondary_background text-text_pink rounded-lg border border-navbar_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	ghost: 'hover:bg-accent hover:text-accent-foreground',
 	link: 'text-primary underline-offset-4 hover:underline'
 };

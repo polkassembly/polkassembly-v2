@@ -22,6 +22,7 @@ import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import classes from './Web2Login.module.scss';
+import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
 const formSchema = z.object({
 	emailOrUsername: z.string(),
@@ -147,6 +148,8 @@ function Web2Login({
 							<Button
 								isLoading={loading}
 								type='submit'
+								className={classes.loginButton}
+								size='lg'
 							>
 								Login
 							</Button>
@@ -170,16 +173,7 @@ function Web2Login({
 				onAddressChange={onAccountChange}
 				onWalletChange={onWalletChange}
 			/>
-			<p className={classes.switchToSignup}>
-				Don&apos;t have an account?{' '}
-				<Button
-					onClick={switchToSignup}
-					variant='ghost'
-					className='p-0 text-text_pink'
-				>
-					Sign Up
-				</Button>
-			</p>
+			<SwitchToWeb2Signup switchToSignup={switchToSignup} />
 		</div>
 	);
 }

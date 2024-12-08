@@ -13,14 +13,14 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 			onClick={() => onClick(wallet)}
 			size='icon'
 			disabled={disabled}
-			variant='secondary'
+			variant='outline'
 		>
 			<WalletIcon wallet={wallet} />
 		</Button>
 	) : (
 		<Button
 			onClick={() => onClick(wallet)}
-			variant='secondary'
+			variant='outline'
 			className={classes.walletButton}
 			leftIcon={<WalletIcon wallet={wallet} />}
 			disabled={disabled}

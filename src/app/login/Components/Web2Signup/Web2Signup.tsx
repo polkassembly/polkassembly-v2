@@ -18,11 +18,7 @@ import { PasswordInput } from '@/app/_shared-components/PasswordInput';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import classes from './Web2Signup.module.scss';
-
-enum ESignupSteps {
-	USERNAME = 'Create Username',
-	PASSWORD = 'Set Password'
-}
+import SignupStepHeader, { ESignupSteps } from './SignupStepHeader';
 
 const formSchema = z.object({
 	email: z.string(),
@@ -103,15 +99,11 @@ function Web2Signup({
 
 	return (
 		<Form {...form}>
-			<div className={classes.header}>
-				<Button
-					variant='ghost'
-					onClick={() => setStep(ESignupSteps.USERNAME)}
-				>
-					01 {ESignupSteps.USERNAME}
-				</Button>
-				<Button variant='ghost'>02 {ESignupSteps.PASSWORD}</Button>
-			</div>
+			<SignupStepHeader
+				step={step}
+				setStep={setStep}
+			/>
+
 			<form onSubmit={form.handleSubmit(handleSignup)}>
 				{step === ESignupSteps.USERNAME ? (
 					<div className={classes.formFields}>
@@ -220,14 +212,33 @@ function Web2Signup({
 				</p>
 				<div className={classes.footer}>
 					{step === ESignupSteps.PASSWORD ? (
-						<Button
-							type='submit'
-							isLoading={loading}
-						>
-							Sign Up
-						</Button>
+						<>
+							<Button
+								onClick={() => setStep(ESignupSteps.USERNAME)}
+								disabled={loading}
+								size='lg'
+								variant='secondary'
+								className={classes.signupButton}
+							>
+								Go Back
+							</Button>
+							<Button
+								type='submit'
+								isLoading={loading}
+								size='lg'
+								className={classes.signupButton}
+							>
+								Sign Up
+							</Button>
+						</>
 					) : (
-						<Button onClick={() => setStep(ESignupSteps.PASSWORD)}>Next</Button>
+						<Button
+							size='lg'
+							className={classes.signupButton}
+							onClick={() => setStep(ESignupSteps.PASSWORD)}
+						>
+							Next
+						</Button>
 					)}
 				</div>
 			</form>
