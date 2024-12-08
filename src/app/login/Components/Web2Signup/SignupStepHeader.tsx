@@ -29,7 +29,7 @@ function SignupStepHeader({ step, setStep }: { step: ESignupSteps; setStep: Reac
 				className={classes.btn}
 			>
 				<div className={cn(classes.tagWrapper, 'border-border_grey', step === ESignupSteps.PASSWORD && 'border-navbar_border')}>
-					<span className={cn(classes.tag, 'text-text_grey bg-border_grey', step === ESignupSteps.PASSWORD && 'bg-bg_pink text-btn_primary_text')}>02</span>
+					<span className={cn(classes.tag, 'bg-border_grey text-text_grey', step === ESignupSteps.PASSWORD && 'bg-bg_pink text-btn_primary_text')}>02</span>
 				</div>
 				<div className={classes.password}>{ESignupSteps.PASSWORD}</div>
 			</Button>
