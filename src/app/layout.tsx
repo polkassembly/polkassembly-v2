@@ -8,22 +8,29 @@ import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
 	description: 'Polkassembly but so much better'
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children
 }: Readonly<{
 	children: ReactNode;
 }>) {
+	const locale = await getLocale();
+	const messages = await getMessages();
+
 	return (
-		<html lang='en'>
+		<html lang={locale}>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<main>{children}</main>
+					<NextIntlClientProvider messages={messages}>
+						<main>{children}</main>
+					</NextIntlClientProvider>
 					<NotificationsContainer />
 				</Providers>
 			</body>

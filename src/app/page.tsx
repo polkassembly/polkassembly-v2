@@ -2,6 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useTranslations } from 'next-intl';
+
 export default function Home() {
-	return <div className='text-center leading-10'>Polkassembly</div>;
+	const t = useTranslations('HomePage');
+	return (
+		<div>
+			<h1 className='text-center leading-10'>{t('title')}</h1>
+		</div>
+	);
 }

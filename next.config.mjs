@@ -1,17 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-	i18n: {
-		locales: ['default', 'en', 'de', 'fr'],
-		defaultLocale: 'default',
-		localeDetection: false,
-		domains: [
-			{
-				domain: 'polkassembly.io',
-				defaultLocale: 'en-US'
-			}
-		]
-	},
-	trailingSlash: true
-};
+import createNextIntlPlugin from 'next-intl/plugin';
+const withNextIntl = createNextIntlPlugin();
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
+
+export default withNextIntl(nextConfig);
