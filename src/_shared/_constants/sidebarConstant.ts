@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Home from '@assets/sidebar/homeicon.svg';
-import Discussion from '@assets/sidebar/discussion.svg';
+import Discussion from '@assets/sidebar/discussion-icon.svg';
 import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
 import Bounty from '@assets/sidebar/bounty.svg';
