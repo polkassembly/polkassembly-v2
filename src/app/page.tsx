@@ -9,6 +9,7 @@ export default function Home() {
 	return (
 		<div>
 			<h1 className='text-center leading-10'>{t('title')}</h1>
+			<h1 className='text-center leading-10'>{t('Greet')}</h1>
 		</div>
 	);
 }
