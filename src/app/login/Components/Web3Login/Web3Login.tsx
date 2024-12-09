@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ENetwork, EWallet, IAuthResponse } from '@/_shared/types';
+import { EWallet, IAuthResponse } from '@/_shared/types';
 import React, { useState } from 'react';
 import { InjectedAccount, InjectedWindow } from '@polkadot/extension-inject/types';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
@@ -12,7 +12,7 @@ import { APPNAME } from '@/_shared/_constants/appName';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
-import { request } from '@/app/_client-utils/request';
+import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { Button } from '@/app/_shared-components/Button';
 import { useRouter } from 'next/navigation';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
@@ -35,19 +35,16 @@ function Web3Login({
 	switchToSignup,
 	onWalletChange,
 	accounts,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-	setAccounts,
-	address,
+	account,
 	onAccountChange,
 	selectedWallet
 }: {
-	address: string;
+	account: InjectedAccount | null;
 	selectedWallet: EWallet | null;
 	switchToWeb2: () => void;
 	switchToSignup: () => void;
 	accounts: InjectedAccount[];
-	setAccounts: React.Dispatch<React.SetStateAction<InjectedAccount[]>>;
-	onAccountChange: (a: string) => void;
+	onAccountChange: (a: InjectedAccount) => void;
 	onWalletChange: (wallet: EWallet) => void;
 }) {
 	const router = useRouter();
@@ -59,7 +56,9 @@ function Web3Login({
 
 	const handleLogin = async () => {
 		try {
-			if (!selectedWallet) return;
+			if (!selectedWallet || !account?.address) return;
+			const { address } = account;
+
 			const injectedWindow = window as Window & InjectedWindow;
 			const wallet = isWeb3Injected ? injectedWindow.injectedWeb3[selectedWallet] : null;
 
@@ -89,51 +88,32 @@ function Web3Login({
 				substrateAddress = address;
 			}
 
-			const signMessage = WEB3_AUTH_SIGN_MESSAGE;
-
-			if (!signMessage) {
-				setLoading(false);
-				throw new Error('Challenge message not found');
-			}
-
 			const { signature } = await signRaw({
 				address: substrateAddress,
-				data: stringToHex(signMessage),
+				data: stringToHex(WEB3_AUTH_SIGN_MESSAGE),
 				type: 'bytes'
 			});
 
-			const data = await request<IAuthResponse>(
-				'/auth/actions/web3LoginOrSignup',
-				{
-					'x-network': ENetwork.POLKADOT
-				},
-				{
-					body: JSON.stringify({
-						address: substrateAddress,
-						signature,
-						wallet: selectedWallet
-					}),
-					method: 'POST'
-				}
-			);
+			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web3LoginOrSignup', {
+				address: substrateAddress,
+				signature,
+				wallet: selectedWallet
+			});
 
-			if (data && data.accessToken) {
-				console.log('login data', data);
-				const decodedData = AuthClientService.handleTokenChange(data.accessToken);
-
-				if (decodedData) {
-					setUserAtom({
-						address: decodedData.defaultAddress,
-						userId: String(decodedData.id),
-						username: decodedData.username,
-						wallet: decodedData.loginWallet
-					});
-				}
-				router.back();
+			if (!data?.accessToken) {
+				console.log('Login failed. Please try again later.');
+				setLoading(false);
+				return;
 			}
+
+			const decodedData = AuthClientService.decodeAccessToken(data.accessToken);
+
+			if (decodedData) {
+				setUserAtom(decodedData);
+			}
+			router.back();
 			setLoading(false);
 		} catch (error) {
-			// setError(error.message);
 			console.log('error', error);
 			setLoading(false);
 		}
@@ -143,24 +123,14 @@ function Web3Login({
 		<div className='w-full'>
 			<WalletButtons
 				accounts={accounts}
-				selectedAddress={address}
+				selectedAddress={account?.address || ''}
 				onAddressChange={onAccountChange}
 				onWalletChange={onWalletChange}
 				selectedWallet={selectedWallet || undefined}
 			/>
 			<div>
-				{address && (
+				{account?.address && (
 					<div className={classes.footer}>
-						{/* <Button
-						variant='secondary'
-						disabled={loading}
-						onClick={() => {
-							setAccounts([]);
-							onAccountChange('');
-						}}
-					>
-						Go Back
-					</Button> */}
 						<Button
 							isLoading={loading}
 							onClick={handleLogin}
@@ -181,7 +151,7 @@ function Web3Login({
 						Login with Username
 					</Button>
 				</div>
-				{address && (
+				{account?.address && (
 					<SwitchToWeb2Signup
 						switchToSignup={() => {
 							switchToWeb2();

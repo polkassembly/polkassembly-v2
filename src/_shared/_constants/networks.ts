@@ -39,6 +39,6 @@ export const NETWORKS_DETAILS = {
 				url: 'wss://rpc.polkadot.io'
 			}
 		],
-		chainId: 'polkadot:6408de7737c59c238890533af25896a2'
+		chainId: 'polkadot:91b171bb158e2d3848fa23a9f1c25182'
 	}
 };

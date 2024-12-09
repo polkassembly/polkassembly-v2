@@ -4,12 +4,8 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import React from 'react';
+import { ESignupSteps } from '@/_shared/types';
 import classes from './SignupStepHeader.module.scss';
-
-export enum ESignupSteps {
-	USERNAME = 'Create Username',
-	PASSWORD = 'Set Password'
-}
 
 function SignupStepHeader({ step, setStep }: { step: ESignupSteps; setStep: React.Dispatch<React.SetStateAction<ESignupSteps>> }) {
 	return (

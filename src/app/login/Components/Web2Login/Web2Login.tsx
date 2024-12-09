@@ -4,20 +4,19 @@
 
 'use client';
 
-import { ENetwork, EWallet, IAuthResponse } from '@/_shared/types';
-import { request } from '@/app/_client-utils/request';
+import { EWallet, IAuthResponse } from '@/_shared/types';
+import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { Input } from '@ui/Input';
-// import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
-import { PasswordInput } from '@/app/_shared-components/PasswordInput';
+import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -30,17 +29,17 @@ const formSchema = z.object({
 });
 
 function Web2Login({
-	address,
+	account,
 	accounts,
 	switchToSignup,
 	onWalletChange,
 	onAccountChange
 }: {
-	address: string;
+	account: InjectedAccount | null;
 	accounts: InjectedAccount[];
 	switchToSignup: () => void;
 	onWalletChange: (wallet: EWallet) => void;
-	onAccountChange: (a: string) => void;
+	onAccountChange: (a: InjectedAccount) => void;
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -53,45 +52,26 @@ function Web2Login({
 	});
 
 	const handleLogin = async (values: z.infer<typeof formSchema>) => {
-		console.log(values);
-
 		const { emailOrUsername, password } = values;
 
 		if (emailOrUsername && password) {
 			setLoading(true);
-			const data = await request<IAuthResponse>(
-				'/auth/actions/web2Login',
-				{
-					'x-network': ENetwork.POLKADOT
-				},
-				{
-					body: JSON.stringify({
-						emailOrUsername,
-						password
-					}),
-					method: 'POST'
-				}
-			);
-			if (!data) {
+			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web2Login', {
+				emailOrUsername,
+				password
+			});
+			if (!data?.accessToken) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);
 				return;
 			}
 
-			if (data?.accessToken) {
-				console.log('login data', data);
-				const decodedData = AuthClientService.handleTokenChange(data.accessToken);
+			const decodedData = AuthClientService.decodeAccessToken(data.accessToken);
 
-				if (decodedData) {
-					setUserAtom({
-						address: decodedData.defaultAddress,
-						userId: String(decodedData.id),
-						username: decodedData.username,
-						wallet: decodedData.loginWallet
-					});
-				}
-				router.back();
+			if (decodedData) {
+				setUserAtom(decodedData);
 			}
+			router.back();
 			setLoading(false);
 		}
 	};
@@ -169,7 +149,7 @@ function Web2Login({
 			<WalletButtons
 				small
 				accounts={accounts}
-				selectedAddress={address}
+				selectedAddress={account?.address || ''}
 				onAddressChange={onAccountChange}
 				onWalletChange={onWalletChange}
 			/>

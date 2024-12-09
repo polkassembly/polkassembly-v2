@@ -6,7 +6,7 @@ import React from 'react';
 import { EWallet } from '@/_shared/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
-import { shortenAddress } from '@/app/_client-utils/shortenAddress';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { Identicon } from '@polkadot/react-identicon';
 import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
@@ -23,7 +23,7 @@ function WalletButtons({
 	onWalletChange: (wallet: EWallet) => void;
 	accounts: InjectedAccount[];
 	selectedAddress: string;
-	onAddressChange: (a: string) => void;
+	onAddressChange: (a: InjectedAccount) => void;
 	small?: boolean;
 	selectedWallet?: EWallet;
 }) {
@@ -57,7 +57,7 @@ function WalletButtons({
 							<button
 								key={`${item.address}`}
 								type='button'
-								onClick={() => onAddressChange(item.address)}
+								onClick={() => onAddressChange(item)}
 								className={classes.dropdownOption}
 							>
 								<Identicon

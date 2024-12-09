@@ -9,6 +9,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Input } from '@ui/Input';
+import classes from './PasswordInput.module.scss';
 
 const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(({ className, ...props }, ref) => {
 	const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +19,7 @@ const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<'input'>
 		<div className='relative'>
 			<Input
 				type={showPassword ? 'text' : 'password'}
-				className={cn('hide-password-toggle pr-10', className)}
+				className={cn(classes.hidePasswordToggle, 'pr-10', className)}
 				ref={ref}
 				{...props}
 			/>
@@ -43,16 +44,6 @@ const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<'input'>
 				)}
 				<span className='sr-only'>{showPassword ? 'Hide password' : 'Show password'}</span>
 			</Button>
-
-			{/* hides browsers password toggles */}
-			<style>{`
-					.hide-password-toggle::-ms-reveal,
-					.hide-password-toggle::-ms-clear {
-						visibility: hidden;
-						pointer-events: none;
-						display: none;
-					}
-				`}</style>
 		</div>
 	);
 });

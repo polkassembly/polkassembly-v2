@@ -306,9 +306,7 @@ export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 }
 
-export interface IUserAtom {
-	userId: string;
-	username: string;
-	address: string;
-	wallet?: EWallet;
+export enum ESignupSteps {
+	USERNAME = 'Create Username',
+	PASSWORD = 'Set Password'
 }

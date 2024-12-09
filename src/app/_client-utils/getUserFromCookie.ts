@@ -8,9 +8,7 @@ import { AuthClientService } from '../_client-services/auth_service';
 export const getUserFromCookie = async () => {
 	const cookieStore = await cookies();
 	const accessToken = cookieStore.get(EAuthCookieNames.ACCESS_TOKEN);
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-	const refreshToken = cookieStore.get(EAuthCookieNames.REFRESH_TOKEN);
 	if (!accessToken || !accessToken.value) return null;
 
-	return AuthClientService.handleTokenChange(accessToken.value);
+	return AuthClientService.decodeAccessToken(accessToken.value);
 };

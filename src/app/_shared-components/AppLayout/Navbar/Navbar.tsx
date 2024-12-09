@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
-import { shortenAddress } from '@/app/_client-utils/shortenAddress';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import classes from './Navbar.module.scss';
 
 function Navbar() {
@@ -17,8 +17,8 @@ function Navbar() {
 	return (
 		<nav className={classes.navbar}>
 			<p>Polkassembly</p>
-			{user && user.userId ? (
-				<div>{shortenAddress(user.address || '')}</div>
+			{user?.id ? (
+				<div>{shortenAddress(user.defaultAddress || '')}</div>
 			) : (
 				<Link href='/login'>
 					<Button>Login</Button>

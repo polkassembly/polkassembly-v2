@@ -3,27 +3,24 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { ENetwork } from '@/_shared/types';
 
-// of the Apache-2.0 license. See the LICENSE file for details.
-
-export function request<T>(endpoint: string, reqHeaders?: object, options?: RequestInit): Promise<T> {
+export async function nextApiClientFetch<T>(endpoint: string, data?: { [key: string]: unknown }, method?: 'GET' | 'POST'): Promise<T> {
 	const baseUrl = window.location.origin;
 	const reqURL = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
 
 	const url = `${baseUrl}/api/v2/${reqURL}`;
 
-	const headers = {
-		Accept: 'application/json',
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		'Content-Type': 'application/json',
-		...reqHeaders
-	};
-	const config = {
-		...options,
-		headers
-	};
-	return fetchPF(url, config)
+	return fetchPF(url, {
+		body: JSON.stringify(data),
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+			'x-api-key': process.env.NEXT_PUBLIC_POLKASSEMBLY_API_KEY || '',
+			'x-network': ENetwork.POLKADOT
+		},
+		method: method || 'POST'
+	})
 		.then((response) => {
 			return response.json();
 		})

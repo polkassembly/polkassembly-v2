@@ -4,8 +4,8 @@
 import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
-import { request } from '@/app/_client-utils/request';
-import { ENetwork, EWallet, IAuthResponse } from '@/_shared/types';
+import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
+import { ESignupSteps, EWallet, IAuthResponse } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
@@ -14,11 +14,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PasswordInput } from '@/app/_shared-components/PasswordInput';
+import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import classes from './Web2Signup.module.scss';
-import SignupStepHeader, { ESignupSteps } from './SignupStepHeader';
+import SignupStepHeader from './SignupStepHeader';
 
 const formSchema = z.object({
 	email: z.string(),
@@ -29,16 +29,16 @@ const formSchema = z.object({
 
 function Web2Signup({
 	switchToLogin,
-	address,
+	account,
 	accounts,
 	onWalletChange,
 	onAccountChange
 }: {
 	switchToLogin: () => void;
-	address: string;
+	account: InjectedAccount | null;
 	accounts: InjectedAccount[];
 	onWalletChange: (wallet: EWallet) => void;
-	onAccountChange: (a: string) => void;
+	onAccountChange: (a: InjectedAccount) => void;
 }) {
 	const [step, setStep] = useState<ESignupSteps>(ESignupSteps.USERNAME);
 
@@ -58,41 +58,24 @@ function Web2Signup({
 
 		if (email && username && password && password === finalPassword) {
 			setLoading(true);
-			const data = await request<IAuthResponse>(
-				'/auth/actions/web2Signup',
-				{
-					'x-network': ENetwork.POLKADOT
-				},
-				{
-					body: JSON.stringify({
-						email,
-						username,
-						password: finalPassword
-					}),
-					method: 'POST'
-				}
-			);
-			if (!data) {
+			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web2Signup', {
+				email,
+				username,
+				password: finalPassword
+			});
+			if (!data?.accessToken) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);
 				return;
 			}
 
-			if (data?.accessToken) {
-				console.log('login data', data);
-				const decodedData = AuthClientService.handleTokenChange(data.accessToken);
+			const decodedData = AuthClientService.decodeAccessToken(data.accessToken);
 
-				if (decodedData) {
-					setUserAtom({
-						address: decodedData.defaultAddress,
-						userId: String(decodedData.id),
-						username: decodedData.username,
-						wallet: decodedData.loginWallet
-					});
-				}
-
-				router.back();
+			if (decodedData) {
+				setUserAtom(decodedData);
 			}
+
+			router.back();
 			setLoading(false);
 		}
 	};
@@ -196,7 +179,7 @@ function Web2Signup({
 				<WalletButtons
 					small
 					accounts={accounts}
-					selectedAddress={address}
+					selectedAddress={account?.address || ''}
 					onAddressChange={onAccountChange}
 					onWalletChange={onWalletChange}
 				/>

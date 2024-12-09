@@ -4,11 +4,11 @@
 
 'use client';
 
-import { IUserAtom } from '@/_shared/types';
+import { IAccessTokenPayload } from '@/_shared/types';
 import { useEffect } from 'react';
 import { useUser } from '../_atoms/user/userAtom';
 
-function Initializers({ userData }: { userData: IUserAtom | null }) {
+function Initializers({ userData }: { userData: IAccessTokenPayload | null }) {
 	const [, setUser] = useUser();
 	useEffect(() => {
 		if (!userData) return;

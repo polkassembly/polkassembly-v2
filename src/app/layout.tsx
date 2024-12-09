@@ -32,7 +32,7 @@ export default async function RootLayout({
 		<html lang='en'>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<Initializers userData={user ? { address: user?.defaultAddress || '', userId: String(user?.id), wallet: user?.loginWallet, username: user?.username || '' } : null} />
+					<Initializers userData={user || null} />
 					<SidebarProvider open>
 						<AppSidebar />
 						{modal}
