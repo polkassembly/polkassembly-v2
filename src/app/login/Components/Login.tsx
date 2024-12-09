@@ -6,9 +6,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { EWallet } from '@/_shared/types';
+import { ENetwork, EWallet } from '@/_shared/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { getAddressesFromWallet } from '@/app/_client-utils/getAddressesFromWallet';
+import { usePolkadotApi } from '@/app/_atoms/polkadotJsApiAtom';
 import Web2Signup from './Web2Signup/Web2Signup';
 import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
@@ -17,6 +18,8 @@ import HeaderLabel from './HeaderLabel';
 
 function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 	const router = useRouter();
+
+	const apiService = usePolkadotApi(ENetwork.POLKADOT);
 
 	useEffect(() => {
 		if (userId) {
@@ -39,7 +42,7 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 	const onAccountChange = (a: InjectedAccount) => setAddress(a);
 
 	const getAccounts = async (chosenWallet: EWallet): Promise<undefined> => {
-		const injectedAccounts = await getAddressesFromWallet(chosenWallet);
+		const injectedAccounts = await getAddressesFromWallet(chosenWallet, apiService || undefined);
 
 		if (injectedAccounts.length === 0) {
 			return;

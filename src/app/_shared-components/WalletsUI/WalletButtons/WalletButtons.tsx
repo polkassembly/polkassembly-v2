@@ -76,6 +76,7 @@ function WalletButtons({
 			{!small && <p className={classes.header}>Select a Wallet</p>}
 			{Object.values(EWallet).map((wallet) => (
 				<WalletButton
+					key={wallet}
 					disabled={!availableWallets[wallet]}
 					wallet={wallet}
 					onClick={onWalletChange}

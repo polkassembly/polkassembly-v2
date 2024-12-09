@@ -6,6 +6,7 @@
 
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { Signer } from '@polkadot/types/types';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
@@ -66,5 +67,9 @@ export class PolkadotApiService {
 
 	async keepAlive(): Promise<void> {
 		await this.getBlockHeight();
+	}
+
+	setSigner(signer: Signer) {
+		this.api.setSigner(signer);
 	}
 }

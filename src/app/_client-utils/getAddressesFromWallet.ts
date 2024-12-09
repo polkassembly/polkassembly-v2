@@ -3,12 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EWallet } from '@/_shared/types';
-import { ApiPromise } from '@polkadot/api';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { Injected, InjectedAccount, InjectedWindow } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/types/types';
+import { PolkadotApiService } from '../_client-services/polkadot_api_service';
 
-export async function getAddressesFromWallet(selectedWallet: EWallet, api?: ApiPromise): Promise<InjectedAccount[]> {
+export async function getAddressesFromWallet(selectedWallet: EWallet, apiService?: PolkadotApiService): Promise<InjectedAccount[]> {
 	const injectedWindow = window as Window & InjectedWindow;
 	const wallet = isWeb3Injected ? injectedWindow.injectedWeb3[selectedWallet] : null;
 	if (!wallet) {
@@ -38,8 +38,8 @@ export async function getAddressesFromWallet(selectedWallet: EWallet, api?: ApiP
 			return [];
 		}
 
-		if (api) {
-			api.setSigner(injected.signer as Signer);
+		if (apiService) {
+			apiService.setSigner(injected.signer as Signer);
 		}
 		return await injected.accounts.get();
 	} catch (err) {

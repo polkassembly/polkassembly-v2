@@ -100,7 +100,8 @@ export class AuthService {
 				isDefault: true,
 				network,
 				userId: newUserId,
-				wallet: wallet || EWallet.OTHER
+				// todo: wallet || EWallet.OTHER
+				wallet: wallet || EWallet.POLKADOT
 			});
 		}
 
