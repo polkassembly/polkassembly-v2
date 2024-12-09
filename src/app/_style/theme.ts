@@ -22,6 +22,7 @@ export const THEME_COLORS = {
 		text_pink: '#E5007A',
 		placeholder: '#576D8BCC',
 		success: '#2ED47A',
+		failure: '#FF3C5F',
 		text_grey: '#7587A0'
 	},
 	dark: {
@@ -43,6 +44,7 @@ export const THEME_COLORS = {
 		text_pink: '#E5007A',
 		placeholder: '#576D8BCC',
 		success: '#2ED47A',
+		failure: '#FF3C5F',
 		text_grey: '#7587A0'
 	}
 };

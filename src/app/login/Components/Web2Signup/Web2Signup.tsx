@@ -12,20 +12,19 @@ import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { emailRules, passwordRules, usernameRules } from '@/app/_client-utils/formValidations';
 import classes from './Web2Signup.module.scss';
 import SignupStepHeader from './SignupStepHeader';
 
-const formSchema = z.object({
-	email: z.string(),
-	username: z.string(),
-	password: z.string(),
-	finalPassword: z.string()
-});
+interface IFormFields {
+	email: string;
+	username: string;
+	password: string;
+	finalPassword: string;
+}
 
 function Web2Signup({
 	switchToLogin,
@@ -48,13 +47,15 @@ function Web2Signup({
 
 	const [loading, setLoading] = useState<boolean>(false);
 
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema)
-	});
+	const formData = useForm<IFormFields>();
 
-	const handleSignup = async (values: z.infer<typeof formSchema>) => {
-		console.log('values', values);
+	const handleSignup = async (values: IFormFields) => {
 		const { email, password, username, finalPassword } = values;
+
+		if (step === ESignupSteps.USERNAME && email && username) {
+			setStep(ESignupSteps.PASSWORD);
+			return;
+		}
 
 		if (email && username && password && password === finalPassword) {
 			setLoading(true);
@@ -81,19 +82,22 @@ function Web2Signup({
 	};
 
 	return (
-		<Form {...form}>
+		<Form {...formData}>
 			<SignupStepHeader
 				step={step}
 				setStep={setStep}
 			/>
 
-			<form onSubmit={form.handleSubmit(handleSignup)}>
+			<form onSubmit={formData.handleSubmit(handleSignup)}>
 				{step === ESignupSteps.USERNAME ? (
 					<div className={classes.formFields}>
 						<div>
 							<FormField
-								control={form.control}
+								control={formData.control}
 								name='username'
+								key='username'
+								rules={usernameRules}
+								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Enter Username</FormLabel>
@@ -113,8 +117,11 @@ function Web2Signup({
 
 						<div>
 							<FormField
-								control={form.control}
+								control={formData.control}
 								name='email'
+								key='email'
+								rules={emailRules}
+								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Enter Email</FormLabel>
@@ -136,8 +143,11 @@ function Web2Signup({
 					<div className={classes.formFields}>
 						<div>
 							<FormField
-								control={form.control}
+								control={formData.control}
 								name='password'
+								key='password'
+								rules={passwordRules}
+								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Set Password</FormLabel>
@@ -153,11 +163,19 @@ function Web2Signup({
 								)}
 							/>
 						</div>
-
 						<div>
 							<FormField
-								control={form.control}
+								control={formData.control}
 								name='finalPassword'
+								key='finalPassword'
+								rules={{
+									required: true,
+									validate: (value, allFields) => {
+										if (value !== allFields.password) return "Password don't match";
+										return true;
+									}
+								}}
+								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Re-enter Password</FormLabel>
@@ -194,35 +212,26 @@ function Web2Signup({
 					</Button>
 				</p>
 				<div className={classes.footer}>
-					{step === ESignupSteps.PASSWORD ? (
-						<>
-							<Button
-								onClick={() => setStep(ESignupSteps.USERNAME)}
-								disabled={loading}
-								size='lg'
-								variant='secondary'
-								className={classes.signupButton}
-							>
-								Go Back
-							</Button>
-							<Button
-								type='submit'
-								isLoading={loading}
-								size='lg'
-								className={classes.signupButton}
-							>
-								Sign Up
-							</Button>
-						</>
-					) : (
+					{step === ESignupSteps.PASSWORD && (
 						<Button
+							onClick={() => setStep(ESignupSteps.USERNAME)}
+							disabled={loading}
 							size='lg'
+							variant='secondary'
 							className={classes.signupButton}
-							onClick={() => setStep(ESignupSteps.PASSWORD)}
+							type='button'
 						>
-							Next
+							Go Back
 						</Button>
 					)}
+					<Button
+						type='submit'
+						isLoading={loading}
+						size='lg'
+						className={classes.signupButton}
+					>
+						{step === ESignupSteps.PASSWORD ? 'Sign Up' : 'Next'}
+					</Button>
 				</div>
 			</form>
 		</Form>

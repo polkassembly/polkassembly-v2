@@ -13,8 +13,6 @@ import { Input } from '@ui/Input';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import { AuthClientService } from '@/app/_client-services/auth_service';
@@ -23,10 +21,10 @@ import { userAtom } from '@/app/_atoms/user/userAtom';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
-const formSchema = z.object({
-	emailOrUsername: z.string(),
-	password: z.string()
-});
+interface IFormFields {
+	emailOrUsername: string;
+	password: string;
+}
 
 function Web2Login({
 	account,
@@ -47,11 +45,9 @@ function Web2Login({
 
 	const setUserAtom = useSetAtom(userAtom);
 
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema)
-	});
+	const form = useForm<IFormFields>();
 
-	const handleLogin = async (values: z.infer<typeof formSchema>) => {
+	const handleLogin = async (values: IFormFields) => {
 		const { emailOrUsername, password } = values;
 
 		if (emailOrUsername && password) {
@@ -79,7 +75,6 @@ function Web2Login({
 	return (
 		<div>
 			<div>
-				{/* shadcn form */}
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(handleLogin)}>
 						<div className={classes.header}>
@@ -87,6 +82,9 @@ function Web2Login({
 								<FormField
 									control={form.control}
 									name='emailOrUsername'
+									key='emailOrUsername'
+									disabled={loading}
+									rules={{ required: true }}
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>Enter Username or Email</FormLabel>
@@ -108,6 +106,9 @@ function Web2Login({
 								<FormField
 									control={form.control}
 									name='password'
+									key='password'
+									rules={{ required: true }}
+									disabled={loading}
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>Enter Password</FormLabel>
