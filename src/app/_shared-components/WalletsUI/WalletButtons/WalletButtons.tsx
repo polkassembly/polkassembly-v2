@@ -12,6 +12,9 @@ import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import classes from './WalletButtons.module.scss';
 
+const getWalletLabel = (wallet: EWallet) =>
+	wallet === EWallet.SUBWALLET ? wallet.charAt(0).toUpperCase() + wallet.slice(1).split('-')[0] : wallet.charAt(0).toUpperCase() + wallet.slice(1).replace('-', '.');
+
 function WalletButtons({
 	onWalletChange,
 	accounts,
@@ -33,11 +36,7 @@ function WalletButtons({
 		<div>
 			<p className={classes.addressHeader}>
 				<WalletIcon wallet={selectedWallet} />
-				<span className={classes.walletName}>
-					{selectedWallet === EWallet.SUBWALLET
-						? selectedWallet.charAt(0).toUpperCase() + selectedWallet.slice(1).split('-')[0]
-						: selectedWallet.charAt(0).toUpperCase() + selectedWallet.slice(1).replace('-', '.')}
-				</span>
+				<span className={classes.walletName}>{getWalletLabel(selectedWallet)}</span>
 			</p>
 			<DropdownMenu>
 				<div>
@@ -75,27 +74,15 @@ function WalletButtons({
 	) : (
 		<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
 			{!small && <p className={classes.header}>Select a Wallet</p>}
-			<WalletButton
-				disabled={!availableWallets[EWallet.POLKADOT]}
-				wallet={EWallet.POLKADOT}
-				onClick={onWalletChange}
-				label='Polkadot.js'
-				small={small}
-			/>
-			<WalletButton
-				disabled={!availableWallets[EWallet.SUBWALLET]}
-				wallet={EWallet.SUBWALLET}
-				onClick={onWalletChange}
-				label='SubWallet'
-				small={small}
-			/>
-			<WalletButton
-				disabled={!availableWallets[EWallet.TALISMAN]}
-				wallet={EWallet.TALISMAN}
-				onClick={onWalletChange}
-				label='Talisman'
-				small={small}
-			/>
+			{Object.values(EWallet).map((wallet) => (
+				<WalletButton
+					disabled={!availableWallets[wallet]}
+					wallet={wallet}
+					onClick={onWalletChange}
+					label={getWalletLabel(wallet)}
+					small={small}
+				/>
+			))}
 		</div>
 	);
 }

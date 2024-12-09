@@ -6,6 +6,7 @@ import { EWallet } from '@/_shared/types';
 import PolkadotJSIcon from '@assets/wallet-icons/polkadotjs-icon.svg';
 import TalismanIcon from '@assets/wallet-icons/talisman-icon.svg';
 import SubWalletIcon from '@assets/wallet-icons/subwallet-icon.svg';
+import PolkagateIcon from '@assets/wallet-icons/polkagate-icon.svg';
 import Image from 'next/image';
 
 export function WalletIcon({ wallet, className }: { wallet: EWallet; className?: string }) {
@@ -31,6 +32,14 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={SubWalletIcon}
+					className={`h-8 w-8 ${className}`}
+				/>
+			);
+		case EWallet.POLKAGATE:
+			return (
+				<Image
+					alt=''
+					src={PolkagateIcon}
 					className={`h-8 w-8 ${className}`}
 				/>
 			);

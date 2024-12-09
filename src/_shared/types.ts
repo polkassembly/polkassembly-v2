@@ -122,16 +122,16 @@ export interface IAuthResponse {
 }
 
 export enum EWallet {
-	TALISMAN = 'talisman',
 	POLKADOT = 'polkadot-js',
-	POLKAGATE = 'polkagate',
 	SUBWALLET = 'subwallet-js',
-	METAMASK = 'metamask',
-	WALLETCONNECT = 'walletconnect',
-	NOVAWALLET = 'polkadot-js',
-	POLYWALLET = 'polywallet',
-	POLKASAFE = 'polkasafe',
-	OTHER = ''
+	TALISMAN = 'talisman',
+	POLKAGATE = 'polkagate'
+	// METAMASK = 'metamask',
+	// WALLETCONNECT = 'walletconnect',
+	// NOVAWALLET = 'polkadot-js',
+	// POLYWALLET = 'polywallet',
+	// POLKASAFE = 'polkasafe',
+	// OTHER = ''
 }
 
 export interface IRefreshTokenPayload {
