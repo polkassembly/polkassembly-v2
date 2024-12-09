@@ -7,7 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@app/api/_api-utils/apiError';
 import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { JWT_KEY_PASSPHRASE, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, REFRESH_TOKEN_PASSPHRASE, REFRESH_TOKEN_PRIVATE_KEY } from '@api/_api-constants/apiEnvVars';
+import { JWT_KEY_PASSPHRASE, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, REFRESH_TOKEN_PASSPHRASE, REFRESH_TOKEN_PRIVATE_KEY, REFRESH_TOKEN_PUBLIC_KEY } from '@api/_api-constants/apiEnvVars';
 import { serialize } from 'cookie';
 import * as argon2 from 'argon2';
 import { createId as createCuid } from '@paralleldrive/cuid2';
@@ -17,8 +17,8 @@ import { randomBytes } from 'crypto';
 import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetails';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { OffChainDbService } from '../offchain_db_service';
-import { redisSetex } from '../redis_service';
-import { get2FAKey, getEmailVerificationTokenKey } from '../redis_service/redisKeys';
+import { redisGet, redisSetex } from '../redis_service';
+import { get2FAKey, getEmailVerificationTokenKey, getRefreshTokenKey } from '../redis_service/redisKeys';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
 import { NotificationService } from '../notification_service';
 
@@ -26,7 +26,7 @@ if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY || !JWT_KEY_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'JWT_PRIVATE_KEY, JWT_PUBLIC_KEY or JWT_KEY_PASSPHRASE not set. Aborting.');
 }
 
-if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PASSPHRASE) {
+if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PUBLIC_KEY || !REFRESH_TOKEN_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REFRESH_TOKEN_PRIVATE_KEY or REFRESH_TOKEN_PASSPHRASE not set. Aborting.');
 }
 
@@ -214,7 +214,16 @@ export class AuthService {
 			loginWallet
 		};
 
-		return jwt.sign(tokenContent, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: REFRESH_TOKEN_PASSPHRASE }, { algorithm: 'RS256', expiresIn: `${REFRESH_TOKEN_LIFE_IN_SECONDS}s` });
+		const refreshToken = jwt.sign(
+			tokenContent,
+			{ key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: REFRESH_TOKEN_PASSPHRASE },
+			{ algorithm: 'RS256', expiresIn: `${REFRESH_TOKEN_LIFE_IN_SECONDS}s` }
+		);
+
+		// save refresh token in redis
+		await redisSetex(getRefreshTokenKey(userId), REFRESH_TOKEN_LIFE_IN_SECONDS, refreshToken);
+
+		return refreshToken;
 	}
 
 	static async Web2Login(emailOrUsername: string, password: string): Promise<IAuthResponse> {
@@ -371,5 +380,46 @@ export class AuthService {
 			accessToken: await this.GetSignedAccessToken(newUser),
 			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
 		};
+	}
+
+	static async IsValidRefreshToken(token: string) {
+		try {
+			const refreshTokenPayload = this.GetRefreshTokenPayload(token);
+
+			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat || !refreshTokenPayload.exp) {
+				return false;
+			}
+
+			const redisRefreshToken = await redisGet(getRefreshTokenKey(refreshTokenPayload.id));
+
+			return redisRefreshToken === token;
+		} catch {
+			return false;
+		}
+	}
+
+	static IsValidAccessToken(token: string) {
+		try {
+			jwt.verify(token, JWT_PUBLIC_KEY);
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	static GetRefreshTokenPayload(token: string) {
+		try {
+			return jwt.verify(token, REFRESH_TOKEN_PUBLIC_KEY) as IRefreshTokenPayload;
+		} catch {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
+		}
+	}
+
+	static GetAccessTokenPayload(token: string) {
+		try {
+			return jwt.verify(token, JWT_PUBLIC_KEY) as IAccessTokenPayload;
+		} catch {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid access token');
+		}
 	}
 }

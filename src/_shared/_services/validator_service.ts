@@ -89,4 +89,8 @@ export class ValidatorService {
 			return false;
 		}
 	}
+
+	static isValidUserId(userId: number): boolean {
+		return !isNaN(userId) && userId >= 0;
+	}
 }
