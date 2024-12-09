@@ -5,12 +5,13 @@
 'use client';
 
 import React from 'react';
+import style from './Navbar.module.scss';
 
 function Navbar() {
 	return (
-		<header className='flex h-16 shrink-0 items-center gap-2 px-4 transition-[width,height] ease-linear'>
+		<header className={style.navbar}>
 			<div>
-				<p className='ml-5 text-lg font-medium text-btn_secondary_text'>OpenGov</p>
+				<p className={style.navbar_title}>OpenGov</p>
 			</div>
 		</header>
 	);
