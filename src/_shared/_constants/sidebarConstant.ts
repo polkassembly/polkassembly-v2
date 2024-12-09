@@ -156,7 +156,7 @@ export const getSidebarData = (networkKey: keyof typeof NETWORKS_DETAILS, pathna
 						icon: CommunityIcon,
 						items: [
 							{ title: 'Members', url: '/members' },
-							{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects', count: 5 }
+							{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects' }
 						]
 					},
 					{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
