@@ -6,3 +6,4 @@ export const getPwdResetTokenKey = (userId: number): string => `PRT-${userId}`;
 export const getEmailVerificationTokenKey = (token: string): string => `EVT-${token}`;
 export const get2FAKey = (userId: number): string => `TFA-${userId}`;
 export const getSubscanDataKey = (network: string, url: string): string => `SDT-${network}-${url}`;
+export const getRefreshTokenKey = (userId: number): string => `RFT-${userId}`;

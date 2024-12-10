@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import { consolePretty } from './consolePretty';
 import { APIError } from './apiError';
 import { storeApiKeyUsage } from './storeApiKeyUsage';
@@ -15,7 +14,7 @@ export const withErrorHandling = (handler: { (req: NextRequest, context?: any): 
 	return async (req: NextRequest, context?: any) => {
 		try {
 			// check if network header is valid, throws error if not
-			getNetworkFromHeaders(await headers());
+			await getNetworkFromHeaders();
 			storeApiKeyUsage(req);
 			return await handler(req, context);
 		} catch (error) {
