@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserAddress } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -182,5 +182,9 @@ export class FirestoreService extends FirestoreRefs {
 		}
 
 		await FirestoreRefs.addressesCollectionRef().doc(substrateAddress).set(addressEntry);
+	}
+
+	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
 	}
 }

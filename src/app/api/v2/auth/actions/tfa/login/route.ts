@@ -1,0 +1,58 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { EAuthCookieNames } from '@/_shared/types';
+import { AuthService } from '@/app/api/_api-services/auth_service';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { getReqBody } from '@/app/api/_api-utils/getReqBody';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { StatusCodes } from 'http-status-codes';
+import { NextRequest, NextResponse } from 'next/server';
+
+export const POST = withErrorHandling(async (req: NextRequest) => {
+	// 1. read auth code and tfa token from request body
+	const { authCode, tfaToken, loginAddress, loginWallet } = await getReqBody(req);
+
+	if (!authCode || !tfaToken) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
+	}
+
+	// 2. get user id from tfa token
+	const user = await AuthService.GetUserFromTfaToken(tfaToken);
+
+	// 3. verify if user has tfa enabled
+	if (!user.twoFactorAuth || !user.twoFactorAuth.enabled || !user.twoFactorAuth.base32Secret || !user.twoFactorAuth.url) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'TFA is not enabled for this user');
+	}
+
+	// 4. verify auth code
+	const isValidAuthCode = await AuthService.IsValidTfaAuthCode({ userId: user.id, authCode, base32Secret: user.twoFactorAuth.base32Secret });
+
+	if (!isValidAuthCode) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid TFA auth code');
+	}
+
+	// 5. send access token and refresh token
+	const accessToken = await AuthService.GetSignedAccessToken({ ...user, loginAddress, loginWallet });
+
+	if (!accessToken) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token not generated');
+	}
+
+	const refreshToken = await AuthService.GetRefreshToken({ userId: user.id, loginAddress, loginWallet });
+
+	if (!refreshToken) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated');
+	}
+
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken);
+	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken);
+
+	const response = NextResponse.json({ message: 'TFA login successful' });
+	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
+	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
+
+	return response;
+});

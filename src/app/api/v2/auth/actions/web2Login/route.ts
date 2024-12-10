@@ -18,7 +18,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 	}
 
-	const { accessToken = '', isTFAEnabled = false, tfaToken = '', userId, refreshToken } = await AuthService.Web2Login(emailOrUsername, password);
+	const { accessToken = '', isTFAEnabled = false, tfaToken = '', refreshToken } = await AuthService.Web2Login(emailOrUsername, password);
 
 	// If 2FA is not enabled and accessToken is not generated, throw error
 	if (!accessToken && !isTFAEnabled) {
@@ -26,7 +26,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	// If 2FA is enabled, return the tfaToken and userId
-	if (isTFAEnabled) return NextResponse.json({ isTFAEnabled, tfaToken, userId });
+	if (isTFAEnabled) return NextResponse.json({ isTFAEnabled, tfaToken });
 
 	if (!refreshToken) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
@@ -45,7 +45,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	// no 2FA, successful login
-	const response = NextResponse.json({ isTFAEnabled, accessToken });
+	const response = NextResponse.json({ isTFAEnabled, message: 'Web2 login successful' });
 	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
 	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
 

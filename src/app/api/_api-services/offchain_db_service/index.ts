@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, EWallet, IOffChainPost, IUser, IUserAddress } from '@shared/types';
+import { EDataSource, ENetwork, EProposalType, EWallet, IOffChainPost, IUser, IUserTFADetails, IUserAddress } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -123,5 +123,9 @@ export class OffChainDbService {
 			wallet
 		} as IUserAddress;
 		return FirestoreService.AddNewAddress(addressEntry);
+	}
+
+	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
+		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 }
