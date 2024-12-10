@@ -1,0 +1,21 @@
+.separator {
+	@apply bg-border_grey;
+}
+
+.hide_scrollbar {
+	@apply overflow-y-auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.hide_scrollbar::-webkit-scrollbar {
+	@apply hidden;
+}
+
+.create_proposal_button {
+	@apply mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-gray-300 bg-gray-50 px-[6px] py-2;
+}
+
+.dark .create_proposal_button {
+	@apply border-[var(--separator-dark)] bg-[var(--section-dark-background)];
+}

@@ -1,0 +1,21 @@
+.hide_scrollbar {
+	@apply overflow-y-auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.hide_scrollbar::-webkit-scrollbar {
+	@apply hidden;
+}
+
+.custom_scrollbar::-webkit-scrollbar {
+	@apply w-[2px];
+}
+
+.custom_scrollbar::-webkit-scrollbar-thumb {
+	@apply rounded-md bg-gray-300;
+}
+
+.custom_scrollbar::-webkit-scrollbar-track {
+	@apply bg-transparent;
+}

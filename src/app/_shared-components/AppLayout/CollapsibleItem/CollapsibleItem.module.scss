@@ -1,0 +1,35 @@
+.sidebarTrigger {
+	@apply relative flex items-center justify-center;
+}
+
+.sidebarButtonCollapse {
+	@apply flex w-40 cursor-pointer items-center justify-center rounded-md px-3 py-2 transition-colors duration-200;
+}
+
+.sidebarButtonHover {
+	@apply rounded-md hover:bg-gray-200;
+}
+
+.subItemCount {
+	@apply ml-auto rounded-lg bg-gray-200 px-1.5 py-1 text-xs font-medium;
+}
+
+.sidebarActive {
+	@apply bg-pink-50 text-pink-600;
+}
+
+.iconWrapper {
+	@apply flex h-8 w-8 items-center justify-center;
+}
+
+.sidebar_selected_icon {
+	filter: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%);
+}
+
+.newBadge {
+	@apply absolute -right-3 -top-1 rounded-full bg-blue-500 px-2 py-[0.1rem] text-[0.625rem] text-white;
+}
+
+.popoverContent {
+	@apply border border-gray-300 bg-white;
+}

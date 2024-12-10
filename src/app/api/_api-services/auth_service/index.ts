@@ -268,6 +268,7 @@ export class AuthService {
 		await this.CreateAndSendEmailVerificationToken(user);
 
 		return {
+			refreshToken: await this.GetRefreshToken({ userId: user.id }),
 			accessToken: await this.GetSignedAccessToken(user)
 		};
 	}

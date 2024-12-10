@@ -8,7 +8,7 @@ import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { ENetwork } from '@shared/types';
+import { EAuthCookieNames, ENetwork } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -34,7 +34,31 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid password');
 	}
 
-	const { accessToken } = await AuthService.Web2SignUp(email.toLowerCase(), password, username, network as ENetwork);
+	const { accessToken, refreshToken } = await AuthService.Web2SignUp(email.toLowerCase(), password, username, network as ENetwork);
 
-	return NextResponse.json({ accessToken });
+	if (!accessToken) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token not generated.');
+	}
+
+	if (!refreshToken) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
+	}
+
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken);
+
+	if (!refreshTokenCookie) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token cookie not generated.');
+	}
+
+	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken);
+
+	if (!accessTokenCookie) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');
+	}
+
+	const response = NextResponse.json({ accessToken });
+	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
+	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
+
+	return response;
 });

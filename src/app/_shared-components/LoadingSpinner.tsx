@@ -1,3 +1,9 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+'use client';
+
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
@@ -18,7 +24,7 @@ export function LoadingSpinner({ size = 'medium', show = true, className, childr
 
 	return show ? (
 		<span className={`flex flex-col items-center justify-center ${className}`}>
-			<Loader2 className={`animate-spin text-primary ${sizeClasses[size]}`} />
+			<Loader2 className={`animate-spin text-primary ${sizeClasses[size as keyof typeof sizeClasses]}`} />
 			{message && <span className='mt-2 text-xs text-gray-500'>{message}</span>}
 			{children}
 		</span>
