@@ -37,7 +37,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	const acessTokenPayload = AuthService.GetAccessTokenPayload(accessToken);
 
 	// 5. check if user has tfa initialized
-	const user = await AuthService.GetUserWithJWT(accessToken);
+	const user = await AuthService.GetUserWithAccessToken(accessToken);
 
 	if (!user?.twoFactorAuth?.base32Secret || !user?.twoFactorAuth?.url) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Two factor authentication has not been initialized for user');
@@ -53,7 +53,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	// 7. verify and enable tfa for user
 	await AuthService.VerifyTfa(user.id, user.twoFactorAuth);
 
-	const newUser = await AuthService.GetUserWithJWT(accessToken);
+	const newUser = await AuthService.GetUserWithAccessToken(accessToken);
 
 	if (!newUser) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'User not found');

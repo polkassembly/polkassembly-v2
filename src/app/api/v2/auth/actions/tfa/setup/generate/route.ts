@@ -28,7 +28,7 @@ export const POST = withErrorHandling(async () => {
 	}
 
 	// 3. get user id from access token
-	const userId = await AuthService.GetUserIdFromJWT(accessToken);
+	const userId = await AuthService.GetUserIdFromAccessToken(accessToken);
 
 	if (!ValidatorService.isValidUserId(userId)) {
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');

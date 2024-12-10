@@ -29,7 +29,7 @@ export const POST = withErrorHandling(async () => {
 	const accessTokenPayload = AuthService.GetAccessTokenPayload(accessToken);
 
 	// 3. verify if user has tfa enabled
-	const user = await AuthService.GetUserWithJWT(accessToken);
+	const user = await AuthService.GetUserWithAccessToken(accessToken);
 
 	if (!user?.twoFactorAuth || !user?.twoFactorAuth?.enabled || !user?.twoFactorAuth?.base32Secret || !user?.twoFactorAuth?.url) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'TFA is not enabled for this user');
@@ -38,7 +38,7 @@ export const POST = withErrorHandling(async () => {
 	// 4. disable tfa
 	await AuthService.DisableTfa(user.id);
 
-	const newUser = await AuthService.GetUserWithJWT(accessToken);
+	const newUser = await AuthService.GetUserWithAccessToken(accessToken);
 
 	if (!newUser) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'User not found');
