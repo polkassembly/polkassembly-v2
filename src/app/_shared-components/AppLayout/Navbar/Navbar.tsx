@@ -7,18 +7,24 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
-import { useAtomValue } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
-import { shortenAddress } from '@/_shared/_utils/shortenAddress';
+import { useUser } from '@/app/_atoms/user/userAtom';
+import { EAuthCookieNames } from '@/_shared/types';
 import classes from './Navbar.module.scss';
 
 function Navbar() {
-	const user = useAtomValue(userAtom);
+	const [user, setUser] = useUser();
 	return (
 		<nav className={classes.navbar}>
 			<p>Polkassembly</p>
 			{user?.id ? (
-				<div>{shortenAddress(user.defaultAddress || '')}</div>
+				<Button
+					onClick={() => {
+						document.cookie = `${EAuthCookieNames.ACCESS_TOKEN}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+						setUser(null);
+					}}
+				>
+					Logout
+				</Button>
 			) : (
 				<Link href='/login'>
 					<Button>Login</Button>
