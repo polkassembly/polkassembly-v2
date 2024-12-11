@@ -7,7 +7,6 @@ import { APIError } from '@api/_api-utils/apiError';
 import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { EAuthCookieNames } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -46,8 +45,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	// no 2FA, successful login
 	const response = NextResponse.json({ isTFAEnabled, message: 'Web2 login successful' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
-	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
+	response.headers.append('Set-Cookie', accessTokenCookie);
+	response.headers.append('Set-Cookie', refreshTokenCookie);
 
 	return response;
 });

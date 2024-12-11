@@ -406,7 +406,7 @@ export class AuthService {
 
 			const refreshTokenPayload = this.GetRefreshTokenPayload(token);
 
-			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat) {
+			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat || !refreshTokenPayload.exp) {
 				return false;
 			}
 

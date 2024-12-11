@@ -52,6 +52,7 @@ export const POST = withErrorHandling(async () => {
 	}
 
 	const response = NextResponse.json({ message: 'TFA disabled successfully' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, newAccessToken);
+	response.headers.append('Set-Cookie', newAccessToken);
+
 	return response;
 });

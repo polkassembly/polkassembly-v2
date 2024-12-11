@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { EAuthCookieNames } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
@@ -51,8 +50,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken);
 
 	const response = NextResponse.json({ message: 'TFA login successful' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
-	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
+	response.headers.append('Set-Cookie', accessTokenCookie);
+	response.headers.append('Set-Cookie', refreshTokenCookie);
 
 	return response;
 });
