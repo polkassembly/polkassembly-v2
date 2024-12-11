@@ -12,7 +12,7 @@ import { SidebarProvider } from './_shared-components/Sidebar';
 import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
 import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 import Initializers from './Initializers';
-import { getUserFromCookie } from './_client-utils/getUserFromCookie';
+import { getRefreshTokenFromCookie, getUserFromCookie } from './_client-utils/getUserFromCookie';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -27,12 +27,16 @@ export default async function RootLayout({
 	modal: ReactNode;
 }>) {
 	const user = await getUserFromCookie();
+	const refreshTokenPayload = await getRefreshTokenFromCookie();
 
 	return (
 		<html lang='en'>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<Initializers userData={user || null} />
+					<Initializers
+						userData={user || null}
+						refreshTokenPayload={refreshTokenPayload}
+					/>
 					<SidebarProvider open>
 						<AppSidebar />
 						{modal}

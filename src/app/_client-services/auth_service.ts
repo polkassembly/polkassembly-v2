@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IAccessTokenPayload } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
 import { decodeToken } from 'react-jwt';
 
 export class AuthClientService {
@@ -11,6 +11,16 @@ export class AuthClientService {
 		const tokenPayload = token && decodeToken<IAccessTokenPayload>(token);
 
 		if (tokenPayload && tokenPayload.sub) {
+			return tokenPayload;
+		}
+		return null;
+	}
+
+	static decodeRefreshToken(token: string) {
+		if (!token) return null;
+		const tokenPayload = token && decodeToken<IRefreshTokenPayload>(token);
+
+		if (tokenPayload) {
 			return tokenPayload;
 		}
 		return null;

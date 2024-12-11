@@ -8,7 +8,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/app/_atoms/user/userAtom';
-import { EAuthCookieNames } from '@/_shared/types';
+import { logout } from '@/app/_client-utils/logout';
 import classes from './Navbar.module.scss';
 
 function Navbar() {
@@ -17,14 +17,7 @@ function Navbar() {
 		<nav className={classes.navbar}>
 			<p>Polkassembly</p>
 			{user?.id ? (
-				<Button
-					onClick={() => {
-						document.cookie = `${EAuthCookieNames.ACCESS_TOKEN}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-						setUser(null);
-					}}
-				>
-					Logout
-				</Button>
+				<Button onClick={() => logout(() => setUser(null))}>Logout</Button>
 			) : (
 				<Link href='/login'>
 					<Button>Login</Button>

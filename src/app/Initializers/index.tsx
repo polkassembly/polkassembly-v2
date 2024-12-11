@@ -4,14 +4,52 @@
 
 'use client';
 
-import { IAccessTokenPayload } from '@/_shared/types';
-import { useEffect } from 'react';
-import { useUser } from '../_atoms/user/userAtom';
+import dayjs from 'dayjs';
 
-function Initializers({ userData }: { userData: IAccessTokenPayload | null }) {
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+
+import { IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
+import { useCallback, useEffect } from 'react';
+import { useUser } from '../_atoms/user/userAtom';
+import { nextApiClientFetch } from '../_client-utils/nextApiClientFetch';
+import { logout } from '../_client-utils/logout';
+
+dayjs.extend(localizedFormat);
+
+function Initializers({ userData, refreshTokenPayload }: { userData: IAccessTokenPayload | null; refreshTokenPayload: IRefreshTokenPayload | null }) {
 	const [, setUser] = useUser();
+
+	const refreshAccessToken = useCallback(async () => {
+		await nextApiClientFetch('/auth/actions/refreshAccessToken');
+	}, []);
+
+	const checkForLoginState = () => {
+		if (document.visibilityState === 'hidden') return;
+
+		if (userData?.exp && Date.now() > userData.exp * 1000) {
+			if (refreshTokenPayload?.exp) {
+				refreshAccessToken();
+				return;
+			}
+
+			// logout
+			logout(() => setUser(null));
+		}
+	};
+
 	useEffect(() => {
-		if (!userData) return;
+		document.addEventListener('visibilitychange', checkForLoginState);
+
+		return () => {
+			document.removeEventListener('visibilitychange', checkForLoginState);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	useEffect(() => {
+		if (!userData) {
+			return;
+		}
 
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

@@ -5,10 +5,21 @@ import { EAuthCookieNames } from '@/_shared/types';
 import { cookies } from 'next/headers';
 import { AuthClientService } from '../_client-services/auth_service';
 
-export const getUserFromCookie = async () => {
+export const getJwtTokenFromCookie = async (cookieName: EAuthCookieNames) => {
 	const cookieStore = await cookies();
-	const accessToken = cookieStore.get(EAuthCookieNames.ACCESS_TOKEN);
+	return cookieStore.get(cookieName);
+};
+
+export const getUserFromCookie = async () => {
+	const accessToken = await getJwtTokenFromCookie(EAuthCookieNames.ACCESS_TOKEN);
 	if (!accessToken || !accessToken.value) return null;
 
 	return AuthClientService.decodeAccessToken(accessToken.value);
+};
+
+export const getRefreshTokenFromCookie = async () => {
+	const refreshToken = await getJwtTokenFromCookie(EAuthCookieNames.REFRESH_TOKEN);
+	if (!refreshToken || !refreshToken.value) return null;
+
+	return AuthClientService.decodeRefreshToken(refreshToken.value);
 };
