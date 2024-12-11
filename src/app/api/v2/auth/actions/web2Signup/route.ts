@@ -8,7 +8,7 @@ import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EAuthCookieNames, ENetwork } from '@shared/types';
+import { ENetwork } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -57,8 +57,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	const response = NextResponse.json({ message: 'Web2 signup successful' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
-	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
+	response.headers.append('Set-Cookie', accessTokenCookie);
+	response.headers.append('Set-Cookie', refreshTokenCookie);
 
 	return response;
 });

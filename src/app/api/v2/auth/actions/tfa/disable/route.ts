@@ -51,7 +51,14 @@ export const POST = withErrorHandling(async () => {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token not generated');
 	}
 
+	const newAccessTokenCookie = await AuthService.GetAccessTokenCookie(newAccessToken);
+
+	if (!newAccessTokenCookie) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated');
+	}
+
 	const response = NextResponse.json({ message: 'TFA disabled successfully' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, newAccessToken);
+	response.headers.append('Set-Cookie', newAccessTokenCookie);
+
 	return response;
 });
