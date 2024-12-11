@@ -17,7 +17,12 @@ function Navbar() {
 		<nav className={classes.navbar}>
 			<p>Polkassembly</p>
 			{user?.id ? (
-				<Button onClick={() => logout(() => setUser(null))}>Logout</Button>
+				<div className='flex items-center gap-x-4'>
+					<Link href='/settings'>
+						<Button variant='secondary'>Settings</Button>
+					</Link>
+					<Button onClick={() => logout(() => setUser(null))}>Logout</Button>
+				</div>
 			) : (
 				<Link href='/login'>
 					<Button>Login</Button>

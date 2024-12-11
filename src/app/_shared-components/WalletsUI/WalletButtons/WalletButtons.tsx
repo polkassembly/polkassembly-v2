@@ -11,11 +11,9 @@ import { Identicon } from '@polkadot/react-identicon';
 import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import SwitchToWeb2Signup from '@/app/login/Components/SwitchToWeb2Signup/SwitchToWeb2Signup';
+import { getWalletLabel } from '@/app/_client-utils/getWalletLabel';
 import classes from './WalletButtons.module.scss';
 import { Button } from '../../Button';
-
-const getWalletLabel = (wallet: EWallet) =>
-	wallet === EWallet.SUBWALLET ? wallet.charAt(0).toUpperCase() + wallet.slice(1).split('-')[0] : wallet.charAt(0).toUpperCase() + wallet.slice(1).replace('-', '.');
 
 function WalletButtons({
 	onWalletChange,

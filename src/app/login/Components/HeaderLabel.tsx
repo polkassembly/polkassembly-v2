@@ -8,7 +8,7 @@ import LoginToPaIcon from '@assets/icons/login-to-pa-icon.svg';
 
 function HeaderLabel() {
 	return (
-		<p className='flex items-center gap-x-2 text-xl font-semibold text-text_primary'>
+		<p className='flex items-center gap-x-2 text-lg font-semibold text-text_primary sm:text-xl'>
 			<Image
 				src={LoginToPaIcon}
 				alt='login to polkassembly'

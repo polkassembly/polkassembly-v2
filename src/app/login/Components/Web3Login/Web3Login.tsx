@@ -31,7 +31,8 @@ function Web3Login({
 	account,
 	onAccountChange,
 	selectedWallet,
-	getAccounts
+	getAccounts,
+	onTfaEnabled
 }: {
 	account: InjectedAccount | null;
 	selectedWallet: EWallet | null;
@@ -41,6 +42,7 @@ function Web3Login({
 	onAccountChange: (a: InjectedAccount) => void;
 	onWalletChange: (wallet: EWallet | null) => void;
 	getAccounts: (wallet: EWallet) => void;
+	onTfaEnabled: (token: string) => void;
 }) {
 	const router = useRouter();
 
@@ -100,10 +102,16 @@ function Web3Login({
 				return;
 			}
 
+			console.log('login data', data);
+
+			if (data.isTFAEnabled && data.tfaToken) {
+				onTfaEnabled(data.tfaToken);
+				return;
+			}
+
 			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
 
 			if (!accessToken) {
-				console.log('No Access token found.');
 				setLoading(false);
 				return;
 			}

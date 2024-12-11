@@ -13,7 +13,7 @@ function SwitchToWeb2Signup({ switchToSignup, className }: { switchToSignup: () 
 			<Button
 				onClick={switchToSignup}
 				variant='ghost'
-				className='p-0 text-text_pink'
+				className='p-0 text-text_pink text-xs sm:text-sm'
 			>
 				Sign Up
 			</Button>

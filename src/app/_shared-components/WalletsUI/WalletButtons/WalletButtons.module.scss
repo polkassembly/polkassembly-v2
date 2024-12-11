@@ -7,7 +7,7 @@
 }
 
 .walletName {
-    @apply text-xl font-medium text-text_primary
+    @apply text-lg sm:text-xl font-medium text-text_primary
 }
 
 .dropdownTrigger {
@@ -31,7 +31,7 @@
 }
 
 .buttonsAlignment {
-    @apply flex flex-col gap-y-4 px-8
+    @apply flex flex-col gap-y-4 sm:px-8
 }
 
 .footer {
@@ -39,5 +39,5 @@
 }
 
 .confirmationText {
-    @apply border-b border-dashed border-border_grey pb-6 pt-3 text-base text-text_primary
+    @apply border-b border-dashed border-border_grey pb-6 pt-3 text-xs sm:text-base text-text_primary
 }

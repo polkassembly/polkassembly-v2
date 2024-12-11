@@ -8,8 +8,10 @@ import dayjs from 'dayjs';
 
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-import { IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
-import { useCallback, useEffect } from 'react';
+import { EAuthCookieNames, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
+import { useEffect, useState } from 'react';
+import { getCookie } from 'cookies-next/client';
+import { decodeToken } from 'react-jwt';
 import { useUser } from '../_atoms/user/userAtom';
 import { nextApiClientFetch } from '../_client-utils/nextApiClientFetch';
 import { logout } from '../_client-utils/logout';
@@ -17,22 +19,40 @@ import { logout } from '../_client-utils/logout';
 dayjs.extend(localizedFormat);
 
 function Initializers({ userData, refreshTokenPayload }: { userData: IAccessTokenPayload | null; refreshTokenPayload: IRefreshTokenPayload | null }) {
-	const [, setUser] = useUser();
+	const [user, setUser] = useUser();
 
-	const refreshAccessToken = useCallback(async () => {
-		await nextApiClientFetch('/auth/actions/refreshAccessToken');
-	}, []);
+	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(refreshTokenPayload);
+
+	const refreshAccessToken = async () => {
+		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/refreshAccessToken');
+		if (data?.message) {
+			console.log(data.message);
+			const newAccessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+			const newRefreshToken = getCookie(EAuthCookieNames.REFRESH_TOKEN);
+
+			if (newAccessToken && newRefreshToken) {
+				const newUserPayload = decodeToken<IAccessTokenPayload>(newAccessToken);
+				const newRefreshTokenPayload = decodeToken<IRefreshTokenPayload>(newRefreshToken);
+
+				if (newUserPayload) {
+					setUser(newUserPayload);
+				}
+				if (newRefreshTokenPayload) {
+					setRefreshTokenData(newRefreshTokenPayload);
+				}
+			}
+		}
+	};
 
 	const checkForLoginState = () => {
 		if (document.visibilityState === 'hidden') return;
 
-		if (userData?.exp && Date.now() > userData.exp * 1000) {
-			if (refreshTokenPayload?.exp) {
+		if (user?.exp && Date.now() > user.exp * 1000) {
+			if (refreshTokenData?.exp && Date.now() < refreshTokenData.exp * 1000) {
 				refreshAccessToken();
 				return;
 			}
 
-			// logout
 			logout(() => setUser(null));
 		}
 	};
@@ -44,7 +64,7 @@ function Initializers({ userData, refreshTokenPayload }: { userData: IAccessToke
 			document.removeEventListener('visibilitychange', checkForLoginState);
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [user]);
 
 	useEffect(() => {
 		if (!userData) {

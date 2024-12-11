@@ -309,3 +309,8 @@ export enum ESignupSteps {
 	USERNAME = 'Create Username',
 	PASSWORD = 'Set Password'
 }
+
+export interface IGenerateTFAResponse {
+	base32Secret: string;
+	otpauthUrl: string;
+}

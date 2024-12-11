@@ -22,7 +22,7 @@ const buttonSizes = {
 	default: 'h-9 px-4 py-2',
 	sm: 'h-8 rounded-md px-3 text-xs',
 	lg: 'h-10 rounded-md px-8',
-	icon: 'px-4 py-1'
+	icon: 'px-2 sm:px-4 py-1'
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

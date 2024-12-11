@@ -15,6 +15,7 @@ import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
 import classes from './Login.module.scss';
 import HeaderLabel from './HeaderLabel';
+import TwoFactorAuth from './TwoFactorAuth/TwoFactorAuth';
 
 function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 	const router = useRouter();
@@ -36,6 +37,9 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 
 	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(null);
 
+	const [isTFAEnabled, setIsTFAEnabled] = useState<boolean>(false);
+	const [tfaToken, setTfaToken] = useState<string>('');
+
 	const switchToWeb2Login = () => {
 		setIsWeb3Login(false);
 		setIsWeb2Signup(false);
@@ -49,6 +53,11 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 	const switchToWeb3Login = () => {
 		setIsWeb2Signup(false);
 		setIsWeb3Login(true);
+	};
+
+	const onTfaEnabled = (token: string) => {
+		setIsTFAEnabled(true);
+		setTfaToken(token);
 	};
 
 	const onAccountChange = (a: InjectedAccount) => setAddress(a);
@@ -80,8 +89,18 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 					<HeaderLabel />
 				</div>
 			)}
-			<div className={!isModal ? 'px-12 py-6' : ''}>
-				{isWeb2Signup ? (
+			<div className={!isModal ? 'px-6 py-6 sm:px-12' : ''}>
+				{isTFAEnabled && address && selectedWallet ? (
+					<TwoFactorAuth
+						tfaToken={tfaToken}
+						loginAddress={address.address}
+						loginWallet={selectedWallet}
+						goBack={() => {
+							setTfaToken('');
+							setIsTFAEnabled(false);
+						}}
+					/>
+				) : isWeb2Signup ? (
 					<Web2Signup
 						accounts={accounts}
 						account={address}
@@ -101,6 +120,7 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 						switchToWeb2={switchToWeb2Login}
 						switchToSignup={switchToWeb2Signup}
 						getAccounts={getAccounts}
+						onTfaEnabled={onTfaEnabled}
 					/>
 				) : (
 					<Web2Login

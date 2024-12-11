@@ -1,9 +1,9 @@
 .wrapper {
-    @apply mb-8 flex w-full items-center gap-x-4
+    @apply mb-6 sm:mb-8 flex w-full items-center gap-x-4
 }
 
 .btn {
-    @apply flex w-full items-center gap-x-0 px-0 text-sm font-normal text-text_primary
+    @apply flex w-full items-center gap-x-0 px-0 text-xs sm:text-sm font-normal text-text_primary
 }
 
 .tagWrapper {

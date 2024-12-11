@@ -16,7 +16,7 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={PolkadotJSIcon}
-					className={`h-8 w-8 ${className}`}
+					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);
 		case EWallet.TALISMAN:
@@ -24,7 +24,7 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={TalismanIcon}
-					className={`h-8 w-8 ${className}`}
+					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);
 		case EWallet.SUBWALLET:
@@ -32,7 +32,7 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={SubWalletIcon}
-					className={`h-8 w-8 ${className}`}
+					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);
 		case EWallet.POLKAGATE:
@@ -40,7 +40,7 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={PolkagateIcon}
-					className={`h-8 w-8 ${className}`}
+					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);
 

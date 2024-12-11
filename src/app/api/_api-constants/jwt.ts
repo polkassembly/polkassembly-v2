@@ -6,7 +6,7 @@ import { CookieSerializeOptions } from 'cookie';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from './timeConstants';
 
 export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
-	httpOnly: true,
+	// httpOnly: true,
 	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS,
 	path: '/',
 	sameSite: true,
@@ -14,7 +14,7 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 };
 
 export const ACCESS_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
-	httpOnly: true,
+	// httpOnly: true,
 	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS,
 	path: '/',
 	sameSite: true,
