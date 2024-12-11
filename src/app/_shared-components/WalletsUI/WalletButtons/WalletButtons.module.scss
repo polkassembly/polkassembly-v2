@@ -33,3 +33,11 @@
 .buttonsAlignment {
     @apply flex flex-col gap-y-4 px-8
 }
+
+.footer {
+    @apply flex justify-end items-center gap-x-4 border-t border-border_grey pt-4
+}
+
+.confirmationText {
+    @apply border-b border-dashed border-border_grey pb-6 pt-3 text-base text-text_primary
+}

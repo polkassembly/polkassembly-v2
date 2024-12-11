@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWallet, IAuthResponse } from '@/_shared/types';
+import { EAuthCookieNames, EWallet, IAuthResponse } from '@/_shared/types';
 import React, { useState } from 'react';
 import { InjectedAccount, InjectedWindow } from '@polkadot/extension-inject/types';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
@@ -19,16 +19,9 @@ import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useSetAtom } from 'jotai';
 import { AuthClientService } from '@/app/_client-services/auth_service';
+import { getCookie } from 'cookies-next/client';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-const initAuthResponse: IAuthResponse = {
-	isTFAEnabled: false,
-	tfaToken: '',
-	accessToken: '',
-	userId: 0
-};
 
 function Web3Login({
 	switchToWeb2,
@@ -37,7 +30,8 @@ function Web3Login({
 	accounts,
 	account,
 	onAccountChange,
-	selectedWallet
+	selectedWallet,
+	getAccounts
 }: {
 	account: InjectedAccount | null;
 	selectedWallet: EWallet | null;
@@ -45,14 +39,14 @@ function Web3Login({
 	switchToSignup: () => void;
 	accounts: InjectedAccount[];
 	onAccountChange: (a: InjectedAccount) => void;
-	onWalletChange: (wallet: EWallet) => void;
+	onWalletChange: (wallet: EWallet | null) => void;
+	getAccounts: (wallet: EWallet) => void;
 }) {
 	const router = useRouter();
 
 	const setUserAtom = useSetAtom(userAtom);
 
 	const [loading, setLoading] = useState(false);
-	// const [authResponse, setAuthResponse] = useState<IAuthResponse>(initAuthResponse);
 
 	const handleLogin = async () => {
 		try {
@@ -100,13 +94,21 @@ function Web3Login({
 				wallet: selectedWallet
 			});
 
-			if (!data?.accessToken) {
+			if (!data) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);
 				return;
 			}
 
-			const decodedData = AuthClientService.decodeAccessToken(data.accessToken);
+			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+
+			if (!accessToken) {
+				console.log('No Access token found.');
+				setLoading(false);
+				return;
+			}
+
+			const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 			if (decodedData) {
 				setUserAtom(decodedData);
@@ -127,6 +129,8 @@ function Web3Login({
 				onAddressChange={onAccountChange}
 				onWalletChange={onWalletChange}
 				selectedWallet={selectedWallet || undefined}
+				getAccounts={getAccounts}
+				switchToSignup={switchToSignup}
 			/>
 			<div>
 				{account?.address && (
@@ -141,18 +145,21 @@ function Web3Login({
 						</Button>
 					</div>
 				)}
-				<div className={classes.switchToWeb2}>
-					Or
-					<Button
-						variant='ghost'
-						className='px-0 text-text_pink'
-						onClick={switchToWeb2}
-					>
-						Login with Username
-					</Button>
-				</div>
+				{!selectedWallet && (
+					<div className={classes.switchToWeb2}>
+						Or
+						<Button
+							variant='ghost'
+							className='px-0 text-text_pink'
+							onClick={switchToWeb2}
+						>
+							Login with Username
+						</Button>
+					</div>
+				)}
 				{account?.address && (
 					<SwitchToWeb2Signup
+						className='mt-4 justify-center'
 						switchToSignup={() => {
 							switchToWeb2();
 							switchToSignup();

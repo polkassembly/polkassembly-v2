@@ -10,7 +10,9 @@ import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { Identicon } from '@polkadot/react-identicon';
 import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
+import SwitchToWeb2Signup from '@/app/login/Components/SwitchToWeb2Signup/SwitchToWeb2Signup';
 import classes from './WalletButtons.module.scss';
+import { Button } from '../../Button';
 
 const getWalletLabel = (wallet: EWallet) =>
 	wallet === EWallet.SUBWALLET ? wallet.charAt(0).toUpperCase() + wallet.slice(1).split('-')[0] : wallet.charAt(0).toUpperCase() + wallet.slice(1).replace('-', '.');
@@ -21,56 +23,91 @@ function WalletButtons({
 	selectedAddress,
 	onAddressChange,
 	small,
-	selectedWallet
+	selectedWallet,
+	getAccounts,
+	switchToSignup
 }: {
-	onWalletChange: (wallet: EWallet) => void;
+	onWalletChange: (wallet: EWallet | null) => void;
 	accounts: InjectedAccount[];
 	selectedAddress: string;
 	onAddressChange: (a: InjectedAccount) => void;
 	small?: boolean;
 	selectedWallet?: EWallet;
+	getAccounts: (wallet: EWallet) => void;
+	switchToSignup: () => void;
 }) {
 	const availableWallets = getAvailableWallets();
 
-	return accounts && accounts.length > 0 && selectedWallet ? (
-		<div>
-			<p className={classes.addressHeader}>
-				<WalletIcon wallet={selectedWallet} />
-				<span className={classes.walletName}>{getWalletLabel(selectedWallet)}</span>
-			</p>
-			<DropdownMenu>
-				<div>
-					<p className='mb-1 text-sm text-wallet_btn_text'>Choose Linked Account</p>
-					<DropdownMenuTrigger className={classes.dropdownTrigger}>
-						<Identicon
-							value={selectedAddress}
-							theme='polkadot'
-							size={25}
-						/>
-						<p className={classes.dropdownTriggerText}>{shortenAddress(selectedAddress)}</p>
-					</DropdownMenuTrigger>
+	return selectedWallet ? (
+		accounts && accounts.length > 0 ? (
+			<div>
+				<p className={classes.addressHeader}>
+					<WalletIcon wallet={selectedWallet} />
+					<span className={classes.walletName}>{getWalletLabel(selectedWallet)}</span>
+				</p>
+				<DropdownMenu>
+					<div>
+						<p className='mb-1 text-sm text-wallet_btn_text'>Choose Linked Account</p>
+						<DropdownMenuTrigger className={classes.dropdownTrigger}>
+							<Identicon
+								value={selectedAddress}
+								theme='polkadot'
+								size={25}
+							/>
+							<p className={classes.dropdownTriggerText}>{shortenAddress(selectedAddress)}</p>
+						</DropdownMenuTrigger>
+					</div>
+					<DropdownMenuContent className='border-0'>
+						{accounts.map((item) => (
+							<DropdownMenuItem key={item.address}>
+								<button
+									key={`${item.address}`}
+									type='button'
+									onClick={() => onAddressChange(item)}
+									className={classes.dropdownOption}
+								>
+									<Identicon
+										value={item.address}
+										theme='polkadot'
+										size={25}
+									/>
+									<p className={classes.dropdownOptionText}>{item.address}</p>
+								</button>
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+		) : (
+			<div>
+				<p className={classes.addressHeader}>
+					<WalletIcon wallet={selectedWallet} />
+					<span className={classes.walletName}>{getWalletLabel(selectedWallet)}</span>
+				</p>
+				<p className={classes.confirmationText}>For fetching your addresses, Polkassembly needs access to your wallet extensions. Please authorize this transaction.</p>
+				<SwitchToWeb2Signup
+					className='my-4'
+					switchToSignup={switchToSignup}
+				/>
+				<div className={classes.footer}>
+					<Button
+						size='lg'
+						variant='secondary'
+						className={classes.signupButton}
+						onClick={() => onWalletChange(null)}
+					>
+						Go Back
+					</Button>
+					<Button
+						size='lg'
+						className={classes.signupButton}
+						onClick={() => getAccounts(selectedWallet)}
+					>
+						Got It
+					</Button>
 				</div>
-				<DropdownMenuContent className='border-0'>
-					{accounts.map((item) => (
-						<DropdownMenuItem key={item.address}>
-							<button
-								key={`${item.address}`}
-								type='button'
-								onClick={() => onAddressChange(item)}
-								className={classes.dropdownOption}
-							>
-								<Identicon
-									value={item.address}
-									theme='polkadot'
-									size={25}
-								/>
-								<p className={classes.dropdownOptionText}>{item.address}</p>
-							</button>
-						</DropdownMenuItem>
-					))}
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
+			</div>
+		)
 	) : (
 		<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
 			{!small && <p className={classes.header}>Select a Wallet</p>}

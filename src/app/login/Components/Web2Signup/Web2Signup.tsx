@@ -5,7 +5,7 @@ import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
 import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
-import { ESignupSteps, EWallet, IAuthResponse } from '@/_shared/types';
+import { EAuthCookieNames, ESignupSteps, EWallet, IAuthResponse } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
@@ -16,6 +16,7 @@ import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { emailRules, passwordRules, usernameRules } from '@/app/_client-utils/formValidations';
+import { getCookie } from 'cookies-next/client';
 import classes from './Web2Signup.module.scss';
 import SignupStepHeader from './SignupStepHeader';
 
@@ -31,13 +32,17 @@ function Web2Signup({
 	account,
 	accounts,
 	onWalletChange,
-	onAccountChange
+	onAccountChange,
+	getAccounts,
+	switchToSignup
 }: {
 	switchToLogin: () => void;
+	switchToSignup: () => void;
 	account: InjectedAccount | null;
 	accounts: InjectedAccount[];
-	onWalletChange: (wallet: EWallet) => void;
+	onWalletChange: (wallet: EWallet | null) => void;
 	onAccountChange: (a: InjectedAccount) => void;
+	getAccounts: (wallet: EWallet) => void;
 }) {
 	const [step, setStep] = useState<ESignupSteps>(ESignupSteps.USERNAME);
 
@@ -64,13 +69,21 @@ function Web2Signup({
 				username,
 				password: finalPassword
 			});
-			if (!data?.accessToken) {
+			if (!data) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);
 				return;
 			}
 
-			const decodedData = AuthClientService.decodeAccessToken(data.accessToken);
+			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+
+			if (!accessToken) {
+				console.log('No Access token found.');
+				setLoading(false);
+				return;
+			}
+
+			const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 			if (decodedData) {
 				setUserAtom(decodedData);
@@ -200,6 +213,8 @@ function Web2Signup({
 					selectedAddress={account?.address || ''}
 					onAddressChange={onAccountChange}
 					onWalletChange={onWalletChange}
+					switchToSignup={switchToSignup}
+					getAccounts={getAccounts}
 				/>
 				<p className={classes.switchToLogin}>
 					Already have an Account?

@@ -27,7 +27,8 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 		}
 	}, [userId, router]);
 
-	const [isWeb2Login, setIsWeb2Login] = useState<boolean>(false);
+	const [isWeb3Login, setIsWeb3Login] = useState<boolean>(true);
+
 	const [isWeb2Signup, setIsWeb2Signup] = useState<boolean>(false);
 
 	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
@@ -35,9 +36,20 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 
 	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(null);
 
-	const switchToWeb2 = () => setIsWeb2Login(true);
-	const switchToWeb3 = () => setIsWeb2Login(false);
-	const switchWeb2LoginType = () => setIsWeb2Signup((prev) => !prev);
+	const switchToWeb2Login = () => {
+		setIsWeb3Login(false);
+		setIsWeb2Signup(false);
+	};
+
+	const switchToWeb2Signup = () => {
+		setIsWeb2Signup(true);
+		setIsWeb3Login(false);
+	};
+
+	const switchToWeb3Login = () => {
+		setIsWeb2Signup(false);
+		setIsWeb3Login(true);
+	};
 
 	const onAccountChange = (a: InjectedAccount) => setAddress(a);
 
@@ -54,11 +66,11 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 		}
 	};
 
-	const onWalletChange = (chosenWallet: EWallet) => {
+	const onWalletChange = (chosenWallet: EWallet | null) => {
 		setSelectedWallet(chosenWallet);
+		setAddress(null);
 		setAccounts([]);
-		getAccounts(chosenWallet);
-		switchToWeb3();
+		switchToWeb3Login();
 	};
 
 	return (
@@ -69,31 +81,35 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 				</div>
 			)}
 			<div className={!isModal ? 'px-12 py-6' : ''}>
-				{!isWeb2Login ? (
+				{isWeb2Signup ? (
+					<Web2Signup
+						accounts={accounts}
+						account={address}
+						onAccountChange={onAccountChange}
+						onWalletChange={onWalletChange}
+						switchToLogin={switchToWeb2Login}
+						switchToSignup={switchToWeb2Signup}
+						getAccounts={getAccounts}
+					/>
+				) : isWeb3Login ? (
 					<Web3Login
 						account={address}
 						selectedWallet={selectedWallet}
 						accounts={accounts}
 						onWalletChange={onWalletChange}
 						onAccountChange={onAccountChange}
-						switchToWeb2={switchToWeb2}
-						switchToSignup={switchWeb2LoginType}
+						switchToWeb2={switchToWeb2Login}
+						switchToSignup={switchToWeb2Signup}
+						getAccounts={getAccounts}
 					/>
-				) : !isWeb2Signup ? (
+				) : (
 					<Web2Login
 						accounts={accounts}
 						account={address}
 						onAccountChange={onAccountChange}
 						onWalletChange={onWalletChange}
-						switchToSignup={switchWeb2LoginType}
-					/>
-				) : (
-					<Web2Signup
-						accounts={accounts}
-						account={address}
-						onAccountChange={onAccountChange}
-						onWalletChange={onWalletChange}
-						switchToLogin={switchWeb2LoginType}
+						switchToSignup={switchToWeb2Signup}
+						getAccounts={getAccounts}
 					/>
 				)}
 			</div>

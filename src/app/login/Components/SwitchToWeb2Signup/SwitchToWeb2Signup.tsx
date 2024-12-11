@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import { Button } from '@ui/Button';
+import { cn } from '@/lib/utils';
 import classes from './SwitchToWeb2Signup.module.scss';
 
-function SwitchToWeb2Signup({ switchToSignup }: { switchToSignup: () => void }) {
+function SwitchToWeb2Signup({ switchToSignup, className }: { switchToSignup: () => void; className?: string }) {
 	return (
-		<p className={classes.switchToWeb2Signup}>
+		<p className={cn(classes.switchToWeb2Signup, className)}>
 			Don&apos;t have an account?{' '}
 			<Button
 				onClick={switchToSignup}

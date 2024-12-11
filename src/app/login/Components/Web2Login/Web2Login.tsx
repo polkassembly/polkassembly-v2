@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWallet, IAuthResponse } from '@/_shared/types';
+import { EAuthCookieNames, EWallet, IAuthResponse } from '@/_shared/types';
 import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
@@ -18,6 +18,7 @@ import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
+import { getCookie } from 'cookies-next/client';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -31,13 +32,15 @@ function Web2Login({
 	accounts,
 	switchToSignup,
 	onWalletChange,
-	onAccountChange
+	onAccountChange,
+	getAccounts
 }: {
 	account: InjectedAccount | null;
 	accounts: InjectedAccount[];
 	switchToSignup: () => void;
-	onWalletChange: (wallet: EWallet) => void;
+	onWalletChange: (wallet: EWallet | null) => void;
 	onAccountChange: (a: InjectedAccount) => void;
+	getAccounts: (wallet: EWallet) => void;
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -56,13 +59,21 @@ function Web2Login({
 				emailOrUsername,
 				password
 			});
-			if (!data?.accessToken) {
+			if (!data) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);
 				return;
 			}
 
-			const decodedData = AuthClientService.decodeAccessToken(data.accessToken);
+			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+
+			if (!accessToken) {
+				console.log('No Access token found.');
+				setLoading(false);
+				return;
+			}
+
+			const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 			if (decodedData) {
 				setUserAtom(decodedData);
@@ -138,14 +149,6 @@ function Web2Login({
 					</form>
 				</Form>
 			</div>
-			{/* <div className='my-2 flex w-full justify-center'>
-				<Button
-					isLoading={loading}
-					onClick={handleLogin}
-				>
-					Login
-				</Button>
-			</div> */}
 			<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
 			<WalletButtons
 				small
@@ -153,8 +156,13 @@ function Web2Login({
 				selectedAddress={account?.address || ''}
 				onAddressChange={onAccountChange}
 				onWalletChange={onWalletChange}
+				switchToSignup={switchToSignup}
+				getAccounts={getAccounts}
 			/>
-			<SwitchToWeb2Signup switchToSignup={switchToSignup} />
+			<SwitchToWeb2Signup
+				className='mt-4 justify-center'
+				switchToSignup={switchToSignup}
+			/>
 		</div>
 	);
 }
