@@ -25,7 +25,7 @@ import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetail
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
 import { OffChainDbService } from '../offchain_db_service';
-import { redisGet, redisSetex } from '../redis_service';
+import { redisDel, redisGet, redisSetex } from '../redis_service';
 import { getEmailVerificationTokenKey, getRefreshTokenKey, getTFAKey } from '../redis_service/redisKeys';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
 import { NotificationService } from '../notification_service';
@@ -239,6 +239,11 @@ export class AuthService {
 		return refreshToken;
 	}
 
+	static async DeleteRefreshToken(refreshToken: string) {
+		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
+		await redisDel(getRefreshTokenKey(refreshTokenPayload.id));
+	}
+
 	static async Web2Login(emailOrUsername: string, password: string): Promise<IAuthResponse> {
 		const isEmail = ValidatorService.isValidEmail(emailOrUsername);
 
@@ -395,6 +400,10 @@ export class AuthService {
 
 	static async IsValidRefreshToken(token: string) {
 		try {
+			if (!token.trim()) {
+				return false;
+			}
+
 			const refreshTokenPayload = this.GetRefreshTokenPayload(token);
 
 			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat) {
