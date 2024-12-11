@@ -74,7 +74,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	// 6. return tokens
 	const response = NextResponse.json({ message: 'TFA auth code verified successfully' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
+	response.headers.append('Set-Cookie', accessTokenCookie);
 
 	return response;
 });

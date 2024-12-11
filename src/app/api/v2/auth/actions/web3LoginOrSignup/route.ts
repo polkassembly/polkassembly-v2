@@ -8,7 +8,6 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
-import { EAuthCookieNames } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -59,8 +58,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	// no 2FA, successful login/signup
 	const response = NextResponse.json({ isTFAEnabled, message: 'Web3 authentication successful' });
-	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
-	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
+	response.headers.append('Set-Cookie', accessTokenCookie);
+	response.headers.append('Set-Cookie', refreshTokenCookie);
 
 	return response;
 });
