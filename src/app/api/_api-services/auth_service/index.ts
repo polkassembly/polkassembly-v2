@@ -7,23 +7,36 @@ import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@app/api/_api-utils/apiError';
 import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { JWT_KEY_PASSPHRASE, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, REFRESH_TOKEN_PASSPHRASE, REFRESH_TOKEN_PRIVATE_KEY, REFRESH_TOKEN_PUBLIC_KEY } from '@api/_api-constants/apiEnvVars';
+import {
+	ACCESS_TOKEN_PASSPHRASE,
+	ACCESS_TOKEN_PRIVATE_KEY,
+	ACCESS_TOKEN_PUBLIC_KEY,
+	REFRESH_TOKEN_PASSPHRASE,
+	REFRESH_TOKEN_PRIVATE_KEY,
+	REFRESH_TOKEN_PUBLIC_KEY
+} from '@api/_api-constants/apiEnvVars';
 import { serialize } from 'cookie';
 import * as argon2 from 'argon2';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { ENetwork, ERole, EWallet, IHashedPassword, IAuthResponse, IRefreshTokenPayload, IUser, IAccessTokenPayload, EAuthCookieNames } from '@shared/types';
+import { ENetwork, ERole, EWallet, IHashedPassword, IAuthResponse, IRefreshTokenPayload, IUser, IAccessTokenPayload, EAuthCookieNames, IUserTFADetails } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { randomBytes } from 'crypto';
 import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetails';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
+import { TOTP } from 'otpauth';
 import { OffChainDbService } from '../offchain_db_service';
-import { redisGet, redisSetex } from '../redis_service';
-import { get2FAKey, getEmailVerificationTokenKey, getRefreshTokenKey } from '../redis_service/redisKeys';
+import { redisDel, redisGet, redisSetex } from '../redis_service';
+import { getEmailVerificationTokenKey, getRefreshTokenKey, getTFAKey } from '../redis_service/redisKeys';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
 import { NotificationService } from '../notification_service';
+import { generateRandomBase32 } from '../../_api-utils/generateRandomBase32';
 
-if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY || !JWT_KEY_PASSPHRASE) {
-	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'JWT_PRIVATE_KEY, JWT_PUBLIC_KEY or JWT_KEY_PASSPHRASE not set. Aborting.');
+if (!ACCESS_TOKEN_PRIVATE_KEY || !ACCESS_TOKEN_PUBLIC_KEY || !ACCESS_TOKEN_PASSPHRASE) {
+	throw new APIError(
+		ERROR_CODES.INTERNAL_SERVER_ERROR,
+		StatusCodes.INTERNAL_SERVER_ERROR,
+		'ACCESS_TOKEN_PRIVATE_KEY, ACCESS_TOKEN_PUBLIC_KEY or ACCESS_TOKEN_PASSPHRASE not set. Aborting.'
+	);
 }
 
 if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PUBLIC_KEY || !REFRESH_TOKEN_PASSPHRASE) {
@@ -108,11 +121,11 @@ export class AuthService {
 		return newUser;
 	}
 
-	static async GetUserIdFromJWT(token: string): Promise<number> {
+	static async GetUserIdFromAccessToken(token: string): Promise<number> {
 		let decoded: IAccessTokenPayload;
 
 		try {
-			decoded = jwt.verify(token, JWT_PUBLIC_KEY) as IAccessTokenPayload;
+			decoded = jwt.verify(token, ACCESS_TOKEN_PUBLIC_KEY) as IAccessTokenPayload;
 		} catch (e) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, `${(e as Error).message}`);
 		}
@@ -132,7 +145,7 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 		}
 
-		const user = await this.GetUserWithJWT(token);
+		const user = await this.GetUserWithAccessToken(token);
 
 		if (!user) {
 			console.log('User not found: ', token);
@@ -142,8 +155,8 @@ export class AuthService {
 		return user;
 	}
 
-	static async GetUserWithJWT(token: string): Promise<IUser | null> {
-		const userId = await this.GetUserIdFromJWT(token);
+	static async GetUserWithAccessToken(token: string): Promise<IUser | null> {
+		const userId = await this.GetUserIdFromAccessToken(token);
 
 		const user = await OffChainDbService.GetUserById(userId);
 		if (!user) return null;
@@ -199,12 +212,12 @@ export class AuthService {
 		if (twoFactorAuth?.enabled && twoFactorAuth?.verified) {
 			tokenContent = {
 				...tokenContent,
-				is2FAEnabled: true
+				isTFAEnabled: true
 			};
 		}
 
 		// valid for 1 day
-		return jwt.sign(tokenContent, { key: JWT_PRIVATE_KEY, passphrase: JWT_KEY_PASSPHRASE }, { algorithm: 'RS256', expiresIn: `${ACCESS_TOKEN_LIFE_IN_SECONDS}s` });
+		return jwt.sign(tokenContent, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: ACCESS_TOKEN_PASSPHRASE }, { algorithm: 'RS256', expiresIn: `${ACCESS_TOKEN_LIFE_IN_SECONDS}s` });
 	}
 
 	static async GetRefreshToken({ userId, loginAddress, loginWallet }: { userId: number; loginAddress?: string; loginWallet?: EWallet }): Promise<string> {
@@ -225,6 +238,11 @@ export class AuthService {
 		await redisSetex(getRefreshTokenKey(userId), REFRESH_TOKEN_LIFE_IN_SECONDS, refreshToken);
 
 		return refreshToken;
+	}
+
+	static async DeleteRefreshToken(refreshToken: string) {
+		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
+		await redisDel(getRefreshTokenKey(refreshTokenPayload.id));
 	}
 
 	static async Web2Login(emailOrUsername: string, password: string): Promise<IAuthResponse> {
@@ -252,12 +270,11 @@ export class AuthService {
 
 		if (isTFAEnabled) {
 			const tfaToken = createCuid();
-			await redisSetex(get2FAKey(Number(user.id)), FIVE_MIN, tfaToken);
+			await redisSetex(getTFAKey(tfaToken), FIVE_MIN, user.id.toString());
 
 			return {
 				isTFAEnabled,
-				tfaToken,
-				userId: user.id
+				tfaToken
 			};
 		}
 
@@ -342,12 +359,11 @@ export class AuthService {
 
 			if (isTFAEnabled) {
 				const tfaToken = createCuid();
-				await redisSetex(get2FAKey(Number(user.id)), FIVE_MIN, tfaToken);
+				await redisSetex(getTFAKey(tfaToken), FIVE_MIN, user.id.toString());
 
 				return {
 					isTFAEnabled,
-					tfaToken,
-					userId: user.id
+					tfaToken
 				};
 			}
 
@@ -385,9 +401,13 @@ export class AuthService {
 
 	static async IsValidRefreshToken(token: string) {
 		try {
+			if (!token.trim()) {
+				return false;
+			}
+
 			const refreshTokenPayload = this.GetRefreshTokenPayload(token);
 
-			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat || !refreshTokenPayload.exp) {
+			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat) {
 				return false;
 			}
 
@@ -401,7 +421,7 @@ export class AuthService {
 
 	static IsValidAccessToken(token: string) {
 		try {
-			jwt.verify(token, JWT_PUBLIC_KEY);
+			jwt.verify(token, ACCESS_TOKEN_PUBLIC_KEY);
 			return true;
 		} catch {
 			return false;
@@ -418,9 +438,109 @@ export class AuthService {
 
 	static GetAccessTokenPayload(token: string) {
 		try {
-			return jwt.verify(token, JWT_PUBLIC_KEY) as IAccessTokenPayload;
+			return jwt.verify(token, ACCESS_TOKEN_PUBLIC_KEY) as IAccessTokenPayload;
 		} catch {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid access token');
 		}
+	}
+
+	private static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
+		if (!ValidatorService.isValidUserId(userId)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id');
+		}
+
+		await OffChainDbService.UpdateUserTfaDetails(userId, newTfaDetails);
+	}
+
+	static async GenerateTfaOtp(userId: number) {
+		const base32Secret = generateRandomBase32();
+
+		const totp = new TOTP({
+			algorithm: 'SHA1',
+			digits: 6,
+			issuer: 'Polkassembly',
+			label: `${userId}`,
+			period: 30,
+			secret: base32Secret
+		});
+
+		const otpauthUrl = totp.toString();
+
+		const newTfaDetails: IUserTFADetails = {
+			base32Secret,
+			enabled: false,
+			url: otpauthUrl,
+			verified: false
+		};
+
+		await OffChainDbService.UpdateUserTfaDetails(userId, newTfaDetails);
+
+		return { base32Secret, otpauthUrl };
+	}
+
+	static async IsValidTfaAuthCode({ userId, authCode, base32Secret }: { userId: number; authCode: string; base32Secret: string }) {
+		if (!ValidatorService.isValidUserId(userId) || !authCode || !base32Secret) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid parameters for TFA auth code');
+		}
+
+		const totp = new TOTP({
+			algorithm: 'SHA1',
+			digits: 6,
+			issuer: 'Polkassembly',
+			label: `${userId}`,
+			period: 30,
+			secret: base32Secret
+		});
+
+		return totp.validate({ token: String(authCode).replaceAll(/\s/g, '') }) !== null;
+	}
+
+	static async VerifyTfa(userId: number, oldTfaDetails: IUserTFADetails) {
+		if (!ValidatorService.isValidUserId(userId) || !oldTfaDetails?.base32Secret || !oldTfaDetails?.url) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or TFA details');
+		}
+
+		const newTfaDetails: IUserTFADetails = {
+			...oldTfaDetails,
+			verified: true,
+			enabled: true
+		};
+
+		await this.UpdateUserTfaDetails(userId, newTfaDetails);
+	}
+
+	static async GetUserFromTfaToken(tfaToken: string): Promise<IUser> {
+		if (!tfaToken) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid TFA token');
+		}
+
+		const userId = await redisGet(getTFAKey(tfaToken));
+
+		if (!userId || !ValidatorService.isValidUserId(Number(userId))) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid TFA token');
+		}
+
+		const user = await OffChainDbService.GetUserById(Number(userId));
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
+		}
+
+		return user;
+	}
+
+	static async DisableTfa(userId: number) {
+		if (!ValidatorService.isValidUserId(userId)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id');
+		}
+
+		const newTfaDetails: IUserTFADetails = {
+			enabled: false,
+			verified: false,
+			url: '',
+			base32Secret: ''
+		};
+
+		await OffChainDbService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 }

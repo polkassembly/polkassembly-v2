@@ -48,7 +48,7 @@ export interface IProfileDetails {
 	achievementBadges: IUserBadgeDetails[];
 }
 
-export interface IUser2FADetails {
+export interface IUserTFADetails {
 	url: string;
 	base32Secret: string;
 	enabled: boolean;
@@ -108,14 +108,13 @@ export interface IUser {
 	isWeb3Signup: boolean;
 	primaryNetwork?: ENetwork;
 	notificationPreferences?: IUserNotificationSettings;
-	twoFactorAuth?: IUser2FADetails;
+	twoFactorAuth?: IUserTFADetails;
 	roles?: ERole[];
 	profileScore: number;
 }
 
 export interface IAuthResponse {
 	accessToken?: string;
-	userId?: number;
 	isTFAEnabled?: boolean;
 	tfaToken?: string;
 	refreshToken?: string;
@@ -153,7 +152,7 @@ export interface IAccessTokenPayload {
 	id: number;
 	roles: ERole[];
 	web3signup: boolean;
-	is2FAEnabled?: boolean;
+	isTFAEnabled?: boolean;
 	loginWallet?: EWallet;
 	loginAddress?: string;
 	exp?: number;

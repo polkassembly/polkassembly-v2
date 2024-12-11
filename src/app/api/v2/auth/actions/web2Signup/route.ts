@@ -56,7 +56,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');
 	}
 
-	const response = NextResponse.json({ accessToken });
+	const response = NextResponse.json({ message: 'Web2 signup successful' });
 	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
 	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
 

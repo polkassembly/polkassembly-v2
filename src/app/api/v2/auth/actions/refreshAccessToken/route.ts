@@ -56,7 +56,7 @@ export const POST = withErrorHandling(async () => {
 	}
 
 	// 6. return tokens
-	const response = NextResponse.json({});
+	const response = NextResponse.json({ message: 'Access token refreshed successfully' });
 	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
 	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
 
