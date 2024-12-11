@@ -10,11 +10,10 @@ import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
 import { EAuthCookieNames } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const network = getNetworkFromHeaders(await headers());
+	const network = await getNetworkFromHeaders();
 
 	const { address = '', wallet = '', signature = '' } = await getReqBody(req);
 
@@ -26,7 +25,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		accessToken = '',
 		isTFAEnabled = false,
 		tfaToken = '',
-		userId,
 		refreshToken
 	} = await AuthService.Web3LoginOrRegister({
 		address,
@@ -41,7 +39,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	// If 2FA is enabled, return the tfaToken and userId
-	if (isTFAEnabled) return NextResponse.json({ isTFAEnabled, tfaToken, userId });
+	if (isTFAEnabled) return NextResponse.json({ isTFAEnabled, tfaToken });
 
 	if (!refreshToken) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
@@ -60,7 +58,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	// no 2FA, successful login/signup
-	const response = NextResponse.json({ isTFAEnabled, accessToken });
+	const response = NextResponse.json({ isTFAEnabled, message: 'Web3 authentication successful' });
 	response.cookies.set(EAuthCookieNames.ACCESS_TOKEN, accessTokenCookie);
 	response.cookies.set(EAuthCookieNames.REFRESH_TOKEN, refreshTokenCookie);
 

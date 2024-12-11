@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { DEFAULT_FETCH_TIMEOUT } from '../_constants/defaultFetchTimeout';
+import { fetchPF } from './fetchPF';
 
 export async function fetchWithTimeout(url: string | URL, options?: Record<string, unknown>) {
 	const { timeout } = options || {};
@@ -10,7 +11,7 @@ export async function fetchWithTimeout(url: string | URL, options?: Record<strin
 	const controller = new AbortController();
 	const id = setTimeout(() => controller.abort(), Number(timeout || DEFAULT_FETCH_TIMEOUT));
 
-	const response = await fetch(url, {
+	const response = await fetchPF(url, {
 		...options,
 		signal: controller.signal
 	});

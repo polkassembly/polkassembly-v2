@@ -8,8 +8,8 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidService } from './subsquid_service';
-
-// TODO: implement fallbacks with onchain subsquare service, onchain subscan service, etc
+import { SubsquareOnChainService } from './subsquare_onchain_service';
+import { SubscanOnChainService } from './subscan_onchain_service';
 
 export class OnChainDbService {
 	static async GetOnChainPostInfo({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
@@ -20,6 +20,12 @@ export class OnChainDbService {
 		// fetch from subsquid
 		const subsquidOnChainPostInfo = await SubsquidService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
 		if (subsquidOnChainPostInfo) return subsquidOnChainPostInfo;
+
+		const subsquareOnChainPostInfo = await SubsquareOnChainService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
+		if (subsquareOnChainPostInfo) return subsquareOnChainPostInfo;
+
+		const subscanOnChainPostInfo = await SubscanOnChainService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
+		if (subscanOnChainPostInfo) return subscanOnChainPostInfo;
 
 		return null;
 	}
@@ -33,6 +39,6 @@ export class OnChainDbService {
 		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page });
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
-		return null;
+		return [];
 	}
 }

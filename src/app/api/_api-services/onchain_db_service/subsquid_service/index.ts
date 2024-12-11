@@ -44,8 +44,7 @@ export class SubsquidService extends SubsquidQueries {
 		return {
 			createdAt: proposal.createdAt,
 			proposer: proposal.proposer || '',
-			status: proposal.status,
-			description: proposal.description || ''
+			status: proposal.status
 		} as IOnChainPostInfo;
 	}
 
@@ -77,7 +76,7 @@ export class SubsquidService extends SubsquidQueries {
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
-					status: proposal.status || EProposalStatus.UNKNOWN,
+					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || ''
 				});

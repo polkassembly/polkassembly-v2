@@ -33,7 +33,8 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
-				status
+				status,
+				hash
 			}
 		}
 	`;

@@ -2,6 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+export enum ENetwork {
+	ROCOCO = 'rococo'
+}
+
 export enum ESocial {
 	EMAIL = 'email',
 	RIOT = 'riot',
@@ -43,7 +47,7 @@ export interface IProfileDetails {
 	achievementBadges: IUserBadgeDetails[];
 }
 
-export interface IUser2FADetails {
+export interface IUserTFADetails {
 	url: string;
 	base32Secret: string;
 	enabled: boolean;
@@ -101,16 +105,15 @@ export interface IUser {
 	profileDetails: IProfileDetails;
 	username: string;
 	isWeb3Signup: boolean;
-	primaryNetwork?: string;
+	primaryNetwork?: ENetwork;
 	notificationPreferences?: IUserNotificationSettings;
-	twoFactorAuth?: IUser2FADetails;
+	twoFactorAuth?: IUserTFADetails;
 	roles?: ERole[];
 	profileScore: number;
 }
 
 export interface IAuthResponse {
 	accessToken?: string;
-	userId?: number;
 	isTFAEnabled?: boolean;
 	tfaToken?: string;
 	refreshToken?: string;
@@ -148,7 +151,7 @@ export interface IAccessTokenPayload {
 	id: number;
 	roles: ERole[];
 	web3signup: boolean;
-	is2FAEnabled?: boolean;
+	isTFAEnabled?: boolean;
 	loginWallet?: EWallet;
 	loginAddress?: string;
 	exp?: number;
@@ -156,23 +159,19 @@ export interface IAccessTokenPayload {
 
 export interface IAddressProxyForEntry {
 	address: string;
-	network: string;
+	network: ENetwork;
 }
 
 export interface IUserAddress {
 	address: string;
 	default: boolean;
-	network: string;
+	network: ENetwork;
 	userId: number;
 	createdAt: Date;
 	updatedAt: Date;
 	wallet?: string;
 	isMultisig?: boolean;
 	proxyFor?: IAddressProxyForEntry[];
-}
-
-export enum ENetwork {
-	ROCOCO = 'rococo'
 }
 
 export interface IHashedPassword {
@@ -217,6 +216,11 @@ export enum ENotificationTrigger {
 	VERIFY_EMAIL = 'verifyEmail'
 }
 
+export enum EDataSource {
+	POLKASSEMBLY = 'polkassembly',
+	SUBSQUARE = 'subsquare'
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -227,12 +231,13 @@ export interface IOffChainPost {
 	createdAt?: Date;
 	updatedAt?: Date;
 	tags?: string[];
+	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
 }
 
 export enum EProposalStatus {
-	UNKNOWN = 'Unknown',
+	Unknown = 'Unknown',
 	Noted = 'Noted',
 	Proposed = 'Proposed',
 	Tabled = 'Tabled',
@@ -277,8 +282,7 @@ export enum EProposalStatus {
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
-	description: string;
-	createdAt: Date;
+	createdAt?: Date;
 }
 
 export interface IPost extends IOffChainPost {
