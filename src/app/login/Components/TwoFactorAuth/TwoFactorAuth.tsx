@@ -73,7 +73,9 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 			<p>
 				<span className={classes.walletName}>Two Factor Authentication</span>
 			</p>
-			<p className='text-xs sm:text-sm text-text_primary'>Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.</p>
+			<p className='text-xs text-text_primary sm:text-sm'>
+				Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.
+			</p>
 			<Form {...formData}>
 				<form onSubmit={formData.handleSubmit(handleLogin)}>
 					<div>
