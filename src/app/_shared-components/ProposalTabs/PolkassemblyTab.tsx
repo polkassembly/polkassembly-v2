@@ -33,10 +33,25 @@ function PolkassemblyTab({ data }: PolkassemblyTabProps) {
 				))}
 			</div>
 			<div className='mt-6 flex items-center justify-center space-x-2'>
-				<button className='rounded bg-gray-200 px-4 py-2'>1</button>
-				<button className='rounded bg-gray-200 px-4 py-2'>2</button>
+				<button
+					type='button'
+					className='rounded bg-gray-200 px-4 py-2'
+				>
+					1
+				</button>
+				<button
+					type='button'
+					className='rounded bg-gray-200 px-4 py-2'
+				>
+					2
+				</button>
 				<span className='px-4 py-2'>...</span>
-				<button className='rounded bg-gray-200 px-4 py-2'>10</button>
+				<button
+					type='button'
+					className='rounded bg-gray-200 px-4 py-2'
+				>
+					10
+				</button>
 			</div>
 		</div>
 	);

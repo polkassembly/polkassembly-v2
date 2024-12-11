@@ -72,12 +72,14 @@ function ReferendaPage() {
 
 			<div className='mb-4 flex space-x-6 border-b'>
 				<button
+					type='button'
 					className={`pb-2 ${activeTab === 'polkassembly' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
 					onClick={() => setActiveTab('polkassembly')}
 				>
 					Polkassembly
 				</button>
 				<button
+					type='button'
 					className={`pb-2 ${activeTab === 'external' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
 					onClick={() => setActiveTab('external')}
 				>
