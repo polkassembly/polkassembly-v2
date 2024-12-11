@@ -6,8 +6,11 @@ import { atom, useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { PolkadotApiService } from '@app/_client-services/polkadot_api_service';
 import { ENetwork } from '@shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
 const polkadotApiAtom = atom<PolkadotApiService | null>(null);
+
+export const selectedRpcEndpointAtom = atom(NETWORKS_DETAILS[ENetwork.ROCOCO].rpcEndpoints[0].url);
 
 export const usePolkadotApi = (network: ENetwork) => {
 	const [api, setApi] = useAtom(polkadotApiAtom);

@@ -15,10 +15,15 @@ export const NETWORKS_DETAILS = {
 		tokenDecimals: 12,
 		tokenSymbol: 'ROC',
 		blockExplorerUrl: 'https://rococo.subscan.io/',
+		rpcEndpoint: 'wss://rococo-rpc.polkadot.io',
 		rpcEndpoints: [
 			{
 				name: 'via Parity',
 				url: 'wss://rococo-rpc.polkadot.io'
+			},
+			{
+				name: 'via temp',
+				url: 'wss://paseo.rpc.amforc.com'
 			}
 		],
 		chainId: 'polkadot:6408de7737c59c238890533af25896a2'
