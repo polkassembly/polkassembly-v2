@@ -52,12 +52,24 @@ function Web2Signup({
 
 	const [loading, setLoading] = useState<boolean>(false);
 
+	const [userExists, setUserExists] = useState<boolean>(false);
+
 	const formData = useForm<IFormFields>();
 
 	const handleSignup = async (values: IFormFields) => {
 		const { email, password, username, finalPassword } = values;
 
 		if (step === ESignupSteps.USERNAME && email && username) {
+			const data = await nextApiClientFetch<{ userExists: boolean; message: string }>('/auth/actions/usernameExists', {
+				username
+			});
+
+			setUserExists(data.userExists);
+
+			if (data.userExists) {
+				console.log(data.message);
+				return;
+			}
 			setStep(ESignupSteps.PASSWORD);
 			return;
 		}
@@ -121,7 +133,7 @@ function Web2Signup({
 												{...field}
 											/>
 										</FormControl>
-
+										{userExists && <p className='text-sm text-failure'>Username exists. Please try another username.</p>}
 										<FormMessage />
 									</FormItem>
 								)}
