@@ -7,16 +7,18 @@
 function ReferendumCard({
 	proposalType,
 	network,
-	onChainInfo: { createdAt, proposer, status, description }
+	title,
+	onChainInfo: { createdAt, proposer, status }
 }: {
 	proposalType: string;
 	network: string;
+	title: string;
 	onChainInfo: { createdAt: string; proposer: string; status: string; description: string };
 }) {
 	return (
 		<div className='flex flex-col items-start justify-between border-b p-4 last:border-none md:flex-row md:items-center'>
 			<div className='flex flex-col'>
-				<h3 className='mb-2 text-lg font-semibold'>{description || proposalType}</h3>
+				<h3 className='mb-2 text-lg font-semibold'>{title || proposalType}</h3>
 				<p className='text-sm text-gray-500'>
 					<strong>Proposer:</strong> {proposer} | <strong>Status:</strong> {status} | <strong>Network:</strong> {network}
 				</p>

@@ -11,6 +11,7 @@ interface PolkassemblyTabProps {
 	data: Array<{
 		id: string;
 		proposalType: string;
+		title: string;
 		network: string;
 		onChainInfo: {
 			createdAt: string;

@@ -26,6 +26,7 @@ interface Referendum {
 	id: string;
 	proposalType: string;
 	network: string;
+	title: string;
 	onChainInfo: {
 		createdAt: string;
 		proposer: string;
