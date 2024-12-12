@@ -10,7 +10,6 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 
 export const POST = withErrorHandling(async () => {
 	// 1. read access token from cookie
@@ -27,15 +26,19 @@ export const POST = withErrorHandling(async () => {
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Access token is invalid');
 	}
 
-	// 3. get user id from access token
-	const userId = await AuthService.GetUserIdFromAccessToken(accessToken);
+	// 3. get user from access token
+	const user = await AuthService.GetUserWithAccessToken(accessToken);
 
-	if (!ValidatorService.isValidUserId(userId)) {
+	if (!user) {
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
 	}
 
+	if (user.twoFactorAuth?.verified) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'TFA already enabled, please disable first.');
+	}
+
 	// 4. generate TFA secret
-	const { base32Secret, otpauthUrl } = await AuthService.GenerateTfaOtp(userId);
+	const { base32Secret, otpauthUrl } = await AuthService.GenerateTfaOtp(user.id);
 
 	if (!base32Secret || !otpauthUrl) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to generate TFA secret');

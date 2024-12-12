@@ -34,6 +34,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 
 		if (!authCode || !tfaToken || !loginAddress || !loginWallet) return;
 
+		setLoading(true);
 		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/tfa/login', {
 			authCode,
 			loginAddress,
@@ -113,6 +114,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 							size='lg'
 							className='px-12'
 							type='submit'
+							isLoading={loading}
 						>
 							Login
 						</Button>

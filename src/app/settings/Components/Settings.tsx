@@ -28,6 +28,8 @@ function Settings() {
 
 	useEffect(() => {
 		const generateTfaCode = async () => {
+			if (user?.isTFAEnabled) return;
+
 			setGeneratingCode(true);
 			const data = await nextApiClientFetch<IGenerateTFAResponse>('/auth/actions/tfa/setup/generate');
 			if (data) {
@@ -36,7 +38,7 @@ function Settings() {
 			setGeneratingCode(false);
 		};
 		generateTfaCode();
-	}, []);
+	}, [user]);
 
 	const verifyCode = async () => {
 		if (!authenticatorCode) return;

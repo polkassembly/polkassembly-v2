@@ -102,8 +102,6 @@ function Web3Login({
 				return;
 			}
 
-			console.log('login data', data);
-
 			if (data.isTFAEnabled && data.tfaToken) {
 				onTfaEnabled(data.tfaToken);
 				return;
