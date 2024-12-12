@@ -12,6 +12,7 @@ interface PolkassemblyTabProps {
 		id: string;
 		proposalType: string;
 		title: string;
+		index: number;
 		network: string;
 		onChainInfo: {
 			createdAt: string;
@@ -28,7 +29,7 @@ function PolkassemblyTab({ data }: PolkassemblyTabProps) {
 			<div className='rounded-lg bg-white shadow'>
 				{data?.map((item, index) => (
 					<ReferendumCard
-						key={item.id || `${item.proposalType}-${item.onChainInfo.createdAt}-${index}`} // Unique key fallback
+						key={item.id || `${item.proposalType}-${item.onChainInfo.createdAt}-${index}`}
 						{...item}
 					/>
 				))}

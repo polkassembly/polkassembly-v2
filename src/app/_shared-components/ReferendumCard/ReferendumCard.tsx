@@ -8,15 +8,22 @@ function ReferendumCard({
 	proposalType,
 	network,
 	title,
-	onChainInfo: { createdAt, proposer, status }
+	onChainInfo: { createdAt, proposer, status },
+	index
 }: {
 	proposalType: string;
 	network: string;
 	title: string;
 	onChainInfo: { createdAt: string; proposer: string; status: string; description: string };
+	index: number;
 }) {
+	const backgroundColor = index % 2 === 0 ? '#F5F6F8' : '#FFFFFF';
+
 	return (
-		<div className='flex flex-col items-start justify-between border-b p-4 last:border-none md:flex-row md:items-center'>
+		<div
+			className='flex flex-col items-start justify-between border-b p-4 last:border-none md:flex-row md:items-center'
+			style={{ backgroundColor }}
+		>
 			<div className='flex flex-col'>
 				<h3 className='mb-2 text-lg font-semibold'>{title || proposalType}</h3>
 				<p className='text-sm text-gray-500'>
