@@ -21,7 +21,7 @@ import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@ui/Sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { ENetwork } from '@/_shared/types';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';

@@ -6,7 +6,7 @@
 
 import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/Collapsible';
-import { SidebarGroup, SidebarMenu, useSidebar } from '@ui/Sidebar';
+import { SidebarGroup, SidebarMenu, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import React from 'react';
 import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
 

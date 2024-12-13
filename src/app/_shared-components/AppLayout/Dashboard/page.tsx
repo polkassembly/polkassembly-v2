@@ -5,7 +5,7 @@
 'use client';
 
 import AppSidebar from '@ui/AppLayout/AppSidebar/AppSidebar';
-import { SidebarInset, SidebarTrigger, useSidebar } from '@ui/Sidebar';
+import { SidebarInset, SidebarTrigger, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import Navbar from '@ui/AppLayout/Navbar/Navbar';
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';

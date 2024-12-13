@@ -10,22 +10,22 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar';
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar/Sidebar';
 import style from './CollapsibleItem.module.scss';
 
-interface Item {
+interface ISidebarMenuItem {
 	title?: string;
 	url?: string;
 	icon?: string;
 	isActive?: boolean;
 	isNew?: boolean;
 	count?: number;
-	items?: Item[];
+	items?: ISidebarMenuItem[];
 }
 
 type State = 'collapsed' | 'expanded';
 
-function CollapsibleItem({ item, state }: { item: Item; state: State }) {
+function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State }) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (

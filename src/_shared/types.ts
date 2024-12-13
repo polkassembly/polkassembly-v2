@@ -309,13 +309,13 @@ export type TRPCEndpoint = {
 	label: string;
 };
 
-export interface Item {
+export interface ISidebarMenuItem {
 	title: string;
 	url: string;
 	icon?: string;
 	isNew?: boolean;
 	count?: number;
-	items?: Item[];
+	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
 }

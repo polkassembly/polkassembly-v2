@@ -22,7 +22,7 @@ import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.s
 import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
-import { Item } from '../types';
+import { ENetwork, ISidebarMenuItem } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
 const capitalizeWords = (text: string) =>
@@ -31,13 +31,13 @@ const capitalizeWords = (text: string) =>
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 		.join(' ');
 
-const ActiveItems = (items: Item[], pathname: string): Item[] =>
+const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuItem[] =>
 	items.map((item) => ({
 		...item,
 		isActive: pathname === item.url,
 		items: item.items ? ActiveItems(item.items, pathname) : undefined
 	}));
-const getTrackItems = (networkKey: keyof typeof NETWORKS_DETAILS, trackGroup: string) => {
+const getTrackItems = (networkKey: ENetwork, trackGroup: string) => {
 	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
@@ -71,7 +71,7 @@ const getOriginIcon = (key: string) => {
 	}
 };
 
-const getOriginsItems = (networkKey: keyof typeof NETWORKS_DETAILS) => {
+const getOriginsItems = (networkKey: ENetwork) => {
 	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
@@ -83,7 +83,7 @@ const getOriginsItems = (networkKey: keyof typeof NETWORKS_DETAILS) => {
 		}));
 };
 
-export const getSidebarData = (networkKey: keyof typeof NETWORKS_DETAILS, pathname: string) => {
+export const getSidebarData = (networkKey: ENetwork, pathname: string) => {
 	// eslint-disable-next-line
 	const network = NETWORKS_DETAILS[networkKey];
 	if (!network) {
