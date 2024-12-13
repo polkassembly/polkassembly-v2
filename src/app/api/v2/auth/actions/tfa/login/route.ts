@@ -3,20 +3,31 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { EWallet } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	// 1. read auth code and tfa token from request body
-	const { authCode, tfaToken, loginAddress, loginWallet } = await getReqBody(req);
+	const zodBodySchema = z.object({
+		authCode: z.string(),
+		tfaToken: z.string(),
+		loginAddress: z
+			.string()
+			.refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Invalid login address')
+			.optional(),
+		loginWallet: z.nativeEnum(EWallet).optional()
+	});
 
-	if (!authCode || !tfaToken) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
-	}
+	const bodyRaw = await getReqBody(req);
+
+	// 1. read auth code and tfa token from request body
+	const { authCode, tfaToken, loginAddress, loginWallet } = zodBodySchema.parse(bodyRaw);
 
 	// 2. get user id from tfa token
 	const user = await AuthService.GetUserFromTfaToken(tfaToken);
