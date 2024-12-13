@@ -5,11 +5,13 @@
 import '@app/_style/globals.scss';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { getLocale } from 'next-intl/server';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { SidebarProvider } from './_shared-components/Sidebar';
+import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
+import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -22,16 +24,19 @@ export default async function RootLayout({
 	children: ReactNode;
 }>) {
 	const locale = await getLocale();
-	const messages = await getMessages();
 
 	return (
 		<html lang={locale}>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<NextIntlClientProvider messages={messages}>
-						<main>{children}</main>
-					</NextIntlClientProvider>
-					<NotificationsContainer />
+					<SidebarProvider open>
+						<AppSidebar />
+						<main className='w-full'>
+							<Navbar />
+							{children}
+						</main>
+						<NotificationsContainer />
+					</SidebarProvider>
 				</Providers>
 			</body>
 		</html>

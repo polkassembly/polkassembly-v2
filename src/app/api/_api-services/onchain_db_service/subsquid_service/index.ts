@@ -10,7 +10,7 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidQueries } from './subsquidQueries';
 
-export class OnChainSubsquidService extends SubsquidQueries {
+export class SubsquidService extends SubsquidQueries {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
 
@@ -44,8 +44,7 @@ export class OnChainSubsquidService extends SubsquidQueries {
 		return {
 			createdAt: proposal.createdAt,
 			proposer: proposal.proposer || '',
-			status: proposal.status,
-			description: proposal.description || ''
+			status: proposal.status
 		} as IOnChainPostInfo;
 	}
 
@@ -77,7 +76,7 @@ export class OnChainSubsquidService extends SubsquidQueries {
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
-					status: proposal.status || EProposalStatus.UNKNOWN,
+					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || ''
 				});

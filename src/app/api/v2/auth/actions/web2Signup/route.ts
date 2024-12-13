@@ -34,7 +34,31 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid password');
 	}
 
-	const { accessToken } = await AuthService.Web2SignUp(email.toLowerCase(), password, username, network as ENetwork);
+	const { accessToken, refreshToken } = await AuthService.Web2SignUp(email.toLowerCase(), password, username, network as ENetwork);
 
-	return NextResponse.json({ accessToken });
+	if (!accessToken) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token not generated.');
+	}
+
+	if (!refreshToken) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
+	}
+
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken);
+
+	if (!refreshTokenCookie) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token cookie not generated.');
+	}
+
+	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken);
+
+	if (!accessTokenCookie) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');
+	}
+
+	const response = NextResponse.json({ message: 'Web2 signup successful' });
+	response.headers.append('Set-Cookie', accessTokenCookie);
+	response.headers.append('Set-Cookie', refreshTokenCookie);
+
+	return response;
 });

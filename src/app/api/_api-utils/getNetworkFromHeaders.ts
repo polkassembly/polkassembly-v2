@@ -4,14 +4,16 @@
 
 import { ValidatorService } from '@shared/_services/validator_service';
 import { ENetwork } from '@shared/types';
-import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { headers } from 'next/headers';
 import { APIError } from './apiError';
 
-export function getNetworkFromHeaders(headers: ReadonlyHeaders) {
-	const headerNetwork = headers.get('x-network');
-	const host = headers.get('host');
+export async function getNetworkFromHeaders() {
+	const readonlyHeaders = await headers();
+
+	const headerNetwork = readonlyHeaders.get('x-network');
+	const host = readonlyHeaders.get('host');
 	const subdomain = host?.split('.')?.[0];
 
 	const network = ValidatorService.isValidNetwork(headerNetwork as ENetwork)

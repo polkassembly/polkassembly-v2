@@ -12,7 +12,7 @@ function RootError({ error, reset }: { error: Error; reset: () => void }) {
 	return (
 		<section className='flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border border-primary_border p-8'>
 			<h2 className='font-semibold'>There was a problem :(</h2>
-			{<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>}
+			<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>
 			<small>
 				Please try again or{' '}
 				<a

@@ -1,12 +1,18 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+'use client';
+
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = {
-	default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
+	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
 	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
 	outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-	secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
+	secondary: 'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border shadow-sm hover:bg-btn_secondary_background/80',
 	ghost: 'hover:bg-accent hover:text-accent-foreground',
 	link: 'text-primary underline-offset-4 hover:underline'
 };
@@ -58,8 +64,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			<Comp
 				className={cn(
 					'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-					buttonVariants[variant],
-					buttonSizes[size],
+					buttonVariants[variant as keyof typeof buttonVariants],
+					buttonSizes[size as keyof typeof buttonSizes],
 					fullWidth && 'w-full',
 					isLoading && 'cursor-not-allowed opacity-70',
 					className

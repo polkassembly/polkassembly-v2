@@ -10,13 +10,12 @@ import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EProposalType, IPostListing } from '@shared/types';
+import { EDataSource, EProposalType, IPostListing } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
-	const { proposalType = '' } = params;
+	const { proposalType = '' } = await params;
 
 	if (!proposalType || !ValidatorService.isValidProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
@@ -34,7 +33,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid page or limit');
 	}
 
-	const network = getNetworkFromHeaders(await headers());
+	const network = await getNetworkFromHeaders();
 
 	let posts: IPostListing[] = [];
 
@@ -42,16 +41,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	if (ValidatorService.isValidOnChainProposalType(proposalType)) {
 		const onChainPosts = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page });
 
-		if (!onChainPosts) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to fetch on-chain posts');
-		}
-
 		// Fetch off-chain data
 		const offChainDataPromises = onChainPosts.map((post) => {
 			return OffChainDbService.GetOffChainPostData({
 				network,
-				indexOrHash: proposalType === EProposalType.TIP ? post.index.toString() : post.hash,
-				proposalType
+				indexOrHash: proposalType !== EProposalType.TIP ? post.index.toString() : post.hash,
+				proposalType,
+				proposer: post.proposer || ''
 			});
 		});
 
@@ -60,6 +56,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		// Merge on-chain and off-chain data
 		posts = onChainPosts.map((post, index) => ({
 			...offChainData[Number(index)],
+			dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 			network,
 			proposalType,
 			onChainInfo: post
