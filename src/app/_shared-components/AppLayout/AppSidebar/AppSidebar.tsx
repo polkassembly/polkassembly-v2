@@ -57,7 +57,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			isExpanded={state === 'expanded'}
 		/>
 	);
-	const data = getSidebarData(ENetwork.ROCOCO, pathname);
+	const data = getSidebarData(ENetwork.POLKADOT, pathname);
 
 	const headerData = [
 		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },
