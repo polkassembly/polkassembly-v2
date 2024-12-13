@@ -130,6 +130,7 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 						onWalletChange={onWalletChange}
 						switchToSignup={switchToWeb2Signup}
 						getAccounts={getAccounts}
+						onTfaEnabled={onTfaEnabled}
 					/>
 				)}
 			</div>

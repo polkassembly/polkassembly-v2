@@ -114,7 +114,7 @@ export class AuthService {
 				network,
 				userId: newUserId,
 				// todo: wallet || EWallet.OTHER
-				wallet: wallet || EWallet.POLKADOT
+				wallet: wallet || EWallet.OTHER
 			});
 		}
 

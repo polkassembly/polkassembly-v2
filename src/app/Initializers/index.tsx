@@ -4,10 +4,6 @@
 
 'use client';
 
-import dayjs from 'dayjs';
-
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-
 import { EAuthCookieNames, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { getCookie } from 'cookies-next/client';
@@ -15,8 +11,6 @@ import { decodeToken } from 'react-jwt';
 import { useUser } from '../_atoms/user/userAtom';
 import { nextApiClientFetch } from '../_client-utils/nextApiClientFetch';
 import { logout } from '../_client-utils/logout';
-
-dayjs.extend(localizedFormat);
 
 function Initializers({ userData, refreshTokenPayload }: { userData: IAccessTokenPayload | null; refreshTokenPayload: IRefreshTokenPayload | null }) {
 	const [user, setUser] = useUser();
@@ -26,7 +20,6 @@ function Initializers({ userData, refreshTokenPayload }: { userData: IAccessToke
 	const refreshAccessToken = async () => {
 		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/refreshAccessToken');
 		if (data?.message) {
-			console.log(data.message);
 			const newAccessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
 			const newRefreshToken = getCookie(EAuthCookieNames.REFRESH_TOKEN);
 

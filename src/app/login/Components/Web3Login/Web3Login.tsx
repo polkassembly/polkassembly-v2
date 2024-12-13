@@ -6,12 +6,9 @@
 
 import { EAuthCookieNames, EWallet, IAuthResponse } from '@/_shared/types';
 import React, { useState } from 'react';
-import { InjectedAccount, InjectedWindow } from '@polkadot/extension-inject/types';
-import { isWeb3Injected } from '@polkadot/extension-dapp';
-import { APPNAME } from '@/_shared/_constants/appName';
+import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { stringToHex } from '@polkadot/util';
 import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { Button } from '@/app/_shared-components/Button';
 import { useRouter } from 'next/navigation';
@@ -20,6 +17,7 @@ import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useSetAtom } from 'jotai';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { getCookie } from 'cookies-next/client';
+import { getUserSignature } from '@/app/_client-utils/getUserSignature';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -55,43 +53,21 @@ function Web3Login({
 			if (!selectedWallet || !account?.address) return;
 			const { address } = account;
 
-			const injectedWindow = window as Window & InjectedWindow;
-			const wallet = isWeb3Injected ? injectedWindow.injectedWeb3[selectedWallet] : null;
-
-			if (!wallet) {
-				return;
-			}
-
-			const injected = wallet && wallet.enable && (await wallet.enable(APPNAME));
-
-			const signRaw = injected && injected.signer && injected.signer.signRaw;
-			if (!signRaw) {
-				console.error('Signer not available');
-				return;
-			}
-
 			setLoading(true);
 
-			let substrateAddress;
-			if (!address.startsWith('0x')) {
-				substrateAddress = getSubstrateAddress(address);
-				if (!substrateAddress) {
-					console.error('Invalid address');
-					setLoading(false);
-					return;
-				}
-			} else {
-				substrateAddress = address;
-			}
-
-			const { signature } = await signRaw({
-				address: substrateAddress,
-				data: stringToHex(WEB3_AUTH_SIGN_MESSAGE),
-				type: 'bytes'
+			const signature = await getUserSignature({
+				data: WEB3_AUTH_SIGN_MESSAGE,
+				address,
+				selectedWallet
 			});
 
+			if (!signature) {
+				setLoading(false);
+				return;
+			}
+
 			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web3LoginOrSignup', {
-				address: substrateAddress,
+				address: getSubstrateAddress(address),
 				signature,
 				wallet: selectedWallet
 			});

@@ -109,16 +109,19 @@ function WalletButtons({
 	) : (
 		<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
 			{!small && <p className={classes.header}>Select a Wallet</p>}
-			{Object.values(EWallet).map((wallet) => (
-				<WalletButton
-					key={wallet}
-					disabled={!availableWallets[wallet]}
-					wallet={wallet}
-					onClick={onWalletChange}
-					label={getWalletLabel(wallet)}
-					small={small}
-				/>
-			))}
+			{Object.values(EWallet).map((wallet) => {
+				if (!wallet) return null;
+				return (
+					<WalletButton
+						key={wallet}
+						disabled={!availableWallets[wallet]}
+						wallet={wallet}
+						onClick={onWalletChange}
+						label={getWalletLabel(wallet)}
+						small={small}
+					/>
+				);
+			})}
 		</div>
 	);
 }

@@ -33,7 +33,8 @@ function Web2Login({
 	switchToSignup,
 	onWalletChange,
 	onAccountChange,
-	getAccounts
+	getAccounts,
+	onTfaEnabled
 }: {
 	account: InjectedAccount | null;
 	accounts: InjectedAccount[];
@@ -41,6 +42,7 @@ function Web2Login({
 	onWalletChange: (wallet: EWallet | null) => void;
 	onAccountChange: (a: InjectedAccount) => void;
 	getAccounts: (wallet: EWallet) => void;
+	onTfaEnabled: (token: string) => void;
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -62,6 +64,11 @@ function Web2Login({
 			if (!data) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);
+				return;
+			}
+
+			if (data.isTFAEnabled && data.tfaToken) {
+				onTfaEnabled(data.tfaToken);
 				return;
 			}
 

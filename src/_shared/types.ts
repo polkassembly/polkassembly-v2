@@ -124,13 +124,13 @@ export enum EWallet {
 	POLKADOT = 'polkadot-js',
 	SUBWALLET = 'subwallet-js',
 	TALISMAN = 'talisman',
-	POLKAGATE = 'polkagate'
+	POLKAGATE = 'polkagate',
+	NOVAWALLET = 'nova',
+	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
-	// NOVAWALLET = 'polkadot-js',
 	// POLYWALLET = 'polywallet',
 	// POLKASAFE = 'polkasafe',
-	// OTHER = ''
 }
 
 export interface IRefreshTokenPayload {
@@ -310,7 +310,6 @@ export enum ESignupSteps {
 	PASSWORD = 'Set Password'
 }
 
-export interface IGenerateTFAResponse {
-	base32Secret: string;
+export interface IGenerateTFAResponse extends Omit<IUserTFADetails, 'url' | 'enabled' | 'verified'> {
 	otpauthUrl: string;
 }

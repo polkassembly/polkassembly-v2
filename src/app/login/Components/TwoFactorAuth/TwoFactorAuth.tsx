@@ -88,7 +88,6 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 							rules={{
 								required: true,
 								validate: (value) => {
-									console.log(value);
 									if (value.length !== 6 || Number.isNaN(Number(value))) return 'Please provide a valid authentication code.';
 									return true;
 								}

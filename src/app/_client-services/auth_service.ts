@@ -8,7 +8,7 @@ import { decodeToken } from 'react-jwt';
 export class AuthClientService {
 	static decodeAccessToken(token: string) {
 		if (!token) return null;
-		const tokenPayload = token && decodeToken<IAccessTokenPayload>(token);
+		const tokenPayload = decodeToken<IAccessTokenPayload>(token);
 
 		if (tokenPayload && tokenPayload.sub) {
 			return tokenPayload;
@@ -18,7 +18,7 @@ export class AuthClientService {
 
 	static decodeRefreshToken(token: string) {
 		if (!token) return null;
-		const tokenPayload = token && decodeToken<IRefreshTokenPayload>(token);
+		const tokenPayload = decodeToken<IRefreshTokenPayload>(token);
 
 		if (tokenPayload) {
 			return tokenPayload;

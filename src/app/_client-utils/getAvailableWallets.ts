@@ -4,6 +4,9 @@
 import { InjectedWindow } from '@polkadot/extension-inject/types';
 
 export const getAvailableWallets = () => {
-	const injectedWindow = window as Window & InjectedWindow;
-	return injectedWindow.injectedWeb3 || {};
+	if (document.readyState === 'complete') {
+		const injectedWindow = window as Window & InjectedWindow;
+		return injectedWindow.injectedWeb3 || {};
+	}
+	return {};
 };

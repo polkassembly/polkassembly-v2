@@ -19,7 +19,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	const user = await OffChainDbService.GetUserByUsername(username);
 
-	if (user) return NextResponse.json({ userExists: true, message: 'User Exists, Please Signup with another Username' });
+	if (user) return NextResponse.json({ userExists: true, message: 'Username is taken' });
 
-	return NextResponse.json({ userExists: false, message: 'Username is Valid' });
+	return NextResponse.json({ userExists: false, message: 'Username is taken' });
 });

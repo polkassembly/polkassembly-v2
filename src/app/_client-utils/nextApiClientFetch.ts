@@ -2,10 +2,11 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+// import { NEXT_PUBLIC_DEFAULT_NETWORK } from '@/_shared/_constants/envVars';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { ENetwork } from '@/_shared/types';
+import { ClientError } from './clientError';
 
-export async function nextApiClientFetch<T>(endpoint: string, data?: { [key: string]: unknown }, method?: 'GET' | 'POST'): Promise<T> {
+export async function nextApiClientFetch<T>(endpoint: string, data?: Record<string, unknown>, method?: 'GET' | 'POST'): Promise<T> {
 	const baseUrl = window.location.origin;
 	const reqURL = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
 
@@ -17,7 +18,7 @@ export async function nextApiClientFetch<T>(endpoint: string, data?: { [key: str
 		headers: {
 			'Content-Type': 'application/json',
 			'x-api-key': process.env.NEXT_PUBLIC_POLKASSEMBLY_API_KEY || '',
-			'x-network': ENetwork.POLKADOT
+			'x-network': process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ''
 		},
 		method: method || 'POST'
 	})
@@ -26,6 +27,6 @@ export async function nextApiClientFetch<T>(endpoint: string, data?: { [key: str
 		})
 		.catch((error) => {
 			console.log('error', error);
-			throw new Error(error.message);
+			throw new ClientError(error.message);
 		});
 }

@@ -7,6 +7,7 @@ import PolkadotJSIcon from '@assets/wallet-icons/polkadotjs-icon.svg';
 import TalismanIcon from '@assets/wallet-icons/talisman-icon.svg';
 import SubWalletIcon from '@assets/wallet-icons/subwallet-icon.svg';
 import PolkagateIcon from '@assets/wallet-icons/polkagate-icon.svg';
+import NovaIcon from '@assets/wallet-icons/nova-wallet-star.svg';
 import Image from 'next/image';
 
 export function WalletIcon({ wallet, className }: { wallet: EWallet; className?: string }) {
@@ -40,6 +41,14 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={PolkagateIcon}
+					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
+				/>
+			);
+		case EWallet.NOVAWALLET:
+			return (
+				<Image
+					alt=''
+					src={NovaIcon}
 					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);
