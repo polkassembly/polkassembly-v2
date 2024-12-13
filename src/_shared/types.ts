@@ -129,7 +129,7 @@ export enum EWallet {
 	NOVAWALLET = 'polkadot-js',
 	POLYWALLET = 'polywallet',
 	POLKASAFE = 'polkasafe',
-	OTHER = ''
+	OTHER = 'other'
 }
 
 export interface IRefreshTokenPayload {

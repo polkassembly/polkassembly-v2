@@ -13,6 +13,10 @@ import util from 'util';
  * pretty_console(data);
  * only use in server side code
  */
-export function consolePretty(data: any) {
-	console.log(util.inspect(data, false, null, true));
+export function consolePretty(data: unknown, isError = false) {
+	if (isError) {
+		console.error(util.inspect(data, false, null, true));
+	} else {
+		console.log(util.inspect(data, false, null, true));
+	}
 }

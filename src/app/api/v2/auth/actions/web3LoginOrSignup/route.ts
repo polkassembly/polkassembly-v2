@@ -2,23 +2,30 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { EWallet } from '@/_shared/types';
 import { AuthService } from '@api/_api-services/auth_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
+import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
 
-	const { address = '', wallet = '', signature = '' } = await getReqBody(req);
+	const zodBodySchema = z.object({
+		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address'),
+		wallet: z.nativeEnum(EWallet),
+		signature: z.string().min(2, 'A valid signature is required')
+	});
 
-	if (!address || !wallet || !signature) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_PARAMS_ERROR);
-	}
+	const bodyRaw = await getReqBody(req);
+
+	const { address, wallet, signature } = zodBodySchema.parse(bodyRaw);
 
 	const {
 		accessToken = '',
