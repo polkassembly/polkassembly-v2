@@ -5,7 +5,8 @@
 import '@app/_style/globals.scss';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getMessages } from 'next-intl/server';
+import { NextIntlClientProvider } from 'next-intl';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
@@ -24,19 +25,25 @@ export default async function RootLayout({
 	children: ReactNode;
 }>) {
 	const locale = await getLocale();
+	const messages = await getMessages();
 
 	return (
 		<html lang={locale}>
 			<body className={poppinsFont.className}>
 				<Providers>
-					<SidebarProvider open>
-						<AppSidebar />
-						<main className='w-full'>
-							<Navbar />
-							{children}
-						</main>
-						<NotificationsContainer />
-					</SidebarProvider>
+					<NextIntlClientProvider
+						messages={messages}
+						locale={locale}
+					>
+						<SidebarProvider open>
+							<AppSidebar />
+							<main className='w-full'>
+								<Navbar />
+								{children}
+							</main>
+							<NotificationsContainer />
+						</SidebarProvider>
+					</NextIntlClientProvider>
 				</Providers>
 			</body>
 		</html>

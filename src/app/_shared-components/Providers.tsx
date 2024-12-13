@@ -6,23 +6,15 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect, useState } from 'react';
-import { NextIntlClientProvider, AbstractIntlMessages } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 
 export function Providers({ children }: { children: ReactNode }) {
 	const [mounted, setMounted] = useState(false);
-	const [messages, setMessages] = useState<AbstractIntlMessages | null>(null);
 
 	useEffect(() => {
 		setMounted(true);
-		const fetchMessages = async () => {
-			const msgs = await getMessages();
-			setMessages(msgs);
-		};
-		fetchMessages();
 	}, []);
 
-	if (!mounted || !messages) {
+	if (!mounted) {
 		return <main>{children}</main>;
 	}
 
@@ -33,7 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
 			themes={['light', 'dark']}
 			enableSystem={false}
 		>
-			<NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+			{children}
 		</ThemeProvider>
 	);
 }

@@ -6,7 +6,7 @@ import { getRequestConfig } from 'next-intl/server';
 import { parse } from 'cookie';
 import { headers } from 'next/headers';
 
-export const requestConfig = getRequestConfig(async () => {
+const requestConfig = getRequestConfig(async () => {
 	const headersList = await headers();
 	const cookies = headersList.get('cookie') || '';
 	const parsedCookies = parse(cookies);
@@ -14,6 +14,8 @@ export const requestConfig = getRequestConfig(async () => {
 
 	return {
 		locale,
-		messages: (await import(`../../messages/${locale}.json`)).default
+		messages: (await import(`../messages/${locale}.json`)).default
 	};
 });
+
+export default requestConfig;
