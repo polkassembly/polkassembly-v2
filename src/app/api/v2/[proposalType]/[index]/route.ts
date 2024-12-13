@@ -9,9 +9,8 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { ENetwork, EProposalType, IPost } from '@shared/types';
+import { EDataSource, ENetwork, EProposalType, IPost } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
@@ -21,7 +20,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 	}
 
-	const network = getNetworkFromHeaders(await headers());
+	const network = await getNetworkFromHeaders();
 
 	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
 
@@ -43,6 +42,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const post: IPost = {
 		...offChainPostData,
+		dataSource: offChainPostData?.dataSource || EDataSource.POLKASSEMBLY,
 		proposalType: proposalType as EProposalType,
 		network: network as ENetwork,
 		onChainInfo: onChainPostInfo

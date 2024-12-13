@@ -89,4 +89,12 @@ export class ValidatorService {
 			return false;
 		}
 	}
+
+	static isValidUserId(userId: number): boolean {
+		return !isNaN(userId) && userId >= 0;
+	}
+
+	static isValidWeb3Address(address: string): boolean {
+		return this.isValidEVMAddress(address) || this.isValidSubstrateAddress(address);
+	}
 }

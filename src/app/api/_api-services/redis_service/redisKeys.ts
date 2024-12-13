@@ -3,11 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 export const getPwdResetTokenKey = (userId: number): string => `PRT-${userId}`;
-export const getAddressLoginKey = (address: string): string => `ALN-${address}`;
-export const getAddressSignupKey = (address: string): string => `ASU-${address}`;
-export const getSetCredentialsKey = (address: string): string => `SCR-${address}`;
 export const getEmailVerificationTokenKey = (token: string): string => `EVT-${token}`;
-export const getMultisigAddressKey = (address: string): string => `MLA-${address}`;
-export const getCreatePostKey = (address: string): string => `CPT-${address}`;
-export const getEditPostKey = (address: string): string => `EPT-${address}`;
-export const get2FAKey = (userId: number): string => `TFA-${userId}`;
+export const getTFAKey = (tfaToken: string): string => `TFA-${tfaToken}`;
+export const getSubscanDataKey = (network: string, url: string): string => `SDT-${network}-${url}`;
+export const getRefreshTokenKey = (userId: number): string => `RFT-${userId}`;
