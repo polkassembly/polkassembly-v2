@@ -141,9 +141,9 @@ const Sidebar = forwardRef<
 		side?: 'left' | 'right';
 		variant?: 'sidebar' | 'floating' | 'inset';
 		collapsible?: 'offcanvas' | 'icon' | 'none';
-		isOpen?: boolean; // Accept `isOpen` as a prop
-		onExpand?: () => void; // Callback when expanding
-		onCollapse?: () => void; // Callback when collapsing
+		isOpen?: boolean;
+		onExpand?: () => void;
+		onCollapse?: () => void;
 	}
 >(({ side = 'left', variant = 'sidebar', collapsible = 'offcanvas', isOpen, onExpand, onCollapse, className, children, ...props }, ref) => {
 	const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
@@ -237,7 +237,7 @@ const Sidebar = forwardRef<
 			>
 				<div
 					data-sidebar='sidebar'
-					className='flex h-full w-full flex-col bg-white group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow'
+					className={`${styles.sidebar_children} group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow`}
 				>
 					{children}
 				</div>
@@ -257,7 +257,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			data-sidebar='trigger'
 			variant='normal'
 			size='icon'
-			className={cn(styles.sidebar_trigger, className)}
+			className={cn(`${styles.sidebar_trigger} bg-white`, className)}
 			type='button'
 			onClick={(event) => {
 				onClick?.(event);
@@ -269,12 +269,17 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 				<Image
 					src={LeftIcon}
 					alt='Left Icon'
-					className='h-8 w-8'
+					className='h-5 w-5'
+					width={5}
+					height={5}
 				/>
 			) : (
 				<Image
 					src={RightIcon}
 					alt='Right Icon'
+					className='h-5 w-5'
+					width={5}
+					height={5}
 				/>
 			)}
 			<span className='sr-only'>Toggle Sidebar</span>
@@ -370,6 +375,7 @@ SidebarMenuItem.displayName = 'SidebarMenuItem';
 const sidebarMenuButtonVariants = cva(
 	cn(
 		styles.menuButton,
+		'transition-[width, height, padding]',
 		'ring-sidebar-ring peer/menu-button focus-visible:ring-2 active:bg-white-accent active:text-sidebar-accent-foreground group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 data-[active=true]:bg-white-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-white-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2'
 	),
 	{

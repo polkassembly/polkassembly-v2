@@ -7,9 +7,6 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
-import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { SidebarProvider } from './_shared-components/Sidebar/Sidebar';
-import Dashboard from './_shared-components/AppLayout/Dashboard/page';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -27,12 +24,7 @@ export default function RootLayout({
 			className='dark'
 		>
 			<body className={`${poppinsFont.className} flex min-h-screen flex-col`}>
-				<Providers>
-					<SidebarProvider>
-						<Dashboard>{children}</Dashboard>
-						<NotificationsContainer />
-					</SidebarProvider>
-				</Providers>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);

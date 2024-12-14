@@ -6,6 +6,9 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect, useState } from 'react';
+import { SidebarProvider } from './Sidebar/Sidebar';
+import Dashboard from './AppLayout/Dashboard/page';
+import NotificationsContainer from './NotificationsContainer';
 
 export function Providers({ children }: { children: ReactNode }) {
 	const [mounted, setMounted] = useState(false);
@@ -25,7 +28,10 @@ export function Providers({ children }: { children: ReactNode }) {
 			themes={['light', 'dark']}
 			enableSystem={false}
 		>
-			{children}
+			<SidebarProvider>
+				<Dashboard>{children}</Dashboard>
+				<NotificationsContainer />
+			</SidebarProvider>
 		</ThemeProvider>
 	);
 }

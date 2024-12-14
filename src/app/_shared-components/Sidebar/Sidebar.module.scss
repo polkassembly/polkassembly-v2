@@ -38,9 +38,12 @@
 	@apply mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5;
 }
 
+.sidebar_children {
+	@apply flex h-full w-full flex-col bg-white
+}
+
 .menuButton {
 	@apply flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm;
-	@apply transition-[width,height,padding];
 	@apply disabled:pointer-events-none disabled:opacity-50;
 	@apply aria-disabled:pointer-events-none aria-disabled:opacity-50;
 
@@ -64,11 +67,11 @@
 		@apply h-12 text-sm;
 	}
 
-	& > span:last-child {
+	&>span:last-child {
 		@apply truncate;
 	}
 
-	& > svg {
+	&>svg {
 		@apply h-4 w-4 shrink-0;
 	}
 }
