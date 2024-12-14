@@ -268,7 +268,7 @@ function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State
 												href={subItem.url || '#'}
 												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
 											>
-												<span>{subItem.title}</span>
+												<span className='px-1'>{subItem.title}</span>
 												{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 											</Link>
 										)}
