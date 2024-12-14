@@ -22,6 +22,13 @@ import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.s
 import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
+import DemocraryProposalIcon from '@assets/sidebar/democracy-proposal-icon.svg';
+import DemocraryReferendumIcon from '@assets/sidebar/democracy-referenda-icon.svg';
+import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal-icon.svg';
+import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
+import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
+import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
+import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
 import { EGovType, ENetwork, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
@@ -186,35 +193,31 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 								{
 									title: 'Democracy',
 									url: '#',
-									icon: ParachainsIcon,
 									items: [
-										{ title: 'Proposals', url: '/proposals' },
-										{ title: 'Referenda', url: '/referenda' }
+										{ title: 'Proposals', url: '/proposals', icon: DemocraryProposalIcon },
+										{ title: 'Referenda', url: '/referenda', icon: DemocraryReferendumIcon }
 									]
 								},
 								{
 									title: 'Treasury',
 									url: '#',
-									icon: ParachainsIcon,
 									items: [
-										{ title: 'Treasury Proposals', url: '/treasury-proposals' },
-										{ title: 'Tips', url: '/tips' }
+										{ title: 'Treasury Proposals', url: '/treasury-proposals', icon: TreasuryProposalIcon },
+										{ title: 'Tips', url: '/tips', icon: TreasuryTipIcon }
 									]
 								},
 								{
 									title: 'Council',
 									url: '#',
-									icon: ParachainsIcon,
 									items: [
-										{ title: 'Motions', url: '/motions' },
-										{ title: 'Members', url: '/members' }
+										{ title: 'Motions', url: '/motions', icon: CouncilMotionIcon },
+										{ title: 'Members', url: '/members', icon: CouncilMemberIcon }
 									]
 								},
 								{
 									title: 'Tech. Comm.',
 									url: '#',
-									icon: ParachainsIcon,
-									items: [{ title: 'Tech Comm Proposals', url: '/tech-comm-proposals' }]
+									items: [{ title: 'Tech Comm Proposals', url: '/tech-comm-proposals', icon: TechCommIcon }]
 								}
 							]
 						}

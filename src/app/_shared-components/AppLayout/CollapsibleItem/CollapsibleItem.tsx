@@ -59,7 +59,19 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 									href={subItem.url || '#'}
 									className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
 								>
-									<span>{subItem.title}</span>
+									<span className='flex items-center'>
+										{subItem.icon && (
+											<div className={style.iconWrapper}>
+												<Image
+													src={subItem.icon || ''}
+													alt={subItem.title || 'icon'}
+													width={24}
+													height={24}
+												/>
+											</div>
+										)}
+										<span>{subItem.title}</span>
+									</span>
 									{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 								</Link>
 							)}
@@ -109,7 +121,20 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 									href={subItem.url || '#'}
 									className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
 								>
-									<span className='whitespace-nowrap'>{subItem.title}</span>
+									<span className='flex items-center'>
+										{subItem.icon && (
+											<div className={style.iconWrapper}>
+												<Image
+													src={subItem.icon}
+													alt={subItem.title || 'icon'}
+													className={subItem.isActive ? style.sidebar_selected_icon : ''}
+													width={20}
+													height={20}
+												/>
+											</div>
+										)}
+										<span className='whitespace-nowrap'>{subItem.title}</span>
+									</span>
 									{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 								</Link>
 							)}

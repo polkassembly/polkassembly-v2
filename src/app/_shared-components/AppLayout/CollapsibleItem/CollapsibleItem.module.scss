@@ -7,7 +7,7 @@
 }
 
 .menuItem {
-	@apply flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-1.5 text-sm transition-colors duration-200 hover:bg-gray-200;
+	@apply flex w-full cursor-pointer items-center justify-between rounded-md px-0.5 py-0.5 text-sm transition-colors duration-200 hover:bg-gray-200;
 }
 
 .subItemCount {
