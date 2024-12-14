@@ -11,15 +11,13 @@ import { SidebarProvider } from './Sidebar';
 import AppSidebar from './AppLayout/AppSidebar/AppSidebar';
 import Navbar from './AppLayout/Navbar/Navbar';
 import NotificationsContainer from './NotificationsContainer';
-import { poppinsFont } from '../_style/fonts';
 
 interface ProvidersProps {
 	children: ReactNode;
-	locale: string;
 	messages: AbstractIntlMessages;
 }
 
-export function Providers({ children, locale, messages }: ProvidersProps) {
+export function Providers({ children, messages }: ProvidersProps) {
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -31,29 +29,22 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
 	}
 
 	return (
-		<html lang={locale}>
-			<body className={poppinsFont.className}>
-				<ThemeProvider
-					attribute='class'
-					defaultTheme='light'
-					themes={['light', 'dark']}
-					enableSystem={false}
-				>
-					<NextIntlClientProvider
-						messages={messages}
-						locale={locale}
-					>
-						<SidebarProvider open>
-							<AppSidebar />
-							<main className='w-full'>
-								<Navbar />
-								{children}
-							</main>
-							<NotificationsContainer />
-						</SidebarProvider>
-					</NextIntlClientProvider>
-				</ThemeProvider>
-			</body>
-		</html>
+		<ThemeProvider
+			attribute='class'
+			defaultTheme='light'
+			themes={['light', 'dark']}
+			enableSystem={false}
+		>
+			<NextIntlClientProvider messages={messages}>
+				<SidebarProvider open>
+					<AppSidebar />
+					<main className='w-full'>
+						<Navbar />
+						{children}
+					</main>
+					<NotificationsContainer />
+				</SidebarProvider>
+			</NextIntlClientProvider>
+		</ThemeProvider>
 	);
 }

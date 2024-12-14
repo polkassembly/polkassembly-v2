@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { getLocale, getMessages } from 'next-intl/server';
 import { Providers } from './_shared-components/Providers';
+import { poppinsFont } from './_style/fonts';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -22,11 +23,10 @@ export default async function RootLayout({
 	const messages = await getMessages();
 
 	return (
-		<Providers
-			locale={locale}
-			messages={messages}
-		>
-			{children}
-		</Providers>
+		<html lang={locale}>
+			<body className={poppinsFont.className}>
+				<Providers messages={messages}>{children}</Providers>
+			</body>
+		</html>
 	);
 }
