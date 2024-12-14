@@ -109,7 +109,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 									href={subItem.url || '#'}
 									className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
 								>
-									<span>{subItem.title}</span>
+									<span className='whitespace-nowrap'>{subItem.title}</span>
 									{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 								</Link>
 							)}

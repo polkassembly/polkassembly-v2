@@ -19,36 +19,36 @@ export const NETWORKS_DETAILS = {
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
 			{
-				label: 'via Parity (recommended)',
-				key: 'wss://rpc.polkadot.io'
+				name: 'via Parity (recommended)',
+				url: 'wss://rpc.polkadot.io'
 			},
 			{
-				label: 'via On-finality',
-				key: 'wss://polkadot.api.onfinality.io/public-ws'
+				name: 'via On-finality',
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
 			},
 			{
-				label: 'via Dwellir',
-				key: 'wss://polkadot-rpc.dwellir.com'
+				name: 'via Dwellir',
+				url: 'wss://polkadot-rpc.dwellir.com'
 			},
 			{
-				label: 'via Pinknode',
-				key: 'wss://public-rpc.pinknode.io/polkadot'
+				name: 'via Pinknode',
+				url: 'wss://public-rpc.pinknode.io/polkadot'
 			},
 			{
-				label: 'via IBP-GeoDNS1',
-				key: 'wss://rpc.ibp.network/polkadot'
+				name: 'via IBP-GeoDNS1',
+				url: 'wss://rpc.ibp.network/polkadot'
 			},
 			{
-				label: 'via IBP-GeoDNS2',
-				key: 'wss://rpc.dotters.network/polkadot'
+				name: 'via IBP-GeoDNS2',
+				url: 'wss://rpc.dotters.network/polkadot'
 			},
 			{
-				label: 'via RadiumBlock',
-				key: 'wss://polkadot.public.curie.radiumblock.co/ws'
+				name: 'via RadiumBlock',
+				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
 			},
 			{
-				label: 'via LuckyFriday',
-				key: 'wss://rpc-polkadot.luckyfriday.io'
+				name: 'via LuckyFriday',
+				url: 'wss://rpc-polkadot.luckyfriday.io'
 			}
 		],
 		tracks: {

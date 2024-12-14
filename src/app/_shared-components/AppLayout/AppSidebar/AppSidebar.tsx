@@ -27,7 +27,7 @@ import { ENetwork } from '@/_shared/types';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
-import style from './AppSidebar.module.scss';
+import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -80,7 +80,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			{...props}
 		>
 			<SidebarHeader>
-				<div className='flex items-center justify-center'>{getLogo()}</div>
+				<div className={styles.sidebar_logo}>{getLogo()}</div>
 			</SidebarHeader>
 
 			<hr className='text-btn_secondary_border' />
@@ -101,7 +101,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						target='_blank'
 						rel='noreferrer'
 					>
-						<div className={style.create_proposal_button}>
+						<div className={styles.create_proposal_button}>
 							<Image
 								src={CautionIcon}
 								alt=''
@@ -110,7 +110,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 							/>
 							<div className='flex flex-col'>
 								<div className='flex gap-1'>
-									<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>Report an issue</span>
+									<span className={`${styles.reportbtn} text-blue-light-high dark:text-blue-dark-high`}>Report an issue</span>
 									<ChevronRight className='h-5 w-5' />
 								</div>
 								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>Need help with something?</span>
