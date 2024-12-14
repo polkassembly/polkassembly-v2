@@ -14,10 +14,11 @@ import NotificationsContainer from './NotificationsContainer';
 
 interface ProvidersProps {
 	children: ReactNode;
+	locale: string;
 	messages: AbstractIntlMessages;
 }
 
-export function Providers({ children, messages }: ProvidersProps) {
+export function Providers({ children, locale, messages }: ProvidersProps) {
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -35,7 +36,10 @@ export function Providers({ children, messages }: ProvidersProps) {
 			themes={['light', 'dark']}
 			enableSystem={false}
 		>
-			<NextIntlClientProvider messages={messages}>
+			<NextIntlClientProvider
+				messages={messages}
+				locale={locale}
+			>
 				<SidebarProvider open>
 					<AppSidebar />
 					<main className='w-full'>

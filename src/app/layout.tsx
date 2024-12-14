@@ -25,7 +25,12 @@ export default async function RootLayout({
 	return (
 		<html lang={locale}>
 			<body className={poppinsFont.className}>
-				<Providers messages={messages}>{children}</Providers>
+				<Providers
+					messages={messages}
+					locale={locale}
+				>
+					{children}
+				</Providers>
 			</body>
 		</html>
 	);
