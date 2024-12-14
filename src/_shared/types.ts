@@ -303,3 +303,12 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 }
+
+export enum ESupportedLanguages {
+	SPANISH = 'es',
+	ENGLISH = 'en'
+}
+
+export enum ELocaleCookieNames {
+	NEXT_LOCALE = 'NEXT_LOCALE'
+}
