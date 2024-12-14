@@ -248,7 +248,7 @@ const Sidebar = forwardRef<
 
 Sidebar.displayName = 'Sidebar';
 
-const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ onClick, ...props }, ref) => {
+const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
 
 	return (
@@ -257,7 +257,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			data-sidebar='trigger'
 			variant='normal'
 			size='icon'
-			className={styles.sidebar_trigger}
+			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2', className)}
 			type='button'
 			onClick={(event) => {
 				onClick?.(event);
