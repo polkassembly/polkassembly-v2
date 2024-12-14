@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/Collaps
 import { SidebarGroup, SidebarMenu, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import React from 'react';
 import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
+import styles from './NavItems.module.scss';
 
 export function NavMain({
 	sections
@@ -67,6 +68,13 @@ export function NavMain({
 				isNew?: boolean;
 				icon?: string;
 				count?: number;
+				items?: {
+					title: string;
+					url: string;
+					isNew?: boolean;
+					icon?: string;
+					count?: number;
+				}[];
 			}[];
 		}[];
 	}[];
@@ -113,7 +121,7 @@ export function NavMain({
 												<span className={`text-lightBlue ${state === 'collapsed' ? 'pl-2' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
 													{mainItem.heading}
 												</span>
-												<ChevronRight className='ml-auto mr-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+												<ChevronRight className={`${styles.chevron} group-data-[state=open]/collapsible:rotate-90`} />
 											</div>
 										</div>
 									</CollapsibleTrigger>

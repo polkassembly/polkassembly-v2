@@ -2,16 +2,18 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType } from '@shared/types';
 
 export const NETWORKS_DETAILS = {
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
 		name: 'Polkadot',
+		govtype: EGovType.OPENGOV,
 		blockTime: 6000,
 		chainId: 0,
 		rpcEndpoint: 'wss://polkadot.api.onfinality.io/public-ws',
 		ss58Format: 0,
+		maxDeciding: 1,
 		subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
 		tokenDecimals: 10,
 		tokenSymbol: 'DOT',
@@ -53,7 +55,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.ROOT]: {
 				trackId: 0,
 				description: 'Origin for General network-wide improvements',
-				group: 'Main',
+				group: 'Origin',
 				name: 'root',
 				maxDeciding: 1,
 				decisionDeposit: 1000000000000000,
@@ -79,7 +81,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.WISH_FOR_CHANGE]: {
 				trackId: 2,
 				description: 'Origin for signaling that the network wishes for some change.',
-				group: 'Main',
+				group: 'Origin',
 				name: 'wish_for_change',
 				decisionDeposit: 200000000000000,
 				preparePeriod: 1200,
@@ -239,7 +241,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.TREASURER]: {
 				trackId: 11,
 				description: 'Origin for spending (any amount of) funds until the upper limit of  10,000,000 DOT',
-				group: 'Treasury',
+				group: 'Origin',
 				name: 'treasurer',
 				maxSpend: 10000000,
 				maxDeciding: 10,
@@ -266,7 +268,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.WHITELISTED_CALLER]: {
 				trackId: 1,
 				description: 'Origin commanded by any members of the Polkadot Fellowship (no Dan grade needed)',
-				group: 'Whitelist',
+				group: 'Origin',
 				name: 'whitelisted_caller',
 				maxDeciding: 100,
 				decisionDeposit: 100000000000000,
@@ -318,7 +320,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.LEASE_ADMIN]: {
 				trackId: 12,
 				description: 'Origin able to force slot leases',
-				group: 'Governance',
+				group: 'Main',
 				name: 'lease_admin',
 				maxDeciding: 10,
 				decisionDeposit: 50000000000000,
@@ -370,7 +372,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.GENERAL_ADMIN]: {
 				trackId: 14,
 				description: 'Origin for managing the registrar',
-				group: 'Governance',
+				group: 'Main',
 				name: 'general_admin',
 				maxDeciding: 10,
 				decisionDeposit: 50000000000000,
@@ -422,7 +424,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.REFERENDUM_CANCELLER]: {
 				trackId: 20,
 				description: 'Origin able to cancel referenda.',
-				group: 'Governance',
+				group: 'Origin',
 				name: 'referendum_canceller',
 				maxDeciding: 1000,
 				decisionDeposit: 100000000000000,
@@ -448,7 +450,7 @@ export const NETWORKS_DETAILS = {
 			[EPostOrigin.REFERENDUM_KILLER]: {
 				trackId: 21,
 				description: 'Origin able to kill referenda.',
-				group: 'Governance',
+				group: 'Origin',
 				name: 'referendum_killer',
 				maxDeciding: 1000,
 				decisionDeposit: 500000000000000,
@@ -476,6 +478,7 @@ export const NETWORKS_DETAILS = {
 	[ENetwork.ROCOCO]: {
 		disabled: false,
 		key: ENetwork.ROCOCO,
+		govtype: EGovType.OPENGOV,
 		name: 'Rococo',
 		blockTime: 6000,
 		ss58Format: 42,

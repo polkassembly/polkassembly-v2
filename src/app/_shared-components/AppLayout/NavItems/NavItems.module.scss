@@ -19,3 +19,7 @@
 .custom_scrollbar::-webkit-scrollbar-track {
 	@apply bg-transparent;
 }
+
+.chevron {
+	@apply ml-auto mr-4 transition-transform duration-200;
+}

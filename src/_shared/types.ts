@@ -7,12 +7,21 @@ export enum ENetwork {
 	POLKADOT = 'polkadot'
 }
 
+export enum EGovType {
+	GOV_1 = 'gov_1',
+	OPENGOV = 'opengov'
+}
+
 export enum ESocial {
 	EMAIL = 'email',
 	RIOT = 'riot',
 	TWITTER = 'twitter',
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord'
+}
+
+export interface ITrackCounts {
+	[trackName: string]: number;
 }
 
 export interface IUserSocialDetails {
