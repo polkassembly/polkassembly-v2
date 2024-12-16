@@ -1,0 +1,53 @@
+.spendPeriodWrapper {
+	.flexContainer {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.title {
+		font-size: 12px;
+		font-weight: 400;
+	}
+
+	.infoIcon {
+		cursor: pointer;
+	}
+
+	.remainingTime {
+		color: #243a57;
+		font-weight: 400;
+		display: flex;
+		align-items: baseline;
+		white-space: pre;
+		padding-top: 5px;
+
+		@media (min-width: 640px) {
+			margin-top: 0;
+		}
+
+		.timeSection {
+			.amount {
+				font-size: 16px;
+
+				@media (min-width: 640px) {
+					font-size: 18px;
+				}
+			}
+
+			.unit {
+				color: #8c94a7;
+				font-size: 12px;
+			}
+		}
+
+		.separator {
+			font-size: 12px;
+		}
+	}
+
+	.separator {
+		margin: 12px 0;
+		width: auto;
+	}
+}

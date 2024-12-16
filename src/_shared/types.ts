@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 export enum ENetwork {
+	POLKADOT = 'polkadot',
 	ROCOCO = 'rococo'
 }
 
@@ -302,4 +303,65 @@ export interface IOnChainPostListing {
 
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
+}
+
+interface Asset {
+	label: string;
+	assetId: number;
+}
+
+export enum EAssets {
+	DED = 'ded',
+	USDT = 'usdt',
+	USDC = 'usdc',
+	MYTH = 'myth'
+}
+export interface IAssets {
+	tokenDecimal: number;
+	name: string;
+	img: string;
+	genralIndex: string;
+}
+
+export type TRPCEndpoint = {
+	name: string;
+	url: string;
+};
+
+export interface ChainProps {
+	peopleChainRpcEndpoint?: string;
+	peopleChainParachain?: string;
+	preImageBaseDeposit?: string;
+	palletInstance?: string;
+	parachain?: string;
+	name?: string;
+	blockTime: number;
+	logo?: any;
+	ss58Format: number;
+	key: string;
+	tokenDecimals: number;
+	tokenSymbol: string;
+	chainId: number;
+	rpcEndpoint: string;
+	category: string;
+	subsquidUrl: string;
+	treasuryAddress?: string;
+	treasuryProposalBondPercent: string | null;
+	treasuryProposalMinBond: string | null;
+	treasuryProposalMaxBond: string | null;
+	externalLinks: string;
+	assethubExternalLinks?: string;
+	rpcEndpoints: TRPCEndpoint[];
+	relayRpcEndpoints?: TRPCEndpoint[];
+	gTag: string | null;
+	assetHubRpcEndpoint?: string;
+	assetHubTreasuryAddress?: string;
+	assetHubTreasuryAddress2?: string;
+	assetHubTreasuryAddress3?: string;
+	assetHubTreasuryAddress4?: string;
+	supportedAssets?: IAssets[];
+	hydrationTreasuryAddress?: string;
+	hydrationTreasuryAddress2?: string;
+	hydrationEndpoints?: string[];
+	hydrationAssets?: Asset[];
 }

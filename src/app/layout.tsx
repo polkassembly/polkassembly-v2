@@ -30,7 +30,7 @@ export default function RootLayout({
 						<AppSidebar />
 						<main className='w-full'>
 							<Navbar />
-							{children}
+							<div className='page-wrapper'>{children}</div>
 						</main>
 						<NotificationsContainer />
 					</SidebarProvider>

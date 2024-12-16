@@ -27,7 +27,7 @@
 }
 
 @layer base {
-  :root {
+	:root {
 		--sidebar-background: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;
 		--sidebar-primary: 240 5.9% 10%;
@@ -37,7 +37,7 @@
 		--sidebar-border: 220 13% 91%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
 	}
-  .dark {
+	.dark {
 		--sidebar-background: 240 5.9% 10%;
 		--sidebar-foreground: 240 4.8% 95.9%;
 		--sidebar-primary: 224.3 76.3% 48%;
@@ -50,10 +50,41 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+	* {
+		@apply border-border;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+.page-wrapper {
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 1.5rem;
+	min-height: 90vh;
+	width: 94vw;
+	max-width: 80rem;
+	flex: 0 1 auto;
+	padding: 32px 32px 0;
+
+	@media (min-width: 1024px) {
+		width: 82vw;
+		opacity: 1;
+	}
+
+	@media (min-width: 1536px) {
+		width: 83.3333%;
+	}
+}
+
+.content-wrapper {
+	border-radius: 1.25rem;
+	margin-top: 32px;
+	padding: 20px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+	@media (min-width: 768px) {
+		padding: 26px;
 	}
 }

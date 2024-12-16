@@ -1,0 +1,57 @@
+.nextBurnWrapper {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+
+	@media (min-width: 640px) {
+		gap: 8px;
+	}
+
+	.contentWrapper {
+		height: 48px;
+
+		.title {
+			color: #8c94a7;
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 1.25rem;
+		}
+
+		.amountContainer {
+			display: flex;
+			align-items: baseline;
+			gap: 6px;
+
+			.amountWrapper {
+				display: flex;
+				align-items: baseline;
+				gap: 3px;
+
+				.amount {
+					font-size: 1.125rem;
+					font-weight: 400;
+				}
+
+				.tokenSymbol {
+					font-size: 1rem;
+					font-weight: 400;
+				}
+			}
+		}
+	}
+
+	.description {
+		margin-top: 8px;
+		flex: 1;
+		border-radius: 8px;
+		background-color: #f4f5f6;
+		padding: 8px 12px;
+		color: #333843;
+		font-size: 12px;
+		font-weight: 400;
+
+		@media (min-width: 640px) {
+			margin-top: 0;
+		}
+	}
+}
