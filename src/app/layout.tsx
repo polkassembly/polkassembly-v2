@@ -7,10 +7,6 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
-import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { SidebarProvider } from './_shared-components/Sidebar';
-import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
-import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -23,18 +19,12 @@ export default function RootLayout({
 	children: ReactNode;
 }>) {
 	return (
-		<html lang='en'>
-			<body className={poppinsFont.className}>
-				<Providers>
-					<SidebarProvider open>
-						<AppSidebar />
-						<main className='w-full'>
-							<Navbar />
-							{children}
-						</main>
-						<NotificationsContainer />
-					</SidebarProvider>
-				</Providers>
+		<html
+			lang='en'
+			className='dark'
+		>
+			<body className={`${poppinsFont.className} flex min-h-screen flex-col`}>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);

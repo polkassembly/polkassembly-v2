@@ -1,29 +1,126 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
-import Image from 'next/image';
-import polkassemblyLogo from '@assets/logos/Polkassembly-logo.png';
-import { Separator } from '@ui/Separator';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader } from '@ui/Sidebar';
-import classes from './AppSidebar.module.scss';
 
-function AppSidebar() {
-	return (
-		<Sidebar>
-			<SidebarHeader className={classes.sidebar_header}>
+'use client';
+
+import Image from 'next/image';
+import React from 'react';
+import { useTheme } from 'next-themes';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
+import PaLogoDark from '@assets/logos/PALogoDark.svg';
+import PaLogo from '@ui/AppLayout/PaLogo';
+import Head1 from '@assets/sidebar/head1.svg';
+import Head2 from '@assets/sidebar/head2.svg';
+import Head3 from '@assets/sidebar/head3.svg';
+import Head4 from '@assets/sidebar/head4.svg';
+import Foot1 from '@assets/sidebar/foot1.svg';
+import Foot2 from '@assets/sidebar/foot2.svg';
+import Foot3 from '@assets/sidebar/foot3.svg';
+import Foot4 from '@assets/sidebar/foot4.svg';
+import CautionIcon from '@assets/sidebar/caution-icon.svg';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
+import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
+import { ENetwork } from '@/_shared/types';
+import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
+import { NavMain } from '../NavItems/NavItems';
+import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
+import styles from './AppSidebar.module.scss';
+
+function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+	const { state } = useSidebar();
+	const { resolvedTheme: theme } = useTheme();
+	const pathname = usePathname();
+
+	const getLogo = () => {
+		if (theme === 'light') {
+			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
+		}
+		if (state === 'expanded') {
+			return (
 				<Image
-					src={polkassemblyLogo}
-					width={110}
-					alt='polkassembly logo'
+					src={PaLogoDark}
+					alt='Polkassembly Logo'
 				/>
+			);
+		}
+		return <PaLogo variant='compact' />;
+	};
+
+	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (
+		<DynamicImageGrid
+			items={data}
+			rowSize={2}
+			tooltipPosition='top'
+			isExpanded={state === 'expanded'}
+		/>
+	);
+	const data = getSidebarData(ENetwork.POLKADOT, pathname);
+
+	const headerData = [
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: 'Leaderboard' },
+		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: 'Delegation' },
+		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: 'Profile' }
+	];
+
+	const bgColor = 'bg-sidebar_footer';
+	const footerData = [
+		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'TownHall', url: 'https://townhallgov.com/' },
+		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Polkasafe', url: 'https://polkasafe.xyz/' },
+		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Fellowship', url: 'https://collectives.polkassembly.io/' },
+		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Staking', url: 'https://staking.polkadot.cloud/#/overview' }
+	];
+
+	return (
+		<Sidebar
+			collapsible='icon'
+			{...props}
+		>
+			<SidebarHeader>
+				<div className={styles.sidebar_logo}>{getLogo()}</div>
 			</SidebarHeader>
-			<Separator className={classes.separator} />
+
+			<hr className='text-btn_secondary_border' />
+
+			<div className='mt-5'>{generateGridData(headerData)}</div>
+
+			<div className='px-4'>
+				<CreateProposalDropdownButton state={state} />
+			</div>
 			<SidebarContent>
-				<SidebarGroup />
-				<SidebarGroup />
+				<NavMain sections={data} />
 			</SidebarContent>
-			<SidebarFooter />
+
+			<SidebarFooter className='mb-3'>
+				{state === 'expanded' && (
+					<Link
+						href='https://polkassembly.hellonext.co/'
+						target='_blank'
+						rel='noreferrer'
+					>
+						<div className={styles.create_proposal_button}>
+							<Image
+								src={CautionIcon}
+								alt=''
+								width={30}
+								height={30}
+							/>
+							<div className='flex flex-col'>
+								<div className='flex gap-1'>
+									<span className={`${styles.reportbtn} text-blue-light-high dark:text-blue-dark-high`}>Report an issue</span>
+									<ChevronRight className='h-5 w-5' />
+								</div>
+								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>Need help with something?</span>
+							</div>
+						</div>
+					</Link>
+				)}
+
+				{generateGridData(footerData)}
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
