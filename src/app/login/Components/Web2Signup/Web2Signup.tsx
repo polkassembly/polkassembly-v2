@@ -18,8 +18,11 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { emailRules, passwordRules, usernameRules } from '@/app/_client-utils/formValidations';
 import { getCookie } from 'cookies-next/client';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import classes from './Web2Signup.module.scss';
+import { StatusCodes } from 'http-status-codes';
+import { apiError } from '@/app/_client-utils/apiError';
+import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import SignupStepHeader from './SignupStepHeader';
+import classes from './Web2Signup.module.scss';
 
 interface IFormFields {
 	email: string;
@@ -53,7 +56,7 @@ function Web2Signup({
 
 	const [loading, setLoading] = useState<boolean>(false);
 
-	const [userExists, setUserExists] = useState<boolean>(false);
+	const [error, setError] = useState<string>('');
 
 	const formData = useForm<IFormFields>();
 
@@ -61,17 +64,21 @@ function Web2Signup({
 		const { email, password, username, finalPassword } = values;
 
 		if (step === ESignupSteps.USERNAME && email && username) {
-			const data = await nextApiClientFetch<{ userExists: boolean; message: string }>('/auth/actions/usernameExists', {
-				username
+			const data = await nextApiClientFetch<{ usernameExists: boolean; emailExists: boolean; message: string; status: StatusCodes }>('/auth/actions/usernameExists', {
+				username,
+				email
 			});
 
-			setUserExists(data.userExists);
-
-			if (data.userExists) {
-				console.log(data.message);
+			if (data.status && apiError(data.status)) {
+				setError(data.message);
 				return;
 			}
-			setStep(ESignupSteps.PASSWORD);
+
+			if (!data.usernameExists && !data.emailExists) {
+				setError('');
+				setStep(ESignupSteps.PASSWORD);
+				return;
+			}
 			return;
 		}
 
@@ -140,7 +147,6 @@ function Web2Signup({
 												{...field}
 											/>
 										</FormControl>
-										{userExists && <p className='text-sm text-failure'>Username exists. Please try another username.</p>}
 										<FormMessage />
 									</FormItem>
 								)}
@@ -152,7 +158,13 @@ function Web2Signup({
 								control={formData.control}
 								name='email'
 								key='email'
-								rules={emailRules}
+								rules={{
+									validate: (value) => {
+										if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
+										return true;
+									},
+									...emailRules
+								}}
 								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
@@ -225,6 +237,7 @@ function Web2Signup({
 						</div>
 					</div>
 				)}
+				{error && <ErrorMessage errorMessage={error} />}
 				<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
 				<WalletButtons
 					small

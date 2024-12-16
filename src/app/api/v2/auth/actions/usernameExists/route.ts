@@ -11,15 +11,22 @@ import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const { username } = await getReqBody(req);
+	const { username, email } = await getReqBody(req);
 
-	if (!username) {
+	if (!username || !email) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_PARAMS_ERROR);
 	}
 
-	const user = await OffChainDbService.GetUserByUsername(username);
+	const usernameExists = await OffChainDbService.IsUsernameInUse(username);
+	const emailExists = await OffChainDbService.IsEmailInUse(email);
 
-	if (user) return NextResponse.json({ userExists: true, message: 'Username is taken' });
+	if (usernameExists) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Username is Taken');
+	}
 
-	return NextResponse.json({ userExists: false, message: 'Username is taken' });
+	if (emailExists) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Email is Taken');
+	}
+
+	return NextResponse.json({ usernameExists, emailExists, message: 'User is Valid' });
 });
