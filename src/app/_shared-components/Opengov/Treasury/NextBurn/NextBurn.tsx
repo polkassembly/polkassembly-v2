@@ -10,8 +10,8 @@ const NextBurn = () => {
 				<div className={styles.title}>Next Burn</div>
 				<div className={styles.amountContainer}>
 					<div className={styles.amountWrapper}>
-						<span className={styles.amount}>13K</span>
-						<span className={styles.tokenSymbol}>{NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.tokenSymbol}</span>
+						<span className={styles.amount}>122.71K</span>
+						<span className={styles.tokenSymbol}>{NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.tokenSymbol}</span>
 					</div>
 				</div>
 			</div>

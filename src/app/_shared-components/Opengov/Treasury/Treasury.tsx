@@ -5,13 +5,18 @@ import React from 'react';
 import styles from './Treasury.module.scss';
 import SpendPeriod from './SpendPeriod/SpendPeriod';
 import NextBurn from './NextBurn/NextBurn';
+import { Separator } from '../../Separator';
+import TreasuryBalance from './TreasuryBalance/TreasuryBalance';
 
 function Treasury() {
 	return (
 		<main className={styles.main}>
-			<section className={styles.contentWrapper}> treasury</section>
+			<section className={styles.contentWrapper}>
+				<TreasuryBalance />
+			</section>
 			<section className={styles.contentWrapper}>
 				<SpendPeriod />
+				<Separator className='my-3 w-auto bg-sidebar-border' />
 				<NextBurn />
 			</section>
 		</main>
