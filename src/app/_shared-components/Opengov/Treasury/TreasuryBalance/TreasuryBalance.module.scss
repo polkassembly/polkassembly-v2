@@ -1,4 +1,8 @@
 .treasuryBalanceWrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+
 	.header {
 		display: flex;
 		align-items: center;
@@ -16,15 +20,17 @@
 
 			.infoIcon {
 				cursor: pointer;
+				width: 16px;
+				height: 16px;
 			}
 
 			.monthlyBadge {
 				border-radius: 2px;
-				background-color: #485f7d0d;
+				background-color: rgba(72, 95, 125, 0.05);
 				padding: 4px 6px;
 				font-size: 10px;
 				font-weight: 500;
-				color: #485f7dcc;
+				color: rgba(72, 95, 125, 0.8);
 			}
 		}
 
@@ -45,18 +51,42 @@
 			}
 
 			.change {
+				display: flex;
+				align-items: center;
+				gap: 2px;
 				font-size: 12px;
-				font-weight: 400;
-				color: #52c41a;
+				font-weight: 500;
+
+				&.positive {
+					color: #52c41a;
+
+					.upArrow {
+						width: 16px;
+						height: 16px;
+					}
+				}
+
+				&.negative {
+					color: #f53c3c;
+
+					.downArrow {
+						width: 16px;
+						height: 16px;
+					}
+				}
 			}
 		}
 	}
 
 	.detailsWrapper {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+
 		.detailsHeader {
 			display: flex;
-			align-items: baseline;
 			gap: 6px;
+			align-items: baseline;
 
 			.totalValue {
 				font-size: 20px;
@@ -66,6 +96,8 @@
 			.detailsLink {
 				display: flex;
 				align-items: center;
+				gap: 2px;
+				cursor: pointer;
 
 				.linkText {
 					font-size: 12px;
@@ -75,6 +107,8 @@
 
 				.arrowIcon {
 					cursor: pointer;
+					width: 16px;
+					height: 16px;
 				}
 			}
 		}

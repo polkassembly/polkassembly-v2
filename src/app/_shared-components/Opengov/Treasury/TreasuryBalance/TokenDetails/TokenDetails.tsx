@@ -1,3 +1,6 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import Image from 'next/image';
 import { ENetwork } from '@/_shared/types';
@@ -8,7 +11,7 @@ import UsdcIcon from '@/_assets/icons/Treasury/usdc-icon.svg';
 import UsdtIcon from '@/_assets/icons/Treasury/usdt-icon.svg';
 import styles from './TokenDetails.module.scss';
 
-const TokenDetails = () => {
+function TokenDetails() {
 	const unit = NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.tokenSymbol;
 	return (
 		<div className={styles.tokenDetailsWrapper}>
@@ -62,6 +65,6 @@ const TokenDetails = () => {
 			</div>
 		</div>
 	);
-};
+}
 
 export default TokenDetails;

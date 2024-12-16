@@ -1,3 +1,6 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
 import { useState, useEffect } from 'react';
 import { usePolkadotApi } from '@/app/_atoms/polkadotJsApiAtom';
 import { ENetwork } from '@/_shared/types';
@@ -30,9 +33,9 @@ export const useNextBurn = (network: string, currentTokenPrice: { value: string 
 			try {
 				const { burn } = await apiService.getTreasuryAccountDetails();
 				const tokenDecimals = 10;
-				const adjustedBurnValue = parseFloat(burn.toString()) / Math.pow(10, tokenDecimals);
+				const adjustedBurnValue = parseFloat(burn.toString()) / 10 ** tokenDecimals;
 
-				let value = formatUSDWithUnits(String(adjustedBurnValue.toFixed(0)));
+				const value = formatUSDWithUnits(String(adjustedBurnValue.toFixed(0)));
 				let valueUSD = '';
 
 				if (currentTokenPrice.value) {
