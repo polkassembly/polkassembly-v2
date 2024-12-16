@@ -17,6 +17,7 @@ import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { emailRules, passwordRules, usernameRules } from '@/app/_client-utils/formValidations';
 import { getCookie } from 'cookies-next/client';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import classes from './Web2Signup.module.scss';
 import SignupStepHeader from './SignupStepHeader';
 
@@ -121,7 +122,13 @@ function Web2Signup({
 								control={formData.control}
 								name='username'
 								key='username'
-								rules={usernameRules}
+								rules={{
+									validate: (value) => {
+										if (!ValidatorService.isValidUsername(value)) return 'Invalid username';
+										return true;
+									},
+									...usernameRules
+								}}
 								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
