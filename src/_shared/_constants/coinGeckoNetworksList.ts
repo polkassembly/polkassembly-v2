@@ -1,4 +1,4 @@
-export const coinGeckoNetworks = {
+export const coinGeckoNetworks: { [key: string]: string } = {
 	calamari: 'calamari-network',
 	cere: 'cere-network',
 	crust: 'crust-network',

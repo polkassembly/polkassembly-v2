@@ -6,9 +6,10 @@
 
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { BN, BN_MILLION, BN_ZERO, u8aConcat, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-
+import type { AccountData } from '@polkadot/types/interfaces';
 import { ENetwork } from '@shared/types';
 
 // Usage:
@@ -68,5 +69,35 @@ export class PolkadotApiService {
 
 	async keepAlive(): Promise<void> {
 		await this.getBlockHeight();
+	}
+
+	async getSpendPeriodConst(): Promise<{ spendPeriodBlocks: number }> {
+		const spendPeriodConst = this.api.consts.treasury?.spendPeriod;
+		if (!spendPeriodConst) {
+			throw new Error('Spend period not defined in the Treasury module');
+		}
+
+		const spendPeriodBlocks = (spendPeriodConst as unknown as BN).toNumber();
+
+		return { spendPeriodBlocks };
+	}
+
+	async getTreasuryAccountDetails(): Promise<{ treasuryAccount: string; systemAccount: AccountData; burn: BN }> {
+		const EMPTY_U8A_32 = new Uint8Array(32);
+
+		const treasuryAccount = u8aConcat('modl', this.api.consts.treasury?.palletId ? (this.api.consts.treasury.palletId.toU8a(true) as Uint8Array) : new Uint8Array(), EMPTY_U8A_32);
+		const systemAccount = (await this.api.query.system.account(u8aToHex(treasuryAccount))) as unknown as { data: AccountData };
+		const freeBalance = new BN(systemAccount?.data?.free) || BN_ZERO;
+
+		const burn =
+			freeBalance.gt(BN_ZERO) && !((this.api.consts.treasury?.burn || BN_ZERO) as unknown as BN).isZero()
+				? ((this.api.consts.treasury?.burn || BN_ZERO) as unknown as BN).mul(freeBalance).div(BN_MILLION)
+				: BN_ZERO;
+
+		return {
+			treasuryAccount: u8aToHex(treasuryAccount),
+			systemAccount: systemAccount.data,
+			burn
+		};
 	}
 }
