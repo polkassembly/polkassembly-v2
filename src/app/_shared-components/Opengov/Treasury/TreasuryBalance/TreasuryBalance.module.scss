@@ -1,0 +1,82 @@
+.treasuryBalanceWrapper {
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.treasuryInfo {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+
+			.title {
+				font-size: 12px;
+				font-weight: 400;
+			}
+
+			.infoIcon {
+				cursor: pointer;
+			}
+
+			.monthlyBadge {
+				border-radius: 2px;
+				background-color: #485f7d0d;
+				padding: 4px 6px;
+				font-size: 10px;
+				font-weight: 500;
+				color: #485f7dcc;
+			}
+		}
+
+		.tokenPrice {
+			display: flex;
+			align-items: baseline;
+			gap: 6px;
+
+			.tokenSymbol {
+				font-size: 12px;
+				font-weight: 400;
+			}
+
+			.price {
+				font-size: 18px;
+				font-weight: 500;
+				color: #485f7d;
+			}
+
+			.change {
+				font-size: 12px;
+				font-weight: 400;
+				color: #52c41a;
+			}
+		}
+	}
+
+	.detailsWrapper {
+		.detailsHeader {
+			display: flex;
+			align-items: baseline;
+			gap: 6px;
+
+			.totalValue {
+				font-size: 20px;
+				font-weight: 500;
+			}
+
+			.detailsLink {
+				display: flex;
+				align-items: center;
+
+				.linkText {
+					font-size: 12px;
+					font-weight: 400;
+					color: #e5007a;
+				}
+
+				.arrowIcon {
+					cursor: pointer;
+				}
+			}
+		}
+	}
+}

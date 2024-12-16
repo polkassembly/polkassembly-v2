@@ -1,0 +1,47 @@
+.tokenDetailsWrapper {
+	margin-top: 4px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+
+	@media (min-width: 640px) {
+		flex-wrap: nowrap;
+		margin-top: 0;
+	}
+
+	.tokenGroup {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+
+		.tokenIcon {
+			margin-top: -2px;
+		}
+
+		.tokenText {
+			font-size: 12px;
+			font-weight: 500;
+		}
+
+		.unit {
+			font-size: 12px;
+		}
+
+		&.noWrap {
+			white-space: nowrap;
+		}
+	}
+
+	.mythGroup {
+		margin-top: 4px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px;
+
+		@media (min-width: 640px) {
+			margin-top: 0;
+		}
+	}
+}

@@ -15,9 +15,7 @@ const NextBurn = () => {
 					</div>
 				</div>
 			</div>
-			<p className={`${styles.description} dark ${styles.darkMode}`}>
-				If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.
-			</p>
+			<p className={`${styles.description}`}>If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.</p>
 		</div>
 	);
 };
