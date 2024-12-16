@@ -90,7 +90,13 @@ function Web2Signup({
 				password: finalPassword
 			});
 			if (!data) {
-				console.log('Login failed. Please try again later.');
+				setError('Login failed. Please try again later.');
+				setLoading(false);
+				return;
+			}
+
+			if (data.status && apiError(data.status)) {
+				setError(data.message || '');
 				setLoading(false);
 				return;
 			}
@@ -98,7 +104,7 @@ function Web2Signup({
 			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
 
 			if (!accessToken) {
-				console.log('No Access token found.');
+				setError('No Access token found.');
 				setLoading(false);
 				return;
 			}
@@ -107,6 +113,7 @@ function Web2Signup({
 
 			if (decodedData) {
 				setUserAtom(decodedData);
+				setError('');
 			}
 
 			router.back();

@@ -86,8 +86,7 @@ function Web2Login({
 			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
 
 			if (!accessToken) {
-				console.log('No Access token found.');
-				setError('Login Failed');
+				setError('No Access token found.');
 				setLoading(false);
 				return;
 			}
