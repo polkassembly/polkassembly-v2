@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { StatusCodes } from 'http-status-codes';
+
 export enum ENetwork {
 	ROCOCO = 'rococo',
 	POLKADOT = 'polkadot'
@@ -118,6 +120,8 @@ export interface IAuthResponse {
 	isTFAEnabled?: boolean;
 	tfaToken?: string;
 	refreshToken?: string;
+	status?: StatusCodes;
+	message?: string;
 }
 
 export enum EWallet {

@@ -19,6 +19,8 @@ import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { getCookie } from 'cookies-next/client';
+import { apiError } from '@/app/_client-utils/apiError';
+import ErrorMessage from '@ui/ErrorMessage';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -52,6 +54,8 @@ function Web2Login({
 
 	const form = useForm<IFormFields>();
 
+	const [error, setError] = useState<string>('');
+
 	const handleLogin = async (values: IFormFields) => {
 		const { emailOrUsername, password } = values;
 
@@ -67,8 +71,15 @@ function Web2Login({
 				return;
 			}
 
+			if (data.status && apiError(data.status)) {
+				setError(data.message || '');
+				setLoading(false);
+				return;
+			}
+
 			if (data.isTFAEnabled && data.tfaToken) {
 				onTfaEnabled(data.tfaToken);
+				setLoading(false);
 				return;
 			}
 
@@ -76,6 +87,7 @@ function Web2Login({
 
 			if (!accessToken) {
 				console.log('No Access token found.');
+				setError('Login Failed');
 				setLoading(false);
 				return;
 			}
@@ -83,6 +95,7 @@ function Web2Login({
 			const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 			if (decodedData) {
+				setError('');
 				setUserAtom(decodedData);
 			}
 			router.back();
@@ -156,6 +169,7 @@ function Web2Login({
 					</form>
 				</Form>
 			</div>
+			{error && <ErrorMessage errorMessage={error} />}
 			<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
 			<WalletButtons
 				small
