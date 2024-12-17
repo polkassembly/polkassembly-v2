@@ -5,7 +5,7 @@
 'use client';
 
 import AppSidebar from '@ui/AppLayout/AppSidebar/AppSidebar';
-import { SidebarInset, SidebarTrigger, useSidebar } from '@ui/Sidebar';
+import { SidebarInset, SidebarTrigger, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import Navbar from '@ui/AppLayout/Navbar/Navbar';
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -16,13 +16,11 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
 	const isMobile = useIsMobile();
 	return (
 		<div className='relative flex flex-1'>
-			{/* Sidebar */}
 			<AppSidebar />
 
-			{/* Sidebar Trigger */}
 			<div
 				className={cn(
-					'', // Base styles
+					'',
 					!isMobile
 						? state === 'collapsed'
 							? 'absolute left-16 top-10 z-50 transition-all duration-200 ease-in-out'
@@ -34,11 +32,8 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
 				<SidebarTrigger />
 			</div>
 
-			{/* Main Content Area */}
 			<SidebarInset>
-				{/* Navbar */}
 				<Navbar />
-				{/* Main Content */}
 				<main className='flex flex-1 flex-col p-4'>{children}</main>
 			</SidebarInset>
 		</div>

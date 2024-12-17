@@ -6,6 +6,9 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect, useState } from 'react';
+import { SidebarProvider } from './Sidebar/Sidebar';
+import Dashboard from './AppLayout/Dashboard/page';
+import NotificationsContainer from './NotificationsContainer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -30,9 +33,13 @@ export function Providers({ children }: { children: ReactNode }) {
 			enableSystem={false}
 		>
 			<QueryClientProvider client={queryClient}>
-				{children}
+				<SidebarProvider>
+					<Dashboard>{children}</Dashboard>
+					<NotificationsContainer />
+				</SidebarProvider>
 				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>
+			;
 		</ThemeProvider>
 	);
 }

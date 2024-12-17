@@ -3,7 +3,13 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 export enum ENetwork {
-	ROCOCO = 'rococo'
+	ROCOCO = 'rococo',
+	POLKADOT = 'polkadot'
+}
+
+export enum EGovType {
+	GOV_1 = 'gov_1',
+	OPENGOV = 'opengov'
 }
 
 export enum ESocial {
@@ -12,6 +18,10 @@ export enum ESocial {
 	TWITTER = 'twitter',
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord'
+}
+
+export interface ITrackCounts {
+	[trackName: string]: number;
 }
 
 export interface IUserSocialDetails {
@@ -129,7 +139,7 @@ export enum EWallet {
 	NOVAWALLET = 'polkadot-js',
 	POLYWALLET = 'polywallet',
 	POLKASAFE = 'polkasafe',
-	OTHER = ''
+	OTHER = 'other'
 }
 
 export interface IRefreshTokenPayload {
@@ -309,13 +319,13 @@ export type TRPCEndpoint = {
 	label: string;
 };
 
-export interface Item {
+export interface ISidebarMenuItem {
 	title: string;
 	url: string;
 	icon?: string;
 	isNew?: boolean;
 	count?: number;
-	items?: Item[];
+	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
 }

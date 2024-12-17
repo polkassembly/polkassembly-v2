@@ -11,14 +11,17 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	// 1. get authCode from req body
-	const { authCode } = await getReqBody(req);
+	const zodBodySchema = z.object({
+		authCode: z.string()
+	});
 
-	if (!authCode) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Auth code is required');
-	}
+	const bodyRaw = await getReqBody(req);
+
+	// 1. get authCode from req body
+	const { authCode } = zodBodySchema.parse(bodyRaw);
 
 	// 2. read access token from cookie
 	const cookieStore = await cookies();

@@ -336,7 +336,7 @@ export class AuthService {
 
 		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
 
-		if (!isEvmAddress || !ValidatorService.isValidSubstrateAddress(address)) {
+		if (!isEvmAddress && !ValidatorService.isValidSubstrateAddress(address)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid address');
 		}
 

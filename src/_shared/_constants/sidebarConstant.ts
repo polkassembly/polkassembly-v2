@@ -22,7 +22,14 @@ import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.s
 import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
-import { Item } from '../types';
+import DemocraryProposalIcon from '@assets/sidebar/democracy-proposal-icon.svg';
+import DemocraryReferendumIcon from '@assets/sidebar/democracy-referenda-icon.svg';
+import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal-icon.svg';
+import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
+import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
+import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
+import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
+import { EGovType, ENetwork, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
 const capitalizeWords = (text: string) =>
@@ -31,21 +38,22 @@ const capitalizeWords = (text: string) =>
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 		.join(' ');
 
-const ActiveItems = (items: Item[], pathname: string): Item[] =>
+const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuItem[] =>
 	items.map((item) => ({
 		...item,
 		isActive: pathname === item.url,
 		items: item.items ? ActiveItems(item.items, pathname) : undefined
 	}));
-const getTrackItems = (networkKey: keyof typeof NETWORKS_DETAILS, trackGroup: string) => {
+const getTrackItems = (networkKey: ENetwork, trackGroup: string, trackCounts?: Record<string, number>) => {
 	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === trackGroup)
-		.map(([, track]) => ({
+		.map(([trackKey, track]) => ({
 			title: capitalizeWords(track.name),
 			url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
-			count: track.maxDeciding,
+			// eslint-disable-next-line
+			count: trackCounts?.[trackKey] || 0,
 			icon: undefined
 		}));
 };
@@ -56,7 +64,7 @@ const getOriginIcon = (key: string) => {
 			return RootIcon;
 		case 'Treasurer':
 			return TreasurerIcon;
-		case 'WISH_FOR_CHANGE':
+		case 'WishForChange':
 			return WishForChangeIcon;
 		case 'ReferendumCanceller':
 			return ReferendumCancellorIcon;
@@ -71,7 +79,7 @@ const getOriginIcon = (key: string) => {
 	}
 };
 
-const getOriginsItems = (networkKey: keyof typeof NETWORKS_DETAILS) => {
+const getOriginsItems = (networkKey: ENetwork) => {
 	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
@@ -83,87 +91,142 @@ const getOriginsItems = (networkKey: keyof typeof NETWORKS_DETAILS) => {
 		}));
 };
 
-export const getSidebarData = (networkKey: keyof typeof NETWORKS_DETAILS, pathname: string) => {
+export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCounts: ITrackCounts = {}) => {
 	// eslint-disable-next-line
 	const network = NETWORKS_DETAILS[networkKey];
 	if (!network) {
 		throw new Error(`Network ${networkKey} not found`);
 	}
 
-	return [
-		{
-			heading: 'Main',
-			initalItems: ActiveItems(
-				[
-					{ title: 'Home', url: '/open-gov', icon: Home },
-					{ title: 'Discussions', url: '/discussions', icon: Discussion },
-					{ title: 'Preimages', url: '/preimages', icon: Preimages },
-					{ title: 'Delegation', url: '/delegation', icon: Delegation },
-					{
-						title: 'Bounty',
-						url: '/bounty',
-						icon: Bounty,
-						isNew: true,
-						items: [
-							{ title: 'Bounty Dashboard', url: '/bounty/dashboard', count: 8 },
-							{ title: 'On-chain Bounties', url: '/bounty/onchain' }
-						]
-					},
-					{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
-				],
-				pathname
-			),
-			mainItems: ActiveItems(
-				[
-					{
-						heading: 'TRACKS',
-						title: 'TRACKS',
-						url: '',
-						items: ActiveItems(
-							[
+	const baseConfig = {
+		heading: 'Main',
+		initalItems: ActiveItems(
+			[
+				{ title: 'Home', url: '/open-gov', icon: Home },
+				{ title: 'Discussions', url: '/discussions', icon: Discussion }
+			],
+			pathname
+		),
+		mainItems: [],
+		endItems: []
+	};
+
+	if (network.govtype === EGovType.OPENGOV) {
+		return [
+			{
+				...baseConfig,
+				initalItems: ActiveItems(
+					[
+						...baseConfig.initalItems,
+						{ title: 'Preimages', url: '/preimages', icon: Preimages },
+						{ title: 'Delegation', url: '/delegation', icon: Delegation },
+						{
+							title: 'Bounty',
+							url: '/bounty',
+							icon: Bounty,
+							isNew: true,
+							items: [
 								{
-									title: 'Treasury',
-									url: '',
-									icon: TreasuryIcon,
-									items: getTrackItems(networkKey, 'Treasury')
+									title: 'Bounty Dashboard',
+									url: '/bounty/dashboard',
+									count: trackCounts.bounty_dashboard || 0
+								},
+								{ title: 'On-chain Bounties', url: '/bounty/onchain' }
+							]
+						},
+						{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
+					],
+					pathname
+				),
+				mainItems: ActiveItems(
+					[
+						{
+							heading: 'TRACKS',
+							title: 'TRACKS',
+							url: '',
+							items: ActiveItems(
+								[
+									{
+										title: 'Treasury',
+										url: '',
+										icon: TreasuryIcon,
+										items: getTrackItems(networkKey, 'Treasury', trackCounts)
+									},
+									{
+										title: 'Administration',
+										url: '',
+										icon: AdministrationIcon,
+										items: getTrackItems(networkKey, 'Main', trackCounts)
+									}
+								],
+								pathname
+							)
+						},
+						{
+							heading: 'ORIGINS',
+							title: 'ORIGINS',
+							url: '',
+							items: ActiveItems(getOriginsItems(networkKey), pathname)
+						}
+					],
+					pathname
+				),
+				endItems: ActiveItems(
+					[
+						{ title: 'Gov Analytics', url: '/gov-analytics', icon: GovAnalytics },
+						{ title: 'Calendar', url: '/calendar', icon: CalendarIcon },
+						{
+							title: 'Community',
+							url: '/community',
+							icon: CommunityIcon,
+							items: [
+								{ title: 'Members', url: '/members' },
+								{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects' }
+							]
+						},
+						{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
+						{
+							title: 'Archived',
+							url: '/archived',
+							icon: ArchivedIcon,
+							items: [
+								{
+									title: 'Democracy',
+									url: '#',
+									items: [
+										{ title: 'Proposals', url: '/proposals', icon: DemocraryProposalIcon },
+										{ title: 'Referenda', url: '/referenda', icon: DemocraryReferendumIcon }
+									]
 								},
 								{
-									title: 'Administration',
-									url: '',
-									icon: AdministrationIcon,
-									items: getTrackItems(networkKey, 'Main')
+									title: 'Treasury',
+									url: '#',
+									items: [
+										{ title: 'Treasury Proposals', url: '/treasury-proposals', icon: TreasuryProposalIcon },
+										{ title: 'Tips', url: '/tips', icon: TreasuryTipIcon }
+									]
+								},
+								{
+									title: 'Council',
+									url: '#',
+									items: [
+										{ title: 'Motions', url: '/motions', icon: CouncilMotionIcon },
+										{ title: 'Members', url: '/members', icon: CouncilMemberIcon }
+									]
+								},
+								{
+									title: 'Tech. Comm.',
+									url: '#',
+									items: [{ title: 'Tech Comm Proposals', url: '/tech-comm-proposals', icon: TechCommIcon }]
 								}
-							],
-							pathname
-						)
-					},
-					{
-						heading: 'ORIGINS',
-						title: 'ORIGINS',
-						url: '',
-						items: ActiveItems(getOriginsItems(networkKey), pathname)
-					}
-				],
-				pathname
-			),
-			endItems: ActiveItems(
-				[
-					{ title: 'Gov Analytics', url: '/gov-analytics', icon: GovAnalytics },
-					{ title: 'Calendar', url: '/calendar', icon: CalendarIcon },
-					{
-						title: 'Community',
-						url: '/community',
-						icon: CommunityIcon,
-						items: [
-							{ title: 'Members', url: '/members' },
-							{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects' }
-						]
-					},
-					{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
-					{ title: 'Archived', url: '/archived', icon: ArchivedIcon }
-				],
-				pathname
-			)
-		}
-	];
+							]
+						}
+					],
+					pathname
+				)
+			}
+		];
+	}
+
+	return [baseConfig];
 };

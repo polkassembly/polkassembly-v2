@@ -4,34 +4,29 @@
 
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { OnChainDbService } from '@api/_api-services/onchain_db_service';
-import { APIError } from '@api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { EDataSource, EProposalType, IPostListing } from '@shared/types';
-import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
-	const { proposalType = '' } = await params;
+	const zodParamsSchema = z.object({
+		proposalType: z.nativeEnum(EProposalType)
+	});
 
-	if (!proposalType || !ValidatorService.isValidProposalType(proposalType)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
-	}
+	const { proposalType } = zodParamsSchema.parse(await params);
 
-	// fetch page and limit from query params
-	const page = Number(req.nextUrl.searchParams.get('page')) || 1;
-	const limit = Number(req.nextUrl.searchParams.get('limit')) || DEFAULT_LISTING_LIMIT;
+	const zodQuerySchema = z.object({
+		page: z.coerce.number().optional().default(1),
+		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
+	});
 
-	if (limit > MAX_LISTING_LIMIT) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, `Limit cannot be greater than ${MAX_LISTING_LIMIT}`);
-	}
+	const searchParamsObject = Object.fromEntries(req.nextUrl.searchParams.entries());
 
-	if (isNaN(page) || isNaN(limit)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid page or limit');
-	}
+	const { page, limit } = zodQuerySchema.parse(searchParamsObject);
 
 	const network = await getNetworkFromHeaders();
 
@@ -39,27 +34,27 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// 1. if proposal type is on-chain, get on-chain posts from onchain_db_service, then get the corresponding off-chain data from offchain_db_service for each on-chain post
 	if (ValidatorService.isValidOnChainProposalType(proposalType)) {
-		const onChainPosts = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page });
+		const onChainPostsInfo = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page });
 
 		// Fetch off-chain data
-		const offChainDataPromises = onChainPosts.map((post) => {
+		const offChainDataPromises = onChainPostsInfo.map((postInfo) => {
 			return OffChainDbService.GetOffChainPostData({
 				network,
-				indexOrHash: proposalType !== EProposalType.TIP ? post.index.toString() : post.hash,
+				indexOrHash: proposalType !== EProposalType.TIP ? postInfo.index.toString() : postInfo.hash,
 				proposalType,
-				proposer: post.proposer || ''
+				proposer: postInfo.proposer || ''
 			});
 		});
 
 		const offChainData = await Promise.all(offChainDataPromises);
 
 		// Merge on-chain and off-chain data
-		posts = onChainPosts.map((post, index) => ({
+		posts = onChainPostsInfo.map((postInfo, index) => ({
 			...offChainData[Number(index)],
 			dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 			network,
 			proposalType,
-			onChainInfo: post
+			onChainInfo: postInfo
 		}));
 	} else {
 		// 2. if proposal type is off-chain, get off-chain posts from offchain_db_service

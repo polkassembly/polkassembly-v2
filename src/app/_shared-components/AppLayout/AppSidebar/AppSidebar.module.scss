@@ -13,9 +13,17 @@
 }
 
 .create_proposal_button {
-	@apply mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-gray-300 bg-gray-50 px-[6px] py-2;
+	@apply mx-3 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-gray-300 bg-gray-50 px-[6px] py-2 mb-2;
 }
 
 .dark .create_proposal_button {
 	@apply border-[var(--separator-dark)] bg-[var(--section-dark-background)];
+}
+
+.sidebar_logo {
+	@apply flex items-center justify-center py-2;
+}
+
+.sidebar_reportbtn {
+	@apply text-sm font-semibold;
 }
