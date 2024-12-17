@@ -242,7 +242,7 @@ function TreasuryDetailsModal() {
 										href='https://polkadot.polkassembly.io/bounty-dashboard'
 										className='text-pink_primary flex cursor-pointer items-center gap-1 text-xs font-medium'
 										target='_blank'
-									></Link>
+									/>
 								</div>
 							</div>
 						</div>
