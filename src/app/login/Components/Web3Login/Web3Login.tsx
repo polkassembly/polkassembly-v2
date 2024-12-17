@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAuthCookieNames, EWallet, IAuthResponse } from '@/_shared/types';
+import { ECookieNames, EWallet, IAuthResponse } from '@/_shared/types';
 import React, { useState } from 'react';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
@@ -83,7 +83,7 @@ function Web3Login({
 				return;
 			}
 
-			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+			const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
 
 			if (!accessToken) {
 				setLoading(false);

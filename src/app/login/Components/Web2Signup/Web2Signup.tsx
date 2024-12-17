@@ -5,7 +5,7 @@ import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
 import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
-import { EAuthCookieNames, ESignupSteps, EWallet, IAuthResponse } from '@/_shared/types';
+import { ECookieNames, ESignupSteps, EWallet, IAuthResponse } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
@@ -101,7 +101,7 @@ function Web2Signup({
 				return;
 			}
 
-			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+			const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
 
 			if (!accessToken) {
 				setError('No Access token found.');

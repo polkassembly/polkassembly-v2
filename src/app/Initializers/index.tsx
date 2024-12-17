@@ -4,24 +4,36 @@
 
 'use client';
 
-import { EAuthCookieNames, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
+import { ECookieNames, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { getCookie } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
+import { useSetAtom } from 'jotai';
 import { useUser } from '../_atoms/user/userAtom';
 import { nextApiClientFetch } from '../_client-utils/nextApiClientFetch';
 import { logout } from '../_client-utils/logout';
+import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 
-function Initializers({ userData, refreshTokenPayload }: { userData: IAccessTokenPayload | null; refreshTokenPayload: IRefreshTokenPayload | null }) {
+function Initializers({
+	userData,
+	refreshTokenPayload,
+	userPreferences
+}: {
+	userData: IAccessTokenPayload | null;
+	refreshTokenPayload: IRefreshTokenPayload | null;
+	userPreferences: IUserPreferences;
+}) {
 	const [user, setUser] = useUser();
+
+	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(refreshTokenPayload);
 
 	const refreshAccessToken = async () => {
 		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/refreshAccessToken');
 		if (data?.message) {
-			const newAccessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
-			const newRefreshToken = getCookie(EAuthCookieNames.REFRESH_TOKEN);
+			const newAccessToken = getCookie(ECookieNames.ACCESS_TOKEN);
+			const newRefreshToken = getCookie(ECookieNames.REFRESH_TOKEN);
 
 			if (newAccessToken && newRefreshToken) {
 				const newUserPayload = decodeToken<IAccessTokenPayload>(newAccessToken);
@@ -58,6 +70,16 @@ function Initializers({ userData, refreshTokenPayload }: { userData: IAccessToke
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
+
+	useEffect(() => {
+		setUserPreferencesAtom({
+			locale: userPreferences.locale,
+			theme: userPreferences.theme,
+			// address: user?.defaultAddress,
+			wallet: user?.loginWallet
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	useEffect(() => {
 		if (!userData) {

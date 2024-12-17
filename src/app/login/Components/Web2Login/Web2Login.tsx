@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAuthCookieNames, EWallet, IAuthResponse } from '@/_shared/types';
+import { ECookieNames, EWallet, IAuthResponse } from '@/_shared/types';
 import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
@@ -83,7 +83,7 @@ function Web2Login({
 				return;
 			}
 
-			const accessToken = getCookie(EAuthCookieNames.ACCESS_TOKEN);
+			const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
 
 			if (!accessToken) {
 				setError('No Access token found.');

@@ -34,6 +34,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { resolvedTheme: theme } = useTheme();
 	const pathname = usePathname();
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
 		if (theme === 'light') {
 			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
@@ -79,9 +80,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			collapsible='icon'
 			{...props}
 		>
-			<SidebarHeader>
-				<div className={styles.sidebar_logo}>{getLogo()}</div>
-			</SidebarHeader>
+			<SidebarHeader>{/* <div className={styles.sidebar_logo}>{getLogo()}</div> */}</SidebarHeader>
 
 			<hr className='text-btn_secondary_border' />
 

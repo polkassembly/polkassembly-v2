@@ -8,11 +8,9 @@ import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { SidebarProvider } from './_shared-components/Sidebar/Sidebar';
-import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
-import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 import Initializers from './Initializers';
-import { getRefreshTokenFromCookie, getUserFromCookie } from './_client-utils/getUserFromCookie';
+import { getRefreshTokenFromCookie, getUserFromCookie, getUserPreferencesFromCookie } from './_client-utils/getUserFromCookie';
+import AppLayout from './_shared-components/AppLayout/AppLayout';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -28,27 +26,24 @@ export default async function RootLayout({
 }>) {
 	const user = await getUserFromCookie();
 	const refreshTokenPayload = await getRefreshTokenFromCookie();
+	const userPreferences = await getUserPreferencesFromCookie();
 
 	return (
 		<html
-			lang='en'
-			className='dark'
+			lang={userPreferences.locale}
+			className={userPreferences.theme}
+			suppressHydrationWarning
 		>
 			<body className={poppinsFont.className}>
+				<Initializers
+					userData={user || null}
+					refreshTokenPayload={refreshTokenPayload}
+					userPreferences={userPreferences}
+				/>
 				<Providers>
-					<Initializers
-						userData={user || null}
-						refreshTokenPayload={refreshTokenPayload}
-					/>
-					<SidebarProvider open>
-						<AppSidebar />
-						{modal}
-						<main className='w-full'>
-							<Navbar />
-							{children}
-						</main>
-						<NotificationsContainer />
-					</SidebarProvider>
+					{modal}
+					<AppLayout>{children}</AppLayout>
+					<NotificationsContainer />
 				</Providers>
 			</body>
 		</html>

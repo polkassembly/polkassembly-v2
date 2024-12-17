@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -221,9 +222,28 @@ export enum EProposalType {
 	GRANT = 'Grant'
 }
 
-export enum EAuthCookieNames {
+export enum ETheme {
+	LIGHT = 'light',
+	DARK = 'dark'
+}
+
+export enum ELocales {
+	SPANISH = 'es',
+	ENGLISH = 'en'
+}
+
+export enum ECookieNames {
 	ACCESS_TOKEN = 'access_token',
-	REFRESH_TOKEN = 'refresh_token'
+	REFRESH_TOKEN = 'refresh_token',
+	THEME = 'theme',
+	LOCALE = 'locale'
+}
+
+export interface IUserPreferences {
+	theme: ETheme;
+	locale: ELocales;
+	wallet?: EWallet;
+	address?: InjectedAccount;
 }
 
 export enum ENotificationTrigger {
