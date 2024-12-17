@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import AppSidebar from '@ui/AppLayout/AppSidebar/AppSidebar';
 import { SidebarInset } from '@/app/_shared-components/Sidebar/Sidebar';
 import Navbar from '@ui/AppLayout/Navbar/Navbar';

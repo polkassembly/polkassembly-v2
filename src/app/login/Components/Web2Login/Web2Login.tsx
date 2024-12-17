@@ -19,7 +19,7 @@ import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { getCookie } from 'cookies-next/client';
-import { apiError } from '@/app/_client-utils/apiError';
+import { isApiError } from '@/app/_client-utils/isApiError';
 import ErrorMessage from '@ui/ErrorMessage';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
@@ -71,7 +71,7 @@ function Web2Login({
 				return;
 			}
 
-			if (data.status && apiError(data.status)) {
+			if (data.status && isApiError(data.status)) {
 				setError(data.message || '');
 				setLoading(false);
 				return;

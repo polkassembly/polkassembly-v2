@@ -3,6 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { StatusCodes } from 'http-status-codes';
 
-export const apiError = (status: StatusCodes) => {
+export const isApiError = (status: StatusCodes) => {
 	return status !== StatusCodes.OK;
 };

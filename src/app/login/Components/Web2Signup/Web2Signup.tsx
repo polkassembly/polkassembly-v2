@@ -15,11 +15,10 @@ import { useForm } from 'react-hook-form';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { emailRules, passwordRules, usernameRules } from '@/app/_client-utils/formValidations';
 import { getCookie } from 'cookies-next/client';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
-import { apiError } from '@/app/_client-utils/apiError';
+import { isApiError } from '@/app/_client-utils/isApiError';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
@@ -69,7 +68,7 @@ function Web2Signup({
 				email
 			});
 
-			if (data.status && apiError(data.status)) {
+			if (data.status && isApiError(data.status)) {
 				setError(data.message);
 				return;
 			}
@@ -95,7 +94,7 @@ function Web2Signup({
 				return;
 			}
 
-			if (data.status && apiError(data.status)) {
+			if (data.status && isApiError(data.status)) {
 				setError(data.message || '');
 				setLoading(false);
 				return;
@@ -141,7 +140,7 @@ function Web2Signup({
 										if (!ValidatorService.isValidUsername(value)) return 'Invalid username';
 										return true;
 									},
-									...usernameRules
+									required: true
 								}}
 								disabled={loading}
 								render={({ field }) => (
@@ -170,7 +169,7 @@ function Web2Signup({
 										if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
 										return true;
 									},
-									...emailRules
+									required: true
 								}}
 								disabled={loading}
 								render={({ field }) => (
@@ -197,7 +196,13 @@ function Web2Signup({
 								control={formData.control}
 								name='password'
 								key='password'
-								rules={passwordRules}
+								rules={{
+									validate: (value) => {
+										if (!ValidatorService.isValidPassword(value)) return 'Invalid Password';
+										return true;
+									},
+									required: true
+								}}
 								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
