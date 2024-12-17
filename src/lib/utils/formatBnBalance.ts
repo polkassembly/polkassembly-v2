@@ -12,7 +12,7 @@ interface Options {
 }
 
 export default function formatBnBalance(value: BN | string, options: Options, network: string): string {
-	const tokenDecimals = NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.tokenDecimals;
+	const tokenDecimals = NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.tokenDecimals;
 	const valueString = String(value);
 
 	let suffix = '';

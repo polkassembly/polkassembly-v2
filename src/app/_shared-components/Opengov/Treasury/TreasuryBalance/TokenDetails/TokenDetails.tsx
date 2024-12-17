@@ -9,10 +9,16 @@ import DotIcon from '@/_assets/icons/Treasury/dot-icon.svg';
 import MythIcon from '@/_assets/icons/Treasury/myth-icon.svg';
 import UsdcIcon from '@/_assets/icons/Treasury/usdc-icon.svg';
 import UsdtIcon from '@/_assets/icons/Treasury/usdt-icon.svg';
+import useCurrentTokenPrice from '@/hooks/Treasury/useCurrentTokenPrice';
+import useTreasuryAvailableBalance from '@/hooks/Treasury/useTreasuryAvailableBalance';
 import styles from './TokenDetails.module.scss';
 
 function TokenDetails() {
 	const unit = NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.tokenSymbol;
+
+	const currentTokenPrice = useCurrentTokenPrice(ENetwork.POLKADOT);
+	const availableBalance = useTreasuryAvailableBalance(ENetwork.POLKADOT, currentTokenPrice);
+
 	return (
 		<div className={styles.tokenDetailsWrapper}>
 			<div className={styles.tokenGroup}>
@@ -24,7 +30,11 @@ function TokenDetails() {
 						src={DotIcon}
 						className={styles.tokenIcon}
 					/>
-					<span className={`${styles.tokenText} darkMode`}>29.35M</span>
+					{availableBalance.isLoading ? (
+						<span className={`${styles.tokenText} darkMode`}>Loading...</span>
+					) : (
+						<span className={`${styles.tokenText} darkMode`}>{availableBalance.value}</span>
+					)}
 					<span className={styles.unit}>{unit}</span>
 				</div>
 				<div className={`${styles.tokenGroup} ${styles.noWrap}`}>

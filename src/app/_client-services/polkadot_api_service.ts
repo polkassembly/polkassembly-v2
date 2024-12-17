@@ -100,4 +100,19 @@ export class PolkadotApiService {
 			burn
 		};
 	}
+
+	async getTreasuryAvailableBalance(): Promise<{ treasuryAccount: string; availableBalance: BN }> {
+		const EMPTY_U8A_32 = new Uint8Array(32);
+
+		const treasuryAccount = u8aConcat('modl', this.api.consts.treasury?.palletId ? (this.api.consts.treasury.palletId.toU8a(true) as Uint8Array) : new Uint8Array(), EMPTY_U8A_32);
+
+		const systemAccount = (await this.api.query.system.account(u8aToHex(treasuryAccount))) as unknown as { data: AccountData };
+
+		const availableBalance = new BN(systemAccount?.data?.free) || BN_ZERO;
+
+		return {
+			treasuryAccount: u8aToHex(treasuryAccount),
+			availableBalance
+		};
+	}
 }

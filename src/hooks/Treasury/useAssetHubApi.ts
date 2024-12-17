@@ -29,7 +29,7 @@ const useAssetHubApi = (network: string) => {
 	useEffect(() => {
 		const initApi = async () => {
 			try {
-				const wsProvider = new WsProvider(NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubRpcEndpoint);
+				const wsProvider = new WsProvider(NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubRpcEndpoint);
 				const apiPromise = await ApiPromise.create({ provider: wsProvider });
 				setAssethubApi(apiPromise);
 
@@ -65,10 +65,10 @@ const useAssetHubApi = (network: string) => {
 	const fetchAssetsAmount = async () => {
 		if (!assethubApi || !assethubApiReady) return;
 
-		if (assethubApiReady && NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubTreasuryAddress) {
+		if (assethubApiReady && NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubTreasuryAddress) {
 			try {
 				// Fetch balance in DOT
-				const tokenResult: any = await assethubApi?.query?.system?.account(NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubTreasuryAddress);
+				const tokenResult: any = await assethubApi?.query?.system?.account(NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubTreasuryAddress);
 				if (tokenResult?.data?.free) {
 					const freeTokenBalance = tokenResult.data.free.toBigInt();
 					setAssethubValues((values) => ({
@@ -76,7 +76,7 @@ const useAssetHubApi = (network: string) => {
 						dotValue: new BN(freeTokenBalance)
 					}));
 				}
-				const tokenResult2: any = await assethubApi?.query?.system?.account(NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubTreasuryAddress2);
+				const tokenResult2: any = await assethubApi?.query?.system?.account(NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubTreasuryAddress2);
 				if (tokenResult2?.data?.free) {
 					const freeTokenBalance = tokenResult2.data.free.toBigInt();
 					setAssethubValues((values) => ({
@@ -86,10 +86,10 @@ const useAssetHubApi = (network: string) => {
 				}
 
 				// Fetch balance in USDC
-				if (NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.supportedAssets?.[2].genralIndex) {
+				if (NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.supportedAssets?.[2].genralIndex) {
 					const usdcResult = (await assethubApi.query.assets.account(
-						NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.supportedAssets?.[2].genralIndex,
-						NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubTreasuryAddress
+						NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.supportedAssets?.[2].genralIndex,
+						NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubTreasuryAddress
 					)) as any;
 
 					if (usdcResult.isNone) {
@@ -105,10 +105,10 @@ const useAssetHubApi = (network: string) => {
 				}
 
 				// Fetch balance in USDT
-				if (NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.supportedAssets?.[1].genralIndex) {
+				if (NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.supportedAssets?.[1].genralIndex) {
 					const usdtResult = (await assethubApi.query.assets.account(
-						NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.supportedAssets?.[1].genralIndex,
-						NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubTreasuryAddress
+						NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.supportedAssets?.[1].genralIndex,
+						NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubTreasuryAddress
 					)) as any;
 
 					if (usdtResult.isNone) {
@@ -122,10 +122,10 @@ const useAssetHubApi = (network: string) => {
 						}));
 					}
 				}
-				if (NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.supportedAssets?.[1].genralIndex) {
+				if (NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.supportedAssets?.[1].genralIndex) {
 					const usdtResult = (await assethubApi.query.assets.account(
-						NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.supportedAssets?.[1].genralIndex,
-						NETWORKS_DETAILS?.[ENetwork.ROCOCO]?.assetHubTreasuryAddress3
+						NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.supportedAssets?.[1].genralIndex,
+						NETWORKS_DETAILS?.[ENetwork.POLKADOT]?.assetHubTreasuryAddress3
 					)) as any;
 
 					if (usdtResult.isNone) {
