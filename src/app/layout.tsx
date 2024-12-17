@@ -23,8 +23,11 @@ export default async function RootLayout({
 	const messages = await getMessages();
 
 	return (
-		<html lang={locale}>
-			<body className={poppinsFont.className}>
+		<html
+			lang='en'
+			className='dark'
+		>
+			<body className={`${poppinsFont.className} flex min-h-screen flex-col`}>
 				<Providers
 					messages={messages}
 					locale={locale}

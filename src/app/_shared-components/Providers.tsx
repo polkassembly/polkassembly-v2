@@ -7,10 +7,9 @@
 import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
 import { ReactNode, useEffect, useState } from 'react';
-import { SidebarProvider } from './Sidebar';
-import AppSidebar from './AppLayout/AppSidebar/AppSidebar';
-import Navbar from './AppLayout/Navbar/Navbar';
 import NotificationsContainer from './NotificationsContainer';
+import Dashboard from './AppLayout/Dashboard/page';
+import { SidebarProvider } from './Sidebar/Sidebar';
 
 interface ProvidersProps {
 	children: ReactNode;
@@ -40,14 +39,10 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
 				messages={messages}
 				locale={locale}
 			>
-				<SidebarProvider open>
-					<AppSidebar />
-					<main className='w-full'>
-						<Navbar />
-						{children}
-					</main>
-					<NotificationsContainer />
+				<SidebarProvider>
+					<Dashboard>{children}</Dashboard>
 				</SidebarProvider>
+				<NotificationsContainer />
 			</NextIntlClientProvider>
 		</ThemeProvider>
 	);

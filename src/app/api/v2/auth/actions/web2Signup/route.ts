@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { AuthService } from '@api/_api-services/auth_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { getReqBody } from '@api/_api-utils/getReqBody';
@@ -10,29 +11,21 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { ENetwork } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const network = (await headers()).get('x-network') || '';
-	if (!ValidatorService.isValidNetwork(network)) {
-		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-	}
+	const network = await getNetworkFromHeaders();
 
-	const { email = '', password = '', username = '' } = await getReqBody(req);
+	const zodBodySchema = z.object({
+		email: z.string().email(),
+		password: z.string().refine((password) => ValidatorService.isValidPassword(password), 'Password must be at least 6 characters long'),
+		username: z.string().refine((username) => ValidatorService.isValidUsername(username), 'Please enter a valid username')
+	});
 
-	if (!email || !password || !username) {
-		throw new APIError(ERROR_CODES.MISSING_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST);
-	}
-	if (!ValidatorService.isValidEmail(email)) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid email');
-	}
-	if (!ValidatorService.isValidUsername(username)) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid username');
-	}
-	if (!ValidatorService.isValidPassword(password)) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid password');
-	}
+	const bodyRaw = await getReqBody(req);
+
+	const { email, password, username } = zodBodySchema.parse(bodyRaw);
 
 	const { accessToken, refreshToken } = await AuthService.Web2SignUp(email.toLowerCase(), password, username, network as ENetwork);
 

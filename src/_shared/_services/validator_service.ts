@@ -8,7 +8,7 @@ import { OFF_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/offChainProposalTyp
 import { WEB3_AUTH_SIGN_MESSAGE } from '@shared/_constants/signMessage';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { getSubstrateAddressPublicKey } from '@shared/_utils/getSubstrateAddressPublicKey';
-import { ENetwork, EProposalType, EWallet } from '@shared/types';
+import { ENetwork, EProposalType, ELocales, EWallet } from '@shared/types';
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
@@ -92,5 +92,13 @@ export class ValidatorService {
 
 	static isValidUserId(userId: number): boolean {
 		return !isNaN(userId) && userId >= 0;
+	}
+
+	static isValidWeb3Address(address: string): boolean {
+		return this.isValidEVMAddress(address) || this.isValidSubstrateAddress(address);
+	}
+
+	static isValidLocale(locale: string): boolean {
+		return Object.values(ELocales).includes(locale as ELocales);
 	}
 }

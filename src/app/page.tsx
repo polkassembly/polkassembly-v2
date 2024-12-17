@@ -4,32 +4,20 @@
 
 'use client';
 
+import { useAtom } from 'jotai';
+import { localeAtom } from '@/app/_atoms/i18requst';
 import { useTranslations } from 'next-intl';
-import { ESupportedLanguages, ELocaleCookieNames } from '@/_shared/types';
-import { useEffect, useState } from 'react';
+import { ELocales, ECookieNames } from '@/_shared/types';
+import { setCookie } from '@/_shared/_utils/cookieUtils';
 
 export default function Home() {
 	const t = useTranslations('HomePage');
-	const [currentLanguage, setCurrentLanguage] = useState<ESupportedLanguages>(ESupportedLanguages.ENGLISH);
+	const [currentLanguage, setCurrentLanguage] = useAtom(localeAtom);
 
-	useEffect(() => {
-		const cookies = document.cookie.split(';');
-		const localeCookie = cookies.find((cookie) => cookie.trim().startsWith(`${ELocaleCookieNames.NEXT_LOCALE}=`));
-		if (localeCookie) {
-			const locale = localeCookie.split('=')[1].trim() as ESupportedLanguages;
-			setCurrentLanguage(locale);
-		}
-	}, []);
-
-	const setLanguage = (language: ESupportedLanguages) => {
-		try {
-			document.cookie = `${ELocaleCookieNames.NEXT_LOCALE}=${language}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Strict${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-			setCurrentLanguage(language);
-			window.location.reload();
-		} catch (error) {
-			// eslint-disable-next-line no-console
-			console.error('Error switching language:', error);
-		}
+	// Update cookie and Jotai state
+	const handleLanguageChange = (language: ELocales) => {
+		setCookie(ECookieNames.LOCALE, language); // Set the cookie
+		setCurrentLanguage(language); // Update Jotai state
 	};
 
 	return (
@@ -40,19 +28,15 @@ export default function Home() {
 			<div className='flex gap-4'>
 				<button
 					type='button'
-					onClick={() => setLanguage(ESupportedLanguages.ENGLISH)}
-					className={`rounded-md border px-4 py-2 transition-colors ${
-						currentLanguage === ESupportedLanguages.ENGLISH ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700'
-					}`}
+					onClick={() => handleLanguageChange(ELocales.ENGLISH)}
+					className={`rounded-md border px-4 py-2 transition-colors ${currentLanguage === ELocales.ENGLISH ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100'}`}
 				>
 					English
 				</button>
 				<button
 					type='button'
-					onClick={() => setLanguage(ESupportedLanguages.SPANISH)}
-					className={`rounded-md border px-4 py-2 transition-colors ${
-						currentLanguage === ESupportedLanguages.SPANISH ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700'
-					}`}
+					onClick={() => handleLanguageChange(ELocales.SPANISH)}
+					className={`rounded-md border px-4 py-2 transition-colors ${currentLanguage === ELocales.SPANISH ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100'}`}
 				>
 					Español
 				</button>

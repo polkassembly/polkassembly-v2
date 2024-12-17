@@ -12,13 +12,15 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import { EDataSource, ENetwork, EProposalType, IPost } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
-	const { proposalType = '', index = '' } = await params;
+	const zodParamsSchema = z.object({
+		proposalType: z.nativeEnum(EProposalType),
+		index: z.string()
+	});
 
-	if (!proposalType || !index || !ValidatorService.isValidProposalType(proposalType)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
-	}
+	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
 

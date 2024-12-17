@@ -5,17 +5,28 @@
 import { getRequestConfig } from 'next-intl/server';
 import { parse } from 'cookie';
 import { headers } from 'next/headers';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { ELocales, ECookieNames } from '@/_shared/types';
 
 const requestConfig = getRequestConfig(async () => {
 	const headersList = await headers();
 	const cookies = headersList.get('cookie') || '';
 	const parsedCookies = parse(cookies);
-	const locale = parsedCookies.NEXT_LOCALE || 'en';
 
-	return {
-		locale,
-		messages: (await import(`../messages/${locale}.json`)).default
-	};
+	const cookieLocale = parsedCookies[ECookieNames.LOCALE];
+	const locale = cookieLocale && ValidatorService.isValidLocale(cookieLocale) ? cookieLocale : ELocales.ENGLISH;
+
+	try {
+		return {
+			locale,
+			messages: (await import(`./messages/${locale}.json`)).default
+		};
+	} catch {
+		return {
+			locale: ELocales.ENGLISH,
+			messages: (await import(`./messages/${ELocales.ENGLISH}.json`)).default
+		};
+	}
 });
 
 // eslint-disable-next-line
