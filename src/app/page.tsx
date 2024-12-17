@@ -5,7 +5,7 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import { localeAtom } from '@/app/_atoms/i18requst';
+import { localeAtom } from '@/app/_atoms/intlAtom';
 import { useTranslations } from 'next-intl';
 import { ELocales, ECookieNames } from '@/_shared/types';
 import { setCookie } from '@/_shared/_utils/cookieUtils';
@@ -14,10 +14,9 @@ export default function Home() {
 	const t = useTranslations('HomePage');
 	const [currentLanguage, setCurrentLanguage] = useAtom(localeAtom);
 
-	// Update cookie and Jotai state
 	const handleLanguageChange = (language: ELocales) => {
-		setCookie(ECookieNames.LOCALE, language); // Set the cookie
-		setCurrentLanguage(language); // Update Jotai state
+		setCookie(ECookieNames.LOCALE, language);
+		setCurrentLanguage(language);
 	};
 
 	return (

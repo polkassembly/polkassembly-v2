@@ -1,6 +1,9 @@
 {
 	"HomePage": {
-		"title": "Polkassembly",
-		"Greet": "Hello Team"
+		"title": "Welcome to Home",
+		"Greet": "Hello!"
+	},
+	"AnotherPage": {
+		"title": "This is Another Page"
 	}
 }
