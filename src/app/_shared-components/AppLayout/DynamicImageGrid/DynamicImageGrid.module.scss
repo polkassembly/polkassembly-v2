@@ -1,0 +1,43 @@
+.flexRow {
+	@apply flex flex-row items-center justify-center gap-3;
+}
+
+.flexCol {
+	@apply flex flex-col items-center justify-center gap-3;
+}
+
+.iconWrapper {
+	@apply flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2;
+}
+
+.image {
+	@apply h-full w-full rounded-md;
+}
+
+.tooltipContent {
+	@apply relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg;
+}
+
+.tooltipText {
+	@apply text-sm;
+}
+
+.tooltipArrow {
+	@apply absolute h-2 w-2 rotate-45 bg-gray-800;
+}
+
+.arrowTop {
+	@apply -bottom-1 left-1/2 -translate-x-1/2;
+}
+
+.arrowBottom {
+	@apply -top-1 left-1/2 -translate-x-1/2;
+}
+
+.arrowLeft {
+	@apply -right-1 top-1/2 -translate-y-1/2;
+}
+
+.arrowRight {
+	@apply -left-1 top-1/2 -translate-y-1/2;
+}

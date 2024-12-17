@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { AuthService } from '@api/_api-services/auth_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { getReqBody } from '@api/_api-utils/getReqBody';
@@ -9,13 +10,19 @@ import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const { emailOrUsername = '', password = '' } = await getReqBody(req);
+	const zodBodySchema = z.object({
+		emailOrUsername: z
+			.string()
+			.refine((emailOrUsername) => ValidatorService.isValidEmail(emailOrUsername) || ValidatorService.isValidUsername(emailOrUsername), 'Please enter a valid email or username'),
+		password: z.string().refine((password) => ValidatorService.isValidPassword(password), 'Password must be at least 6 characters long')
+	});
 
-	if (!emailOrUsername || !password) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
-	}
+	const bodyRaw = await getReqBody(req);
+
+	const { emailOrUsername, password } = zodBodySchema.parse(bodyRaw);
 
 	const { accessToken = '', isTFAEnabled = false, tfaToken = '', refreshToken } = await AuthService.Web2Login(emailOrUsername, password);
 

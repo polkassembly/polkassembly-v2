@@ -9,12 +9,21 @@ export enum ENetwork {
 	POLKADOT = 'polkadot'
 }
 
+export enum EGovType {
+	GOV_1 = 'gov_1',
+	OPENGOV = 'opengov'
+}
+
 export enum ESocial {
 	EMAIL = 'email',
 	RIOT = 'riot',
 	TWITTER = 'twitter',
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord'
+}
+
+export interface ITrackCounts {
+	[trackName: string]: number;
 }
 
 export interface IUserSocialDetails {
@@ -316,4 +325,50 @@ export enum ESignupSteps {
 
 export interface IGenerateTFAResponse extends Omit<IUserTFADetails, 'url' | 'enabled' | 'verified'> {
 	otpauthUrl: string;
+}
+
+export type TRPCEndpoint = {
+	key: string;
+	label: string;
+};
+
+export interface ISidebarMenuItem {
+	title: string;
+	url: string;
+	icon?: string;
+	isNew?: boolean;
+	count?: number;
+	items?: ISidebarMenuItem[];
+	key?: string;
+	heading?: string;
+}
+
+export enum EPostOrigin {
+	AUCTION_ADMIN = 'AuctionAdmin',
+	BIG_SPENDER = 'BigSpender',
+	BIG_TIPPER = 'BigTipper',
+	CANDIDATES = 'Candidates',
+	EXPERTS = 'Experts',
+	FELLOWS = 'Fellows',
+	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
+	GENERAL_ADMIN = 'GeneralAdmin',
+	GRAND_MASTERS = 'GrandMasters',
+	LEASE_ADMIN = 'LeaseAdmin',
+	MASTERS = 'Masters',
+	MEDIUM_SPENDER = 'MediumSpender',
+	MEMBERS = 'Members',
+	PROFICIENTS = 'Proficients',
+	REFERENDUM_CANCELLER = 'ReferendumCanceller',
+	REFERENDUM_KILLER = 'ReferendumKiller',
+	ROOT = 'root',
+	SENIOR_EXPERTS = 'SeniorExperts',
+	SENIOR_FELLOWS = 'SeniorFellows',
+	SENIOR_MASTERS = 'SeniorMasters',
+	SMALL_SPENDER = 'SmallSpender',
+	SMALL_TIPPER = 'SmallTipper',
+	STAKING_ADMIN = 'StakingAdmin',
+	TREASURER = 'Treasurer',
+	WHITELISTED_CALLER = 'WhitelistedCaller',
+	WISH_FOR_CHANGE = 'WishForChange',
+	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }

@@ -5,10 +5,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { consolePretty } from './consolePretty';
+import { ZodError } from 'zod';
+import { StatusCodes } from 'http-status-codes';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { fromZodError } from 'zod-validation-error';
 import { APIError } from './apiError';
 import { storeApiKeyUsage } from './storeApiKeyUsage';
 import { getNetworkFromHeaders } from './getNetworkFromHeaders';
+import { consolePretty } from './consolePretty';
 
 export const withErrorHandling = (handler: { (req: NextRequest, context?: any): Promise<NextResponse> }) => {
 	return async (req: NextRequest, context?: any) => {
@@ -18,9 +22,17 @@ export const withErrorHandling = (handler: { (req: NextRequest, context?: any): 
 			storeApiKeyUsage(req);
 			return await handler(req, context);
 		} catch (error) {
-			const err = error as APIError;
 			console.log('Error in API call : ', req.nextUrl);
-			consolePretty({ err });
+			consolePretty({ error }, true);
+
+			let err: APIError;
+
+			if (error instanceof ZodError) {
+				err = new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, fromZodError(error).toString());
+			} else {
+				err = error as APIError;
+			}
+
 			return NextResponse.json({ ...err, message: err.message }, { status: err.status });
 		}
 	};

@@ -8,7 +8,7 @@ import { ReactNode } from 'react';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
-import { SidebarProvider } from './_shared-components/Sidebar';
+import { SidebarProvider } from './_shared-components/Sidebar/Sidebar';
 import Navbar from './_shared-components/AppLayout/Navbar/Navbar';
 import AppSidebar from './_shared-components/AppLayout/AppSidebar/AppSidebar';
 import Initializers from './Initializers';
@@ -30,7 +30,10 @@ export default async function RootLayout({
 	const refreshTokenPayload = await getRefreshTokenFromCookie();
 
 	return (
-		<html lang='en'>
+		<html
+			lang='en'
+			className='dark'
+		>
 			<body className={poppinsFont.className}>
 				<Providers>
 					<Initializers

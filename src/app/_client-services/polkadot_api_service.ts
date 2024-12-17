@@ -32,6 +32,8 @@ export class PolkadotApiService {
 			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].rpcEndpoints[0].url)
 		});
 
+		await api.isReady;
+
 		return new PolkadotApiService(network, api);
 	}
 
