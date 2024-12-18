@@ -6,12 +6,12 @@
 
 import dynamic from 'next/dynamic';
 
-const ReferendaPage = dynamic(() => import('../_shared-components/ReferendumCard/ReferendaPage'), { ssr: false });
+const ListingPage = dynamic(() => import('../_shared-components/ListingCard/ListingPage'), { ssr: false });
 
 function Page() {
 	return (
 		<div>
-			<ReferendaPage />
+			<ListingPage proposalType='ReferendumV2' />
 		</div>
 	);
 }
