@@ -30,17 +30,18 @@ function ListingCard({
 				<p className='text-sidebar_text'>#{index}</p>
 				<div className='flex flex-col gap-1'>
 					<h3 className='font-medium text-btn_secondary_text'>{title}</h3>
-					<p className='flex items-center gap-1 text-sm text-gray-500'>
+					<div className='flex items-center gap-1 text-sm text-gray-500'>
 						<span>
 							<Address address={proposer} />
-						</span>{' '}
-						|{' '}
+						</span>
+						<span>|</span>
 						<span className='flex items-center gap-1 text-xs'>
 							<FaRegClock />
 							{formattedCreatedAt}
-						</span>{' '}
-						| <span>{origin}</span>
-					</p>
+						</span>
+						<span>|</span>
+						<span>{origin}</span>
+					</div>
 				</div>
 			</div>
 		</div>

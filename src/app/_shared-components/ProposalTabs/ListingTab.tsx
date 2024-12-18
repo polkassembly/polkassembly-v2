@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import ReferendumCard from '../ListingCard/ListingCard';
+import ListingCard from '../ListingCard/ListingCard';
 
 interface ListingTabProps {
 	data: Array<{
@@ -37,7 +37,7 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 							key={item.id || `${item.proposalType}-${item.onChainInfo.createdAt}-${idx}`}
 							className={`border-b border-primary_border ${idx === data.length - 1 ? 'border-none' : ''}`}
 						>
-							<ReferendumCard
+							<ListingCard
 								backgroundColor={backgroundColor}
 								{...item}
 							/>
