@@ -4,8 +4,7 @@
 import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
-import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
-import { ECookieNames, ESignupSteps, EWallet, IAuthResponse } from '@/_shared/types';
+import { ECookieNames, ESignupSteps, EWallet } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
@@ -17,9 +16,9 @@ import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { getCookie } from 'cookies-next/client';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { StatusCodes } from 'http-status-codes';
 import { isApiError } from '@/app/_client-utils/isApiError';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
@@ -63,7 +62,7 @@ function Web2Signup({
 		const { email, password, username, finalPassword } = values;
 
 		if (step === ESignupSteps.USERNAME && email && username) {
-			const data = await nextApiClientFetch<{ usernameExists: boolean; emailExists: boolean; message: string; status: StatusCodes }>('/auth/actions/usernameExists', {
+			const data = await NextApiClientService.checkForUsernameAndEmail({
 				username,
 				email
 			});
@@ -83,11 +82,13 @@ function Web2Signup({
 
 		if (email && username && password && password === finalPassword) {
 			setLoading(true);
-			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web2Signup', {
+
+			const data = await NextApiClientService.web2Signup({
 				email,
 				username,
 				password: finalPassword
 			});
+
 			if (!data) {
 				setError('Login failed. Please try again later.');
 				setLoading(false);

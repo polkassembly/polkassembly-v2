@@ -4,15 +4,16 @@
 
 'use client';
 
-import { ECookieNames, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
+import { ECookieNames, ENetwork, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { getCookie } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
 import { useSetAtom } from 'jotai';
 import { useUser } from '../_atoms/user/userAtom';
-import { nextApiClientFetch } from '../_client-utils/nextApiClientFetch';
-import { logout } from '../_client-utils/logout';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
+import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
+import { AuthClientService } from '../_client-services/auth_service';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
 
 function Initializers({
 	userData,
@@ -25,12 +26,15 @@ function Initializers({
 }) {
 	const [user, setUser] = useUser();
 
+	const api = usePolkadotApi(ENetwork.POLKADOT);
+
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(refreshTokenPayload);
 
 	const refreshAccessToken = async () => {
-		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/refreshAccessToken');
+		const data = await NextApiClientService.refreshAccessToken();
+
 		if (data?.message) {
 			const newAccessToken = getCookie(ECookieNames.ACCESS_TOKEN);
 			const newRefreshToken = getCookie(ECookieNames.REFRESH_TOKEN);
@@ -52,13 +56,15 @@ function Initializers({
 	const checkForLoginState = () => {
 		if (document.visibilityState === 'hidden') return;
 
+		api?.reconnect();
+
 		if (user?.exp && Date.now() > user.exp * 1000) {
 			if (refreshTokenData?.exp && Date.now() < refreshTokenData.exp * 1000) {
 				refreshAccessToken();
 				return;
 			}
 
-			logout(() => setUser(null));
+			AuthClientService.logout(() => setUser(null));
 		}
 	};
 

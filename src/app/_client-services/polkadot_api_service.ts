@@ -71,6 +71,10 @@ export class PolkadotApiService {
 		await this.getBlockHeight();
 	}
 
+	async reconnect(): Promise<void> {
+		await this.api.connect();
+	}
+
 	setSigner(signer: Signer) {
 		this.api.setSigner(signer);
 	}

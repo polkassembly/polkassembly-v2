@@ -4,12 +4,11 @@
 
 'use client';
 
-import { ECookieNames, EWallet, IAuthResponse } from '@/_shared/types';
+import { ECookieNames, EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { Button } from '@/app/_shared-components/Button';
 import { useRouter } from 'next/navigation';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
@@ -17,7 +16,8 @@ import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useSetAtom } from 'jotai';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { getCookie } from 'cookies-next/client';
-import { getUserSignature } from '@/app/_client-utils/getUserSignature';
+import { WalletClientService } from '@/app/_client-services/wallet_service';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -55,7 +55,7 @@ function Web3Login({
 
 			setLoading(true);
 
-			const signature = await getUserSignature({
+			const signature = await WalletClientService.signMessage({
 				data: WEB3_AUTH_SIGN_MESSAGE,
 				address,
 				selectedWallet
@@ -66,8 +66,8 @@ function Web3Login({
 				return;
 			}
 
-			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web3LoginOrSignup', {
-				address: getSubstrateAddress(address),
+			const data = await NextApiClientService.web3LoginOrSignup({
+				address: getSubstrateAddress(address) || address,
 				signature,
 				wallet: selectedWallet
 			});

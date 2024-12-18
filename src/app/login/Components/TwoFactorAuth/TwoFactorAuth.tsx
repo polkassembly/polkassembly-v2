@@ -5,7 +5,6 @@ import { ECookieNames, EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { Button } from '@ui/Button';
-import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { getCookie } from 'cookies-next/client';
 import { useSetAtom } from 'jotai';
@@ -14,7 +13,8 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { Input } from '@ui/Input';
-import { getWalletLabel } from '@/app/_client-utils/getWalletLabel';
+import { WalletClientService } from '@/app/_client-services/wallet_service';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import classes from './TwoFactorAuth.module.scss';
 
 interface IFormFields {
@@ -35,7 +35,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 		if (!authCode || !tfaToken || !loginAddress || !loginWallet) return;
 
 		setLoading(true);
-		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/tfa/login', {
+		const data = await NextApiClientService.tfaLogin({
 			authCode,
 			loginAddress,
 			loginWallet,
@@ -69,7 +69,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 		<div className='flex flex-col gap-y-4'>
 			<p className={classes.addressHeader}>
 				<WalletIcon wallet={loginWallet} />
-				<span className={classes.walletName}>{getWalletLabel(loginWallet)}</span>
+				<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(loginWallet)}</span>
 			</p>
 			<p>
 				<span className={classes.walletName}>Two Factor Authentication</span>

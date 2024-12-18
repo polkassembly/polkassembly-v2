@@ -3,11 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import LoginComponent from './Components/Login';
-import { getUserFromCookie } from '../_client-utils/getUserFromCookie';
 import classes from './Components/Login.module.scss';
+import { CookieService } from '../_client-services/cookie_service';
 
 async function Login() {
-	const user = await getUserFromCookie();
+	const user = await CookieService.getUserFromCookie();
 
 	return (
 		<div className={classes.rootClass}>

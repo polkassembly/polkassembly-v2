@@ -2,12 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Button } from '@ui/Button';
+import HomePage from './_shared-components/Home/Home';
 
 export default function Home() {
-	return (
-		<div className='text-center leading-10'>
-			Polkassembly <Button variant='secondary'>hello</Button>{' '}
-		</div>
-	);
+	return <HomePage />;
 }

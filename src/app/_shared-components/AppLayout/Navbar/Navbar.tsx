@@ -8,7 +8,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/app/_atoms/user/userAtom';
-import { logout } from '@/app/_client-utils/logout';
+import { AuthClientService } from '@/app/_client-services/auth_service';
 import classes from './Navbar.module.scss';
 
 function Navbar() {
@@ -21,7 +21,7 @@ function Navbar() {
 					<Link href='/settings'>
 						<Button variant='secondary'>Settings</Button>
 					</Link>
-					<Button onClick={() => logout(() => setUser(null))}>Logout</Button>
+					<Button onClick={() => AuthClientService.logout(() => setUser(null))}>Logout</Button>
 				</div>
 			) : (
 				<Link href='/login'>

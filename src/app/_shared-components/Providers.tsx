@@ -7,20 +7,26 @@
 import { ThemeProvider } from 'next-themes';
 import { ReactNode } from 'react';
 import { ETheme } from '@/_shared/types';
+import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { SidebarProvider } from './Sidebar/Sidebar';
 import { useUserPreferences } from '../_atoms/user/userPreferencesAtom';
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children, messages, locale }: { children: ReactNode; messages: AbstractIntlMessages; locale: string }) {
 	const [userPreferences] = useUserPreferences();
 
 	return (
-		<ThemeProvider
-			attribute='class'
-			defaultTheme={userPreferences?.theme || ETheme.LIGHT}
-			themes={[ETheme.LIGHT, ETheme.DARK]}
-			enableSystem={false}
+		<NextIntlClientProvider
+			messages={messages}
+			locale={locale}
 		>
-			<SidebarProvider>{children}</SidebarProvider>
-		</ThemeProvider>
+			<ThemeProvider
+				attribute='class'
+				defaultTheme={userPreferences.theme}
+				themes={[ETheme.LIGHT, ETheme.DARK]}
+				enableSystem={false}
+			>
+				<SidebarProvider>{children}</SidebarProvider>
+			</ThemeProvider>
+		</NextIntlClientProvider>
 	);
 }

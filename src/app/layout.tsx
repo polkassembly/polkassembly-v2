@@ -5,12 +5,13 @@
 import '@app/_style/globals.scss';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { getLocale, getMessages } from 'next-intl/server';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
-import { getRefreshTokenFromCookie, getUserFromCookie, getUserPreferencesFromCookie } from './_client-utils/getUserFromCookie';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
+import { CookieService } from './_client-services/cookie_service';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -24,9 +25,12 @@ export default async function RootLayout({
 	children: ReactNode;
 	modal: ReactNode;
 }>) {
-	const user = await getUserFromCookie();
-	const refreshTokenPayload = await getRefreshTokenFromCookie();
-	const userPreferences = await getUserPreferencesFromCookie();
+	const user = await CookieService.getUserFromCookie();
+	const refreshTokenPayload = await CookieService.getRefreshTokenFromCookie();
+	const userPreferences = await CookieService.getUserPreferencesFromCookie();
+
+	const messages = await getMessages();
+	const locale = await getLocale();
 
 	return (
 		<html
@@ -40,7 +44,10 @@ export default async function RootLayout({
 					refreshTokenPayload={refreshTokenPayload}
 					userPreferences={userPreferences}
 				/>
-				<Providers>
+				<Providers
+					messages={messages}
+					locale={locale}
+				>
 					{modal}
 					<AppLayout>{children}</AppLayout>
 					<NotificationsContainer />

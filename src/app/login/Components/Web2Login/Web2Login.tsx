@@ -4,8 +4,7 @@
 
 'use client';
 
-import { ECookieNames, EWallet, IAuthResponse } from '@/_shared/types';
-import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
+import { ECookieNames, EWallet } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
@@ -21,6 +20,7 @@ import { userAtom } from '@/app/_atoms/user/userAtom';
 import { getCookie } from 'cookies-next/client';
 import { isApiError } from '@/app/_client-utils/isApiError';
 import ErrorMessage from '@ui/ErrorMessage';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -61,10 +61,12 @@ function Web2Login({
 
 		if (emailOrUsername && password) {
 			setLoading(true);
-			const data = await nextApiClientFetch<IAuthResponse>('/auth/actions/web2Login', {
+
+			const data = await NextApiClientService.web2Login({
 				emailOrUsername,
 				password
 			});
+
 			if (!data) {
 				console.log('Login failed. Please try again later.');
 				setLoading(false);

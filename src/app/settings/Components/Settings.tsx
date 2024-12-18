@@ -4,9 +4,8 @@
 
 'use client';
 
-import { IGenerateTFAResponse } from '@/_shared/types';
 import { useUser } from '@/app/_atoms/user/userAtom';
-import { nextApiClientFetch } from '@/app/_client-utils/nextApiClientFetch';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Input } from '@/app/_shared-components/Input';
 import { Button } from '@ui/Button';
 import { useRouter } from 'next/navigation';
@@ -31,7 +30,8 @@ function Settings() {
 			if (user?.isTFAEnabled) return;
 
 			setGeneratingCode(true);
-			const data = await nextApiClientFetch<IGenerateTFAResponse>('/auth/actions/tfa/setup/generate');
+			const data = await NextApiClientService.generateTfaToken();
+
 			if (data) {
 				setTfaCode(data.base32Secret);
 			}
@@ -43,9 +43,10 @@ function Settings() {
 	const verifyCode = async () => {
 		if (!authenticatorCode) return;
 
-		const data = await nextApiClientFetch<{ message: string }>('/auth/actions/tfa/setup/verify', {
+		const data = await NextApiClientService.verifyTfaToken({
 			authCode: authenticatorCode
 		});
+
 		if (data && user) {
 			console.log(data.message);
 			setUser({
