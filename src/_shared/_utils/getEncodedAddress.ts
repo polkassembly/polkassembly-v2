@@ -12,6 +12,8 @@ import { ENetwork } from '../types';
  * @param address An address
  *
  */
+
+// eslint-disable-next-line
 export default function getEncodedAddress(address: string, network: ENetwork): string | null {
 	if (!network || !(network in NETWORKS_DETAILS)) {
 		return null;

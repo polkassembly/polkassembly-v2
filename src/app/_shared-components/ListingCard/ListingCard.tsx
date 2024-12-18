@@ -5,8 +5,8 @@
 'use client';
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import Address from '../Profile/Address/Address';
 import { FaRegClock } from 'react-icons/fa6';
+import Address from '../Profile/Address/Address';
 
 function ListingCard({
 	title,
