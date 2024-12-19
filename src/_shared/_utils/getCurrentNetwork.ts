@@ -4,8 +4,9 @@
 
 import { ValidatorService } from '@shared/_services/validator_service';
 import { ENetwork } from '@shared/types';
+import { getSharedEnvVars } from './getSharedEnvVars';
 
-const defaultNetwork = process.env.NEXT_PUBLIC_DEFAULT_NETWORK;
+const { NEXT_PUBLIC_DEFAULT_NETWORK: defaultNetwork } = getSharedEnvVars();
 if (!defaultNetwork || !ValidatorService.isValidNetwork(defaultNetwork)) {
 	throw new Error('NEXT_PUBLIC_DEFAULT_NETWORK is not set');
 }

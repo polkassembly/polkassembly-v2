@@ -5,4 +5,7 @@
 // NOTE: THIS FILE SHOULD STRICTLY EXPORT ONLY PUBLIC ENVs
 // (should start with NEXT_PUBLIC_)
 
-export const { NEXT_PUBLIC_APP_ENV = '', NEXT_PUBLIC_DEFAULT_NETWORK = '' } = process.env;
+export const getSharedEnvVars = () => ({
+	NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV || '',
+	NEXT_PUBLIC_DEFAULT_NETWORK: process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ''
+});
