@@ -359,3 +359,22 @@ export enum EPostOrigin {
 	WISH_FOR_CHANGE = 'WishForChange',
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
+
+export interface IListingResponse {
+	id?: string;
+	proposalType?: string;
+	network?: string;
+	title: string;
+	index: number;
+	content?: string;
+	tags?: string[];
+	dataSource?: string;
+	createdAt?: string;
+	onChainInfo?: {
+		createdAt?: string;
+		proposer?: string;
+		status?: string;
+		description?: string;
+		origin?: string;
+	};
+}

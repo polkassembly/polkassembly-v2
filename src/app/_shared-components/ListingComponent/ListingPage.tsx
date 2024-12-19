@@ -4,38 +4,15 @@
 
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import queryService from '@/app/_client-services/api_query_service';
+import { IListingResponse } from '@/_shared/types';
+import { FaFilter } from 'react-icons/fa6';
+import { BiSort } from 'react-icons/bi';
 import { LoadingSpinner } from '../LoadingSpinner';
-import ListingTab from '../ProposalTabs/ListingTab';
-import ExternalTab from '../ProposalTabs/ExternalTab';
-
-async function fetchListingData(proposalType: string, page: number) {
-	const response = await fetch(`/api/v2/${proposalType}?page=${page}&limit=10`, {
-		headers: { 'Content-Type': 'application/json', 'x-network': 'polkadot' }
-	});
-
-	if (!response.ok) {
-		throw new Error('Network response was not ok');
-	}
-
-	return response.json();
-}
-
-interface Referendum {
-	id: string;
-	proposalType: string;
-	network: string;
-	title: string;
-	index: number;
-	onChainInfo: {
-		createdAt: string;
-		proposer: string;
-		status: string;
-		description: string;
-		origin: string;
-	};
-}
+import ListingTab from './ListingTab';
+import ExternalTab from './ExternalTab';
 
 interface ListingPageProps {
 	proposalType: string;
@@ -43,25 +20,25 @@ interface ListingPageProps {
 
 function ListingPage({ proposalType }: ListingPageProps) {
 	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
-	const [currentPage, setCurrentPage] = useState(1); // New state for current page
+	const [currentPage, setCurrentPage] = useState(1);
 
 	const {
 		data: polkassemblyData,
 		error: polkassemblyError,
 		isLoading: polkassemblyLoading
-	} = useQuery<Referendum[]>({
-		queryKey: ['polkassemblyReferenda', proposalType, currentPage], // Include currentPage in the query key
-		queryFn: () => fetchListingData(proposalType, currentPage),
+	} = useQuery<IListingResponse[]>({
+		queryKey: ['polkassemblyReferenda', proposalType, currentPage],
+		queryFn: () => queryService.fetchListingData(proposalType, currentPage),
 		enabled: activeTab === 'polkassembly'
 	});
 
-	const data = activeTab === 'polkassembly' ? polkassemblyData : [];
+	const data = Array.isArray(polkassemblyData) ? polkassemblyData : [];
 	const error = activeTab === 'polkassembly' ? polkassemblyError : null;
 	const isLoading = activeTab === 'polkassembly' ? polkassemblyLoading : false;
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
 
-	const totalCount = data?.length || 0;
+	const totalCount = data.length;
 
 	return (
 		<div>
@@ -78,22 +55,31 @@ function ListingPage({ proposalType }: ListingPageProps) {
 						<span className='text-xl'>+</span> <span className='text-sm'>Create Post</span>
 					</button>
 				</div>
-
-				<div className='mt-5 flex space-x-6'>
-					<button
-						type='button'
-						className={`pb-2 ${activeTab === 'polkassembly' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
-						onClick={() => setActiveTab('polkassembly')}
-					>
-						Polkassembly
-					</button>
-					<button
-						type='button'
-						className={`pb-2 ${activeTab === 'external' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
-						onClick={() => setActiveTab('external')}
-					>
-						External
-					</button>
+				<div className='mt-5 flex items-center justify-between'>
+					<div className='flex space-x-6'>
+						<button
+							type='button'
+							className={`pb-3 ${activeTab === 'polkassembly' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
+							onClick={() => setActiveTab('polkassembly')}
+						>
+							POLKASSEMBLY
+						</button>
+						<button
+							type='button'
+							className={`pb-3 ${activeTab === 'external' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
+							onClick={() => setActiveTab('external')}
+						>
+							EXTERNAL
+						</button>
+					</div>
+					<div className='flex gap-4 pb-3 text-sm text-sidebar_text'>
+						<p className='flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200'>
+							Filter <FaFilter />
+						</p>
+						<p className='flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200'>
+							Sort By <BiSort />
+						</p>
+					</div>
 				</div>
 			</div>
 			<div className='w-full bg-[#F5F6F8] px-10 py-5'>
@@ -103,7 +89,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 					<div>
 						{activeTab === 'polkassembly' ? (
 							<ListingTab
-								data={data || []}
+								data={data}
 								currentPage={currentPage}
 								setCurrentPage={setCurrentPage}
 							/>

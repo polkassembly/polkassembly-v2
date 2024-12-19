@@ -1,0 +1,48 @@
+.spanStyle {
+    @apply bg-[#ECECEC] dark:bg-[#333333] text-[#666666] dark:text-[#CCCCCC];
+}
+
+.Auction,
+.BigTipper,
+.BigSpender,
+.Bounties,
+.ChildBounties,
+.SmallSpender,
+.SmallTipper,
+.Treasurer,
+.Treasury,
+.Governance {
+    @apply bg-[#FFF4EB] dark:bg-[#302234] text-[#AC6A30] dark:text-[#CCAED4];
+}
+
+.Community,
+.Democracy,
+.GeneralAdmin,
+.ReferendumCanceller,
+.ReferendumKiller,
+.LeaseAdmin,
+.Staking {
+    @apply bg-[#EEF8FF] dark:bg-[#1C2945] text-[#093874] dark:text-[#96AAD6];
+}
+
+.Council,
+.Root,
+.Whitelist,
+.WishForChange,
+.StakingAdmin {
+    @apply bg-[#FFEDF2] dark:bg-[#0B353C] text-[#CD1F59] dark:text-[#93C9D1];
+}
+
+.Technical,
+.Tech,
+.AuctionAdmin,
+.WhitelistedCaller,
+.FellowshipAdmin,
+.Members {
+    @apply bg-[#FEF7DD] dark:bg-[#302921] text-[#75610E] dark:text-[#BFA889];
+}
+
+.General,
+.Upgrade {
+    @apply bg-[#FDF5F0] dark:bg-[#380E0E] text-[#EF884A] dark:text-[#DB8383];
+}

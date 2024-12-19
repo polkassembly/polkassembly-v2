@@ -7,6 +7,7 @@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
 import Address from '../Profile/Address/Address';
+import { getSpanStyle } from '../TopicTag/TopicTag';
 
 function ListingCard({
 	title,
@@ -27,10 +28,10 @@ function ListingCard({
 			style={{ backgroundColor }}
 		>
 			<div className='flex items-start gap-4'>
-				<p className='text-sidebar_text'>#{index}</p>
+				<p className='ml-5 w-14 text-sidebar_text'>#{index}</p>
 				<div className='flex flex-col gap-1'>
 					<h3 className='font-medium text-btn_secondary_text'>{title}</h3>
-					<div className='flex items-center gap-1 text-sm text-gray-500'>
+					<div className='flex items-center gap-2 text-sm text-gray-500'>
 						<span>
 							<Address address={proposer} />
 						</span>
@@ -40,7 +41,7 @@ function ListingCard({
 							{formattedCreatedAt}
 						</span>
 						<span>|</span>
-						<span>{origin}</span>
+						<span className={`${getSpanStyle(origin, 1)} rounded-md px-1.5 py-1 text-xs`}>{origin}</span>
 					</div>
 				</div>
 			</div>
