@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ECookieNames, EWeb3LoginScreens } from '@/_shared/types';
+import { EWeb3LoginScreens } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -88,18 +88,14 @@ function Web3Login({
 					return;
 				}
 
-				const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+				const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
-				if (!accessToken) {
+				if (!accessTokenPayload) {
 					setLoading(false);
 					return;
 				}
 
-				const decodedData = AuthClientService.decodeAccessToken(accessToken);
-
-				if (decodedData) {
-					setUserAtom(decodedData);
-				}
+				setUserAtom(accessTokenPayload);
 				router.back();
 			}
 			setLoading(false);

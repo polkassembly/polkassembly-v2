@@ -2,45 +2,24 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECookieNames, EWallet, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
-import { decodeToken } from 'react-jwt';
+import { EWallet } from '@/_shared/types';
 import { NextApiClientService } from './next_api_client_service';
 import { CookieClientService } from './cookie_client_service';
 
-export class AuthClientService {
-	static decodeAccessToken(token: string) {
-		if (!token) return null;
-		const tokenPayload = decodeToken<IAccessTokenPayload>(token);
-
-		if (tokenPayload && tokenPayload.sub) {
-			return tokenPayload;
-		}
-		return null;
-	}
-
-	static decodeRefreshToken(token: string) {
-		if (!token) return null;
-		const tokenPayload = decodeToken<IRefreshTokenPayload>(token);
-
-		if (tokenPayload) {
-			return tokenPayload;
-		}
-		return null;
-	}
-
+export class AuthClientService extends NextApiClientService {
 	static async refreshAccessToken() {
-		return NextApiClientService.refreshAccessToken();
+		return this.refreshAccessTokenApi();
 	}
 
 	static async web2Login({ emailOrUsername, password }: { emailOrUsername: string; password: string }) {
-		return NextApiClientService.web2Login({
+		return this.web2LoginApi({
 			emailOrUsername,
 			password
 		});
 	}
 
 	static async web2Signup({ email, username, password }: { email: string; username: string; password: string }) {
-		return NextApiClientService.web2Signup({
+		return this.web2SignupApi({
 			email,
 			username,
 			password
@@ -48,7 +27,7 @@ export class AuthClientService {
 	}
 
 	static async web3LoginOrSignup({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
-		return NextApiClientService.web3LoginOrSignup({
+		return this.web3LoginOrSignupApi({
 			address,
 			signature,
 			wallet
@@ -56,14 +35,14 @@ export class AuthClientService {
 	}
 
 	static async checkForUsernameAndEmail({ email, username }: { email: string; username: string }) {
-		return NextApiClientService.checkForUsernameAndEmail({
+		return this.checkForUsernameAndEmailApi({
 			username,
 			email
 		});
 	}
 
 	static async tfaLogin({ authCode, loginAddress, loginWallet, tfaToken }: { authCode: string; loginAddress: string; loginWallet: EWallet; tfaToken: string }) {
-		return NextApiClientService.tfaLogin({
+		return this.tfaLoginApi({
 			authCode,
 			loginAddress,
 			loginWallet,
@@ -72,24 +51,20 @@ export class AuthClientService {
 	}
 
 	static async generateTfaToken() {
-		return NextApiClientService.generateTfaToken();
+		return this.generateTfaTokenApi();
 	}
 
 	static async verifyTfaToken({ authCode }: { authCode: string }) {
-		return NextApiClientService.verifyTfaToken({
+		return this.verifyTfaTokenApi({
 			authCode
 		});
 	}
 
 	static async logout(onLogout?: () => void) {
+		this.logoutApi();
+
 		onLogout?.();
-		CookieClientService.deleteCookieFromClient(ECookieNames.ACCESS_TOKEN);
-		CookieClientService.deleteCookieFromClient(ECookieNames.REFRESH_TOKEN);
-
-		const { data } = await NextApiClientService.logout();
-
-		if (data?.message) {
-			console.log(data.message);
-		}
+		CookieClientService.deleteAccessToken();
+		CookieClientService.deleteRefreshToken();
 	}
 }

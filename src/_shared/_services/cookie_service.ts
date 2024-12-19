@@ -2,12 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECookieNames, ELocales, ETheme } from '@/_shared/types';
+import { ECookieNames, ELocales, ETheme, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
 import { cookies } from 'next/headers';
 import { DEFAULT_THEME } from '@/_shared/_constants/defaultTheme';
 import { DEFAULT_LOCALE } from '@/_shared/_constants/defaultLocale';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { AuthClientService } from '@/app/_client-services/auth_service';
+import { decodeToken } from 'react-jwt';
 
 export class CookieService {
 	// getters
@@ -16,18 +16,28 @@ export class CookieService {
 		return cookieStore.get(cookieName);
 	}
 
+	private static decodeCookieToken<T>(token: string) {
+		if (!token) return null;
+		const tokenPayload = decodeToken<T>(token);
+
+		if (tokenPayload) {
+			return tokenPayload;
+		}
+		return null;
+	}
+
 	static async getUserFromCookie() {
 		const accessToken = await this.getCookieValueByName(ECookieNames.ACCESS_TOKEN);
 		if (!accessToken || !accessToken.value) return null;
 
-		return AuthClientService.decodeAccessToken(accessToken.value);
+		return this.decodeCookieToken<IAccessTokenPayload>(accessToken.value);
 	}
 
 	static async getRefreshTokenFromCookie() {
 		const refreshToken = await this.getCookieValueByName(ECookieNames.REFRESH_TOKEN);
 		if (!refreshToken || !refreshToken.value) return null;
 
-		return AuthClientService.decodeRefreshToken(refreshToken.value);
+		return this.decodeCookieToken<IRefreshTokenPayload>(refreshToken.value);
 	}
 
 	static async getUserPreferencesFromCookie() {

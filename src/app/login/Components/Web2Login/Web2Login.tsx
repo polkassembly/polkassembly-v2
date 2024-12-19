@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ECookieNames, EWallet } from '@/_shared/types';
+import { EWallet } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { Input } from '@ui/Input';
@@ -69,20 +69,17 @@ function Web2Login({
 					return;
 				}
 
-				const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+				const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
-				if (!accessToken) {
+				if (!accessTokenPayload) {
 					setErrorMessage('No Access token found.');
 					setLoading(false);
 					return;
 				}
 
-				const decodedData = AuthClientService.decodeAccessToken(accessToken);
+				setErrorMessage('');
+				setUserAtom(accessTokenPayload);
 
-				if (decodedData) {
-					setErrorMessage('');
-					setUserAtom(decodedData);
-				}
 				router.back();
 			}
 			setLoading(false);

@@ -4,9 +4,10 @@
 
 'use client';
 
-import { ECookieNames, ENetwork, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useSetAtom } from 'jotai';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '../_atoms/user/userAtom';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
@@ -17,14 +18,14 @@ import { CookieClientService } from '../_client-services/cookie_client_service';
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const [user, setUser] = useUser();
 
-	const api = usePolkadotApi(ENetwork.POLKADOT);
+	const network = getCurrentNetwork();
+	const api = usePolkadotApi(network);
 
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
-	const oldRefreshtoken = CookieClientService.getCookieInClient(ECookieNames.REFRESH_TOKEN);
-	const refreshTokenPayload = AuthClientService.decodeRefreshToken(oldRefreshtoken || '');
+	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
-	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(refreshTokenPayload);
+	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(currentRefreshTokenPayload);
 
 	const refreshAccessToken = async () => {
 		const { data, error } = await AuthClientService.refreshAccessToken();
@@ -34,19 +35,14 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			throw new ClientError(error.message);
 		}
 
-		const newAccessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
-		const newRefreshToken = CookieClientService.getCookieInClient(ECookieNames.REFRESH_TOKEN);
+		const newUserPayload = CookieClientService.getAccessTokenPayload();
+		const newRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
-		if (newAccessToken && newRefreshToken) {
-			const newUserPayload = AuthClientService.decodeAccessToken(newAccessToken);
-			const newRefreshTokenPayload = AuthClientService.decodeRefreshToken(newRefreshToken);
-
-			if (newUserPayload) {
-				setUser(newUserPayload);
-			}
-			if (newRefreshTokenPayload) {
-				setRefreshTokenData(newRefreshTokenPayload);
-			}
+		if (newUserPayload) {
+			setUser(newUserPayload);
+		}
+		if (newRefreshTokenPayload) {
+			setRefreshTokenData(newRefreshTokenPayload);
 		}
 	};
 

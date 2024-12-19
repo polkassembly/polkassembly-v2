@@ -89,4 +89,8 @@ export class PolkadotApiService {
 	setSigner(signer: Signer) {
 		this.api.setSigner(signer);
 	}
+
+	async apiReady() {
+		await this.api.isReady;
+	}
 }

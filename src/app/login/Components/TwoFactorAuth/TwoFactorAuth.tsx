@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { ECookieNames, EWallet } from '@/_shared/types';
+import { EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { Button } from '@ui/Button';
@@ -51,19 +51,16 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 		}
 
 		if (data) {
-			const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+			const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
-			if (!accessToken) {
+			if (!accessTokenPayload) {
 				console.log('No Access token found.');
 				setLoading(false);
 				return;
 			}
 
-			const decodedData = AuthClientService.decodeAccessToken(accessToken);
+			setUserAtom(accessTokenPayload);
 
-			if (decodedData) {
-				setUserAtom(decodedData);
-			}
 			router.back();
 		}
 		setLoading(false);

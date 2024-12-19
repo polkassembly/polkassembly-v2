@@ -48,7 +48,9 @@ function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) =
 		onChange?.(a);
 	};
 
-	if (!userPreferences.wallet || !accounts) return null;
+	if (!userPreferences.wallet) return <div className={classes.fallbackText}>Please select wallet</div>;
+
+	if (!accounts) return <div className={classes.fallbackText}>No accounts found, check permission</div>;
 
 	return (
 		<div>

@@ -21,3 +21,7 @@
 .walletName {
     @apply text-lg sm:text-xl font-medium text-text_primary
 }
+
+.fallbackText {
+    @apply text-center text-text_primary;
+}

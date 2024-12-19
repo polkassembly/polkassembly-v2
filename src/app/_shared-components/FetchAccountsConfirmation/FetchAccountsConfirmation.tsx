@@ -11,7 +11,7 @@ import { Button } from '../Button';
 
 function FetchAccountsConfirmation({ switchToSignup, goBack, onConfirm }: { switchToSignup: () => void; goBack: () => void; onConfirm?: () => void }) {
 	const [userPreferences] = useUserPreferences();
-	if (!userPreferences.wallet) return null;
+	if (!userPreferences.wallet) return <div className='text-center text-text_primary'>Please Select Wallet</div>;
 
 	return (
 		<div>

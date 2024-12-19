@@ -4,7 +4,7 @@
 import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
-import { ECookieNames, ESignupSteps, EWallet } from '@/_shared/types';
+import { ESignupSteps, EWallet } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
@@ -77,20 +77,16 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 			}
 
 			if (data) {
-				const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+				const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
-				if (!accessToken) {
+				if (!accessTokenPayload) {
 					setErrorMessage('No Access token found.');
 					setLoading(false);
 					return;
 				}
 
-				const decodedData = AuthClientService.decodeAccessToken(accessToken);
-
-				if (decodedData) {
-					setUserAtom(decodedData);
-					setErrorMessage('');
-				}
+				setUserAtom(accessTokenPayload);
+				setErrorMessage('');
 
 				router.back();
 			}

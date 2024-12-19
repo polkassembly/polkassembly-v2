@@ -24,17 +24,22 @@ export class WalletClientService {
 		this.apiService = apiService;
 	}
 
-	static async Init(network: ENetwork) {
+	static async Init(network: ENetwork, apiService: PolkadotApiService) {
+		// Todo: wait for doc ready. (async)
 		const returnWalletService = async () => {
 			const injectedWindow = window as Window & InjectedWindow;
-			const apiService = await PolkadotApiService.Init(network);
+
+			await apiService.apiReady();
+
 			return new WalletClientService(injectedWindow, apiService, network);
 		};
 
 		if (document.readyState !== 'loading') {
 			return returnWalletService();
 		}
-		document.addEventListener('DOMContentLoaded', () => returnWalletService());
+		document.addEventListener('DOMContentLoaded', () => {
+			returnWalletService();
+		});
 		return null;
 	}
 
@@ -78,10 +83,7 @@ export class WalletClientService {
 	}
 
 	getInjectedWallets() {
-		if (document.readyState === 'complete') {
-			return this.injectedWindow.injectedWeb3 || {};
-		}
-		return {};
+		return this.injectedWindow.injectedWeb3 || {};
 	}
 
 	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
