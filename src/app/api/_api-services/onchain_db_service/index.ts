@@ -35,20 +35,20 @@ export class OnChainDbService {
 		proposalType,
 		limit,
 		page,
-		status
+		statuses
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
-		status?: EProposalStatus;
+		statuses?: EProposalStatus[];
 	}) {
 		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
 
 		// fetch from subsquid
-		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page, status });
+		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses });
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
 		return [];
