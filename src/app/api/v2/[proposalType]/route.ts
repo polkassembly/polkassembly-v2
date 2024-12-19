@@ -22,12 +22,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		status: z.nativeEnum(EProposalStatus).optional()
+		statuses: z.array(z.nativeEnum(EProposalStatus)).optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(req.nextUrl.searchParams.entries());
 
-	const { page, limit, status } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, statuses } = zodQuerySchema.parse(searchParamsObject);
 
 	const network = await getNetworkFromHeaders();
 
@@ -35,7 +35,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// 1. if proposal type is on-chain, get on-chain posts from onchain_db_service, then get the corresponding off-chain data from offchain_db_service for each on-chain post
 	if (ValidatorService.isValidOnChainProposalType(proposalType)) {
-		const onChainPostsInfo = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page, status });
+		const onChainPostsInfo = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses });
 
 		// Fetch off-chain data
 		const offChainDataPromises = onChainPostsInfo.map((postInfo) => {
