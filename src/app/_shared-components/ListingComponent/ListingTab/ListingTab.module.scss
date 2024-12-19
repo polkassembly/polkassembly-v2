@@ -3,7 +3,7 @@
 }
 
 .page-button {
-    @apply rounded-lg border-2 border-[#CED4DE] px-4 py-2 text-[#334D6E];
+    @apply rounded-lg border-2 border-listing_page_border px-3 py-1 text-listing_page_btn;
 }
 
 .page-button-active {
