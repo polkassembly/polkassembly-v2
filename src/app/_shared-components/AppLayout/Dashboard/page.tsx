@@ -26,7 +26,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
 			<div className='flex flex-1 flex-col'>
 				<SidebarInset>
 					<Navbar />
-					<main className='-my-4 -mr-1 flex flex-1 flex-col'>{children}</main>
+					<main className='-my-4 flex flex-1 flex-col'>{children}</main>
 				</SidebarInset>
 			</div>
 		</div>
