@@ -10,9 +10,10 @@ import queryService from '@/app/_client-services/api_query_service';
 import { IListingResponse } from '@/_shared/types';
 import { FaFilter } from 'react-icons/fa6';
 import { BiSort } from 'react-icons/bi';
-import { LoadingSpinner } from '../LoadingSpinner';
-import ListingTab from './ListingTab';
-import ExternalTab from './ExternalTab';
+import { LoadingSpinner } from '../../LoadingSpinner';
+import ListingTab from '../ListingTab/ListingTab';
+import ExternalTab from '../ExternalTab';
+import styles from './ListingPage.module.scss';
 
 interface ListingPageProps {
 	proposalType: string;
@@ -42,47 +43,47 @@ function ListingPage({ proposalType }: ListingPageProps) {
 
 	return (
 		<div>
-			<div className='container mx-auto bg-white px-4 pt-8'>
-				<div className='bg-h flex items-center justify-between'>
+			<div className={styles.container}>
+				<div className={styles.header}>
 					<div>
-						<h1 className='text-2xl font-bold'>Onchain Referenda ({totalCount})</h1>
-						<p className='text-sm text-gray-600'>A space to share insights, provide feedback, and collaborate on ideas that impact the network.</p>
+						<h1 className={styles.title}>Onchain Referenda ({totalCount})</h1>
+						<p className={styles.subtitle}>A space to share insights, provide feedback, and collaborate on ideas that impact the network.</p>
 					</div>
 					<button
 						type='button'
-						className='flex items-center gap-1.5 rounded-full bg-pink-500 px-6 py-2 text-white shadow'
+						className={styles.button}
 					>
 						<span className='text-xl'>+</span> <span className='text-sm'>Create Post</span>
 					</button>
 				</div>
-				<div className='mt-5 flex items-center justify-between'>
+				<div className={styles.tabs}>
 					<div className='flex space-x-6'>
 						<button
 							type='button'
-							className={`pb-3 ${activeTab === 'polkassembly' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
+							className={`${styles['tab-button']} ${activeTab === 'polkassembly' ? styles['tab-button-active'] : ''}`}
 							onClick={() => setActiveTab('polkassembly')}
 						>
 							POLKASSEMBLY
 						</button>
 						<button
 							type='button'
-							className={`pb-3 ${activeTab === 'external' ? 'border-b-2 border-pink-500 text-pink-500' : 'text-gray-500'}`}
+							className={`${styles['tab-button']} ${activeTab === 'external' ? styles['tab-button-active'] : ''}`}
 							onClick={() => setActiveTab('external')}
 						>
 							EXTERNAL
 						</button>
 					</div>
-					<div className='flex gap-4 pb-3 text-sm text-sidebar_text'>
-						<p className='flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200'>
+					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
+						<p className={styles.filter}>
 							Filter <FaFilter />
 						</p>
-						<p className='flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200'>
+						<p className={styles.filter}>
 							Sort By <BiSort />
 						</p>
 					</div>
 				</div>
 			</div>
-			<div className='w-full bg-[#F5F6F8] px-10 py-5'>
+			<div className={styles.content}>
 				{isLoading ? (
 					<LoadingSpinner />
 				) : (

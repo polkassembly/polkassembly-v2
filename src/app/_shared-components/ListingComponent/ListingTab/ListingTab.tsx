@@ -6,7 +6,8 @@
 
 import React from 'react';
 import { IListingResponse } from '@/_shared/types';
-import ListingCard from './ListingCard';
+import styles from './ListingTab.module.scss';
+import ListingCard from '../ListingCard/ListingCard';
 
 interface ListingTabProps {
 	data: Array<IListingResponse>;
@@ -16,12 +17,12 @@ interface ListingTabProps {
 
 function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 	const renderPagination = () => (
-		<div className='mt-6 flex items-center justify-center space-x-2'>
+		<div className={styles.pagination}>
 			{[1, 2, 3, 4, 5].map((page) => (
 				<button
 					key={page}
 					type='button'
-					className={`rounded-lg border-2 px-4 py-2 ${page === currentPage ? 'border-navbar_border text-navbar_border' : 'border-[#CED4DE] text-[#334D6E]'}`}
+					className={`${styles['page-button']} ${page === currentPage ? styles['page-button-active'] : ''}`}
 					onClick={() => setCurrentPage(page)}
 				>
 					{page}
@@ -43,7 +44,7 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 			return (
 				<div
 					key={item.id || `${item.proposalType}-${item.onChainInfo?.createdAt}-${idx}`}
-					className={`border-b border-primary_border ${idx === data.length - 1 ? 'border-none' : ''} relative transform cursor-pointer transition-transform duration-300 ease-in-out hover:z-10 hover:shadow-lg`}
+					className={`${styles['listing-item']} ${idx === data.length - 1 ? styles['listing-item-last'] : ''}`}
 				>
 					<ListingCard
 						backgroundColor={backgroundColor}
@@ -57,7 +58,7 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 
 	return (
 		<div>
-			<div className='overflow-hidden rounded-xl bg-white shadow-lg'>{data.length > 0 ? renderListingCards() : <p className='text-center text-gray-500'>No data available</p>}</div>
+			<div className={styles['listing-container']}>{data.length > 0 ? renderListingCards() : <p className={styles['no-data']}>No data available</p>}</div>
 			{data.length > 0 && renderPagination()}
 		</div>
 	);

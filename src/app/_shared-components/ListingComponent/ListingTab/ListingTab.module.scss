@@ -1,0 +1,27 @@
+.pagination {
+    @apply mt-6 flex items-center justify-center space-x-2;
+}
+
+.page-button {
+    @apply rounded-lg border-2 border-[#CED4DE] px-4 py-2 text-[#334D6E];
+}
+
+.page-button-active {
+    @apply border-navbar_border text-navbar_border;
+}
+
+.listing-container {
+    @apply overflow-hidden rounded-xl bg-white shadow-lg;
+}
+
+.listing-item {
+    @apply border-b border-primary_border relative transform cursor-pointer transition-transform duration-300 ease-in-out hover:z-10 hover:shadow-lg;
+}
+
+.listing-item-last {
+    @apply border-none;
+}
+
+.no-data {
+    @apply text-center text-gray-500;
+}

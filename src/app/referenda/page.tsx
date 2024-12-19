@@ -6,7 +6,7 @@
 
 import dynamic from 'next/dynamic';
 
-const ListingPage = dynamic(() => import('../_shared-components/ListingComponent/ListingPage'), { ssr: false });
+const ListingPage = dynamic(() => import('../_shared-components/ListingComponent/ListingPage/ListingPage'), { ssr: false });
 
 function Page() {
 	return (

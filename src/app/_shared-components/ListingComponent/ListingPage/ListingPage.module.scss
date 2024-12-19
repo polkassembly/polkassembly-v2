@@ -1,0 +1,39 @@
+.container {
+    @apply mx-auto bg-white px-4 pt-8;
+}
+
+.header {
+    @apply flex items-center justify-between;
+}
+
+.title {
+    @apply text-2xl font-bold;
+}
+
+.subtitle {
+    @apply text-sm text-gray-600;
+}
+
+.button {
+    @apply flex items-center gap-1.5 rounded-full bg-pink-500 px-6 py-2 text-white shadow;
+}
+
+.tabs {
+    @apply mt-5 flex items-center justify-between;
+}
+
+.tab-button {
+    @apply pb-3 text-gray-500;
+}
+
+.tab-button-active {
+    @apply border-b-2 border-pink-500 text-pink-500;
+}
+
+.filter {
+    @apply flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200;
+}
+
+.content {
+    @apply w-full bg-gray-100 px-10 py-5;
+}
