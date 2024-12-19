@@ -33,7 +33,9 @@ export const THEME_COLORS = {
 		light_general_bg: '#FDF5F0',
 		light_general_text: '#EF884A',
 		light_technical_bg: '#FEF7DD',
-		light_technical_text: '#75610E'
+		light_technical_text: '#75610E',
+		text_dropdown: '#485F7D',
+		search_bg: '#E3E4E4'
 	},
 	dark: {
 		navbar_border: '#E5007A',

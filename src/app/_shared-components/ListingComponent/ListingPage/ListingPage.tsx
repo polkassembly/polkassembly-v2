@@ -7,10 +7,12 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import queryService from '@/app/_client-services/api_query_service';
-import { IListingResponse } from '@/_shared/types';
+import { EProposalStatus, IListingResponse } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
+import { MdSearch } from 'react-icons/md';
+import { IoMdTrendingUp } from 'react-icons/io';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
@@ -24,6 +26,26 @@ function ListingPage({ proposalType }: ListingPageProps) {
 	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [filterActive, setFilterActive] = useState(false);
+	const [tagSearchTerm, setTagSearchTerm] = useState('');
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+	const statuses = [
+		EProposalStatus.Cancelled,
+		EProposalStatus.Confirmed,
+		EProposalStatus.ConfirmAborted,
+		EProposalStatus.ConfirmStarted,
+		EProposalStatus.Deciding,
+		EProposalStatus.Executed,
+		EProposalStatus.ExecutionFailed,
+		EProposalStatus.Killed,
+		EProposalStatus.Rejected,
+		EProposalStatus.Submitted,
+		EProposalStatus.TimedOut
+	];
+
+	const tags = ['Abc', 'Xyz', 'Network', 'Governance', 'Proposal', 'Test'];
+
+	const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(tagSearchTerm.toLowerCase()));
 
 	const {
 		data: polkassemblyData,
@@ -38,6 +60,10 @@ function ListingPage({ proposalType }: ListingPageProps) {
 	const data = Array.isArray(polkassemblyData) ? polkassemblyData : [];
 	const error = activeTab === 'polkassembly' ? polkassemblyError : null;
 	const isLoading = activeTab === 'polkassembly' ? polkassemblyLoading : false;
+
+	const toggleTag = (tag: string) => {
+		setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+	};
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
 
@@ -98,73 +124,52 @@ function ListingPage({ proposalType }: ListingPageProps) {
 								className={styles.popoverContent}
 							>
 								<div className='p-4'>
-									<h3 className='text-sm font-bold'>Status</h3>
-									<ul className='mt-2 space-y-1'>
-										<li>
-											<span>
+									<h3 className='text-text_dropdown text-sm font-semibold'>STATUS</h3>
+									<div className='mt-2 max-h-28 space-y-1 overflow-y-auto'>
+										{statuses.map((status, index) => (
+											<span
+												key={index}
+												className='flex items-center'
+											>
 												<input
 													type='checkbox'
 													className='mr-2'
-												/>{' '}
-												Cancelled
+												/>
+												<span className='text-text_dropdown text-sm'>{status}</span>
 											</span>
-										</li>
-										<li>
-											<span>
-												<input
-													type='checkbox'
-													className='mr-2'
-												/>{' '}
-												Confirmed
-											</span>
-										</li>
-										<li>
-											<span>
-												<input
-													type='checkbox'
-													className='mr-2'
-												/>{' '}
-												Confirm Aborted
-											</span>
-										</li>
-										<li>
-											<span>
-												<input
-													type='checkbox'
-													className='mr-2'
-												/>{' '}
-												Confirm Started
-											</span>
-										</li>
-									</ul>
-									<h3 className='mt-4 text-sm font-bold'>Tags</h3>
+										))}
+									</div>
+
+									<h3 className='text-text_dropdown mt-4 text-sm font-semibold'>Tags</h3>
 									<div className='relative mt-2'>
 										<input
 											type='text'
 											placeholder='Search'
-											className='w-full rounded border px-2 py-1'
+											value={tagSearchTerm}
+											onChange={(e) => setTagSearchTerm(e.target.value)}
+											className='bg-search_bg text-text_dropdown w-full rounded border border-primary_border bg-opacity-[20%] px-2 py-1 pr-10'
 										/>
+										<MdSearch className='text-text_dropdown absolute right-3 top-1/2 -translate-y-1/2 transform' />
 									</div>
-									<ul className='mt-2 space-y-1'>
-										<li>
-											<span>
+
+									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
+										{filteredTags.map((tag, index) => (
+											<span
+												key={index}
+												className='flex items-center'
+											>
 												<input
 													type='checkbox'
 													className='mr-2'
-												/>{' '}
-												Abc
+													checked={selectedTags.includes(tag)}
+													onChange={() => toggleTag(tag)}
+												/>
+												<span className='text-text_dropdown flex items-center gap-1 text-sm'>
+													<IoMdTrendingUp /> {tag}
+												</span>
 											</span>
-										</li>
-										<li>
-											<span>
-												<input
-													type='checkbox'
-													className='mr-2'
-												/>{' '}
-												Xyz
-											</span>
-										</li>
-									</ul>
+										))}
+									</div>
 								</div>
 							</PopoverContent>
 						</Popover>
