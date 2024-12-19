@@ -9,7 +9,7 @@ import style from './Navbar.module.scss';
 
 function Navbar() {
 	return (
-		<header className={style.navbar}>
+		<header className={`${style.navbar} transition-[width, height] ease-linear`}>
 			<div>
 				<p className={style.navbar_title}>OpenGov</p>
 			</div>

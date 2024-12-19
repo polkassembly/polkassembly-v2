@@ -19,23 +19,16 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
 		<div className='relative flex flex-1'>
 			<AppSidebar />
 
-			<div
-				className={cn(
-					'fixed',
-					!isMobile
-						? state === 'collapsed'
-							? 'left-16 top-10 z-50 transition-all duration-200 ease-in-out'
-							: 'left-60 top-10 z-50 transition-all duration-200 ease-in-out'
-						: 'ml-4 mt-4'
-				)}
-			>
+			<div className={cn('absolute top-10 z-50 transition-all duration-200 ease-in-out lg:fixed', !isMobile ? (state === 'collapsed' ? 'left-16' : 'left-60') : 'left-4 top-4')}>
 				<SidebarTrigger />
 			</div>
 
-			<SidebarInset>
-				<Navbar />
-				<main className='-my-4 flex flex-1 flex-col'>{children}</main>
-			</SidebarInset>
+			<div className='flex flex-1 flex-col'>
+				<SidebarInset>
+					<Navbar />
+					<main className='-my-4 -mr-1 flex flex-1 flex-col'>{children}</main>
+				</SidebarInset>
+			</div>
 		</div>
 	);
 }

@@ -1,7 +1,7 @@
 .navbar {
-	@apply flex h-16 shrink-0 items-center gap-2 px-4 transition-[width,height] ease-linear;
+	@apply flex h-16 shrink-0 items-center gap-2 px-4;
 }
 
 .navbar_title {
-	@apply text-btn_secondary_text ml-5 text-lg font-medium;
+	@apply text-btn_secondary_text lg:ml-5 ml-12 text-lg font-medium;
 }
