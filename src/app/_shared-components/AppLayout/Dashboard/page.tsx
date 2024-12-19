@@ -14,21 +14,21 @@ import { cn } from '@/lib/utils';
 export default function Dashboard({ children }: { children: React.ReactNode }) {
 	const { state } = useSidebar();
 	const isMobile = useIsMobile();
+
 	return (
 		<div className='relative flex flex-1'>
 			<AppSidebar />
 
 			<div
 				className={cn(
-					'',
+					'fixed',
 					!isMobile
 						? state === 'collapsed'
-							? 'absolute left-16 top-10 z-50 transition-all duration-200 ease-in-out'
-							: 'absolute left-60 top-10 z-50 transition-all duration-200 ease-in-out'
+							? 'left-16 top-10 z-50 transition-all duration-200 ease-in-out'
+							: 'left-60 top-10 z-50 transition-all duration-200 ease-in-out'
 						: 'ml-4 mt-4'
 				)}
 			>
-				{' '}
 				<SidebarTrigger />
 			</div>
 
