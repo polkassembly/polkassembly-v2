@@ -23,6 +23,7 @@ interface ListingPageProps {
 function ListingPage({ proposalType }: ListingPageProps) {
 	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
 	const [currentPage, setCurrentPage] = useState(1);
+	const [filterActive, setFilterActive] = useState(false);
 
 	const {
 		data: polkassemblyData,
@@ -75,11 +76,22 @@ function ListingPage({ proposalType }: ListingPageProps) {
 						</button>
 					</div>
 					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
-						<Popover>
+						<Popover
+							onOpenChange={(open) => {
+								setFilterActive(open);
+							}}
+						>
 							<PopoverTrigger asChild>
-								<p className={styles.filter}>
-									Filter <FaFilter />
-								</p>
+								<div
+									className={`${styles.filter} ${filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
+									role='button'
+									tabIndex={0}
+								>
+									<span className={filterActive ? styles.selectedicon : ''}>
+										<FaFilter />
+									</span>
+									Filter
+								</div>
 							</PopoverTrigger>
 							<PopoverContent
 								sideOffset={5}
@@ -89,40 +101,40 @@ function ListingPage({ proposalType }: ListingPageProps) {
 									<h3 className='text-sm font-bold'>Status</h3>
 									<ul className='mt-2 space-y-1'>
 										<li>
-											<label>
+											<span>
 												<input
 													type='checkbox'
 													className='mr-2'
 												/>{' '}
 												Cancelled
-											</label>
+											</span>
 										</li>
 										<li>
-											<label>
+											<span>
 												<input
 													type='checkbox'
 													className='mr-2'
 												/>{' '}
 												Confirmed
-											</label>
+											</span>
 										</li>
 										<li>
-											<label>
+											<span>
 												<input
 													type='checkbox'
 													className='mr-2'
 												/>{' '}
 												Confirm Aborted
-											</label>
+											</span>
 										</li>
 										<li>
-											<label>
+											<span>
 												<input
 													type='checkbox'
 													className='mr-2'
 												/>{' '}
 												Confirm Started
-											</label>
+											</span>
 										</li>
 									</ul>
 									<h3 className='mt-4 text-sm font-bold'>Tags</h3>
@@ -135,22 +147,22 @@ function ListingPage({ proposalType }: ListingPageProps) {
 									</div>
 									<ul className='mt-2 space-y-1'>
 										<li>
-											<label>
+											<span>
 												<input
 													type='checkbox'
 													className='mr-2'
 												/>{' '}
 												Abc
-											</label>
+											</span>
 										</li>
 										<li>
-											<label>
+											<span>
 												<input
 													type='checkbox'
 													className='mr-2'
 												/>{' '}
 												Xyz
-											</label>
+											</span>
 										</li>
 									</ul>
 								</div>
