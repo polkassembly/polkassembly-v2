@@ -4,6 +4,7 @@
 
 'use client';
 
+import { EProposalType } from '@/_shared/types';
 import dynamic from 'next/dynamic';
 
 const ListingPage = dynamic(() => import('../_shared-components/ListingComponent/ListingPage/ListingPage'), { ssr: false });
@@ -11,7 +12,7 @@ const ListingPage = dynamic(() => import('../_shared-components/ListingComponent
 function Page() {
 	return (
 		<div>
-			<ListingPage proposalType='ReferendumV2' />
+			<ListingPage proposalType={EProposalType.REFERENDUM_V2} />
 		</div>
 	);
 }
