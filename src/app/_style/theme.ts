@@ -34,7 +34,7 @@ export const THEME_COLORS = {
 		light_general_text: '#EF884A',
 		light_technical_bg: '#FEF7DD',
 		light_technical_text: '#75610E',
-		text_dropdown: '#485F7D',
+		filter_dropdown: '#485F7D',
 		search_bg: '#E3E4E4'
 	},
 	dark: {

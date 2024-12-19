@@ -133,10 +133,11 @@ function ListingPage({ proposalType }: ListingPageProps) {
 								className={styles.popoverContent}
 							>
 								<div className='p-4'>
-									<h3 className='text-text_dropdown text-sm font-semibold'>STATUS</h3>
+									<h3 className='text-filter_dropdown text-sm font-semibold'>STATUS</h3>
 									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
 										{statuses.map((status, index) => (
 											<span
+												// eslint-disable-next-line react/no-array-index-key
 												key={index}
 												className='flex items-center'
 											>
@@ -146,26 +147,27 @@ function ListingPage({ proposalType }: ListingPageProps) {
 													checked={selectedStatuses.includes(status)}
 													onChange={() => toggleStatus(status)}
 												/>
-												<span className='text-text_dropdown text-sm'>{status}</span>
+												<span className='text-filter_dropdown text-sm'>{status}</span>
 											</span>
 										))}
 									</div>
 
-									<h3 className='text-text_dropdown mt-4 text-sm font-semibold'>Tags</h3>
+									<h3 className='text-filter_dropdown mt-4 text-sm font-semibold'>Tags</h3>
 									<div className='relative mt-2'>
 										<input
 											type='text'
 											placeholder='Search'
 											value={tagSearchTerm}
 											onChange={(e) => setTagSearchTerm(e.target.value)}
-											className='bg-search_bg text-text_dropdown w-full rounded border border-primary_border bg-opacity-[20%] px-2 py-1 pr-10'
+											className={styles.searchbar}
 										/>
-										<MdSearch className='text-text_dropdown absolute right-3 top-1/2 -translate-y-1/2 transform' />
+										<MdSearch className='text-filter_dropdown absolute right-3 top-1/2 -translate-y-1/2 transform' />
 									</div>
 
 									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
 										{filteredTags.map((tag, index) => (
 											<span
+												// eslint-disable-next-line react/no-array-index-key
 												key={index}
 												className='flex items-center'
 											>
@@ -175,7 +177,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 													checked={selectedTags.includes(tag)}
 													onChange={() => toggleTag(tag)}
 												/>
-												<span className='text-text_dropdown flex items-center gap-1 text-sm'>
+												<span className='text-filter_dropdown flex items-center gap-1 text-sm'>
 													<IoMdTrendingUp /> {tag}
 												</span>
 											</span>

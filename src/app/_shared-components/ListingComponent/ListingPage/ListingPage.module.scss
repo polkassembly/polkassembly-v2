@@ -45,3 +45,7 @@
 .selectedicon {
     filter: 'brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%)'
 }
+
+.searchbar{
+    @apply bg-search_bg text-filter_dropdown w-full rounded border border-primary_border bg-opacity-[20%] px-2 py-1 pr-10;
+}
