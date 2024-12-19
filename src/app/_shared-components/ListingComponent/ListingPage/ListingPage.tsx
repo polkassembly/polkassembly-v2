@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import queryService from '@/app/_client-services/api_query_service';
 import { EProposalStatus, IListingResponse } from '@/_shared/types';
@@ -26,6 +26,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [filterActive, setFilterActive] = useState(false);
+	const [selectedStatuses, setSelectedStatuses] = useState<EProposalStatus[]>([]);
 	const [tagSearchTerm, setTagSearchTerm] = useState('');
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -42,28 +43,36 @@ function ListingPage({ proposalType }: ListingPageProps) {
 		EProposalStatus.Submitted,
 		EProposalStatus.TimedOut
 	];
-
 	const tags = ['Abc', 'Xyz', 'Network', 'Governance', 'Proposal', 'Test'];
-
 	const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(tagSearchTerm.toLowerCase()));
-
 	const {
 		data: polkassemblyData,
 		error: polkassemblyError,
-		isLoading: polkassemblyLoading
+		isLoading: polkassemblyLoading,
+		refetch
 	} = useQuery<IListingResponse[]>({
-		queryKey: ['polkassemblyReferenda', proposalType, currentPage],
-		queryFn: () => queryService.fetchListingData(proposalType, currentPage),
+		queryKey: ['polkassemblyReferenda', proposalType, currentPage, selectedStatuses],
+		queryFn: () => queryService.fetchListingData(proposalType, currentPage, selectedStatuses),
 		enabled: activeTab === 'polkassembly'
 	});
 
-	const data = Array.isArray(polkassemblyData) ? polkassemblyData : [];
-	const error = activeTab === 'polkassembly' ? polkassemblyError : null;
-	const isLoading = activeTab === 'polkassembly' ? polkassemblyLoading : false;
+	const toggleStatus = (status: EProposalStatus) => {
+		setSelectedStatuses((prevStatuses) => (prevStatuses.includes(status) ? prevStatuses.filter((s) => s !== status) : [...prevStatuses, status]));
+	};
 
 	const toggleTag = (tag: string) => {
 		setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
 	};
+
+	useEffect(() => {
+		if (activeTab === 'polkassembly') {
+			refetch();
+		}
+	}, [selectedStatuses, refetch, activeTab]);
+
+	const data = Array.isArray(polkassemblyData) ? polkassemblyData : [];
+	const error = activeTab === 'polkassembly' ? polkassemblyError : null;
+	const isLoading = activeTab === 'polkassembly' ? polkassemblyLoading : false;
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
 
@@ -125,7 +134,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 							>
 								<div className='p-4'>
 									<h3 className='text-text_dropdown text-sm font-semibold'>STATUS</h3>
-									<div className='mt-2 max-h-28 space-y-1 overflow-y-auto'>
+									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
 										{statuses.map((status, index) => (
 											<span
 												key={index}
@@ -134,6 +143,8 @@ function ListingPage({ proposalType }: ListingPageProps) {
 												<input
 													type='checkbox'
 													className='mr-2'
+													checked={selectedStatuses.includes(status)}
+													onChange={() => toggleStatus(status)}
 												/>
 												<span className='text-text_dropdown text-sm'>{status}</span>
 											</span>

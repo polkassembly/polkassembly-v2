@@ -18,7 +18,7 @@ class QueryService {
 		});
 
 		if (statuses && statuses.length > 0) {
-			statuses.forEach((status) => queryParams.append('status', status));
+			statuses.forEach((status) => queryParams.append('statuses', status));
 		}
 
 		const response = await fetch(`${this.baseUrl}/api/v2/${proposalType}?${queryParams.toString()}`, {
