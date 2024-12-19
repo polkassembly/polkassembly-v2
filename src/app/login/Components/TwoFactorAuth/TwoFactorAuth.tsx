@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { Button } from '@ui/Button';
 import { AuthClientService } from '@/app/_client-services/auth_service';
-import { getCookie } from 'cookies-next/client';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useRouter } from 'next/navigation';
@@ -14,7 +13,8 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { Input } from '@ui/Input';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import ErrorMessage from '@/app/_shared-components/ErrorMessage';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import classes from './TwoFactorAuth.module.scss';
 
 interface IFormFields {
@@ -29,39 +29,43 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 
 	const formData = useForm<IFormFields>();
 
+	const [errorMessage, setErrorMessage] = useState<string>('');
+
 	const handleLogin = async (values: IFormFields) => {
 		const { authCode } = values;
 
 		if (!authCode || !tfaToken || !loginAddress || !loginWallet) return;
 
 		setLoading(true);
-		const data = await NextApiClientService.tfaLogin({
+		const { data, error } = await AuthClientService.tfaLogin({
 			authCode,
 			loginAddress,
 			loginWallet,
 			tfaToken
 		});
 
-		if (!data) {
-			console.log('Login failed. Please try again later.');
+		if (error) {
+			setErrorMessage(error.message);
 			setLoading(false);
 			return;
 		}
 
-		const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
+		if (data) {
+			const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
 
-		if (!accessToken) {
-			console.log('No Access token found.');
-			setLoading(false);
-			return;
+			if (!accessToken) {
+				console.log('No Access token found.');
+				setLoading(false);
+				return;
+			}
+
+			const decodedData = CookieClientService.decodeAccessToken(accessToken);
+
+			if (decodedData) {
+				setUserAtom(decodedData);
+			}
+			router.back();
 		}
-
-		const decodedData = AuthClientService.decodeAccessToken(accessToken);
-
-		if (decodedData) {
-			setUserAtom(decodedData);
-		}
-		router.back();
 		setLoading(false);
 	};
 
@@ -108,6 +112,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 							)}
 						/>
 					</div>
+					{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 					<div className='mt-4 flex justify-center'>
 						<Button
 							size='lg'

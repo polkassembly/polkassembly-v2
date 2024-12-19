@@ -15,9 +15,11 @@ import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useSetAtom } from 'jotai';
 import { AuthClientService } from '@/app/_client-services/auth_service';
-import { getCookie } from 'cookies-next/client';
-import { WalletClientService } from '@/app/_client-services/wallet_service';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import ErrorMessage from '@/app/_shared-components/ErrorMessage';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
+import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
+import FetchAccountsConfirmation from '@/app/_shared-components/FetchAccountsConfirmation/FetchAccountsConfirmation';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -48,14 +50,18 @@ function Web3Login({
 
 	const [loading, setLoading] = useState(false);
 
+	const [errorMessage, setErrorMessage] = useState<string>('');
+
+	const walletService = useWalletService();
+
 	const handleLogin = async () => {
 		try {
-			if (!selectedWallet || !account?.address) return;
+			if (!selectedWallet || !account?.address || !walletService) return;
 			const { address } = account;
 
 			setLoading(true);
 
-			const signature = await WalletClientService.signMessage({
+			const signature = await walletService.signMessage({
 				data: WEB3_AUTH_SIGN_MESSAGE,
 				address,
 				selectedWallet
@@ -66,36 +72,38 @@ function Web3Login({
 				return;
 			}
 
-			const data = await NextApiClientService.web3LoginOrSignup({
+			const { data, error } = await AuthClientService.web3LoginOrSignup({
 				address: getSubstrateAddress(address) || address,
 				signature,
 				wallet: selectedWallet
 			});
 
-			if (!data) {
-				console.log('Login failed. Please try again later.');
+			if (error) {
+				setErrorMessage(error.message);
 				setLoading(false);
 				return;
 			}
 
-			if (data.isTFAEnabled && data.tfaToken) {
-				onTfaEnabled(data.tfaToken);
-				return;
+			if (data) {
+				if (data.isTFAEnabled && data.tfaToken) {
+					onTfaEnabled(data.tfaToken);
+					return;
+				}
+
+				const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+
+				if (!accessToken) {
+					setLoading(false);
+					return;
+				}
+
+				const decodedData = CookieClientService.decodeAccessToken(accessToken);
+
+				if (decodedData) {
+					setUserAtom(decodedData);
+				}
+				router.back();
 			}
-
-			const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
-
-			if (!accessToken) {
-				setLoading(false);
-				return;
-			}
-
-			const decodedData = AuthClientService.decodeAccessToken(accessToken);
-
-			if (decodedData) {
-				setUserAtom(decodedData);
-			}
-			router.back();
 			setLoading(false);
 		} catch (error) {
 			console.log('error', error);
@@ -105,15 +113,27 @@ function Web3Login({
 
 	return (
 		<div className='w-full'>
-			<WalletButtons
-				accounts={accounts}
-				selectedAddress={account?.address || ''}
-				onAddressChange={onAccountChange}
-				onWalletChange={onWalletChange}
-				selectedWallet={selectedWallet || undefined}
-				getAccounts={getAccounts}
-				switchToSignup={switchToSignup}
-			/>
+			{selectedWallet ? (
+				accounts && accounts.length > 0 ? (
+					<AddressDropdown
+						accounts={accounts}
+						selectedAddress={account?.address || ''}
+						onAddressChange={onAccountChange}
+						selectedWallet={selectedWallet}
+					/>
+				) : (
+					<FetchAccountsConfirmation
+						onWalletChange={onWalletChange}
+						getAccounts={getAccounts}
+						selectedWallet={selectedWallet}
+						switchToSignup={switchToSignup}
+					/>
+				)
+			) : (
+				<WalletButtons onWalletChange={onWalletChange} />
+			)}
+
+			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 			<div>
 				{account?.address && (
 					<div className={classes.footer}>

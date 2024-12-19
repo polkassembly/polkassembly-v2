@@ -392,3 +392,21 @@ export enum EPostOrigin {
 	WISH_FOR_CHANGE = 'WishForChange',
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
+
+export interface IErrorResponse {
+	status: StatusCodes;
+	message: string;
+	name: string;
+}
+
+export enum EApiRoute {
+	WEB2_LOGIN = 'web2Login',
+	WEB2_SIGNUP = 'web2Signup',
+	WEB3_LOGIN = 'web3LoginOrSignup',
+	REFRESH_ACCESS_TOKEN = 'refreshAccessToken',
+	USER_EXISTS = 'checkForUsernameAndEmail',
+	TFA_LOGIN = 'tfaLogin',
+	GEN_TFA_TOKEN = 'generateTfaToken',
+	VERIFY_TFA_TOKEN = 'verifyTfaToken',
+	LOGOUT = 'logout'
+}

@@ -11,7 +11,7 @@ import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
-import { CookieService } from './_client-services/cookie_service';
+import { CookieService } from '../_shared/_services/cookie_service';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -26,7 +26,6 @@ export default async function RootLayout({
 	modal: ReactNode;
 }>) {
 	const user = await CookieService.getUserFromCookie();
-	const refreshTokenPayload = await CookieService.getRefreshTokenFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
 
 	const messages = await getMessages();
@@ -41,7 +40,6 @@ export default async function RootLayout({
 			<body className={poppinsFont.className}>
 				<Initializers
 					userData={user || null}
-					refreshTokenPayload={refreshTokenPayload}
 					userPreferences={userPreferences}
 				/>
 				<Providers

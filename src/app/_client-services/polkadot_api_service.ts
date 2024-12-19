@@ -60,6 +60,7 @@ export class PolkadotApiService {
 		this.api = await ApiPromise.create({
 			provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
 		});
+		await this.api.isReady;
 	}
 
 	async getBlockHeight(): Promise<number> {
@@ -72,7 +73,17 @@ export class PolkadotApiService {
 	}
 
 	async reconnect(): Promise<void> {
-		await this.api.connect();
+		if (this.api.isConnected && (await this.api.isReady)) return;
+
+		try {
+			this.api = await ApiPromise.create({
+				provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
+			});
+
+			await this.api.isReady;
+		} catch {
+			await this.switchToNewRpcEndpoint();
+		}
 	}
 
 	setSigner(signer: Signer) {

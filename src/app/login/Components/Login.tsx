@@ -9,7 +9,8 @@ import { useRouter } from 'next/navigation';
 import { ENetwork, EWallet } from '@/_shared/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { usePolkadotApi } from '@/app/_atoms/polkadotJsApiAtom';
-import { WalletClientService } from '@/app/_client-services/wallet_service';
+import { useUser } from '@/app/_atoms/user/userAtom';
+import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
 import Web2Signup from './Web2Signup/Web2Signup';
 import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
@@ -17,16 +18,19 @@ import classes from './Login.module.scss';
 import HeaderLabel from './HeaderLabel';
 import TwoFactorAuth from './TwoFactorAuth/TwoFactorAuth';
 
-function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
+function Login({ isModal }: { isModal?: boolean }) {
 	const router = useRouter();
 
 	const apiService = usePolkadotApi(ENetwork.POLKADOT);
+	const walletService = useWalletService();
+
+	const [user] = useUser();
 
 	useEffect(() => {
-		if (userId) {
+		if (user) {
 			router.replace('/');
 		}
-	}, [userId, router]);
+	}, [user, router]);
 
 	const [isWeb3Login, setIsWeb3Login] = useState<boolean>(true);
 
@@ -63,7 +67,8 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 	const onAccountChange = (a: InjectedAccount) => setAddress(a);
 
 	const getAccounts = async (chosenWallet: EWallet): Promise<undefined> => {
-		const injectedAccounts = await WalletClientService.getAddressesFromWallet(chosenWallet, apiService || undefined);
+		if (!walletService) return;
+		const injectedAccounts = await walletService?.getAddressesFromWallet(chosenWallet, apiService || undefined);
 
 		if (injectedAccounts.length === 0) {
 			return;
@@ -102,13 +107,8 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 					/>
 				) : isWeb2Signup ? (
 					<Web2Signup
-						accounts={accounts}
-						account={address}
-						onAccountChange={onAccountChange}
 						onWalletChange={onWalletChange}
 						switchToLogin={switchToWeb2Login}
-						switchToSignup={switchToWeb2Signup}
-						getAccounts={getAccounts}
 					/>
 				) : isWeb3Login ? (
 					<Web3Login
@@ -124,12 +124,8 @@ function Login({ userId, isModal }: { userId?: string; isModal?: boolean }) {
 					/>
 				) : (
 					<Web2Login
-						accounts={accounts}
-						account={address}
-						onAccountChange={onAccountChange}
 						onWalletChange={onWalletChange}
 						switchToSignup={switchToWeb2Signup}
-						getAccounts={getAccounts}
 						onTfaEnabled={onTfaEnabled}
 					/>
 				)}

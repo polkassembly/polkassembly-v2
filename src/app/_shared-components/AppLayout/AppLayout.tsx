@@ -10,7 +10,7 @@ import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div className='relative flex flex-1'>
+		<main className='relative flex flex-1'>
 			<AppSidebar />
 
 			<CustomSidebarTrigger />
@@ -19,6 +19,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 				<Navbar />
 				<main className='flex flex-1 flex-col p-4'>{children}</main>
 			</SidebarInset>
-		</div>
+		</main>
 	);
 }

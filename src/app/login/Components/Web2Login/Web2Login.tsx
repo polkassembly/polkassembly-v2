@@ -7,7 +7,6 @@
 import { ECookieNames, EWallet } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
-import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { Input } from '@ui/Input';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -17,10 +16,8 @@ import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
-import { getCookie } from 'cookies-next/client';
-import { isApiError } from '@/app/_client-utils/isApiError';
 import ErrorMessage from '@ui/ErrorMessage';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -30,20 +27,12 @@ interface IFormFields {
 }
 
 function Web2Login({
-	account,
-	accounts,
 	switchToSignup,
 	onWalletChange,
-	onAccountChange,
-	getAccounts,
 	onTfaEnabled
 }: {
-	account: InjectedAccount | null;
-	accounts: InjectedAccount[];
 	switchToSignup: () => void;
 	onWalletChange: (wallet: EWallet | null) => void;
-	onAccountChange: (a: InjectedAccount) => void;
-	getAccounts: (wallet: EWallet) => void;
 	onTfaEnabled: (token: string) => void;
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
@@ -54,7 +43,7 @@ function Web2Login({
 
 	const form = useForm<IFormFields>();
 
-	const [error, setError] = useState<string>('');
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const handleLogin = async (values: IFormFields) => {
 		const { emailOrUsername, password } = values;
@@ -62,44 +51,40 @@ function Web2Login({
 		if (emailOrUsername && password) {
 			setLoading(true);
 
-			const data = await NextApiClientService.web2Login({
+			const { data, error } = await AuthClientService.web2Login({
 				emailOrUsername,
 				password
 			});
 
-			if (!data) {
-				console.log('Login failed. Please try again later.');
+			if (error) {
+				setErrorMessage(error.message || '');
 				setLoading(false);
 				return;
 			}
 
-			if (data.status && isApiError(data.status)) {
-				setError(data.message || '');
-				setLoading(false);
-				return;
+			if (data) {
+				if (data.isTFAEnabled && data.tfaToken) {
+					onTfaEnabled(data.tfaToken);
+					setLoading(false);
+					return;
+				}
+
+				const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+
+				if (!accessToken) {
+					setErrorMessage('No Access token found.');
+					setLoading(false);
+					return;
+				}
+
+				const decodedData = CookieClientService.decodeAccessToken(accessToken);
+
+				if (decodedData) {
+					setErrorMessage('');
+					setUserAtom(decodedData);
+				}
+				router.back();
 			}
-
-			if (data.isTFAEnabled && data.tfaToken) {
-				onTfaEnabled(data.tfaToken);
-				setLoading(false);
-				return;
-			}
-
-			const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
-
-			if (!accessToken) {
-				setError('No Access token found.');
-				setLoading(false);
-				return;
-			}
-
-			const decodedData = AuthClientService.decodeAccessToken(accessToken);
-
-			if (decodedData) {
-				setError('');
-				setUserAtom(decodedData);
-			}
-			router.back();
 			setLoading(false);
 		}
 	};
@@ -170,16 +155,11 @@ function Web2Login({
 					</form>
 				</Form>
 			</div>
-			{error && <ErrorMessage errorMessage={error} />}
+			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 			<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
 			<WalletButtons
 				small
-				accounts={accounts}
-				selectedAddress={account?.address || ''}
-				onAddressChange={onAccountChange}
 				onWalletChange={onWalletChange}
-				switchToSignup={switchToSignup}
-				getAccounts={getAccounts}
 			/>
 			<SwitchToWeb2Signup
 				className='mt-4 justify-center'

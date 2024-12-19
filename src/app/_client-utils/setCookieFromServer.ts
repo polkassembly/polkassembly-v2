@@ -5,9 +5,8 @@
 'use server';
 
 import { ECookieNames } from '@/_shared/types';
-import { cookies } from 'next/headers';
+import { CookieService } from '../../_shared/_services/cookie_service';
 
 export const setCookieValueByName = async (cookieName: ECookieNames, value: string) => {
-	const cookieStore = await cookies();
-	cookieStore.set(cookieName, value);
+	await CookieService.setCookieValueByName(cookieName, value);
 };

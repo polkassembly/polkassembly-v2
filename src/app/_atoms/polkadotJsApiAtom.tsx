@@ -40,7 +40,8 @@ export const usePolkadotApi = (network: ENetwork) => {
 				api.disconnect().then(() => setApi(null));
 			}
 		};
-	}, [api, network, setApi]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [api, network]);
 
 	return api;
 };

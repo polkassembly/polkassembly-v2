@@ -7,9 +7,10 @@ import { cookies } from 'next/headers';
 import { DEFAULT_THEME } from '@/_shared/_constants/defaultTheme';
 import { DEFAULT_LOCALE } from '@/_shared/_constants/defaultLocale';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { AuthClientService } from './auth_service';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 
 export class CookieService {
+	// getters
 	static async getCookieValueByName(cookieName: ECookieNames) {
 		const cookieStore = await cookies();
 		return cookieStore.get(cookieName);
@@ -19,14 +20,14 @@ export class CookieService {
 		const accessToken = await this.getCookieValueByName(ECookieNames.ACCESS_TOKEN);
 		if (!accessToken || !accessToken.value) return null;
 
-		return AuthClientService.decodeAccessToken(accessToken.value);
+		return CookieClientService.decodeAccessToken(accessToken.value);
 	}
 
 	static async getRefreshTokenFromCookie() {
 		const refreshToken = await this.getCookieValueByName(ECookieNames.REFRESH_TOKEN);
 		if (!refreshToken || !refreshToken.value) return null;
 
-		return AuthClientService.decodeRefreshToken(refreshToken.value);
+		return CookieClientService.decodeRefreshToken(refreshToken.value);
 	}
 
 	static async getUserPreferencesFromCookie() {
@@ -45,5 +46,11 @@ export class CookieService {
 		}
 
 		return { theme, locale };
+	}
+
+	// setters (use in util functions with 'use server')
+	static async setCookieValueByName(cookieName: ECookieNames, value: string) {
+		const cookieStore = await cookies();
+		cookieStore.set(cookieName, value);
 	}
 }

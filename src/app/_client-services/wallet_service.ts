@@ -12,9 +12,18 @@ import { stringToHex } from '@polkadot/util';
 import { PolkadotApiService } from './polkadot_api_service';
 
 export class WalletClientService {
-	static async getAddressesFromWallet(selectedWallet: EWallet, apiService?: PolkadotApiService): Promise<InjectedAccount[]> {
-		const injectedWindow = window as Window & InjectedWindow;
-		const wallet = isWeb3Injected ? injectedWindow.injectedWeb3[selectedWallet] : null;
+	private injectedWindow: Window & InjectedWindow;
+
+	private constructor(injectedWindow: Window & InjectedWindow) {
+		this.injectedWindow = injectedWindow;
+	}
+
+	static async Init(injectedWindow: Window & InjectedWindow) {
+		return new WalletClientService(injectedWindow);
+	}
+
+	async getAddressesFromWallet(selectedWallet: EWallet, apiService?: PolkadotApiService): Promise<InjectedAccount[]> {
+		const wallet = isWeb3Injected ? this.injectedWindow.injectedWeb3[selectedWallet] : null;
 		if (!wallet) {
 			return [];
 		}
@@ -52,17 +61,15 @@ export class WalletClientService {
 		}
 	}
 
-	static getAvailableWallets() {
+	getInjectedWallets() {
 		if (document.readyState === 'complete') {
-			const injectedWindow = window as Window & InjectedWindow;
-			return injectedWindow.injectedWeb3 || {};
+			return this.injectedWindow.injectedWeb3 || {};
 		}
 		return {};
 	}
 
-	static async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
-		const injectedWindow = window as Window & InjectedWindow;
-		const wallet = isWeb3Injected ? injectedWindow.injectedWeb3[selectedWallet] : null;
+	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
+		const wallet = isWeb3Injected ? this.injectedWindow.injectedWeb3[selectedWallet] : null;
 
 		if (!wallet) {
 			return null;

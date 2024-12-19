@@ -6,49 +6,46 @@
 
 import { ECookieNames, ENetwork, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
-import { getCookie } from 'cookies-next/client';
-import { decodeToken } from 'react-jwt';
 import { useSetAtom } from 'jotai';
 import { useUser } from '../_atoms/user/userAtom';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_service';
-import { NextApiClientService } from '../_client-services/next_api_client_service';
+import { ClientError } from '../_client-utils/clientError';
+import { CookieClientService } from '../_client-services/cookie_client_service';
 
-function Initializers({
-	userData,
-	refreshTokenPayload,
-	userPreferences
-}: {
-	userData: IAccessTokenPayload | null;
-	refreshTokenPayload: IRefreshTokenPayload | null;
-	userPreferences: IUserPreferences;
-}) {
+function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const [user, setUser] = useUser();
 
 	const api = usePolkadotApi(ENetwork.POLKADOT);
 
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
+	const oldRefreshtoken = CookieClientService.getCookieInClient(ECookieNames.REFRESH_TOKEN);
+	const refreshTokenPayload = CookieClientService.decodeRefreshToken(oldRefreshtoken || '');
+
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(refreshTokenPayload);
 
 	const refreshAccessToken = async () => {
-		const data = await NextApiClientService.refreshAccessToken();
+		const { data, error } = await AuthClientService.refreshAccessToken();
 
-		if (data?.message) {
-			const newAccessToken = getCookie(ECookieNames.ACCESS_TOKEN);
-			const newRefreshToken = getCookie(ECookieNames.REFRESH_TOKEN);
+		if (error && !data) {
+			console.log('error in refreshAccesstoken', error);
+			throw new ClientError(error.message);
+		}
 
-			if (newAccessToken && newRefreshToken) {
-				const newUserPayload = decodeToken<IAccessTokenPayload>(newAccessToken);
-				const newRefreshTokenPayload = decodeToken<IRefreshTokenPayload>(newRefreshToken);
+		const newAccessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+		const newRefreshToken = CookieClientService.getCookieInClient(ECookieNames.REFRESH_TOKEN);
 
-				if (newUserPayload) {
-					setUser(newUserPayload);
-				}
-				if (newRefreshTokenPayload) {
-					setRefreshTokenData(newRefreshTokenPayload);
-				}
+		if (newAccessToken && newRefreshToken) {
+			const newUserPayload = CookieClientService.decodeAccessToken(newAccessToken);
+			const newRefreshTokenPayload = CookieClientService.decodeRefreshToken(newRefreshToken);
+
+			if (newUserPayload) {
+				setUser(newUserPayload);
+			}
+			if (newRefreshTokenPayload) {
+				setRefreshTokenData(newRefreshTokenPayload);
 			}
 		}
 	};

@@ -4,15 +4,12 @@
 import React from 'react';
 import LoginComponent from './Components/Login';
 import classes from './Components/Login.module.scss';
-import { CookieService } from '../_client-services/cookie_service';
 
 async function Login() {
-	const user = await CookieService.getUserFromCookie();
-
 	return (
 		<div className={classes.rootClass}>
 			<div className={classes.loginComp}>
-				<LoginComponent userId={user?.id?.toString()} />
+				<LoginComponent />
 			</div>
 		</div>
 	);

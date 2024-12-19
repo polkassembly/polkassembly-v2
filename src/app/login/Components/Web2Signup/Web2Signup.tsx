@@ -13,12 +13,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
-import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { getCookie } from 'cookies-next/client';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { isApiError } from '@/app/_client-utils/isApiError';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
@@ -29,23 +26,7 @@ interface IFormFields {
 	finalPassword: string;
 }
 
-function Web2Signup({
-	switchToLogin,
-	account,
-	accounts,
-	onWalletChange,
-	onAccountChange,
-	getAccounts,
-	switchToSignup
-}: {
-	switchToLogin: () => void;
-	switchToSignup: () => void;
-	account: InjectedAccount | null;
-	accounts: InjectedAccount[];
-	onWalletChange: (wallet: EWallet | null) => void;
-	onAccountChange: (a: InjectedAccount) => void;
-	getAccounts: (wallet: EWallet) => void;
-}) {
+function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => void; onWalletChange: (wallet: EWallet | null) => void }) {
 	const [step, setStep] = useState<ESignupSteps>(ESignupSteps.USERNAME);
 
 	const setUserAtom = useSetAtom(userAtom);
@@ -54,7 +35,7 @@ function Web2Signup({
 
 	const [loading, setLoading] = useState<boolean>(false);
 
-	const [error, setError] = useState<string>('');
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const formData = useForm<IFormFields>();
 
@@ -62,18 +43,18 @@ function Web2Signup({
 		const { email, password, username, finalPassword } = values;
 
 		if (step === ESignupSteps.USERNAME && email && username) {
-			const data = await NextApiClientService.checkForUsernameAndEmail({
+			const { data, error } = await AuthClientService.checkForUsernameAndEmail({
 				username,
 				email
 			});
 
-			if (data.status && isApiError(data.status)) {
-				setError(data.message);
+			if (error) {
+				setErrorMessage(error.message);
 				return;
 			}
 
-			if (!data.usernameExists && !data.emailExists) {
-				setError('');
+			if (data && !data.usernameExists && !data.emailExists) {
+				setErrorMessage('');
 				setStep(ESignupSteps.PASSWORD);
 				return;
 			}
@@ -83,40 +64,36 @@ function Web2Signup({
 		if (email && username && password && password === finalPassword) {
 			setLoading(true);
 
-			const data = await NextApiClientService.web2Signup({
+			const { data, error } = await AuthClientService.web2Signup({
 				email,
 				username,
 				password: finalPassword
 			});
 
-			if (!data) {
-				setError('Login failed. Please try again later.');
+			if (error) {
+				setErrorMessage(error.message || '');
 				setLoading(false);
 				return;
 			}
 
-			if (data.status && isApiError(data.status)) {
-				setError(data.message || '');
-				setLoading(false);
-				return;
+			if (data) {
+				const accessToken = CookieClientService.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+
+				if (!accessToken) {
+					setErrorMessage('No Access token found.');
+					setLoading(false);
+					return;
+				}
+
+				const decodedData = CookieClientService.decodeAccessToken(accessToken);
+
+				if (decodedData) {
+					setUserAtom(decodedData);
+					setErrorMessage('');
+				}
+
+				router.back();
 			}
-
-			const accessToken = getCookie(ECookieNames.ACCESS_TOKEN);
-
-			if (!accessToken) {
-				setError('No Access token found.');
-				setLoading(false);
-				return;
-			}
-
-			const decodedData = AuthClientService.decodeAccessToken(accessToken);
-
-			if (decodedData) {
-				setUserAtom(decodedData);
-				setError('');
-			}
-
-			router.back();
 			setLoading(false);
 		}
 	};
@@ -250,16 +227,11 @@ function Web2Signup({
 						</div>
 					</div>
 				)}
-				{error && <ErrorMessage errorMessage={error} />}
+				{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 				<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
 				<WalletButtons
 					small
-					accounts={accounts}
-					selectedAddress={account?.address || ''}
-					onAddressChange={onAccountChange}
 					onWalletChange={onWalletChange}
-					switchToSignup={switchToSignup}
-					getAccounts={getAccounts}
 				/>
 				<p className={classes.switchToLogin}>
 					Already have an Account?
