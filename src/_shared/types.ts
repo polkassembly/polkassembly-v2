@@ -2,6 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { StatusCodes } from 'http-status-codes';
+
 export enum ENetwork {
 	ROCOCO = 'rococo',
 	POLKADOT = 'polkadot'
@@ -130,16 +133,16 @@ export interface IAuthResponse {
 }
 
 export enum EWallet {
-	TALISMAN = 'talisman',
 	POLKADOT = 'polkadot-js',
-	POLKAGATE = 'polkagate',
 	SUBWALLET = 'subwallet-js',
-	METAMASK = 'metamask',
-	WALLETCONNECT = 'walletconnect',
-	NOVAWALLET = 'polkadot-js',
-	POLYWALLET = 'polywallet',
-	POLKASAFE = 'polkasafe',
-	OTHER = 'other'
+	TALISMAN = 'talisman',
+	POLKAGATE = 'polkagate',
+	NOVAWALLET = 'nova',
+	OTHER = ''
+	// METAMASK = 'metamask',
+	// WALLETCONNECT = 'walletconnect',
+	// POLYWALLET = 'polywallet',
+	// POLKASAFE = 'polkasafe',
 }
 
 export interface IRefreshTokenPayload {
@@ -217,9 +220,28 @@ export enum EProposalType {
 	GRANT = 'Grant'
 }
 
-export enum EAuthCookieNames {
+export enum ETheme {
+	LIGHT = 'light',
+	DARK = 'dark'
+}
+
+export enum ELocales {
+	SPANISH = 'es',
+	ENGLISH = 'en'
+}
+
+export enum ECookieNames {
 	ACCESS_TOKEN = 'access_token',
-	REFRESH_TOKEN = 'refresh_token'
+	REFRESH_TOKEN = 'refresh_token',
+	THEME = 'theme',
+	LOCALE = 'locale'
+}
+
+export interface IUserPreferences {
+	theme: ETheme;
+	locale: ELocales;
+	wallet?: EWallet;
+	address?: InjectedAccount;
 }
 
 export enum ENotificationTrigger {
@@ -314,6 +336,15 @@ export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 }
 
+export enum ESignupSteps {
+	USERNAME = 'Create Username',
+	PASSWORD = 'Set Password'
+}
+
+export interface IGenerateTFAResponse extends Omit<IUserTFADetails, 'url' | 'enabled' | 'verified'> {
+	otpauthUrl: string;
+}
+
 export type TRPCEndpoint = {
 	key: string;
 	label: string;
@@ -358,4 +389,28 @@ export enum EPostOrigin {
 	WHITELISTED_CALLER = 'WhitelistedCaller',
 	WISH_FOR_CHANGE = 'WishForChange',
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
+}
+
+export interface IErrorResponse {
+	status: StatusCodes;
+	message: string;
+	name: string;
+}
+
+export enum EApiRoute {
+	WEB2_LOGIN = 'WEB2_LOGIN',
+	WEB2_SIGNUP = 'WEB2_SIGNUP',
+	WEB3_LOGIN = 'WEB3_LOGIN',
+	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
+	USER_EXISTS = 'USER_EXISTS',
+	TFA_LOGIN = 'TFA_LOGIN',
+	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
+	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
+	LOGOUT = 'LOGOUT'
+}
+
+export enum EWeb3LoginScreens {
+	SELECT_WALLET,
+	FETCH_CONFIRMATION,
+	SELECT_ADDRESS
 }

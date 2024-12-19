@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Button } from '@/app/_shared-components/Button/Button';
+import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import LeftIcon from '@assets/sidebar/lefticon.svg';
@@ -255,7 +255,6 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 		<Button
 			ref={ref}
 			data-sidebar='trigger'
-			variant='normal'
 			size='icon'
 			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2', className)}
 			type='button'

@@ -5,15 +5,30 @@
 'use client';
 
 import React from 'react';
-import style from './Navbar.module.scss';
+import Link from 'next/link';
+import { Button } from '@ui/Button';
+import { useUser } from '@/app/_atoms/user/userAtom';
+import { AuthClientService } from '@/app/_client-services/auth_service';
+import classes from './Navbar.module.scss';
 
 function Navbar() {
+	const [user, setUser] = useUser();
 	return (
-		<header className={style.navbar}>
-			<div>
-				<p className={style.navbar_title}>OpenGov</p>
-			</div>
-		</header>
+		<nav className={classes.navbar}>
+			<p>Polkassembly</p>
+			{user?.id ? (
+				<div className='flex items-center gap-x-4'>
+					<Link href='/settings'>
+						<Button variant='secondary'>Settings</Button>
+					</Link>
+					<Button onClick={() => AuthClientService.logout(() => setUser(null))}>Logout</Button>
+				</div>
+			) : (
+				<Link href='/login'>
+					<Button>Login</Button>
+				</Link>
+			)}
+		</nav>
 	);
 }
 

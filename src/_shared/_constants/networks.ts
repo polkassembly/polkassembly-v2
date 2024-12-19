@@ -10,7 +10,7 @@ export const NETWORKS_DETAILS = {
 		name: 'Polkadot',
 		govtype: EGovType.OPENGOV,
 		blockTime: 6000,
-		chainId: 0,
+		chainId: 'polkadot:91b171bb158e2d3848fa23a9f1c25182',
 		rpcEndpoint: 'wss://polkadot.api.onfinality.io/public-ws',
 		ss58Format: 0,
 		maxDeciding: 1,

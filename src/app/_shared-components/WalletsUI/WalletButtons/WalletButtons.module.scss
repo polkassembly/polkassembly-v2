@@ -1,0 +1,43 @@
+.header {
+    @apply text-center text-sm font-normal text-wallet_btn_text
+}
+
+.addressHeader {
+    @apply mb-4 flex items-center gap-x-2
+}
+
+.walletName {
+    @apply text-lg sm:text-xl font-medium text-text_primary
+}
+
+.dropdownTrigger {
+    @apply flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2
+}
+
+.dropdownTriggerText {
+    @apply text-sm text-text_primary text-opacity-60
+}
+
+.dropdownOption {
+    @apply flex w-full items-center gap-x-2
+}
+
+.dropdownOptionText {
+    @apply text-sm text-text_primary text-opacity-60
+}
+
+.buttonsAlignmentSmall {
+    @apply flex items-center justify-center gap-x-4
+}
+
+.buttonsAlignment {
+    @apply flex flex-col gap-y-4 sm:px-8
+}
+
+.footer {
+    @apply flex justify-end items-center gap-x-4 border-t border-border_grey pt-4
+}
+
+.confirmationText {
+    @apply border-b border-dashed border-border_grey pb-6 pt-3 text-xs sm:text-base text-text_primary
+}

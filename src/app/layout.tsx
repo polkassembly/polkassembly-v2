@@ -5,26 +5,51 @@
 import '@app/_style/globals.scss';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { getLocale, getMessages } from 'next-intl/server';
 import { Providers } from './_shared-components/Providers';
 import { poppinsFont } from './_style/fonts';
+import NotificationsContainer from './_shared-components/NotificationsContainer';
+import Initializers from './Initializers';
+import AppLayout from './_shared-components/AppLayout/AppLayout';
+import { CookieService } from '../_shared/_services/cookie_service';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
 	description: 'Polkassembly but so much better'
 };
 
-export default function RootLayout({
-	children
+export default async function RootLayout({
+	children,
+	modal
 }: Readonly<{
 	children: ReactNode;
+	modal: ReactNode;
 }>) {
+	const user = await CookieService.getUserFromCookie();
+	const userPreferences = await CookieService.getUserPreferencesFromCookie();
+
+	const messages = await getMessages();
+	const locale = await getLocale();
+
 	return (
 		<html
-			lang='en'
-			className='dark'
+			lang={userPreferences.locale}
+			className={userPreferences.theme}
+			suppressHydrationWarning
 		>
-			<body className={`${poppinsFont.className} flex min-h-screen flex-col`}>
-				<Providers>{children}</Providers>
+			<body className={poppinsFont.className}>
+				<Initializers
+					userData={user || null}
+					userPreferences={userPreferences}
+				/>
+				<Providers
+					messages={messages}
+					locale={locale}
+				>
+					{modal}
+					<AppLayout>{children}</AppLayout>
+					<NotificationsContainer />
+				</Providers>
 			</body>
 		</html>
 	);

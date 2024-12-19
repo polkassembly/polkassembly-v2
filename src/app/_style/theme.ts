@@ -4,7 +4,10 @@
 
 export const THEME_COLORS = {
 	light: {
+		wallet_btn_text: '#485F7D',
+		bg_modal: '#FFF',
 		navbar_border: '#E5007A',
+		bg_pink: '#E5007A',
 		btn_primary_background: '#E5007A',
 		primary_border: '#D2D8E0',
 		tooltip_background: '#363636',
@@ -15,6 +18,12 @@ export const THEME_COLORS = {
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
 		border_grey: '#D2D8E0',
+		text_primary: '#243A57',
+		text_pink: '#E5007A',
+		placeholder: '#576D8BCC',
+		success: '#2ED47A',
+		failure: '#FF3C5F',
+		text_grey: '#7587A0',
 		sidebar_head1: '#F3F9D7',
 		sidebar_head2: '#fdf8e1',
 		sidebar_head3: '#ffede5',
@@ -26,7 +35,10 @@ export const THEME_COLORS = {
 		create_proposal_btn_create: '#0A3EAF'
 	},
 	dark: {
+		wallet_btn_text: '#485F7D',
+		bg_modal: '#000',
 		navbar_border: '#E5007A',
+		bg_pink: '#E5007A',
 		btn_primary_background: '#E5007A',
 		primary_border: '#3F3F46',
 		tooltip_background: '#363636',
@@ -37,6 +49,12 @@ export const THEME_COLORS = {
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
 		border_grey: '#D2D8E0',
+		text_primary: '#FFF',
+		text_pink: '#E5007A',
+		placeholder: '#576D8BCC',
+		success: '#2ED47A',
+		failure: '#FF3C5F',
+		text_grey: '#7587A0',
 		create_proposal_btn_create: '#49CFFC'
 	}
 };

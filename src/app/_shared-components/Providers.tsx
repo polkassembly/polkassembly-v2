@@ -5,33 +5,28 @@
 'use client';
 
 import { ThemeProvider } from 'next-themes';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
+import { ETheme } from '@/_shared/types';
+import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { SidebarProvider } from './Sidebar/Sidebar';
-import Dashboard from './AppLayout/Dashboard/page';
-import NotificationsContainer from './NotificationsContainer';
+import { useUserPreferences } from '../_atoms/user/userPreferencesAtom';
 
-export function Providers({ children }: { children: ReactNode }) {
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	if (!mounted) {
-		return <main>{children}</main>;
-	}
+export function Providers({ children, messages, locale }: { children: ReactNode; messages: AbstractIntlMessages; locale: string }) {
+	const [userPreferences] = useUserPreferences();
 
 	return (
-		<ThemeProvider
-			attribute='class'
-			defaultTheme='light'
-			themes={['light', 'dark']}
-			enableSystem={false}
+		<NextIntlClientProvider
+			messages={messages}
+			locale={locale}
 		>
-			<SidebarProvider>
-				<Dashboard>{children}</Dashboard>
-				<NotificationsContainer />
-			</SidebarProvider>
-		</ThemeProvider>
+			<ThemeProvider
+				attribute='class'
+				defaultTheme={userPreferences.theme}
+				themes={[ETheme.LIGHT, ETheme.DARK]}
+				enableSystem={false}
+			>
+				<SidebarProvider>{children}</SidebarProvider>
+			</ThemeProvider>
+		</NextIntlClientProvider>
 	);
 }
