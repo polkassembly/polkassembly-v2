@@ -133,7 +133,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 								className={styles.popoverContent}
 							>
 								<div className='p-4'>
-									<h3 className='text-filter_dropdown text-sm font-semibold'>STATUS</h3>
+									<h3 className='text-sm font-semibold text-filter_dropdown'>STATUS</h3>
 									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
 										{statuses.map((status, index) => (
 											<span
@@ -147,12 +147,12 @@ function ListingPage({ proposalType }: ListingPageProps) {
 													checked={selectedStatuses.includes(status)}
 													onChange={() => toggleStatus(status)}
 												/>
-												<span className='text-filter_dropdown text-sm'>{status}</span>
+												<span className='text-sm text-filter_dropdown'>{status}</span>
 											</span>
 										))}
 									</div>
 
-									<h3 className='text-filter_dropdown mt-4 text-sm font-semibold'>Tags</h3>
+									<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>Tags</h3>
 									<div className='relative mt-2'>
 										<input
 											type='text'
@@ -161,7 +161,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 											onChange={(e) => setTagSearchTerm(e.target.value)}
 											className={styles.searchbar}
 										/>
-										<MdSearch className='text-filter_dropdown absolute right-3 top-1/2 -translate-y-1/2 transform' />
+										<MdSearch className='absolute right-3 top-1/2 -translate-y-1/2 transform text-filter_dropdown' />
 									</div>
 
 									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
@@ -177,7 +177,7 @@ function ListingPage({ proposalType }: ListingPageProps) {
 													checked={selectedTags.includes(tag)}
 													onChange={() => toggleTag(tag)}
 												/>
-												<span className='text-filter_dropdown flex items-center gap-1 text-sm'>
+												<span className='flex items-center gap-1 text-sm text-filter_dropdown'>
 													<IoMdTrendingUp /> {tag}
 												</span>
 											</span>
