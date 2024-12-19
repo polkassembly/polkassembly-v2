@@ -5,17 +5,27 @@ import React from 'react';
 import { EWallet } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
+import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
 import classes from './WalletButton.module.scss';
 
 function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWallet; onClick: (wallet: EWallet) => void; disabled?: boolean; label: string; small?: boolean }) {
 	const walletName = wallet === EWallet.NOVAWALLET ? EWallet.POLKADOT : wallet;
+	const [userPreferences, setUserPreferences] = useUserPreferences();
+
+	const onWalletSelect = (selectedWallet: EWallet) => {
+		setUserPreferences({
+			...userPreferences,
+			wallet: selectedWallet
+		});
+		onClick(selectedWallet);
+	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	if (wallet === EWallet.NOVAWALLET && !(window as any).walletExtension?.isNovaWallet) return null;
 
 	return small ? (
 		<Button
-			onClick={() => onClick(walletName)}
+			onClick={() => onWalletSelect(walletName)}
 			size='icon'
 			disabled={disabled}
 			variant='outline'
@@ -24,7 +34,7 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 		</Button>
 	) : (
 		<Button
-			onClick={() => onClick(walletName)}
+			onClick={() => onWalletSelect(walletName)}
 			variant='outline'
 			className={classes.walletButton}
 			leftIcon={<WalletIcon wallet={wallet} />}

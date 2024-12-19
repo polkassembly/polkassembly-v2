@@ -2,28 +2,44 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EWallet } from '@/_shared/types';
+import { ENetwork, EWallet } from '@/_shared/types';
 import { Injected, InjectedAccount, InjectedWindow } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/types/types';
-import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
+import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { PolkadotApiService } from './polkadot_api_service';
 
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
 
-	private constructor(injectedWindow: Window & InjectedWindow) {
+	private apiService: PolkadotApiService;
+
+	private readonly network: ENetwork;
+
+	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork) {
+		this.network = network;
 		this.injectedWindow = injectedWindow;
+		this.apiService = apiService;
 	}
 
-	static async Init(injectedWindow: Window & InjectedWindow) {
-		return new WalletClientService(injectedWindow);
+	static async Init(network: ENetwork) {
+		const returnWalletService = async () => {
+			const injectedWindow = window as Window & InjectedWindow;
+			const apiService = await PolkadotApiService.Init(network);
+			return new WalletClientService(injectedWindow, apiService, network);
+		};
+
+		if (document.readyState !== 'loading') {
+			return returnWalletService();
+		}
+		document.addEventListener('DOMContentLoaded', () => returnWalletService());
+		return null;
 	}
 
-	async getAddressesFromWallet(selectedWallet: EWallet, apiService?: PolkadotApiService): Promise<InjectedAccount[]> {
-		const wallet = isWeb3Injected ? this.injectedWindow.injectedWeb3[selectedWallet] : null;
+	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
+		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[selectedWallet] : null;
 		if (!wallet) {
 			return [];
 		}
@@ -51,8 +67,8 @@ export class WalletClientService {
 				return [];
 			}
 
-			if (apiService) {
-				apiService.setSigner(injected.signer as Signer);
+			if (this.apiService) {
+				this.apiService.setSigner(injected.signer as Signer);
 			}
 			return await injected.accounts.get();
 		} catch (err) {

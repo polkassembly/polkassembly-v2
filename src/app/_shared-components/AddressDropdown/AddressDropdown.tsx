@@ -1,43 +1,71 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
-import { EWallet } from '@/_shared/types';
+
+'use client';
+
 import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import Identicon from '@polkadot/react-identicon';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
-import { WalletIcon } from '../WalletsUI/WalletsIcon';
+import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
+import { EWallet } from '@/_shared/types';
+import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
+import { useEffect, useState } from 'react';
 import classes from './AddressDropdown.module.scss';
+import { WalletIcon } from '../WalletsUI/WalletsIcon';
 
-function AddressDropdown({
-	selectedWallet,
-	selectedAddress,
-	accounts,
-	onAddressChange
-}: {
-	selectedWallet: EWallet;
-	selectedAddress: string;
-	accounts: InjectedAccount[];
-	onAddressChange: (address: InjectedAccount) => void;
-}) {
+function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) => void }) {
+	const [userPreferences, setUserPreferences] = useUserPreferences();
+
+	const walletService = useWalletService();
+
+	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
+
+	const getAccounts = async (chosenWallet: EWallet): Promise<undefined> => {
+		if (!walletService) return;
+		const injectedAccounts = await walletService?.getAddressesFromWallet(chosenWallet);
+
+		if (injectedAccounts.length === 0) {
+			return;
+		}
+
+		setAccounts(injectedAccounts);
+		setUserPreferences({
+			...userPreferences,
+			address: injectedAccounts[0]
+		});
+	};
+
+	useEffect(() => {
+		if (userPreferences?.wallet) getAccounts(userPreferences.wallet);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userPreferences?.wallet]);
+
+	const onAccountChange = (a: InjectedAccount) => {
+		setUserPreferences({ ...userPreferences, address: a });
+		onChange?.(a);
+	};
+
+	if (!userPreferences.wallet || !accounts) return null;
+
 	return (
 		<div>
 			<p className={classes.addressHeader}>
-				<WalletIcon wallet={selectedWallet} />
-				<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(selectedWallet)}</span>
+				<WalletIcon wallet={userPreferences.wallet} />
+				<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(userPreferences.wallet)}</span>
 			</p>
 			<DropdownMenu>
 				<div>
 					<p className='mb-1 text-sm text-wallet_btn_text'>Choose Linked Account</p>
 					<DropdownMenuTrigger className={classes.dropdownTrigger}>
 						<Identicon
-							value={selectedAddress}
+							value={userPreferences?.address?.address}
 							theme='polkadot'
 							size={25}
 						/>
-						<p className={classes.dropdownTriggerText}>{shortenAddress(selectedAddress)}</p>
+						<p className={classes.dropdownTriggerText}>{shortenAddress(userPreferences?.address?.address || '')}</p>
 					</DropdownMenuTrigger>
 				</div>
 				<DropdownMenuContent className='border-0'>
@@ -46,7 +74,7 @@ function AddressDropdown({
 							<button
 								key={`${item.address}`}
 								type='button'
-								onClick={() => onAddressChange(item)}
+								onClick={() => onAccountChange(item)}
 								className={classes.dropdownOption}
 							>
 								<Identicon

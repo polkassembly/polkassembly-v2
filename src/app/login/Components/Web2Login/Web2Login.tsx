@@ -77,7 +77,7 @@ function Web2Login({
 					return;
 				}
 
-				const decodedData = CookieClientService.decodeAccessToken(accessToken);
+				const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 				if (decodedData) {
 					setErrorMessage('');

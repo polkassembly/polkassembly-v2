@@ -9,7 +9,7 @@ import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse
 import { StatusCodes } from 'http-status-codes';
 
 export class NextApiClientService {
-	private static baseURL = `${window.location.origin}/api/v2`;
+	private static baseURL = typeof window !== 'undefined' ? `${window.location.origin}/api/v2` : '';
 
 	private static getApiRoute: Record<EApiRoute, (data?: Record<string, unknown>) => URL> = {
 		[EApiRoute.WEB2_LOGIN]: () => new URL(`${this.baseURL}/auth/actions/web2Login`),

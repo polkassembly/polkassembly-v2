@@ -59,7 +59,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 				return;
 			}
 
-			const decodedData = CookieClientService.decodeAccessToken(accessToken);
+			const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 			if (decodedData) {
 				setUserAtom(decodedData);

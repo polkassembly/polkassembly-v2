@@ -5,7 +5,7 @@
 import { atom, useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
-import { InjectedWindow } from '@polkadot/extension-inject/types';
+import { ENetwork } from '@/_shared/types';
 
 const walletAtom = atom<WalletClientService | null>(null);
 
@@ -13,22 +13,16 @@ export const useWalletService = () => {
 	const [walletService, setWalletService] = useAtom(walletAtom);
 
 	useEffect(() => {
+		// Todo: reload(notification) if service is null;
+
 		const initWalletService = async () => {
-			const injectedWindow = window as Window & InjectedWindow;
-			const service = await WalletClientService.Init(injectedWindow);
+			const service = await WalletClientService.Init(ENetwork.POLKADOT);
 			setWalletService(service);
 		};
 
-		if (document.readyState !== 'loading') {
-			initWalletService();
-		} else {
-			document.addEventListener('DOMContentLoaded', initWalletService);
-		}
-
-		return () => {
-			document.removeEventListener('DOMContentLoaded', initWalletService);
-		};
-	}, [setWalletService]);
+		initWalletService();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return walletService;
 };

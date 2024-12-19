@@ -6,11 +6,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ENetwork, EWallet } from '@/_shared/types';
-import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { usePolkadotApi } from '@/app/_atoms/polkadotJsApiAtom';
 import { useUser } from '@/app/_atoms/user/userAtom';
-import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
+import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
 import Web2Signup from './Web2Signup/Web2Signup';
 import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
@@ -20,9 +17,6 @@ import TwoFactorAuth from './TwoFactorAuth/TwoFactorAuth';
 
 function Login({ isModal }: { isModal?: boolean }) {
 	const router = useRouter();
-
-	const apiService = usePolkadotApi(ENetwork.POLKADOT);
-	const walletService = useWalletService();
 
 	const [user] = useUser();
 
@@ -36,13 +30,10 @@ function Login({ isModal }: { isModal?: boolean }) {
 
 	const [isWeb2Signup, setIsWeb2Signup] = useState<boolean>(false);
 
-	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
-	const [address, setAddress] = useState<InjectedAccount | null>(null);
-
-	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(null);
-
 	const [isTFAEnabled, setIsTFAEnabled] = useState<boolean>(false);
 	const [tfaToken, setTfaToken] = useState<string>('');
+
+	const [userPreferences] = useUserPreferences();
 
 	const switchToWeb2Login = () => {
 		setIsWeb3Login(false);
@@ -64,29 +55,6 @@ function Login({ isModal }: { isModal?: boolean }) {
 		setTfaToken(token);
 	};
 
-	const onAccountChange = (a: InjectedAccount) => setAddress(a);
-
-	const getAccounts = async (chosenWallet: EWallet): Promise<undefined> => {
-		if (!walletService) return;
-		const injectedAccounts = await walletService?.getAddressesFromWallet(chosenWallet, apiService || undefined);
-
-		if (injectedAccounts.length === 0) {
-			return;
-		}
-
-		setAccounts(injectedAccounts);
-		if (injectedAccounts.length > 0) {
-			setAddress(injectedAccounts[0]);
-		}
-	};
-
-	const onWalletChange = (chosenWallet: EWallet | null) => {
-		setSelectedWallet(chosenWallet);
-		setAddress(null);
-		setAccounts([]);
-		switchToWeb3Login();
-	};
-
 	return (
 		<>
 			{!isModal && (
@@ -95,11 +63,11 @@ function Login({ isModal }: { isModal?: boolean }) {
 				</div>
 			)}
 			<div className={!isModal ? 'px-6 py-6 sm:px-12' : ''}>
-				{isTFAEnabled && address && selectedWallet ? (
+				{isTFAEnabled && userPreferences.address && userPreferences.wallet ? (
 					<TwoFactorAuth
 						tfaToken={tfaToken}
-						loginAddress={address.address}
-						loginWallet={selectedWallet}
+						loginAddress={userPreferences.address.address}
+						loginWallet={userPreferences.wallet}
 						goBack={() => {
 							setTfaToken('');
 							setIsTFAEnabled(false);
@@ -107,24 +75,19 @@ function Login({ isModal }: { isModal?: boolean }) {
 					/>
 				) : isWeb2Signup ? (
 					<Web2Signup
-						onWalletChange={onWalletChange}
+						onWalletChange={switchToWeb3Login}
 						switchToLogin={switchToWeb2Login}
 					/>
 				) : isWeb3Login ? (
 					<Web3Login
-						account={address}
-						selectedWallet={selectedWallet}
-						accounts={accounts}
-						onWalletChange={onWalletChange}
-						onAccountChange={onAccountChange}
+						onWalletChange={switchToWeb3Login}
 						switchToWeb2={switchToWeb2Login}
 						switchToSignup={switchToWeb2Signup}
-						getAccounts={getAccounts}
 						onTfaEnabled={onTfaEnabled}
 					/>
 				) : (
 					<Web2Login
-						onWalletChange={onWalletChange}
+						onWalletChange={switchToWeb3Login}
 						switchToSignup={switchToWeb2Signup}
 						onTfaEnabled={onTfaEnabled}
 					/>

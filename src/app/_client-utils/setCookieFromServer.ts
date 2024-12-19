@@ -4,9 +4,8 @@
 
 'use server';
 
-import { ECookieNames } from '@/_shared/types';
 import { CookieService } from '../../_shared/_services/cookie_service';
 
-export const setCookieValueByName = async (cookieName: ECookieNames, value: string) => {
-	await CookieService.setCookieValueByName(cookieName, value);
+export const setLocaleCookie = async (value: string) => {
+	await CookieService.setLocaleCookie(value);
 };

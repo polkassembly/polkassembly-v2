@@ -4,9 +4,8 @@
 
 'use client';
 
-import { ECookieNames, EWallet } from '@/_shared/types';
+import { ECookieNames, EWeb3LoginScreens } from '@/_shared/types';
 import React, { useState } from 'react';
-import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '@/app/_shared-components/Button';
@@ -20,6 +19,7 @@ import { CookieClientService } from '@/app/_client-services/cookie_client_servic
 import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import FetchAccountsConfirmation from '@/app/_shared-components/FetchAccountsConfirmation/FetchAccountsConfirmation';
+import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -27,24 +27,18 @@ function Web3Login({
 	switchToWeb2,
 	switchToSignup,
 	onWalletChange,
-	accounts,
-	account,
-	onAccountChange,
-	selectedWallet,
-	getAccounts,
 	onTfaEnabled
 }: {
-	account: InjectedAccount | null;
-	selectedWallet: EWallet | null;
 	switchToWeb2: () => void;
 	switchToSignup: () => void;
-	accounts: InjectedAccount[];
-	onAccountChange: (a: InjectedAccount) => void;
-	onWalletChange: (wallet: EWallet | null) => void;
-	getAccounts: (wallet: EWallet) => void;
+	onWalletChange: () => void;
 	onTfaEnabled: (token: string) => void;
 }) {
 	const router = useRouter();
+
+	const [web3Screen, setWeb3Screen] = useState<EWeb3LoginScreens>(EWeb3LoginScreens.SELECT_WALLET);
+
+	const [userPreferences] = useUserPreferences();
 
 	const setUserAtom = useSetAtom(userAtom);
 
@@ -54,17 +48,21 @@ function Web3Login({
 
 	const walletService = useWalletService();
 
+	const onChangeWeb3LoginScreen = (screen: EWeb3LoginScreens) => {
+		setWeb3Screen(screen);
+	};
+
 	const handleLogin = async () => {
 		try {
-			if (!selectedWallet || !account?.address || !walletService) return;
-			const { address } = account;
+			if (!userPreferences.wallet || !userPreferences?.address?.address || !walletService) return;
+			const { address } = userPreferences.address;
 
 			setLoading(true);
 
 			const signature = await walletService.signMessage({
 				data: WEB3_AUTH_SIGN_MESSAGE,
 				address,
-				selectedWallet
+				selectedWallet: userPreferences.wallet
 			});
 
 			if (!signature) {
@@ -75,7 +73,7 @@ function Web3Login({
 			const { data, error } = await AuthClientService.web3LoginOrSignup({
 				address: getSubstrateAddress(address) || address,
 				signature,
-				wallet: selectedWallet
+				wallet: userPreferences.wallet
 			});
 
 			if (error) {
@@ -97,7 +95,7 @@ function Web3Login({
 					return;
 				}
 
-				const decodedData = CookieClientService.decodeAccessToken(accessToken);
+				const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 				if (decodedData) {
 					setUserAtom(decodedData);
@@ -113,29 +111,26 @@ function Web3Login({
 
 	return (
 		<div className='w-full'>
-			{selectedWallet ? (
-				accounts && accounts.length > 0 ? (
-					<AddressDropdown
-						accounts={accounts}
-						selectedAddress={account?.address || ''}
-						onAddressChange={onAccountChange}
-						selectedWallet={selectedWallet}
-					/>
-				) : (
-					<FetchAccountsConfirmation
-						onWalletChange={onWalletChange}
-						getAccounts={getAccounts}
-						selectedWallet={selectedWallet}
-						switchToSignup={switchToSignup}
-					/>
-				)
+			{web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && userPreferences.wallet ? (
+				<AddressDropdown />
+			) : web3Screen === EWeb3LoginScreens.FETCH_CONFIRMATION && userPreferences.wallet ? (
+				<FetchAccountsConfirmation
+					goBack={() => onChangeWeb3LoginScreen(EWeb3LoginScreens.SELECT_WALLET)}
+					switchToSignup={switchToSignup}
+					onConfirm={() => onChangeWeb3LoginScreen(EWeb3LoginScreens.SELECT_ADDRESS)}
+				/>
 			) : (
-				<WalletButtons onWalletChange={onWalletChange} />
+				<WalletButtons
+					onWalletChange={() => {
+						onWalletChange();
+						onChangeWeb3LoginScreen(EWeb3LoginScreens.FETCH_CONFIRMATION);
+					}}
+				/>
 			)}
 
 			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 			<div>
-				{account?.address && (
+				{userPreferences?.address?.address && web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && (
 					<div className={classes.footer}>
 						<Button
 							isLoading={loading}
@@ -147,7 +142,7 @@ function Web3Login({
 						</Button>
 					</div>
 				)}
-				{!selectedWallet && (
+				{web3Screen === EWeb3LoginScreens.SELECT_WALLET && (
 					<div className={classes.switchToWeb2}>
 						Or
 						<Button
@@ -159,7 +154,7 @@ function Web3Login({
 						</Button>
 					</div>
 				)}
-				{account?.address && (
+				{web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && (
 					<SwitchToWeb2Signup
 						className='mt-4 justify-center'
 						switchToSignup={() => {

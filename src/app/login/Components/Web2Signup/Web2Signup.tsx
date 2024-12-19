@@ -85,7 +85,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 					return;
 				}
 
-				const decodedData = CookieClientService.decodeAccessToken(accessToken);
+				const decodedData = AuthClientService.decodeAccessToken(accessToken);
 
 				if (decodedData) {
 					setUserAtom(decodedData);

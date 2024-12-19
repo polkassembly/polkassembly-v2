@@ -4,9 +4,9 @@
 
 'use client';
 
-import { ECookieNames, ELocales } from '@/_shared/types';
+import { ELocales } from '@/_shared/types';
 import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
-import { setCookieValueByName } from '@/app/_client-utils/setCookieFromServer';
+import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 
@@ -15,7 +15,7 @@ export default function HomePage() {
 	const [userPreferences, setUserPreferences] = useUserPreferences();
 
 	const onLocaleChange = async () => {
-		setCookieValueByName(ECookieNames.LOCALE, ELocales.SPANISH);
+		setLocaleCookie(ELocales.SPANISH);
 		setUserPreferences({ ...userPreferences, locale: ELocales.SPANISH });
 	};
 

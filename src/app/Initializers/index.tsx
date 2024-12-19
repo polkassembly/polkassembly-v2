@@ -22,7 +22,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
 	const oldRefreshtoken = CookieClientService.getCookieInClient(ECookieNames.REFRESH_TOKEN);
-	const refreshTokenPayload = CookieClientService.decodeRefreshToken(oldRefreshtoken || '');
+	const refreshTokenPayload = AuthClientService.decodeRefreshToken(oldRefreshtoken || '');
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(refreshTokenPayload);
 
@@ -38,8 +38,8 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		const newRefreshToken = CookieClientService.getCookieInClient(ECookieNames.REFRESH_TOKEN);
 
 		if (newAccessToken && newRefreshToken) {
-			const newUserPayload = CookieClientService.decodeAccessToken(newAccessToken);
-			const newRefreshTokenPayload = CookieClientService.decodeRefreshToken(newRefreshToken);
+			const newUserPayload = AuthClientService.decodeAccessToken(newAccessToken);
+			const newRefreshTokenPayload = AuthClientService.decodeRefreshToken(newRefreshToken);
 
 			if (newUserPayload) {
 				setUser(newUserPayload);
@@ -50,7 +50,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		}
 	};
 
-	const checkForLoginState = () => {
+	const restablishConnections = () => {
 		if (document.visibilityState === 'hidden') return;
 
 		api?.reconnect();
@@ -66,10 +66,10 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	};
 
 	useEffect(() => {
-		document.addEventListener('visibilitychange', checkForLoginState);
+		document.addEventListener('visibilitychange', restablishConnections);
 
 		return () => {
-			document.removeEventListener('visibilitychange', checkForLoginState);
+			document.removeEventListener('visibilitychange', restablishConnections);
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);

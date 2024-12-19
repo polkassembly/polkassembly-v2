@@ -130,8 +130,6 @@ export interface IAuthResponse {
 	isTFAEnabled?: boolean;
 	tfaToken?: string;
 	refreshToken?: string;
-	status?: StatusCodes;
-	message?: string;
 }
 
 export enum EWallet {
@@ -400,13 +398,19 @@ export interface IErrorResponse {
 }
 
 export enum EApiRoute {
-	WEB2_LOGIN = 'web2Login',
-	WEB2_SIGNUP = 'web2Signup',
-	WEB3_LOGIN = 'web3LoginOrSignup',
-	REFRESH_ACCESS_TOKEN = 'refreshAccessToken',
-	USER_EXISTS = 'checkForUsernameAndEmail',
-	TFA_LOGIN = 'tfaLogin',
-	GEN_TFA_TOKEN = 'generateTfaToken',
-	VERIFY_TFA_TOKEN = 'verifyTfaToken',
-	LOGOUT = 'logout'
+	WEB2_LOGIN = 'WEB2_LOGIN',
+	WEB2_SIGNUP = 'WEB2_SIGNUP',
+	WEB3_LOGIN = 'WEB3_LOGIN',
+	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
+	USER_EXISTS = 'USER_EXISTS',
+	TFA_LOGIN = 'TFA_LOGIN',
+	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
+	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
+	LOGOUT = 'LOGOUT'
+}
+
+export enum EWeb3LoginScreens {
+	SELECT_WALLET,
+	FETCH_CONFIRMATION,
+	SELECT_ADDRESS
 }
