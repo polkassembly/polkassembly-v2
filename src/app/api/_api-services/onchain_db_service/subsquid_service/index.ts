@@ -48,13 +48,26 @@ export class SubsquidService extends SubsquidQueries {
 		} as IOnChainPostInfo;
 	}
 
-	static async GetOnChainPostsListing({ network, proposalType, limit, page }: { network: ENetwork; proposalType: EProposalType; limit: number; page: number }) {
+	static async GetOnChainPostsListing({
+		network,
+		proposalType,
+		limit,
+		page,
+		status
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		limit: number;
+		page: number;
+		status?: EProposalStatus;
+	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
-			.query(this.GET_PROPOSALS_LISTING_BY_TYPE, {
+			.query(status ? this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUS : this.GET_PROPOSALS_LISTING_BY_TYPE, {
 				limit,
 				offset: (page - 1) * limit,
+				status_eq: status,
 				type_eq: proposalType
 			})
 			.toPromise();
