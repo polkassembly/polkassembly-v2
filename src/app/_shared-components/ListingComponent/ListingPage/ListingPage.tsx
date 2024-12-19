@@ -8,8 +8,9 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import queryService from '@/app/_client-services/api_query_service';
 import { IListingResponse } from '@/_shared/types';
-import { FaFilter } from 'react-icons/fa6';
+import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { BiSort } from 'react-icons/bi';
+import { FaFilter } from 'react-icons/fa6';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
@@ -74,9 +75,87 @@ function ListingPage({ proposalType }: ListingPageProps) {
 						</button>
 					</div>
 					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
-						<p className={styles.filter}>
-							Filter <FaFilter />
-						</p>
+						<Popover>
+							<PopoverTrigger asChild>
+								<p className={styles.filter}>
+									Filter <FaFilter />
+								</p>
+							</PopoverTrigger>
+							<PopoverContent
+								sideOffset={5}
+								className={styles.popoverContent}
+							>
+								<div className='p-4'>
+									<h3 className='text-sm font-bold'>Status</h3>
+									<ul className='mt-2 space-y-1'>
+										<li>
+											<label>
+												<input
+													type='checkbox'
+													className='mr-2'
+												/>{' '}
+												Cancelled
+											</label>
+										</li>
+										<li>
+											<label>
+												<input
+													type='checkbox'
+													className='mr-2'
+												/>{' '}
+												Confirmed
+											</label>
+										</li>
+										<li>
+											<label>
+												<input
+													type='checkbox'
+													className='mr-2'
+												/>{' '}
+												Confirm Aborted
+											</label>
+										</li>
+										<li>
+											<label>
+												<input
+													type='checkbox'
+													className='mr-2'
+												/>{' '}
+												Confirm Started
+											</label>
+										</li>
+									</ul>
+									<h3 className='mt-4 text-sm font-bold'>Tags</h3>
+									<div className='relative mt-2'>
+										<input
+											type='text'
+											placeholder='Search'
+											className='w-full rounded border px-2 py-1'
+										/>
+									</div>
+									<ul className='mt-2 space-y-1'>
+										<li>
+											<label>
+												<input
+													type='checkbox'
+													className='mr-2'
+												/>{' '}
+												Abc
+											</label>
+										</li>
+										<li>
+											<label>
+												<input
+													type='checkbox'
+													className='mr-2'
+												/>{' '}
+												Xyz
+											</label>
+										</li>
+									</ul>
+								</div>
+							</PopoverContent>
+						</Popover>
 						<p className={styles.filter}>
 							Sort By <BiSort />
 						</p>
