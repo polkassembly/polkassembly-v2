@@ -9,9 +9,9 @@ import React from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ChevronRight } from 'lucide-react';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
-import PaLogo from '@ui/AppLayout/PaLogo';
 import Head1 from '@assets/sidebar/head1.svg';
 import Head2 from '@assets/sidebar/head2.svg';
 import Head3 from '@assets/sidebar/head3.svg';
@@ -28,6 +28,8 @@ import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
+
+const PaLogo = dynamic(() => import('@ui/AppLayout/PaLogo'), { ssr: false });
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -82,7 +84,9 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			collapsible='icon'
 			{...props}
 		>
-			<SidebarHeader>{/* <div className={styles.sidebar_logo}>{getLogo()}</div> */}</SidebarHeader>
+			<SidebarHeader>
+				<div className={styles.sidebar_logo}>{getLogo()}</div>
+			</SidebarHeader>
 
 			<hr className='text-btn_secondary_border' />
 

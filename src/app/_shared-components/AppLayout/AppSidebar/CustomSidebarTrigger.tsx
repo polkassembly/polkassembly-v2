@@ -13,7 +13,7 @@ function CustomSidebarTrigger() {
 	const { state } = useSidebar();
 	const isMobile = useIsMobile();
 	return (
-		<div className={cn('absolute top-10 z-50 transition-all duration-200 ease-in-out lg:fixed', !isMobile ? (state === 'collapsed' ? 'left-16' : 'left-60') : 'left-4 top-4')}>
+		<div className={cn('absolute top-12 z-50 transition-all duration-200 ease-in-out lg:fixed', !isMobile ? (state === 'collapsed' ? 'left-16' : 'left-60') : 'left-4 top-4')}>
 			<SidebarTrigger />
 		</div>
 	);
