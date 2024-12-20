@@ -22,13 +22,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		statuses: z.array(z.nativeEnum(EProposalStatus)).optional(),
-		origins: z.array(z.nativeEnum(EPostOrigin)).optional()
+		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
+		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional()
 	});
 
-	const searchParamsObject = Object.fromEntries(req.nextUrl.searchParams.entries());
+	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, statuses, origins } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, status: statuses, origin: origins } = zodQuerySchema.parse(searchParamsObject);
 
 	const network = await getNetworkFromHeaders();
 

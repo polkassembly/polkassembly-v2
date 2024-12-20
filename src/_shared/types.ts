@@ -383,7 +383,7 @@ export enum EPostOrigin {
 	PROFICIENTS = 'Proficients',
 	REFERENDUM_CANCELLER = 'ReferendumCanceller',
 	REFERENDUM_KILLER = 'ReferendumKiller',
-	ROOT = 'root',
+	ROOT = 'Root',
 	SENIOR_EXPERTS = 'SeniorExperts',
 	SENIOR_FELLOWS = 'SeniorFellows',
 	SENIOR_MASTERS = 'SeniorMasters',
