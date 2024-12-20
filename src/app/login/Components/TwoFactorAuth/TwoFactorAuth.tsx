@@ -5,7 +5,6 @@ import { EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { Button } from '@ui/Button';
-import { AuthClientService } from '@/app/_client-services/auth_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useRouter } from 'next/navigation';
@@ -15,6 +14,7 @@ import { Input } from '@ui/Input';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import classes from './TwoFactorAuth.module.scss';
 
 interface IFormFields {

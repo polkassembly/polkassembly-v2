@@ -11,7 +11,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '../_atoms/user/userAtom';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
-import { AuthClientService } from '../_client-services/auth_service';
+import { AuthClientService } from '../_client-services/auth_client_service';
 import { ClientError } from '../_client-utils/clientError';
 import { CookieClientService } from '../_client-services/cookie_client_service';
 
