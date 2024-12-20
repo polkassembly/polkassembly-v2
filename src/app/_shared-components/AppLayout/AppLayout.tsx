@@ -21,7 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 			<SidebarInset>
 				<Navbar />
-				<main className='flex flex-1 flex-col p-4'>{children}</main>
+				<main className='flex flex-1 flex-col'>{children}</main>
 			</SidebarInset>
 		</main>
 	);
