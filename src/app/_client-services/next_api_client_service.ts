@@ -23,13 +23,7 @@ export class NextApiClientService {
 		[EApiRoute.LOGOUT]: () => new URL(`${this.baseURL}/auth/actions/logout`)
 	};
 
-	private static async nextApiClientFetch<T>(
-		endpoint: EApiRoute,
-		data?: Record<string, unknown>,
-		method?: 'GET' | 'POST'
-	): Promise<{ data: T | null; error: IErrorResponse | null }> {
-		const url = this.getApiRoute[endpoint]();
-
+	private static async nextApiClientFetch<T>(url: URL, data?: Record<string, unknown>, method?: 'GET' | 'POST'): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
@@ -48,18 +42,18 @@ export class NextApiClientService {
 	}
 
 	protected static async refreshAccessTokenApi() {
-		return this.nextApiClientFetch<{ message: string }>(EApiRoute.REFRESH_ACCESS_TOKEN);
+		return this.nextApiClientFetch<{ message: string }>(this.getApiRoute[EApiRoute.REFRESH_ACCESS_TOKEN]());
 	}
 
 	protected static async web2LoginApi({ emailOrUsername, password }: { emailOrUsername: string; password: string }) {
-		return this.nextApiClientFetch<IAuthResponse>(EApiRoute.WEB2_LOGIN, {
+		return this.nextApiClientFetch<IAuthResponse>(this.getApiRoute[EApiRoute.WEB2_LOGIN](), {
 			emailOrUsername,
 			password
 		});
 	}
 
 	protected static async web2SignupApi({ email, username, password }: { email: string; username: string; password: string }) {
-		return this.nextApiClientFetch<IAuthResponse>(EApiRoute.WEB2_SIGNUP, {
+		return this.nextApiClientFetch<IAuthResponse>(this.getApiRoute[EApiRoute.WEB2_SIGNUP](), {
 			email,
 			username,
 			password
@@ -67,7 +61,7 @@ export class NextApiClientService {
 	}
 
 	protected static async web3LoginOrSignupApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
-		return this.nextApiClientFetch<IAuthResponse>(EApiRoute.WEB3_LOGIN, {
+		return this.nextApiClientFetch<IAuthResponse>(this.getApiRoute[EApiRoute.WEB3_LOGIN](), {
 			address,
 			signature,
 			wallet
@@ -75,14 +69,14 @@ export class NextApiClientService {
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {
-		return this.nextApiClientFetch<{ usernameExists: boolean; emailExists: boolean; message: string; status: StatusCodes }>(EApiRoute.USER_EXISTS, {
+		return this.nextApiClientFetch<{ usernameExists: boolean; emailExists: boolean; message: string; status: StatusCodes }>(this.getApiRoute[EApiRoute.USER_EXISTS](), {
 			username,
 			email
 		});
 	}
 
 	protected static async tfaLoginApi({ authCode, loginAddress, loginWallet, tfaToken }: { authCode: string; loginAddress: string; loginWallet: EWallet; tfaToken: string }) {
-		return this.nextApiClientFetch<{ message: string; status: StatusCodes }>(EApiRoute.TFA_LOGIN, {
+		return this.nextApiClientFetch<{ message: string; status: StatusCodes }>(this.getApiRoute[EApiRoute.TFA_LOGIN](), {
 			authCode,
 			loginAddress,
 			loginWallet,
@@ -91,16 +85,16 @@ export class NextApiClientService {
 	}
 
 	protected static async generateTfaTokenApi() {
-		return this.nextApiClientFetch<IGenerateTFAResponse>(EApiRoute.GEN_TFA_TOKEN);
+		return this.nextApiClientFetch<IGenerateTFAResponse>(this.getApiRoute[EApiRoute.GEN_TFA_TOKEN]());
 	}
 
 	protected static async verifyTfaTokenApi({ authCode }: { authCode: string }) {
-		return this.nextApiClientFetch<{ message: string }>(EApiRoute.VERIFY_TFA_TOKEN, {
+		return this.nextApiClientFetch<{ message: string }>(this.getApiRoute[EApiRoute.VERIFY_TFA_TOKEN](), {
 			authCode
 		});
 	}
 
 	protected static async logoutApi() {
-		return this.nextApiClientFetch<{ message: string }>(EApiRoute.LOGOUT);
+		return this.nextApiClientFetch<{ message: string }>(this.getApiRoute[EApiRoute.LOGOUT]());
 	}
 }

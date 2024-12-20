@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useSetAtom } from 'jotai';
-import { AuthClientService } from '@/app/_client-services/auth_service';
+import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useWalletService } from '@/app/_atoms/wallet/walletAtom';

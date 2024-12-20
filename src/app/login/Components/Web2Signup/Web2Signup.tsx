@@ -6,7 +6,7 @@ import { Button } from '@ui/Button';
 import React, { useState } from 'react';
 import { ESignupSteps, EWallet } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
-import { AuthClientService } from '@/app/_client-services/auth_service';
+import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';

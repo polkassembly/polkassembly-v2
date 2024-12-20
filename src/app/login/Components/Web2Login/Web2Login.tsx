@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
-import { AuthClientService } from '@/app/_client-services/auth_service';
+import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { useSetAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import ErrorMessage from '@ui/ErrorMessage';

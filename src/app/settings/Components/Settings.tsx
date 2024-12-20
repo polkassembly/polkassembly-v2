@@ -5,7 +5,7 @@
 'use client';
 
 import { useUser } from '@/app/_atoms/user/userAtom';
-import { AuthClientService } from '@/app/_client-services/auth_service';
+import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { Input } from '@/app/_shared-components/Input';
 import { Button } from '@ui/Button';
 import { useRouter } from 'next/navigation';
