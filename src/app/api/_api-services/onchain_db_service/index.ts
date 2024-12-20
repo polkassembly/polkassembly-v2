@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EProposalStatus, EProposalType } from '@shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EProposalType } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
@@ -35,20 +35,22 @@ export class OnChainDbService {
 		proposalType,
 		limit,
 		page,
-		statuses
+		statuses,
+		origins
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
 		statuses?: EProposalStatus[];
+		origins?: EPostOrigin[];
 	}) {
 		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
 
 		// fetch from subsquid
-		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses });
+		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins });
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
 		return [];
