@@ -11,7 +11,7 @@ class QueryService {
 		this.baseUrl = baseUrl;
 	}
 
-	async fetchListingData(proposalType: string, page: number, statuses?: EProposalStatus[]): Promise<IListingResponse[]> {
+	async fetchListingData(proposalType: string, page: number, statuses?: EProposalStatus[], origins?: string): Promise<IListingResponse[]> {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: '10'
@@ -19,6 +19,10 @@ class QueryService {
 
 		if (statuses && statuses.length > 0) {
 			statuses.forEach((status) => queryParams.append('statuses', status));
+		}
+
+		if (origins) {
+			queryParams.append('origins', origins);
 		}
 
 		const response = await fetch(`${this.baseUrl}/api/v2/${proposalType}?${queryParams.toString()}`, {

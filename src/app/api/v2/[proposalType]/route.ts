@@ -23,7 +23,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		statuses: z.preprocess((value) => (typeof value === 'string' ? value.split(',') : value), z.array(z.nativeEnum(EProposalStatus)).optional()),
-		origins: z.array(z.nativeEnum(EPostOrigin)).optional()
+		origins: z.preprocess((value) => (typeof value === 'string' ? value.split(',') : value), z.array(z.nativeEnum(EPostOrigin)).optional())
 	});
 
 	const searchParamsObject = Object.fromEntries(req.nextUrl.searchParams.entries());

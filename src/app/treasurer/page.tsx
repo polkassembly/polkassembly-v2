@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType } from '@/_shared/types';
+import { EPostOrigin, EProposalType } from '@/_shared/types';
 import dynamic from 'next/dynamic';
 
 const ListingPage = dynamic(() => import('../_shared-components/ListingComponent/ListingPage/ListingPage'), { ssr: false });
@@ -13,9 +13,10 @@ function Page() {
 	return (
 		<div>
 			<ListingPage
-				title='Onchain Referenda'
+				title='Treasurer'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
-				proposalType={EProposalType.REFERENDUM}
+				proposalType={EProposalType.REFERENDUM_V2}
+				origins={EPostOrigin.TREASURER}
 			/>
 		</div>
 	);

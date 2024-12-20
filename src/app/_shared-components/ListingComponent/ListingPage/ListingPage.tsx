@@ -20,9 +20,12 @@ import styles from './ListingPage.module.scss';
 
 interface ListingPageProps {
 	proposalType: string;
+	origins?: string;
+	title?: string;
+	description?: string;
 }
 
-function ListingPage({ proposalType }: ListingPageProps) {
+function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
 	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [filterActive, setFilterActive] = useState(false);
@@ -51,8 +54,8 @@ function ListingPage({ proposalType }: ListingPageProps) {
 		isLoading: polkassemblyLoading,
 		refetch
 	} = useQuery<IListingResponse[]>({
-		queryKey: ['polkassemblyReferenda', proposalType, currentPage, selectedStatuses],
-		queryFn: () => queryService.fetchListingData(proposalType, currentPage, selectedStatuses),
+		queryKey: ['polkassemblyReferenda', proposalType, currentPage, selectedStatuses, origins],
+		queryFn: () => queryService.fetchListingData(proposalType, currentPage, selectedStatuses, origins),
 		enabled: activeTab === 'polkassembly'
 	});
 
@@ -83,8 +86,10 @@ function ListingPage({ proposalType }: ListingPageProps) {
 			<div className={styles.container}>
 				<div className={styles.header}>
 					<div>
-						<h1 className={styles.title}>Onchain Referenda ({totalCount})</h1>
-						<p className={styles.subtitle}>A space to share insights, provide feedback, and collaborate on ideas that impact the network.</p>
+						<h1 className={styles.title}>
+							{title} ({totalCount})
+						</h1>
+						<p className={styles.subtitle}>{description}</p>
 					</div>
 					<button
 						type='button'
