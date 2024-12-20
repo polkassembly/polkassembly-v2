@@ -8,7 +8,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/app/_atoms/user/userAtom';
-import { AuthClientService } from '@/app/_client-services/auth_service';
+import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import classes from './Navbar.module.scss';
 
 function Navbar() {
