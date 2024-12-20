@@ -336,6 +336,11 @@ export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 }
 
+export interface IOnChainPostListingResponse {
+	posts: IPostListing[];
+	totalCount: number;
+}
+
 export enum ESignupSteps {
 	USERNAME = 'Create Username',
 	PASSWORD = 'Set Password'
