@@ -9,9 +9,9 @@ import React from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { ChevronRight } from 'lucide-react';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
+import PaLogo from '@ui/AppLayout/PaLogo';
 import Head1 from '@assets/sidebar/head1.svg';
 import Head2 from '@assets/sidebar/head2.svg';
 import Head3 from '@assets/sidebar/head3.svg';
@@ -28,8 +28,7 @@ import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
-
-const PaLogo = dynamic(() => import('@ui/AppLayout/PaLogo'), { ssr: false });
+import { ETheme } from '@/_shared/types';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -40,7 +39,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
-		if (theme === 'light') {
+		if (theme === ETheme.LIGHT) {
 			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
 		}
 		if (state === 'expanded') {
