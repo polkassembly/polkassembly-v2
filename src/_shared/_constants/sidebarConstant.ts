@@ -166,7 +166,13 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 							heading: 'ORIGINS',
 							title: 'ORIGINS',
 							url: '',
-							items: ActiveItems(getOriginsItems(networkKey), pathname)
+							items: (() => {
+								const originsItems = getOriginsItems(networkKey); // Fetch the items
+								console.log('Origins Items:', originsItems); // Log the result of getOriginsItems
+								const activeItems = ActiveItems(originsItems, pathname); // Process items
+								console.log('Active Items:', activeItems); // Log the processed active items
+								return activeItems; // Return the active items
+							})()
 						}
 					],
 					pathname
