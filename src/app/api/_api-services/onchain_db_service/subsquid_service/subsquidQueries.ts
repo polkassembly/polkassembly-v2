@@ -52,4 +52,32 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS = `
+		query GetProposalsListingByTypeAndOrigins($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $origin_in: [String!]!) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, origin_in: $origin_in}) {
+				createdAt
+				description
+				index
+				origin
+				proposer
+				status
+				hash
+			}
+		}
+	`;
+
+	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS = `
+		query GetProposalsListingByTypeAndStatusesAndOrigins($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!, $origin_in: [String!]!) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in, origin_in: $origin_in}) {
+				createdAt
+				description
+				index
+				origin
+				proposer
+				status
+				hash
+			}
+		}
+	`;
 }

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EProposalStatus, EProposalType, IOnChainPostInfo, IOnChainPostListing } from '@shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, IOnChainPostInfo, IOnChainPostListing } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { APIError } from '@api/_api-utils/apiError';
@@ -53,22 +53,35 @@ export class SubsquidService extends SubsquidQueries {
 		proposalType,
 		limit,
 		page,
-		statuses
+		statuses,
+		origins
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
 		statuses?: EProposalStatus[];
+		origins?: EPostOrigin[];
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
+		let gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE;
+
+		if (statuses && origins) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS;
+		} else if (statuses) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
+		} else if (origins) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS;
+		}
+
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
-			.query(statuses ? this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES : this.GET_PROPOSALS_LISTING_BY_TYPE, {
+			.query(gqlQuery, {
 				limit,
 				offset: (page - 1) * limit,
 				status_in: statuses,
-				type_eq: proposalType
+				type_eq: proposalType,
+				origin_in: origins
 			})
 			.toPromise();
 
