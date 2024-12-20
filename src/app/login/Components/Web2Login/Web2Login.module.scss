@@ -1,0 +1,11 @@
+.header {
+    @apply flex w-full flex-col gap-y-4
+}
+
+.footer {
+    @apply my-8 flex w-full justify-center
+}
+
+.loginButton {
+    @apply px-12
+}

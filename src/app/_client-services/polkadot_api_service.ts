@@ -6,6 +6,7 @@
 
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { Signer } from '@polkadot/types/types';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
@@ -59,6 +60,7 @@ export class PolkadotApiService {
 		this.api = await ApiPromise.create({
 			provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
 		});
+		await this.api.isReady;
 	}
 
 	async getBlockHeight(): Promise<number> {
@@ -68,5 +70,27 @@ export class PolkadotApiService {
 
 	async keepAlive(): Promise<void> {
 		await this.getBlockHeight();
+	}
+
+	async reconnect(): Promise<void> {
+		if (this.api.isConnected && (await this.api.isReady)) return;
+
+		try {
+			this.api = await ApiPromise.create({
+				provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
+			});
+
+			await this.api.isReady;
+		} catch {
+			await this.switchToNewRpcEndpoint();
+		}
+	}
+
+	setSigner(signer: Signer) {
+		this.api.setSigner(signer);
+	}
+
+	async apiReady() {
+		await this.api.isReady;
 	}
 }

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { EAuthCookieNames } from '@/_shared/types';
+import { ECookieNames } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -15,7 +15,7 @@ import { NextResponse } from 'next/server';
 export const POST = withErrorHandling(async () => {
 	// 1. read refresh token from cookie
 	const cookieStore = await cookies();
-	const refreshToken = cookieStore.get(EAuthCookieNames.REFRESH_TOKEN)?.value;
+	const refreshToken = cookieStore.get(ECookieNames.REFRESH_TOKEN)?.value;
 
 	// 2. validate refresh token
 	if (!refreshToken) {

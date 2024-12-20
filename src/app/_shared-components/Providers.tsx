@@ -5,41 +5,35 @@
 'use client';
 
 import { ThemeProvider } from 'next-themes';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
+import { ETheme } from '@/_shared/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { SidebarProvider } from './Sidebar/Sidebar';
-import Dashboard from './AppLayout/Dashboard/page';
-import NotificationsContainer from './NotificationsContainer';
+import { useUserPreferences } from '../_atoms/user/userPreferencesAtom';
 
 const queryClient = new QueryClient();
 
-export function Providers({ children }: { children: ReactNode }) {
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	if (!mounted) {
-		return <main>{children}</main>;
-	}
+export function Providers({ children, messages, locale }: { children: ReactNode; messages: AbstractIntlMessages; locale: string }) {
+	const [userPreferences] = useUserPreferences();
 
 	return (
-		<ThemeProvider
-			attribute='class'
-			defaultTheme='light'
-			themes={['light', 'dark']}
-			enableSystem={false}
+		<NextIntlClientProvider
+			messages={messages}
+			locale={locale}
 		>
 			<QueryClientProvider client={queryClient}>
-				<SidebarProvider>
-					<Dashboard>{children}</Dashboard>
-					<NotificationsContainer />
-				</SidebarProvider>
+				<ThemeProvider
+					attribute='class'
+					defaultTheme={userPreferences.theme}
+					themes={[ETheme.LIGHT, ETheme.DARK]}
+					enableSystem={false}
+				>
+					<SidebarProvider>{children}</SidebarProvider>
+				</ThemeProvider>
 				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>
-			;
-		</ThemeProvider>
+		</NextIntlClientProvider>
 	);
 }

@@ -1,7 +1,3 @@
 .navbar {
-	@apply flex h-16 shrink-0 items-center gap-2 px-4;
-}
-
-.navbar_title {
-	@apply text-btn_secondary_text lg:ml-5 ml-12 text-lg font-medium;
+	@apply sticky top-0 w-full py-4 px-8 border-b-[3px] border-navbar_border shadow-md flex justify-between;
 }

@@ -18,7 +18,7 @@ import {
 import { serialize } from 'cookie';
 import * as argon2 from 'argon2';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { ENetwork, ERole, EWallet, IHashedPassword, IAuthResponse, IRefreshTokenPayload, IUser, IAccessTokenPayload, EAuthCookieNames, IUserTFADetails } from '@shared/types';
+import { ENetwork, ERole, EWallet, IHashedPassword, IAuthResponse, IRefreshTokenPayload, IUser, IAccessTokenPayload, ECookieNames, IUserTFADetails } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { randomBytes } from 'crypto';
 import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetails';
@@ -113,6 +113,7 @@ export class AuthService {
 				isDefault: true,
 				network,
 				userId: newUserId,
+				// todo: wallet || EWallet.OTHER
 				wallet: wallet || EWallet.OTHER
 			});
 		}
@@ -286,7 +287,7 @@ export class AuthService {
 
 	static async Web2SignUp(email: string, password: string, username: string, network: ENetwork): Promise<IAuthResponse> {
 		// find if username is in blacklisted usernames
-		if (ValidatorService.isValidUsername(username)) {
+		if (!ValidatorService.isValidUsername(username)) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Username is not allowed.');
 		}
 
@@ -318,11 +319,11 @@ export class AuthService {
 	}
 
 	static async GetRefreshTokenCookie(refreshToken: string) {
-		return serialize(EAuthCookieNames.REFRESH_TOKEN, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
+		return serialize(ECookieNames.REFRESH_TOKEN, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 	}
 
 	static async GetAccessTokenCookie(accessToken: string) {
-		return serialize(EAuthCookieNames.ACCESS_TOKEN, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
 	}
 
 	static async Web3LoginOrRegister({ address, wallet, signature, network }: { address: string; wallet: EWallet; signature: string; network: ENetwork }): Promise<IAuthResponse> {

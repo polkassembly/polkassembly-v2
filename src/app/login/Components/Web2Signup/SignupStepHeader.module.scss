@@ -1,0 +1,23 @@
+.wrapper {
+    @apply mb-6 sm:mb-8 flex w-full items-center gap-x-4
+}
+
+.btn {
+    @apply flex w-full items-center gap-x-0 px-0 text-xs sm:text-sm font-normal text-text_primary
+}
+
+.tagWrapper {
+    @apply border-b-2 py-3
+}
+
+.tag {
+    @apply rounded-full px-2 py-1
+}
+
+.username {
+    @apply w-full border-b-2 px-2 py-3 text-left
+}
+
+.password {
+    @apply w-full border-b-2 border-border_grey px-2 py-3 text-left
+}

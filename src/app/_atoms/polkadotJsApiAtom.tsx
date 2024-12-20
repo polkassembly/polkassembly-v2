@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { atom, useAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { PolkadotApiService } from '@app/_client-services/polkadot_api_service';
 import { ENetwork } from '@shared/types';
 
@@ -40,7 +40,10 @@ export const usePolkadotApi = (network: ENetwork) => {
 				api.disconnect().then(() => setApi(null));
 			}
 		};
-	}, [api, network, setApi]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [network]);
 
-	return api;
+	return useMemo(() => {
+		return api;
+	}, [api]);
 };

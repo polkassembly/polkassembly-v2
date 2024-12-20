@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { EAuthCookieNames } from '@/_shared/types';
+import { ECookieNames } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
@@ -25,7 +25,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	// 2. read access token from cookie
 	const cookieStore = await cookies();
-	const accessToken = cookieStore.get(EAuthCookieNames.ACCESS_TOKEN)?.value;
+	const accessToken = cookieStore.get(ECookieNames.ACCESS_TOKEN)?.value;
 
 	// 3. verify access token
 	if (!accessToken) {
