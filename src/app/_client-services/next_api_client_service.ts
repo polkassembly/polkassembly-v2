@@ -5,7 +5,7 @@
 /* eslint-disable lines-between-class-members */
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse } from '@/_shared/types';
+import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse, IOnChainPostListingResponse } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 
 export class NextApiClientService {
@@ -20,7 +20,14 @@ export class NextApiClientService {
 		[EApiRoute.TFA_LOGIN]: () => new URL(`${this.baseURL}/auth/actions/tfa/login`),
 		[EApiRoute.GEN_TFA_TOKEN]: () => new URL(`${this.baseURL}/auth/actions/tfa/setup/generate`),
 		[EApiRoute.VERIFY_TFA_TOKEN]: () => new URL(`${this.baseURL}/auth/actions/tfa/setup/verify`),
-		[EApiRoute.LOGOUT]: () => new URL(`${this.baseURL}/auth/actions/logout`)
+		[EApiRoute.LOGOUT]: () => new URL(`${this.baseURL}/auth/actions/logout`),
+		[EApiRoute.FETCH_LISTING_DATA]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
+			const url = new URL(`${this.baseURL}/${routeSegments?.join('/') || ''}`);
+			if (queryParams) {
+				url.search = queryParams.toString();
+			}
+			return url;
+		}
 	};
 
 	private static async nextApiClientFetch<T>(url: URL, data?: Record<string, unknown>, method?: 'GET' | 'POST'): Promise<{ data: T | null; error: IErrorResponse | null }> {
@@ -96,5 +103,28 @@ export class NextApiClientService {
 
 	protected static async logoutApi() {
 		return this.nextApiClientFetch<{ message: string }>(this.getApiRoute[EApiRoute.LOGOUT]());
+	}
+
+	protected static async fetchListingDataApi(
+		proposalType: string,
+		page: number,
+		statuses?: string[],
+		origins?: string
+	): Promise<{ data: IOnChainPostListingResponse | null; error: IErrorResponse | null }> {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: '10'
+		});
+
+		if (statuses?.length) {
+			statuses.forEach((status) => queryParams.append('status', status));
+		}
+
+		if (origins) {
+			queryParams.append('origin', origins);
+		}
+
+		const url = this.getApiRoute[EApiRoute.FETCH_LISTING_DATA]([proposalType], queryParams);
+		return this.nextApiClientFetch<IOnChainPostListingResponse>(url, undefined, 'GET');
 	}
 }

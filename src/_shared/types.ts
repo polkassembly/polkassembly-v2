@@ -397,6 +397,7 @@ export enum EPostOrigin {
 }
 
 export interface IListingResponse {
+	posts: IPostListing[];
 	id?: string;
 	proposalType?: string;
 	network?: string;
@@ -430,7 +431,8 @@ export enum EApiRoute {
 	TFA_LOGIN = 'TFA_LOGIN',
 	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
 	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
-	LOGOUT = 'LOGOUT'
+	LOGOUT = 'LOGOUT',
+	FETCH_LISTING_DATA = 'FETCH_LISTING_DATA'
 }
 
 export enum EWeb3LoginScreens {

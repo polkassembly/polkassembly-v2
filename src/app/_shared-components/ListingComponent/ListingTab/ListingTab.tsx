@@ -44,7 +44,7 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 			return (
 				<div
 					key={item.id || `${item.proposalType}-${item.onChainInfo?.createdAt}-${idx}`}
-					className={`${styles['listing-item']} ${idx === data.length - 1 ? styles['listing-item-last'] : ''}`}
+					className={`${styles['listing-item']} ${idx === (data?.length ?? 0) - 1 ? styles['listing-item-last'] : ''}`}
 				>
 					<ListingCard
 						backgroundColor={backgroundColor}
@@ -58,8 +58,8 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 
 	return (
 		<div>
-			<div className={styles['listing-container']}>{data.length > 0 ? renderListingCards() : <p className={styles['no-data']}>No data available</p>}</div>
-			{data.length > 0 && renderPagination()}
+			<div className={styles['listing-container']}>{data?.length > 0 ? renderListingCards() : <p className={styles['no-data']}>No data available</p>}</div>
+			{data?.length > 0 && renderPagination()}
 		</div>
 	);
 }

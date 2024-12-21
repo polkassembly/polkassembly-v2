@@ -5,10 +5,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import queryService from '@/app/_client-services/api_query_service';
-import { EProposalStatus, IListingResponse } from '@/_shared/types';
+import { EProposalStatus, IOnChainPostListingResponse } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
+import { QueryService } from '@/app/_client-services/api_query_service';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
@@ -48,16 +47,28 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	];
 	const tags = ['Abc', 'Xyz', 'Network', 'Governance', 'Proposal', 'Test'];
 	const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(tagSearchTerm.toLowerCase()));
-	const {
-		data: polkassemblyData,
-		error: polkassemblyError,
-		isLoading: polkassemblyLoading,
-		refetch
-	} = useQuery<IListingResponse[]>({
-		queryKey: ['polkassemblyReferenda', proposalType, currentPage, selectedStatuses, origins],
-		queryFn: () => queryService.fetchListingData(proposalType, currentPage, selectedStatuses, origins),
-		enabled: activeTab === 'polkassembly'
-	});
+
+	const [listingData, setListingData] = useState<IOnChainPostListingResponse | null>(null);
+	const [totalCount, setTotalCount] = useState<number>(0);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [error, setError] = useState<Error | null>(null);
+
+	const fetchListingData = async () => {
+		setIsLoading(true);
+		const { data, error: dataError } = await QueryService.fetchListingData(proposalType, currentPage, selectedStatuses, origins);
+
+		if (dataError) {
+			setError(dataError);
+			setIsLoading(false);
+			return;
+		}
+
+		if (data) {
+			setListingData(data.posts);
+			setTotalCount(data?.totalCount);
+		}
+		setIsLoading(false);
+	};
 
 	const toggleStatus = (status: EProposalStatus) => {
 		setSelectedStatuses((prevStatuses) => (prevStatuses.includes(status) ? prevStatuses.filter((s) => s !== status) : [...prevStatuses, status]));
@@ -69,17 +80,11 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	useEffect(() => {
 		if (activeTab === 'polkassembly') {
-			refetch();
+			fetchListingData();
 		}
-	}, [selectedStatuses, refetch, activeTab]);
-
-	const data = Array.isArray(polkassemblyData) ? polkassemblyData : [];
-	const error = activeTab === 'polkassembly' ? polkassemblyError : null;
-	const isLoading = activeTab === 'polkassembly' ? polkassemblyLoading : false;
+	}, [selectedStatuses, activeTab]);
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
-
-	const totalCount = data.length;
 
 	return (
 		<div>
@@ -204,7 +209,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<div>
 						{activeTab === 'polkassembly' ? (
 							<ListingTab
-								data={data}
+								data={listingData}
 								currentPage={currentPage}
 								setCurrentPage={setCurrentPage}
 							/>
