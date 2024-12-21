@@ -85,6 +85,10 @@ export class SubsquidService extends SubsquidQueries {
 			})
 			.toPromise();
 
+		console.log({
+			subsquidData
+		});
+
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain posts listing from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain posts listing from Subsquid');
@@ -116,7 +120,7 @@ export class SubsquidService extends SubsquidQueries {
 
 		return {
 			posts,
-			totalCount: subsquidData.proposals.length
+			totalCount: subsquidData.proposalsConnection.totalCount
 		};
 	}
 }
