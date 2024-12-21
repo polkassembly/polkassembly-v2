@@ -5,12 +5,12 @@
 'use client';
 
 import React from 'react';
-import { IListingResponse } from '@/_shared/types';
+import { IPostListing } from '@/_shared/types';
 import styles from './ListingTab.module.scss';
 import ListingCard from '../ListingCard/ListingCard';
 
 interface ListingTabProps {
-	data: Array<IListingResponse>;
+	data: Array<IPostListing>;
 	currentPage: number;
 	setCurrentPage: (page: number) => void;
 }
@@ -36,7 +36,7 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 			const backgroundColor = idx % 2 === 0 ? '#fbfbfb' : '#FFFFFF';
 
 			const onChainInfo = {
-				createdAt: item.onChainInfo?.createdAt || 'N/A',
+				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt).toISOString() : 'N/A',
 				proposer: item.onChainInfo?.proposer || 'Unknown Proposer',
 				origin: item.onChainInfo?.origin || 'Unknown Origin'
 			};
@@ -48,9 +48,9 @@ function ListingTab({ data, currentPage, setCurrentPage }: ListingTabProps) {
 				>
 					<ListingCard
 						backgroundColor={backgroundColor}
-						title={item.title}
+						title={item.title || 'Untitled'}
 						onChainInfo={onChainInfo}
-						index={item.index}
+						index={item.index ?? 0}
 					/>
 				</div>
 			);

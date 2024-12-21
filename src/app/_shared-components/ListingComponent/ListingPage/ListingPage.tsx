@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { EProposalStatus, IOnChainPostListingResponse } from '@/_shared/types';
+import { EProposalStatus, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { QueryService } from '@/app/_client-services/api_query_service';
 import { BiSort } from 'react-icons/bi';
@@ -48,7 +48,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	const tags = ['Abc', 'Xyz', 'Network', 'Governance', 'Proposal', 'Test'];
 	const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(tagSearchTerm.toLowerCase()));
 
-	const [listingData, setListingData] = useState<IOnChainPostListingResponse | null>(null);
+	const [listingData, setListingData] = useState<IPostListing[]>([]);
 	const [totalCount, setTotalCount] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<Error | null>(null);
@@ -64,7 +64,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		}
 
 		if (data) {
-			setListingData(data.posts);
+			setListingData(data?.posts || []);
 			setTotalCount(data?.totalCount);
 		}
 		setIsLoading(false);
@@ -82,6 +82,8 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		if (activeTab === 'polkassembly') {
 			fetchListingData();
 		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedStatuses, activeTab]);
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
