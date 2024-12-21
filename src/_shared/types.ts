@@ -336,6 +336,11 @@ export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 }
 
+export interface IOnChainPostListingResponse {
+	posts: IPostListing[];
+	totalCount: number;
+}
+
 export enum ESignupSteps {
 	USERNAME = 'Create Username',
 	PASSWORD = 'Set Password'
@@ -378,7 +383,7 @@ export enum EPostOrigin {
 	PROFICIENTS = 'Proficients',
 	REFERENDUM_CANCELLER = 'ReferendumCanceller',
 	REFERENDUM_KILLER = 'ReferendumKiller',
-	ROOT = 'root',
+	ROOT = 'Root',
 	SENIOR_EXPERTS = 'SeniorExperts',
 	SENIOR_FELLOWS = 'SeniorFellows',
 	SENIOR_MASTERS = 'SeniorMasters',

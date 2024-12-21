@@ -90,7 +90,12 @@ export class SubsquidService extends SubsquidQueries {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain posts listing from Subsquid');
 		}
 
-		if (subsquidData.proposals.length === 0) return [];
+		if (subsquidData.proposals.length === 0) {
+			return {
+				posts: [],
+				totalCount: subsquidData.proposalsConnection.totalCount
+			};
+		}
 
 		const posts: IOnChainPostListing[] = [];
 
@@ -109,6 +114,9 @@ export class SubsquidService extends SubsquidQueries {
 			}
 		);
 
-		return posts;
+		return {
+			posts,
+			totalCount: subsquidData.proposals.length
+		};
 	}
 }

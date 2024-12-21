@@ -53,6 +53,9 @@ export class OnChainDbService {
 		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins });
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
-		return [];
+		return {
+			posts: [],
+			totalCount: 0
+		};
 	}
 }

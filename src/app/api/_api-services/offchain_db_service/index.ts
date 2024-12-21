@@ -98,6 +98,10 @@ export class OffChainDbService {
 		return [];
 	}
 
+	static async GetTotalOffChainPostsCount({ network, proposalType }: { network: ENetwork; proposalType: EProposalType }): Promise<number> {
+		return FirestoreService.GetTotalOffChainPostsCount({ network, proposalType });
+	}
+
 	// Write methods
 
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {

@@ -150,6 +150,13 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
+	static async GetTotalOffChainPostsCount({ network, proposalType }: { network: ENetwork; proposalType: EProposalType }): Promise<number> {
+		const postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network).count();
+
+		const postsQuerySnapshot = await postsQuery.get();
+		return postsQuerySnapshot?.data?.()?.count || 0;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
