@@ -75,12 +75,14 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 			tags
 		});
 
+		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType, tags });
+
 		const postIdentifier: keyof IOffChainPost = proposalType === EProposalType.TIP ? 'hash' : 'index';
 
 		// get onchain data for each post
 		const onChainDataPromises = postsOffchainData.map((post) => {
 			if (!post[postIdentifier as keyof IOffChainPost]) {
-				throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, `Post identifier is not found for the ${proposalType} proposal type and post id ${post.id}`);
+				throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, `${postIdentifier} not found for the ${proposalType} proposal type and post id ${post.id}`);
 			}
 
 			return OnChainDbService.GetOnChainPostInfo({ network, proposalType, indexOrHash: post[postIdentifier as keyof IOffChainPost]?.toString() || '' });
