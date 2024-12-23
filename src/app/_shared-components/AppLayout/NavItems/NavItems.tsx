@@ -8,7 +8,6 @@ import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/Collapsible';
 import { SidebarGroup, SidebarMenu, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import React from 'react';
-import Link from 'next/link';
 import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
 import styles from './NavItems.module.scss';
 
@@ -131,15 +130,10 @@ export function NavMain({
 											{mainItem.items &&
 												mainItem.items.map((item) => (
 													<div key={item.title}>
-														<Link
-															href={item.url || '#'}
-															passHref
-														>
-															<CollapsibleItem
-																item={item}
-																state={state}
-															/>
-														</Link>
+														<CollapsibleItem
+															item={item}
+															state={state}
+														/>
 													</div>
 												))}
 										</SidebarMenu>
