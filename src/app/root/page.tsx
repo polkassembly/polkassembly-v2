@@ -2,12 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { EPostOrigin, EProposalType } from '@/_shared/types';
-import dynamic from 'next/dynamic';
-
-const ListingPage = dynamic(() => import('../_shared-components/ListingComponent/ListingPage/ListingPage'), { ssr: false });
+import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
 
 function Page() {
 	return (

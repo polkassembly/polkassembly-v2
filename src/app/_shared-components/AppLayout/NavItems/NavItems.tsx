@@ -131,7 +131,10 @@ export function NavMain({
 											{mainItem.items &&
 												mainItem.items.map((item) => (
 													<div key={item.title}>
-														<Link href={item.url || '#'}>
+														<Link
+															href={item.url || '#'}
+															passHref
+														>
 															<CollapsibleItem
 																item={item}
 																state={state}

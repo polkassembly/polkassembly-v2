@@ -181,7 +181,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 							icon: CommunityIcon,
 							items: [
 								{ title: 'Members', url: '/members' },
-								{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects' }
+								{ title: 'Ecosystem Projects', url: '/ecosystem-projects' }
 							]
 						},
 						{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
