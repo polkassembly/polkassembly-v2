@@ -84,7 +84,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedStatuses, activeTab]);
+	}, [selectedStatuses, activeTab, currentPage]);
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
 
@@ -212,6 +212,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 						{activeTab === 'polkassembly' ? (
 							<ListingTab
 								data={listingData}
+								totalCount={totalCount}
 								currentPage={currentPage}
 								setCurrentPage={setCurrentPage}
 							/>

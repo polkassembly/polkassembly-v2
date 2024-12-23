@@ -35,7 +35,7 @@
 }
 
 .content {
-    @apply w-full bg-gray-100 px-10 py-5;
+    @apply w-full bg-gray-100 min-h-[600px] px-10 py-5;
 }
 
 .popoverContent {

@@ -122,7 +122,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 						{ title: 'Delegation', url: '/delegation', icon: Delegation },
 						{
 							title: 'Bounty',
-							url: '/bounty',
+							url: '',
 							icon: Bounty,
 							isNew: true,
 							items: [
@@ -131,7 +131,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 									url: '/bounty/dashboard',
 									count: trackCounts.bounty_dashboard || 0
 								},
-								{ title: 'On-chain Bounties', url: '/bounty/onchain' }
+								{ title: 'On-chain Bounties', url: '/bounty/onchain-bounty' }
 							]
 						},
 						{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }

@@ -230,30 +230,59 @@ function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State
 				onOpenChange={setIsOpen}
 				className={style.mainCollapsible}
 			>
-				<CollapsibleTrigger asChild>
-					<SidebarMenuButton
-						size='default'
-						tooltip={item.title}
-						className={`${style.mainButton} ${item.isActive ? style.sidebarActive : ''}`}
-					>
-						{item.icon && (
-							<div className={style.iconWrapper}>
-								<Image
-									src={item.icon}
-									alt={item.title || 'icon'}
-									className={item.isActive ? style.sidebar_selected_icon : ''}
-									width={24}
-									height={24}
-								/>
-							</div>
-						)}
-						<span className={style.mainTitle}>
-							{item.title}
-							{item.isNew && <span className={style.newBadge_expanded}>New</span>}
-						</span>
-						{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
-					</SidebarMenuButton>
-				</CollapsibleTrigger>
+				{item.items ? (
+					<CollapsibleTrigger asChild>
+						<SidebarMenuButton
+							size='default'
+							tooltip={item.title}
+							className={`${style.mainButton} ${item.isActive ? style.sidebarActive : ''}`}
+						>
+							{item.icon && (
+								<div className={style.iconWrapper}>
+									<Image
+										src={item.icon}
+										alt={item.title || 'icon'}
+										className={item.isActive ? style.sidebar_selected_icon : ''}
+										width={24}
+										height={24}
+									/>
+								</div>
+							)}
+							<span className={style.mainTitle}>
+								{item.title}
+								{item.isNew && <span className={style.newBadge_expanded}>New</span>}
+							</span>
+							{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
+						</SidebarMenuButton>
+					</CollapsibleTrigger>
+				) : (
+					<CollapsibleTrigger asChild>
+						<Link href={item.url || ''}>
+							<SidebarMenuButton
+								size='default'
+								tooltip={item.title}
+								className={`${style.mainButton} ${item.isActive ? style.sidebarActive : ''}`}
+							>
+								{item.icon && (
+									<div className={style.iconWrapper}>
+										<Image
+											src={item.icon}
+											alt={item.title || 'icon'}
+											className={item.isActive ? style.sidebar_selected_icon : ''}
+											width={24}
+											height={24}
+										/>
+									</div>
+								)}
+								<span className={style.mainTitle}>
+									{item.title}
+									{item.isNew && <span className={style.newBadge_expanded}>New</span>}
+								</span>
+								{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
+							</SidebarMenuButton>
+						</Link>
+					</CollapsibleTrigger>
+				)}
 
 				{item.items && (
 					<CollapsibleContent>
