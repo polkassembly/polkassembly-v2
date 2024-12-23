@@ -124,18 +124,22 @@ export class FirestoreService extends FirestoreRefs {
 		network,
 		proposalType,
 		limit,
-		page
+		page,
+		tags
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
+		tags?: string[];
 	}): Promise<IOffChainPost[]> {
-		const postsQuery = FirestoreRefs.postsCollectionRef()
-			.where('proposalType', '==', proposalType)
-			.where('network', '==', network)
-			.limit(limit)
-			.offset((page - 1) * limit);
+		let postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
+
+		if (tags?.length) {
+			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
+		}
+
+		postsQuery = postsQuery.limit(limit).offset((page - 1) * limit);
 
 		const postsQuerySnapshot = await postsQuery.get();
 

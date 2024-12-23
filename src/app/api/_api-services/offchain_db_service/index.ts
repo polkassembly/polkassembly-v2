@@ -82,15 +82,21 @@ export class OffChainDbService {
 		network,
 		proposalType,
 		limit,
-		page
+		page,
+		tags
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
+		tags?: string[];
 	}): Promise<IOffChainPost[]> {
-		const posts = await FirestoreService.GetOffChainPostsListing({ network, proposalType, limit, page });
+		const posts = await FirestoreService.GetOffChainPostsListing({ network, proposalType, limit, page, tags });
 		if (posts.length) return posts;
+
+		if (tags?.length) {
+			return [];
+		}
 
 		const subsquarePosts = await SubsquareOffChainService.GetOffChainPostsListing({ network, proposalType, limit, page });
 		if (subsquarePosts.length) return subsquarePosts;

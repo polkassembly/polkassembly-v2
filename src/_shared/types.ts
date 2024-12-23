@@ -311,10 +311,44 @@ export enum EProposalStatus {
 	Opened = 'Opened'
 }
 
+export enum EPostOrigin {
+	AUCTION_ADMIN = 'AuctionAdmin',
+	BIG_SPENDER = 'BigSpender',
+	BIG_TIPPER = 'BigTipper',
+	CANDIDATES = 'Candidates',
+	EXPERTS = 'Experts',
+	FELLOWS = 'Fellows',
+	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
+	GENERAL_ADMIN = 'GeneralAdmin',
+	GRAND_MASTERS = 'GrandMasters',
+	LEASE_ADMIN = 'LeaseAdmin',
+	MASTERS = 'Masters',
+	MEDIUM_SPENDER = 'MediumSpender',
+	MEMBERS = 'Members',
+	PROFICIENTS = 'Proficients',
+	REFERENDUM_CANCELLER = 'ReferendumCanceller',
+	REFERENDUM_KILLER = 'ReferendumKiller',
+	ROOT = 'Root',
+	SENIOR_EXPERTS = 'SeniorExperts',
+	SENIOR_FELLOWS = 'SeniorFellows',
+	SENIOR_MASTERS = 'SeniorMasters',
+	SMALL_SPENDER = 'SmallSpender',
+	SMALL_TIPPER = 'SmallTipper',
+	STAKING_ADMIN = 'StakingAdmin',
+	TREASURER = 'Treasurer',
+	WHITELISTED_CALLER = 'WhitelistedCaller',
+	WISH_FOR_CHANGE = 'WishForChange',
+	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
+}
+
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
 	createdAt?: Date;
+	index?: number;
+	hash?: string;
+	origin?: EPostOrigin;
+	description?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -364,36 +398,6 @@ export interface ISidebarMenuItem {
 	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
-}
-
-export enum EPostOrigin {
-	AUCTION_ADMIN = 'AuctionAdmin',
-	BIG_SPENDER = 'BigSpender',
-	BIG_TIPPER = 'BigTipper',
-	CANDIDATES = 'Candidates',
-	EXPERTS = 'Experts',
-	FELLOWS = 'Fellows',
-	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
-	GENERAL_ADMIN = 'GeneralAdmin',
-	GRAND_MASTERS = 'GrandMasters',
-	LEASE_ADMIN = 'LeaseAdmin',
-	MASTERS = 'Masters',
-	MEDIUM_SPENDER = 'MediumSpender',
-	MEMBERS = 'Members',
-	PROFICIENTS = 'Proficients',
-	REFERENDUM_CANCELLER = 'ReferendumCanceller',
-	REFERENDUM_KILLER = 'ReferendumKiller',
-	ROOT = 'Root',
-	SENIOR_EXPERTS = 'SeniorExperts',
-	SENIOR_FELLOWS = 'SeniorFellows',
-	SENIOR_MASTERS = 'SeniorMasters',
-	SMALL_SPENDER = 'SmallSpender',
-	SMALL_TIPPER = 'SmallTipper',
-	STAKING_ADMIN = 'StakingAdmin',
-	TREASURER = 'Treasurer',
-	WHITELISTED_CALLER = 'WhitelistedCaller',
-	WISH_FOR_CHANGE = 'WishForChange',
-	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
 
 export interface IErrorResponse {

@@ -44,7 +44,11 @@ export class SubsquidService extends SubsquidQueries {
 		return {
 			createdAt: proposal.createdAt,
 			proposer: proposal.proposer || '',
-			status: proposal.status
+			status: proposal.status,
+			index: proposal.index,
+			hash: proposal.hash,
+			origin: proposal.origin,
+			description: proposal.description || ''
 		} as IOnChainPostInfo;
 	}
 
