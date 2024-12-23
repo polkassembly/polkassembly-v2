@@ -60,7 +60,8 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 			const onChainInfo = {
 				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt).toISOString() : 'N/A',
 				proposer: item.onChainInfo?.proposer || 'Unknown Proposer',
-				origin: item.onChainInfo?.origin || 'Unknown Origin'
+				origin: item.onChainInfo?.origin || 'Unknown Origin',
+				status: item.onChainInfo?.status || 'Unknown Status'
 			};
 
 			return (

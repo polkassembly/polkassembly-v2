@@ -9,15 +9,16 @@ import { FaRegClock } from 'react-icons/fa6';
 import Address from '../../Profile/Address/Address';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 import styles from './ListingCard.module.scss';
+import StatusTag from '../../StatusTag/StatusTag';
 
 function ListingCard({
 	title,
-	onChainInfo: { proposer, createdAt, origin },
+	onChainInfo: { proposer, createdAt, origin, status },
 	backgroundColor,
 	index
 }: {
 	title: string;
-	onChainInfo: { proposer: string; createdAt: string; origin: string };
+	onChainInfo: { proposer: string; createdAt: string; origin: string; status: string };
 	backgroundColor: string;
 	index: number;
 }) {
@@ -45,6 +46,9 @@ function ListingCard({
 						<span className={`${getSpanStyle(origin, 1)} ${styles.originStyle}`}>{origin}</span>
 					</div>
 				</div>
+			</div>
+			<div>
+				<StatusTag status={status} />
 			</div>
 		</div>
 	);

@@ -78,6 +78,7 @@ export const THEME_COLORS = {
 		success: '#2ED47A',
 		failure: '#FF3C5F',
 		text_grey: '#7587A0',
-		create_proposal_btn_create: '#49CFFC'
+		create_proposal_btn_create: '#49CFFC',
+		section_dark_overlay: '#0D0D0D'
 	}
 };
