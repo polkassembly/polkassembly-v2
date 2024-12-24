@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import getEncodedAddress from '@/_shared/_utils/getEncodedAddress';
-import midTruncateText from '@/_shared/_utils/midTruncateText';
+import { midTruncateText } from '@/_shared/_utils/midTruncateText';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import AddressInline from './AddressInline';
 

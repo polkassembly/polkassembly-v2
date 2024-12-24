@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import midTruncateText from '@/_shared/_utils/midTruncateText';
+import { midTruncateText } from '@/_shared/_utils/midTruncateText';
 import Identicon from '@polkadot/react-identicon';
 
 interface Props {
