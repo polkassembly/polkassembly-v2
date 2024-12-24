@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { midTruncateText } from '@/_shared/_utils/midTruncateText';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import Identicon from '@polkadot/react-identicon';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 }
 
 function AddressInline({ address, addressDisplayText, className, startChars, endChars, iconSize = 20 }: Props) {
-	const displayText = addressDisplayText || (startChars && endChars ? midTruncateText({ text: address, startChars, endChars }) : address);
+	const displayText = addressDisplayText || (startChars && endChars ? shortenAddress(address) : address);
 
 	return (
 		<div

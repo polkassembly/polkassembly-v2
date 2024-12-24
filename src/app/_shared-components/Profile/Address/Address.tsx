@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import getEncodedAddress from '@/_shared/_utils/getEncodedAddress';
-import { midTruncateText } from '@/_shared/_utils/midTruncateText';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import AddressInline from './AddressInline';
 
@@ -23,22 +23,9 @@ function Address({ className, address, truncateCharLen, iconSize = 20 }: Props) 
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
 	const onChainUsername = 'vm';
-	const addressDisplayText = truncateCharLen
-		? midTruncateText({
-				text: encodedAddress,
-				startChars: truncateCharLen,
-				endChars: truncateCharLen
-			})
-		: encodedAddress;
+	const addressDisplayText = truncateCharLen ? shortenAddress(encodedAddress) : encodedAddress;
 
-	const truncatedUsername = truncateCharLen
-		? midTruncateText({
-				text: onChainUsername,
-				startChars: 10,
-				endChars: 10
-			})
-		: onChainUsername;
-
+	const truncatedUsername = truncateCharLen ? shortenAddress(onChainUsername, truncateCharLen) : onChainUsername;
 	return (
 		<div>
 			<AddressInline
