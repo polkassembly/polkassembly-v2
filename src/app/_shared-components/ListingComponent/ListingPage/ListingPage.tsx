@@ -103,7 +103,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 						type='button'
 						className={styles.button}
 					>
-						<span className='text-xl'>+</span> <span className='text-sm'>Create Post</span>
+						<span className='text-xl'>+</span> <span className='whitespace-nowrap text-sm'>Create Post</span>
 					</button>
 				</div>
 				<div className={styles.tabs}>

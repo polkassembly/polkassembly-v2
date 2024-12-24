@@ -1,13 +1,13 @@
 .container {
-    @apply mx-auto bg-white px-10 pt-8;
+    @apply lg:mx-auto bg-white px-5 lg:px-10 pt-8;
 }
 
 .header {
-    @apply flex items-center justify-between;
+    @apply flex items-center gap-5 md:gap-0 justify-between;
 }
 
 .title {
-    @apply text-2xl font-bold;
+    @apply lg:text-2xl text-lg font-bold;
 }
 
 .subtitle {
@@ -15,7 +15,7 @@
 }
 
 .button {
-    @apply flex items-center gap-1.5 rounded-full bg-pink-500 px-6 py-2 text-white shadow;
+    @apply flex items-center gap-1.5 rounded-full bg-pink-500 px-3 py-1.5 lg:px-6 lg:py-2 text-white shadow;
 }
 
 .tabs {
@@ -35,7 +35,7 @@
 }
 
 .content {
-    @apply w-full bg-gray-100 min-h-[600px] px-10 py-5;
+    @apply min-w-full bg-gray-100 min-h-[600px] px-10 py-5;
 }
 
 .popoverContent {
