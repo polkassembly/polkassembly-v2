@@ -424,3 +424,8 @@ export enum EWeb3LoginScreens {
 	FETCH_CONFIRMATION,
 	SELECT_ADDRESS
 }
+
+export enum EActivityFeedTab {
+	EXPLORE = 'explore',
+	FOLLOWING = 'following'
+}
