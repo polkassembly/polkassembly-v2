@@ -105,13 +105,8 @@
 		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": [
-			"yarn eslint --fix",
-			"yarn prettier --write"
-		],
-		"**/*.(md|css|scss|html)": [
-			"yarn prettier --write"
-		]
+		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
+		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
 	},
 	"husky": {
 		"hooks": {
