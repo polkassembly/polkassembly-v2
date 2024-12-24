@@ -14,14 +14,14 @@ interface Props {
 function StatusTag({ className = '', status, colorInverted }: Props) {
 	const { theme } = useTheme();
 
-	const normalizedStatus = status?.toLowerCase();
+	const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
 
 	return (
 		<div
 			// eslint-disable-next-line
-			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus] : ''} ${
-				colorInverted ? styles.inverted : ''
-			} ${theme === 'dark' ? styles.dark : styles.light} ${className}`}
+			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus] : ''} ${colorInverted ? styles.inverted : ''} ${
+				theme === 'dark' ? styles.dark : styles.light
+			} ${className}`}
 		>
 			{status?.split(/(?=[A-Z])/).join(' ')}
 		</div>
