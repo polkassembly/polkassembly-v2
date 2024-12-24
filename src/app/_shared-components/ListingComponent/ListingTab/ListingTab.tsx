@@ -4,6 +4,7 @@
 
 import { getPageNumbers } from '@/app/_client-utils/getPageNumber';
 import { IPostListing } from '@/_shared/types';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import styles from './ListingTab.module.scss';
 import ListingCard from '../ListingCard/ListingCard';
 
@@ -15,8 +16,7 @@ interface ListingTabProps {
 }
 
 function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTabProps) {
-	const ITEMS_PER_PAGE = 10;
-	const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+	const totalPages = Math.ceil(totalCount / DEFAULT_LISTING_LIMIT);
 
 	const renderPagination = () => (
 		<div className={styles.pagination}>
