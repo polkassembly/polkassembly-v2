@@ -32,7 +32,7 @@ export class NextApiClientService {
 				'x-api-key': process.env.NEXT_PUBLIC_POLKASSEMBLY_API_KEY || '',
 				'x-network': process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ''
 			},
-			method: method || 'POST'
+			method: method ?? (data ? 'POST' : 'GET')
 		});
 
 		const resJSON = await response.json();
