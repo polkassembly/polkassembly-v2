@@ -4,8 +4,6 @@
 
 'use client';
 
-'use client';
-
 import { getPageNumbers } from '@/app/_client-utils/getPageNumber';
 import { IPostListing } from '@/_shared/types';
 import styles from './ListingTab.module.scss';
