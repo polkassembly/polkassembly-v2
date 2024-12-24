@@ -46,7 +46,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.string(),
+		content: z.string().min(1, 'Content is required'),
 		parentCommentId: z.string().optional()
 	});
 

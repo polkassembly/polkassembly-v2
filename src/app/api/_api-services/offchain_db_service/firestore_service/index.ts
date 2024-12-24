@@ -187,6 +187,25 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
+	static async GetCommentById(id: string): Promise<IComment | null> {
+		const commentDocSnapshot = await FirestoreRefs.commentsCollectionRef().doc(id).get();
+		if (!commentDocSnapshot.exists) {
+			return null;
+		}
+
+		const data = commentDocSnapshot.data();
+
+		if (!data) {
+			return null;
+		}
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IComment;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -256,5 +275,13 @@ export class FirestoreService extends FirestoreRefs {
 		};
 
 		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
+	}
+
+	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
+		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async DeleteComment(commentId: string) {
+		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
 	}
 }

@@ -112,6 +112,10 @@ export class OffChainDbService {
 		return FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
 	}
 
+	static async GetCommentById(id: string): Promise<IComment | null> {
+		return FirestoreService.GetCommentById(id);
+	}
+
 	// Write methods
 
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
@@ -159,5 +163,13 @@ export class OffChainDbService {
 		parentCommentId?: string;
 	}) {
 		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId });
+	}
+
+	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
+		return FirestoreService.UpdateComment({ commentId, content });
+	}
+
+	static async DeleteComment(commentId: string) {
+		return FirestoreService.DeleteComment(commentId);
 	}
 }
