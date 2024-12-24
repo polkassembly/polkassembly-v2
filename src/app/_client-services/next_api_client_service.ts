@@ -133,6 +133,6 @@ export class NextApiClientService {
 		}
 
 		const url = this.getApiRoute[EApiRoute.POSTS_LISTING]([proposalType], queryParams);
-		return this.nextApiClientFetch<IOnChainPostListingResponse>(url, undefined, 'GET');
+		return this.nextApiClientFetch<IOnChainPostListingResponse>(url);
 	}
 }
