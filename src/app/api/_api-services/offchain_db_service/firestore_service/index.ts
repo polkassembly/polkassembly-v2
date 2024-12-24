@@ -224,4 +224,37 @@ export class FirestoreService extends FirestoreRefs {
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
 	}
+
+	static async AddNewComment({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		content,
+		parentCommentId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+		parentCommentId?: string;
+	}) {
+		const newCommentId = FirestoreRefs.commentsCollectionRef().doc().id;
+
+		const newComment: IComment = {
+			id: newCommentId,
+			network,
+			proposalType,
+			userId,
+			content,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			isDeleted: false,
+			indexOrHash,
+			parentCommentId: parentCommentId || null
+		};
+
+		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
+	}
 }

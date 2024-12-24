@@ -142,4 +142,22 @@ export class OffChainDbService {
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
+
+	static async AddNewComment({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		content,
+		parentCommentId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+		parentCommentId?: string;
+	}) {
+		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId });
+	}
 }

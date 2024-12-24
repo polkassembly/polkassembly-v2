@@ -437,7 +437,7 @@ export interface IComment {
 	content: string;
 	network: ENetwork;
 	proposalType: EProposalType;
-	index?: number;
-	hash?: string;
-	parentCommentId?: string;
+	indexOrHash: string;
+	parentCommentId: string | null;
+	isDeleted: boolean;
 }
