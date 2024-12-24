@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { EProposalStatus, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
-import { QueryService } from '@/app/_client-services/api_query_service';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
@@ -19,7 +19,7 @@ import styles from './ListingPage.module.scss';
 
 interface ListingPageProps {
 	proposalType: string;
-	origins?: string;
+	origins?: string[];
 	title?: string;
 	description?: string;
 }
@@ -56,7 +56,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	const fetchListingData = async () => {
 		setIsLoading(true);
-		const { data, error: dataError } = await QueryService.fetchListingData(proposalType, currentPage, selectedStatuses, origins, selectedTags);
+		const { data, error: dataError } = await NextApiClientService.fetchListingDataApi(proposalType, currentPage, selectedStatuses, origins, selectedTags);
 
 		if (dataError) {
 			setError(dataError);
@@ -87,7 +87,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedStatuses, activeTab, currentPage, selectedTags]);
 
-	if (error instanceof Error) return <p>Error: {error.message}</p>;
+	if (error) return <p>Error: {error.message}</p>;
 
 	return (
 		<div>

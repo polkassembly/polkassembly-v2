@@ -8,8 +8,7 @@
 import React from 'react';
 import getEncodedAddress from '@/_shared/_utils/getEncodedAddress';
 import midTruncateText from '@/_shared/_utils/midTruncateText';
-import { ENetwork } from '@/_shared/types';
-import LinkWithNetwork from '../../Misc/LinkWithNetwork';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import AddressInline from './AddressInline';
 
 interface Props {
@@ -20,7 +19,7 @@ interface Props {
 }
 
 function Address({ className, address, truncateCharLen, iconSize = 20 }: Props) {
-	const network = ENetwork.POLKADOT;
+	const network = getCurrentNetwork();
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
 	const onChainUsername = 'vm';
@@ -41,14 +40,14 @@ function Address({ className, address, truncateCharLen, iconSize = 20 }: Props) 
 		: onChainUsername;
 
 	return (
-		<LinkWithNetwork>
+		<div>
 			<AddressInline
 				className={className}
 				address={encodedAddress}
 				addressDisplayText={truncatedUsername || addressDisplayText}
 				iconSize={iconSize}
 			/>
-		</LinkWithNetwork>
+		</div>
 	);
 }
 

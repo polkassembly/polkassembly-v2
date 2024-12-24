@@ -400,26 +400,6 @@ export interface ISidebarMenuItem {
 	heading?: string;
 }
 
-export interface IListingResponse {
-	posts: IPostListing[];
-	id?: string;
-	proposalType?: string;
-	network?: string;
-	title: string;
-	index: number;
-	content?: string;
-	tags?: string[];
-	dataSource?: string;
-	createdAt?: string;
-	onChainInfo?: {
-		createdAt?: string;
-		proposer?: string;
-		status?: string;
-		description?: string;
-		origin?: string;
-	};
-}
-
 export interface IErrorResponse {
 	status: StatusCodes;
 	message: string;
@@ -436,7 +416,7 @@ export enum EApiRoute {
 	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
 	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
 	LOGOUT = 'LOGOUT',
-	FETCH_LISTING_DATA = 'FETCH_LISTING_DATA'
+	POSTS_LISTING = 'POSTS_LISTING'
 }
 
 export enum EWeb3LoginScreens {

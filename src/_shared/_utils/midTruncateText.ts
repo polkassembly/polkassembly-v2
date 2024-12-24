@@ -18,7 +18,6 @@ interface Params {
  * @return {string}
  */
 
-// eslint-disable-next-line
 export default function midTruncateText({ text, startChars, endChars, separator = '...' }: Params): string {
 	const maxLength = startChars + endChars;
 

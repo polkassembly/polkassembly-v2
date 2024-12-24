@@ -4,6 +4,7 @@
 
 /* eslint-disable lines-between-class-members */
 
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse, IOnChainPostListingResponse } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -21,10 +22,12 @@ export class NextApiClientService {
 		[EApiRoute.GEN_TFA_TOKEN]: () => new URL(`${this.baseURL}/auth/actions/tfa/setup/generate`),
 		[EApiRoute.VERIFY_TFA_TOKEN]: () => new URL(`${this.baseURL}/auth/actions/tfa/setup/verify`),
 		[EApiRoute.LOGOUT]: () => new URL(`${this.baseURL}/auth/actions/logout`),
-		[EApiRoute.FETCH_LISTING_DATA]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
+		[EApiRoute.POSTS_LISTING]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
 			const url = new URL(`${this.baseURL}/${routeSegments?.join('/') || ''}`);
 			if (queryParams) {
-				url.search = queryParams.toString();
+				queryParams.forEach((value, key) => {
+					url.searchParams.set(key, value);
+				});
 			}
 			return url;
 		}
@@ -105,16 +108,16 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>(this.getApiRoute[EApiRoute.LOGOUT]());
 	}
 
-	protected static async fetchListingDataApi(
+	static async fetchListingDataApi(
 		proposalType: string,
 		page: number,
 		statuses?: string[],
-		origins?: string,
+		origins?: string[],
 		tags: string[] = []
 	): Promise<{ data: IOnChainPostListingResponse | null; error: IErrorResponse | null }> {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
-			limit: '10'
+			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
 
 		if (statuses?.length) {
@@ -125,11 +128,11 @@ export class NextApiClientService {
 			tags.forEach((tag) => queryParams.append('tags', tag));
 		}
 
-		if (origins) {
-			queryParams.append('origin', origins);
+		if (Array.isArray(origins) && origins.length) {
+			origins.forEach((origin) => queryParams.append('origin', origin));
 		}
 
-		const url = this.getApiRoute[EApiRoute.FETCH_LISTING_DATA]([proposalType], queryParams);
+		const url = this.getApiRoute[EApiRoute.POSTS_LISTING]([proposalType], queryParams);
 		return this.nextApiClientFetch<IOnChainPostListingResponse>(url, undefined, 'GET');
 	}
 }
