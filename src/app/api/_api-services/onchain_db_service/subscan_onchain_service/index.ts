@@ -6,6 +6,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { snakeToPascalCase } from '@/_shared/_utils/snakeToPascalCase';
 import { ENetwork, EProposalType, IOnChainPostInfo } from '@/_shared/types';
 import { SUBSCAN_API_KEY } from '@/app/api/_api-constants/apiEnvVars';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -106,7 +107,10 @@ export class SubscanOnChainService {
 		return {
 			proposer: ValidatorService.isValidSubstrateAddress(data?.data?.proposer?.address) ? getSubstrateAddress(data?.data?.proposer?.address) || '' : '',
 			status: data?.data?.status || '',
-			createdAt: data?.data?.timeline?.[0].time ? dayjs(data?.data?.timeline?.[0].time).toDate() : undefined
+			createdAt: data?.data?.timeline?.[0].time ? dayjs(data?.data?.timeline?.[0].time).toDate() : undefined,
+			origin: data?.data?.origins ? snakeToPascalCase(data?.data?.origins) : undefined,
+			index: data?.data?.referendum_index ?? undefined,
+			hash: data?.data?.info?.hash || undefined
 		} as IOnChainPostInfo;
 	}
 }

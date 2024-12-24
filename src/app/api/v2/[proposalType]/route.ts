@@ -8,9 +8,12 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EDataSource, EPostOrigin, EProposalStatus, EProposalType, IOnChainPostListingResponse, IPostListing } from '@shared/types';
+import { EDataSource, EPostOrigin, EProposalStatus, EProposalType, IOffChainPost, IOnChainPostListing, IOnChainPostListingResponse, IPostListing } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
+import { APIError } from '../../_api-utils/apiError';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	const zodParamsSchema = z.object({
@@ -23,12 +26,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
-		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional()
+		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional(),
+		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional() // max 30 tags because of firestore query limit
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, status: statuses, origin: origins } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, status: statuses, origin: origins, tags } = zodQuerySchema.parse(searchParamsObject);
 
 	const network = await getNetworkFromHeaders();
 
@@ -36,7 +40,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	let totalCount = 0;
 
 	// 1. if proposal type is on-chain, get on-chain posts from onchain_db_service, then get the corresponding off-chain data from offchain_db_service for each on-chain post
-	if (ValidatorService.isValidOnChainProposalType(proposalType)) {
+	if (ValidatorService.isValidOnChainProposalType(proposalType) && !tags?.length) {
 		const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins });
 
 		// Fetch off-chain data
@@ -61,13 +65,58 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		}));
 
 		totalCount = onChainPostsListingResponse.totalCount;
+	} else if (ValidatorService.isValidOnChainProposalType(proposalType) && tags?.length) {
+		// 2. if proposal type is on-chain and tags are provided, get on-chain posts from offchain_db_service, then get the corresponding on-chain data from onchain_db_service for each on-chain post
+		const postsOffchainData = await OffChainDbService.GetOffChainPostsListing({
+			network,
+			proposalType,
+			limit,
+			page,
+			tags
+		});
+
+		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType, tags });
+
+		const postIdentifier: keyof IOffChainPost = proposalType === EProposalType.TIP ? 'hash' : 'index';
+
+		// get onchain data for each post
+		const onChainDataPromises = postsOffchainData.map((post) => {
+			if (!post[postIdentifier as keyof IOffChainPost]) {
+				throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, `${postIdentifier} not found for the ${proposalType} proposal type and post id ${post.id}`);
+			}
+
+			return OnChainDbService.GetOnChainPostInfo({ network, proposalType, indexOrHash: post[postIdentifier as keyof IOffChainPost]?.toString() || '' });
+		});
+
+		const onChainData = await Promise.all(onChainDataPromises);
+
+		posts = postsOffchainData.map((post, index) => {
+			const onChainPostInfo = onChainData[Number(index)] || undefined;
+			const onChainListingInfo: IOnChainPostListing | undefined = onChainPostInfo
+				? {
+						createdAt: onChainPostInfo.createdAt || post.createdAt || new Date(),
+						proposer: onChainPostInfo.proposer,
+						status: onChainPostInfo.status,
+						description: onChainPostInfo.description || '',
+						index: onChainPostInfo.index || post.index || 0,
+						origin: onChainPostInfo.origin || '',
+						type: proposalType,
+						hash: onChainPostInfo.hash || post.hash || ''
+					}
+				: undefined;
+			return {
+				...post,
+				onChainInfo: onChainListingInfo
+			};
+		});
 	} else {
-		// 2. if proposal type is off-chain, get off-chain posts from offchain_db_service
+		// 3. if proposal type is off-chain, get off-chain posts from offchain_db_service
 		posts = await OffChainDbService.GetOffChainPostsListing({
 			network,
 			proposalType,
 			limit,
-			page
+			page,
+			tags
 		});
 
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });

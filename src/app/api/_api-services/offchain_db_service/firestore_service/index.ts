@@ -124,18 +124,22 @@ export class FirestoreService extends FirestoreRefs {
 		network,
 		proposalType,
 		limit,
-		page
+		page,
+		tags
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
+		tags?: string[];
 	}): Promise<IOffChainPost[]> {
-		const postsQuery = FirestoreRefs.postsCollectionRef()
-			.where('proposalType', '==', proposalType)
-			.where('network', '==', network)
-			.limit(limit)
-			.offset((page - 1) * limit);
+		let postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
+
+		if (tags?.length) {
+			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
+		}
+
+		postsQuery = postsQuery.limit(limit).offset((page - 1) * limit);
 
 		const postsQuerySnapshot = await postsQuery.get();
 
@@ -150,11 +154,15 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
-	static async GetTotalOffChainPostsCount({ network, proposalType }: { network: ENetwork; proposalType: EProposalType }): Promise<number> {
-		const postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network).count();
+	static async GetTotalOffChainPostsCount({ network, proposalType, tags }: { network: ENetwork; proposalType: EProposalType; tags?: string[] }): Promise<number> {
+		let postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
 
-		const postsQuerySnapshot = await postsQuery.get();
-		return postsQuerySnapshot?.data?.()?.count || 0;
+		if (tags?.length) {
+			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
+		}
+
+		const countSnapshot = await postsQuery.count().get();
+		return countSnapshot.data().count || 0;
 	}
 
 	// write methods

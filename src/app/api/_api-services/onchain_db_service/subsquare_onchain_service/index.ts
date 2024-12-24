@@ -43,7 +43,10 @@ export class SubsquareOnChainService {
 		const onChainPostInfo: IOnChainPostInfo = {
 			proposer: ValidatorService.isValidSubstrateAddress(proposer) ? getSubstrateAddress(proposer) || '' : '',
 			status: data?.state?.name || data?.onchainData?.state?.name || EProposalStatus.Unknown,
-			createdAt: data?.createdAt ? new Date(data?.createdAt) : undefined
+			createdAt: data?.createdAt ? new Date(data?.createdAt) : undefined,
+			origin: data?.onchainData?.info?.origin?.origins,
+			index: data?.onchainData?.timeline?.[0]?.referendumIndex ?? undefined,
+			hash: data?.onchainData?.timeline?.[0]?.args?.proposalHash || undefined
 		};
 
 		return onChainPostInfo;

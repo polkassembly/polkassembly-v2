@@ -6,10 +6,13 @@ export class SubsquidQueries {
 	protected static GET_PROPOSAL_BY_INDEX_AND_TYPE = `
 		query ProposalByIndexAndType($index_eq: Int!, $type_eq: ProposalType!) {
 			proposals(where: {index_eq: $index_eq, type_eq: $type_eq}, limit: 1) {
+				index
+				hash
 				createdAt
 				proposer
 				status
 				description
+				origin
 			}
 		}
 	`;
@@ -17,10 +20,13 @@ export class SubsquidQueries {
 	protected static GET_PROPOSAL_BY_HASH_AND_TYPE = `
 		query GetProposalByHash($type_eq: ProposalType!, $hash_eq: String!) {
 			proposals(where: {type_eq: $type_eq, hash_eq: $hash_eq}, limit: 1) {
+				index
+				hash
 				createdAt
 				proposer
 				status
 				description
+				origin
 			}
 		}
 	`;
