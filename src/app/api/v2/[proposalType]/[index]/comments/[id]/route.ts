@@ -32,7 +32,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	return NextResponse.json(comment);
 });
 
-export const UPDATE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
+export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const zodParamsSchema = z.object({
 		id: z.string()
 	});
