@@ -428,3 +428,16 @@ export enum EActivityFeedTab {
 	EXPLORE = 'explore',
 	FOLLOWING = 'following'
 }
+
+export interface IComment {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	userId: number;
+	content: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	index?: number;
+	hash?: string;
+	parentCommentId?: string;
+}

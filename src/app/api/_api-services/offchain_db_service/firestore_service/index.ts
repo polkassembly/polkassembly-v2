@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -163,6 +163,28 @@ export class FirestoreService extends FirestoreRefs {
 
 		const countSnapshot = await postsQuery.count().get();
 		return countSnapshot.data().count || 0;
+	}
+
+	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IComment[]> {
+		let commentsQuery = FirestoreRefs.commentsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType);
+
+		if (proposalType === EProposalType.TIP) {
+			commentsQuery = commentsQuery.where('hash', '==', indexOrHash);
+		} else {
+			commentsQuery = commentsQuery.where('index', '==', Number(indexOrHash));
+		}
+
+		const commentsQuerySnapshot = await commentsQuery.get();
+
+		return commentsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IComment;
+		});
 	}
 
 	// write methods
