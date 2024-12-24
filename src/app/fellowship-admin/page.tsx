@@ -12,7 +12,7 @@ function Page() {
 				title='Fellowship Admin'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM_V2}
-				origins={EPostOrigin.FELLOWSHIP_ADMIN}
+				origins={[EPostOrigin.FELLOWSHIP_ADMIN]}
 			/>
 		</div>
 	);

@@ -12,7 +12,7 @@ function Page() {
 				title='Whitelisted Caller'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM_V2}
-				origins={EPostOrigin.WHITELISTED_CALLER}
+				origins={[EPostOrigin.WHITELISTED_CALLER]}
 			/>
 		</div>
 	);

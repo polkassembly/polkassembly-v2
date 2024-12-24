@@ -12,7 +12,7 @@ function Page() {
 				title='Medium Spender'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM_V2}
-				origins={EPostOrigin.MEDIUM_SPENDER}
+				origins={[EPostOrigin.MEDIUM_SPENDER]}
 			/>
 		</div>
 	);

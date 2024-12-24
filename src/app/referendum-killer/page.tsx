@@ -12,7 +12,7 @@ function Page() {
 				title='Referendum Killer'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM}
-				origins={EPostOrigin.REFERENDUM_KILLER}
+				origins={[EPostOrigin.REFERENDUM_KILLER]}
 			/>
 		</div>
 	);

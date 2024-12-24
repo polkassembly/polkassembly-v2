@@ -12,7 +12,7 @@ function Page() {
 				title='Wish For Change'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM_V2}
-				origins={EPostOrigin.WISH_FOR_CHANGE}
+				origins={[EPostOrigin.WISH_FOR_CHANGE]}
 			/>
 		</div>
 	);

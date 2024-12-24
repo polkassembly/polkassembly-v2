@@ -12,7 +12,7 @@ function Page() {
 				title='Big Spender'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM_V2}
-				origins={EPostOrigin.BIG_SPENDER}
+				origins={[EPostOrigin.BIG_SPENDER]}
 			/>
 		</div>
 	);
