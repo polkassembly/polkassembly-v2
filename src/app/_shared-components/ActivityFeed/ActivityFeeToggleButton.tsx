@@ -3,8 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { EActivityFeedTab } from '@/_shared/types';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 interface IToggleButtonProps {
 	activeTab: EActivityFeedTab;
@@ -13,35 +13,29 @@ interface IToggleButtonProps {
 
 function ActivityFeeToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
 	const router = useRouter();
-	const { query } = router;
-
+	const searchParams = useSearchParams();
+	const pathname = usePathname();
+	const queryTab = searchParams.get('tab');
 	useEffect(() => {
-		if (query.tab === 'subscribed') {
+		if (queryTab === 'subscribed') {
 			setActiveTab(EActivityFeedTab.FOLLOWING);
 		} else {
 			setActiveTab(EActivityFeedTab.EXPLORE);
 		}
-	}, [query.tab, setActiveTab]);
+	}, [queryTab, setActiveTab]);
 
 	const handleTabClick = (tab: EActivityFeedTab) => {
 		setActiveTab(tab);
-		router.push(
-			{
-				pathname: router.pathname,
-				query: { ...router.query, tab: tab === EActivityFeedTab.EXPLORE ? 'explore' : 'subscribed' }
-			},
-			undefined,
-			{ shallow: true }
-		);
+		router.push(`${pathname}?tab=${tab === EActivityFeedTab.EXPLORE ? 'explore' : 'subscribed'}`);
 	};
 
 	return (
-		<div className='mt-2 flex h-9 items-center gap-1 rounded-lg bg-[#ECECEC] p-2 dark:bg-white dark:bg-opacity-[12%] md:gap-2 md:p-2 md:pt-5'>
+		<div className='my-2 flex h-9 items-center rounded-lg bg-[#ECECEC] px-1.5 pb-1 dark:bg-white dark:bg-opacity-[12%]'>
 			<button
 				type='button'
 				onClick={() => handleTabClick(EActivityFeedTab.EXPLORE)}
-				className={`mt-4 cursor-pointer rounded-md px-2 py-[3px] text-[15px] font-semibold md:mt-1 md:px-4 md:py-[5px] md:text-[16px] ${
-					activeTab === EActivityFeedTab.EXPLORE ? 'text-pink_primary bg-[#FFFFFF] dark:bg-[#0D0D0D]' : 'text-blue-light-medium dark:text-[#DADADA]'
+				className={`md:text-md mt-4 cursor-pointer rounded-md px-2 py-[3px] text-sm font-medium md:mt-1 md:px-3 md:py-[2px] ${
+					activeTab === EActivityFeedTab.EXPLORE ? 'bg-[#FFFFFF] text-navbar_border dark:bg-[#0D0D0D]' : 'text-blue-light-medium dark:text-[#DADADA]'
 				}`}
 			>
 				Explore
@@ -49,8 +43,8 @@ function ActivityFeeToggleButton({ activeTab, setActiveTab }: IToggleButtonProps
 			<button
 				type='button'
 				onClick={() => handleTabClick(EActivityFeedTab.FOLLOWING)}
-				className={`mt-4 cursor-pointer rounded-lg px-2 py-[3px] text-[15px] font-semibold md:mt-1 md:px-4 md:py-[5px] md:text-[16px] ${
-					activeTab === EActivityFeedTab.FOLLOWING ? 'text-pink_primary bg-[#FFFFFF] dark:bg-[#0D0D0D]' : 'text-blue-light-medium dark:text-[#DADADA]'
+				className={`md:text-md mt-4 cursor-pointer rounded-md px-2 py-[3px] text-sm font-medium md:mt-1 md:px-3 md:py-[2px] ${
+					activeTab === EActivityFeedTab.FOLLOWING ? 'bg-[#FFFFFF] text-navbar_border dark:bg-[#0D0D0D]' : 'text-blue-light-medium dark:text-[#DADADA]'
 				}`}
 			>
 				Subscribed
