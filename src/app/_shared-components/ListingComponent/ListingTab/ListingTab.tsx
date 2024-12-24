@@ -50,7 +50,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 	);
 
 	const renderListingCards = () =>
-		data.slice(0, ITEMS_PER_PAGE).map((item, idx) => {
+		data.slice(0, DEFAULT_LISTING_LIMIT).map((item, idx) => {
 			const backgroundColor = idx % 2 === 0 ? '#fbfbfb' : '#FFFFFF';
 
 			const onChainInfo = {
@@ -63,7 +63,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 			return (
 				<div
 					key={item.id || `${item.proposalType}-${item.onChainInfo?.createdAt}-${idx}`}
-					className={`${styles.listing_item} ${idx === Math.min(ITEMS_PER_PAGE - 1, (data?.length ?? 0) - 1) ? styles.listing_item_last : ''}`}
+					className={`${styles.listing_item} ${idx === Math.min(DEFAULT_LISTING_LIMIT - 1, (data?.length ?? 0) - 1) ? styles.listing_item_last : ''}`}
 				>
 					<ListingCard
 						backgroundColor={backgroundColor}
@@ -78,7 +78,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 	return (
 		<div>
 			<div className={styles.listing_container}>{data?.length > 0 ? renderListingCards() : <p className={styles.no_data}>No data available</p>}</div>
-			{totalCount > ITEMS_PER_PAGE && renderPagination()}
+			{totalCount > DEFAULT_LISTING_LIMIT && renderPagination()}
 		</div>
 	);
 }
