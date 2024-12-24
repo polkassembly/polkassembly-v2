@@ -109,7 +109,8 @@ export class NextApiClientService {
 		proposalType: string,
 		page: number,
 		statuses?: string[],
-		origins?: string
+		origins?: string,
+		tags: string[] = []
 	): Promise<{ data: IOnChainPostListingResponse | null; error: IErrorResponse | null }> {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
@@ -118,6 +119,10 @@ export class NextApiClientService {
 
 		if (statuses?.length) {
 			statuses.forEach((status) => queryParams.append('status', status));
+		}
+
+		if (tags.length) {
+			tags.forEach((tag) => queryParams.append('tags', tag));
 		}
 
 		if (origins) {

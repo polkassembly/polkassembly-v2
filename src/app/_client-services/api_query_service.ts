@@ -5,7 +5,7 @@
 import { NextApiClientService } from './next_api_client_service';
 
 export class QueryService extends NextApiClientService {
-	static async fetchListingData(proposalType: string, page: number, statuses?: string[], origins?: string) {
-		return this.fetchListingDataApi(proposalType, page, statuses, origins);
+	static async fetchListingData(proposalType: string, page: number, statuses?: string[], origins?: string, tags?: string[]) {
+		return this.fetchListingDataApi(proposalType, page, statuses, origins, tags);
 	}
 }

@@ -45,7 +45,8 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		EProposalStatus.Submitted,
 		EProposalStatus.TimedOut
 	];
-	const tags = ['Abc', 'Xyz', 'Network', 'Governance', 'Proposal', 'Test'];
+
+	const tags = ['bounty', 'treasury', 'smart contract', 'polkadot', 'Network', 'Governance', 'Proposal', 'Test'];
 	const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(tagSearchTerm.toLowerCase()));
 
 	const [listingData, setListingData] = useState<IPostListing[]>([]);
@@ -55,7 +56,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	const fetchListingData = async () => {
 		setIsLoading(true);
-		const { data, error: dataError } = await QueryService.fetchListingData(proposalType, currentPage, selectedStatuses, origins);
+		const { data, error: dataError } = await QueryService.fetchListingData(proposalType, currentPage, selectedStatuses, origins, selectedTags);
 
 		if (dataError) {
 			setError(dataError);
@@ -84,7 +85,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedStatuses, activeTab, currentPage]);
+	}, [selectedStatuses, activeTab, currentPage, selectedTags]);
 
 	if (error instanceof Error) return <p>Error: {error.message}</p>;
 
