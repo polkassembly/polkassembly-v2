@@ -35,7 +35,7 @@ function ActivityFeeToggleButton({ activeTab, setActiveTab }: IToggleButtonProps
 				type='button'
 				onClick={() => handleTabClick(EActivityFeedTab.EXPLORE)}
 				className={`md:text-md mt-4 cursor-pointer rounded-md px-2 py-[3px] text-sm font-medium md:mt-1 md:px-3 md:py-[2px] ${
-					activeTab === EActivityFeedTab.EXPLORE ? 'bg-[#FFFFFF] text-navbar_border dark:bg-[#0D0D0D]' : 'text-blue-light-medium dark:text-[#DADADA]'
+					activeTab === EActivityFeedTab.EXPLORE ? 'bg-[#FFFFFF] text-navbar_border dark:bg-[#0D0D0D]' : 'text-sidebar_text dark:text-[#DADADA]'
 				}`}
 			>
 				Explore
@@ -44,7 +44,7 @@ function ActivityFeeToggleButton({ activeTab, setActiveTab }: IToggleButtonProps
 				type='button'
 				onClick={() => handleTabClick(EActivityFeedTab.FOLLOWING)}
 				className={`md:text-md mt-4 cursor-pointer rounded-md px-2 py-[3px] text-sm font-medium md:mt-1 md:px-3 md:py-[2px] ${
-					activeTab === EActivityFeedTab.FOLLOWING ? 'bg-[#FFFFFF] text-navbar_border dark:bg-[#0D0D0D]' : 'text-blue-light-medium dark:text-[#DADADA]'
+					activeTab === EActivityFeedTab.FOLLOWING ? 'bg-[#FFFFFF] text-navbar_border dark:bg-[#0D0D0D]' : 'text-sidebar_text dark:text-[#DADADA]'
 				}`}
 			>
 				Subscribed
