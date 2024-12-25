@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { EProposalStatus, IPostListing } from '@/_shared/types';
+import { EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { BiSort } from 'react-icons/bi';
@@ -25,12 +25,14 @@ interface ListingPageProps {
 }
 
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
-	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
+	const [activeTab, setActiveTab] = useState<'tab1' | 'tab2'>('tab1');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [filterActive, setFilterActive] = useState(false);
 	const [selectedStatuses, setSelectedStatuses] = useState<EProposalStatus[]>([]);
 	const [tagSearchTerm, setTagSearchTerm] = useState('');
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+	const tabNames = proposalType === EProposalType.DISCUSSION ? { tab1: 'POLKASSEMBLY', tab2: 'EXTERNAL' } : { tab1: 'REFERENDA', tab2: 'ANALYTICS' };
 
 	const statuses = [
 		EProposalStatus.Cancelled,
@@ -80,7 +82,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	};
 
 	useEffect(() => {
-		if (activeTab === 'polkassembly') {
+		if (activeTab === 'tab1') {
 			fetchListingData();
 		}
 
@@ -110,17 +112,17 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<div className='flex space-x-6'>
 						<button
 							type='button'
-							className={`${styles['tab-button']} ${activeTab === 'polkassembly' ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab('polkassembly')}
+							className={`${styles['tab-button']} ${activeTab === 'tab1' ? styles['tab-button-active'] : ''}`}
+							onClick={() => setActiveTab('tab1')}
 						>
-							POLKASSEMBLY
+							{tabNames.tab1}
 						</button>
 						<button
 							type='button'
-							className={`${styles['tab-button']} ${activeTab === 'external' ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab('external')}
+							className={`${styles['tab-button']} ${activeTab === 'tab2' ? styles['tab-button-active'] : ''}`}
+							onClick={() => setActiveTab('tab2')}
 						>
-							EXTERNAL
+							{tabNames.tab2}
 						</button>
 					</div>
 					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
@@ -138,7 +140,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 									<span className={filterActive ? styles.selectedicon : ''}>
 										<FaFilter />
 									</span>
-									Filter
+									<span className='hidden lg:block'>Filter</span>
 								</div>
 							</PopoverTrigger>
 							<PopoverContent
@@ -200,7 +202,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 							</PopoverContent>
 						</Popover>
 						<p className={styles.filter}>
-							Sort By <BiSort />
+							<span className='hidden lg:block'>Sort By</span> <BiSort />
 						</p>
 					</div>
 				</div>
@@ -210,7 +212,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<LoadingSpinner />
 				) : (
 					<div>
-						{activeTab === 'polkassembly' ? (
+						{activeTab === 'tab1' ? (
 							<ListingTab
 								data={listingData}
 								totalCount={totalCount}

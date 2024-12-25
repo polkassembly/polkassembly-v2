@@ -1,5 +1,5 @@
 .base {
-    @apply h-min whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium tracking-tight;
+    @apply h-min whitespace-nowrap rounded-full lg:px-4 lg:py-2 py-1 px-3 text-xs font-medium tracking-tight;
 }
 
 .inverted {
