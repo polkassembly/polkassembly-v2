@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Members'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Open Tech Committee Members is a mostly self-governing expert body with a primary goal of representing the humans who embody and contain the technical knowledge base of the Polkadot network and protocol.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.MEMBERS]}
 			/>

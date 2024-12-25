@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Small Tipper'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin able to spend up to 250 DOT from the treasury at onceShow.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.SMALL_SPENDER]}
 			/>

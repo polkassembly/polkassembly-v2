@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Lease Admin'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin able to force slot leases'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.LEASE_ADMIN]}
 			/>

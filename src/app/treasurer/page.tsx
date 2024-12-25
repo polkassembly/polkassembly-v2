@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Treasurer'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin for spending (any amount of) funds until the upper limit of 10,000,000 DOT.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.TREASURER]}
 			/>
