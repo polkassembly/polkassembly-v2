@@ -11,7 +11,7 @@ function Page() {
 			<ListingPage
 				title='Referendum Canceller'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
-				proposalType={EProposalType.REFERENDUM}
+				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.REFERENDUM_CANCELLER]}
 			/>
 		</div>

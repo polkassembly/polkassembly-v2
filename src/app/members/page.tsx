@@ -9,10 +9,10 @@ function Page() {
 	return (
 		<div>
 			<ListingPage
-				title='Referendum Killer'
+				title='Members'
 				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
 				proposalType={EProposalType.REFERENDUM_V2}
-				origins={[EPostOrigin.REFERENDUM_KILLER]}
+				origins={[EPostOrigin.MEMBERS]}
 			/>
 		</div>
 	);
