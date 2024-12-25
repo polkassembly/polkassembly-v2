@@ -1,0 +1,31 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { useTheme } from 'next-themes';
+import styles from './StatusTag.module.scss';
+
+interface Props {
+	className?: string;
+	status: string | undefined;
+	colorInverted?: boolean;
+}
+
+function StatusTag({ className = '', status, colorInverted }: Props) {
+	const { theme } = useTheme();
+
+	const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
+
+	return (
+		<div
+			// eslint-disable-next-line
+			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus] : ''} ${colorInverted ? styles.inverted : ''} ${
+				theme === 'dark' ? styles.dark : styles.light
+			} ${className}`}
+		>
+			{status?.split(/(?=[A-Z])/).join(' ')}
+		</div>
+	);
+}
+
+export default StatusTag;

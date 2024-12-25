@@ -7,9 +7,13 @@
 import { ThemeProvider } from 'next-themes';
 import { ReactNode } from 'react';
 import { ETheme } from '@/_shared/types';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { SidebarProvider } from './Sidebar/Sidebar';
 import { useUserPreferences } from '../_atoms/user/userPreferencesAtom';
+
+const queryClient = new QueryClient();
 
 export function Providers({ children, messages, locale }: { children: ReactNode; messages: AbstractIntlMessages; locale: string }) {
 	const [userPreferences] = useUserPreferences();
@@ -19,14 +23,17 @@ export function Providers({ children, messages, locale }: { children: ReactNode;
 			messages={messages}
 			locale={locale}
 		>
-			<ThemeProvider
-				attribute='class'
-				defaultTheme={userPreferences.theme}
-				themes={[ETheme.LIGHT, ETheme.DARK]}
-				enableSystem={false}
-			>
-				<SidebarProvider>{children}</SidebarProvider>
-			</ThemeProvider>
+			<QueryClientProvider client={queryClient}>
+				<ThemeProvider
+					attribute='class'
+					defaultTheme={userPreferences.theme}
+					themes={[ETheme.LIGHT, ETheme.DARK]}
+					enableSystem={false}
+				>
+					<SidebarProvider>{children}</SidebarProvider>
+				</ThemeProvider>
+				<ReactQueryDevtools initialIsOpen={false} />
+			</QueryClientProvider>
 		</NextIntlClientProvider>
 	);
 }

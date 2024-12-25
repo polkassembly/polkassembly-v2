@@ -15,7 +15,7 @@ function Navbar() {
 	const [user, setUser] = useUser();
 	return (
 		<nav className={classes.navbar}>
-			<p>Polkassembly</p>
+			<p className='ml-10 md:ml-0'>Polkassembly</p>
 			{user?.id ? (
 				<div className='flex items-center gap-x-4'>
 					<Link href='/settings'>

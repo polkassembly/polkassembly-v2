@@ -415,7 +415,8 @@ export enum EApiRoute {
 	TFA_LOGIN = 'TFA_LOGIN',
 	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
 	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
-	LOGOUT = 'LOGOUT'
+	LOGOUT = 'LOGOUT',
+	POSTS_LISTING = 'POSTS_LISTING'
 }
 
 export enum EWeb3LoginScreens {

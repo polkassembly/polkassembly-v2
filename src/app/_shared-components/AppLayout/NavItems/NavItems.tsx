@@ -129,11 +129,12 @@ export function NavMain({
 										<SidebarMenu>
 											{mainItem.items &&
 												mainItem.items.map((item) => (
-													<CollapsibleItem
-														key={item.title}
-														item={item}
-														state={state}
-													/>
+													<div key={item.title}>
+														<CollapsibleItem
+															item={item}
+															state={state}
+														/>
+													</div>
 												))}
 										</SidebarMenu>
 									</CollapsibleContent>

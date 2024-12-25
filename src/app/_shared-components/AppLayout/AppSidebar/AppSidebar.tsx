@@ -20,6 +20,7 @@ import Foot1 from '@assets/sidebar/foot1.svg';
 import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
+import { ETheme } from '@/_shared/types';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
@@ -38,7 +39,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
-		if (theme === 'light') {
+		if (theme === ETheme.LIGHT) {
 			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
 		}
 		if (state === 'expanded') {
@@ -82,7 +83,9 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			collapsible='icon'
 			{...props}
 		>
-			<SidebarHeader>{/* <div className={styles.sidebar_logo}>{getLogo()}</div> */}</SidebarHeader>
+			<SidebarHeader>
+				<div className={styles.sidebar_logo}>{getLogo()}</div>
+			</SidebarHeader>
 
 			<hr className='text-btn_secondary_border' />
 

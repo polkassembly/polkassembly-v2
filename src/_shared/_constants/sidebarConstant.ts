@@ -29,7 +29,7 @@ import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
 import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
 import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
 import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
-import { EGovType, ENetwork, ISidebarMenuItem, ITrackCounts } from '../types';
+import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
 const capitalizeWords = (text: string) =>
@@ -60,19 +60,19 @@ const getTrackItems = (networkKey: ENetwork, trackGroup: string, trackCounts?: R
 
 const getOriginIcon = (key: string) => {
 	switch (key) {
-		case 'root':
+		case EPostOrigin.ROOT:
 			return RootIcon;
-		case 'Treasurer':
+		case EPostOrigin.TREASURER:
 			return TreasurerIcon;
-		case 'WishForChange':
+		case EPostOrigin.WISH_FOR_CHANGE:
 			return WishForChangeIcon;
-		case 'ReferendumCanceller':
+		case EPostOrigin.REFERENDUM_CANCELLER:
 			return ReferendumCancellorIcon;
-		case 'ReferendumKiller':
+		case EPostOrigin.REFERENDUM_KILLER:
 			return ReferendumKillerIcon;
-		case 'WhitelistedCaller':
+		case EPostOrigin.WHITELISTED_CALLER:
 			return WhitelistedCallerIcon;
-		case 'FellowshipAdmin':
+		case EPostOrigin.FELLOWSHIP_ADMIN:
 			return FellowshipAdminIcon;
 		default:
 			return null;
@@ -122,7 +122,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 						{ title: 'Delegation', url: '/delegation', icon: Delegation },
 						{
 							title: 'Bounty',
-							url: '/bounty',
+							url: '',
 							icon: Bounty,
 							isNew: true,
 							items: [
@@ -131,7 +131,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 									url: '/bounty/dashboard',
 									count: trackCounts.bounty_dashboard || 0
 								},
-								{ title: 'On-chain Bounties', url: '/bounty/onchain' }
+								{ title: 'On-chain Bounties', url: '/bounty/onchain-bounty' }
 							]
 						},
 						{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
@@ -181,7 +181,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 							icon: CommunityIcon,
 							items: [
 								{ title: 'Members', url: '/members' },
-								{ title: 'On-Ecosystem Projects', url: '/ecosystem-projects' }
+								{ title: 'Ecosystem Projects', url: '/ecosystem-projects' }
 							]
 						},
 						{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },

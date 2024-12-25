@@ -4,8 +4,9 @@
 
 /* eslint-disable lines-between-class-members */
 
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse } from '@/_shared/types';
+import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse, IOnChainPostListingResponse } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 
 export class NextApiClientService {
@@ -20,7 +21,16 @@ export class NextApiClientService {
 		[EApiRoute.TFA_LOGIN]: () => new URL(`${this.baseURL}/auth/actions/tfa/login`),
 		[EApiRoute.GEN_TFA_TOKEN]: () => new URL(`${this.baseURL}/auth/actions/tfa/setup/generate`),
 		[EApiRoute.VERIFY_TFA_TOKEN]: () => new URL(`${this.baseURL}/auth/actions/tfa/setup/verify`),
-		[EApiRoute.LOGOUT]: () => new URL(`${this.baseURL}/auth/actions/logout`)
+		[EApiRoute.LOGOUT]: () => new URL(`${this.baseURL}/auth/actions/logout`),
+		[EApiRoute.POSTS_LISTING]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
+			const url = new URL(`${this.baseURL}/${routeSegments?.join('/') || ''}`);
+			if (queryParams) {
+				queryParams.forEach((value, key) => {
+					url.searchParams.set(key, value);
+				});
+			}
+			return url;
+		}
 	};
 
 	private static async nextApiClientFetch<T>(url: URL, data?: Record<string, unknown>, method?: 'GET' | 'POST'): Promise<{ data: T | null; error: IErrorResponse | null }> {
@@ -96,5 +106,33 @@ export class NextApiClientService {
 
 	protected static async logoutApi() {
 		return this.nextApiClientFetch<{ message: string }>(this.getApiRoute[EApiRoute.LOGOUT]());
+	}
+
+	static async fetchListingDataApi(
+		proposalType: string,
+		page: number,
+		statuses?: string[],
+		origins?: string[],
+		tags: string[] = []
+	): Promise<{ data: IOnChainPostListingResponse | null; error: IErrorResponse | null }> {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		if (statuses?.length) {
+			statuses.forEach((status) => queryParams.append('status', status));
+		}
+
+		if (tags.length) {
+			tags.forEach((tag) => queryParams.append('tags', tag));
+		}
+
+		if (Array.isArray(origins) && origins.length) {
+			origins.forEach((origin) => queryParams.append('origin', origin));
+		}
+
+		const url = this.getApiRoute[EApiRoute.POSTS_LISTING]([proposalType], queryParams);
+		return this.nextApiClientFetch<IOnChainPostListingResponse>(url);
 	}
 }

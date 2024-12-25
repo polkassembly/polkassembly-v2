@@ -2,11 +2,15 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import AppSidebar from '@ui/AppLayout/AppSidebar/AppSidebar';
+'use client';
+
 import { SidebarInset } from '@/app/_shared-components/Sidebar/Sidebar';
 import Navbar from '@ui/AppLayout/Navbar/Navbar';
+import dynamic from 'next/dynamic';
 import React from 'react';
 import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
+
+const AppSidebar = dynamic(() => import('./AppSidebar/AppSidebar'), { ssr: false });
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -17,7 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 			<SidebarInset>
 				<Navbar />
-				<main className='flex flex-1 flex-col p-4'>{children}</main>
+				<main className='flex flex-1 flex-col'>{children}</main>
 			</SidebarInset>
 		</main>
 	);

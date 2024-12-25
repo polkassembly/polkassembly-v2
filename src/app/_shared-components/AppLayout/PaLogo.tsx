@@ -10,7 +10,6 @@ import { useTheme } from 'next-themes';
 interface IPaLogoProps {
 	className?: string;
 	variant?: 'full' | 'compact';
-	// style?: object;
 }
 const PaLogo: FC<IPaLogoProps> = function PaLogo(props) {
 	const { className, variant = 'full' } = props;
