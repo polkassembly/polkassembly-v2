@@ -44,7 +44,8 @@ export const THEME_COLORS = {
 		light_technical_bg: '#FEF7DD',
 		light_technical_text: '#75610E',
 		filter_dropdown: '#485F7D',
-		search_bg: '#E3E4E4'
+		search_bg: '#E3E4E4',
+		activity_feed_bg: '#F5F7F9'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',

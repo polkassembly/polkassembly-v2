@@ -13,8 +13,8 @@ function Page() {
 
 	return (
 		<div>
-			<div className='w-full'>
-				<div className='flex w-full justify-between lg:mt-3 xl:items-center'>
+			<div className='bg-activity_feed_bg min-h-screen w-full px-10 pt-5'>
+				<div className='flex w-full justify-between xl:items-center'>
 					<div className='flex flex-col lg:flex-row xl:h-12 xl:gap-2'>
 						<div>
 							<h1 className='dark:text-blue-dark-high mx-2 text-xl font-semibold leading-9 text-text_primary lg:mt-3 lg:text-2xl'>Activity Feed</h1>
