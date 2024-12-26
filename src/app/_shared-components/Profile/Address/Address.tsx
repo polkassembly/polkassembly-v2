@@ -10,7 +10,7 @@ import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IOnChainIdentity } from '@/_shared/types';
 import { IdentityService } from '@/app/_client-services/identity_service';
-import AddressInline from './AddressInline';
+import AddressInline from './AddressInline/AddressInline';
 
 interface Props {
 	className?: string;

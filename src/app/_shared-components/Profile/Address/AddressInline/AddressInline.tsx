@@ -8,7 +8,8 @@ import React from 'react';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import Identicon from '@polkadot/react-identicon';
 import { IOnChainIdentity } from '@/_shared/types';
-import IdentityBadge from './IdentityBadge';
+import IdentityBadge from '../IdentityBadge';
+import style from './AddressInline.module.scss';
 
 interface Props {
 	address: string;
@@ -39,7 +40,7 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 				onChainIdentity={onChainIdentity}
 				iconSize={iconSize}
 			/>
-			<p className='flex flex-nowrap whitespace-nowrap'>{displayText}</p>
+			<p className={style.displaytext}>{displayText}</p>
 		</div>
 	);
 }

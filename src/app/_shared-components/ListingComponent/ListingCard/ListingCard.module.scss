@@ -3,19 +3,19 @@
 }
 
 .indexText {
-    @apply ml-2 md:ml-5 w-12 lg:w-14 text-sidebar_text;
+    @apply ml-2 md:ml-5 text-sidebar_text;
 }
 
 .titleText {
-    @apply font-medium text-btn_secondary_text;
+    @apply font-medium ml-2 md:ml-0 text-sm text-btn_secondary_text;
 }
 
 .infoContainer {
-    @apply flex items-center gap-2 text-sm text-gray-500;
+    @apply flex items-center ml-2 md:ml-0 gap-1 lg:gap-2 text-sm text-gray-500;
 }
 
 .infoItem {
-    @apply flex items-center gap-1 text-xs;
+    @apply flex items-center text-wallet_btn_text gap-1 text-xs;
 }
 
 .originStyle {
