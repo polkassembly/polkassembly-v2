@@ -9,7 +9,7 @@ import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import Identicon from '@polkadot/react-identicon';
 import { IOnChainIdentity } from '@/_shared/types';
 import IdentityBadge from '../IdentityBadge';
-import style from './AddressInline.module.scss';
+import styles from './AddressInline.module.scss';
 
 interface Props {
 	address: string;
@@ -26,7 +26,7 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 
 	return (
 		<div
-			className={`flex flex-row items-center gap-1.5 ${className}`.trim()}
+			className={`${styles.container} ${className}`.trim()}
 			title={address}
 		>
 			<Identicon
@@ -40,7 +40,7 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 				onChainIdentity={onChainIdentity}
 				iconSize={iconSize}
 			/>
-			<p className={style.displaytext}>{displayText}</p>
+			<p className={styles.displaytext}>{displayText}</p>
 		</div>
 	);
 }

@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
+import { EListingTab, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { BiSort } from 'react-icons/bi';
@@ -32,7 +32,8 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	const [tagSearchTerm, setTagSearchTerm] = useState('');
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-	const tabNames = proposalType === EProposalType.DISCUSSION ? { tab1: 'POLKASSEMBLY', tab2: 'EXTERNAL' } : { tab1: 'REFERENDA', tab2: 'ANALYTICS' };
+	const tabNames =
+		proposalType === EProposalType.DISCUSSION ? { tab1: EListingTab.POLKASSEMBLY, tab2: EListingTab.EXTERNAL } : { tab1: EListingTab.REFERENDA, tab2: EListingTab.ANALYTICS };
 
 	const statuses = [
 		EProposalStatus.Cancelled,
