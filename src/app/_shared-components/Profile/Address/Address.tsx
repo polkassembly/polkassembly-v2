@@ -40,7 +40,6 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 		fetchIdentity();
 	}, [encodedAddress, network]);
 
-	// if identity display exists shorten idenity else shorten address
 	const displayText = identity?.display ? shortenAddress(identity?.display, truncateCharLen) : shortenAddress(encodedAddress, truncateCharLen);
 
 	return (

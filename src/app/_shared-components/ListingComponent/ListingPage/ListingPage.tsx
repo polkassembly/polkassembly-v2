@@ -105,7 +105,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 						type='button'
 						className={styles.button}
 					>
-						<span className='text-xl'>+</span> <span className='whitespace-nowrap text-sm'>Create Post</span>
+						<span className='text-xl'>+</span> <span className='whitespace-nowrap text-sm'>Create {proposalType === EProposalType.DISCUSSION ? 'Post' : 'Proposal'}</span>
 					</button>
 				</div>
 				<div className={styles.tabs}>
