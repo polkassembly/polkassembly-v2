@@ -40,8 +40,8 @@ function ListingCard({
 						</span>
 						<span>|</span>
 						<span className={styles.infoItem}>
-							<FaRegClock className='h-3 w-3' />
-							<span className='whitespace-nowrap text-[10px]'> {formattedCreatedAt}</span>
+							<FaRegClock className={styles.infoIcon} />
+							<span className={styles.infoTimer}> {formattedCreatedAt}</span>
 						</span>
 						{proposalType === EProposalType.DISCUSSION && (
 							<span>
