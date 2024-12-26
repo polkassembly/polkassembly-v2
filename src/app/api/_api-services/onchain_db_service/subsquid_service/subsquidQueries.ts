@@ -33,7 +33,7 @@ export class SubsquidQueries {
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE = `
 		query GetProposalsListingByType($limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
-			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq}) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq}, orderBy: index_DESC) {
 				createdAt
 				description
 				index
@@ -51,7 +51,7 @@ export class SubsquidQueries {
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES = `
 		query GetProposalsListingByTypeAndStatuses($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!) {
-			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in}) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in}, orderBy: index_DESC) {
 				createdAt
 				description
 				index
@@ -69,7 +69,7 @@ export class SubsquidQueries {
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS = `
 		query GetProposalsListingByTypeAndOrigins($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $origin_in: [String!]!) {
-			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, origin_in: $origin_in}) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, origin_in: $origin_in}, orderBy: index_DESC) {
 				createdAt
 				description
 				index
@@ -87,7 +87,7 @@ export class SubsquidQueries {
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS = `
 		query GetProposalsListingByTypeAndStatusesAndOrigins($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!, $origin_in: [String!]!) {
-			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in, origin_in: $origin_in}) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in, origin_in: $origin_in}, orderBy: index_DESC) {
 				createdAt
 				description
 				index
