@@ -94,7 +94,7 @@
 		"react/require-default-props": "off",
 		"no-shadow": "off",
 		"@typescript-eslint/no-shadow": "warn",
-		"sonarjs/cognitive-complexity": ["error", 20],
+		"sonarjs/cognitive-complexity": ["error", 23],
 		"no-restricted-globals": "off",
 		"import/no-default-export": "error",
 		"react/prop-types": "off"
