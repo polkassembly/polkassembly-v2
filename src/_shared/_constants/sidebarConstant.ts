@@ -102,7 +102,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 		heading: 'Main',
 		initalItems: ActiveItems(
 			[
-				{ title: 'Home', url: '/open-gov', icon: Home },
+				{ title: 'Home', url: '#', icon: Home },
 				{ title: 'Discussions', url: '/discussions', icon: Discussion }
 			],
 			pathname
@@ -134,7 +134,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 								{ title: 'On-chain Bounties', url: '/bounty/onchain-bounty' }
 							]
 						},
-						{ title: 'Batch Voting', url: '/batch-voting', icon: BatchVoting, isNew: true }
+						{ title: 'Batch Voting', url: '#', icon: BatchVoting, isNew: true }
 					],
 					pathname
 				),

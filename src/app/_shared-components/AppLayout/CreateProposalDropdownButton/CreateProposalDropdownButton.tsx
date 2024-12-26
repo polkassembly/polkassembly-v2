@@ -23,7 +23,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 	];
 
 	return (
-		<div className={`${style.card} mt-4 p-[2px] ${state === 'collapsed' ? 'w-full' : 'mx-4 w-[200px]'}`}>
+		<div className={`${style.card} mt-4 p-[2px] ${state === 'collapsed' ? 'w-full' : 'mx-4 lg:w-[200px]'}`}>
 			<Popover>
 				<PopoverTrigger asChild>
 					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}>

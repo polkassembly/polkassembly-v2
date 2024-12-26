@@ -186,10 +186,10 @@ const Sidebar = forwardRef<
 				<SheetContent
 					data-sidebar='sidebar'
 					data-mobile='true'
-					className={`${styles.sidebarsheetcontent} [&>button]:hidden`}
+					className={`${styles.sidebarsheetcontent} m-0 bg-white p-0 [&>button]:hidden`}
 					style={
 						{
-							'--sidebar-width': SIDEBAR_WIDTH_MOBILE
+							width: SIDEBAR_WIDTH_MOBILE
 						} as CSSProperties
 					}
 					side={side}
