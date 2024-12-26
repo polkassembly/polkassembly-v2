@@ -30,7 +30,7 @@ function ListingCard({
 			className={styles.listingCard}
 			style={{ backgroundColor }}
 		>
-			<div className='flex items-start gap-4'>
+			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
 				<div className='flex flex-col gap-1'>
 					<h3 className={styles.titleText}>{title}</h3>

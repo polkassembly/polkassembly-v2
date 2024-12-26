@@ -7,17 +7,20 @@
 import React from 'react';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import Identicon from '@polkadot/react-identicon';
+import { IOnChainIdentity } from '@/_shared/types';
+import IdentityBadge from './IdentityBadge';
 
 interface Props {
 	address: string;
 	className?: string;
+	onChainIdentity: IOnChainIdentity;
 	addressDisplayText?: string;
 	startChars?: number;
 	endChars?: number;
 	iconSize?: number;
 }
 
-function AddressInline({ address, addressDisplayText, className, startChars, endChars, iconSize = 20 }: Props) {
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, startChars, endChars, iconSize = 20 }: Props) {
 	const displayText = addressDisplayText || (startChars && endChars ? shortenAddress(address) : address);
 
 	return (
@@ -32,6 +35,10 @@ function AddressInline({ address, addressDisplayText, className, startChars, end
 				theme='polkadot'
 			/>
 
+			<IdentityBadge
+				onChainIdentity={onChainIdentity}
+				iconSize={iconSize}
+			/>
 			<p className='flex flex-nowrap whitespace-nowrap'>{displayText}</p>
 		</div>
 	);

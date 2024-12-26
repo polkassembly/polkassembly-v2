@@ -166,13 +166,11 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IComment[]> {
-		let commentsQuery = FirestoreRefs.commentsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType);
-
-		if (proposalType === EProposalType.TIP) {
-			commentsQuery = commentsQuery.where('hash', '==', indexOrHash);
-		} else {
-			commentsQuery = commentsQuery.where('index', '==', Number(indexOrHash));
-		}
+		const commentsQuery = FirestoreRefs.commentsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('isDeleted', '==', false);
 
 		const commentsQuerySnapshot = await commentsQuery.get();
 
@@ -195,7 +193,7 @@ export class FirestoreService extends FirestoreRefs {
 
 		const data = commentDocSnapshot.data();
 
-		if (!data) {
+		if (!data || data.isDeleted) {
 			return null;
 		}
 

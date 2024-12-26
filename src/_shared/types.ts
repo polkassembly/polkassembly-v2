@@ -3,10 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
-	ROCOCO = 'rococo',
+	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot'
 }
 
@@ -441,4 +442,24 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
+}
+
+export interface IOnChainIdentity {
+	display: string;
+	legal: string;
+	email: string;
+	twitter: string;
+	web: string;
+	github: string;
+	discord: string;
+	matrix: string;
+	displayParent: string;
+	nickname: string;
+	isIdentitySet: boolean;
+	isVerified: boolean;
+	isGood: boolean;
+	judgements: RegistrationJudgement[];
+	verifiedByPolkassembly: boolean;
+	parentProxyTitle: string | null;
+	parentProxyAddress: string;
 }

@@ -4,11 +4,12 @@
 
 'use client';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
-import getEncodedAddress from '@/_shared/_utils/getEncodedAddress';
+import React, { useEffect, useState } from 'react';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { IOnChainIdentity } from '@/_shared/types';
+import { IdentityService } from '@/app/_client-services/identity_service';
 import AddressInline from './AddressInline';
 
 interface Props {
@@ -18,20 +19,37 @@ interface Props {
 	iconSize?: number;
 }
 
-function Address({ className, address, truncateCharLen, iconSize = 20 }: Props) {
+function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Props) {
 	const network = getCurrentNetwork();
+	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
-	const onChainUsername = 'vm';
-	const addressDisplayText = truncateCharLen ? shortenAddress(encodedAddress) : encodedAddress;
 
-	const truncatedUsername = truncateCharLen ? shortenAddress(onChainUsername, truncateCharLen) : onChainUsername;
+	useEffect(() => {
+		async function fetchIdentity() {
+			try {
+				const service = await IdentityService.Init(network);
+				const identityInfo = await service.getOnChainIdentity(encodedAddress);
+				setIdentity(identityInfo);
+				await service.disconnectPeopleChainApi();
+			} catch (error) {
+				console.error('Error fetching identity:', error);
+			}
+		}
+
+		fetchIdentity();
+	}, [encodedAddress, network]);
+
+	// if identity display exists shorten idenity else shorten address
+	const displayText = identity?.display ? shortenAddress(identity?.display, truncateCharLen) : shortenAddress(encodedAddress, truncateCharLen);
+
 	return (
 		<div>
 			<AddressInline
 				className={className}
 				address={encodedAddress}
-				addressDisplayText={truncatedUsername || addressDisplayText}
+				onChainIdentity={identity || ({} as IOnChainIdentity)}
+				addressDisplayText={displayText}
 				iconSize={iconSize}
 			/>
 		</div>

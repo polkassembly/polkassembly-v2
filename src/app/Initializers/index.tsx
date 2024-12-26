@@ -31,7 +31,6 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		const { data, error } = await AuthClientService.refreshAccessToken();
 
 		if (error && !data) {
-			console.log('error in refreshAccesstoken', error);
 			throw new ClientError(error.message);
 		}
 
