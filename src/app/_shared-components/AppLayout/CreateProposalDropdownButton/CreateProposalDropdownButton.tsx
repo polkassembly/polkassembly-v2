@@ -17,9 +17,9 @@ import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const menuItems = [
-		{ title: 'Treasury Proposal', icon: TreasuryProposalIcon, url: '/treasury-proposal' },
-		{ title: 'Proposal', icon: ProposalIcon, url: '/proposal' },
-		{ title: 'Discussion Post', icon: DiscussionIcon, url: '/discussion-post' }
+		{ title: 'Treasury Proposal', icon: TreasuryProposalIcon, url: '#' },
+		{ title: 'Proposal', icon: ProposalIcon, url: '#' },
+		{ title: 'Discussion Post', icon: DiscussionIcon, url: '#' }
 	];
 
 	return (
