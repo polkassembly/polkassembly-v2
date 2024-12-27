@@ -10,7 +10,6 @@ import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IOnChainIdentity } from '@/_shared/types';
 import { useIdentityService } from '@/app/_atoms/identityApiAtom';
-import { IdentityService } from '@/app/_client-services/identity_service';
 import AddressInline from './AddressInline/AddressInline';
 
 interface Props {
@@ -24,21 +23,22 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 	const network = getCurrentNetwork();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 	const { getOnChainIdentity } = useIdentityService(network);
+
 	const encodedAddress = getEncodedAddress(address, network) || address;
 
-	useEffect(() => {
-		async function fetchIdentity() {
-			try {
-				const service = await IdentityService.Init(network);
-				const identityInfo = await service.getOnChainIdentity(encodedAddress);
-				setIdentity(identityInfo);
-				await service.disconnect();
-			} catch (error) {
-				console.error('Error fetching identity:', error);
-			}
+	const fetchIdentity = async () => {
+		try {
+			const identityInfo = await getOnChainIdentity(encodedAddress);
+			setIdentity(identityInfo);
+		} catch (error) {
+			console.error('Error fetching identity:', error);
 		}
+	};
 
+	useEffect(() => {
 		fetchIdentity();
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [encodedAddress, network]);
 
 	const displayText = identity?.display ? shortenAddress(identity?.display, truncateCharLen) : shortenAddress(encodedAddress, truncateCharLen);
