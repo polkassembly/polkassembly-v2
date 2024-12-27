@@ -207,10 +207,14 @@ export class FirestoreService extends FirestoreRefs {
 				return null;
 			}
 
-			return { ...comment, user };
+			return {
+				...comment,
+				user,
+				children: []
+			} as ICommentResponse;
 		});
 
-		const commentsWithUser = (await Promise.all(commentResponsePromises)).filter((comment) => comment !== null);
+		const commentsWithUser = (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
 
 		// Helper function to build comment tree
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
