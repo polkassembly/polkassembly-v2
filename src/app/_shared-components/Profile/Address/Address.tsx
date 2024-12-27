@@ -48,7 +48,7 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 			<AddressInline
 				className={className}
 				address={encodedAddress}
-				onChainIdentity={identity || ({} as IOnChainIdentity)}
+				onChainIdentity={identity as IOnChainIdentity}
 				addressDisplayText={displayText}
 				iconSize={iconSize}
 			/>
