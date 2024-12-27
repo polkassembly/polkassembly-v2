@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment, ICommentResponse, IPublicUser } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment, ICommentResponse, IPublicUser, IReaction } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -247,6 +247,19 @@ export class FirestoreService extends FirestoreRefs {
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate()
 		} as IComment;
+	}
+
+	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
+		const reactionsQuery = FirestoreRefs.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
+		const reactionsQuerySnapshot = await reactionsQuery.get();
+		return reactionsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IReaction;
+		});
 	}
 
 	// write methods

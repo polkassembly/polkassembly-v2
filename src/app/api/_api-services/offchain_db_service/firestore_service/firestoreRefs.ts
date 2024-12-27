@@ -44,6 +44,8 @@ export class FirestoreRefs {
 
 	protected static apiKeysCollectionRef = () => this.firestoreDb.collection('api_keys');
 
+	protected static reactionsCollectionRef = () => this.firestoreDb.collection('reactions');
+
 	// document reference methods
 	protected static getUserDocRefById = (userId: number) => this.usersCollectionRef().doc(userId.toString());
 

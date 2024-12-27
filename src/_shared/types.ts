@@ -476,3 +476,18 @@ export interface IOnChainIdentity {
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
 }
+
+export enum EReaction {
+	like = 'like',
+	dislike = 'dislike'
+}
+
+export interface IReaction {
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	userId: number;
+	reaction: EReaction;
+	createdAt: Date;
+	updatedAt: Date;
+}
