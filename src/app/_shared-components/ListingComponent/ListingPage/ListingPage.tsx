@@ -7,11 +7,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { EListingTab, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
+import { useFetchListingData } from '@/app/_atoms/listingPageAtom';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
@@ -50,6 +50,7 @@ interface ListingPageProps {
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const fetchListingData = useFetchListingData();
 
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
@@ -84,28 +85,30 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		[router, searchParams]
 	);
 
-	console.log('ListingPage', state.selectedStatuses);
-	const fetchListingData = useCallback(async () => {
+	const fetchData = useCallback(async () => {
 		setState((prev) => ({ ...prev, isLoading: true }));
-
-		const { data, error: dataError } = await NextApiClientService.fetchListingDataApi(proposalType, state.currentPage, state.selectedStatuses, origins, state.selectedTags);
-
-		if (dataError) {
+		try {
+			const { data, totalCount } = await fetchListingData({
+				proposalType,
+				currentPage: state.currentPage,
+				selectedStatuses: state.selectedStatuses,
+				selectedTags: state.selectedTags,
+				origins
+			});
 			setState((prev) => ({
 				...prev,
-				error: dataError,
+				listingData: data,
+				totalCount,
 				isLoading: false
 			}));
-			return;
+		} catch (error) {
+			setState((prev) => ({
+				...prev,
+				error,
+				isLoading: false
+			}));
 		}
-
-		setState((prev) => ({
-			...prev,
-			listingData: data?.posts || [],
-			totalCount: data?.totalCount || 0,
-			isLoading: false
-		}));
-	}, [proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins]);
+	}, [fetchListingData, proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins]);
 
 	const handlePageChange = useCallback(
 		(page: number) => {
@@ -136,9 +139,9 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	useEffect(() => {
 		if (state.activeTab === EListingTabState.INTERNAL_PROPOSALS) {
-			fetchListingData();
+			fetchData();
 		}
-	}, [state.activeTab, state.selectedStatuses, state.currentPage, state.selectedTags, fetchListingData]);
+	}, [state.activeTab, state.selectedStatuses, state.currentPage, state.selectedTags, fetchData]);
 
 	useEffect(() => {
 		const page = parseInt(searchParams.get('page') || '1', 10);
