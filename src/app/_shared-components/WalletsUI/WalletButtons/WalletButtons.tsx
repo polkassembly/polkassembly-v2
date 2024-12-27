@@ -20,7 +20,7 @@ function WalletButtons({ onWalletChange, small }: { onWalletChange: (wallet: EWa
 				return (
 					<WalletButton
 						key={wallet}
-						disabled={!availableWallets?.[wallet]}
+						disabled={!availableWallets?.[String(wallet)]}
 						wallet={wallet}
 						onClick={onWalletChange}
 						label={WalletClientService.getWalletNameLabel(wallet)}

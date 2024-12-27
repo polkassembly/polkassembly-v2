@@ -14,14 +14,14 @@ import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
 import { ClientError } from '../_client-utils/clientError';
 import { CookieClientService } from '../_client-services/cookie_client_service';
-import { useIdentityApi } from '../_atoms/identityApiAtom';
+import { useIdentityService } from '../_atoms/identityApiAtom';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const [user, setUser] = useUser();
 
 	const network = getCurrentNetwork();
 	const api = usePolkadotApi(network);
-	const identityApi = useIdentityApi(network);
+	const { identityApi } = useIdentityService(network);
 
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 

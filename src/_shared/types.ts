@@ -126,6 +126,13 @@ export interface IUser {
 	profileScore: number;
 }
 
+export interface IPublicUser {
+	id: number;
+	username: string;
+	profileScore: number;
+	addresses: string[];
+}
+
 export interface IAuthResponse {
 	accessToken?: string;
 	isTFAEnabled?: boolean;
@@ -449,6 +456,12 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
+	address: string | null;
+}
+
+export interface ICommentResponse extends IComment {
+	user: IPublicUser;
+	children?: ICommentResponse[];
 }
 
 export interface IOnChainIdentity {
@@ -474,4 +487,19 @@ export interface IOnChainIdentity {
 export enum EListingTabState {
 	TAB1 = 'TAB1',
 	TAB2 = 'TAB2'
+}
+
+export enum EReaction {
+	like = 'like',
+	dislike = 'dislike'
+}
+
+export interface IReaction {
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	userId: number;
+	reaction: EReaction;
+	createdAt: Date;
+	updatedAt: Date;
 }
