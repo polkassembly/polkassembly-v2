@@ -126,6 +126,13 @@ export interface IUser {
 	profileScore: number;
 }
 
+export interface IPublicUser {
+	id: number;
+	username: string;
+	profileScore: number;
+	addresses: string[];
+}
+
 export interface IAuthResponse {
 	accessToken?: string;
 	isTFAEnabled?: boolean;
@@ -442,6 +449,12 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
+	address: string | null;
+}
+
+export interface ICommentResponse extends IComment {
+	user: IPublicUser;
+	children?: ICommentResponse[];
 }
 
 export interface IOnChainIdentity {

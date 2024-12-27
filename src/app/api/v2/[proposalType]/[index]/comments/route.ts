@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ECookieNames, EProposalType } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
@@ -47,10 +48,14 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
 		content: z.string().min(1, 'Content is required'),
-		parentCommentId: z.string().optional()
+		parentCommentId: z.string().optional(),
+		address: z
+			.string()
+			.refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
+			.optional()
 	});
 
-	const { content, parentCommentId } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, address } = zodBodySchema.parse(await getReqBody(req));
 
 	await OffChainDbService.AddNewComment({
 		network,
@@ -58,7 +63,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		proposalType: proposalType as EProposalType,
 		userId: await AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content,
-		parentCommentId
+		parentCommentId,
+		address
 	});
 
 	const response = NextResponse.json({ message: 'Comment added successfully' });

@@ -153,7 +153,8 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		parentCommentId
+		parentCommentId,
+		address
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -161,8 +162,9 @@ export class OffChainDbService {
 		userId: number;
 		content: string;
 		parentCommentId?: string;
+		address?: string;
 	}) {
-		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId });
+		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 	}
 
 	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
