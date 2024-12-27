@@ -4,9 +4,7 @@
 
 /* eslint-disable sonarjs/no-duplicate-string */
 
-import { ECookieNames } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
-import { cookies } from 'next/headers';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -16,11 +14,11 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
-	const zodParamsSchema = z.object({
-		id: z.string()
-	});
+const zodParamsSchema = z.object({
+	id: z.string()
+});
 
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
 	const comment = await OffChainDbService.GetCommentById(id);
@@ -33,18 +31,10 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 });
 
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
-	const zodParamsSchema = z.object({
-		id: z.string()
-	});
-
 	const { id } = zodParamsSchema.parse(await params);
 
 	// 1. check if user is logged in
-	const cookiesStore = await cookies();
-	const accessToken = cookiesStore.get(ECookieNames.ACCESS_TOKEN)?.value;
-	const refreshToken = cookiesStore.get(ECookieNames.REFRESH_TOKEN)?.value;
-
-	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens(accessToken, refreshToken);
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
@@ -79,18 +69,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 });
 
 export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
-	const zodParamsSchema = z.object({
-		id: z.string()
-	});
-
 	const { id } = zodParamsSchema.parse(await params);
 
 	// 1. check if user is logged in
-	const cookiesStore = await cookies();
-	const accessToken = cookiesStore.get(ECookieNames.ACCESS_TOKEN)?.value;
-	const refreshToken = cookiesStore.get(ECookieNames.REFRESH_TOKEN)?.value;
-
-	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens(accessToken, refreshToken);
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. check if user is the owner of the comment
 	const userId = await AuthService.GetUserIdFromAccessToken(newAccessToken);

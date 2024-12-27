@@ -56,4 +56,6 @@ export class FirestoreRefs {
 		}
 		return this.addressesCollectionRef().doc(formattedAddress);
 	};
+
+	protected static getReactionDocRefById = (reactionId: string) => this.reactionsCollectionRef().doc(reactionId);
 }

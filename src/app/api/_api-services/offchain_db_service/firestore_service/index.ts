@@ -2,7 +2,20 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment, ICommentResponse, IPublicUser, IReaction } from '@/_shared/types';
+import {
+	EDataSource,
+	ENetwork,
+	EProposalType,
+	IOffChainPost,
+	IUser,
+	IUserTFADetails,
+	IUserAddress,
+	IComment,
+	ICommentResponse,
+	IPublicUser,
+	IReaction,
+	EReaction
+} from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -262,6 +275,25 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
+	static async GetPostReactionById(id: string): Promise<IReaction | null> {
+		const reactionDocSnapshot = await FirestoreRefs.getReactionDocRefById(id).get();
+		if (!reactionDocSnapshot.exists) {
+			return null;
+		}
+
+		const data = reactionDocSnapshot.data();
+
+		if (!data) {
+			return null;
+		}
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IReaction;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -342,5 +374,51 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async DeleteComment(commentId: string) {
 		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async AddPostReaction({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		reaction
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		reaction: EReaction;
+	}) {
+		// if user has already reacted to this post, replace the reaction
+		const existingReaction = await FirestoreRefs.reactionsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('userId', '==', userId)
+			.get();
+
+		let reactionId = FirestoreRefs.reactionsCollectionRef().doc().id;
+
+		if (existingReaction.docs.length) {
+			reactionId = existingReaction.docs[0].id;
+		}
+
+		await FirestoreRefs.getReactionDocRefById(reactionId).set(
+			{
+				id: reactionId,
+				network,
+				indexOrHash,
+				proposalType,
+				userId,
+				reaction,
+				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt.toDate() : new Date(),
+				updatedAt: new Date()
+			},
+			{ merge: true }
+		);
+	}
+
+	static async DeletePostReaction(id: string) {
+		await FirestoreRefs.getReactionDocRefById(id).delete();
 	}
 }
