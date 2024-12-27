@@ -41,16 +41,15 @@ export default async function RootLayout({
 				<Initializers
 					userData={user || null}
 					userPreferences={userPreferences}
+				/>
+				<Providers
+					messages={messages}
+					locale={locale}
 				>
-					<Providers
-						messages={messages}
-						locale={locale}
-					>
-						{modal}
-						<AppLayout>{children}</AppLayout>
-						<NotificationsContainer />
-					</Providers>
-				</Initializers>
+					{modal}
+					<AppLayout>{children}</AppLayout>
+					<NotificationsContainer />
+				</Providers>
 			</body>
 		</html>
 	);

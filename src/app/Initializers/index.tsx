@@ -5,10 +5,9 @@
 'use client';
 
 import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
-import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { IdentityService } from '@/app/_client-services/identity_service';
 import { useUser } from '../_atoms/user/userAtom';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
@@ -17,30 +16,12 @@ import { ClientError } from '../_client-utils/clientError';
 import { CookieClientService } from '../_client-services/cookie_client_service';
 import { useIdentityApi } from '../_atoms/identityApiAtom';
 
-const IdentityServiceContext = createContext<IdentityService | null>(null);
-
-export const useIdentityService = () => {
-	const context = useContext(IdentityServiceContext);
-	if (!context) {
-		throw new Error('useIdentityService must be used within an IdentityServiceProvider.');
-	}
-	return context;
-};
-
-interface InitializersProps {
-	userData: IAccessTokenPayload | null;
-	userPreferences: IUserPreferences;
-	children: ReactNode;
-}
-
-function Initializers({ userData, userPreferences, children }: InitializersProps) {
+function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const [user, setUser] = useUser();
 
 	const network = getCurrentNetwork();
 	const api = usePolkadotApi(network);
 	const identityApi = useIdentityApi(network);
-
-	const [identityService, setIdentityService] = useState<IdentityService | null>(null);
 
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
@@ -95,6 +76,7 @@ function Initializers({ userData, userPreferences, children }: InitializersProps
 		setUserPreferencesAtom({
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
+			// address: user?.defaultAddress,
 			wallet: user?.loginWallet
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,21 +90,7 @@ function Initializers({ userData, userPreferences, children }: InitializersProps
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
-
-	useEffect(() => {
-		async function initIdentityService() {
-			const service = await IdentityService.Init(network);
-			setIdentityService(service);
-		}
-
-		initIdentityService();
-
-		return () => {
-			identityService?.disconnect();
-		};
-	}, [network]);
-
-	return <IdentityServiceContext.Provider value={identityService}>{children}</IdentityServiceContext.Provider>;
+	return null;
 }
 
 export default Initializers;

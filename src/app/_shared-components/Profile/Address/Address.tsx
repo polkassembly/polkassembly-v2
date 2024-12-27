@@ -9,7 +9,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IOnChainIdentity } from '@/_shared/types';
-import { useIdentityService } from '@/app/Initializers';
+import { IdentityService } from '@/app/_client-services/identity_service';
 import AddressInline from './AddressInline/AddressInline';
 
 interface Props {
@@ -25,20 +25,20 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
 
-	const identityService = useIdentityService();
-
 	useEffect(() => {
 		async function fetchIdentity() {
 			try {
-				const identityInfo = await identityService.getOnChainIdentity(encodedAddress);
+				const service = await IdentityService.Init(network);
+				const identityInfo = await service.getOnChainIdentity(encodedAddress);
 				setIdentity(identityInfo);
+				await service.disconnect();
 			} catch (error) {
 				console.error('Error fetching identity:', error);
 			}
 		}
 
 		fetchIdentity();
-	}, [encodedAddress, identityService]);
+	}, [encodedAddress, network]);
 
 	const displayText = identity?.display ? shortenAddress(identity?.display, truncateCharLen) : shortenAddress(encodedAddress, truncateCharLen);
 
