@@ -22,6 +22,7 @@ interface Props {
 function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Props) {
 	const network = getCurrentNetwork();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+
 	const encodedAddress = getEncodedAddress(address, network) || address;
 
 	const identityService = useIdentityService();

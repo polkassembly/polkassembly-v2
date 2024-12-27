@@ -2,8 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
-import { useEffect, useState, createContext, useContext } from 'react';
+import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IdentityService } from '@/app/_client-services/identity_service';
@@ -25,7 +27,13 @@ export const useIdentityService = () => {
 	return context;
 };
 
-function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
+interface InitializersProps {
+	userData: IAccessTokenPayload | null;
+	userPreferences: IUserPreferences;
+	children: ReactNode;
+}
+
+function Initializers({ userData, userPreferences, children }: InitializersProps) {
 	const [user, setUser] = useUser();
 
 	const network = getCurrentNetwork();
@@ -114,7 +122,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		};
 	}, [network]);
 
-	return <IdentityServiceContext.Provider value={identityService}>{null}</IdentityServiceContext.Provider>;
+	return <IdentityServiceContext.Provider value={identityService}>{children}</IdentityServiceContext.Provider>;
 }
 
 export default Initializers;
