@@ -44,7 +44,7 @@ export class WalletClientService {
 	}
 
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[selectedWallet] : null;
+		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
 		if (!wallet) {
 			return [];
 		}
@@ -87,7 +87,7 @@ export class WalletClientService {
 	}
 
 	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
-		const wallet = isWeb3Injected ? this.injectedWindow.injectedWeb3[selectedWallet] : null;
+		const wallet = isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
 
 		if (!wallet) {
 			return null;
