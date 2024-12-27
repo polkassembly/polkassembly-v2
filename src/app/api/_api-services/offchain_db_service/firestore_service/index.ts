@@ -2,7 +2,20 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment } from '@/_shared/types';
+import {
+	EDataSource,
+	ENetwork,
+	EProposalType,
+	IOffChainPost,
+	IUser,
+	IUserTFADetails,
+	IUserAddress,
+	IComment,
+	ICommentResponse,
+	IPublicUser,
+	IReaction,
+	EReaction
+} from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -60,6 +73,23 @@ export class FirestoreService extends FirestoreRefs {
 			createdAt: userData.createdAt?.toDate(),
 			updatedAt: userData.updatedAt?.toDate()
 		} as IUser;
+	}
+
+	static async GetPublicUserById(userId: number): Promise<IPublicUser | null> {
+		const user = await this.GetUserById(userId);
+
+		if (!user) {
+			return null;
+		}
+
+		const addresses = await this.GetAddressesForUserId(userId);
+
+		return {
+			id: user.id,
+			username: user.username,
+			profileScore: user.profileScore,
+			addresses: addresses.map((address) => address.address)
+		};
 	}
 
 	static async GetUserByAddress(address: string): Promise<IUser | null> {
@@ -165,18 +195,16 @@ export class FirestoreService extends FirestoreRefs {
 		return countSnapshot.data().count || 0;
 	}
 
-	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IComment[]> {
-		let commentsQuery = FirestoreRefs.commentsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType);
-
-		if (proposalType === EProposalType.TIP) {
-			commentsQuery = commentsQuery.where('hash', '==', indexOrHash);
-		} else {
-			commentsQuery = commentsQuery.where('index', '==', Number(indexOrHash));
-		}
+	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
+		const commentsQuery = FirestoreRefs.commentsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('isDeleted', '==', false);
 
 		const commentsQuerySnapshot = await commentsQuery.get();
 
-		return commentsQuerySnapshot.docs.map((doc) => {
+		const comments = commentsQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
 
 			return {
@@ -185,6 +213,34 @@ export class FirestoreService extends FirestoreRefs {
 				updatedAt: data.updatedAt?.toDate()
 			} as IComment;
 		});
+
+		const commentResponsePromises = comments.map(async (comment) => {
+			const user = await this.GetPublicUserById(comment.userId);
+			if (!user) {
+				return null;
+			}
+
+			return {
+				...comment,
+				user,
+				children: []
+			} as ICommentResponse;
+		});
+
+		const commentsWithUser = (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
+
+		// Helper function to build comment tree
+		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
+			return commentsWithUser
+				.filter((comment) => comment.parentCommentId === parentId)
+				.map((comment) => ({
+					...comment,
+					children: buildCommentTree(comment.id)
+				}));
+		};
+
+		// Get only top-level comments (those with no parent)
+		return buildCommentTree(null);
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
@@ -195,7 +251,7 @@ export class FirestoreService extends FirestoreRefs {
 
 		const data = commentDocSnapshot.data();
 
-		if (!data) {
+		if (!data || data.isDeleted) {
 			return null;
 		}
 
@@ -204,6 +260,38 @@ export class FirestoreService extends FirestoreRefs {
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate()
 		} as IComment;
+	}
+
+	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
+		const reactionsQuery = FirestoreRefs.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
+		const reactionsQuerySnapshot = await reactionsQuery.get();
+		return reactionsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IReaction;
+		});
+	}
+
+	static async GetPostReactionById(id: string): Promise<IReaction | null> {
+		const reactionDocSnapshot = await FirestoreRefs.getReactionDocRefById(id).get();
+		if (!reactionDocSnapshot.exists) {
+			return null;
+		}
+
+		const data = reactionDocSnapshot.data();
+
+		if (!data) {
+			return null;
+		}
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IReaction;
 	}
 
 	// write methods
@@ -250,7 +338,8 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType,
 		userId,
 		content,
-		parentCommentId
+		parentCommentId,
+		address
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -258,6 +347,7 @@ export class FirestoreService extends FirestoreRefs {
 		userId: number;
 		content: string;
 		parentCommentId?: string;
+		address?: string;
 	}) {
 		const newCommentId = FirestoreRefs.commentsCollectionRef().doc().id;
 
@@ -271,7 +361,8 @@ export class FirestoreService extends FirestoreRefs {
 			updatedAt: new Date(),
 			isDeleted: false,
 			indexOrHash,
-			parentCommentId: parentCommentId || null
+			parentCommentId: parentCommentId || null,
+			address: address || null
 		};
 
 		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -283,5 +374,51 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async DeleteComment(commentId: string) {
 		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async AddPostReaction({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		reaction
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		reaction: EReaction;
+	}) {
+		// if user has already reacted to this post, replace the reaction
+		const existingReaction = await FirestoreRefs.reactionsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('userId', '==', userId)
+			.get();
+
+		let reactionId = FirestoreRefs.reactionsCollectionRef().doc().id;
+
+		if (existingReaction.docs.length) {
+			reactionId = existingReaction.docs[0].id;
+		}
+
+		await FirestoreRefs.getReactionDocRefById(reactionId).set(
+			{
+				id: reactionId,
+				network,
+				indexOrHash,
+				proposalType,
+				userId,
+				reaction,
+				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt.toDate() : new Date(),
+				updatedAt: new Date()
+			},
+			{ merge: true }
+		);
+	}
+
+	static async DeletePostReaction(id: string) {
+		await FirestoreRefs.getReactionDocRefById(id).delete();
 	}
 }

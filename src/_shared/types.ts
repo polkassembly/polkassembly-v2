@@ -3,10 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
-	ROCOCO = 'rococo',
+	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot'
 }
 
@@ -123,6 +124,13 @@ export interface IUser {
 	twoFactorAuth?: IUserTFADetails;
 	roles?: ERole[];
 	profileScore: number;
+}
+
+export interface IPublicUser {
+	id: number;
+	username: string;
+	profileScore: number;
+	addresses: string[];
 }
 
 export interface IAuthResponse {
@@ -441,4 +449,46 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
+	address: string | null;
+}
+
+export interface ICommentResponse extends IComment {
+	user: IPublicUser;
+	children?: ICommentResponse[];
+}
+
+export interface IOnChainIdentity {
+	display: string;
+	legal: string;
+	email: string;
+	twitter: string;
+	web: string;
+	github: string;
+	discord: string;
+	matrix: string;
+	displayParent: string;
+	nickname: string;
+	isIdentitySet: boolean;
+	isVerified: boolean;
+	isGood: boolean;
+	judgements: RegistrationJudgement[];
+	verifiedByPolkassembly: boolean;
+	parentProxyTitle: string | null;
+	parentProxyAddress: string;
+}
+
+export enum EReaction {
+	like = 'like',
+	dislike = 'dislike'
+}
+
+export interface IReaction {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	userId: number;
+	reaction: EReaction;
+	createdAt: Date;
+	updatedAt: Date;
 }

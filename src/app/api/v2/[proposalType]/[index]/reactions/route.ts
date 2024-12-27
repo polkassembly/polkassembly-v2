@@ -2,15 +2,14 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EProposalType } from '@/_shared/types';
-import { AuthService } from '@/app/api/_api-services/auth_service';
-import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { getReqBody } from '@/app/api/_api-utils/getReqBody';
-import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
+import { EReaction, EProposalType } from '@/_shared/types';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { AuthService } from '@/app/api/_api-services/auth_service';
+import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -22,9 +21,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
-	const comments = await OffChainDbService.GetPostComments({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
+	const reactions = await OffChainDbService.GetPostReactions({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
 
-	return NextResponse.json(comments);
+	return NextResponse.json(reactions);
 });
 
 export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
@@ -37,27 +36,21 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.string().min(1, 'Content is required'),
-		parentCommentId: z.string().optional(),
-		address: z
-			.string()
-			.refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
-			.optional()
+		reaction: z.nativeEnum(EReaction)
 	});
 
-	const { content, parentCommentId, address } = zodBodySchema.parse(await getReqBody(req));
+	const { reaction } = zodBodySchema.parse(await getReqBody(req));
 
-	await OffChainDbService.AddNewComment({
+	// 3. add the reaction to the database
+	await OffChainDbService.AddPostReaction({
 		network,
 		indexOrHash: index,
 		proposalType: proposalType as EProposalType,
 		userId: await AuthService.GetUserIdFromAccessToken(newAccessToken),
-		content,
-		parentCommentId,
-		address
+		reaction
 	});
 
-	const response = NextResponse.json({ message: 'Comment added successfully' });
+	const response = NextResponse.json({ message: 'Reaction added successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

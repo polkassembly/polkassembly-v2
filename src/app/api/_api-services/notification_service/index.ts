@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 /* eslint-disable lines-between-class-members */
 
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { fetchPF } from '@shared/_utils/fetchPF';
-import { ENetwork, ENotificationTrigger, IUser } from '@shared/types';
+import { ENotificationTrigger, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 
 if (!NOTIFICATION_ENGINE_API_KEY) {
@@ -16,7 +17,7 @@ if (!NOTIFICATION_ENGINE_API_KEY) {
 
 export class NotificationService {
 	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-polkassembly-dev.cloudfunctions.net/notify';
-	private static DEFAULT_NOTIFICATION_NETWORK = ENetwork.ROCOCO; // TODO: change to Polkadot
+	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK;
 	private static firebaseFunctionsHeader = (network: string) => ({
 		Accept: 'application/json',
 		'Content-Type': 'application/json',

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, EWallet, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment } from '@shared/types';
+import { EDataSource, ENetwork, EProposalType, EWallet, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment, IReaction, EReaction } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -116,6 +116,14 @@ export class OffChainDbService {
 		return FirestoreService.GetCommentById(id);
 	}
 
+	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
+		return FirestoreService.GetPostReactions({ network, indexOrHash, proposalType });
+	}
+
+	static async GetPostReactionById(id: string): Promise<IReaction | null> {
+		return FirestoreService.GetPostReactionById(id);
+	}
+
 	// Write methods
 
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
@@ -153,7 +161,8 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		parentCommentId
+		parentCommentId,
+		address
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -161,8 +170,9 @@ export class OffChainDbService {
 		userId: number;
 		content: string;
 		parentCommentId?: string;
+		address?: string;
 	}) {
-		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId });
+		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 	}
 
 	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
@@ -171,5 +181,25 @@ export class OffChainDbService {
 
 	static async DeleteComment(commentId: string) {
 		return FirestoreService.DeleteComment(commentId);
+	}
+
+	static async AddPostReaction({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		reaction
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		reaction: EReaction;
+	}) {
+		return FirestoreService.AddPostReaction({ network, indexOrHash, proposalType, userId, reaction });
+	}
+
+	static async DeletePostReaction(id: string) {
+		return FirestoreService.DeletePostReaction(id);
 	}
 }
