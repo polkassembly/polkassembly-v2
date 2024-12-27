@@ -104,7 +104,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		} catch (error) {
 			setState((prev) => ({
 				...prev,
-				error,
+				error: error as Error,
 				isLoading: false
 			}));
 		}
