@@ -47,7 +47,6 @@ export const useFetchListingData = () => {
 
 			const cachedData = cache[cacheKey];
 			if (cachedData && now - cachedData.timestamp < CACHE_DURATION) {
-				console.log('Using cached data');
 				return {
 					data: cachedData.data,
 					totalCount: cachedData.totalCount
