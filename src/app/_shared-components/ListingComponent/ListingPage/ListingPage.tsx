@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { EListingTab, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
+import { EListingTab, EListingTabState, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { BiSort } from 'react-icons/bi';
@@ -25,7 +25,7 @@ interface ListingPageProps {
 }
 
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
-	const [activeTab, setActiveTab] = useState<'tab1' | 'tab2'>('tab1');
+	const [activeTab, setActiveTab] = useState<EListingTabState.TAB1 | EListingTabState.TAB2>(EListingTabState.TAB1);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [filterActive, setFilterActive] = useState(false);
 	const [selectedStatuses, setSelectedStatuses] = useState<EProposalStatus[]>([]);
@@ -83,7 +83,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	};
 
 	useEffect(() => {
-		if (activeTab === 'tab1') {
+		if (activeTab === EListingTabState.TAB1) {
 			fetchListingData();
 		}
 
@@ -113,15 +113,15 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<div className='flex space-x-6'>
 						<button
 							type='button'
-							className={`${styles['tab-button']} ${activeTab === 'tab1' ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab('tab1')}
+							className={`${styles['tab-button']} ${activeTab === EListingTabState.TAB1 ? styles['tab-button-active'] : ''}`}
+							onClick={() => setActiveTab(EListingTabState.TAB1)}
 						>
 							{tabNames.tab1}
 						</button>
 						<button
 							type='button'
-							className={`${styles['tab-button']} ${activeTab === 'tab2' ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab('tab2')}
+							className={`${styles['tab-button']} ${activeTab === EListingTabState.TAB2 ? styles['tab-button-active'] : ''}`}
+							onClick={() => setActiveTab(EListingTabState.TAB2)}
 						>
 							{tabNames.tab2}
 						</button>
@@ -213,7 +213,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<LoadingSpinner />
 				) : (
 					<div>
-						{activeTab === 'tab1' ? (
+						{activeTab === EListingTabState.TAB1 ? (
 							<ListingTab
 								data={listingData}
 								totalCount={totalCount}

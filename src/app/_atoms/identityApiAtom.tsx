@@ -22,9 +22,9 @@ export const useIdentityApi = (network: ENetwork) => {
 
 				intervalId = setInterval(async () => {
 					try {
-						await newApi.keepAlivePeopleChainApi();
+						await newApi.keepAlive();
 					} catch {
-						await newApi.switchToNewPeopleChainRpcEndpoint();
+						await newApi.switchToNewRpcEndpoint();
 					}
 				}, 6000);
 			}
@@ -37,7 +37,7 @@ export const useIdentityApi = (network: ENetwork) => {
 				clearInterval(intervalId);
 			}
 			if (api) {
-				api.disconnectPeopleChainApi().then(() => setApi(null));
+				api.disconnect().then(() => setApi(null));
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps

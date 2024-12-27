@@ -2,24 +2,37 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext, useContext } from 'react';
 import { useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { IdentityService } from '@/app/_client-services/identity_service';
 import { useUser } from '../_atoms/user/userAtom';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { usePolkadotApi } from '../_atoms/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
 import { ClientError } from '../_client-utils/clientError';
 import { CookieClientService } from '../_client-services/cookie_client_service';
+import { useIdentityApi } from '../_atoms/identityApiAtom';
+
+const IdentityServiceContext = createContext<IdentityService | null>(null);
+
+export const useIdentityService = () => {
+	const context = useContext(IdentityServiceContext);
+	if (!context) {
+		throw new Error('useIdentityService must be used within an IdentityServiceProvider.');
+	}
+	return context;
+};
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const [user, setUser] = useUser();
 
 	const network = getCurrentNetwork();
 	const api = usePolkadotApi(network);
+	const identityApi = useIdentityApi(network);
+
+	const [identityService, setIdentityService] = useState<IdentityService | null>(null);
 
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 
@@ -49,6 +62,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		if (document.visibilityState === 'hidden') return;
 
 		api?.reconnect();
+		identityApi?.reconnect();
 
 		if (user?.exp && Date.now() > user.exp * 1000) {
 			if (refreshTokenData?.exp && Date.now() < refreshTokenData.exp * 1000) {
@@ -73,7 +87,6 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		setUserPreferencesAtom({
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
-			// address: user?.defaultAddress,
 			wallet: user?.loginWallet
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +100,21 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
-	return null;
+
+	useEffect(() => {
+		async function initIdentityService() {
+			const service = await IdentityService.Init(network);
+			setIdentityService(service);
+		}
+
+		initIdentityService();
+
+		return () => {
+			identityService?.disconnect();
+		};
+	}, [network]);
+
+	return <IdentityServiceContext.Provider value={identityService}>{null}</IdentityServiceContext.Provider>;
 }
 
 export default Initializers;

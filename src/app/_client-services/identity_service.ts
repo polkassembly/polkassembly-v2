@@ -39,15 +39,15 @@ export class IdentityService {
 		return new IdentityService(network, api);
 	}
 
-	async disconnectPeopleChainApi(): Promise<void> {
+	async disconnect(): Promise<void> {
 		await this.peopleChainApi.disconnect();
 	}
 
-	getCurrentPeopleChainRpcIndex(): number {
+	getCurrentRpcIndex(): number {
 		return this.currentPeopleChainRpcEndpointIndex;
 	}
 
-	async switchToNewPeopleChainRpcEndpoint(index?: number): Promise<void> {
+	async switchToNewRpcEndpoint(index?: number): Promise<void> {
 		if (index) {
 			// check if valid index
 			if (index < 0 || index >= NETWORKS_DETAILS[this.network].rpcEndpoints.length) {
@@ -65,16 +65,16 @@ export class IdentityService {
 		await this.peopleChainApi.isReady;
 	}
 
-	async getPeopleChainBlockHeight(): Promise<number> {
+	async getBlockHeight(): Promise<number> {
 		const header = await this.peopleChainApi.rpc.chain.getHeader();
 		return header.number.toNumber();
 	}
 
-	async keepAlivePeopleChainApi(): Promise<void> {
-		await this.getPeopleChainBlockHeight();
+	async keepAlive(): Promise<void> {
+		await this.getBlockHeight();
 	}
 
-	async reconnectPeopleChainApi(): Promise<void> {
+	async reconnect(): Promise<void> {
 		if (this.peopleChainApi.isConnected && (await this.peopleChainApi.isReady)) return;
 
 		try {
@@ -84,11 +84,11 @@ export class IdentityService {
 
 			await this.peopleChainApi.isReady;
 		} catch {
-			await this.switchToNewPeopleChainRpcEndpoint();
+			await this.switchToNewRpcEndpoint();
 		}
 	}
 
-	async peopleChainApiReady() {
+	async ready() {
 		await this.peopleChainApi.isReady;
 	}
 

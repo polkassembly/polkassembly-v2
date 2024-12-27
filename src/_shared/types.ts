@@ -470,3 +470,8 @@ export interface IOnChainIdentity {
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
 }
+
+export enum EListingTabState {
+	TAB1 = 'TAB1',
+	TAB2 = 'TAB2'
+}
