@@ -495,6 +495,7 @@ export enum EReaction {
 }
 
 export interface IReaction {
+	id: string;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;

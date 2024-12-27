@@ -24,6 +24,7 @@ import { randomBytes } from 'crypto';
 import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetails';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
+import { cookies } from 'next/headers';
 import { OffChainDbService } from '../offchain_db_service';
 import { redisDel, redisGet, redisSetex } from '../redis_service';
 import { getEmailVerificationTokenKey, getRefreshTokenKey, getTFAKey } from '../redis_service/redisKeys';
@@ -536,16 +537,13 @@ export class AuthService {
 	 * @memberof AuthService
 	 * @throws {APIError} 401 - Invalid access token or refresh token
 	 */
-	static async ValidateAuthAndRefreshTokens(accessToken?: string, refreshToken?: string): Promise<{ newAccessToken: string; newRefreshToken: string }> {
-		if (!accessToken || !refreshToken) {
-			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not logged in');
-		}
+	static async ValidateAuthAndRefreshTokens(): Promise<{ newAccessToken: string; newRefreshToken: string }> {
+		const cookiesStore = await cookies();
+		const accessToken = cookiesStore.get(ECookieNames.ACCESS_TOKEN)?.value;
+		const refreshToken = cookiesStore.get(ECookieNames.REFRESH_TOKEN)?.value;
 
-		let isValidAccessToken = true;
-		try {
-			this.IsValidAccessToken(accessToken);
-		} catch {
-			isValidAccessToken = false;
+		if (!refreshToken) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not logged in');
 		}
 
 		const isValidRefreshToken = await this.IsValidRefreshToken(refreshToken);
@@ -554,36 +552,39 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
 		}
 
-		// If access token is invalid, try to generate a new one using refresh token
-		if (!isValidAccessToken) {
-			const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
-			const user = await OffChainDbService.GetUserById(refreshTokenPayload.id);
+		const isValidAccessToken = accessToken && this.IsValidAccessToken(accessToken);
 
-			if (!user) {
-				throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
-			}
-
-			const newAccessToken = await this.GetSignedAccessToken({
-				...user,
-				loginAddress: refreshTokenPayload.loginAddress,
-				loginWallet: refreshTokenPayload.loginWallet
-			});
-
-			const newRefreshToken = await this.GetRefreshToken({
-				userId: user.id,
-				loginAddress: refreshTokenPayload.loginAddress,
-				loginWallet: refreshTokenPayload.loginWallet
-			});
-
+		if (isValidAccessToken) {
 			return {
-				newAccessToken,
-				newRefreshToken
+				newAccessToken: accessToken,
+				newRefreshToken: refreshToken
 			};
 		}
 
+		// If access token is invalid, try to generate a new one using refresh token
+		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
+		const user = await OffChainDbService.GetUserById(refreshTokenPayload.id);
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
+		}
+
+		const newAccessToken = await this.GetSignedAccessToken({
+			...user,
+			loginAddress: refreshTokenPayload.loginAddress,
+			loginWallet: refreshTokenPayload.loginWallet
+		});
+
+		// rotate refresh token
+		const newRefreshToken = await this.GetRefreshToken({
+			userId: user.id,
+			loginAddress: refreshTokenPayload.loginAddress,
+			loginWallet: refreshTokenPayload.loginWallet
+		});
+
 		return {
-			newAccessToken: accessToken,
-			newRefreshToken: refreshToken
+			newAccessToken,
+			newRefreshToken
 		};
 	}
 }

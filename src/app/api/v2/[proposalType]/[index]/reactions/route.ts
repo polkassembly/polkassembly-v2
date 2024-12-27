@@ -3,18 +3,20 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { EProposalType } from '@/_shared/types';
+import { EReaction, EProposalType } from '@/_shared/types';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { AuthService } from '@/app/api/_api-services/auth_service';
+import { getReqBody } from '@/app/api/_api-utils/getReqBody';
+
+const zodParamsSchema = z.object({
+	proposalType: z.nativeEnum(EProposalType),
+	index: z.string()
+});
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
-	const zodParamsSchema = z.object({
-		proposalType: z.nativeEnum(EProposalType),
-		index: z.string()
-	});
-
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
@@ -22,4 +24,35 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const reactions = await OffChainDbService.GetPostReactions({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
 
 	return NextResponse.json(reactions);
+});
+
+export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType, index } = zodParamsSchema.parse(await params);
+
+	const network = await getNetworkFromHeaders();
+
+	// 1. check if user is logged in
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	// 2. read and validate the request body
+	const zodBodySchema = z.object({
+		reaction: z.nativeEnum(EReaction)
+	});
+
+	const { reaction } = zodBodySchema.parse(await getReqBody(req));
+
+	// 3. add the reaction to the database
+	await OffChainDbService.AddPostReaction({
+		network,
+		indexOrHash: index,
+		proposalType: proposalType as EProposalType,
+		userId: await AuthService.GetUserIdFromAccessToken(newAccessToken),
+		reaction
+	});
+
+	const response = NextResponse.json({ message: 'Reaction added successfully' });
+	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
 });
