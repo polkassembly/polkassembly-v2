@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { EListingTab, EListingTabState, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
+import { EListingTab, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { BiSort } from 'react-icons/bi';
@@ -17,6 +17,10 @@ import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
 
+enum EListingTabState {
+	INTERNAL_PROPOSALS = 'INTERNAL_PROPOSALS',
+	EXTERNAL_PROPOSALS = 'EXTERNAL_PROPOSALS'
+}
 interface ListingPageProps {
 	proposalType: string;
 	origins?: string[];
@@ -25,7 +29,7 @@ interface ListingPageProps {
 }
 
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
-	const [activeTab, setActiveTab] = useState<EListingTabState.TAB1 | EListingTabState.TAB2>(EListingTabState.TAB1);
+	const [activeTab, setActiveTab] = useState<EListingTabState.INTERNAL_PROPOSALS | EListingTabState.EXTERNAL_PROPOSALS>(EListingTabState.INTERNAL_PROPOSALS);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [filterActive, setFilterActive] = useState(false);
 	const [selectedStatuses, setSelectedStatuses] = useState<EProposalStatus[]>([]);
@@ -33,7 +37,9 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
 	const tabNames =
-		proposalType === EProposalType.DISCUSSION ? { tab1: EListingTab.POLKASSEMBLY, tab2: EListingTab.EXTERNAL } : { tab1: EListingTab.REFERENDA, tab2: EListingTab.ANALYTICS };
+		proposalType === EProposalType.DISCUSSION
+			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: EListingTab.EXTERNAL }
+			: { INTERNAL_PROPOSALS: EListingTab.REFERENDA, EXTERNAL_PROPOSALS: EListingTab.ANALYTICS };
 
 	const statuses = [
 		EProposalStatus.Cancelled,
@@ -83,7 +89,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	};
 
 	useEffect(() => {
-		if (activeTab === EListingTabState.TAB1) {
+		if (activeTab === EListingTabState.INTERNAL_PROPOSALS) {
 			fetchListingData();
 		}
 
@@ -113,17 +119,17 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<div className='flex space-x-6'>
 						<button
 							type='button'
-							className={`${styles['tab-button']} ${activeTab === EListingTabState.TAB1 ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab(EListingTabState.TAB1)}
+							className={`${styles['tab-button']} ${activeTab === EListingTabState.INTERNAL_PROPOSALS ? styles['tab-button-active'] : ''}`}
+							onClick={() => setActiveTab(EListingTabState.INTERNAL_PROPOSALS)}
 						>
-							{tabNames.tab1}
+							{tabNames.INTERNAL_PROPOSALS}
 						</button>
 						<button
 							type='button'
-							className={`${styles['tab-button']} ${activeTab === EListingTabState.TAB2 ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab(EListingTabState.TAB2)}
+							className={`${styles['tab-button']} ${activeTab === EListingTabState.EXTERNAL_PROPOSALS ? styles['tab-button-active'] : ''}`}
+							onClick={() => setActiveTab(EListingTabState.EXTERNAL_PROPOSALS)}
 						>
-							{tabNames.tab2}
+							{tabNames.EXTERNAL_PROPOSALS}
 						</button>
 					</div>
 					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
@@ -213,7 +219,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<LoadingSpinner />
 				) : (
 					<div>
-						{activeTab === EListingTabState.TAB1 ? (
+						{activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
 							<ListingTab
 								data={listingData}
 								totalCount={totalCount}

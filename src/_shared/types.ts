@@ -484,11 +484,6 @@ export interface IOnChainIdentity {
 	parentProxyAddress: string;
 }
 
-export enum EListingTabState {
-	TAB1 = 'TAB1',
-	TAB2 = 'TAB2'
-}
-
 export enum EReaction {
 	like = 'like',
 	dislike = 'dislike'
