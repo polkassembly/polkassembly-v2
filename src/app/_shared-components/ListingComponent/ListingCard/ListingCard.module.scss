@@ -1,5 +1,5 @@
 .listingCard {
-    @apply flex flex-col-reverse gap-1 items-start justify-between p-3 md:p-6 lg:flex-row md:items-center;
+    @apply flex flex-col-reverse gap-1 items-start justify-between p-3 md:p-6 md:flex-row md:items-center;
 }
 
 .indexText {
@@ -11,7 +11,7 @@
 }
 
 .infoContainer {
-    @apply flex items-center ml-2 md:ml-0 gap-1 lg:gap-2 text-sm text-gray-500;
+    @apply flex items-center ml-2 md:ml-0 gap-1 md:gap-2 text-sm text-gray-500;
 }
 
 .infoItem {
@@ -23,9 +23,9 @@
 }
 
 .infoIcon {
-    @apply h-3 w-3 lg:h-3.5 lg:w-3.5;
+    @apply h-3 w-3 md:h-3.5 md:w-3.5;
 }
 
 .infoTimer {
-    @apply whitespace-nowrap text-[10px] lg:text-xs
+    @apply whitespace-nowrap text-[10px] md:text-xs
 }
