@@ -5,7 +5,6 @@
 'use client';
 
 import React from 'react';
-import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import Identicon from '@polkadot/react-identicon';
 import { IOnChainIdentity } from '@/_shared/types';
 import IdentityBadge from '../IdentityBadge';
@@ -16,18 +15,14 @@ interface Props {
 	className?: string;
 	onChainIdentity: IOnChainIdentity;
 	addressDisplayText?: string;
-	startChars?: number;
-	endChars?: number;
 	iconSize?: number;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, startChars, endChars, iconSize = 20 }: Props) {
-	const displayText = addressDisplayText || (startChars && endChars ? shortenAddress(address) : address);
-
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20 }: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
-			title={address}
+			title={addressDisplayText || address}
 		>
 			<Identicon
 				className='image identicon'
@@ -40,7 +35,8 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 				onChainIdentity={onChainIdentity}
 				iconSize={iconSize}
 			/>
-			<p className={styles.displaytext}>{displayText}</p>
+
+			<p className={styles.displaytext}>{addressDisplayText}</p>
 		</div>
 	);
 }
