@@ -4,14 +4,15 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { EListingTab, EProposalStatus, EProposalType, IPostListing } from '@/_shared/types';
+import React, { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { EListingTab, EProposalStatus, EProposalType } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdSearch } from 'react-icons/md';
-import { useFetchListingData } from '@/app/_atoms/listingPageAtom';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
@@ -50,7 +51,6 @@ interface ListingPageProps {
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const fetchListingData = useFetchListingData();
 
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
@@ -61,11 +61,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		filterActive: false,
 		selectedStatuses: initialTrackStatus === 'all' ? [] : (initialTrackStatus.split(',') as EProposalStatus[]),
 		tagSearchTerm: '',
-		selectedTags: [] as string[],
-		listingData: [] as IPostListing[],
-		totalCount: 0,
-		isLoading: false,
-		error: null as Error | null
+		selectedTags: [] as string[]
 	});
 
 	const tabNames =
@@ -85,82 +81,50 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		[router, searchParams]
 	);
 
-	const fetchData = useCallback(async () => {
-		setState((prev) => ({ ...prev, isLoading: true }));
-		try {
-			const { data, totalCount } = await fetchListingData({
-				proposalType,
-				currentPage: state.currentPage,
-				selectedStatuses: state.selectedStatuses,
-				selectedTags: state.selectedTags,
-				origins
-			});
-			setState((prev) => ({
-				...prev,
-				listingData: data,
-				totalCount,
-				isLoading: false
-			}));
-		} catch (error) {
-			setState((prev) => ({
-				...prev,
-				error: error as Error,
-				isLoading: false
-			}));
+	const fetchListingData = async () => {
+		const { data, error } = await NextApiClientService.fetchListingDataApi(proposalType, state.currentPage, state.selectedStatuses, origins, state.selectedTags);
+
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
 		}
-	}, [fetchListingData, proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins]);
+		return data;
+	};
 
-	const handlePageChange = useCallback(
-		(page: number) => {
-			setState((prev) => ({ ...prev, currentPage: page }));
-			updateUrlParams(page, state.selectedStatuses);
-		},
-		[updateUrlParams, state.selectedStatuses]
-	);
+	const { data, isLoading, error } = useQuery({
+		queryKey: ['listingData', proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins],
+		queryFn: fetchListingData,
+		placeholderData: (previousData) => previousData,
+		staleTime: 5 * 60 * 1000
+	});
 
-	const handleStatusToggle = useCallback(
-		(status: EProposalStatus) => {
-			setState((prev) => {
-				const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
+	const handlePageChange = (page: number) => {
+		setState((prev) => ({ ...prev, currentPage: page }));
+		updateUrlParams(page, state.selectedStatuses);
+	};
 
-				updateUrlParams(prev.currentPage, newStatuses);
-				return { ...prev, selectedStatuses: newStatuses };
-			});
-		},
-		[updateUrlParams]
-	);
+	const handleStatusToggle = (status: EProposalStatus) => {
+		setState((prev) => {
+			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
-	const handleTagToggle = useCallback((tag: string) => {
+			updateUrlParams(prev.currentPage, newStatuses);
+			return { ...prev, selectedStatuses: newStatuses };
+		});
+	};
+
+	const handleTagToggle = (tag: string) => {
 		setState((prev) => ({
 			...prev,
 			selectedTags: prev.selectedTags.includes(tag) ? prev.selectedTags.filter((t) => t !== tag) : [...prev.selectedTags, tag]
 		}));
-	}, []);
+	};
 
-	useEffect(() => {
-		if (state.activeTab === EListingTabState.INTERNAL_PROPOSALS) {
-			fetchData();
-		}
-	}, [state.activeTab, state.selectedStatuses, state.currentPage, state.selectedTags, fetchData]);
-
-	useEffect(() => {
-		const page = parseInt(searchParams.get('page') || '1', 10);
-		const trackStatus = searchParams.get('trackStatus') || 'all';
-
-		setState((prev) => ({
-			...prev,
-			currentPage: page,
-			selectedStatuses: trackStatus === 'all' ? [] : (trackStatus.split(',') as EProposalStatus[])
-		}));
-	}, [searchParams]);
-
-	if (state.error) return <p>Error: {state.error.message}</p>;
+	if (error) return <p>Error: {error.message}</p>;
 
 	const renderHeader = () => (
 		<div className={styles.header}>
 			<div>
 				<h1 className={styles.title}>
-					{title} ({state.totalCount})
+					{title} ({data?.totalCount || 0})
 				</h1>
 				<p className={styles.subtitle}>{description}</p>
 			</div>
@@ -272,14 +236,14 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 				</div>
 			</div>
 			<div className={styles.content}>
-				{state.isLoading ? (
+				{isLoading ? (
 					<LoadingSpinner />
 				) : (
 					<div>
 						{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
 							<ListingTab
-								data={state.listingData}
-								totalCount={state.totalCount}
+								data={data?.posts || []}
+								totalCount={data?.totalCount || 0}
 								currentPage={state.currentPage}
 								setCurrentPage={handlePageChange}
 							/>
