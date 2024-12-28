@@ -13,6 +13,7 @@ import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdSearch } from 'react-icons/md';
+import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
@@ -94,7 +95,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		queryKey: ['listingData', proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins],
 		queryFn: fetchListingData,
 		placeholderData: (previousData) => previousData,
-		staleTime: 5 * 60 * 1000
+		staleTime: ADDRESS_LOGIN_TTL
 	});
 
 	const handlePageChange = (page: number) => {
