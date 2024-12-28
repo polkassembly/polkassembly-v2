@@ -37,11 +37,10 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 
 	useEffect(() => {
 		fetchIdentity();
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [encodedAddress, network]);
 
-	const displayText = identity?.display ? shortenAddress(identity?.display, truncateCharLen) : shortenAddress(encodedAddress, truncateCharLen);
+	const displayText = identity?.display || shortenAddress(encodedAddress, truncateCharLen);
 
 	return (
 		<div>
