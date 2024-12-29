@@ -122,7 +122,7 @@ export class AuthService {
 		return newUser;
 	}
 
-	static async GetUserIdFromAccessToken(token: string): Promise<number> {
+	static GetUserIdFromAccessToken(token: string): number {
 		let decoded: IAccessTokenPayload;
 
 		try {
@@ -139,7 +139,7 @@ export class AuthService {
 	}
 
 	static async GetUserWithAccessToken(token: string): Promise<IUser | null> {
-		const userId = await this.GetUserIdFromAccessToken(token);
+		const userId = this.GetUserIdFromAccessToken(token);
 
 		const user = await OffChainDbService.GetUserById(userId);
 		if (!user) return null;

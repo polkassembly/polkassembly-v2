@@ -33,7 +33,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	// 1. check if user is logged in
+	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. read and validate the request body
@@ -44,7 +44,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const { content } = zodBodySchema.parse(await getReqBody(req));
 
 	// 3. check if user is the owner of the comment
-	const userId = await AuthService.GetUserIdFromAccessToken(newAccessToken);
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
 	const comment = await OffChainDbService.GetCommentById(id);
 
@@ -71,11 +71,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	// 1. check if user is logged in
+	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. check if user is the owner of the comment
-	const userId = await AuthService.GetUserIdFromAccessToken(newAccessToken);
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
 	const comment = await OffChainDbService.GetCommentById(id);
 

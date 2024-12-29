@@ -294,6 +294,12 @@ export class FirestoreService extends FirestoreRefs {
 		} as IReaction;
 	}
 
+	static async GetLatestOffChainPostIndex(network: ENetwork, proposalType: EProposalType): Promise<number> {
+		const postsQuery = FirestoreRefs.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).orderBy('index', 'desc').limit(1);
+		const postsQuerySnapshot = await postsQuery.get();
+		return postsQuerySnapshot.docs[0].data().index || 0;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -420,5 +426,48 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async DeletePostReaction(id: string) {
 		await FirestoreRefs.getReactionDocRefById(id).delete();
+	}
+
+	static async UpdatePost({ id, content }: { id?: string; content: string }) {
+		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async CreatePost({
+		network,
+		proposalType,
+		userId,
+		content,
+		indexOrHash
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+		indexOrHash?: string;
+	}): Promise<{ id: string; indexOrHash: string }> {
+		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
+
+		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
+
+		const newPost: IOffChainPost = {
+			id: newPostId,
+			network,
+			proposalType,
+			userId,
+			content,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			dataSource: EDataSource.POLKASSEMBLY
+		};
+
+		if (proposalType === EProposalType.TIP) {
+			newPost.hash = indexOrHash;
+		} else {
+			newPost.index = Number(newIndex);
+		}
+
+		await FirestoreRefs.getPostDocRefById(newPostId).set(newPost, { merge: true });
+
+		return { id: newPostId, indexOrHash: String(newIndex) };
 	}
 }

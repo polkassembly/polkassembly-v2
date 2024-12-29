@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { AuthService } from '@/app/api/_api-services/auth_service';
+import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { OnChainDbService } from '@api/_api-services/onchain_db_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -14,12 +16,12 @@ import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
-	const zodParamsSchema = z.object({
-		proposalType: z.nativeEnum(EProposalType),
-		index: z.string()
-	});
+const zodParamsSchema = z.object({
+	proposalType: z.nativeEnum(EProposalType),
+	index: z.string()
+});
 
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
@@ -51,4 +53,42 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	};
 
 	return NextResponse.json(post);
+});
+
+export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType, index } = zodParamsSchema.parse(await params);
+
+	const network = await getNetworkFromHeaders();
+
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	const zodBodySchema = z.object({
+		content: z.string().min(1, 'Content is required')
+	});
+
+	const { content } = zodBodySchema.parse(await getReqBody(req));
+
+	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
+		await OffChainDbService.UpdateOffChainPost({
+			network,
+			indexOrHash: index,
+			proposalType: proposalType as EProposalType,
+			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
+			content
+		});
+	} else {
+		await OffChainDbService.UpdateOnChainPost({
+			network,
+			indexOrHash: index,
+			proposalType: proposalType as EProposalType,
+			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
+			content
+		});
+	}
+
+	const response = NextResponse.json({ message: 'Post updated successfully' });
+	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
 });

@@ -58,4 +58,6 @@ export class FirestoreRefs {
 	};
 
 	protected static getReactionDocRefById = (reactionId: string) => this.reactionsCollectionRef().doc(reactionId);
+
+	protected static getPostDocRefById = (id: string) => this.postsCollectionRef().doc(id);
 }

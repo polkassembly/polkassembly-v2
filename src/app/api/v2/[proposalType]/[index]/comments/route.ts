@@ -32,7 +32,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const network = await getNetworkFromHeaders();
 
-	// 1. check if user is logged in
+	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. read and validate the request body
@@ -51,7 +51,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		network,
 		indexOrHash: index,
 		proposalType: proposalType as EProposalType,
-		userId: await AuthService.GetUserIdFromAccessToken(newAccessToken),
+		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content,
 		parentCommentId,
 		address
