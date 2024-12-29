@@ -45,7 +45,7 @@ export const useIdentityService = (network: ENetwork) => {
 		// Update cache
 		setIdentityCache((prev) => ({
 			...prev,
-			[address]: {
+			[formattedAddress]: {
 				identity,
 				timestamp: now
 			}
