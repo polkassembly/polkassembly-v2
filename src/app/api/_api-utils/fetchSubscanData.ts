@@ -4,8 +4,7 @@
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { SUBSCAN_API_KEY, SUBSCAN_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
-import { redisGet, redisSetex } from '@/app/api/_api-services/redis_service';
-import { getSubscanDataKey } from '@/app/api/_api-services/redis_service/redisKeys';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 if (!SUBSCAN_API_KEY) {
 	throw new Error('SUBSCAN_API_KEY env variable is not set');
@@ -17,13 +16,9 @@ const SUBSCAN_API_HEADERS = {
 	'X-API-Key': SUBSCAN_API_KEY
 };
 
-const TWELWE_HOURS_IN_SECONDS = 43200;
-
 export const fetchSubscanData = async (url: string | URL, network: string, body?: Record<string, unknown>, method?: 'POST' | 'GET') => {
 	try {
-		const redisKey = getSubscanDataKey(network, url.toString());
-
-		const redisData = await redisGet(redisKey);
+		const redisData = await RedisService.GetSubscanData(network, url.toString());
 
 		if (redisData && SUBSCAN_CACHE_ENABLED) {
 			return JSON.parse(redisData);
@@ -41,7 +36,7 @@ export const fetchSubscanData = async (url: string | URL, network: string, body?
 		).json();
 
 		if (data?.message === 'Success' && SUBSCAN_CACHE_ENABLED) {
-			await redisSetex(redisKey, TWELWE_HOURS_IN_SECONDS, data);
+			await RedisService.SetSubscanData(network, url.toString(), JSON.stringify(data));
 		}
 
 		return data;

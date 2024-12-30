@@ -26,9 +26,8 @@ import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
 import { cookies } from 'next/headers';
 import { OffChainDbService } from '../offchain_db_service';
-import { redisDel, redisGet, redisSetex } from '../redis_service';
-import { getEmailVerificationTokenKey, getRefreshTokenKey, getTFAKey } from '../redis_service/redisKeys';
-import { ACCESS_TOKEN_LIFE_IN_SECONDS, FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
+import { RedisService } from '../redis_service';
+import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
 import { NotificationService } from '../notification_service';
 import { generateRandomBase32 } from '../../_api-utils/generateRandomBase32';
 
@@ -48,7 +47,7 @@ export class AuthService {
 	private static async CreateAndSendEmailVerificationToken(user: IUser): Promise<void> {
 		if (user.email) {
 			const verifyToken = createCuid();
-			await redisSetex(getEmailVerificationTokenKey(verifyToken), ONE_DAY, user.email);
+			await RedisService.SetEmailVerificationToken(verifyToken, user.email);
 
 			// send verification email in background
 			NotificationService.SendVerificationEmail(user, verifyToken);
@@ -218,14 +217,14 @@ export class AuthService {
 		);
 
 		// save refresh token in redis
-		await redisSetex(getRefreshTokenKey(userId), REFRESH_TOKEN_LIFE_IN_SECONDS, refreshToken);
+		await RedisService.SetRefreshToken(userId, refreshToken);
 
 		return refreshToken;
 	}
 
 	static async DeleteRefreshToken(refreshToken: string) {
 		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
-		await redisDel(getRefreshTokenKey(refreshTokenPayload.id));
+		await RedisService.DeleteRefreshToken(refreshTokenPayload.id);
 	}
 
 	static async Web2Login(emailOrUsername: string, password: string): Promise<IAuthResponse> {
@@ -253,7 +252,7 @@ export class AuthService {
 
 		if (isTFAEnabled) {
 			const tfaToken = createCuid();
-			await redisSetex(getTFAKey(tfaToken), FIVE_MIN, user.id.toString());
+			await RedisService.SetTfaToken(tfaToken, user.id);
 
 			return {
 				isTFAEnabled,
@@ -342,7 +341,7 @@ export class AuthService {
 
 			if (isTFAEnabled) {
 				const tfaToken = createCuid();
-				await redisSetex(getTFAKey(tfaToken), FIVE_MIN, user.id.toString());
+				await RedisService.SetTfaToken(tfaToken, user.id);
 
 				return {
 					isTFAEnabled,
@@ -394,7 +393,7 @@ export class AuthService {
 				return false;
 			}
 
-			const redisRefreshToken = await redisGet(getRefreshTokenKey(refreshTokenPayload.id));
+			const redisRefreshToken = await RedisService.GetRefreshToken(refreshTokenPayload.id);
 
 			return redisRefreshToken === token;
 		} catch {
@@ -497,7 +496,7 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid TFA token');
 		}
 
-		const userId = await redisGet(getTFAKey(tfaToken));
+		const userId = await RedisService.GetTfaToken(tfaToken);
 
 		if (!userId || !ValidatorService.isValidUserId(Number(userId))) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid TFA token');
