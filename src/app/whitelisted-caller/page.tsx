@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Whitelisted Caller'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin commanded by any members of the Polkadot Fellowship (no Dan grade needed).'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.WHITELISTED_CALLER]}
 			/>

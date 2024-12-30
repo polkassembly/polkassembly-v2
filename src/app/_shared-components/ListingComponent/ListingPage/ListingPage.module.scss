@@ -15,7 +15,7 @@
 }
 
 .button {
-    @apply flex items-center gap-1.5 rounded-full bg-pink-500 px-3 py-1.5 lg:px-6 lg:py-2 text-white shadow;
+    @apply items-center hidden lg:flex gap-1.5 rounded-full bg-pink-500 px-3 py-1.5 lg:px-6 lg:py-2 text-white shadow;
 }
 
 .tabs {

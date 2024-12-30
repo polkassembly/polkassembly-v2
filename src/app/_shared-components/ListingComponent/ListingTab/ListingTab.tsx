@@ -69,6 +69,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 						backgroundColor={backgroundColor}
 						title={item.title || 'Untitled'}
 						onChainInfo={onChainInfo}
+						proposalType={item.proposalType}
 						index={item.index ?? 0}
 					/>
 				</div>

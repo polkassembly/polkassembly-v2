@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Referendum Killer'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin able to kill referenda.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.REFERENDUM_KILLER]}
 			/>

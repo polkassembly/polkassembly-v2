@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Wish For Change'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin for signaling that the network wishes for some change.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.WISH_FOR_CHANGE]}
 			/>

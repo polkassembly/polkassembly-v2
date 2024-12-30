@@ -1,0 +1,8 @@
+.container {
+    @apply flex flex-row items-center gap-1.5;
+}
+
+.displaytext {
+    @apply text-[12px] lg:text-xs text-text_primary whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] inline-block align-middle;
+
+}

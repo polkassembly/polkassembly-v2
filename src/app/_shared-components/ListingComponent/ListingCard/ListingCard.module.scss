@@ -1,23 +1,31 @@
 .listingCard {
-    @apply flex flex-col items-start justify-between p-6 md:flex-row md:items-center;
+    @apply flex flex-col-reverse gap-1 items-start justify-between p-3 md:p-6 md:flex-row md:items-center;
 }
 
 .indexText {
-    @apply ml-5 w-14 text-sidebar_text;
+    @apply pl-2 md:pl-5 text-sidebar_text;
 }
 
 .titleText {
-    @apply font-medium text-btn_secondary_text;
+    @apply font-medium pl-2 lg:pl-0 text-sm text-btn_secondary_text;
 }
 
 .infoContainer {
-    @apply flex items-center gap-2 text-sm text-gray-500;
+    @apply flex items-center pl-2 lg:pl-0 gap-1 md:gap-2 text-sm text-gray-500;
 }
 
 .infoItem {
-    @apply flex items-center gap-1 text-xs;
+    @apply flex items-center text-wallet_btn_text gap-1 text-xs;
 }
 
 .originStyle {
     @apply rounded-md px-1.5 py-1 text-xs;
+}
+
+.infoIcon {
+    @apply h-3 w-3 md:h-3.5 md:w-3.5;
+}
+
+.infoTimer {
+    @apply whitespace-nowrap text-[10px] md:text-xs
 }

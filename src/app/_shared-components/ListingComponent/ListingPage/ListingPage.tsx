@@ -4,18 +4,43 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { EProposalStatus, IPostListing } from '@/_shared/types';
+import React, { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { EListingTab, EProposalStatus, EProposalType } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdSearch } from 'react-icons/md';
+import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
+
+// Constants
+enum EListingTabState {
+	INTERNAL_PROPOSALS = 'INTERNAL_PROPOSALS',
+	EXTERNAL_PROPOSALS = 'EXTERNAL_PROPOSALS'
+}
+
+const STATUSES = [
+	EProposalStatus.Cancelled,
+	EProposalStatus.Confirmed,
+	EProposalStatus.ConfirmAborted,
+	EProposalStatus.ConfirmStarted,
+	EProposalStatus.Deciding,
+	EProposalStatus.Executed,
+	EProposalStatus.ExecutionFailed,
+	EProposalStatus.Killed,
+	EProposalStatus.Rejected,
+	EProposalStatus.Submitted,
+	EProposalStatus.TimedOut
+];
+
+const TAGS = ['bounty', 'treasury', 'smart contract', 'polkadot', 'Network', 'Governance', 'Proposal', 'Test'];
 
 interface ListingPageProps {
 	proposalType: string;
@@ -25,182 +50,188 @@ interface ListingPageProps {
 }
 
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
-	const [activeTab, setActiveTab] = useState<'polkassembly' | 'external'>('polkassembly');
-	const [currentPage, setCurrentPage] = useState(1);
-	const [filterActive, setFilterActive] = useState(false);
-	const [selectedStatuses, setSelectedStatuses] = useState<EProposalStatus[]>([]);
-	const [tagSearchTerm, setTagSearchTerm] = useState('');
-	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+	const router = useRouter();
+	const searchParams = useSearchParams();
 
-	const statuses = [
-		EProposalStatus.Cancelled,
-		EProposalStatus.Confirmed,
-		EProposalStatus.ConfirmAborted,
-		EProposalStatus.ConfirmStarted,
-		EProposalStatus.Deciding,
-		EProposalStatus.Executed,
-		EProposalStatus.ExecutionFailed,
-		EProposalStatus.Killed,
-		EProposalStatus.Rejected,
-		EProposalStatus.Submitted,
-		EProposalStatus.TimedOut
-	];
+	const initialPage = parseInt(searchParams.get('page') || '1', 10);
+	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
 
-	const tags = ['bounty', 'treasury', 'smart contract', 'polkadot', 'Network', 'Governance', 'Proposal', 'Test'];
-	const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(tagSearchTerm.toLowerCase()));
+	const [state, setState] = useState({
+		activeTab: EListingTabState.INTERNAL_PROPOSALS,
+		currentPage: initialPage,
+		filterActive: false,
+		selectedStatuses: initialTrackStatus === 'all' ? [] : (initialTrackStatus.split(',') as EProposalStatus[]),
+		tagSearchTerm: '',
+		selectedTags: [] as string[]
+	});
 
-	const [listingData, setListingData] = useState<IPostListing[]>([]);
-	const [totalCount, setTotalCount] = useState<number>(0);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [error, setError] = useState<Error | null>(null);
+	const tabNames =
+		proposalType === EProposalType.DISCUSSION
+			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: EListingTab.EXTERNAL }
+			: { INTERNAL_PROPOSALS: EListingTab.REFERENDA, EXTERNAL_PROPOSALS: EListingTab.ANALYTICS };
+
+	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
+
+	const updateUrlParams = useCallback(
+		(page: number, statuses: EProposalStatus[]) => {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set('page', page.toString());
+			params.set('trackStatus', statuses.length > 0 ? statuses.join(',') : 'all');
+			router.push(`?${params.toString()}`, { scroll: false });
+		},
+		[router, searchParams]
+	);
 
 	const fetchListingData = async () => {
-		setIsLoading(true);
-		const { data, error: dataError } = await NextApiClientService.fetchListingDataApi(proposalType, currentPage, selectedStatuses, origins, selectedTags);
+		const { data, error } = await NextApiClientService.fetchListingDataApi(proposalType, state.currentPage, state.selectedStatuses, origins, state.selectedTags);
 
-		if (dataError) {
-			setError(dataError);
-			setIsLoading(false);
-			return;
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
 		}
-
-		if (data) {
-			setListingData(data?.posts || []);
-			setTotalCount(data?.totalCount);
-		}
-		setIsLoading(false);
+		return data;
 	};
 
-	const toggleStatus = (status: EProposalStatus) => {
-		setSelectedStatuses((prevStatuses) => (prevStatuses.includes(status) ? prevStatuses.filter((s) => s !== status) : [...prevStatuses, status]));
+	const { data, isLoading, error } = useQuery({
+		queryKey: ['listingData', proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins],
+		queryFn: fetchListingData,
+		placeholderData: (previousData) => previousData,
+		staleTime: ADDRESS_LOGIN_TTL
+	});
+
+	const handlePageChange = (page: number) => {
+		setState((prev) => ({ ...prev, currentPage: page }));
+		updateUrlParams(page, state.selectedStatuses);
 	};
 
-	const toggleTag = (tag: string) => {
-		setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+	const handleStatusToggle = (status: EProposalStatus) => {
+		setState((prev) => {
+			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
+
+			updateUrlParams(prev.currentPage, newStatuses);
+			return { ...prev, selectedStatuses: newStatuses };
+		});
 	};
 
-	useEffect(() => {
-		if (activeTab === 'polkassembly') {
-			fetchListingData();
-		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedStatuses, activeTab, currentPage, selectedTags]);
+	const handleTagToggle = (tag: string) => {
+		setState((prev) => ({
+			...prev,
+			selectedTags: prev.selectedTags.includes(tag) ? prev.selectedTags.filter((t) => t !== tag) : [...prev.selectedTags, tag]
+		}));
+	};
 
 	if (error) return <p>Error: {error.message}</p>;
+
+	const renderHeader = () => (
+		<div className={styles.header}>
+			<div>
+				<h1 className={styles.title}>
+					{title} ({data?.totalCount || 0})
+				</h1>
+				<p className={styles.subtitle}>{description}</p>
+			</div>
+			<button
+				type='button'
+				className={styles.button}
+			>
+				<span className='text-xl'>+</span>
+				<span className='whitespace-nowrap text-sm'>Create {proposalType === EProposalType.DISCUSSION ? 'Post' : 'Proposal'}</span>
+			</button>
+		</div>
+	);
+
+	const renderFilterContent = () => (
+		<div className='p-4'>
+			<h3 className='text-sm font-semibold text-filter_dropdown'>STATUS</h3>
+			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
+				{STATUSES.map((status) => (
+					<span
+						key={status}
+						className='flex items-center'
+					>
+						<input
+							type='checkbox'
+							className='mr-2'
+							checked={state.selectedStatuses.includes(status)}
+							onChange={() => handleStatusToggle(status)}
+						/>
+						<span className='text-sm text-filter_dropdown'>{status}</span>
+					</span>
+				))}
+			</div>
+
+			<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>Tags</h3>
+			<div className='relative mt-2'>
+				<input
+					type='text'
+					placeholder='Search'
+					value={state.tagSearchTerm}
+					onChange={(e) => setState((prev) => ({ ...prev, tagSearchTerm: e.target.value }))}
+					className={styles.searchbar}
+				/>
+				<MdSearch className='absolute right-3 top-1/2 -translate-y-1/2 transform text-filter_dropdown' />
+			</div>
+
+			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
+				{filteredTags.map((tag) => (
+					<span
+						key={tag}
+						className='flex items-center'
+					>
+						<input
+							type='checkbox'
+							className='mr-2'
+							checked={state.selectedTags.includes(tag)}
+							onChange={() => handleTagToggle(tag)}
+						/>
+						<span className='flex items-center gap-1 text-sm text-filter_dropdown'>
+							<IoMdTrendingUp /> {tag}
+						</span>
+					</span>
+				))}
+			</div>
+		</div>
+	);
 
 	return (
 		<div>
 			<div className={styles.container}>
-				<div className={styles.header}>
-					<div>
-						<h1 className={styles.title}>
-							{title} ({totalCount})
-						</h1>
-						<p className={styles.subtitle}>{description}</p>
-					</div>
-					<button
-						type='button'
-						className={styles.button}
-					>
-						<span className='text-xl'>+</span> <span className='whitespace-nowrap text-sm'>Create Post</span>
-					</button>
-				</div>
+				{renderHeader()}
 				<div className={styles.tabs}>
 					<div className='flex space-x-6'>
-						<button
-							type='button'
-							className={`${styles['tab-button']} ${activeTab === 'polkassembly' ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab('polkassembly')}
-						>
-							POLKASSEMBLY
-						</button>
-						<button
-							type='button'
-							className={`${styles['tab-button']} ${activeTab === 'external' ? styles['tab-button-active'] : ''}`}
-							onClick={() => setActiveTab('external')}
-						>
-							EXTERNAL
-						</button>
+						{Object.entries(tabNames).map(([key, value]) => (
+							<button
+								key={key}
+								type='button'
+								className={`${styles['tab-button']} ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
+								onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
+							>
+								{value}
+							</button>
+						))}
 					</div>
 					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
-						<Popover
-							onOpenChange={(open) => {
-								setFilterActive(open);
-							}}
-						>
+						<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
 							<PopoverTrigger asChild>
 								<div
-									className={`${styles.filter} ${filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
+									className={`${styles.filter} ${state.filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
 									role='button'
 									tabIndex={0}
 								>
-									<span className={filterActive ? styles.selectedicon : ''}>
+									<span className={state.filterActive ? styles.selectedicon : ''}>
 										<FaFilter />
 									</span>
-									Filter
+									<span className='hidden lg:block'>Filter</span>
 								</div>
 							</PopoverTrigger>
 							<PopoverContent
 								sideOffset={5}
 								className={styles.popoverContent}
 							>
-								<div className='p-4'>
-									<h3 className='text-sm font-semibold text-filter_dropdown'>STATUS</h3>
-									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
-										{statuses.map((status, index) => (
-											<span
-												// eslint-disable-next-line react/no-array-index-key
-												key={index}
-												className='flex items-center'
-											>
-												<input
-													type='checkbox'
-													className='mr-2'
-													checked={selectedStatuses.includes(status)}
-													onChange={() => toggleStatus(status)}
-												/>
-												<span className='text-sm text-filter_dropdown'>{status}</span>
-											</span>
-										))}
-									</div>
-
-									<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>Tags</h3>
-									<div className='relative mt-2'>
-										<input
-											type='text'
-											placeholder='Search'
-											value={tagSearchTerm}
-											onChange={(e) => setTagSearchTerm(e.target.value)}
-											className={styles.searchbar}
-										/>
-										<MdSearch className='absolute right-3 top-1/2 -translate-y-1/2 transform text-filter_dropdown' />
-									</div>
-
-									<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
-										{filteredTags.map((tag, index) => (
-											<span
-												// eslint-disable-next-line react/no-array-index-key
-												key={index}
-												className='flex items-center'
-											>
-												<input
-													type='checkbox'
-													className='mr-2'
-													checked={selectedTags.includes(tag)}
-													onChange={() => toggleTag(tag)}
-												/>
-												<span className='flex items-center gap-1 text-sm text-filter_dropdown'>
-													<IoMdTrendingUp /> {tag}
-												</span>
-											</span>
-										))}
-									</div>
-								</div>
+								{renderFilterContent()}
 							</PopoverContent>
 						</Popover>
 						<p className={styles.filter}>
-							Sort By <BiSort />
+							<span className='hidden lg:block'>Sort By</span> <BiSort />
 						</p>
 					</div>
 				</div>
@@ -210,12 +241,12 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<LoadingSpinner />
 				) : (
 					<div>
-						{activeTab === 'polkassembly' ? (
+						{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
 							<ListingTab
-								data={listingData}
-								totalCount={totalCount}
-								currentPage={currentPage}
-								setCurrentPage={setCurrentPage}
+								data={data?.posts || []}
+								totalCount={data?.totalCount || 0}
+								currentPage={state.currentPage}
+								setCurrentPage={handlePageChange}
 							/>
 						) : (
 							<ExternalTab />

@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Fellowship Admin'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin for managing the composition of the fellowshipShow.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.FELLOWSHIP_ADMIN]}
 			/>

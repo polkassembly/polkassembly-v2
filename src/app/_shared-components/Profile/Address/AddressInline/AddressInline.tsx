@@ -5,25 +5,24 @@
 'use client';
 
 import React from 'react';
-import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import Identicon from '@polkadot/react-identicon';
+import { IOnChainIdentity } from '@/_shared/types';
+import IdentityBadge from '../IdentityBadge';
+import styles from './AddressInline.module.scss';
 
 interface Props {
 	address: string;
 	className?: string;
+	onChainIdentity: IOnChainIdentity;
 	addressDisplayText?: string;
-	startChars?: number;
-	endChars?: number;
 	iconSize?: number;
 }
 
-function AddressInline({ address, addressDisplayText, className, startChars, endChars, iconSize = 20 }: Props) {
-	const displayText = addressDisplayText || (startChars && endChars ? shortenAddress(address) : address);
-
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20 }: Props) {
 	return (
 		<div
-			className={`flex flex-row items-center gap-1.5 ${className}`.trim()}
-			title={address}
+			className={`${styles.container} ${className}`.trim()}
+			title={addressDisplayText || address}
 		>
 			<Identicon
 				className='image identicon'
@@ -32,7 +31,12 @@ function AddressInline({ address, addressDisplayText, className, startChars, end
 				theme='polkadot'
 			/>
 
-			<p className='flex flex-nowrap whitespace-nowrap'>{displayText}</p>
+			<IdentityBadge
+				onChainIdentity={onChainIdentity}
+				iconSize={iconSize}
+			/>
+
+			<p className={styles.displaytext}>{addressDisplayText}</p>
 		</div>
 	);
 }

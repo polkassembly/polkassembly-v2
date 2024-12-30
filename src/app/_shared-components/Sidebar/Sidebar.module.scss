@@ -11,7 +11,7 @@
 }
 
 .sidebar_mobile_children {
-	@apply flex h-full w-full flex-col;
+	@apply flex h-full w-full bg-white flex-col;
 }
 
 .sidebar_trigger {
@@ -23,7 +23,7 @@
 }
 
 .sidebar_content {
-	@apply my-2 flex min-h-0 flex-1 flex-col items-center gap-2;
+	@apply my-2 flex min-h-0 flex-1 bg-white flex-col items-center gap-2;
 }
 
 .sidebar_menu {

@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Auction Admin'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin for starting auctions.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.AUCTION_ADMIN]}
 			/>

@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Medium Spender'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin able to spend up to 100,000 DOT from the treasury at once.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.MEDIUM_SPENDER]}
 			/>

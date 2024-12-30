@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Onchain Referenda'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='This is the place to discuss on-chain referenda. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.'
 				proposalType={EProposalType.REFERENDUM}
 			/>
 		</div>

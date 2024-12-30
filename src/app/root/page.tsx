@@ -10,7 +10,7 @@ function Page() {
 		<div>
 			<ListingPage
 				title='Root'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				description='Origin for General network-wide improvements.'
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.ROOT]}
 			/>
