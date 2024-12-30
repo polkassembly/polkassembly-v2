@@ -4,13 +4,13 @@
 import React from 'react';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
 import SwitchToWeb2Signup from '@/app/login/Components/SwitchToWeb2Signup/SwitchToWeb2Signup';
-import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { WalletIcon } from '../WalletsUI/WalletsIcon';
 import classes from './FetchAccountsConfirmation.module.scss';
 import { Button } from '../Button';
 
 function FetchAccountsConfirmation({ switchToSignup, goBack, onConfirm }: { switchToSignup: () => void; goBack: () => void; onConfirm?: () => void }) {
-	const [userPreferences] = useUserPreferences();
+	const { userPreferences } = useUserPreferences();
 	if (!userPreferences.wallet) return <div className='text-center text-text_primary'>Please Select Wallet</div>;
 
 	return (

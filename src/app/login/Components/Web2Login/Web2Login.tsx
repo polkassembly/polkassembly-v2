@@ -14,10 +14,9 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import { useSetAtom } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
 import ErrorMessage from '@ui/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import { useUser } from '@/hooks/useUser';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -37,9 +36,9 @@ function Web2Login({
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
 
-	const router = useRouter();
+	const { setUser } = useUser();
 
-	const setUserAtom = useSetAtom(userAtom);
+	const router = useRouter();
 
 	const form = useForm<IFormFields>();
 
@@ -78,7 +77,7 @@ function Web2Login({
 				}
 
 				setErrorMessage('');
-				setUserAtom(accessTokenPayload);
+				setUser(accessTokenPayload);
 
 				router.back();
 			}

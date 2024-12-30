@@ -4,11 +4,9 @@
 import { DEFAULT_LOCALE } from '@/_shared/_constants/defaultLocale';
 import { DEFAULT_THEME } from '@/_shared/_constants/defaultTheme';
 import { IUserPreferences } from '@/_shared/types';
-import { atom, useAtom } from 'jotai';
+import { atom } from 'jotai';
 
 export const userPreferencesAtom = atom<IUserPreferences>({
 	locale: DEFAULT_LOCALE,
 	theme: DEFAULT_THEME
 });
-
-export const useUserPreferences = () => useAtom(userPreferencesAtom);

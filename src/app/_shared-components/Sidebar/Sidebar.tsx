@@ -8,7 +8,6 @@ import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
 import Image from 'next/image';
 
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
@@ -16,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/To
 import LeftIcon from '@assets/sidebar/lefticon.svg';
 import RightIcon from '@assets/sidebar/righticon.svg';
 import { ComponentProps, createContext, CSSProperties, ElementRef, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import styles from './Sidebar.module.scss';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';

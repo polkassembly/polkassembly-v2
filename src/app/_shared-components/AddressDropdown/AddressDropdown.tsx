@@ -9,15 +9,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import Identicon from '@polkadot/react-identicon';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
-import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
 import { EWallet } from '@/_shared/types';
-import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
+import { useWalletService } from '@/hooks/useWalletService';
 import { useEffect, useState } from 'react';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './AddressDropdown.module.scss';
 import { WalletIcon } from '../WalletsUI/WalletsIcon';
 
 function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) => void }) {
-	const [userPreferences, setUserPreferences] = useUserPreferences();
+	const { userPreferences, setUserPreferences } = useUserPreferences();
 
 	const walletService = useWalletService();
 

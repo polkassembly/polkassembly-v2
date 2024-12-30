@@ -7,12 +7,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
-import { useUser } from '@/app/_atoms/user/userAtom';
+import { useUser } from '@/hooks/useUser';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import classes from './Navbar.module.scss';
 
 function Navbar() {
-	const [user, setUser] = useUser();
+	const { user, setUser } = useUser();
 	return (
 		<nav className={classes.navbar}>
 			<p className='ml-10 md:ml-0'>Polkassembly</p>
