@@ -4,9 +4,9 @@
 
 'use client';
 
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { SidebarTrigger, useSidebar } from '../../Sidebar/Sidebar';
 
 function CustomSidebarTrigger() {

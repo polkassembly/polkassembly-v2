@@ -7,8 +7,6 @@ import React, { useState } from 'react';
 import { ESignupSteps, EWallet } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import { useSetAtom } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
 import { PasswordInput } from '@ui/PasswordInput/PasswordInput';
@@ -16,6 +14,7 @@ import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import { useUser } from '@/hooks/useUser';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
@@ -29,7 +28,7 @@ interface IFormFields {
 function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => void; onWalletChange: (wallet: EWallet | null) => void }) {
 	const [step, setStep] = useState<ESignupSteps>(ESignupSteps.USERNAME);
 
-	const setUserAtom = useSetAtom(userAtom);
+	const { setUser } = useUser();
 
 	const router = useRouter();
 
@@ -85,7 +84,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 					return;
 				}
 
-				setUserAtom(accessTokenPayload);
+				setUser(accessTokenPayload);
 				setErrorMessage('');
 
 				router.back();

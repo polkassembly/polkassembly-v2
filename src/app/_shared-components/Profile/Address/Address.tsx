@@ -9,7 +9,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IOnChainIdentity } from '@/_shared/types';
-import { useIdentityService } from '@/app/_atoms/identityApiAtom';
+import { useIdentityService } from '@/hooks/useIdentityService';
 import AddressInline from './AddressInline/AddressInline';
 
 interface Props {
@@ -21,8 +21,8 @@ interface Props {
 
 function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Props) {
 	const network = getCurrentNetwork();
+	const { getOnChainIdentity } = useIdentityService();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
-	const { getOnChainIdentity } = useIdentityService(network);
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
 
@@ -30,8 +30,8 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 		try {
 			const identityInfo = await getOnChainIdentity(encodedAddress);
 			setIdentity(identityInfo);
-		} catch (error) {
-			console.error('Error fetching identity:', error);
+		} catch {
+			// console.error('Error fetching identity:', error);
 		}
 	};
 

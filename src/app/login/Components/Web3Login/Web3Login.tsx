@@ -11,15 +11,14 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '@/app/_shared-components/Button';
 import { useRouter } from 'next/navigation';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
-import { userAtom } from '@/app/_atoms/user/userAtom';
-import { useSetAtom } from 'jotai';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
-import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
+import { useWalletService } from '@/hooks/useWalletService';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import FetchAccountsConfirmation from '@/app/_shared-components/FetchAccountsConfirmation/FetchAccountsConfirmation';
-import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useUser } from '@/hooks/useUser';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -38,9 +37,9 @@ function Web3Login({
 
 	const [web3Screen, setWeb3Screen] = useState<EWeb3LoginScreens>(EWeb3LoginScreens.SELECT_WALLET);
 
-	const [userPreferences] = useUserPreferences();
+	const { userPreferences } = useUserPreferences();
 
-	const setUserAtom = useSetAtom(userAtom);
+	const { setUser } = useUser();
 
 	const [loading, setLoading] = useState(false);
 
@@ -95,7 +94,7 @@ function Web3Login({
 					return;
 				}
 
-				setUserAtom(accessTokenPayload);
+				setUser(accessTokenPayload);
 				router.back();
 			}
 			setLoading(false);

@@ -5,7 +5,7 @@ import React from 'react';
 import { EWallet } from '@/_shared/types';
 import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
-import { useWalletService } from '@/app/_atoms/wallet/walletAtom';
+import { useWalletService } from '@/hooks/useWalletService';
 import classes from './WalletButtons.module.scss';
 
 function WalletButtons({ onWalletChange, small }: { onWalletChange: (wallet: EWallet | null) => void; small?: boolean }) {
