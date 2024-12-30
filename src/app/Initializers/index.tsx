@@ -28,10 +28,10 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const identityApi = useAtomValue(identityApiAtom);
 
 	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
-	const setPolkadotApi = useSetAtom(polkadotApiAtom);
-	const setIdentityApi = useSetAtom(identityApiAtom);
-	const setWalletService = useSetAtom(walletAtom);
-	const setUser = useSetAtom(userAtom);
+	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
+	const setIdentityApiAtom = useSetAtom(identityApiAtom);
+	const setWalletServiceAtom = useSetAtom(walletAtom);
+	const setUserAtom = useSetAtom(userAtom);
 
 	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
@@ -48,7 +48,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		const newRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
 		if (newUserPayload) {
-			setUser(newUserPayload);
+			setUserAtom(newUserPayload);
 		}
 		if (newRefreshTokenPayload) {
 			setRefreshTokenData(newRefreshTokenPayload);
@@ -67,7 +67,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				return;
 			}
 
-			AuthClientService.logout(() => setUser(null));
+			AuthClientService.logout(() => setUserAtom(null));
 		}
 	};
 
@@ -80,83 +80,91 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
 
+	// init identity api
+	useEffect(() => {
+		let identityApiIntervalId: ReturnType<typeof setInterval>;
+
+		(async () => {
+			if (identityApi) return;
+
+			const newApi = await IdentityService.Init(network);
+			setIdentityApiAtom(newApi);
+
+			identityApiIntervalId = setInterval(async () => {
+				try {
+					await newApi.keepAlive();
+				} catch {
+					await newApi.switchToNewRpcEndpoint();
+				}
+			}, 6000);
+		})();
+
+		return () => {
+			if (identityApiIntervalId) {
+				clearInterval(identityApiIntervalId);
+			}
+			identityApi?.disconnect().then(() => setIdentityApiAtom(null));
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [identityApi, network]);
+
+	// init polkadot api and wallet service
 	useEffect(() => {
 		let polkadotApiIntervalId: ReturnType<typeof setInterval>;
 
-		// init polkadot api
 		(async () => {
-			if (!polkadotApi) {
-				const newApi = await PolkadotApiService.Init(network);
-				setPolkadotApi(newApi);
+			if (polkadotApi) return;
 
-				polkadotApiIntervalId = setInterval(async () => {
-					try {
-						await newApi.keepAlive();
-					} catch {
-						await newApi.switchToNewRpcEndpoint();
-					}
-				}, 6000);
-			}
-		})();
+			const newApi = await PolkadotApiService.Init(network);
+			setPolkadotApiAtom(newApi);
 
-		let identityApiIntervalId: ReturnType<typeof setInterval>;
-
-		// init identity api
-		(async () => {
-			if (!identityApi) {
-				const newApi = await IdentityService.Init(network);
-				setIdentityApi(newApi);
-
-				identityApiIntervalId = setInterval(async () => {
-					try {
-						await newApi.keepAlive();
-					} catch {
-						await newApi.switchToNewRpcEndpoint();
-					}
-				}, 6000);
-			}
+			polkadotApiIntervalId = setInterval(async () => {
+				try {
+					await newApi.keepAlive();
+				} catch {
+					await newApi.switchToNewRpcEndpoint();
+				}
+			}, 6000);
 		})();
 
 		// init wallet service
 		(async () => {
-			if (polkadotApi) {
-				const service = await WalletClientService.Init(network, polkadotApi);
-				setWalletService(service);
-			}
+			if (!polkadotApi) return;
+
+			const service = await WalletClientService.Init(network, polkadotApi);
+			setWalletServiceAtom(service);
 		})();
 
+		return () => {
+			if (polkadotApiIntervalId) {
+				clearInterval(polkadotApiIntervalId);
+			}
+			polkadotApi?.disconnect().then(() => setPolkadotApiAtom(null));
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [network, polkadotApi]);
+
+	// set user preferences
+	useEffect(() => {
 		setUserPreferencesAtom({
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
 			// address: user?.defaultAddress, TODO: fix this @aadarsh012
 			wallet: user?.loginWallet
 		});
-
-		return () => {
-			if (polkadotApiIntervalId) {
-				clearInterval(polkadotApiIntervalId);
-			}
-			if (polkadotApi) {
-				polkadotApi.disconnect().then(() => setPolkadotApi(null));
-			}
-			if (identityApiIntervalId) {
-				clearInterval(identityApiIntervalId);
-			}
-			if (identityApi) {
-				identityApi.disconnect().then(() => setIdentityApi(null));
-			}
-		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [identityApi, network, polkadotApi, user?.loginWallet, userPreferences.locale, userPreferences.theme]);
+	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
 
+	// set user
 	useEffect(() => {
 		if (!userData) {
 			return;
 		}
 
-		setUser(userData);
+		setUserAtom(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
+
 	return null;
 }
 
