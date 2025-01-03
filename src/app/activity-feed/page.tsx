@@ -7,13 +7,14 @@
 import { EActivityFeedTab } from '@/_shared/types';
 import React, { useState } from 'react';
 import ActivityFeeToggleButton from '../_shared-components/ActivityFeed/ActivityFeeToggleButton';
+import LatestActivity from '../_shared-components/ActivityFeed';
 
 function Page() {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 
 	return (
 		<div>
-			<div className='bg-activity_feed_bg min-h-screen w-full px-10 pt-5'>
+			<div className='min-h-screen w-full bg-activity_feed_bg px-10 pt-5'>
 				<div className='flex w-full justify-between xl:items-center'>
 					<div className='flex flex-col lg:flex-row xl:h-12 xl:gap-2'>
 						<div>
@@ -29,7 +30,7 @@ function Page() {
 				<div className='flex flex-col justify-between gap-5 xl:flex-row'>
 					<div className='mx-1 mt-[26px] flex-grow'>
 						<div className=''>
-							{/* {activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />} */}
+							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}
 						</div>
 					</div>
 					{/* <ActivityFeedSidebar networkSocialsData={networkSocialsData || { data: null, error: '', status: 500 }} /> */}

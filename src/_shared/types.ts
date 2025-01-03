@@ -434,8 +434,8 @@ export enum EWeb3LoginScreens {
 }
 
 export enum EActivityFeedTab {
-	EXPLORE = 'explore',
-	FOLLOWING = 'following'
+	EXPLORE = 'EXPLORE',
+	FOLLOWING = 'FOLLOWING'
 }
 
 export enum EListingTab {

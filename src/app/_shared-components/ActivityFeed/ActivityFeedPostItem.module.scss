@@ -1,0 +1,74 @@
+.activity_icons {
+    transition: all 0.2s ease-in-out;
+    width: 20px;
+    height: 20px;
+    display: block;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+.likeGifContainer {
+    position: absolute;
+    top: -19px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    animation: popAnimation 1.5s ease-out;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.dislikeGifContainer {
+    position: absolute;
+    top: -21px;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    z-index: 10;
+    animation: popAnimation 1.5s ease-out;
+    display: flex;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+}
+
+@keyframes popAnimation {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.2);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.reactionCount {
+    min-width: 20px;
+    display: inline-block;
+    text-align: center;
+}
+
+.timestamp {
+    color: #666;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

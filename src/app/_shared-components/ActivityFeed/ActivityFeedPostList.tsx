@@ -11,6 +11,24 @@ interface IPostListProps {
 	postData: any;
 }
 
+const post = {
+	id: 1,
+	amount: 2500,
+	equivalentUSD: 36000,
+	status: 'Active',
+	proposer: '1eGtATyy4ayn77dsrhdW8N3Vs1yjqjzJcintksNmScqy31j',
+	category: 'Council',
+	date: '20 Dec 2021',
+	title: '#45 Standard Guidelines to judge Liquidity Treasury Proposals on the main governance side - Kusama and Polkadot your Vote!',
+	description:
+		'Based on the income to the treasuries, the amounts getting burned and the amounts going to proposals, the treasury can be utilised: this includes spending funds, extending the c...',
+	likes: 16,
+	dislikes: 4,
+	comments: 10,
+	shares: 16,
+	approvalRating: 20
+};
+
 function ActivityFeedPostList({ postData }: IPostListProps) {
 	return (
 		<div className='hide-scrollbar space-y-5 lg:max-h-[1078px] lg:overflow-y-auto'>
@@ -32,13 +50,7 @@ function ActivityFeedPostList({ postData }: IPostListProps) {
 					</p>
 				</div>
 			) : (
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				// postData?.map((post: any, index: number) => (
-				<ActivityFeedPostItem
-				// key={index}
-				// post={post}
-				/>
-				// ))
+				<ActivityFeedPostItem postData={post} />
 			)}
 		</div>
 	);
