@@ -211,7 +211,7 @@ function ActivityFeedPostItem({ postData }: { postData: PostData }) {
 					>
 						<Image
 							src={CommentIcon}
-							className={`${styles.activity_icons} mr-2`}
+							className='mr-2'
 							alt='Comment'
 							width={16}
 							height={16}
