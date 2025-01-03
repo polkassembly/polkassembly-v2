@@ -20,6 +20,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { OutputData } from '@editorjs/editorjs';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -351,7 +352,7 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
 	}) {
@@ -372,6 +373,8 @@ export class FirestoreService extends FirestoreRefs {
 		};
 
 		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
+
+		return newComment;
 	}
 
 	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {

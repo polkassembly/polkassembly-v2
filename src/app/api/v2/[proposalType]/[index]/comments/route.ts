@@ -9,6 +9,7 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
+import { OutputData } from '@editorjs/editorjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -37,7 +38,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.string().min(1, 'Content is required'),
+		content: z.custom<OutputData>(),
 		parentCommentId: z.string().optional(),
 		address: z
 			.string()
@@ -47,7 +48,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const { content, parentCommentId, address } = zodBodySchema.parse(await getReqBody(req));
 
-	await OffChainDbService.AddNewComment({
+	const newComment = await OffChainDbService.AddNewComment({
 		network,
 		indexOrHash: index,
 		proposalType: proposalType as EProposalType,
@@ -57,7 +58,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		address
 	});
 
-	const response = NextResponse.json({ message: 'Comment added successfully' });
+	const response = NextResponse.json(newComment);
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { OutputData } from '@editorjs/editorjs';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { StatusCodes } from 'http-status-codes';
@@ -424,7 +425,10 @@ export enum EApiRoute {
 	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
 	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
 	LOGOUT = 'LOGOUT',
-	POSTS_LISTING = 'POSTS_LISTING'
+	POSTS_LISTING = 'POSTS_LISTING',
+	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
+	GET_COMMENTS = 'GET_COMMENTS',
+	ADD_COMMENT = 'ADD_COMMENT'
 }
 
 export enum EWeb3LoginScreens {
@@ -450,7 +454,7 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: string;
+	content: OutputData;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;

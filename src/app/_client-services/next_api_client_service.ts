@@ -6,7 +6,19 @@
 
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { EApiRoute, EWallet, IAuthResponse, IErrorResponse, IGenerateTFAResponse, IOnChainPostListingResponse } from '@/_shared/types';
+import {
+	EApiRoute,
+	EProposalType,
+	EWallet,
+	IAuthResponse,
+	IComment,
+	ICommentResponse,
+	IErrorResponse,
+	IGenerateTFAResponse,
+	IOnChainPostListingResponse,
+	IPost
+} from '@/_shared/types';
+import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
@@ -32,6 +44,33 @@ export class NextApiClientService {
 				});
 			}
 			return { url, method: 'GET' };
+		},
+		[EApiRoute.FETCH_PROPOSAL_DETAILS]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
+			const url = new URL(`http://localhost:3000/api/v2/${routeSegments?.join('/') || ''}`);
+			if (queryParams) {
+				queryParams.forEach((value, key) => {
+					url.searchParams.set(key, value);
+				});
+			}
+			return { url, method: 'GET' };
+		},
+		[EApiRoute.GET_COMMENTS]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
+			const url = new URL(`http://localhost:3000/api/v2/${routeSegments?.join('/') || ''}/comments`);
+			if (queryParams) {
+				queryParams.forEach((value, key) => {
+					url.searchParams.set(key, value);
+				});
+			}
+			return { url, method: 'GET' };
+		},
+		[EApiRoute.ADD_COMMENT]: (routeSegments?: string[], queryParams?: URLSearchParams) => {
+			const url = new URL(`http://localhost:3000/api/v2/${routeSegments?.join('/') || ''}/comments`);
+			if (queryParams) {
+				queryParams.forEach((value, key) => {
+					url.searchParams.set(key, value);
+				});
+			}
+			return { url, method: 'POST' };
 		}
 	};
 
@@ -57,10 +96,13 @@ export class NextApiClientService {
 
 		const resJSON = await response.json();
 
-		if (response.status === StatusCodes.OK) return { data: resJSON as T, error: null };
+		if (response.status === StatusCodes.OK) {
+			return { data: resJSON as T, error: null };
+		}
 		return { data: null, error: resJSON as IErrorResponse };
 	}
 
+	// auth
 	protected static async refreshAccessTokenApi() {
 		const { url, method } = this.getApiRoute[EApiRoute.REFRESH_ACCESS_TOKEN]();
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
@@ -132,5 +174,38 @@ export class NextApiClientService {
 
 		const { url, method } = this.getApiRoute[EApiRoute.POSTS_LISTING]([proposalType], queryParams);
 		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+	}
+	// details
+	static async fetchProposalDetailsApi(proposalType: EProposalType, index: string) {
+		const { url, method } = this.getApiRoute[EApiRoute.FETCH_PROPOSAL_DETAILS]([proposalType, index]);
+		return this.nextApiClientFetch<IPost>({ url, method });
+	}
+
+	// comments
+	protected static async getCommentsOfPostApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = this.getApiRoute[EApiRoute.GET_COMMENTS]([proposalType, index]);
+		return this.nextApiClientFetch<ICommentResponse[]>({ url, method });
+	}
+
+	protected static async addCommentToPostApi({
+		proposalType,
+		index,
+		content,
+		parentCommentId
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		content: OutputData;
+		parentCommentId?: string;
+	}) {
+		const { url, method } = this.getApiRoute[EApiRoute.ADD_COMMENT]([proposalType, index]);
+		return this.nextApiClientFetch<IComment>({
+			url,
+			method,
+			data: {
+				content,
+				parentCommentId
+			}
+		});
 	}
 }

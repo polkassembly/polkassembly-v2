@@ -12,7 +12,7 @@ import { StatusCodes } from 'http-status-codes';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-export const POST = withErrorHandling(async () => {
+export const GET = withErrorHandling(async () => {
 	// 1. read refresh token from cookie
 	const cookieStore = await cookies();
 	const refreshToken = cookieStore.get(ECookieNames.REFRESH_TOKEN)?.value;

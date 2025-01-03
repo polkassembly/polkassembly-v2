@@ -68,3 +68,7 @@
 .hide_scrollbar::-webkit-scrollbar {
 	@apply hidden;
 }
+
+.codex-editor__redactor {
+	padding-bottom: 0 !important;
+}

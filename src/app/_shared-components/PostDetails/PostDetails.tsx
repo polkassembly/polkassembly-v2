@@ -1,0 +1,34 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { EProposalType, IPost } from '@/_shared/types';
+import { Suspense } from 'react';
+import PostHeader from './PostHeader/PostHeader';
+import PostComments from '../PostComments/PostComments';
+import classes from './PostDetails.module.scss';
+
+function PostDetails({ postData, index }: { postData: IPost; index: string }) {
+	return (
+		<div>
+			<div className={classes.headerWrapper}>
+				<PostHeader title={postData.title || ''} />
+			</div>
+			<div className={classes.detailsWrapper}>
+				<div className={classes.leftWrapper}>
+					<div className={classes.descBox}>description</div>
+					<div className={classes.commentsBox}>
+						<Suspense fallback='Loading...'>
+							<PostComments
+								proposalType={EProposalType.REFERENDUM_V2}
+								index={index}
+							/>
+						</Suspense>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+export default PostDetails;
