@@ -33,7 +33,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	// 1. check if user is logged in
+	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. delete the reaction from the database

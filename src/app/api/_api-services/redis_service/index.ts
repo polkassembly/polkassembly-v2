@@ -7,98 +7,101 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
-
-// TODO: convert to class
+import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
 }
 
-export const client = new Redis(REDIS_URL);
+enum ERedisKeys {
+	PASSWORD_RESET_TOKEN = 'PRT',
+	EMAIL_VERIFICATION_TOKEN = 'EVT',
+	TWO_FACTOR_AUTH_TOKEN = 'TFA',
+	SUBSCAN_DATA = 'SDT',
+	REFRESH_TOKEN = 'RFT'
+}
 
-/**
- * get from redis
- *
- * @param key string
- *
- * @returns values string
- */
+export class RedisService {
+	private static readonly client: Redis = new Redis(REDIS_URL);
 
-export const redisGet = (key: string): Promise<string | null> =>
-	new Promise((resolve, reject) => {
-		client
-			.get(key)
-			.then((value) => {
-				resolve(value);
-			})
-			.catch((err) => reject(err));
-	});
+	private static readonly redisKeysMap = {
+		[ERedisKeys.PASSWORD_RESET_TOKEN]: (userId: number): string => `${ERedisKeys.PASSWORD_RESET_TOKEN}-${userId}`,
+		[ERedisKeys.EMAIL_VERIFICATION_TOKEN]: (token: string): string => `${ERedisKeys.EMAIL_VERIFICATION_TOKEN}-${token}`,
+		[ERedisKeys.TWO_FACTOR_AUTH_TOKEN]: (tfaToken: string): string => `${ERedisKeys.TWO_FACTOR_AUTH_TOKEN}-${tfaToken}`,
+		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
+		[ERedisKeys.REFRESH_TOKEN]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN}-${userId}`
+	};
 
-/**
- * set key-value in redis
- *
- * @param key string
- * @param value string
- */
-export const redisSet = (key: string, value: string): Promise<string | null> =>
-	new Promise((resolve, reject) => {
-		client
-			.set(key, value)
-			.then((reply) => {
-				resolve(reply);
-			})
-			.catch((err) => reject(err));
-	});
+	// helper methods
 
-/**
- * set key-value in redis with ttl(expiry in seconds)
- *
- * @param key string
- * @param ttl number in seconds
- * @param value string
- */
-export const redisSetex = (key: string, ttl: number, value: string): Promise<string> =>
-	new Promise((resolve, reject) => {
-		client
-			.set(key, value, 'EX', ttl)
-			.then((reply) => {
-				resolve(reply);
-			})
-			.catch((err) => reject(err));
-	});
+	private static async Get(key: string): Promise<string | null> {
+		return this.client.get(key);
+	}
 
-/**
- * delete key from redis
- *
- * @param key string
- */
-export const redisDel = (key: string): Promise<number> =>
-	new Promise((resolve, reject) => {
-		client
-			.del(key)
-			.then((reply) => {
-				resolve(reply);
-			})
-			.catch((err) => reject(err));
-	});
-
-export async function deleteKeys(pattern: string) {
-	const stream = client.scanStream({
-		count: 200,
-		match: pattern
-	});
-	stream.on('data', async (keys) => {
-		if (keys.length) {
-			const pipeline = client.pipeline();
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			keys.forEach((key: any) => {
-				pipeline.del(key);
-			});
-			await pipeline.exec();
+	private static async Set(key: string, value: string, ttlSeconds?: number): Promise<string | null> {
+		if (ttlSeconds) {
+			return this.client.set(key, value, 'EX', ttlSeconds);
 		}
-	});
 
-	stream.on('end', () => {
-		console.log('All keys matching pattern deleted.');
-	});
+		return this.client.set(key, value);
+	}
+
+	private static async Delete(key: string): Promise<number> {
+		return this.client.del(key);
+	}
+
+	private static async DeleteKeys(pattern: string): Promise<void> {
+		const stream = this.client.scanStream({
+			count: 200,
+			match: pattern
+		});
+
+		stream.on('data', async (keys) => {
+			if (keys.length) {
+				const pipeline = this.client.pipeline();
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				keys.forEach((key: any) => {
+					pipeline.del(key);
+				});
+				await pipeline.exec();
+			}
+		});
+
+		stream.on('end', () => {
+			console.log('All keys matching pattern deleted.');
+		});
+	}
+
+	// static methods
+	static async SetEmailVerificationToken(token: string, email: string): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY);
+	}
+
+	static async SetRefreshToken(userId: number, refreshToken: string): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), refreshToken, REFRESH_TOKEN_LIFE_IN_SECONDS);
+	}
+
+	static async GetRefreshToken(userId: number): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId));
+	}
+
+	static async DeleteRefreshToken(userId: number): Promise<void> {
+		await this.Delete(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId));
+	}
+
+	static async SetTfaToken(tfaToken: string, userId: number): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), userId.toString(), FIVE_MIN);
+	}
+
+	static async GetTfaToken(tfaToken: string): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken));
+	}
+
+	static async GetSubscanData(network: string, url: string): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url));
+	}
+
+	static async SetSubscanData(network: string, url: string, data: string): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), data, TWELVE_HOURS_IN_SECONDS);
+	}
 }

@@ -438,6 +438,13 @@ export enum EActivityFeedTab {
 	FOLLOWING = 'following'
 }
 
+export enum EListingTab {
+	ANALYTICS = 'ANALYTICS',
+	EXTERNAL = 'EXTERNAL',
+	REFERENDA = 'REFERENDA',
+	POLKASSEMBLY = 'POLKASSEMBLY'
+}
+
 export interface IComment {
 	id: string;
 	createdAt: Date;

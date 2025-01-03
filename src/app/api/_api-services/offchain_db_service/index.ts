@@ -12,6 +12,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
+import { OnChainDbService } from '../onchain_db_service';
 
 export class OffChainDbService {
 	// Read methods
@@ -201,5 +202,73 @@ export class OffChainDbService {
 
 	static async DeletePostReaction(id: string) {
 		return FirestoreService.DeletePostReaction(id);
+	}
+
+	static async CreateOffChainPost({ network, proposalType, userId, content }: { network: ENetwork; proposalType: EProposalType; userId: number; content: string }) {
+		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
+		}
+
+		return FirestoreService.CreatePost({ network, proposalType, userId, content });
+	}
+
+	static async UpdateOffChainPost({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		content
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+	}) {
+		const postData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
+
+		if (!postData || !postData.id) {
+			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
+		}
+
+		if (postData.userId !== userId) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+		}
+
+		await FirestoreService.UpdatePost({ id: postData.id, content });
+	}
+
+	static async UpdateOnChainPost({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		content
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+	}) {
+		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
+		if (!onChainPostInfo || !onChainPostInfo.proposer) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+
+		const proposerAddress = getSubstrateAddress(onChainPostInfo.proposer);
+
+		if (!proposerAddress || !ValidatorService.isValidSubstrateAddress(proposerAddress)) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+
+		// check if the user is the proposer
+		const userAddresses = await this.GetAddressesForUserId(userId);
+		if (!userAddresses.find((address) => address.address === proposerAddress)) throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+
+		// check if offchain post context exists
+		const offChainPostData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
+
+		if (!offChainPostData) {
+			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash });
+		} else {
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content });
+		}
 	}
 }

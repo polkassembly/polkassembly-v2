@@ -5,14 +5,14 @@
 'use client';
 
 import { ELocales } from '@/_shared/types';
-import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export default function HomePage() {
 	const t = useTranslations('HomePage');
-	const [userPreferences, setUserPreferences] = useUserPreferences();
+	const { userPreferences, setUserPreferences } = useUserPreferences();
 
 	const onLocaleChange = async () => {
 		setLocaleCookie(ELocales.SPANISH);

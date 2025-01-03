@@ -5,12 +5,12 @@ import React from 'react';
 import { EWallet } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
-import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './WalletButton.module.scss';
 
 function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWallet; onClick: (wallet: EWallet) => void; disabled?: boolean; label: string; small?: boolean }) {
 	const walletName = wallet === EWallet.NOVAWALLET ? EWallet.POLKADOT : wallet;
-	const [userPreferences, setUserPreferences] = useUserPreferences();
+	const { userPreferences, setUserPreferences } = useUserPreferences();
 
 	const onWalletSelect = (selectedWallet: EWallet) => {
 		setUserPreferences({

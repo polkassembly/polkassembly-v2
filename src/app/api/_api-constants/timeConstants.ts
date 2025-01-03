@@ -8,3 +8,4 @@ export const ADDRESS_LOGIN_TTL = 5 * 60; // 5 min (expressed in seconds)
 export const CREATE_POST_TTL = 60 * 60; // 1 hour (expressed in seconds)
 export const ACCESS_TOKEN_LIFE_IN_SECONDS = 60 * 60 * 24 * 7 * 1; // 1 week
 export const REFRESH_TOKEN_LIFE_IN_SECONDS = 60 * 60 * 24 * 7 * 4; // 4 weeks
+export const TWELVE_HOURS_IN_SECONDS = 43200;

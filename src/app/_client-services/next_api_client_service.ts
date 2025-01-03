@@ -28,7 +28,7 @@ export class NextApiClientService {
 			const url = new URL(`${this.baseURL}/${routeSegments?.join('/') || ''}`);
 			if (queryParams) {
 				queryParams.forEach((value, key) => {
-					url.searchParams.set(key, value);
+					url.searchParams.append(key, value);
 				});
 			}
 			return { url, method: 'GET' };

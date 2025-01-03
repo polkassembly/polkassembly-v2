@@ -6,8 +6,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/app/_atoms/user/userAtom';
-import { useUserPreferences } from '@/app/_atoms/user/userPreferencesAtom';
+import { useUser } from '@/hooks/useUser';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import Web2Signup from './Web2Signup/Web2Signup';
 import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
@@ -18,7 +18,7 @@ import TwoFactorAuth from './TwoFactorAuth/TwoFactorAuth';
 function Login({ isModal }: { isModal?: boolean }) {
 	const router = useRouter();
 
-	const [user] = useUser();
+	const { user } = useUser();
 
 	useEffect(() => {
 		if (user) {
@@ -33,7 +33,7 @@ function Login({ isModal }: { isModal?: boolean }) {
 	const [isTFAEnabled, setIsTFAEnabled] = useState<boolean>(false);
 	const [tfaToken, setTfaToken] = useState<string>('');
 
-	const [userPreferences] = useUserPreferences();
+	const { userPreferences } = useUserPreferences();
 
 	const switchToWeb2Login = () => {
 		setIsWeb3Login(false);

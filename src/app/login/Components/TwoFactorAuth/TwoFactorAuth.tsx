@@ -5,8 +5,7 @@ import { EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { Button } from '@ui/Button';
-import { useSetAtom } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
+import { useUser } from '@/hooks/useUser';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
@@ -24,7 +23,7 @@ interface IFormFields {
 function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaToken: string; loginAddress: string; loginWallet: EWallet; goBack: () => void }) {
 	const [loading, setLoading] = useState<boolean>(false);
 
-	const setUserAtom = useSetAtom(userAtom);
+	const { setUser } = useUser();
 	const router = useRouter();
 
 	const formData = useForm<IFormFields>();
@@ -59,7 +58,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 				return;
 			}
 
-			setUserAtom(accessTokenPayload);
+			setUser(accessTokenPayload);
 
 			router.back();
 		}

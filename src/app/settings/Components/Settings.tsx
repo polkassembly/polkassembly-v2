@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useUser } from '@/app/_atoms/user/userAtom';
+import { useUser } from '@/hooks/useUser';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { Input } from '@/app/_shared-components/Input';
 import { Button } from '@ui/Button';
@@ -17,7 +17,7 @@ function Settings() {
 	const [generatingCode, setGeneratingCode] = useState<boolean>(false);
 	const [authenticatorCode, setAuthenticatorCode] = useState<string>('');
 
-	const [user, setUser] = useUser();
+	const { user, setUser } = useUser();
 
 	useEffect(() => {
 		if (!user) {
