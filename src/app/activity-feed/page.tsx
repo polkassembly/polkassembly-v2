@@ -8,6 +8,7 @@ import { EActivityFeedTab } from '@/_shared/types';
 import React, { useState } from 'react';
 import ActivityFeeToggleButton from '../_shared-components/ActivityFeed/ActivityFeeToggleButton';
 import LatestActivity from '../_shared-components/ActivityFeed';
+import ActivityFeedSidebar from '../_shared-components/ActivityFeed/ActivityFeedSidebar';
 
 function Page() {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
@@ -33,7 +34,7 @@ function Page() {
 							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}
 						</div>
 					</div>
-					{/* <ActivityFeedSidebar networkSocialsData={networkSocialsData || { data: null, error: '', status: 500 }} /> */}
+					<ActivityFeedSidebar />
 				</div>
 			</div>
 		</div>
