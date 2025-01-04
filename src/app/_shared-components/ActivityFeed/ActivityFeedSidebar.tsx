@@ -5,12 +5,14 @@
 import React from 'react';
 import ActivityFeedAbout from './ActivityFeedAbout';
 import ActivityFeedActiveProposal from './ActivityFeedActiveProposal';
+import ActivityFeedRankCard from './ActivityFeedRankCard';
 
 function ActivityFeedSidebar() {
 	return (
 		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
 			<ActivityFeedActiveProposal />
+			<ActivityFeedRankCard />
 		</div>
 	);
 }
