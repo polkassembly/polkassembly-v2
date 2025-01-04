@@ -5,6 +5,7 @@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
 import { EProposalType } from '@/_shared/types';
+import Link from 'next/link';
 import Address from '../../Profile/Address/Address';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 import styles from './ListingCard.module.scss';
@@ -26,7 +27,8 @@ function ListingCard({
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
 
 	return (
-		<div
+		<Link
+			href={`/referenda/${index}`}
 			className={styles.listingCard}
 			style={{ backgroundColor }}
 		>
@@ -55,7 +57,7 @@ function ListingCard({
 			<div>
 				<StatusTag status={status} />
 			</div>
-		</div>
+		</Link>
 	);
 }
 

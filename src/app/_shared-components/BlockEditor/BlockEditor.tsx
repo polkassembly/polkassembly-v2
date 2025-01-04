@@ -63,6 +63,8 @@ function BlockEditor({
 					}
 				},
 				async onChange(api) {
+					if (readOnly) return;
+
 					const edJsData = await api.saver.save();
 					// const htmlArr = edjsParser.parse(edJsData);
 					onChange?.(edJsData);
