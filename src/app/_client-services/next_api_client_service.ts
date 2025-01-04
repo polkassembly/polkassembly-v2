@@ -24,7 +24,7 @@ import { StatusCodes } from 'http-status-codes';
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
 export class NextApiClientService {
-	private static baseURL = typeof window !== 'undefined' ? `${window.location.origin}/api/v2` : '';
+	private static baseURL = typeof window !== 'undefined' ? `${window.location.origin}/api/v2` : 'https://polkassembly-v2-git-details-page-polkassembly-next.vercel.app/api/v2';
 
 	private static getApiRoute: Record<EApiRoute, (routeSegments?: string[], queryParams?: URLSearchParams) => { url: URL; method: Method }> = {
 		[EApiRoute.WEB2_LOGIN]: () => ({ url: new URL(`${this.baseURL}/auth/actions/web2Login`), method: 'POST' }),
