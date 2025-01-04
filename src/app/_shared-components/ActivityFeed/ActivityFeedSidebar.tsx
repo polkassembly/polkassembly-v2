@@ -4,11 +4,13 @@
 
 import React from 'react';
 import ActivityFeedAbout from './ActivityFeedAbout';
+import ActivityFeedActiveProposal from './ActivityFeedActiveProposal';
 
 function ActivityFeedSidebar() {
 	return (
-		<div>
+		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
+			<ActivityFeedActiveProposal />
 		</div>
 	);
 }
