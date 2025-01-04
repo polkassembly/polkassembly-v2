@@ -6,10 +6,9 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React from 'react';
 
-async function SmallSpenderDetails({ params }: { params: Promise<{ index: string }> }) {
+async function Referenda({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
 	const { data, error } = await NextApiClientService.fetchProposalDetailsApi(EProposalType.REFERENDUM_V2, index);
-	console.log('data', data);
 
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 
@@ -23,4 +22,4 @@ async function SmallSpenderDetails({ params }: { params: Promise<{ index: string
 	);
 }
 
-export default SmallSpenderDetails;
+export default Referenda;
