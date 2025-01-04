@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
+import BlockEditor from '../BlockEditor/BlockEditor';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	return (
@@ -16,7 +17,15 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 			</div>
 			<div className={classes.detailsWrapper}>
 				<div className={classes.leftWrapper}>
-					<div className={classes.descBox}>description</div>
+					<div className={classes.descBox}>
+						<BlockEditor
+							data={postData.content}
+							readOnly
+							renderFromHtml
+							className='max-h-full border-none'
+							id='post-content'
+						/>
+					</div>
 					<div className={classes.commentsBox}>
 						<Suspense fallback='Loading...'>
 							<PostComments

@@ -13,15 +13,18 @@ import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
+import { useAtomValue } from 'jotai';
+import { userAtom } from '@/app/_atoms/user/userAtom';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 
 function SingleComment({ commentData, proposalType, index }: { commentData: ICommentResponse; proposalType: EProposalType; index: string }) {
 	const [reply, setReply] = useState<boolean>(false);
-	// const [replyContent, setReplyContent] = useState<OutputData | null>(null);
 
 	const [comment, setComment] = useState<ICommentResponse>(commentData);
 	const [showReplies, setShowReplies] = useState<boolean>(false);
+
+	const user = useAtomValue(userAtom);
 
 	return (
 		<div className={classes.wrapper}>
@@ -45,22 +48,24 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 					id={`comment-${comment.id}`}
 				/>
 
-				<div className={classes.tools}>
-					<Button
-						variant='ghost'
-						className={classes.replyButton}
-						onClick={() => setReply(true)}
-						size='sm'
-						leftIcon={
-							<Image
-								src={ReplyIcon}
-								alt='reply'
-							/>
-						}
-					>
-						Reply
-					</Button>
-				</div>
+				{user && (
+					<div className={classes.tools}>
+						<Button
+							variant='ghost'
+							className={classes.replyButton}
+							onClick={() => setReply(true)}
+							size='sm'
+							leftIcon={
+								<Image
+									src={ReplyIcon}
+									alt='reply'
+								/>
+							}
+						>
+							Reply
+						</Button>
+					</div>
+				)}
 
 				{reply && (
 					<AddComment
@@ -69,14 +74,14 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 						parentCommentId={comment.id}
 						onCancel={() => setReply(false)}
 						editorId={`new-comment-${comment.id}`}
-						onConfirm={(newComment, user) => {
+						onConfirm={(newComment, publicUser) => {
 							setComment((prev) => ({
 								...prev,
 								children: [
 									...(prev.children || []),
 									{
 										...newComment,
-										user
+										user: publicUser
 									}
 								]
 							}));

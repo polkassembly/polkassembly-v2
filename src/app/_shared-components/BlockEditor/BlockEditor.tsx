@@ -26,13 +26,15 @@ function BlockEditor({
 	onChange,
 	readOnly,
 	className,
-	id
+	id,
+	renderFromHtml
 }: {
-	data?: OutputData;
+	data?: OutputData | string;
 	onChange?: (data: OutputData) => void;
 	readOnly?: boolean;
 	className?: string;
 	id?: string;
+	renderFromHtml?: boolean;
 }) {
 	const ref = useRef<EditorJS>(null);
 
@@ -50,10 +52,14 @@ function BlockEditor({
 				minHeight: 400,
 				holder: `block-editor-${id}`,
 				tools: EDITOR_TOOLS,
-				data,
+				data: data as OutputData,
 				onReady: async () => {
 					if (data) {
-						await editor.blocks.render(data);
+						if (renderFromHtml) {
+							await editor.blocks.renderFromHTML(data as string);
+						} else {
+							await editor.blocks.render(data as OutputData);
+						}
 					}
 				},
 				async onChange(api) {

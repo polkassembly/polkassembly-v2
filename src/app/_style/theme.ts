@@ -46,7 +46,8 @@ export const THEME_COLORS = {
 		filter_dropdown: '#485F7D',
 		search_bg: '#E3E4E4',
 		page_background: '#F5F6F8',
-		small_btn_text: '#6D7F97'
+		small_btn_text: '#6D7F97',
+		bg_light_blue: '#E6F4FF'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',
@@ -83,6 +84,7 @@ export const THEME_COLORS = {
 		create_proposal_btn_create: '#49CFFC',
 		section_dark_overlay: '#0D0D0D',
 		page_background: '#F5F6F8',
-		small_btn_text: '#6D7F97'
+		small_btn_text: '#6D7F97',
+		bg_light_blue: '#E6F4FF'
 	}
 };
