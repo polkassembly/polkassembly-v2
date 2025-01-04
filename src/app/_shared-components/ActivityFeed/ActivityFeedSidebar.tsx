@@ -6,6 +6,7 @@ import React from 'react';
 import ActivityFeedAbout from './ActivityFeedAbout';
 import ActivityFeedActiveProposal from './ActivityFeedActiveProposal';
 import ActivityFeedRankCard from './ActivityFeedRankCard';
+import ActivityFeedFeaturesSection from './ActivityFeedFeaturesSection';
 
 function ActivityFeedSidebar() {
 	return (
@@ -13,6 +14,7 @@ function ActivityFeedSidebar() {
 			<ActivityFeedAbout />
 			<ActivityFeedActiveProposal />
 			<ActivityFeedRankCard />
+			<ActivityFeedFeaturesSection />
 		</div>
 	);
 }
