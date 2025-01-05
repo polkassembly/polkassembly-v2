@@ -15,7 +15,7 @@ import {
 	IPublicUser,
 	IReaction,
 	EReaction,
-	IPostMetrics
+	IPostOffChainMetrics
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -239,7 +239,7 @@ export class FirestoreService extends FirestoreRefs {
 		return commentsCount.data().count || 0;
 	}
 
-	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostMetrics> {
+	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
 		const postReactionsCount = (await this.GetPostReactionsCount({ network, indexOrHash, proposalType })).reduce(
 			(acc, curr) => {
 				acc[curr.reaction] = curr.count;
@@ -253,7 +253,7 @@ export class FirestoreService extends FirestoreRefs {
 		return {
 			reactions: postReactionsCount,
 			comments: commentsCount
-		} as IPostMetrics;
+		} as IPostOffChainMetrics;
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {

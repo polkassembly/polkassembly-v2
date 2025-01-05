@@ -47,6 +47,7 @@ export class SubsquareOnChainService {
 			origin: data?.onchainData?.info?.origin?.origins,
 			index: data?.onchainData?.timeline?.[0]?.referendumIndex ?? undefined,
 			hash: data?.onchainData?.timeline?.[0]?.args?.proposalHash || undefined
+			// TODO: add vote metrics
 		};
 
 		return onChainPostInfo;
