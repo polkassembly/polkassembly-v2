@@ -67,6 +67,8 @@ export class OffChainDbService {
 		const subsquarePost = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		if (subsquarePost) return subsquarePost;
 
+		const postMetrics = await FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
+
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
@@ -75,7 +77,8 @@ export class OffChainDbService {
 			tags: [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,
-			network
+			network,
+			metrics: postMetrics
 		} as IOffChainPost;
 	}
 

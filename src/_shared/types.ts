@@ -261,6 +261,16 @@ export enum EDataSource {
 	SUBSQUARE = 'subsquare'
 }
 
+export enum EReaction {
+	like = 'like',
+	dislike = 'dislike'
+}
+
+export interface IPostMetrics {
+	reactions: { [key in EReaction]: number };
+	comments: number;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -274,6 +284,7 @@ export interface IOffChainPost {
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
+	metrics?: IPostMetrics;
 }
 
 export enum EProposalStatus {
@@ -482,11 +493,6 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
-}
-
-export enum EReaction {
-	like = 'like',
-	dislike = 'dislike'
 }
 
 export interface IReaction {
