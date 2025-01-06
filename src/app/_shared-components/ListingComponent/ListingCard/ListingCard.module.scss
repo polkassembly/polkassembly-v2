@@ -29,3 +29,15 @@
 .infoTimer {
     @apply whitespace-nowrap text-[10px] md:text-xs
 }
+
+.progressBar {
+    margin-top: 8px;
+
+    path {
+        transition: all 0.3s ease;
+    }
+
+    text {
+        font-weight: 500;
+    }
+}

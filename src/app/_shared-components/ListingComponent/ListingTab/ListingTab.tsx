@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getPageNumbers } from '@/app/_client-utils/getPageNumber';
-import { IPostListing } from '@/_shared/types';
+import { IPostListing, EProposalStatus, EProposalType, IOnChainPostListing, EVoteType } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import styles from './ListingTab.module.scss';
 import ListingCard from '../ListingCard/ListingCard';
@@ -53,11 +53,21 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 		data.slice(0, DEFAULT_LISTING_LIMIT).map((item, idx) => {
 			const backgroundColor = idx % 2 === 0 ? '#fbfbfb' : '#FFFFFF';
 
-			const onChainInfo = {
-				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt).toISOString() : 'N/A',
+			const onChainInfo: IOnChainPostListing = {
+				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt) : new Date(),
 				proposer: item.onChainInfo?.proposer || 'Unknown Proposer',
 				origin: item.onChainInfo?.origin || 'Unknown Origin',
-				status: item.onChainInfo?.status || 'Unknown Status'
+				status: (item.onChainInfo?.status as EProposalStatus) || EProposalStatus.Submitted,
+				description: item.onChainInfo?.description || '',
+				index: item.onChainInfo?.index || 0,
+				type: (item.onChainInfo?.type as EProposalType) || EProposalType.REFERENDUM_V2,
+				hash: item.onChainInfo?.hash || '',
+				voteMetrics: item.onChainInfo?.voteMetrics || {
+					support: { value: '0' },
+					bareAyes: { value: '0' },
+					[EVoteType.AYE]: { count: 0, value: '0' },
+					[EVoteType.NAY]: { count: 0, value: '0' }
+				}
 			};
 
 			return (
