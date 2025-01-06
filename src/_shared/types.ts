@@ -361,17 +361,17 @@ export enum EPostOrigin {
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
 
-export enum EVoteType {
+export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
 	ABSTAIN = 'abstain',
 	SPLIT = 'split',
-	SPLIT_ABSTAIN = 'split_abstain'
+	SPLIT_ABSTAIN = 'splitAbstain'
 }
 
 export interface IVoteMetrics {
-	[EVoteType.AYE]: { count: number; value: string };
-	[EVoteType.NAY]: { count: number; value: string };
+	[EVoteDecision.AYE]: { count: number; value: string };
+	[EVoteDecision.NAY]: { count: number; value: string };
 	support: { value: string };
 	bareAyes: { value: string };
 }
@@ -525,4 +525,15 @@ export interface IReaction {
 	reaction: EReaction;
 	createdAt: Date;
 	updatedAt: Date;
+}
+
+export interface IVoteData {
+	balanceValue: string;
+	decision: EVoteDecision;
+	lockPeriod: number;
+	createdAt: Date;
+	voterAddress: string;
+	selfVotingPower?: string;
+	totalVotingPower?: string;
+	delegatedVotingPower?: string;
 }
