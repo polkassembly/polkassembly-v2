@@ -21,6 +21,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { decodeEditorJsDataFromFirestore } from '@/app/api/_api-utils/decodeEditorJsDataFromFirestore';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -268,8 +269,12 @@ export class FirestoreService extends FirestoreRefs {
 		const comments = commentsQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
 
+			const { content } = data;
+			const decodedContent = decodeEditorJsDataFromFirestore(content);
+
 			return {
 				...data,
+				content: decodedContent as unknown as Record<string, unknown>,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate()
 			} as IComment;
@@ -413,7 +418,7 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: Record<string, unknown>;
 		parentCommentId?: string;
 		address?: string;
 	}) {
@@ -434,6 +439,8 @@ export class FirestoreService extends FirestoreRefs {
 		};
 
 		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
+
+		return newComment;
 	}
 
 	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {

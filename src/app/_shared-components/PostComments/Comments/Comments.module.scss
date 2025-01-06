@@ -1,0 +1,7 @@
+.wrapper {
+    @apply flex flex-col gap-y-4
+}
+
+.loginToComment {
+	@apply bg-bg_light_blue flex w-full items-center justify-center gap-x-1 rounded-lg p-4 text-text_primary shadow-md;
+}
