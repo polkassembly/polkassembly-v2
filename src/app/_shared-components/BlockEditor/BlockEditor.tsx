@@ -76,6 +76,9 @@ function BlockEditor({
 						class: Image,
 						inlineToolbar: true,
 						config: {
+							features: {
+								caption: false
+							},
 							uploader: {
 								uploadByFile: async (file: File) => {
 									const form = new FormData();
