@@ -18,9 +18,10 @@ import StatusTag from '../../StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import VotingBar from '../VotingBar/VotingBar';
 
-const calculatePercentage = (count: number, totalCount: number) => {
-	if (totalCount === 0) return 50;
-	return (count / totalCount) * 100;
+const calculatePercentage = (value: string, totalValue: bigint) => {
+	if (totalValue === BigInt(0)) return 0;
+	const valueBI = BigInt(value);
+	return Number((valueBI * BigInt(100) * BigInt(100)) / totalValue) / 100;
 };
 
 function ListingCard({
@@ -40,10 +41,10 @@ function ListingCard({
 }) {
 	const network = getCurrentNetwork();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
-	const totalVoteCount = (voteMetrics?.aye.count || 0) + (voteMetrics?.nay.count || 0);
+	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
 
-	const ayePercent = calculatePercentage(voteMetrics?.aye.count || 0, totalVoteCount);
-	const nayPercent = calculatePercentage(voteMetrics?.nay.count || 0, totalVoteCount);
+	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
+	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
 
 	return (
 		<Link
