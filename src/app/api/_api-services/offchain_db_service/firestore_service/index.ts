@@ -14,12 +14,14 @@ import {
 	ICommentResponse,
 	IPublicUser,
 	IReaction,
-	EReaction
+	EReaction,
+	IPostOffChainMetrics
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { decodeEditorJsDataFromFirestore } from '@/app/api/_api-utils/decodeEditorJsDataFromFirestore';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -173,15 +175,20 @@ export class FirestoreService extends FirestoreRefs {
 
 		const postsQuerySnapshot = await postsQuery.get();
 
-		return postsQuerySnapshot.docs.map((doc) => {
+		const postsWithMetricsPromises = postsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+			const indexOrHash = data.hash || String(data.index);
+			const metrics = await this.GetPostMetrics({ network, indexOrHash, proposalType });
 
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				updatedAt: data.updatedAt?.toDate(),
+				metrics
 			} as IOffChainPost;
 		});
+
+		return Promise.all(postsWithMetricsPromises);
 	}
 
 	static async GetTotalOffChainPostsCount({ network, proposalType, tags }: { network: ENetwork; proposalType: EProposalType; tags?: string[] }): Promise<number> {
@@ -193,6 +200,61 @@ export class FirestoreService extends FirestoreRefs {
 
 		const countSnapshot = await postsQuery.count().get();
 		return countSnapshot.data().count || 0;
+	}
+
+	static async GetPostReactionsCount({
+		network,
+		indexOrHash,
+		proposalType
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+	}): Promise<{ reaction: EReaction; count: number }[]> {
+		const reactionCountPromises = Object.values(EReaction).map(async (reaction) => {
+			const reactionCount = await FirestoreRefs.reactionsCollectionRef()
+				.where('network', '==', network)
+				.where('proposalType', '==', proposalType)
+				.where('indexOrHash', '==', indexOrHash)
+				.where('reaction', '==', reaction)
+				.count()
+				.get();
+
+			return {
+				reaction,
+				count: reactionCount.data().count || 0
+			};
+		});
+
+		return Promise.all(reactionCountPromises);
+	}
+
+	static async GetPostCommentsCount({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<number> {
+		const commentsCount = await FirestoreRefs.commentsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('isDeleted', '==', false)
+			.count()
+			.get();
+		return commentsCount.data().count || 0;
+	}
+
+	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+		const postReactionsCount = (await this.GetPostReactionsCount({ network, indexOrHash, proposalType })).reduce(
+			(acc, curr) => {
+				acc[curr.reaction] = curr.count;
+				return acc;
+			},
+			{} as { [key in EReaction]: number }
+		);
+
+		const commentsCount = await this.GetPostCommentsCount({ network, indexOrHash, proposalType });
+
+		return {
+			reactions: postReactionsCount,
+			comments: commentsCount
+		} as IPostOffChainMetrics;
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
@@ -207,8 +269,12 @@ export class FirestoreService extends FirestoreRefs {
 		const comments = commentsQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
 
+			const { content } = data;
+			const decodedContent = decodeEditorJsDataFromFirestore(content);
+
 			return {
 				...data,
+				content: decodedContent as unknown as Record<string, unknown>,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate()
 			} as IComment;
@@ -233,6 +299,7 @@ export class FirestoreService extends FirestoreRefs {
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
 			return commentsWithUser
 				.filter((comment) => comment.parentCommentId === parentId)
+				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
 					...comment,
 					children: buildCommentTree(comment.id)
@@ -351,7 +418,7 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: Record<string, unknown>;
 		parentCommentId?: string;
 		address?: string;
 	}) {
@@ -372,6 +439,8 @@ export class FirestoreService extends FirestoreRefs {
 		};
 
 		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
+
+		return newComment;
 	}
 
 	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {

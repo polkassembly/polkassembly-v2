@@ -261,6 +261,16 @@ export enum EDataSource {
 	SUBSQUARE = 'subsquare'
 }
 
+export enum EReaction {
+	like = 'like',
+	dislike = 'dislike'
+}
+
+export interface IPostOffChainMetrics {
+	reactions: Record<EReaction, number>;
+	comments: number;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -274,6 +284,7 @@ export interface IOffChainPost {
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
+	metrics?: IPostOffChainMetrics;
 }
 
 export enum EProposalStatus {
@@ -349,6 +360,21 @@ export enum EPostOrigin {
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
 
+export enum EVoteDecision {
+	AYE = 'aye',
+	NAY = 'nay',
+	ABSTAIN = 'abstain',
+	SPLIT = 'split',
+	SPLIT_ABSTAIN = 'splitAbstain'
+}
+
+export interface IVoteMetrics {
+	[EVoteDecision.AYE]: { count: number; value: string };
+	[EVoteDecision.NAY]: { count: number; value: string };
+	support: { value: string };
+	bareAyes: { value: string };
+}
+
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
@@ -357,6 +383,8 @@ export interface IOnChainPostInfo {
 	hash?: string;
 	origin?: EPostOrigin;
 	description?: string;
+	voteMetrics?: IVoteMetrics;
+	reward?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -372,6 +400,8 @@ export interface IOnChainPostListing {
 	status: EProposalStatus;
 	type: EProposalType;
 	hash: string;
+	voteMetrics?: IVoteMetrics;
+	reward?: string;
 }
 
 export interface IPostListing extends IOffChainPost {
@@ -424,7 +454,10 @@ export enum EApiRoute {
 	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
 	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
 	LOGOUT = 'LOGOUT',
-	POSTS_LISTING = 'POSTS_LISTING'
+	POSTS_LISTING = 'POSTS_LISTING',
+	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
+	GET_COMMENTS = 'GET_COMMENTS',
+	ADD_COMMENT = 'ADD_COMMENT'
 }
 
 export enum EWeb3LoginScreens {
@@ -450,7 +483,7 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: string;
+	content: Record<string, unknown>;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;
@@ -484,11 +517,6 @@ export interface IOnChainIdentity {
 	parentProxyAddress: string;
 }
 
-export enum EReaction {
-	like = 'like',
-	dislike = 'dislike'
-}
-
 export interface IReaction {
 	id: string;
 	network: ENetwork;
@@ -498,4 +526,15 @@ export interface IReaction {
 	reaction: EReaction;
 	createdAt: Date;
 	updatedAt: Date;
+}
+
+export interface IVoteData {
+	balanceValue: string;
+	decision: EVoteDecision;
+	lockPeriod: number;
+	createdAt: Date;
+	voterAddress: string;
+	selfVotingPower?: string;
+	totalVotingPower?: string;
+	delegatedVotingPower?: string;
 }

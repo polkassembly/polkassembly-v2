@@ -15,7 +15,7 @@ function Page() {
 
 	return (
 		<div>
-			<div className='min-h-screen w-full bg-activity_feed_bg px-10 pt-5'>
+			<div className='min-h-screen w-full bg-page_background px-10 pt-5'>
 				<div className='flex w-full justify-between xl:items-center'>
 					<div className='flex flex-col lg:flex-row xl:h-12 xl:gap-2'>
 						<div>
