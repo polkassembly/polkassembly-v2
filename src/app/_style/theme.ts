@@ -47,7 +47,8 @@ export const THEME_COLORS = {
 		search_bg: '#E3E4E4',
 		page_background: '#F5F6F8',
 		small_btn_text: '#6D7F97',
-		bg_light_blue: '#E6F4FF'
+		bg_light_blue: '#E6F4FF',
+		voting_bar_bg: '#575255'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',
