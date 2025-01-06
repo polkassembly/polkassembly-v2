@@ -11,11 +11,15 @@ import classes from './PostHeader.module.scss';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
 import PostTags from '../PostTags/PostTags';
+import StatusTag from '../../StatusTag/StatusTag';
 
-function PostHeader({ title, proposer, createdAt, tags }: { title: string; proposer: string; createdAt: Date; tags?: string[] }) {
+function PostHeader({ title, proposer, createdAt, tags, status }: { title: string; proposer: string; createdAt: Date; tags?: string[]; status: string }) {
 	return (
 		<div>
 			<div className='mb-4'>
+				<div className='mb-2 flex items-center'>
+					<StatusTag status={status} />
+				</div>
 				<p className={classes.postTitle}>{title}</p>
 				<div className='flex items-center gap-x-2'>
 					<Address address={proposer} />

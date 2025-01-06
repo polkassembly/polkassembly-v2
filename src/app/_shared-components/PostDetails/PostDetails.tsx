@@ -19,6 +19,7 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 					proposer={postData.onChainInfo?.proposer || ''}
 					createdAt={postData.createdAt || new Date()}
 					tags={postData.tags}
+					status={postData.onChainInfo?.status || ''}
 				/>
 			</div>
 			<div className={classes.detailsWrapper}>
