@@ -262,6 +262,16 @@ export enum EDataSource {
 	SUBSQUARE = 'subsquare'
 }
 
+export enum EReaction {
+	like = 'like',
+	dislike = 'dislike'
+}
+
+export interface IPostOffChainMetrics {
+	reactions: Record<EReaction, number>;
+	comments: number;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -275,6 +285,7 @@ export interface IOffChainPost {
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
+	metrics?: IPostOffChainMetrics;
 }
 
 export enum EProposalStatus {
@@ -350,6 +361,21 @@ export enum EPostOrigin {
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
 
+export enum EVoteType {
+	AYE = 'aye',
+	NAY = 'nay',
+	ABSTAIN = 'abstain',
+	SPLIT = 'split',
+	SPLIT_ABSTAIN = 'split_abstain'
+}
+
+export interface IVoteMetrics {
+	[EVoteType.AYE]: { count: number; value: string };
+	[EVoteType.NAY]: { count: number; value: string };
+	support: { value: string };
+	bareAyes: { value: string };
+}
+
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
@@ -358,6 +384,7 @@ export interface IOnChainPostInfo {
 	hash?: string;
 	origin?: EPostOrigin;
 	description?: string;
+	voteMetrics?: IVoteMetrics;
 }
 
 export interface IPost extends IOffChainPost {
@@ -373,6 +400,7 @@ export interface IOnChainPostListing {
 	status: EProposalStatus;
 	type: EProposalType;
 	hash: string;
+	voteMetrics?: IVoteMetrics;
 }
 
 export interface IPostListing extends IOffChainPost {
@@ -486,11 +514,6 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
-}
-
-export enum EReaction {
-	like = 'like',
-	dislike = 'dislike'
 }
 
 export interface IReaction {

@@ -102,4 +102,60 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_VOTES_BY_PROPOSAL_TYPE_AND_INDEX = `
+		query GetVotesByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
+			noCount: votesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			yesCount: votesConnection(where: {decision_eq: yes, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			abstainCount: votesConnection(where: {decision_eq: abstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			splitCount: votesConnection(where: {decision_eq: split, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			splitAbstainCount: votesConnection(where: {decision_eq: splitAbstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			tally: proposals(where:{index_eq: $index_eq, type_eq: $type_eq}) {
+				tally {
+					ayes
+					bareAyes
+					nays
+					support
+				}
+			}
+		}
+	`;
+
+	protected static GET_CONVICTION_VOTES_BY_PROPOSAL_TYPE_AND_INDEX = `
+		query GetConvictionVotesByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
+			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			yesCount: convictionVotesConnection(where: {decision_eq: yes, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			abstainCount: convictionVotesConnection(where: {decision_eq: abstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			splitCount: convictionVotesConnection(where: {decision_eq: split, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			splitAbstainCount: convictionVotesConnection(where: {decision_eq: splitAbstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			tally: proposals(where:{index_eq: $index_eq, type_eq: $type_eq}) {
+				tally {
+					ayes
+					bareAyes
+					nays
+					support
+				}
+			}
+		}
+	`;
 }

@@ -103,7 +103,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 						index: onChainPostInfo.index || post.index || 0,
 						origin: onChainPostInfo.origin || '',
 						type: proposalType,
-						hash: onChainPostInfo.hash || post.hash || ''
+						hash: onChainPostInfo.hash || post.hash || '',
+						voteMetrics: onChainPostInfo.voteMetrics
 					}
 				: undefined;
 			return {
