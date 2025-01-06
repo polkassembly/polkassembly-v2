@@ -188,10 +188,10 @@ export class SubsquidService extends SubsquidQueries {
 
 		const query =
 			proposalType === EProposalType.TIP
-				? this.GET_VOTES_BY_PROPOSAL_TYPE_AND_HASH
+				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
 				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
-					? this.GET_CONVICTION_VOTES_BY_PROPOSAL_TYPE_AND_INDEX
-					: this.GET_VOTES_BY_PROPOSAL_TYPE_AND_INDEX;
+					? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
+					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
 
 		const variables =
 			proposalType === EProposalType.TIP
@@ -205,9 +205,11 @@ export class SubsquidService extends SubsquidQueries {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post vote data from Subsquid');
 		}
 
+		console.log({ query, variables, subsquidData });
+
 		const votes: IVoteData[] = subsquidData.votes.map(
 			(vote: {
-				balance: { value: string };
+				balance: { value?: string; aye?: string; nay?: string; abstain?: string };
 				decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
 				lockPeriod: number;
 				createdAt?: string;
@@ -217,7 +219,7 @@ export class SubsquidService extends SubsquidQueries {
 				totalVotingPower?: string;
 				delegatedVotingPower?: string;
 			}) => ({
-				balanceValue: vote.balance.value,
+				balanceValue: vote.decision === 'abstain' ? vote.balance.abstain : vote.balance.value,
 				decision: vote.decision === 'yes' ? EVoteDecision.AYE : vote.decision === 'no' ? EVoteDecision.NAY : (vote.decision as EVoteDecision),
 				lockPeriod: vote.lockPeriod,
 				createdAt: vote.createdAt ? new Date(vote.createdAt) : new Date(vote.timestamp || ''),

@@ -159,8 +159,8 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_VOTES_BY_PROPOSAL_TYPE_AND_INDEX = `
-		query GetVotesByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = `
+		query GetVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
 			votes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
@@ -178,12 +178,16 @@ export class SubsquidQueries {
 				timestamp
 				voter
 			}
+
+			votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
 		}
 	`;
 
-	protected static GET_CONVICTION_VOTES_BY_PROPOSAL_TYPE_AND_INDEX = `
-		query GetConvictionVotesByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
-			votes:convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAt_isNull: false}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = `
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
+			votes:convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAt_isNull: true}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -203,11 +207,15 @@ export class SubsquidQueries {
 				totalVotingPower
 				delegatedVotingPower
 			}
+
+			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
 		}
 	`;
 
-	protected static GET_VOTES_BY_PROPOSAL_TYPE_AND_HASH = `
-		query GetVotesByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!) {
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH = `
+		query GetVotesListingByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!) {
 			votes(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
@@ -224,6 +232,10 @@ export class SubsquidQueries {
 				lockPeriod
 				timestamp
 				voter
+			}
+
+			votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
 			}
 		}
 	`;
