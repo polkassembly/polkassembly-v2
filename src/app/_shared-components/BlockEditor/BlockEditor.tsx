@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { memo, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import EditorJS, { OutputData, BlockToolConstructable } from '@editorjs/editorjs';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
@@ -34,6 +34,9 @@ function BlockEditor({
 	renderFromHtml?: boolean;
 	ref?: React.RefObject<{ clearEditor: () => void } | null>;
 }) {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const [shouldScroll, setShouldScroll] = useState(false);
+
 	const blockEditorRef = useRef<EditorJS>(null);
 
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
@@ -128,6 +131,9 @@ function BlockEditor({
 					const edJsData = await api.saver.save();
 					// const htmlArr = edjsParser.parse(edJsData);
 					onChange?.(edJsData);
+					// if (containerRef.current) {
+					// api.blocks.getBlockByElement(containerRef.current)?.holder.scrollIntoView();
+					// }
 				},
 				placeholder: 'Type your comment here'
 			});
@@ -143,9 +149,37 @@ function BlockEditor({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	// make div scrollable if content is more than 400px
+	useEffect(() => {
+		const checkHeight = () => {
+			if (containerRef.current) {
+				const contentHeight = containerRef.current.getBoundingClientRect().height;
+				setShouldScroll(contentHeight >= 400);
+			}
+		};
+		checkHeight();
+
+		// resize observer to check height changes
+		const observer = new ResizeObserver(checkHeight);
+		if (containerRef.current) {
+			observer.observe(containerRef.current);
+		}
+
+		return () => {
+			observer.disconnect();
+		};
+	}, []);
+
 	return (
 		<div
-			className={cn('max-h-[400px] overflow-y-auto rounded-md border border-border_grey', !readOnly && 'min-h-[150px] px-4 py-2', classes.blockEditor, className)}
+			ref={containerRef}
+			className={cn(
+				'relative rounded-md border border-border_grey',
+				!readOnly && 'min-h-[150px] px-4 py-2',
+				shouldScroll && 'max-h-[400px] overflow-y-auto',
+				classes.blockEditor,
+				className
+			)}
 			id={`block-editor-${id}`}
 		/>
 	);

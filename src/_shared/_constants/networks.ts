@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EGovType } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
 
 const VIA_PARITY = 'via Parity';
 const VIA_DWELLIR = 'via Dwellir';
@@ -12,6 +12,22 @@ const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
 const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
 const VIA_PINKNODE = 'via Pinknode';
+
+interface ITreasuryAsset {
+	name: string;
+	tokenDecimal: number;
+	symbol: string;
+}
+
+interface INetworkTreasuryAssets extends ITreasuryAsset {
+	index: string;
+}
+
+export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
+	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
+	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT' },
+	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' }
+} as const;
 
 export const PEOPLE_CHAIN_NETWORK_DETAILS = {
 	[ENetwork.POLKADOT]: {
@@ -96,6 +112,20 @@ export const NETWORKS_DETAILS = {
 				url: 'wss://rpc-polkadot.luckyfriday.io'
 			}
 		],
+		supportedAssets: {
+			'1984': {
+				...treasuryAssetsData[EAssets.USDT],
+				index: '1984'
+			},
+			'1337': {
+				...treasuryAssetsData[EAssets.USDC],
+				index: '1337'
+			},
+			'30': {
+				...treasuryAssetsData[EAssets.DED],
+				index: '30'
+			}
+		} as Record<string, INetworkTreasuryAssets>,
 		peopleChainEndpoints: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT].rpcEndpoints,
 		tracks: {
 			[EPostOrigin.ROOT]: {
@@ -531,6 +561,12 @@ export const NETWORKS_DETAILS = {
 		ss58Format: 2,
 		subsquidUrl: 'https://squid.subsquid.io/kusama-polkassembly/graphql',
 		tokenDecimals: 12,
+		supportedAssets: {
+			'1984': {
+				...treasuryAssetsData[EAssets.USDT],
+				index: '1984'
+			}
+		} as Record<string, INetworkTreasuryAssets>,
 		tokenSymbol: 'KSM',
 		blockExplorerUrl: 'https://kusama.subscan.io/',
 		rpcEndpoints: [
