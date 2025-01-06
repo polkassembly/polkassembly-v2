@@ -58,4 +58,26 @@ export class OnChainDbService {
 			totalCount: 0
 		};
 	}
+
+	static async GetPostVoteData({
+		network,
+		proposalType,
+		indexOrHash,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+		page: number;
+		limit: number;
+	}) {
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit });
+		if (postVoteData) return postVoteData;
+
+		return {
+			votes: [],
+			totalCount: 0
+		};
+	}
 }

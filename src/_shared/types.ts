@@ -360,17 +360,17 @@ export enum EPostOrigin {
 	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
 }
 
-export enum EVoteType {
+export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
 	ABSTAIN = 'abstain',
 	SPLIT = 'split',
-	SPLIT_ABSTAIN = 'split_abstain'
+	SPLIT_ABSTAIN = 'splitAbstain'
 }
 
 export interface IVoteMetrics {
-	[EVoteType.AYE]: { count: number; value: string };
-	[EVoteType.NAY]: { count: number; value: string };
+	[EVoteDecision.AYE]: { count: number; value: string };
+	[EVoteDecision.NAY]: { count: number; value: string };
 	support: { value: string };
 	bareAyes: { value: string };
 }
@@ -384,6 +384,7 @@ export interface IOnChainPostInfo {
 	origin?: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
+	reward?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -400,6 +401,7 @@ export interface IOnChainPostListing {
 	type: EProposalType;
 	hash: string;
 	voteMetrics?: IVoteMetrics;
+	reward?: string;
 }
 
 export interface IPostListing extends IOffChainPost {
@@ -452,7 +454,10 @@ export enum EApiRoute {
 	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
 	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
 	LOGOUT = 'LOGOUT',
-	POSTS_LISTING = 'POSTS_LISTING'
+	POSTS_LISTING = 'POSTS_LISTING',
+	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
+	GET_COMMENTS = 'GET_COMMENTS',
+	ADD_COMMENT = 'ADD_COMMENT'
 }
 
 export enum EWeb3LoginScreens {
@@ -478,7 +483,7 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: string;
+	content: Record<string, unknown>;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;
@@ -521,4 +526,15 @@ export interface IReaction {
 	reaction: EReaction;
 	createdAt: Date;
 	updatedAt: Date;
+}
+
+export interface IVoteData {
+	balanceValue: string;
+	decision: EVoteDecision;
+	lockPeriod: number;
+	createdAt: Date;
+	voterAddress: string;
+	selfVotingPower?: string;
+	totalVotingPower?: string;
+	delegatedVotingPower?: string;
 }

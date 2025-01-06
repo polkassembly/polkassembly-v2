@@ -172,7 +172,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: Record<string, unknown>;
 		parentCommentId?: string;
 		address?: string;
 	}) {

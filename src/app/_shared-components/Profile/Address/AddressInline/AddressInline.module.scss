@@ -3,6 +3,6 @@
 }
 
 .displaytext {
-    @apply text-[12px] lg:text-xs text-text_primary whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] inline-block align-middle;
+    @apply text-xs lg:text-sm text-text_primary font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] inline-block align-middle ;
 
 }

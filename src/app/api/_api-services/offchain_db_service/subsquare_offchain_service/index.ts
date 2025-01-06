@@ -34,7 +34,12 @@ export class SubsquareOffChainService {
 		try {
 			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-			if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
+			// TODO: ENABLE THIS
+			// if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
+			// return null;
+			// }
+
+			if (!data) {
 				return null;
 			}
 
