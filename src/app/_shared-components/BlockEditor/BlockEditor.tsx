@@ -10,8 +10,6 @@ import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Paragraph from '@editorjs/paragraph';
 import Header from '@editorjs/header';
-import EdJsHTML from 'editorjs-html';
-import { blockEditorTableParser } from '@/app/_client-utils/blockEditorTableParser';
 import { cn } from '@/lib/utils';
 
 const EDITOR_TOOLS = {
@@ -39,11 +37,6 @@ function BlockEditor({
 	ref?: React.RefObject<{ clearEditor: () => void } | null>;
 }) {
 	const blockEditorRef = useRef<EditorJS>(null);
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-	const edjsParser = EdJsHTML({
-		table: blockEditorTableParser
-	});
 
 	const clearEditor = () => {
 		blockEditorRef?.current?.blocks?.clear?.();

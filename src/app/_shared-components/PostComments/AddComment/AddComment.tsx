@@ -30,7 +30,7 @@ function AddComment({
 	onCancel?: () => void;
 	editorId: string;
 }) {
-	const [content, setContent] = useState<Record<string, unknown> | null>(null);
+	const [content, setContent] = useState<OutputData | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
@@ -62,7 +62,7 @@ function AddComment({
 					profileScore: user.id
 				};
 
-				onConfirm?.({ ...data, content }, publicUser);
+				onConfirm?.({ ...data, content: content as unknown as Record<string, unknown> }, publicUser);
 
 				setContent(null);
 				blockEditorActionsRef.current?.clearEditor?.();
@@ -85,7 +85,7 @@ function AddComment({
 				<div className='flex-1'>
 					<BlockEditor
 						onChange={(data) => {
-							setContent(data as unknown as Record<string, unknown>);
+							setContent(data);
 						}}
 						id={editorId}
 						ref={blockEditorActionsRef}

@@ -15,7 +15,7 @@ const Separator = React.forwardRef<React.ElementRef<typeof SeparatorPrimitive.Ro
 			ref={ref}
 			decorative={decorative}
 			orientation={orientation}
-			className={cn('shrink-0 bg-primary_border', orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]', className)}
+			className={cn('shrink-0 bg-wallet_btn_text', orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]', className)}
 			{...props}
 		/>
 	)

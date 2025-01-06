@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EProposalType } from '@/_shared/types';
+import { OutputData } from '@editorjs/editorjs';
 import { NextApiClientService } from './next_api_client_service';
 
 export class CommentClientService extends NextApiClientService {
@@ -13,17 +14,7 @@ export class CommentClientService extends NextApiClientService {
 		});
 	}
 
-	static async addCommentToPost({
-		proposalType,
-		index,
-		content,
-		parentCommentId
-	}: {
-		proposalType: EProposalType;
-		index: string;
-		content: Record<string, unknown>;
-		parentCommentId?: string;
-	}) {
+	static async addCommentToPost({ proposalType, index, content, parentCommentId }: { proposalType: EProposalType; index: string; content: OutputData; parentCommentId?: string }) {
 		return this.addCommentToPostApi({
 			proposalType,
 			index,

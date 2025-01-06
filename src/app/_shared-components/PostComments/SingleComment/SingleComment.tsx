@@ -36,9 +36,12 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 				/>
 			</div>
 			<div className={classes.innerWrapper}>
-				<div className='flex gap-x-2'>
+				<div className='flex items-center gap-x-2'>
 					<span className={classes.username}>{comment.user.username}</span>
-					<Separator orientation='vertical' />
+					<Separator
+						orientation='vertical'
+						className='h-3'
+					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
 				</div>
 				<BlockEditor

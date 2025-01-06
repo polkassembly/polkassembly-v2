@@ -19,6 +19,7 @@ import {
 	IOnChainPostListingResponse,
 	IPost
 } from '@/_shared/types';
+import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
@@ -181,7 +182,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		content: Record<string, unknown>;
+		content: OutputData;
 		parentCommentId?: string;
 	}) {
 		const { url, method } = (await this.getApiRoute(EApiRoute.ADD_COMMENT))([proposalType, index, 'comments']);

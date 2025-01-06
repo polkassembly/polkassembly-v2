@@ -14,7 +14,12 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	return (
 		<div>
 			<div className={classes.headerWrapper}>
-				<PostHeader title={postData.title || ''} />
+				<PostHeader
+					title={postData.title || ''}
+					proposer={postData.onChainInfo?.proposer || ''}
+					createdAt={postData.createdAt || new Date()}
+					tags={postData.tags}
+				/>
 			</div>
 			<div className={classes.detailsWrapper}>
 				<div className={classes.leftWrapper}>
