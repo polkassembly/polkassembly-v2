@@ -12,7 +12,8 @@ export class SubsquidQueries {
 				proposer
 				status
 				description
-				origin
+				origin,
+				reward
 			}
 		}
 	`;
@@ -26,7 +27,8 @@ export class SubsquidQueries {
 				proposer
 				status
 				description
-				origin
+				origin,
+				reward
 			}
 		}
 	`;
@@ -40,7 +42,8 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
-				hash
+				hash,
+				reward
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq}) {
@@ -58,7 +61,8 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
-				hash
+				hash,
+				reward
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_in: $status_in}) {
@@ -76,7 +80,8 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status
-				hash
+				hash,
+				reward
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, origin_in: $origin_in}) {
@@ -94,7 +99,8 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status
-				hash
+				hash,
+				reward
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_in: $status_in, origin_in: $origin_in}) {

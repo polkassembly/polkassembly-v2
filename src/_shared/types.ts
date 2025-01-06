@@ -384,6 +384,7 @@ export interface IOnChainPostInfo {
 	origin?: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
+	reward?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -400,6 +401,7 @@ export interface IOnChainPostListing {
 	type: EProposalType;
 	hash: string;
 	voteMetrics?: IVoteMetrics;
+	reward?: string;
 }
 
 export interface IPostListing extends IOffChainPost {

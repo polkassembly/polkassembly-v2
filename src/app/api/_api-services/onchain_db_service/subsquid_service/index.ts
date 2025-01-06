@@ -83,7 +83,8 @@ export class SubsquidService extends SubsquidQueries {
 			hash: proposal.hash,
 			origin: proposal.origin,
 			description: proposal.description || '',
-			voteMetrics
+			voteMetrics,
+			reward: proposal.reward
 		} as IOnChainPostInfo;
 	}
 
@@ -150,7 +151,19 @@ export class SubsquidService extends SubsquidQueries {
 		const posts: IOnChainPostListing[] = [];
 
 		subsquidData.proposals.forEach(
-			(proposal: { createdAt: Date; description?: string; index: number; origin: string; proposer?: string; status?: EProposalStatus; hash?: string }, index: number) => {
+			(
+				proposal: {
+					createdAt: Date;
+					description?: string;
+					index: number;
+					origin: string;
+					proposer?: string;
+					status?: EProposalStatus;
+					hash?: string;
+					reward?: string;
+				},
+				index: number
+			) => {
 				posts.push({
 					createdAt: proposal.createdAt,
 					description: proposal.description || '',
@@ -160,7 +173,8 @@ export class SubsquidService extends SubsquidQueries {
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
-					voteMetrics: voteMetrics[Number(index)]
+					voteMetrics: voteMetrics[Number(index)],
+					reward: proposal.reward
 				});
 			}
 		);

@@ -110,7 +110,8 @@ export class SubscanOnChainService {
 			createdAt: data?.data?.timeline?.[0].time ? dayjs(data?.data?.timeline?.[0].time).toDate() : undefined,
 			origin: data?.data?.origins ? snakeToPascalCase(data?.data?.origins) : undefined,
 			index: data?.data?.referendum_index ?? undefined,
-			hash: data?.data?.info?.hash || undefined
+			hash: data?.data?.info?.hash || undefined,
+			reward: data?.data?.pre_image?.amount
 		} as IOnChainPostInfo;
 	}
 }
