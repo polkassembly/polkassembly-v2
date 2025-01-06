@@ -30,21 +30,6 @@
     @apply whitespace-nowrap text-[10px] md:text-xs
 }
 
-.progressBar {
-    @apply w-10 h-10;
-
-    path {
-        transition: all 0.3s ease;
-    }
-
-    text {
-        font-weight: 500;
-    }
-
-
-}
-
-
-.progressBarText {
+.progressBarContainer {
     @apply flex bg-[#575255] text-white p-3 w-48 rounded-md flex-col;
 }
