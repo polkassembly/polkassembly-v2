@@ -33,12 +33,12 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 					proposalType={proposalType}
 					proposalIndex={index}
 					editorId='new-comment'
-					onConfirm={(newComment, user) => {
+					onConfirm={(newComment, publicUser) => {
 						setAllComments((prev) => [
 							...prev,
 							{
 								...newComment,
-								user
+								user: publicUser
 							}
 						]);
 					}}

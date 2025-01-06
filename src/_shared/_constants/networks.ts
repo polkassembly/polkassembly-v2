@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EGovType } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
 
 const VIA_PARITY = 'via Parity';
 const VIA_DWELLIR = 'via Dwellir';
@@ -12,6 +12,22 @@ const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
 const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
 const VIA_PINKNODE = 'via Pinknode';
+
+export const treasuryAssets = {
+	[EAssets.DED]: { id: EAssets.DED, name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
+	[EAssets.USDT]: {
+		id: EAssets.USDT,
+		name: 'usdt',
+		tokenDecimal: 6,
+		symbol: 'USDT'
+	},
+	[EAssets.USDC]: {
+		id: EAssets.USDC,
+		name: 'usdc',
+		tokenDecimal: 6,
+		symbol: 'USDC'
+	}
+};
 
 export const PEOPLE_CHAIN_NETWORK_DETAILS = {
 	[ENetwork.POLKADOT]: {
@@ -96,6 +112,9 @@ export const NETWORKS_DETAILS = {
 				url: 'wss://rpc-polkadot.luckyfriday.io'
 			}
 		],
+		supportedAssets: {
+			...treasuryAssets
+		},
 		peopleChainEndpoints: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT].rpcEndpoints,
 		tracks: {
 			[EPostOrigin.ROOT]: {

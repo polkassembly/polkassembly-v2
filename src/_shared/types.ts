@@ -549,3 +549,9 @@ export interface IVoteData {
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
 }
+
+export enum EAssets {
+	DED = '30',
+	USDT = '1984',
+	USDC = '1337'
+}

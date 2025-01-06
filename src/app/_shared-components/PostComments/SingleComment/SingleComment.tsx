@@ -15,6 +15,7 @@ import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 
@@ -37,7 +38,7 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 			</div>
 			<div className={classes.innerWrapper}>
 				<div className='flex items-center gap-x-2'>
-					<span className={classes.username}>{comment.user.username}</span>
+					<span className={classes.username}>{comment.user.username || shortenAddress(comment.user.addresses[0])}</span>
 					<Separator
 						orientation='vertical'
 						className='h-3'

@@ -8,7 +8,12 @@ function PostTags({ tags }: { tags: string[] }) {
 	return (
 		<div className='flex items-center gap-x-2'>
 			{tags.map((tag) => (
-				<div className={classes.tag}>{tag}</div>
+				<div
+					key={tag}
+					className={classes.tag}
+				>
+					{tag}
+				</div>
 			))}
 		</div>
 	);
