@@ -501,6 +501,7 @@ export interface IComment {
 	parentCommentId: string | null;
 	isDeleted: boolean;
 	address: string | null;
+	dataSource: EDataSource;
 }
 
 export interface ICommentResponse extends IComment {

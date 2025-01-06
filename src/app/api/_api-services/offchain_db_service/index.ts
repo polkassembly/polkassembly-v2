@@ -2,7 +2,20 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, EWallet, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment, IReaction, EReaction } from '@shared/types';
+import {
+	EDataSource,
+	ENetwork,
+	EProposalType,
+	EWallet,
+	IOffChainPost,
+	IUser,
+	IUserTFADetails,
+	IUserAddress,
+	IComment,
+	IReaction,
+	EReaction,
+	ICommentResponse
+} from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -112,8 +125,26 @@ export class OffChainDbService {
 		return FirestoreService.GetTotalOffChainPostsCount({ network, proposalType, tags });
 	}
 
-	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IComment[]> {
-		return FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
+	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
+		const firestoreComments = await FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
+		const subsquareComments = await SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType });
+
+		// Combine all comments from both sources
+		const allComments = [...firestoreComments, ...subsquareComments];
+
+		// Helper function to build comment tree
+		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
+			return allComments
+				.filter((comment) => comment.parentCommentId === parentId)
+				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
+				.map((comment) => ({
+					...comment,
+					children: buildCommentTree(comment.id)
+				}));
+		};
+
+		// Get only top-level comments (those with no parent)
+		return buildCommentTree(null);
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {

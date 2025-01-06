@@ -1,11 +1,14 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EDataSource, ENetwork, EProposalType, IOffChainPost } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost } from '@/_shared/types';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
@@ -91,5 +94,63 @@ export class SubsquareOffChainService {
 		page: number;
 	}): Promise<IOffChainPost[]> {
 		return [];
+	}
+
+	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
+		let mappedUrl = this.postDetailsUrlMap[proposalType as keyof typeof this.postDetailsUrlMap]?.(indexOrHash, network);
+
+		if (!mappedUrl) {
+			return [];
+		}
+
+		mappedUrl = `${mappedUrl}/comments`;
+
+		try {
+			const commentsData = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
+
+			if (!commentsData?.items?.length) {
+				return [];
+			}
+
+			// Helper function to process a comment and its replies
+			const processComment = async (comment: any): Promise<any> => {
+				const publicUser = await FirestoreService.GetPublicUserByAddress(comment.author.address);
+
+				return {
+					// eslint-disable-next-line no-underscore-dangle
+					id: comment._id,
+					content: comment.content,
+					userId: publicUser?.id ?? 0,
+					user: publicUser ?? {
+						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
+						id: 0,
+						username: '',
+						profileScore: 0
+					},
+					createdAt: new Date(comment.createdAt),
+					updatedAt: new Date(comment.updatedAt),
+					isDeleted: false,
+					network,
+					proposalType,
+					indexOrHash,
+					parentCommentId: comment.replyToComment || null,
+					address: comment.author.address,
+					children: [],
+					dataSource: EDataSource.SUBSQUARE
+				};
+			};
+
+			// Process all comments and their replies
+			const processCommentsWithReplies = async (comments: any[]): Promise<any[]> => {
+				const mainComments = await Promise.all(comments.map(processComment));
+				const replies = await Promise.all(comments.filter((comment) => comment.replies?.length > 0).flatMap((comment) => processCommentsWithReplies(comment.replies)));
+
+				return [...mainComments, ...replies.flat()];
+			};
+
+			return await processCommentsWithReplies(commentsData.items);
+		} catch {
+			return [];
+		}
 	}
 }
