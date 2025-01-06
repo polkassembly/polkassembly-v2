@@ -8,11 +8,13 @@ import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { convertMarkdownToBlocksServer } from '@/app/api/_api-utils/convertMarkdownToBlocksServer';
+import { convertHtmlToBlocksServer } from '@/app/api/_api-utils/convertHtmlToBlocksServer';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-// TODO: IMPLEMENT THIS
+
 export class SubsquareOffChainService {
 	private static postDetailsUrlMap = {
 		[EProposalType.BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/bounties/${id}`,
@@ -116,10 +118,12 @@ export class SubsquareOffChainService {
 			const processComment = async (comment: any): Promise<any> => {
 				const publicUser = await FirestoreService.GetPublicUserByAddress(comment.author.address);
 
+				const content = comment.contentType === 'markdown' ? convertMarkdownToBlocksServer(comment.content) : convertHtmlToBlocksServer(comment.content);
+
 				return {
 					// eslint-disable-next-line no-underscore-dangle
 					id: comment._id,
-					content: comment.content,
+					content,
 					userId: publicUser?.id ?? 0,
 					user: publicUser ?? {
 						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],

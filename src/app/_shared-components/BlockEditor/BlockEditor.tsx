@@ -12,9 +12,9 @@ import Paragraph from '@editorjs/paragraph';
 import Header from '@editorjs/header';
 import Image from '@editorjs/image';
 import { cn } from '@/lib/utils';
-import { convertMarkdownToHtml } from '@/app/_client-utils/markdownToHtml';
-import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
+import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
 import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
@@ -108,7 +108,7 @@ function BlockEditor({
 				onReady: async () => {
 					if (data) {
 						if (renderFromHtml) {
-							const htmlString = await convertMarkdownToHtml(data as string);
+							const htmlString = convertMarkdownToHtml(data as string);
 
 							const blocks = convertHtmlToBlocks(htmlString as string);
 

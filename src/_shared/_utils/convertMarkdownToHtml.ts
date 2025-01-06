@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { marked } from 'marked';
 
-export async function convertMarkdownToHtml(markdown: string): Promise<string> {
+export function convertMarkdownToHtml(markdown: string): string {
 	try {
 		// Configure marked options if needed
 		marked.setOptions({
@@ -11,7 +11,7 @@ export async function convertMarkdownToHtml(markdown: string): Promise<string> {
 			gfm: true
 		});
 
-		return marked.parse(markdown);
+		return marked.parse(markdown, { async: false });
 	} catch (error) {
 		console.error('Error converting markdown to HTML:', error);
 		return markdown;
