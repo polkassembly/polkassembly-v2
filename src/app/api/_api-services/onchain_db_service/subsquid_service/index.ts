@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteType, IOnChainPostInfo, IOnChainPostListing, IVoteMetrics } from '@shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IOnChainPostListing, IVoteData, IVoteMetrics } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { APIError } from '@api/_api-utils/apiError';
@@ -28,8 +28,8 @@ export class SubsquidService extends SubsquidQueries {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
-			? this.GET_CONVICTION_VOTES_BY_PROPOSAL_TYPE_AND_INDEX
-			: this.GET_VOTES_BY_PROPOSAL_TYPE_AND_INDEX;
+			? this.GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX
+			: this.GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX;
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { index_eq: index, type_eq: proposalType }).toPromise();
 
@@ -39,11 +39,11 @@ export class SubsquidService extends SubsquidQueries {
 		}
 
 		return {
-			[EVoteType.NAY]: {
+			[EVoteDecision.NAY]: {
 				count: subsquidData.noCount.totalCount || 0,
 				value: subsquidData.tally?.[0]?.tally?.nays || '0'
 			},
-			[EVoteType.AYE]: {
+			[EVoteDecision.AYE]: {
 				count: subsquidData.yesCount.totalCount || 0,
 				value: subsquidData.tally?.[0]?.tally?.ayes || '0'
 			},
@@ -168,6 +168,69 @@ export class SubsquidService extends SubsquidQueries {
 		return {
 			posts,
 			totalCount: subsquidData.proposalsConnection.totalCount
+		};
+	}
+
+	static async GetPostVoteData({
+		network,
+		proposalType,
+		indexOrHash,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+		page: number;
+		limit: number;
+	}) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query =
+			proposalType === EProposalType.TIP
+				? this.GET_VOTES_BY_PROPOSAL_TYPE_AND_HASH
+				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
+					? this.GET_CONVICTION_VOTES_BY_PROPOSAL_TYPE_AND_INDEX
+					: this.GET_VOTES_BY_PROPOSAL_TYPE_AND_INDEX;
+
+		const variables =
+			proposalType === EProposalType.TIP
+				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit }
+				: { index_eq: Number(indexOrHash), type_eq: proposalType, limit, offset: (page - 1) * limit };
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain post vote data from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post vote data from Subsquid');
+		}
+
+		const votes: IVoteData[] = subsquidData.votes.map(
+			(vote: {
+				balance: { value: string };
+				decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+				lockPeriod: number;
+				createdAt?: string;
+				timestamp?: string;
+				voter: string;
+				selfVotingPower?: string;
+				totalVotingPower?: string;
+				delegatedVotingPower?: string;
+			}) => ({
+				balanceValue: vote.balance.value,
+				decision: vote.decision === 'yes' ? EVoteDecision.AYE : vote.decision === 'no' ? EVoteDecision.NAY : (vote.decision as EVoteDecision),
+				lockPeriod: vote.lockPeriod,
+				createdAt: vote.createdAt ? new Date(vote.createdAt) : new Date(vote.timestamp || ''),
+				voterAddress: vote.voter,
+				selfVotingPower: vote.selfVotingPower,
+				totalVotingPower: vote.totalVotingPower,
+				delegatedVotingPower: vote.delegatedVotingPower
+			})
+		);
+
+		return {
+			votes,
+			totalCount: subsquidData.votesConnection.totalCount
 		};
 	}
 }
