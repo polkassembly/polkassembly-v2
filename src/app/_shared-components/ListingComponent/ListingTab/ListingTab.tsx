@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getPageNumbers } from '@/app/_client-utils/getPageNumber';
-import { IPostListing, EProposalStatus, EProposalType, IOnChainPostListing, EVoteType } from '@/_shared/types';
+import { IPostListing, EProposalStatus, EProposalType, IOnChainPostListing, EVoteDecision } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import styles from './ListingTab.module.scss';
 import ListingCard from '../ListingCard/ListingCard';
@@ -65,8 +65,8 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 				voteMetrics: item.onChainInfo?.voteMetrics || {
 					support: { value: '0' },
 					bareAyes: { value: '0' },
-					[EVoteType.AYE]: { count: 0, value: '0' },
-					[EVoteType.NAY]: { count: 0, value: '0' }
+					[EVoteDecision.AYE]: { count: 0, value: '0' },
+					[EVoteDecision.NAY]: { count: 0, value: '0' }
 				}
 			};
 

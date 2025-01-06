@@ -6,16 +6,14 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
 import { EProposalType, IOnChainPostListing } from '@/_shared/types';
 import Link from 'next/link';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import Address from '../../Profile/Address/Address';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 import styles from './ListingCard.module.scss';
 import StatusTag from '../../StatusTag/StatusTag';
-
-const formatDOTValue = (value: string) => {
-	const num = Number(value);
-	if (isNaN(num)) return '0.0';
-	return (num / 1e10).toFixed(1);
-};
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 
 const calculatePercentage = (count: number, totalCount: number) => {
 	if (totalCount === 0) return 50;
@@ -24,8 +22,8 @@ const calculatePercentage = (count: number, totalCount: number) => {
 
 function HalfCircleProgressBar({ ayePercent, nayPercent }: { ayePercent: number; nayPercent: number }) {
 	const width = 120;
-	const height = 60;
-	const strokeWidth = 8;
+	const height = 40;
+	const strokeWidth = 16;
 	const radius = 50;
 
 	const createArc = (percentage: number, isAye: boolean) => {
@@ -85,6 +83,7 @@ function ListingCard({
 	proposalType: string;
 	index: number;
 }) {
+	const network = getCurrentNetwork();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
 	const totalVoteCount = (voteMetrics?.aye.count || 0) + (voteMetrics?.nay.count || 0);
 
@@ -118,14 +117,32 @@ function ListingCard({
 								<span className={`${getSpanStyle(origin, 1)} ${styles.originStyle}`}>{origin}</span>
 							</span>
 						)}
-					</div>
-					<p>{formatDOTValue(voteMetrics?.aye.value || '0')} </p>
-					<p>{formatDOTValue(voteMetrics?.nay.value || '0')} </p>
-					<div className={styles.progressBarContainer}>
-						<HalfCircleProgressBar
-							ayePercent={ayePercent}
-							nayPercent={nayPercent}
-						/>
+						<span>|</span>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<div>
+									<HalfCircleProgressBar
+										ayePercent={ayePercent}
+										nayPercent={nayPercent}
+									/>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent
+								side='top'
+								align='center'
+							>
+								<div className={styles.progressBarText}>
+									<p>
+										Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+										{ayePercent.toFixed(2)}%)
+									</p>
+									<p>
+										Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+										{nayPercent.toFixed(2)}%)
+									</p>
+								</div>
+							</TooltipContent>
+						</Tooltip>
 					</div>
 				</div>
 			</div>
