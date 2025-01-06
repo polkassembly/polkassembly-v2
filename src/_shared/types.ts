@@ -551,7 +551,7 @@ export interface IVoteData {
 }
 
 export enum EAssets {
-	DED = '30',
-	USDT = '1984',
-	USDC = '1337'
+	DED = 'DED',
+	USDT = 'USDT',
+	USDC = 'USDC'
 }

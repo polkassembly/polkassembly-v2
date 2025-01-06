@@ -2,8 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { NETWORKS_DETAILS, treasuryAssets } from '@/_shared/_constants/networks';
-import { EAssets, ENetwork } from '@/_shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ENetwork } from '@/_shared/types';
 
 interface Options {
 	numberAfterComma?: number;
@@ -11,8 +11,8 @@ interface Options {
 	withThousandDelimitor?: boolean;
 }
 
-export function formatBnBalance(value: string, options: Options, network: ENetwork, assetId?: EAssets | null): string {
-	const tokenDecimals = assetId ? treasuryAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
+export function formatBnBalance(value: string, options: Options, network: ENetwork, assetId?: string): string {
+	const tokenDecimals = assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
 	const valueString = value.toString();
 
 	let suffix = '';
@@ -41,7 +41,7 @@ export function formatBnBalance(value: string, options: Options, network: ENetwo
 		prefix = prefix.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}
 
-	const unit = withUnit ? (assetId ? treasuryAssets[`${assetId}`]?.symbol : NETWORKS_DETAILS[`${network}`]?.tokenSymbol) : '';
+	const unit = withUnit ? (assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.symbol : NETWORKS_DETAILS[`${network}`]?.tokenSymbol) : '';
 
 	return `${prefix}${comma}${suffix} ${unit}`;
 }

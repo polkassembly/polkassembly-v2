@@ -13,21 +13,21 @@ const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
 const VIA_PINKNODE = 'via Pinknode';
 
-export const treasuryAssets = {
-	[EAssets.DED]: { id: EAssets.DED, name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
-	[EAssets.USDT]: {
-		id: EAssets.USDT,
-		name: 'usdt',
-		tokenDecimal: 6,
-		symbol: 'USDT'
-	},
-	[EAssets.USDC]: {
-		id: EAssets.USDC,
-		name: 'usdc',
-		tokenDecimal: 6,
-		symbol: 'USDC'
-	}
-};
+interface ITreasuryAsset {
+	name: string;
+	tokenDecimal: number;
+	symbol: string;
+}
+
+interface INetworkTreasuryAssets extends ITreasuryAsset {
+	index: string;
+}
+
+export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
+	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
+	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT' },
+	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' }
+} as const;
 
 export const PEOPLE_CHAIN_NETWORK_DETAILS = {
 	[ENetwork.POLKADOT]: {
@@ -113,8 +113,19 @@ export const NETWORKS_DETAILS = {
 			}
 		],
 		supportedAssets: {
-			...treasuryAssets
-		},
+			'1984': {
+				...treasuryAssetsData[EAssets.USDT],
+				index: '1984'
+			},
+			'1337': {
+				...treasuryAssetsData[EAssets.USDC],
+				index: '1337'
+			},
+			'30': {
+				...treasuryAssetsData[EAssets.DED],
+				index: '30'
+			}
+		} as Record<string, INetworkTreasuryAssets>,
 		peopleChainEndpoints: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT].rpcEndpoints,
 		tracks: {
 			[EPostOrigin.ROOT]: {
@@ -550,6 +561,12 @@ export const NETWORKS_DETAILS = {
 		ss58Format: 2,
 		subsquidUrl: 'https://squid.subsquid.io/kusama-polkassembly/graphql',
 		tokenDecimals: 12,
+		supportedAssets: {
+			'1984': {
+				...treasuryAssetsData[EAssets.USDT],
+				index: '1984'
+			}
+		} as Record<string, INetworkTreasuryAssets>,
 		tokenSymbol: 'KSM',
 		blockExplorerUrl: 'https://kusama.subscan.io/',
 		rpcEndpoints: [
