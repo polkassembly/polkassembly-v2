@@ -5,7 +5,8 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { ENetwork, EProposalStatus, EProposalType, IOnChainPostInfo } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IRequestedAssetData, IVoteMetrics } from '@/_shared/types';
+import { hexToString } from '@polkadot/util';
 
 export class SubsquareOnChainService {
 	private static postDetailsUrlMap = {
@@ -38,6 +39,37 @@ export class SubsquareOnChainService {
 
 		const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
+		const requestedAssetData: IRequestedAssetData | undefined = data?.onchainData?.treasuryInfo
+			? {
+					assetId: null,
+					amount: data.onchainData.treasuryInfo.amount,
+					beneficiaries: data.onchainData.treasuryInfo.beneficiaries.map((address: string) => ({
+						address,
+						amount: data.onchainData.treasuryInfo.amount // In this case all amount goes to single beneficiary
+					}))
+				}
+			: undefined;
+
+		// Convert hex values to strings and extract vote metrics from tally data
+		const voteMetrics: IVoteMetrics | undefined = data?.state?.args?.tally
+			? {
+					[EVoteDecision.AYE]: {
+						count: 0,
+						value: data.state.args.tally.ayes.toString()
+					},
+					[EVoteDecision.NAY]: {
+						count: 0,
+						value: data.state.args.tally.nays.startsWith('0x') ? hexToString(data.state.args.tally.nays) : data.state.args.tally.nays.toString()
+					},
+					support: {
+						value: data.state.args.tally.support.toString()
+					},
+					bareAyes: {
+						value: data.state.args.tally.ayes.toString()
+					}
+				}
+			: undefined;
+
 		const proposer = data?.proposer || data?.onchainData?.proposer || '';
 
 		const onChainPostInfo: IOnChainPostInfo = {
@@ -47,8 +79,8 @@ export class SubsquareOnChainService {
 			origin: data?.onchainData?.info?.origin?.origins,
 			index: data?.onchainData?.timeline?.[0]?.referendumIndex ?? undefined,
 			hash: data?.onchainData?.timeline?.[0]?.args?.proposalHash || undefined,
-			// TODO: add vote metrics,
-			reward: data?.onchainData?.treasuryInfo?.amount || undefined
+			requestedAssetData,
+			voteMetrics
 		};
 
 		return onChainPostInfo;

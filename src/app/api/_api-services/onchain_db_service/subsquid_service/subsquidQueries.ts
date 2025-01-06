@@ -13,7 +13,11 @@ export class SubsquidQueries {
 				status
 				description
 				origin,
-				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 		}
 	`;
@@ -28,7 +32,11 @@ export class SubsquidQueries {
 				status
 				description
 				origin,
-				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 		}
 	`;
@@ -43,7 +51,11 @@ export class SubsquidQueries {
 				proposer
 				status,
 				hash,
-				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq}) {
@@ -62,7 +74,11 @@ export class SubsquidQueries {
 				proposer
 				status,
 				hash,
-				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_in: $status_in}) {
@@ -81,7 +97,11 @@ export class SubsquidQueries {
 				proposer
 				status
 				hash,
-				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, origin_in: $origin_in}) {
@@ -100,7 +120,11 @@ export class SubsquidQueries {
 				proposer
 				status
 				hash,
-				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_in: $status_in, origin_in: $origin_in}) {

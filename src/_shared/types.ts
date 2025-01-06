@@ -375,6 +375,17 @@ export interface IVoteMetrics {
 	bareAyes: { value: string };
 }
 
+export interface IBeneficiary {
+	address: string;
+	amount: string;
+}
+
+export interface IRequestedAssetData {
+	assetId: string | null;
+	amount: string;
+	beneficiaries: IBeneficiary[];
+}
+
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
@@ -384,7 +395,7 @@ export interface IOnChainPostInfo {
 	origin?: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
-	reward?: string;
+	requestedAssetData?: IRequestedAssetData;
 }
 
 export interface IPost extends IOffChainPost {
@@ -401,7 +412,7 @@ export interface IOnChainPostListing {
 	type: EProposalType;
 	hash: string;
 	voteMetrics?: IVoteMetrics;
-	reward?: string;
+	requestedAssetData?: IRequestedAssetData;
 }
 
 export interface IPostListing extends IOffChainPost {
