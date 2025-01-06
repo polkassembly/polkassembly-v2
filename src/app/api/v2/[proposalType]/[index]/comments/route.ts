@@ -6,6 +6,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EProposalType } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { encodeEditorJsDataForFirestore } from '@/app/api/_api-utils/encodeEditorJsDataForFirestore';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
@@ -38,7 +39,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.custom<OutputData>(),
+		content: z.custom<Record<string, unknown>>(),
 		parentCommentId: z.string().optional(),
 		address: z
 			.string()
@@ -48,12 +49,14 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const { content, parentCommentId, address } = zodBodySchema.parse(await getReqBody(req));
 
+	const encodedContent = encodeEditorJsDataForFirestore(content as unknown as OutputData);
+
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
 		indexOrHash: index,
 		proposalType: proposalType as EProposalType,
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-		content,
+		content: encodedContent as unknown as Record<string, unknown>,
 		parentCommentId,
 		address
 	});

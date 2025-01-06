@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useImperativeHandle, useRef } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
@@ -27,38 +27,48 @@ function BlockEditor({
 	readOnly,
 	className,
 	id,
-	renderFromHtml
+	renderFromHtml,
+	ref
 }: {
-	data?: OutputData | string;
+	data?: Record<string, unknown> | string;
 	onChange?: (data: OutputData) => void;
 	readOnly?: boolean;
 	className?: string;
 	id?: string;
 	renderFromHtml?: boolean;
+	ref?: React.RefObject<{ clearEditor: () => void } | null>;
 }) {
-	const ref = useRef<EditorJS>(null);
+	const blockEditorRef = useRef<EditorJS>(null);
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const edjsParser = EdJsHTML({
 		table: blockEditorTableParser
 	});
 
+	const clearEditor = () => {
+		blockEditorRef?.current?.blocks?.clear?.();
+	};
+
+	useImperativeHandle(ref, () => ({
+		clearEditor
+	}));
+
 	// Initialize editorjs
 	useEffect(() => {
 		// Initialize editorjs if we don't have a reference
-		if (!ref.current) {
+		if (!blockEditorRef.current) {
 			const editor = new EditorJS({
 				readOnly,
 				minHeight: 400,
 				holder: `block-editor-${id}`,
 				tools: EDITOR_TOOLS,
-				data: data as OutputData,
+				data: data as unknown as OutputData,
 				onReady: async () => {
 					if (data) {
 						if (renderFromHtml) {
 							await editor.blocks.renderFromHTML(data as string);
 						} else {
-							await editor.blocks.render(data as OutputData);
+							await editor.blocks.render(data as unknown as OutputData);
 						}
 					}
 				},
@@ -71,13 +81,13 @@ function BlockEditor({
 				},
 				placeholder: 'Type your comment here'
 			});
-			ref.current = editor;
+			blockEditorRef.current = editor;
 		}
 
 		// Add a return function to handle cleanup
 		return () => {
-			if (ref.current && ref.current.destroy) {
-				ref.current.destroy();
+			if (blockEditorRef.current && blockEditorRef.current.destroy) {
+				blockEditorRef.current.destroy();
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps

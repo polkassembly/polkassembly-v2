@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { OutputData } from '@editorjs/editorjs';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { StatusCodes } from 'http-status-codes';
@@ -482,7 +481,7 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: OutputData;
+	content: Record<string, unknown>;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;

@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { EProposalType, IComment, IPublicUser } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
@@ -30,13 +30,15 @@ function AddComment({
 	onCancel?: () => void;
 	editorId: string;
 }) {
-	const [content, setContent] = useState<OutputData | null>(null);
+	const [content, setContent] = useState<Record<string, unknown> | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
 
+	const blockEditorActionsRef = useRef<{ clearEditor: () => void } | null>(null);
+
 	const addComment = async () => {
-		if (!content || !content.blocks || content.blocks.length === 0 || !user) return;
+		if (!content || !content.blocks || (content as unknown as OutputData).blocks.length === 0 || !user) return;
 		try {
 			setLoading(true);
 			const { data, error } = await CommentClientService.addCommentToPost({
@@ -60,9 +62,10 @@ function AddComment({
 					profileScore: user.id
 				};
 
-				onConfirm?.(data, publicUser);
+				onConfirm?.({ ...data, content }, publicUser);
 
 				setContent(null);
+				blockEditorActionsRef.current?.clearEditor?.();
 			}
 			setLoading(false);
 		} catch (err) {
@@ -82,9 +85,10 @@ function AddComment({
 				<div className='flex-1'>
 					<BlockEditor
 						onChange={(data) => {
-							setContent(data);
+							setContent(data as unknown as Record<string, unknown>);
 						}}
 						id={editorId}
+						ref={blockEditorActionsRef}
 					/>
 				</div>
 				<div className={classes.btnWrapper}>
@@ -100,7 +104,7 @@ function AddComment({
 					<Button
 						className={classes.postBtn}
 						onClick={addComment}
-						disabled={!content || !content.blocks || content.blocks.length === 0}
+						disabled={!content || !content.blocks || (content as unknown as OutputData).blocks.length === 0}
 						isLoading={loading}
 					>
 						Post

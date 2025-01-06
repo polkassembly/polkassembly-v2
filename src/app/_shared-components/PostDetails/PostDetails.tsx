@@ -8,6 +8,7 @@ import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
 import BlockEditor from '../BlockEditor/BlockEditor';
+import { Skeleton } from '../Skeleton';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	return (
@@ -27,7 +28,7 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 						/>
 					</div>
 					<div className={classes.commentsBox}>
-						<Suspense fallback='Loading...'>
+						<Suspense fallback={<Skeleton className='h-4' />}>
 							<PostComments
 								proposalType={EProposalType.REFERENDUM_V2}
 								index={index}
