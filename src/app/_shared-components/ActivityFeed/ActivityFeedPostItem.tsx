@@ -11,13 +11,13 @@ import { IoShareSocialOutline } from 'react-icons/io5';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { useUser } from '@/hooks/useUser';
 import LikeGif from '@assets/reactions/Liked-Colored.gif';
+import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styles from './ActivityFeedPostItem.module.scss';
 import Address from '../Profile/Address/Address';
-import Link from 'next/link';
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
