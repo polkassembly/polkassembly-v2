@@ -9,6 +9,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidQueries } from './subsquidQueries';
+import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidQueries {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -83,7 +84,8 @@ export class SubsquidService extends SubsquidQueries {
 			hash: proposal.hash,
 			origin: proposal.origin,
 			description: proposal.description || '',
-			voteMetrics
+			voteMetrics,
+			requestedAssetData: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined
 		} as IOnChainPostInfo;
 	}
 
@@ -150,7 +152,23 @@ export class SubsquidService extends SubsquidQueries {
 		const posts: IOnChainPostListing[] = [];
 
 		subsquidData.proposals.forEach(
-			(proposal: { createdAt: Date; description?: string; index: number; origin: string; proposer?: string; status?: EProposalStatus; hash?: string }, index: number) => {
+			(
+				proposal: {
+					createdAt: Date;
+					description?: string;
+					index: number;
+					origin: string;
+					proposer?: string;
+					status?: EProposalStatus;
+					hash?: string;
+					preimage?: {
+						proposedCall?: {
+							args?: Record<string, unknown>;
+						};
+					};
+				},
+				index: number
+			) => {
 				posts.push({
 					createdAt: proposal.createdAt,
 					description: proposal.description || '',
@@ -160,7 +178,8 @@ export class SubsquidService extends SubsquidQueries {
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
-					voteMetrics: voteMetrics[Number(index)]
+					voteMetrics: voteMetrics[Number(index)],
+					requestedAssetData: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined
 				});
 			}
 		);
