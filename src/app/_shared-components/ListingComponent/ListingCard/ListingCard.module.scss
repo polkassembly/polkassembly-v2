@@ -33,3 +33,7 @@
 .progressBarContainer {
     @apply flex bg-voting_bar_bg text-white p-3 w-48 rounded-md flex-col;
 }
+
+.commentContainer {
+    @apply flex items-center gap-1;
+}

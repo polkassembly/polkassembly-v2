@@ -4,11 +4,13 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
-import { EProposalType, IOnChainPostListing } from '@/_shared/types';
+import { EProposalType, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import Link from 'next/link';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import Image from 'next/image';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import CommentIcon from '@assets/icons/Comment.svg';
 import Address from '../../Profile/Address/Address';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 import styles from './ListingCard.module.scss';
@@ -26,12 +28,14 @@ function ListingCard({
 	onChainInfo: { proposer, createdAt, origin, status, voteMetrics },
 	backgroundColor,
 	proposalType,
+	metrics = { reactions: { like: 0, dislike: 0 }, comments: 0 },
 	index
 }: {
 	title: string;
 	onChainInfo: IOnChainPostListing;
 	backgroundColor: string;
 	proposalType: string;
+	metrics?: IPostOffChainMetrics;
 	index: number;
 }) {
 	const network = getCurrentNetwork();
@@ -66,6 +70,17 @@ function ListingCard({
 								<span className={`${getSpanStyle(origin, 1)} ${styles.originStyle}`}>{origin}</span>
 							</span>
 						)}
+						<span>|</span>
+						<div className={styles.commentContainer}>
+							<Image
+								src={CommentIcon}
+								alt='voting_bar'
+								width={16}
+								height={16}
+							/>
+							<span>{metrics?.comments || 0}</span>
+						</div>
+
 						<span>|</span>
 						<Tooltip>
 							<TooltipTrigger asChild>

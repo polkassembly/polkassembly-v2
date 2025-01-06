@@ -80,6 +80,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 						title={item.title || 'Untitled'}
 						onChainInfo={onChainInfo}
 						proposalType={item.proposalType}
+						metrics={item.metrics}
 						index={item.index ?? 0}
 					/>
 				</div>
