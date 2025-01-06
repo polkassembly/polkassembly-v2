@@ -7,8 +7,9 @@ import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
-import BlockEditor from '../BlockEditor/BlockEditor';
+// import BlockEditor from '../BlockEditor/BlockEditor';
 import { Skeleton } from '../Skeleton';
+import BlockEditor from '../BlockEditor/BlockEditor';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	return (

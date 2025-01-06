@@ -10,13 +10,18 @@ import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Paragraph from '@editorjs/paragraph';
 import Header from '@editorjs/header';
+import Image from '@editorjs/image';
 import { cn } from '@/lib/utils';
+import { convertMarkdownToHtml } from '@/app/_client-utils/markdownToHtml';
+import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
+import classes from './BlockEditor.module.scss';
 
 const EDITOR_TOOLS = {
 	header: Header,
 	paragraph: Paragraph,
 	table: Table,
-	list: List
+	list: List,
+	image: Image
 };
 
 function BlockEditor({
@@ -59,7 +64,15 @@ function BlockEditor({
 				onReady: async () => {
 					if (data) {
 						if (renderFromHtml) {
-							await editor.blocks.renderFromHTML(data as string);
+							const htmlString = await convertMarkdownToHtml(data as string);
+
+							const blocks = convertHtmlToBlocks(htmlString as string);
+
+							await editor.blocks.render({
+								blocks,
+								time: Date.now(),
+								version: '2.30.7'
+							});
 						} else {
 							await editor.blocks.render(data as unknown as OutputData);
 						}
@@ -88,7 +101,7 @@ function BlockEditor({
 
 	return (
 		<div
-			className={cn('max-h-[400px] overflow-y-auto rounded-md border border-border_grey', !readOnly && 'min-h-[150px] px-4 py-2', className)}
+			className={cn('max-h-[400px] overflow-y-auto rounded-md border border-border_grey', !readOnly && 'min-h-[150px] px-4 py-2', classes.blockEditor, className)}
 			id={`block-editor-${id}`}
 		/>
 	);
