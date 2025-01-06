@@ -5,7 +5,7 @@
 'use client';
 
 import React, { memo, useEffect, useImperativeHandle, useRef } from 'react';
-import EditorJS, { OutputData } from '@editorjs/editorjs';
+import EditorJS, { OutputData, BlockToolConstructable } from '@editorjs/editorjs';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Paragraph from '@editorjs/paragraph';
@@ -14,15 +14,8 @@ import Image from '@editorjs/image';
 import { cn } from '@/lib/utils';
 import { convertMarkdownToHtml } from '@/app/_client-utils/markdownToHtml';
 import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import classes from './BlockEditor.module.scss';
-
-const EDITOR_TOOLS = {
-	header: Header,
-	paragraph: Paragraph,
-	table: Table,
-	list: List,
-	image: Image
-};
 
 function BlockEditor({
 	data,
@@ -43,6 +36,8 @@ function BlockEditor({
 }) {
 	const blockEditorRef = useRef<EditorJS>(null);
 
+	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
+
 	const clearEditor = () => {
 		blockEditorRef?.current?.blocks?.clear?.();
 	};
@@ -59,7 +54,53 @@ function BlockEditor({
 				readOnly,
 				minHeight: 400,
 				holder: `block-editor-${id}`,
-				tools: EDITOR_TOOLS,
+				inlineToolbar: true,
+				tools: {
+					header: {
+						class: Header as unknown as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					list: {
+						class: List as unknown as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					table: {
+						class: Table as unknown as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					paragraph: {
+						class: Paragraph as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					image: {
+						class: Image,
+						inlineToolbar: true,
+						config: {
+							uploader: {
+								uploadByFile: async (file: File) => {
+									const form = new FormData();
+									form.append('image', file, `${file.name}`);
+									const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
+										body: form,
+										method: 'POST'
+									});
+									const uploadData = await res.json();
+									if (uploadData?.success) {
+										return {
+											success: 1,
+											file: {
+												url: uploadData.data.url
+											}
+										};
+									}
+									return {
+										success: 0
+									};
+								}
+							}
+						}
+					}
+				},
 				data: data as unknown as OutputData,
 				onReady: async () => {
 					if (data) {
