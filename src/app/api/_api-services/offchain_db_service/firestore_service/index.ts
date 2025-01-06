@@ -294,6 +294,7 @@ export class FirestoreService extends FirestoreRefs {
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
 			return commentsWithUser
 				.filter((comment) => comment.parentCommentId === parentId)
+				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
 					...comment,
 					children: buildCommentTree(comment.id)
