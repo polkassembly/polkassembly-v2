@@ -9,6 +9,7 @@ import { FaRegClock } from 'react-icons/fa6';
 import { AiOutlineLike, AiOutlineDislike, AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { IoShareSocialOutline } from 'react-icons/io5';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
+import { useUser } from '@/hooks/useUser';
 import LikeGif from '@assets/reactions/Liked-Colored.gif';
 import VoteIcon from '@assets/activityfeed/vote.svg';
 import dayjs from 'dayjs';
@@ -16,6 +17,7 @@ import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styles from './ActivityFeedPostItem.module.scss';
 import Address from '../Profile/Address/Address';
+import Link from 'next/link';
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
@@ -53,9 +55,11 @@ const POST_LABEL = 'Post';
 const ANIMATION_DURATION = 1500;
 
 function ActivityFeedPostItem({ postData }: { postData: PostData }) {
+	const { user } = useUser();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
+
 	const [reactionState, setReactionState] = useState<ReactionState>({
 		isLiked: false,
 		isDisliked: false,
@@ -109,7 +113,9 @@ function ActivityFeedPostItem({ postData }: { postData: PostData }) {
 							width={20}
 							height={20}
 						/>
-						<span>Cast Vote</span>
+						<Link href='/login'>
+							<span>{user?.id ? 'Cast Vote' : 'Login to vote'}</span>
+						</Link>
 					</span>
 				</div>
 			</div>
