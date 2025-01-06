@@ -174,8 +174,8 @@ function BlockEditor({
 		<div
 			ref={containerRef}
 			className={cn(
-				'relative rounded-md border border-border_grey',
-				!readOnly && 'min-h-[150px] px-4 py-2',
+				'relative z-10 rounded-md border border-border_grey',
+				!readOnly && 'z-20 min-h-[150px] px-4 py-2',
 				shouldScroll && 'max-h-[400px] overflow-y-auto',
 				classes.blockEditor,
 				className
