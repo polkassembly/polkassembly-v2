@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import BN from 'bn.js';
+import { ENetwork } from '@/_shared/types';
 
 interface Options {
 	numberAfterComma?: number;
@@ -11,9 +11,9 @@ interface Options {
 	withThousandDelimitor?: boolean;
 }
 
-export const formatBnBalance = (value: BN | string, options: Options, network: string): string => {
-	const tokenDecimals = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.tokenDecimals;
-	const valueString = String(value);
+export function formatBnBalance(value: string, options: Options, network: ENetwork, assetId?: string): string {
+	const tokenDecimals = assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
+	const valueString = value.toString();
 
 	let suffix = '';
 	let prefix = '';
@@ -23,14 +23,14 @@ export const formatBnBalance = (value: BN | string, options: Options, network: s
 		prefix = valueString.slice(0, valueString.length - tokenDecimals);
 	} else {
 		prefix = '0';
-		suffix = valueString.padStart(tokenDecimals - 1, '0');
+		suffix = valueString.padStart(tokenDecimals, '0');
 	}
 
 	let comma = '.';
 	const { numberAfterComma, withThousandDelimitor = true, withUnit } = options;
 	const numberAfterCommaLtZero = numberAfterComma && numberAfterComma < 0;
 
-	if (numberAfterCommaLtZero || numberAfterComma === 0) {
+	if (numberAfterCommaLtZero || numberAfterComma === 0 || suffix === '') {
 		comma = '';
 		suffix = '';
 	} else if (numberAfterComma && numberAfterComma > 0) {
@@ -41,7 +41,7 @@ export const formatBnBalance = (value: BN | string, options: Options, network: s
 		prefix = prefix.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}
 
-	const unit = withUnit ? ` ${NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.tokenSymbol}` : '';
+	const unit = withUnit ? (assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.symbol : NETWORKS_DETAILS[`${network}`]?.tokenSymbol) : '';
 
-	return `${prefix}${comma}${suffix}${unit}`;
-};
+	return `${prefix}${comma}${suffix} ${unit}`;
+}

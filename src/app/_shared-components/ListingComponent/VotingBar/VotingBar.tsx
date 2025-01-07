@@ -32,21 +32,21 @@ export default function VotingBar({ ayePercent, nayPercent }: { ayePercent: numb
 			<path
 				d={`M 10 ${height} A ${radius} ${radius} 0 0 1 ${width - 10} ${height}`}
 				fill='none'
-				stroke='#d3d3d3'
+				className={styles.progress_default}
 				strokeWidth={strokeWidth}
 			/>
 
 			<path
 				d={createArc(ayePercent, true)}
 				fill='none'
-				stroke='#27d57b'
+				className={styles.progress_aye}
 				strokeWidth={strokeWidth}
 				strokeLinecap='butt'
 			/>
 			<path
 				d={createArc(nayPercent, false)}
 				fill='none'
-				stroke='#fc3e5d'
+				className={styles.progress_nay}
 				strokeWidth={strokeWidth}
 				strokeLinecap='butt'
 			/>

@@ -9,6 +9,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidQueries } from './subsquidQueries';
+import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidQueries {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -84,7 +85,7 @@ export class SubsquidService extends SubsquidQueries {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
-			reward: proposal.reward
+			requestedAssetData: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined
 		} as IOnChainPostInfo;
 	}
 
@@ -160,7 +161,11 @@ export class SubsquidService extends SubsquidQueries {
 					proposer?: string;
 					status?: EProposalStatus;
 					hash?: string;
-					reward?: string;
+					preimage?: {
+						proposedCall?: {
+							args?: Record<string, unknown>;
+						};
+					};
 				},
 				index: number
 			) => {
@@ -174,7 +179,7 @@ export class SubsquidService extends SubsquidQueries {
 					type: proposalType,
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
-					reward: proposal.reward
+					requestedAssetData: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined
 				});
 			}
 		);

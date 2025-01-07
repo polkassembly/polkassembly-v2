@@ -1,3 +1,36 @@
 .postTitle {
     @apply mb-2 text-xl font-semibold text-text_primary
 }
+
+.requestedWrapper {
+    @apply mb-2 flex flex-col items-start gap-2 lg:flex-row lg:items-center
+}
+
+.requestedText {
+    @apply text-base text-listing_page_btn lg:text-lg
+}
+
+.requestedAmount {
+    @apply text-base font-semibold text-text_pink lg:text-lg
+}
+
+.proposerWrapper {
+    @apply flex flex-col flex-wrap gap-2 lg:flex-row lg:items-center
+}
+
+.beneficiaryWrapper {
+    @apply flex flex-wrap items-center gap-x-2
+}
+
+.beneficiaryText {
+    @apply text-xs text-wallet_btn_text
+}
+
+.beneficiaryTooltipContent {
+    @apply flex flex-col gap-y-2 bg-bg_modal shadow-lg
+}
+
+
+
+
+

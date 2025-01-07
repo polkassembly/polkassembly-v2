@@ -4,20 +4,18 @@
 
 'use client';
 
-import React, { memo, useEffect, useImperativeHandle, useRef } from 'react';
-import EditorJS, { OutputData } from '@editorjs/editorjs';
+import React, { memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import EditorJS, { OutputData, BlockToolConstructable } from '@editorjs/editorjs';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Paragraph from '@editorjs/paragraph';
 import Header from '@editorjs/header';
+import Image from '@editorjs/image';
 import { cn } from '@/lib/utils';
-
-const EDITOR_TOOLS = {
-	header: Header,
-	paragraph: Paragraph,
-	table: Table,
-	list: List
-};
+import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
+import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
 	data,
@@ -36,7 +34,12 @@ function BlockEditor({
 	renderFromHtml?: boolean;
 	ref?: React.RefObject<{ clearEditor: () => void } | null>;
 }) {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const [shouldScroll, setShouldScroll] = useState(false);
+
 	const blockEditorRef = useRef<EditorJS>(null);
+
+	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
 	const clearEditor = () => {
 		blockEditorRef?.current?.blocks?.clear?.();
@@ -54,12 +57,69 @@ function BlockEditor({
 				readOnly,
 				minHeight: 400,
 				holder: `block-editor-${id}`,
-				tools: EDITOR_TOOLS,
+				inlineToolbar: true,
+				tools: {
+					header: {
+						class: Header as unknown as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					list: {
+						class: List as unknown as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					table: {
+						class: Table as unknown as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					paragraph: {
+						class: Paragraph as BlockToolConstructable,
+						inlineToolbar: true
+					},
+					image: {
+						class: Image,
+						inlineToolbar: true,
+						config: {
+							features: {
+								caption: false
+							},
+							uploader: {
+								uploadByFile: async (file: File) => {
+									const form = new FormData();
+									form.append('image', file, `${file.name}`);
+									const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
+										body: form,
+										method: 'POST'
+									});
+									const uploadData = await res.json();
+									if (uploadData?.success) {
+										return {
+											success: 1,
+											file: {
+												url: uploadData.data.url
+											}
+										};
+									}
+									return {
+										success: 0
+									};
+								}
+							}
+						}
+					}
+				},
 				data: data as unknown as OutputData,
 				onReady: async () => {
 					if (data) {
 						if (renderFromHtml) {
-							await editor.blocks.renderFromHTML(data as string);
+							const htmlString = convertMarkdownToHtml(data as string);
+
+							const blocks = convertHtmlToBlocks(htmlString as string);
+
+							await editor.blocks.render({
+								blocks,
+								time: Date.now(),
+								version: '2.30.7'
+							});
 						} else {
 							await editor.blocks.render(data as unknown as OutputData);
 						}
@@ -71,6 +131,9 @@ function BlockEditor({
 					const edJsData = await api.saver.save();
 					// const htmlArr = edjsParser.parse(edJsData);
 					onChange?.(edJsData);
+					// if (containerRef.current) {
+					// api.blocks.getBlockByElement(containerRef.current)?.holder.scrollIntoView();
+					// }
 				},
 				placeholder: 'Type your comment here'
 			});
@@ -86,9 +149,37 @@ function BlockEditor({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	// make div scrollable if content is more than 400px
+	useEffect(() => {
+		const checkHeight = () => {
+			if (containerRef.current) {
+				const contentHeight = containerRef.current.getBoundingClientRect().height;
+				setShouldScroll(contentHeight >= 400);
+			}
+		};
+		checkHeight();
+
+		// resize observer to check height changes
+		const observer = new ResizeObserver(checkHeight);
+		if (containerRef.current) {
+			observer.observe(containerRef.current);
+		}
+
+		return () => {
+			observer.disconnect();
+		};
+	}, []);
+
 	return (
 		<div
-			className={cn('max-h-[400px] overflow-y-auto rounded-md border border-border_grey', !readOnly && 'min-h-[150px] px-4 py-2', className)}
+			ref={containerRef}
+			className={cn(
+				'relative z-10 rounded-md border border-border_grey',
+				!readOnly && 'z-20 min-h-[150px] px-4 py-2',
+				shouldScroll && 'max-h-[400px] overflow-y-auto',
+				classes.blockEditor,
+				className
+			)}
 			id={`block-editor-${id}`}
 		/>
 	);
