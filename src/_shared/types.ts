@@ -396,6 +396,7 @@ export interface IOnChainPostInfo {
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	requestedAssetData?: IRequestedAssetData;
+	decisionPeriodEndsAt?: Date;
 }
 
 export interface IPost extends IOffChainPost {
@@ -413,6 +414,7 @@ export interface IOnChainPostListing {
 	hash: string;
 	voteMetrics?: IVoteMetrics;
 	requestedAssetData?: IRequestedAssetData;
+	decisionPeriodEndsAt?: Date;
 }
 
 export interface IPostListing extends IOffChainPost {

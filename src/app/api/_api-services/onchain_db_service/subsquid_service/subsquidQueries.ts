@@ -18,6 +18,10 @@ export class SubsquidQueries {
 						args
 					}
 				}
+				statusHistory {
+					status
+					timestamp
+				}
 			}
 		}
 	`;
@@ -37,6 +41,10 @@ export class SubsquidQueries {
 						args
 					}
 				}
+				statusHistory {
+					status
+					timestamp
+				}
 			}
 		}
 	`;
@@ -55,6 +63,10 @@ export class SubsquidQueries {
 					proposedCall {
 						args
 					}
+				}
+				statusHistory {
+					status
+					timestamp
 				}
 			}
 
@@ -79,6 +91,10 @@ export class SubsquidQueries {
 						args
 					}
 				}
+				statusHistory {
+					status
+					timestamp
+				}
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_in: $status_in}) {
@@ -102,6 +118,10 @@ export class SubsquidQueries {
 						args
 					}
 				}
+				statusHistory {
+					status
+					timestamp
+				}
 			}
 
 			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, origin_in: $origin_in}) {
@@ -124,6 +144,10 @@ export class SubsquidQueries {
 					proposedCall {
 						args
 					}
+				}
+				statusHistory {
+					status
+					timestamp
 				}
 			}
 
