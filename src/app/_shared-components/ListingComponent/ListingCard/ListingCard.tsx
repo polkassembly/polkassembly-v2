@@ -17,16 +17,21 @@ import styles from './ListingCard.module.scss';
 import StatusTag from '../../StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import VotingBar from '../VotingBar/VotingBar';
+import { Progress } from '../../progress';
 
-const calculatePercentage = (value: string, totalValue: bigint) => {
-	if (totalValue === BigInt(0)) return 0;
-	const valueBI = BigInt(value);
-	return Number((valueBI * BigInt(100) * BigInt(100)) / totalValue) / 100;
+const calculatePercentage = (value: string | number, totalValue: bigint | number) => {
+	if (typeof totalValue === 'bigint') {
+		if (totalValue === BigInt(0)) return 0;
+		const valueBI = BigInt(value);
+		return Number((valueBI * BigInt(100) * BigInt(100)) / totalValue) / 100;
+	}
+	if (totalValue === 0) return 0;
+	return (Number(value) * 100) / totalValue;
 };
 
 function ListingCard({
 	title,
-	onChainInfo: { proposer, createdAt, origin, status, voteMetrics },
+	onChainInfo: { proposer, createdAt, origin, status, voteMetrics, decisionPeriodEndsAt, beneficiaries },
 	backgroundColor,
 	proposalType,
 	metrics = { reactions: { like: 0, dislike: 0 }, comments: 0 },
@@ -39,12 +44,38 @@ function ListingCard({
 	metrics?: IPostOffChainMetrics;
 	index: number;
 }) {
+	console.log(beneficiaries);
 	const network = getCurrentNetwork();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
 	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
-
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
 	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
+
+	const getTimeRemaining = (endDate: Date | string) => {
+		const now = dayjs();
+		const end = dayjs(endDate);
+		const diff = end.diff(now);
+		if (diff <= 0) return null;
+		const duration = dayjs.duration(diff);
+		const days = Math.floor(duration.asDays());
+		const hours = Math.floor(duration.hours());
+		const minutes = Math.floor(duration.minutes());
+
+		return `Deciding ends in ${days}d : ${hours}hrs : ${minutes}mins`;
+	};
+
+	const calculateDecisionProgress = () => {
+		if (!decisionPeriodEndsAt) return 0;
+		const now = dayjs();
+		const endDate = dayjs(decisionPeriodEndsAt);
+		const startDate = endDate.subtract(28, 'days');
+		if (now.isAfter(endDate)) return 100;
+		if (now.isBefore(startDate)) return 0;
+		return (now.diff(startDate, 'minutes') / (28 * 24 * 60)) * 100;
+	};
+
+	const decisionPeriodPercentage = calculateDecisionProgress();
+	const timeRemaining = decisionPeriodEndsAt ? getTimeRemaining(decisionPeriodEndsAt) : null;
 
 	return (
 		<Link
@@ -81,7 +112,31 @@ function ListingCard({
 							/>
 							<span>{metrics?.comments || 0}</span>
 						</div>
-
+						<div>
+							{timeRemaining && (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<div className='flex items-center gap-1'>
+											<span>|</span>
+											<div className='w-8'>
+												<Progress
+													value={decisionPeriodPercentage}
+													className='h-1.5 bg-decision_bar_bg'
+												/>
+											</div>
+										</div>
+									</TooltipTrigger>
+									<TooltipContent
+										side='top'
+										align='center'
+									>
+										<div className={styles.timeBarContainer}>
+											<p>{timeRemaining}</p>
+										</div>
+									</TooltipContent>
+								</Tooltip>
+							)}
+						</div>
 						<span>|</span>
 						<Tooltip>
 							<TooltipTrigger asChild>

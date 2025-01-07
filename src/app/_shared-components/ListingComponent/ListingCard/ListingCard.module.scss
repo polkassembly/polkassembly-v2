@@ -37,3 +37,7 @@
 .commentContainer {
     @apply flex items-center gap-1;
 }
+
+.timeBarContainer {
+    @apply flex bg-voting_bar_bg text-white p-3 w-56 rounded-md flex-col;
+}
