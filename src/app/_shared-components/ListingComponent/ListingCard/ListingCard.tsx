@@ -16,7 +16,9 @@ import Address from '@ui/Profile/Address/Address';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
+import { calculateDecisionProgress, getTimeRemaining } from '@/app/_client-utils/timeUtils';
 import { Progress } from '@ui/progress';
+import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
 import DOTIcon from '@assets/icons/dot.png';
@@ -58,40 +60,9 @@ function ListingCard({
 		usdt: USDTIcon,
 		dot: DOTIcon
 	};
-
-	const groupedByAsset = beneficiaries?.reduce((acc: Record<string, number>, curr) => {
-		const assetId = curr.assetId || NETWORKS_DETAILS[`${network}`].tokenSymbol;
-
-		acc[`${assetId}`] = (acc[`${assetId}`] || 0) + Number(curr.amount);
-		return acc;
-	}, {});
-
-	const getTimeRemaining = (endDate: Date | string) => {
-		const now = dayjs();
-		const end = dayjs(endDate);
-		const diff = end.diff(now);
-		if (diff <= 0) return null;
-		const duration = dayjs.duration(diff);
-		const days = Math.floor(duration.asDays());
-		const hours = Math.floor(duration.hours());
-		const minutes = Math.floor(duration.minutes());
-
-		return `Deciding ends in ${days}d : ${hours}hrs : ${minutes}mins`;
-	};
-
-	const calculateDecisionProgress = () => {
-		if (!decisionPeriodEndsAt) return 0;
-		const now = dayjs();
-		const endDate = dayjs(decisionPeriodEndsAt);
-		const startDate = endDate.subtract(28, 'days');
-		if (now.isAfter(endDate)) return 100;
-		if (now.isBefore(startDate)) return 0;
-		return (now.diff(startDate, 'minutes') / (28 * 24 * 60)) * 100;
-	};
-
-	const decisionPeriodPercentage = calculateDecisionProgress();
+	const decisionPeriodPercentage = decisionPeriodEndsAt ? calculateDecisionProgress(decisionPeriodEndsAt) : 0;
 	const timeRemaining = decisionPeriodEndsAt ? getTimeRemaining(decisionPeriodEndsAt) : null;
-
+	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 	return (
 		<Link
 			href={`/referenda/${index}`}
@@ -185,7 +156,7 @@ function ListingCard({
 				<div className='flex'>
 					<StatusTag status={status} />
 				</div>
-				{beneficiaries && beneficiaries.length > 0 && groupedByAsset && (
+				{beneficiaries && beneficiaries.length > 0 && groupBeneficiariesByAsset(beneficiaries, network) && (
 					<div className='flex flex-wrap items-center gap-x-2'>
 						{beneficiaries.length > 1 ? (
 							<Tooltip>
