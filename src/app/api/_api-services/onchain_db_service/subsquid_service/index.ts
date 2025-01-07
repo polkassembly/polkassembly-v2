@@ -105,7 +105,9 @@ export class SubsquidService extends SubsquidQueries {
 			description: proposal.description || '',
 			voteMetrics,
 			beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+			preparePeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getPreparePeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined,
 			decisionPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getDecisionPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined,
+			confirmationPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getConfirmationPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined,
 			timeline: proposal.statusHistory as IStatusHistoryItem[]
 		};
 	}

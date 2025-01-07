@@ -129,4 +129,68 @@ export class SubsquidUtils {
 			return null;
 		}
 	}
+
+	public static getPreparePeriodEnd(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): Date | null {
+		try {
+			// Find submitted status block
+			const submittedStatus = statusHistory.find((status) => status.status === EProposalStatus.Submitted);
+			if (!submittedStatus?.timestamp) {
+				return null;
+			}
+
+			// Get block time and track data from network properties
+			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
+			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
+			const preparePeriod = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks]?.preparePeriod;
+
+			if (!preparePeriod) {
+				console.error('Prepare period not found for network:', network);
+				return null;
+			}
+
+			// Convert prepare period blocks to milliseconds
+			const preparePeriodMs = Number(preparePeriod) * blockTime;
+
+			// Calculate end date by adding prepare period to submitted timestamp
+			const submittedStartDate = dayjs(submittedStatus.timestamp);
+			const endDate = submittedStartDate.add(preparePeriodMs, 'millisecond');
+
+			return endDate.toDate();
+		} catch (error) {
+			console.error('Error calculating prepare period end:', error);
+			return null;
+		}
+	}
+
+	public static getConfirmationPeriodEnd(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): Date | null {
+		try {
+			// Find confirm started status block
+			const confirmStartedStatus = statusHistory.find((status) => status.status === EProposalStatus.ConfirmStarted);
+			if (!confirmStartedStatus?.timestamp) {
+				return null;
+			}
+
+			// Get block time and track data from network properties
+			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
+			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
+			const confirmPeriod = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks]?.confirmPeriod;
+
+			if (!confirmPeriod) {
+				console.error('Confirm period not found for network:', network);
+				return null;
+			}
+
+			// Convert confirm period blocks to milliseconds
+			const confirmPeriodMs = Number(confirmPeriod) * blockTime;
+
+			// Calculate end date by adding confirm period to confirm started timestamp
+			const confirmStartDate = dayjs(confirmStartedStatus.timestamp);
+			const endDate = confirmStartDate.add(confirmPeriodMs, 'millisecond');
+
+			return endDate.toDate();
+		} catch (error) {
+			console.error('Error calculating confirmation period end:', error);
+			return null;
+		}
+	}
 }

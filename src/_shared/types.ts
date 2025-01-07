@@ -397,7 +397,9 @@ export interface IOnChainPostInfo {
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	preparePeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
+	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 }
 
