@@ -11,7 +11,7 @@ interface Options {
 	withThousandDelimitor?: boolean;
 }
 
-export function formatBnBalance(value: string, options: Options, network: ENetwork, assetId?: string): string {
+export function formatBnBalance(value: string, options: Options, network: ENetwork, assetId?: string | null): string {
 	const tokenDecimals = assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
 	const valueString = value.toString();
 

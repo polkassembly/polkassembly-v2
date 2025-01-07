@@ -15,9 +15,9 @@ import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
-import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
+import Address from '../../Profile/Address/Address';
 
 function SingleComment({ commentData, proposalType, index }: { commentData: ICommentResponse; proposalType: EProposalType; index: string }) {
 	const [reply, setReply] = useState<boolean>(false);
@@ -38,7 +38,12 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 			</div>
 			<div className={classes.innerWrapper}>
 				<div className='flex items-center gap-x-2'>
-					<span className={classes.username}>{comment.user.username || shortenAddress(comment.user.addresses[0])}</span>
+					<span className={classes.username}>
+						<Address
+							address={comment.user.addresses[0]}
+							showIdenticon={false}
+						/>
+					</span>
 					<Separator
 						orientation='vertical'
 						className='h-3'
