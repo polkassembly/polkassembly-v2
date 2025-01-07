@@ -85,6 +85,7 @@ export class SubsquareOffChainService {
 		}
 	}
 
+	// TODO: IMPLEMENT THIS
 	static async GetOffChainPostsListing({
 		network,
 		proposalType,

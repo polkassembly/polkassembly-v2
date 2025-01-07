@@ -15,6 +15,12 @@ interface IStatusHistory {
 	timestamp: string;
 }
 
+interface IPeriodEndDates {
+	decisionPeriodEnd: Date | null;
+	preparePeriodEnd: Date | null;
+	confirmationPeriodEnd: Date | null;
+}
+
 export class SubsquidUtils {
 	/**
 	 * Helper to extract beneficiary address from complex object structure
@@ -98,35 +104,48 @@ export class SubsquidUtils {
 		return result;
 	}
 
-	public static getDecisionPeriodEnd(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): Date | null {
-		try {
-			// Find deciding status block
-			const decidingStatus = statusHistory.find((status) => status.status === EProposalStatus.Deciding || status.status === EProposalStatus.DecisionDepositPlaced);
-			if (!decidingStatus?.timestamp) {
-				return null;
-			}
+	public static getAllPeriodEndDates(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): IPeriodEndDates {
+		const result: IPeriodEndDates = {
+			decisionPeriodEnd: null,
+			preparePeriodEnd: null,
+			confirmationPeriodEnd: null
+		};
 
-			// Get block time and track data from network properties
+		try {
 			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
 			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
-			const decisionPeriod = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks]?.decisionPeriod;
+			const trackData = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks];
 
-			if (!decisionPeriod) {
-				console.error('Decision period not found for network:', network);
-				return null;
+			if (!trackData) {
+				console.error('Track data not found for network:', network);
+				return result;
 			}
 
-			// Convert decision period blocks to milliseconds
-			const decisionPeriodMs = Number(decisionPeriod) * blockTime;
+			// Calculate decision period end
+			const decidingStatus = statusHistory.find((status) => status.status === EProposalStatus.Deciding || status.status === EProposalStatus.DecisionDepositPlaced);
+			if (decidingStatus?.timestamp && trackData.decisionPeriod) {
+				const decisionPeriodMs = Number(trackData.decisionPeriod) * blockTime;
+				result.decisionPeriodEnd = dayjs(decidingStatus.timestamp).add(decisionPeriodMs, 'millisecond').toDate();
+			}
 
-			// Calculate end date by adding decision period to deciding timestamp
-			const decidingStartDate = dayjs(decidingStatus.timestamp);
-			const endDate = decidingStartDate.add(decisionPeriodMs, 'millisecond');
+			// Calculate prepare period end
+			const submittedStatus = statusHistory.find((status) => status.status === EProposalStatus.Submitted);
+			if (submittedStatus?.timestamp && trackData.preparePeriod) {
+				const preparePeriodMs = Number(trackData.preparePeriod) * blockTime;
+				result.preparePeriodEnd = dayjs(submittedStatus.timestamp).add(preparePeriodMs, 'millisecond').toDate();
+			}
 
-			return endDate.toDate();
+			// Calculate confirmation period end
+			const confirmStartedStatus = statusHistory.find((status) => status.status === EProposalStatus.ConfirmStarted);
+			if (confirmStartedStatus?.timestamp && trackData.confirmPeriod) {
+				const confirmPeriodMs = Number(trackData.confirmPeriod) * blockTime;
+				result.confirmationPeriodEnd = dayjs(confirmStartedStatus.timestamp).add(confirmPeriodMs, 'millisecond').toDate();
+			}
+
+			return result;
 		} catch (error) {
-			console.error('Error calculating decision period end:', error);
-			return null;
+			console.error('Error calculating period end dates:', error);
+			return result;
 		}
 	}
 }

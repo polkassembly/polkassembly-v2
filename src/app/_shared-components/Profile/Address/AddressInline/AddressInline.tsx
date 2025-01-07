@@ -16,20 +16,23 @@ interface Props {
 	onChainIdentity: IOnChainIdentity;
 	addressDisplayText?: string;
 	iconSize?: number;
+	showIdenticon?: boolean;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20 }: Props) {
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true }: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
 			title={addressDisplayText || address}
 		>
-			<Identicon
-				className='image identicon'
-				value={address}
-				size={iconSize}
-				theme='polkadot'
-			/>
+			{showIdenticon && (
+				<Identicon
+					className='image identicon'
+					value={address}
+					size={iconSize}
+					theme='polkadot'
+				/>
+			)}
 
 			<IdentityBadge
 				onChainIdentity={onChainIdentity}

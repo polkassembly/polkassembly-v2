@@ -17,9 +17,10 @@ interface Props {
 	address: string;
 	truncateCharLen?: number;
 	iconSize?: number;
+	showIdenticon?: boolean;
 }
 
-function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Props) {
+function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true }: Props) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
@@ -50,6 +51,7 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20 }: Pro
 				onChainIdentity={identity as IOnChainIdentity}
 				addressDisplayText={displayText}
 				iconSize={iconSize}
+				showIdenticon={showIdenticon}
 			/>
 		</div>
 	);
