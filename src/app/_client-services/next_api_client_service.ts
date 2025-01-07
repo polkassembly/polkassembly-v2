@@ -59,6 +59,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.USER_EXISTS:
 				path = '/auth/actions/usernameExists';
+				method = 'POST';
 				break;
 			case EApiRoute.TFA_LOGIN:
 				path = '/auth/actions/tfa/login';
@@ -66,6 +67,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GEN_TFA_TOKEN:
 				path = '/auth/actions/tfa/setup/generate';
+				method = 'POST';
 				break;
 			case EApiRoute.VERIFY_TFA_TOKEN:
 				path = '/auth/actions/tfa/setup/verify';
@@ -73,6 +75,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.LOGOUT:
 				path = '/auth/actions/logout';
+				method = 'POST';
 				break;
 			// Dynamic routes
 			case EApiRoute.POSTS_LISTING:

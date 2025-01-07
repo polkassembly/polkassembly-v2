@@ -53,8 +53,11 @@ function PostHeader({
 							<span className={classes.requestedText}>Requested:</span>
 							<span className={classes.requestedAmount}>
 								{Object.entries(groupedByAsset).map(([assetId, amount], i) => (
-									<>
-										<span key={assetId}>
+									<span
+										className='flex items-center gap-x-1'
+										key={assetId}
+									>
+										<span>
 											{formatBnBalance(
 												amount.toString(),
 												{ withUnit: true, numberAfterComma: 2 },
@@ -63,7 +66,7 @@ function PostHeader({
 											)}
 										</span>
 										{i < Object.entries(groupedByAsset).length - 1 && <span className='text-text_primary'>&</span>}
-									</>
+									</span>
 								))}
 							</span>
 							<Separator
@@ -110,7 +113,7 @@ function PostHeader({
 							</div>
 							{beneficiaries.slice(0, 2).map((beneficiary) => (
 								<div
-									key={beneficiary.address}
+									key={beneficiary.amount}
 									className='flex items-center gap-x-1'
 								>
 									<Address address={beneficiary.address} />

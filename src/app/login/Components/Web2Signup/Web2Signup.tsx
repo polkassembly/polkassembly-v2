@@ -42,6 +42,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 		const { email, password, username, finalPassword } = values;
 
 		if (step === ESignupSteps.USERNAME && email && username) {
+			setLoading(true);
 			const { data, error } = await AuthClientService.checkForUsernameAndEmail({
 				username,
 				email
@@ -49,14 +50,17 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 
 			if (error) {
 				setErrorMessage(error.message);
+				setLoading(false);
 				return;
 			}
 
 			if (data && !data.usernameExists && !data.emailExists) {
 				setErrorMessage('');
 				setStep(ESignupSteps.PASSWORD);
+				setLoading(false);
 				return;
 			}
+			setLoading(false);
 			return;
 		}
 
@@ -115,7 +119,6 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 									},
 									required: true
 								}}
-								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Enter Username</FormLabel>
@@ -144,7 +147,6 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 									},
 									required: true
 								}}
-								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Enter Email</FormLabel>
