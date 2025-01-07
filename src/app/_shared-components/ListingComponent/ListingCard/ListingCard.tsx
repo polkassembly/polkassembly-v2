@@ -181,14 +181,14 @@ function ListingCard({
 					<div className='flex flex-wrap items-center gap-x-2'>
 						<span className={styles.requestedAmount}>
 							{Object.entries(groupedByAsset).map(([assetId, amount], i) => (
-								<>
-									<span key={assetId}>
+								<div key={assetId}>
+									<span>
 										{formatUSDWithUnits(
 											formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
 										)}
 									</span>
 									{i < Object.entries(groupedByAsset).length - 1 && <span className='text-text_primary'>&</span>}
-								</>
+								</div>
 							))}
 						</span>
 					</div>
