@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, IPost } from '@/_shared/types';
+import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
 import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -10,10 +10,12 @@ import classes from './PostDetails.module.scss';
 // import BlockEditor from '../BlockEditor/BlockEditor';
 import { Skeleton } from '../Skeleton';
 import BlockEditor from '../BlockEditor/BlockEditor';
+import { Tabs, TabsContent } from '../Tabs';
+import Timeline from './Timeline/Timeline';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	return (
-		<div>
+		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
 				<PostHeader
 					title={postData.title || ''}
@@ -27,13 +29,18 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 			<div className={classes.detailsWrapper}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
-						<BlockEditor
-							data={postData.content}
-							readOnly
-							renderFromHtml
-							className='max-h-full border-none'
-							id='post-content'
-						/>
+						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
+							<BlockEditor
+								data={postData.content}
+								readOnly
+								renderFromHtml
+								className='max-h-full border-none'
+								id='post-content'
+							/>
+						</TabsContent>
+						<TabsContent value={EPostDetailsTab.TIMELINE}>
+							<Timeline timeline={postData.onChainInfo?.timeline} />
+						</TabsContent>
 					</div>
 					<div className={classes.commentsBox}>
 						<Suspense fallback={<Skeleton className='h-4' />}>
@@ -45,7 +52,7 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 					</div>
 				</div>
 			</div>
-		</div>
+		</Tabs>
 	);
 }
 

@@ -5,9 +5,9 @@
 'use client';
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@ui/Tabs';
+import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, IBeneficiary } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IBeneficiary } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -146,12 +146,10 @@ function PostHeader({
 					)}
 				</div>
 			</div>
-			<Tabs defaultValue='description'>
-				<TabsList>
-					<TabsTrigger value='description'>DESCRIPTION</TabsTrigger>
-					<TabsTrigger value='timeline'>TIMELINE</TabsTrigger>
-				</TabsList>
-			</Tabs>
+			<TabsList>
+				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>DESCRIPTION</TabsTrigger>
+				<TabsTrigger value={EPostDetailsTab.TIMELINE}>TIMELINE</TabsTrigger>
+			</TabsList>
 		</div>
 	);
 }

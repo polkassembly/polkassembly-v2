@@ -8,11 +8,13 @@ import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 dayjs.extend(duration);
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
+dayjs.extend(advancedFormat);
 
 export { dayjs };
