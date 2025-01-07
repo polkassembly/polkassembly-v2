@@ -120,7 +120,8 @@ export class SubsquidService extends SubsquidQueries {
 		limit,
 		page,
 		statuses,
-		origins
+		origins,
+		notVotedByAddresses
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -128,6 +129,7 @@ export class SubsquidService extends SubsquidQueries {
 		page: number;
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
+		notVotedByAddresses?: string[];
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -139,6 +141,10 @@ export class SubsquidService extends SubsquidQueries {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
 		} else if (origins) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS;
+		}
+
+		if (notVotedByAddresses && statuses) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_WHERE_NOT_VOTED;
 		}
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
