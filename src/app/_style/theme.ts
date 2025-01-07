@@ -68,7 +68,6 @@ export const THEME_COLORS = {
 		btn_secondary_background: '#FFF',
 		btn_secondary_text: '#243A57',
 		border_grey: '#3F3F46',
-		sidebar_footer: '#302234',
 		dark_auction_bg: '#302234',
 		dark_auction_text: '#CCAED4',
 		dark_community_bg: '#1C2945',
@@ -89,6 +88,11 @@ export const THEME_COLORS = {
 		section_dark_overlay: '#0D0D0D',
 		page_background: '#F5F6F8',
 		small_btn_text: '#6D7F97',
-		bg_light_blue: '#E6F4FF'
+		bg_light_blue: '#E6F4FF',
+		sidebar_head1: '#2f3717',
+		sidebar_head2: '#3c371d',
+		sidebar_head3: '#3d2a23',
+		sidebar_head4: '#1d333c',
+		sidebar_footer: '#272727'
 	}
 };

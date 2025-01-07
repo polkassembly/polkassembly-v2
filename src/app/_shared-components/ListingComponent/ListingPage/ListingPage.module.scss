@@ -39,7 +39,7 @@
 }
 
 .popoverContent {
-    @apply w-56 border border-gray-300 bg-white p-2;
+    @apply w-56 border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-2;
 }
 
 .selectedicon {

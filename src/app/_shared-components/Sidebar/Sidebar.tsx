@@ -186,7 +186,7 @@ const Sidebar = forwardRef<
 				<SheetContent
 					data-sidebar='sidebar'
 					data-mobile='true'
-					className={`${styles.sidebarsheetcontent} m-0 bg-white p-0 [&>button]:hidden`}
+					className={`${styles.sidebarsheetcontent} m-0 bg-white p-0 dark:bg-section_dark_overlay [&>button]:hidden`}
 					style={
 						{
 							width: SIDEBAR_WIDTH_MOBILE
@@ -237,7 +237,7 @@ const Sidebar = forwardRef<
 			>
 				<div
 					data-sidebar='sidebar'
-					className={`${styles.sidebar_children} group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow`}
+					className={`${styles.sidebar_children} group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow dark:bg-section_dark_overlay`}
 				>
 					{children}
 				</div>
@@ -331,7 +331,7 @@ const SidebarContent = forwardRef<HTMLDivElement, ComponentProps<'div'>>(({ clas
 		<div
 			ref={ref}
 			data-sidebar='content'
-			className={cn(`hide_scrollbar ${styles.sidebar_content}`, className)}
+			className={cn(`hide_scrollbar dark:bg-section_dark_overlay ${styles.sidebar_content}`, className)}
 			style={{ height: 'calc(100vh - 60px)' }}
 			{...props}
 		/>
