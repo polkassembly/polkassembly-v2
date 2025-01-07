@@ -1,0 +1,35 @@
+.timelineWrapper {
+	@apply py-4 lg:px-10
+}
+
+.timelineHeader {
+	@apply mb-3 flex items-center gap-x-6
+}
+
+.timelineIconAndLine {
+	@apply flex w-5 justify-center
+}
+
+.timelineTitle {
+	@apply text-base text-text_pink
+}
+
+.timelineContent {
+	@apply flex items-stretch gap-x-6
+}
+
+.timelineLine {
+	@apply relative w-0.5 bg-bg_pink
+}
+
+.timelineDot {
+	@apply absolute -bottom-[5px] -left-[4px] h-2.5 w-2.5 rounded-full bg-bg_pink
+}
+
+.timelineItems {
+	@apply flex flex-1 flex-col gap-y-4
+}
+
+.timelineItem {
+	@apply flex w-full items-center justify-between
+}
