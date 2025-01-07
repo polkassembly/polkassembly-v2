@@ -1,5 +1,5 @@
 .container {
-    @apply lg:mx-auto bg-page_background px-5 lg:px-10 pt-8;
+    @apply lg:mx-auto bg-[var(--sidebar-background)] px-5 lg:px-10 pt-8;
 }
 
 .header {

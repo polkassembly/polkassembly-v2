@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar/Sidebar';
@@ -24,6 +25,9 @@ interface ISidebarMenuItem {
 }
 
 type State = 'collapsed' | 'expanded';
+
+const DARK_THEME_CLASS = 'dark-icons';
+const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
 
 function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
@@ -85,6 +89,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 
 function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 	const [isNestedOpen, setIsNestedOpen] = useState(false);
+	const { resolvedTheme: theme } = useTheme();
 
 	return (
 		<Collapsible
@@ -127,7 +132,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 												<Image
 													src={subItem.icon}
 													alt={subItem.title || 'icon'}
-													className={subItem.isActive ? style.sidebar_selected_icon : ''}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
 													width={20}
 													height={20}
 												/>
@@ -146,83 +151,82 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 	);
 }
 
-function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State }) {
-	const [isOpen, setIsOpen] = useState(false);
-
-	if (state === 'collapsed') {
-		return (
-			<SidebarMenuItem>
-				<div className={style.sidebarTrigger}>
-					<Popover>
-						<PopoverTrigger asChild>
-							<div className={style.triggerWrapper}>
-								{item.isNew && <span className={style.newBadge}>New</span>}
-								<SidebarMenuButton
-									size='lg'
-									tooltip={item.title}
-									className={`${style.sidebarButtonCollapse} ${item.isActive ? style.sidebarActive : ''}`}
-									onClick={() => {
-										if (!item.items?.length) {
-											window.location.href = item.url || '#';
-										}
-									}}
-								>
-									{item.icon && (
-										<div className={style.iconWrapper}>
-											<Image
-												src={item.icon}
-												alt={item.title || 'icon'}
-												className={item.isActive ? style.sidebar_selected_icon : ''}
-												width={24}
-												height={24}
-											/>
-										</div>
-									)}
-								</SidebarMenuButton>
-							</div>
-						</PopoverTrigger>
-
-						{item.items && (
-							<PopoverContent
-								side='right'
-								sideOffset={10}
-								className={style.popoverContent}
+function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: string | undefined }) {
+	return (
+		<SidebarMenuItem>
+			<div className={style.sidebarTrigger}>
+				<Popover>
+					<PopoverTrigger asChild>
+						<div className={style.triggerWrapper}>
+							{item.isNew && <span className={style.newBadge}>New</span>}
+							<SidebarMenuButton
+								size='lg'
+								tooltip={item.title}
+								className={`${style.sidebarButtonCollapse} ${item.isActive ? style.sidebarActive : ''}`}
+								onClick={() => {
+									if (!item.items?.length) {
+										window.location.href = item.url || '#';
+									}
+								}}
 							>
-								<ul className={style.menuList}>
-									{item.items.map((subItem) => (
-										<li key={subItem.title}>
-											{subItem.items ? (
-												<NestedPopover item={subItem} />
-											) : (
-												<Link
-													href={subItem.url || '#'}
-													className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
-												>
-													{subItem.icon && (
-														<div className={style.iconWrapper}>
-															<Image
-																src={subItem.icon}
-																alt={subItem.title || 'icon'}
-																width={24}
-																height={24}
-															/>
-														</div>
-													)}
-													<span>{subItem.title}</span>
-													{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
-												</Link>
-											)}
-										</li>
-									))}
-								</ul>
-							</PopoverContent>
-						)}
-					</Popover>
-				</div>
-			</SidebarMenuItem>
-		);
-	}
+								{item.icon && (
+									<div className={style.iconWrapper}>
+										<Image
+											src={item.icon}
+											alt={item.title || 'icon'}
+											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+											width={24}
+											height={24}
+										/>
+									</div>
+								)}
+							</SidebarMenuButton>
+						</div>
+					</PopoverTrigger>
 
+					{item.items && (
+						<PopoverContent
+							side='right'
+							sideOffset={10}
+							className={style.popoverContent}
+						>
+							<ul className={style.menuList}>
+								{item.items.map((subItem) => (
+									<li key={subItem.title}>
+										{subItem.items ? (
+											<NestedPopover item={subItem} />
+										) : (
+											<Link
+												href={subItem.url || '#'}
+												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
+											>
+												{subItem.icon && (
+													<div className={style.iconWrapper}>
+														<Image
+															src={subItem.icon}
+															alt={subItem.title || 'icon'}
+															className={`${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+															width={24}
+															height={24}
+														/>
+													</div>
+												)}
+												<span>{subItem.title}</span>
+												{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
+											</Link>
+										)}
+									</li>
+								))}
+							</ul>
+						</PopoverContent>
+					)}
+				</Popover>
+			</div>
+		</SidebarMenuItem>
+	);
+}
+
+function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: string | undefined }) {
 	return (
 		<SidebarMenuItem>
 			<Collapsible
@@ -242,7 +246,7 @@ function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State
 									<Image
 										src={item.icon}
 										alt={item.title || 'icon'}
-										className={item.isActive ? style.sidebar_selected_icon : ''}
+										className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
 										width={24}
 										height={24}
 									/>
@@ -268,7 +272,7 @@ function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State
 										<Image
 											src={item.icon}
 											alt={item.title || 'icon'}
-											className={item.isActive ? style.sidebar_selected_icon : ''}
+											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
 											width={24}
 											height={24}
 										/>
@@ -311,6 +315,25 @@ function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State
 				)}
 			</Collapsible>
 		</SidebarMenuItem>
+	);
+}
+
+function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State }) {
+	const [isOpen, setIsOpen] = useState(false);
+	const { resolvedTheme: theme } = useTheme();
+
+	return state === 'collapsed' ? (
+		<CollapsedState
+			item={item}
+			theme={theme}
+		/>
+	) : (
+		<ExpandedState
+			item={item}
+			isOpen={isOpen}
+			setIsOpen={setIsOpen}
+			theme={theme}
+		/>
 	);
 }
 

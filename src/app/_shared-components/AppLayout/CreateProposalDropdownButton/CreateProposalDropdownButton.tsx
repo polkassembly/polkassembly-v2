@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-component
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
+import { useTheme } from 'next-themes';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import style from './CreateProposalDropdownButton.module.scss';
@@ -21,6 +22,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 		{ title: 'Proposal', icon: ProposalIcon, url: '#' },
 		{ title: 'Discussion Post', icon: DiscussionIcon, url: '#' }
 	];
+
+	const { resolvedTheme: theme } = useTheme();
 
 	return (
 		<div className={`${style.card} mt-4 p-[2px] ${state === 'collapsed' ? 'w-full' : 'mx-4 lg:w-[200px]'}`}>
@@ -57,6 +60,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 									alt='Dropdown Icon'
 									width={20}
 									height={20}
+									className={`${theme === 'dark' ? 'dark-icons' : ''}`}
 								/>
 
 								<Link

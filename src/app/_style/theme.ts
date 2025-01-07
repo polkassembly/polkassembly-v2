@@ -51,7 +51,8 @@ export const THEME_COLORS = {
 		voting_bar_bg: '#575255',
 		progress_default: '#d3d3d3',
 		progress_aye: '#27d57b',
-		progress_nay: '#fc3e5d'
+		progress_nay: '#fc3e5d',
+		sidebar_accent: '#e5e7eb'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',
@@ -93,6 +94,7 @@ export const THEME_COLORS = {
 		sidebar_head2: '#3c371d',
 		sidebar_head3: '#3d2a23',
 		sidebar_head4: '#1d333c',
-		sidebar_footer: '#272727'
+		sidebar_footer: '#272727',
+		sidebar_accent: '#FFFFFF14'
 	}
 };

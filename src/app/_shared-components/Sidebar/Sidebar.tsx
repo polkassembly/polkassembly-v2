@@ -268,7 +268,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 				<Image
 					src={LeftIcon}
 					alt='Left Icon'
-					className='h-5 w-5'
+					className='dark-icons h-5 w-5'
 					width={5}
 					height={5}
 				/>
@@ -276,7 +276,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 				<Image
 					src={RightIcon}
 					alt='Right Icon'
-					className='h-5 w-5'
+					className='dark-icons h-5 w-5'
 					width={5}
 					height={5}
 				/>
