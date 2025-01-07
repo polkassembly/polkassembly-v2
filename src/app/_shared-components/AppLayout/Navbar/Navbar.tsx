@@ -8,6 +8,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
+import ToggleButton from '@ui/ToggleButton';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import classes from './Navbar.module.scss';
 
@@ -28,6 +29,7 @@ function Navbar() {
 					<Button>Login</Button>
 				</Link>
 			)}
+			<ToggleButton />
 		</nav>
 	);
 }
