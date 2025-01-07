@@ -78,107 +78,111 @@ function ListingCard({
 				<div className='flex flex-col gap-1'>
 					<h3 className={styles.titleText}>{title}</h3>
 					<div className={styles.infoContainer}>
-						<span>
+						<div className='flex items-center gap-2'>
 							<Address address={proposer} />
-						</span>
-						<span>|</span>
-						<span className={styles.infoItem}>
-							<FaRegClock className={styles.infoIcon} />
-							<span className={styles.infoTimer}> {formattedCreatedAt}</span>
-						</span>
-						{proposalType === EProposalType.DISCUSSION && (
-							<span>
-								<span>|</span>
-								<span className={`${getSpanStyle(origin, 1)} ${styles.originStyle}`}>{origin}</span>
+							<span>|</span>
+							<span className={styles.infoItem}>
+								<FaRegClock className={styles.infoIcon} />
+								<span className={styles.infoTimer}>{formattedCreatedAt}</span>
 							</span>
-						)}
-						<span>|</span>
-						<div className={styles.commentContainer}>
-							<Image
-								src={CommentIcon}
-								alt='voting_bar'
-								width={16}
-								height={16}
-							/>
-							<span>{metrics?.comments || 0}</span>
-						</div>
-						<div>
-							{timeRemaining && (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<div className='flex items-center gap-1'>
-											<span>|</span>
-											<div className='w-8'>
-												<Progress
-													value={decisionPeriodPercentage}
-													className='h-1.5 bg-decision_bar_bg'
-												/>
-											</div>
-										</div>
-									</TooltipTrigger>
-									<TooltipContent
-										side='top'
-										align='center'
-									>
-										<div className={styles.timeBarContainer}>
-											<p>{formattedTime}</p>
-										</div>
-									</TooltipContent>
-								</Tooltip>
+							{proposalType === EProposalType.DISCUSSION && (
+								<>
+									<span>|</span>
+									<span className={`${getSpanStyle(origin, 1)} ${styles.originStyle}`}>{origin}</span>
+								</>
 							)}
 						</div>
-						<span>|</span>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div>
-									<VotingBar
-										ayePercent={ayePercent}
-										nayPercent={nayPercent}
-									/>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent
-								side='top'
-								align='center'
-							>
-								<div className={styles.progressBarContainer}>
-									<p>
-										Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-										{ayePercent.toFixed(2)}%)
-									</p>
-									<p>
-										Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-										{nayPercent.toFixed(2)}%)
-									</p>
-								</div>
-							</TooltipContent>
-						</Tooltip>
+						<div className='flex items-center gap-2'>
+							<div className={styles.commentContainer}>
+								<Image
+									src={CommentIcon}
+									alt='comments'
+									width={16}
+									height={16}
+								/>
+								<span>{metrics?.comments || 0}</span>
+							</div>
+							{timeRemaining && (
+								<>
+									<span>|</span>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className='flex items-center gap-1'>
+												<div className='w-8'>
+													<Progress
+														value={decisionPeriodPercentage}
+														className='h-1.5 bg-decision_bar_bg'
+													/>
+												</div>
+											</div>
+										</TooltipTrigger>
+										<TooltipContent
+											side='top'
+											align='center'
+										>
+											<div className={styles.timeBarContainer}>
+												<p>{formattedTime}</p>
+											</div>
+										</TooltipContent>
+									</Tooltip>
+								</>
+							)}
+							<span>|</span>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div>
+										<VotingBar
+											ayePercent={ayePercent}
+											nayPercent={nayPercent}
+										/>
+									</div>
+								</TooltipTrigger>
+								<TooltipContent
+									side='top'
+									align='center'
+								>
+									<div className={styles.progressBarContainer}>
+										<p>
+											Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+											{ayePercent.toFixed(2)}%)
+										</p>
+										<p>
+											Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+											{nayPercent.toFixed(2)}%)
+										</p>
+									</div>
+								</TooltipContent>
+							</Tooltip>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div className='flex flex-col items-end gap-1'>
+			<div className={styles.tagContainer}>
 				<div className='flex'>
 					<StatusTag status={status} />
 				</div>
 				{beneficiaries && beneficiaries.length > 0 && groupBeneficiariesByAsset(beneficiaries, network) && (
-					<div className='flex flex-wrap items-center gap-x-2'>
+					<div className={styles.beneficiaryContainer}>
 						{beneficiaries.length > 1 ? (
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<div className='flex items-center -space-x-1.5'>
-										{Object.entries(groupedByAsset).map(([assetId]) => {
-											const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-											const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DOTIcon;
-											return (
-												<Image
-													key={assetId}
-													src={icon}
-													alt={unit}
-													width={18}
-													height={18}
-												/>
-											);
-										})}
+									<div className='flex items-center gap-1'>
+										<div className='flex items-center -space-x-1.5'>
+											{Object.entries(groupedByAsset).map(([assetId]) => {
+												const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+												const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DOTIcon;
+												return (
+													<Image
+														key={assetId}
+														src={icon}
+														alt={unit}
+														width={18}
+														height={18}
+													/>
+												);
+											})}
+										</div>
+										<span className='block lg:hidden'>|</span>
 									</div>
 								</TooltipTrigger>
 								<TooltipContent
@@ -216,6 +220,7 @@ function ListingCard({
 										)}
 									</span>
 									{i < Object.entries(groupedByAsset).length - 1 && <span className='text-text_primary'>&</span>}
+									<span className='block lg:hidden'>|</span>
 								</div>
 							))
 						)}
