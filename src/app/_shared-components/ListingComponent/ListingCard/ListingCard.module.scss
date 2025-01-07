@@ -11,7 +11,7 @@
 }
 
 .infoContainer {
-    @apply flex items-center pl-2 lg:pl-0 gap-1 md:gap-2.5 align-middle text-sm text-gray-500;
+    @apply flex lg:items-center pl-2 lg:pl-0 gap-1 md:gap-2.5 flex-col lg:flex-row align-middle text-sm text-gray-500;
 }
 
 .infoItem {
@@ -36,4 +36,28 @@
 
 .commentContainer {
     @apply flex items-center gap-1;
+}
+
+.timeBarContainer {
+    @apply flex bg-voting_bar_bg text-white p-3 w-60 rounded-md flex-col;
+}
+
+.requestedAmount {
+    @apply font-medium text-text_primary text-base flex items-center gap-1
+}
+
+.listedAmount {
+    @apply font-medium text-text_primary text-base flex items-center -space-x-2 flex-wrap
+}
+
+.assetContainer {
+    @apply flex bg-voting_bar_bg text-white p-3 w-32 rounded-md flex-col;
+}
+
+.tagContainer {
+    @apply flex flex-row-reverse items-end gap-1 lg:flex-col
+}
+
+.beneficiaryContainer {
+    @apply flex flex-wrap items-center gap-x-2
 }
