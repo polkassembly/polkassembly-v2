@@ -86,7 +86,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className={styles.sidebar_logo}>{getLogo()}</div>
 			</SidebarHeader>
 
-			<hr className='text-btn_secondary_border' />
+			<hr className='text-btn_secondary_border dark:text-[#4B4B4B]' />
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 

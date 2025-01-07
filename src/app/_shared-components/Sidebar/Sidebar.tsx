@@ -256,7 +256,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			ref={ref}
 			data-sidebar='trigger'
 			variant='link'
-			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2', className)}
+			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2 dark:bg-section_dark_overlay', className)}
 			type='button'
 			onClick={(event) => {
 				onClick?.(event);

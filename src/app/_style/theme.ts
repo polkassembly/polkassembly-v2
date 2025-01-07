@@ -86,7 +86,7 @@ export const THEME_COLORS = {
 		text_grey: '#7587A0',
 		create_proposal_btn_create: '#49CFFC',
 		section_dark_overlay: '#0D0D0D',
-		page_background: '#F5F6F8',
+		page_background: '#1C1D1F',
 		small_btn_text: '#6D7F97',
 		bg_light_blue: '#E6F4FF',
 		sidebar_head1: '#2f3717',
