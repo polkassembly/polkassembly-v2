@@ -62,7 +62,10 @@ function ListingCard({
 		dot: DOTIcon
 	};
 	const decisionPeriodPercentage = decisionPeriodEndsAt ? calculateDecisionProgress(decisionPeriodEndsAt) : 0;
+
 	const timeRemaining = decisionPeriodEndsAt ? getTimeRemaining(decisionPeriodEndsAt) : null;
+	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 	return (
 		<Link
@@ -118,7 +121,7 @@ function ListingCard({
 										align='center'
 									>
 										<div className={styles.timeBarContainer}>
-											<p>{timeRemaining}</p>
+											<p>{formattedTime}</p>
 										</div>
 									</TooltipContent>
 								</Tooltip>

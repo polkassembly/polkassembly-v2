@@ -9,10 +9,12 @@ export const getTimeRemaining = (endDate: Date | string) => {
 	const end = dayjs(endDate);
 	const diff = end.diff(now);
 	if (diff <= 0) return null;
-	const duration = dayjs.duration(diff);
-	const days = Math.floor(duration.asDays());
-	const hours = Math.floor(duration.hours());
-	const minutes = Math.floor(duration.minutes());
 
-	return `Deciding ends in ${days}d : ${hours}hrs : ${minutes}mins`;
+	const duration = dayjs.duration(diff);
+	return {
+		days: Math.floor(duration.asDays()),
+		hours: duration.hours(),
+		minutes: duration.minutes(),
+		seconds: duration.seconds()
+	};
 };
