@@ -80,7 +80,16 @@ export class OffChainDbService {
 		const subsquarePost = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		if (subsquarePost) return subsquarePost;
 
-		const postMetrics = await FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
+		const firestorePostMetrics = await FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
+		const subsquarePostMetrics = await SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType });
+
+		const postMetrics = {
+			reactions: {
+				like: firestorePostMetrics.reactions.like + subsquarePostMetrics.reactions.like,
+				dislike: firestorePostMetrics.reactions.dislike + subsquarePostMetrics.reactions.dislike
+			},
+			comments: firestorePostMetrics.comments + subsquarePostMetrics.comments
+		};
 
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,

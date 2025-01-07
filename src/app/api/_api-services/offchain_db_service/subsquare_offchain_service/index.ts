@@ -6,7 +6,7 @@
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { convertMarkdownToBlocksServer } from '@/app/api/_api-utils/convertMarkdownToBlocksServer';
 import { convertHtmlToBlocksServer } from '@/app/api/_api-utils/convertHtmlToBlocksServer';
@@ -156,5 +156,15 @@ export class SubsquareOffChainService {
 		} catch {
 			return [];
 		}
+	}
+
+	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+		return {
+			reactions: {
+				like: 0,
+				dislike: 0
+			},
+			comments: await this.GetPostComments({ network, indexOrHash, proposalType }).then((comments) => comments.length)
+		};
 	}
 }
