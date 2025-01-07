@@ -74,14 +74,20 @@ export class OffChainDbService {
 		proposalType: EProposalType;
 		proposer?: string;
 	}): Promise<IOffChainPost> {
-		const post = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
-		if (post) return post;
+		let post: IOffChainPost | null = null;
 
-		const subsquarePost = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
-		if (subsquarePost) return subsquarePost;
+		// 1. get post from firestore
+		post = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
 
-		const firestorePostMetrics = await FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
-		const subsquarePostMetrics = await SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType });
+		// 2. if not found, get post from subsquare
+		if (!post) {
+			post = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
+		}
+
+		const firestorePostMetricsPromise = FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
+		const subsquarePostMetricsPromise = SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType });
+
+		const [firestorePostMetrics, subsquarePostMetrics] = await Promise.all([firestorePostMetricsPromise, subsquarePostMetricsPromise]);
 
 		const postMetrics = {
 			reactions: {
