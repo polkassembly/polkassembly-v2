@@ -95,6 +95,8 @@ export class SubsquidService extends SubsquidQueries {
 
 		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, index: Number(proposal.index) });
 
+		const allPeriodEnds = proposal.statusHistory ? SubsquidUtils.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+
 		return {
 			createdAt: proposal.createdAt,
 			proposer: proposal.proposer || '',
@@ -105,9 +107,9 @@ export class SubsquidService extends SubsquidQueries {
 			description: proposal.description || '',
 			voteMetrics,
 			beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
-			preparePeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getPreparePeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined,
-			decisionPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getDecisionPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined,
-			confirmationPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getConfirmationPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined,
+			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
+			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
+			confirmationPeriodEndsAt: allPeriodEnds?.confirmationPeriodEnd ?? undefined,
 			timeline: proposal.statusHistory as IStatusHistoryItem[]
 		};
 	}
@@ -196,6 +198,8 @@ export class SubsquidService extends SubsquidQueries {
 				},
 				index: number
 			) => {
+				const allPeriodEnds = proposal.statusHistory ? SubsquidUtils.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+
 				posts.push({
 					createdAt: proposal.createdAt,
 					description: proposal.description || '',
@@ -207,7 +211,7 @@ export class SubsquidService extends SubsquidQueries {
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
 					beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
-					decisionPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getDecisionPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined
+					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined
 				});
 			}
 		);

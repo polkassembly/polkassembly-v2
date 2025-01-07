@@ -15,6 +15,12 @@ interface IStatusHistory {
 	timestamp: string;
 }
 
+interface IPeriodEndDates {
+	decisionPeriodEnd: Date | null;
+	preparePeriodEnd: Date | null;
+	confirmationPeriodEnd: Date | null;
+}
+
 export class SubsquidUtils {
 	/**
 	 * Helper to extract beneficiary address from complex object structure
@@ -98,99 +104,48 @@ export class SubsquidUtils {
 		return result;
 	}
 
-	public static getDecisionPeriodEnd(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): Date | null {
+	public static getAllPeriodEndDates(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): IPeriodEndDates {
+		const result: IPeriodEndDates = {
+			decisionPeriodEnd: null,
+			preparePeriodEnd: null,
+			confirmationPeriodEnd: null
+		};
+
 		try {
-			// Find deciding status block
+			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
+			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
+			const trackData = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks];
+
+			if (!trackData) {
+				console.error('Track data not found for network:', network);
+				return result;
+			}
+
+			// Calculate decision period end
 			const decidingStatus = statusHistory.find((status) => status.status === EProposalStatus.Deciding || status.status === EProposalStatus.DecisionDepositPlaced);
-			if (!decidingStatus?.timestamp) {
-				return null;
+			if (decidingStatus?.timestamp && trackData.decisionPeriod) {
+				const decisionPeriodMs = Number(trackData.decisionPeriod) * blockTime;
+				result.decisionPeriodEnd = dayjs(decidingStatus.timestamp).add(decisionPeriodMs, 'millisecond').toDate();
 			}
 
-			// Get block time and track data from network properties
-			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
-			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
-			const decisionPeriod = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks]?.decisionPeriod;
-
-			if (!decisionPeriod) {
-				console.error('Decision period not found for network:', network);
-				return null;
-			}
-
-			// Convert decision period blocks to milliseconds
-			const decisionPeriodMs = Number(decisionPeriod) * blockTime;
-
-			// Calculate end date by adding decision period to deciding timestamp
-			const decidingStartDate = dayjs(decidingStatus.timestamp);
-			const endDate = decidingStartDate.add(decisionPeriodMs, 'millisecond');
-
-			return endDate.toDate();
-		} catch (error) {
-			console.error('Error calculating decision period end:', error);
-			return null;
-		}
-	}
-
-	public static getPreparePeriodEnd(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): Date | null {
-		try {
-			// Find submitted status block
+			// Calculate prepare period end
 			const submittedStatus = statusHistory.find((status) => status.status === EProposalStatus.Submitted);
-			if (!submittedStatus?.timestamp) {
-				return null;
+			if (submittedStatus?.timestamp && trackData.preparePeriod) {
+				const preparePeriodMs = Number(trackData.preparePeriod) * blockTime;
+				result.preparePeriodEnd = dayjs(submittedStatus.timestamp).add(preparePeriodMs, 'millisecond').toDate();
 			}
 
-			// Get block time and track data from network properties
-			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
-			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
-			const preparePeriod = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks]?.preparePeriod;
-
-			if (!preparePeriod) {
-				console.error('Prepare period not found for network:', network);
-				return null;
-			}
-
-			// Convert prepare period blocks to milliseconds
-			const preparePeriodMs = Number(preparePeriod) * blockTime;
-
-			// Calculate end date by adding prepare period to submitted timestamp
-			const submittedStartDate = dayjs(submittedStatus.timestamp);
-			const endDate = submittedStartDate.add(preparePeriodMs, 'millisecond');
-
-			return endDate.toDate();
-		} catch (error) {
-			console.error('Error calculating prepare period end:', error);
-			return null;
-		}
-	}
-
-	public static getConfirmationPeriodEnd(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): Date | null {
-		try {
-			// Find confirm started status block
+			// Calculate confirmation period end
 			const confirmStartedStatus = statusHistory.find((status) => status.status === EProposalStatus.ConfirmStarted);
-			if (!confirmStartedStatus?.timestamp) {
-				return null;
+			if (confirmStartedStatus?.timestamp && trackData.confirmPeriod) {
+				const confirmPeriodMs = Number(trackData.confirmPeriod) * blockTime;
+				result.confirmationPeriodEnd = dayjs(confirmStartedStatus.timestamp).add(confirmPeriodMs, 'millisecond').toDate();
 			}
 
-			// Get block time and track data from network properties
-			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
-			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
-			const confirmPeriod = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks]?.confirmPeriod;
-
-			if (!confirmPeriod) {
-				console.error('Confirm period not found for network:', network);
-				return null;
-			}
-
-			// Convert confirm period blocks to milliseconds
-			const confirmPeriodMs = Number(confirmPeriod) * blockTime;
-
-			// Calculate end date by adding confirm period to confirm started timestamp
-			const confirmStartDate = dayjs(confirmStartedStatus.timestamp);
-			const endDate = confirmStartDate.add(confirmPeriodMs, 'millisecond');
-
-			return endDate.toDate();
+			return result;
 		} catch (error) {
-			console.error('Error calculating confirmation period end:', error);
-			return null;
+			console.error('Error calculating period end dates:', error);
+			return result;
 		}
 	}
 }
