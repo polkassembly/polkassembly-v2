@@ -85,7 +85,7 @@ export class SubsquidService extends SubsquidQueries {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
-			requestedAssetData: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+			beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 			decisionPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getDecisionPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined
 		} as IOnChainPostInfo;
 	}
@@ -184,7 +184,7 @@ export class SubsquidService extends SubsquidQueries {
 					type: proposalType,
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
-					requestedAssetData: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+					beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: proposal.statusHistory ? (SubsquidUtils.getDecisionPeriodEnd(proposal.statusHistory, network, proposal.origin) ?? undefined) : undefined
 				});
 			}

@@ -5,7 +5,7 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IRequestedAssetData, IVoteMetrics } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IVoteMetrics } from '@/_shared/types';
 import { hexToString } from '@polkadot/util';
 
 export class SubsquareOnChainService {
@@ -39,15 +39,13 @@ export class SubsquareOnChainService {
 
 		const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-		const requestedAssetData: IRequestedAssetData | undefined = data?.onchainData?.treasuryInfo
-			? {
-					assetId: null,
-					amount: data.onchainData.treasuryInfo.amount,
-					beneficiaries: data.onchainData.treasuryInfo.beneficiaries.map((address: string) => ({
-						address,
-						amount: data.onchainData.treasuryInfo.amount // In this case all amount goes to single beneficiary
-					}))
-				}
+		const beneficiaries = data?.onchainData?.treasuryInfo?.beneficiaries
+			? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+				data.onchainData.treasuryInfo.beneficiaries.map((beneficiary: any) => ({
+					address: beneficiary.address,
+					amount: beneficiary.amount || data.onchainData.treasuryInfo.amount,
+					assetId: beneficiary.assetId || null
+				}))
 			: undefined;
 
 		// Convert hex values to strings and extract vote metrics from tally data
@@ -79,7 +77,7 @@ export class SubsquareOnChainService {
 			origin: data?.onchainData?.info?.origin?.origins,
 			index: data?.onchainData?.timeline?.[0]?.referendumIndex ?? undefined,
 			hash: data?.onchainData?.timeline?.[0]?.args?.proposalHash || undefined,
-			requestedAssetData,
+			beneficiaries,
 			voteMetrics
 		};
 

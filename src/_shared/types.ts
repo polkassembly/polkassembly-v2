@@ -378,12 +378,7 @@ export interface IVoteMetrics {
 export interface IBeneficiary {
 	address: string;
 	amount: string;
-}
-
-export interface IRequestedAssetData {
 	assetId: string | null;
-	amount: string;
-	beneficiaries: IBeneficiary[];
 }
 
 export interface IOnChainPostInfo {
@@ -395,7 +390,7 @@ export interface IOnChainPostInfo {
 	origin?: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
-	requestedAssetData?: IRequestedAssetData;
+	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
 }
 
@@ -413,7 +408,7 @@ export interface IOnChainPostListing {
 	type: EProposalType;
 	hash: string;
 	voteMetrics?: IVoteMetrics;
-	requestedAssetData?: IRequestedAssetData;
+	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
 }
 

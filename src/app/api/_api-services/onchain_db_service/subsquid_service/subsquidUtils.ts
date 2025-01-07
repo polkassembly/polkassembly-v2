@@ -7,29 +7,8 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { ENetwork, EPostOrigin, EProposalStatus, IRequestedAssetData } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, IBeneficiary } from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
-
-interface IAssetKind {
-	assetId?: {
-		value?: { interior?: { value?: any } };
-		interior?: { value?: any };
-	};
-}
-
-interface ICallValue {
-	value?: {
-		assetKind?: IAssetKind;
-		beneficiary?: {
-			value?: {
-				interior?: {
-					value?: { id?: string } | Array<{ id?: string }>;
-				};
-			};
-		};
-		amount?: string | number;
-	};
-}
 
 interface IStatusHistory {
 	status: EProposalStatus;
@@ -49,7 +28,7 @@ export class SubsquidUtils {
 			return substrateAddress || beneficiary.value;
 		}
 
-		// Handle nested interior case
+		// Handle V3/V4 nested interior case
 		const id = beneficiary?.value?.interior?.value?.id || beneficiary?.value?.interior?.value?.[0]?.id;
 		if (id) {
 			const substrateAddress = encodeAddress(id, 42);
@@ -59,63 +38,63 @@ export class SubsquidUtils {
 	}
 
 	/**
+	 * Helper to extract assetId from assetKind object
+	 */
+	private static extractAssetId(assetKind: any): string | null {
+		if (!assetKind) return null;
+
+		const interior = assetKind?.assetId?.value?.interior?.value || assetKind?.assetId?.interior?.value;
+
+		if (Array.isArray(interior)) {
+			const generalIndex = interior.find((item: any) => item?.__kind === 'GeneralIndex');
+			return generalIndex?.value?.toString() || null;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Extracts asset information from call arguments
 	 * @param args - Call arguments containing asset and beneficiary information
-	 * @returns Extracted amounts, assetId and beneficiaries
+	 * @returns Array of IBeneficiary with amounts, assetIds and addresses
 	 */
-	public static extractAmountAndAssetId(args: any): IRequestedAssetData {
-		const result: IRequestedAssetData = {
-			assetId: null,
-			beneficiaries: [],
-			amount: '0'
-		};
+	public static extractAmountAndAssetId(args: any): IBeneficiary[] {
+		const result: IBeneficiary[] = [];
 
 		if (!args) return result;
 
-		// Extract assetId
-		const assetKind = args.assetKind as IAssetKind;
-		const calls = Array.isArray(args.calls) ? (args.calls as ICallValue[]) : null;
+		// Handle single spend case
+		if (args.amount && args.beneficiary) {
+			const assetId = this.extractAssetId(args.assetKind);
+			const address = this.extractBeneficiaryAddress(args.beneficiary);
 
-		const interior = assetKind?.assetId?.value?.interior?.value || assetKind?.assetId?.interior?.value || calls?.[0]?.value?.assetKind?.assetId?.interior?.value;
-
-		if (interior?.length) {
-			const generalIndex = interior.find((item: any) => item?.__kind === 'GeneralIndex');
-			result.assetId = generalIndex?.value?.toString() || null;
-		}
-
-		let requested = BigInt(0);
-
-		// Handle direct amount
-		if (args.amount) {
-			requested = BigInt(args.amount);
-			if (args.beneficiary) {
-				const address = typeof args.beneficiary === 'string' ? args.beneficiary : SubsquidUtils.extractBeneficiaryAddress(args.beneficiary);
-
-				result.beneficiaries.push({
+			if (address) {
+				result.push({
 					address,
-					amount: args.amount.toString()
+					amount: args.amount.toString(),
+					assetId
 				});
 			}
 		}
-		// Handle calls array
-		else if (calls?.length && result.assetId) {
-			calls.forEach((call) => {
+		// Handle multiple calls case
+		else if (Array.isArray(args.calls)) {
+			args.calls.forEach((call: any) => {
 				if (!call.value) return;
 
-				const amount = BigInt(call.value.amount || 0);
-				requested += amount;
+				const { amount, beneficiary, assetKind } = call.value;
+				const assetId = this.extractAssetId(assetKind);
+				const address = this.extractBeneficiaryAddress(beneficiary);
 
-				const address = SubsquidUtils.extractBeneficiaryAddress(call.value.beneficiary);
 				if (address && amount) {
-					result.beneficiaries.push({
+					result.push({
 						address,
-						amount: amount.toString()
+						amount: amount.toString(),
+						assetId
 					});
 				}
 			});
 		}
 
-		result.amount = requested.toString();
 		return result;
 	}
 
