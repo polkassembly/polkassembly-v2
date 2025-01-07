@@ -17,19 +17,21 @@ function Navbar() {
 	return (
 		<nav className={classes.navbar}>
 			<p className='ml-10 md:ml-0'>Polkassembly</p>
-			{user?.id ? (
-				<div className='flex items-center gap-x-4'>
-					<Link href='/settings'>
-						<Button variant='secondary'>Settings</Button>
+			<div className='flex items-center gap-x-4'>
+				{user?.id ? (
+					<div className='flex items-center gap-x-4'>
+						<Link href='/settings'>
+							<Button variant='secondary'>Settings</Button>
+						</Link>
+						<Button onClick={() => AuthClientService.logout(() => setUser(null))}>Logout</Button>
+					</div>
+				) : (
+					<Link href='/login'>
+						<Button>Login</Button>
 					</Link>
-					<Button onClick={() => AuthClientService.logout(() => setUser(null))}>Logout</Button>
-				</div>
-			) : (
-				<Link href='/login'>
-					<Button>Login</Button>
-				</Link>
-			)}
-			<ToggleButton />
+				)}
+				<ToggleButton />
+			</div>
 		</nav>
 	);
 }
