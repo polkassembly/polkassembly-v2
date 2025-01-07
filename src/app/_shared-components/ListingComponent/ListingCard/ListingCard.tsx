@@ -11,13 +11,14 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import CommentIcon from '@assets/icons/Comment.svg';
-import Address from '../../Profile/Address/Address';
-import { getSpanStyle } from '../../TopicTag/TopicTag';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import Address from '@ui/Profile/Address/Address';
+import { getSpanStyle } from '@ui/TopicTag/TopicTag';
+import StatusTag from '@ui/StatusTag/StatusTag';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
+import { Progress } from '@ui/progress';
 import styles from './ListingCard.module.scss';
-import StatusTag from '../../StatusTag/StatusTag';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import VotingBar from '../VotingBar/VotingBar';
-import { Progress } from '../../progress';
 
 const calculatePercentage = (value: string | number, totalValue: bigint | number) => {
 	if (typeof totalValue === 'bigint') {
@@ -44,12 +45,18 @@ function ListingCard({
 	metrics?: IPostOffChainMetrics;
 	index: number;
 }) {
-	console.log(beneficiaries);
 	const network = getCurrentNetwork();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
 	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
 	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
+
+	const groupedByAsset = beneficiaries?.reduce((acc: Record<string, number>, curr) => {
+		const assetId = curr.assetId || NETWORKS_DETAILS[`${network}`].tokenSymbol;
+
+		acc[`${assetId}`] = (acc[`${assetId}`] || 0) + Number(curr.amount);
+		return acc;
+	}, {});
 
 	const getTimeRemaining = (endDate: Date | string) => {
 		const now = dayjs();
@@ -166,8 +173,26 @@ function ListingCard({
 					</div>
 				</div>
 			</div>
-			<div>
-				<StatusTag status={status} />
+			<div className='flex flex-col items-end gap-1'>
+				<div className='flex'>
+					<StatusTag status={status} />
+				</div>
+				{beneficiaries && beneficiaries.length > 0 && groupedByAsset && (
+					<div className='flex flex-wrap items-center gap-x-2'>
+						<span className={styles.requestedAmount}>
+							{Object.entries(groupedByAsset).map(([assetId, amount], i) => (
+								<>
+									<span key={assetId}>
+										{formatUSDWithUnits(
+											formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
+										)}
+									</span>
+									{i < Object.entries(groupedByAsset).length - 1 && <span className='text-text_primary'>&</span>}
+								</>
+							))}
+						</span>
+					</div>
+				)}
 			</div>
 		</Link>
 	);
