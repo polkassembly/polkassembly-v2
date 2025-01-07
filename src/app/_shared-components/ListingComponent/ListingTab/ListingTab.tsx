@@ -63,7 +63,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 				type: (item.onChainInfo?.type as EProposalType) || EProposalType.REFERENDUM_V2,
 				hash: item.onChainInfo?.hash || '',
 				beneficiaries: item.onChainInfo?.beneficiaries || [],
-				decisionPeriodEndsAt: item.onChainInfo?.decisionPeriodEndsAt || new Date(),
+				decisionPeriodEndsAt: item.onChainInfo?.decisionPeriodEndsAt || undefined,
 				voteMetrics: item.onChainInfo?.voteMetrics || {
 					support: { value: '0' },
 					bareAyes: { value: '0' },
