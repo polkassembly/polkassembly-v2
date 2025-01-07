@@ -45,3 +45,11 @@
 .requestedAmount {
     @apply font-medium text-text_primary text-base flex items-center gap-x-1 flex-wrap
 }
+
+.listedAmount {
+    @apply font-medium text-text_primary text-base flex items-center -space-x-2 flex-wrap
+}
+
+.assetContainer {
+    @apply flex bg-voting_bar_bg text-white p-3 w-32 rounded-md flex-col;
+}

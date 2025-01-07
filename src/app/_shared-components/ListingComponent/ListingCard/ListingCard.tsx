@@ -17,6 +17,9 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { Progress } from '@ui/progress';
+import USDTIcon from '@assets/icons/usdt.svg';
+import USDCIcon from '@assets/icons/usdc.svg';
+import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -50,6 +53,11 @@ function ListingCard({
 	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
 	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
+	const ICONS = {
+		usdc: USDCIcon,
+		usdt: USDTIcon,
+		dot: DOTIcon
+	};
 
 	const groupedByAsset = beneficiaries?.reduce((acc: Record<string, number>, curr) => {
 		const assetId = curr.assetId || NETWORKS_DETAILS[`${network}`].tokenSymbol;
@@ -179,8 +187,50 @@ function ListingCard({
 				</div>
 				{beneficiaries && beneficiaries.length > 0 && groupedByAsset && (
 					<div className='flex flex-wrap items-center gap-x-2'>
-						<span className={styles.requestedAmount}>
-							{Object.entries(groupedByAsset).map(([assetId, amount], i) => (
+						{beneficiaries.length > 1 ? (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div className='flex items-center -space-x-1.5'>
+										{Object.entries(groupedByAsset).map(([assetId]) => {
+											const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+											const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DOTIcon;
+											return (
+												<Image
+													key={assetId}
+													src={icon}
+													alt={unit}
+													width={18}
+													height={18}
+												/>
+											);
+										})}
+									</div>
+								</TooltipTrigger>
+								<TooltipContent
+									side='top'
+									align='center'
+								>
+									<div className={styles.assetContainer}>
+										{Object.entries(groupedByAsset).map(([assetId, amount]) => {
+											return (
+												<div key={assetId}>
+													~{' '}
+													{formatUSDWithUnits(
+														formatBnBalance(
+															amount.toString(),
+															{ withUnit: true, numberAfterComma: 2 },
+															network,
+															assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+														)
+													)}{' '}
+												</div>
+											);
+										})}
+									</div>
+								</TooltipContent>
+							</Tooltip>
+						) : (
+							Object.entries(groupedByAsset).map(([assetId, amount], i) => (
 								<div key={assetId}>
 									<span>
 										{formatUSDWithUnits(
@@ -189,8 +239,8 @@ function ListingCard({
 									</span>
 									{i < Object.entries(groupedByAsset).length - 1 && <span className='text-text_primary'>&</span>}
 								</div>
-							))}
-						</span>
+							))
+						)}
 					</div>
 				)}
 			</div>
