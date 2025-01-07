@@ -11,7 +11,7 @@
 }
 
 .requestedAmount {
-    @apply text-base font-semibold text-text_pink lg:text-lg
+    @apply text-base font-semibold text-text_pink lg:text-lg flex items-center gap-x-1 flex-wrap
 }
 
 .proposerWrapper {
