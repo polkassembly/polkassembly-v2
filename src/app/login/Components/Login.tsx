@@ -24,7 +24,8 @@ function Login({ isModal }: { isModal?: boolean }) {
 		if (user) {
 			router.replace('/');
 		}
-	}, [user, router]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [router]);
 
 	const [isWeb3Login, setIsWeb3Login] = useState<boolean>(true);
 

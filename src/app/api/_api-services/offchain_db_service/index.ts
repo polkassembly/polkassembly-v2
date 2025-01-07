@@ -97,6 +97,13 @@ export class OffChainDbService {
 			comments: firestorePostMetrics.comments + subsquarePostMetrics.comments
 		};
 
+		if (post) {
+			return {
+				...post,
+				metrics: postMetrics
+			};
+		}
+
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,

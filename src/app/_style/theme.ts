@@ -52,7 +52,9 @@ export const THEME_COLORS = {
 		progress_default: '#d3d3d3',
 		progress_aye: '#27d57b',
 		progress_nay: '#fc3e5d',
-		sidebar_accent: '#e5e7eb'
+		sidebar_accent: '#e5e7eb',
+		decision_bar_bg: '#D4E0FC',
+		decision_bar_indicator: '#407AFC'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',
