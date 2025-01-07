@@ -381,6 +381,12 @@ export interface IBeneficiary {
 	assetId: string | null;
 }
 
+export interface IStatusHistoryItem {
+	status: EProposalStatus;
+	timestamp: Date;
+	block: number;
+}
+
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
@@ -392,6 +398,7 @@ export interface IOnChainPostInfo {
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
+	timeline?: IStatusHistoryItem[];
 }
 
 export interface IPost extends IOffChainPost {

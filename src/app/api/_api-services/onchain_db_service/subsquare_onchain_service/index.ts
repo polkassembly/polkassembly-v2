@@ -5,7 +5,7 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IVoteMetrics } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IStatusHistoryItem, IVoteMetrics } from '@/_shared/types';
 import { hexToString } from '@polkadot/util';
 
 export class SubsquareOnChainService {
@@ -70,6 +70,14 @@ export class SubsquareOnChainService {
 
 		const proposer = data?.proposer || data?.onchainData?.proposer || '';
 
+		const timeline: IStatusHistoryItem[] =
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			data?.onchainData?.timeline?.map((event: any) => ({
+				status: event.name as EProposalStatus,
+				timestamp: new Date(event.indexer.blockTime),
+				block: event.indexer.blockHeight
+			})) || [];
+
 		const onChainPostInfo: IOnChainPostInfo = {
 			proposer: ValidatorService.isValidSubstrateAddress(proposer) ? getSubstrateAddress(proposer) || '' : '',
 			status: data?.state?.name || data?.onchainData?.state?.name || EProposalStatus.Unknown,
@@ -78,7 +86,8 @@ export class SubsquareOnChainService {
 			index: data?.onchainData?.timeline?.[0]?.referendumIndex ?? undefined,
 			hash: data?.onchainData?.timeline?.[0]?.args?.proposalHash || undefined,
 			beneficiaries,
-			voteMetrics
+			voteMetrics,
+			timeline
 		};
 
 		return onChainPostInfo;

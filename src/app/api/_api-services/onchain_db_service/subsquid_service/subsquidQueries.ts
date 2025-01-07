@@ -21,6 +21,7 @@ export class SubsquidQueries {
 				statusHistory {
 					status
 					timestamp
+					block
 				}
 			}
 		}
@@ -44,6 +45,7 @@ export class SubsquidQueries {
 				statusHistory {
 					status
 					timestamp
+					block
 				}
 			}
 		}
