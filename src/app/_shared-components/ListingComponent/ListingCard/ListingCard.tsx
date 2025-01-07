@@ -231,7 +231,10 @@ function ListingCard({
 							</Tooltip>
 						) : (
 							Object.entries(groupedByAsset).map(([assetId, amount], i) => (
-								<div key={assetId}>
+								<div
+									className={styles.requestedAmount}
+									key={assetId}
+								>
 									<span>
 										{formatUSDWithUnits(
 											formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
