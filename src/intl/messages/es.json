@@ -18,10 +18,10 @@
 		"showPassword": "Mostrar Contraseña"
 	},
 	"ListingTab": {
-		"polkassemby": "Polkassemby",
-		"analytics": "Análisis",
-		"external": "Externo",
-		"referenda": "Referéndums"
+		"Polkassemby": "Polkassemby",
+		"Analytics": "Análisis",
+		"External": "Externo",
+		"Referenda": "Referéndums"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
@@ -143,5 +143,62 @@
 		"FellowshipAdmin": "Administrador de Comunidad",
 		"ReportAnIssue": "Reportar un Problema",
 		"NeedHelp": "¿Necesita ayuda con algo?"
+	},
+	"ListingPage_Status": {
+		"Cancelled": "Cancelado",
+		"Confirmed": "Confirmado",
+		"ConfirmAborted": "Confirmación abortada",
+		"ConfirmStarted": "Confirmación iniciada",
+		"Deciding": "Decidiendo",
+		"Executed": "Ejecutado",
+		"ExecutionFailed": "Ejecución fallida",
+		"Killed": "Muerto",
+		"Rejected": "Rechazado",
+		"Submitted": "Enviado",
+		"TimedOut": "Tiempo agotado"
+	},
+	"ListingPage_Tags": {
+		"bounty": "Prémio",
+		"treasury": "Tesorería",
+		"smart contract": "Contrato inteligente",
+		"polkadot": "Polkadot",
+		"Network": "Red",
+		"Governance": "Gobernanza",
+		"Proposal": "Propuesta",
+		"Test": "Prueba"
+	},
+	"ProposalStatus": {
+		"cancelled": "Cancelado",
+		"timedout": "Tiempo agotado",
+		"confirmed": "Confirmado",
+		"approved": "Aprobado",
+		"rejected": "Rechazado",
+		"executed": "Ejecutado",
+		"killed": "Eliminado",
+		"executionfailed": "Ejecución fallida",
+		"decisiondepositplaced": "Depósito de decisión realizado",
+		"deciding": "En decisión",
+		"confirmstarted": "Confirmación iniciada",
+		"confirmaborted": "Confirmación abortada",
+		"opened": "Abierto",
+		"retracted": "Retirado",
+		"slashed": "Penalizado",
+		"active": "Activo",
+		"extended": "Extendido",
+		"claimed": "Reclamado",
+		"unrequested": "No solicitado",
+		"requested": "Solicitado",
+		"submitted": "Enviado",
+		"cleared": "Borrado",
+		"voting": "En votación",
+		"votingended": "Votación finalizada",
+		"votingstarted": "Votación iniciada",
+		"invalid": "Inválido",
+		"missing": "Faltante",
+		"reaped": "Eliminado",
+		"disapproved": "Desaprobado",
+		"closed": "Cerrado",
+		"awarded": "Otorgado",
+		"added": "Añadido"
 	}
 }

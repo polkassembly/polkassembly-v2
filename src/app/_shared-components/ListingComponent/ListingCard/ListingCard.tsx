@@ -166,7 +166,7 @@ function ListingCard({
 			</div>
 			<div className={styles.tagContainer}>
 				<div className='flex'>
-					<StatusTag status={status} />
+					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 				{beneficiaries && beneficiaries.length > 0 && groupBeneficiariesByAsset(beneficiaries, network) && (
 					<div className={styles.beneficiaryContainer}>

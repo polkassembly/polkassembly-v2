@@ -19,9 +19,9 @@
 	},
 	"ListingTab": {
 		"polkassemby": "Polkassemby",
-		"analytics": "Analysen",
-		"external": "Extern",
-		"referenda": "Referenden"
+		"Analytics": "Analysen",
+		"External": "Extern",
+		"Referenda": "Referenden"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury-Vorschlag",
@@ -143,5 +143,62 @@
 		"FellowshipAdmin": "Gemeinschafts Verwalter",
 		"ReportAnIssue": "Problem melden",
 		"NeedHelp": "Brauchst du Hilfe?"
+	},
+	"ListingPage_Status": {
+		"Cancelled": "Abgebrochen",
+		"Confirmed": "Bestätigt",
+		"ConfirmAborted": "Bestätigung abgebrochen",
+		"ConfirmStarted": "Bestätigung gestartet",
+		"Deciding": "Entscheidung",
+		"Executed": "Ausgeführt",
+		"ExecutionFailed": "Ausführung fehlgeschlagen",
+		"Killed": "Getötet",
+		"Rejected": "Abgelehnt",
+		"Submitted": "Eingereicht",
+		"TimedOut": "Zeitüberschreitung"
+	},
+	"ListingPage_Tags": {
+		"bounty": "Prämie",
+		"treasury": "Treasury",
+		"smart contract": "Smart Contract",
+		"polkadot": "Polkadot",
+		"Network": "Netzwerk",
+		"Governance": "Governance",
+		"Proposal": "Vorschlag",
+		"Test": "Test"
+	},
+	"ProposalStatus": {
+		"cancelled": "Abgebrochen",
+		"timedout": "Zeitüberschreitung",
+		"confirmed": "Bestätigt",
+		"approved": "Genehmigt",
+		"rejected": "Abgelehnt",
+		"executed": "Ausgeführt",
+		"killed": "Beendet",
+		"executionfailed": "Ausführung fehlgeschlagen",
+		"decisiondepositplaced": "Entscheidungseinlage platziert",
+		"deciding": "In Entscheidung",
+		"confirmstarted": "Bestätigung gestartet",
+		"confirmaborted": "Bestätigung abgebrochen",
+		"opened": "Eröffnet",
+		"retracted": "Zurückgezogen",
+		"slashed": "Gekürzt",
+		"active": "Aktiv",
+		"extended": "Verlängert",
+		"claimed": "Beansprucht",
+		"unrequested": "Nicht angefordert",
+		"requested": "Angefordert",
+		"submitted": "Eingereicht",
+		"cleared": "Gelöscht",
+		"voting": "Abstimmung läuft",
+		"votingended": "Abstimmung beendet",
+		"votingstarted": "Abstimmung gestartet",
+		"invalid": "Ungültig",
+		"missing": "Fehlend",
+		"reaped": "Entfernt",
+		"disapproved": "Nicht genehmigt",
+		"closed": "Geschlossen",
+		"awarded": "Zuerkannt",
+		"added": "Hinzugefügt"
 	}
 }

@@ -18,10 +18,10 @@
 		"showPassword": "显示密码"
 	},
 	"ListingTab": {
-		"polkassemby": "Polkassemby",
-		"analytics": "分析",
-		"external": "外部",
-		"referenda": "公投"
+		"Polkassemby": "Polkassemby",
+		"Analytics": "分析",
+		"External": "外部",
+		"Referenda": "公投"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
@@ -143,5 +143,62 @@
 		"FellowshipAdmin": "研究员管理员",
 		"ReportAnIssue": "报告问题",
 		"NeedHelp": "需要帮助？"
+	},
+	"ListingPage_Status": {
+		"Cancelled": "取消",
+		"Confirmed": "确认",
+		"ConfirmAborted": "确认中止",
+		"ConfirmStarted": "确认开始",
+		"Deciding": "决定中",
+		"Executed": "执行",
+		"ExecutionFailed": "执行失败",
+		"Killed": "杀死",
+		"Rejected": "拒绝",
+		"Submitted": "提交",
+		"TimedOut": "超时"
+	},
+	"ListingPage_Tags": {
+		"bounty": "赏金",
+		"treasury": "国库",
+		"smart contract": "智能合约",
+		"polkadot": "Polkadot",
+		"Network": "网络",
+		"Governance": "治理",
+		"Proposal": "提案",
+		"Test": "测试"
+	},
+	"ProposalStatus": {
+		"cancelled": "已取消",
+		"timedout": "已超时",
+		"confirmed": "已确认",
+		"approved": "已批准",
+		"rejected": "已拒绝",
+		"executed": "已执行",
+		"killed": "已终止",
+		"executionfailed": "执行失败",
+		"decisiondepositplaced": "已缴纳决策保证金",
+		"deciding": "决策中",
+		"confirmstarted": "确认开始",
+		"confirmaborted": "确认中止",
+		"opened": "已开启",
+		"retracted": "已撤回",
+		"slashed": "已惩罚",
+		"active": "进行中",
+		"extended": "已延期",
+		"claimed": "已认领",
+		"unrequested": "未请求",
+		"requested": "已请求",
+		"submitted": "已提交",
+		"cleared": "已清除",
+		"voting": "投票中",
+		"votingended": "投票结束",
+		"votingstarted": "投票开始",
+		"invalid": "无效",
+		"missing": "缺失",
+		"reaped": "已移除",
+		"disapproved": "不批准",
+		"closed": "已关闭",
+		"awarded": "已授予",
+		"added": "已添加"
 	}
 }
