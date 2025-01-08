@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './Navbar.module.scss';
+import RpcSwitch from '../RpcSwitch/RpcSwitch';
+import ToggleButton from '../../ToggleButton';
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -72,6 +74,9 @@ function Navbar() {
 						<Button>{t('Profile.login')}</Button>
 					</Link>
 				)}
+
+				<RpcSwitch />
+				<ToggleButton />
 			</div>
 		</nav>
 	);
