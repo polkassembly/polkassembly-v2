@@ -1,5 +1,9 @@
 {
-    "HomePage": {
-      "title": "Welcome to Home"
-    }
+	"HomePage": {
+		"title": "Welcome to Home"
+	},
+	"ActivityFeed": {
+		"ExploreTab": "Explore",
+		"SubscribedTab": "Subscribed"
+	}
 }
