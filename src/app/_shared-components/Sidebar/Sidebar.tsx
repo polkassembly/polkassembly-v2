@@ -186,7 +186,7 @@ const Sidebar = forwardRef<
 				<SheetContent
 					data-sidebar='sidebar'
 					data-mobile='true'
-					className={`${styles.sidebarsheetcontent} m-0 bg-white p-0 dark:bg-section_dark_overlay [&>button]:hidden`}
+					className={`${styles.sidebarsheetcontent} [&>button]:hidden`}
 					style={
 						{
 							width: SIDEBAR_WIDTH_MOBILE
@@ -197,7 +197,7 @@ const Sidebar = forwardRef<
 					<SheetHeader>
 						<SheetTitle className='sr-only'>Mobile Sidebar</SheetTitle>
 					</SheetHeader>
-					<div className={`${styles.sidebar_mobile_children} dark:bg-section_dark_overlay`}>{children}</div>
+					<div className={styles.sidebar_mobile_children}>{children}</div>
 				</SheetContent>
 			</Sheet>
 		);
@@ -237,7 +237,7 @@ const Sidebar = forwardRef<
 			>
 				<div
 					data-sidebar='sidebar'
-					className={`${styles.sidebar_children} group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow dark:bg-section_dark_overlay`}
+					className={`${styles.sidebar_children} group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow`}
 				>
 					{children}
 				</div>
@@ -257,7 +257,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			ref={ref}
 			data-sidebar='trigger'
 			variant='link'
-			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2 dark:bg-section_dark_overlay', className)}
+			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-section_dark_overlay p-2', className)}
 			type='button'
 			onClick={(event) => {
 				onClick?.(event);
@@ -308,7 +308,7 @@ const SidebarHeader = forwardRef<HTMLDivElement, ComponentProps<'div'>>(({ class
 		<div
 			ref={ref}
 			data-sidebar='header'
-			className={cn(styles.sidebar_header, 'dark:bg-section_dark_overlay', className)}
+			className={cn(styles.sidebar_header, className)}
 			{...props}
 		/>
 	);

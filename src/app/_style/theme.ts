@@ -51,6 +51,7 @@ export const THEME_COLORS = {
 		voting_bar_bg: '#575255',
 		progress_default: '#d3d3d3',
 		progress_aye: '#27d57b',
+		section_dark_overlay: '#FFFFFF',
 		progress_nay: '#fc3e5d',
 		sidebar_accent: '#e5e7eb',
 		decision_bar_bg: '#D4E0FC',

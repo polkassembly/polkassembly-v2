@@ -2,16 +2,20 @@
 	@apply flex min-h-svh w-full;
 }
 
+.sidebar_header {
+	@apply bg-section_dark_overlay
+}
+
 .sidebarcollapsible {
 	@apply flex h-full flex-col bg-white text-sidebar-foreground;
 }
 
 .sidebarsheetcontent {
-	@apply w-[--sidebar-width] bg-white p-0 text-sidebar-foreground;
+	@apply w-[--sidebar-width] m-0 bg-section_dark_overlay p-0 text-sidebar-foreground;
 }
 
 .sidebar_mobile_children {
-	@apply flex h-full w-full bg-white flex-col;
+	@apply flex h-full w-full bg-section_dark_overlay flex-col;
 }
 
 .sidebar_trigger {
@@ -31,7 +35,7 @@
 }
 
 .sidebar_menubtn {
-	@apply rounded-md px-2 py-1 text-white;
+	@apply rounded-md px-2 py-1;
 }
 
 .sidebar_menusub {
@@ -39,7 +43,7 @@
 }
 
 .sidebar_children {
-	@apply flex h-full w-full flex-col bg-white
+	@apply flex h-full w-full flex-col bg-section_dark_overlay
 }
 
 .menuButton {

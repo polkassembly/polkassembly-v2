@@ -15,7 +15,7 @@ import classes from './Navbar.module.scss';
 function Navbar() {
 	const { user, setUser } = useUser();
 	return (
-		<nav className={`${classes.navbar} dark:bg-section_dark_overlay`}>
+		<nav className={classes.navbar}>
 			<p className='ml-10 md:ml-0'>Polkassembly</p>
 			<div className='flex items-center gap-x-4'>
 				{user?.id ? (
