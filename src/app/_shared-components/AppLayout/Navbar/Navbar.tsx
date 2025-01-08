@@ -11,7 +11,7 @@ import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { ELocales } from '@/_shared/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './Navbar.module.scss';
