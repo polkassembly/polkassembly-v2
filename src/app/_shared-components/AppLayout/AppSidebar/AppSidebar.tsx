@@ -20,6 +20,7 @@ import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
 import { ETheme } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
@@ -31,6 +32,7 @@ import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
+	const t = useTranslations();
 	const { resolvedTheme: theme } = useTheme();
 	const pathname = usePathname();
 
@@ -60,13 +62,13 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			isExpanded={state === 'expanded'}
 		/>
 	);
-	const data = getSidebarData(network, pathname);
+	const data = getSidebarData(network, pathname, t);
 
 	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },
-		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: 'Leaderboard' },
-		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: 'Delegation' },
-		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: 'Profile' }
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard') },
+		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation') },
+		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile') }
 	];
 
 	const bgColor = 'bg-sidebar_footer';
