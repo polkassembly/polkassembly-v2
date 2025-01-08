@@ -332,7 +332,7 @@ const SidebarContent = forwardRef<HTMLDivElement, ComponentProps<'div'>>(({ clas
 		<div
 			ref={ref}
 			data-sidebar='content'
-			className={cn(`hide_scrollbar dark:bg-section_dark_overlay ${styles.sidebar_content}`, className)}
+			className={cn(`hide_scrollbar ${styles.sidebar_content}`, className)}
 			style={{ height: 'calc(100vh - 60px)' }}
 			{...props}
 		/>

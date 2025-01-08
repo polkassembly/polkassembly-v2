@@ -19,7 +19,7 @@
 }
 
 .sidebar_trigger {
-	@apply h-8 w-8 rounded-lg border border-border_grey bg-white p-2;
+	@apply h-8 w-8 rounded-lg border border-border_grey bg-section_dark_overlay p-2;
 }
 
 .sidebar_inset {
@@ -27,7 +27,7 @@
 }
 
 .sidebar_content {
-	@apply my-2 flex min-h-0 flex-1 bg-white flex-col items-center gap-2;
+	@apply my-2 flex min-h-0 flex-1 bg-section_dark_overlay flex-col items-center gap-2;
 }
 
 .sidebar_menu {
