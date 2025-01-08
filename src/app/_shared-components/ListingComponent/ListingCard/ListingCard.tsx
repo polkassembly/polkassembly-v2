@@ -95,6 +95,7 @@ function ListingCard({
 						</div>
 						<div className='flex items-center gap-2'>
 							<div className={styles.commentContainer}>
+								<span className='hidden lg:block'>|</span>
 								<Image
 									src={CommentIcon}
 									alt='comments'
