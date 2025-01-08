@@ -135,5 +135,32 @@
 		"ReferendumKiller": "Referendum Beender",
 		"WhitelistedCaller": "Zugelassener Aufrufer",
 		"FellowshipAdmin": "Gemeinschafts Verwalter"
+	},
+	"PostDetails": {
+		"castVote": "Abstimmen",
+		"requested": "Angefordert",
+		"beneficiary": "Begünstigter",
+		"description": "BESCHREIBUNG",
+		"timeline": "ZEITPLAN",
+		"more": "mehr",
+		"referendum": "Referendum",
+		"comments": "Kommentare",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toComment": "um zu kommentieren",
+		"post": "Veröffentlichen",
+		"cancel": "Abbrechen",
+		"reply": "Antworten",
+		"proposalPassed": "Vorschlag angenommen",
+		"proposalFailed": "Vorschlag abgelehnt",
+		"confirmationPeriod": "Bestätigungszeitraum",
+		"votingStarted": "Abstimmung hat begonnen",
+		"preparePeriod": "Vorbereitungszeit",
+		"decisionPeriod": "Entscheidungsphase",
+		"summary": "Zusammenfassung",
+		"aye": "Ja",
+		"nay": "Nein",
+		"support": "Unterstützung",
+		"bareAyes": "Einfache Ja-Stimmen"
 	}
 }

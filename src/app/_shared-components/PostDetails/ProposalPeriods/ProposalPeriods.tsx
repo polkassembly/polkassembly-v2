@@ -4,6 +4,7 @@
 import React from 'react';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { EProposalStatus } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
 
@@ -18,6 +19,7 @@ function ProposalPeriods({
 	preparePeriodEndsAt?: Date;
 	status?: EProposalStatus;
 }) {
+	const t = useTranslations();
 	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;
 	const decisionPeriodEnded = decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(dayjs()) : false;
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
@@ -30,13 +32,13 @@ function ProposalPeriods({
 				<p className={classes.proposalPeriodsHeaderTitle}>
 					{confirmationPeriodEnded
 						? status === EProposalStatus.Passed || EProposalStatus.Executed
-							? 'Proposal Passed'
-							: 'Proposal Failed'
+							? t('PostDetails.proposalPassed')
+							: t('PostDetails.proposalFailed')
 						: decisionPeriodEnded
-							? 'Confirmation Period'
+							? t('PostDetails.confirmationPeriod')
 							: preparePeriodEnded
-								? 'Voting has Started'
-								: 'Prepare Period'}
+								? t('PostDetails.votingStarted')
+								: t('PostDetails.preparePeriod')}
 				</p>
 				<div className={classes.proposalPeriodsHeaderPeriods}>
 					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
@@ -47,18 +49,18 @@ function ProposalPeriods({
 				<div className='flex flex-col gap-y-6'>
 					<PeriodProgress
 						periodEndsAt={decisionPeriodEndsAt}
-						periodName='Decision Period'
+						periodName={t('PostDetails.decisionPeriod')}
 					/>
 					<PeriodProgress
 						periodEndsAt={confirmationPeriodEndsAt}
-						periodName='Confirmation Period'
+						periodName={t('PostDetails.confirmationPeriod')}
 					/>
 				</div>
 			) : (
 				<div>
 					<PeriodProgress
 						periodEndsAt={preparePeriodEndsAt}
-						periodName='Prepare Period'
+						periodName={t('PostDetails.preparePeriod')}
 					/>
 				</div>
 			)}
