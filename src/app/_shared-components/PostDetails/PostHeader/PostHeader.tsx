@@ -151,8 +151,18 @@ function PostHeader({
 				</div>
 			</div>
 			<TabsList>
-				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
-				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
+					value={EPostDetailsTab.DESCRIPTION}
+				>
+					{t('PostDetails.description')}
+				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
+					value={EPostDetailsTab.TIMELINE}
+				>
+					{t('PostDetails.timeline')}
+				</TabsTrigger>
 			</TabsList>
 		</div>
 	);
