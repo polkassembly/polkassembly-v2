@@ -111,7 +111,7 @@ export function NavMain({
 								>
 									<CollapsibleTrigger asChild>
 										<div>
-											<div className='mt-4 flex items-center border-t-2 border-dotted border-[#ccc] pt-4 dark:border-[#4B4B4B]'>
+											<div className='mt-4 flex items-center border-t-2 border-dotted border-border_grey pt-4'>
 												<span className={`text-lightBlue ${state === 'collapsed' ? 'pl-2' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
 													{mainItem.heading}
 												</span>
@@ -139,7 +139,7 @@ export function NavMain({
 
 					{section.endItems && (
 						<div className='mt-4'>
-							<div className='mt-4 flex items-center border-t-2 border-dotted border-[#ccc] pt-4 dark:border-[#4B4B4B]'>
+							<div className='mt-4 flex items-center border-t-2 border-dotted border-border_grey pt-4'>
 								<SidebarMenu>
 									{section.endItems.map((item) => (
 										<CollapsibleItem

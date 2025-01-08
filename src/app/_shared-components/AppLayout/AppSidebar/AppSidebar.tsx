@@ -86,7 +86,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className={styles.sidebar_logo}>{getLogo()}</div>
 			</SidebarHeader>
 
-			<hr className='text-btn_secondary_border dark:text-[#4B4B4B]' />
+			<hr className='text-border_grey' />
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
@@ -104,7 +104,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						target='_blank'
 						rel='noreferrer'
 					>
-						<div className='mx-3 mb-2 flex cursor-pointer items-center justify-center gap-[6px] rounded-xl border border-solid border-primary_border bg-[#F8F9FC] px-[6px] py-2 dark:border-[#4B4B4B] dark:bg-[#1C1D1F]'>
+						<div className={styles.create_proposal_button}>
 							<Image
 								src={CautionIcon}
 								alt=''
