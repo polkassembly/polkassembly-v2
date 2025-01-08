@@ -235,7 +235,10 @@ export enum ETheme {
 
 export enum ELocales {
 	SPANISH = 'es',
-	ENGLISH = 'en'
+	ENGLISH = 'en',
+	CHINESE = 'zh',
+	GERMAN = 'de',
+	JAPANESE = 'jp'
 }
 
 export enum ECookieNames {
