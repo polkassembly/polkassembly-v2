@@ -135,5 +135,32 @@
 		"ReferendumKiller": "住民投票終了者",
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
 		"FellowshipAdmin": "フェローシップ管理者"
+	},
+	"PostDetails": {
+		"castVote": "投票する",
+		"requested": "リクエスト済み",
+		"beneficiary": "受益者",
+		"description": "説明",
+		"timeline": "タイムライン",
+		"more": "もっと見る",
+		"referendum": "レファレンダム",
+		"comments": "コメント",
+		"please": "お願いします",
+		"login": "ログイン",
+		"toComment": "コメントするには",
+		"post": "投稿",
+		"cancel": "キャンセル",
+		"reply": "返信",
+		"proposalPassed": "提案が可決されました",
+		"proposalFailed": "提案が否決されました",
+		"confirmationPeriod": "確認期間",
+		"votingStarted": "投票が開始されました",
+		"preparePeriod": "準備期間",
+		"decisionPeriod": "決定期間",
+		"summary": "概要",
+		"aye": "賛成",
+		"nay": "反対",
+		"support": "サポート",
+		"bareAyes": "単純賛成票"
 	}
 }

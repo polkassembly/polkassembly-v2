@@ -9,11 +9,13 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
 import classes from './Comments.module.scss';
 
 function Comments({ comments, proposalType, index }: { comments: ICommentResponse[]; proposalType: EProposalType; index: string }) {
+	const t = useTranslations();
 	const [allComments, setAllComments] = useState<ICommentResponse[]>(comments);
 	const user = useAtomValue(userAtom);
 
@@ -45,14 +47,14 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 				/>
 			) : (
 				<div className={classes.loginToComment}>
-					Please{' '}
+					{t('PostDetails.please')}
 					<Link
 						className='text-text_pink'
 						href='/login'
 					>
-						Login
+						{t('PostDetails.login')}
 					</Link>{' '}
-					to comment
+					{t('PostDetails.toComment')}
 				</div>
 			)}
 		</div>

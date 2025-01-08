@@ -11,9 +11,11 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { PieChart } from 'react-minimal-pie-chart';
 import React from 'react';
 import { BN } from '@polkadot/util';
+import { useTranslations } from 'next-intl';
 import classes from './VoteSummary.module.scss';
 
 function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
+	const t = useTranslations();
 	const network = getCurrentNetwork();
 	if (!voteMetrics) return null;
 	const ayeVotesNumber =
@@ -38,11 +40,11 @@ function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
 
 	return (
 		<div className={classes.voteSummaryWrapper}>
-			<p className={classes.voteSummaryTitle}>Summary</p>
+			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
 			<div className={classes.voteSummaryPieChart}>
 				<div className={classes.voteSummaryPieChartAyeNay}>
 					<p className='text-xl font-semibold text-success'>{isAyeNaN ? 50 : ayePercent.toFixed(1)}%</p>
-					<p className={classes.voteSummaryPieChartAyeNayTitle}>Aye</p>
+					<p className={classes.voteSummaryPieChartAyeNayTitle}>{t('PostDetails.aye')}</p>
 				</div>
 				<PieChart
 					className='w-[47%] xl:w-[49%]'
@@ -59,35 +61,35 @@ function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
 
 				<div className={classes.voteSummaryPieChartAyeNay}>
 					<p className='text-xl font-semibold text-failure'>{isNayNaN ? 50 : nayPercent.toFixed(1)}%</p>
-					<p className={classes.voteSummaryPieChartAyeNayTitle}>Nay</p>
+					<p className={classes.voteSummaryPieChartAyeNayTitle}>{t('PostDetails.nay')}</p>
 				</div>
 			</div>
 			<div className={classes.voteSummaryTable}>
 				<div className={classes.voteSummaryTableItem}>
 					<p className={classes.voteSummaryTableItemTitle}>
 						<span>
-							{EVoteDecision.AYE} ({voteMetrics[EVoteDecision.AYE].count})
+							{t('PostDetails.aye')} ({voteMetrics[EVoteDecision.AYE].count})
 						</span>
 						<span>
 							{formatUSDWithUnits(formatBnBalance(voteMetrics[EVoteDecision.AYE].value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>
 					</p>
 					<p className={classes.voteSummaryTableItemTitle}>
-						<span>Support</span>
+						<span>{t('PostDetails.support')}</span>
 						<span>{formatUSDWithUnits(formatBnBalance(voteMetrics.support.value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
 					</p>
 				</div>
 				<div className={classes.voteSummaryTableItem}>
 					<p className={classes.voteSummaryTableItemTitle}>
 						<span>
-							{EVoteDecision.NAY} ({voteMetrics[EVoteDecision.NAY].count})
+							{t('PostDetails.nay')} ({voteMetrics[EVoteDecision.NAY].count})
 						</span>
 						<span>
 							{formatUSDWithUnits(formatBnBalance(voteMetrics[EVoteDecision.NAY].value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>
 					</p>
 					<p className={classes.voteSummaryTableItemTitle}>
-						<span>Bare Ayes</span>
+						<span>{t('PostDetails.bareAyes')}</span>
 						<span>
 							{formatUSDWithUnits(formatBnBalance(voteMetrics.bareAyes.value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()), 1)}
 						</span>

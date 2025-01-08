@@ -135,5 +135,34 @@
 		"ReferendumKiller": "Referendum Killer",
 		"WhitelistedCaller": "Whitelisted Caller",
 		"FellowshipAdmin": "Fellowship Admin"
+	},
+	"PostDetails": {
+		"castVote": "Cast Vote",
+		"requested": "Requested",
+		"beneficiary": "Beneficiary",
+		"description": "Description",
+		"timeline": "Timeline",
+		"more": "more",
+		"referendum": "Referendum",
+		"comments": "Comments",
+		"please": "Please",
+		"login": "Login",
+		"toComment": "to comment",
+		"post": "Post",
+		"cancel": "Cancel",
+		"reply": "Reply",
+		"proposalPassed": "Proposal Passed",
+		"proposalFailed": "Proposal Failed",
+		"confirmationPeriod": "Confirmation Period",
+		"votingStarted": "Voting has Started",
+		"preparePeriod": "Prepare Period",
+		"decisionPeriod": "Decision Period",
+		"summary": "Summary",
+		"aye": "Aye",
+		"nay": "Nay",
+		"support": "Support",
+		"bareAyes": "Bare Ayes"
 	}
 }
+
+
