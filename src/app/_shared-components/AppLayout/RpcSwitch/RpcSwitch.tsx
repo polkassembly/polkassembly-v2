@@ -11,7 +11,9 @@ import { useRpcEndpoint } from '@/hooks/useRpcEndpoint';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
 export default function RpcSwitch() {
-	const { network, rpcEndpoints, userPreferences, handleRpcSwitch } = useRpcEndpoint();
+	const { network, rpcEndpoints, handleRpcSwitch, userPreferences } = useRpcEndpoint();
+
+	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	if (!Object.prototype.hasOwnProperty.call(NETWORKS_DETAILS, network)) {
 		return null;
@@ -30,7 +32,7 @@ export default function RpcSwitch() {
 				{rpcEndpoints.map((endpoint, index) => (
 					<DropdownMenuItem
 						key={endpoint?.url}
-						className={`cursor-pointer ${userPreferences?.rpcIndex === index ? 'bg-[#fde7f0] text-bg_pink' : ''}`}
+						className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-[#fde7f0] text-bg_pink' : ''}`}
 						onClick={() => handleRpcSwitch(index)}
 					>
 						<span className='text-sm font-medium'>{endpoint.name}</span>
