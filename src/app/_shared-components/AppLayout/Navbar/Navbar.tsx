@@ -17,7 +17,7 @@ import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './Navbar.module.scss';
 
-const RpcSwitch = dynamic(() => import('../RpcSwitch/RpcSwitch'), { ssr: false });
+const RPCSwitchDropdown = dynamic(() => import('../RpcSwitch/RPCSwitchDropdown'), { ssr: false });
 const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
 
 const LANGUAGES = {
@@ -77,7 +77,7 @@ function Navbar() {
 					</Link>
 				)}
 
-				<RpcSwitch />
+				<RPCSwitchDropdown />
 				<ToggleButton />
 			</div>
 		</nav>

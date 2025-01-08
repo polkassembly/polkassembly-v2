@@ -2,22 +2,33 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import React from 'react';
 import { MdOutlineSignalCellularAlt } from 'react-icons/md';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { useRpcEndpoint } from '@/hooks/useRpcEndpoint';
+import { useAtom } from 'jotai';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { userPreferencesAtom } from '@/app/_atoms/user/userPreferencesAtom';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
-export default function RpcSwitch() {
-	const { network, rpcEndpoints, handleRpcSwitch, userPreferences } = useRpcEndpoint();
+export default function RPCSwitchDropdown() {
+	const network = getCurrentNetwork();
+	const api = usePolkadotApiService();
+	const [userPreferences, setUserPreferences] = useAtom(userPreferencesAtom);
 
+	const { rpcEndpoints } = NETWORKS_DETAILS[network];
 	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	if (!Object.prototype.hasOwnProperty.call(NETWORKS_DETAILS, network)) {
 		return null;
 	}
+
+	const handleRpcSwitch = async (index: number) => {
+		if (api) {
+			await api.switchToNewRpcEndpoint(index);
+			setUserPreferences((prev) => ({ ...prev, rpcIndex: index }));
+		}
+	};
 
 	return (
 		<DropdownMenu>

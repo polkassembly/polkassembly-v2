@@ -6,7 +6,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { EProposalStatus, EProposalType } from '@/_shared/types';
+import { EListingTab, EProposalStatus, EProposalType } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
@@ -77,7 +77,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	const tabNames =
 		proposalType === EProposalType.DISCUSSION
-			? { INTERNAL_PROPOSALS: t('ListingTab.Polkassemby'), EXTERNAL_PROPOSALS: t('ListingTab.External') }
+			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
 			: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
