@@ -3,9 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import { dayjs } from '@shared/_utils/dayjsInit';
-import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { EProposalStatus } from '@/_shared/types';
-import { Progress } from '../../progress';
+import PeriodProgress from './PeriodProgress';
+import classes from './ProposalPeriods.module.scss';
 
 function ProposalPeriods({
 	confirmationPeriodEndsAt,
@@ -25,9 +25,9 @@ function ProposalPeriods({
 	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
 
 	return (
-		<div className='flex flex-col gap-y-8 rounded-xl bg-bg_modal p-6 shadow-lg'>
-			<div className='flex items-center justify-between'>
-				<p className='text-xl font-semibold text-text_primary'>
+		<div className={classes.proposalPeriodsWrapper}>
+			<div className={classes.proposalPeriodsHeader}>
+				<p className={classes.proposalPeriodsHeaderTitle}>
 					{confirmationPeriodEnded
 						? status === EProposalStatus.Passed || EProposalStatus.Executed
 							? 'Proposal Passed'
@@ -38,38 +38,28 @@ function ProposalPeriods({
 								? 'Voting has Started'
 								: 'Prepare Period'}
 				</p>
-				<div className='flex items-center rounded-xl bg-primary_border/[0.2] text-xs text-wallet_btn_text'>
-					<p className='h-6 w-6 rounded-full bg-bg_pink p-1 text-center text-white'>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
+				<div className={classes.proposalPeriodsHeaderPeriods}>
+					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
 					<span className='pl-1 pr-2'>of 3</span>
 				</div>
 			</div>
 			{confirmationPeriodEnded ? null : preparePeriodEnded ? (
 				<div className='flex flex-col gap-y-6'>
-					<div className='flex flex-col gap-y-2'>
-						<Progress
-							className='bg-progress_pink_bg'
-							indicatorClassName='bg-bg_pink'
-							value={calculateDecisionProgress(decisionPeriodEndsAt || '')}
-						/>
-						<p className='text-sm text-text_primary'>Decision Period</p>
-					</div>
-					<div className='flex flex-col gap-y-2'>
-						<Progress
-							className='bg-progress_pink_bg'
-							indicatorClassName='bg-bg_pink'
-							value={calculateDecisionProgress(confirmationPeriodEndsAt || '')}
-						/>
-						<p className='text-sm text-text_primary'>Confirmation Period</p>
-					</div>
+					<PeriodProgress
+						periodEndsAt={decisionPeriodEndsAt}
+						periodName='Decision Period'
+					/>
+					<PeriodProgress
+						periodEndsAt={confirmationPeriodEndsAt}
+						periodName='Confirmation Period'
+					/>
 				</div>
 			) : (
-				<div className='flex flex-col gap-y-2'>
-					<Progress
-						className='bg-progress_pink_bg'
-						indicatorClassName='bg-bg_pink'
-						value={calculateDecisionProgress(preparePeriodEndsAt || '')}
+				<div>
+					<PeriodProgress
+						periodEndsAt={preparePeriodEndsAt}
+						periodName='Prepare Period'
 					/>
-					<p className='text-sm text-text_primary'>Prepare Period</p>
 				</div>
 			)}
 		</div>

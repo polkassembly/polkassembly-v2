@@ -11,6 +11,7 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { PieChart } from 'react-minimal-pie-chart';
 import React from 'react';
 import { BN } from '@polkadot/util';
+import classes from './VoteSummary.module.scss';
 
 function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
 	const network = getCurrentNetwork();
@@ -36,12 +37,12 @@ function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
 	const isNayNaN = isNaN(nayPercent);
 
 	return (
-		<div className='flex flex-col rounded-xl bg-bg_modal p-6 shadow-lg'>
-			<p className='text-xl font-semibold text-text_primary'>Summary</p>
-			<div className='mb-6 flex items-end justify-center gap-x-4'>
-				<div className='mb-8 flex flex-col gap-y-1'>
+		<div className={classes.voteSummaryWrapper}>
+			<p className={classes.voteSummaryTitle}>Summary</p>
+			<div className={classes.voteSummaryPieChart}>
+				<div className={classes.voteSummaryPieChartAyeNay}>
 					<p className='text-xl font-semibold text-success'>{isAyeNaN ? 50 : ayePercent.toFixed(1)}%</p>
-					<p className='text-xs font-medium text-wallet_btn_text'>Aye</p>
+					<p className={classes.voteSummaryPieChartAyeNayTitle}>Aye</p>
 				</div>
 				<PieChart
 					className='w-[47%] xl:w-[49%]'
@@ -56,44 +57,36 @@ function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
 					]}
 				/>
 
-				<div className='mb-8 flex flex-col gap-y-1'>
+				<div className={classes.voteSummaryPieChartAyeNay}>
 					<p className='text-xl font-semibold text-failure'>{isNayNaN ? 50 : nayPercent.toFixed(1)}%</p>
-					<p className='text-xs font-medium text-wallet_btn_text'>Nay</p>
+					<p className={classes.voteSummaryPieChartAyeNayTitle}>Nay</p>
 				</div>
 			</div>
-			<div className='grid grid-cols-2 gap-4 text-xs text-wallet_btn_text'>
-				<div className='col-span-1 flex flex-col gap-y-2'>
-					<p className='flex items-center justify-between capitalize'>
+			<div className={classes.voteSummaryTable}>
+				<div className={classes.voteSummaryTableItem}>
+					<p className={classes.voteSummaryTableItemTitle}>
 						<span>
 							{EVoteDecision.AYE} ({voteMetrics[EVoteDecision.AYE].count})
 						</span>
 						<span>
-							{formatUSDWithUnits(
-								formatBnBalance(voteMetrics[EVoteDecision.AYE].value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()),
-								1
-							)}
+							{formatUSDWithUnits(formatBnBalance(voteMetrics[EVoteDecision.AYE].value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>
 					</p>
-					<p className='flex items-center justify-between capitalize'>
+					<p className={classes.voteSummaryTableItemTitle}>
 						<span>Support</span>
-						<span>
-							{formatUSDWithUnits(formatBnBalance(voteMetrics.support.value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()), 1)}
-						</span>
+						<span>{formatUSDWithUnits(formatBnBalance(voteMetrics.support.value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
 					</p>
 				</div>
-				<div className='col-span-1 flex flex-col gap-y-2'>
-					<p className='flex items-center justify-between capitalize'>
+				<div className={classes.voteSummaryTableItem}>
+					<p className={classes.voteSummaryTableItemTitle}>
 						<span>
 							{EVoteDecision.NAY} ({voteMetrics[EVoteDecision.NAY].count})
 						</span>
 						<span>
-							{formatUSDWithUnits(
-								formatBnBalance(voteMetrics[EVoteDecision.NAY].value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()),
-								1
-							)}
+							{formatUSDWithUnits(formatBnBalance(voteMetrics[EVoteDecision.NAY].value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>
 					</p>
-					<p className='flex items-center justify-between capitalize'>
+					<p className={classes.voteSummaryTableItemTitle}>
 						<span>Bare Ayes</span>
 						<span>
 							{formatUSDWithUnits(formatBnBalance(voteMetrics.bareAyes.value, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()), 1)}
