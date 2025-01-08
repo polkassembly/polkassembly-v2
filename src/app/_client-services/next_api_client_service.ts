@@ -17,7 +17,8 @@ import {
 	IErrorResponse,
 	IGenerateTFAResponse,
 	IOnChainPostListingResponse,
-	IPost
+	IPost,
+	IVoteData
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -81,6 +82,7 @@ export class NextApiClientService {
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_COMMENTS:
+			case EApiRoute.GET_VOTES:
 				break;
 			case EApiRoute.ADD_COMMENT:
 				method = 'POST';
@@ -230,5 +232,11 @@ export class NextApiClientService {
 				parentCommentId
 			}
 		});
+	}
+
+	// votes
+	static async getVotesApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES, routeSegments: [proposalType, index, 'votes'] });
+		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
 	}
 }

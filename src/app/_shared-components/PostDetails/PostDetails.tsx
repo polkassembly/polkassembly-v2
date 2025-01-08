@@ -7,11 +7,13 @@ import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
-// import BlockEditor from '../BlockEditor/BlockEditor';
 import { Skeleton } from '../Skeleton';
 import BlockEditor from '../BlockEditor/BlockEditor';
 import { Tabs, TabsContent } from '../Tabs';
 import Timeline from './Timeline/Timeline';
+import { Button } from '../Button';
+import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
+import VoteSummary from './VoteSummary/VoteSummary';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	return (
@@ -50,6 +52,27 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 							/>
 						</Suspense>
 					</div>
+				</div>
+				<div className={classes.rightWrapper}>
+					<Button
+						className='w-full'
+						size='lg'
+					>
+						Cast Vote
+					</Button>
+					<ProposalPeriods
+						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}
+						decisionPeriodEndsAt={postData.onChainInfo?.decisionPeriodEndsAt}
+						preparePeriodEndsAt={postData.onChainInfo?.preparePeriodEndsAt}
+						status={postData.onChainInfo?.status}
+					/>
+					<VoteSummary voteMetrics={postData.onChainInfo?.voteMetrics} />
+					{/* <Suspense fallback={<Skeleton className='h-4' />}>
+						<VoteDetails
+							proposalType={EProposalType.REFERENDUM_V2}
+							index={index}
+						/>
+					</Suspense> */}
 				</div>
 			</div>
 		</Tabs>
