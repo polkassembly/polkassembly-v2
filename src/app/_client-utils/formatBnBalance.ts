@@ -4,6 +4,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
+import { BN } from '@polkadot/util';
 
 interface Options {
 	numberAfterComma?: number;
@@ -11,9 +12,9 @@ interface Options {
 	withThousandDelimitor?: boolean;
 }
 
-export function formatBnBalance(value: string, options: Options, network: ENetwork, assetId?: string | null): string {
+export function formatBnBalance(value: string | BN, options: Options, network: ENetwork, assetId?: string | null): string {
 	const tokenDecimals = assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
-	const valueString = value.toString();
+	const valueString = value instanceof BN ? value.toString() : value;
 
 	let suffix = '';
 	let prefix = '';
