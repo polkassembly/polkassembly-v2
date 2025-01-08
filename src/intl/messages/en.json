@@ -5,5 +5,10 @@
 	"ActivityFeed": {
 		"ExploreTab": "Explore",
 		"SubscribedTab": "Subscribed"
+	},
+	"AddressDropdown": {
+		"fallbackText": "Please select wallet",
+		"chooseLinkedAccount": "Choose Linked Account",
+		"noAccountsFound": "No accounts found, check permission"
 	}
 }
