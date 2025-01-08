@@ -51,6 +51,12 @@
 		"loginwithusername": "Login with Username",
 		"loginToPolkassembly": "Login to Polkassembly"
 	},
+	"ListingTab": {
+		"Polkassemby": "Polkassemby",
+		"Analytics": "Analytics",
+		"External": "External",
+		"Referenda": "Referenda"
+	},
 	"ListingPage": {
 		"auctionAdmin": "Auction Admin",
 		"auctionAdminDescription": "Origin for starting auctions.",
@@ -134,6 +140,8 @@
 		"ReferendumCanceller": "Referendum Canceller",
 		"ReferendumKiller": "Referendum Killer",
 		"WhitelistedCaller": "Whitelisted Caller",
-		"FellowshipAdmin": "Fellowship Admin"
+		"FellowshipAdmin": "Fellowship Admin",
+		"ReportAnIssue": "Report an issue",
+		"NeedHelp": "Need help with something?"
 	}
 }

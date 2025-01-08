@@ -17,6 +17,12 @@
 		"hidePassword": "パスワードを非表示",
 		"showPassword": "パスワードを表示"
 	},
+	"ListingTab": {
+		"polkassemby": "Polkassemby",
+		"analytics": "分析",
+		"external": "外部",
+		"referenda": "レファレンダム"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",
 		"proposal": "提案",
@@ -134,6 +140,8 @@
 		"ReferendumCanceller": "住民投票キャンセル者",
 		"ReferendumKiller": "住民投票終了者",
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
-		"FellowshipAdmin": "フェローシップ管理者"
+		"FellowshipAdmin": "フェローシップ管理者",
+		"ReportAnIssue": "問題を報告",
+		"NeedHelp": "助けが必要ですか？"
 	}
 }

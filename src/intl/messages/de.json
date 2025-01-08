@@ -17,6 +17,12 @@
 		"hidePassword": "Passwort verbergen",
 		"showPassword": "Passwort anzeigen"
 	},
+	"ListingTab": {
+		"polkassemby": "Polkassemby",
+		"analytics": "Analysen",
+		"external": "Extern",
+		"referenda": "Referenden"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury-Vorschlag",
 		"proposal": "Vorschlag",
@@ -134,6 +140,8 @@
 		"ReferendumCanceller": "Referendum Annullierer",
 		"ReferendumKiller": "Referendum Beender",
 		"WhitelistedCaller": "Zugelassener Aufrufer",
-		"FellowshipAdmin": "Gemeinschafts Verwalter"
+		"FellowshipAdmin": "Gemeinschafts Verwalter",
+		"ReportAnIssue": "Problem melden",
+		"NeedHelp": "Brauchst du Hilfe?"
 	}
 }

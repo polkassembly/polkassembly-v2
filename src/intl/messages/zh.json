@@ -17,6 +17,12 @@
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码"
 	},
+	"ListingTab": {
+		"polkassemby": "Polkassemby",
+		"analytics": "分析",
+		"external": "外部",
+		"referenda": "公投"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
 		"proposal": "提案",
@@ -134,6 +140,8 @@
 		"ReferendumCanceller": "公投取消者",
 		"ReferendumKiller": "公投终止者",
 		"WhitelistedCaller": "白名单调用者",
-		"FellowshipAdmin": "研究员管理员"
+		"FellowshipAdmin": "研究员管理员",
+		"ReportAnIssue": "报告问题",
+		"NeedHelp": "需要帮助？"
 	}
 }

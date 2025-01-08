@@ -6,7 +6,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { EListingTab, EProposalStatus, EProposalType } from '@/_shared/types';
+import { EProposalStatus, EProposalType } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
@@ -52,8 +52,8 @@ interface ListingPageProps {
 
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
 	const router = useRouter();
+	const t = useTranslations();
 	const searchParams = useSearchParams();
-
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
 
@@ -68,8 +68,8 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	const tabNames =
 		proposalType === EProposalType.DISCUSSION
-			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: EListingTab.EXTERNAL }
-			: { INTERNAL_PROPOSALS: EListingTab.REFERENDA, EXTERNAL_PROPOSALS: EListingTab.ANALYTICS };
+			? { INTERNAL_PROPOSALS: t('ListingTab.Polkassemby'), EXTERNAL_PROPOSALS: t('ListingTab.External') }
+			: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
@@ -112,8 +112,6 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 			return { ...prev, selectedStatuses: newStatuses };
 		});
 	};
-
-	const t = useTranslations();
 
 	const handleTagToggle = (tag: string) => {
 		setState((prev) => ({
