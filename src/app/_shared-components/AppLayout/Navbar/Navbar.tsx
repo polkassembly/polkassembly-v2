@@ -12,11 +12,13 @@ import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { ELocales } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
+import dynamic from 'next/dynamic';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './Navbar.module.scss';
-import RpcSwitch from '../RpcSwitch/RpcSwitch';
-import ToggleButton from '../../ToggleButton';
+
+const RpcSwitch = dynamic(() => import('../RpcSwitch/RpcSwitch'), { ssr: false });
+const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
