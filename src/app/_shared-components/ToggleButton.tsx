@@ -28,8 +28,7 @@ function ToggleButton({ className }: ToggleButtonProps) {
 				'hover:bg-gray-100 dark:hover:bg-gray-800',
 				'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900',
 				{
-					'border-gray-200 dark:border-gray-700': true,
-					'bg-white dark:bg-gray-900': true
+					'border-gray-200 dark:border-gray-700': true
 				},
 				className
 			)}
