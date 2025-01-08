@@ -4,13 +4,15 @@
 
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Referendum Canceller'
-				description='Origin able to cancel referenda.'
+				title={t('referendumCanceller')}
+				description={t('referendumCancellerDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.REFERENDUM_CANCELLER]}
 			/>

@@ -4,13 +4,15 @@
 
 import { EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Onchain Bounty'
-				description='A space to share insights, provide feedback, and collaborate on ideas that impact the network.'
+				title={t('ListingPage.onchainBounty')}
+				description={t('ListingPage.onchainBountyDescription')}
 				proposalType={EProposalType.BOUNTY}
 			/>
 		</div>

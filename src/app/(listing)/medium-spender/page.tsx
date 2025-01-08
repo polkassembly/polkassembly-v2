@@ -4,13 +4,15 @@
 
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Medium Spender'
-				description='Origin able to spend up to 100,000 DOT from the treasury at once.'
+				title={t('ListingPage.mediumSpender')}
+				description={t('ListingPage.mediumSpenderDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.MEDIUM_SPENDER]}
 			/>

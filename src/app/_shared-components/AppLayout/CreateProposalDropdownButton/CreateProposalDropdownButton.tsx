@@ -37,7 +37,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						/>
 						{state !== 'collapsed' && (
 							<>
-								<span className={style.triggerText}>{t('CreateProposalDropdownButton.createProposal')}</span>
+								<span className={style.triggerText}>{t('CreateProposalDropdownButton.create')}</span>
 								<ChevronDown className={style.triggerIcon} />
 							</>
 						)}

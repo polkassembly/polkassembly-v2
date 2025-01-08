@@ -5,6 +5,7 @@
 import { getPageNumbers } from '@/app/_client-utils/getPageNumber';
 import { IPostListing, EProposalStatus, EProposalType, IOnChainPostListing, EVoteDecision } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { useTranslations } from 'next-intl';
 import styles from './ListingTab.module.scss';
 import ListingCard from '../ListingCard/ListingCard';
 
@@ -17,6 +18,7 @@ interface ListingTabProps {
 
 function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTabProps) {
 	const totalPages = Math.ceil(totalCount / DEFAULT_LISTING_LIMIT);
+	const t = useTranslations();
 
 	const renderPagination = () => (
 		<div className={styles.pagination}>
@@ -91,7 +93,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 
 	return (
 		<div>
-			<div className={styles.listing_container}>{data?.length > 0 ? renderListingCards() : <p className={styles.no_data}>No data available</p>}</div>
+			<div className={styles.listing_container}>{data?.length > 0 ? renderListingCards() : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}</div>
 			{totalCount > DEFAULT_LISTING_LIMIT && renderPagination()}
 		</div>
 	);
