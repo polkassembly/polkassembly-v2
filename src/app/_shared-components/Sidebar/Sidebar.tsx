@@ -7,7 +7,7 @@
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
 import Image from 'next/image';
-
+import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
@@ -250,6 +250,7 @@ Sidebar.displayName = 'Sidebar';
 
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
+	const { resolvedTheme: theme } = useTheme();
 
 	return (
 		<Button
@@ -268,7 +269,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 				<Image
 					src={LeftIcon}
 					alt='Left Icon'
-					className='dark-icons h-5 w-5'
+					className={`${theme === 'dark' ? 'dark-icons' : ''} h-5 w-5`}
 					width={5}
 					height={5}
 				/>
@@ -276,7 +277,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 				<Image
 					src={RightIcon}
 					alt='Right Icon'
-					className='dark-icons h-5 w-5'
+					className={`${theme === 'dark' ? 'dark-icons' : ''} h-5 w-5`}
 					width={5}
 					height={5}
 				/>
