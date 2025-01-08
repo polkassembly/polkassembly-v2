@@ -54,7 +54,8 @@ export const THEME_COLORS = {
 		progress_nay: '#fc3e5d',
 		sidebar_accent: '#e5e7eb',
 		decision_bar_bg: '#D4E0FC',
-		decision_bar_indicator: '#407AFC'
+		decision_bar_indicator: '#407AFC',
+		sidebar_foreground: '#0A3EAF'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',
@@ -81,7 +82,7 @@ export const THEME_COLORS = {
 		dark_general_text: '#DB8383',
 		dark_technical_bg: '#302921',
 		dark_technical_text: '#BFA889',
-		text_primary: '#FFF',
+		text_primary: '#9E9E9E',
 		text_pink: '#E5007A',
 		placeholder: '#576D8BCC',
 		success: '#2ED47A',
@@ -97,6 +98,7 @@ export const THEME_COLORS = {
 		sidebar_head3: '#3d2a23',
 		sidebar_head4: '#1d333c',
 		sidebar_footer: '#272727',
-		sidebar_accent: '#FFFFFF14'
+		sidebar_accent: '#FFFFFF14',
+		sidebar_foreground: '#49CFFC'
 	}
 };

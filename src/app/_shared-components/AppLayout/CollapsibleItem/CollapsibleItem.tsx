@@ -253,7 +253,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 								</div>
 							)}
 							<span className={style.mainTitle}>
-								{item.title}
+								<span className='text-text_primary'>{item.title}</span>
 								{item.isNew && <span className={style.newBadge_expanded}>New</span>}
 							</span>
 							{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
@@ -265,7 +265,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 							<SidebarMenuButton
 								size='default'
 								tooltip={item.title}
-								className={`${style.mainButton} ${item.isActive ? style.sidebarActive : ''}`}
+								className={`${style.mainButton} ${item.isActive ? style.sidebarActive : 'text-text_primary'}`}
 							>
 								{item.icon && (
 									<div className={style.iconWrapper}>
@@ -299,10 +299,10 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 										) : (
 											<Link
 												href={subItem.url || '#'}
-												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
+												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : 'text-text_primary'}`}
 											>
 												<div className='flex items-center'>
-													<span className='px-1'>{subItem.title}</span>
+													{subItem.title}
 													{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 												</div>
 											</Link>

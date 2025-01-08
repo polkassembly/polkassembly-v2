@@ -197,7 +197,7 @@ const Sidebar = forwardRef<
 					<SheetHeader>
 						<SheetTitle className='sr-only'>Mobile Sidebar</SheetTitle>
 					</SheetHeader>
-					<div className={styles.sidebar_mobile_children}>{children}</div>
+					<div className={`${styles.sidebar_mobile_children} dark:bg-section_dark_overlay`}>{children}</div>
 				</SheetContent>
 			</Sheet>
 		);
@@ -307,7 +307,7 @@ const SidebarHeader = forwardRef<HTMLDivElement, ComponentProps<'div'>>(({ class
 		<div
 			ref={ref}
 			data-sidebar='header'
-			className={cn(styles.sidebar_header, className)}
+			className={cn(styles.sidebar_header, 'dark:bg-section_dark_overlay', className)}
 			{...props}
 		/>
 	);
@@ -430,7 +430,7 @@ const SidebarMenuButton = forwardRef<
 			<TooltipContent
 				side='right'
 				align='center'
-				className={styles.sidebar_menubtn}
+				className={`${styles.sidebar_menubtn} bg-gray-700 text-white dark:bg-[var(--sidebar-primary-foreground)]`}
 				hidden={state !== 'collapsed' || isMobile}
 				{...tooltipProps}
 			/>
