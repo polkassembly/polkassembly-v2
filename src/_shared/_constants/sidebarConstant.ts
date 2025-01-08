@@ -91,19 +91,18 @@ const getOriginsItems = (networkKey: ENetwork) => {
 		}));
 };
 
-export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCounts: ITrackCounts = {}) => {
-	// eslint-disable-next-line
+export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: string) => string, trackCounts: ITrackCounts = {}) => {
 	const network = NETWORKS_DETAILS[networkKey];
 	if (!network) {
 		throw new Error(`Network ${networkKey} not found`);
 	}
 
 	const baseConfig = {
-		heading: 'Main',
+		heading: t('Sidebar.main'),
 		initalItems: ActiveItems(
 			[
-				{ title: 'Home', url: '#', icon: Home },
-				{ title: 'Discussions', url: '/discussions', icon: Discussion }
+				{ title: t('Sidebar.home'), url: '#', icon: Home },
+				{ title: t('Sidebar.discussions'), url: '/discussions', icon: Discussion }
 			],
 			pathname
 		),
@@ -118,42 +117,42 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 				initalItems: ActiveItems(
 					[
 						...baseConfig.initalItems,
-						{ title: 'Preimages', url: '#', icon: Preimages },
-						{ title: 'Delegation', url: '#', icon: Delegation },
+						{ title: t('Sidebar.preimages'), url: '#', icon: Preimages },
+						{ title: t('Sidebar.delegation'), url: '#', icon: Delegation },
 						{
-							title: 'Bounty',
+							title: t('Sidebar.bounty'),
 							url: '',
 							icon: Bounty,
 							isNew: true,
 							items: [
 								{
-									title: 'Bounty Dashboard',
+									title: t('Sidebar.bountyDashboard'),
 									url: '#',
 									count: trackCounts.bounty_dashboard || 0
 								},
-								{ title: 'On-chain Bounties', url: '/bounty/onchain-bounty' }
+								{ title: t('Sidebar.onChainBounties'), url: '/bounty/onchain-bounty' }
 							]
 						},
-						{ title: 'Batch Voting', url: '#', icon: BatchVoting, isNew: true }
+						{ title: t('Sidebar.batchVoting'), url: '#', icon: BatchVoting, isNew: true }
 					],
 					pathname
 				),
 				mainItems: ActiveItems(
 					[
 						{
-							heading: 'TRACKS',
-							title: 'TRACKS',
+							heading: t('Sidebar.tracks'),
+							title: t('Sidebar.tracks'),
 							url: '',
 							items: ActiveItems(
 								[
 									{
-										title: 'Treasury',
+										title: t('Sidebar.treasury'),
 										url: '',
 										icon: TreasuryIcon,
 										items: getTrackItems(networkKey, 'Treasury', trackCounts)
 									},
 									{
-										title: 'Administration',
+										title: t('Sidebar.administration'),
 										url: '',
 										icon: AdministrationIcon,
 										items: getTrackItems(networkKey, 'Main', trackCounts)
@@ -163,8 +162,8 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 							)
 						},
 						{
-							heading: 'ORIGINS',
-							title: 'ORIGINS',
+							heading: t('Sidebar.origins'),
+							title: t('Sidebar.origins'),
 							url: '',
 							items: ActiveItems(getOriginsItems(networkKey), pathname)
 						}
@@ -173,51 +172,51 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, trackCoun
 				),
 				endItems: ActiveItems(
 					[
-						{ title: 'Gov Analytics', url: '/gov-analytics', icon: GovAnalytics },
-						{ title: 'Calendar', url: '/calendar', icon: CalendarIcon },
+						{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics', icon: GovAnalytics },
+						{ title: t('Sidebar.calendar'), url: '/calendar', icon: CalendarIcon },
 						{
-							title: 'Community',
+							title: t('Sidebar.community'),
 							url: '/community',
 							icon: CommunityIcon,
 							items: [
-								{ title: 'Members', url: '/members' },
-								{ title: 'Ecosystem Projects', url: '/ecosystem-projects' }
+								{ title: t('Sidebar.members'), url: '/members' },
+								{ title: t('Sidebar.ecosystemProjects'), url: '/ecosystem-projects' }
 							]
 						},
-						{ title: 'Parachains', url: '/parachains', icon: ParachainsIcon },
+						{ title: t('Sidebar.parachains'), url: '/parachains', icon: ParachainsIcon },
 						{
-							title: 'Archived',
+							title: t('Sidebar.archived'),
 							url: '/archived',
 							icon: ArchivedIcon,
 							items: [
 								{
-									title: 'Democracy',
+									title: t('Sidebar.democracy'),
 									url: '#',
 									items: [
-										{ title: 'Proposals', url: '/proposals', icon: DemocraryProposalIcon },
-										{ title: 'Referenda', url: '/referenda', icon: DemocraryReferendumIcon }
+										{ title: t('Sidebar.proposals'), url: '/proposals', icon: DemocraryProposalIcon },
+										{ title: t('Sidebar.referenda'), url: '/referenda', icon: DemocraryReferendumIcon }
 									]
 								},
 								{
-									title: 'Treasury',
+									title: t('Sidebar.treasury'),
 									url: '#',
 									items: [
-										{ title: 'Treasury Proposals', url: '/treasury-proposals', icon: TreasuryProposalIcon },
-										{ title: 'Tips', url: '/tips', icon: TreasuryTipIcon }
+										{ title: t('Sidebar.treasuryProposals'), url: '/treasury-proposals', icon: TreasuryProposalIcon },
+										{ title: t('Sidebar.tips'), url: '/tips', icon: TreasuryTipIcon }
 									]
 								},
 								{
-									title: 'Council',
+									title: t('Sidebar.council'),
 									url: '#',
 									items: [
-										{ title: 'Motions', url: '/motions', icon: CouncilMotionIcon },
-										{ title: 'Members', url: '/members', icon: CouncilMemberIcon }
+										{ title: t('Sidebar.motions'), url: '/motions', icon: CouncilMotionIcon },
+										{ title: t('Sidebar.members'), url: '/members', icon: CouncilMemberIcon }
 									]
 								},
 								{
-									title: 'Tech. Comm.',
+									title: t('Sidebar.techComm'),
 									url: '#',
-									items: [{ title: 'Tech Comm Proposals', url: '/tech-comm-proposals', icon: TechCommIcon }]
+									items: [{ title: t('Sidebar.techCommProposals'), url: '/tech-comm-proposals', icon: TechCommIcon }]
 								}
 							]
 						}
