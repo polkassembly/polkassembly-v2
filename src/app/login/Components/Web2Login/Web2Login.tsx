@@ -17,6 +17,7 @@ import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import ErrorMessage from '@ui/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useUser } from '@/hooks/useUser';
+import { useTranslations } from 'next-intl';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -35,6 +36,7 @@ function Web2Login({
 	onTfaEnabled: (token: string) => void;
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
+	const t = useTranslations();
 
 	const { setUser } = useUser();
 
@@ -100,7 +102,7 @@ function Web2Login({
 									rules={{ required: true }}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Enter Username or Email</FormLabel>
+											<FormLabel>{t('Profile.enterUsernameOrEmail')}</FormLabel>
 											<FormControl>
 												<Input
 													placeholder='Type here'
@@ -124,7 +126,7 @@ function Web2Login({
 									disabled={loading}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Enter Password</FormLabel>
+											<FormLabel>{t('Profile.enterPassword')}</FormLabel>
 											<FormControl>
 												<PasswordInput
 													placeholder='Type here'
@@ -145,14 +147,14 @@ function Web2Login({
 								className={classes.loginButton}
 								size='lg'
 							>
-								Login
+								{t('Profile.login')}
 							</Button>
 						</div>
 					</form>
 				</Form>
 			</div>
 			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-			<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
+			<div className='my-4 flex justify-center text-xs text-border_grey'>{t('Profile.orLoginWith')}</div>
 			<WalletButtons
 				small
 				onWalletChange={onWalletChange}

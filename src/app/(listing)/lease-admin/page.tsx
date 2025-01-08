@@ -4,13 +4,15 @@
 
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Lease Admin'
-				description='Origin able to force slot leases'
+				title={t('ListingPage.leaseAdmin')}
+				description={t('ListingPage.leaseAdminDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.LEASE_ADMIN]}
 			/>

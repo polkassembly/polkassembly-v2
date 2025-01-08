@@ -14,6 +14,7 @@ import { WalletClientService } from '@/app/_client-services/wallet_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
+import { useTranslations } from 'next-intl';
 import classes from './TwoFactorAuth.module.scss';
 
 interface IFormFields {
@@ -22,7 +23,7 @@ interface IFormFields {
 
 function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaToken: string; loginAddress: string; loginWallet: EWallet; goBack: () => void }) {
 	const [loading, setLoading] = useState<boolean>(false);
-
+	const t = useTranslations();
 	const { setUser } = useUser();
 	const router = useRouter();
 
@@ -72,11 +73,9 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 				<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(loginWallet)}</span>
 			</p>
 			<p>
-				<span className={classes.walletName}>Two Factor Authentication</span>
+				<span className={classes.walletName}>{t('Profile.twoFactorAuth')}</span>
 			</p>
-			<p className='text-xs text-text_primary sm:text-sm'>
-				Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.
-			</p>
+			<p className='text-xs text-text_primary sm:text-sm'>{t('Profile.twoFactorAuthDescription')}</p>
 			<Form {...formData}>
 				<form onSubmit={formData.handleSubmit(handleLogin)}>
 					<div>
@@ -94,7 +93,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 							}}
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Authentication Code</FormLabel>
+									<FormLabel>{t('Profile.authCode')}</FormLabel>
 									<FormControl>
 										<Input
 											placeholder='######'
@@ -116,7 +115,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 							type='submit'
 							isLoading={loading}
 						>
-							Login
+							{t('Profile.login')}
 						</Button>
 					</div>
 				</form>
@@ -127,7 +126,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 					onClick={goBack}
 					type='button'
 				>
-					Go Back
+					{t('Profile.goBack')}
 				</Button>
 			</div>
 		</div>

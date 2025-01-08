@@ -15,6 +15,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { MdSearch } from 'react-icons/md';
 import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import { IoMdTrendingUp } from 'react-icons/io';
+import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
@@ -112,6 +113,8 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		});
 	};
 
+	const t = useTranslations();
+
 	const handleTagToggle = (tag: string) => {
 		setState((prev) => ({
 			...prev,
@@ -134,14 +137,14 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 				className={styles.button}
 			>
 				<span className='text-xl'>+</span>
-				<span className='whitespace-nowrap text-sm'>Create {proposalType === EProposalType.DISCUSSION ? 'Post' : 'Proposal'}</span>
+				<span className='whitespace-nowrap text-sm'>{t(`CreateProposalDropdownButton.create${proposalType === EProposalType.DISCUSSION ? 'Post' : 'Proposal'}`)}</span>
 			</button>
 		</div>
 	);
 
 	const renderFilterContent = () => (
 		<div className='p-4'>
-			<h3 className='text-sm font-semibold text-filter_dropdown'>STATUS</h3>
+			<h3 className='text-sm font-semibold uppercase text-filter_dropdown'>{t('CreateProposalDropdownButton.status')}</h3>
 			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
 				{STATUSES.map((status) => (
 					<span
@@ -159,7 +162,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 				))}
 			</div>
 
-			<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>Tags</h3>
+			<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>{t('CreateProposalDropdownButton.tags')}</h3>
 			<div className='relative mt-2'>
 				<input
 					type='text'
@@ -220,7 +223,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 									<span className={state.filterActive ? styles.selectedicon : ''}>
 										<FaFilter />
 									</span>
-									<span className='hidden lg:block'>Filter</span>
+									<span className='hidden lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
 								</div>
 							</PopoverTrigger>
 							<PopoverContent
@@ -231,7 +234,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 							</PopoverContent>
 						</Popover>
 						<p className={styles.filter}>
-							<span className='hidden lg:block'>Sort By</span> <BiSort />
+							<span className='hidden lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort />
 						</p>
 					</div>
 				</div>

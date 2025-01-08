@@ -19,6 +19,7 @@ import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDro
 import FetchAccountsConfirmation from '@/app/_shared-components/FetchAccountsConfirmation/FetchAccountsConfirmation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useUser } from '@/hooks/useUser';
+import { useTranslations } from 'next-intl';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -34,6 +35,7 @@ function Web3Login({
 	onTfaEnabled: (token: string) => void;
 }) {
 	const router = useRouter();
+	const t = useTranslations();
 
 	const [web3Screen, setWeb3Screen] = useState<EWeb3LoginScreens>(EWeb3LoginScreens.SELECT_WALLET);
 
@@ -133,7 +135,7 @@ function Web3Login({
 							size='lg'
 							className={classes.loginButton}
 						>
-							Login
+							{t('Profile.login')}
 						</Button>
 					</div>
 				)}
@@ -145,7 +147,7 @@ function Web3Login({
 							className='px-0 text-text_pink'
 							onClick={switchToWeb2}
 						>
-							Login with Username
+							{t('Profile.loginwithusername')}
 						</Button>
 					</div>
 				)}

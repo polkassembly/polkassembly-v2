@@ -4,18 +4,20 @@
 import React from 'react';
 import { Button } from '@ui/Button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import classes from './SwitchToWeb2Signup.module.scss';
 
 function SwitchToWeb2Signup({ switchToSignup, className }: { switchToSignup: () => void; className?: string }) {
+	const t = useTranslations();
 	return (
 		<p className={cn(classes.switchToWeb2Signup, className)}>
-			Don&apos;t have an account?{' '}
+			{t('SwitchToWeb2Signup.dontHaveAnAccount')}
 			<Button
 				onClick={switchToSignup}
 				variant='ghost'
 				className='p-0 text-xs text-text_pink sm:text-sm'
 			>
-				Sign Up
+				{t('SwitchToWeb2Signup.signUp')}
 			</Button>
 		</p>
 	);
