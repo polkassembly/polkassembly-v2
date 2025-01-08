@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
@@ -132,7 +133,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 												<Image
 													src={subItem.icon}
 													alt={subItem.title || 'icon'}
-													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
 													width={20}
 													height={20}
 												/>
@@ -151,7 +152,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 	);
 }
 
-function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: string | undefined }) {
+function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme }) {
 	return (
 		<SidebarMenuItem>
 			<div className={style.sidebarTrigger}>
@@ -174,7 +175,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: string
 										<Image
 											src={item.icon}
 											alt={item.title || 'icon'}
-											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
 											width={24}
 											height={24}
 										/>
@@ -205,7 +206,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: string
 														<Image
 															src={subItem.icon}
 															alt={subItem.title || 'icon'}
-															className={`${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+															className={`${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
 															width={24}
 															height={24}
 														/>
@@ -226,7 +227,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: string
 	);
 }
 
-function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: string | undefined }) {
+function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: ETheme }) {
 	return (
 		<SidebarMenuItem>
 			<Collapsible
@@ -246,7 +247,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 									<Image
 										src={item.icon}
 										alt={item.title || 'icon'}
-										className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+										className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
 										width={24}
 										height={24}
 									/>
@@ -272,7 +273,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 										<Image
 											src={item.icon}
 											alt={item.title || 'icon'}
-											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === 'dark' ? DARK_THEME_CLASS : ''}`}
+											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
 											width={24}
 											height={24}
 										/>
@@ -320,7 +321,8 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 
 function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State }) {
 	const [isOpen, setIsOpen] = useState(false);
-	const { resolvedTheme: theme } = useTheme();
+	const { resolvedTheme } = useTheme();
+	const theme = resolvedTheme as ETheme;
 
 	return state === 'collapsed' ? (
 		<CollapsedState

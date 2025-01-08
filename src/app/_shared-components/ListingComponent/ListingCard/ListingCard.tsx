@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
-import { EProposalType, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EProposalType, ETheme, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import Link from 'next/link';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -100,7 +100,7 @@ function ListingCard({
 									src={CommentIcon}
 									alt='comments'
 									width={16}
-									className={theme === 'dark' ? 'dark-icons' : ''}
+									className={theme === ETheme.DARK ? 'dark-icons' : ''}
 									height={16}
 								/>
 								<span className='text-text_primary'>{metrics?.comments || 0}</span>

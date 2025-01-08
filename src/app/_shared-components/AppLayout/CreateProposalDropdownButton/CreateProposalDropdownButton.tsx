@@ -12,6 +12,7 @@ import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
 import { useTheme } from 'next-themes';
+import { ETheme } from '@/_shared/types';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -62,7 +63,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 									alt='Dropdown Icon'
 									width={20}
 									height={20}
-									className={`${theme === 'dark' ? 'dark-icons' : ''}`}
+									className={`${theme === ETheme.DARK ? 'dark-icons' : ''}`}
 								/>
 
 								<Link

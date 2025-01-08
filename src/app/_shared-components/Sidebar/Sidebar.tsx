@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
+import { ETheme } from '@/_shared/types';
 import LeftIcon from '@assets/sidebar/lefticon.svg';
 import RightIcon from '@assets/sidebar/righticon.svg';
 import { ComponentProps, createContext, CSSProperties, ElementRef, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -251,16 +252,6 @@ Sidebar.displayName = 'Sidebar';
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
 	const { resolvedTheme: theme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	if (!mounted) {
-		return null;
-	}
-
 	return (
 		<Button
 			ref={ref}
@@ -278,7 +269,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 				src={state === 'expanded' ? LeftIcon : RightIcon}
 				alt={state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}
 				className={cn('h-5 w-5', {
-					'dark-icons': theme === 'dark'
+					'dark-icons': theme === ETheme.DARK
 				})}
 				width={20}
 				height={20}

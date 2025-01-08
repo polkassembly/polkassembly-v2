@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
+import { ETheme } from '@/_shared/types';
 
 interface ToggleButtonProps {
 	className?: string;
@@ -15,12 +16,12 @@ interface ToggleButtonProps {
 function ToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
 
-	const isDark = resolvedTheme === 'dark';
+	const isDark = resolvedTheme === ETheme.DARK;
 
 	return (
 		<button
 			type='button'
-			onClick={() => setTheme(isDark ? 'light' : 'dark')}
+			onClick={() => setTheme(isDark ? ETheme.LIGHT : ETheme.DARK)}
 			className={cn(
 				'flex items-center justify-center',
 				'rounded-full border',
@@ -31,7 +32,7 @@ function ToggleButton({ className }: ToggleButtonProps) {
 				'border-gray-200 dark:border-gray-700',
 				className
 			)}
-			aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+			aria-label={`Switch to ${isDark ? ETheme.LIGHT : ETheme.DARK} theme`}
 		>
 			{isDark ? (
 				<FiMoon

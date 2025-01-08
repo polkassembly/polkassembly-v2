@@ -7,7 +7,10 @@
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { SidebarTrigger, useSidebar } from '../../Sidebar/Sidebar';
+import dynamic from 'next/dynamic';
+import { useSidebar } from '../../Sidebar/Sidebar';
+
+const SidebarTrigger = dynamic(() => import('../../Sidebar/Sidebar').then((mod) => mod.SidebarTrigger), { ssr: false });
 
 function CustomSidebarTrigger() {
 	const { state } = useSidebar();
