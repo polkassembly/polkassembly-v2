@@ -46,15 +46,17 @@ function Navbar() {
 						<SelectValue placeholder='Select Language' />
 					</SelectTrigger>
 					<SelectContent>
-						{Object.entries(LANGUAGES).map(([locale, label]) => (
-							<SelectItem
-								key={locale}
-								value={locale}
-								className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-							>
-								{label}
-							</SelectItem>
-						))}
+						<div>
+							{Object.entries(LANGUAGES).map(([locale, label]) => (
+								<SelectItem
+									key={locale}
+									value={locale}
+									className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+								>
+									{label}
+								</SelectItem>
+							))}
+						</div>
 					</SelectContent>
 				</Select>
 
