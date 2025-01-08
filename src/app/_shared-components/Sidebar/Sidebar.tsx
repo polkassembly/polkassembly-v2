@@ -424,7 +424,7 @@ const SidebarMenuButton = forwardRef<
 			<TooltipContent
 				side='right'
 				align='center'
-				className={`${styles.sidebar_menubtn} bg-gray-700 text-white dark:bg-[var(--sidebar-primary-foreground)]`}
+				className={`${styles.sidebar_menubtn} bg-tooltip_background text-white`}
 				hidden={state !== 'collapsed' || isMobile}
 				{...tooltipProps}
 			/>
