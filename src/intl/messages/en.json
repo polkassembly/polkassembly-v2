@@ -10,5 +10,11 @@
 		"fallbackText": "Please select wallet",
 		"chooseLinkedAccount": "Choose Linked Account",
 		"noAccountsFound": "No accounts found, check permission"
+	},
+	"CreateProposalDropdownButton": {
+		"treasuryProposal": "Treasury Proposal",
+		"proposal": "Proposal",
+		"discussionPost": "Discussion Post",
+		"createProposal": "Create"
 	}
 }

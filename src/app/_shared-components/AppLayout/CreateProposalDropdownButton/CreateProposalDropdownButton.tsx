@@ -13,13 +13,15 @@ import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
+	const t = useTranslations();
 	const menuItems = [
-		{ title: 'Treasury Proposal', icon: TreasuryProposalIcon, url: '#' },
-		{ title: 'Proposal', icon: ProposalIcon, url: '#' },
-		{ title: 'Discussion Post', icon: DiscussionIcon, url: '#' }
+		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
+		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '#' }
 	];
 
 	return (
@@ -35,7 +37,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						/>
 						{state !== 'collapsed' && (
 							<>
-								<span className={style.triggerText}>Create</span>
+								<span className={style.triggerText}>{t('CreateProposalDropdownButton.createProposal')}</span>
 								<ChevronDown className={style.triggerIcon} />
 							</>
 						)}
