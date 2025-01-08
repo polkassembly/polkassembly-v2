@@ -127,6 +127,13 @@
 		"motions": "Motions",
 		"council": "Council",
 		"techComm": "Tech Comm.",
-		"onChainBounties": "Onchain Bounties"
+		"onChainBounties": "Onchain Bounties",
+		"Root": "Root",
+		"Treasurer": "Treasurer",
+		"WishForChange": "Wish For Change",
+		"ReferendumCanceller": "Referendum Canceller",
+		"ReferendumKiller": "Referendum Killer",
+		"WhitelistedCaller": "Whitelisted Caller",
+		"FellowshipAdmin": "Fellowship Admin"
 	}
 }

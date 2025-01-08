@@ -32,30 +32,33 @@ import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
 import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
-const capitalizeWords = (text: string) =>
-	text
-		.split('_')
-		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-		.join(' ');
-
 const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuItem[] =>
 	items.map((item) => ({
 		...item,
 		isActive: pathname === item.url,
 		items: item.items ? ActiveItems(item.items, pathname) : undefined
 	}));
-const getTrackItems = (networkKey: ENetwork, trackGroup: string, trackCounts?: Record<string, number>) => {
+const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string) => string, trackCounts?: Record<string, number>) => {
 	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === trackGroup)
-		.map(([trackKey, track]) => ({
-			title: capitalizeWords(track.name),
-			url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
-			// eslint-disable-next-line
-			count: trackCounts?.[trackKey] || 0,
-			icon: undefined
-		}));
+		.map(([trackKey, track]) => {
+			const formattedName = track.name
+				.split('_')
+				.map((word: string, index: number) => {
+					return index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+				})
+				.join('');
+			const translationKey = `ListingPage.${formattedName}`;
+			return {
+				title: t(translationKey),
+				url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
+				// eslint-disable-next-line
+				count: trackCounts?.[trackKey] || 0,
+				icon: undefined
+			};
+		});
 };
 
 const getOriginIcon = (key: string) => {
@@ -79,16 +82,19 @@ const getOriginIcon = (key: string) => {
 	}
 };
 
-const getOriginsItems = (networkKey: ENetwork) => {
+const getOriginsItems = (networkKey: ENetwork, t: (key: string) => string) => {
 	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === 'Origin')
-		.map(([key, track]) => ({
-			title: capitalizeWords(track.name),
-			url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
-			icon: getOriginIcon(key)
-		}));
+		.map(([key, track]) => {
+			const translationKey = `Sidebar.${key}`;
+			return {
+				title: t(translationKey),
+				url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
+				icon: getOriginIcon(key)
+			};
+		});
 };
 
 export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: string) => string, trackCounts: ITrackCounts = {}) => {
@@ -149,13 +155,13 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 										title: t('Sidebar.treasury'),
 										url: '',
 										icon: TreasuryIcon,
-										items: getTrackItems(networkKey, 'Treasury', trackCounts)
+										items: getTrackItems(networkKey, 'Treasury', t, trackCounts)
 									},
 									{
 										title: t('Sidebar.administration'),
 										url: '',
 										icon: AdministrationIcon,
-										items: getTrackItems(networkKey, 'Main', trackCounts)
+										items: getTrackItems(networkKey, 'Main', t, trackCounts)
 									}
 								],
 								pathname
@@ -165,7 +171,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							heading: t('Sidebar.origins'),
 							title: t('Sidebar.origins'),
 							url: '',
-							items: ActiveItems(getOriginsItems(networkKey), pathname)
+							items: ActiveItems(getOriginsItems(networkKey, t), pathname)
 						}
 					],
 					pathname
