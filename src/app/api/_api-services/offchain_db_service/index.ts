@@ -14,7 +14,8 @@ import {
 	IComment,
 	IReaction,
 	EReaction,
-	ICommentResponse
+	ICommentResponse,
+	IPublicUser
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -51,6 +52,16 @@ export class OffChainDbService {
 		return FirestoreService.GetUserByUsername(username);
 	}
 
+	static async GetPublicUserByUsername(username: string): Promise<IPublicUser | null> {
+		return FirestoreService.GetPublicUserByUsername(username);
+	}
+
+	static async GetPublicUserByAddress(address: string): Promise<IPublicUser | null> {
+		const formattedAddress = ValidatorService.isValidEVMAddress(address) ? address : getSubstrateAddress(address);
+		if (!formattedAddress) throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid address');
+		return FirestoreService.GetPublicUserByAddress(formattedAddress);
+	}
+
 	static async GetUserById(userId: number): Promise<IUser | null> {
 		return FirestoreService.GetUserById(userId);
 	}
@@ -61,6 +72,10 @@ export class OffChainDbService {
 
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {
 		return FirestoreService.GetAddressesForUserId(userId);
+	}
+
+	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+		return FirestoreService.GetPublicUsers(page, limit);
 	}
 
 	static async GetOffChainPostData({
@@ -179,6 +194,10 @@ export class OffChainDbService {
 
 	static async GetPostReactionById(id: string): Promise<IReaction | null> {
 		return FirestoreService.GetPostReactionById(id);
+	}
+
+	static async GetPublicUserById(id: number): Promise<IPublicUser | null> {
+		return FirestoreService.GetPublicUserById(id);
 	}
 
 	// Write methods

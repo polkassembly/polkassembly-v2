@@ -95,6 +95,15 @@ export class FirestoreService extends FirestoreRefs {
 		};
 	}
 
+	static async GetPublicUserByUsername(username: string): Promise<IPublicUser | null> {
+		const user = await this.GetUserByUsername(username);
+		if (!user) {
+			return null;
+		}
+
+		return this.GetPublicUserById(user.id);
+	}
+
 	static async GetPublicUserByAddress(address: string): Promise<IPublicUser | null> {
 		if (!ValidatorService.isValidWeb3Address(address)) {
 			return null;
@@ -113,6 +122,30 @@ export class FirestoreService extends FirestoreRefs {
 			profileScore: user.profileScore,
 			addresses: addresses.map((addr) => addr.address)
 		};
+	}
+
+	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+		const usersQuery = FirestoreRefs.usersCollectionRef()
+			.orderBy('profileScore', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const usersQuerySnapshot = await usersQuery.get();
+
+		return Promise.all(
+			usersQuerySnapshot.docs.map(async (doc) => {
+				const data = doc.data();
+
+				const addresses = await this.GetAddressesForUserId(data.id);
+
+				return {
+					id: data.id,
+					username: data.username,
+					profileScore: data.profileScore,
+					addresses: addresses.map((addr: IUserAddress) => addr.address)
+				} as IPublicUser;
+			})
+		);
 	}
 
 	static async GetUserByAddress(address: string): Promise<IUser | null> {
