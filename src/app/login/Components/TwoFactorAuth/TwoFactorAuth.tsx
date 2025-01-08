@@ -126,7 +126,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 					onClick={goBack}
 					type='button'
 				>
-					{t('Profile.goBack')}
+					{t('AddressDropdown.goBack')}
 				</Button>
 			</div>
 		</div>

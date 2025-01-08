@@ -252,7 +252,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 							className={classes.signupButton}
 							type='button'
 						>
-							{t('Profile.goBack')}
+							{t('AddressDropdown.goBack')}
 						</Button>
 					)}
 					<Button

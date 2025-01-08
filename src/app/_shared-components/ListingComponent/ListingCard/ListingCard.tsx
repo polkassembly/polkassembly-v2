@@ -22,6 +22,7 @@ import { Progress } from '@ui/progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
+import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
@@ -52,6 +53,7 @@ function ListingCard({
 	index: number;
 }) {
 	const network = getCurrentNetwork();
+	const { resolvedTheme: theme } = useTheme();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
 	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
@@ -70,8 +72,7 @@ function ListingCard({
 	return (
 		<Link
 			href={`/referenda/${index}`}
-			className={styles.listingCard}
-			style={{ backgroundColor }}
+			className={`${styles.listingCard} ${backgroundColor}`}
 		>
 			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
@@ -98,9 +99,10 @@ function ListingCard({
 									src={CommentIcon}
 									alt='comments'
 									width={16}
+									className={theme === 'dark' ? 'dark-icons' : ''}
 									height={16}
 								/>
-								<span>{metrics?.comments || 0}</span>
+								<span className='text-text_primary'>{metrics?.comments || 0}</span>
 							</div>
 							{timeRemaining && (
 								<>

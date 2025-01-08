@@ -1,5 +1,5 @@
 .container {
-    @apply lg:mx-auto bg-[var(--sidebar-background)] px-5 lg:px-10 pt-8;
+    @apply lg:mx-auto bg-section_dark_overlay px-5 lg:px-10 pt-8;
 }
 
 .header {
@@ -11,7 +11,7 @@
 }
 
 .subtitle {
-    @apply text-sm text-gray-600;
+    @apply text-sm text-gray-600 pt-5;
 }
 
 .button {
@@ -23,7 +23,7 @@
 }
 
 .tab-button {
-    @apply pb-3 text-gray-500;
+    @apply pb-3 text-text_primary;
 }
 
 .tab-button-active {

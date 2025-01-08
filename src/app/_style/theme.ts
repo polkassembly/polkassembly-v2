@@ -34,6 +34,7 @@ export const THEME_COLORS = {
 		sidebar_menu_bg: '#fce6f1',
 		create_proposal_btn_create: '#0A3EAF',
 		listing_page_btn: '#334D6E',
+		listing_card1: '#F5F6F8',
 		listing_page_border: '#CED4DE',
 		light_auction_text: '#AC6A30',
 		light_council_bg: '#FFEDF2',
@@ -62,7 +63,7 @@ export const THEME_COLORS = {
 		wallet_btn_text: '#485F7D',
 		bg_modal: '#000',
 		navbar_border: '#E5007A',
-		bg_pink: '#E5007A',
+		bg_pink: '#FF4098',
 		btn_primary_background: '#E5007A',
 		primary_border: '#333333',
 		tooltip_background: '#363636',
@@ -71,7 +72,7 @@ export const THEME_COLORS = {
 		btn_primary_text: '#FFF',
 		btn_secondary_border: '#D2D8E0',
 		btn_secondary_background: '#FFF',
-		btn_secondary_text: '#243A57',
+		btn_secondary_text: '#FFFFFF',
 		border_grey: '#3F3F46',
 		dark_auction_bg: '#302234',
 		dark_auction_text: '#CCAED4',
@@ -88,6 +89,8 @@ export const THEME_COLORS = {
 		placeholder: '#576D8BCC',
 		success: '#2ED47A',
 		failure: '#FF3C5F',
+		listing_page_border: '#4B4B4B',
+		listing_card1: '#4B4B4B',
 		text_grey: '#7587A0',
 		create_proposal_btn_create: '#49CFFC',
 		section_dark_overlay: '#0D0D0D',
@@ -100,6 +103,12 @@ export const THEME_COLORS = {
 		sidebar_head4: '#1d333c',
 		sidebar_footer: '#272727',
 		sidebar_accent: '#FFFFFF14',
-		sidebar_foreground: '#49CFFC'
+		sidebar_foreground: '#49CFFC',
+		voting_bar_bg: '#575255',
+		progress_default: '#d3d3d3',
+		progress_aye: '#27d57b',
+		progress_nay: '#fc3e5d',
+		decision_bar_bg: '#D4E0FC',
+		decision_bar_indicator: '#407AFC'
 	}
 };

@@ -130,7 +130,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 				<h1 className={styles.title}>
 					{title} ({data?.totalCount || 0})
 				</h1>
-				<p className={styles.subtitle}>{description}</p>
+				<p className={`${styles.subtitle} dark:text-white`}>{description}</p>
 			</div>
 			<button
 				type='button'
@@ -221,9 +221,9 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 									tabIndex={0}
 								>
 									<span className={state.filterActive ? styles.selectedicon : ''}>
-										<FaFilter />
+										<FaFilter className='text-text_primary' />
 									</span>
-									<span className='hidden lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
+									<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
 								</div>
 							</PopoverTrigger>
 							<PopoverContent
@@ -234,7 +234,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 							</PopoverContent>
 						</Popover>
 						<p className={styles.filter}>
-							<span className='hidden lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort />
+							<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort className='text-text_primary' />
 						</p>
 					</div>
 				</div>

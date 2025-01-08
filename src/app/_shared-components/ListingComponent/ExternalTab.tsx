@@ -11,7 +11,7 @@ function ExternalTab() {
 	const t = useTranslations();
 	return (
 		<div>
-			<p>{t('ExternalTab.contentWillBeAvailableSoon')}</p>
+			<p>{t('CreateProposalDropdownButton.contentWillBeAvailableSoon')}</p>
 		</div>
 	);
 }

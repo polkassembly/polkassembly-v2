@@ -11,13 +11,13 @@ function SwitchToWeb2Signup({ switchToSignup, className }: { switchToSignup: () 
 	const t = useTranslations();
 	return (
 		<p className={cn(classes.switchToWeb2Signup, className)}>
-			{t('SwitchToWeb2Signup.dontHaveAnAccount')}
+			{t('Profile.dontHaveAnAccount')}
 			<Button
 				onClick={switchToSignup}
 				variant='ghost'
 				className='p-0 text-xs text-text_pink sm:text-sm'
 			>
-				{t('SwitchToWeb2Signup.signUp')}
+				{t('Profile.signUp')}
 			</Button>
 		</p>
 	);
