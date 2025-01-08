@@ -232,22 +232,22 @@ export class SubsquidQueries {
 
 	protected static GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetConvictionVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
-			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-			yesCount: convictionVotesConnection(where: {decision_eq: yes, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			yesCount: convictionVotesConnection(where: {decision_eq: yes, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-			abstainCount: convictionVotesConnection(where: {decision_eq: abstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			abstainCount: convictionVotesConnection(where: {decision_eq: abstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-			splitCount: convictionVotesConnection(where: {decision_eq: split, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			splitCount: convictionVotesConnection(where: {decision_eq: split, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-			splitAbstainCount: convictionVotesConnection(where: {decision_eq: splitAbstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			splitAbstainCount: convictionVotesConnection(where: {decision_eq: splitAbstain, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-			tally: proposals(where:{index_eq: $index_eq, type_eq: $type_eq}) {
+			tally: proposals(where: {index_eq: $index_eq, type_eq: $type_eq}) {
 				tally {
 					ayes
 					bareAyes
@@ -286,7 +286,7 @@ export class SubsquidQueries {
 
 	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
-			votes:convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAt_isNull: true}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+			votes:convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
