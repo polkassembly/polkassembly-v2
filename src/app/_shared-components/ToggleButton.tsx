@@ -2,7 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
@@ -13,8 +15,18 @@ interface ToggleButtonProps {
 }
 
 function ToggleButton({ className }: ToggleButtonProps) {
-	const { resolvedTheme: theme, setTheme } = useTheme();
-	const isDark = theme === 'dark';
+	const { resolvedTheme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) {
+		return null;
+	}
+
+	const isDark = resolvedTheme === 'dark';
 
 	return (
 		<button
@@ -27,20 +39,28 @@ function ToggleButton({ className }: ToggleButtonProps) {
 				'transition-all duration-200 ease-in-out',
 				'hover:bg-gray-100 dark:hover:bg-gray-800',
 				'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900',
-				{
-					'border-gray-200 dark:border-gray-700': true
-				},
+				'border-gray-200 dark:border-gray-700',
 				className
 			)}
 			aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
 		>
 			{isDark ? (
-				<FiMoon className='h-4 w-4 text-[#90A0B7] transition-transform duration-200 hover:scale-110' />
+				<FiMoon
+					className='h-4 w-4 text-[#90A0B7] transition-transform duration-200 hover:scale-110'
+					strokeWidth={2}
+					aria-hidden='true'
+				/>
 			) : (
-				<IoSunnyOutline className='h-5 w-5 text-[#888888] transition-transform duration-200 hover:scale-110' />
+				<IoSunnyOutline
+					className='h-5 w-5 text-[#888888] transition-transform duration-200 hover:scale-110'
+					strokeWidth={2}
+					aria-hidden='true'
+				/>
 			)}
 		</button>
 	);
 }
+
+ToggleButton.displayName = 'ToggleButton';
 
 export default ToggleButton;

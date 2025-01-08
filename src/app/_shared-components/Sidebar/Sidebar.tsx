@@ -251,6 +251,15 @@ Sidebar.displayName = 'Sidebar';
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
 	const { resolvedTheme: theme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) {
+		return null;
+	}
 
 	return (
 		<Button
@@ -265,24 +274,17 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			}}
 			{...props}
 		>
-			{state === 'expanded' ? (
-				<Image
-					src={LeftIcon}
-					alt='Left Icon'
-					className={`${theme === 'dark' ? 'dark-icons' : ''} h-5 w-5`}
-					width={5}
-					height={5}
-				/>
-			) : (
-				<Image
-					src={RightIcon}
-					alt='Right Icon'
-					className={`${theme === 'dark' ? 'dark-icons' : ''} h-5 w-5`}
-					width={5}
-					height={5}
-				/>
-			)}
-			<span className='sr-only'>Toggle Sidebar</span>
+			<Image
+				src={state === 'expanded' ? LeftIcon : RightIcon}
+				alt={state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}
+				className={cn('h-5 w-5', {
+					'dark-icons': theme === 'dark'
+				})}
+				width={20}
+				height={20}
+				priority
+			/>
+			<span className='sr-only'>{state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}</span>
 		</Button>
 	);
 });
