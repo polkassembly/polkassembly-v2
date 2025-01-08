@@ -2,9 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTheme } from 'next-themes';
 import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
@@ -16,15 +14,6 @@ interface ToggleButtonProps {
 
 function ToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	if (!mounted) {
-		return null;
-	}
 
 	const isDark = resolvedTheme === 'dark';
 

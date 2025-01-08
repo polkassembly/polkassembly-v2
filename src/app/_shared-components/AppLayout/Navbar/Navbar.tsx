@@ -10,8 +10,10 @@ import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
+import dynamic from 'next/dynamic';
 import classes from './Navbar.module.scss';
-import ToggleButton from '../../ToggleButton';
+
+const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
 
 function Navbar() {
 	const { user, setUser } = useUser();
