@@ -13,6 +13,8 @@ import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { OutputData } from '@editorjs/editorjs';
+import { encodeEditorJsDataForFirestore } from '@/app/api/_api-utils/encodeEditorJsDataForFirestore';
 
 const zodParamsSchema = z.object({
 	id: z.string()
@@ -38,7 +40,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.string()
+		content: z.custom<Record<string, unknown>>() // TODO: should be able to take a string
 	});
 
 	const { content } = zodBodySchema.parse(await getReqBody(req));
@@ -56,9 +58,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User is not the owner of the comment');
 	}
 
+	const encodedContent = encodeEditorJsDataForFirestore(content as unknown as OutputData);
+
 	await OffChainDbService.UpdateComment({
 		commentId: id,
-		content
+		content: encodedContent as unknown as Record<string, unknown>
 	});
 
 	const response = NextResponse.json({ message: 'Comment updated successfully' });

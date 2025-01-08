@@ -39,7 +39,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.custom<Record<string, unknown>>(),
+		content: z.custom<Record<string, unknown>>(), // TODO: should be able to take a string
 		parentCommentId: z.string().optional(),
 		address: z
 			.string()

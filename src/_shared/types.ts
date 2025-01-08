@@ -562,3 +562,8 @@ export enum EAssets {
 	USDT = 'USDT',
 	USDC = 'USDC'
 }
+
+export enum EPostDetailsTab {
+	DESCRIPTION = 'description',
+	TIMELINE = 'timeline'
+}

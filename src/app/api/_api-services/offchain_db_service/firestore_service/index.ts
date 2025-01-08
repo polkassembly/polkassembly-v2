@@ -455,7 +455,7 @@ export class FirestoreService extends FirestoreRefs {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
+	static async UpdateComment({ commentId, content }: { commentId: string; content: Record<string, unknown> }) {
 		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, updatedAt: new Date() }, { merge: true });
 	}
 
@@ -509,8 +509,8 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.getReactionDocRefById(id).delete();
 	}
 
-	static async UpdatePost({ id, content }: { id?: string; content: string }) {
-		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, updatedAt: new Date() }, { merge: true });
+	static async UpdatePost({ id, content, title }: { id?: string; content: string; title: string }) {
+		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, title, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -518,13 +518,15 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType,
 		userId,
 		content,
-		indexOrHash
+		indexOrHash,
+		title
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
 		content: string;
 		indexOrHash?: string;
+		title: string;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
 
@@ -536,6 +538,7 @@ export class FirestoreService extends FirestoreRefs {
 			proposalType,
 			userId,
 			content,
+			title,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY

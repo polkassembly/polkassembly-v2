@@ -63,10 +63,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const zodBodySchema = z.object({
+		title: z.string().min(1, 'Title is required'),
 		content: z.string().min(1, 'Content is required')
 	});
 
-	const { content } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title } = zodBodySchema.parse(await getReqBody(req));
 
 	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 		await OffChainDbService.UpdateOffChainPost({
@@ -74,7 +75,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			indexOrHash: index,
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content
+			content,
+			title
 		});
 	} else {
 		await OffChainDbService.UpdateOnChainPost({
@@ -82,7 +84,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			indexOrHash: index,
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content
+			content,
+			title
 		});
 	}
 

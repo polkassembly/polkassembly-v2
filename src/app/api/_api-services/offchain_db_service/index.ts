@@ -232,7 +232,7 @@ export class OffChainDbService {
 		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
+	static async UpdateComment({ commentId, content }: { commentId: string; content: Record<string, unknown> }) {
 		return FirestoreService.UpdateComment({ commentId, content });
 	}
 
@@ -260,12 +260,24 @@ export class OffChainDbService {
 		return FirestoreService.DeletePostReaction(id);
 	}
 
-	static async CreateOffChainPost({ network, proposalType, userId, content }: { network: ENetwork; proposalType: EProposalType; userId: number; content: string }) {
+	static async CreateOffChainPost({
+		network,
+		proposalType,
+		userId,
+		content,
+		title
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+		title: string;
+	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
 		}
 
-		return FirestoreService.CreatePost({ network, proposalType, userId, content });
+		return FirestoreService.CreatePost({ network, proposalType, userId, content, title });
 	}
 
 	static async UpdateOffChainPost({
@@ -273,13 +285,15 @@ export class OffChainDbService {
 		indexOrHash,
 		proposalType,
 		userId,
-		content
+		content,
+		title
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
 		content: string;
+		title: string;
 	}) {
 		const postData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
@@ -291,7 +305,7 @@ export class OffChainDbService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 		}
 
-		await FirestoreService.UpdatePost({ id: postData.id, content });
+		await FirestoreService.UpdatePost({ id: postData.id, content, title });
 	}
 
 	static async UpdateOnChainPost({
@@ -299,13 +313,15 @@ export class OffChainDbService {
 		indexOrHash,
 		proposalType,
 		userId,
-		content
+		content,
+		title
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
 		content: string;
+		title: string;
 	}) {
 		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
 		if (!onChainPostInfo || !onChainPostInfo.proposer) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
@@ -322,9 +338,9 @@ export class OffChainDbService {
 		const offChainPostData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
 		if (!offChainPostData) {
-			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash });
+			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title });
 		} else {
-			await FirestoreService.UpdatePost({ id: offChainPostData.id, content });
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title });
 		}
 	}
 }

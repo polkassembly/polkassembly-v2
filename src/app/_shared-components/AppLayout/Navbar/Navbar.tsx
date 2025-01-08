@@ -8,12 +8,14 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
-import ToggleButton from '@ui/ToggleButton';
+import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import classes from './Navbar.module.scss';
+import ToggleButton from '../../ToggleButton';
 
 function Navbar() {
 	const { user, setUser } = useUser();
+	const t = useTranslations();
 	return (
 		<nav className={classes.navbar}>
 			<p className='ml-10 md:ml-0'>Polkassembly</p>
@@ -21,13 +23,13 @@ function Navbar() {
 				{user?.id ? (
 					<div className='flex items-center gap-x-4'>
 						<Link href='/settings'>
-							<Button variant='secondary'>Settings</Button>
+							<Button variant='secondary'>{t('Profile.settings')}</Button>
 						</Link>
-						<Button onClick={() => AuthClientService.logout(() => setUser(null))}>Logout</Button>
+						<Button onClick={() => AuthClientService.logout(() => setUser(null))}>{t('Profile.logout')}</Button>
 					</div>
 				) : (
 					<Link href='/login'>
-						<Button>Login</Button>
+						<Button>{t('Profile.login')}</Button>
 					</Link>
 				)}
 				<ToggleButton />

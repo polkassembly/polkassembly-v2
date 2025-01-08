@@ -36,7 +36,8 @@ export class OnChainDbService {
 		limit,
 		page,
 		statuses,
-		origins
+		origins,
+		notVotedByAddresses
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -44,13 +45,27 @@ export class OnChainDbService {
 		page: number;
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
+		notVotedByAddresses?: string[];
 	}) {
 		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
 
+		if (notVotedByAddresses?.length && !statuses?.length) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Statuses are required when notVotedByAddresses is provided.');
+		}
+
 		// fetch from subsquid
-		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins });
+		const subsquidOnChainPostsListing = await SubsquidService.GetOnChainPostsListing({
+			network,
+			proposalType,
+			limit,
+			page,
+			statuses,
+			origins,
+			notVotedByAddresses
+		});
+
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
 		return {

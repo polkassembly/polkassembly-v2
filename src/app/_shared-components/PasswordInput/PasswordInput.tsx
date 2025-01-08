@@ -9,11 +9,13 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Input } from '@ui/Input';
+import { useTranslations } from 'next-intl';
 import classes from './PasswordInput.module.scss';
 
 const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(({ className, ...props }, ref) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const disabled = props.value === '' || props.value === undefined || props.disabled;
+	const t = useTranslations();
 
 	return (
 		<div className='relative'>
@@ -42,7 +44,7 @@ const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<'input'>
 						aria-hidden='true'
 					/>
 				)}
-				<span className='sr-only'>{showPassword ? 'Hide password' : 'Show password'}</span>
+				<span className='sr-only'>{showPassword ? t('AddressDropdown.hidePassword') : t('AddressDropdown.showPassword')}</span>
 			</Button>
 		</div>
 	);

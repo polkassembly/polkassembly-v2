@@ -5,8 +5,10 @@
 import React from 'react';
 import Image from 'next/image';
 import LoginToPaIcon from '@assets/icons/login-to-pa-icon.svg';
+import { useTranslations } from 'next-intl';
 
 function HeaderLabel() {
+	const t = useTranslations();
 	return (
 		<p className='flex items-center gap-x-2 text-lg font-semibold text-text_primary sm:text-xl'>
 			<Image
@@ -15,7 +17,7 @@ function HeaderLabel() {
 				height={24}
 				width={24}
 			/>
-			Login to Polkassembly
+			{t('Profile.loginToPolkassembly')}
 		</p>
 	);
 }

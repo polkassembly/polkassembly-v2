@@ -1,5 +1,9 @@
 {
 	"HomePage": {
 		"title": "Bienvenido a la página principal"
+	},
+	"ActivityFeed": {
+		"ExploreTab": "Explorar",
+		"SubscribedTab": "Suscrito"
 	}
 }

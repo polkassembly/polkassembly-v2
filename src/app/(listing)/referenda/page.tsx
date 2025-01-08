@@ -4,13 +4,15 @@
 
 import { EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Onchain Referenda'
-				description='This is the place to discuss on-chain referenda. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.'
+				title={t('ListingPage.referenda')}
+				description={t('ListingPage.referendaDescription')}
 				proposalType={EProposalType.REFERENDUM}
 			/>
 		</div>
