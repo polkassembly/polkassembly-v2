@@ -49,7 +49,7 @@ function Navbar() {
 					<SelectTrigger className='w-[180px] border-border_grey'>
 						<SelectValue placeholder='Select Language' />
 					</SelectTrigger>
-					<SelectContent>
+					<SelectContent className='border-border_grey'>
 						<div>
 							{Object.entries(LANGUAGES).map(([locale, label]) => (
 								<SelectItem
