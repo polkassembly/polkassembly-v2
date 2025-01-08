@@ -1,5 +1,5 @@
 .card {
-	@apply relative z-10 rounded-[11.5px] bg-[var(--sidebar-background)] text-center;
+	@apply relative z-10 mt-4 p-[2px] rounded-[11.5px] bg-[var(--sidebar-background)] text-center;
 }
 
 @property --angle {
@@ -21,18 +21,12 @@
 	from {
 		--angle: 0deg;
 	}
+
 	to {
 		--angle: 360deg;
 	}
 }
 
-.cardCollapsed {
-	@apply mt-4 w-full p-[2px];
-}
-
-.cardExpanded {
-	@apply ml-2 mt-4 w-[200px] p-[2px];
-}
 
 .trigger {
 	@apply flex cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
@@ -43,19 +37,19 @@
 }
 
 .triggerExpanded {
-	@apply p-[2px];
+	@apply p-[2px] py-[4px];
 }
 
 .triggerText {
-	@apply text-sm font-medium leading-4 text-[var(--sidebar-foreground)];
+	@apply text-lg font-medium leading-4 text-sidebar_foreground;
 }
 
 .triggerIcon {
-	@apply ml-1 text-sm text-[var(--sidebar-foreground)];
+	@apply ml-1 text-lg text-sidebar_foreground;
 }
 
 .popoverContent {
-	@apply w-56 rounded-xl border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md dark:bg-[var(--sidebar-accent-foreground)];
+	@apply w-56 rounded-xl border-none text-text_primary bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md dark:bg-[var(--sidebar-accent-foreground)];
 }
 
 .menuList {
@@ -75,7 +69,7 @@
 }
 
 .menuLink {
-	@apply text-sm font-medium text-[var(--sidebar-accent-foreground)];
+	@apply text-sm font-medium text-text_primary;
 
 	.dark & {
 		@apply text-[var(--sidebar-foreground)];

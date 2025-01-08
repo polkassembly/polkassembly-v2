@@ -6,7 +6,7 @@ import styles from './VotingBar.module.scss';
 
 export default function VotingBar({ ayePercent, nayPercent }: { ayePercent: number; nayPercent: number }) {
 	const width = 120;
-	const height = 40;
+	const height = 30;
 	const strokeWidth = 16;
 	const radius = 50;
 

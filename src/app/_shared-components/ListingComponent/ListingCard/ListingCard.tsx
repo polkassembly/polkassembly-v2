@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
-import { EProposalType, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EProposalType, ETheme, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import Link from 'next/link';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -22,6 +22,7 @@ import { Progress } from '@ui/progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
+import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
@@ -52,6 +53,7 @@ function ListingCard({
 	index: number;
 }) {
 	const network = getCurrentNetwork();
+	const { resolvedTheme: theme } = useTheme();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
 	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
@@ -70,8 +72,7 @@ function ListingCard({
 	return (
 		<Link
 			href={`/referenda/${index}`}
-			className={styles.listingCard}
-			style={{ backgroundColor }}
+			className={`${styles.listingCard} ${backgroundColor}`}
 		>
 			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
@@ -94,13 +95,15 @@ function ListingCard({
 						</div>
 						<div className='flex items-center gap-2'>
 							<div className={styles.commentContainer}>
+								<span className='hidden lg:block'>|</span>
 								<Image
 									src={CommentIcon}
 									alt='comments'
 									width={16}
+									className={theme === ETheme.DARK ? 'dark-icons' : ''}
 									height={16}
 								/>
-								<span>{metrics?.comments || 0}</span>
+								<span className='text-text_primary'>{metrics?.comments || 0}</span>
 							</div>
 							{timeRemaining && (
 								<>
@@ -127,32 +130,36 @@ function ListingCard({
 									</Tooltip>
 								</>
 							)}
-							<span>|</span>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<div>
-										<VotingBar
-											ayePercent={ayePercent}
-											nayPercent={nayPercent}
-										/>
-									</div>
-								</TooltipTrigger>
-								<TooltipContent
-									side='top'
-									align='center'
-								>
-									<div className={styles.progressBarContainer}>
-										<p>
-											Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-											{ayePercent.toFixed(2)}%)
-										</p>
-										<p>
-											Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-											{nayPercent.toFixed(2)}%)
-										</p>
-									</div>
-								</TooltipContent>
-							</Tooltip>
+							{ayePercent > 0 && nayPercent > 0 && (
+								<>
+									<span>|</span>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div>
+												<VotingBar
+													ayePercent={ayePercent}
+													nayPercent={nayPercent}
+												/>
+											</div>
+										</TooltipTrigger>
+										<TooltipContent
+											side='top'
+											align='center'
+										>
+											<div className={styles.progressBarContainer}>
+												<p>
+													Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))}{' '}
+													({ayePercent.toFixed(2)}%)
+												</p>
+												<p>
+													Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))}{' '}
+													({nayPercent.toFixed(2)}%)
+												</p>
+											</div>
+										</TooltipContent>
+									</Tooltip>
+								</>
+							)}
 						</div>
 					</div>
 				</div>

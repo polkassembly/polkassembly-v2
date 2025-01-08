@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useTheme } from 'next-themes';
+import { ETheme } from '@/_shared/types';
 import styles from './StatusTag.module.scss';
 
 interface Props {
@@ -20,7 +21,7 @@ function StatusTag({ className = '', status, colorInverted }: Props) {
 		<div
 			// eslint-disable-next-line
 			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus] : ''} ${colorInverted ? styles.inverted : ''} ${
-				theme === 'dark' ? styles.dark : styles.light
+				theme === ETheme.DARK ? styles.dark : styles.light
 			} ${className}`}
 		>
 			{status?.split(/(?=[A-Z])/).join(' ')}

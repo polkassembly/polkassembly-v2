@@ -9,7 +9,6 @@ import React from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
 import Head1 from '@assets/sidebar/head1.svg';
@@ -87,7 +86,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className={styles.sidebar_logo}>{getLogo()}</div>
 			</SidebarHeader>
 
-			<hr className='text-btn_secondary_border' />
+			<hr className='text-border_grey' />
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
@@ -113,10 +112,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 								height={30}
 							/>
 							<div className='flex flex-col'>
-								<div className='flex gap-1'>
-									<span className={`${styles.reportbtn} text-blue-light-high dark:text-blue-dark-high`}>Report an issue</span>
-									<ChevronRight className='h-5 w-5' />
-								</div>
+								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>Report an issue</span>
 								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>Need help with something?</span>
 							</div>
 						</div>
