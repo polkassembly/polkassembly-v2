@@ -13,6 +13,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
 import BeneficiaryIcon from '@assets/icons/beneficiary-icon.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useTranslations } from 'next-intl';
 import classes from './PostHeader.module.scss';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
@@ -36,6 +37,7 @@ function PostHeader({
 	beneficiaries?: IBeneficiary[];
 }) {
 	const network = getCurrentNetwork();
+	const t = useTranslations();
 
 	const groupedByAsset = beneficiaries?.reduce((acc: Record<string, number>, curr) => {
 		const assetId = curr.assetId || NETWORKS_DETAILS[`${network}`].tokenSymbol;
@@ -50,7 +52,7 @@ function PostHeader({
 				<div className={classes.requestedWrapper}>
 					{beneficiaries && beneficiaries.length > 0 && groupedByAsset && (
 						<div className='flex flex-wrap items-center gap-x-2'>
-							<span className={classes.requestedText}>Requested:</span>
+							<span className={classes.requestedText}>{t('PostDetails.requested')}:</span>
 							<span className={classes.requestedAmount}>
 								{Object.entries(groupedByAsset).map(([assetId, amount], i) => (
 									<span
@@ -109,7 +111,7 @@ function PostHeader({
 									width={14}
 									height={14}
 								/>
-								<span className={classes.beneficiaryText}>Beneficiary:</span>
+								<span className={classes.beneficiaryText}>{t('PostDetails.beneficiary')}:</span>
 							</div>
 							{beneficiaries.slice(0, 2).map((beneficiary) => (
 								<div
@@ -125,7 +127,9 @@ function PostHeader({
 							{beneficiaries.length > 2 && (
 								<Tooltip>
 									<TooltipTrigger>
-										<span className='text-xs text-wallet_btn_text'>+ {beneficiaries.length - 2} more</span>
+										<span className='text-xs text-wallet_btn_text'>
+											+ {beneficiaries.length - 2} {t('PostDetails.more')}
+										</span>
 									</TooltipTrigger>
 									<TooltipContent className={classes.beneficiaryTooltipContent}>
 										{beneficiaries.slice(2).map((beneficiary) => (
@@ -147,8 +151,18 @@ function PostHeader({
 				</div>
 			</div>
 			<TabsList>
-				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>DESCRIPTION</TabsTrigger>
-				<TabsTrigger value={EPostDetailsTab.TIMELINE}>TIMELINE</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
+					value={EPostDetailsTab.DESCRIPTION}
+				>
+					{t('PostDetails.description')}
+				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
+					value={EPostDetailsTab.TIMELINE}
+				>
+					{t('PostDetails.timeline')}
+				</TabsTrigger>
 			</TabsList>
 		</div>
 	);

@@ -10,9 +10,11 @@ import { Separator } from '@ui/Separator';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import ReferendaIcon from '@assets/icons/timeline-referenda-icon.svg';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import classes from './Timeline.module.scss';
 
 function Timeline({ timeline }: { timeline?: IStatusHistoryItem[] }) {
+	const t = useTranslations();
 	return (
 		<div className={classes.timelineWrapper}>
 			<div className={classes.timelineHeader}>
@@ -24,7 +26,7 @@ function Timeline({ timeline }: { timeline?: IStatusHistoryItem[] }) {
 						height={24}
 					/>
 				</span>
-				<span className={classes.timelineTitle}>Referendum</span>
+				<span className={classes.timelineTitle}>{t('PostDetails.referendum')}</span>
 			</div>
 			<div className={classes.timelineContent}>
 				<div className={classes.timelineIconAndLine}>

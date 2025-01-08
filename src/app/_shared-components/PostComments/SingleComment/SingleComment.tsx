@@ -15,12 +15,14 @@ import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
+import { useTranslations } from 'next-intl';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 
 function SingleComment({ commentData, proposalType, index }: { commentData: ICommentResponse; proposalType: EProposalType; index: string }) {
 	const [reply, setReply] = useState<boolean>(false);
+	const t = useTranslations();
 
 	const [comment, setComment] = useState<ICommentResponse>(commentData);
 	const [showReplies, setShowReplies] = useState<boolean>(false);
@@ -71,7 +73,7 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 								/>
 							}
 						>
-							Reply
+							{t('PostDetails.reply')}
 						</Button>
 					</div>
 				)}

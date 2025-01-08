@@ -4,8 +4,20 @@
 
 import { EProposalType } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
+import { useTranslations } from 'next-intl';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
+
+function CommentsTitle({ count }: { count: number }) {
+	'use client';
+
+	const t = useTranslations();
+	return (
+		<p className={classes.title}>
+			{t('PostDetails.comments')} <span className='text-base font-normal'>({count})</span>
+		</p>
+	);
+}
 
 async function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
@@ -13,9 +25,7 @@ async function PostComments({ proposalType, index }: { proposalType: EProposalTy
 	return (
 		<div>
 			{error && <p>{error.message}</p>}
-			<p className={classes.title}>
-				Comments <span className='text-base font-normal'>({data?.length || 0})</span>
-			</p>
+			<CommentsTitle count={data?.length || 0} />
 			<Comments
 				proposalType={proposalType}
 				index={index}

@@ -4,6 +4,7 @@
 
 import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -16,6 +17,7 @@ import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
+	const t = useTranslations();
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
@@ -58,7 +60,7 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 						className='w-full'
 						size='lg'
 					>
-						Cast Vote
+						{t('PostDetails.castVote')}
 					</Button>
 					<ProposalPeriods
 						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}
