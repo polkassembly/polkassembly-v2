@@ -11,8 +11,8 @@ function Page() {
 	return (
 		<div>
 			<ListingPage
-				title={t('smallTipper')}
-				description={t('smallTipperDescription')}
+				title={t('ListingPage.smallTipper')}
+				description={t('ListingPage.smallTipperDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.SMALL_SPENDER]}
 			/>

@@ -11,8 +11,8 @@ function Page() {
 	return (
 		<div>
 			<ListingPage
-				title={t('root')}
-				description={t('rootDescription')}
+				title={t('ListingPage.root')}
+				description={t('ListingPage.rootDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.ROOT]}
 			/>

@@ -129,32 +129,36 @@ function ListingCard({
 									</Tooltip>
 								</>
 							)}
-							<span>|</span>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<div>
-										<VotingBar
-											ayePercent={ayePercent}
-											nayPercent={nayPercent}
-										/>
-									</div>
-								</TooltipTrigger>
-								<TooltipContent
-									side='top'
-									align='center'
-								>
-									<div className={styles.progressBarContainer}>
-										<p>
-											Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-											{ayePercent.toFixed(2)}%)
-										</p>
-										<p>
-											Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-											{nayPercent.toFixed(2)}%)
-										</p>
-									</div>
-								</TooltipContent>
-							</Tooltip>
+							{ayePercent > 0 && nayPercent > 0 && (
+								<>
+									<span>|</span>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div>
+												<VotingBar
+													ayePercent={ayePercent}
+													nayPercent={nayPercent}
+												/>
+											</div>
+										</TooltipTrigger>
+										<TooltipContent
+											side='top'
+											align='center'
+										>
+											<div className={styles.progressBarContainer}>
+												<p>
+													Aye = {formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))}{' '}
+													({ayePercent.toFixed(2)}%)
+												</p>
+												<p>
+													Nay = {formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))}{' '}
+													({nayPercent.toFixed(2)}%)
+												</p>
+											</div>
+										</TooltipContent>
+									</Tooltip>
+								</>
+							)}
 						</div>
 					</div>
 				</div>

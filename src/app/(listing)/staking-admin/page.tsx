@@ -11,8 +11,8 @@ function Page() {
 	return (
 		<div>
 			<ListingPage
-				title={t('stakingAdmin')}
-				description={t('stakingAdminDescription')}
+				title={t('ListingPage.stakingAdmin')}
+				description={t('ListingPage.stakingAdminDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.STAKING_ADMIN]}
 			/>

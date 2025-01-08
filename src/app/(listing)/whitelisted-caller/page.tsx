@@ -11,8 +11,8 @@ function Page() {
 	return (
 		<div>
 			<ListingPage
-				title={t('whitelistedCaller')}
-				description={t('whitelistedCallerDescription')}
+				title={t('ListingPage.whitelistedCaller')}
+				description={t('ListingPage.whitelistedCallerDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.WHITELISTED_CALLER]}
 			/>
