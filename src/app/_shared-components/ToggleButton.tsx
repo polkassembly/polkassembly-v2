@@ -29,7 +29,7 @@ function ToggleButton({ className }: ToggleButtonProps) {
 				'transition-all duration-200 ease-in-out',
 				'hover:bg-gray-100 dark:hover:bg-gray-800',
 				'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900',
-				'border-gray-200 dark:border-gray-700',
+				'border-border_grey',
 				className
 			)}
 			aria-label={`Switch to ${isDark ? ETheme.LIGHT : ETheme.DARK} theme`}
