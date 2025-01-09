@@ -68,7 +68,11 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 						preparePeriodEndsAt={postData.onChainInfo?.preparePeriodEndsAt}
 						status={postData.onChainInfo?.status}
 					/>
-					<VoteSummary voteMetrics={postData.onChainInfo?.voteMetrics} />
+					<VoteSummary
+						proposalType={EProposalType.REFERENDUM_V2}
+						index={index}
+						voteMetrics={postData.onChainInfo?.voteMetrics}
+					/>
 					{/* <Suspense fallback={<Skeleton className='h-4' />}>
 						<VoteDetails
 							proposalType={EProposalType.REFERENDUM_V2}
