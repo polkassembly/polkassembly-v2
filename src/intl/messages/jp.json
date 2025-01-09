@@ -226,7 +226,8 @@
 		"closed": "終了",
 		"awarded": "付与済み",
 		"added": "追加済み",
-		"notPassed": "不承認",
-		"started": "開始"
+		"notpassed": "不承認",
+		"started": "開始",
+		"passed": "承認"
 	}
 }

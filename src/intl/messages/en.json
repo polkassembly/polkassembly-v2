@@ -228,7 +228,8 @@
 		"closed": "Closed",
 		"awarded": "Awarded",
 		"added": "Added",
-		"notPassed": "Not Passed",
-		"started": "Started"
+		"notpassed": "Not Passed",
+		"started": "Started",
+		"passed": "Passed"
 	}
 }

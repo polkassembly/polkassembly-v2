@@ -226,7 +226,8 @@
 		"closed": "Cerrado",
 		"awarded": "Otorgado",
 		"added": "Añadido",
-		"notPassed": "No aprobado",
-		"started": "Empezado"
+		"notpassed": "No aprobado",
+		"started": "Empezado",
+		"passed": "Aprobado"
 	}
 }

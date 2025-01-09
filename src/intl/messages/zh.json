@@ -226,7 +226,8 @@
 		"closed": "已关闭",
 		"awarded": "已授予",
 		"added": "已添加",
-		"notPassed": "未通过",
-		"started": "已开始"
+		"notpassed": "未通过",
+		"started": "已开始",
+		"passed": "已通过"
 	}
 }
