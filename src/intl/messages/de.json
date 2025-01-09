@@ -226,6 +226,7 @@
 		"closed": "Geschlossen",
 		"awarded": "Zuerkannt",
 		"added": "Hinzugefügt",
-		"notPassed": "Nicht bestanden"
+		"notPassed": "Nicht bestanden",
+		"started": "Gestartet"
 	}
 }
