@@ -27,22 +27,6 @@ enum EListingTabState {
 	EXTERNAL_PROPOSALS = 'EXTERNAL_PROPOSALS'
 }
 
-const STATUSES = [
-	EProposalStatus.Cancelled,
-	EProposalStatus.Confirmed,
-	EProposalStatus.ConfirmAborted,
-	EProposalStatus.ConfirmStarted,
-	EProposalStatus.Deciding,
-	EProposalStatus.Executed,
-	EProposalStatus.ExecutionFailed,
-	EProposalStatus.Killed,
-	EProposalStatus.Rejected,
-	EProposalStatus.Submitted,
-	EProposalStatus.TimedOut
-];
-
-const TAGS = ['bounty', 'treasury', 'smart contract', 'polkadot', 'Network', 'Governance', 'Proposal', 'Test'];
-
 interface ListingPageProps {
 	proposalType: string;
 	origins?: string[];
@@ -52,10 +36,35 @@ interface ListingPageProps {
 
 function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
 	const router = useRouter();
+	const t = useTranslations();
 	const searchParams = useSearchParams();
-
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
+
+	const STATUSES = [
+		t('ListingPage_Status.Cancelled'),
+		t('ListingPage_Status.Confirmed'),
+		t('ListingPage_Status.ConfirmAborted'),
+		t('ListingPage_Status.ConfirmStarted'),
+		t('ListingPage_Status.Deciding'),
+		t('ListingPage_Status.Executed'),
+		t('ListingPage_Status.ExecutionFailed'),
+		t('ListingPage_Status.Killed'),
+		t('ListingPage_Status.Rejected'),
+		t('ListingPage_Status.Submitted'),
+		t('ListingPage_Status.TimedOut')
+	];
+
+	const TAGS = [
+		t('ListingPage_Tags.bounty'),
+		t('ListingPage_Tags.treasury'),
+		t('ListingPage_Tags.smart contract'),
+		t('ListingPage_Tags.polkadot'),
+		t('ListingPage_Tags.Network'),
+		t('ListingPage_Tags.Governance'),
+		t('ListingPage_Tags.Proposal'),
+		t('ListingPage_Tags.Test')
+	];
 
 	const [state, setState] = useState({
 		activeTab: EListingTabState.INTERNAL_PROPOSALS,
@@ -68,8 +77,8 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	const tabNames =
 		proposalType === EProposalType.DISCUSSION
-			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: EListingTab.EXTERNAL }
-			: { INTERNAL_PROPOSALS: EListingTab.REFERENDA, EXTERNAL_PROPOSALS: EListingTab.ANALYTICS };
+			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
+			: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
@@ -103,17 +112,15 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		setState((prev) => ({ ...prev, currentPage: page }));
 		updateUrlParams(page, state.selectedStatuses);
 	};
-
-	const handleStatusToggle = (status: EProposalStatus) => {
+	const handleStatusToggle = (statusStr: string) => {
 		setState((prev) => {
-			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
-
-			updateUrlParams(prev.currentPage, newStatuses);
-			return { ...prev, selectedStatuses: newStatuses };
+			const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
+			return {
+				...prev,
+				selectedStatuses: prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status]
+			};
 		});
 	};
-
-	const t = useTranslations();
 
 	const handleTagToggle = (tag: string) => {
 		setState((prev) => ({
@@ -154,7 +161,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 						<input
 							type='checkbox'
 							className='mr-2'
-							checked={state.selectedStatuses.includes(status)}
+							checked={state.selectedStatuses.some((s) => t(`ListingPage_Status.${s}`) === status)}
 							onChange={() => handleStatusToggle(status)}
 						/>
 						<span className='text-sm text-filter_dropdown'>{status}</span>
