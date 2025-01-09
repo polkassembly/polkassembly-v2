@@ -11,19 +11,25 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-component
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
+import { useTheme } from 'next-themes';
+import { ETheme } from '@/_shared/types';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
+	const t = useTranslations();
 	const menuItems = [
-		{ title: 'Treasury Proposal', icon: TreasuryProposalIcon, url: '#' },
-		{ title: 'Proposal', icon: ProposalIcon, url: '#' },
-		{ title: 'Discussion Post', icon: DiscussionIcon, url: '#' }
+		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
+		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '#' }
 	];
 
+	const { resolvedTheme: theme } = useTheme();
+
 	return (
-		<div className={`${style.card} mt-4 p-[2px] ${state === 'collapsed' ? 'w-full' : 'mx-4 lg:w-[200px]'}`}>
+		<div className={`${style.card} ${state === 'collapsed' ? 'w-full' : 'mx-4 lg:w-[200px]'}`}>
 			<Popover>
 				<PopoverTrigger asChild>
 					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}>
@@ -35,7 +41,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 						/>
 						{state !== 'collapsed' && (
 							<>
-								<span className={style.triggerText}>Create</span>
+								<span className={style.triggerText}>{t('CreateProposalDropdownButton.create')}</span>
 								<ChevronDown className={style.triggerIcon} />
 							</>
 						)}
@@ -57,6 +63,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 									alt='Dropdown Icon'
 									width={20}
 									height={20}
+									className={`${theme === ETheme.DARK ? 'dark-icons' : ''}`}
 								/>
 
 								<Link

@@ -3,8 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getPageNumbers } from '@/app/_client-utils/getPageNumber';
-import { IPostListing } from '@/_shared/types';
+import { IPostListing, EProposalStatus, EProposalType, IOnChainPostListing, EVoteDecision } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { useTranslations } from 'next-intl';
 import styles from './ListingTab.module.scss';
 import ListingCard from '../ListingCard/ListingCard';
 
@@ -17,6 +18,7 @@ interface ListingTabProps {
 
 function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTabProps) {
 	const totalPages = Math.ceil(totalCount / DEFAULT_LISTING_LIMIT);
+	const t = useTranslations();
 
 	const renderPagination = () => (
 		<div className={styles.pagination}>
@@ -51,13 +53,25 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 
 	const renderListingCards = () =>
 		data.slice(0, DEFAULT_LISTING_LIMIT).map((item, idx) => {
-			const backgroundColor = idx % 2 === 0 ? '#fbfbfb' : '#FFFFFF';
+			const backgroundColor = idx % 2 === 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay';
 
-			const onChainInfo = {
-				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt).toISOString() : 'N/A',
+			const onChainInfo: IOnChainPostListing = {
+				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt) : new Date(),
 				proposer: item.onChainInfo?.proposer || 'Unknown Proposer',
 				origin: item.onChainInfo?.origin || 'Unknown Origin',
-				status: item.onChainInfo?.status || 'Unknown Status'
+				status: (item.onChainInfo?.status as EProposalStatus) || EProposalStatus.Submitted,
+				description: item.onChainInfo?.description || '',
+				index: item.onChainInfo?.index || 0,
+				type: (item.onChainInfo?.type as EProposalType) || EProposalType.REFERENDUM_V2,
+				hash: item.onChainInfo?.hash || '',
+				beneficiaries: item.onChainInfo?.beneficiaries || [],
+				decisionPeriodEndsAt: item.onChainInfo?.decisionPeriodEndsAt || undefined,
+				voteMetrics: item.onChainInfo?.voteMetrics || {
+					support: { value: '0' },
+					bareAyes: { value: '0' },
+					[EVoteDecision.AYE]: { count: 0, value: '0' },
+					[EVoteDecision.NAY]: { count: 0, value: '0' }
+				}
 			};
 
 			return (
@@ -70,6 +84,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 						title={item.title || 'Untitled'}
 						onChainInfo={onChainInfo}
 						proposalType={item.proposalType}
+						metrics={item.metrics}
 						index={item.index ?? 0}
 					/>
 				</div>
@@ -78,7 +93,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 
 	return (
 		<div>
-			<div className={styles.listing_container}>{data?.length > 0 ? renderListingCards() : <p className={styles.no_data}>No data available</p>}</div>
+			<div className={styles.listing_container}>{data?.length > 0 ? renderListingCards() : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}</div>
 			{totalCount > DEFAULT_LISTING_LIMIT && renderPagination()}
 		</div>
 	);

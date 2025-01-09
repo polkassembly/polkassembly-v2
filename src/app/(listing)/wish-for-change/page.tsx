@@ -4,13 +4,15 @@
 
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Wish For Change'
-				description='Origin for signaling that the network wishes for some change.'
+				title={t('ListingPage.wishForChange')}
+				description={t('ListingPage.wishForChangeDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.WISH_FOR_CHANGE]}
 			/>

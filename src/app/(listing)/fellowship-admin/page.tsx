@@ -4,13 +4,15 @@
 
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Fellowship Admin'
-				description='Origin for managing the composition of the fellowshipShow.'
+				title={t('ListingPage.fellowshipAdmin')}
+				description={t('ListingPage.fellowshipAdminDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.FELLOWSHIP_ADMIN]}
 			/>

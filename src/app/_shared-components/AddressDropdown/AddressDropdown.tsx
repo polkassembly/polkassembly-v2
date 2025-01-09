@@ -10,6 +10,7 @@ import Identicon from '@polkadot/react-identicon';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { EWallet } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -18,7 +19,7 @@ import { WalletIcon } from '../WalletsUI/WalletsIcon';
 
 function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) => void }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
-
+	const t = useTranslations();
 	const walletService = useWalletService();
 
 	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
@@ -48,9 +49,9 @@ function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) =
 		onChange?.(a);
 	};
 
-	if (!userPreferences.wallet) return <div className={classes.fallbackText}>Please select wallet</div>;
+	if (!userPreferences.wallet) return <div className={classes.fallbackText}>{t('AddressDropdown.fallbackText')}</div>;
 
-	if (!accounts) return <div className={classes.fallbackText}>No accounts found, check permission</div>;
+	if (!accounts) return <div className={classes.fallbackText}>{t('AddressDropdown.noAccountsFound')}</div>;
 
 	return (
 		<div>
@@ -60,7 +61,7 @@ function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) =
 			</p>
 			<DropdownMenu>
 				<div>
-					<p className='mb-1 text-sm text-wallet_btn_text'>Choose Linked Account</p>
+					<p className='mb-1 text-sm text-wallet_btn_text'>{t('AddressDropdown.chooseLinkedAccount')}</p>
 					<DropdownMenuTrigger className={classes.dropdownTrigger}>
 						<Identicon
 							value={userPreferences?.address?.address}

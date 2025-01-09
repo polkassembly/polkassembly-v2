@@ -5,7 +5,8 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { ENetwork, EProposalStatus, EProposalType, IOnChainPostInfo } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IStatusHistoryItem, IVoteMetrics } from '@/_shared/types';
+import { hexToString } from '@polkadot/util';
 
 export class SubsquareOnChainService {
 	private static postDetailsUrlMap = {
@@ -38,7 +39,44 @@ export class SubsquareOnChainService {
 
 		const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
+		const beneficiaries = data?.onchainData?.treasuryInfo?.beneficiaries
+			? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+				data.onchainData.treasuryInfo.beneficiaries.map((beneficiary: any) => ({
+					address: beneficiary.address,
+					amount: beneficiary.amount || data.onchainData.treasuryInfo.amount,
+					assetId: beneficiary.assetId || null
+				}))
+			: undefined;
+
+		// Convert hex values to strings and extract vote metrics from tally data
+		const voteMetrics: IVoteMetrics | undefined = data?.state?.args?.tally
+			? {
+					[EVoteDecision.AYE]: {
+						count: 0,
+						value: data.state.args.tally.ayes.toString()
+					},
+					[EVoteDecision.NAY]: {
+						count: 0,
+						value: data.state.args.tally.nays.startsWith('0x') ? hexToString(data.state.args.tally.nays) : data.state.args.tally.nays.toString()
+					},
+					support: {
+						value: data.state.args.tally.support.toString()
+					},
+					bareAyes: {
+						value: data.state.args.tally.ayes.toString()
+					}
+				}
+			: undefined;
+
 		const proposer = data?.proposer || data?.onchainData?.proposer || '';
+
+		const timeline: IStatusHistoryItem[] =
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			data?.onchainData?.timeline?.map((event: any) => ({
+				status: event.name as EProposalStatus,
+				timestamp: new Date(event.indexer.blockTime),
+				block: event.indexer.blockHeight
+			})) || [];
 
 		const onChainPostInfo: IOnChainPostInfo = {
 			proposer: ValidatorService.isValidSubstrateAddress(proposer) ? getSubstrateAddress(proposer) || '' : '',
@@ -47,8 +85,9 @@ export class SubsquareOnChainService {
 			origin: data?.onchainData?.info?.origin?.origins,
 			index: data?.onchainData?.timeline?.[0]?.referendumIndex ?? undefined,
 			hash: data?.onchainData?.timeline?.[0]?.args?.proposalHash || undefined,
-			// TODO: add vote metrics,
-			reward: data?.onchainData?.treasuryInfo?.amount || undefined
+			beneficiaries,
+			voteMetrics,
+			timeline
 		};
 
 		return onChainPostInfo;

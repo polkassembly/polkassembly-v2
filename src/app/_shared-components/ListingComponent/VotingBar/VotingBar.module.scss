@@ -1,0 +1,23 @@
+.progressBar {
+    @apply w-10;
+
+    path {
+        transition: all 0.3s ease;
+    }
+
+    text {
+        font-weight: 500;
+    }
+}
+
+.progress_default {
+    @apply stroke-progress_default
+}
+
+.progress_aye {
+    @apply stroke-progress_aye
+}
+
+.progress_nay {
+    @apply stroke-progress_nay
+}

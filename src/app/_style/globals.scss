@@ -42,7 +42,7 @@
 		--sidebar-background: hsl(240 5.9% 10%);
 		--sidebar-foreground: hsl(240 4.8% 95.9%);
 		--sidebar-primary: hsl(224.3 76.3% 48%);
-		--sidebar-primary-foreground: hsl(0 0% 100%);
+		--sidebar-primary-foreground: hsl(220, 7%, 17%);
 		--sidebar-accent: hsl(240 3.7% 15.9%);
 		--sidebar-accent-foreground: hsl(240 4.8% 95.9%);
 		--sidebar-border: hsl(240 3.7% 15.9%);
@@ -54,6 +54,7 @@
 	* {
 		@apply border-border;
 	}
+
 	body {
 		@apply bg-background text-foreground;
 	}
@@ -71,4 +72,13 @@
 
 .codex-editor__redactor {
 	padding-bottom: 0 !important;
+}
+
+.ce-block__content {
+	max-width: 100% !important;
+	margin: 0 !important;
+}
+
+.dark-icons {
+	filter: invert(56%) sepia(0%) saturate(15%) hue-rotate(141deg) brightness(101%) contrast(93%) !important;
 }

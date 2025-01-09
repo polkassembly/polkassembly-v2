@@ -142,16 +142,17 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const zodBodySchema = z.object({
+		title: z.string().min(1, 'Title is required'),
 		content: z.string().min(1, 'Content is required')
 	});
 
-	const { content } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title } = zodBodySchema.parse(await getReqBody(req));
 
 	if (ValidatorService.isValidOnChainProposalType(proposalType) || !ValidatorService.isValidOffChainProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type, cannot create on-chain posts, you can only edit them.');
 	}
 
-	const { id, indexOrHash } = await OffChainDbService.CreateOffChainPost({ network, proposalType, userId: AuthService.GetUserIdFromAccessToken(newAccessToken), content });
+	const { id, indexOrHash } = await OffChainDbService.CreateOffChainPost({ network, proposalType, userId: AuthService.GetUserIdFromAccessToken(newAccessToken), content, title });
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

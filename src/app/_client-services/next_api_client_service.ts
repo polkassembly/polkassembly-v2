@@ -17,7 +17,8 @@ import {
 	IErrorResponse,
 	IGenerateTFAResponse,
 	IOnChainPostListingResponse,
-	IPost
+	IPost,
+	IVoteData
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -59,6 +60,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.USER_EXISTS:
 				path = '/auth/actions/usernameExists';
+				method = 'POST';
 				break;
 			case EApiRoute.TFA_LOGIN:
 				path = '/auth/actions/tfa/login';
@@ -66,6 +68,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GEN_TFA_TOKEN:
 				path = '/auth/actions/tfa/setup/generate';
+				method = 'POST';
 				break;
 			case EApiRoute.VERIFY_TFA_TOKEN:
 				path = '/auth/actions/tfa/setup/verify';
@@ -73,11 +76,13 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.LOGOUT:
 				path = '/auth/actions/logout';
+				method = 'POST';
 				break;
 			// Dynamic routes
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_COMMENTS:
+			case EApiRoute.GET_VOTES:
 				break;
 			case EApiRoute.ADD_COMMENT:
 				method = 'POST';
@@ -227,5 +232,11 @@ export class NextApiClientService {
 				parentCommentId
 			}
 		});
+	}
+
+	// votes
+	static async getVotesApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES, routeSegments: [proposalType, index, 'votes'] });
+		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
 	}
 }

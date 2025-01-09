@@ -13,6 +13,7 @@ import { userAtom } from '@/app/_atoms/user/userAtom';
 import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import Identicon from '@polkadot/react-identicon';
+import { useTranslations } from 'next-intl';
 import classes from './AddComment.module.scss';
 
 function AddComment({
@@ -30,6 +31,7 @@ function AddComment({
 	onCancel?: () => void;
 	editorId: string;
 }) {
+	const t = useTranslations();
 	const [content, setContent] = useState<OutputData | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -98,7 +100,7 @@ function AddComment({
 							onClick={onCancel}
 							disabled={loading}
 						>
-							Cancel
+							{t('PostDetails.cancel')}
 						</Button>
 					)}
 					<Button
@@ -107,7 +109,7 @@ function AddComment({
 						disabled={!content || !content.blocks || (content as unknown as OutputData).blocks.length === 0}
 						isLoading={loading}
 					>
-						Post
+						{t('PostDetails.post')}
 					</Button>
 				</div>
 			</div>

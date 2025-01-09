@@ -1,0 +1,31 @@
+.voteSummaryWrapper {
+	@apply flex flex-col rounded-xl bg-bg_modal p-6 shadow-lg
+}
+
+.voteSummaryTitle {
+	@apply text-xl font-semibold text-text_primary
+}
+
+.voteSummaryPieChart {
+	@apply mb-6 flex items-end justify-center gap-x-4
+}
+
+.voteSummaryTable {
+	@apply grid grid-cols-2 gap-4 text-xs text-wallet_btn_text
+}
+
+.voteSummaryPieChartAyeNay {
+	@apply mb-8 flex flex-col gap-y-1
+}
+
+.voteSummaryPieChartAyeNayTitle {
+	@apply text-xs font-medium text-wallet_btn_text
+}
+
+.voteSummaryTableItem {
+	@apply col-span-1 flex flex-col gap-y-2
+}
+
+.voteSummaryTableItemTitle {
+	@apply flex items-center justify-between capitalize
+}

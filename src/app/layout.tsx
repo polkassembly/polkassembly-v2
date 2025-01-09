@@ -5,9 +5,9 @@
 import '@app/_style/globals.scss';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { DM_Sans as dmSans } from 'next/font/google';
 import { getLocale, getMessages } from 'next-intl/server';
 import { Providers } from './_shared-components/Providers';
-import { poppinsFont } from './_style/fonts';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
@@ -17,6 +17,15 @@ export const metadata: Metadata = {
 	title: 'Polkassembly',
 	description: 'Polkassembly but so much better'
 };
+
+export const fontDmSans = dmSans({
+	adjustFontFallback: false,
+	display: 'swap',
+	style: ['italic', 'normal'],
+	subsets: ['latin'],
+	variable: '--font-dmSans',
+	weight: ['400', '500', '700']
+});
 
 export default async function RootLayout({
 	children,
@@ -37,7 +46,7 @@ export default async function RootLayout({
 			className={userPreferences.theme}
 			suppressHydrationWarning
 		>
-			<body className={poppinsFont.className}>
+			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
 				<Initializers
 					userData={user || null}
 					userPreferences={userPreferences}

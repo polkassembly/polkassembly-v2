@@ -22,6 +22,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { decodeEditorJsDataFromFirestore } from '@/app/api/_api-utils/decodeEditorJsDataFromFirestore';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -94,8 +95,67 @@ export class FirestoreService extends FirestoreRefs {
 		};
 	}
 
+	static async GetPublicUserByUsername(username: string): Promise<IPublicUser | null> {
+		const user = await this.GetUserByUsername(username);
+		if (!user) {
+			return null;
+		}
+
+		return this.GetPublicUserById(user.id);
+	}
+
+	static async GetPublicUserByAddress(address: string): Promise<IPublicUser | null> {
+		if (!ValidatorService.isValidWeb3Address(address)) {
+			return null;
+		}
+
+		const user = await this.GetUserByAddress(address);
+		if (!user) {
+			return null;
+		}
+
+		const addresses = await this.GetAddressesForUserId(user.id);
+
+		return {
+			id: user.id,
+			username: user.username,
+			profileScore: user.profileScore,
+			addresses: addresses.map((addr) => addr.address)
+		};
+	}
+
+	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+		const usersQuery = FirestoreRefs.usersCollectionRef()
+			.orderBy('profileScore', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const usersQuerySnapshot = await usersQuery.get();
+
+		return Promise.all(
+			usersQuerySnapshot.docs.map(async (doc) => {
+				const data = doc.data();
+
+				const addresses = await this.GetAddressesForUserId(data.id);
+
+				return {
+					id: data.id,
+					username: data.username,
+					profileScore: data.profileScore,
+					addresses: addresses.map((addr: IUserAddress) => addr.address)
+				} as IPublicUser;
+			})
+		);
+	}
+
 	static async GetUserByAddress(address: string): Promise<IUser | null> {
-		const addressDocSnapshot = await FirestoreRefs.getAddressDocRefByAddress(address).get();
+		const substrAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
+
+		if (!substrAddress) {
+			return null;
+		}
+
+		const addressDocSnapshot = await FirestoreRefs.getAddressDocRefByAddress(substrAddress).get();
 		if (!addressDocSnapshot.exists) {
 			return null;
 		}
@@ -266,48 +326,32 @@ export class FirestoreService extends FirestoreRefs {
 
 		const commentsQuerySnapshot = await commentsQuery.get();
 
-		const comments = commentsQuerySnapshot.docs.map((doc) => {
-			const data = doc.data();
+		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
+			const dataRaw = doc.data();
+			const decodedContent = decodeEditorJsDataFromFirestore(dataRaw.content);
 
-			const { content } = data;
-			const decodedContent = decodeEditorJsDataFromFirestore(content);
-
-			return {
-				...data,
+			const commentData = {
+				...dataRaw,
 				content: decodedContent as unknown as Record<string, unknown>,
-				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				createdAt: dataRaw.createdAt?.toDate(),
+				updatedAt: dataRaw.updatedAt?.toDate(),
+				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
 			} as IComment;
-		});
 
-		const commentResponsePromises = comments.map(async (comment) => {
-			const user = await this.GetPublicUserById(comment.userId);
+			const user = await this.GetPublicUserById(commentData.userId);
+
 			if (!user) {
 				return null;
 			}
 
 			return {
-				...comment,
+				...commentData,
 				user,
 				children: []
 			} as ICommentResponse;
 		});
 
-		const commentsWithUser = (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
-
-		// Helper function to build comment tree
-		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
-			return commentsWithUser
-				.filter((comment) => comment.parentCommentId === parentId)
-				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
-				.map((comment) => ({
-					...comment,
-					children: buildCommentTree(comment.id)
-				}));
-		};
-
-		// Get only top-level comments (those with no parent)
-		return buildCommentTree(null);
+		return (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
@@ -435,7 +479,8 @@ export class FirestoreService extends FirestoreRefs {
 			isDeleted: false,
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
-			address: address || null
+			address: address || null,
+			dataSource: EDataSource.POLKASSEMBLY
 		};
 
 		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -443,7 +488,7 @@ export class FirestoreService extends FirestoreRefs {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
+	static async UpdateComment({ commentId, content }: { commentId: string; content: Record<string, unknown> }) {
 		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, updatedAt: new Date() }, { merge: true });
 	}
 
@@ -497,8 +542,8 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.getReactionDocRefById(id).delete();
 	}
 
-	static async UpdatePost({ id, content }: { id?: string; content: string }) {
-		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, updatedAt: new Date() }, { merge: true });
+	static async UpdatePost({ id, content, title }: { id?: string; content: string; title: string }) {
+		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, title, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -506,13 +551,15 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType,
 		userId,
 		content,
-		indexOrHash
+		indexOrHash,
+		title
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
 		content: string;
 		indexOrHash?: string;
+		title: string;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
 
@@ -524,6 +571,7 @@ export class FirestoreService extends FirestoreRefs {
 			proposalType,
 			userId,
 			content,
+			title,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY

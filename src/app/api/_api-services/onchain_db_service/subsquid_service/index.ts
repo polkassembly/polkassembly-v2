@@ -2,13 +2,25 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostInfo, IOnChainPostListing, IVoteData, IVoteMetrics } from '@shared/types';
+import {
+	ENetwork,
+	EPostOrigin,
+	EProposalStatus,
+	EProposalType,
+	EVoteDecision,
+	IOnChainPostInfo,
+	IOnChainPostListing,
+	IStatusHistoryItem,
+	IVoteData,
+	IVoteMetrics
+} from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidQueries } from './subsquidQueries';
+import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidQueries {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -56,7 +68,15 @@ export class SubsquidService extends SubsquidQueries {
 		};
 	}
 
-	static async GetOnChainPostInfo({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
+	static async GetOnChainPostInfo({
+		network,
+		indexOrHash,
+		proposalType
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+	}): Promise<IOnChainPostInfo | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = proposalType === EProposalType.TIP ? this.GET_PROPOSAL_BY_HASH_AND_TYPE : this.GET_PROPOSAL_BY_INDEX_AND_TYPE;
@@ -75,6 +95,8 @@ export class SubsquidService extends SubsquidQueries {
 
 		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, index: Number(proposal.index) });
 
+		const allPeriodEnds = proposal.statusHistory ? SubsquidUtils.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+
 		return {
 			createdAt: proposal.createdAt,
 			proposer: proposal.proposer || '',
@@ -84,8 +106,12 @@ export class SubsquidService extends SubsquidQueries {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
-			reward: proposal.reward
-		} as IOnChainPostInfo;
+			beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
+			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
+			confirmationPeriodEndsAt: allPeriodEnds?.confirmationPeriodEnd ?? undefined,
+			timeline: proposal.statusHistory as IStatusHistoryItem[]
+		};
 	}
 
 	static async GetOnChainPostsListing({
@@ -94,7 +120,8 @@ export class SubsquidService extends SubsquidQueries {
 		limit,
 		page,
 		statuses,
-		origins
+		origins,
+		notVotedByAddresses
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -102,6 +129,7 @@ export class SubsquidService extends SubsquidQueries {
 		page: number;
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
+		notVotedByAddresses?: string[];
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -113,6 +141,10 @@ export class SubsquidService extends SubsquidQueries {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
 		} else if (origins) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS;
+		}
+
+		if (notVotedByAddresses && statuses) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_WHERE_NOT_VOTED;
 		}
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
@@ -154,16 +186,26 @@ export class SubsquidService extends SubsquidQueries {
 			(
 				proposal: {
 					createdAt: Date;
-					description?: string;
+					description?: string | null;
 					index: number;
-					origin: string;
+					origin: EPostOrigin;
 					proposer?: string;
 					status?: EProposalStatus;
 					hash?: string;
-					reward?: string;
+					preimage?: {
+						proposedCall?: {
+							args?: Record<string, unknown>;
+						};
+					};
+					statusHistory?: Array<{
+						status: EProposalStatus;
+						timestamp: string;
+					}>;
 				},
 				index: number
 			) => {
+				const allPeriodEnds = proposal.statusHistory ? SubsquidUtils.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+
 				posts.push({
 					createdAt: proposal.createdAt,
 					description: proposal.description || '',
@@ -174,7 +216,8 @@ export class SubsquidService extends SubsquidQueries {
 					type: proposalType,
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
-					reward: proposal.reward
+					beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined
 				});
 			}
 		);
@@ -218,8 +261,6 @@ export class SubsquidService extends SubsquidQueries {
 			console.error(`Error fetching on-chain post vote data from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post vote data from Subsquid');
 		}
-
-		console.log({ query, variables, subsquidData });
 
 		const votes: IVoteData[] = subsquidData.votes.map(
 			(vote: {

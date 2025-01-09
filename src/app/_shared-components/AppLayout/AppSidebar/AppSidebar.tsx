@@ -9,7 +9,6 @@ import React from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
 import Head1 from '@assets/sidebar/head1.svg';
@@ -21,6 +20,7 @@ import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
 import { ETheme } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
@@ -32,6 +32,7 @@ import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
+	const t = useTranslations();
 	const { resolvedTheme: theme } = useTheme();
 	const pathname = usePathname();
 
@@ -61,13 +62,13 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			isExpanded={state === 'expanded'}
 		/>
 	);
-	const data = getSidebarData(network, pathname);
+	const data = getSidebarData(network, pathname, t);
 
 	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: 'On-Chain Identity' },
-		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: 'Leaderboard' },
-		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: 'Delegation' },
-		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: 'Profile' }
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard') },
+		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation') },
+		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile') }
 	];
 
 	const bgColor = 'bg-sidebar_footer';
@@ -87,7 +88,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<div className={styles.sidebar_logo}>{getLogo()}</div>
 			</SidebarHeader>
 
-			<hr className='text-btn_secondary_border' />
+			<hr className='text-border_grey' />
 
 			<div className='mt-5'>{generateGridData(headerData)}</div>
 
@@ -113,10 +114,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 								height={30}
 							/>
 							<div className='flex flex-col'>
-								<div className='flex gap-1'>
-									<span className={`${styles.reportbtn} text-blue-light-high dark:text-blue-dark-high`}>Report an issue</span>
-									<ChevronRight className='h-5 w-5' />
-								</div>
+								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>Report an issue</span>
 								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>Need help with something?</span>
 							</div>
 						</div>

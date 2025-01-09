@@ -7,11 +7,12 @@
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
 import Image from 'next/image';
-
+import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
+import { ETheme } from '@/_shared/types';
 import LeftIcon from '@assets/sidebar/lefticon.svg';
 import RightIcon from '@assets/sidebar/righticon.svg';
 import { ComponentProps, createContext, CSSProperties, ElementRef, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -186,7 +187,7 @@ const Sidebar = forwardRef<
 				<SheetContent
 					data-sidebar='sidebar'
 					data-mobile='true'
-					className={`${styles.sidebarsheetcontent} m-0 bg-white p-0 [&>button]:hidden`}
+					className={`${styles.sidebarsheetcontent} m-0 p-0 [&>button]:hidden`}
 					style={
 						{
 							width: SIDEBAR_WIDTH_MOBILE
@@ -250,13 +251,13 @@ Sidebar.displayName = 'Sidebar';
 
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
-
+	const { resolvedTheme: theme } = useTheme();
 	return (
 		<Button
 			ref={ref}
 			data-sidebar='trigger'
 			variant='link'
-			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-white p-2', className)}
+			className={cn('h-8 w-8 rounded-lg border border-border_grey bg-section_dark_overlay p-2', className)}
 			type='button'
 			onClick={(event) => {
 				onClick?.(event);
@@ -264,24 +265,17 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			}}
 			{...props}
 		>
-			{state === 'expanded' ? (
-				<Image
-					src={LeftIcon}
-					alt='Left Icon'
-					className='h-5 w-5'
-					width={5}
-					height={5}
-				/>
-			) : (
-				<Image
-					src={RightIcon}
-					alt='Right Icon'
-					className='h-5 w-5'
-					width={5}
-					height={5}
-				/>
-			)}
-			<span className='sr-only'>Toggle Sidebar</span>
+			<Image
+				src={state === 'expanded' ? LeftIcon : RightIcon}
+				alt={state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}
+				className={cn('h-5 w-5', {
+					'dark-icons': theme === ETheme.DARK
+				})}
+				width={20}
+				height={20}
+				priority
+			/>
+			<span className='sr-only'>{state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}</span>
 		</Button>
 	);
 });
@@ -430,7 +424,7 @@ const SidebarMenuButton = forwardRef<
 			<TooltipContent
 				side='right'
 				align='center'
-				className={styles.sidebar_menubtn}
+				className={`${styles.sidebar_menubtn} bg-tooltip_background text-white`}
 				hidden={state !== 'collapsed' || isMobile}
 				{...tooltipProps}
 			/>

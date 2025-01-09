@@ -235,7 +235,10 @@ export enum ETheme {
 
 export enum ELocales {
 	SPANISH = 'es',
-	ENGLISH = 'en'
+	ENGLISH = 'en',
+	CHINESE = 'zh',
+	GERMAN = 'de',
+	JAPANESE = 'jp'
 }
 
 export enum ECookieNames {
@@ -375,6 +378,18 @@ export interface IVoteMetrics {
 	bareAyes: { value: string };
 }
 
+export interface IBeneficiary {
+	address: string;
+	amount: string;
+	assetId: string | null;
+}
+
+export interface IStatusHistoryItem {
+	status: EProposalStatus;
+	timestamp: Date;
+	block: number;
+}
+
 export interface IOnChainPostInfo {
 	proposer: string;
 	status: EProposalStatus;
@@ -384,7 +399,11 @@ export interface IOnChainPostInfo {
 	origin?: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
-	reward?: string;
+	beneficiaries?: IBeneficiary[];
+	preparePeriodEndsAt?: Date;
+	decisionPeriodEndsAt?: Date;
+	confirmationPeriodEndsAt?: Date;
+	timeline?: IStatusHistoryItem[];
 }
 
 export interface IPost extends IOffChainPost {
@@ -401,7 +420,8 @@ export interface IOnChainPostListing {
 	type: EProposalType;
 	hash: string;
 	voteMetrics?: IVoteMetrics;
-	reward?: string;
+	beneficiaries?: IBeneficiary[];
+	decisionPeriodEndsAt?: Date;
 }
 
 export interface IPostListing extends IOffChainPost {
@@ -457,7 +477,8 @@ export enum EApiRoute {
 	POSTS_LISTING = 'POSTS_LISTING',
 	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
 	GET_COMMENTS = 'GET_COMMENTS',
-	ADD_COMMENT = 'ADD_COMMENT'
+	ADD_COMMENT = 'ADD_COMMENT',
+	GET_VOTES = 'GET_VOTES'
 }
 
 export enum EWeb3LoginScreens {
@@ -490,6 +511,7 @@ export interface IComment {
 	parentCommentId: string | null;
 	isDeleted: boolean;
 	address: string | null;
+	dataSource: EDataSource;
 }
 
 export interface ICommentResponse extends IComment {
@@ -537,4 +559,15 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+}
+
+export enum EAssets {
+	DED = 'DED',
+	USDT = 'USDT',
+	USDC = 'USDC'
+}
+
+export enum EPostDetailsTab {
+	DESCRIPTION = 'description',
+	TIMELINE = 'timeline'
 }

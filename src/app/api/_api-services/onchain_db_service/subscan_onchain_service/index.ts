@@ -7,7 +7,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { snakeToPascalCase } from '@/_shared/_utils/snakeToPascalCase';
-import { ENetwork, EProposalType, IOnChainPostInfo } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, IOnChainPostInfo } from '@/_shared/types';
 import { SUBSCAN_API_KEY } from '@/app/api/_api-constants/apiEnvVars';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { fetchSubscanData } from '@/app/api/_api-utils/fetchSubscanData';
@@ -111,7 +111,14 @@ export class SubscanOnChainService {
 			origin: data?.data?.origins ? snakeToPascalCase(data?.data?.origins) : undefined,
 			index: data?.data?.referendum_index ?? undefined,
 			hash: data?.data?.info?.hash || undefined,
-			reward: data?.data?.pre_image?.amount
+			reward: data?.data?.pre_image?.amount,
+			timeline:
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				data?.data?.timeline?.map((item: any) => ({
+					status: item.status as EProposalStatus,
+					timestamp: dayjs(item.time).toDate(),
+					block: item.block
+				})) || undefined
 		} as IOnChainPostInfo;
 	}
 }

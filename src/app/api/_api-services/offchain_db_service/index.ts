@@ -2,7 +2,21 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDataSource, ENetwork, EProposalType, EWallet, IOffChainPost, IUser, IUserTFADetails, IUserAddress, IComment, IReaction, EReaction } from '@shared/types';
+import {
+	EDataSource,
+	ENetwork,
+	EProposalType,
+	EWallet,
+	IOffChainPost,
+	IUser,
+	IUserTFADetails,
+	IUserAddress,
+	IComment,
+	IReaction,
+	EReaction,
+	ICommentResponse,
+	IPublicUser
+} from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -38,6 +52,16 @@ export class OffChainDbService {
 		return FirestoreService.GetUserByUsername(username);
 	}
 
+	static async GetPublicUserByUsername(username: string): Promise<IPublicUser | null> {
+		return FirestoreService.GetPublicUserByUsername(username);
+	}
+
+	static async GetPublicUserByAddress(address: string): Promise<IPublicUser | null> {
+		const formattedAddress = ValidatorService.isValidEVMAddress(address) ? address : getSubstrateAddress(address);
+		if (!formattedAddress) throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid address');
+		return FirestoreService.GetPublicUserByAddress(formattedAddress);
+	}
+
 	static async GetUserById(userId: number): Promise<IUser | null> {
 		return FirestoreService.GetUserById(userId);
 	}
@@ -48,6 +72,10 @@ export class OffChainDbService {
 
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {
 		return FirestoreService.GetAddressesForUserId(userId);
+	}
+
+	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+		return FirestoreService.GetPublicUsers(page, limit);
 	}
 
 	static async GetOffChainPostData({
@@ -61,13 +89,35 @@ export class OffChainDbService {
 		proposalType: EProposalType;
 		proposer?: string;
 	}): Promise<IOffChainPost> {
-		const post = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
-		if (post) return post;
+		let post: IOffChainPost | null = null;
 
-		const subsquarePost = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
-		if (subsquarePost) return subsquarePost;
+		// 1. get post from firestore
+		post = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
 
-		const postMetrics = await FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
+		// 2. if not found, get post from subsquare
+		if (!post) {
+			post = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
+		}
+
+		const firestorePostMetricsPromise = FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
+		const subsquarePostMetricsPromise = SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType });
+
+		const [firestorePostMetrics, subsquarePostMetrics] = await Promise.all([firestorePostMetricsPromise, subsquarePostMetricsPromise]);
+
+		const postMetrics = {
+			reactions: {
+				like: firestorePostMetrics.reactions.like + subsquarePostMetrics.reactions.like,
+				dislike: firestorePostMetrics.reactions.dislike + subsquarePostMetrics.reactions.dislike
+			},
+			comments: firestorePostMetrics.comments + subsquarePostMetrics.comments
+		};
+
+		if (post) {
+			return {
+				...post,
+				metrics: postMetrics
+			};
+		}
 
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,
@@ -112,8 +162,26 @@ export class OffChainDbService {
 		return FirestoreService.GetTotalOffChainPostsCount({ network, proposalType, tags });
 	}
 
-	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IComment[]> {
-		return FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
+	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
+		const firestoreComments = await FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
+		const subsquareComments = await SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType });
+
+		// Combine all comments from both sources
+		const allComments = [...firestoreComments, ...subsquareComments];
+
+		// Helper function to build comment tree
+		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
+			return allComments
+				.filter((comment) => comment.parentCommentId === parentId)
+				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
+				.map((comment) => ({
+					...comment,
+					children: buildCommentTree(comment.id)
+				}));
+		};
+
+		// Get only top-level comments (those with no parent)
+		return buildCommentTree(null);
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
@@ -126,6 +194,10 @@ export class OffChainDbService {
 
 	static async GetPostReactionById(id: string): Promise<IReaction | null> {
 		return FirestoreService.GetPostReactionById(id);
+	}
+
+	static async GetPublicUserById(id: number): Promise<IPublicUser | null> {
+		return FirestoreService.GetPublicUserById(id);
 	}
 
 	// Write methods
@@ -179,7 +251,7 @@ export class OffChainDbService {
 		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: string }) {
+	static async UpdateComment({ commentId, content }: { commentId: string; content: Record<string, unknown> }) {
 		return FirestoreService.UpdateComment({ commentId, content });
 	}
 
@@ -207,12 +279,24 @@ export class OffChainDbService {
 		return FirestoreService.DeletePostReaction(id);
 	}
 
-	static async CreateOffChainPost({ network, proposalType, userId, content }: { network: ENetwork; proposalType: EProposalType; userId: number; content: string }) {
+	static async CreateOffChainPost({
+		network,
+		proposalType,
+		userId,
+		content,
+		title
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		userId: number;
+		content: string;
+		title: string;
+	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
 		}
 
-		return FirestoreService.CreatePost({ network, proposalType, userId, content });
+		return FirestoreService.CreatePost({ network, proposalType, userId, content, title });
 	}
 
 	static async UpdateOffChainPost({
@@ -220,13 +304,15 @@ export class OffChainDbService {
 		indexOrHash,
 		proposalType,
 		userId,
-		content
+		content,
+		title
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
 		content: string;
+		title: string;
 	}) {
 		const postData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
@@ -238,7 +324,7 @@ export class OffChainDbService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 		}
 
-		await FirestoreService.UpdatePost({ id: postData.id, content });
+		await FirestoreService.UpdatePost({ id: postData.id, content, title });
 	}
 
 	static async UpdateOnChainPost({
@@ -246,13 +332,15 @@ export class OffChainDbService {
 		indexOrHash,
 		proposalType,
 		userId,
-		content
+		content,
+		title
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
 		content: string;
+		title: string;
 	}) {
 		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
 		if (!onChainPostInfo || !onChainPostInfo.proposer) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
@@ -269,9 +357,9 @@ export class OffChainDbService {
 		const offChainPostData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
 		if (!offChainPostData) {
-			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash });
+			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title });
 		} else {
-			await FirestoreService.UpdatePost({ id: offChainPostData.id, content });
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title });
 		}
 	}
 }

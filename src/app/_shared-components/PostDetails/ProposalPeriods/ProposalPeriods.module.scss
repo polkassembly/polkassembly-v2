@@ -1,0 +1,19 @@
+.proposalPeriodsWrapper {
+	@apply flex flex-col gap-y-8 rounded-xl bg-bg_modal p-6 shadow-lg;
+}
+
+.proposalPeriodsHeader {
+	@apply flex items-center justify-between
+}
+
+.proposalPeriodsHeaderTitle {
+	@apply text-xl font-semibold text-text_primary
+}
+
+.proposalPeriodsHeaderPeriods {
+	@apply flex items-center rounded-xl bg-primary_border/[0.2] text-xs text-wallet_btn_text
+}
+
+.proposalPeriodsHeaderPeriodsNumber {
+	@apply h-6 w-6 rounded-full bg-bg_pink p-1 text-center text-white
+}

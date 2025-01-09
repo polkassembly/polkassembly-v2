@@ -5,11 +5,13 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 function ExternalTab() {
+	const t = useTranslations();
 	return (
 		<div>
-			<p>Content will be available soon...</p>
+			<p>{t('CreateProposalDropdownButton.contentWillBeAvailableSoon')}</p>
 		</div>
 	);
 }

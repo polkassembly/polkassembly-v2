@@ -4,13 +4,15 @@
 
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
+import { useTranslations } from 'next-intl';
 
 function Page() {
+	const t = useTranslations();
 	return (
 		<div>
 			<ListingPage
-				title='Whitelisted Caller'
-				description='Origin commanded by any members of the Polkadot Fellowship (no Dan grade needed).'
+				title={t('ListingPage.whitelistedCaller')}
+				description={t('ListingPage.whitelistedCallerDescription')}
 				proposalType={EProposalType.REFERENDUM_V2}
 				origins={[EPostOrigin.WHITELISTED_CALLER]}
 			/>

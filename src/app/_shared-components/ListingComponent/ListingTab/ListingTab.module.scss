@@ -3,15 +3,15 @@
 }
 
 .page_button {
-    @apply rounded-lg border-2 border-listing_page_border px-3 py-1 text-listing_page_btn;
+    @apply rounded-lg bg-bg_modal border-2 border-listing_page_border px-3 py-1 text-listing_page_btn;
 }
 
 .page_button_active {
-    @apply border-navbar_border text-navbar_border;
+    @apply border-bg_pink text-bg_pink;
 }
 
 .listing_container {
-    @apply overflow-hidden rounded-xl bg-white shadow-lg;
+    @apply overflow-hidden rounded-xl bg-page_background shadow-lg;
 }
 
 .listing_item {

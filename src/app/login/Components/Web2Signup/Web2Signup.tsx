@@ -15,6 +15,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useUser } from '@/hooks/useUser';
+import { useTranslations } from 'next-intl';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
@@ -27,6 +28,7 @@ interface IFormFields {
 
 function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => void; onWalletChange: (wallet: EWallet | null) => void }) {
 	const [step, setStep] = useState<ESignupSteps>(ESignupSteps.USERNAME);
+	const t = useTranslations();
 
 	const { setUser } = useUser();
 
@@ -42,6 +44,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 		const { email, password, username, finalPassword } = values;
 
 		if (step === ESignupSteps.USERNAME && email && username) {
+			setLoading(true);
 			const { data, error } = await AuthClientService.checkForUsernameAndEmail({
 				username,
 				email
@@ -49,14 +52,17 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 
 			if (error) {
 				setErrorMessage(error.message);
+				setLoading(false);
 				return;
 			}
 
 			if (data && !data.usernameExists && !data.emailExists) {
 				setErrorMessage('');
 				setStep(ESignupSteps.PASSWORD);
+				setLoading(false);
 				return;
 			}
+			setLoading(false);
 			return;
 		}
 
@@ -115,7 +121,6 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 									},
 									required: true
 								}}
-								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Enter Username</FormLabel>
@@ -144,7 +149,6 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 									},
 									required: true
 								}}
-								disabled={loading}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Enter Email</FormLabel>
@@ -223,19 +227,19 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 					</div>
 				)}
 				{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-				<div className='my-4 flex justify-center text-xs text-border_grey'>Or Login with</div>
+				<div className='my-4 flex justify-center text-xs text-border_grey'>{t('Profile.orLoginWith')}</div>
 				<WalletButtons
 					small
 					onWalletChange={onWalletChange}
 				/>
 				<p className={classes.switchToLogin}>
-					Already have an Account?
+					{t('Profile.alreadyHaveAnAccount')}
 					<Button
 						onClick={switchToLogin}
 						variant='ghost'
 						className='p-0 text-text_pink'
 					>
-						Login
+						{t('Profile.login')}
 					</Button>
 				</p>
 				<div className={classes.footer}>
@@ -248,7 +252,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 							className={classes.signupButton}
 							type='button'
 						>
-							Go Back
+							{t('AddressDropdown.goBack')}
 						</Button>
 					)}
 					<Button
@@ -257,7 +261,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 						size='lg'
 						className={classes.signupButton}
 					>
-						{step === ESignupSteps.PASSWORD ? 'Sign Up' : 'Next'}
+						{step === ESignupSteps.PASSWORD ? t('Profile.signUp') : t('Profile.next')}
 					</Button>
 				</div>
 			</form>
