@@ -326,8 +326,13 @@ function ActivityFeedPostItem({ postData, totalCount }: { postData: IPostListing
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<p className='mb-4 text-sm text-btn_secondary_text'>
-				{postData.onChainInfo?.description}
-				<span className='ml-1 cursor-pointer text-xs font-medium text-blue-600'>Read more</span>
+				{postData.content?.slice(0, 400)}
+				<Link
+					href={`/referenda/${postData.index}`}
+					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
+				>
+					Read more
+				</Link>
 			</p>
 
 			{/* Metrics Section */}

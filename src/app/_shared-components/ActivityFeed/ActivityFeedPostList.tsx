@@ -10,7 +10,7 @@ import ActivityFeedPostItem from './ActivityFeedPostItem/ActivityFeedPostItem';
 
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
 	return (
-		<div className='hide-scrollbar space-y-5 pb-10 lg:max-h-[1078px] lg:overflow-y-auto'>
+		<div className='hide_scrollbar space-y-5 pb-10 lg:max-h-[1078px] lg:overflow-y-auto'>
 			{loading ? (
 				<Loading />
 			) : postData?.posts?.length === 0 ? (
