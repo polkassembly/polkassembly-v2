@@ -23,6 +23,8 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { OutputData } from '@editorjs/editorjs';
+import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
@@ -119,11 +121,16 @@ export class OffChainDbService {
 			};
 		}
 
+		const content = getDefaultPostContent(proposalType, proposer);
+		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
+
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 			title: DEFAULT_POST_TITLE,
-			content: getDefaultPostContent(proposalType, proposer),
+			content,
+			htmlContent: html,
+			markdownContent: markdown,
 			tags: [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,
@@ -244,14 +251,14 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: Record<string, unknown>;
+		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
 	}) {
 		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: Record<string, unknown> }) {
+	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
 		return FirestoreService.UpdateComment({ commentId, content });
 	}
 
@@ -289,7 +296,7 @@ export class OffChainDbService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: OutputData;
 		title: string;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
@@ -311,7 +318,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: OutputData;
 		title: string;
 	}) {
 		const postData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -339,7 +346,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: OutputData;
 		title: string;
 	}) {
 		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
