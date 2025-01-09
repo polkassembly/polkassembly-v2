@@ -64,7 +64,7 @@ function AddComment({
 					profileScore: user.id
 				};
 
-				onConfirm?.({ ...data, content: content as unknown as Record<string, unknown> }, publicUser);
+				onConfirm?.({ ...data, content }, publicUser);
 
 				setContent(null);
 				blockEditorActionsRef.current?.clearEditor?.();
