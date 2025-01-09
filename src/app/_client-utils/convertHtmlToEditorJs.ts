@@ -2,30 +2,16 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { EDITOR_JS_VERSION } from '@/_shared/_constants/editorJsVersion';
-import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
-import { OutputBlockData } from '@editorjs/editorjs';
-import { JSDOM } from 'jsdom';
+import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
-export function convertHtmlToBlocksServer(html: string) {
-	if (typeof window !== 'undefined') {
-		return convertHtmlToBlocks(html);
-	}
-
-	// Ensure HTML has proper structure
-	const wrappedHtml = html.trim().startsWith('<html>') ? html : `<html><body>${html}</body></html>`;
-
-	// Create DOM with configured options
-	const dom = new JSDOM(wrappedHtml, {
-		runScripts: 'outside-only',
-		pretendToBeVisual: true
-	});
-	const doc = dom.window.document;
-
+export function convertHtmlToEditorJs(html: string): OutputData {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
 	const blocks: OutputBlockData[] = [];
 
 	// Process each element in the body
 	doc.body.childNodes.forEach((node) => {
-		if (node.nodeType === 1) {
+		if (node.nodeType === Node.ELEMENT_NODE) {
 			const element = node as HTMLElement;
 
 			switch (element.tagName.toLowerCase()) {
@@ -79,7 +65,7 @@ export function convertHtmlToBlocksServer(html: string) {
 
 	return {
 		blocks,
-		time: Date.now(),
+		time: new Date().getTime(),
 		version: EDITOR_JS_VERSION
 	};
 }

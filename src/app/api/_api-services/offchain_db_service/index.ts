@@ -24,6 +24,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { OutputData } from '@editorjs/editorjs';
+import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
@@ -120,11 +121,16 @@ export class OffChainDbService {
 			};
 		}
 
+		const content = getDefaultPostContent(proposalType, proposer);
+		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
+
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 			title: DEFAULT_POST_TITLE,
-			content: getDefaultPostContent(proposalType, proposer),
+			content,
+			htmlContent: html,
+			markdownContent: markdown,
 			tags: [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,

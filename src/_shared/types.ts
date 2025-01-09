@@ -283,6 +283,8 @@ export interface IOffChainPost {
 	userId?: number;
 	title?: string;
 	content?: OutputData;
+	htmlContent: string; // TODO: make this optional
+	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
 	tags?: string[];
@@ -507,6 +509,8 @@ export interface IComment {
 	updatedAt: Date;
 	userId: number;
 	content: OutputData;
+	htmlContent: string;
+	markdownContent: string;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;

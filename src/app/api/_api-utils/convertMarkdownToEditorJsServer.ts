@@ -3,9 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
-import { convertHtmlToBlocksServer } from './convertHtmlToBlocksServer';
+import { OutputData } from '@editorjs/editorjs';
+import { convertHtmlToEditorJsServer } from './convertHtmlToEditorJsServer';
 
-export function convertMarkdownToBlocksServer(markdown: string) {
+export function convertMarkdownToEditorJsServer(markdown: string): OutputData {
 	const html = convertMarkdownToHtml(markdown);
-	return convertHtmlToBlocksServer(html);
+	return convertHtmlToEditorJsServer(html);
 }

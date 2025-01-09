@@ -1,0 +1,44 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import TurndownService from 'turndown';
+import { gfm } from 'turndown-plugin-gfm';
+
+/**
+ * Converts HTML to Markdown with support for tables and GitHub Flavored Markdown features
+ * @param html The HTML string to convert
+ * @returns The converted Markdown string
+ */
+export function htmlToMarkdown(html: string): string {
+	try {
+		const turndownService = new TurndownService({
+			bulletListMarker: '-',
+			codeBlockStyle: 'fenced',
+			emDelimiter: '_',
+			headingStyle: 'atx',
+			hr: '---',
+			strongDelimiter: '**'
+		});
+
+		// Use the GitHub Flavored Markdown plugin
+		turndownService.use(gfm);
+
+		// Custom rule for tables to ensure proper formatting
+		turndownService.addRule('tableCell', {
+			filter: ['th', 'td'],
+			replacement(content: string, node: TurndownService.Node) {
+				if (node.nodeType !== 1) return content;
+				const element = node as unknown as HTMLTableCellElement;
+				const index = element.cellIndex;
+				const prefix = index === 0 ? '| ' : '';
+				return `${prefix}${content.trim()} |`;
+			}
+		});
+
+		return turndownService.turndown(html);
+	} catch (error) {
+		console.error('Error converting HTML to Markdown:', error);
+		return '';
+	}
+}

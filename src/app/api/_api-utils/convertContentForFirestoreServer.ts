@@ -6,8 +6,8 @@
 
 import { OutputData } from '@editorjs/editorjs';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { convertMarkdownToBlocksServer } from '@/app/api/_api-utils/convertMarkdownToBlocksServer';
-import { convertHtmlToBlocksServer } from '@/app/api/_api-utils/convertHtmlToBlocksServer';
+import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
+import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
 import { EDITOR_JS_VERSION } from '@/_shared/_constants/editorJsVersion';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
@@ -35,13 +35,13 @@ export function convertContentForFirestoreServer(content: string | Record<string
 
 	// If content is Markdown, convert to HTML first
 	if (ValidatorService.isMarkdown(contentStr)) {
-		contentBlocks = convertMarkdownToBlocksServer(contentStr) as OutputData['blocks'];
+		contentBlocks = convertMarkdownToEditorJsServer(contentStr).blocks;
 	}
 
 	// At this point, content is either HTML or plain text
 	if (ValidatorService.isHTML(content as string)) {
 		// Convert HTML to EditorJS blocks
-		contentBlocks = convertHtmlToBlocksServer(content as string) as OutputData['blocks'];
+		contentBlocks = convertHtmlToEditorJsServer(content as string).blocks;
 	}
 
 	if (!contentBlocks.length) {

@@ -14,8 +14,7 @@ import Image from '@editorjs/image';
 import { cn } from '@/lib/utils';
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
-import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
-import { EDITOR_JS_VERSION } from '@/_shared/_constants/editorJsVersion';
+import { convertHtmlToEditorJs } from '@/app/_client-utils/convertHtmlToEditorJs';
 import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
@@ -114,13 +113,9 @@ function BlockEditor({
 						if (renderFromHtml) {
 							const htmlString = convertMarkdownToHtml(data as string);
 
-							const blocks = convertHtmlToBlocks(htmlString as string);
+							const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
 
-							await editor.blocks.render({
-								blocks,
-								time: Date.now(),
-								version: EDITOR_JS_VERSION
-							});
+							await editor.blocks.render(editorJsOutputData);
 						} else {
 							await editor.blocks.render(data as unknown as OutputData);
 						}
