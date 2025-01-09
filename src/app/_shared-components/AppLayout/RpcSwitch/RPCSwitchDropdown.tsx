@@ -50,7 +50,7 @@ export default function RPCSwitchDropdown() {
 				{rpcEndpoints.map((endpoint, index) => (
 					<DropdownMenuItem
 						key={endpoint?.url}
-						className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-[#fde7f0] text-bg_pink' : ''} ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
+						className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-tooltip_foreground text-bg_pink' : ''} ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
 						onClick={() => handleRpcSwitch(index)}
 					>
 						<span className='text-sm font-medium'>{endpoint.name}</span>
