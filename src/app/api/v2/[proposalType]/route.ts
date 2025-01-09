@@ -13,9 +13,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
+import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -134,6 +136,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	return NextResponse.json(response);
 });
 
+// Creates an off-chain post
 export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string }> }): Promise<NextResponse> => {
 	const { proposalType } = zodParamsSchema.parse(await params);
 
@@ -143,16 +146,24 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.string().min(1, 'Content is required')
+		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content')
 	});
 
 	const { content, title } = zodBodySchema.parse(await getReqBody(req));
+
+	const formattedContent = convertContentForFirestoreServer(content);
 
 	if (ValidatorService.isValidOnChainProposalType(proposalType) || !ValidatorService.isValidOffChainProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type, cannot create on-chain posts, you can only edit them.');
 	}
 
-	const { id, indexOrHash } = await OffChainDbService.CreateOffChainPost({ network, proposalType, userId: AuthService.GetUserIdFromAccessToken(newAccessToken), content, title });
+	const { id, indexOrHash } = await OffChainDbService.CreateOffChainPost({
+		network,
+		proposalType,
+		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
+		content: formattedContent,
+		title
+	});
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

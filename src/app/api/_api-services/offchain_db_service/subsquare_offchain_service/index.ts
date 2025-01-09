@@ -8,8 +8,9 @@ import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { convertMarkdownToBlocksServer } from '@/app/api/_api-utils/convertMarkdownToBlocksServer';
-import { convertHtmlToBlocksServer } from '@/app/api/_api-utils/convertHtmlToBlocksServer';
+import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
+import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
+import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -40,7 +41,7 @@ export class SubsquareOffChainService {
 		try {
 			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-			// TODO: ENABLE THIS
+			// TODO: ENABLE THIS FOR PROD
 			// if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
 			// return null;
 			// }
@@ -59,18 +60,23 @@ export class SubsquareOffChainService {
 				title = title.replace(/\[Root\] Referendum #\d+: /, '');
 			}
 
-			const content = data?.content || '';
+			const content = data?.content || getDefaultPostContent(proposalType, data?.proposer);
+			const editorJsContent = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+
+			const { html, markdown } = htmlAndMarkdownFromEditorJs(editorJsContent);
 
 			if (!title && !content) {
 				return null;
 			}
 
-			const offChainPost: IOffChainPost = {
+			return {
 				id: '',
 				index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
 				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 				title: title || DEFAULT_POST_TITLE,
-				content: content || getDefaultPostContent(proposalType, data?.proposer),
+				content: editorJsContent,
+				htmlContent: html,
+				markdownContent: markdown,
 				createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
 				updatedAt: data?.updatedAt ? new Date(data.updatedAt) : undefined,
 				tags: [],
@@ -78,14 +84,12 @@ export class SubsquareOffChainService {
 				network,
 				dataSource: EDataSource.SUBSQUARE
 			};
-
-			return offChainPost;
 		} catch {
 			return null;
 		}
 	}
 
-	// TODO: IMPLEMENT THIS
+	// TODO: IMPLEMENT THIS (figure out page and limit)
 	static async GetOffChainPostsListing({
 		network,
 		proposalType,
@@ -117,15 +121,19 @@ export class SubsquareOffChainService {
 			}
 
 			// Helper function to process a comment and its replies
-			const processComment = async (comment: any): Promise<any> => {
+			const processComment = async (comment: any): Promise<ICommentResponse> => {
 				const publicUser = await FirestoreService.GetPublicUserByAddress(comment.author.address);
 
-				const content = comment.contentType === 'markdown' ? convertMarkdownToBlocksServer(comment.content) : convertHtmlToBlocksServer(comment.content);
+				const content = comment.contentType === 'markdown' ? convertMarkdownToEditorJsServer(comment.content) : convertHtmlToEditorJsServer(comment.content);
+
+				const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 				return {
 					// eslint-disable-next-line no-underscore-dangle
 					id: comment._id,
 					content,
+					htmlContent: html,
+					markdownContent: markdown,
 					userId: publicUser?.id ?? 0,
 					user: publicUser ?? {
 						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],

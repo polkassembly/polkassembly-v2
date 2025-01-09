@@ -21,8 +21,10 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { decodeEditorJsDataFromFirestore } from '@/app/api/_api-utils/decodeEditorJsDataFromFirestore';
+import { firestoreContentToEditorJs } from '@/app/api/_api-utils/firestoreContentToEditorJs';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { OutputData } from '@editorjs/editorjs';
+import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -204,8 +206,21 @@ export class FirestoreService extends FirestoreRefs {
 
 		const postData = postDocSnapshot.docs[0].data();
 
+		let { htmlContent = '', markdownContent = '' } = postData;
+		const formattedContent = firestoreContentToEditorJs(postData.content);
+
+		if (!htmlContent && !markdownContent && formattedContent) {
+			const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
+
+			htmlContent = html;
+			markdownContent = markdown;
+		}
+
 		return {
 			...postData,
+			content: formattedContent,
+			htmlContent,
+			markdownContent,
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate()
@@ -240,8 +255,21 @@ export class FirestoreService extends FirestoreRefs {
 			const indexOrHash = data.hash || String(data.index);
 			const metrics = await this.GetPostMetrics({ network, indexOrHash, proposalType });
 
+			let { htmlContent = '', markdownContent = '' } = data;
+			const formattedContent = firestoreContentToEditorJs(data.content);
+
+			if (!htmlContent && !markdownContent && formattedContent) {
+				const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
+
+				htmlContent = html;
+				markdownContent = markdown;
+			}
+
 			return {
 				...data,
+				content: formattedContent,
+				htmlContent,
+				markdownContent,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				metrics
@@ -328,11 +356,22 @@ export class FirestoreService extends FirestoreRefs {
 
 		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
 			const dataRaw = doc.data();
-			const decodedContent = decodeEditorJsDataFromFirestore(dataRaw.content);
+
+			let { htmlContent = '', markdownContent = '' } = dataRaw;
+			const formattedContent = firestoreContentToEditorJs(dataRaw.content);
+
+			if (!htmlContent && !markdownContent && formattedContent) {
+				const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
+
+				htmlContent = html;
+				markdownContent = markdown;
+			}
 
 			const commentData = {
 				...dataRaw,
-				content: decodedContent as unknown as Record<string, unknown>,
+				content: formattedContent,
+				htmlContent,
+				markdownContent,
 				createdAt: dataRaw.createdAt?.toDate(),
 				updatedAt: dataRaw.updatedAt?.toDate(),
 				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
@@ -366,8 +405,21 @@ export class FirestoreService extends FirestoreRefs {
 			return null;
 		}
 
+		let { htmlContent = '', markdownContent = '' } = data;
+		const formattedContent = firestoreContentToEditorJs(data.content);
+
+		if (!htmlContent && !markdownContent && formattedContent) {
+			const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
+
+			htmlContent = html;
+			markdownContent = markdown;
+		}
+
 		return {
 			...data,
+			content: formattedContent,
+			htmlContent,
+			markdownContent,
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate()
 		} as IComment;
@@ -408,7 +460,7 @@ export class FirestoreService extends FirestoreRefs {
 	static async GetLatestOffChainPostIndex(network: ENetwork, proposalType: EProposalType): Promise<number> {
 		const postsQuery = FirestoreRefs.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).orderBy('index', 'desc').limit(1);
 		const postsQuerySnapshot = await postsQuery.get();
-		return postsQuerySnapshot.docs[0].data().index || 0;
+		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
 	// write methods
@@ -462,11 +514,13 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: Record<string, unknown>;
+		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
 	}) {
 		const newCommentId = FirestoreRefs.commentsCollectionRef().doc().id;
+
+		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newComment: IComment = {
 			id: newCommentId,
@@ -474,6 +528,8 @@ export class FirestoreService extends FirestoreRefs {
 			proposalType,
 			userId,
 			content,
+			htmlContent: html,
+			markdownContent: markdown,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isDeleted: false,
@@ -488,8 +544,10 @@ export class FirestoreService extends FirestoreRefs {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: Record<string, unknown> }) {
-		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, updatedAt: new Date() }, { merge: true });
+	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
+		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
+
+		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, htmlContent: html, markdownContent: markdown, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -542,8 +600,10 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.getReactionDocRefById(id).delete();
 	}
 
-	static async UpdatePost({ id, content, title }: { id?: string; content: string; title: string }) {
-		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, title, updatedAt: new Date() }, { merge: true });
+	static async UpdatePost({ id, content, title }: { id?: string; content: OutputData; title: string }) {
+		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
+
+		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, htmlContent: html, markdownContent: markdown, title, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -557,11 +617,13 @@ export class FirestoreService extends FirestoreRefs {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
-		content: string;
+		content: OutputData;
 		indexOrHash?: string;
 		title: string;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
+
+		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
 
@@ -571,6 +633,8 @@ export class FirestoreService extends FirestoreRefs {
 			proposalType,
 			userId,
 			content,
+			htmlContent: html,
+			markdownContent: markdown,
 			title,
 			createdAt: new Date(),
 			updatedAt: new Date(),

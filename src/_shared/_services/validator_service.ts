@@ -105,4 +105,115 @@ export class ValidatorService {
 	static isValidWeb3Address(address: string): boolean {
 		return this.isValidEVMAddress(address) || this.isValidSubstrateAddress(address);
 	}
+
+	static isHTML(textRaw: string): boolean {
+		let text = textRaw;
+
+		// More comprehensive HTML detection
+		if (!text || typeof text !== 'string') return false;
+
+		// Strip comments and CDATA
+		text = text.replace(/<!--[\s\S]*?-->/g, '').replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, '');
+
+		// Common HTML patterns
+		const patterns = {
+			tags: /<[a-z][\s\S]*>/i,
+			entities: /&[a-z]+;/i,
+			doctype: /<!DOCTYPE\s+html>/i,
+			selfClosingTags: /<(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr).*?>/i,
+			attributes: /\s+[a-zA-Z-]+=(["']).*?\1/
+		};
+
+		// Check if text contains multiple HTML indicators
+		const indicators = Object.values(patterns).filter((pattern) => pattern.test(text));
+		return indicators.length >= 2; // Require at least 2 indicators for more confidence
+	}
+
+	static isMarkdown(
+		text: string,
+		options = {
+			minIndicators: 2, // Minimum number of different Markdown elements required
+			strictMode: false // If true, requires more precise pattern matching
+		}
+	): boolean {
+		if (!text || typeof text !== 'string') return false;
+
+		const markdownPatterns = {
+			headers: {
+				pattern: /^#{1,6}\s+[^\n]+$/m,
+				strict: /^#{1,6}\s+[^\n]+$(?:\n|$)/m
+			},
+			emphasis: {
+				pattern: /[*_]{1,2}[^*_\n]+[*_]{1,2}/,
+				strict: /(?:^|\s)[*_]{1,2}[^*_\n]+[*_]{1,2}(?:\s|$)/
+			},
+			lists: {
+				pattern: /^[\s]*[-*+]\s+[^\n]+/m,
+				strict: /^[\s]*[-*+]\s+[^\n]+(?:\n|$)/m
+			},
+			numberedLists: {
+				pattern: /^[\s]*\d+\.\s+[^\n]+/m,
+				strict: /^[\s]*\d+\.\s+[^\n]+(?:\n|$)/m
+			},
+			blockquotes: {
+				pattern: /^[\s]*>\s+[^\n]+/m,
+				strict: /^[\s]*>\s+[^\n]+(?:\n|$)/m
+			},
+			codeBlocks: {
+				pattern: /```[\s\S]*?```/,
+				strict: /^```[\s\S]*?```$/m
+			},
+			inlineCode: {
+				pattern: /`[^`]+`/,
+				strict: /(?:^|\s)`[^`]+`(?:\s|$)/
+			},
+			links: {
+				pattern: /\[([^\]]+)\]\(([^)]+)\)/,
+				strict: /(?:^|\s)\[([^\]]+)\]\(([^)]+)\)(?:\s|$)/
+			},
+			images: {
+				pattern: /!\[([^\]]*)\]\(([^)]+)\)/,
+				strict: /(?:^|\s)!\[([^\]]*)\]\(([^)]+)\)(?:\s|$)/
+			},
+			tables: {
+				pattern: /\|.*\|/,
+				strict: /^\|.*\|$/m
+			},
+			horizontalRules: {
+				pattern: /^[-*_]{3,}\s*$/m,
+				strict: /^[-*_]{3,}\s*$/m
+			}
+		};
+
+		// Count how many different Markdown elements are present
+		let indicators = Object.values(markdownPatterns).reduce((count, patterns) => {
+			const pattern = options.strictMode ? patterns.strict : patterns.pattern;
+			return pattern.test(text) ? count + 1 : count;
+		}, 0);
+
+		// Additional checks for common Markdown structures
+		const specialCases = [
+			// Check for proper link references
+			/^\[[^\]]+\]:\s*http[s]?:\/\/\S+$/m,
+			// Check for footnotes
+			/^\[\^[^\]]+\]:\s*[^\n]+$/m,
+			// Check for task lists
+			/^[\s]*[-*+]\s+\[[xX\s]\]\s+[^\n]+/m
+		];
+
+		specialCases.forEach((pattern) => {
+			if (pattern.test(text)) indicators += 1;
+		});
+
+		// Additional validation for potential false positives
+		const falsePositiveIndicators = [
+			/^[A-Za-z0-9\s,.!?'"]+$/, // Only plain text
+			/^[0-9\s.,]+$/ // Only numbers and spaces
+		];
+
+		const mightBePlainText = falsePositiveIndicators.some((pattern) => pattern.test(text));
+		if (mightBePlainText && indicators < 2) return false;
+
+		return indicators >= options.minIndicators;
+	}
 }
