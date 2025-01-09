@@ -10,6 +10,7 @@ import { VOTING_PROPOSAL_STATUSES } from '@/_shared/_constants/votingProposalSta
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ENetwork, EPostOrigin, EProposalStatus, IBeneficiary } from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
+import { SubsquidQueries } from './subsquidQueries';
 
 interface IStatusHistory {
 	status: EProposalStatus;
@@ -22,7 +23,7 @@ interface IPeriodEndDates {
 	confirmationPeriodEnd: Date | null;
 }
 
-export class SubsquidUtils {
+export class SubsquidUtils extends SubsquidQueries {
 	/**
 	 * Helper to extract beneficiary address from complex object structure
 	 */
@@ -65,7 +66,7 @@ export class SubsquidUtils {
 	 * @param args - Call arguments containing asset and beneficiary information
 	 * @returns Array of IBeneficiary with amounts, assetIds and addresses
 	 */
-	public static extractAmountAndAssetId(args: any): IBeneficiary[] {
+	protected static extractAmountAndAssetId(args: any): IBeneficiary[] {
 		const result: IBeneficiary[] = [];
 
 		if (!args) return result;
@@ -105,7 +106,7 @@ export class SubsquidUtils {
 		return result;
 	}
 
-	public static getAllPeriodEndDates(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): IPeriodEndDates {
+	protected static getAllPeriodEndDates(statusHistory: IStatusHistory[], network: ENetwork, origin: EPostOrigin): IPeriodEndDates {
 		const result: IPeriodEndDates = {
 			decisionPeriodEnd: null,
 			preparePeriodEnd: null,
