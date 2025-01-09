@@ -12,9 +12,13 @@ import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { ELocales } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
+import dynamic from 'next/dynamic';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './Navbar.module.scss';
+
+const RPCSwitchDropdown = dynamic(() => import('../RpcSwitch/RPCSwitchDropdown'), { ssr: false });
+const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -42,10 +46,10 @@ function Navbar() {
 					value={userPreferences.locale}
 					onValueChange={(value: ELocales) => handleLocaleChange(value)}
 				>
-					<SelectTrigger className='w-[180px]'>
+					<SelectTrigger className='w-[180px] border-border_grey'>
 						<SelectValue placeholder='Select Language' />
 					</SelectTrigger>
-					<SelectContent>
+					<SelectContent className='border-border_grey'>
 						<div>
 							{Object.entries(LANGUAGES).map(([locale, label]) => (
 								<SelectItem
@@ -72,6 +76,9 @@ function Navbar() {
 						<Button>{t('Profile.login')}</Button>
 					</Link>
 				)}
+
+				<RPCSwitchDropdown />
+				<ToggleButton />
 			</div>
 		</nav>
 	);

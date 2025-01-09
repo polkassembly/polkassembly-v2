@@ -8,5 +8,6 @@ import { atom } from 'jotai';
 
 export const userPreferencesAtom = atom<IUserPreferences>({
 	locale: DEFAULT_LOCALE,
-	theme: DEFAULT_THEME
+	theme: DEFAULT_THEME,
+	rpcIndex: 0
 });

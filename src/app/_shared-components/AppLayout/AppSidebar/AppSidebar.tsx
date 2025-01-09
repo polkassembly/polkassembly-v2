@@ -114,8 +114,8 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 								height={30}
 							/>
 							<div className='flex flex-col'>
-								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>Report an issue</span>
-								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>Need help with something?</span>
+								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>{t('Sidebar.ReportAnIssue')}</span>
+								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>{t('Sidebar.NeedHelp')}</span>
 							</div>
 						</div>
 					</Link>

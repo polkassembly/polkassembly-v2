@@ -253,6 +253,7 @@ export interface IUserPreferences {
 	locale: ELocales;
 	wallet?: EWallet;
 	address?: InjectedAccount;
+	rpcIndex?: number;
 }
 
 export enum ENotificationTrigger {

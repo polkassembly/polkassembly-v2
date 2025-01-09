@@ -17,6 +17,11 @@
 		"hidePassword": "パスワードを非表示",
 		"showPassword": "パスワードを表示"
 	},
+	"ListingTab": {
+		"Analytics": "分析",
+		"External": "外部",
+		"Referenda": "レファレンダム"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",
 		"proposal": "提案",
@@ -134,7 +139,9 @@
 		"ReferendumCanceller": "住民投票キャンセル者",
 		"ReferendumKiller": "住民投票終了者",
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
-		"FellowshipAdmin": "フェローシップ管理者"
+		"FellowshipAdmin": "フェローシップ管理者",
+		"ReportAnIssue": "問題を報告",
+		"NeedHelp": "助けが必要ですか？"
 	},
 	"PostDetails": {
 		"castVote": "投票する",
@@ -162,5 +169,65 @@
 		"nay": "反対",
 		"support": "サポート",
 		"bareAyes": "単純賛成票"
+	},
+	"ListingPage_Status": {
+		"Cancelled": "キャンセル",
+		"Confirmed": "確認",
+		"ConfirmAborted": "確認中止",
+		"ConfirmStarted": "確認開始",
+		"Deciding": "決定中",
+		"Executed": "実行",
+		"ExecutionFailed": "実行失敗",
+		"Killed": "殺害",
+		"Rejected": "拒否",
+		"Submitted": "提出",
+		"TimedOut": "タイムアウト"
+	},
+	"ListingPage_Tags": {
+		"bounty": "報奨金",
+		"treasury": "トレジャリー",
+		"smart contract": "スマートコントラクト",
+		"polkadot": "Polkadot",
+		"Network": "ネットワーク",
+		"Governance": "ガバナンス",
+		"Proposal": "提案",
+		"Test": "テスト"
+	},
+	"ProposalStatus": {
+		"cancelled": "キャンセル済み",
+		"timedout": "タイムアウト",
+		"confirmed": "確認済み",
+		"approved": "承認済み",
+		"rejected": "否決",
+		"executed": "実行済み",
+		"killed": "強制終了",
+		"executionfailed": "実行失敗",
+		"decisiondepositplaced": "決定保証金預入済み",
+		"deciding": "決定中",
+		"confirmstarted": "確認開始",
+		"confirmaborted": "確認中止",
+		"opened": "開始",
+		"retracted": "取り下げ",
+		"slashed": "スラッシュ済み",
+		"active": "アクティブ",
+		"extended": "延長済み",
+		"claimed": "請求済み",
+		"unrequested": "未要求",
+		"requested": "要求済み",
+		"submitted": "提出済み",
+		"cleared": "クリア済み",
+		"voting": "投票中",
+		"votingended": "投票終了",
+		"votingstarted": "投票開始",
+		"invalid": "無効",
+		"missing": "不明",
+		"reaped": "削除済み",
+		"disapproved": "不承認",
+		"closed": "終了",
+		"awarded": "付与済み",
+		"added": "追加済み",
+		"notpassed": "不承認",
+		"started": "開始",
+		"passed": "承認"
 	}
 }
