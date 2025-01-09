@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { convertHtmlToBlocks } from '@/app/_client-utils/convertHtmlToBlocks';
+import { EDITOR_JS_VERSION } from '@/_shared/_constants/editorJsVersion';
 import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
@@ -118,7 +119,7 @@ function BlockEditor({
 							await editor.blocks.render({
 								blocks,
 								time: Date.now(),
-								version: '2.30.7'
+								version: EDITOR_JS_VERSION
 							});
 						} else {
 							await editor.blocks.render(data as unknown as OutputData);

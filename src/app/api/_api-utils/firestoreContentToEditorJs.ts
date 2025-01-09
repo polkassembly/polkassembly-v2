@@ -4,7 +4,7 @@
 
 import { OutputData } from '@editorjs/editorjs';
 
-export function decodeEditorJsDataFromFirestore(data: OutputData) {
+export function firestoreContentToEditorJs(data: OutputData) {
 	const { blocks } = data;
 	if (!blocks || !blocks.length) return data;
 	const newBlocks = blocks.map((block) => {
