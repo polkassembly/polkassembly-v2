@@ -1,0 +1,7 @@
+.tabsList {
+	@apply flex gap-x-2 rounded border border-border_grey p-1
+}
+
+.tabsTrigger {
+	@apply text-sm flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-wallet_btn_text data-[state=active]:border-none data-[state=active]:text-white
+}

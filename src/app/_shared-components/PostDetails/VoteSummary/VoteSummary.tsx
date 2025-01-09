@@ -15,7 +15,7 @@ import { ChevronRight } from 'lucide-react';
 import classes from './VoteSummary.module.scss';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../../Dialog';
 import { Button } from '../../Button';
-import VoteHistory from './VoteHistory';
+import VoteHistory from './VoteHistory/VoteHistory';
 
 function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
 	const t = useTranslations();

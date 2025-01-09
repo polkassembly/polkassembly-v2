@@ -1,0 +1,231 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+'use client';
+
+import { type ReactNode, useCallback, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from './Pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select/Select';
+
+export interface PaginationWithLinksProps {
+	pageSizeSelectOptions?: {
+		pageSizeSearchParam?: string;
+		pageSizeOptions: number[];
+	};
+	totalCount: number;
+	pageSize: number;
+	page: number;
+	pageSearchParam?: string;
+	onClick?: (page: number) => void;
+}
+
+/**
+ * Navigate with Nextjs links (need to update your own `pagination.tsx` to use Nextjs Link)
+ *
+ * @example
+ * ```
+ * <PaginationWithLinks
+    page={1}
+    pageSize={20}
+    totalCount={500}
+  />
+ * ```
+ */
+
+function SelectRowsPerPage({ options, setPageSize, pageSize }: { options: number[]; setPageSize: (newSize: number) => void; pageSize: number }) {
+	return (
+		<div className='flex items-center gap-4'>
+			<span className='whitespace-nowrap text-sm'>Rows per page</span>
+
+			<Select
+				value={String(pageSize)}
+				onValueChange={(value) => setPageSize(Number(value))}
+			>
+				<SelectTrigger>
+					<SelectValue placeholder='Select page size'>{String(pageSize)}</SelectValue>
+				</SelectTrigger>
+				<SelectContent>
+					{options.map((option) => (
+						<SelectItem
+							key={option}
+							value={String(option)}
+						>
+							{option}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
+		</div>
+	);
+}
+
+export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCount, page, pageSearchParam, onClick }: PaginationWithLinksProps) {
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
+	const [currentPage, setCurrentPage] = useState(page);
+
+	const totalPageCount = Math.ceil(totalCount / pageSize);
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+	const buildLink = useCallback(
+		(newPage: number) => {
+			const key = pageSearchParam || 'page';
+			if (!searchParams) return `${pathname}?${key}=${newPage}`;
+			const newSearchParams = new URLSearchParams(searchParams);
+			newSearchParams.set(key, String(newPage));
+			return `${pathname}?${newSearchParams.toString()}`;
+		},
+		[searchParams, pathname]
+	);
+
+	const navToPageSize = useCallback(
+		(newPageSize: number) => {
+			const key = pageSizeSelectOptions?.pageSizeSearchParam || 'pageSize';
+			const newSearchParams = new URLSearchParams(searchParams || undefined);
+			newSearchParams.set(key, String(newPageSize));
+			newSearchParams.delete(pageSearchParam || 'page'); // Clear the page number when changing page size
+			router.push(`${pathname}?${newSearchParams.toString()}`);
+		},
+		[searchParams, pathname]
+	);
+
+	const renderPageNumbers = () => {
+		const items: ReactNode[] = [];
+		const maxVisiblePages = 5;
+
+		if (totalPageCount <= maxVisiblePages) {
+			for (let i = 1; i <= totalPageCount; i += 1) {
+				items.push(
+					<PaginationItem key={i}>
+						<PaginationLink
+							// href={buildLink(i)}
+							onClick={() => {
+								setCurrentPage(i);
+								onClick?.(i);
+							}}
+							isActive={currentPage === i}
+						>
+							{i}
+						</PaginationLink>
+					</PaginationItem>
+				);
+			}
+		} else {
+			items.push(
+				<PaginationItem key={1}>
+					<PaginationLink
+						// href={buildLink(1)}
+						onClick={() => {
+							setCurrentPage(1);
+							onClick?.(1);
+						}}
+						isActive={currentPage === 1}
+					>
+						1
+					</PaginationLink>
+				</PaginationItem>
+			);
+
+			if (currentPage > 3) {
+				items.push(
+					<PaginationItem key='ellipsis-start'>
+						<PaginationEllipsis />
+					</PaginationItem>
+				);
+			}
+
+			const start = Math.max(2, currentPage - 1);
+			const end = Math.min(totalPageCount - 1, currentPage + 1);
+
+			for (let i = start; i <= end; i += 1) {
+				items.push(
+					<PaginationItem key={i}>
+						<PaginationLink
+							// href={buildLink(i)}
+							onClick={() => {
+								setCurrentPage(i);
+								onClick?.(i);
+							}}
+							isActive={currentPage === i}
+						>
+							{i}
+						</PaginationLink>
+					</PaginationItem>
+				);
+			}
+
+			if (currentPage < totalPageCount - 2) {
+				items.push(
+					<PaginationItem key='ellipsis-end'>
+						<PaginationEllipsis />
+					</PaginationItem>
+				);
+			}
+
+			items.push(
+				<PaginationItem key={totalPageCount}>
+					<PaginationLink
+						// href={buildLink(totalPageCount)}
+						onClick={() => {
+							setCurrentPage(totalPageCount);
+							onClick?.(totalPageCount);
+						}}
+						isActive={currentPage === totalPageCount}
+					>
+						{totalPageCount}
+					</PaginationLink>
+				</PaginationItem>
+			);
+		}
+
+		return items;
+	};
+
+	return (
+		<div className='flex w-full flex-col items-center gap-3 md:flex-row'>
+			{pageSizeSelectOptions && (
+				<div className='flex flex-1 flex-col gap-4'>
+					<SelectRowsPerPage
+						options={pageSizeSelectOptions.pageSizeOptions}
+						setPageSize={navToPageSize}
+						pageSize={pageSize}
+					/>
+				</div>
+			)}
+			<Pagination className={cn({ 'md:justify-end': pageSizeSelectOptions })}>
+				<PaginationContent className='max-sm:gap-0'>
+					<PaginationItem>
+						<PaginationPrevious
+							// href={buildLink(Math.max(currentPage - 1, 1))}
+							onClick={() => {
+								setCurrentPage(Math.max(currentPage - 1, 1));
+								onClick?.(Math.max(currentPage - 1, 1));
+							}}
+							aria-disabled={currentPage === 1}
+							tabIndex={currentPage === 1 ? -1 : undefined}
+							className={currentPage === 1 ? 'pointer-events-none opacity-50' : undefined}
+						/>
+					</PaginationItem>
+					{renderPageNumbers()}
+					<PaginationItem>
+						<PaginationNext
+							// href={buildLink(Math.min(currentPage + 1, totalPageCount))}
+							onClick={() => {
+								setCurrentPage(Math.min(currentPage + 1, totalPageCount));
+								onClick?.(Math.min(currentPage + 1, totalPageCount));
+							}}
+							aria-disabled={currentPage === totalPageCount}
+							tabIndex={currentPage === totalPageCount ? -1 : undefined}
+							className={currentPage === totalPageCount ? 'pointer-events-none opacity-50' : undefined}
+						/>
+					</PaginationItem>
+				</PaginationContent>
+			</Pagination>
+		</div>
+	);
+}

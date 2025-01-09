@@ -8,7 +8,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
 
-const buttonVariants = {
+export const buttonVariants = {
 	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
 	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
 	outline:
@@ -18,7 +18,7 @@ const buttonVariants = {
 	link: 'text-primary underline-offset-4 hover:underline'
 };
 
-const buttonSizes = {
+export const buttonSizes = {
 	default: 'h-9 px-4 py-2',
 	sm: 'h-8 rounded-md px-3 text-xs',
 	lg: 'h-10 rounded-md px-8',
