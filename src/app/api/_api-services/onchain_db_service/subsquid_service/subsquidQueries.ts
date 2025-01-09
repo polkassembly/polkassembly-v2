@@ -306,8 +306,7 @@ export class SubsquidQueries {
 				totalVotingPower
 				delegatedVotingPower
 			}
-
-			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
