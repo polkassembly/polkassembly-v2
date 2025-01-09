@@ -26,7 +26,7 @@ function BlockEditor({
 	renderFromHtml,
 	ref
 }: {
-	data?: Record<string, unknown> | string;
+	data?: OutputData | string;
 	onChange?: (data: OutputData) => void;
 	readOnly?: boolean;
 	className?: string;

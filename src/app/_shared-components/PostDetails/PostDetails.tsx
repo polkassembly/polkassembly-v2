@@ -37,7 +37,6 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 							<BlockEditor
 								data={postData.content}
 								readOnly
-								renderFromHtml
 								className='max-h-full border-none'
 								id='post-content'
 							/>
