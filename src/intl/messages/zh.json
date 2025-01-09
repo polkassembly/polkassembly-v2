@@ -225,6 +225,7 @@
 		"disapproved": "不批准",
 		"closed": "已关闭",
 		"awarded": "已授予",
-		"added": "已添加"
+		"added": "已添加",
+		"notPassed": "未通过"
 	}
 }

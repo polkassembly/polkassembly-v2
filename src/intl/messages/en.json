@@ -227,6 +227,7 @@
 		"disapproved": "Disapproved",
 		"closed": "Closed",
 		"awarded": "Awarded",
-		"added": "Added"
+		"added": "Added",
+		"notPassed": "Not Passed"
 	}
 }

@@ -225,6 +225,7 @@
 		"disapproved": "不承認",
 		"closed": "終了",
 		"awarded": "付与済み",
-		"added": "追加済み"
+		"added": "追加済み",
+		"notPassed": "不承認"
 	}
 }

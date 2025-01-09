@@ -225,6 +225,7 @@
 		"disapproved": "Desaprobado",
 		"closed": "Cerrado",
 		"awarded": "Otorgado",
-		"added": "Añadido"
+		"added": "Añadido",
+		"notPassed": "No aprobado"
 	}
 }
