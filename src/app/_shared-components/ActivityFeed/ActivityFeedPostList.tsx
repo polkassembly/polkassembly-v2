@@ -5,7 +5,7 @@ import React from 'react';
 import { IOnChainPostListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
-import ActivityFeedPostItem from './ActivityFeedPostItem';
+import ActivityFeedPostItem from './ActivityFeedPostItem/ActivityFeedPostItem';
 
 function ActivityFeedPostList({ postData }: { postData: IOnChainPostListingResponse }) {
 	return (
@@ -30,8 +30,9 @@ function ActivityFeedPostList({ postData }: { postData: IOnChainPostListingRespo
 			) : (
 				postData.posts.map((post) => (
 					<ActivityFeedPostItem
+						key={post?.index}
 						postData={post}
-						totalCount={postData.totalCount}
+						totalCount={postData?.totalCount}
 					/>
 				))
 			)}

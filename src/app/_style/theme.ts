@@ -61,7 +61,7 @@ export const THEME_COLORS = {
 		progress_pink_bg: '#FEF2F8'
 	},
 	dark: {
-		wallet_btn_text: '#485F7D',
+		wallet_btn_text: '#9E9E9E',
 		bg_modal: '#000',
 		navbar_border: '#E5007A',
 		bg_pink: '#FF4098',
