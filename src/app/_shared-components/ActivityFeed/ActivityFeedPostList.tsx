@@ -5,12 +5,15 @@ import React from 'react';
 import { IOnChainPostListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
+import Loading from '@/app/loading';
 import ActivityFeedPostItem from './ActivityFeedPostItem/ActivityFeedPostItem';
 
-function ActivityFeedPostList({ postData }: { postData: IOnChainPostListingResponse }) {
+function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
 	return (
-		<div className='hide-scrollbar space-y-5 lg:max-h-[1078px] lg:overflow-y-auto'>
-			{postData?.posts?.length === 0 ? (
+		<div className='hide-scrollbar space-y-5 pb-10 lg:max-h-[1078px] lg:overflow-y-auto'>
+			{loading ? (
+				<Loading />
+			) : postData?.posts?.length === 0 ? (
 				<div className='flex h-[900px] flex-col items-center rounded-xl border border-solid border-[#D2D8E0] bg-white px-5 pt-5 dark:border-[#4B4B4B] dark:bg-[#0D0D0D] md:pt-10'>
 					<Image
 						src={JoinPA}

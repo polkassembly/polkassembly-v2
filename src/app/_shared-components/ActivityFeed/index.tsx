@@ -3,36 +3,41 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { EActivityFeedTab, IOnChainPostListingResponse, EDataSource, EProposalType, ENetwork } from '@/_shared/types';
+import { EActivityFeedTab } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
+import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import ActivityFeedPostList from './ActivityFeedPostList';
 
 function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
-	const getExploreActivityFeed = async (): Promise<IOnChainPostListingResponse> => {
-		const { data, error } = await NextApiClientService.getActivityFeedApi();
+	const getExploreActivityFeed = async () => {
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi(1, 10);
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
-		if (Array.isArray(data)) {
-			const posts = data.map((post) => ({
-				...post,
-				dataSource: EDataSource.POLKASSEMBLY,
-				proposalType: EProposalType.REFERENDUM_V2,
-				network: ENetwork.POLKADOT
-			}));
-			return { posts, totalCount: posts.length };
-		}
-		return data || { posts: [], totalCount: 0 };
+
+		return data;
 	};
 
-	const { data: activityData } = useQuery<IOnChainPostListingResponse>({
+	const { data, isLoading } = useQuery({
 		queryKey: ['activityFeed', currentTab],
-		queryFn: getExploreActivityFeed
+		queryFn: getExploreActivityFeed,
+		placeholderData: (previousData) => previousData,
+		staleTime: ADDRESS_LOGIN_TTL
 	});
+	console.log('activityData', data);
 
 	return (
-		<div className='space-y-5'>{currentTab === EActivityFeedTab.EXPLORE ? <ActivityFeedPostList postData={activityData || { posts: [], totalCount: 0 }} /> : <p>No data</p>}</div>
+		<div className='space-y-5'>
+			{currentTab === EActivityFeedTab.EXPLORE ? (
+				<ActivityFeedPostList
+					loading={isLoading}
+					postData={data || { posts: [], totalCount: 0 }}
+				/>
+			) : (
+				<p>Data will be available soon</p>
+			)}
+		</div>
 	);
 }
 
