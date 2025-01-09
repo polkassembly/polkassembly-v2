@@ -9,6 +9,7 @@ import { useAtom } from 'jotai';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { userPreferencesAtom } from '@/app/_atoms/user/userPreferencesAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { Loader2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
 export default function RPCSwitchDropdown() {
@@ -39,10 +40,10 @@ export default function RPCSwitchDropdown() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger>
-				<div className={`cursor-pointer ${isLoading ? 'pointer-events-none opacity-50' : ''}`}>
-					<div className='rounded-md border-[1px] border-border_grey p-1.5'>
-						<MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />
+			<DropdownMenuTrigger disabled={isLoading}>
+				<div className='cursor-pointer'>
+					<div className='relative rounded-md border-[1px] border-border_grey p-1.5'>
+						{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
 					</div>
 				</div>
 			</DropdownMenuTrigger>
@@ -50,8 +51,9 @@ export default function RPCSwitchDropdown() {
 				{rpcEndpoints.map((endpoint, index) => (
 					<DropdownMenuItem
 						key={endpoint?.url}
-						className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-sidebar_menu_bg text-bg_pink' : ''} ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
+						className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-sidebar_menu_bg text-bg_pink' : ''}`}
 						onClick={() => handleRpcSwitch(index)}
+						disabled={isLoading}
 					>
 						<span className='text-sm font-medium'>{endpoint.name}</span>
 					</DropdownMenuItem>
