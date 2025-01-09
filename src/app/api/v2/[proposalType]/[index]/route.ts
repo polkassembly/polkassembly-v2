@@ -4,6 +4,7 @@
 
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
+import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { OnChainDbService } from '@api/_api-services/onchain_db_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -15,6 +16,7 @@ import { EDataSource, ENetwork, EProposalType, IPost } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -64,10 +66,12 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.string().min(1, 'Content is required')
+		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content')
 	});
 
 	const { content, title } = zodBodySchema.parse(await getReqBody(req));
+
+	const formattedContent = convertContentForFirestoreServer(content);
 
 	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 		await OffChainDbService.UpdateOffChainPost({
@@ -75,7 +79,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			indexOrHash: index,
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content,
+			content: formattedContent,
 			title
 		});
 	} else {
@@ -84,7 +88,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			indexOrHash: index,
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content,
+			content: formattedContent,
 			title
 		});
 	}

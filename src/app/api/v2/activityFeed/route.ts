@@ -60,7 +60,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		limit,
 		page,
 		statuses: ACTIVE_PROPOSAL_STATUSES,
-		notVotedByAddresses: isUserAuthenticated ? userAddresses : undefined
+		notVotedByAddresses: isUserAuthenticated && userAddresses.length ? userAddresses : undefined
 	});
 
 	// Fetch off-chain data

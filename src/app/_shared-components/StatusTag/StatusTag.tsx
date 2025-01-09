@@ -4,6 +4,7 @@
 
 import { useTheme } from 'next-themes';
 import { ETheme } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import styles from './StatusTag.module.scss';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 
 function StatusTag({ className = '', status, colorInverted }: Props) {
 	const { theme } = useTheme();
+	const t = useTranslations();
 
 	const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
 
@@ -24,7 +26,7 @@ function StatusTag({ className = '', status, colorInverted }: Props) {
 				theme === ETheme.DARK ? styles.dark : styles.light
 			} ${className}`}
 		>
-			{status?.split(/(?=[A-Z])/).join(' ')}
+			{t(`ProposalStatus.${status?.toLowerCase()}`)}
 		</div>
 	);
 }

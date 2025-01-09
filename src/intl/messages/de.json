@@ -17,6 +17,11 @@
 		"hidePassword": "Passwort verbergen",
 		"showPassword": "Passwort anzeigen"
 	},
+	"ListingTab": {
+		"Analytics": "Analysen",
+		"External": "Extern",
+		"Referenda": "Referenden"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury-Vorschlag",
 		"proposal": "Vorschlag",
@@ -134,7 +139,9 @@
 		"ReferendumCanceller": "Referendum Annullierer",
 		"ReferendumKiller": "Referendum Beender",
 		"WhitelistedCaller": "Zugelassener Aufrufer",
-		"FellowshipAdmin": "Gemeinschafts Verwalter"
+		"FellowshipAdmin": "Gemeinschafts Verwalter",
+		"ReportAnIssue": "Problem melden",
+		"NeedHelp": "Brauchst du Hilfe?"
 	},
 	"PostDetails": {
 		"castVote": "Abstimmen",
@@ -162,5 +169,65 @@
 		"nay": "Nein",
 		"support": "Unterstützung",
 		"bareAyes": "Einfache Ja-Stimmen"
+	},
+	"ListingPage_Status": {
+		"Cancelled": "Abgebrochen",
+		"Confirmed": "Bestätigt",
+		"ConfirmAborted": "Bestätigung abgebrochen",
+		"ConfirmStarted": "Bestätigung gestartet",
+		"Deciding": "Entscheidung",
+		"Executed": "Ausgeführt",
+		"ExecutionFailed": "Ausführung fehlgeschlagen",
+		"Killed": "Getötet",
+		"Rejected": "Abgelehnt",
+		"Submitted": "Eingereicht",
+		"TimedOut": "Zeitüberschreitung"
+	},
+	"ListingPage_Tags": {
+		"bounty": "Prämie",
+		"treasury": "Treasury",
+		"smart contract": "Smart Contract",
+		"polkadot": "Polkadot",
+		"Network": "Netzwerk",
+		"Governance": "Governance",
+		"Proposal": "Vorschlag",
+		"Test": "Test"
+	},
+	"ProposalStatus": {
+		"cancelled": "Abgebrochen",
+		"timedout": "Zeitüberschreitung",
+		"confirmed": "Bestätigt",
+		"approved": "Genehmigt",
+		"rejected": "Abgelehnt",
+		"executed": "Ausgeführt",
+		"killed": "Beendet",
+		"executionfailed": "Ausführung fehlgeschlagen",
+		"decisiondepositplaced": "Entscheidungseinlage platziert",
+		"deciding": "In Entscheidung",
+		"confirmstarted": "Bestätigung gestartet",
+		"confirmaborted": "Bestätigung abgebrochen",
+		"opened": "Eröffnet",
+		"retracted": "Zurückgezogen",
+		"slashed": "Gekürzt",
+		"active": "Aktiv",
+		"extended": "Verlängert",
+		"claimed": "Beansprucht",
+		"unrequested": "Nicht angefordert",
+		"requested": "Angefordert",
+		"submitted": "Eingereicht",
+		"cleared": "Gelöscht",
+		"voting": "Abstimmung läuft",
+		"votingended": "Abstimmung beendet",
+		"votingstarted": "Abstimmung gestartet",
+		"invalid": "Ungültig",
+		"missing": "Fehlend",
+		"reaped": "Entfernt",
+		"disapproved": "Nicht genehmigt",
+		"closed": "Geschlossen",
+		"awarded": "Zuerkannt",
+		"added": "Hinzugefügt",
+		"notpassed": "Nicht bestanden",
+		"started": "Gestartet",
+		"passed": "Bestanden"
 	}
 }
