@@ -87,6 +87,9 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 				method = 'POST';
 				break;
+			case EApiRoute.GET_ACTIVITY_FEED:
+				path = '/activityFeed';
+				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
 		}
@@ -238,5 +241,12 @@ export class NextApiClientService {
 	static async getVotesApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES, routeSegments: [proposalType, index, 'votes'] });
 		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	// activity feed
+	// {{baseUrl}}/api/v2/activityFeed
+	static async getActivityFeedApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED });
+		return this.nextApiClientFetch<IOnChainPostListingResponse[]>({ url, method });
 	}
 }

@@ -15,33 +15,13 @@ import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { IPostListing } from '@/_shared/types';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styles from './ActivityFeedPostItem.module.scss';
 import Address from '../Profile/Address/Address';
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
-
-interface PostData {
-	id: number;
-	amount: number;
-	equivalentUSD: number;
-	status: string;
-	proposer: string;
-	category: string;
-	date: string;
-	title: string;
-	description: string;
-	likes: number;
-	dislikes: number;
-	comments: number;
-	shares: number;
-	approvalRating: number;
-	reactions?: {
-		userAddress: string;
-		reaction: 'like' | 'dislike';
-	}[];
-}
 
 interface ReactionState {
 	isLiked: boolean;
@@ -54,7 +34,7 @@ const COMMENT_PLACEHOLDER = 'Type your comment here';
 const POST_LABEL = 'Post';
 const ANIMATION_DURATION = 1500;
 
-function ActivityFeedPostItem({ postData }: { postData: PostData }) {
+function ActivityFeedPostItem({ postData, totalCount }: { postData: IPostListing; totalCount: number }) {
 	const { user } = useUser();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [showLikeGif, setShowLikeGif] = useState(false);
@@ -63,8 +43,8 @@ function ActivityFeedPostItem({ postData }: { postData: PostData }) {
 	const [reactionState, setReactionState] = useState<ReactionState>({
 		isLiked: false,
 		isDisliked: false,
-		likesCount: postData.likes,
-		dislikesCount: postData.dislikes
+		likesCount: postData?.metrics?.reactions?.like || 0,
+		dislikesCount: postData?.metrics?.reactions?.dislike || 0
 	});
 
 	const formatDate = (date: string) => {
@@ -96,6 +76,9 @@ function ActivityFeedPostItem({ postData }: { postData: PostData }) {
 			}));
 		}
 	};
+
+	console.log('postData', postData);
+	console.log('totalCount', totalCount);
 
 	return (
 		<div className='rounded-xl border border-gray-200 bg-white p-5 shadow-md'>

@@ -2,37 +2,15 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
+import { IOnChainPostListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
 import ActivityFeedPostItem from './ActivityFeedPostItem';
 
-interface IPostListProps {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	postData: any;
-}
-
-const post = {
-	id: 1,
-	amount: 2500,
-	equivalentUSD: 36000,
-	status: 'Active',
-	proposer: '1eGtATyy4ayn77dsrhdW8N3Vs1yjqjzJcintksNmScqy31j',
-	category: 'Council',
-	date: '20 Dec 2021',
-	title: '#45 Standard Guidelines to judge Liquidity Treasury Proposals on the main governance side - Kusama and Polkadot your Vote!',
-	description:
-		'Based on the income to the treasuries, the amounts getting burned and the amounts going to proposals, the treasury can be utilised: this includes spending funds, extending the c...',
-	likes: 16,
-	dislikes: 4,
-	comments: 10,
-	shares: 16,
-	approvalRating: 20
-};
-
-function ActivityFeedPostList({ postData }: IPostListProps) {
+function ActivityFeedPostList({ postData }: { postData: IOnChainPostListingResponse }) {
 	return (
 		<div className='hide-scrollbar space-y-5 lg:max-h-[1078px] lg:overflow-y-auto'>
-			{postData?.length === 0 ? (
+			{postData?.posts?.length === 0 ? (
 				<div className='flex h-[900px] flex-col items-center rounded-xl border border-solid border-[#D2D8E0] bg-white px-5 pt-5 dark:border-[#4B4B4B] dark:bg-[#0D0D0D] md:pt-10'>
 					<Image
 						src={JoinPA}
@@ -50,7 +28,12 @@ function ActivityFeedPostList({ postData }: IPostListProps) {
 					</p>
 				</div>
 			) : (
-				<ActivityFeedPostItem postData={post} />
+				postData.posts.map((post) => (
+					<ActivityFeedPostItem
+						postData={post}
+						totalCount={postData.totalCount}
+					/>
+				))
 			)}
 		</div>
 	);
