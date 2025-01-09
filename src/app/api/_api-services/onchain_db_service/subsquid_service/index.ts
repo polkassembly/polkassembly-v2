@@ -142,7 +142,7 @@ export class SubsquidService extends SubsquidUtils {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS;
 		}
 
-		if (notVotedByAddresses && statuses) {
+		if (notVotedByAddresses?.length && statuses) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_WHERE_NOT_VOTED;
 		}
 
