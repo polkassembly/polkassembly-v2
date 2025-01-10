@@ -7,10 +7,13 @@ import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
 import Loading from '@/app/loading';
 import ActivityFeedPostItem from './ActivityFeedPostItem/ActivityFeedPostItem';
+import ActivityFeedNavbar from './ActivityFeedNavbar';
 
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
+	console.log('postData', postData.totalCount);
 	return (
 		<div className='hide_scrollbar space-y-5 pb-10 lg:max-h-[1078px] lg:overflow-y-auto'>
+			<ActivityFeedNavbar />
 			{loading ? (
 				<Loading />
 			) : postData?.posts?.length === 0 ? (
@@ -35,7 +38,6 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 					<ActivityFeedPostItem
 						key={post?.index}
 						postData={post}
-						totalCount={postData?.totalCount}
 					/>
 				))
 			)}

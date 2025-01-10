@@ -20,22 +20,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { Progress } from '@ui/progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
+import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
 import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
-
-const calculatePercentage = (value: string | number, totalValue: bigint | number) => {
-	if (typeof totalValue === 'bigint') {
-		if (totalValue === BigInt(0)) return 0;
-		const valueBI = BigInt(value);
-		return Number((valueBI * BigInt(100) * BigInt(100)) / totalValue) / 100;
-	}
-	if (totalValue === 0) return 0;
-	return (Number(value) * 100) / totalValue;
-};
 
 function ListingCard({
 	title,

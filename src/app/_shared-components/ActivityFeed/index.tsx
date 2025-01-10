@@ -15,7 +15,6 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
-
 		return data;
 	};
 
@@ -25,7 +24,6 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 		placeholderData: (previousData) => previousData,
 		staleTime: ADDRESS_LOGIN_TTL
 	});
-	console.log('activityData', data);
 
 	return (
 		<div className='space-y-5'>
