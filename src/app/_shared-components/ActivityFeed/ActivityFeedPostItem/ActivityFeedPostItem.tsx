@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import React, { RefObject, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
@@ -22,11 +24,11 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@ui/Profile/Address/Address';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
+import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
-import BlockEditor from '../../BlockEditor/BlockEditor';
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
@@ -85,7 +87,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 							<div className={styles.beneficiaryContainer}>
 								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo?.beneficiaries, postData.network)).map(([assetId, amount]) => (
 									<div
-										key={assetId}
+										key={`${assetId}-${postData.index}`}
 										className={styles.requestedAmount}
 									>
 										<span>
@@ -149,11 +151,12 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
-			<p className='mb-4 text-sm text-btn_secondary_text'>
+			<div className='mb-4 text-sm text-btn_secondary_text'>
 				<BlockEditor
-					data={postData?.content}
+					data={postData.content}
 					readOnly
-					renderFromHtml
+					className='max-h-20 overflow-hidden border-none'
+					id={`post-content-${postData.index}`}
 				/>
 				<Link
 					href={`/referenda/${postData.index}`}
@@ -161,7 +164,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				>
 					Read more
 				</Link>
-			</p>
+			</div>
 
 			{/* Metrics Section */}
 			<div className='flex items-center justify-end'>
