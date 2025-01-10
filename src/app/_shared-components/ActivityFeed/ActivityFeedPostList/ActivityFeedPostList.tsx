@@ -62,7 +62,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 				<div className='flex flex-col gap-5'>
 					{(currentTab === 'All' ? postData.posts : filteredPosts).map((post: IPostListing) => (
 						<ActivityFeedPostItem
-							key={post?.index}
+							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}
 						/>
 					))}

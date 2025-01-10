@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -12,7 +12,7 @@ import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 
 function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
-	const observerTarget = React.useRef<HTMLDivElement>(null);
+	const observerTarget = useRef<HTMLDivElement>(null);
 
 	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
@@ -28,7 +28,13 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 		queryKey: ['activityFeed', currentTab],
 		queryFn: getExploreActivityFeed,
 		initialPageParam: 1,
-		getNextPageParam: (lastPage) => (lastPage.posts?.length === 10 ? lastPage.page + 1 : undefined),
+		getNextPageParam: (lastPage) => {
+			// Ensure unique page number
+			if (lastPage.posts?.length === 10) {
+				return lastPage.page + 1; // Increment page
+			}
+			return undefined; // No more pages to fetch
+		},
 		staleTime: ADDRESS_LOGIN_TTL
 	});
 
@@ -76,4 +82,5 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 		</div>
 	);
 }
+
 export default LatestActivity;
