@@ -75,18 +75,6 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 
 	const totalPageCount = Math.ceil(totalCount / pageSize);
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-	const buildLink = useCallback(
-		(newPage: number) => {
-			const key = pageSearchParam || 'page';
-			if (!searchParams) return `${pathname}?${key}=${newPage}`;
-			const newSearchParams = new URLSearchParams(searchParams);
-			newSearchParams.set(key, String(newPage));
-			return `${pathname}?${newSearchParams.toString()}`;
-		},
-		[searchParams, pathname]
-	);
-
 	const navToPageSize = useCallback(
 		(newPageSize: number) => {
 			const key = pageSizeSelectOptions?.pageSizeSearchParam || 'pageSize';
