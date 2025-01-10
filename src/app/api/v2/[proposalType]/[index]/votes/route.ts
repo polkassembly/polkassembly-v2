@@ -24,10 +24,17 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		decision: z.nativeEnum(EVoteDecision).optional()
+		decision: z
+			.string()
+			.transform((val) => {
+				return !val || !Object.values(EVoteDecision).includes(val as EVoteDecision) ? undefined : (val as EVoteDecision);
+			})
+			.optional()
 	});
 
-	const { page, limit, decision } = zodQuerySchema.parse(req.nextUrl.searchParams);
+	const { page, limit, decision } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+
+	console.log('Raw search params:', Object.fromEntries(req.nextUrl.searchParams));
 
 	const network = await getNetworkFromHeaders();
 
