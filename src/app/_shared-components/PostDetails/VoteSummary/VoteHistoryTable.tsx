@@ -8,6 +8,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
 import Address from '../../Profile/Address/Address';
 import { Button } from '../../Button';
@@ -33,7 +34,7 @@ const columns: ColumnDef<IVoteData>[] = [
 		header: ({ column }) => (
 			<Button
 				variant='ghost'
-				className='flex items-center gap-x-2 text-xs font-medium text-wallet_btn_text'
+				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
 				onClick={() => column.toggleSorting()}
 			>
 				Capital
@@ -46,7 +47,7 @@ const columns: ColumnDef<IVoteData>[] = [
 		header: ({ column }) => (
 			<Button
 				variant='ghost'
-				className='flex items-center gap-x-2 text-xs font-medium text-wallet_btn_text'
+				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
 				onClick={() => column.toggleSorting()}
 			>
 				Voting Power
@@ -59,7 +60,7 @@ const columns: ColumnDef<IVoteData>[] = [
 		header: ({ column }) => (
 			<Button
 				variant='ghost'
-				className='flex items-center gap-x-2 text-xs font-medium text-wallet_btn_text'
+				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
 				onClick={() => column.toggleSorting()}
 			>
 				Delegated
@@ -73,6 +74,8 @@ const columns: ColumnDef<IVoteData>[] = [
 function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: boolean }) {
 	const network = getCurrentNetwork();
 
+	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
+
 	const [sorting, setSorting] = useState<SortingState>([]);
 
 	const table = useReactTable({
@@ -85,6 +88,10 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 			sorting
 		}
 	});
+
+	const formatBalance = (balance: string) => {
+		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
+	};
 
 	return (
 		<Table className='relative min-h-[200px]'>
@@ -109,9 +116,15 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 						<TableCell className='py-4'>
 							<Address address={vote.original.voterAddress} />
 						</TableCell>
-						<TableCell className='py-4'>{formatBnBalance(vote.original.balanceValue || '0', { withUnit: true, numberAfterComma: 2 }, network)}</TableCell>
-						<TableCell className='py-4'>{formatBnBalance(vote.original.selfVotingPower || '0', { withUnit: true, numberAfterComma: 2 }, network)}</TableCell>
-						<TableCell className='py-4'>{formatBnBalance(vote.original.delegatedVotingPower || '0', { withUnit: true, numberAfterComma: 2 }, network)}</TableCell>
+						<TableCell className='py-4'>
+							{formatBalance(vote.original.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+						</TableCell>
+						<TableCell className='py-4'>
+							{formatBalance(vote.original.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+						</TableCell>
+						<TableCell className='py-4'>
+							{formatBalance(vote.original.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+						</TableCell>
 					</TableRow>
 				))}
 			</TableBody>

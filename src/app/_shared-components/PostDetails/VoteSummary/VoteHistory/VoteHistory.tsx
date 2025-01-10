@@ -2,9 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EVoteDecision, IVoteData } from '@/_shared/types';
+import { EProposalType, EVoteDecision } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { FIVE_MIN } from '@/app/api/_api-constants/timeConstants';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
@@ -18,38 +18,29 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 	const [tab, setTab] = useState(EVoteDecision.AYE);
 	const [page, setPage] = useState(1);
 
-	const fetchVoteHistory = async (pageNumber: number) => {
-		const { data, error } = await NextApiClientService.getVotesHistoryApi({ proposalType, index, page: pageNumber });
+	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision) => {
+		const { data, error } = await NextApiClientService.getVotesHistoryApi({ proposalType, index, page: pageNumber, decision });
 
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
 		return data;
 	};
-	const { data, refetch, isFetching } = useQuery({
-		queryKey: ['voteHistory', proposalType, index, page],
-		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number),
+	const { data, isFetching } = useQuery({
+		queryKey: ['voteHistory', proposalType, index, page, tab],
+		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision),
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN
+		staleTime: FIVE_MIN_IN_MILLI
 	});
-	const ayeVotes: IVoteData[] = [];
-	const nayVotes: IVoteData[] = [];
-	const abstainVotes: IVoteData[] = [];
 
-	data?.votes?.forEach((vote: IVoteData) => {
-		if (vote.decision === EVoteDecision.AYE) {
-			ayeVotes.push(vote);
-		} else if (vote.decision === EVoteDecision.NAY) {
-			nayVotes.push(vote);
-		} else if (vote.decision === EVoteDecision.ABSTAIN) {
-			abstainVotes.push(vote);
-		}
-	});
 	return (
 		<div>
 			<Tabs
 				defaultValue={tab}
-				onValueChange={(t) => setTab(t as EVoteDecision)}
+				onValueChange={(t) => {
+					setTab(t as EVoteDecision);
+					setPage(1);
+				}}
 			>
 				<TabsList className='flex gap-x-2 rounded border border-border_grey p-1'>
 					<TabsTrigger
@@ -85,19 +76,25 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 					className='flex max-h-[500px] flex-col'
 				>
 					<VoteHistoryTable
-						votes={ayeVotes}
+						votes={data?.votes || []}
 						loading={isFetching}
 					/>
 				</TabsContent>
-				<TabsContent value={EVoteDecision.NAY}>
+				<TabsContent
+					value={EVoteDecision.NAY}
+					className='flex max-h-[500px] flex-col'
+				>
 					<VoteHistoryTable
-						votes={nayVotes}
+						votes={data?.votes || []}
 						loading={isFetching}
 					/>
 				</TabsContent>
-				<TabsContent value={EVoteDecision.ABSTAIN}>
+				<TabsContent
+					value={EVoteDecision.ABSTAIN}
+					className='flex max-h-[500px] flex-col'
+				>
 					<VoteHistoryTable
-						votes={abstainVotes}
+						votes={data?.votes || []}
 						loading={isFetching}
 					/>
 				</TabsContent>
@@ -108,7 +105,6 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				totalCount={data?.totalCount || 0}
 				onClick={(pageNumber) => {
 					setPage(pageNumber);
-					refetch();
 				}}
 			/>
 		</div>

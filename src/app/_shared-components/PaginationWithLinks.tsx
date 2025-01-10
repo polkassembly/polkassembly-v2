@@ -4,7 +4,7 @@
 
 'use client';
 
-import { type ReactNode, useCallback, useState } from 'react';
+import { type ReactNode, useCallback, useState, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from './Pagination';
@@ -68,6 +68,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 	const searchParams = useSearchParams();
 
 	const [currentPage, setCurrentPage] = useState(page);
+
+	useEffect(() => {
+		setCurrentPage(page);
+	}, [page]);
 
 	const totalPageCount = Math.ceil(totalCount / pageSize);
 
