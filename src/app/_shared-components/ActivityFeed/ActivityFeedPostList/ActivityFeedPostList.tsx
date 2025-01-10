@@ -8,8 +8,9 @@ import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
 import Loading from '@/app/loading';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import ActivityFeedPostItem from './ActivityFeedPostItem/ActivityFeedPostItem';
-import ActivityFeedNavbar from './ActivityFeedNavbar/ActivityFeedNavbar';
+import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
+import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
+import styles from './ActivityFeedPostList.module.scss';
 
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
 	const [currentTab, setCurrentTab] = useState<string>('All');
@@ -38,7 +39,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 			{loading ? (
 				<Loading />
 			) : postData?.posts?.length === 0 ? (
-				<div className='flex h-[900px] flex-col items-center rounded-xl border border-solid border-border_grey bg-page_background px-5 pt-5 text-text_primary md:pt-10'>
+				<div className={styles.allCaughtUp}>
 					<Image
 						src={JoinPA}
 						alt='empty state'

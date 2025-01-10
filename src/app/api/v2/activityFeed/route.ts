@@ -24,9 +24,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
-	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
-
-	const { page, limit } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit } = zodQuerySchema.parse(req.nextUrl.searchParams);
 
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
@@ -60,7 +58,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		limit,
 		page,
 		statuses: ACTIVE_PROPOSAL_STATUSES,
-		notVotedByAddresses: isUserAuthenticated ? userAddresses : undefined
+		notVotedByAddresses: isUserAuthenticated && userAddresses.length ? userAddresses : undefined
 	});
 
 	// Fetch off-chain data

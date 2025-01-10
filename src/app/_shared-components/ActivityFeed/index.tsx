@@ -7,7 +7,7 @@ import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
-import ActivityFeedPostList from './ActivityFeedPostList';
+import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 
 function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 	const observerTarget = React.useRef<HTMLDivElement>(null);

@@ -4,7 +4,7 @@
 
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/onChainProposalTypes';
-import { EProposalType } from '@/_shared/types';
+import { EProposalType, EVoteDecision } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
@@ -23,16 +23,22 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
-		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
+		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
+		decision: z
+			.string()
+			.transform((val) => {
+				return !val || !Object.values(EVoteDecision).includes(val as EVoteDecision) ? undefined : (val as EVoteDecision);
+			})
+			.optional()
 	});
 
-	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
+	const { page, limit, decision } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
-	const { page, limit } = zodQuerySchema.parse(searchParamsObject);
+	console.log('Raw search params:', Object.fromEntries(req.nextUrl.searchParams));
 
 	const network = await getNetworkFromHeaders();
 
-	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, page, limit });
+	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, page, limit, decision });
 
 	return NextResponse.json(voteData);
 });

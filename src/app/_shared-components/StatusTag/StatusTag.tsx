@@ -26,7 +26,7 @@ function StatusTag({ className = '', status, colorInverted }: Props) {
 				theme === ETheme.DARK ? styles.dark : styles.light
 			} ${className}`}
 		>
-			{t(`ProposalStatus.${status}`)}
+			{t(`ProposalStatus.${status?.toLowerCase()}`)}
 		</div>
 	);
 }

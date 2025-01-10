@@ -15,9 +15,7 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
-	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
-
-	const { page, limit } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit } = zodQuerySchema.parse(req.nextUrl.searchParams);
 
 	const users: IPublicUser[] = await OffChainDbService.GetPublicUsers(page, limit);
 

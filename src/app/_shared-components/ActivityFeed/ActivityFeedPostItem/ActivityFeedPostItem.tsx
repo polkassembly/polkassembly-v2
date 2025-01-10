@@ -26,6 +26,7 @@ import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
+import BlockEditor from '../../BlockEditor/BlockEditor';
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
@@ -105,7 +106,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
 				</div>
 				<div>
-					<span className='flex gap-1 rounded-md border-[1px] border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border'>
+					<span className={styles.castVoteButton}>
 						<Image
 							src={VoteIcon}
 							alt=''
@@ -149,7 +150,11 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<p className='mb-4 text-sm text-btn_secondary_text'>
-				{postData.content?.slice(0, 400)}
+				<BlockEditor
+					data={postData?.content}
+					readOnly
+					renderFromHtml
+				/>
 				<Link
 					href={`/referenda/${postData.index}`}
 					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'

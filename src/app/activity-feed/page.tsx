@@ -6,7 +6,7 @@
 
 import { EActivityFeedTab } from '@/_shared/types';
 import React, { useState } from 'react';
-import ActivityFeeToggleButton from '../_shared-components/ActivityFeed/ActivityFeeToggleButton';
+import ActivityFeeToggleButton from '../_shared-components/ActivityFeed/ActivityFeeToggleButton/ActivityFeeToggleButton';
 import LatestActivity from '../_shared-components/ActivityFeed';
 import ActivityFeedSidebar from '../_shared-components/ActivityFeed/ActivityFeedSidebar';
 

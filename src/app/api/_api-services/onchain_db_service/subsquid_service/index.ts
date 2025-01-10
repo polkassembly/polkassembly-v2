@@ -19,10 +19,9 @@ import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { SubsquidQueries } from './subsquidQueries';
 import { SubsquidUtils } from './subsquidUtils';
 
-export class SubsquidService extends SubsquidQueries {
+export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
 
@@ -95,7 +94,7 @@ export class SubsquidService extends SubsquidQueries {
 
 		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, index: Number(proposal.index) });
 
-		const allPeriodEnds = proposal.statusHistory ? SubsquidUtils.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+		const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 
 		return {
 			createdAt: proposal.createdAt,
@@ -106,7 +105,7 @@ export class SubsquidService extends SubsquidQueries {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
-			beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+			beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 			confirmationPeriodEndsAt: allPeriodEnds?.confirmationPeriodEnd ?? undefined,
@@ -143,7 +142,7 @@ export class SubsquidService extends SubsquidQueries {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS;
 		}
 
-		if (notVotedByAddresses && statuses) {
+		if (notVotedByAddresses?.length && statuses) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_WHERE_NOT_VOTED;
 		}
 
@@ -204,7 +203,7 @@ export class SubsquidService extends SubsquidQueries {
 				},
 				index: number
 			) => {
-				const allPeriodEnds = proposal.statusHistory ? SubsquidUtils.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+				const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 
 				posts.push({
 					createdAt: proposal.createdAt,
@@ -216,7 +215,7 @@ export class SubsquidService extends SubsquidQueries {
 					type: proposalType,
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
-					beneficiaries: proposal.preimage?.proposedCall?.args ? SubsquidUtils.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined
 				});
 			}
@@ -233,27 +232,37 @@ export class SubsquidService extends SubsquidQueries {
 		proposalType,
 		indexOrHash,
 		page,
-		limit
+		limit,
+		decision
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		indexOrHash: string;
 		page: number;
 		limit: number;
+		decision?: EVoteDecision;
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
+		const subsquidDecision = decision === EVoteDecision.AYE ? 'yes' : decision === EVoteDecision.NAY ? 'no' : decision;
+
 		const query =
 			proposalType === EProposalType.TIP
-				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
+				? subsquidDecision
+					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION
+					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
 				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
-					? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
-					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
+					? subsquidDecision
+						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
+						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
+					: subsquidDecision
+						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
+						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
 
 		const variables =
 			proposalType === EProposalType.TIP
-				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit }
-				: { index_eq: Number(indexOrHash), type_eq: proposalType, limit, offset: (page - 1) * limit };
+				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_eq: subsquidDecision }) }
+				: { index_eq: Number(indexOrHash), type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_eq: subsquidDecision }) };
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 

@@ -1,9 +1,10 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { OutputBlockData } from '@editorjs/editorjs';
+import { EDITOR_JS_VERSION } from '@/_shared/_constants/editorJsVersion';
+import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
-export function convertHtmlToBlocks(html: string) {
+export function convertHtmlToEditorJs(html: string): OutputData {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
 	const blocks: OutputBlockData[] = [];
@@ -61,5 +62,10 @@ export function convertHtmlToBlocks(html: string) {
 			}
 		}
 	});
-	return blocks;
+
+	return {
+		blocks,
+		time: new Date().getTime(),
+		version: EDITOR_JS_VERSION
+	};
 }

@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { OutputData } from '@editorjs/editorjs';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { StatusCodes } from 'http-status-codes';
@@ -281,7 +282,9 @@ export interface IOffChainPost {
 	hash?: string;
 	userId?: number;
 	title?: string;
-	content?: string;
+	content?: OutputData;
+	htmlContent: string; // TODO: make this optional
+	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
 	tags?: string[];
@@ -506,7 +509,9 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: Record<string, unknown>;
+	content: OutputData;
+	htmlContent: string;
+	markdownContent: string;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;
