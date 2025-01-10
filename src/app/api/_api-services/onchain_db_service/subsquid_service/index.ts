@@ -232,27 +232,37 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType,
 		indexOrHash,
 		page,
-		limit
+		limit,
+		decision
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		indexOrHash: string;
 		page: number;
 		limit: number;
+		decision?: EVoteDecision;
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
+		const subsquidDecision = decision === EVoteDecision.AYE ? 'yes' : decision === EVoteDecision.NAY ? 'no' : decision;
+
 		const query =
 			proposalType === EProposalType.TIP
-				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
+				? subsquidDecision
+					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION
+					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
 				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
-					? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
-					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
+					? subsquidDecision
+						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
+						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
+					: subsquidDecision
+						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
+						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
 
 		const variables =
 			proposalType === EProposalType.TIP
-				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit }
-				: { index_eq: Number(indexOrHash), type_eq: proposalType, limit, offset: (page - 1) * limit };
+				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_eq: subsquidDecision }) }
+				: { index_eq: Number(indexOrHash), type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_eq: subsquidDecision }) };
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 

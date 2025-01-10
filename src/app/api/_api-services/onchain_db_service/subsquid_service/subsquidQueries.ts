@@ -3,6 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 export class SubsquidQueries {
+	// single proposal queries
+
 	protected static GET_PROPOSAL_BY_INDEX_AND_TYPE = `
 		query ProposalByIndexAndType($index_eq: Int!, $type_eq: ProposalType!) {
 			proposals(where: {index_eq: $index_eq, type_eq: $type_eq}, limit: 1) {
@@ -50,6 +52,8 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	// proposal listing queries
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE = `
 		query GetProposalsListingByType($limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
@@ -202,6 +206,8 @@ export class SubsquidQueries {
 		}
 	`;
 
+	// vote metrics queries
+
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
 			noCount: votesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
@@ -257,6 +263,8 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	// vote listing queries
 
 	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
@@ -333,6 +341,84 @@ export class SubsquidQueries {
 			}
 
 			votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = `
+		query GetVotesListingByProposalTypeAndIndexAndDecision($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!) {
+			votes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: $decision_eq}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+				id
+				balance {
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				lockPeriod
+				timestamp
+				voter
+			}
+			votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: $decision_eq}, orderBy: id_ASC) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = `
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!) {
+			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: $decision_eq}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+				id
+				balance {
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				lockPeriod
+				voter
+				createdAt
+				selfVotingPower
+				totalVotingPower
+				delegatedVotingPower
+			}
+			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: $decision_eq}, orderBy: id_ASC) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION = `
+		query GetVotesListingByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!) {
+			votes(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: $decision_eq}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+				id
+				balance {
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				lockPeriod
+				timestamp
+				voter
+			}
+			votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: $decision_eq}, orderBy: id_ASC) {
 				totalCount
 			}
 		}

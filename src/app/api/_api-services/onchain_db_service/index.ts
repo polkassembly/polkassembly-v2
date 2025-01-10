@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType } from '@shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
@@ -79,15 +79,17 @@ export class OnChainDbService {
 		proposalType,
 		indexOrHash,
 		page,
-		limit
+		limit,
+		decision
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		indexOrHash: string;
 		page: number;
 		limit: number;
+		decision?: EVoteDecision;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision });
 		if (postVoteData) return postVoteData;
 
 		return {
