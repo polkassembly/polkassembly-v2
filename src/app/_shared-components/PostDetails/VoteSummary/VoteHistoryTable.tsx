@@ -87,7 +87,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 	});
 
 	return (
-		<Table className='relative'>
+		<Table className='relative min-h-[200px]'>
 			{loading && <LoadingLayover />}
 			<TableHeader className='w-full'>
 				{table.getHeaderGroups().map((headerGroup) => (

@@ -9,11 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
-import { cn } from '@/lib/utils';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import classes from './VoteHistory.module.scss';
 import VoteHistoryTable from '../VoteHistoryTable';
 
 function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
@@ -53,9 +51,9 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				defaultValue={tab}
 				onValueChange={(t) => setTab(t as EVoteDecision)}
 			>
-				<TabsList className={classes.tabsList}>
+				<TabsList className='flex gap-x-2 rounded border border-border_grey p-1'>
 					<TabsTrigger
-						className={cn(classes.tabsTrigger, 'data-[state=active]:bg-success')}
+						className='flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-sm text-wallet_btn_text data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white'
 						value={EVoteDecision.AYE}
 					>
 						<ThumbsUp
@@ -65,7 +63,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						Aye
 					</TabsTrigger>
 					<TabsTrigger
-						className={cn(classes.tabsTrigger, 'data-[state=active]:bg-failure')}
+						className='flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-sm text-wallet_btn_text data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white'
 						value={EVoteDecision.NAY}
 					>
 						<ThumbsDown
@@ -75,7 +73,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						Nay
 					</TabsTrigger>
 					<TabsTrigger
-						className={cn(classes.tabsTrigger, 'data-[state=active]:bg-decision_bar_indicator')}
+						className='flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-sm text-wallet_btn_text data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white'
 						value={EVoteDecision.ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
