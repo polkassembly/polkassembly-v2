@@ -34,8 +34,6 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const { page, limit, decision } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
-	console.log('Raw search params:', Object.fromEntries(req.nextUrl.searchParams));
-
 	const network = await getNetworkFromHeaders();
 
 	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, page, limit, decision });

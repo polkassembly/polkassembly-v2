@@ -24,7 +24,7 @@ export function LoadingSpinner({ size = 'medium', show = true, className, childr
 
 	return show ? (
 		<span className={`flex flex-col items-center justify-center ${className}`}>
-			<Loader2 className={`animate-spin text-primary ${sizeClasses[size as keyof typeof sizeClasses]}`} />
+			<Loader2 className={`animate-spin text-text_pink ${sizeClasses[size as keyof typeof sizeClasses]}`} />
 			{message && <span className='mt-2 text-xs text-gray-500'>{message}</span>}
 			{children}
 		</span>

@@ -14,8 +14,10 @@ import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { AlertCircle } from 'lucide-react';
 import classes from './AddressDropdown.module.scss';
 import { WalletIcon } from '../WalletsUI/WalletsIcon';
+import { Alert, AlertDescription } from '../Alert';
 
 function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) => void }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
@@ -59,38 +61,54 @@ function AddressDropdown({ onChange }: { onChange?: (account: InjectedAccount) =
 				<WalletIcon wallet={userPreferences.wallet} />
 				<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(userPreferences.wallet)}</span>
 			</p>
-			<DropdownMenu>
-				<div>
-					<p className='mb-1 text-sm text-wallet_btn_text'>{t('AddressDropdown.chooseLinkedAccount')}</p>
-					<DropdownMenuTrigger className={classes.dropdownTrigger}>
-						<Identicon
-							value={userPreferences?.address?.address}
-							theme='polkadot'
-							size={25}
-						/>
-						<p className={classes.dropdownTriggerText}>{shortenAddress(userPreferences?.address?.address || '')}</p>
-					</DropdownMenuTrigger>
-				</div>
-				<DropdownMenuContent className='border-0'>
-					{accounts.map((item) => (
-						<DropdownMenuItem key={item.address}>
-							<button
-								key={`${item.address}`}
-								type='button'
-								onClick={() => onAccountChange(item)}
-								className={classes.dropdownOption}
-							>
-								<Identicon
-									value={item.address}
-									theme='polkadot'
-									size={25}
-								/>
-								<p className={classes.dropdownOptionText}>{item.address}</p>
-							</button>
-						</DropdownMenuItem>
-					))}
-				</DropdownMenuContent>
-			</DropdownMenu>
+			{!accounts || accounts.length === 0 ? (
+				<Alert
+					variant='info'
+					className='flex items-center gap-x-3'
+				>
+					<AlertCircle className='h-4 w-4' />
+					<AlertDescription className=''>
+						<h2 className='mb-2 text-base font-medium'>No Accounts Found</h2>
+						<ul className='list-disc pl-4'>
+							<li>Please connect your wallet to Polkassembly.</li>
+							<li>Please check the connected wallets in extension.</li>
+						</ul>
+					</AlertDescription>
+				</Alert>
+			) : (
+				<DropdownMenu>
+					<div>
+						<p className='mb-1 text-sm text-wallet_btn_text'>{t('AddressDropdown.chooseLinkedAccount')}</p>
+						<DropdownMenuTrigger className={classes.dropdownTrigger}>
+							<Identicon
+								value={userPreferences?.address?.address}
+								theme='polkadot'
+								size={25}
+							/>
+							<p className={classes.dropdownTriggerText}>{shortenAddress(userPreferences?.address?.address || '')}</p>
+						</DropdownMenuTrigger>
+					</div>
+					<DropdownMenuContent className='border-0'>
+						{accounts.map((item) => (
+							<DropdownMenuItem key={item.address}>
+								<button
+									key={`${item.address}`}
+									type='button'
+									onClick={() => onAccountChange(item)}
+									className={classes.dropdownOption}
+								>
+									<Identicon
+										value={item.address}
+										theme='polkadot'
+										size={25}
+									/>
+									<p className={classes.dropdownOptionText}>{item.address}</p>
+								</button>
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			)}
 		</div>
 	);
 }

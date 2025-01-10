@@ -115,7 +115,7 @@ function PostHeader({
 							</div>
 							{beneficiaries.slice(0, 2).map((beneficiary) => (
 								<div
-									key={beneficiary.amount}
+									key={`${beneficiary.amount}-${beneficiary.address}-${beneficiary.assetId}`}
 									className='flex items-center gap-x-1'
 								>
 									<Address address={beneficiary.address} />

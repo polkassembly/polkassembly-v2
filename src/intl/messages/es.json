@@ -168,7 +168,14 @@
 		"aye": "Sí",
 		"nay": "No",
 		"support": "Apoyo",
-		"bareAyes": "Votos simples a favor"
+		"bareAyes": "Votos simples a favor",
+		"viewVoteHistory": "Ver historial de votos",
+		"voteHistory": "Historial de votos",
+		"delegated": "Delegado",
+		"votingPower": "Poder de voto",
+		"capital": "Capital",
+		"account": "Cuenta",
+		"abstain": "Abstención"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -229,5 +236,9 @@
 		"notpassed": "No aprobado",
 		"started": "Empezado",
 		"passed": "Aprobado"
+	},
+	"Pagination": {
+		"next": "Siguiente",
+		"previous": "Anterior"
 	}
 }
