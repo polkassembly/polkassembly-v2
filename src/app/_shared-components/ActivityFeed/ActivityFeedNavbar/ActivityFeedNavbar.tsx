@@ -6,6 +6,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
 import React, { useState, useMemo } from 'react';
+import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
@@ -90,20 +91,24 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 		return count > 0 ? `(${count})` : '';
 	};
 
+	const isActiveCategory = (category: string, tracks: EPostOrigin[]) => {
+		if (currentTab === category) return true;
+		return tracks.some((track) => currentTab === track);
+	};
+
 	return (
-		<div className='font-dmSans mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-solid border-border_grey bg-bg_modal px-4 py-3'>
+		<div className={styles.container}>
 			{Object.entries(categoryStructure).map(([category, tracks]) => (
 				<Popover key={category}>
 					<PopoverTrigger asChild>
-						<div className='category-container'>
+						<div>
 							<button
 								type='button'
-								className={`rounded-lg px-4 py-2 text-sm font-medium text-text_primary hover:bg-btn_secondary_border ${
-									currentTab === category ? 'bg-sidebar_menu_bg text-btn_primary_background' : ''
-								}`}
+								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-sidebar_menu_bg text-btn_primary_background' : ''}`}
 								onClick={() => handleCategoryClick(category)}
 							>
 								{category}
+								{tracks?.length > 1 && <FaAngleDown />}
 							</button>
 						</div>
 					</PopoverTrigger>
@@ -112,12 +117,12 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 							sideOffset={5}
 							className={styles.popoverContent}
 						>
-							<div className='flex flex-col items-start gap-2 border-border_grey p-2'>
+							<div className='w-full'>
 								{tracks.map((track) => (
 									<div key={track}>
 										<button
 											type='button'
-											className='text-sm font-medium text-text_primary'
+											className={styles.trackName}
 											onClick={() => setCurrentTab(track)}
 										>
 											{formatTrackName(track)} {getPostCount(track)}

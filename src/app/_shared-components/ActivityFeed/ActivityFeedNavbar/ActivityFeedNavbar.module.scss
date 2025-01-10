@@ -1,3 +1,15 @@
 .popoverContent {
     @apply w-52 border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-2 !important;
 }
+
+.trackName {
+    @apply w-full rounded-lg border-border_grey px-2 py-1 text-start text-sm font-medium text-text_primary hover:bg-btn_secondary_border;
+}
+
+.popoverTrigger {
+    @apply flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-text_primary hover:bg-btn_secondary_border;
+}
+
+.container {
+    @apply mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-border_grey bg-bg_modal px-4 py-3;
+}
