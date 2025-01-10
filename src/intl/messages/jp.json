@@ -168,7 +168,14 @@
 		"aye": "賛成",
 		"nay": "反対",
 		"support": "サポート",
-		"bareAyes": "単純賛成票"
+		"bareAyes": "単純賛成票",
+		"viewVoteHistory": "投票履歴を表示",
+		"voteHistory": "投票履歴",
+		"delegated": "委任済み",
+		"votingPower": "投票力",
+		"capital": "資本",
+		"account": "アカウント",
+		"abstain": "棄権"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル",
@@ -229,5 +236,9 @@
 		"notpassed": "不承認",
 		"started": "開始",
 		"passed": "承認"
+	},
+	"Pagination": {
+		"next": "次へ",
+		"previous": "前へ"
 	}
 }

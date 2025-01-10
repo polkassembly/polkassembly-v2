@@ -108,12 +108,12 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 						variant='outline'
 						className='flex justify-between text-xs font-normal text-text_pink'
 					>
-						View Vote History
+						{t('PostDetails.viewVoteHistory')}
 						<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
 					</Button>
 				</DialogTrigger>
 				<DialogContent className='max-w-xl'>
-					<DialogHeader className='text-xl font-semibold text-text_primary'>Vote History</DialogHeader>
+					<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.voteHistory')}</DialogHeader>
 					<VoteHistory
 						proposalType={proposalType}
 						index={index}

@@ -168,7 +168,14 @@
 		"aye": "赞成",
 		"nay": "反对",
 		"support": "支持",
-		"bareAyes": "简单赞成票"
+		"bareAyes": "简单赞成票",
+		"viewVoteHistory": "查看投票历史",
+		"voteHistory": "投票历史",
+		"delegated": "已委托",
+		"votingPower": "投票权重",
+		"capital": "资本",
+		"account": "账户",
+		"abstain": "弃权"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "取消",
@@ -229,5 +236,9 @@
 		"notpassed": "未通过",
 		"started": "已开始",
 		"passed": "已通过"
+	},
+	"Pagination": {
+		"next": "下一页",
+		"previous": "上一页"
 	}
 }

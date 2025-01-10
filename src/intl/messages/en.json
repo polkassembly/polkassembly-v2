@@ -168,7 +168,14 @@
 		"aye": "Aye",
 		"nay": "Nay",
 		"support": "Support",
-		"bareAyes": "Bare Ayes"
+		"bareAyes": "Bare Ayes",
+		"viewVoteHistory": "View Vote History",
+		"voteHistory": "Vote History",
+		"delegated": "Delegated",
+		"votingPower": "Voting Power",
+		"capital": "Capital",
+		"account": "Account",
+		"abstain": "Abstain"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelled",
@@ -231,5 +238,9 @@
 		"notpassed": "Not Passed",
 		"started": "Started",
 		"passed": "Passed"
+	},
+	"Pagination": {
+		"next": "Next",
+		"previous": "Previous"
 	}
 }

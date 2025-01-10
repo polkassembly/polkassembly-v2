@@ -9,6 +9,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useTranslations } from 'next-intl';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
 import Address from '../../Profile/Address/Address';
 import { Button } from '../../Button';
@@ -28,8 +29,8 @@ function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	);
 }
 
-const columns: ColumnDef<IVoteData>[] = [
-	{ header: 'Account', accessorKey: 'voterAddress' },
+const columns = (t: (key: string) => string): ColumnDef<IVoteData>[] => [
+	{ header: t('PostDetails.account'), accessorKey: 'voterAddress' },
 	{
 		header: ({ column }) => (
 			<Button
@@ -37,7 +38,7 @@ const columns: ColumnDef<IVoteData>[] = [
 				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
 				onClick={() => column.toggleSorting()}
 			>
-				Capital
+				{t('PostDetails.capital')}
 				<SortingIcon sort={column.getIsSorted()} />
 			</Button>
 		),
@@ -50,7 +51,7 @@ const columns: ColumnDef<IVoteData>[] = [
 				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
 				onClick={() => column.toggleSorting()}
 			>
-				Voting Power
+				{t('PostDetails.votingPower')}
 				<SortingIcon sort={column.getIsSorted()} />
 			</Button>
 		),
@@ -63,7 +64,7 @@ const columns: ColumnDef<IVoteData>[] = [
 				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
 				onClick={() => column.toggleSorting()}
 			>
-				Delegated
+				{t('PostDetails.delegated')}
 				<SortingIcon sort={column.getIsSorted()} />
 			</Button>
 		),
@@ -72,6 +73,7 @@ const columns: ColumnDef<IVoteData>[] = [
 ];
 
 function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: boolean }) {
+	const t = useTranslations();
 	const network = getCurrentNetwork();
 
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
@@ -80,7 +82,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 
 	const table = useReactTable({
 		data: votes,
-		columns,
+		columns: columns(t),
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		onSortingChange: setSorting,
