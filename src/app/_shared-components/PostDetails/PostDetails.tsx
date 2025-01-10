@@ -72,12 +72,6 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 						index={index}
 						voteMetrics={postData.onChainInfo?.voteMetrics}
 					/>
-					{/* <Suspense fallback={<Skeleton className='h-4' />}>
-						<VoteDetails
-							proposalType={EProposalType.REFERENDUM_V2}
-							index={index}
-						/>
-					</Suspense> */}
 				</div>
 			</div>
 		</Tabs>

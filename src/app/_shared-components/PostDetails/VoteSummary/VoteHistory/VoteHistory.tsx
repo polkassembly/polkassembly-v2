@@ -13,10 +13,12 @@ import { THEME_COLORS } from '@/app/_style/theme';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import VoteHistoryTable from '../VoteHistoryTable';
 import classes from './VoteHistory.module.scss';
 
 function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+	const t = useTranslations();
 	const [tab, setTab] = useState(EVoteDecision.AYE);
 	const [page, setPage] = useState(1);
 
@@ -53,7 +55,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.AYE ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						Aye
+						{t('PostDetails.aye')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
@@ -63,14 +65,14 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.NAY ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						Nay
+						{t('PostDetails.nay')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
 						value={EVoteDecision.ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
-						Abstain
+						{t('PostDetails.abstain')}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent

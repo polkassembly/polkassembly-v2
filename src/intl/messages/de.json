@@ -168,7 +168,14 @@
 		"aye": "Ja",
 		"nay": "Nein",
 		"support": "Unterstützung",
-		"bareAyes": "Einfache Ja-Stimmen"
+		"bareAyes": "Einfache Ja-Stimmen",
+		"viewVoteHistory": "Abstimmungsverlauf anzeigen",
+		"voteHistory": "Abstimmungsverlauf",
+		"delegated": "Delegiert",
+		"votingPower": "Stimmgewicht",
+		"capital": "Kapital",
+		"account": "Konto",
+		"abstain": "Enthaltung"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -229,5 +236,9 @@
 		"notpassed": "Nicht bestanden",
 		"started": "Gestartet",
 		"passed": "Bestanden"
+	},
+	"Pagination": {
+		"next": "Weiter",
+		"previous": "Zurück"
 	}
 }
