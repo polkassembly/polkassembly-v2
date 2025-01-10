@@ -12,7 +12,7 @@ import ActivityFeedNavbar from './ActivityFeedNavbar';
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
 	console.log('postData', postData.totalCount);
 	return (
-		<div className='hide_scrollbar space-y-5 pb-10 lg:max-h-[1078px] lg:overflow-y-auto'>
+		<div className='hide_scrollbar pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
 			<ActivityFeedNavbar />
 			{loading ? (
 				<Loading />
@@ -34,12 +34,14 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 					</p>
 				</div>
 			) : (
-				postData.posts.map((post) => (
-					<ActivityFeedPostItem
-						key={post?.index}
-						postData={post}
-					/>
-				))
+				<div className='flex flex-col gap-5'>
+					{postData.posts.map((post) => (
+						<ActivityFeedPostItem
+							key={post?.index}
+							postData={post}
+						/>
+					))}
+				</div>
 			)}
 		</div>
 	);

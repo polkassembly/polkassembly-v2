@@ -99,6 +99,7 @@ export const THEME_COLORS = {
 		page_background: '#1C1D1F',
 		small_btn_text: '#6D7F97',
 		bg_light_blue: '#E6F4FF',
+		filter_dropdown: '#262627',
 		sidebar_head1: '#2f3717',
 		sidebar_head2: '#3c371d',
 		sidebar_head3: '#3d2a23',

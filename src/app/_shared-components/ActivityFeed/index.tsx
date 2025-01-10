@@ -26,7 +26,7 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 	});
 
 	return (
-		<div className='space-y-5'>
+		<div>
 			{currentTab === EActivityFeedTab.EXPLORE ? (
 				<ActivityFeedPostList
 					loading={isLoading}
