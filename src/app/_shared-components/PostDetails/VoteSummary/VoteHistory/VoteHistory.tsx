@@ -12,7 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { cn } from '@/lib/utils';
 import VoteHistoryTable from '../VoteHistoryTable';
+import classes from './VoteHistory.module.scss';
 
 function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const [tab, setTab] = useState(EVoteDecision.AYE);
@@ -44,7 +46,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 			>
 				<TabsList className='flex gap-x-2 rounded border border-border_grey p-1'>
 					<TabsTrigger
-						className='flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-sm text-wallet_btn_text data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white'
+						className={cn(classes.tabs, 'data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white')}
 						value={EVoteDecision.AYE}
 					>
 						<ThumbsUp
@@ -54,7 +56,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						Aye
 					</TabsTrigger>
 					<TabsTrigger
-						className='flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-sm text-wallet_btn_text data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white'
+						className={cn(classes.tabs, 'data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
 						value={EVoteDecision.NAY}
 					>
 						<ThumbsDown
@@ -64,7 +66,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						Nay
 					</TabsTrigger>
 					<TabsTrigger
-						className='flex w-full items-center justify-center gap-x-2 rounded py-1.5 text-sm text-wallet_btn_text data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white'
+						className={cn(classes.tabs, 'data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
 						value={EVoteDecision.ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
@@ -73,7 +75,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				</TabsList>
 				<TabsContent
 					value={EVoteDecision.AYE}
-					className='flex max-h-[500px] flex-col'
+					className={classes.tabsContent}
 				>
 					<VoteHistoryTable
 						votes={data?.votes || []}
@@ -82,7 +84,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				</TabsContent>
 				<TabsContent
 					value={EVoteDecision.NAY}
-					className='flex max-h-[500px] flex-col'
+					className={classes.tabsContent}
 				>
 					<VoteHistoryTable
 						votes={data?.votes || []}
@@ -91,7 +93,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				</TabsContent>
 				<TabsContent
 					value={EVoteDecision.ABSTAIN}
-					className='flex max-h-[500px] flex-col'
+					className={classes.tabsContent}
 				>
 					<VoteHistoryTable
 						votes={data?.votes || []}
