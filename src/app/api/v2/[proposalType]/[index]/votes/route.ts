@@ -27,9 +27,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		decision: z.nativeEnum(EVoteDecision).optional()
 	});
 
-	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
-
-	const { page, limit, decision } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, decision } = zodQuerySchema.parse(req.nextUrl.searchParams);
 
 	const network = await getNetworkFromHeaders();
 
