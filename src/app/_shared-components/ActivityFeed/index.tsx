@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -34,7 +34,7 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 	const allPosts = data?.pages.flatMap((page) => page.posts || []).filter((post): post is IPostListing => post !== undefined);
 
 	// Intersection Observer
-	React.useEffect(() => {
+	useEffect(() => {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				if (entries[0].isIntersecting && !isLoading && hasNextPage) {
