@@ -4,6 +4,7 @@
 
 export const ONE_DAY = 24 * 60 * 60; // (expressed in seconds)
 export const FIVE_MIN = 5 * 60; // (expressed in seconds)
+export const FIVE_MIN_IN_MILLI = 5 * 60 * 1000; // (expressed in milliseconds)
 export const ADDRESS_LOGIN_TTL = 5 * 60; // 5 min (expressed in seconds)
 export const CREATE_POST_TTL = 60 * 60; // 1 hour (expressed in seconds)
 export const ACCESS_TOKEN_LIFE_IN_SECONDS = 60 * 60 * 24 * 7 * 1; // 1 week

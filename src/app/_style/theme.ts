@@ -58,7 +58,8 @@ export const THEME_COLORS = {
 		decision_bar_bg: '#D4E0FC',
 		decision_bar_indicator: '#407AFC',
 		sidebar_foreground: '#0A3EAF',
-		progress_pink_bg: '#FEF2F8'
+		progress_pink_bg: '#FEF2F8',
+		info: '#1677ff'
 	},
 	dark: {
 		wallet_btn_text: '#485F7D',
@@ -112,6 +113,7 @@ export const THEME_COLORS = {
 		progress_nay: '#fc3e5d',
 		decision_bar_bg: '#D4E0FC',
 		decision_bar_indicator: '#407AFC',
-		progress_pink_bg: '#FEF2F8'
+		progress_pink_bg: '#FEF2F8',
+		info: '#1677ff'
 	}
 };

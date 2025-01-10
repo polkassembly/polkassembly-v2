@@ -5,16 +5,19 @@
 'use client';
 
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EVoteDecision, IVoteMetrics } from '@/_shared/types';
+import { EProposalType, EVoteDecision, IVoteMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { PieChart } from 'react-minimal-pie-chart';
-import React from 'react';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
+import { ChevronRight } from 'lucide-react';
 import classes from './VoteSummary.module.scss';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../../Dialog';
+import { Button } from '../../Button';
+import VoteHistory from './VoteHistory/VoteHistory';
 
-function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
+function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	if (!voteMetrics) return null;
@@ -96,6 +99,27 @@ function VoteSummary({ voteMetrics }: { voteMetrics?: IVoteMetrics }) {
 					</p>
 				</div>
 			</div>
+			<Dialog>
+				<DialogTrigger
+					asChild
+					className='mt-6'
+				>
+					<Button
+						variant='outline'
+						className='flex justify-between text-xs font-normal text-text_pink'
+					>
+						View Vote History
+						<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
+					</Button>
+				</DialogTrigger>
+				<DialogContent className='max-w-xl'>
+					<DialogHeader className='text-xl font-semibold text-text_primary'>Vote History</DialogHeader>
+					<VoteHistory
+						proposalType={proposalType}
+						index={index}
+					/>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

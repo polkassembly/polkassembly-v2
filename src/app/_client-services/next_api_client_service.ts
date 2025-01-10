@@ -10,6 +10,7 @@ import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EApiRoute,
 	EProposalType,
+	EVoteDecision,
 	EWallet,
 	IAuthResponse,
 	IComment,
@@ -82,7 +83,7 @@ export class NextApiClientService {
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_COMMENTS:
-			case EApiRoute.GET_VOTES:
+			case EApiRoute.GET_VOTES_HISTORY:
 				break;
 			case EApiRoute.ADD_COMMENT:
 				method = 'POST';
@@ -235,8 +236,13 @@ export class NextApiClientService {
 	}
 
 	// votes
-	static async getVotesApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES, routeSegments: [proposalType, index, 'votes'] });
+	static async getVotesHistoryApi({ proposalType, index, page, decision }: { proposalType: EProposalType; index: string; page: number; decision: EVoteDecision }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: DEFAULT_LISTING_LIMIT.toString(),
+			decision
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
 	}
 }
