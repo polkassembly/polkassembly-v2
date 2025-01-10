@@ -24,7 +24,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
-	const { page, limit } = zodQuerySchema.parse(req.nextUrl.searchParams);
+	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
