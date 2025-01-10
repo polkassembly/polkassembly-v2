@@ -13,7 +13,6 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	const Network = getCurrentNetwork();
 	const trackInfo = NETWORKS_DETAILS[Network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-	console.log('currentTab', currentTab);
 
 	// Dynamically create category structure from trackInfo
 	const categoryStructure = useMemo(() => {
@@ -78,7 +77,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 
 	const handleCategoryClick = (category: string) => {
 		if (category === 'All') {
-			setCurrentTab('All'); // This is already correct
+			setCurrentTab('All');
 		} else if (['Root', 'Wish For Change'].includes(category)) {
 			setCurrentTab(category);
 		} else {
@@ -92,14 +91,16 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	};
 
 	return (
-		<div className='font-dmSans mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-solid border-border_grey bg-bg_modal px-4 py-3 dark:border dark:border-solid'>
+		<div className='font-dmSans mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-solid border-border_grey bg-bg_modal px-4 py-3'>
 			{Object.entries(categoryStructure).map(([category, tracks]) => (
 				<Popover key={category}>
-					<PopoverTrigger>
+					<PopoverTrigger asChild>
 						<div className='category-container'>
 							<button
 								type='button'
-								className={`rounded-lg px-4 py-2 text-sm font-medium text-text_primary hover:bg-btn_secondary_border dark:hover:bg-gray-600 dark:hover:text-white ${currentTab === category ? 'bg-sidebar_menu_bg text-btn_primary_background' : ''}`}
+								className={`rounded-lg px-4 py-2 text-sm font-medium text-text_primary hover:bg-btn_secondary_border ${
+									currentTab === category ? 'bg-sidebar_menu_bg text-btn_primary_background' : ''
+								}`}
 								onClick={() => handleCategoryClick(category)}
 							>
 								{category}
@@ -113,14 +114,15 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 						>
 							<div className='flex flex-col items-start gap-2 border-border_grey p-2'>
 								{tracks.map((track) => (
-									<button
-										type='button'
-										key={track}
-										className={`text-sm font-medium text-text_primary ${currentTab === track ? 'active' : ''}`}
-										onClick={() => setCurrentTab(track)}
-									>
-										{formatTrackName(track)} {getPostCount(track)}
-									</button>
+									<div key={track}>
+										<button
+											type='button'
+											className='text-sm font-medium text-text_primary'
+											onClick={() => setCurrentTab(track)}
+										>
+											{formatTrackName(track)} {getPostCount(track)}
+										</button>
+									</div>
 								))}
 							</div>
 						</PopoverContent>

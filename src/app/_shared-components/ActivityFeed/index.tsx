@@ -3,40 +3,75 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { EActivityFeedTab } from '@/_shared/types';
+import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import ActivityFeedPostList from './ActivityFeedPostList';
 
 function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
-	const getExploreActivityFeed = async () => {
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi(1, 10);
+	const observerTarget = React.useRef<HTMLDivElement>(null);
+
+	// Fetch activity feed API
+	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, 10);
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
-		return data;
+		return { ...data, page: pageParam };
 	};
 
-	const { data, isLoading } = useQuery({
+	// Infinite query
+	const { data, isLoading, isError, error, fetchNextPage, hasNextPage } = useInfiniteQuery({
 		queryKey: ['activityFeed', currentTab],
 		queryFn: getExploreActivityFeed,
-		placeholderData: (previousData) => previousData,
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => (lastPage.posts?.length === 10 ? lastPage.page + 1 : undefined),
 		staleTime: ADDRESS_LOGIN_TTL
 	});
+
+	// Flatten all posts from pages
+	const allPosts = data?.pages.flatMap((page) => page.posts || []).filter((post): post is IPostListing => post !== undefined);
+
+	// Intersection Observer
+	React.useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && !isLoading && hasNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		if (observerTarget.current) {
+			observer.observe(observerTarget.current);
+		}
+
+		return () => observer.disconnect();
+	}, [isLoading, hasNextPage, fetchNextPage]);
 
 	return (
 		<div>
 			{currentTab === EActivityFeedTab.EXPLORE ? (
-				<ActivityFeedPostList
-					loading={isLoading}
-					postData={data || { posts: [], totalCount: 0 }}
-				/>
+				<>
+					<ActivityFeedPostList
+						loading={isLoading}
+						postData={{
+							posts: allPosts || [],
+							totalCount: data?.pages[0]?.totalCount || 0
+						}}
+					/>
+					{isError && <p>Error: {error?.message}</p>}
+					<div
+						ref={observerTarget}
+						style={{ height: '20px' }}
+					/>
+				</>
 			) : (
 				<p>Data will be available soon</p>
 			)}
 		</div>
 	);
 }
-
 export default LatestActivity;
