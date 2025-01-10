@@ -46,7 +46,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 			>
 				<TabsList className='flex gap-x-2 rounded border border-border_grey p-1'>
 					<TabsTrigger
-						className={cn(classes.tabs, 'data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white')}
+						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white')}
 						value={EVoteDecision.AYE}
 					>
 						<ThumbsUp
@@ -56,7 +56,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						Aye
 					</TabsTrigger>
 					<TabsTrigger
-						className={cn(classes.tabs, 'data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
+						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
 						value={EVoteDecision.NAY}
 					>
 						<ThumbsDown
@@ -66,7 +66,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						Nay
 					</TabsTrigger>
 					<TabsTrigger
-						className={cn(classes.tabs, 'data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
+						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
 						value={EVoteDecision.ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
