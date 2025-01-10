@@ -28,7 +28,7 @@ function Page() {
 					</div>
 				</div>
 
-				<div className='flex flex-col justify-between gap-5 xl:flex-row'>
+				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
 					<div className='mx-1 w-3/4 flex-grow'>
 						<div className=''>
 							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}

@@ -75,7 +75,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
 	return (
-		<div className='rounded-xl border border-gray-200 bg-white p-5 shadow-md'>
+		<div className='rounded-xl border border-border_grey bg-bg_modal p-5'>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>

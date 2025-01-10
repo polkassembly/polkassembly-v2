@@ -1,23 +1,50 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
-import { IOnChainPostListingResponse } from '@/_shared/types';
+import React, { useState } from 'react';
+import { IOnChainPostListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
 import Loading from '@/app/loading';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import ActivityFeedPostItem from './ActivityFeedPostItem/ActivityFeedPostItem';
-import ActivityFeedNavbar from './ActivityFeedNavbar';
+import ActivityFeedNavbar from './ActivityFeedNavbar/ActivityFeedNavbar';
 
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
-	console.log('postData', postData.totalCount);
+	const [currentTab, setCurrentTab] = useState<string>('All');
+	const network = getCurrentNetwork();
+
+	const filteredPosts =
+		currentTab === 'All'
+			? postData.posts
+			: postData.posts.filter((post: IPostListing) => {
+					if (!(network in NETWORKS_DETAILS)) {
+						return false;
+					}
+					const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
+					if (!networkInfo) return false;
+
+					const trackName = Object.keys(networkInfo.tracks).find((key) => networkInfo.tracks[key as keyof typeof networkInfo.tracks].name === post?.onChainInfo?.origin);
+
+					const formattedTrackName = trackName
+						?.replace(/([a-z])([A-Z])/g, '$1-$2')
+						?.replace(/_/g, '-')
+						?.toLowerCase();
+
+					return formattedTrackName === currentTab;
+				});
 	return (
 		<div className='hide_scrollbar pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
-			<ActivityFeedNavbar />
+			<ActivityFeedNavbar
+				gov2LatestPosts={postData.posts}
+				currentTab={currentTab}
+				setCurrentTab={setCurrentTab}
+			/>
 			{loading ? (
 				<Loading />
 			) : postData?.posts?.length === 0 ? (
-				<div className='flex h-[900px] flex-col items-center rounded-xl border border-solid border-[#D2D8E0] bg-white px-5 pt-5 dark:border-[#4B4B4B] dark:bg-[#0D0D0D] md:pt-10'>
+				<div className='flex h-[900px] flex-col items-center rounded-xl border border-solid border-border_grey bg-page_background px-5 pt-5 text-text_primary md:pt-10'>
 					<Image
 						src={JoinPA}
 						alt='empty state'
@@ -25,9 +52,9 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 						width={320}
 						height={320}
 					/>
-					<p className='p-0 text-xl font-medium text-[#243A57] dark:text-white'>You&apos;re all caught up!</p>
+					<p className='p-0 text-xl font-medium'>You&apos;re all caught up!</p>
 					<p
-						className='p-0 text-center text-[#243A57] dark:text-white'
+						className='p-0 text-center text-sm'
 						style={{ lineHeight: '1.8' }}
 					>
 						Why not explore other categories or topics?
@@ -35,7 +62,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 				</div>
 			) : (
 				<div className='flex flex-col gap-5'>
-					{postData.posts.map((post) => (
+					{(currentTab === 'All' ? postData.posts : filteredPosts).map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={post?.index}
 							postData={post}
