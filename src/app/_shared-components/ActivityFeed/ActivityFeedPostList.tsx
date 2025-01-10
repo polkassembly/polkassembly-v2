@@ -25,14 +25,8 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 					const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
 					if (!networkInfo) return false;
 
-					const trackName = Object.keys(networkInfo.tracks).find((key) => networkInfo.tracks[key as keyof typeof networkInfo.tracks].name === post?.onChainInfo?.origin);
-
-					const formattedTrackName = trackName
-						?.replace(/([a-z])([A-Z])/g, '$1-$2')
-						?.replace(/_/g, '-')
-						?.toLowerCase();
-
-					return formattedTrackName === currentTab;
+					const trackName = Object.keys(networkInfo.tracks).find((key) => post?.onChainInfo?.origin === key);
+					return trackName === currentTab;
 				});
 	return (
 		<div className='hide_scrollbar pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>

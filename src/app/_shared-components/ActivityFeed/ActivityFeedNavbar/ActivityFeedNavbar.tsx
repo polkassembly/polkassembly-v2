@@ -13,6 +13,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	const Network = getCurrentNetwork();
 	const trackInfo = NETWORKS_DETAILS[Network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+	console.log('currentTab', currentTab);
 
 	// Dynamically create category structure from trackInfo
 	const categoryStructure = useMemo(() => {
