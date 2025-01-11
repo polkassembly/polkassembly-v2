@@ -6,12 +6,14 @@
 
 import { EActivityFeedTab } from '@/_shared/types';
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import ActivityFeeToggleButton from '../_shared-components/ActivityFeed/ActivityFeeToggleButton/ActivityFeeToggleButton';
 import LatestActivity from '../_shared-components/ActivityFeed';
 import ActivityFeedSidebar from '../_shared-components/ActivityFeed/ActivityFeedSidebar';
 
 function Page() {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
+	const t = useTranslations();
 
 	return (
 		<div>
@@ -19,7 +21,7 @@ function Page() {
 				<div className='flex w-full justify-between xl:items-center'>
 					<div className='flex flex-col lg:flex-row xl:h-12 xl:gap-2'>
 						<div>
-							<h1 className='dark:text-blue-dark-high mx-2 text-xl font-semibold leading-9 text-text_primary lg:mt-3 lg:text-2xl'>Activity Feed</h1>
+							<h1 className='dark:text-blue-dark-high mx-2 text-xl font-semibold leading-9 text-text_primary lg:mt-3 lg:text-2xl'>{t('ActivityFeed.title')}</h1>
 						</div>
 						<ActivityFeeToggleButton
 							activeTab={activeTab}

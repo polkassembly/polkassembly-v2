@@ -3,6 +3,7 @@
 		"title": "Welcome to Home"
 	},
 	"ActivityFeed": {
+		"title": "Activity Feed",
 		"ExploreTab": "Explore",
 		"SubscribedTab": "Subscribed"
 	},
