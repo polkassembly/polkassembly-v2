@@ -22,13 +22,15 @@ import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@ui/Profile/Address/Address';
+import dynamic from 'next/dynamic';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
-import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
+
+const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
