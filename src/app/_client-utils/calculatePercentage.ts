@@ -2,11 +2,16 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-export const calculatePercentage = (value: string | number, totalValue: bigint | number) => {
-	if (typeof totalValue === 'bigint') {
-		if (totalValue === BigInt(0)) return 0;
-		const valueBI = BigInt(value);
-		return Number((valueBI * BigInt(100) * BigInt(100)) / totalValue) / 100;
+import { BN } from '@polkadot/util';
+
+export const calculatePercentage = (value: string | number, totalValue: BN | number) => {
+	if (totalValue instanceof BN) {
+		if (totalValue.isZero()) return 0;
+		const valueBN = new BN(value.toString());
+		const hundred = new BN(100);
+		// Multiply by 100 twice for precision (once for percentage, once for decimal places)
+		const result = valueBN.mul(hundred).mul(hundred).div(totalValue);
+		return result.toNumber() / 100;
 	}
 	if (totalValue === 0) return 0;
 	return (Number(value) * 100) / totalValue;

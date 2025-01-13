@@ -71,9 +71,9 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 		}
 	};
 
-	const totalValue = BigInt(postData.onChainInfo?.voteMetrics?.aye.value || '0') + BigInt(postData.onChainInfo?.voteMetrics?.nay.value || '0');
-	const ayePercent = calculatePercentage(postData.onChainInfo?.voteMetrics?.aye.value || '0', totalValue);
-	const nayPercent = calculatePercentage(postData.onChainInfo?.voteMetrics?.nay.value || '0', totalValue);
+	const totalValue = Number(BigInt(postData.onChainInfo?.voteMetrics?.aye.value || '0') + BigInt(postData.onChainInfo?.voteMetrics?.nay.value || '0'));
+	const ayePercent = calculatePercentage(Number(postData.onChainInfo?.voteMetrics?.aye.value || '0'), totalValue);
+	const nayPercent = calculatePercentage(Number(postData.onChainInfo?.voteMetrics?.nay.value || '0'), totalValue);
 	const decisionPeriodPercentage = postData.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(postData.onChainInfo?.decisionPeriodEndsAt) : 0;
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
