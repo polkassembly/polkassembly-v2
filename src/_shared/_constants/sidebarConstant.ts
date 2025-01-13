@@ -107,7 +107,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 		heading: t('Sidebar.main'),
 		initalItems: ActiveItems(
 			[
-				{ title: t('Sidebar.home'), url: '#', icon: Home },
+				{ title: t('Sidebar.home'), url: '/', icon: Home },
 				{ title: t('Sidebar.discussions'), url: '/discussions', icon: Discussion }
 			],
 			pathname
