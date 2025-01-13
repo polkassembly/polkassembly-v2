@@ -5,7 +5,6 @@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
 import { EProposalType, ETheme, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
-import Link from 'next/link';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -61,8 +60,10 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 	return (
-		<Link
+		<a
 			href={`/referenda/${index}`}
+			target='_self'
+			rel='noreferrer'
 			className={`${styles.listingCard} ${backgroundColor}`}
 		>
 			<div className='flex items-start lg:gap-4'>
@@ -225,7 +226,7 @@ function ListingCard({
 					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 			</div>
-		</Link>
+		</a>
 	);
 }
 
