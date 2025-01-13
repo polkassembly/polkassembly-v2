@@ -21,6 +21,7 @@ import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecision
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
 import StatusTag from '@ui/StatusTag/StatusTag';
@@ -71,9 +72,11 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 		}
 	};
 
-	const totalValue = Number(BigInt(postData.onChainInfo?.voteMetrics?.aye.value || '0') + BigInt(postData.onChainInfo?.voteMetrics?.nay.value || '0'));
-	const ayePercent = calculatePercentage(Number(postData.onChainInfo?.voteMetrics?.aye.value || '0'), totalValue);
-	const nayPercent = calculatePercentage(Number(postData.onChainInfo?.voteMetrics?.nay.value || '0'), totalValue);
+	const ayeValue = new BN(postData.onChainInfo?.voteMetrics?.aye.value || '0');
+	const nayValue = new BN(postData.onChainInfo?.voteMetrics?.nay.value || '0');
+	const totalValue = ayeValue.add(nayValue);
+	const ayePercent = calculatePercentage(postData.onChainInfo?.voteMetrics?.aye.value || '0', totalValue);
+	const nayPercent = calculatePercentage(postData.onChainInfo?.voteMetrics?.nay.value || '0', totalValue);
 	const decisionPeriodPercentage = postData.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(postData.onChainInfo?.decisionPeriodEndsAt) : 0;
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;

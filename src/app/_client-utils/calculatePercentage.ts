@@ -9,7 +9,6 @@ export const calculatePercentage = (value: string | number, totalValue: BN | num
 		if (totalValue.isZero()) return 0;
 		const valueBN = new BN(value.toString());
 		const hundred = new BN(100);
-		// Multiply by 100 twice for precision (once for percentage, once for decimal places)
 		const result = valueBN.mul(hundred).mul(hundred).div(totalValue);
 		return result.toNumber() / 100;
 	}

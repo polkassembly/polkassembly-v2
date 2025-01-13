@@ -22,6 +22,7 @@ import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils'
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
+import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
@@ -45,7 +46,9 @@ function ListingCard({
 	const network = getCurrentNetwork();
 	const { resolvedTheme: theme } = useTheme();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
-	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
+	const ayeValue = new BN(voteMetrics?.aye.value || '0');
+	const nayValue = new BN(voteMetrics?.nay.value || '0');
+	const totalValue = ayeValue.add(nayValue);
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
 	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
 	const ICONS = {
