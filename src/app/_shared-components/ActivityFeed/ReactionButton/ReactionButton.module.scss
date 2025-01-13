@@ -1,60 +1,35 @@
 .activity_icons {
-    transition: all 0.2s ease-in-out;
-    width: 20px;
-    height: 20px;
-    display: block;
+    @apply transition-all duration-200 ease-in-out w-5 h-5 block;
 
     &:hover {
-        transform: scale(1.1);
+        @apply scale-110;
     }
 }
 
 .likeGifContainer {
-    position: absolute;
-    top: -19px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    animation: popAnimation 1.5s ease-out;
-    display: flex;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
+    @apply absolute top-[-19px] left-1/2 transform -translate-x-1/2 z-10 flex w-10 h-10 items-center justify-center animate-[popAnimation_0.5s_ease-in-out_1];
 }
 
 .dislikeGifContainer {
-    position: absolute;
-    top: -21px;
-    left: 50%;
+    @apply absolute top-[-21px] left-1/2 z-10 flex w-10 h-10 items-center justify-center;
     transform: translateX(-50%) rotate(180deg);
-    z-index: 10;
     animation: popAnimation 1.5s ease-out;
-    display: flex;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    justify-content: center;
 }
 
 @keyframes popAnimation {
     0% {
-        opacity: 0;
-        transform: translateX(-50%) scale(0);
+        @apply opacity-0 scale-0 -translate-x-1/2;
     }
 
     20% {
-        opacity: 1;
-        transform: translateX(-50%) scale(1.2);
+        @apply opacity-100 scale-[1.2] -translate-x-1/2;
     }
 
     80% {
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
+        @apply opacity-100 scale-100 -translate-x-1/2;
     }
 
     100% {
-        opacity: 0;
-        transform: translateX(-50%) scale(1);
+        @apply opacity-0 scale-100 -translate-x-1/2;
     }
 }
