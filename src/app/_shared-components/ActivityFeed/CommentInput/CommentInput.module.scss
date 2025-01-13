@@ -1,13 +1,13 @@
 .commentInputContainer {
-    @apply flex h-9 w-full flex-col justify-center rounded-l-md border-y border-l border-r-0 border-solid border-[#D2D8E0] outline-none dark:border dark:border-solid dark:border-[#4B4B4B] lg:ml-4 xl:ml-3
+    @apply flex h-9 w-full flex-col justify-center rounded-l-md border-y border-l border-r-0 border-solid border-listing_page_border outline-none lg:ml-4 xl:ml-3
 }
 
 .postButton {
-    @apply h-9 w-28 cursor-pointer rounded-r-md border border-solid border-primary_border bg-filter_dropdown bg-opacity-[5%] text-text_primary
+    @apply h-9 w-28 cursor-pointer rounded-r-md border border-solid border-listing_page_border bg-filter_dropdown bg-opacity-[5%] text-text_primary
 }
 
 .commentPlaceholder {
-    @apply px-2 text-sm text-placeholder text-opacity-[80%]
+    @apply px-2 text-sm text-text_primary
 }
 
 .postLabel {
