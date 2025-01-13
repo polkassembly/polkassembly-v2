@@ -15,7 +15,8 @@ import {
 	IReaction,
 	EReaction,
 	ICommentResponse,
-	IPublicUser
+	IPublicUser,
+	IUserActivity
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -205,6 +206,10 @@ export class OffChainDbService {
 
 	static async GetPublicUserById(id: number): Promise<IPublicUser | null> {
 		return FirestoreService.GetPublicUserById(id);
+	}
+
+	static async GetUserActivitiesByUserId(userId: number): Promise<IUserActivity[]> {
+		return FirestoreService.GetUserActivitiesByUserId(userId);
 	}
 
 	// Write methods

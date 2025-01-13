@@ -15,7 +15,8 @@ import {
 	IPublicUser,
 	IReaction,
 	EReaction,
-	IPostOffChainMetrics
+	IPostOffChainMetrics,
+	IUserActivity
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -461,6 +462,19 @@ export class FirestoreService extends FirestoreRefs {
 		const postsQuery = FirestoreRefs.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).orderBy('index', 'desc').limit(1);
 		const postsQuerySnapshot = await postsQuery.get();
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
+	}
+
+	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
+		const userActivityQuery = FirestoreRefs.userActivityCollectionRef().where('userId', '==', id);
+		const userActivityQuerySnapshot = await userActivityQuery.get();
+		return userActivityQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IUserActivity;
+		});
 	}
 
 	// write methods

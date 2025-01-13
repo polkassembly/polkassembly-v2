@@ -577,3 +577,83 @@ export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	TIMELINE = 'timeline'
 }
+
+export enum EActivityName {
+	// On-chain Activities
+	VOTED_ON_PROPOSAL = 'voted_on_proposal',
+	CREATED_PROPOSAL = 'created_proposal',
+	CREATED_TIP = 'created_tip',
+	GAVE_TIP = 'gave_tip',
+	CREATED_BOUNTY = 'created_bounty',
+	CREATED_CHILD_BOUNTY = 'created_child_bounty',
+	CLAIMED_BOUNTY = 'claimed_bounty',
+	LINKED_WALLET = 'linked_wallet',
+	VERIFIED_IDENTITY = 'verified_identity',
+	COMPLETED_JUDGEMENT = 'completed_judgement',
+	DELEGATED_VOTE = 'delegated_vote',
+	RECEIVED_DELEGATION = 'received_delegation',
+	PLACED_DECISION_DEPOSIT = 'placed_decision_deposit',
+	REMOVED_VOTE = 'removed_vote',
+
+	// Off-chain Activities
+	REACTED_TO_POST = 'reacted_to_post',
+	COMMENTED_ON_POST = 'commented_on_post',
+	REPLIED_TO_COMMENT = 'replied_to_comment',
+	CREATED_DISCUSSION = 'created_discussion',
+	LINKED_DISCUSSION = 'linked_discussion',
+	TOOK_QUIZ = 'took_quiz',
+	UPDATED_PROFILE = 'updated_profile',
+	REPORTED_CONTENT = 'reported_content',
+	RECEIVED_REPORT = 'received_report',
+	REMOVED_CONTENT = 'removed_content',
+	RECEIVED_LIKES = 'received_likes'
+}
+
+export enum EActivityCategory {
+	ON_CHAIN = 'on_chain',
+	OFF_CHAIN = 'off_chain'
+}
+
+export interface IActivityMetadata {
+	// For votes
+	decision?: EVoteDecision;
+	conviction?: number;
+
+	// For reactions/comments
+	reactionId?: string;
+	commentId?: string;
+
+	// For reports
+	reportReason?: string;
+	reportedByUserId?: number;
+
+	// For profile updates
+	field?: string;
+
+	// For likes received
+	likeCount?: number;
+
+	// For delegations
+	delegatedToAddress?: string;
+	delegatedFromAddress?: string;
+
+	// For quiz
+	score?: number;
+
+	// For bounties/tips
+	amount?: string;
+	beneficiaryAddress?: string;
+}
+
+export interface IUserActivity {
+	id: string;
+	userId: number;
+	name: EActivityName;
+	category: EActivityCategory;
+	network?: ENetwork; // optional for profile activities
+	proposalType?: EProposalType;
+	indexOrHash?: string;
+	metadata?: IActivityMetadata;
+	createdAt: Date;
+	updatedAt: Date;
+}
