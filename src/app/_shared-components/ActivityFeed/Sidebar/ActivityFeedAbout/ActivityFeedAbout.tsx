@@ -3,74 +3,16 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { TiHome } from 'react-icons/ti';
-import { FaTwitter, FaTelegramPlane, FaYoutube, FaDiscord } from 'react-icons/fa';
-import { PiRedditLogoFill } from 'react-icons/pi';
-import { TbBrandGithubFilled } from 'react-icons/tb';
-import { RiBox3Line } from 'react-icons/ri';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { networkSocialLinks } from '@/_shared/_constants/socialNetwork';
 import ActivityFeedAboutStyles from './ActivityFeedAbout.module.scss';
-
-interface SocialLink {
-	id: string;
-	icon: React.ReactNode;
-	href: string;
-	label: string;
-}
 
 function ActivityFeedAbout() {
 	const t = useTranslations();
-	const socialLinks: SocialLink[] = [
-		{
-			id: 'home',
-			icon: <TiHome className='transition-transform hover:scale-110' />,
-			href: 'https://polkadot.network/',
-			label: 'Polkadot Homepage'
-		},
-		{
-			id: 'twitter',
-			icon: <FaTwitter className='transition-transform hover:scale-110' />,
-			href: 'https://twitter.com/Polkadot',
-			label: 'Twitter'
-		},
-		{
-			id: 'discord',
-			icon: <FaDiscord className='transition-transform hover:scale-110' />,
-			href: 'https://discord.gg/polkadot',
-			label: 'Discord'
-		},
-		{
-			id: 'github',
-			icon: <TbBrandGithubFilled className='transition-transform hover:scale-110' />,
-			href: 'https://github.com/polkadot-js',
-			label: 'GitHub'
-		},
-		{
-			id: 'youtube',
-			icon: <FaYoutube className='transition-transform hover:scale-110' />,
-			href: 'https://www.youtube.com/channel/UCB7PbjuZLEba_znc7mEGNgw',
-			label: 'YouTube'
-		},
-		{
-			id: 'reddit',
-			icon: <PiRedditLogoFill className='transition-transform hover:scale-110' />,
-			href: 'https://www.reddit.com/r/polkadot',
-			label: 'Reddit'
-		},
-		{
-			id: 'telegram',
-			icon: <FaTelegramPlane className='transition-transform hover:scale-110' />,
-			href: 'https://t.me/PolkadotOfficial',
-			label: 'Telegram'
-		},
-		{
-			id: 'subscan',
-			icon: <RiBox3Line className='transition-transform hover:scale-110' />,
-			href: 'https://polkadot.subscan.io/',
-			label: 'Subscan'
-		}
-	];
+	const network = getCurrentNetwork();
+	const socialLinks = networkSocialLinks[network];
 
 	return (
 		<div className={ActivityFeedAboutStyles.aboutContainer}>

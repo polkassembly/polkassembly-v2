@@ -5,11 +5,12 @@
 import React from 'react';
 import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
 import Image from 'next/image';
+import { EReaction } from '@/_shared/types';
 import LikeGif from '@assets/reactions/Liked-Colored.gif';
 import styles from './ReactionButton.module.scss';
 
-function ReactionButton({ type, isActive, showGif, onClick }: { type: 'like' | 'dislike'; isActive: boolean; showGif: boolean; onClick: () => void }) {
-	const Icon = type === 'like' ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
+function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction; isActive: boolean; showGif: boolean; onClick: () => void }) {
+	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
 
 	return (
 		<button
@@ -19,21 +20,21 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: 'like' | '
 		>
 			<div className='relative mr-1 w-[24px]'>
 				{showGif ? (
-					<div className={type === 'like' ? styles.likeGifContainer : styles.dislikeGifContainer}>
+					<div className={type === EReaction.like ? styles.likeGifContainer : styles.dislikeGifContainer}>
 						<Image
 							src={LikeGif}
 							alt={`${type} Animation`}
 							width={24}
 							className='h-10 w-10'
 							height={24}
-							style={type === 'dislike' ? { transform: 'scaleY(-1)' } : undefined}
+							style={type === EReaction.dislike ? { transform: 'scaleY(-1)' } : undefined}
 						/>
 					</div>
 				) : (
 					<Icon className={`${styles.activity_icons} text-lg ${isActive ? 'text-text_pink' : ''}`} />
 				)}
 			</div>
-			<span className={isActive ? 'text-text_pink' : ''}>{isActive ? `${type}d` : type}</span>
+			<span className={isActive ? 'text-text_pink' : ''}>{isActive ? `${type.toLowerCase()}d` : type.toLowerCase()}</span>
 		</button>
 	);
 }

@@ -5,8 +5,8 @@
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import VotingBar from '@ui/ListingComponent/VotingBar/VotingBar';
-import { formatUSDWithUnits } from '@app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IPostListing } from '@/_shared/types';
 import styles from './VotingMetrics.module.scss';
 
@@ -17,6 +17,12 @@ interface VotingMetricsProps {
 }
 
 function VotingMetrics({ postData, ayePercent, nayPercent }: VotingMetricsProps) {
+	const network = getCurrentNetwork();
+	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
+
+	const formatBalance = (balance: string) => {
+		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
+	};
 	return (
 		<>
 			<span>|</span>
@@ -35,18 +41,10 @@ function VotingMetrics({ postData, ayePercent, nayPercent }: VotingMetricsProps)
 				>
 					<div className={styles.progressBarContainer}>
 						<p>
-							Aye ={' '}
-							{formatUSDWithUnits(
-								formatBnBalance(postData.onChainInfo?.voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, postData.network)
-							)}{' '}
-							({ayePercent.toFixed(2)}%)
+							Aye = {formatBalance(postData.onChainInfo?.voteMetrics?.aye.value || '0')} ({ayePercent.toFixed(2)}%)
 						</p>
 						<p>
-							Nay ={' '}
-							{formatUSDWithUnits(
-								formatBnBalance(postData.onChainInfo?.voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, postData.network)
-							)}{' '}
-							({nayPercent.toFixed(2)}%)
+							Nay = {formatBalance(postData.onChainInfo?.voteMetrics?.nay.value || '0')} ({nayPercent.toFixed(2)}%)
 						</p>
 					</div>
 				</TooltipContent>
@@ -54,5 +52,4 @@ function VotingMetrics({ postData, ayePercent, nayPercent }: VotingMetricsProps)
 		</>
 	);
 }
-
 export default VotingMetrics;

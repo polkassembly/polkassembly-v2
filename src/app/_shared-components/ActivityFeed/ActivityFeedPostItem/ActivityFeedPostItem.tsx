@@ -88,9 +88,9 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>
 					<span className='text-xl font-bold'>
-						{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && (
+						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
 							<div className={styles.beneficiaryContainer}>
-								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo?.beneficiaries, postData.network)).map(([assetId, amount]) => (
+								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => (
 									<div
 										key={`${assetId}-${postData.index}`}
 										className={styles.requestedAmount}
@@ -188,13 +188,13 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<div className='mb-4 flex items-center justify-between text-sm text-navbar_border'>
 				<div className='flex space-x-4'>
 					<ReactionButton
-						type='like'
+						type={EReaction.like}
 						isActive={reactionState.isLiked}
 						showGif={showLikeGif}
 						onClick={() => handleReaction(EReaction.like)}
 					/>
 					<ReactionButton
-						type='dislike'
+						type={EReaction.dislike}
 						isActive={reactionState.isDisliked}
 						showGif={showDislikeGif}
 						onClick={() => handleReaction(EReaction.dislike)}
