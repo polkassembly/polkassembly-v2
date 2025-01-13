@@ -32,7 +32,7 @@ function CommentInput({ inputRef }: { inputRef: React.RefObject<HTMLInputElement
 			</div>
 			<button
 				type='button'
-				className={`${styles.postButton} dark:bg-[#4B4B4B]`}
+				className={styles.postButton}
 			>
 				<span className={styles.postLabel}>{CONSTANTS.POST_LABEL}</span>
 			</button>

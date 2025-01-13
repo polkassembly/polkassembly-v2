@@ -33,6 +33,8 @@ export const THEME_COLORS = {
 		sidebar_menu_text: '#ff0080',
 		sidebar_menu_bg: '#FDE7F0',
 		create_proposal_btn_create: '#0A3EAF',
+		rank_card_text: '#243A57',
+		rank_card_bg: '#FCC636',
 		listing_page_btn: '#334D6E',
 		listing_card1: '#F5F6F8',
 		listing_page_border: '#CED4DE',
@@ -60,7 +62,9 @@ export const THEME_COLORS = {
 		sidebar_foreground: '#0A3EAF',
 		progress_pink_bg: '#FEF2F8',
 		info: '#1677ff',
-		activity_selected_tab: '#F2F4F7'
+		activity_selected_tab: '#F2F4F7',
+		post_btn_bg: '#EFF1F3',
+		active_proposal_bg: '#485F7D'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -89,12 +93,14 @@ export const THEME_COLORS = {
 		dark_technical_bg: '#302921',
 		dark_technical_text: '#BFA889',
 		text_primary: '#9E9E9E',
+		rank_card_text: '#243A57',
 		text_pink: '#E5007A',
 		placeholder: '#576D8BCC',
 		success: '#2ED47A',
 		failure: '#FF3C5F',
 		listing_page_border: '#4B4B4B',
 		listing_card1: '#4B4B4B',
+		rank_card_bg: '#FCC636',
 		text_grey: '#7587A0',
 		create_proposal_btn_create: '#49CFFC',
 		section_dark_overlay: '#0D0D0D',
@@ -117,6 +123,8 @@ export const THEME_COLORS = {
 		decision_bar_indicator: '#407AFC',
 		progress_pink_bg: '#FEF2F8',
 		info: '#1677ff',
-		activity_selected_tab: '#2E2E2E'
+		activity_selected_tab: '#2E2E2E',
+		post_btn_bg: '#4B4B4B',
+		active_proposal_bg: '#262626'
 	}
 };

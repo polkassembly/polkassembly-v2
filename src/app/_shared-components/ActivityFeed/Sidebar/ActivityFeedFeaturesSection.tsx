@@ -78,7 +78,7 @@ function ActivityFeedFeaturesSection() {
 	}, [features?.length]);
 
 	return (
-		<div className='font-dmSans dark:bg-section-dark-overlay text_primary mt-5 rounded-xl border-[0.6px] border-solid border-[#D2D8E0] bg-bg_modal p-5 dark:border-[#4B4B4B]'>
+		<div className='font-dmSans dark:bg-section-dark-overlay text_primary mt-5 rounded-xl border-[0.6px] border-solid border-border_grey bg-bg_modal p-5'>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
 					<p className='text-xl font-semibold text-text_primary dark:text-white'>{t('ActivityFeed.Features')}</p>
@@ -89,7 +89,7 @@ function ActivityFeedFeaturesSection() {
 						<button
 							key={feature.id}
 							type='button'
-							className={`mt-2 h-2 w-2 cursor-pointer rounded-full ${features[currentIndex].id === feature.id ? 'bg-black dark:bg-[#9E9E9E]' : 'bg-[#D9D9D9]'}`}
+							className={`mt-2 h-2 w-2 cursor-pointer rounded-full ${features[currentIndex].id === feature.id ? 'bg-black dark:bg-text_primary' : 'bg-primary_border'}`}
 							onClick={() => handleDotClick(features.indexOf(feature))}
 							aria-label={`Show feature ${feature.title}`}
 						/>

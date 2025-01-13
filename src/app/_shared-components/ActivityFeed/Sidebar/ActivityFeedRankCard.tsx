@@ -36,7 +36,7 @@ function ActivityFeedRankCard() {
 				</div>
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
-					<p className='text-base font-semibold text-text_primary dark:text-[#243A57]'>{t('ActivityFeed.Rank')} 49</p>
+					<p className='text-rank_card_text text-base font-semibold'>{t('ActivityFeed.Rank')} 49</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
 						<div className='flex items-center gap-2'>
 							<Image
@@ -50,7 +50,7 @@ function ActivityFeedRankCard() {
 						</div>
 
 						<div>
-							<div className='flex items-center gap-1 rounded-lg bg-[#FCC636] px-1.5 py-0.5 font-medium'>
+							<div className='bg-rank_card_bg flex items-center gap-1 rounded-lg px-1.5 py-0.5 font-medium'>
 								<Image
 									src={rankStar}
 									alt='Rank Star'
