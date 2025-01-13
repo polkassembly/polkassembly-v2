@@ -7,9 +7,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import ReferendaDialog from '@ui/ListingComponent/ReferendaDialog';
 
 interface PageProps {
-	params: {
-		index: string;
-	};
+	params: { index: string };
 }
 
 export default async function ReferendaPage({ params }: PageProps) {
