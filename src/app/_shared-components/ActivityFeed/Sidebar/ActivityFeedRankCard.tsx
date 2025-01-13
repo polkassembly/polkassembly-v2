@@ -8,8 +8,10 @@ import profileAvatar from '@assets/profile/user-icon.svg';
 import rankCardInner from '@assets/profile/rankcard-inner.svg';
 import rankStar from '@assets/profile/rank-star.svg';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 function ActivityFeedRankCard() {
+	const t = useTranslations();
 	return (
 		<div className='relative'>
 			<div className='absolute inset-0 z-0'>
@@ -34,7 +36,7 @@ function ActivityFeedRankCard() {
 				</div>
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
-					<p className='text-base font-semibold text-text_primary dark:text-[#243A57]'>Rank 49</p>
+					<p className='text-base font-semibold text-text_primary dark:text-[#243A57]'>{t('ActivityFeed.Rank')} 49</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
 						<div className='flex items-center gap-2'>
 							<Image

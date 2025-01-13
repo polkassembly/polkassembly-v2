@@ -9,6 +9,7 @@ import { PiRedditLogoFill } from 'react-icons/pi';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 import { RiBox3Line } from 'react-icons/ri';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface SocialLink {
 	id: string;
@@ -18,6 +19,7 @@ interface SocialLink {
 }
 
 function ActivityFeedAbout() {
+	const t = useTranslations();
 	const socialLinks: SocialLink[] = [
 		{
 			id: 'home',
@@ -71,14 +73,14 @@ function ActivityFeedAbout() {
 
 	return (
 		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary'>
-			<span className='text-xl font-semibold dark:text-white'>About</span>
+			<span className='text-xl font-semibold dark:text-white'>{t('ActivityFeed.About')}</span>
 			<div className='text-sm'>
-				<span className='dark:text-white'>Polkadot is the all-in-one DeFi hub of Polkadot. </span>
+				<span className='dark:text-white'>{t('ActivityFeed.AboutDescription')} </span>
 				<Link
 					href='https://polkadot.network/about'
 					className='cursor-pointer text-text_pink hover:underline'
 				>
-					Know More
+					{t('ActivityFeed.KnowMore')}
 				</Link>
 			</div>
 			<div className='flex flex-wrap gap-5 text-xl text-wallet_btn_text'>

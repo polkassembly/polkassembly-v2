@@ -5,15 +5,16 @@
 import React from 'react';
 import Image from 'next/image';
 import userIcon from '@assets/profile/user-icon.svg';
+import { useTranslations } from 'next-intl';
 import styles from './CommentInput.module.scss';
 
-const CONSTANTS = {
-	COMMENT_PLACEHOLDER: 'Type your comment here',
-	POST_LABEL: 'Post',
-	ANIMATION_DURATION: 1500
-};
-
 function CommentInput({ inputRef }: { inputRef: React.RefObject<HTMLInputElement> }) {
+	const t = useTranslations();
+	const CONSTANTS = {
+		COMMENT_PLACEHOLDER: t('ActivityFeed.CommentPlaceholder'),
+		POST_LABEL: t('ActivityFeed.Post'),
+		ANIMATION_DURATION: 1500
+	};
 	return (
 		<div className='flex items-center'>
 			<Image

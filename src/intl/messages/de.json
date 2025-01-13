@@ -3,9 +3,28 @@
 		"title": "Willkommen"
 	},
 	"ActivityFeed": {
-		"title": "Aktivitätsfeed",
+		"title": "Aktivitäts-Feed",
 		"ExploreTab": "Erkunden",
-		"SubscribedTab": "Abonniert"
+		"SubscribedTab": "Abonniert",
+		"About": "Über",
+		"AboutDescription": "Polkadot ist die All-in-One DeFi-Plattform von Polkadot.",
+		"KnowMore": "Mehr erfahren",
+		"VotedProposals": "Abgestimmte Vorschläge",
+		"ActiveProposals": "Aktive Vorschläge",
+		"Last15Days": "Letzte 15 Tage",
+		"Rank": "Rang",
+		"BatchVoting": "Batch-Abstimmung",
+		"BatchVotingDescription": "Stimmen Sie in einer einzigen Transaktion über Top-Vorschläge ab",
+		"DelegationDashboardDescription": "Delegieren Sie Ihre Stimme und bleiben Sie mit dem Delegations-Dashboard auf dem Laufenden",
+		"DelegationDashboard": "Delegations-Dashboard",
+		"Bounty": "Prämie",
+		"BountyDescription": "Verdienen Sie DOT durch das Einreichen von Prämien bei Polkadot",
+		"Identity": "Identität",
+		"IdentityDescription": "Legen Sie Ihre Identität mit Polkassembly zu 1/4 der Kosten fest",
+		"Features": "Funktionen",
+		"Live": "LIVE",
+		"CommentPlaceholder": "Schreiben Sie hier Ihren Kommentar",
+		"Post": "Post"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Bitte Wallet auswählen",

@@ -5,7 +5,26 @@
 	"ActivityFeed": {
 		"title": "动态反馈",
 		"ExploreTab": "探索",
-		"SubscribedTab": "已订阅"
+		"SubscribedTab": "已订阅",
+		"About": "关于",
+		"AboutDescription": "Polkadot是Polkadot的一站式DeFi中心。",
+		"KnowMore": "了解更多",
+		"VotedProposals": "已投票提案",
+		"ActiveProposals": "活跃提案",
+		"Last15Days": "最近15天",
+		"Rank": "排名",
+		"BatchVoting": "批量投票",
+		"BatchVotingDescription": "在单次交易中对多个提案进行投票",
+		"DelegationDashboardDescription": "委托您的投票并通过委托仪表板进行跟进",
+		"DelegationDashboard": "委托仪表板",
+		"Bounty": "赏金",
+		"BountyDescription": "通过向Polkadot提交赏金来赚取DOT",
+		"Identity": "身份",
+		"IdentityDescription": "以1/4的成本在Polkassembly上设置身份",
+		"Features": "功能",
+		"Live": "实时",
+		"CommentPlaceholder": "请输入您的评论",
+		"Post": "发布"
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",

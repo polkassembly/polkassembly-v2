@@ -11,6 +11,7 @@ import delegationDashboard from '@assets/activityfeed/features/features1.svg';
 import batchVoting from '@assets/activityfeed/features/features2.svg';
 import bounty from '@assets/activityfeed/features/features3.svg';
 import identity from '@assets/activityfeed/features/features4.svg';
+import { useTranslations } from 'next-intl';
 
 interface IFeature {
 	title: string;
@@ -22,34 +23,35 @@ interface IFeature {
 
 function ActivityFeedFeaturesSection() {
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const t = useTranslations();
 	const features = [
 		{
 			id: 'delegation-dashboard',
-			description: 'Delegate your vote and catchup with Delegation Dashboard',
+			description: t('ActivityFeed.DelegationDashboardDescription'),
 			image: delegationDashboard,
 			path: '/delegation',
-			title: 'Delegation Dashboard'
+			title: t('ActivityFeed.DelegationDashboard')
 		},
 		{
 			id: 'batch-voting',
-			description: 'Vote on top proposals in a single transaction',
+			description: t('ActivityFeed.BatchVotingDescription'),
 			image: batchVoting,
 			path: '/batch-voting',
-			title: 'Batch Voting'
+			title: t('ActivityFeed.BatchVoting')
 		},
 		{
 			id: 'bounty',
-			description: 'Create, Manage and Participate in Bounties',
+			description: t('ActivityFeed.BountyDescription'),
 			image: bounty,
 			path: 'bounty',
-			title: 'Bounties'
+			title: t('ActivityFeed.Bounty')
 		},
 		{
 			id: 'identity',
-			description: 'Set identity with Polkassembly at 1/4th of the cost',
+			description: t('ActivityFeed.IdentityDescription'),
 			image: identity,
 			path: '',
-			title: 'Identity'
+			title: t('ActivityFeed.Identity')
 		}
 	];
 
@@ -79,8 +81,8 @@ function ActivityFeedFeaturesSection() {
 		<div className='font-dmSans dark:bg-section-dark-overlay text_primary mt-5 rounded-xl border-[0.6px] border-solid border-[#D2D8E0] bg-bg_modal p-5 dark:border-[#4B4B4B]'>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
-					<p className='text-xl font-semibold text-text_primary dark:text-white'>Features</p>
-					<p className='mt-1 rounded-full bg-navbar_border px-2 py-0.5 text-[10px] font-bold text-white'>LIVE</p>
+					<p className='text-xl font-semibold text-text_primary dark:text-white'>{t('ActivityFeed.Features')}</p>
+					<p className='mt-1 rounded-full bg-navbar_border px-2 py-0.5 text-[10px] font-bold text-white'>{t('ActivityFeed.Live')}</p>
 				</div>
 				<div className='flex gap-2'>
 					{features?.map((feature) => (

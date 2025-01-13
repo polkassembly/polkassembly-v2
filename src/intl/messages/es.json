@@ -5,7 +5,26 @@
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
 		"ExploreTab": "Explorar",
-		"SubscribedTab": "Suscrito"
+		"SubscribedTab": "Suscrito",
+		"About": "Acerca de",
+		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
+		"KnowMore": "Saber más",
+		"VotedProposals": "Propuestas Votadas",
+		"ActiveProposals": "Propuestas Activas",
+		"Last15Days": "Últimos 15 días",
+		"Rank": "Rango",
+		"BatchVoting": "Votación por Lotes",
+		"BatchVotingDescription": "Vote sobre las principales propuestas en una sola transacción",
+		"DelegationDashboardDescription": "Delegue su voto y póngase al día con el Panel de Delegación",
+		"DelegationDashboard": "Panel de Delegación",
+		"Bounty": "Recompensa",
+		"BountyDescription": "Gane DOT enviando recompensas a Polkadot",
+		"Identity": "Identidad",
+		"IdentityDescription": "Establezca su identidad con Polkassembly a 1/4 del costo",
+		"Features": "Características",
+		"Live": "EN VIVO",
+		"CommentPlaceholder": "Escriba su comentario aquí",
+		"Post": "Publicar"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione una billetera",
