@@ -7,13 +7,11 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React from 'react';
 
-async function Referenda({ params }: { params: { index: string } }) {
-	const { index } = params;
+async function Referenda({ params }: { params: Promise<{ index: string }> }) {
+	const { index } = await params;
 	const { data, error } = await NextApiClientService.fetchProposalDetailsApi(EProposalType.REFERENDUM_V2, index);
 
-	if (error || !data) {
-		return <div className='text-center text-text_primary'>{error?.message}</div>;
-	}
+	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 
 	return (
 		<div className='h-full w-full bg-page_background'>
