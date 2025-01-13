@@ -76,7 +76,7 @@ function ActivityFeedFeaturesSection() {
 	}, [features?.length]);
 
 	return (
-		<div className='font-dmSans dark:bg-section-dark-overlay text_primary mt-5 rounded-xl border-[0.6px] border-solid border-[#D2D8E0] bg-white p-5 dark:border-[#4B4B4B]'>
+		<div className='font-dmSans dark:bg-section-dark-overlay text_primary mt-5 rounded-xl border-[0.6px] border-solid border-[#D2D8E0] bg-bg_modal p-5 dark:border-[#4B4B4B]'>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
 					<p className='text-xl font-semibold text-text_primary dark:text-white'>Features</p>

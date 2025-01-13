@@ -1,13 +1,13 @@
 .popoverContent {
-    @apply w-52 border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-2 !important;
+    @apply w-52 border-none bg-[var(--sidebar-primary-foreground)] p-2 !important;
 }
 
 .trackName {
-    @apply w-full rounded-lg border-border_grey px-2 py-1 text-start text-sm font-medium text-text_primary hover:bg-btn_secondary_border;
+    @apply w-full rounded-lg border-border_grey px-2 py-1 text-start text-sm font-medium text-text_primary hover:bg-activity_selected_tab;
 }
 
 .popoverTrigger {
-    @apply flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-text_primary hover:bg-btn_secondary_border;
+    @apply flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-text_primary;
 }
 
 .container {

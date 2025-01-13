@@ -70,10 +70,10 @@ function ActivityFeedAbout() {
 	];
 
 	return (
-		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-white p-5 text-text_primary'>
-			<span className='text-xl font-semibold'>About</span>
+		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary'>
+			<span className='text-xl font-semibold dark:text-white'>About</span>
 			<div className='text-sm'>
-				<span>Polkadot is the all-in-one DeFi hub of Polkadot. </span>
+				<span className='dark:text-white'>Polkadot is the all-in-one DeFi hub of Polkadot. </span>
 				<Link
 					href='https://polkadot.network/about'
 					className='cursor-pointer text-text_pink hover:underline'

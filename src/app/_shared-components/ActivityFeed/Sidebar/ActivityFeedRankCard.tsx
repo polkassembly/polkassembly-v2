@@ -29,11 +29,12 @@ function ActivityFeedRankCard() {
 						width={500}
 						height={500}
 						priority
+						className='filter dark:brightness-0 dark:saturate-100'
 					/>
 				</div>
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
-					<p className='text-base font-semibold text-btn_secondary_text'>Rank 49</p>
+					<p className='text-base font-semibold text-text_primary dark:text-[#243A57]'>Rank 49</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
 						<div className='flex items-center gap-2'>
 							<Image

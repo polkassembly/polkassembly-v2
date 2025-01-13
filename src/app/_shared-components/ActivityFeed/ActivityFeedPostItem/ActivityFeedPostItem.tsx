@@ -170,7 +170,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 
 			{/* Metrics Section */}
 			<div className='flex items-center justify-end'>
-				<div className='flex items-center gap-2 text-xs text-btn_secondary_text'>
+				<div className='flex items-center gap-2 text-xs text-text_primary'>
 					<span>{reactionState.likesCount} likes</span>
 					<span>|</span>
 					<span>{reactionState.dislikesCount} dislikes</span>

@@ -7,12 +7,12 @@ import { FaAngleRight } from 'react-icons/fa';
 
 function ActivityFeedActiveProposal() {
 	return (
-		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-white p-5 text-text_primary'>
+		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary'>
 			<div className='flex items-center justify-between'>
-				<span className='flex items-center gap-1 text-sm font-semibold'>
+				<span className='flex items-center gap-1 text-sm font-semibold dark:text-white'>
 					Voted Proposals <FaAngleRight />
 				</span>
-				<span className='rounded-full bg-wallet_btn_text bg-opacity-[5%] px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%]'>Last 15 days</span>
+				<span className='rounded-full bg-wallet_btn_text bg-opacity-[5%] px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%] dark:bg-[#262626]'>Last 15 days</span>
 			</div>
 			<div className='text-sm'>
 				<span className='text-xs text-wallet_btn_text'>

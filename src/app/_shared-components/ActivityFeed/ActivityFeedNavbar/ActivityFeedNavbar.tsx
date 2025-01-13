@@ -104,7 +104,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 						<div>
 							<button
 								type='button'
-								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-sidebar_menu_bg text-btn_primary_background' : ''}`}
+								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab dark:text-white' : ''}`}
 								onClick={() => handleCategoryClick(category)}
 							>
 								{category}

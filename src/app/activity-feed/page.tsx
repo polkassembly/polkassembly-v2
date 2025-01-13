@@ -21,7 +21,7 @@ function Page() {
 				<div className='flex w-full justify-between xl:items-center'>
 					<div className='flex flex-col lg:flex-row xl:h-12 xl:gap-2'>
 						<div>
-							<h1 className='dark:text-blue-dark-high mx-2 text-xl font-semibold leading-9 text-text_primary lg:mt-3 lg:text-2xl'>{t('ActivityFeed.title')}</h1>
+							<h1 className='mx-2 text-xl font-semibold leading-9 text-text_primary dark:text-white lg:mt-3 lg:text-2xl'>{t('ActivityFeed.title')}</h1>
 						</div>
 						<ActivityFeeToggleButton
 							activeTab={activeTab}
@@ -32,7 +32,7 @@ function Page() {
 
 				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
 					<div className='mx-1 w-3/4 flex-grow'>
-						<div className=''>
+						<div>
 							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}
 						</div>
 					</div>
