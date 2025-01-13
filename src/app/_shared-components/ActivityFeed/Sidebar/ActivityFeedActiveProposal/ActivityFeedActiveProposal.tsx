@@ -15,10 +15,10 @@ function ActivityFeedActiveProposal() {
 				<span className={`${ActivityFeedActiveProposalStyles.activeProposalTitleText} dark:text-white`}>
 					{t('ActivityFeed.VotedProposals')} <FaAngleRight />
 				</span>
-				<span className={`${ActivityFeedActiveProposalStyles.activeProposalTitleDate} dark:bg-active_proposal_bg`}>{t('ActivityFeed.Last15Days')}</span>
+				<span className={ActivityFeedActiveProposalStyles.activeProposalTitleDate}>{t('ActivityFeed.Last15Days')}</span>
 			</div>
 			<div className='text-sm'>
-				<span className={ActivityFeedActiveProposalStyles.activeProposalTitleDate}>
+				<span className='text-xs text-wallet_btn_text'>
 					<span className='text-xl font-semibold text-navbar_border'>09</span> out of <span className='text-sm font-semibold'>12</span> {t('ActivityFeed.ActiveProposals')}
 				</span>
 			</div>
