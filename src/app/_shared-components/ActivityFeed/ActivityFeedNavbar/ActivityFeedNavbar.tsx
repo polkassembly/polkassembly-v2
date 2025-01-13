@@ -7,12 +7,22 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
 import React, { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import Home from '@assets/activityfeed/All.svg';
+import RootIcon from '@assets/sidebar/root-icon.svg';
+import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
+import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
+import GovernanceIcon from '@assets/sidebar/admin-icon.svg';
+import AdminIcon from '@assets/activityfeed/admin.svg';
+import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
+import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
+import { useSidebar } from '../../Sidebar/Sidebar';
 
 function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { gov2LatestPosts: IPostListing[]; currentTab: string; setCurrentTab: (tab: string) => void }) {
 	const Network = getCurrentNetwork();
+	const { isMobile } = useSidebar();
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[Network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -24,6 +34,16 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	const GOVERNANCE_CATEGORY = t('ActivityFeed.Navbar.Governance');
 	const TREASURY_CATEGORY = t('ActivityFeed.Navbar.Treasury');
 	const WHITELIST_CATEGORY = t('ActivityFeed.Navbar.Whitelist');
+
+	const categoryIconPaths = {
+		[ALL_CATEGORY]: Home,
+		[ROOT_CATEGORY]: RootIcon,
+		[WISH_FOR_CHANGE_CATEGORY]: WishForChangeIcon,
+		[ADMIN_CATEGORY]: AdminIcon,
+		[GOVERNANCE_CATEGORY]: GovernanceIcon,
+		[TREASURY_CATEGORY]: TreasuryIcon,
+		[WHITELIST_CATEGORY]: WhitelistedCallerIcon
+	};
 
 	// Dynamically create category structure from trackInfo
 	const categoryStructure = useMemo(() => {
@@ -107,7 +127,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	};
 
 	return (
-		<div className={styles.container}>
+		<div className={`${styles.container} ${isMobile ? styles.mobileContainer : ''}`}>
 			{Object.entries(categoryStructure).map(([category, tracks]) => (
 				<Popover key={category}>
 					<PopoverTrigger asChild>
@@ -117,7 +137,17 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab dark:text-white' : ''}`}
 								onClick={() => handleCategoryClick(category)}
 							>
-								{category}
+								<span className='flex items-center gap-1.5 whitespace-nowrap'>
+									<Image
+										src={categoryIconPaths[category]}
+										alt={category}
+										width={20}
+										height={20}
+										className='dark:brightness-0 dark:invert'
+									/>
+
+									{category}
+								</span>
 								{tracks?.length > 1 && <FaAngleDown />}
 							</button>
 						</div>

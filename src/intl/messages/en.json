@@ -170,7 +170,16 @@
 		"WhitelistedCaller": "Whitelisted Caller",
 		"FellowshipAdmin": "Fellowship Admin",
 		"ReportAnIssue": "Report an issue",
-		"NeedHelp": "Need help with something?"
+		"NeedHelp": "Need help with something?",
+		"AuctionAdmin": "Auction Admin",
+		"BigSpender": "Big Spender",
+		"BigTipper": "Big Tipper",
+		"MediumSpender": "Medium Spender",
+		"SmallSpender": "Small Spender",
+		"SmallTipper": "Small Tipper",
+		"Treasury": "Treasury",
+		"LeaseAdmin": "Lease Admin",
+		"GeneralAdmin": "General Admin"
 	},
 	"PostDetails": {
 		"castVote": "Cast Vote",
