@@ -31,12 +31,12 @@ function Page() {
 				</div>
 
 				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
-					<div className='mx-1 w-3/4 flex-grow'>
+					<div className='mx-1 xl:w-3/4 xl:flex-grow'>
 						<div>
 							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}
 						</div>
 					</div>
-					<div className='w-1/4'>
+					<div className='hidden xl:block xl:w-1/4'>
 						<ActivityFeedSidebar />
 					</div>
 				</div>

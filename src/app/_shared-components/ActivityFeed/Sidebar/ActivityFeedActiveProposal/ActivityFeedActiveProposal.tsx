@@ -5,17 +5,17 @@
 import React from 'react';
 import { FaAngleRight } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
-import ActivityFeedActiveProposalStyles from './ActivityFeedActiveProposal.module.scss';
+import styles from './ActivityFeedActiveProposal.module.scss';
 
 function ActivityFeedActiveProposal() {
 	const t = useTranslations();
 	return (
-		<div className={ActivityFeedActiveProposalStyles.activeProposalContainer}>
-			<div className={ActivityFeedActiveProposalStyles.activeProposalTitle}>
-				<span className={`${ActivityFeedActiveProposalStyles.activeProposalTitleText} dark:text-white`}>
+		<div className={styles.activeProposalContainer}>
+			<div className={styles.activeProposalTitle}>
+				<span className={`${styles.activeProposalTitleText} dark:text-white`}>
 					{t('ActivityFeed.VotedProposals')} <FaAngleRight />
 				</span>
-				<span className={ActivityFeedActiveProposalStyles.activeProposalTitleDate}>{t('ActivityFeed.Last15Days')}</span>
+				<span className={styles.activeProposalTitleDate}>{t('ActivityFeed.Last15Days')}</span>
 			</div>
 			<div className='text-sm'>
 				<span className='text-xs text-wallet_btn_text'>

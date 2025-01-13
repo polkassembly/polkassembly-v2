@@ -24,6 +24,7 @@ import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
 import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
+import Link from 'next/link';
 import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
@@ -63,7 +64,7 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 	return (
-		<a
+		<Link
 			href={`/referenda/${index}`}
 			target='_self'
 			rel='noreferrer'
@@ -229,7 +230,7 @@ function ListingCard({
 					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 			</div>
-		</a>
+		</Link>
 	);
 }
 

@@ -7,7 +7,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { networkSocialLinks } from '@/_shared/_constants/socialNetwork';
-import ActivityFeedAboutStyles from './ActivityFeedAbout.module.scss';
+import styles from './ActivityFeedAbout.module.scss';
 
 function ActivityFeedAbout() {
 	const t = useTranslations();
@@ -15,9 +15,9 @@ function ActivityFeedAbout() {
 	const socialLinks = networkSocialLinks[network];
 
 	return (
-		<div className={ActivityFeedAboutStyles.aboutContainer}>
-			<span className={`${ActivityFeedAboutStyles.aboutTitle} dark:text-white`}>{t('ActivityFeed.About')}</span>
-			<div className={ActivityFeedAboutStyles.aboutDescription}>
+		<div className={styles.aboutContainer}>
+			<span className={`${styles.aboutTitle} dark:text-white`}>{t('ActivityFeed.About')}</span>
+			<div className={styles.aboutDescription}>
 				<span className='dark:text-white'>{t('ActivityFeed.AboutDescription')} </span>
 				<Link
 					href='https://polkadot.network/about'
@@ -26,14 +26,14 @@ function ActivityFeedAbout() {
 					{t('ActivityFeed.KnowMore')}
 				</Link>
 			</div>
-			<div className={ActivityFeedAboutStyles.aboutSocialContainer}>
+			<div className={styles.aboutSocialContainer}>
 				{socialLinks.map((link) => (
 					<Link
 						key={link.id}
 						href={link.href}
 						target='_blank'
 						rel='noopener noreferrer'
-						className={ActivityFeedAboutStyles.aboutSocialLink}
+						className={styles.aboutSocialLink}
 						title={link.label}
 					>
 						{link.icon}

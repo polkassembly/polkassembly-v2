@@ -137,7 +137,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab dark:text-white' : ''}`}
 								onClick={() => handleCategoryClick(category)}
 							>
-								<span className='flex items-center gap-1.5 whitespace-nowrap'>
+								<span className='flex items-center gap-3 whitespace-nowrap px-1 py-2 lg:px-3 xl:gap-1.5'>
 									<Image
 										src={categoryIconPaths[category]}
 										alt={category}
@@ -146,9 +146,9 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 										className='dark:brightness-0 dark:invert'
 									/>
 
-									{category}
+									<span>{category}</span>
+									<span>{tracks?.length > 1 && <FaAngleDown />}</span>
 								</span>
-								{tracks?.length > 1 && <FaAngleDown />}
 							</button>
 						</div>
 					</PopoverTrigger>

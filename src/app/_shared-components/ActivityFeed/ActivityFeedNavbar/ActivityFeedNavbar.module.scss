@@ -7,11 +7,11 @@
 }
 
 .popoverTrigger {
-    @apply flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-text_primary;
+    @apply rounded-lg text-sm font-medium text-text_primary;
 }
 
 .container {
-    @apply mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-border_grey bg-bg_modal px-4 py-3;
+    @apply mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-border_grey bg-bg_modal px-3 py-2 lg:px-4 lg:py-3;
 }
 
 .mobileContainer {
