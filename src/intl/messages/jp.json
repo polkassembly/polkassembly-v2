@@ -24,7 +24,16 @@
 		"Features": "機能",
 		"Live": "ライブ",
 		"CommentPlaceholder": "コメントを入力してください",
-		"Post": "投稿"
+		"Post": "投稿",
+		"Navbar": {
+			"All": "すべて",
+			"Root": "ルート",
+			"Wish For Change": "変更への願い",
+			"Admin": "管理者",
+			"Governance": "ガバナンス",
+			"Treasury": "トレジャリー",
+			"Whitelist": "ホワイトリスト"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",

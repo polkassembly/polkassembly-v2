@@ -24,7 +24,16 @@
 		"Features": "Features",
 		"Live": "LIVE",
 		"CommentPlaceholder": "Type your comment here",
-		"Post": "Post"
+		"Post": "Post",
+		"Navbar": {
+			"All": "All",
+			"Root": "Root",
+			"Wish For Change": "Wish For Change",
+			"Admin": "Admin",
+			"Governance": "Governance",
+			"Treasury": "Treasury",
+			"Whitelist": "Whitelist"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",

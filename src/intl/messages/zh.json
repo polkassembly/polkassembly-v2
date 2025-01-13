@@ -24,7 +24,16 @@
 		"Features": "功能",
 		"Live": "实时",
 		"CommentPlaceholder": "请输入您的评论",
-		"Post": "发布"
+		"Post": "发布",
+		"Navbar": {
+			"All": "全部",
+			"Root": "根",
+			"Wish For Change": "愿望改变",
+			"Admin": "管理员",
+			"Governance": "治理",
+			"Treasury": "国库",
+			"Whitelist": "白名单"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",

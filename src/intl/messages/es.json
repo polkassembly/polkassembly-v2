@@ -24,7 +24,16 @@
 		"Features": "Características",
 		"Live": "EN VIVO",
 		"CommentPlaceholder": "Escriba su comentario aquí",
-		"Post": "Publicar"
+		"Post": "Publicar",
+		"Navbar": {
+			"All": "Todos",
+			"Root": "Raíz",
+			"Wish For Change": "Deseo de Cambio",
+			"Admin": "Admin",
+			"Governance": "Gobernanza",
+			"Treasury": "Tesorería",
+			"Whitelist": "Lista Blanca"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione una billetera",

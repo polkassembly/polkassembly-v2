@@ -6,25 +6,35 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
 import React, { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { gov2LatestPosts: IPostListing[]; currentTab: string; setCurrentTab: (tab: string) => void }) {
 	const Network = getCurrentNetwork();
+	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[Network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
+	const ALL_CATEGORY = t('ActivityFeed.Navbar.All');
+	const ROOT_CATEGORY = t('ActivityFeed.Navbar.Root');
+	const WISH_FOR_CHANGE_CATEGORY = t('ActivityFeed.Navbar.Wish For Change');
+	const GOVERNANCE_CATEGORY = t('ActivityFeed.Navbar.Governance');
+	const TREASURY_CATEGORY = t('ActivityFeed.Navbar.Treasury');
+	const WHITELIST_CATEGORY = t('ActivityFeed.Navbar.Whitelist');
 
 	// Dynamically create category structure from trackInfo
 	const categoryStructure = useMemo(() => {
 		const structure: Record<string, EPostOrigin[]> = {
-			All: [],
-			Root: [],
-			'Wish For Change': [],
-			Admin: [],
-			Governance: [],
-			Treasury: [],
-			Whitelist: []
+			[ALL_CATEGORY]: [],
+			[ROOT_CATEGORY]: [],
+			[WISH_FOR_CHANGE_CATEGORY]: [],
+			[ADMIN_CATEGORY]: [],
+			[GOVERNANCE_CATEGORY]: [],
+			[TREASURY_CATEGORY]: [],
+			[WHITELIST_CATEGORY]: []
 		};
 
 		Object.entries(trackInfo).forEach(([key]) => {
@@ -32,15 +42,15 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 
 			// Root category
 			if (origin === EPostOrigin.ROOT) {
-				structure.Root.push(origin);
+				structure[ROOT_CATEGORY].push(origin);
 			}
 			// Wish For Change category
 			else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
-				structure['Wish For Change'].push(origin);
+				structure[WISH_FOR_CHANGE_CATEGORY].push(origin);
 			}
 			// Admin category
 			else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
-				structure.Admin.push(origin);
+				structure[ADMIN_CATEGORY].push(origin);
 			}
 			// Governance category
 			else if (
@@ -49,7 +59,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 				origin.includes(EPostOrigin.REFERENDUM_CANCELLER) ||
 				origin.includes(EPostOrigin.REFERENDUM_KILLER)
 			) {
-				structure.Governance.push(origin);
+				structure[GOVERNANCE_CATEGORY].push(origin);
 			}
 			// Treasury category
 			else if (
@@ -60,11 +70,11 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 				origin.includes(EPostOrigin.SMALL_TIPPER) ||
 				origin.includes(EPostOrigin.TREASURER)
 			) {
-				structure.Treasury.push(origin);
+				structure[TREASURY_CATEGORY].push(origin);
 			}
 			// Whitelist category
 			else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
-				structure.Whitelist.push(origin);
+				structure[WHITELIST_CATEGORY].push(origin);
 			}
 		});
 
@@ -77,9 +87,9 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	};
 
 	const handleCategoryClick = (category: string) => {
-		if (category === 'All') {
-			setCurrentTab('All');
-		} else if (['Root', 'Wish For Change'].includes(category)) {
+		if (category === ALL_CATEGORY) {
+			setCurrentTab(ALL_CATEGORY);
+		} else if ([ROOT_CATEGORY, WISH_FOR_CHANGE_CATEGORY].includes(category)) {
 			setCurrentTab(category);
 		} else {
 			setExpandedCategory(expandedCategory === category ? null : category);
