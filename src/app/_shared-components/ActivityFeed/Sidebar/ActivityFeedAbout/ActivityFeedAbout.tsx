@@ -10,6 +10,7 @@ import { TbBrandGithubFilled } from 'react-icons/tb';
 import { RiBox3Line } from 'react-icons/ri';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import ActivityFeedAboutStyles from './ActivityFeedAbout.module.scss';
 
 interface SocialLink {
 	id: string;
@@ -72,9 +73,9 @@ function ActivityFeedAbout() {
 	];
 
 	return (
-		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary'>
-			<span className='text-xl font-semibold dark:text-white'>{t('ActivityFeed.About')}</span>
-			<div className='text-sm'>
+		<div className={ActivityFeedAboutStyles.aboutContainer}>
+			<span className={`${ActivityFeedAboutStyles.aboutTitle} dark:text-white`}>{t('ActivityFeed.About')}</span>
+			<div className={ActivityFeedAboutStyles.aboutDescription}>
 				<span className='dark:text-white'>{t('ActivityFeed.AboutDescription')} </span>
 				<Link
 					href='https://polkadot.network/about'
@@ -83,14 +84,14 @@ function ActivityFeedAbout() {
 					{t('ActivityFeed.KnowMore')}
 				</Link>
 			</div>
-			<div className='flex flex-wrap gap-5 text-xl text-wallet_btn_text'>
+			<div className={ActivityFeedAboutStyles.aboutSocialContainer}>
 				{socialLinks.map((link) => (
 					<Link
 						key={link.id}
 						href={link.href}
 						target='_blank'
 						rel='noopener noreferrer'
-						className='transition-colors duration-200 hover:text-text_pink'
+						className={ActivityFeedAboutStyles.aboutSocialLink}
 						title={link.label}
 					>
 						{link.icon}

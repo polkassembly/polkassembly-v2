@@ -3,10 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import ActivityFeedAbout from './Sidebar/ActivityFeedAbout';
-import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal';
+import ActivityFeedAbout from './Sidebar/ActivityFeedAbout/ActivityFeedAbout';
+import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal/ActivityFeedActiveProposal';
 import ActivityFeedRankCard from './Sidebar/ActivityFeedRankCard';
-import ActivityFeedFeaturesSection from './Sidebar/ActivityFeedFeaturesSection';
+import ActivityFeedFeaturesSection from './Sidebar/ActivityFeedFeaturesSection/ActivityFeedFeaturesSection';
 
 function ActivityFeedSidebar() {
 	return (

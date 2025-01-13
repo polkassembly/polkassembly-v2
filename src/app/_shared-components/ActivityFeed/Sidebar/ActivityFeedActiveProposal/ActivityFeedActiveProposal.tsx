@@ -5,21 +5,20 @@
 import React from 'react';
 import { FaAngleRight } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
+import ActivityFeedActiveProposalStyles from './ActivityFeedActiveProposal.module.scss';
 
 function ActivityFeedActiveProposal() {
 	const t = useTranslations();
 	return (
-		<div className='flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary'>
-			<div className='flex items-center justify-between'>
-				<span className='flex items-center gap-1 text-sm font-semibold dark:text-white'>
+		<div className={ActivityFeedActiveProposalStyles.activeProposalContainer}>
+			<div className={ActivityFeedActiveProposalStyles.activeProposalTitle}>
+				<span className={`${ActivityFeedActiveProposalStyles.activeProposalTitleText} dark:text-white`}>
 					{t('ActivityFeed.VotedProposals')} <FaAngleRight />
 				</span>
-				<span className='rounded-full bg-active_proposal_bg bg-opacity-[5%] px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%] dark:bg-active_proposal_bg'>
-					{t('ActivityFeed.Last15Days')}
-				</span>
+				<span className={`${ActivityFeedActiveProposalStyles.activeProposalTitleDate} dark:bg-active_proposal_bg`}>{t('ActivityFeed.Last15Days')}</span>
 			</div>
 			<div className='text-sm'>
-				<span className='text-xs text-wallet_btn_text'>
+				<span className={ActivityFeedActiveProposalStyles.activeProposalTitleDate}>
 					<span className='text-xl font-semibold text-navbar_border'>09</span> out of <span className='text-sm font-semibold'>12</span> {t('ActivityFeed.ActiveProposals')}
 				</span>
 			</div>

@@ -12,6 +12,7 @@ import batchVoting from '@assets/activityfeed/features/features2.svg';
 import bounty from '@assets/activityfeed/features/features3.svg';
 import identity from '@assets/activityfeed/features/features4.svg';
 import { useTranslations } from 'next-intl';
+import ActivityFeedFeaturesSectionStyles from './ActivityFeedFeaturesSection.module.scss';
 
 interface IFeature {
 	title: string;
@@ -78,11 +79,11 @@ function ActivityFeedFeaturesSection() {
 	}, [features?.length]);
 
 	return (
-		<div className='font-dmSans dark:bg-section-dark-overlay text_primary mt-5 rounded-xl border-[0.6px] border-solid border-border_grey bg-bg_modal p-5'>
+		<div className={ActivityFeedFeaturesSectionStyles.featuresContainer}>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
-					<p className='text-xl font-semibold text-text_primary dark:text-white'>{t('ActivityFeed.Features')}</p>
-					<p className='mt-1 rounded-full bg-navbar_border px-2 py-0.5 text-[10px] font-bold text-white'>{t('ActivityFeed.Live')}</p>
+					<p className={`${ActivityFeedFeaturesSectionStyles.featuresTitle} dark:text-white`}>{t('ActivityFeed.Features')}</p>
+					<p className={ActivityFeedFeaturesSectionStyles.featuresLive}>{t('ActivityFeed.Live')}</p>
 				</div>
 				<div className='flex gap-2'>
 					{features?.map((feature) => (
