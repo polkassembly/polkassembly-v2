@@ -12,7 +12,7 @@ import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { IPostListing } from '@/_shared/types';
+import { EReaction, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -45,8 +45,8 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	});
 	const ANIMATION_DURATION = 1500;
 
-	const handleReaction = (type: 'like' | 'dislike') => {
-		const isLikeAction = type === 'like';
+	const handleReaction = (type: EReaction.like | EReaction.dislike) => {
+		const isLikeAction = type === EReaction.like;
 		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 		const currentState = isLikeAction ? reactionState.isLiked : reactionState.isDisliked;
 
@@ -188,13 +188,13 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						type='like'
 						isActive={reactionState.isLiked}
 						showGif={showLikeGif}
-						onClick={() => handleReaction('like')}
+						onClick={() => handleReaction(EReaction.like)}
 					/>
 					<ReactionButton
 						type='dislike'
 						isActive={reactionState.isDisliked}
 						showGif={showDislikeGif}
-						onClick={() => handleReaction('dislike')}
+						onClick={() => handleReaction(EReaction.dislike)}
 					/>
 					<button
 						type='button'
