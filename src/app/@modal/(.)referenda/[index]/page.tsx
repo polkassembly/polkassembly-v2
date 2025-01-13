@@ -6,7 +6,13 @@ import { EProposalType, IPost } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import ReferendaDialog from '@ui/ListingComponent/ReferendaDialog';
 
-async function Referenda({ params }: { params: { index: string } }) {
+interface ReferendaParams {
+	params: {
+		index: string;
+	};
+}
+
+async function Referenda({ params }: ReferendaParams) {
 	const result = await NextApiClientService.fetchProposalDetailsApi(EProposalType.REFERENDUM_V2, params.index);
 
 	if (result.error) {
