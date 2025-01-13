@@ -14,7 +14,7 @@ function ActivityFeedActiveProposal() {
 				<span className='flex items-center gap-1 text-sm font-semibold dark:text-white'>
 					{t('ActivityFeed.VotedProposals')} <FaAngleRight />
 				</span>
-				<span className='bg-active_proposal_bg dark:bg-active_proposal_bg rounded-full bg-opacity-[5%] px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%]'>
+				<span className='rounded-full bg-active_proposal_bg bg-opacity-[5%] px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%] dark:bg-active_proposal_bg'>
 					{t('ActivityFeed.Last15Days')}
 				</span>
 			</div>
