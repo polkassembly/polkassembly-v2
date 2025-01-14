@@ -108,7 +108,7 @@ function ActivityFeedFeaturesSection() {
 				<Carousel
 					opts={{ loop: true, align: 'start' }}
 					setApi={setApi}
-					className={`${state === 'collapsed' ? 'w-80' : 'w-60 2xl:w-72'} m-0 p-0`}
+					className={`${state === 'collapsed' ? 'w-72' : 'w-60 2xl:w-72'} m-0 p-0`}
 				>
 					<CarouselContent className='m-0 p-0'>
 						{features.map((feature) => (
