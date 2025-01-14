@@ -28,6 +28,7 @@ import Link from 'next/link';
 import DOTIcon from '@assets/icons/dot.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
+import { MouseEvent } from 'react';
 
 function ListingCard({
 	title,
@@ -63,12 +64,20 @@ function ListingCard({
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
+
+	const handleFullscreenClick = (e: MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setTimeout(() => {
+			window.location.href = `/referenda/${index}`;
+		}, 100);
+	};
+
 	return (
-		<Link
-			href={`/referenda/${index}`}
-			target='_self'
-			rel='noreferrer'
+		<div
+			onClick={handleFullscreenClick}
 			className={`${styles.listingCard} ${backgroundColor}`}
+			aria-hidden='true'
 		>
 			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
@@ -230,7 +239,7 @@ function ListingCard({
 					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 			</div>
-		</Link>
+		</div>
 	);
 }
 
