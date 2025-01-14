@@ -13,6 +13,7 @@ import bounty from '@assets/activityfeed/features/features3.svg';
 import identity from '@assets/activityfeed/features/features4.svg';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/carousel';
 import { useTranslations } from 'next-intl';
+import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import styles from './ActivityFeedFeaturesSection.module.scss';
 
 interface IFeature {
@@ -25,6 +26,7 @@ interface IFeature {
 
 function ActivityFeedFeaturesSection() {
 	const [api, setApi] = useState<CarouselApi>();
+	const { state } = useSidebar();
 
 	const [current, setCurrent] = useState(0);
 	const t = useTranslations();
@@ -83,7 +85,7 @@ function ActivityFeedFeaturesSection() {
 	}, [api]);
 
 	return (
-		<div className={styles.featuresContainer}>
+		<div className={`${state === 'collapsed' ? styles.featuresContainerClosed : styles.featuresContainerOpen} `}>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
 					<p className={`${styles.featuresTitle} dark:text-white`}>{t('ActivityFeed.Features')}</p>
@@ -106,7 +108,7 @@ function ActivityFeedFeaturesSection() {
 				<Carousel
 					opts={{ loop: true, align: 'start' }}
 					setApi={setApi}
-					className='m-0 w-60 p-0 2xl:w-72'
+					className={`${state === 'collapsed' ? 'w-80' : 'w-60 2xl:w-72'} m-0 p-0`}
 				>
 					<CarouselContent className='m-0 p-0'>
 						{features.map((feature) => (
