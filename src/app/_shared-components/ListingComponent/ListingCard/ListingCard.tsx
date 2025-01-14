@@ -24,11 +24,10 @@ import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
 import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
-import Link from 'next/link';
 import DOTIcon from '@assets/icons/dot.png';
+import { MouseEvent } from 'react';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
-import { MouseEvent } from 'react';
 
 function ListingCard({
 	title,
