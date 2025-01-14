@@ -10,6 +10,7 @@ import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
 import { MdFullscreen } from 'react-icons/md';
 import { useTranslations } from 'next-intl';
+import { MouseEvent } from 'react';
 
 interface ReferendaDialogProps {
 	data: IPost;
@@ -24,6 +25,17 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 		router.back();
 	};
 
+	const handleFullscreenClick = (e: MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		router.back();
+
+		setTimeout(() => {
+			window.location.href = `/referenda/${index}`;
+		}, 100);
+	};
+
 	return (
 		<Dialog
 			defaultOpen
@@ -35,7 +47,13 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 					<DialogTitle>
 						<p className='pt-4'>{t('ListingTab.Referenda')}</p>
 					</DialogTitle>
-					<MdFullscreen className='pr-5 pt-0.5 text-4xl' />
+					<button
+						onClick={handleFullscreenClick}
+						type='button'
+						className='transition-opacity hover:opacity-75'
+					>
+						<MdFullscreen className='pr-5 pt-0.5 text-4xl' />
+					</button>{' '}
 				</DialogHeader>
 				<PostDetails
 					index={index}
