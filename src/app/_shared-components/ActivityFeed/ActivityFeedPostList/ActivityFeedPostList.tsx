@@ -41,7 +41,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 			/>
 			{loading ? (
 				<Loading />
-			) : postData?.posts?.length === 0 ? (
+			) : filteredPosts?.length === 0 || postData?.posts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={JoinPA}

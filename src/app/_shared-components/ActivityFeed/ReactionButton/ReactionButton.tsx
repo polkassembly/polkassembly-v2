@@ -34,7 +34,9 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction;
 					<Icon className={`${styles.activity_icons} text-lg ${isActive ? 'text-text_pink' : ''}`} />
 				)}
 			</div>
-			<span className={isActive ? 'text-text_pink' : ''}>{isActive ? `${type.toLowerCase()}d` : type.toLowerCase()}</span>
+			<span className={isActive ? 'text-text_pink' : ''}>
+				{isActive ? `${type.charAt(0).toUpperCase()}${type.slice(1).toLowerCase()}d` : `${type.charAt(0).toUpperCase()}${type.slice(1).toLowerCase()}`}
+			</span>
 		</button>
 	);
 }

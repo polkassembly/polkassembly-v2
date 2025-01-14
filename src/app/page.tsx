@@ -2,8 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import HomePage from './_shared-components/Home/Home';
+import ActivityFeed from './_shared-components/ActivityFeed';
 
 export default function Home() {
-	return <HomePage />;
+	return <ActivityFeed />;
 }

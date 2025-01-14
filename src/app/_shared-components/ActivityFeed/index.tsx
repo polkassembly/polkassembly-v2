@@ -4,83 +4,45 @@
 
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { EActivityFeedTab, IPostListing } from '@/_shared/types';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
-import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
+import { EActivityFeedTab } from '@/_shared/types';
+import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import ActivityFeeToggleButton from './ActivityFeeToggleButton/ActivityFeeToggleButton';
+import ActivityFeedSidebar from './ActivityFeedSidebar';
+import LatestActivity from './LatestActivity';
 
-function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
-	const observerTarget = useRef<HTMLDivElement>(null);
-
-	// Fetch activity feed API
-	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, 10);
-		if (error) {
-			throw new Error(error.message || 'Failed to fetch data');
-		}
-		return { ...data, page: pageParam };
-	};
-
-	// Infinite query
-	const { data, isLoading, isError, error, fetchNextPage, hasNextPage } = useInfiniteQuery({
-		queryKey: ['activityFeed', currentTab],
-		queryFn: getExploreActivityFeed,
-		initialPageParam: 1,
-		getNextPageParam: (lastPage) => {
-			// Ensure unique page number
-			if (lastPage.posts?.length === 10) {
-				return lastPage.page + 1; // Increment page
-			}
-			return undefined; // No more pages to fetch
-		},
-		staleTime: ADDRESS_LOGIN_TTL
-	});
-
-	// Flatten all posts from pages
-	const allPosts = data?.pages.flatMap((page) => page.posts || []).filter((post): post is IPostListing => post !== undefined);
-
-	// Intersection Observer
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting && !isLoading && hasNextPage) {
-					fetchNextPage();
-				}
-			},
-			{ threshold: 0.1 }
-		);
-
-		if (observerTarget.current) {
-			observer.observe(observerTarget.current);
-		}
-
-		return () => observer.disconnect();
-	}, [isLoading, hasNextPage, fetchNextPage]);
+function ActivityFeed() {
+	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
+	const t = useTranslations();
 
 	return (
 		<div>
-			{currentTab === EActivityFeedTab.EXPLORE ? (
-				<>
-					<ActivityFeedPostList
-						loading={isLoading}
-						postData={{
-							posts: allPosts || [],
-							totalCount: data?.pages[0]?.totalCount || 0
-						}}
-					/>
-					{isError && <p>Error: {error?.message}</p>}
-					<div
-						ref={observerTarget}
-						style={{ height: '20px' }}
-					/>
-				</>
-			) : (
-				<p>Data will be available soon</p>
-			)}
+			<div className='min-h-screen w-full bg-page_background px-10 pt-5'>
+				<div className='flex w-full justify-between xl:items-center'>
+					<div className='flex flex-row items-center gap-2'>
+						<div>
+							<h1 className='mx-2 text-xl font-semibold leading-9 text-text_primary dark:text-white lg:mt-3 lg:text-2xl'>{t('ActivityFeed.title')}</h1>
+						</div>
+						<ActivityFeeToggleButton
+							activeTab={activeTab}
+							setActiveTab={setActiveTab}
+						/>
+					</div>
+				</div>
+
+				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
+					<div className='mx-1 xl:w-3/4 xl:flex-grow'>
+						<div>
+							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}
+						</div>
+					</div>
+					<div className='hidden xl:block xl:w-1/4'>
+						<ActivityFeedSidebar />
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }
 
-export default LatestActivity;
+export default ActivityFeed;
