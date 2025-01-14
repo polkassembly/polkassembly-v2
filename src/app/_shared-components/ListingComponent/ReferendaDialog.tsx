@@ -8,6 +8,7 @@ import { IPost } from '@/_shared/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
+import { MdFullscreen } from 'react-icons/md';
 import { useTranslations } from 'next-intl';
 
 interface ReferendaDialogProps {
@@ -32,8 +33,9 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 			<DialogContent className='m-0 h-[80vh] max-w-5xl overflow-y-auto p-0'>
 				<DialogHeader>
 					<DialogTitle>
-						<p>{t('ListingTab.Referenda')}</p>
+						<p className='pt-4'>{t('ListingTab.Referenda')}</p>
 					</DialogTitle>
+					<MdFullscreen className='pt-2 text-3xl' />
 				</DialogHeader>
 				<PostDetails
 					index={index}
