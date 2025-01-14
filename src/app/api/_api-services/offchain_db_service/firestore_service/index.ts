@@ -15,7 +15,8 @@ import {
 	IPublicUser,
 	IReaction,
 	EReaction,
-	IPostOffChainMetrics
+	IPostOffChainMetrics,
+	IUserActivity
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -463,6 +464,19 @@ export class FirestoreService extends FirestoreRefs {
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
+	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
+		const userActivityQuery = FirestoreRefs.userActivityCollectionRef().where('userId', '==', id);
+		const userActivityQuerySnapshot = await userActivityQuery.get();
+		return userActivityQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IUserActivity;
+		});
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -650,5 +664,18 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.getPostDocRefById(newPostId).set(newPost, { merge: true });
 
 		return { id: newPostId, indexOrHash: String(newIndex) };
+	}
+
+	static async AddUserActivity(activity: IUserActivity) {
+		const newActivityId = FirestoreRefs.userActivityCollectionRef().doc().id;
+		await FirestoreRefs.userActivityCollectionRef()
+			.doc(newActivityId)
+			.set({ ...activity, id: newActivityId });
+	}
+
+	static async IncrementUserProfileScore(userId: number, score: number) {
+		await FirestoreRefs.usersCollectionRef()
+			.doc(userId.toString())
+			.set({ profileScore: FirestoreRefs.increment(score) }, { merge: true });
 	}
 }
