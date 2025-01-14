@@ -16,7 +16,10 @@ import {
 	EReaction,
 	ICommentResponse,
 	IPublicUser,
-	IUserActivity
+	IUserActivity,
+	EActivityName,
+	EActivityCategory,
+	IActivityMetadata
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -26,6 +29,8 @@ import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { OutputData } from '@editorjs/editorjs';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
+import { ON_CHAIN_ACTIVITY_NAMES } from '@/_shared/_constants/onChainActivityNames';
+import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
@@ -212,7 +217,62 @@ export class OffChainDbService {
 		return FirestoreService.GetUserActivitiesByUserId(userId);
 	}
 
+	// helper methods
+	private static async calculateProfileScoreIncrement({
+		userId,
+		activityName,
+		activityMetadata,
+		subActivityName
+	}: {
+		userId: number;
+		activityName: EActivityName;
+		activityMetadata?: IActivityMetadata;
+		subActivityName?: EActivityName;
+	}) {
+		// TODO: calculate score based on activity name and sub activity name
+		console.log('TODO: calculateProfileScoreIncrement fire and forget a cloud function maybe ?');
+		console.log({ userId, activityName, activityMetadata, subActivityName });
+		return 1;
+	}
+
 	// Write methods
+
+	private static async saveUserActivity({
+		userId,
+		name,
+		network,
+		proposalType,
+		indexOrHash,
+		metadata,
+		subActivityName
+	}: {
+		userId: number;
+		name: EActivityName;
+		network?: ENetwork;
+		proposalType?: EProposalType;
+		indexOrHash?: string;
+		metadata?: IActivityMetadata;
+		subActivityName?: EActivityName;
+	}): Promise<void> {
+		const activity: IUserActivity = {
+			id: '', // Firestore service class will generate this
+			userId,
+			name,
+			category: ON_CHAIN_ACTIVITY_NAMES.includes(name) ? EActivityCategory.ON_CHAIN : EActivityCategory.OFF_CHAIN,
+			network,
+			proposalType,
+			indexOrHash,
+			metadata,
+			subActivityName,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+
+		await FirestoreService.AddUserActivity(activity);
+
+		const score = await this.calculateProfileScoreIncrement({ userId, activityMetadata: metadata, activityName: name, subActivityName });
+		await FirestoreService.IncrementUserProfileScore(userId, score);
+	}
 
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		return FirestoreService.UpdateApiKeyUsage(apiKey, apiRoute);
@@ -223,20 +283,27 @@ export class OffChainDbService {
 	}
 
 	static async AddNewAddress({ address, userId, isDefault, wallet, network }: { address: string; userId: number; isDefault: boolean; wallet: EWallet; network: ENetwork }) {
-		if (!ValidatorService.isValidEVMAddress(address) && !ValidatorService.isValidSubstrateAddress(address)) {
-			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
+		if (!ValidatorService.isValidWeb3Address(address)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'address is not a valid web-3 address');
 		}
 
-		const addressEntry = {
-			address: ValidatorService.isValidEVMAddress(address) ? address : getSubstrateAddress(address),
+		const addressEntry: IUserAddress = {
+			address: ValidatorService.isValidEVMAddress(address) ? address : getSubstrateAddress(address)!,
 			default: isDefault,
 			network,
 			userId,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			wallet
-		} as IUserAddress;
-		return FirestoreService.AddNewAddress(addressEntry);
+		};
+
+		await FirestoreService.AddNewAddress(addressEntry);
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.LINKED_ADDRESS,
+			metadata: { address: addressEntry.address }
+		});
 	}
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
@@ -260,7 +327,18 @@ export class OffChainDbService {
 		parentCommentId?: string;
 		address?: string;
 	}) {
-		return FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
+
+		await this.saveUserActivity({
+			userId,
+			name: parentCommentId ? EActivityName.REPLIED_TO_COMMENT : EActivityName.COMMENTED_ON_POST,
+			network,
+			proposalType,
+			indexOrHash,
+			metadata: { commentId: comment.id, parentCommentId }
+		});
+
+		return comment;
 	}
 
 	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
@@ -268,7 +346,20 @@ export class OffChainDbService {
 	}
 
 	static async DeleteComment(commentId: string) {
-		return FirestoreService.DeleteComment(commentId);
+		const comment = await FirestoreService.GetCommentById(commentId);
+
+		if (!comment) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+
+		await FirestoreService.DeleteComment(commentId);
+
+		await this.saveUserActivity({
+			userId: comment.userId,
+			name: EActivityName.DELETED_COMMENT,
+			network: comment.network,
+			proposalType: comment.proposalType,
+			indexOrHash: comment.indexOrHash,
+			metadata: { commentId }
+		});
 	}
 
 	static async AddPostReaction({
@@ -284,11 +375,32 @@ export class OffChainDbService {
 		userId: number;
 		reaction: EReaction;
 	}) {
-		return FirestoreService.AddPostReaction({ network, indexOrHash, proposalType, userId, reaction });
+		await FirestoreService.AddPostReaction({ network, indexOrHash, proposalType, userId, reaction });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.REACTED_TO_POST,
+			network,
+			proposalType,
+			indexOrHash,
+			metadata: { reaction }
+		});
 	}
 
 	static async DeletePostReaction(id: string) {
-		return FirestoreService.DeletePostReaction(id);
+		const reaction = await FirestoreService.GetPostReactionById(id);
+		if (!reaction) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+
+		await FirestoreService.DeletePostReaction(id);
+
+		await this.saveUserActivity({
+			userId: reaction.userId,
+			name: EActivityName.DELETED_REACTION,
+			network: reaction.network,
+			proposalType: reaction.proposalType,
+			indexOrHash: reaction.indexOrHash,
+			metadata: { reaction: reaction.reaction }
+		});
 	}
 
 	static async CreateOffChainPost({
@@ -308,7 +420,17 @@ export class OffChainDbService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
 		}
 
-		return FirestoreService.CreatePost({ network, proposalType, userId, content, title });
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title });
+
+		await this.saveUserActivity({
+			userId,
+			name: OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType) ? EActivityName.CREATED_OFFCHAIN_POST : EActivityName.CREATED_PROPOSAL,
+			network,
+			proposalType,
+			indexOrHash: post.indexOrHash || post.id
+		});
+
+		return post;
 	}
 
 	static async UpdateOffChainPost({
@@ -370,6 +492,13 @@ export class OffChainDbService {
 
 		if (!offChainPostData) {
 			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title });
+			await this.saveUserActivity({
+				userId,
+				name: EActivityName.ADDED_CONTEXT_TO_PROPOSAL,
+				network,
+				proposalType,
+				indexOrHash
+			});
 		} else {
 			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title });
 		}

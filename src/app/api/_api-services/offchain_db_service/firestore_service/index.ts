@@ -665,4 +665,17 @@ export class FirestoreService extends FirestoreRefs {
 
 		return { id: newPostId, indexOrHash: String(newIndex) };
 	}
+
+	static async AddUserActivity(activity: IUserActivity) {
+		const newActivityId = FirestoreRefs.userActivityCollectionRef().doc().id;
+		await FirestoreRefs.userActivityCollectionRef()
+			.doc(newActivityId)
+			.set({ ...activity, id: newActivityId });
+	}
+
+	static async IncrementUserProfileScore(userId: number, score: number) {
+		await FirestoreRefs.usersCollectionRef()
+			.doc(userId.toString())
+			.set({ profileScore: FirestoreRefs.increment(score) }, { merge: true });
+	}
 }

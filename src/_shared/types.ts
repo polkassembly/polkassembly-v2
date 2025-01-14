@@ -587,26 +587,51 @@ export enum EActivityName {
 	CREATED_BOUNTY = 'created_bounty',
 	CREATED_CHILD_BOUNTY = 'created_child_bounty',
 	CLAIMED_BOUNTY = 'claimed_bounty',
-	LINKED_WALLET = 'linked_wallet',
+	SIGNED_UP_FOR_IDENTITY_VERIFICATION = 'signed_up_for_identity_verification',
+	APPROVED_BOUNTY = 'approved_bounty',
+	LINKED_ADDRESS = 'linked_address',
 	VERIFIED_IDENTITY = 'verified_identity',
-	COMPLETED_JUDGEMENT = 'completed_judgement',
+	COMPLETED_IDENTITY_JUDGEMENT = 'completed_identity_judgement',
 	DELEGATED_VOTE = 'delegated_vote',
 	RECEIVED_DELEGATION = 'received_delegation',
 	PLACED_DECISION_DEPOSIT = 'placed_decision_deposit',
 	REMOVED_VOTE = 'removed_vote',
+	REDUCED_CONVICTION = 'reduced_conviction',
+	REDUCED_CONVICTION_AFTER_SIX_HOURS_OF_FIRST_VOTE = 'reduced_conviction_after_six_hours_of_first_vote',
+	REMOVED_VOTE_AFTER_SIX_HOURS_OF_FIRST_VOTE = 'removed_vote_after_six_hours_of_first_vote',
+	LOST_DUE_TO_SLASHING_TIP_OR_PROPOSAL = 'lost_due_to_slashing_tip_or_proposal',
+	PROPOSAL_FAILED = 'proposal_failed',
+	PROPOSAL_PASSED = 'proposal_passed',
+	VOTE_PASSED = 'vote_passed',
+	VOTE_FAILED = 'vote_failed',
+	QUIZ_ANSWERED_CORRECTLY = 'quiz_answered_correctly',
 
 	// Off-chain Activities
 	REACTED_TO_POST = 'reacted_to_post',
+	REACTED_TO_COMMENT = 'reacted_to_comment',
 	COMMENTED_ON_POST = 'commented_on_post',
+	DELETED_COMMENT = 'deleted_comment',
 	REPLIED_TO_COMMENT = 'replied_to_comment',
-	CREATED_DISCUSSION = 'created_discussion',
+	CREATED_OFFCHAIN_POST = 'created_offchain_post',
 	LINKED_DISCUSSION = 'linked_discussion',
 	TOOK_QUIZ = 'took_quiz',
 	UPDATED_PROFILE = 'updated_profile',
 	REPORTED_CONTENT = 'reported_content',
 	RECEIVED_REPORT = 'received_report',
+	RECEIVED_SPAM_REPORT = 'received_spam_report',
 	REMOVED_CONTENT = 'removed_content',
-	RECEIVED_LIKES = 'received_likes'
+	RECEIVED_LIKE_ON_DISCUSSION = 'received_like_on_discussion',
+	RECEIVED_LIKE_ON_COMMENT = 'received_like_on_comment',
+	DELETED_REACTION = 'deleted_reaction',
+	ADDED_CONTEXT_TO_PROPOSAL = 'added_context_to_proposal',
+	ADDED_PROFILE_PICTURE = 'added_profile_picture',
+	ADDED_BIO = 'added_bio',
+	ADDED_PROFILE_TITLE = 'added_profile_title',
+	ADDED_PROFILE_TAGS = 'added_profile_tags',
+	COMMENT_TAKEN_DOWN = 'comment_taken_down',
+	POST_TAKEN_DOWN = 'post_taken_down',
+	POST_MARKED_AS_SPAM = 'post_marked_as_spam',
+	LINKED_MULTIPLE_ADDRESSES = 'linked_multiple_addresses'
 }
 
 export enum EActivityCategory {
@@ -619,9 +644,12 @@ export interface IActivityMetadata {
 	decision?: EVoteDecision;
 	conviction?: number;
 
-	// For reactions/comments
-	reactionId?: string;
+	// For reactions
+	reaction?: EReaction;
+
+	// For comments
 	commentId?: string;
+	parentCommentId?: string;
 
 	// For reports
 	reportReason?: string;
@@ -643,12 +671,16 @@ export interface IActivityMetadata {
 	// For bounties/tips
 	amount?: string;
 	beneficiaryAddress?: string;
+
+	// for identity and link address
+	address?: string;
 }
 
 export interface IUserActivity {
 	id: string;
 	userId: number;
 	name: EActivityName;
+	subActivityName?: EActivityName;
 	category: EActivityCategory;
 	network?: ENetwork; // optional for profile activities
 	proposalType?: EProposalType;
