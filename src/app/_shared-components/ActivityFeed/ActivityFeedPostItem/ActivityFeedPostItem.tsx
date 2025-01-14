@@ -160,7 +160,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<BlockEditor
 					data={postData.content}
 					readOnly
-					className='max-h-20 overflow-hidden border-none'
+					className='max-h-32 w-96 overflow-hidden border-none lg:w-full'
 					id={`post-content-${postData.index}`}
 				/>
 				<Link

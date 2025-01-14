@@ -20,7 +20,7 @@ function CommentInput({ inputRef }: { inputRef: React.RefObject<HTMLInputElement
 			<Image
 				src={userIcon}
 				alt='User Icon'
-				className='h-7 w-7 rounded-full'
+				className='h-7 w-7 rounded-full pr-2 lg:pr-0'
 				width={32}
 				height={32}
 			/>

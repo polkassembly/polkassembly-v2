@@ -8,6 +8,7 @@ import { PiRedditLogoFill } from 'react-icons/pi';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 import { RiBox3Line } from 'react-icons/ri';
 import { ReactElement } from 'react';
+import { ENetwork } from '../types';
 
 interface ISocialLink {
 	id: string;
@@ -16,7 +17,7 @@ interface ISocialLink {
 	label: string;
 }
 
-export const networkSocialLinks: Record<string, ISocialLink[]> = {
+export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	polkadot: [
 		{
 			id: 'home',
@@ -65,6 +66,14 @@ export const networkSocialLinks: Record<string, ISocialLink[]> = {
 			icon: <RiBox3Line className='transition-transform hover:scale-110' />,
 			href: 'https://polkadot.subscan.io/',
 			label: 'Subscan'
+		}
+	],
+	kusama: [
+		{
+			id: 'home',
+			icon: <TiHome className='transition-transform hover:scale-110' />,
+			href: 'https://kusama.network/',
+			label: 'Kusama Homepage'
 		}
 	]
 } as const;

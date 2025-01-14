@@ -5,6 +5,7 @@
 import React from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Link from 'next/link';
+import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { networkSocialLinks } from '@/_shared/_constants/socialNetwork';
 import styles from './ActivityFeedAbout.module.scss';
@@ -12,7 +13,7 @@ import styles from './ActivityFeedAbout.module.scss';
 function ActivityFeedAbout() {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const socialLinks = networkSocialLinks[network];
+	const socialLinks = networkSocialLinks[network as ENetwork];
 
 	return (
 		<div className={styles.aboutContainer}>
