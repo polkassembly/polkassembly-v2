@@ -29,7 +29,7 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className='h-[80vh] max-w-5xl overflow-y-auto'>
+			<DialogContent className='m-0 h-[80vh] max-w-5xl overflow-y-auto p-0'>
 				<DialogHeader>
 					<DialogTitle>
 						<p>{t('ListingTab.Referenda')}</p>
