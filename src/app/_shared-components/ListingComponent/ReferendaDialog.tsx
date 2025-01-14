@@ -35,7 +35,7 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 					<DialogTitle>
 						<p className='pt-4'>{t('ListingTab.Referenda')}</p>
 					</DialogTitle>
-					<MdFullscreen className='pt-2 text-3xl' />
+					<MdFullscreen className='pr-5 pt-0.5 text-4xl' />
 				</DialogHeader>
 				<PostDetails
 					index={index}

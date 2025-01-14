@@ -58,7 +58,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn('flex justify-between space-y-1.5 border-b border-border_grey px-12 pb-4 text-center sm:text-left', className)}
+			className={cn('flex justify-between space-y-1.5 border-b border-border_grey px-6 pb-4 text-center sm:text-left', className)}
 			{...props}
 		/>
 	);
