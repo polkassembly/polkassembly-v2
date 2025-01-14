@@ -19,7 +19,7 @@ function Page() {
 		<div>
 			<div className='min-h-screen w-full bg-page_background px-10 pt-5'>
 				<div className='flex w-full justify-between xl:items-center'>
-					<div className='flex flex-col lg:flex-row xl:h-12 xl:gap-2'>
+					<div className='flex flex-row items-center gap-2'>
 						<div>
 							<h1 className='mx-2 text-xl font-semibold leading-9 text-text_primary dark:text-white lg:mt-3 lg:text-2xl'>{t('ActivityFeed.title')}</h1>
 						</div>
