@@ -7,13 +7,9 @@
 }
 
 .popoverTrigger {
-    @apply rounded-lg text-sm font-medium text-text_primary;
+    @apply rounded-lg relative text-sm font-medium w-full text-text_primary px-3 py-2;
 }
 
 .container {
-    @apply mb-5 flex justify-between overflow-x-auto rounded-lg border-[1px] border-border_grey bg-bg_modal px-3 py-2 lg:px-4 lg:py-3;
-}
-
-.mobileContainer {
-    @apply mb-5 flex justify-between overflow-x-scroll rounded-lg border-[1px] border-border_grey bg-bg_modal px-3 py-2 lg:px-4 lg:py-3;
+    @apply mb-5 flex justify-start gap-4 overflow-x-auto rounded-lg border-[1px] border-border_grey bg-bg_modal min-w-full px-3 py-2 lg:px-4 lg:py-3;
 }
