@@ -11,6 +11,7 @@ import delegationDashboard from '@assets/activityfeed/features/features1.svg';
 import batchVoting from '@assets/activityfeed/features/features2.svg';
 import bounty from '@assets/activityfeed/features/features3.svg';
 import identity from '@assets/activityfeed/features/features4.svg';
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/carousel';
 import { useTranslations } from 'next-intl';
 import styles from './ActivityFeedFeaturesSection.module.scss';
 
@@ -23,7 +24,9 @@ interface IFeature {
 }
 
 function ActivityFeedFeaturesSection() {
-	const [currentIndex, setCurrentIndex] = useState(0);
+	const [api, setApi] = useState<CarouselApi>();
+
+	const [current, setCurrent] = useState(0);
 	const t = useTranslations();
 	const features = [
 		{
@@ -56,10 +59,6 @@ function ActivityFeedFeaturesSection() {
 		}
 	];
 
-	const handleDotClick = (index: number) => {
-		setCurrentIndex(index);
-	};
-
 	const handleFeatureClick = (e: MouseEvent<HTMLAnchorElement>, feature: IFeature) => {
 		if (feature?.title === 'Identity') {
 			e.stopPropagation();
@@ -68,15 +67,20 @@ function ActivityFeedFeaturesSection() {
 	};
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			setCurrentIndex((prevIndex) => {
-				const length = features?.length || 0;
-				return (prevIndex + 1) % length;
-			});
-		}, 5000);
+		if (!api) {
+			return () => {};
+		}
+		const handleSelect = () => setCurrent(api.selectedScrollSnap());
+		api.on('select', handleSelect);
 
-		return () => clearInterval(interval);
-	}, [features?.length]);
+		const autoplayInterval = setInterval(() => {
+			api.scrollNext();
+		}, 5000);
+		return () => {
+			clearInterval(autoplayInterval);
+			api.off('select', handleSelect);
+		};
+	}, [api]);
 
 	return (
 		<div className={styles.featuresContainer}>
@@ -86,34 +90,49 @@ function ActivityFeedFeaturesSection() {
 					<p className={styles.featuresLive}>{t('ActivityFeed.Live')}</p>
 				</div>
 				<div className='flex gap-2'>
-					{features?.map((feature) => (
+					{features.map((feature, index) => (
 						<button
 							key={feature.id}
 							type='button'
-							className={`mt-2 h-2 w-2 cursor-pointer rounded-full ${features[currentIndex].id === feature.id ? 'bg-black dark:bg-text_primary' : 'bg-primary_border'}`}
-							onClick={() => handleDotClick(features.indexOf(feature))}
-							aria-label={`Show feature ${feature.title}`}
+							className={`mt-2 h-2 w-2 cursor-pointer rounded-full ${current === index ? 'bg-black dark:bg-text_primary' : 'bg-primary_border'}`}
+							onClick={() => api?.scrollTo(index)}
+							aria-label={`Show feature ${index + 1}`}
 						/>
 					))}
 				</div>
 			</div>
+
 			<div className='mt-2'>
-				<Link
-					href={features[currentIndex]?.path}
-					onClick={(e) => handleFeatureClick(e, features[currentIndex])}
+				<Carousel
+					opts={{ loop: true, align: 'start' }}
+					setApi={setApi}
+					className='m-0 w-60 p-0'
 				>
-					<Image
-						src={features[currentIndex]?.image}
-						className='h-full w-full'
-						alt={features[currentIndex]?.title}
-						width={800}
-						height={800}
-					/>
-					<div className='mt-3'>
-						<p className='text-base font-semibold dark:text-white'>{features[currentIndex]?.title}</p>
-						<p className='pt-1 text-sm dark:text-white'>{features[currentIndex]?.description}</p>
-					</div>
-				</Link>
+					<CarouselContent className='m-0 p-0'>
+						{features.map((feature) => (
+							<CarouselItem
+								key={feature.id}
+								className='m-0 p-0'
+							>
+								<Link
+									href={feature.path}
+									onClick={(e) => handleFeatureClick(e, feature)}
+								>
+									<Image
+										src={feature.image}
+										alt={feature.title}
+										width={800}
+										height={800}
+									/>
+									<div className='mt-3'>
+										<p className='text-base font-semibold dark:text-white'>{feature.title}</p>
+										<p className='pt-1 text-sm dark:text-white'>{feature.description}</p>
+									</div>
+								</Link>
+							</CarouselItem>
+						))}
+					</CarouselContent>
+				</Carousel>
 			</div>
 		</div>
 	);

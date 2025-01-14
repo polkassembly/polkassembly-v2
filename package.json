@@ -63,6 +63,7 @@
     "cookies-next": "^5.0.2",
     "dayjs": "^1.11.13",
     "editorjs-html": "^3.4.3",
+    "embla-carousel-react": "^8.5.2",
     "eth-sig-util": "^3.0.1",
     "fetch-ponyfill": "^7.1.0",
     "firebase-admin": "^12.4.0",
