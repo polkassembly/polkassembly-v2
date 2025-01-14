@@ -18,9 +18,11 @@ import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
+import { useSidebar } from '../../Sidebar/Sidebar';
 
 function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { gov2LatestPosts: IPostListing[]; currentTab: string; setCurrentTab: (tab: string) => void }) {
 	const Network = getCurrentNetwork();
+	const { isMobile } = useSidebar();
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[Network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -125,7 +127,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	};
 
 	return (
-		<div className={styles.container}>
+		<div className={`${styles.container} ${isMobile ? styles.mobileContainer : ''}`}>
 			{Object.entries(categoryStructure).map(([category, tracks]) => (
 				<Popover key={category}>
 					<PopoverTrigger asChild>
@@ -135,7 +137,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab dark:text-white' : ''}`}
 								onClick={() => handleCategoryClick(category)}
 							>
-								<span className='flex items-center gap-2 whitespace-nowrap'>
+								<span className='flex items-center gap-3 whitespace-nowrap px-1 py-2 lg:px-3 xl:gap-1.5'>
 									<Image
 										src={categoryIconPaths[category]}
 										alt={category}
