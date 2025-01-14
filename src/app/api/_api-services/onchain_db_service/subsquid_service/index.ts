@@ -152,7 +152,8 @@ export class SubsquidService extends SubsquidUtils {
 				offset: (page - 1) * limit,
 				status_in: statuses,
 				type_eq: proposalType,
-				origin_in: origins
+				origin_in: origins,
+				voters: notVotedByAddresses
 			})
 			.toPromise();
 
