@@ -34,11 +34,11 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 				});
 	return (
 		<div className='hide_scrollbar pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
-			{/* <ActivityFeedNavbar
+			<ActivityFeedNavbar
 				gov2LatestPosts={postData.posts}
 				currentTab={currentTab}
 				setCurrentTab={setCurrentTab}
-			/> */}
+			/>
 			{loading ? (
 				<Loading />
 			) : filteredPosts?.length === 0 || postData?.posts?.length === 0 ? (
