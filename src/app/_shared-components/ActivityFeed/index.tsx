@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
 import LatestActivity from './LatestActivity';
+import { Tabs, TabsContent } from '../Tabs/Tabs';
 
 function ActivityFeed() {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
@@ -31,11 +32,17 @@ function ActivityFeed() {
 				</div>
 
 				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
-					<div className='mx-1 xl:w-3/4 xl:flex-grow'>
-						<div>
-							{activeTab === EActivityFeedTab.EXPLORE ? <LatestActivity currentTab={EActivityFeedTab.EXPLORE} /> : <LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />}
-						</div>
-					</div>
+					<Tabs
+						className='mx-1 xl:w-3/4 xl:flex-grow'
+						value={activeTab}
+					>
+						<TabsContent value={EActivityFeedTab.EXPLORE}>
+							<LatestActivity currentTab={EActivityFeedTab.EXPLORE} />
+						</TabsContent>
+						<TabsContent value={EActivityFeedTab.FOLLOWING}>
+							<LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />
+						</TabsContent>
+					</Tabs>
 					<div className='hidden xl:block xl:w-1/4'>
 						<ActivityFeedSidebar />
 					</div>
