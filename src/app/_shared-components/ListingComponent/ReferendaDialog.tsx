@@ -5,7 +5,7 @@
 'use client';
 
 import { IPost } from '@/_shared/types';
-import { Dialog, DialogContent, DialogHeader } from '@/app/_shared-components/Dialog';
+import { Dialog, DialogContent, DialogHeader } from '@ui/Dialog/Dialog';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
 import { MdFullscreen } from 'react-icons/md';

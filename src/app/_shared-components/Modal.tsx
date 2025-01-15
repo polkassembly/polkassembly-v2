@@ -5,7 +5,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import { useRouter } from 'next/navigation';
 
 function Modal({ children }: { children: ReactNode }) {
