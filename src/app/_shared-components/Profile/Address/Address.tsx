@@ -18,9 +18,10 @@ interface Props {
 	truncateCharLen?: number;
 	iconSize?: number;
 	showIdenticon?: boolean;
+	walletAddressName?: string;
 }
 
-function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true }: Props) {
+function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName }: Props) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
@@ -41,7 +42,7 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [encodedAddress, network]);
 
-	const displayText = identity?.display || shortenAddress(encodedAddress, truncateCharLen);
+	const displayText = identity?.display || walletAddressName || shortenAddress(encodedAddress, truncateCharLen);
 
 	return (
 		<div>

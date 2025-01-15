@@ -20,6 +20,8 @@ import FetchAccountsConfirmation from '@/app/_shared-components/FetchAccountsCon
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
+import { WalletIcon } from '@/app/_shared-components/WalletsUI/WalletsIcon';
+import { WalletClientService } from '@/app/_client-services/wallet_service';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -109,7 +111,13 @@ function Web3Login({
 	return (
 		<div className='w-full'>
 			{web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && userPreferences.wallet ? (
-				<AddressDropdown />
+				<div>
+					<p className={classes.addressHeader}>
+						<WalletIcon wallet={userPreferences.wallet} />
+						<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(userPreferences.wallet)}</span>
+					</p>
+					<AddressDropdown />
+				</div>
 			) : web3Screen === EWeb3LoginScreens.FETCH_CONFIRMATION && userPreferences.wallet ? (
 				<FetchAccountsConfirmation
 					goBack={() => onChangeWeb3LoginScreen(EWeb3LoginScreens.SELECT_WALLET)}

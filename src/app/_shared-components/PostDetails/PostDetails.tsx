@@ -15,6 +15,8 @@ import Timeline from './Timeline/Timeline';
 import { Button } from '../Button';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog';
+import VoteReferendum from './VoteReferendum/VoteReferendum';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 	const t = useTranslations();
@@ -55,12 +57,21 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 					</div>
 				</div>
 				<div className={classes.rightWrapper}>
-					<Button
-						className='w-full'
-						size='lg'
-					>
-						{t('PostDetails.castVote')}
-					</Button>
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button
+								className='w-full'
+								size='lg'
+							>
+								{t('PostDetails.castVote')}
+							</Button>
+						</DialogTrigger>
+						<DialogContent className='max-w-xl'>
+							<DialogHeader className='text-xl font-semibold text-text_primary'>Cast Your Vote</DialogHeader>
+							<VoteReferendum index={index} />
+						</DialogContent>
+					</Dialog>
+
 					<ProposalPeriods
 						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}
 						decisionPeriodEndsAt={postData.onChainInfo?.decisionPeriodEndsAt}
