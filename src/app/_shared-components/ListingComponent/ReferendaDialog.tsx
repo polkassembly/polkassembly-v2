@@ -5,11 +5,10 @@
 'use client';
 
 import { IPost } from '@/_shared/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/app/_shared-components/Dialog';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
 import { MdFullscreen } from 'react-icons/md';
-import { useTranslations } from 'next-intl';
 import { MouseEvent } from 'react';
 
 interface ReferendaDialogProps {
@@ -19,7 +18,6 @@ interface ReferendaDialogProps {
 
 export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 	const router = useRouter();
-	const t = useTranslations();
 
 	const handleOpenChange = () => {
 		router.back();
@@ -44,9 +42,8 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 		>
 			<DialogContent className='m-0 h-[80vh] max-w-5xl overflow-y-auto p-0'>
 				<DialogHeader>
-					<DialogTitle>
-						<p className='pt-4'>{t('ListingTab.Referenda')}</p>
-					</DialogTitle>
+					{/* eslint-disable-next-line */}
+					<div></div>
 					<button
 						onClick={handleFullscreenClick}
 						type='button'

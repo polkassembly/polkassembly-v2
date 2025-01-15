@@ -73,10 +73,10 @@ function ListingCard({
 	};
 
 	return (
-		<div
+		<button
 			onClick={handleFullscreenClick}
+			type='button'
 			className={`${styles.listingCard} ${backgroundColor}`}
-			aria-hidden='true'
 		>
 			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
@@ -238,7 +238,7 @@ function ListingCard({
 					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 			</div>
-		</div>
+		</button>
 	);
 }
 

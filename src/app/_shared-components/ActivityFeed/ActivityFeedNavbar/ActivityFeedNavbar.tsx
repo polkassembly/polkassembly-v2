@@ -21,10 +21,10 @@ import styles from './ActivityFeedNavbar.module.scss';
 import { useSidebar } from '../../Sidebar/Sidebar';
 
 function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { gov2LatestPosts: IPostListing[]; currentTab: string; setCurrentTab: (tab: string) => void }) {
-	const Network = getCurrentNetwork();
+	const network = getCurrentNetwork();
 	const { isMobile } = useSidebar();
 	const t = useTranslations();
-	const trackInfo = NETWORKS_DETAILS[Network as ENetwork].tracks;
+	const trackInfo = NETWORKS_DETAILS[network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
 	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
@@ -152,7 +152,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 							</button>
 						</div>
 					</PopoverTrigger>
-					{expandedCategory === category && tracks.length > 0 && (
+					{expandedCategory === category && tracks && tracks.length > 0 && (
 						<PopoverContent
 							sideOffset={5}
 							className={styles.popoverContent}

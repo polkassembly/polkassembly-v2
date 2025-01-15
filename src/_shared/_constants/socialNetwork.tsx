@@ -18,7 +18,7 @@ interface ISocialLink {
 }
 
 export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
-	polkadot: [
+	[ENetwork.POLKADOT]: [
 		{
 			id: 'home',
 			icon: <TiHome className='transition-transform hover:scale-110' />,
@@ -68,7 +68,7 @@ export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			label: 'Subscan'
 		}
 	],
-	kusama: [
+	[ENetwork.KUSAMA]: [
 		{
 			id: 'home',
 			icon: <TiHome className='transition-transform hover:scale-110' />,
