@@ -7,7 +7,7 @@
 import { EActivityFeedTab } from '@/_shared/types';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
+import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
 import LatestActivity from './LatestActivity';
 
