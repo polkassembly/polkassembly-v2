@@ -7,7 +7,7 @@
 import { EActivityFeedTab } from '@/_shared/types';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import ActivityFeeToggleButton from './ActivityFeeToggleButton/ActivityFeeToggleButton';
+import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
 import LatestActivity from './LatestActivity';
 
@@ -23,7 +23,7 @@ function ActivityFeed() {
 						<div>
 							<h1 className='mx-2 text-xl font-semibold leading-9 text-text_primary dark:text-white lg:text-2xl'>{t('ActivityFeed.title')}</h1>
 						</div>
-						<ActivityFeeToggleButton
+						<ActivityFeedToggleButton
 							activeTab={activeTab}
 							setActiveTab={setActiveTab}
 						/>
