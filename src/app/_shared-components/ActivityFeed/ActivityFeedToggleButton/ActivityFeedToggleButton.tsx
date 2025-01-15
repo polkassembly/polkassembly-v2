@@ -15,7 +15,7 @@ interface IToggleButtonProps {
 	setActiveTab: (tab: EActivityFeedTab) => void;
 }
 
-function ActivityFeedToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
+function ActivityFeeToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
@@ -54,4 +54,4 @@ function ActivityFeedToggleButton({ activeTab, setActiveTab }: IToggleButtonProp
 	);
 }
 
-export default ActivityFeedToggleButton;
+export default ActivityFeeToggleButton;
