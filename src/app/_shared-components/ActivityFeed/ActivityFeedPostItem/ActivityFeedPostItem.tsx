@@ -12,7 +12,7 @@ import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { EReaction, IPostListing } from '@/_shared/types';
+import { EProposalType, EReaction, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -30,6 +30,7 @@ import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -46,10 +47,14 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	});
 	const ANIMATION_DURATION = 1500;
 
-	const handleReaction = (type: EReaction.like | EReaction.dislike) => {
+	const handleReaction = async (type: EReaction) => {
 		const isLikeAction = type === EReaction.like;
 		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 		const currentState = isLikeAction ? reactionState.isLiked : reactionState.isDisliked;
+
+		const response = await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+
+		console.log(response);
 
 		if (!currentState) {
 			showGifSetter(true);

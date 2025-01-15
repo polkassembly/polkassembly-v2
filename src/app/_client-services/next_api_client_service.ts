@@ -10,6 +10,7 @@ import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EApiRoute,
 	EProposalType,
+	EReaction,
 	EVoteDecision,
 	EWallet,
 	IAuthResponse,
@@ -88,6 +89,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 				break;
 			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
 				break;
 			default:
@@ -203,6 +205,13 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
 		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
 	}
+
+	// Post Reactions
+	static async fetchPostReactionsApi(proposalType: EProposalType, index: string, reactionType: EReaction) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POST_REACTIONS, routeSegments: [proposalType, index, 'reactions'] });
+		return this.nextApiClientFetch<IPost>({ url, method, data: { reaction: reactionType } });
+	}
+
 	// details
 	static async fetchProposalDetailsApi(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
