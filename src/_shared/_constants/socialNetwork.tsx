@@ -17,53 +17,66 @@ interface ISocialLink {
 	label: string;
 }
 
+const HOVER_SCALE_CLASS = 'transition-transform hover:scale-110';
+
+const SocialIcons = {
+	Discord: <FaDiscord className={HOVER_SCALE_CLASS} />,
+	Github: <TbBrandGithubFilled className={HOVER_SCALE_CLASS} />,
+	Home: <TiHome className={HOVER_SCALE_CLASS} />,
+	Reddit: <PiRedditLogoFill className={HOVER_SCALE_CLASS} />,
+	Telegram: <FaTelegramPlane className={HOVER_SCALE_CLASS} />,
+	Twitter: <FaTwitter className={HOVER_SCALE_CLASS} />,
+	Youtube: <FaYoutube className={HOVER_SCALE_CLASS} />,
+	Subscan: <RiBox3Line className={HOVER_SCALE_CLASS} />
+} as const;
+
 export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	[ENetwork.POLKADOT]: [
 		{
 			id: 'home',
-			icon: <TiHome className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Home,
 			href: 'https://polkadot.network/',
 			label: 'Polkadot Homepage'
 		},
 		{
 			id: 'twitter',
-			icon: <FaTwitter className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Twitter,
 			href: 'https://twitter.com/Polkadot',
 			label: 'Twitter'
 		},
 		{
 			id: 'discord',
-			icon: <FaDiscord className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Discord,
 			href: 'https://discord.gg/polkadot',
 			label: 'Discord'
 		},
 		{
 			id: 'github',
-			icon: <TbBrandGithubFilled className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Github,
 			href: 'https://github.com/polkadot-js',
 			label: 'GitHub'
 		},
 		{
 			id: 'youtube',
-			icon: <FaYoutube className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Youtube,
 			href: 'https://www.youtube.com/channel/UCB7PbjuZLEba_znc7mEGNgw',
 			label: 'YouTube'
 		},
 		{
 			id: 'reddit',
-			icon: <PiRedditLogoFill className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Reddit,
 			href: 'https://www.reddit.com/r/polkadot',
 			label: 'Reddit'
 		},
 		{
 			id: 'telegram',
-			icon: <FaTelegramPlane className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Telegram,
 			href: 'https://t.me/PolkadotOfficial',
 			label: 'Telegram'
 		},
 		{
 			id: 'subscan',
-			icon: <RiBox3Line className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Subscan,
 			href: 'https://polkadot.subscan.io/',
 			label: 'Subscan'
 		}
@@ -71,7 +84,7 @@ export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	[ENetwork.KUSAMA]: [
 		{
 			id: 'home',
-			icon: <TiHome className='transition-transform hover:scale-110' />,
+			icon: SocialIcons.Home,
 			href: 'https://kusama.network/',
 			label: 'Kusama Homepage'
 		}
