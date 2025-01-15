@@ -26,11 +26,11 @@ import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
