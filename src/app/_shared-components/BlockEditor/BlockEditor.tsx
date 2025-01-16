@@ -130,7 +130,8 @@ function BlockEditor({
 					// if (containerRef.current) {
 					// api.blocks.getBlockByElement(containerRef.current)?.holder.scrollIntoView();
 					// }
-				}
+				},
+				placeholder: !readOnly ? 'Type your comment here' : ''
 			});
 			blockEditorRef.current = editor;
 		}
