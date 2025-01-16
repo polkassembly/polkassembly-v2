@@ -23,9 +23,13 @@
 }
 
 .requestedAmount {
-    @apply font-medium text-text_primary text-base flex items-center gap-1
+    @apply font-medium text-text_primary text-base flex items-center gap-1 whitespace-nowrap;
 }
 
 .castVoteButton {
     @apply flex gap-1 rounded-md border-[1px] border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border;
+}
+
+.beneficiaryContainer {
+    @apply flex flex-col gap-1 whitespace-nowrap;
 }

@@ -88,7 +88,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>
-					<span className='text-xl font-bold'>
+					<span className='flex items-center gap-2 whitespace-nowrap text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
 							<div className={styles.beneficiaryContainer}>
 								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => {
@@ -97,7 +97,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 											key={`${assetId}-${postData.index}`}
 											className={styles.requestedAmount}
 										>
-											<span className='text-xl font-semibold text-wallet_btn_text'>
+											<span className='flex items-center gap-2 whitespace-nowrap text-xl font-semibold text-wallet_btn_text'>
 												{formatBnBalance(
 													amount.toString(),
 													{ withUnit: true, numberAfterComma: 2, compactNotation: true },

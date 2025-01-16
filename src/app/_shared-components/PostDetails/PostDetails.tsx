@@ -31,7 +31,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 					beneficiaries={postData.onChainInfo?.beneficiaries}
 				/>
 			</div>
-			<div className={cn(classes.detailsWrapper, isModalOpen ? 'xl:grid-cols-1' : 'xl:grid-cols-3')}>
+			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
 						<TabsContent
