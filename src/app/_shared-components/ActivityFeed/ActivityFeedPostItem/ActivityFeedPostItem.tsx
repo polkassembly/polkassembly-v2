@@ -48,46 +48,33 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const ANIMATION_DURATION = 1500;
 
 	const handleReaction = async (type: EReaction) => {
+		// do the action first then set the api because user state and expierence should be better
 		const isLikeAction = type === EReaction.like;
 		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
+		const currentState = isLikeAction ? reactionState.isLiked : reactionState.isDisliked;
 
-		setReactionState((prev) => {
-			const currentState = isLikeAction ? prev.isLiked : prev.isDisliked;
+		const response = await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
 
-			if (!currentState) {
-				showGifSetter(true);
-				setTimeout(() => showGifSetter(false), ANIMATION_DURATION);
+		console.log(response);
 
-				return {
-					isLiked: isLikeAction,
-					isDisliked: !isLikeAction,
-					likesCount: prev.likesCount + (isLikeAction ? 1 : prev.isLiked ? -1 : 0),
-					dislikesCount: prev.dislikesCount + (!isLikeAction ? 1 : prev.isDisliked ? -1 : 0)
-				};
-			}
-			return {
+		if (!currentState) {
+			showGifSetter(true);
+			setTimeout(() => showGifSetter(false), ANIMATION_DURATION);
+
+			setReactionState((prev) => ({
+				isLiked: isLikeAction,
+				isDisliked: !isLikeAction,
+				likesCount: prev.likesCount + (isLikeAction ? 1 : prev.isLiked ? -1 : 0),
+				dislikesCount: prev.dislikesCount + (!isLikeAction ? 1 : prev.isDisliked ? -1 : 0)
+			}));
+		} else {
+			setReactionState((prev) => ({
 				...prev,
 				isLiked: isLikeAction ? false : prev.isLiked,
 				isDisliked: !isLikeAction ? false : prev.isDisliked,
 				likesCount: prev.likesCount + (isLikeAction ? -1 : 0),
 				dislikesCount: prev.dislikesCount + (!isLikeAction ? -1 : 0)
-			};
-		});
-
-		try {
-			const response = await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
-			console.log(response);
-		} catch (error) {
-			console.error('Error updating reaction:', error);
-			setReactionState((prev) => {
-				return {
-					...prev,
-					isLiked: isLikeAction ? !prev.isLiked : prev.isLiked,
-					isDisliked: !isLikeAction ? !prev.isDisliked : prev.isDisliked,
-					likesCount: prev.likesCount - (isLikeAction ? 1 : 0),
-					dislikesCount: prev.dislikesCount - (!isLikeAction ? 1 : 0)
-				};
-			});
+			}));
 		}
 	};
 
