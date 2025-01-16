@@ -33,6 +33,19 @@
 			"Governance": "ガバナンス",
 			"Treasury": "トレジャリー",
 			"Whitelist": "ホワイトリスト"
+		},
+		"PostItem": {
+			"likes": "いいね",
+			"dislikes": "よくないね",
+			"comments": "コメント",
+			"readMore": "続きを読む",
+			"castVote": "投票する",
+			"share": "共有",
+			"comment": "コメントする",
+			"like": "いいね",
+			"dislike": "よくないね",
+			"liked": "いいね済み",
+			"disliked": "よくないね済み"
 		}
 	},
 	"AddressDropdown": {

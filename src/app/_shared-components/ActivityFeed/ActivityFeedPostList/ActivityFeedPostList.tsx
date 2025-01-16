@@ -9,6 +9,7 @@ import { IOnChainPostListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
 import Loading from '@/app/loading';
+import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
@@ -16,11 +17,13 @@ import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 import styles from './ActivityFeedPostList.module.scss';
 
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
-	const [currentTab, setCurrentTab] = useState<string>('All');
+	const t = useTranslations();
+	const all = t('ActivityFeed.Navbar.All');
+	const [currentTab, setCurrentTab] = useState<string>(all);
 	const network = getCurrentNetwork();
 
 	const filteredPosts =
-		currentTab === 'All'
+		currentTab === all
 			? postData.posts
 			: postData.posts.filter((post: IPostListing) => {
 					if (!(network in NETWORKS_DETAILS)) {
@@ -60,7 +63,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 				</div>
 			) : (
 				<div className='flex flex-col gap-5'>
-					{(currentTab === 'All' ? postData.posts : filteredPosts).map((post: IPostListing) => (
+					{(currentTab === all ? postData.posts : filteredPosts).map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}

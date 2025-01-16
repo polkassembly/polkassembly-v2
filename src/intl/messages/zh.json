@@ -33,6 +33,19 @@
 			"Governance": "治理",
 			"Treasury": "国库",
 			"Whitelist": "白名单"
+		},
+		"PostItem": {
+			"likes": "赞",
+			"dislikes": "踩",
+			"comments": "评论",
+			"readMore": "阅读更多",
+			"castVote": "投票",
+			"share": "分享",
+			"comment": "评论",
+			"like": "赞",
+			"dislike": "踩",
+			"liked": "已赞",
+			"disliked": "已踩"
 		}
 	},
 	"AddressDropdown": {

@@ -33,7 +33,7 @@ function ActivityFeed() {
 
 				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
 					<Tabs
-						className='mx-1 xl:w-3/4 xl:flex-grow'
+						className='mx-1 xl:w-3/4 xl:max-w-5xl xl:flex-grow'
 						value={activeTab}
 					>
 						<TabsContent value={EActivityFeedTab.EXPLORE}>
@@ -43,7 +43,7 @@ function ActivityFeed() {
 							<LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />
 						</TabsContent>
 					</Tabs>
-					<div className='hidden xl:block xl:w-1/4'>
+					<div className='hidden max-w-lg xl:block xl:w-1/4'>
 						<ActivityFeedSidebar />
 					</div>
 				</div>

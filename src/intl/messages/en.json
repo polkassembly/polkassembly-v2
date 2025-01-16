@@ -33,6 +33,19 @@
 			"Governance": "Governance",
 			"Treasury": "Treasury",
 			"Whitelist": "Whitelist"
+		},
+		"PostItem": {
+			"likes": "likes",
+			"dislikes": "dislikes",
+			"comments": "comments",
+			"readMore": "Read more",
+			"castVote": "Cast Vote",
+			"share": "Share",
+			"comment": "Comment",
+			"like": "Like",
+			"dislike": "Dislike",
+			"liked": "Liked",
+			"disliked": "Disliked"
 		}
 	},
 	"AddressDropdown": {

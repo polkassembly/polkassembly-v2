@@ -33,6 +33,19 @@
 			"Governance": "Gobernanza",
 			"Treasury": "Tesorería",
 			"Whitelist": "Lista Blanca"
+		},
+		"PostItem": {
+			"likes": "Me gusta",
+			"dislikes": "No me gusta",
+			"comments": "Comentarios",
+			"readMore": "Leer más",
+			"castVote": "Votar",
+			"share": "Compartir",
+			"comment": "Comentar",
+			"like": "Me gusta",
+			"dislike": "No me gusta",
+			"liked": "Me gustó",
+			"disliked": "No me gustó"
 		}
 	},
 	"AddressDropdown": {

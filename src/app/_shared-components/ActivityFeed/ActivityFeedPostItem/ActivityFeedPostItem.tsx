@@ -24,6 +24,7 @@ import dynamic from 'next/dynamic';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
+import { useTranslations } from 'next-intl';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
@@ -33,6 +34,7 @@ const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: 
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
+	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const [showLikeGif, setShowLikeGif] = useState(false);
@@ -174,11 +176,17 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			{/* Metrics Section */}
 			<div className='flex items-center justify-end'>
 				<div className='flex items-center gap-2 text-xs text-text_primary'>
-					<span>{reactionState.likesCount} likes</span>
+					<span>
+						{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+					</span>
 					<span>|</span>
-					<span>{reactionState.dislikesCount} dislikes</span>
+					<span>
+						{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+					</span>
 					<span>|</span>
-					<span>{postData?.metrics?.comments} comments</span>
+					<span>
+						{postData?.metrics?.comments} {t('ActivityFeed.PostItem.comments')}
+					</span>
 				</div>
 			</div>
 
@@ -204,7 +212,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						className='flex cursor-pointer items-center'
 					>
 						<IoShareSocialOutline className={`${styles.activity_icons} mr-2 text-lg`} />
-						<span>Share</span>
+						<span>{t('ActivityFeed.PostItem.share')}</span>
 					</button>
 					<button
 						type='button'
@@ -217,7 +225,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 							width={16}
 							height={16}
 						/>
-						<span>Comment</span>
+						<span>{t('ActivityFeed.PostItem.comment')}</span>
 					</button>
 				</div>
 			</div>
