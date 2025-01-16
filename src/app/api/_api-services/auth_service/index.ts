@@ -156,7 +156,8 @@ export class AuthService {
 		twoFactorAuth,
 		loginAddress,
 		loginWallet,
-		roles
+		roles,
+		profileScore
 	}: IUser & { loginAddress?: string; loginWallet?: EWallet }): Promise<string> {
 		let defaultAddress = null;
 		let addresses: string[] = [];
@@ -182,7 +183,8 @@ export class AuthService {
 			roles: allowedRoles,
 			sub: id.toString(),
 			username,
-			web3signup: isWeb3Signup || false
+			web3signup: isWeb3Signup || false,
+			profileScore: profileScore || 0
 		};
 
 		if (loginAddress) {

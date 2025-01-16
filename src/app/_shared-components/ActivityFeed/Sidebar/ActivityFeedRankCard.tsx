@@ -9,9 +9,11 @@ import rankCardInner from '@assets/profile/rankcard-inner.svg';
 import rankStar from '@assets/profile/rank-star.svg';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/hooks/useUser';
 
 function ActivityFeedRankCard() {
 	const t = useTranslations();
+	const { user } = useUser();
 	return (
 		<div className='relative'>
 			<div className='absolute inset-0 z-0'>
@@ -46,7 +48,7 @@ function ActivityFeedRankCard() {
 								width={32}
 								height={32}
 							/>
-							<p className='text-base font-semibold text-btn_secondary_text'>Courtney</p>
+							<p className='text-base font-semibold text-btn_secondary_text'>{user?.username}</p>
 						</div>
 
 						<div>
@@ -57,7 +59,7 @@ function ActivityFeedRankCard() {
 									width={16}
 									height={16}
 								/>
-								<span className='text-sm font-medium text-gray-800'>870</span>
+								<span className='text-sm font-medium text-gray-800'>{user?.profileScore}</span>
 							</div>
 						</div>
 					</div>

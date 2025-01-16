@@ -178,6 +178,7 @@ export interface IAccessTokenPayload {
 	loginWallet?: EWallet;
 	loginAddress?: string;
 	exp?: number;
+	profileScore: number;
 }
 
 export interface IAddressProxyForEntry {
