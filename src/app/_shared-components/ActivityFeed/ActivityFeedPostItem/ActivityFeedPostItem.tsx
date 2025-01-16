@@ -25,7 +25,7 @@ import dynamic from 'next/dynamic';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
