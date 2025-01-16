@@ -5,11 +5,12 @@
 'use client';
 
 import { IPost } from '@/_shared/types';
-import { Dialog, DialogContent } from '@ui/Dialog';
+import { Dialog, DialogContent } from '@ui/Dialog/Dialog';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
 import { MdFullscreen } from 'react-icons/md';
 import { MouseEvent } from 'react';
+import { DialogTitle } from '@radix-ui/react-dialog';
 
 interface ReferendaDialogProps {
 	data: IPost;
@@ -40,24 +41,26 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className='m-0 h-[80vh] max-w-4xl overflow-y-auto p-0'>
-				<div className='relative'>
-					<div className='absolute right-12 top-4'>
-						<button
-							onClick={handleFullscreenClick}
-							type='button'
-							className='transition-opacity hover:opacity-75'
-						>
-							<MdFullscreen className='text-lg text-text_primary' />
-						</button>{' '}
+			<DialogTitle>
+				<DialogContent className='m-0 h-[80vh] max-w-4xl overflow-y-auto p-0'>
+					<div className='relative'>
+						<div className='absolute -top-0.5 right-12'>
+							<button
+								onClick={handleFullscreenClick}
+								type='button'
+								className='transition-opacity hover:opacity-75'
+							>
+								<MdFullscreen className='text-text_primary' />
+							</button>{' '}
+						</div>
+						<PostDetails
+							index={index}
+							postData={data}
+							isModalOpen
+						/>
 					</div>
-					<PostDetails
-						index={index}
-						postData={data}
-						isModalOpen
-					/>
-				</div>
-			</DialogContent>
+				</DialogContent>
+			</DialogTitle>
 		</Dialog>
 	);
 }

@@ -5,7 +5,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
@@ -24,6 +24,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
 
 	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
 	const ALL_CATEGORY = t('ActivityFeed.Navbar.All');
@@ -115,15 +116,24 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 		return tracks.some((track) => currentTab === track);
 	};
 
+	useEffect(() => {
+		if (containerRef.current) {
+			containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+		}
+	}, [currentTab]);
+
 	return (
-		<div className={styles.container}>
+		<div
+			className={styles.container}
+			ref={containerRef}
+		>
 			{Object.entries(categoryStructure).map(([category, tracks]) => (
 				<Popover key={category}>
 					<PopoverTrigger asChild>
 						<div>
 							<button
 								type='button'
-								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab dark:text-white' : ''}`}
+								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? styles.activeTab : ''}`}
 								onClick={() => handleCategoryClick(category)}
 							>
 								<span className='flex items-center whitespace-nowrap py-2 lg:gap-1.5'>

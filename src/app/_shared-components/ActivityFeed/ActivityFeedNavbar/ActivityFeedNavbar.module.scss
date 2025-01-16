@@ -11,5 +11,11 @@
 }
 
 .container {
-    @apply mb-5 flex max-w-lg items-center lg:justify-between gap-5 lg:gap-3 overflow-x-auto rounded-lg border-border_grey bg-bg_modal px-3 py-2 sm:max-w-2xl md:max-w-4xl lg:max-w-5xl;
+    @apply mb-5 flex items-center gap-3 overflow-x-auto rounded-lg border-border_grey bg-bg_modal px-3 py-2;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.activeTab {
+    @apply bg-activity_selected_tab dark:text-white;
 }

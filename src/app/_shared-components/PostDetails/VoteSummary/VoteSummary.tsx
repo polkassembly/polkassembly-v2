@@ -12,7 +12,7 @@ import { PieChart } from 'react-minimal-pie-chart';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@ui/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@ui/Dialog/Dialog';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';

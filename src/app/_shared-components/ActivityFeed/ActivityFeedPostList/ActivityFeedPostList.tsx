@@ -35,7 +35,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 					return trackName === currentTab;
 				});
 	return (
-		<div className='hide_scrollbar pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
+		<div>
 			<ActivityFeedNavbar
 				gov2LatestPosts={postData.posts}
 				currentTab={currentTab}
@@ -61,7 +61,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 					</p>
 				</div>
 			) : (
-				<div className='flex flex-col gap-5'>
+				<div className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
 					{(currentTab === 'All' ? postData.posts : filteredPosts).map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
