@@ -5,6 +5,7 @@
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { SUBSCAN_API_KEY, SUBSCAN_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { deepParseJson } from 'deep-parse-json';
 
 if (!SUBSCAN_API_KEY) {
 	throw new Error('SUBSCAN_API_KEY env variable is not set');
@@ -21,15 +22,12 @@ export const fetchSubscanData = async (url: string | URL, network: string, body?
 		const redisData = await RedisService.GetSubscanData(network, url.toString());
 
 		if (redisData && SUBSCAN_CACHE_ENABLED) {
-			return JSON.parse(redisData);
+			return deepParseJson(redisData);
 		}
 
-		const filteredUrl = url.toString().charAt(0) === '/' ? url.toString().substring(1) : url;
-		const validURL = new URL(`https://${network}.api.subscan.io/${filteredUrl}`);
-
 		const data = await (
-			await fetchPF(validURL, {
-				body: JSON.stringify(body),
+			await fetchPF(url, {
+				body: body ? JSON.stringify(body) : undefined,
 				headers: SUBSCAN_API_HEADERS,
 				method: body ? 'POST' : method || 'GET'
 			})
