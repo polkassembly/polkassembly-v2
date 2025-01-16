@@ -9,6 +9,7 @@ import { IOnChainPostListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
 import Loading from '@/app/loading';
+import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
@@ -18,6 +19,7 @@ import styles from './ActivityFeedPostList.module.scss';
 function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
 	const [currentTab, setCurrentTab] = useState<string>('All');
 	const network = getCurrentNetwork();
+	const t = useTranslations();
 
 	const filteredPosts =
 		currentTab === 'All'
@@ -50,12 +52,12 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 						width={320}
 						height={320}
 					/>
-					<p className='p-0 text-xl font-medium'>You&apos;re all caught up!</p>
+					<p className='p-0 text-xl font-medium'>{t('ActivityFeed.PostItem.allCaughtUp')}</p>
 					<p
 						className='p-0 text-center text-sm'
 						style={{ lineHeight: '1.8' }}
 					>
-						Why not explore other categories or topics?
+						{t('ActivityFeed.PostItem.allCaughtUpDescription')}
 					</p>
 				</div>
 			) : (

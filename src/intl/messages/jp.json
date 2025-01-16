@@ -45,7 +45,9 @@
 			"like": "いいね",
 			"dislike": "よくないね",
 			"liked": "いいね済み",
-			"disliked": "よくないね済み"
+			"disliked": "よくないね済み",
+			"allCaughtUp": "あなたはすべての更新を読み終えました！",
+			"allCaughtUpDescription": "他のカテゴリやトピックを探検してみませんか？"
 		}
 	},
 	"AddressDropdown": {
@@ -183,7 +185,10 @@
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
 		"FellowshipAdmin": "フェローシップ管理者",
 		"ReportAnIssue": "問題を報告",
-		"NeedHelp": "助けが必要ですか？"
+		"NeedHelp": "助けが必要ですか？",
+		"Tag": {
+			"new": "新規"
+		}
 	},
 	"PostDetails": {
 		"castVote": "投票する",

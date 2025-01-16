@@ -10,6 +10,7 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar/Sidebar';
@@ -29,6 +30,7 @@ type State = 'collapsed' | 'expanded';
 
 const DARK_THEME_CLASS = 'dark-icons';
 const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
+const NEW_BADGE_TEXT = 'Sidebar.Tag.new';
 
 function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
@@ -153,13 +155,14 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 }
 
 function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme }) {
+	const t = useTranslations();
 	return (
 		<SidebarMenuItem>
 			<div className={style.sidebarTrigger}>
 				<Popover>
 					<PopoverTrigger asChild>
 						<div className={style.triggerWrapper}>
-							{item.isNew && <span className={style.newBadge}>New</span>}
+							{item.isNew && <span className={style.newBadge}>{t(NEW_BADGE_TEXT)}</span>}
 							<SidebarMenuButton
 								size='lg'
 								tooltip={item.title}
@@ -228,6 +231,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 }
 
 function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: ETheme }) {
+	const t = useTranslations();
 	return (
 		<SidebarMenuItem>
 			<Collapsible
@@ -255,7 +259,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 							)}
 							<span className={style.mainTitle}>
 								<span className='text-text_primary'>{item.title}</span>
-								{item.isNew && <span className={style.newBadge_expanded}>New</span>}
+								{item.isNew && <span className={style.newBadge_expanded}>{t(NEW_BADGE_TEXT)}</span>}
 							</span>
 							{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
 						</SidebarMenuButton>
@@ -281,7 +285,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 								)}
 								<span className={style.mainTitle}>
 									{item.title}
-									{item.isNew && <span className={style.newBadge_expanded}>New</span>}
+									{item.isNew && <span className={style.newBadge_expanded}>{t(NEW_BADGE_TEXT)}</span>}
 								</span>
 								{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
 							</SidebarMenuButton>

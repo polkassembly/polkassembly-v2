@@ -169,7 +169,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					href={`/referenda/${postData.index}`}
 					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
 				>
-					Read more
+					{t('ActivityFeed.PostItem.readMore')}
 				</Link>
 			</div>
 
