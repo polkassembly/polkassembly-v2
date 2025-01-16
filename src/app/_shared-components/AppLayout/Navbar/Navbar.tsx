@@ -40,7 +40,7 @@ function Navbar() {
 
 	return (
 		<nav className={classes.navbar}>
-			<p className='ml-10 md:ml-0'>Polkassembly</p>
+			<p className='text-navbar_title pl-8 font-semibold md:pl-0'>OpenGov</p>
 			<div className='flex items-center gap-x-4'>
 				<Select
 					value={userPreferences.locale}
@@ -77,8 +77,8 @@ function Navbar() {
 					</Link>
 				)}
 
-				<RPCSwitchDropdown />
-				<ToggleButton />
+				<RPCSwitchDropdown className='hidden lg:block' />
+				<ToggleButton className='hidden lg:block' />
 			</div>
 		</nav>
 	);

@@ -10,9 +10,10 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { userPreferencesAtom } from '@/app/_atoms/user/userPreferencesAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
-export default function RPCSwitchDropdown() {
+export default function RPCSwitchDropdown({ className }: { className?: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const network = getCurrentNetwork();
 	const api = usePolkadotApiService();
@@ -39,26 +40,28 @@ export default function RPCSwitchDropdown() {
 	};
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger disabled={isLoading}>
-				<div className='cursor-pointer'>
-					<div className='relative rounded-md border-[1px] border-border_grey p-1.5'>
-						{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
+		<div className={cn(className)}>
+			<DropdownMenu>
+				<DropdownMenuTrigger disabled={isLoading}>
+					<div className='cursor-pointer'>
+						<div className='relative rounded-md border-[1px] border-border_grey p-1.5'>
+							{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
+						</div>
 					</div>
-				</div>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent className='border-border_grey'>
-				{rpcEndpoints.map((endpoint, index) => (
-					<DropdownMenuItem
-						key={endpoint?.url}
-						className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-sidebar_menu_bg text-bg_pink' : ''}`}
-						onClick={() => handleRpcSwitch(index)}
-						disabled={isLoading}
-					>
-						<span className='text-sm font-medium'>{endpoint.name}</span>
-					</DropdownMenuItem>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenu>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className='border-border_grey'>
+					{rpcEndpoints.map((endpoint, index) => (
+						<DropdownMenuItem
+							key={endpoint?.url}
+							className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-sidebar_menu_bg text-bg_pink' : ''}`}
+							onClick={() => handleRpcSwitch(index)}
+							disabled={isLoading}
+						>
+							<span className='text-sm font-medium'>{endpoint.name}</span>
+						</DropdownMenuItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 }
