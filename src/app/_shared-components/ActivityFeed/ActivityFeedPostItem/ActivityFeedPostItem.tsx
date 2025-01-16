@@ -14,7 +14,6 @@ import { EReaction, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
@@ -22,6 +21,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import ReactionButton from '../ReactionButton/ReactionButton';
@@ -34,6 +34,7 @@ const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
 	const inputRef = useRef<HTMLInputElement>(null);
+	const network = getCurrentNetwork();
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
 	const [reactionState, setReactionState] = useState({
@@ -88,23 +89,23 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					<span className='text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
 							<div className={styles.beneficiaryContainer}>
-								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => (
-									<div
-										key={`${assetId}-${postData.index}`}
-										className={styles.requestedAmount}
-									>
-										<span>
-											{formatUSDWithUnits(
-												formatBnBalance(
+								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => {
+									return (
+										<div
+											key={`${assetId}-${postData.index}`}
+											className={styles.requestedAmount}
+										>
+											<span className='text-xl font-semibold text-wallet_btn_text'>
+												{formatBnBalance(
 													amount.toString(),
-													{ withUnit: true, numberAfterComma: 2 },
-													postData.network,
-													assetId === NETWORKS_DETAILS[postData.network].tokenSymbol ? null : assetId
-												)
-											)}
-										</span>
-									</div>
-								))}
+													{ withUnit: true, numberAfterComma: 2, compactNotation: true },
+													network,
+													assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+												)}
+											</span>
+										</div>
+									);
+								})}
 							</div>
 						)}
 					</span>
