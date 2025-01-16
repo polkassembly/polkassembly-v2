@@ -39,6 +39,10 @@ export class SubsquareOnChainService {
 
 		const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
+		if (!data || !data.onchainData) {
+			return null;
+		}
+
 		const beneficiaries = data?.onchainData?.treasuryInfo?.beneficiaries
 			? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 				data.onchainData.treasuryInfo.beneficiaries.map((beneficiary: any) => ({
