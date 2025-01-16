@@ -26,10 +26,14 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useRouter } from 'next/navigation';
+import userIcon from '@assets/profile/user-icon.svg';
+
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
+import AddComment from '../../PostComments/AddComment/AddComment';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -39,6 +43,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
+
 	const [reactionState, setReactionState] = useState({
 		isLiked: false,
 		isDisliked: false,
@@ -55,6 +60,11 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
 		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
 		global?.window?.open(url);
+	};
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+	const handleCommentClick = () => {
+		setIsDialogOpen(true);
 	};
 
 	const handleReaction = async (type: EReaction) => {
@@ -253,6 +263,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					<button
 						type='button'
 						className='flex cursor-pointer items-center'
+						onClick={handleCommentClick}
 					>
 						<Image
 							src={CommentIcon}
@@ -266,7 +277,59 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				</div>
 			</div>
 
-			<CommentInput inputRef={inputRef as RefObject<HTMLInputElement>} />
+			<CommentInput
+				inputRef={inputRef as RefObject<HTMLInputElement>}
+				onClick={handleCommentClick}
+			/>
+
+			<Dialog
+				open={isDialogOpen}
+				onOpenChange={setIsDialogOpen}
+			>
+				<DialogTitle>
+					<DialogContent>
+						<DialogHeader>
+							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
+								<div className='flex flex-col gap-3'>
+									<Image
+										src={userIcon}
+										alt='User Icon'
+										className='h-16 w-16 rounded-full pr-2 lg:pr-0'
+										width={16}
+										height={16}
+									/>
+									<hr className='w-full rotate-90 border-border_grey' />
+								</div>
+								<div className='flex flex-col pt-3'>
+									<div className='flex items-center gap-2 text-xs text-btn_secondary_text'>
+										<span className='font-medium'>
+											<Address address={postData.onChainInfo?.proposer || ''} />
+										</span>
+										<span>in</span>
+										<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{postData.onChainInfo?.origin}</span>
+										<span>|</span>
+										<span className='flex items-center gap-2'>
+											<FaRegClock className='text-sm' />
+											{dayjs.utc(postData.onChainInfo?.createdAt).fromNow()}
+										</span>
+									</div>
+									<span className='text-sm font-medium text-text_primary'>
+										#{postData.index} {postData.title}
+									</span>
+									<span className='text-xs text-text_pink'>Commenting on proposal</span>
+								</div>
+							</div>
+						</DialogHeader>
+						<div className='flex justify-end px-5'>
+							<AddComment
+								proposalType={postData.proposalType as EProposalType}
+								proposalIndex={postData.index?.toString() || ''}
+								editorId='new-comment'
+							/>
+						</div>
+					</DialogContent>
+				</DialogTitle>
+			</Dialog>
 		</div>
 	);
 }
