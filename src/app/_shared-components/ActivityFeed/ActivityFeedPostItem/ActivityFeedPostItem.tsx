@@ -64,7 +64,11 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const handleCommentClick = () => {
-		setIsDialogOpen(true);
+		if (!user?.id) {
+			router.push('/login');
+		} else {
+			setIsDialogOpen(true);
+		}
 	};
 
 	const handleReaction = async (type: EReaction) => {
