@@ -259,11 +259,11 @@ export class OffChainDbService {
 			userId,
 			name,
 			category: ON_CHAIN_ACTIVITY_NAMES.includes(name) ? EActivityCategory.ON_CHAIN : EActivityCategory.OFF_CHAIN,
-			network,
-			proposalType,
-			indexOrHash,
-			metadata,
-			subActivityName,
+			...(network && { network }),
+			...(proposalType && { proposalType }),
+			...(indexOrHash && { indexOrHash }),
+			...(metadata && { metadata }),
+			...(subActivityName && { subActivityName }),
 			createdAt: new Date(),
 			updatedAt: new Date()
 		};

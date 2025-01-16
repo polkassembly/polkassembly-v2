@@ -102,7 +102,11 @@ export class SubscanOnChainService {
 			return null;
 		}
 
-		const data = await fetchSubscanData(new URL(mappedRequestObject.url), network, mappedRequestObject.body, 'POST').then((res) => res.json());
+		const data = await fetchSubscanData(new URL(mappedRequestObject.url), network, mappedRequestObject.body, 'POST');
+
+		if (data?.message !== 'Success') {
+			return null;
+		}
 
 		return {
 			proposer: ValidatorService.isValidSubstrateAddress(data?.data?.proposer?.address) ? getSubstrateAddress(data?.data?.proposer?.address) || '' : '',
