@@ -88,26 +88,22 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>
-					<span className='flex items-center gap-2 whitespace-nowrap text-xl font-bold'>
+					<span className='text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
-							<div className={styles.beneficiaryContainer}>
-								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => {
-									return (
-										<div
-											key={`${assetId}-${postData.index}`}
-											className={styles.requestedAmount}
-										>
-											<span className='flex items-center gap-2 whitespace-nowrap text-xl font-semibold text-wallet_btn_text'>
-												{formatBnBalance(
-													amount.toString(),
-													{ withUnit: true, numberAfterComma: 2, compactNotation: true },
-													network,
-													assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
-												)}
-											</span>
-										</div>
-									);
-								})}
+							<div className={`${styles.beneficiaryContainer} flex flex-wrap gap-4`}>
+								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => (
+									<span
+										key={`${assetId}-${postData.index}`}
+										className='flex items-center gap-2 whitespace-nowrap text-xl font-semibold text-wallet_btn_text'
+									>
+										{formatBnBalance(
+											amount.toString(),
+											{ withUnit: true, numberAfterComma: 2, compactNotation: true },
+											network,
+											assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+										)}
+									</span>
+								))}
 							</div>
 						)}
 					</span>
