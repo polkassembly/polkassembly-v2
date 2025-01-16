@@ -77,8 +77,8 @@ function Navbar() {
 					</Link>
 				)}
 
-				<RPCSwitchDropdown className='hidden lg:block' />
-				<ToggleButton className='hidden lg:block' />
+				<RPCSwitchDropdown className='hidden lg:flex' />
+				<ToggleButton className='hidden lg:flex' />
 			</div>
 		</nav>
 	);
