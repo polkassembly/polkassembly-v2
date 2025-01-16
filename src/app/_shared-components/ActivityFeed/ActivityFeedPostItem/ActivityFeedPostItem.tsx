@@ -165,9 +165,19 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 							width={20}
 							height={20}
 						/>
-						<Link href='/login'>
-							<span>{user?.id ? 'Cast Vote' : 'Login to vote'}</span>
-						</Link>
+						{user?.id ? (
+							<button
+								// onClick={() => handleVoteClick()}
+								className='cursor-pointer'
+								type='button'
+							>
+								<span>Cast Vote</span>
+							</button>
+						) : (
+							<Link href='/login'>
+								<span>Login to vote</span>
+							</Link>
+						)}
 					</span>
 				</div>
 			</div>
