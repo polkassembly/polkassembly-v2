@@ -194,13 +194,25 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						type={EReaction.like}
 						isActive={reactionState.isLiked}
 						showGif={showLikeGif}
-						onClick={() => handleReaction(EReaction.like)}
+						onClick={() => {
+							if (!user?.id) {
+								window.location.href = '/login';
+							} else {
+								handleReaction(EReaction.like);
+							}
+						}}
 					/>
 					<ReactionButton
 						type={EReaction.dislike}
 						isActive={reactionState.isDisliked}
 						showGif={showDislikeGif}
-						onClick={() => handleReaction(EReaction.dislike)}
+						onClick={() => {
+							if (!user?.id) {
+								window.location.href = '/login';
+							} else {
+								handleReaction(EReaction.like);
+							}
+						}}
 					/>
 					<button
 						type='button'
