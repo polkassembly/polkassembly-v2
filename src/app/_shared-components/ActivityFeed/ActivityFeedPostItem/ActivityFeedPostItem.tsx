@@ -23,6 +23,7 @@ import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
 import StatusTag from '@ui/StatusTag/StatusTag';
+import { useRouter } from 'next/navigation';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import ReactionButton from '../ReactionButton/ReactionButton';
@@ -34,6 +35,7 @@ const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: 
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
+	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
@@ -198,7 +200,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						showGif={showLikeGif}
 						onClick={() => {
 							if (!user?.id) {
-								window.location.href = '/login';
+								router.push('/login');
 							} else {
 								handleReaction(EReaction.like);
 							}
@@ -210,7 +212,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						showGif={showDislikeGif}
 						onClick={() => {
 							if (!user?.id) {
-								window.location.href = '/login';
+								router.push('/login');
 							} else {
 								handleReaction(EReaction.like);
 							}
