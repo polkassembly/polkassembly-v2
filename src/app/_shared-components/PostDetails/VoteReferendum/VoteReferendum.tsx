@@ -9,7 +9,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Ban, Split, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { THEME_COLORS } from '@/app/_style/theme';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -34,8 +34,18 @@ function VoteReferendum({ index }: { index: string }) {
 
 	const polkadotApiService = usePolkadotApiService();
 
+	const isInvalidAmount = useMemo(() => {
+		return (
+			([EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) && balance.lte(BN_ZERO)) ||
+			(voteDecision === EVoteDecision.ABSTAIN && abstainVoteValue.add(ayeVoteValue).add(nayVoteValue).lte(BN_ZERO)) ||
+			(voteDecision === EVoteDecision.SPLIT && ayeVoteValue.add(nayVoteValue).lte(BN_ZERO))
+		);
+	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
+
 	const onVoteConfirm = async () => {
-		if (!polkadotApiService) return;
+		if (!polkadotApiService || !userPreferences.address?.address) return;
+
+		if (isInvalidAmount) return;
 
 		try {
 			setIsLoading(true);
@@ -77,9 +87,7 @@ function VoteReferendum({ index }: { index: string }) {
 				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
 				<Tabs
 					defaultValue={voteDecision}
-					onValueChange={(tab) => {
-						setVoteDecision(tab as EVoteDecision);
-					}}
+					onValueChange={(tab) => setVoteDecision(tab as EVoteDecision)}
 					className='flex flex-col gap-y-3'
 				>
 					<TabsList className='flex gap-x-2 rounded border border-border_grey p-1'>
@@ -122,6 +130,7 @@ function VoteReferendum({ index }: { index: string }) {
 						{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
 							<>
 								<BalanceInput
+									name={`${voteDecision}-balance`}
 									label={t('VoteReferendum.lockBalance')}
 									onChange={setBalance}
 								/>
@@ -159,7 +168,7 @@ function VoteReferendum({ index }: { index: string }) {
 			</div>
 			<div className='flex items-center justify-end gap-x-4'>
 				<Button
-					disabled={isLoading}
+					disabled={isInvalidAmount}
 					isLoading={isLoading}
 					onClick={onVoteConfirm}
 					size='lg'
