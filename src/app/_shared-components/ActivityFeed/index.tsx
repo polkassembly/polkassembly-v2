@@ -33,7 +33,7 @@ function ActivityFeed() {
 
 				<div className='flex flex-col justify-between gap-5 pt-5 xl:flex-row'>
 					<Tabs
-						className='mx-1 xl:w-3/4 xl:max-w-5xl xl:flex-grow'
+						className='mx-1 xl:w-3/4 xl:max-w-5xl xl:flex-grow 2xl:max-w-full'
 						value={activeTab}
 					>
 						<TabsContent value={EActivityFeedTab.EXPLORE}>
