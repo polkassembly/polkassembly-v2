@@ -169,6 +169,7 @@ export interface IAccessTokenPayload {
 	username: string;
 	email: string;
 	isEmailVerified: boolean;
+	profileDetails: IProfileDetails;
 	iat: number;
 	id: number;
 	roles: ERole[];

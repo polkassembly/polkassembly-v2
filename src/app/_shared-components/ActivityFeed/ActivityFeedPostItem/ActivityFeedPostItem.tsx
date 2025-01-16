@@ -10,7 +10,7 @@ import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { EProposalType, EReaction, IPostListing } from '@/_shared/types';
+import { EProposalType, EReaction, ESocial, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -46,6 +46,16 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 		dislikesCount: postData?.metrics?.reactions?.dislike || 0
 	});
 	const ANIMATION_DURATION = 1500;
+
+	const twitterHandle = user?.profileDetails?.socialLinks?.find((social) => social.type === ESocial.TWITTER);
+
+	const share = () => {
+		const titlePart = postData?.title ? ` for ${postData.title}` : '';
+		const message = `The referendum${titlePart} is now live for @${twitterHandle}\nCast your vote here: ${global?.window?.location?.href}`;
+		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
+		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
+		global?.window?.open(url);
+	};
 
 	const handleReaction = async (type: EReaction) => {
 		const isLikeAction = type === EReaction.like;
@@ -235,8 +245,9 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					<button
 						type='button'
 						className='flex cursor-pointer items-center'
+						onClick={share}
 					>
-						<IoShareSocialOutline className={`${styles.activity_icons} mr-2 text-lg`} />
+						<IoShareSocialOutline className='mr-2 text-lg' />
 						<span>Share</span>
 					</button>
 					<button
