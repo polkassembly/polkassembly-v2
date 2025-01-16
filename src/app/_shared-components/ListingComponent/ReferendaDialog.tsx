@@ -42,7 +42,7 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 		>
 			<DialogContent className='m-0 h-[80vh] max-w-4xl overflow-y-auto p-0'>
 				<div className='relative'>
-					<div className='absolute right-12'>
+					<div className='absolute right-12 top-4'>
 						<button
 							onClick={handleFullscreenClick}
 							type='button'
