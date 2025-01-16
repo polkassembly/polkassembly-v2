@@ -10,7 +10,7 @@ interface Options {
 	numberAfterComma?: number;
 	withUnit?: boolean;
 	withThousandDelimitor?: boolean;
-	compactNotation?: boolean; // New option for compact formatting
+	compactNotation?: boolean;
 }
 
 export function formatBnBalance(value: string | BN, options: Options, network: ENetwork, assetId?: string | null): string {
@@ -40,11 +40,9 @@ export function formatBnBalance(value: string | BN, options: Options, network: E
 	let formattedValue: string;
 
 	if (compactNotation) {
-		// Use Intl.NumberFormat for compact notation
 		const fullValue = parseFloat(`${prefix}.${suffix}`);
 		formattedValue = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: numberAfterComma || 2 }).format(fullValue);
 	} else {
-		// Regular formatting
 		if (withThousandDelimitor) {
 			prefix = prefix.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 		}

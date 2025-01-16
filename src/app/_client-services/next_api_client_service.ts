@@ -83,7 +83,6 @@ export class NextApiClientService {
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_COMMENTS:
-			case EApiRoute.GET_VOTES:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
 				break;
