@@ -62,6 +62,7 @@
     "cookie": "^0.6.0",
     "cookies-next": "^5.0.2",
     "dayjs": "^1.11.13",
+    "deep-parse-json": "^2.0.0",
     "editorjs-html": "^3.4.3",
     "eth-sig-util": "^3.0.1",
     "fetch-ponyfill": "^7.1.0",

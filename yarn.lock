@@ -3111,6 +3111,11 @@ deep-is@^0.1.3:
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.4.tgz#a6f2dce612fadd2ef1f519b73551f17e85199831"
   integrity sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==
 
+deep-parse-json@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/deep-parse-json/-/deep-parse-json-2.0.0.tgz#621e62083853f34bc42b803c1d534737a71c4d54"
+  integrity sha512-tDr7ojkafPLqECGR5Jfwu33NAKiXPhxS0fTCXpTg9fkrRxJHYzDM/v6J5o1JMwsIEGjanB93U0+YB57G1SLTtg==
+
 define-data-property@^1.0.1, define-data-property@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/define-data-property/-/define-data-property-1.1.4.tgz#894dc141bb7d3060ae4366f6a0107e68fbe48c5e"
