@@ -23,9 +23,9 @@ import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
 import StatusTag from '@ui/StatusTag/StatusTag';
-import { useRouter } from 'next/navigation';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useRouter } from 'next/router';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
@@ -48,9 +48,14 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const ANIMATION_DURATION = 1500;
 
 	const handleReaction = async (type: EReaction) => {
+		// do the action first then set the api because user state and expierence should be better
 		const isLikeAction = type === EReaction.like;
 		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 		const currentState = isLikeAction ? reactionState.isLiked : reactionState.isDisliked;
+
+		const response = await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+
+		console.log(response);
 
 		if (!currentState) {
 			showGifSetter(true);
@@ -70,12 +75,6 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				likesCount: prev.likesCount + (isLikeAction ? -1 : 0),
 				dislikesCount: prev.dislikesCount + (!isLikeAction ? -1 : 0)
 			}));
-		}
-
-		try {
-			await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
-		} catch (error) {
-			console.error('Error handling reaction:', error);
 		}
 	};
 
