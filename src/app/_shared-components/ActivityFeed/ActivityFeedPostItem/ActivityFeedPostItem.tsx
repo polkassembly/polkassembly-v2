@@ -50,10 +50,6 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 		const currentState = isLikeAction ? reactionState.isLiked : reactionState.isDisliked;
 
-		const response = await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
-
-		console.log(response);
-
 		if (!currentState) {
 			showGifSetter(true);
 			setTimeout(() => showGifSetter(false), ANIMATION_DURATION);
@@ -72,6 +68,12 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				likesCount: prev.likesCount + (isLikeAction ? -1 : 0),
 				dislikesCount: prev.dislikesCount + (!isLikeAction ? -1 : 0)
 			}));
+		}
+
+		try {
+			await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+		} catch (error) {
+			console.error('Error handling reaction:', error);
 		}
 	};
 
