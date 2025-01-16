@@ -34,11 +34,14 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'xl:grid-cols-1' : 'xl:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
-						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
+						<TabsContent
+							className={isModalOpen ? 'flex max-h-40 w-96 overflow-hidden border-none lg:w-full' : ''}
+							value={EPostDetailsTab.DESCRIPTION}
+						>
 							<BlockEditor
 								data={postData.content}
 								readOnly
-								className='max-h-full border-none'
+								className={isModalOpen ? '' : 'max-h-full border-none'}
 								id='post-content'
 							/>
 						</TabsContent>
