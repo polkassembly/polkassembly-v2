@@ -9,7 +9,7 @@
 }
 
 .activeTab {
-    @apply bg-[#ffe6ef] text-text_pink dark:bg-[#530d32];
+    @apply bg-activity_selected_tab text-text_pink;
 }
 
 .popoverContent {
@@ -18,10 +18,6 @@
 
 .trackName {
     @apply w-full rounded-lg px-2 py-2 text-start text-sm font-medium;
-
-    &:hover {
-        @apply bg-[#F2F4F7] dark:bg-[#9E9E9E] dark:bg-opacity-10;
-    }
 }
 
 @media (max-width: 768px) {
