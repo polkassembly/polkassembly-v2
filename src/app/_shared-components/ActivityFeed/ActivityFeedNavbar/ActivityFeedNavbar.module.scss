@@ -1,21 +1,35 @@
-.popoverContent {
-    @apply w-52 border-none bg-[var(--sidebar-primary-foreground)] p-2 !important;
-}
+.container {
+    @apply flex items-center justify-between text-text_primary overflow-x-auto rounded-lg border-solid border-border_grey bg-bg_modal px-4 py-3;
 
-.trackName {
-    @apply w-full rounded-lg border-border_grey px-2 py-1 text-start text-sm font-medium text-text_primary hover:bg-activity_selected_tab;
 }
 
 .popoverTrigger {
-    @apply rounded-lg w-full px-3 text-sm font-medium text-text_primary;
-}
+    @apply flex h-9 items-center justify-between rounded-lg px-2 text-sm font-medium;
 
-.container {
-    @apply mb-5 flex items-center gap-3 overflow-x-auto rounded-lg border-border_grey bg-bg_modal px-3 py-2;
-    white-space: nowrap;
-    width: 100%;
 }
 
 .activeTab {
-    @apply bg-activity_selected_tab dark:text-white;
+    @apply bg-[#ffe6ef] text-text_pink dark:bg-[#530d32];
+}
+
+.popoverContent {
+    @apply w-52 border-none bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
+}
+
+.trackName {
+    @apply w-full rounded-lg px-2 py-2 text-start text-sm font-medium;
+
+    &:hover {
+        @apply bg-[#F2F4F7] dark:bg-[#9E9E9E] dark:bg-opacity-10;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        @apply px-2;
+    }
+
+    .popoverTrigger {
+        @apply px-1.5;
+    }
 }

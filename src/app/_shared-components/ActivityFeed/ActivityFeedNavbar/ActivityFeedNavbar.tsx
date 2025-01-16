@@ -123,56 +123,61 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	}, [currentTab]);
 
 	return (
-		<div
-			className={styles.container}
-			ref={containerRef}
-		>
-			{Object.entries(categoryStructure).map(([category, tracks]) => (
-				<Popover key={category}>
-					<PopoverTrigger asChild>
-						<div>
-							<button
-								type='button'
-								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? styles.activeTab : ''}`}
-								onClick={() => handleCategoryClick(category)}
-							>
-								<span className='flex items-center whitespace-nowrap py-2 lg:gap-1.5'>
-									<Image
-										src={categoryIconPaths[category]}
-										alt={category}
-										width={20}
-										height={20}
-										className='dark:brightness-0 dark:invert'
-									/>
-
-									<span>{category}</span>
-									<span>{tracks?.length > 1 && <FaAngleDown />}</span>
-								</span>
-							</button>
-						</div>
-					</PopoverTrigger>
-					{expandedCategory === category && tracks && tracks.length > 0 && (
-						<PopoverContent
-							sideOffset={5}
-							className={styles.popoverContent}
-						>
-							<div className='w-full'>
-								{tracks.map((track) => (
-									<div key={track}>
-										<button
-											type='button'
-											className={styles.trackName}
-											onClick={() => setCurrentTab(track)}
-										>
-											{formatTrackName(track)} {getPostCount(track)}
-										</button>
-									</div>
-								))}
+		<div className='mb-5 w-full'>
+			<div
+				className={`${styles.container} hide_scrollbar`}
+				ref={containerRef}
+			>
+				{Object.entries(categoryStructure).map(([category, tracks]) => (
+					<Popover key={category}>
+						<PopoverTrigger asChild>
+							<div className='flex-shrink-0'>
+								<button
+									type='button'
+									className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab' : ''}`}
+									onClick={() => handleCategoryClick(category)}
+								>
+									<span className='flex items-center whitespace-nowrap'>
+										<Image
+											src={categoryIconPaths[category]}
+											alt={category}
+											width={20}
+											height={20}
+											className='dark:brightness-0 dark:invert'
+										/>
+										<span className='ml-2'>{category}</span>
+										{tracks?.length > 1 && (
+											<span className='ml-1'>
+												<FaAngleDown />
+											</span>
+										)}
+									</span>
+								</button>
 							</div>
-						</PopoverContent>
-					)}
-				</Popover>
-			))}
+						</PopoverTrigger>
+						{expandedCategory === category && tracks && tracks.length > 0 && (
+							<PopoverContent
+								sideOffset={5}
+								className={styles.popoverContent}
+							>
+								<div className='w-full'>
+									{tracks.map((track) => (
+										<div key={track}>
+											<button
+												type='button'
+												className={`${styles.trackName} ${currentTab === track ? 'bg-activity_selected_tab' : ''}`}
+												onClick={() => setCurrentTab(track)}
+											>
+												{formatTrackName(track)} {getPostCount(track)}
+											</button>
+										</div>
+									))}
+								</div>
+							</PopoverContent>
+						)}
+					</Popover>
+				))}
+			</div>
 		</div>
 	);
 }
