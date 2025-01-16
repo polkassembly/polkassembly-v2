@@ -1,0 +1,19 @@
+.dialogContent {
+    @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-bg_modal py-4 shadow-lg duration-200 sm:rounded-lg
+}
+
+.dialogOverlay {
+    @apply fixed inset-0 z-50 bg-black/80
+}
+
+.dialogHeader {
+    @apply flex justify-between space-y-1.5 border-b border-border_grey px-6 pb-4 text-center sm:text-left
+}
+
+.dialogFooter {
+    @apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2
+}
+
+.dialogTitle {
+    @apply text-lg font-semibold leading-none tracking-tight
+}

@@ -13,7 +13,7 @@ import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
 import classes from './VoteSummary.module.scss';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../../Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 
