@@ -6,16 +6,18 @@ import { inputToBn } from '@/app/_client-utils/inputToBn';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useTranslations } from 'next-intl';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 
 function BalanceInput({ label, placeholder, onChange }: { label: string; placeholder?: string; onChange: (value: BN) => void }) {
+	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const onBalanceChange = (value: string | null): void => {
-		const [bnBalance, isValid] = inputToBn(`${value}`, network, false);
+		const { bnValue, isValid } = inputToBn(value || '', network, false);
 
 		if (isValid) {
-			onChange(bnBalance);
+			onChange(bnValue);
 		} else {
 			onChange(BN_ZERO);
 		}
@@ -26,7 +28,7 @@ function BalanceInput({ label, placeholder, onChange }: { label: string; placeho
 			<div className='relative'>
 				<Input
 					className='w-full'
-					placeholder={placeholder || 'Add Balance'}
+					placeholder={placeholder || t('BalanceInput.addBalance')}
 					onChange={(e) => onBalanceChange(e.target.value)}
 				/>
 				<div className={classes.tokenSymbol}>{NETWORKS_DETAILS[`${network}`].tokenSymbol}</div>

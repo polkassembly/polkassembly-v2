@@ -175,7 +175,10 @@
 		"votingPower": "投票权重",
 		"capital": "资本",
 		"account": "账户",
-		"abstain": "弃权"
+		"abstain": "弃权",
+		"castYourVote": "投出您的一票",
+		"loginToVote": "登录以投票",
+		"split": "分割"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "取消",
@@ -240,5 +243,17 @@
 	"Pagination": {
 		"next": "下一页",
 		"previous": "上一页"
+	},
+	"BalanceInput": {
+		"addBalance": "添加余额"
+	},
+	"VoteReferendum": {
+		"chooseYourVote": "选择您的投票",
+		"conviction": "信念",
+		"lockBalance": "锁定余额",
+		"abstainVoteValue": "弃权票值",
+		"ayeVoteValue": "赞成票值",
+		"nayVoteValue": "反对票值",
+		"confirm": "确认"
 	}
 }

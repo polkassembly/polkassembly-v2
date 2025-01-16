@@ -4,7 +4,6 @@
 
 import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
 import { Suspense } from 'react';
-import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -12,14 +11,11 @@ import { Skeleton } from '../Skeleton';
 import BlockEditor from '../BlockEditor/BlockEditor';
 import { Tabs, TabsContent } from '../Tabs';
 import Timeline from './Timeline/Timeline';
-import { Button } from '../Button';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog';
-import VoteReferendum from './VoteReferendum/VoteReferendum';
+import VoteReferendumButton from './VoteReferendumButton';
 
 function PostDetails({ postData, index }: { postData: IPost; index: string }) {
-	const t = useTranslations();
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
@@ -57,20 +53,7 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 					</div>
 				</div>
 				<div className={classes.rightWrapper}>
-					<Dialog>
-						<DialogTrigger asChild>
-							<Button
-								className='w-full'
-								size='lg'
-							>
-								{t('PostDetails.castVote')}
-							</Button>
-						</DialogTrigger>
-						<DialogContent className='max-w-xl'>
-							<DialogHeader className='text-xl font-semibold text-text_primary'>Cast Your Vote</DialogHeader>
-							<VoteReferendum index={index} />
-						</DialogContent>
-					</Dialog>
+					<VoteReferendumButton index={index} />
 
 					<ProposalPeriods
 						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}

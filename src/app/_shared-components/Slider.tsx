@@ -4,14 +4,14 @@
 
 'use client';
 
-import * as React from 'react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 
 import { cn } from '@/lib/utils';
+import { ComponentPropsWithoutRef, ComponentRef, forwardRef, useState } from 'react';
 
-const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & { withBottomIndicator?: boolean }>(
+const Slider = forwardRef<ComponentRef<typeof SliderPrimitive.Root>, ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & { withBottomIndicator?: boolean }>(
 	({ className, ...props }, ref) => {
-		const [value, setValue] = React.useState(props.defaultValue);
+		const [value, setValue] = useState(props.defaultValue);
 		return (
 			<div>
 				<SliderPrimitive.Root

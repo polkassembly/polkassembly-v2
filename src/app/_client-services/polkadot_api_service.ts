@@ -115,7 +115,7 @@ export class PolkadotApiService {
 			totalBalance
 		};
 
-		if (!address || !this.api.derive || !this.api.derive.balances || !this.api.derive.balances.all) {
+		if (!address || !this.api?.derive?.balances?.all) {
 			return responseObj;
 		}
 
@@ -123,17 +123,17 @@ export class PolkadotApiService {
 		await this.api.derive.balances
 			.all(encodedAddress)
 			.then((result) => {
-				lockedBalance = new BN((result.lockedBalance || lockedBalance.toString()).toBigInt().toString());
+				lockedBalance = new BN(result.lockedBalance || lockedBalance);
 			})
 			.catch((e) => console.log(e));
 
 		await this.api.query.system
 			.account(encodedAddress)
 			.then((result: any) => {
-				const free = result?.data?.free?.toBigInt() || BigInt(0);
-				const reserved = result?.data?.reserved?.toBigInt() || BigInt(0);
-				totalBalance = new BN((free + reserved).toString());
-				freeBalance = new BN(free.toString());
+				const free = new BN(result?.data?.free) || BN_ZERO;
+				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
+				totalBalance = free.add(reserved);
+				freeBalance = free;
 			})
 			.catch((e) => console.error(e));
 
@@ -145,6 +145,9 @@ export class PolkadotApiService {
 	}
 
 	async voteReferendum({
+		address,
+		onSuccess,
+		onFailed,
 		referendumId,
 		vote,
 		lockedBalance,
@@ -153,6 +156,9 @@ export class PolkadotApiService {
 		nayVoteValue,
 		abstainVoteValue
 	}: {
+		address: string;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		referendumId: number;
 		vote: EVoteDecision;
 		lockedBalance?: BN;
@@ -173,10 +179,18 @@ export class PolkadotApiService {
 			});
 		}
 
-		return voteTx;
+		if (voteTx) {
+			await this.executeTx({
+				tx: voteTx,
+				address,
+				errorMessageFallback: 'Failed to vote',
+				onSuccess,
+				onFailed
+			});
+		}
 	}
 
-	async executeTx({
+	private async executeTx({
 		tx,
 		address,
 		proxyAddress,

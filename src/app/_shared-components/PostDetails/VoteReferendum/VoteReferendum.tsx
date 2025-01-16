@@ -39,7 +39,16 @@ function VoteReferendum({ index }: { index: string }) {
 
 		try {
 			setIsLoading(true);
-			const voteTx = await polkadotApiService.voteReferendum({
+			await polkadotApiService.voteReferendum({
+				address: userPreferences.address?.address ?? '',
+				onSuccess: () => {
+					console.log('Vote successful');
+					setIsLoading(false);
+				},
+				onFailed: () => {
+					console.log('Vote failed');
+					setIsLoading(false);
+				},
 				referendumId: Number(index),
 				vote: voteDecision,
 				lockedBalance: balance,
@@ -48,29 +57,6 @@ function VoteReferendum({ index }: { index: string }) {
 				nayVoteValue,
 				abstainVoteValue
 			});
-
-			console.log('voteTx', voteTx);
-
-			if (!voteTx) {
-				setIsLoading(false);
-				return;
-			}
-
-			if (voteTx) {
-				await polkadotApiService.executeTx({
-					tx: voteTx,
-					address: userPreferences.address?.address ?? '',
-					errorMessageFallback: 'Failed to vote',
-					onSuccess: () => {
-						console.log('Vote successful');
-						setIsLoading(false);
-					},
-					onFailed: () => {
-						console.log('Vote failed');
-						setIsLoading(false);
-					}
-				});
-			}
 		} catch (error) {
 			console.error('Error voting', error);
 			setIsLoading(false);
@@ -88,7 +74,7 @@ function VoteReferendum({ index }: { index: string }) {
 				onChange={(a) => setUserPreferences({ ...userPreferences, address: a })}
 			/>
 			<div>
-				<p className='mb-1 text-sm text-wallet_btn_text'>Choose your Vote</p>
+				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
 				<Tabs
 					defaultValue={voteDecision}
 					onValueChange={(tab) => {
@@ -136,12 +122,11 @@ function VoteReferendum({ index }: { index: string }) {
 						{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
 							<>
 								<BalanceInput
-									label='Lock Balance'
-									placeholder='Add Balance'
+									label={t('VoteReferendum.lockBalance')}
 									onChange={setBalance}
 								/>
 								<div>
-									<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
+									<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
 									<Slider
 										max={6}
 										step={1}
@@ -155,19 +140,16 @@ function VoteReferendum({ index }: { index: string }) {
 							<>
 								{voteDecision === EVoteDecision.ABSTAIN && (
 									<BalanceInput
-										label='Abstain vote value'
-										placeholder='Add Balance'
+										label={t('VoteReferendum.abstainVoteValue')}
 										onChange={setAbstainVoteValue}
 									/>
 								)}
 								<BalanceInput
-									label='Aye vote value'
-									placeholder='Add Balance'
+									label={t('VoteReferendum.ayeVoteValue')}
 									onChange={setAyeVoteValue}
 								/>
 								<BalanceInput
-									label='Nay vote value'
-									placeholder='Add Balance'
+									label={t('VoteReferendum.nayVoteValue')}
 									onChange={setNayVoteValue}
 								/>
 							</>
@@ -182,7 +164,7 @@ function VoteReferendum({ index }: { index: string }) {
 					onClick={onVoteConfirm}
 					size='lg'
 				>
-					Confirm
+					{t('VoteReferendum.confirm')}
 				</Button>
 			</div>
 		</div>

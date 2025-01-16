@@ -4,12 +4,12 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
-import { BN, BN_TEN, BN_TWO, BN_ZERO } from '@polkadot/util';
+import { BN, BN_ONE, BN_TEN, BN_TWO, BN_ZERO } from '@polkadot/util';
 
 const BITLENGTH = 128;
 
 function getGlobalMaxValue(): BN {
-	return BN_TWO.pow(new BN(BITLENGTH)).subn(1);
+	return BN_TWO.pow(new BN(BITLENGTH)).isub(BN_ONE);
 }
 
 function isValidNumber(bn: BN, isZeroable?: boolean): boolean {
@@ -17,7 +17,7 @@ function isValidNumber(bn: BN, isZeroable?: boolean): boolean {
 	return !(
 		bn.lt(BN_ZERO) ||
 		// cannot be > than allowed max
-		!bn.lt(getGlobalMaxValue()) ||
+		bn.gt(getGlobalMaxValue()) ||
 		// check if 0 and it should be a value
 		bnEqZero ||
 		// check that the bitlengths fit
@@ -25,7 +25,7 @@ function isValidNumber(bn: BN, isZeroable?: boolean): boolean {
 	);
 }
 
-export function inputToBn(input: string, network: ENetwork, isZeroable?: boolean): [BN, boolean] {
+export function inputToBn(input: string, network: ENetwork, isZeroable?: boolean): { bnValue: BN; isValid: boolean } {
 	const tokenDecimal = NETWORKS_DETAILS[`${network}`].tokenDecimals;
 	const tokenDecimalBN = new BN(tokenDecimal);
 
@@ -37,7 +37,7 @@ export function inputToBn(input: string, network: ENetwork, isZeroable?: boolean
 		// return -1 if the amount of decimal is higher than supported
 		if (isDecimalValue[2].length > tokenDecimal) {
 			result = new BN(-1);
-			return [result, isValidNumber(result, isZeroable)];
+			return { bnValue: result, isValid: isValidNumber(result, isZeroable) };
 		}
 
 		// get what is before the point and replace what isn't a number
@@ -52,5 +52,5 @@ export function inputToBn(input: string, network: ENetwork, isZeroable?: boolean
 		result = new BN(input.replace(/[^\d]/g, '')).mul(BN_TEN.pow(tokenDecimalBN));
 	}
 
-	return [result, isValidNumber(result, isZeroable)];
+	return { bnValue: result, isValid: isValidNumber(result, isZeroable) };
 }
