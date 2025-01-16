@@ -5,7 +5,7 @@
 'use client';
 
 import { IPost } from '@/_shared/types';
-import { Dialog, DialogContent, DialogHeader } from '@ui/Dialog/Dialog';
+import { Dialog, DialogContent } from '@ui/Dialog/Dialog';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
 import { MdFullscreen } from 'react-icons/md';
@@ -40,22 +40,23 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className='m-0 h-[80vh] max-w-5xl overflow-y-auto p-0'>
-				<DialogHeader>
-					{/* eslint-disable-next-line */}
-					<div></div>
-					<button
-						onClick={handleFullscreenClick}
-						type='button'
-						className='transition-opacity hover:opacity-75'
-					>
-						<MdFullscreen className='pr-5 pt-0.5 text-4xl' />
-					</button>{' '}
-				</DialogHeader>
-				<PostDetails
-					index={index}
-					postData={data}
-				/>
+			<DialogContent className='m-0 h-[80vh] max-w-4xl overflow-y-auto p-0'>
+				<div className='relative'>
+					<div className='absolute right-12'>
+						<button
+							onClick={handleFullscreenClick}
+							type='button'
+							className='transition-opacity hover:opacity-75'
+						>
+							<MdFullscreen className='text-lg text-text_primary' />
+						</button>{' '}
+					</div>
+					<PostDetails
+						index={index}
+						postData={data}
+						isModalOpen
+					/>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

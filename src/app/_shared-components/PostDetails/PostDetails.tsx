@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
+import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
@@ -16,7 +17,7 @@ import { Button } from '../Button';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 
-function PostDetails({ postData, index }: { postData: IPost; index: string }) {
+function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index: string; isModalOpen?: boolean }) {
 	const t = useTranslations();
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
@@ -30,7 +31,7 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 					beneficiaries={postData.onChainInfo?.beneficiaries}
 				/>
 			</div>
-			<div className={classes.detailsWrapper}>
+			<div className={cn(classes.detailsWrapper, isModalOpen ? 'xl:grid-cols-1' : 'xl:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
 						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
