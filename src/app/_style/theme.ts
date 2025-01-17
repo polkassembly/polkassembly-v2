@@ -65,7 +65,8 @@ export const THEME_COLORS = {
 		activity_selected_tab: '#F2F4F7',
 		post_btn_bg: '#EFF1F3',
 		active_proposal_bg: '#485F7D',
-		navbar_title: '#243A57'
+		navbar_title: '#243A57',
+		yellow_primary: '#ffbf60'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -127,6 +128,7 @@ export const THEME_COLORS = {
 		activity_selected_tab: '#2E2E2E',
 		post_btn_bg: '#4B4B4B',
 		active_proposal_bg: '#262626',
-		navbar_title: '#fff'
+		navbar_title: '#fff',
+		yellow_primary: '#ffbf60'
 	}
 };

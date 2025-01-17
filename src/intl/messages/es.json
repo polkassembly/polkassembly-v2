@@ -226,7 +226,10 @@
 		"votingPower": "Poder de voto",
 		"capital": "Capital",
 		"account": "Cuenta",
-		"abstain": "Abstención"
+		"abstain": "Abstención",
+		"castYourVote": "Emita su voto",
+		"loginToVote": "Inicie sesión para votar",
+		"split": "Dividir"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -291,5 +294,20 @@
 	"Pagination": {
 		"next": "Siguiente",
 		"previous": "Anterior"
+	},
+	"BalanceInput": {
+		"addBalance": "Agregar Saldo"
+	},
+	"VoteReferendum": {
+		"chooseYourVote": "Elija su Voto",
+		"conviction": "Convicción",
+		"lockBalance": "Bloquear Saldo",
+		"abstainVoteValue": "Valor del voto de abstención",
+		"ayeVoteValue": "Valor del voto afirmativo",
+		"nayVoteValue": "Valor del voto negativo",
+		"confirm": "Confirmar"
+	},
+	"Balance": {
+		"voteBalance": "Saldo de votación"
 	}
 }

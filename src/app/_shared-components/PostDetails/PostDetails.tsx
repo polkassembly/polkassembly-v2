@@ -5,7 +5,6 @@
 import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
-import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -13,12 +12,11 @@ import { Skeleton } from '../Skeleton';
 import BlockEditor from '../BlockEditor/BlockEditor';
 import { Tabs, TabsContent } from '../Tabs';
 import Timeline from './Timeline/Timeline';
-import { Button } from '../Button';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
+import VoteReferendumButton from './VoteReferendumButton';
 
 function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index: string; isModalOpen?: boolean }) {
-	const t = useTranslations();
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
@@ -35,7 +33,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
 						<TabsContent
-							className={isModalOpen ? 'hide_scrollbar flex max-h-96 w-96 overflow-y-auto border-none lg:w-full' : ''}
+							className={isModalOpen ? 'flex max-h-40 w-96 overflow-hidden border-none lg:w-full' : ''}
 							value={EPostDetailsTab.DESCRIPTION}
 						>
 							<BlockEditor
@@ -59,12 +57,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 					</div>
 				</div>
 				<div className={classes.rightWrapper}>
-					<Button
-						className='w-full'
-						size='lg'
-					>
-						{t('PostDetails.castVote')}
-					</Button>
+					<VoteReferendumButton index={index} />
 					<ProposalPeriods
 						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}
 						decisionPeriodEndsAt={postData.onChainInfo?.decisionPeriodEndsAt}

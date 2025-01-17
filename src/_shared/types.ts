@@ -693,3 +693,12 @@ export interface IUserActivity {
 	createdAt: Date;
 	updatedAt: Date;
 }
+
+export interface IVoteCurve {
+	id: string;
+	index: number;
+	block: number;
+	timestamp: string;
+	approvalPercent: number;
+	supportPercent: number;
+}

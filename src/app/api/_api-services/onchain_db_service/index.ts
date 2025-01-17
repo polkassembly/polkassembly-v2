@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision } from '@shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IVoteCurve } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
@@ -96,5 +96,12 @@ export class OnChainDbService {
 			votes: [],
 			totalCount: 0
 		};
+	}
+
+	static async GetPostVoteCurves({ network, index }: { network: ENetwork; index: number }): Promise<IVoteCurve[]> {
+		const voteCurves = await SubsquidService.GetPostVoteCurves({ network, index });
+		if (voteCurves) return voteCurves;
+
+		return [];
 	}
 }
