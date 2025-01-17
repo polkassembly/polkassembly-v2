@@ -14,7 +14,7 @@ interface Props {
 }
 
 function StatusTag({ className = '', status, colorInverted }: Props) {
-	const { theme } = useTheme();
+	const { resolvedTheme: theme } = useTheme();
 	const t = useTranslations();
 
 	const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
