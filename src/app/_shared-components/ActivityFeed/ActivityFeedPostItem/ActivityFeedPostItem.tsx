@@ -27,15 +27,13 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import userIcon from '@assets/profile/user-icon.svg';
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
+import CommentModal from '../CommentModal/CommentModal';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
-const AddComment = dynamic(() => import('@ui/PostComments/AddComment/AddComment'), { ssr: false });
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
@@ -298,55 +296,11 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				onClick={handleCommentClick}
 			/>
 
-			<Dialog
-				open={isDialogOpen}
-				onOpenChange={setIsDialogOpen}
-			>
-				<DialogTitle>
-					<DialogContent className='max-w-lg p-6 lg:max-w-2xl'>
-						<DialogHeader>
-							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
-								<div className='flex flex-col gap-3'>
-									<Image
-										src={userIcon}
-										alt='User Icon'
-										className='h-14 w-14 rounded-full'
-										width={56}
-										height={56}
-									/>
-									<hr className='w-full rotate-90 border-border_grey' />
-								</div>
-
-								<div className='flex flex-col pt-3'>
-									<div className='flex items-center gap-2 text-xs text-btn_secondary_text'>
-										<span className='font-medium'>
-											<Address address={postData.onChainInfo?.proposer || ''} />
-										</span>
-										<span>in</span>
-										<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{postData.onChainInfo?.origin}</span>
-										<span>|</span>
-										<span className='flex items-center gap-2'>
-											<FaRegClock className='text-sm' />
-											{dayjs.utc(postData.onChainInfo?.createdAt).fromNow()}
-										</span>
-									</div>
-									<span className='text-sm font-medium text-text_primary'>
-										#{postData.index} {postData.title}
-									</span>
-									<span className='text-xs text-text_pink'>Commenting on proposal</span>
-								</div>
-							</div>
-						</DialogHeader>
-						<div className='flex justify-end px-3'>
-							<AddComment
-								proposalType={postData.proposalType as EProposalType}
-								proposalIndex={postData.index?.toString() || ''}
-								editorId='new-comment'
-							/>
-						</div>
-					</DialogContent>
-				</DialogTitle>
-			</Dialog>
+			<CommentModal
+				isDialogOpen={isDialogOpen}
+				setIsDialogOpen={setIsDialogOpen}
+				postData={postData}
+			/>
 		</div>
 	);
 }
