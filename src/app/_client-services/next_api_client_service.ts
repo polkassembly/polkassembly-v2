@@ -83,6 +83,7 @@ export class NextApiClientService {
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_COMMENTS:
+			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
 				break;
 			case EApiRoute.ADD_COMMENT:
@@ -244,5 +245,16 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	// activity feed
+	static async fetchActivityFeedApi(page: number, limit: number = DEFAULT_LISTING_LIMIT) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, routeSegments: ['activityFeed'], queryParams });
+		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
 	}
 }

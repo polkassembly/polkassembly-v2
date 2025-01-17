@@ -3,8 +3,52 @@
 		"title": "Bienvenido a Inicio"
 	},
 	"ActivityFeed": {
+		"title": "Feed de Actividad",
 		"ExploreTab": "Explorar",
-		"SubscribedTab": "Suscrito"
+		"SubscribedTab": "Suscrito",
+		"About": "Acerca de",
+		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
+		"KnowMore": "Saber más",
+		"VotedProposals": "Propuestas Votadas",
+		"ActiveProposals": "Propuestas Activas",
+		"Last15Days": "Últimos 15 días",
+		"Rank": "Rango",
+		"BatchVoting": "Votación por Lotes",
+		"BatchVotingDescription": "Vote sobre las principales propuestas en una sola transacción",
+		"DelegationDashboardDescription": "Delegue su voto y póngase al día con el Panel de Delegación",
+		"DelegationDashboard": "Panel de Delegación",
+		"Bounty": "Recompensa",
+		"BountyDescription": "Gane DOT enviando recompensas a Polkadot",
+		"Identity": "Identidad",
+		"IdentityDescription": "Establezca su identidad con Polkassembly a 1/4 del costo",
+		"Features": "Características",
+		"Live": "EN VIVO",
+		"CommentPlaceholder": "Escriba su comentario aquí",
+		"Post": "Publicar",
+		"Navbar": {
+			"All": "Todos",
+			"Root": "Raíz",
+			"Wish For Change": "Deseo de Cambio",
+			"Admin": "Admin",
+			"Governance": "Gobernanza",
+			"Treasury": "Tesorería",
+			"Whitelist": "Lista Blanca"
+		},
+		"PostItem": {
+			"likes": "Me gusta",
+			"dislikes": "No me gusta",
+			"comments": "Comentarios",
+			"readMore": "Leer más",
+			"castVote": "Votar",
+			"share": "Compartir",
+			"comment": "Comentar",
+			"like": "Me gusta",
+			"dislike": "No me gusta",
+			"liked": "Me gustó",
+			"disliked": "No me gustó",
+			"allCaughtUp": "Estás al día!",
+			"allCaughtUpDescription": "¿Por qué no explorar otras categorías o temas?"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione una billetera",
@@ -141,7 +185,10 @@
 		"WhitelistedCaller": "Llamador en Lista Blanca",
 		"FellowshipAdmin": "Administrador de Comunidad",
 		"ReportAnIssue": "Reportar un Problema",
-		"NeedHelp": "¿Necesita ayuda con algo?"
+		"NeedHelp": "¿Necesita ayuda con algo?",
+		"Tag": {
+			"new": "Nuevo"
+		}
 	},
 	"PostDetails": {
 		"castVote": "Emitir voto",

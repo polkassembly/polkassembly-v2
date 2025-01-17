@@ -12,8 +12,8 @@ import { PieChart } from 'react-minimal-pie-chart';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@ui/Dialog/Dialog';
 import classes from './VoteSummary.module.scss';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../../Dialog';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 
@@ -112,7 +112,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 						<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
 					</Button>
 				</DialogTrigger>
-				<DialogContent className='max-w-xl'>
+				<DialogContent className='max-w-xl p-6'>
 					<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.voteHistory')}</DialogHeader>
 					<VoteHistory
 						proposalType={proposalType}

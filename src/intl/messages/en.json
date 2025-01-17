@@ -3,8 +3,52 @@
 		"title": "Welcome to Home"
 	},
 	"ActivityFeed": {
+		"title": "Activity Feed",
 		"ExploreTab": "Explore",
-		"SubscribedTab": "Subscribed"
+		"SubscribedTab": "Subscribed",
+		"About": "About",
+		"AboutDescription": "Polkadot is the all-in-one DeFi hub of Polkadot.",
+		"KnowMore": "Know More",
+		"VotedProposals": "Voted Proposals",
+		"ActiveProposals": "Active Proposals",
+		"Last15Days": "Last 15 days",
+		"Rank": "Rank",
+		"BatchVoting": "Batch Voting",
+		"BatchVotingDescription": "Vote on top proposals in a single transaction",
+		"DelegationDashboardDescription": "Delegate your vote and catchup with Delegation Dashboard",
+		"DelegationDashboard": "Delegation Dashboard",
+		"Bounty": "Bounty",
+		"BountyDescription": "Earn DOT by submitting bounties to Polkadot",
+		"Identity": "Identity",
+		"IdentityDescription": "Set identity with Polkassembly at 1/4th of the cost",
+		"Features": "Features",
+		"Live": "LIVE",
+		"CommentPlaceholder": "Type your comment here",
+		"Post": "Post",
+		"Navbar": {
+			"All": "All",
+			"Root": "Root",
+			"Wish For Change": "Wish For Change",
+			"Admin": "Admin",
+			"Governance": "Governance",
+			"Treasury": "Treasury",
+			"Whitelist": "Whitelist"
+		},
+		"PostItem": {
+			"likes": "likes",
+			"dislikes": "dislikes",
+			"comments": "comments",
+			"readMore": "Read more",
+			"castVote": "Cast Vote",
+			"share": "Share",
+			"comment": "Comment",
+			"like": "Like",
+			"dislike": "Dislike",
+			"liked": "Liked",
+			"disliked": "Disliked",
+			"allCaughtUp": "You're all caught up!",
+			"allCaughtUpDescription": "Why not explore other categories or topics?"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
@@ -141,7 +185,19 @@
 		"WhitelistedCaller": "Whitelisted Caller",
 		"FellowshipAdmin": "Fellowship Admin",
 		"ReportAnIssue": "Report an issue",
-		"NeedHelp": "Need help with something?"
+		"NeedHelp": "Need help with something?",
+		"AuctionAdmin": "Auction Admin",
+		"BigSpender": "Big Spender",
+		"BigTipper": "Big Tipper",
+		"MediumSpender": "Medium Spender",
+		"SmallSpender": "Small Spender",
+		"SmallTipper": "Small Tipper",
+		"Treasury": "Treasury",
+		"LeaseAdmin": "Lease Admin",
+		"GeneralAdmin": "General Admin",
+		"Tag": {
+			"new": "New"
+		}
 	},
 	"PostDetails": {
 		"castVote": "Cast Vote",

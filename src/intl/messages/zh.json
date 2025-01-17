@@ -3,8 +3,52 @@
 		"title": "欢迎来到主页"
 	},
 	"ActivityFeed": {
+		"title": "动态反馈",
 		"ExploreTab": "探索",
-		"SubscribedTab": "已订阅"
+		"SubscribedTab": "已订阅",
+		"About": "关于",
+		"AboutDescription": "Polkadot是Polkadot的一站式DeFi中心。",
+		"KnowMore": "了解更多",
+		"VotedProposals": "已投票提案",
+		"ActiveProposals": "活跃提案",
+		"Last15Days": "最近15天",
+		"Rank": "排名",
+		"BatchVoting": "批量投票",
+		"BatchVotingDescription": "在单次交易中对多个提案进行投票",
+		"DelegationDashboardDescription": "委托您的投票并通过委托仪表板进行跟进",
+		"DelegationDashboard": "委托仪表板",
+		"Bounty": "赏金",
+		"BountyDescription": "通过向Polkadot提交赏金来赚取DOT",
+		"Identity": "身份",
+		"IdentityDescription": "以1/4的成本在Polkassembly上设置身份",
+		"Features": "功能",
+		"Live": "实时",
+		"CommentPlaceholder": "请输入您的评论",
+		"Post": "发布",
+		"Navbar": {
+			"All": "全部",
+			"Root": "根",
+			"Wish For Change": "愿望改变",
+			"Admin": "管理员",
+			"Governance": "治理",
+			"Treasury": "国库",
+			"Whitelist": "白名单"
+		},
+		"PostItem": {
+			"likes": "赞",
+			"dislikes": "踩",
+			"comments": "评论",
+			"readMore": "阅读更多",
+			"castVote": "投票",
+			"share": "分享",
+			"comment": "评论",
+			"like": "赞",
+			"dislike": "踩",
+			"liked": "已赞",
+			"disliked": "已踩",
+			"allCaughtUp": "你已经跟上所有更新了！",
+			"allCaughtUpDescription": "为什么不探索其他类别或主题呢？"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",
@@ -141,7 +185,10 @@
 		"WhitelistedCaller": "白名单调用者",
 		"FellowshipAdmin": "研究员管理员",
 		"ReportAnIssue": "报告问题",
-		"NeedHelp": "需要帮助？"
+		"NeedHelp": "需要帮助？",
+		"Tag": {
+			"new": "新"
+		}
 	},
 	"PostDetails": {
 		"castVote": "投票",

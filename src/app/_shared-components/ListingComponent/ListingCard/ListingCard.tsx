@@ -5,7 +5,6 @@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
 import { EProposalType, ETheme, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
-import Link from 'next/link';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -20,22 +19,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { Progress } from '@ui/progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
+import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
+import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
+import { MouseEvent } from 'react';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
-
-const calculatePercentage = (value: string | number, totalValue: bigint | number) => {
-	if (typeof totalValue === 'bigint') {
-		if (totalValue === BigInt(0)) return 0;
-		const valueBI = BigInt(value);
-		return Number((valueBI * BigInt(100) * BigInt(100)) / totalValue) / 100;
-	}
-	if (totalValue === 0) return 0;
-	return (Number(value) * 100) / totalValue;
-};
 
 function ListingCard({
 	title,
@@ -55,7 +47,9 @@ function ListingCard({
 	const network = getCurrentNetwork();
 	const { resolvedTheme: theme } = useTheme();
 	const formattedCreatedAt = dayjs(createdAt).fromNow();
-	const totalValue = BigInt(voteMetrics?.aye.value || '0') + BigInt(voteMetrics?.nay.value || '0');
+	const ayeValue = new BN(voteMetrics?.aye.value || '0');
+	const nayValue = new BN(voteMetrics?.nay.value || '0');
+	const totalValue = ayeValue.add(nayValue);
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
 	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
 	const ICONS = {
@@ -69,14 +63,24 @@ function ListingCard({
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
+
+	const handleFullscreenClick = (e: MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setTimeout(() => {
+			window.location.href = `/referenda/${index}`;
+		}, 100);
+	};
+
 	return (
-		<Link
-			href={`/referenda/${index}`}
+		<button
+			onClick={handleFullscreenClick}
+			type='button'
 			className={`${styles.listingCard} ${backgroundColor}`}
 		>
 			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
-				<div className='flex flex-col gap-1'>
+				<div className='flex flex-col items-start gap-1'>
 					<h3 className={styles.titleText}>{title}</h3>
 					<div className={styles.infoContainer}>
 						<div className='flex items-center gap-2'>
@@ -234,7 +238,7 @@ function ListingCard({
 					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 			</div>
-		</Link>
+		</button>
 	);
 }
 

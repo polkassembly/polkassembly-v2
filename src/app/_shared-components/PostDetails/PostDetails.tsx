@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
+import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -15,7 +16,7 @@ import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
 
-function PostDetails({ postData, index }: { postData: IPost; index: string }) {
+function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index: string; isModalOpen?: boolean }) {
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
@@ -28,14 +29,17 @@ function PostDetails({ postData, index }: { postData: IPost; index: string }) {
 					beneficiaries={postData.onChainInfo?.beneficiaries}
 				/>
 			</div>
-			<div className={classes.detailsWrapper}>
+			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
-						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
+						<TabsContent
+							className={isModalOpen ? 'flex max-h-96 w-96 overflow-y-auto border-none lg:w-full' : ''}
+							value={EPostDetailsTab.DESCRIPTION}
+						>
 							<BlockEditor
 								data={postData.content}
 								readOnly
-								className='max-h-full border-none'
+								className={isModalOpen ? '' : 'max-h-full border-none'}
 								id='post-content'
 							/>
 						</TabsContent>

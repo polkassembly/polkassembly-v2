@@ -482,6 +482,7 @@ export enum EApiRoute {
 	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
 	GET_COMMENTS = 'GET_COMMENTS',
 	ADD_COMMENT = 'ADD_COMMENT',
+	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY'
 }
 
@@ -492,8 +493,8 @@ export enum EWeb3LoginScreens {
 }
 
 export enum EActivityFeedTab {
-	EXPLORE = 'explore',
-	FOLLOWING = 'following'
+	EXPLORE = 'EXPLORE',
+	FOLLOWING = 'FOLLOWING'
 }
 
 export enum EListingTab {

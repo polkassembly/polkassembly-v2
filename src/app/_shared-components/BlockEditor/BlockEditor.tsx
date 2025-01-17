@@ -131,7 +131,7 @@ function BlockEditor({
 					// api.blocks.getBlockByElement(containerRef.current)?.holder.scrollIntoView();
 					// }
 				},
-				placeholder: 'Type your comment here'
+				placeholder: readOnly ? '' : 'Type your comment here'
 			});
 			blockEditorRef.current = editor;
 		}
@@ -170,8 +170,8 @@ function BlockEditor({
 		<div
 			ref={containerRef}
 			className={cn(
-				'relative z-10 rounded-md border border-border_grey',
-				!readOnly && 'z-20 min-h-[150px] px-4 py-2',
+				'relative z-10',
+				!readOnly && 'z-20 min-h-[150px] rounded-md border border-border_grey px-4 py-2',
 				shouldScroll && 'max-h-[400px] overflow-y-auto',
 				classes.blockEditor,
 				className

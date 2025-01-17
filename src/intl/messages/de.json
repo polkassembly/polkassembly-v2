@@ -3,8 +3,52 @@
 		"title": "Willkommen"
 	},
 	"ActivityFeed": {
+		"title": "Aktivitäts-Feed",
 		"ExploreTab": "Erkunden",
-		"SubscribedTab": "Abonniert"
+		"SubscribedTab": "Abonniert",
+		"About": "Über",
+		"AboutDescription": "Polkadot ist die All-in-One DeFi-Plattform von Polkadot.",
+		"KnowMore": "Mehr erfahren",
+		"VotedProposals": "Abgestimmte Vorschläge",
+		"ActiveProposals": "Aktive Vorschläge",
+		"Last15Days": "Letzte 15 Tage",
+		"Rank": "Rang",
+		"BatchVoting": "Batch-Abstimmung",
+		"BatchVotingDescription": "Stimmen Sie in einer einzigen Transaktion über Top-Vorschläge ab",
+		"DelegationDashboardDescription": "Delegieren Sie Ihre Stimme und bleiben Sie mit dem Delegations-Dashboard auf dem Laufenden",
+		"DelegationDashboard": "Delegations-Dashboard",
+		"Bounty": "Prämie",
+		"BountyDescription": "Verdienen Sie DOT durch das Einreichen von Prämien bei Polkadot",
+		"Identity": "Identität",
+		"IdentityDescription": "Legen Sie Ihre Identität mit Polkassembly zu 1/4 der Kosten fest",
+		"Features": "Funktionen",
+		"Live": "LIVE",
+		"CommentPlaceholder": "Schreiben Sie hier Ihren Kommentar",
+		"Post": "Post",
+		"Navbar": {
+			"All": "Alle",
+			"Root": "Root",
+			"Wish For Change": "Wunsch nach Veränderung",
+			"Admin": "Admin",
+			"Governance": "Governance",
+			"Treasury": "Treasury",
+			"Whitelist": "Whitelist"
+		},
+		"PostItem": {
+			"likes": "Gefällt mir",
+			"dislikes": "Gefällt mir nicht",
+			"comments": "Kommentare",
+			"readMore": "Weiterlesen",
+			"castVote": "Abstimmen",
+			"share": "Teilen",
+			"comment": "Kommentieren",
+			"like": "Gefällt mir",
+			"dislike": "Gefällt mir nicht",
+			"liked": "Gefällt mir",
+			"disliked": "Gefällt mir nicht",
+			"allCaughtUp": "Du bist auf dem Laufenden!",
+			"allCaughtUpDescription": "Warum nicht andere Kategorien oder Themen erkunden?"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "Bitte Wallet auswählen",
@@ -141,7 +185,10 @@
 		"WhitelistedCaller": "Zugelassener Aufrufer",
 		"FellowshipAdmin": "Gemeinschafts Verwalter",
 		"ReportAnIssue": "Problem melden",
-		"NeedHelp": "Brauchst du Hilfe?"
+		"NeedHelp": "Brauchst du Hilfe?",
+		"Tag": {
+			"new": "Neu"
+		}
 	},
 	"PostDetails": {
 		"castVote": "Abstimmen",

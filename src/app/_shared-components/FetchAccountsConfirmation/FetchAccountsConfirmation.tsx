@@ -30,7 +30,7 @@ function FetchAccountsConfirmation({ switchToSignup, goBack, onConfirm }: { swit
 				<Button
 					size='lg'
 					variant='secondary'
-					className={classes.signupButton}
+					className={classes.goBackButton}
 					onClick={goBack}
 				>
 					{t('AddressDropdown.goBack')}

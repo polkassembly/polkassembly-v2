@@ -4,13 +4,31 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { IBeneficiary, ENetwork } from '@/_shared/types';
+import { BN } from '@polkadot/util';
 
-export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiary[] | undefined, network: ENetwork) => {
-	if (!beneficiaries) return {};
+export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiary[] | undefined | null, network: ENetwork): Record<string, BN> => {
+	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network]) {
+		return {};
+	}
 
-	return beneficiaries.reduce((acc: Record<string, number>, curr) => {
+	return beneficiaries.reduce((acc: Record<string, BN>, curr: IBeneficiary) => {
+		if (!curr) return acc;
+
 		const assetId = curr.assetId || NETWORKS_DETAILS[network].tokenSymbol;
-		acc[assetId] = (acc[assetId] || 0) + Number(curr.amount);
+
+		if (!assetId) return acc;
+
+		if (!acc[assetId]) {
+			acc[assetId] = new BN(0);
+		}
+
+		try {
+			const amount = new BN(curr.amount || '0');
+			acc[assetId] = acc[assetId].add(amount);
+		} catch (error) {
+			console.error(`Error processing beneficiary amount: ${error}`);
+		}
+
 		return acc;
 	}, {});
 };

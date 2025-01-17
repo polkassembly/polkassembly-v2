@@ -3,8 +3,52 @@
 		"title": "ホームへようこそ"
 	},
 	"ActivityFeed": {
+		"title": "アクティビティフィード",
 		"ExploreTab": "探索",
-		"SubscribedTab": "購読中"
+		"SubscribedTab": "購読済み",
+		"About": "概要",
+		"AboutDescription": "Polkadotは、Polkadotのオールインワンのデファイハブです。",
+		"KnowMore": "詳細を見る",
+		"VotedProposals": "投票済み提案",
+		"ActiveProposals": "アクティブな提案",
+		"Last15Days": "過去15日間",
+		"Rank": "ランク",
+		"BatchVoting": "一括投票",
+		"BatchVotingDescription": "一回のトランザクションで複数の提案に投票",
+		"DelegationDashboardDescription": "委任ダッシュボードで投票を委任し最新情報を確認",
+		"DelegationDashboard": "委任ダッシュボード",
+		"Bounty": "報奨金",
+		"BountyDescription": "Polkadotの報奨金に応募してDOTを獲得",
+		"Identity": "アイデンティティ",
+		"IdentityDescription": "Polkassemblyで通常の1/4のコストでアイデンティティを設定",
+		"Features": "機能",
+		"Live": "ライブ",
+		"CommentPlaceholder": "コメントを入力してください",
+		"Post": "投稿",
+		"Navbar": {
+			"All": "すべて",
+			"Root": "ルート",
+			"Wish For Change": "変更への願い",
+			"Admin": "管理者",
+			"Governance": "ガバナンス",
+			"Treasury": "トレジャリー",
+			"Whitelist": "ホワイトリスト"
+		},
+		"PostItem": {
+			"likes": "いいね",
+			"dislikes": "よくないね",
+			"comments": "コメント",
+			"readMore": "続きを読む",
+			"castVote": "投票する",
+			"share": "共有",
+			"comment": "コメントする",
+			"like": "いいね",
+			"dislike": "よくないね",
+			"liked": "いいね済み",
+			"disliked": "よくないね済み",
+			"allCaughtUp": "あなたはすべての更新を読み終えました！",
+			"allCaughtUpDescription": "他のカテゴリやトピックを探検してみませんか？"
+		}
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",
@@ -141,7 +185,10 @@
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
 		"FellowshipAdmin": "フェローシップ管理者",
 		"ReportAnIssue": "問題を報告",
-		"NeedHelp": "助けが必要ですか？"
+		"NeedHelp": "助けが必要ですか？",
+		"Tag": {
+			"new": "新規"
+		}
 	},
 	"PostDetails": {
 		"castVote": "投票する",
