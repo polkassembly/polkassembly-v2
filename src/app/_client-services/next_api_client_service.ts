@@ -20,6 +20,7 @@ import {
 	IGenerateTFAResponse,
 	IOnChainPostListingResponse,
 	IPost,
+	IReaction,
 	IVoteData
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
@@ -90,6 +91,9 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
+				break;
+			case EApiRoute.DELETE_REACTION:
+				method = 'DELETE';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -206,9 +210,15 @@ export class NextApiClientService {
 	}
 
 	// Post Reactions
-	static async fetchPostReactionsApi(proposalType: EProposalType, index: string, reactionType: EReaction) {
+	static async postReactionsApi(proposalType: EProposalType, index: string, reactionType: EReaction) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POST_REACTIONS, routeSegments: [proposalType, index, 'reactions'] });
-		return this.nextApiClientFetch<IPost>({ url, method, data: { reaction: reactionType } });
+		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
+	}
+
+	// Delete Post Reaction
+	static async deletePostReactionApi(proposalType: EProposalType, index: string, reactionId: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_REACTION, routeSegments: [proposalType, index, 'reactions', reactionId] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	// details

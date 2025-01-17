@@ -13,6 +13,7 @@ export const usePostReactions = (postData: IPostListing) => {
 		likesCount: postData?.metrics?.reactions?.like || 0,
 		dislikesCount: postData?.metrics?.reactions?.dislike || 0
 	});
+	const [currentReactionId, setCurrentReactionId] = useState<string | null>(null);
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
 
@@ -21,19 +22,36 @@ export const usePostReactions = (postData: IPostListing) => {
 		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 
 		try {
-			// Optimistic update
-			setReactionState((prev) => ({
-				...prev,
-				isLiked: isLikeAction ? !prev.isLiked : false,
-				isDisliked: !isLikeAction ? !prev.isDisliked : false,
-				likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? -1 : 1) : prev.isLiked ? -1 : 0),
-				dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? -1 : 1) : prev.isDisliked ? -1 : 0)
-			}));
+			// Determine if the action is to delete the reaction
+			const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
 
-			showGifSetter(true);
-			setTimeout(() => showGifSetter(false), 1500);
+			if (isDeleteAction) {
+				// Optimistic update: Remove reaction
+				setReactionState((prev) => ({
+					...prev,
+					isLiked: false,
+					isDisliked: false,
+					likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
+					dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
+				}));
+				await NextApiClientService.deletePostReactionApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', currentReactionId);
+				setCurrentReactionId(null);
+			} else {
+				// Optimistic update: Add or switch reaction
+				setReactionState((prev) => ({
+					...prev,
+					isLiked: isLikeAction,
+					isDisliked: !isLikeAction,
+					likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? 0 : 1) : prev.isLiked ? -1 : 0),
+					dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? 0 : 1) : prev.isDisliked ? -1 : 0)
+				}));
 
-			await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+				showGifSetter(true);
+				setTimeout(() => showGifSetter(false), 1500);
+
+				const response = await NextApiClientService.postReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+				setCurrentReactionId(response?.data?.reactionId || null);
+			}
 		} catch (error) {
 			console.error('Error updating reaction:', error);
 			// Revert on error
