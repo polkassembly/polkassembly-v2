@@ -30,6 +30,8 @@ import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
+import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -94,13 +96,22 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 							height={20}
 						/>
 						{user?.id ? (
-							<button
-								// onClick={() => handleVoteClick()}
-								className='cursor-pointer'
-								type='button'
-							>
-								<span>Cast Vote</span>
-							</button>
+							<Dialog>
+								<DialogTrigger asChild>
+									<button
+										className='w-full'
+										type='button'
+									>
+										{t('PostDetails.castVote')}
+									</button>
+								</DialogTrigger>
+								<DialogTitle>
+									<DialogContent className='max-w-xl p-6'>
+										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+										<VoteReferendum index={postData?.index?.toString() || ''} />
+									</DialogContent>
+								</DialogTitle>
+							</Dialog>
 						) : (
 							<Link href='/login'>
 								<span>Login to vote</span>
