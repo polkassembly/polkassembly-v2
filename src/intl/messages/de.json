@@ -52,7 +52,8 @@
 			"noActivityDescription": "Folgen oder Abonnieren Sie Personen und Beiträge, um personalisierte Inhalte auf Ihrem Feed anzuzeigen!",
 			"LogoutAllCaughtUp": "Tritt Polkassembly bei, um dein Abonniertes Tab anzuzeigen!",
 			"LogoutAllCaughtUpDescription": "Diskutiere, beitrage und erhalte regelmäßige Updates von Polkassembly",
-			"showMore": "Mehr anzeigen"
+			"showMore": "Mehr anzeigen",
+			"loadMoreComments": "Mehr Kommentare anzeigen"
 		}
 	},
 	"AddressDropdown": {

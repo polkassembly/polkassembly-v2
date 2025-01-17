@@ -52,7 +52,8 @@
 			"noActivityDescription": "关注或订阅人员和帖子，以在您的feed中查看个性化内容！",
 			"LogoutAllCaughtUp": "加入Polkassembly，查看您的订阅标签！",
 			"LogoutAllCaughtUpDescription": "在Polkassembly中讨论、投稿和接收定期更新",
-			"showMore": "显示更多"
+			"showMore": "显示更多",
+			"loadMoreComments": "加载更多评论"
 		}
 	},
 	"AddressDropdown": {

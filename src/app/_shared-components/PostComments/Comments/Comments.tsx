@@ -36,14 +36,14 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						commentData={item}
 					/>
 				))}
-				{!showMore && (
+				{!showMore && allComments?.length > 2 && (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowMore}
 							className={classes.loadMoreComments}
 							aria-hidden='true'
 						>
-							Load more comments <HiOutlineArrowDownCircle className='text-lg' />
+							{t('ActivityFeed.PostItem.loadMoreComments')} <HiOutlineArrowDownCircle className='text-lg' />
 						</span>
 					</div>
 				)}
