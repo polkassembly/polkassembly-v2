@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
-import { HiOutlineArrowDownCircle } from 'react-icons/hi2';
+import { HiOutlineArrowDownCircle, HiOutlineArrowUpCircle } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
@@ -48,7 +48,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							className={classes.loadMoreComments}
 							aria-hidden='true'
 						>
-							{t('ActivityFeed.PostItem.showLessComments')} <HiOutlineArrowDownCircle className='text-lg' />
+							{t('ActivityFeed.PostItem.showLessComments')} <HiOutlineArrowUpCircle className='text-lg' />
 						</span>
 					</div>
 				) : (
