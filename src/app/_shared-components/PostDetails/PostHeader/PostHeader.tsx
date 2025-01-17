@@ -7,12 +7,17 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, IBeneficiary } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
 import BeneficiaryIcon from '@assets/icons/beneficiary-icon.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { BN } from '@polkadot/util';
+import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
+import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
+import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
+
 import { useTranslations } from 'next-intl';
 import classes from './PostHeader.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -20,37 +25,34 @@ import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
 import PostTags from '../PostTags/PostTags';
 import StatusTag from '../../StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
+import VotingProgress from '../../ActivityFeed/VotingProgress/VotingProgress';
 
-function PostHeader({
-	title,
-	proposer,
-	createdAt,
-	tags,
-	status,
-	beneficiaries
-}: {
-	title: string;
-	proposer: string;
-	createdAt: Date;
-	tags?: string[];
-	status: string;
-	beneficiaries?: IBeneficiary[];
-}) {
+function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
-	const groupedByAsset = beneficiaries?.reduce((acc: Record<string, number>, curr) => {
+	const groupedByAsset = postData.onChainInfo?.beneficiaries?.reduce((acc: Record<string, number>, curr) => {
 		const assetId = curr.assetId || NETWORKS_DETAILS[`${network}`].tokenSymbol;
 
 		acc[`${assetId}`] = (acc[`${assetId}`] || 0) + Number(curr.amount);
 		return acc;
 	}, {});
 
+	const ayeValue = new BN(postData.onChainInfo?.voteMetrics?.aye.value || '0');
+	const nayValue = new BN(postData.onChainInfo?.voteMetrics?.nay.value || '0');
+	const totalValue = ayeValue.add(nayValue);
+	const ayePercent = calculatePercentage(postData.onChainInfo?.voteMetrics?.aye.value || '0', totalValue);
+	const nayPercent = calculatePercentage(postData.onChainInfo?.voteMetrics?.nay.value || '0', totalValue);
+	const decisionPeriodPercentage = postData.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(postData.onChainInfo?.decisionPeriodEndsAt) : 0;
+
+	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
+	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+
 	return (
 		<div>
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
-					{beneficiaries && beneficiaries.length > 0 && groupedByAsset && (
+					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (
 						<div className='flex flex-wrap items-center gap-x-2'>
 							<span className={classes.requestedText}>{t('PostDetails.requested')}:</span>
 							<span className={classes.requestedAmount}>
@@ -79,26 +81,26 @@ function PostHeader({
 					)}
 					<StatusTag status={status} />
 				</div>
-				<p className={classes.postTitle}>{title}</p>
+				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
-						<Address address={proposer} />
+						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
 						<Separator
 							orientation='vertical'
 							className='h-3'
 						/>
-						<CreatedAtTime createdAt={createdAt} />
-						{tags && tags.length > 0 && (
+						{postData?.createdAt && <CreatedAtTime createdAt={postData.createdAt} />}
+						{postData.tags && postData.tags.length > 0 && (
 							<>
 								<Separator
 									orientation='vertical'
 									className='h-3'
 								/>
-								<PostTags tags={tags} />
+								<PostTags tags={postData.tags} />
 							</>
 						)}
 					</div>
-					{beneficiaries && beneficiaries.length > 0 && (
+					{postData?.onChainInfo?.beneficiaries && postData?.onChainInfo?.beneficiaries.length > 0 && (
 						<div className={classes.beneficiaryWrapper}>
 							<Separator
 								orientation='vertical'
@@ -113,7 +115,7 @@ function PostHeader({
 								/>
 								<span className={classes.beneficiaryText}>{t('PostDetails.beneficiary')}:</span>
 							</div>
-							{beneficiaries.slice(0, 2).map((beneficiary) => (
+							{postData.onChainInfo?.beneficiaries?.slice(0, 2).map((beneficiary) => (
 								<div
 									key={`${beneficiary.amount}-${beneficiary.address}-${beneficiary.assetId}`}
 									className='flex items-center gap-x-1'
@@ -124,15 +126,15 @@ function PostHeader({
 									</span>
 								</div>
 							))}
-							{beneficiaries.length > 2 && (
+							{postData?.onChainInfo?.beneficiaries?.length > 2 && (
 								<Tooltip>
 									<TooltipTrigger>
 										<span className='text-xs text-wallet_btn_text'>
-											+ {beneficiaries.length - 2} {t('PostDetails.more')}
+											+ {postData?.onChainInfo?.beneficiaries?.length ?? 0 - 2} {t('PostDetails.more')}{' '}
 										</span>
 									</TooltipTrigger>
 									<TooltipContent className={classes.beneficiaryTooltipContent}>
-										{beneficiaries.slice(2).map((beneficiary) => (
+										{postData?.onChainInfo?.beneficiaries?.slice(2).map((beneficiary) => (
 											<div
 												key={beneficiary.amount}
 												className='flex items-center gap-x-1'
@@ -146,6 +148,22 @@ function PostHeader({
 									</TooltipContent>
 								</Tooltip>
 							)}
+						</div>
+					)}
+					{postData?.onChainInfo?.voteMetrics && isModalOpen && (
+						<div className='flex items-center gap-x-2'>
+							<Separator
+								orientation='vertical'
+								className='hidden h-3 lg:block'
+							/>
+							<VotingProgress
+								timeRemaining={timeRemaining}
+								decisionPeriodPercentage={decisionPeriodPercentage}
+								formattedTime={formattedTime}
+								ayePercent={ayePercent}
+								nayPercent={nayPercent}
+								postData={postData}
+							/>
 						</div>
 					)}
 				</div>

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, EProposalType } from '@/_shared/types';
+import { EPostDetailsTab, EProposalType, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Suspense, useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
@@ -42,6 +42,10 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 		setShowMore(true);
 	};
 
+	const handleShowLess = () => {
+		setShowMore(false);
+	};
+
 	const truncatedData = showMore
 		? data?.data?.content
 		: data?.data?.content && {
@@ -56,12 +60,8 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
 				<PostHeader
-					title={data?.data?.title || ''}
-					proposer={data?.data?.onChainInfo?.proposer || ''}
-					createdAt={data?.data?.createdAt || new Date()}
-					tags={data?.data?.tags}
-					status={data?.data?.onChainInfo?.status || ''}
-					beneficiaries={data?.data?.onChainInfo?.beneficiaries}
+					isModalOpen={isModalOpen ?? false}
+					postData={data?.data as IPostListing}
 				/>
 			</div>
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
@@ -75,7 +75,16 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 								className={isModalOpen ? '' : 'max-h-full border-none'}
 								onChange={() => {}}
 							/>
-							{!showMore && (
+
+							{showMore ? (
+								<span
+									onClick={handleShowLess}
+									className='cursor-pointer text-sm font-medium text-text_pink'
+									aria-hidden='true'
+								>
+									{t('ActivityFeed.PostItem.showLess')}
+								</span>
+							) : (
 								<span
 									onClick={handleShowMore}
 									className='cursor-pointer text-sm font-medium text-text_pink'
@@ -89,29 +98,39 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 							<Timeline timeline={data?.data?.onChainInfo?.timeline} />
 						</TabsContent>
 					</div>
-					<div className={classes.commentsBox}>
-						<Suspense fallback={<Skeleton className='h-4' />}>
-							<PostComments
-								proposalType={EProposalType.REFERENDUM_V2}
-								index={index}
-							/>
-						</Suspense>
+					{isModalOpen && (
+						<div className='pt-5'>
+							{' '}
+							<VoteReferendumButton index={index} />
+						</div>
+					)}
+					{!isModalOpen && (
+						<div className={classes.commentsBox}>
+							<Suspense fallback={<Skeleton className='h-4' />}>
+								<PostComments
+									proposalType={EProposalType.REFERENDUM_V2}
+									index={index}
+								/>
+							</Suspense>
+						</div>
+					)}
+				</div>
+				{!isModalOpen && (
+					<div className={classes.rightWrapper}>
+						<VoteReferendumButton index={index} />
+						<ProposalPeriods
+							confirmationPeriodEndsAt={data?.data?.onChainInfo?.confirmationPeriodEndsAt}
+							decisionPeriodEndsAt={data?.data?.onChainInfo?.decisionPeriodEndsAt}
+							preparePeriodEndsAt={data?.data?.onChainInfo?.preparePeriodEndsAt}
+							status={data?.data?.onChainInfo?.status}
+						/>
+						<VoteSummary
+							proposalType={EProposalType.REFERENDUM_V2}
+							index={index}
+							voteMetrics={data?.data?.onChainInfo?.voteMetrics}
+						/>
 					</div>
-				</div>
-				<div className={classes.rightWrapper}>
-					<VoteReferendumButton index={index} />
-					<ProposalPeriods
-						confirmationPeriodEndsAt={data?.data?.onChainInfo?.confirmationPeriodEndsAt}
-						decisionPeriodEndsAt={data?.data?.onChainInfo?.decisionPeriodEndsAt}
-						preparePeriodEndsAt={data?.data?.onChainInfo?.preparePeriodEndsAt}
-						status={data?.data?.onChainInfo?.status}
-					/>
-					<VoteSummary
-						proposalType={EProposalType.REFERENDUM_V2}
-						index={index}
-						voteMetrics={data?.data?.onChainInfo?.voteMetrics}
-					/>
-				</div>
+				)}
 			</div>
 		</Tabs>
 	);
