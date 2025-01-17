@@ -17,6 +17,9 @@ import styles from './CommentModal.module.scss';
 const AddComment = dynamic(() => import('@ui/PostComments/AddComment/AddComment'), { ssr: false });
 
 function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpen: boolean; setIsDialogOpen: (open: boolean) => void; postData: IPostListing }) {
+	const formatOriginText = (text: string): string => {
+		return text.replace(/([A-Z])/g, ' $1').trim();
+	};
 	return (
 		<div>
 			<Dialog
@@ -44,7 +47,8 @@ function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpe
 											<Address address={postData.onChainInfo?.proposer || ''} />
 										</span>
 										<span>in</span>
-										<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{postData.onChainInfo?.origin}</span>
+										<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
+
 										<span>|</span>
 										<span className='flex items-center gap-2'>
 											<FaRegClock className='text-sm' />
