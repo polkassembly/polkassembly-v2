@@ -14,14 +14,6 @@
     @apply text-sm text-text_primary text-opacity-60
 }
 
-.addressHeader {
-    @apply mb-4 flex items-center gap-x-2
-}
-
-.walletName {
-    @apply text-lg sm:text-xl font-medium text-text_primary
-}
-
 .fallbackText {
     @apply text-center text-text_primary;
 }

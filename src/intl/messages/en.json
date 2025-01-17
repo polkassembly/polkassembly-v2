@@ -145,6 +145,8 @@
 	},
 	"PostDetails": {
 		"castVote": "Cast Vote",
+		"castYourVote": "Cast Your Vote",
+		"loginToVote": "Login to Vote",
 		"requested": "Requested",
 		"beneficiary": "Beneficiary",
 		"description": "Description",
@@ -167,6 +169,7 @@
 		"summary": "Summary",
 		"aye": "Aye",
 		"nay": "Nay",
+		"split": "Split",
 		"support": "Support",
 		"bareAyes": "Bare Ayes",
 		"viewVoteHistory": "View Vote History",
@@ -242,5 +245,20 @@
 	"Pagination": {
 		"next": "Next",
 		"previous": "Previous"
+	},
+	"BalanceInput": {
+		"addBalance": "Add Balance"
+	},
+	"VoteReferendum": {
+		"chooseYourVote": "Choose your Vote",
+		"conviction": "Conviction",
+		"lockBalance": "Lock Balance",
+		"abstainVoteValue": "Abstain vote value",
+		"ayeVoteValue": "Aye vote value",
+		"nayVoteValue": "Nay vote value",
+		"confirm": "Confirm"
+	},
+	"Balance": {
+		"voteBalance": "Vote Balance"
 	}
 }
