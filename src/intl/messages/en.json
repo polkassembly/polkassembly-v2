@@ -54,7 +54,8 @@
 			"LogoutAllCaughtUpDescription": "Discuss, contribute and get regular updates from Polkassembly",
 			"showMore": "Show More",
 			"showLess": "Show Less",
-			"loadMoreComments": "Load more comments"
+			"loadMoreComments": "Load more comments",
+			"showLessComments": "Show less comments"
 		}
 	},
 	"AddressDropdown": {

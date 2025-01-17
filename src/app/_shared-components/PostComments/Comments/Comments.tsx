@@ -25,6 +25,11 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	const handleShowMore = () => {
 		setShowMore(true);
 	};
+
+	const handleShowLess = () => {
+		setShowMore(false);
+	};
+
 	return (
 		<div className={classes.wrapper}>
 			<div>
@@ -36,7 +41,17 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						commentData={item}
 					/>
 				))}
-				{!showMore && allComments?.length > 2 && (
+				{showMore && allComments?.length > 2 ? (
+					<div className='flex justify-center'>
+						<span
+							onClick={handleShowLess}
+							className={classes.loadMoreComments}
+							aria-hidden='true'
+						>
+							{t('ActivityFeed.PostItem.showLessComments')} <HiOutlineArrowDownCircle className='text-lg' />
+						</span>
+					</div>
+				) : (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowMore}

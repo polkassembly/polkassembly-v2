@@ -53,7 +53,8 @@
 			"LogoutAllCaughtUp": "Polkassemblyに参加して、購読済みタブを表示します！",
 			"LogoutAllCaughtUpDescription": "Polkassemblyで議論、投稿、および定期的な更新を受信",
 			"showMore": "もっと見る",
-			"loadMoreComments": "もっとコメントを見る"
+			"loadMoreComments": "もっとコメントを見る",
+			"showLessComments": "もっとコメントを見る"
 		}
 	},
 	"AddressDropdown": {

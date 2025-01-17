@@ -53,7 +53,8 @@
 			"LogoutAllCaughtUp": "Tritt Polkassembly bei, um dein Abonniertes Tab anzuzeigen!",
 			"LogoutAllCaughtUpDescription": "Diskutiere, beitrage und erhalte regelmäßige Updates von Polkassembly",
 			"showMore": "Mehr anzeigen",
-			"loadMoreComments": "Mehr Kommentare anzeigen"
+			"loadMoreComments": "Mehr Kommentare anzeigen",
+			"showLessComments": "Weniger Kommentare anzeigen"
 		}
 	},
 	"AddressDropdown": {

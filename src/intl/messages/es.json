@@ -53,7 +53,8 @@
 			"LogoutAllCaughtUp": "Únete a Polkassembly para ver tu pestaña Suscrito!",
 			"LogoutAllCaughtUpDescription": "Discute, contribuye y obtén actualizaciones regulares de Polkassembly",
 			"showMore": "Mostrar más",
-			"loadMoreComments": "Cargar más comentarios"
+			"loadMoreComments": "Cargar más comentarios",
+			"showLessComments": "Mostrar menos comentarios"
 		}
 	},
 	"AddressDropdown": {
