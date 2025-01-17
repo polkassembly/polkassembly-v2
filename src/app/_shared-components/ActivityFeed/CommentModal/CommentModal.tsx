@@ -58,7 +58,7 @@ function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpe
 								</div>
 							</div>
 						</DialogHeader>
-						<div className='flex justify-end px-3'>
+						<div className='w-full px-3'>
 							<AddComment
 								proposalType={postData.proposalType as EProposalType}
 								proposalIndex={postData.index?.toString() || ''}
