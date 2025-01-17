@@ -51,7 +51,8 @@
 			"noActivity": "No Activity Found",
 			"noActivityDescription": "Follow or Subscribe to people and posts to view personalized content on your feed!",
 			"LogoutAllCaughtUp": "Join Polkassembly to see your Following tab!",
-			"LogoutAllCaughtUpDescription": "Discuss, contribute and get regular updates from Polkassembly"
+			"LogoutAllCaughtUpDescription": "Discuss, contribute and get regular updates from Polkassembly",
+			"showMore": "Show More"
 		}
 	},
 	"AddressDropdown": {

@@ -8,6 +8,7 @@ import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Suspense, useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
+import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -21,6 +22,7 @@ import VoteReferendumButton from './VoteReferendumButton';
 
 function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index: string; isModalOpen?: boolean }) {
 	const [showMore, setShowMore] = useState(false);
+	const t = useTranslations();
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -62,7 +64,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 									className='cursor-pointer text-sm font-medium text-text_pink'
 									aria-hidden='true'
 								>
-									Show More
+									{t('ActivityFeed.PostItem.showMore')}
 								</span>
 							)}
 						</TabsContent>

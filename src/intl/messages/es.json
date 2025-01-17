@@ -51,7 +51,8 @@
 			"noActivity": "No se encontraron actividades",
 			"noActivityDescription": "Sigue o suscríbete a personas y publicaciones para ver contenido personalizado en tu feed!",
 			"LogoutAllCaughtUp": "Únete a Polkassembly para ver tu pestaña Suscrito!",
-			"LogoutAllCaughtUpDescription": "Discute, contribuye y obtén actualizaciones regulares de Polkassembly"
+			"LogoutAllCaughtUpDescription": "Discute, contribuye y obtén actualizaciones regulares de Polkassembly",
+			"showMore": "Mostrar más"
 		}
 	},
 	"AddressDropdown": {

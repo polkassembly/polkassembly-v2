@@ -51,7 +51,8 @@
 			"noActivity": "アクティビティが見つかりません",
 			"noActivityDescription": "Polkassemblyにフォローまたは購読して、フィードに個別のコンテンツを表示します！",
 			"LogoutAllCaughtUp": "Polkassemblyに参加して、購読済みタブを表示します！",
-			"LogoutAllCaughtUpDescription": "Polkassemblyで議論、投稿、および定期的な更新を受信"
+			"LogoutAllCaughtUpDescription": "Polkassemblyで議論、投稿、および定期的な更新を受信",
+			"showMore": "もっと見る"
 		}
 	},
 	"AddressDropdown": {
