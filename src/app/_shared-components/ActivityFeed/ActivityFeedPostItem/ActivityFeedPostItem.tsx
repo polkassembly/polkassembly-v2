@@ -303,19 +303,20 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				onOpenChange={setIsDialogOpen}
 			>
 				<DialogTitle>
-					<DialogContent>
+					<DialogContent className='max-w-lg p-6 lg:max-w-2xl'>
 						<DialogHeader>
 							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
 								<div className='flex flex-col gap-3'>
 									<Image
 										src={userIcon}
 										alt='User Icon'
-										className='h-16 w-16 rounded-full pr-2 lg:pr-0'
-										width={16}
-										height={16}
+										className='h-14 w-14 rounded-full'
+										width={56}
+										height={56}
 									/>
 									<hr className='w-full rotate-90 border-border_grey' />
 								</div>
+
 								<div className='flex flex-col pt-3'>
 									<div className='flex items-center gap-2 text-xs text-btn_secondary_text'>
 										<span className='font-medium'>
@@ -336,7 +337,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 								</div>
 							</div>
 						</DialogHeader>
-						<div className='flex justify-end px-5'>
+						<div className='flex justify-end px-3'>
 							<AddComment
 								proposalType={postData.proposalType as EProposalType}
 								proposalIndex={postData.index?.toString() || ''}
