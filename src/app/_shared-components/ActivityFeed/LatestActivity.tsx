@@ -78,7 +78,7 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 					/>
 				</>
 			) : (
-				<SubscribedPostList />
+				<SubscribedPostList postData={{ posts: [], totalCount: 0 }} />
 			)}
 		</div>
 	);
