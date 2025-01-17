@@ -41,6 +41,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
+	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
 
 	const { reactionState, showLikeGif, showDislikeGif, handleReaction } = usePostReactions(postData);
 
@@ -185,7 +186,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					</span>
 					<span>|</span>
 					<span>
-						{postData?.metrics?.comments} {t('ActivityFeed.PostItem.comments')}
+						{commentCount} {t('ActivityFeed.PostItem.comments')}
 					</span>
 				</div>
 			</div>
@@ -211,6 +212,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				isDialogOpen={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
 				postData={postData}
+				onCommentAdded={() => setCommentCount((prev) => prev + 1)}
 			/>
 		</div>
 	);

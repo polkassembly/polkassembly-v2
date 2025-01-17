@@ -20,7 +20,17 @@ import { Button } from '../../Button';
 
 const BlockEditor = dynamic(() => import('../../BlockEditor/BlockEditor'), { ssr: false });
 
-function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpen: boolean; setIsDialogOpen: (open: boolean) => void; postData: IPostListing }) {
+function CommentModal({
+	isDialogOpen,
+	setIsDialogOpen,
+	postData,
+	onCommentAdded
+}: {
+	isDialogOpen: boolean;
+	setIsDialogOpen: (open: boolean) => void;
+	postData: IPostListing;
+	onCommentAdded: () => void;
+}) {
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
@@ -47,6 +57,7 @@ function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpe
 				setContent(null);
 				setIsDialogOpen(false);
 				blockEditorActionsRef.current?.clearEditor?.();
+				onCommentAdded();
 			}
 		} catch (err) {
 			console.log(err);
@@ -81,7 +92,7 @@ function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpe
 									/>
 								</div>
 
-								<div className='flex flex-col pt-3'>
+								<div className='flex flex-1 flex-col pt-3'>
 									<div className='flex items-center gap-2 text-xs text-btn_secondary_text'>
 										<span className='font-medium'>
 											<Address address={postData.onChainInfo?.proposer || ''} />
@@ -99,7 +110,7 @@ function CommentModal({ isDialogOpen, setIsDialogOpen, postData }: { isDialogOpe
 										#{postData.index} {postData.title?.slice(0, 80).concat('...')}
 									</span>
 									<span className='text-xs text-text_pink'>{t('ActivityFeed.PostItem.commentingOnProposal')}</span>
-									<div className='pt-5'>
+									<div className='w-full pt-5'>
 										<BlockEditor
 											onChange={(data) => {
 												setContent(data);
