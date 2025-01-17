@@ -62,6 +62,28 @@ function Navbar() {
 			<p className='pl-8 font-semibold text-navbar_title md:pl-0'>OpenGov</p>
 
 			<div className='flex items-center gap-x-4'>
+				<Select
+					value={userPreferences.locale}
+					onValueChange={(value: ELocales) => handleLocaleChange(value)}
+				>
+					<SelectTrigger className='w-[180px] border-border_grey'>
+						<SelectValue placeholder='Select Language' />
+					</SelectTrigger>
+					<SelectContent className='border-border_grey'>
+						<div>
+							{Object.entries(LANGUAGES).map(([locale, label]) => (
+								<SelectItem
+									key={locale}
+									value={locale}
+									className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+								>
+									{label}
+								</SelectItem>
+							))}
+						</div>
+					</SelectContent>
+				</Select>
+
 				<div className='relative'>
 					<Select
 						value={selectedNetwork}
@@ -115,28 +137,6 @@ function Navbar() {
 						</SelectContent>
 					</Select>
 				</div>
-
-				<Select
-					value={userPreferences.locale}
-					onValueChange={(value: ELocales) => handleLocaleChange(value)}
-				>
-					<SelectTrigger className='w-[180px] border-border_grey'>
-						<SelectValue placeholder='Select Language' />
-					</SelectTrigger>
-					<SelectContent className='border-border_grey'>
-						<div>
-							{Object.entries(LANGUAGES).map(([locale, label]) => (
-								<SelectItem
-									key={locale}
-									value={locale}
-									className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-								>
-									{label}
-								</SelectItem>
-							))}
-						</div>
-					</SelectContent>
-				</Select>
 
 				{user?.id ? (
 					<>
