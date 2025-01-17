@@ -79,7 +79,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 							/>
 						</div>
 					)}
-					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
+					<StatusTag status={postData?.onChainInfo?.status?.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
