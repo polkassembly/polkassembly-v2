@@ -121,7 +121,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 									width={20}
 									height={20}
 								/>
-								<span>Login to vote</span>
+								<span>{t('PostDetails.loginToVote')}</span>
 							</span>
 						</Link>
 					)}
