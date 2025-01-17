@@ -48,10 +48,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
-						<TabsContent
-							className={isModalOpen ? 'flex max-h-96 w-96 overflow-y-auto border-none lg:w-full' : ''}
-							value={EPostDetailsTab.DESCRIPTION}
-						>
+						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
 							<BlockEditor
 								data={truncatedData as OutputData}
 								readOnly
