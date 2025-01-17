@@ -252,6 +252,8 @@ Sidebar.displayName = 'Sidebar';
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
 	const { resolvedTheme: theme } = useTheme();
+	const isMobile = useIsMobile();
+
 	return (
 		<Button
 			ref={ref}
@@ -266,7 +268,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			{...props}
 		>
 			<Image
-				src={state === 'expanded' ? LeftIcon : RightIcon}
+				src={isMobile ? RightIcon : state === 'expanded' ? LeftIcon : RightIcon}
 				alt={state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}
 				className={cn('h-5 w-5', {
 					'dark-icons': theme === ETheme.DARK

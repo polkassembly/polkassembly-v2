@@ -14,7 +14,6 @@ import { EProposalType, EReaction, ESocial, IPostListing } from '@/_shared/types
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
@@ -22,12 +21,13 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import userIcon from '@assets/profile/user-icon.svg';
-
 import ReactionButton from '../ReactionButton/ReactionButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
@@ -40,7 +40,9 @@ const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
 	const router = useRouter();
+	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
+	const network = getCurrentNetwork();
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
 
@@ -134,24 +136,17 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>
 					<span className='text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
-							<div className={styles.beneficiaryContainer}>
-								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network)).map(([assetId, amount]) => (
-									<div
-										key={`${assetId}-${postData.index}`}
-										className={styles.requestedAmount}
-									>
-										<span>
-											{formatUSDWithUnits(
-												formatBnBalance(
-													amount.toString(),
-													{ withUnit: true, numberAfterComma: 2 },
-													postData.network,
-													assetId === NETWORKS_DETAILS[postData.network].tokenSymbol ? null : assetId
-												)
-											)}
-										</span>
-									</div>
-								))}
+							<div className={`${styles.beneficiaryContainer} text-xl font-semibold text-wallet_btn_text`}>
+								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network))
+									.map(([assetId, amount]) =>
+										formatBnBalance(
+											amount.toString(),
+											{ withUnit: true, numberAfterComma: 2, compactNotation: true },
+											network,
+											assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+										)
+									)
+									.join(', ')}
 							</div>
 						)}
 					</span>
@@ -212,28 +207,35 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<BlockEditor
-					data={postData.content}
-					readOnly
-					className='max-h-32 w-96 overflow-hidden border-none lg:w-full'
-					id={`post-content-${postData.index}`}
-				/>
+				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
+					<BlockEditor
+						data={postData.content}
+						readOnly
+						id={`post-content-${postData.index}`}
+					/>
+				</div>
 				<Link
 					href={`/referenda/${postData.index}`}
 					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
 				>
-					Read more
+					{t('ActivityFeed.PostItem.readMore')}
 				</Link>
 			</div>
 
 			{/* Metrics Section */}
 			<div className='flex items-center justify-end'>
 				<div className='flex items-center gap-2 text-xs text-text_primary'>
-					<span>{reactionState.likesCount} likes</span>
+					<span>
+						{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+					</span>
 					<span>|</span>
-					<span>{reactionState.dislikesCount} dislikes</span>
+					<span>
+						{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+					</span>
 					<span>|</span>
-					<span>{postData?.metrics?.comments} comments</span>
+					<span>
+						{postData?.metrics?.comments} {t('ActivityFeed.PostItem.comments')}
+					</span>
 				</div>
 			</div>
 
@@ -271,8 +273,8 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						className='flex cursor-pointer items-center'
 						onClick={share}
 					>
-						<IoShareSocialOutline className='mr-2 text-lg' />
-						<span>Share</span>
+						<IoShareSocialOutline className={`${styles.activity_icons} mr-2 text-lg`} />
+						<span>{t('ActivityFeed.PostItem.share')}</span>
 					</button>
 					<button
 						type='button'
@@ -286,7 +288,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 							width={16}
 							height={16}
 						/>
-						<span>Comment</span>
+						<span>{t('ActivityFeed.PostItem.comment')}</span>
 					</button>
 				</div>
 			</div>

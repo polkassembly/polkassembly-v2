@@ -16,10 +16,10 @@ function CommentInput({ inputRef, onClick }: { inputRef: React.RefObject<HTMLInp
 		ANIMATION_DURATION: 1500
 	};
 	return (
-		<button
-			type='button'
+		<div
 			onClick={onClick}
 			className='flex w-full items-center text-start'
+			aria-hidden='true'
 		>
 			<Image
 				src={userIcon}
@@ -40,7 +40,7 @@ function CommentInput({ inputRef, onClick }: { inputRef: React.RefObject<HTMLInp
 			>
 				<span className={styles.postLabel}>{CONSTANTS.POST_LABEL}</span>
 			</button>
-		</button>
+		</div>
 	);
 }
 

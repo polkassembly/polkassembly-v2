@@ -33,6 +33,21 @@
 			"Governance": "治理",
 			"Treasury": "国库",
 			"Whitelist": "白名单"
+		},
+		"PostItem": {
+			"likes": "赞",
+			"dislikes": "踩",
+			"comments": "评论",
+			"readMore": "阅读更多",
+			"castVote": "投票",
+			"share": "分享",
+			"comment": "评论",
+			"like": "赞",
+			"dislike": "踩",
+			"liked": "已赞",
+			"disliked": "已踩",
+			"allCaughtUp": "你已经跟上所有更新了！",
+			"allCaughtUpDescription": "为什么不探索其他类别或主题呢？"
 		}
 	},
 	"AddressDropdown": {
@@ -170,7 +185,10 @@
 		"WhitelistedCaller": "白名单调用者",
 		"FellowshipAdmin": "研究员管理员",
 		"ReportAnIssue": "报告问题",
-		"NeedHelp": "需要帮助？"
+		"NeedHelp": "需要帮助？",
+		"Tag": {
+			"new": "新"
+		}
 	},
 	"PostDetails": {
 		"castVote": "投票",

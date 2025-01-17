@@ -33,6 +33,21 @@
 			"Governance": "Governance",
 			"Treasury": "Treasury",
 			"Whitelist": "Whitelist"
+		},
+		"PostItem": {
+			"likes": "likes",
+			"dislikes": "dislikes",
+			"comments": "comments",
+			"readMore": "Read more",
+			"castVote": "Cast Vote",
+			"share": "Share",
+			"comment": "Comment",
+			"like": "Like",
+			"dislike": "Dislike",
+			"liked": "Liked",
+			"disliked": "Disliked",
+			"allCaughtUp": "You're all caught up!",
+			"allCaughtUpDescription": "Why not explore other categories or topics?"
 		}
 	},
 	"AddressDropdown": {
@@ -179,7 +194,10 @@
 		"SmallTipper": "Small Tipper",
 		"Treasury": "Treasury",
 		"LeaseAdmin": "Lease Admin",
-		"GeneralAdmin": "General Admin"
+		"GeneralAdmin": "General Admin",
+		"Tag": {
+			"new": "New"
+		}
 	},
 	"PostDetails": {
 		"castVote": "Cast Vote",

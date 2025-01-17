@@ -33,6 +33,21 @@
 			"Governance": "Governance",
 			"Treasury": "Treasury",
 			"Whitelist": "Whitelist"
+		},
+		"PostItem": {
+			"likes": "Gefällt mir",
+			"dislikes": "Gefällt mir nicht",
+			"comments": "Kommentare",
+			"readMore": "Weiterlesen",
+			"castVote": "Abstimmen",
+			"share": "Teilen",
+			"comment": "Kommentieren",
+			"like": "Gefällt mir",
+			"dislike": "Gefällt mir nicht",
+			"liked": "Gefällt mir",
+			"disliked": "Gefällt mir nicht",
+			"allCaughtUp": "Du bist auf dem Laufenden!",
+			"allCaughtUpDescription": "Warum nicht andere Kategorien oder Themen erkunden?"
 		}
 	},
 	"AddressDropdown": {
@@ -170,7 +185,10 @@
 		"WhitelistedCaller": "Zugelassener Aufrufer",
 		"FellowshipAdmin": "Gemeinschafts Verwalter",
 		"ReportAnIssue": "Problem melden",
-		"NeedHelp": "Brauchst du Hilfe?"
+		"NeedHelp": "Brauchst du Hilfe?",
+		"Tag": {
+			"new": "Neu"
+		}
 	},
 	"PostDetails": {
 		"castVote": "Abstimmen",

@@ -5,7 +5,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
@@ -18,14 +18,13 @@ import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
-import { useSidebar } from '../../Sidebar/Sidebar';
 
 function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { gov2LatestPosts: IPostListing[]; currentTab: string; setCurrentTab: (tab: string) => void }) {
 	const network = getCurrentNetwork();
-	const { isMobile } = useSidebar();
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].tracks;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
 
 	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
 	const ALL_CATEGORY = t('ActivityFeed.Navbar.All');
@@ -35,17 +34,19 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 	const TREASURY_CATEGORY = t('ActivityFeed.Navbar.Treasury');
 	const WHITELIST_CATEGORY = t('ActivityFeed.Navbar.Whitelist');
 
-	const categoryIconPaths = {
-		[ALL_CATEGORY]: Home,
-		[ROOT_CATEGORY]: RootIcon,
-		[WISH_FOR_CHANGE_CATEGORY]: WishForChangeIcon,
-		[ADMIN_CATEGORY]: AdminIcon,
-		[GOVERNANCE_CATEGORY]: GovernanceIcon,
-		[TREASURY_CATEGORY]: TreasuryIcon,
-		[WHITELIST_CATEGORY]: WhitelistedCallerIcon
-	};
+	const categoryIconPaths = useMemo(
+		() => ({
+			[ALL_CATEGORY]: Home,
+			[ROOT_CATEGORY]: RootIcon,
+			[WISH_FOR_CHANGE_CATEGORY]: WishForChangeIcon,
+			[ADMIN_CATEGORY]: AdminIcon,
+			[GOVERNANCE_CATEGORY]: GovernanceIcon,
+			[TREASURY_CATEGORY]: TreasuryIcon,
+			[WHITELIST_CATEGORY]: WhitelistedCallerIcon
+		}),
+		[t]
+	);
 
-	// Dynamically create category structure from trackInfo
 	const categoryStructure = useMemo(() => {
 		const structure: Record<string, EPostOrigin[]> = {
 			[ALL_CATEGORY]: [],
@@ -60,29 +61,20 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 		Object.entries(trackInfo).forEach(([key]) => {
 			const origin = key as EPostOrigin;
 
-			// Root category
 			if (origin === EPostOrigin.ROOT) {
 				structure[ROOT_CATEGORY].push(origin);
-			}
-			// Wish For Change category
-			else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
+			} else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
 				structure[WISH_FOR_CHANGE_CATEGORY].push(origin);
-			}
-			// Admin category
-			else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
+			} else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
 				structure[ADMIN_CATEGORY].push(origin);
-			}
-			// Governance category
-			else if (
+			} else if (
 				origin.includes(EPostOrigin.LEASE_ADMIN) ||
 				origin.includes(EPostOrigin.GENERAL_ADMIN) ||
 				origin.includes(EPostOrigin.REFERENDUM_CANCELLER) ||
 				origin.includes(EPostOrigin.REFERENDUM_KILLER)
 			) {
 				structure[GOVERNANCE_CATEGORY].push(origin);
-			}
-			// Treasury category
-			else if (
+			} else if (
 				origin.includes(EPostOrigin.BIG_SPENDER) ||
 				origin.includes(EPostOrigin.MEDIUM_SPENDER) ||
 				origin.includes(EPostOrigin.SMALL_SPENDER) ||
@@ -91,16 +83,14 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 				origin.includes(EPostOrigin.TREASURER)
 			) {
 				structure[TREASURY_CATEGORY].push(origin);
-			}
-			// Whitelist category
-			else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
+			} else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
 				structure[WHITELIST_CATEGORY].push(origin);
 			}
 		});
 
 		// Remove empty categories
-		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === 'All'));
-	}, [trackInfo]);
+		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === t('ActivityFeed.Navbar.All')));
+	}, [trackInfo, t]);
 
 	const formatTrackName = (name: string) => {
 		return name.replace(/([A-Z])/g, ' $1').trim();
@@ -126,54 +116,68 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 		return tracks.some((track) => currentTab === track);
 	};
 
-	return (
-		<div className={`${styles.container} ${isMobile ? styles.mobileContainer : ''}`}>
-			{Object.entries(categoryStructure).map(([category, tracks]) => (
-				<Popover key={category}>
-					<PopoverTrigger asChild>
-						<div>
-							<button
-								type='button'
-								className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab dark:text-white' : ''}`}
-								onClick={() => handleCategoryClick(category)}
-							>
-								<span className='flex items-center gap-3 whitespace-nowrap px-1 py-2 lg:px-3 xl:gap-1.5'>
-									<Image
-										src={categoryIconPaths[category]}
-										alt={category}
-										width={20}
-										height={20}
-										className='dark:brightness-0 dark:invert'
-									/>
+	useEffect(() => {
+		if (containerRef.current) {
+			containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+		}
+	}, [currentTab]);
 
-									<span>{category}</span>
-									<span>{tracks?.length > 1 && <FaAngleDown />}</span>
-								</span>
-							</button>
-						</div>
-					</PopoverTrigger>
-					{expandedCategory === category && tracks && tracks.length > 0 && (
-						<PopoverContent
-							sideOffset={5}
-							className={styles.popoverContent}
-						>
-							<div className='w-full'>
-								{tracks.map((track) => (
-									<div key={track}>
-										<button
-											type='button'
-											className={styles.trackName}
-											onClick={() => setCurrentTab(track)}
-										>
-											{formatTrackName(track)} {getPostCount(track)}
-										</button>
-									</div>
-								))}
+	return (
+		<div className='mb-5 w-full'>
+			<div
+				className={`${styles.container} hide_scrollbar`}
+				ref={containerRef}
+			>
+				{Object.entries(categoryStructure).map(([category, tracks]) => (
+					<Popover key={category}>
+						<PopoverTrigger asChild>
+							<div className='flex-shrink-0'>
+								<button
+									type='button'
+									className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab' : ''}`}
+									onClick={() => handleCategoryClick(category)}
+								>
+									<span className='flex items-center whitespace-nowrap'>
+										<Image
+											src={categoryIconPaths[category]}
+											alt={category}
+											width={20}
+											height={20}
+											className='dark:brightness-0 dark:invert'
+										/>
+										<span className='ml-2'>{category}</span>
+										{tracks?.length > 1 && (
+											<span className='ml-1'>
+												<FaAngleDown />
+											</span>
+										)}
+									</span>
+								</button>
 							</div>
-						</PopoverContent>
-					)}
-				</Popover>
-			))}
+						</PopoverTrigger>
+						{expandedCategory === category && tracks && tracks.length > 0 && (
+							<PopoverContent
+								sideOffset={5}
+								className={styles.popoverContent}
+							>
+								<div className='w-full'>
+									{tracks.map((track) => (
+										<div key={track}>
+											<button
+												type='button'
+												className={`${styles.trackName} ${currentTab === track ? 'bg-activity_selected_tab' : ''}`}
+												onClick={() => setCurrentTab(track)}
+											>
+												{formatTrackName(track)} {getPostCount(track)}
+											</button>
+										</div>
+									))}
+								</div>
+							</PopoverContent>
+						)}
+					</Popover>
+				))}
+			</div>
 		</div>
 	);
 }

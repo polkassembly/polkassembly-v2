@@ -53,7 +53,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 
 	const renderListingCards = () =>
 		data.slice(0, DEFAULT_LISTING_LIMIT).map((item, idx) => {
-			const backgroundColor = idx % 2 === 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay';
+			const backgroundColor = idx % 2 === 0 ? 'bg-section_dark_overlay' : 'bg-listing_card1';
 
 			const onChainInfo: IOnChainPostListing = {
 				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt) : new Date(),

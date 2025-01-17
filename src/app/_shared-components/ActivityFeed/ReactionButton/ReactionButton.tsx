@@ -7,10 +7,12 @@ import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'reac
 import Image from 'next/image';
 import { EReaction } from '@/_shared/types';
 import LikeGif from '@assets/reactions/Liked-Colored.gif';
+import { useTranslations } from 'next-intl';
 import styles from './ReactionButton.module.scss';
 
 function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction; isActive: boolean; showGif: boolean; onClick: () => void }) {
 	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
+	const t = useTranslations();
 
 	return (
 		<button
@@ -34,9 +36,7 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction;
 					<Icon className={`${styles.activity_icons} text-lg ${isActive ? 'text-text_pink' : ''}`} />
 				)}
 			</div>
-			<span className={isActive ? 'text-text_pink' : ''}>
-				{isActive ? `${type.charAt(0).toUpperCase()}${type.slice(1).toLowerCase()}d` : `${type.charAt(0).toUpperCase()}${type.slice(1).toLowerCase()}`}
-			</span>
+			<span className={isActive ? 'text-text_pink' : ''}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
 		</button>
 	);
 }

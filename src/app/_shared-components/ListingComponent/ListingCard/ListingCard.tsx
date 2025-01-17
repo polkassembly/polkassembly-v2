@@ -80,7 +80,7 @@ function ListingCard({
 		>
 			<div className='flex items-start lg:gap-4'>
 				<p className={styles.indexText}>#{index}</p>
-				<div className='flex flex-col gap-1'>
+				<div className='flex flex-col items-start gap-1'>
 					<h3 className={styles.titleText}>{title}</h3>
 					<div className={styles.infoContainer}>
 						<div className='flex items-center gap-2'>

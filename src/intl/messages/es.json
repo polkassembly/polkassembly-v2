@@ -33,6 +33,21 @@
 			"Governance": "Gobernanza",
 			"Treasury": "Tesorería",
 			"Whitelist": "Lista Blanca"
+		},
+		"PostItem": {
+			"likes": "Me gusta",
+			"dislikes": "No me gusta",
+			"comments": "Comentarios",
+			"readMore": "Leer más",
+			"castVote": "Votar",
+			"share": "Compartir",
+			"comment": "Comentar",
+			"like": "Me gusta",
+			"dislike": "No me gusta",
+			"liked": "Me gustó",
+			"disliked": "No me gustó",
+			"allCaughtUp": "Estás al día!",
+			"allCaughtUpDescription": "¿Por qué no explorar otras categorías o temas?"
 		}
 	},
 	"AddressDropdown": {
@@ -170,7 +185,10 @@
 		"WhitelistedCaller": "Llamador en Lista Blanca",
 		"FellowshipAdmin": "Administrador de Comunidad",
 		"ReportAnIssue": "Reportar un Problema",
-		"NeedHelp": "¿Necesita ayuda con algo?"
+		"NeedHelp": "¿Necesita ayuda con algo?",
+		"Tag": {
+			"new": "Nuevo"
+		}
 	},
 	"PostDetails": {
 		"castVote": "Emitir voto",

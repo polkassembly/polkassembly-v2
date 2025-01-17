@@ -10,10 +10,12 @@ interface Options {
 	numberAfterComma?: number;
 	withUnit?: boolean;
 	withThousandDelimitor?: boolean;
+	compactNotation?: boolean;
 }
 
 export function formatBnBalance(value: string | BN, options: Options, network: ENetwork, assetId?: string | null): string {
 	const tokenDecimals = assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
+
 	const valueString = value instanceof BN ? value.toString() : value;
 
 	let suffix = '';
@@ -27,22 +29,27 @@ export function formatBnBalance(value: string | BN, options: Options, network: E
 		suffix = valueString.padStart(tokenDecimals, '0');
 	}
 
-	let comma = '.';
-	const { numberAfterComma, withThousandDelimitor = true, withUnit } = options;
-	const numberAfterCommaLtZero = numberAfterComma && numberAfterComma < 0;
+	const { numberAfterComma, withThousandDelimitor = true, withUnit, compactNotation = false } = options;
 
-	if (numberAfterCommaLtZero || numberAfterComma === 0 || suffix === '') {
-		comma = '';
+	if (numberAfterComma === 0 || !suffix) {
 		suffix = '';
 	} else if (numberAfterComma && numberAfterComma > 0) {
 		suffix = suffix.slice(0, numberAfterComma);
 	}
 
-	if (withThousandDelimitor) {
-		prefix = prefix.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	let formattedValue: string;
+
+	if (compactNotation) {
+		const fullValue = parseFloat(`${prefix}.${suffix}`);
+		formattedValue = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: numberAfterComma || 2 }).format(fullValue);
+	} else {
+		if (withThousandDelimitor) {
+			prefix = prefix.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		}
+		formattedValue = `${prefix}.${suffix}`;
 	}
 
 	const unit = withUnit ? (assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.symbol : NETWORKS_DETAILS[`${network}`]?.tokenSymbol) : '';
 
-	return `${prefix}${comma}${suffix} ${unit}`;
+	return `${formattedValue} ${unit}`.trim();
 }
