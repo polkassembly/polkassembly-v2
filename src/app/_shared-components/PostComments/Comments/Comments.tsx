@@ -32,7 +32,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 
 	return (
 		<div className={classes.wrapper}>
-			<div>
+			<div className='px-6'>
 				{commentsToShow.map((item) => (
 					<SingleComment
 						proposalType={proposalType}
@@ -65,20 +65,22 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 			</div>
 
 			{user ? (
-				<AddComment
-					proposalType={proposalType}
-					proposalIndex={index}
-					editorId='new-comment'
-					onConfirm={(newComment, publicUser) => {
-						setAllComments((prev) => [
-							...prev,
-							{
-								...newComment,
-								user: publicUser
-							}
-						]);
-					}}
-				/>
+				<div className='w-full px-6 py-6 shadow-2xl'>
+					<AddComment
+						proposalType={proposalType}
+						proposalIndex={index}
+						editorId='new-comment'
+						onConfirm={(newComment, publicUser) => {
+							setAllComments((prev) => [
+								...prev,
+								{
+									...newComment,
+									user: publicUser
+								}
+							]);
+						}}
+					/>
+				</div>
 			) : (
 				<div className={classes.loginToComment}>
 					{t('PostDetails.please')}
