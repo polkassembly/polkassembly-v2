@@ -41,8 +41,12 @@ function BlockEditor({
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
 	const clearEditor = async () => {
-		if (blockEditorRef.current?.blocks) {
-			await blockEditorRef.current.blocks.clear();
+		try {
+			if (blockEditorRef.current?.blocks) {
+				await blockEditorRef.current.blocks.clear();
+			}
+		} catch (error) {
+			console.error('Error clearing editor:', error);
 		}
 	};
 
@@ -52,82 +56,94 @@ function BlockEditor({
 
 	// Initialize editorjs
 	useEffect(() => {
-		if (!blockEditorRef.current) {
-			const editor = new EditorJS({
-				readOnly,
-				minHeight: 400,
-				holder: `block-editor-${id}`,
-				inlineToolbar: true,
-				tools: {
-					header: {
-						class: Header as unknown as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					list: {
-						class: List as unknown as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					table: {
-						class: Table as unknown as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					paragraph: {
-						class: Paragraph as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					image: {
-						class: Image,
-						inlineToolbar: true,
-						config: {
-							features: {
-								caption: false
-							},
-							uploader: {
-								uploadByFile: async (file: File) => {
-									const form = new FormData();
-									form.append('image', file, file.name);
-									const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
-										body: form,
-										method: 'POST'
-									});
-									const uploadData = await res.json();
-									if (uploadData?.success) {
+		const initializeEditor = async () => {
+			if (!blockEditorRef.current) {
+				const editor = new EditorJS({
+					readOnly,
+					minHeight: 400,
+					holder: `block-editor-${id}`,
+					inlineToolbar: true,
+					tools: {
+						header: {
+							class: Header as unknown as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						list: {
+							class: List as unknown as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						table: {
+							class: Table as unknown as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						paragraph: {
+							class: Paragraph as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						image: {
+							class: Image,
+							inlineToolbar: true,
+							config: {
+								features: {
+									caption: false
+								},
+								uploader: {
+									uploadByFile: async (file: File) => {
+										const form = new FormData();
+										form.append('image', file, file.name);
+										const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
+											body: form,
+											method: 'POST'
+										});
+										const uploadData = await res.json();
+										if (uploadData?.success) {
+											return {
+												success: 1,
+												file: {
+													url: uploadData.data.url
+												}
+											};
+										}
 										return {
-											success: 1,
-											file: {
-												url: uploadData.data.url
-											}
+											success: 0
 										};
 									}
-									return {
-										success: 0
-									};
 								}
 							}
 						}
-					}
-				},
-				data: data as OutputData,
-				onReady: async () => {
-					if (data) {
-						if (renderFromHtml) {
-							const htmlString = convertMarkdownToHtml(data as string);
-							const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
-							await editor.blocks.render(editorJsOutputData);
-						} else {
-							await editor.blocks.render(data as OutputData);
+					},
+					data: data as OutputData,
+					onReady: async () => {
+						if (data) {
+							try {
+								if (renderFromHtml) {
+									const htmlString = convertMarkdownToHtml(data as string);
+									const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
+									await editor.blocks.render(editorJsOutputData);
+								} else {
+									await editor.blocks.render(data as OutputData);
+								}
+							} catch (error) {
+								console.error('Error rendering initial data:', error);
+							}
 						}
-					}
-				},
-				async onChange(api) {
-					if (readOnly) return;
-					const edJsData = await api.saver.save();
-					onChange?.(edJsData);
-				},
-				placeholder: readOnly ? '' : 'Type your comment here'
-			});
-			blockEditorRef.current = editor;
-		}
+					},
+					async onChange(api) {
+						if (readOnly) return;
+						try {
+							const edJsData = await api.saver.save();
+							onChange?.(edJsData);
+						} catch (error) {
+							console.error('Error in onChange:', error);
+						}
+					},
+					placeholder: readOnly ? '' : 'Type your comment here'
+				});
+				blockEditorRef.current = editor;
+			}
+		};
+
+		initializeEditor();
 
 		return () => {
 			if (blockEditorRef.current && blockEditorRef.current.destroy) {
@@ -158,14 +174,24 @@ function BlockEditor({
 
 	useEffect(() => {
 		const updateContent = async () => {
-			if (blockEditorRef.current && data) {
-				await blockEditorRef.current.blocks.clear(); // Clear existing content
-				await blockEditorRef.current.render(data as OutputData); // Render new data
+			try {
+				if (blockEditorRef?.current?.blocks && data) {
+					await blockEditorRef.current.blocks.clear();
+					if (renderFromHtml) {
+						const htmlString = convertMarkdownToHtml(data as string);
+						const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
+						await blockEditorRef.current.blocks.render(editorJsOutputData);
+					} else {
+						await blockEditorRef.current.blocks.render(data as OutputData);
+					}
+				}
+			} catch (error) {
+				console.error('Error updating content:', error);
 			}
 		};
 
 		updateContent();
-	}, [data]);
+	}, [data, renderFromHtml]);
 
 	return (
 		<div
