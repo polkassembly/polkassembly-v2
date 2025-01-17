@@ -32,7 +32,6 @@ import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../../Dialog/Dialog';
 import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
-import { OutputData } from '@editorjs/editorjs';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
