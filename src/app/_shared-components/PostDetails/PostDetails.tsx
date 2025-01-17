@@ -35,7 +35,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
 						<TabsContent
-							className={isModalOpen ? 'flex max-h-40 w-96 overflow-hidden border-none lg:w-full' : ''}
+							className={isModalOpen ? `${classes.modalDescBox} hide_scrollbar` : ''}
 							value={EPostDetailsTab.DESCRIPTION}
 						>
 							<BlockEditor
