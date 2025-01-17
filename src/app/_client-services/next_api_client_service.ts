@@ -20,7 +20,6 @@ import {
 	IGenerateTFAResponse,
 	IOnChainPostListingResponse,
 	IPost,
-	IReaction,
 	IVoteData
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
