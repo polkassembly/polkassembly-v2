@@ -6,6 +6,7 @@ import { EProposalType } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
+import Loading from '@/app/loading';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 
@@ -34,7 +35,7 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 	});
 
 	if (isLoading) {
-		return <p>Loading comments...</p>;
+		return <Loading />;
 	}
 
 	if (error instanceof Error) {

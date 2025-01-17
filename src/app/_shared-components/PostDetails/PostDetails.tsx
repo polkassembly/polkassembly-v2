@@ -4,10 +4,13 @@
 
 'use client';
 
-import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
+import { EPostDetailsTab, EProposalType } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Suspense, useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
+import { useQuery } from '@tanstack/react-query';
+import Loading from '@/app/loading';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -20,7 +23,18 @@ import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
 
-function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index: string; isModalOpen?: boolean }) {
+async function fetchProposalDetails(proposalType: EProposalType, index: string) {
+	return NextApiClientService.fetchProposalDetailsApi(proposalType, index);
+}
+
+function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: boolean }) {
+	const { data, error, isLoading } = useQuery({
+		queryKey: ['proposal', EProposalType.REFERENDUM_V2, index],
+		queryFn: () => fetchProposalDetails(EProposalType.REFERENDUM_V2, index),
+		staleTime: 300000,
+		retry: 3
+	});
+
 	const [showMore, setShowMore] = useState(false);
 	const t = useTranslations();
 
@@ -29,22 +43,25 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 	};
 
 	const truncatedData = showMore
-		? postData.content
-		: postData.content && {
-				...postData.content,
-				blocks: postData.content.blocks?.slice(0, 4) || []
+		? data?.data?.content
+		: data?.data?.content && {
+				...data?.data?.content,
+				blocks: data?.data?.content.blocks?.slice(0, 4) || []
 			};
+
+	if (isLoading) return <Loading />;
+	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
 				<PostHeader
-					title={postData.title || ''}
-					proposer={postData.onChainInfo?.proposer || ''}
-					createdAt={postData.createdAt || new Date()}
-					tags={postData.tags}
-					status={postData.onChainInfo?.status || ''}
-					beneficiaries={postData.onChainInfo?.beneficiaries}
+					title={data?.data?.title || ''}
+					proposer={data?.data?.onChainInfo?.proposer || ''}
+					createdAt={data?.data?.createdAt || new Date()}
+					tags={data?.data?.tags}
+					status={data?.data?.onChainInfo?.status || ''}
+					beneficiaries={data?.data?.onChainInfo?.beneficiaries}
 				/>
 			</div>
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
@@ -69,7 +86,7 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 							)}
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
-							<Timeline timeline={postData.onChainInfo?.timeline} />
+							<Timeline timeline={data?.data?.onChainInfo?.timeline} />
 						</TabsContent>
 					</div>
 					<div className={classes.commentsBox}>
@@ -84,15 +101,15 @@ function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index:
 				<div className={classes.rightWrapper}>
 					<VoteReferendumButton index={index} />
 					<ProposalPeriods
-						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}
-						decisionPeriodEndsAt={postData.onChainInfo?.decisionPeriodEndsAt}
-						preparePeriodEndsAt={postData.onChainInfo?.preparePeriodEndsAt}
-						status={postData.onChainInfo?.status}
+						confirmationPeriodEndsAt={data?.data?.onChainInfo?.confirmationPeriodEndsAt}
+						decisionPeriodEndsAt={data?.data?.onChainInfo?.decisionPeriodEndsAt}
+						preparePeriodEndsAt={data?.data?.onChainInfo?.preparePeriodEndsAt}
+						status={data?.data?.onChainInfo?.status}
 					/>
 					<VoteSummary
 						proposalType={EProposalType.REFERENDUM_V2}
 						index={index}
-						voteMetrics={postData.onChainInfo?.voteMetrics}
+						voteMetrics={data?.data?.onChainInfo?.voteMetrics}
 					/>
 				</div>
 			</div>
