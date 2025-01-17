@@ -6,6 +6,7 @@ import { EWallet } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { cn } from '@/lib/utils';
 import classes from './WalletButton.module.scss';
 
 function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWallet; onClick: (wallet: EWallet) => void; disabled?: boolean; label: string; small?: boolean }) {
@@ -29,6 +30,7 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 			size='icon'
 			disabled={disabled}
 			variant='outline'
+			className={cn(wallet === userPreferences.wallet && 'border border-navbar_border')}
 		>
 			<WalletIcon wallet={wallet} />
 		</Button>
@@ -36,7 +38,7 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 		<Button
 			onClick={() => onWalletSelect(walletName)}
 			variant='outline'
-			className={classes.walletButton}
+			className={cn(classes.walletButton, wallet === userPreferences.wallet && 'border border-navbar_border')}
 			leftIcon={<WalletIcon wallet={wallet} />}
 			disabled={disabled}
 			size='lg'

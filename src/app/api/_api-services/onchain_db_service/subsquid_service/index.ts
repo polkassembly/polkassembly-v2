@@ -11,6 +11,7 @@ import {
 	IOnChainPostInfo,
 	IOnChainPostListing,
 	IStatusHistoryItem,
+	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
 } from '@shared/types';
@@ -299,5 +300,20 @@ export class SubsquidService extends SubsquidUtils {
 			votes,
 			totalCount: subsquidData.votesConnection.totalCount
 		};
+	}
+
+	static async GetPostVoteCurves({ network, index }: { network: ENetwork; index: number }): Promise<IVoteCurve[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_VOTES_CURVE_DATA_BY_POST_INDEX;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { index_eq: Number(index) }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain post vote curves from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post vote curves from Subsquid');
+		}
+
+		return subsquidData.curveData as IVoteCurve[];
 	}
 }

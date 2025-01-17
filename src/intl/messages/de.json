@@ -222,7 +222,10 @@
 		"votingPower": "Stimmgewicht",
 		"capital": "Kapital",
 		"account": "Konto",
-		"abstain": "Enthaltung"
+		"abstain": "Enthaltung",
+		"castYourVote": "Geben Sie Ihre Stimme ab",
+		"loginToVote": "Anmelden zum Abstimmen",
+		"split": "Aufteilen"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -287,5 +290,20 @@
 	"Pagination": {
 		"next": "Weiter",
 		"previous": "Zurück"
+	},
+	"BalanceInput": {
+		"addBalance": "Guthaben hinzufügen"
+	},
+	"VoteReferendum": {
+		"chooseYourVote": "Wählen Sie Ihre Stimme",
+		"conviction": "Überzeugung",
+		"lockBalance": "Guthaben sperren",
+		"abstainVoteValue": "Enthaltungsstimmwert",
+		"ayeVoteValue": "Ja-Stimmwert",
+		"nayVoteValue": "Nein-Stimmwert",
+		"confirm": "Bestätigen"
+	},
+	"Balance": {
+		"voteBalance": "Abstimmungsguthaben"
 	}
 }

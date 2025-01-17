@@ -9,3 +9,11 @@
 .loginButton {
     @apply px-12
 }
+
+.addressHeader {
+    @apply mb-4 flex items-center gap-x-2
+}
+
+.walletName {
+    @apply text-lg sm:text-xl font-medium text-text_primary
+}
