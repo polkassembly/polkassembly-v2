@@ -5,12 +5,10 @@
 import React, { RefObject, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
-import { IoShareSocialOutline } from 'react-icons/io5';
-import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { EProposalType, EReaction, ESocial, IPostListing } from '@/_shared/types';
+import { IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -26,12 +24,12 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import ReactionButton from '../ReactionButton/ReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
+import ReactionHandler from '../ReactionHandler';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -41,26 +39,9 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
-	const [showLikeGif, setShowLikeGif] = useState(false);
-	const [showDislikeGif, setShowDislikeGif] = useState(false);
 
-	const [reactionState, setReactionState] = useState({
-		isLiked: false,
-		isDisliked: false,
-		likesCount: postData?.metrics?.reactions?.like || 0,
-		dislikesCount: postData?.metrics?.reactions?.dislike || 0
-	});
-	const ANIMATION_DURATION = 1500;
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction } = usePostReactions(postData);
 
-	const twitterHandle = user?.profileDetails?.socialLinks?.find((social) => social.type === ESocial.TWITTER);
-
-	const share = () => {
-		const titlePart = postData?.title ? ` for ${postData.title}` : '';
-		const message = `The referendum${titlePart} is now live for @${twitterHandle}\nCast your vote here: ${global?.window?.location?.href}`;
-		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
-		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
-		global?.window?.open(url);
-	};
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const handleCommentClick = () => {
@@ -68,52 +49,6 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			router.push('/login');
 		} else {
 			setIsDialogOpen(true);
-		}
-	};
-
-	const handleReaction = async (type: EReaction) => {
-		const isLikeAction = type === EReaction.like;
-		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
-
-		// Optimistically update state
-		setReactionState((prev) => {
-			const currentState = isLikeAction ? prev.isLiked : prev.isDisliked;
-
-			if (!currentState) {
-				showGifSetter(true);
-				setTimeout(() => showGifSetter(false), ANIMATION_DURATION);
-
-				return {
-					isLiked: isLikeAction,
-					isDisliked: !isLikeAction,
-					likesCount: prev.likesCount + (isLikeAction ? 1 : prev.isLiked ? -1 : 0),
-					dislikesCount: prev.dislikesCount + (!isLikeAction ? 1 : prev.isDisliked ? -1 : 0)
-				};
-			}
-			return {
-				...prev,
-				isLiked: isLikeAction ? false : prev.isLiked,
-				isDisliked: !isLikeAction ? false : prev.isDisliked,
-				likesCount: prev.likesCount + (isLikeAction ? -1 : 0),
-				dislikesCount: prev.dislikesCount + (!isLikeAction ? -1 : 0)
-			};
-		});
-
-		try {
-			const response = await NextApiClientService.fetchPostReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
-			console.log(response);
-		} catch (error) {
-			console.error('Error updating reaction:', error);
-
-			setReactionState((prev) => {
-				return {
-					...prev,
-					isLiked: isLikeAction ? !prev.isLiked : prev.isLiked,
-					isDisliked: !isLikeAction ? !prev.isDisliked : prev.isDisliked,
-					likesCount: prev.likesCount - (isLikeAction ? 1 : 0),
-					dislikesCount: prev.dislikesCount - (!isLikeAction ? 1 : 0)
-				};
-			});
 		}
 	};
 
@@ -240,56 +175,14 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<div className='mb-4 flex items-center justify-between text-sm text-navbar_border'>
-				<div className='flex space-x-4'>
-					<ReactionButton
-						type={EReaction.like}
-						isActive={reactionState.isLiked}
-						showGif={showLikeGif}
-						onClick={() => {
-							if (!user?.id) {
-								router.push('/login');
-							} else {
-								handleReaction(EReaction.like);
-							}
-						}}
-					/>
-					<ReactionButton
-						type={EReaction.dislike}
-						isActive={reactionState.isDisliked}
-						showGif={showDislikeGif}
-						onClick={() => {
-							if (!user?.id) {
-								router.push('/login');
-							} else {
-								handleReaction(EReaction.dislike);
-							}
-						}}
-					/>
-					<button
-						type='button'
-						className='flex cursor-pointer items-center'
-						onClick={share}
-					>
-						<IoShareSocialOutline className={`${styles.activity_icons} mr-2 text-lg`} />
-						<span>{t('ActivityFeed.PostItem.share')}</span>
-					</button>
-					<button
-						type='button'
-						className='flex cursor-pointer items-center'
-						onClick={handleCommentClick}
-					>
-						<Image
-							src={CommentIcon}
-							className='mr-2'
-							alt='Comment'
-							width={16}
-							height={16}
-						/>
-						<span>{t('ActivityFeed.PostItem.comment')}</span>
-					</button>
-				</div>
-			</div>
+			<ReactionHandler
+				postData={postData}
+				setIsDialogOpen={setIsDialogOpen}
+				reactionState={reactionState}
+				showLikeGif={showLikeGif}
+				showDislikeGif={showDislikeGif}
+				handleReaction={handleReaction}
+			/>
 
 			<CommentInput
 				inputRef={inputRef as RefObject<HTMLInputElement>}
