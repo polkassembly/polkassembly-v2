@@ -51,7 +51,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							{t('ActivityFeed.PostItem.showLessComments')} <HiOutlineArrowUpCircle className='text-lg' />
 						</span>
 					</div>
-				) : (
+				) : !showMore && allComments?.length > 2 ? (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowMore}
@@ -61,7 +61,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							{t('ActivityFeed.PostItem.loadMoreComments')} <HiOutlineArrowDownCircle className='text-lg' />
 						</span>
 					</div>
-				)}
+				) : null}
 			</div>
 
 			{user ? (
