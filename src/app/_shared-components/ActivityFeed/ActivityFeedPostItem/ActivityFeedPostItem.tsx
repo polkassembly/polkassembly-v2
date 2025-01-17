@@ -30,7 +30,7 @@ import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../../Dialog/Dialog';
 import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
@@ -64,6 +64,10 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
+	const formatOriginText = (text: string): string => {
+		return text.replace(/([A-Z])/g, ' $1').trim();
+	};
+
 	return (
 		<div className='rounded-xl border border-border_grey bg-bg_modal p-5'>
 			{/* Header Section */}
@@ -88,36 +92,39 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
 				</div>
 				<div>
-					<span className={styles.castVoteButton}>
-						<Image
-							src={VoteIcon}
-							alt=''
-							width={20}
-							height={20}
-						/>
-						{user?.id ? (
-							<Dialog>
-								<DialogTrigger asChild>
-									<button
-										className='w-full'
-										type='button'
-									>
-										{t('PostDetails.castVote')}
-									</button>
-								</DialogTrigger>
-								<DialogTitle>
-									<DialogContent className='max-w-xl p-6'>
-										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-										<VoteReferendum index={postData?.index?.toString() || ''} />
-									</DialogContent>
-								</DialogTitle>
-							</Dialog>
-						) : (
-							<Link href='/login'>
+					{user?.id ? (
+						<Dialog>
+							<DialogTrigger asChild>
+								<span className={`${styles.castVoteButton} cursor-pointer`}>
+									<Image
+										src={VoteIcon}
+										alt=''
+										width={20}
+										height={20}
+									/>
+									<span>{t('PostDetails.castVote')}</span>
+								</span>
+							</DialogTrigger>
+							<DialogTitle>
+								<DialogContent className='max-w-xl p-6'>
+									<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+									<VoteReferendum index={postData?.index?.toString() || ''} />
+								</DialogContent>
+							</DialogTitle>
+						</Dialog>
+					) : (
+						<Link href='/login'>
+							<span className={`${styles.castVoteButton} cursor-pointer`}>
+								<Image
+									src={VoteIcon}
+									alt=''
+									width={20}
+									height={20}
+								/>
 								<span>Login to vote</span>
-							</Link>
-						)}
-					</span>
+							</span>
+						</Link>
+					)}
 				</div>
 			</div>
 
@@ -128,7 +135,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						<Address address={postData.onChainInfo?.proposer || ''} />
 					</span>
 					<span>in</span>
-					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{postData.onChainInfo?.origin}</span>
+					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
 					<span>|</span>
 					<span className='flex items-center gap-2'>
 						<FaRegClock className='text-sm' />
