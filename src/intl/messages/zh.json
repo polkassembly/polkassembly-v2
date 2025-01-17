@@ -54,7 +54,8 @@
 			"LogoutAllCaughtUpDescription": "在Polkassembly中讨论、投稿和接收定期更新",
 			"showMore": "显示更多",
 			"loadMoreComments": "加载更多评论",
-			"showLessComments": "显示更少评论"
+			"showLessComments": "显示更少评论",
+			"commentingOnProposal": "在提案中评论"
 		}
 	},
 	"AddressDropdown": {

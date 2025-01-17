@@ -54,7 +54,8 @@
 			"LogoutAllCaughtUpDescription": "Polkassemblyで議論、投稿、および定期的な更新を受信",
 			"showMore": "もっと見る",
 			"loadMoreComments": "もっとコメントを見る",
-			"showLessComments": "もっとコメントを見る"
+			"showLessComments": "もっとコメントを見る",
+			"commentingOnProposal": "提案にコメントする"
 		}
 	},
 	"AddressDropdown": {

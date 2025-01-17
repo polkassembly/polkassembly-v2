@@ -54,7 +54,8 @@
 			"LogoutAllCaughtUpDescription": "Diskutiere, beitrage und erhalte regelmäßige Updates von Polkassembly",
 			"showMore": "Mehr anzeigen",
 			"loadMoreComments": "Mehr Kommentare anzeigen",
-			"showLessComments": "Weniger Kommentare anzeigen"
+			"showLessComments": "Weniger Kommentare anzeigen",
+			"commentingOnProposal": "Kommentieren auf Vorschlag"
 		}
 	},
 	"AddressDropdown": {

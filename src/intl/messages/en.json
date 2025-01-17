@@ -55,7 +55,8 @@
 			"showMore": "Show More",
 			"showLess": "Show Less",
 			"loadMoreComments": "Load more comments",
-			"showLessComments": "Show less comments"
+			"showLessComments": "Show less comments",
+			"commentingOnProposal": "Commenting on proposal"
 		}
 	},
 	"AddressDropdown": {
