@@ -62,7 +62,7 @@ function PostHeader({
 										<span>
 											{formatBnBalance(
 												amount.toString(),
-												{ withUnit: true, numberAfterComma: 2 },
+												{ withUnit: true, numberAfterComma: 2, compactNotation: true },
 												network,
 												assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
 											)}
@@ -120,7 +120,7 @@ function PostHeader({
 								>
 									<Address address={beneficiary.address} />
 									<span className='text-xs text-wallet_btn_text'>
-										({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2 }, network, beneficiary.assetId as EAssets)})
+										({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 									</span>
 								</div>
 							))}
@@ -139,7 +139,7 @@ function PostHeader({
 											>
 												<Address address={beneficiary.address} />
 												<span className='text-xs text-wallet_btn_text'>
-													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2 }, network, beneficiary.assetId as EAssets)})
+													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 												</span>
 											</div>
 										))}
