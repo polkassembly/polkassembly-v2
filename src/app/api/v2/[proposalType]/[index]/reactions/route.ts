@@ -42,7 +42,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const { reaction } = zodBodySchema.parse(await getReqBody(req));
 
 	// 3. add the reaction to the database
-	await OffChainDbService.AddPostReaction({
+	const reactionId = await OffChainDbService.AddPostReaction({
 		network,
 		indexOrHash: index,
 		proposalType: proposalType as EProposalType,
@@ -50,7 +50,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		reaction
 	});
 
-	const response = NextResponse.json({ message: 'Reaction added successfully' });
+	const response = NextResponse.json({ message: 'Reaction added successfully', reactionId });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

@@ -580,7 +580,7 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType: EProposalType;
 		userId: number;
 		reaction: EReaction;
-	}) {
+	}): Promise<string> {
 		// if user has already reacted to this post, replace the reaction
 		const existingReaction = await FirestoreRefs.reactionsCollectionRef()
 			.where('network', '==', network)
@@ -608,6 +608,8 @@ export class FirestoreService extends FirestoreRefs {
 			},
 			{ merge: true }
 		);
+
+		return reactionId;
 	}
 
 	static async DeletePostReaction(id: string) {

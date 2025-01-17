@@ -374,8 +374,8 @@ export class OffChainDbService {
 		proposalType: EProposalType;
 		userId: number;
 		reaction: EReaction;
-	}) {
-		await FirestoreService.AddPostReaction({ network, indexOrHash, proposalType, userId, reaction });
+	}): Promise<string> {
+		const reactionId = await FirestoreService.AddPostReaction({ network, indexOrHash, proposalType, userId, reaction });
 
 		await this.saveUserActivity({
 			userId,
@@ -385,6 +385,8 @@ export class OffChainDbService {
 			indexOrHash,
 			metadata: { reaction }
 		});
+
+		return reactionId;
 	}
 
 	static async DeletePostReaction(id: string) {
