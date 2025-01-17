@@ -36,13 +36,14 @@ function BlockEditor({
 }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [shouldScroll, setShouldScroll] = useState(false);
-
-	const blockEditorRef = useRef<EditorJS>(null);
+	const blockEditorRef = useRef<EditorJS | null>(null);
 
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
-	const clearEditor = () => {
-		blockEditorRef?.current?.blocks?.clear?.();
+	const clearEditor = async () => {
+		if (blockEditorRef.current?.blocks) {
+			await blockEditorRef.current.blocks.clear();
+		}
 	};
 
 	useImperativeHandle(ref, () => ({
@@ -51,7 +52,6 @@ function BlockEditor({
 
 	// Initialize editorjs
 	useEffect(() => {
-		// Initialize editorjs if we don't have a reference
 		if (!blockEditorRef.current) {
 			const editor = new EditorJS({
 				readOnly,
@@ -85,7 +85,7 @@ function BlockEditor({
 							uploader: {
 								uploadByFile: async (file: File) => {
 									const form = new FormData();
-									form.append('image', file, `${file.name}`);
+									form.append('image', file, file.name);
 									const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
 										body: form,
 										method: 'POST'
@@ -107,42 +107,33 @@ function BlockEditor({
 						}
 					}
 				},
-				data: data as unknown as OutputData,
+				data: data as OutputData,
 				onReady: async () => {
 					if (data) {
 						if (renderFromHtml) {
 							const htmlString = convertMarkdownToHtml(data as string);
-
 							const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
-
 							await editor.blocks.render(editorJsOutputData);
 						} else {
-							await editor.blocks.render(data as unknown as OutputData);
+							await editor.blocks.render(data as OutputData);
 						}
 					}
 				},
 				async onChange(api) {
 					if (readOnly) return;
-
 					const edJsData = await api.saver.save();
-					// const htmlArr = edjsParser.parse(edJsData);
 					onChange?.(edJsData);
-					// if (containerRef.current) {
-					// api.blocks.getBlockByElement(containerRef.current)?.holder.scrollIntoView();
-					// }
 				},
 				placeholder: readOnly ? '' : 'Type your comment here'
 			});
 			blockEditorRef.current = editor;
 		}
 
-		// Add a return function to handle cleanup
 		return () => {
 			if (blockEditorRef.current && blockEditorRef.current.destroy) {
 				blockEditorRef.current.destroy();
 			}
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	// make div scrollable if content is more than 400px
@@ -155,7 +146,6 @@ function BlockEditor({
 		};
 		checkHeight();
 
-		// resize observer to check height changes
 		const observer = new ResizeObserver(checkHeight);
 		if (containerRef.current) {
 			observer.observe(containerRef.current);
@@ -165,6 +155,17 @@ function BlockEditor({
 			observer.disconnect();
 		};
 	}, []);
+
+	useEffect(() => {
+		const updateContent = async () => {
+			if (blockEditorRef.current && data) {
+				await blockEditorRef.current.blocks.clear(); // Clear existing content
+				await blockEditorRef.current.render(data as OutputData); // Render new data
+			}
+		};
+
+		updateContent();
+	}, [data]);
 
 	return (
 		<div

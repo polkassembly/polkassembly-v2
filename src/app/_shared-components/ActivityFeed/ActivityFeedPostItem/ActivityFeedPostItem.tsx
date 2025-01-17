@@ -32,6 +32,7 @@ import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../../Dialog/Dialog';
 import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
+import { OutputData } from '@editorjs/editorjs';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -158,9 +159,13 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
+				<div>
 					<BlockEditor
-						data={postData.content}
+						data={{
+							blocks: postData.content?.blocks?.slice(0, 3) || [],
+							time: postData.content?.time,
+							version: postData.content?.version || ''
+						}}
 						readOnly
 						id={`post-content-${postData.index}`}
 					/>
