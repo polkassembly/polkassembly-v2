@@ -255,5 +255,8 @@
 		"ayeVoteValue": "Ja-Stimmwert",
 		"nayVoteValue": "Nein-Stimmwert",
 		"confirm": "Bestätigen"
+	},
+	"Balance": {
+		"voteBalance": "Abstimmungsguthaben"
 	}
 }

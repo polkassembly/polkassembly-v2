@@ -255,5 +255,8 @@
 		"ayeVoteValue": "赞成票值",
 		"nayVoteValue": "反对票值",
 		"confirm": "确认"
+	},
+	"Balance": {
+		"voteBalance": "投票余额"
 	}
 }

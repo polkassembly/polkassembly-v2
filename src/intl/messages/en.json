@@ -257,5 +257,8 @@
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
 		"confirm": "Confirm"
+	},
+	"Balance": {
+		"voteBalance": "Vote Balance"
 	}
 }

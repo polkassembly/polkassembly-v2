@@ -255,5 +255,8 @@
 		"ayeVoteValue": "Valor del voto afirmativo",
 		"nayVoteValue": "Valor del voto negativo",
 		"confirm": "Confirmar"
+	},
+	"Balance": {
+		"voteBalance": "Saldo de votación"
 	}
 }

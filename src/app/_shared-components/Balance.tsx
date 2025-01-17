@@ -8,6 +8,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { formatBnBalance } from '../_client-utils/formatBnBalance';
 import { Skeleton } from './Skeleton';
 
@@ -20,6 +21,7 @@ interface Props {
 	usedInIdentityFlow?: boolean;
 }
 function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBalance, classname, usedInIdentityFlow = false }: Props) {
+	const t = useTranslations();
 	const [balance, setBalance] = useState<string>('0');
 	const [loading, setLoading] = useState(false);
 
@@ -47,7 +49,7 @@ function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBala
 
 	return (
 		<div className={cn('flex items-center gap-x-1 text-xs', classname)}>
-			<span className='text-placeholder'>Vote Balance: </span>
+			<span className='text-placeholder'>{t('Balance.voteBalance')}: </span>
 			<span className='text-text_pink'>{loading ? <Skeleton className='h-4 w-[20px]' /> : formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</span>
 		</div>
 	);
