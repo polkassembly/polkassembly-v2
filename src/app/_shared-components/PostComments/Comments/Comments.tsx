@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
+import { HiOutlineArrowDownCircle } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
@@ -18,17 +19,35 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	const t = useTranslations();
 	const [allComments, setAllComments] = useState<ICommentResponse[]>(comments);
 	const user = useAtomValue(userAtom);
+	const [showMore, setShowMore] = useState(false);
+	const commentsToShow = showMore ? allComments : allComments.slice(0, 2);
 
+	const handleShowMore = () => {
+		setShowMore(true);
+	};
 	return (
 		<div className={classes.wrapper}>
-			{allComments.map((item) => (
-				<SingleComment
-					key={item.id}
-					proposalType={proposalType}
-					index={index}
-					commentData={item}
-				/>
-			))}
+			<div>
+				{commentsToShow.map((item) => (
+					<SingleComment
+						proposalType={proposalType}
+						index={index}
+						key={item.id}
+						commentData={item}
+					/>
+				))}
+				{!showMore && (
+					<div className='flex justify-center'>
+						<span
+							onClick={handleShowMore}
+							className={classes.loadMoreComments}
+							aria-hidden='true'
+						>
+							Load more comments <HiOutlineArrowDownCircle className='text-lg' />
+						</span>
+					</div>
+				)}
+			</div>
 
 			{user ? (
 				<AddComment
