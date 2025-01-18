@@ -6,39 +6,19 @@
 
 import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { Suspense, useState } from 'react';
-import { OutputData } from '@editorjs/editorjs';
-import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
 import { Skeleton } from '../Skeleton';
-import BlockEditor from '../BlockEditor/BlockEditor';
 import { Tabs, TabsContent } from '../Tabs';
 import Timeline from './Timeline/Timeline';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
+import PostContent from './PostContent/PostContent';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
-	const [showMore, setShowMore] = useState(false);
-	const t = useTranslations();
-
-	const handleShowMore = () => {
-		setShowMore(true);
-	};
-
-	const handleShowLess = () => {
-		setShowMore(false);
-	};
-
-	const truncatedData = showMore
-		? postData?.content
-		: postData?.content && {
-				...postData?.content,
-				blocks: postData?.content.blocks?.slice(0, 4) || []
-			};
-
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
@@ -51,31 +31,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
 						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
-							<BlockEditor
-								data={truncatedData as OutputData}
-								readOnly
-								id='post-content'
-								className={isModalOpen ? '' : 'max-h-full border-none'}
-								onChange={() => {}}
+							<PostContent
+								postData={postData as IPostListing}
+								isModalOpen={isModalOpen ?? false}
 							/>
-
-							{showMore ? (
-								<span
-									onClick={handleShowLess}
-									className='cursor-pointer text-sm font-medium text-text_pink'
-									aria-hidden='true'
-								>
-									{t('ActivityFeed.PostItem.showLess')}
-								</span>
-							) : (
-								<span
-									onClick={handleShowMore}
-									className='cursor-pointer text-sm font-medium text-text_pink'
-									aria-hidden='true'
-								>
-									{t('ActivityFeed.PostItem.showMore')}
-								</span>
-							)}
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
 							<Timeline timeline={postData?.onChainInfo?.timeline} />
