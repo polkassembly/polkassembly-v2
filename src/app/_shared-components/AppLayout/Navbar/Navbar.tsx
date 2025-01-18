@@ -59,7 +59,7 @@ function Navbar() {
 
 	return (
 		<nav className={classes.navbar}>
-			<p className='text-navbar_title pl-8 font-semibold md:pl-0'>OpenGov</p>
+			<p className='pl-8 font-semibold text-navbar_title md:pl-0'>OpenGov</p>
 
 			<div className='flex items-center gap-x-4'>
 				<Select
