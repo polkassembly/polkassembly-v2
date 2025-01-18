@@ -25,7 +25,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					postData={postData as IPostListing}
 				/>
 			</div>
-			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
+			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
 						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
