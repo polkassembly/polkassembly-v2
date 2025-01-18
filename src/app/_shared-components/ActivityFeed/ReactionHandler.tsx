@@ -5,7 +5,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
-import { EReaction, ESocial, IPostListing } from '@/_shared/types';
+import { EReaction, IPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { IoShareSocialOutline } from 'react-icons/io5';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
@@ -57,11 +57,9 @@ function ReactionHandler({
 		action();
 	};
 
-	const twitterHandle = user?.profileDetails?.socialLinks?.find((social) => social.type === ESocial.TWITTER);
-
 	const handleShare = () => {
 		const titlePart = postData?.title ? ` for ${postData.title}` : '';
-		const message = `The referendum${titlePart} is now live for @${twitterHandle}\nCast your vote here: ${global?.window?.location?.href}`;
+		const message = `The referendum${titlePart} is now live for @Polkassembly \nCast your vote here: ${global?.window?.location?.href}`;
 		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
 		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
 		global?.window?.open(url);
