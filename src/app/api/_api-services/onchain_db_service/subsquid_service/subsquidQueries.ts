@@ -188,6 +188,7 @@ export class SubsquidQueries {
 				where: {
 						type_eq: $type_eq, 
 						status_in: $status_in,
+						origin_in: $origin_in,
 						convictionVoting_none: { voter_in: $voters }
 				}
 			) {
