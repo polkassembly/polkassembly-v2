@@ -125,7 +125,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 	const handleTagToggle = (tag: string) => {
 		setState((prev) => ({
 			...prev,
-			selectedTags: prev.selectedTags.includes(tag) ? prev.selectedTags.filter((t) => t !== tag) : [...prev.selectedTags, tag]
+			selectedTags: prev.selectedTags.includes(tag) ? prev.selectedTags.filter((tags) => tags !== tag) : [...prev.selectedTags, tag]
 		}));
 	};
 

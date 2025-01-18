@@ -101,7 +101,7 @@ function Navbar() {
 							}}
 						>
 							<SelectValue>
-								<div className='flex items-center gap-2'>{NETWORKS_DETAILS[selectedNetwork]?.name}</div>
+								<div className='flex items-center gap-2'>{NETWORKS_DETAILS[selectedNetwork as ENetwork]?.name}</div>
 							</SelectValue>
 						</SelectTrigger>
 						<SelectContent

@@ -44,6 +44,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 			[TREASURY_CATEGORY]: TreasuryIcon,
 			[WHITELIST_CATEGORY]: WhitelistedCallerIcon
 		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[t]
 	);
 
@@ -62,18 +63,18 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 			const origin = key as EPostOrigin;
 
 			if (origin === EPostOrigin.ROOT) {
-				structure[ROOT_CATEGORY].push(origin);
+				structure[ROOT_CATEGORY as string].push(origin);
 			} else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
-				structure[WISH_FOR_CHANGE_CATEGORY].push(origin);
+				structure[WISH_FOR_CHANGE_CATEGORY as string].push(origin);
 			} else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
-				structure[ADMIN_CATEGORY].push(origin);
+				structure[ADMIN_CATEGORY as string].push(origin);
 			} else if (
 				origin.includes(EPostOrigin.LEASE_ADMIN) ||
 				origin.includes(EPostOrigin.GENERAL_ADMIN) ||
 				origin.includes(EPostOrigin.REFERENDUM_CANCELLER) ||
 				origin.includes(EPostOrigin.REFERENDUM_KILLER)
 			) {
-				structure[GOVERNANCE_CATEGORY].push(origin);
+				structure[GOVERNANCE_CATEGORY as string].push(origin);
 			} else if (
 				origin.includes(EPostOrigin.BIG_SPENDER) ||
 				origin.includes(EPostOrigin.MEDIUM_SPENDER) ||
@@ -82,14 +83,15 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 				origin.includes(EPostOrigin.SMALL_TIPPER) ||
 				origin.includes(EPostOrigin.TREASURER)
 			) {
-				structure[TREASURY_CATEGORY].push(origin);
+				structure[TREASURY_CATEGORY as string].push(origin);
 			} else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
-				structure[WHITELIST_CATEGORY].push(origin);
+				structure[WHITELIST_CATEGORY as string].push(origin);
 			}
 		});
 
 		// Remove empty categories
 		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === t('ActivityFeed.Navbar.All')));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [trackInfo, t]);
 
 	const formatTrackName = (name: string) => {
@@ -139,7 +141,7 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 								>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
-											src={categoryIconPaths[category]}
+											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
 											alt={category}
 											width={20}
 											height={20}

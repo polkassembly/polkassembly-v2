@@ -150,6 +150,7 @@ function BlockEditor({
 				blockEditorRef.current.destroy();
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	// make div scrollable if content is more than 400px
