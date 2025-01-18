@@ -1,7 +1,6 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-/* eslint-disable lines-between-class-members */
 
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
@@ -17,7 +16,9 @@ if (!NOTIFICATION_ENGINE_API_KEY) {
 
 export class NotificationService {
 	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-polkassembly-dev.cloudfunctions.net/notify';
+
 	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK;
+
 	private static firebaseFunctionsHeader = (network: string) => ({
 		Accept: 'application/json',
 		'Content-Type': 'application/json',

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EDataSource, EProposalType, IPostListing } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IPostListing } from '@/_shared/types';
 import { z } from 'zod';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -21,10 +21,13 @@ import { OffChainDbService } from '../../_api-services/offchain_db_service';
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
-		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
+		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
+		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional()
 	});
 
-	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
+
+	const { page, limit, origin: origins } = zodQuerySchema.parse(searchParamsObject);
 
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
@@ -58,6 +61,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		limit,
 		page,
 		statuses: ACTIVE_PROPOSAL_STATUSES,
+		origins,
 		notVotedByAddresses: isUserAuthenticated && userAddresses.length ? userAddresses : undefined
 	});
 

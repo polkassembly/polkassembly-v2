@@ -135,16 +135,20 @@ export class SubsquidService extends SubsquidUtils {
 
 		let gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE;
 
-		if (statuses && origins) {
+		if (statuses?.length && origins?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS;
-		} else if (statuses) {
+		} else if (statuses?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
-		} else if (origins) {
+		} else if (origins?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS;
 		}
 
-		if (notVotedByAddresses?.length && statuses) {
+		if (notVotedByAddresses?.length && statuses?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_WHERE_NOT_VOTED;
+		}
+
+		if (notVotedByAddresses?.length && statuses?.length && origins?.length) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_AND_ORIGINS_WHERE_NOT_VOTED;
 		}
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient

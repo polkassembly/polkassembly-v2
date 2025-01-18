@@ -152,6 +152,50 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_AND_ORIGINS_WHERE_NOT_VOTED = `
+		query GetProposalsListingByTypeAndStatusesAndOrigins($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!, $origin_in: [String!]!, $voters: [String!]!) {
+			proposals(
+					limit: $limit, 
+					offset: $offset, 
+					where: {
+							type_eq: $type_eq, 
+							status_in: $status_in,
+							origin_in: $origin_in,
+							convictionVoting_none: { voter_in: $voters }
+					}, 
+					orderBy: index_DESC
+			) {
+					createdAt
+					description
+					index
+					origin
+					proposer
+					status,
+					hash,
+					preimage {
+							proposedCall {
+									args
+							}
+					}
+					statusHistory {
+							status
+							timestamp
+					}
+				}
+
+			proposalsConnection(
+				orderBy: id_ASC, 
+				where: {
+						type_eq: $type_eq, 
+						status_in: $status_in,
+						convictionVoting_none: { voter_in: $voters }
+				}
+			) {
+					totalCount
+			}
+		}
+	`;
+
 	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_ORIGINS = `
 		query GetProposalsListingByTypeAndOrigins($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $origin_in: [String!]!) {
 			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, origin_in: $origin_in}, orderBy: index_DESC) {
