@@ -169,7 +169,6 @@ export interface IAccessTokenPayload {
 	username: string;
 	email: string;
 	isEmailVerified: boolean;
-	profileDetails: IProfileDetails;
 	iat: number;
 	id: number;
 	roles: ERole[];
@@ -178,7 +177,6 @@ export interface IAccessTokenPayload {
 	loginWallet?: EWallet;
 	loginAddress?: string;
 	exp?: number;
-	profileScore: number;
 }
 
 export interface IAddressProxyForEntry {

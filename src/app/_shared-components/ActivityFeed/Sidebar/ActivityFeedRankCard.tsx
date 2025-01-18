@@ -59,7 +59,7 @@ function ActivityFeedRankCard() {
 									width={16}
 									height={16}
 								/>
-								<span className='text-sm font-medium text-gray-800'>{user?.profileScore || 0}</span>
+								<span className='text-sm font-medium text-gray-800'>{0}</span>
 							</div>
 						</div>
 					</div>

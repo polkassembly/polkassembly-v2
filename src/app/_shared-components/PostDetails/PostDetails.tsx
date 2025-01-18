@@ -4,13 +4,10 @@
 
 'use client';
 
-import { EPostDetailsTab, EProposalType, IPostListing } from '@/_shared/types';
+import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Suspense, useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
-import { useQuery } from '@tanstack/react-query';
-import Loading from '@/app/loading';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useTranslations } from 'next-intl';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -23,18 +20,7 @@ import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
 
-async function fetchProposalDetails(proposalType: EProposalType, index: string) {
-	return NextApiClientService.fetchProposalDetailsApi(proposalType, index);
-}
-
-function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: boolean }) {
-	const { data, error, isLoading } = useQuery({
-		queryKey: ['proposal', EProposalType.REFERENDUM_V2, index],
-		queryFn: () => fetchProposalDetails(EProposalType.REFERENDUM_V2, index),
-		staleTime: 300000,
-		retry: 3
-	});
-
+function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
 	const [showMore, setShowMore] = useState(false);
 	const t = useTranslations();
 
@@ -47,21 +33,18 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 	};
 
 	const truncatedData = showMore
-		? data?.data?.content
-		: data?.data?.content && {
-				...data?.data?.content,
-				blocks: data?.data?.content.blocks?.slice(0, 4) || []
+		? postData?.content
+		: postData?.content && {
+				...postData?.content,
+				blocks: postData?.content.blocks?.slice(0, 4) || []
 			};
-
-	if (isLoading) return <Loading />;
-	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
 				<PostHeader
 					isModalOpen={isModalOpen ?? false}
-					postData={data?.data as IPostListing}
+					postData={postData as IPostListing}
 				/>
 			</div>
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
@@ -95,7 +78,7 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 							)}
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
-							<Timeline timeline={data?.data?.onChainInfo?.timeline} />
+							<Timeline timeline={postData?.onChainInfo?.timeline} />
 						</TabsContent>
 					</div>
 					{isModalOpen && (
@@ -119,15 +102,15 @@ function PostDetails({ index, isModalOpen }: { index: string; isModalOpen?: bool
 					<div className={classes.rightWrapper}>
 						<VoteReferendumButton index={index} />
 						<ProposalPeriods
-							confirmationPeriodEndsAt={data?.data?.onChainInfo?.confirmationPeriodEndsAt}
-							decisionPeriodEndsAt={data?.data?.onChainInfo?.decisionPeriodEndsAt}
-							preparePeriodEndsAt={data?.data?.onChainInfo?.preparePeriodEndsAt}
-							status={data?.data?.onChainInfo?.status}
+							confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
+							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
+							preparePeriodEndsAt={postData?.onChainInfo?.preparePeriodEndsAt}
+							status={postData?.onChainInfo?.status}
 						/>
 						<VoteSummary
 							proposalType={EProposalType.REFERENDUM_V2}
 							index={index}
-							voteMetrics={data?.data?.onChainInfo?.voteMetrics}
+							voteMetrics={postData?.onChainInfo?.voteMetrics}
 						/>
 					</div>
 				)}

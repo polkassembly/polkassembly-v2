@@ -151,13 +151,11 @@ export class AuthService {
 		isEmailVerified,
 		id,
 		username,
-		profileDetails,
 		isWeb3Signup,
 		twoFactorAuth,
 		loginAddress,
 		loginWallet,
-		roles,
-		profileScore
+		roles
 	}: IUser & { loginAddress?: string; loginWallet?: EWallet }): Promise<string> {
 		let defaultAddress = null;
 		let addresses: string[] = [];
@@ -176,15 +174,13 @@ export class AuthService {
 			addresses: addresses || [],
 			defaultAddress: defaultAddress?.address || '',
 			email,
-			profileDetails: profileDetails || {},
 			isEmailVerified: isEmailVerified || false,
 			iat: Math.floor(Date.now() / 1000),
 			id,
 			roles: allowedRoles,
 			sub: id.toString(),
 			username,
-			web3signup: isWeb3Signup || false,
-			profileScore: profileScore || 0
+			web3signup: isWeb3Signup || false
 		};
 
 		if (loginAddress) {

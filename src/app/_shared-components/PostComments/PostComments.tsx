@@ -5,8 +5,6 @@
 import { EProposalType } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
-import { useQuery } from '@tanstack/react-query';
-import Loading from '@/app/loading';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 
@@ -21,29 +19,12 @@ function CommentsTitle({ count }: { count: number }) {
 	);
 }
 
-async function fetchComments(proposalType: EProposalType, index: string) {
-	const { data } = await CommentClientService.getCommentsOfPost({ proposalType, index });
-	return data;
-}
-
-function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
-	const { data, error, isLoading } = useQuery({
-		queryKey: ['comments', proposalType, index],
-		queryFn: () => fetchComments(proposalType, index),
-		staleTime: 300000,
-		retry: 3
-	});
-
-	if (isLoading) {
-		return <Loading />;
-	}
-
-	if (error instanceof Error) {
-		return <p>Error: {error.message}</p>;
-	}
+async function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+	const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
 
 	return (
 		<div>
+			{error && <p>{error.message}</p>}
 			<CommentsTitle count={data?.length || 0} />
 			<Comments
 				proposalType={proposalType}
