@@ -11,6 +11,7 @@ import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
 import LatestActivity from './LatestActivity';
 import { Tabs, TabsContent } from '../Tabs/Tabs';
+import styles from './ActivityFeed.module.scss';
 
 function ActivityFeed() {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
@@ -20,10 +21,10 @@ function ActivityFeed() {
 		<div className='min-h-screen bg-page_background px-10 pt-5'>
 			<div className='container mx-auto grid grid-cols-12 gap-5'>
 				<div className='col-span-12 pt-5'>
-					<div className='flex w-full justify-between xl:items-center'>
-						<div className='flex flex-row items-center gap-2'>
+					<div className={styles.activityFeedContainer}>
+						<div className={styles.activityFeedToggleButton}>
 							<div>
-								<h1 className='text-xl font-semibold leading-9 text-text_primary dark:text-white lg:text-2xl'>{t('ActivityFeed.title')}</h1>
+								<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
 							</div>
 							<ActivityFeedToggleButton
 								activeTab={activeTab}
@@ -33,9 +34,9 @@ function ActivityFeed() {
 					</div>
 				</div>
 
-				<div className='col-span-12 xl:col-span-9'>
+				<div className={styles.activityFeedTabs}>
 					<Tabs
-						className='xl:max-w-5xl xl:flex-grow 2xl:max-w-full'
+						className={styles.activityFeedTabsContent}
 						value={activeTab}
 					>
 						<TabsContent value={EActivityFeedTab.EXPLORE}>

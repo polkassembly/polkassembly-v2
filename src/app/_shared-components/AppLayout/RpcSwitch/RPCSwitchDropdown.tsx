@@ -5,25 +5,25 @@
 import React, { useState } from 'react';
 import { MdOutlineSignalCellularAlt } from 'react-icons/md';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { useAtom } from 'jotai';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { userPreferencesAtom } from '@/app/_atoms/user/userPreferencesAtom';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ENetwork } from '@/_shared/types';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
 export default function RPCSwitchDropdown({ className }: { className?: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const network = getCurrentNetwork();
 	const api = usePolkadotApiService();
-	const [userPreferences, setUserPreferences] = useAtom(userPreferencesAtom);
+	const { userPreferences, setUserPreferences } = useUserPreferences();
 
 	if (!(network in NETWORKS_DETAILS)) {
 		return null;
 	}
 
-	const { rpcEndpoints } = NETWORKS_DETAILS[network];
+	const { rpcEndpoints } = NETWORKS_DETAILS[network as ENetwork];
 	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	const handleRpcSwitch = async (index: number) => {
