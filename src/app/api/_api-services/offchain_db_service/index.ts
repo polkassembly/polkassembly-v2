@@ -217,6 +217,20 @@ export class OffChainDbService {
 		return FirestoreService.GetUserActivitiesByUserId(userId);
 	}
 
+	static async GetUserReactionForPost({
+		network,
+		indexOrHash,
+		proposalType,
+		userId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+	}): Promise<IReaction | null> {
+		return FirestoreService.GetUserReactionForPost({ network, indexOrHash, proposalType, userId });
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,

@@ -272,6 +272,17 @@ export enum EReaction {
 	dislike = 'dislike'
 }
 
+export interface IReaction {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	userId: number;
+	reaction: EReaction;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export interface IPostOffChainMetrics {
 	reactions: Record<EReaction, number>;
 	comments: number;
@@ -433,6 +444,10 @@ export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 }
 
+export interface IActivityFeedPostListing extends IPostListing {
+	userReaction?: IReaction;
+}
+
 export interface IOnChainPostListingResponse {
 	posts: IPostListing[];
 	totalCount: number;
@@ -547,17 +562,6 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
-}
-
-export interface IReaction {
-	id: string;
-	network: ENetwork;
-	proposalType: EProposalType;
-	indexOrHash: string;
-	userId: number;
-	reaction: EReaction;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 export interface IVoteData {

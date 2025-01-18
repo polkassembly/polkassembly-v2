@@ -477,6 +477,29 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
+	static async GetUserReactionForPost({
+		network,
+		indexOrHash,
+		proposalType,
+		userId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+	}): Promise<IReaction | null> {
+		const reactionQuery = FirestoreRefs.reactionsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('userId', '==', userId)
+			.limit(1);
+
+		const reactionQuerySnapshot = await reactionQuery.get();
+
+		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {

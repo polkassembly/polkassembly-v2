@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EDataSource, EPostOrigin, EProposalType, IPostListing } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IReaction } from '@/_shared/types';
 import { z } from 'zod';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -52,7 +52,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const network = await getNetworkFromHeaders();
 
-	let posts: IPostListing[] = [];
+	let posts: IActivityFeedPostListing[] = [];
 	let totalCount = 0;
 
 	const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({
@@ -77,13 +77,30 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const offChainData = await Promise.all(offChainDataPromises);
 
+	let userReactions: (IReaction | null)[] = [];
+
+	if (isUserAuthenticated && accessToken) {
+		// fetch user reaction for each post
+		const userReactionPromises = onChainPostsListingResponse.posts.map((postInfo) => {
+			return OffChainDbService.GetUserReactionForPost({
+				network,
+				proposalType: EProposalType.REFERENDUM_V2,
+				indexOrHash: postInfo.index.toString(),
+				userId: AuthService.GetUserIdFromAccessToken(accessToken)
+			});
+		});
+
+		userReactions = await Promise.all(userReactionPromises);
+	}
+
 	// Merge on-chain and off-chain data
 	posts = onChainPostsListingResponse.posts.map((postInfo, index) => ({
 		...offChainData[Number(index)],
 		dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 		network,
 		proposalType: EProposalType.REFERENDUM_V2,
-		onChainInfo: postInfo
+		onChainInfo: postInfo,
+		userReaction: userReactions[Number(index)] || undefined
 	}));
 
 	// Sort posts by comment count in descending order
