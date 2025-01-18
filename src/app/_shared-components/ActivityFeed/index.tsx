@@ -18,7 +18,7 @@ function ActivityFeed() {
 
 	return (
 		<div>
-			<div className='min-h-screen w-full bg-page_background px-10 pt-5'>
+			<div className='min-h-screen w-full bg-page_background px-5 pt-5'>
 				<div className='flex w-full justify-between xl:items-center'>
 					<div className='flex flex-row items-center gap-2'>
 						<div>
