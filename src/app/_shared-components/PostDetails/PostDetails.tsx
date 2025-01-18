@@ -14,7 +14,7 @@ import Timeline from './Timeline/Timeline';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
-import PostContent from './PostContent/PostContent';
+import PostContent from './PostContent';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
 	return (

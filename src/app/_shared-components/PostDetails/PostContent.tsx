@@ -8,8 +8,7 @@ import React, { useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
 import { IPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import BlockEditor from '../../BlockEditor/BlockEditor';
-import classes from './PostContent.module.scss';
+import BlockEditor from '../BlockEditor/BlockEditor';
 
 function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
 	const [showMore, setShowMore] = useState(false);
@@ -31,7 +30,7 @@ function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModa
 			};
 
 	return (
-		<div className={classes.descBox}>
+		<div>
 			<BlockEditor
 				data={truncatedData as OutputData}
 				readOnly

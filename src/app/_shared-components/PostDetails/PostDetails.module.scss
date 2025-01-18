@@ -14,6 +14,10 @@
     @apply col-span-1 flex flex-col gap-y-6
 }
 
+.descBox {
+    @apply rounded-xl bg-bg_modal p-6 shadow-lg
+}
+
 .commentsBox {
     @apply flex flex-col gap-y-4 rounded-xl bg-bg_modal shadow-lg
 }
