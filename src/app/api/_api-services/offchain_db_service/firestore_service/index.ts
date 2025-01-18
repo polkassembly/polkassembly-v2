@@ -680,4 +680,8 @@ export class FirestoreService extends FirestoreRefs {
 			.doc(userId.toString())
 			.set({ profileScore: FirestoreRefs.increment(score) }, { merge: true });
 	}
+
+	static async UpdateUserPassword(userId: number, password: string, salt: string) {
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ password, salt }, { merge: true });
+	}
 }

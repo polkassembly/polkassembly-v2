@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@app/api/_api-utils/apiError';
 import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
-import { ERROR_CODES } from '@shared/_constants/errorLiterals';
+import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
 import {
 	ACCESS_TOKEN_PASSPHRASE,
 	ACCESS_TOKEN_PRIVATE_KEY,
@@ -505,7 +505,7 @@ export class AuthService {
 		const user = await OffChainDbService.GetUserById(Number(userId));
 
 		if (!user) {
-			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
 		}
 
 		return user;
@@ -565,7 +565,7 @@ export class AuthService {
 		const user = await OffChainDbService.GetUserById(refreshTokenPayload.id);
 
 		if (!user) {
-			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
 		}
 
 		const newAccessToken = await this.GetSignedAccessToken({
@@ -585,5 +585,38 @@ export class AuthService {
 			newAccessToken,
 			newRefreshToken
 		};
+	}
+
+	static async SendResetPasswordEmail(email: string) {
+		const user = await OffChainDbService.GetUserByEmail(email);
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
+		}
+
+		const resetToken = createCuid();
+		await RedisService.SetResetPasswordToken(resetToken, user.id);
+
+		await NotificationService.SendResetPasswordEmail(user, resetToken);
+	}
+
+	static async ResetPassword(token: string, newPassword: string) {
+		const userId = await RedisService.GetUserIdFromResetPasswordToken(token);
+
+		if (!userId || !ValidatorService.isValidUserId(Number(userId))) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid reset password token');
+		}
+
+		const user = await OffChainDbService.GetUserById(userId);
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
+		}
+
+		const { password, salt } = await this.GetSaltAndHashedPassword(newPassword);
+
+		await OffChainDbService.UpdateUserPassword(user.id, password, salt);
+
+		await RedisService.DeleteResetPasswordToken(token);
 	}
 }

@@ -505,4 +505,8 @@ export class OffChainDbService {
 			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title });
 		}
 	}
+
+	static async UpdateUserPassword(userId: number, password: string, salt: string) {
+		return FirestoreService.UpdateUserPassword(userId, password, salt);
+	}
 }

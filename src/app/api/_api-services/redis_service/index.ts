@@ -25,7 +25,7 @@ export class RedisService {
 	private static readonly client: Redis = new Redis(REDIS_URL);
 
 	private static readonly redisKeysMap = {
-		[ERedisKeys.PASSWORD_RESET_TOKEN]: (userId: number): string => `${ERedisKeys.PASSWORD_RESET_TOKEN}-${userId}`,
+		[ERedisKeys.PASSWORD_RESET_TOKEN]: (token: string): string => `${ERedisKeys.PASSWORD_RESET_TOKEN}-${token}`,
 		[ERedisKeys.EMAIL_VERIFICATION_TOKEN]: (token: string): string => `${ERedisKeys.EMAIL_VERIFICATION_TOKEN}-${token}`,
 		[ERedisKeys.TWO_FACTOR_AUTH_TOKEN]: (tfaToken: string): string => `${ERedisKeys.TWO_FACTOR_AUTH_TOKEN}-${tfaToken}`,
 		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
@@ -103,5 +103,18 @@ export class RedisService {
 
 	static async SetSubscanData(network: string, url: string, data: string): Promise<void> {
 		await this.Set(this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), data, TWELVE_HOURS_IN_SECONDS);
+	}
+
+	static async SetResetPasswordToken(token: string, userId: number): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), userId.toString(), ONE_DAY);
+	}
+
+	static async GetUserIdFromResetPasswordToken(token: string): Promise<number | null> {
+		const userId = await this.Get(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
+		return userId ? Number(userId) : null;
+	}
+
+	static async DeleteResetPasswordToken(token: string): Promise<void> {
+		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
 	}
 }

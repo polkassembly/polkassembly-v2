@@ -31,7 +31,6 @@ export class NotificationService {
 			body: JSON.stringify({
 				args: {
 					email: user.email,
-					username: user.username,
 					verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
 				},
 				trigger: ENotificationTrigger.VERIFY_EMAIL
@@ -39,5 +38,19 @@ export class NotificationService {
 			headers: this.firebaseFunctionsHeader(user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK),
 			method: 'POST'
 		}).catch((e) => console.error('Verification Email not sent', e));
+	}
+
+	static async SendResetPasswordEmail(user: IUser, token: string) {
+		await fetchPF(`${this.NOTIFICATION_ENGINE_URL}`, {
+			body: JSON.stringify({
+				args: {
+					email: user.email,
+					resetUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/reset-password?token=${token}`
+				},
+				trigger: ENotificationTrigger.RESET_PASSWORD
+			}),
+			headers: this.firebaseFunctionsHeader(user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK),
+			method: 'POST'
+		}).catch((e) => console.error('Reset Password Email not sent', e));
 	}
 }

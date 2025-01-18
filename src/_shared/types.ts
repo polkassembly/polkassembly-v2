@@ -258,7 +258,8 @@ export interface IUserPreferences {
 }
 
 export enum ENotificationTrigger {
-	VERIFY_EMAIL = 'verifyEmail'
+	VERIFY_EMAIL = 'verifyEmail',
+	RESET_PASSWORD = 'resetPassword'
 }
 
 export enum EDataSource {
