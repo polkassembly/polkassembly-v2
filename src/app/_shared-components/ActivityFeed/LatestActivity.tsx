@@ -10,6 +10,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
+import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
 
 function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 	const observerTarget = useRef<HTMLDivElement>(null);
@@ -77,7 +78,7 @@ function LatestActivity({ currentTab }: { currentTab: EActivityFeedTab }) {
 					/>
 				</>
 			) : (
-				<p>Data will be available soon</p>
+				<SubscribedPostList postData={{ posts: [], totalCount: 0 }} />
 			)}
 		</div>
 	);

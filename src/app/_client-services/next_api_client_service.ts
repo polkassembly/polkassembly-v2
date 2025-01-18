@@ -10,6 +10,7 @@ import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EApiRoute,
 	EProposalType,
+	EReaction,
 	EVoteDecision,
 	EWallet,
 	IAuthResponse,
@@ -87,7 +88,11 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 				break;
 			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
+				break;
+			case EApiRoute.DELETE_REACTION:
+				method = 'DELETE';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -202,6 +207,19 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
 		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
 	}
+
+	// Post Reactions
+	static async postReactionsApi(proposalType: EProposalType, index: string, reactionType: EReaction) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POST_REACTIONS, routeSegments: [proposalType, index, 'reactions'] });
+		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
+	}
+
+	// Delete Post Reaction
+	static async deletePostReactionApi(proposalType: EProposalType, index: string, reactionId: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_REACTION, routeSegments: [proposalType, index, 'reactions', reactionId] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
 	// details
 	static async fetchProposalDetailsApi(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });

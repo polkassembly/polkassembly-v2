@@ -47,7 +47,15 @@
 			"liked": "いいね済み",
 			"disliked": "よくないね済み",
 			"allCaughtUp": "あなたはすべての更新を読み終えました！",
-			"allCaughtUpDescription": "他のカテゴリやトピックを探検してみませんか？"
+			"allCaughtUpDescription": "他のカテゴリやトピックを探検してみませんか？",
+			"noActivity": "アクティビティが見つかりません",
+			"noActivityDescription": "Polkassemblyにフォローまたは購読して、フィードに個別のコンテンツを表示します！",
+			"LogoutAllCaughtUp": "Polkassemblyに参加して、購読済みタブを表示します！",
+			"LogoutAllCaughtUpDescription": "Polkassemblyで議論、投稿、および定期的な更新を受信",
+			"showMore": "もっと見る",
+			"loadMoreComments": "もっとコメントを見る",
+			"showLessComments": "もっとコメントを見る",
+			"commentingOnProposal": "提案にコメントする"
 		}
 	},
 	"AddressDropdown": {

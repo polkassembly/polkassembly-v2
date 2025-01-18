@@ -8,7 +8,7 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { useTranslations } from 'next-intl';
 import styles from './CommentInput.module.scss';
 
-function CommentInput({ inputRef }: { inputRef: React.RefObject<HTMLInputElement> }) {
+function CommentInput({ inputRef, onClick }: { inputRef: React.RefObject<HTMLInputElement>; onClick: () => void }) {
 	const t = useTranslations();
 	const CONSTANTS = {
 		COMMENT_PLACEHOLDER: t('ActivityFeed.CommentPlaceholder'),
@@ -16,7 +16,11 @@ function CommentInput({ inputRef }: { inputRef: React.RefObject<HTMLInputElement
 		ANIMATION_DURATION: 1500
 	};
 	return (
-		<div className='flex items-center'>
+		<div
+			onClick={onClick}
+			className='flex w-full items-center text-start'
+			aria-hidden='true'
+		>
 			<Image
 				src={userIcon}
 				alt='User Icon'

@@ -2,75 +2,81 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
+import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
 import { Skeleton } from '../Skeleton';
-import BlockEditor from '../BlockEditor/BlockEditor';
 import { Tabs, TabsContent } from '../Tabs';
 import Timeline from './Timeline/Timeline';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
+import PostContent from './PostContent';
 
-function PostDetails({ postData, index, isModalOpen }: { postData: IPost; index: string; isModalOpen?: boolean }) {
+function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
 				<PostHeader
-					title={postData.title || ''}
-					proposer={postData.onChainInfo?.proposer || ''}
-					createdAt={postData.createdAt || new Date()}
-					tags={postData.tags}
-					status={postData.onChainInfo?.status || ''}
-					beneficiaries={postData.onChainInfo?.beneficiaries}
+					isModalOpen={isModalOpen ?? false}
+					postData={postData as IPostListing}
 				/>
 			</div>
-			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-3')}>
+			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3')}>
 				<div className={classes.leftWrapper}>
 					<div className={classes.descBox}>
-						<TabsContent
-							className={isModalOpen ? 'flex max-h-96 w-96 overflow-y-auto border-none lg:w-full' : ''}
-							value={EPostDetailsTab.DESCRIPTION}
-						>
-							<BlockEditor
-								data={postData.content}
-								readOnly
-								className={isModalOpen ? '' : 'max-h-full border-none'}
-								id='post-content'
+						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
+							<PostContent
+								postData={postData as IPostListing}
+								isModalOpen={isModalOpen ?? false}
 							/>
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
-							<Timeline timeline={postData.onChainInfo?.timeline} />
+							<Timeline timeline={postData?.onChainInfo?.timeline} />
 						</TabsContent>
 					</div>
-					<div className={classes.commentsBox}>
-						<Suspense fallback={<Skeleton className='h-4' />}>
-							<PostComments
-								proposalType={EProposalType.REFERENDUM_V2}
-								index={index}
-							/>
-						</Suspense>
+					{isModalOpen && (
+						<div className='pt-5'>
+							{' '}
+							<VoteReferendumButton index={index} />
+						</div>
+					)}
+					{!isModalOpen && (
+						<div className={classes.commentsBox}>
+							<Suspense
+								fallback={
+									<div className='p-6'>
+										<Skeleton className='h-4' />
+									</div>
+								}
+							>
+								<PostComments
+									proposalType={EProposalType.REFERENDUM_V2}
+									index={index}
+								/>
+							</Suspense>
+						</div>
+					)}
+				</div>
+				{!isModalOpen && (
+					<div className={classes.rightWrapper}>
+						<VoteReferendumButton index={index} />
+						<ProposalPeriods
+							confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
+							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
+							preparePeriodEndsAt={postData?.onChainInfo?.preparePeriodEndsAt}
+							status={postData?.onChainInfo?.status}
+						/>
+						<VoteSummary
+							proposalType={EProposalType.REFERENDUM_V2}
+							index={index}
+							voteMetrics={postData?.onChainInfo?.voteMetrics}
+						/>
 					</div>
-				</div>
-				<div className={classes.rightWrapper}>
-					<VoteReferendumButton index={index} />
-
-					<ProposalPeriods
-						confirmationPeriodEndsAt={postData.onChainInfo?.confirmationPeriodEndsAt}
-						decisionPeriodEndsAt={postData.onChainInfo?.decisionPeriodEndsAt}
-						preparePeriodEndsAt={postData.onChainInfo?.preparePeriodEndsAt}
-						status={postData.onChainInfo?.status}
-					/>
-					<VoteSummary
-						proposalType={EProposalType.REFERENDUM_V2}
-						index={index}
-						voteMetrics={postData.onChainInfo?.voteMetrics}
-					/>
-				</div>
+				)}
 			</div>
 		</Tabs>
 	);

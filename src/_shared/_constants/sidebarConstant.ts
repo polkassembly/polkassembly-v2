@@ -98,7 +98,7 @@ const getOriginsItems = (networkKey: ENetwork, t: (key: string) => string) => {
 };
 
 export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: string) => string, trackCounts: ITrackCounts = {}) => {
-	const network = NETWORKS_DETAILS[networkKey];
+	const network = NETWORKS_DETAILS[networkKey as ENetwork];
 	if (!network) {
 		throw new Error(`Network ${networkKey} not found`);
 	}

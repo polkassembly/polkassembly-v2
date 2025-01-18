@@ -13,3 +13,7 @@
 .editorWrapper {
     @apply flex flex-1 items-end gap-x-2
 }
+
+.commentsBox {
+    @apply flex flex-col items-end gap-y-2
+}

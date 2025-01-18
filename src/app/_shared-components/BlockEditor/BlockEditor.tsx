@@ -36,13 +36,18 @@ function BlockEditor({
 }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [shouldScroll, setShouldScroll] = useState(false);
-
-	const blockEditorRef = useRef<EditorJS>(null);
+	const blockEditorRef = useRef<EditorJS | null>(null);
 
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
-	const clearEditor = () => {
-		blockEditorRef?.current?.blocks?.clear?.();
+	const clearEditor = async () => {
+		try {
+			if (blockEditorRef.current?.blocks) {
+				await blockEditorRef.current.blocks.clear();
+			}
+		} catch (error) {
+			console.error('Error clearing editor:', error);
+		}
 	};
 
 	useImperativeHandle(ref, () => ({
@@ -51,92 +56,95 @@ function BlockEditor({
 
 	// Initialize editorjs
 	useEffect(() => {
-		// Initialize editorjs if we don't have a reference
-		if (!blockEditorRef.current) {
-			const editor = new EditorJS({
-				readOnly,
-				minHeight: 400,
-				holder: `block-editor-${id}`,
-				inlineToolbar: true,
-				tools: {
-					header: {
-						class: Header as unknown as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					list: {
-						class: List as unknown as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					table: {
-						class: Table as unknown as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					paragraph: {
-						class: Paragraph as BlockToolConstructable,
-						inlineToolbar: true
-					},
-					image: {
-						class: Image,
-						inlineToolbar: true,
-						config: {
-							features: {
-								caption: false
-							},
-							uploader: {
-								uploadByFile: async (file: File) => {
-									const form = new FormData();
-									form.append('image', file, `${file.name}`);
-									const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
-										body: form,
-										method: 'POST'
-									});
-									const uploadData = await res.json();
-									if (uploadData?.success) {
+		const initializeEditor = async () => {
+			if (!blockEditorRef.current) {
+				const editor = new EditorJS({
+					readOnly,
+					minHeight: 400,
+					holder: `block-editor-${id}`,
+					inlineToolbar: true,
+					tools: {
+						header: {
+							class: Header as unknown as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						list: {
+							class: List as unknown as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						table: {
+							class: Table as unknown as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						paragraph: {
+							class: Paragraph as BlockToolConstructable,
+							inlineToolbar: true
+						},
+						image: {
+							class: Image,
+							inlineToolbar: true,
+							config: {
+								features: {
+									caption: false
+								},
+								uploader: {
+									uploadByFile: async (file: File) => {
+										const form = new FormData();
+										form.append('image', file, file.name);
+										const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
+											body: form,
+											method: 'POST'
+										});
+										const uploadData = await res.json();
+										if (uploadData?.success) {
+											return {
+												success: 1,
+												file: {
+													url: uploadData.data.url
+												}
+											};
+										}
 										return {
-											success: 1,
-											file: {
-												url: uploadData.data.url
-											}
+											success: 0
 										};
 									}
-									return {
-										success: 0
-									};
 								}
 							}
 						}
-					}
-				},
-				data: data as unknown as OutputData,
-				onReady: async () => {
-					if (data) {
-						if (renderFromHtml) {
-							const htmlString = convertMarkdownToHtml(data as string);
-
-							const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
-
-							await editor.blocks.render(editorJsOutputData);
-						} else {
-							await editor.blocks.render(data as unknown as OutputData);
+					},
+					data: data as OutputData,
+					onReady: async () => {
+						if (data) {
+							try {
+								if (renderFromHtml) {
+									const htmlString = convertMarkdownToHtml(data as string);
+									const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
+									await editor.blocks.render(editorJsOutputData);
+								} else {
+									await editor.blocks.render(data as OutputData);
+								}
+							} catch (error) {
+								console.error('Error rendering initial data:', error);
+							}
 						}
-					}
-				},
-				async onChange(api) {
-					if (readOnly) return;
+					},
+					async onChange(api) {
+						if (readOnly) return;
+						try {
+							const edJsData = await api.saver.save();
+							onChange?.(edJsData);
+						} catch (error) {
+							console.error('Error in onChange:', error);
+						}
+					},
+					placeholder: readOnly ? '' : 'Type your comment here'
+				});
+				blockEditorRef.current = editor;
+			}
+		};
 
-					const edJsData = await api.saver.save();
-					// const htmlArr = edjsParser.parse(edJsData);
-					onChange?.(edJsData);
-					// if (containerRef.current) {
-					// api.blocks.getBlockByElement(containerRef.current)?.holder.scrollIntoView();
-					// }
-				},
-				placeholder: readOnly ? '' : 'Type your comment here'
-			});
-			blockEditorRef.current = editor;
-		}
+		initializeEditor();
 
-		// Add a return function to handle cleanup
 		return () => {
 			if (blockEditorRef.current && blockEditorRef.current.destroy) {
 				blockEditorRef.current.destroy();
@@ -155,7 +163,6 @@ function BlockEditor({
 		};
 		checkHeight();
 
-		// resize observer to check height changes
 		const observer = new ResizeObserver(checkHeight);
 		if (containerRef.current) {
 			observer.observe(containerRef.current);
@@ -165,6 +172,27 @@ function BlockEditor({
 			observer.disconnect();
 		};
 	}, []);
+
+	useEffect(() => {
+		const updateContent = async () => {
+			try {
+				if (blockEditorRef?.current?.blocks && data) {
+					await blockEditorRef.current.blocks.clear();
+					if (renderFromHtml) {
+						const htmlString = convertMarkdownToHtml(data as string);
+						const editorJsOutputData = convertHtmlToEditorJs(htmlString as string);
+						await blockEditorRef.current.blocks.render(editorJsOutputData);
+					} else {
+						await blockEditorRef.current.blocks.render(data as OutputData);
+					}
+				}
+			} catch (error) {
+				console.error('Error updating content:', error);
+			}
+		};
+
+		updateContent();
+	}, [data, renderFromHtml]);
 
 	return (
 		<div

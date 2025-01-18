@@ -5,12 +5,10 @@
 import React, { RefObject, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
-import { IoShareSocialOutline } from 'react-icons/io5';
-import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { EReaction, IPostListing } from '@/_shared/types';
+import { IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -25,51 +23,35 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
-import ReactionButton from '../ReactionButton/ReactionButton';
+import { useRouter } from 'next/navigation';
+import { usePostReactions } from '@/hooks/usePostReactions';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
+import CommentModal from '../CommentModal/CommentModal';
+import ReactionHandler from '../ReactionHandler';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../../Dialog/Dialog';
+import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
 function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
+	const router = useRouter();
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
-	const [showLikeGif, setShowLikeGif] = useState(false);
-	const [showDislikeGif, setShowDislikeGif] = useState(false);
-	const [reactionState, setReactionState] = useState({
-		isLiked: false,
-		isDisliked: false,
-		likesCount: postData?.metrics?.reactions?.like || 0,
-		dislikesCount: postData?.metrics?.reactions?.dislike || 0
-	});
-	const ANIMATION_DURATION = 1500;
+	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
 
-	const handleReaction = (type: EReaction.like | EReaction.dislike) => {
-		const isLikeAction = type === EReaction.like;
-		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
-		const currentState = isLikeAction ? reactionState.isLiked : reactionState.isDisliked;
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction } = usePostReactions(postData);
 
-		if (!currentState) {
-			showGifSetter(true);
-			setTimeout(() => showGifSetter(false), ANIMATION_DURATION);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-			setReactionState((prev) => ({
-				isLiked: isLikeAction,
-				isDisliked: !isLikeAction,
-				likesCount: prev.likesCount + (isLikeAction ? 1 : prev.isLiked ? -1 : 0),
-				dislikesCount: prev.dislikesCount + (!isLikeAction ? 1 : prev.isDisliked ? -1 : 0)
-			}));
+	const handleCommentClick = () => {
+		if (!user?.id) {
+			router.push('/login');
 		} else {
-			setReactionState((prev) => ({
-				...prev,
-				isLiked: isLikeAction ? false : prev.isLiked,
-				isDisliked: !isLikeAction ? false : prev.isDisliked,
-				likesCount: prev.likesCount + (isLikeAction ? -1 : 0),
-				dislikesCount: prev.dislikesCount + (!isLikeAction ? -1 : 0)
-			}));
+			setIsDialogOpen(true);
 		}
 	};
 
@@ -82,6 +64,10 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+
+	const formatOriginText = (text: string): string => {
+		return text.replace(/([A-Z])/g, ' $1').trim();
+	};
 
 	return (
 		<div className='rounded-xl border border-border_grey bg-bg_modal p-5'>
@@ -107,17 +93,39 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
 				</div>
 				<div>
-					<span className={styles.castVoteButton}>
-						<Image
-							src={VoteIcon}
-							alt=''
-							width={20}
-							height={20}
-						/>
+					{user?.id ? (
+						<Dialog>
+							<DialogTrigger asChild>
+								<span className={`${styles.castVoteButton} cursor-pointer`}>
+									<Image
+										src={VoteIcon}
+										alt=''
+										width={20}
+										height={20}
+									/>
+									<span>{t('PostDetails.castVote')}</span>
+								</span>
+							</DialogTrigger>
+							<DialogTitle>
+								<DialogContent className='max-w-xl p-6'>
+									<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+									<VoteReferendum index={postData?.index?.toString() || ''} />
+								</DialogContent>
+							</DialogTitle>
+						</Dialog>
+					) : (
 						<Link href='/login'>
-							<span>{user?.id ? 'Cast Vote' : 'Login to vote'}</span>
+							<span className={`${styles.castVoteButton} cursor-pointer`}>
+								<Image
+									src={VoteIcon}
+									alt=''
+									width={20}
+									height={20}
+								/>
+								<span>{t('PostDetails.loginToVote')}</span>
+							</span>
 						</Link>
-					</span>
+					)}
 				</div>
 			</div>
 
@@ -128,7 +136,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 						<Address address={postData.onChainInfo?.proposer || ''} />
 					</span>
 					<span>in</span>
-					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{postData.onChainInfo?.origin}</span>
+					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
 					<span>|</span>
 					<span className='flex items-center gap-2'>
 						<FaRegClock className='text-sm' />
@@ -178,7 +186,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					</span>
 					<span>|</span>
 					<span>
-						{postData?.metrics?.comments} {t('ActivityFeed.PostItem.comments')}
+						{commentCount} {t('ActivityFeed.PostItem.comments')}
 					</span>
 				</div>
 			</div>
@@ -186,44 +194,26 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<div className='mb-4 flex items-center justify-between text-sm text-navbar_border'>
-				<div className='flex space-x-4'>
-					<ReactionButton
-						type={EReaction.like}
-						isActive={reactionState.isLiked}
-						showGif={showLikeGif}
-						onClick={() => handleReaction(EReaction.like)}
-					/>
-					<ReactionButton
-						type={EReaction.dislike}
-						isActive={reactionState.isDisliked}
-						showGif={showDislikeGif}
-						onClick={() => handleReaction(EReaction.dislike)}
-					/>
-					<button
-						type='button'
-						className='flex cursor-pointer items-center'
-					>
-						<IoShareSocialOutline className={`${styles.activity_icons} mr-2 text-lg`} />
-						<span>{t('ActivityFeed.PostItem.share')}</span>
-					</button>
-					<button
-						type='button'
-						className='flex cursor-pointer items-center'
-					>
-						<Image
-							src={CommentIcon}
-							className='mr-2'
-							alt='Comment'
-							width={16}
-							height={16}
-						/>
-						<span>{t('ActivityFeed.PostItem.comment')}</span>
-					</button>
-				</div>
-			</div>
+			<ReactionHandler
+				postData={postData}
+				setIsDialogOpen={setIsDialogOpen}
+				reactionState={reactionState}
+				showLikeGif={showLikeGif}
+				showDislikeGif={showDislikeGif}
+				handleReaction={handleReaction}
+			/>
 
-			<CommentInput inputRef={inputRef as RefObject<HTMLInputElement>} />
+			<CommentInput
+				inputRef={inputRef as RefObject<HTMLInputElement>}
+				onClick={handleCommentClick}
+			/>
+
+			<CommentModal
+				isDialogOpen={isDialogOpen}
+				setIsDialogOpen={setIsDialogOpen}
+				postData={postData}
+				onCommentAdded={() => setCommentCount((prev) => prev + 1)}
+			/>
 		</div>
 	);
 }

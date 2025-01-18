@@ -43,7 +43,7 @@ function Timeline({ timeline }: { timeline?: IStatusHistoryItem[] }) {
 							>
 								<div className={classes.timelineItem}>
 									<span className='text-xs text-text_primary'>{dayjs(item.timestamp).format("Do MMM 'YY, h:mm a")}</span>
-									<StatusTag status={item.status} />
+									<StatusTag status={item.status.toLowerCase().replace(/\s+/g, '_')} />
 								</div>
 								{i !== timeline.length - 1 && <Separator className='bg-border_grey' />}
 							</div>

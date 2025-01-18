@@ -47,7 +47,15 @@
 			"liked": "Me gustó",
 			"disliked": "No me gustó",
 			"allCaughtUp": "Estás al día!",
-			"allCaughtUpDescription": "¿Por qué no explorar otras categorías o temas?"
+			"allCaughtUpDescription": "¿Por qué no explorar otras categorías o temas?",
+			"noActivity": "No se encontraron actividades",
+			"noActivityDescription": "Sigue o suscríbete a personas y publicaciones para ver contenido personalizado en tu feed!",
+			"LogoutAllCaughtUp": "Únete a Polkassembly para ver tu pestaña Suscrito!",
+			"LogoutAllCaughtUpDescription": "Discute, contribuye y obtén actualizaciones regulares de Polkassembly",
+			"showMore": "Mostrar más",
+			"loadMoreComments": "Cargar más comentarios",
+			"showLessComments": "Mostrar menos comentarios",
+			"commentingOnProposal": "Comentando en propuesta"
 		}
 	},
 	"AddressDropdown": {

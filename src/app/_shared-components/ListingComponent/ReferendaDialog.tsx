@@ -55,8 +55,8 @@ export default function ReferendaDialog({ data, index }: ReferendaDialogProps) {
 						</div>
 						<PostDetails
 							index={index}
-							postData={data}
 							isModalOpen
+							postData={data}
 						/>
 					</div>
 				</DialogContent>

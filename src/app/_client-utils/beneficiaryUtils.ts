@@ -7,24 +7,24 @@ import { IBeneficiary, ENetwork } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 
 export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiary[] | undefined | null, network: ENetwork): Record<string, BN> => {
-	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network]) {
+	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network as ENetwork]) {
 		return {};
 	}
 
 	return beneficiaries.reduce((acc: Record<string, BN>, curr: IBeneficiary) => {
 		if (!curr) return acc;
 
-		const assetId = curr.assetId || NETWORKS_DETAILS[network].tokenSymbol;
+		const assetId = curr.assetId || NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
 
 		if (!assetId) return acc;
 
-		if (!acc[assetId]) {
-			acc[assetId] = new BN(0);
+		if (!acc[assetId as string]) {
+			acc[assetId as string] = new BN(0);
 		}
 
 		try {
 			const amount = new BN(curr.amount || '0');
-			acc[assetId] = acc[assetId].add(amount);
+			acc[assetId as string] = acc[assetId as string].add(amount);
 		} catch (error) {
 			console.error(`Error processing beneficiary amount: ${error}`);
 		}

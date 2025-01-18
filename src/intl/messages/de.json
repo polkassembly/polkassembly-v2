@@ -47,7 +47,15 @@
 			"liked": "Gefällt mir",
 			"disliked": "Gefällt mir nicht",
 			"allCaughtUp": "Du bist auf dem Laufenden!",
-			"allCaughtUpDescription": "Warum nicht andere Kategorien oder Themen erkunden?"
+			"allCaughtUpDescription": "Warum nicht andere Kategorien oder Themen erkunden?",
+			"noActivity": "Keine Aktivität gefunden",
+			"noActivityDescription": "Folgen oder Abonnieren Sie Personen und Beiträge, um personalisierte Inhalte auf Ihrem Feed anzuzeigen!",
+			"LogoutAllCaughtUp": "Tritt Polkassembly bei, um dein Abonniertes Tab anzuzeigen!",
+			"LogoutAllCaughtUpDescription": "Diskutiere, beitrage und erhalte regelmäßige Updates von Polkassembly",
+			"showMore": "Mehr anzeigen",
+			"loadMoreComments": "Mehr Kommentare anzeigen",
+			"showLessComments": "Weniger Kommentare anzeigen",
+			"commentingOnProposal": "Kommentieren auf Vorschlag"
 		}
 	},
 	"AddressDropdown": {

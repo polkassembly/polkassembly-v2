@@ -47,7 +47,16 @@
 			"liked": "Liked",
 			"disliked": "Disliked",
 			"allCaughtUp": "You're all caught up!",
-			"allCaughtUpDescription": "Why not explore other categories or topics?"
+			"allCaughtUpDescription": "Why not explore other categories or topics?",
+			"noActivity": "No Activity Found",
+			"noActivityDescription": "Follow or Subscribe to people and posts to view personalized content on your feed!",
+			"LogoutAllCaughtUp": "Join Polkassembly to see your Following tab!",
+			"LogoutAllCaughtUpDescription": "Discuss, contribute and get regular updates from Polkassembly",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"loadMoreComments": "Load more comments",
+			"showLessComments": "Show less comments",
+			"commentingOnProposal": "Commenting on proposal"
 		}
 	},
 	"AddressDropdown": {

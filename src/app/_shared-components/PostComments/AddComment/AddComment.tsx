@@ -77,41 +77,44 @@ function AddComment({
 	};
 
 	return (
-		<div className={classes.wrapper}>
-			<Identicon
-				value={user?.addresses[0]}
-				theme='polkadot'
-				size={30}
-			/>
-			<div className={classes.editorWrapper}>
-				<div className='flex-1'>
-					<BlockEditor
-						onChange={(data) => {
-							setContent(data);
-						}}
-						id={editorId}
-						ref={blockEditorActionsRef}
-					/>
+		<div className={classes.commentsBox}>
+			<div className={classes.wrapper}>
+				<Identicon
+					value={user?.addresses[0]}
+					theme='polkadot'
+					size={30}
+				/>
+				<div className={classes.editorWrapper}>
+					<div className='flex-1'>
+						<BlockEditor
+							onChange={(data) => {
+								setContent(data);
+							}}
+							id={editorId}
+							ref={blockEditorActionsRef}
+						/>
+					</div>
 				</div>
-				<div className={classes.btnWrapper}>
-					{onCancel && (
-						<Button
-							variant='secondary'
-							onClick={onCancel}
-							disabled={loading}
-						>
-							{t('PostDetails.cancel')}
-						</Button>
-					)}
+			</div>
+
+			<div className={classes.btnWrapper}>
+				{onCancel && (
 					<Button
-						className={classes.postBtn}
-						onClick={addComment}
-						disabled={!content || !content.blocks || (content as unknown as OutputData).blocks.length === 0}
-						isLoading={loading}
+						variant='secondary'
+						onClick={onCancel}
+						disabled={loading}
 					>
-						{t('PostDetails.post')}
+						{t('PostDetails.cancel')}
 					</Button>
-				</div>
+				)}
+				<Button
+					className={classes.postBtn}
+					onClick={addComment}
+					disabled={!content || !content.blocks || (content as unknown as OutputData).blocks.length === 0}
+					isLoading={loading}
+				>
+					{t('PostDetails.post')}
+				</Button>
 			</div>
 		</div>
 	);

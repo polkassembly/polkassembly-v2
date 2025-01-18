@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { IOnChainPostListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
-import JoinPA from '@/_assets/activityfeed/gifs/joinpa.gif';
+import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Loading from '@/app/loading';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -37,7 +37,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 	return (
 		<div>
 			<ActivityFeedNavbar
-				gov2LatestPosts={postData.posts}
+				gov2LatestPosts={postData?.posts}
 				currentTab={currentTab}
 				setCurrentTab={setCurrentTab}
 			/>
@@ -46,7 +46,7 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 			) : filteredPosts?.length === 0 || postData?.posts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
-						src={JoinPA}
+						src={NoActivity}
 						alt='empty state'
 						className='h-80 w-80 p-0'
 						width={320}
