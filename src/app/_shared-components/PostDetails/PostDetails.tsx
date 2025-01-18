@@ -46,7 +46,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 					{!isModalOpen && (
 						<div className={classes.commentsBox}>
-							<Suspense fallback={<Skeleton className='h-4' />}>
+							<Suspense
+								fallback={
+									<div className='p-6'>
+										<Skeleton className='h-4' />
+									</div>
+								}
+							>
 								<PostComments
 									proposalType={EProposalType.REFERENDUM_V2}
 									index={index}
