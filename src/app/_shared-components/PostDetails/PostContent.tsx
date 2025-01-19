@@ -39,7 +39,7 @@ function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModa
 				onChange={() => {}}
 			/>
 
-			{showMore ? (
+			{postData?.content?.blocks?.length && postData?.content?.blocks?.length > 4 && showMore ? (
 				<span
 					onClick={handleShowLess}
 					className='cursor-pointer text-sm font-medium text-text_pink'
