@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
-import LatestActivity from './LatestActivity';
+import LatestActivity from './ActivityFeedTab';
 import { Tabs, TabsContent } from '../Tabs/Tabs';
 import styles from './ActivityFeed.module.scss';
 
