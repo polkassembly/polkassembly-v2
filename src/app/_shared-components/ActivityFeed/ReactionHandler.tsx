@@ -5,7 +5,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
-import { EReaction, IPostListing } from '@/_shared/types';
+import { EReaction, IActivityFeedPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { IoShareSocialOutline } from 'react-icons/io5';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
@@ -33,7 +33,7 @@ function ReactionHandler({
 	showDislikeGif,
 	handleReaction
 }: {
-	postData: IPostListing;
+	postData: IActivityFeedPostListing;
 	setIsDialogOpen: (value: boolean) => void;
 	reactionState: {
 		isLiked: boolean;
@@ -48,6 +48,14 @@ function ReactionHandler({
 	const router = useRouter();
 	const { user } = useUser();
 	const t = useTranslations();
+
+	const UserReaction = postData?.userReaction?.userId === user?.id ? postData?.userReaction?.reaction : null;
+
+	const currentReactionState = {
+		...reactionState,
+		isLiked: UserReaction === EReaction.like,
+		isDisliked: UserReaction === EReaction.dislike
+	};
 
 	const handleAuthenticatedAction = (action: () => void) => {
 		if (!user?.id) {
@@ -80,13 +88,13 @@ function ReactionHandler({
 			<div className='flex space-x-4'>
 				<ReactionButton
 					type={EReaction.like}
-					isActive={reactionState.isLiked}
+					isActive={currentReactionState.isLiked}
 					showGif={showLikeGif}
 					onClick={handleLike}
 				/>
 				<ReactionButton
 					type={EReaction.dislike}
-					isActive={reactionState.isDisliked}
+					isActive={currentReactionState.isDisliked}
 					showGif={showDislikeGif}
 					onClick={handleDislike}
 				/>
