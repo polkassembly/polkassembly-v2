@@ -178,6 +178,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

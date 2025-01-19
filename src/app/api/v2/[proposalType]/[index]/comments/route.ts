@@ -65,6 +65,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	// Invalidate caches since comment count changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json(newComment);
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

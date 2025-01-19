@@ -73,6 +73,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const network = await getNetworkFromHeaders();
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Comment updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
@@ -106,6 +107,7 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	const network = await getNetworkFromHeaders();
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Comment deleted successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

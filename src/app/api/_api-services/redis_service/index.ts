@@ -20,7 +20,8 @@ enum ERedisKeys {
 	SUBSCAN_DATA = 'SDT',
 	REFRESH_TOKEN = 'RFT',
 	POST_DATA = 'PDT',
-	POSTS_LISTING = 'PLT'
+	POSTS_LISTING = 'PLT',
+	ACTIVITY_FEED = 'AFD'
 }
 
 export class RedisService {
@@ -39,6 +40,12 @@ export class RedisService {
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
 			return baseKey + statusesPart + originsPart + tagsPart;
+		},
+		[ERedisKeys.ACTIVITY_FEED]: (network: string, page: number, limit: number, userId?: number, origins?: string[]): string => {
+			const baseKey = `${ERedisKeys.ACTIVITY_FEED}-${network}-${page}-${limit}`;
+			const userPart = userId ? `-u:${userId}` : '';
+			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
+			return baseKey + userPart + originsPart;
 		}
 	};
 
@@ -185,5 +192,44 @@ export class RedisService {
 
 	static async DeletePostsListing({ network, proposalType }: { network: string; proposalType: string }): Promise<void> {
 		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*`);
+	}
+
+	// Activity feed caching methods
+	static async GetActivityFeed({
+		network,
+		page,
+		limit,
+		userId,
+		origins
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		userId?: number;
+		origins?: string[];
+	}): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins));
+	}
+
+	static async SetActivityFeed({
+		network,
+		page,
+		limit,
+		data,
+		userId,
+		origins
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		data: string;
+		userId?: number;
+		origins?: string[];
+	}): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), data, ONE_DAY);
+	}
+
+	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
+		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
 	}
 }
