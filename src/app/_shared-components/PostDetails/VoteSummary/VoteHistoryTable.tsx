@@ -95,9 +95,12 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
 	};
 
+	if (loading) {
+		return <LoadingLayover />;
+	}
+
 	return (
 		<Table className='relative min-h-[200px]'>
-			{loading && <LoadingLayover />}
 			<TableHeader className='w-full'>
 				{table.getHeaderGroups().map((headerGroup) => (
 					<TableRow key={headerGroup.id}>

@@ -135,7 +135,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 												<Image
 													src={subItem.icon}
 													alt={subItem.title || 'icon'}
-													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !subItem.isActive ? DARK_THEME_CLASS : ''}`}
 													width={20}
 													height={20}
 												/>
@@ -166,7 +166,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 							<SidebarMenuButton
 								size='lg'
 								tooltip={item.title}
-								className={`${style.sidebarButtonCollapse} ${item.isActive ? style.sidebarActive : ''}`}
+								className={`${style.sidebarButtonCollapse} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.sidebarActive : ''}`}
 								onClick={() => {
 									if (!item.items?.length) {
 										window.location.href = item.url || '#';
@@ -178,7 +178,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 										<Image
 											src={item.icon}
 											alt={item.title || 'icon'}
-											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
+											className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
 											width={24}
 											height={24}
 										/>
@@ -230,8 +230,46 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 	);
 }
 
-function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: ETheme }) {
+function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMenuItem; isOpen: boolean; theme: ETheme; onClick?: () => void }) {
 	const t = useTranslations();
+	return (
+		<SidebarMenuButton
+			size='default'
+			tooltip={item.title}
+			className={`${style.mainButton} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.sidebarActive : ''}`}
+			onClick={onClick}
+		>
+			{item.icon && (
+				<div className={style.iconWrapper}>
+					<Image
+						src={item.icon}
+						alt={item.title || 'icon'}
+						className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
+						width={24}
+						height={24}
+					/>
+				</div>
+			)}
+			<span className={style.mainTitle}>
+				<span className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? 'text-sidebar_menu_active_text' : ''}`}>{item.title}</span>
+				{item.isNew && <span className={style.newBadge_expanded}>{t(NEW_BADGE_TEXT)}</span>}
+			</span>
+			{item.items && (
+				<ChevronRight
+					className={`${style.chevron} ${isOpen ? style.chevronRotate : ''} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.chevron_active : ''}`}
+				/>
+			)}
+		</SidebarMenuButton>
+	);
+}
+
+function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: ETheme }) {
+	const handleClick = () => {
+		if (item.items) {
+			setIsOpen(!isOpen);
+		}
+	};
+
 	return (
 		<SidebarMenuItem>
 			<Collapsible
@@ -239,65 +277,30 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 				onOpenChange={setIsOpen}
 				className={style.mainCollapsible}
 			>
-				{item.items ? (
-					<CollapsibleTrigger asChild>
-						<SidebarMenuButton
-							size='default'
-							tooltip={item.title}
-							className={`${style.mainButton} ${item.isActive ? style.sidebarActive : ''}`}
-						>
-							{item.icon && (
-								<div className={style.iconWrapper}>
-									<Image
-										src={item.icon}
-										alt={item.title || 'icon'}
-										className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
-										width={24}
-										height={24}
-									/>
-								</div>
-							)}
-							<span className={style.mainTitle}>
-								<span className='text-text_primary'>{item.title}</span>
-								{item.isNew && <span className={style.newBadge_expanded}>{t(NEW_BADGE_TEXT)}</span>}
-							</span>
-							{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
-						</SidebarMenuButton>
-					</CollapsibleTrigger>
-				) : (
-					<CollapsibleTrigger asChild>
-						<Link href={item.url || ''}>
-							<SidebarMenuButton
-								size='default'
-								tooltip={item.title}
-								className={`${style.mainButton} ${item.isActive ? style.sidebarActive : 'text-text_primary'}`}
-							>
-								{item.icon && (
-									<div className={style.iconWrapper}>
-										<Image
-											src={item.icon}
-											alt={item.title || 'icon'}
-											className={`${item.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
-											width={24}
-											height={24}
-										/>
-									</div>
-								)}
-								<span className={style.mainTitle}>
-									{item.title}
-									{item.isNew && <span className={style.newBadge_expanded}>{t(NEW_BADGE_TEXT)}</span>}
-								</span>
-								{item.items && <ChevronRight className={`${style.chevron} ${isOpen ? style.chevronRotate : ''}`} />}
-							</SidebarMenuButton>
+				<CollapsibleTrigger asChild>
+					{item.items ? (
+						<CollapsibleButton
+							item={item}
+							isOpen={isOpen}
+							theme={theme}
+							onClick={handleClick}
+						/>
+					) : (
+						<Link href={item.url || '#'}>
+							<CollapsibleButton
+								item={item}
+								isOpen={isOpen}
+								theme={theme}
+							/>
 						</Link>
-					</CollapsibleTrigger>
-				)}
+					)}
+				</CollapsibleTrigger>
 
 				{item.items && (
 					<CollapsibleContent>
 						<SidebarMenuSub>
 							<ul className={style.mainList}>
-								{item.items.map((subItem) => (
+								{item.items.map((subItem: ISidebarMenuItem) => (
 									<SidebarMenuSubItem key={subItem.title}>
 										{subItem.items ? (
 											<NestedCollapsible item={subItem} />

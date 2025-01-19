@@ -49,7 +49,7 @@
 }
 
 .popoverContent {
-	@apply w-56 rounded-xl border-none text-text_primary bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md dark:bg-[var(--sidebar-accent-foreground)];
+	@apply w-52 rounded-xl border-none text-text_primary bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md dark:bg-[var(--sidebar-accent-foreground)];
 }
 
 .menuList {

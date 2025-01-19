@@ -20,7 +20,7 @@ function ActivityFeed() {
 	return (
 		<div className='min-h-screen bg-page_background px-10 pt-5'>
 			<div className='container mx-auto grid grid-cols-12 gap-5'>
-				<div className='col-span-12 pt-5'>
+				<div className='col-span-12'>
 					<div className={styles.activityFeedContainer}>
 						<div className={styles.activityFeedToggleButton}>
 							<div>

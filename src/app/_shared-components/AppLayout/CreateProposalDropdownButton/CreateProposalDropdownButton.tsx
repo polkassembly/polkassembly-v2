@@ -29,7 +29,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 	const { resolvedTheme: theme } = useTheme();
 
 	return (
-		<div className={`${style.card} ${state === 'collapsed' ? 'w-full' : 'mx-4 lg:w-[200px]'}`}>
+		<div className={`${style.card} ${state === 'collapsed' ? 'w-full' : 'lg:w-[200px]'}`}>
 			<Popover>
 				<PopoverTrigger asChild>
 					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}>
