@@ -17,6 +17,8 @@ import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { deepParseJson } from 'deep-parse-json';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -28,6 +30,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
+	// Try to get from cache first
+	const cachedData = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
+	if (cachedData) {
+		return NextResponse.json(deepParseJson(cachedData));
+	}
+
 	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
 
 	// if is off-chain post just return the offchain post data
@@ -36,6 +44,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
 		}
 
+		// Cache the response
+		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(offChainPostData) });
 		return NextResponse.json(offChainPostData);
 	}
 
@@ -53,6 +63,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		network: network as ENetwork,
 		onChainInfo: onChainPostInfo
 	};
+
+	// Cache the response
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
 
 	return NextResponse.json(post);
 });
@@ -92,6 +105,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			title
 		});
 	}
+
+	// Invalidate caches
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

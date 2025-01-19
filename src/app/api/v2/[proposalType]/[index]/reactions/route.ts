@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -49,6 +50,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		reaction
 	});
+
+	// Invalidate caches since reaction metrics changed
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
 
 	const response = NextResponse.json({ message: 'Reaction added successfully', reactionId });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

@@ -15,9 +15,13 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 
 const zodParamsSchema = z.object({
-	id: z.string()
+	id: z.string(),
+	proposalType: z.string(),
+	index: z.string()
 });
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
@@ -32,8 +36,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	return NextResponse.json(comment);
 });
 
-export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
-	const { id } = zodParamsSchema.parse(await params);
+export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string; proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { id, proposalType, index } = zodParamsSchema.parse(await params);
 
 	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
@@ -65,6 +69,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		content: formattedContent
 	});
 
+	// Invalidate caches since comment content changed
+	const network = await getNetworkFromHeaders();
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
+
 	const response = NextResponse.json({ message: 'Comment updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
@@ -72,8 +81,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	return response;
 });
 
-export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
-	const { id } = zodParamsSchema.parse(await params);
+export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string; proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { id, proposalType, index } = zodParamsSchema.parse(await params);
 
 	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
@@ -92,6 +101,11 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	}
 
 	await OffChainDbService.DeleteComment(id);
+
+	// Invalidate caches since comment was deleted
+	const network = await getNetworkFromHeaders();
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
 
 	const response = NextResponse.json({ message: 'Comment deleted successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
