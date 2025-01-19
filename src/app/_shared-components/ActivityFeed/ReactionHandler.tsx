@@ -80,13 +80,13 @@ function ReactionHandler({
 			<div className='flex space-x-4'>
 				<ReactionButton
 					type={EReaction.like}
-					isActive={reactionState.isLiked} // Use reactionState directly
+					isActive={reactionState.isLiked}
 					showGif={showLikeGif}
 					onClick={handleLike}
 				/>
 				<ReactionButton
 					type={EReaction.dislike}
-					isActive={reactionState.isDisliked} // Use reactionState directly
+					isActive={reactionState.isDisliked}
 					showGif={showDislikeGif}
 					onClick={handleDislike}
 				/>
