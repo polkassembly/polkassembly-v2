@@ -89,12 +89,20 @@ export class FirestoreService extends FirestoreRefs {
 		}
 
 		const addresses = await this.GetAddressesForUserId(userId);
+		const rank =
+			(
+				await FirestoreRefs.usersCollectionRef()
+					.where('profileScore', '>', Number(user.profileScore || 0))
+					.count()
+					.get()
+			).data().count + 1;
 
 		return {
 			id: user.id,
 			username: user.username,
 			profileScore: user.profileScore,
-			addresses: addresses.map((address) => address.address)
+			addresses: addresses.map((address) => address.address),
+			rank
 		};
 	}
 
@@ -118,11 +126,19 @@ export class FirestoreService extends FirestoreRefs {
 		}
 
 		const addresses = await this.GetAddressesForUserId(user.id);
+		const rank =
+			(
+				await FirestoreRefs.usersCollectionRef()
+					.where('profileScore', '>', Number(user.profileScore || 0))
+					.count()
+					.get()
+			).data().count + 1;
 
 		return {
 			id: user.id,
 			username: user.username,
 			profileScore: user.profileScore,
+			rank,
 			addresses: addresses.map((addr) => addr.address)
 		};
 	}
@@ -140,12 +156,20 @@ export class FirestoreService extends FirestoreRefs {
 				const data = doc.data();
 
 				const addresses = await this.GetAddressesForUserId(data.id);
+				const rank =
+					(
+						await FirestoreRefs.usersCollectionRef()
+							.where('profileScore', '>', Number(data.profileScore || 0))
+							.count()
+							.get()
+					).data().count + 1;
 
 				return {
 					id: data.id,
 					username: data.username,
 					profileScore: data.profileScore,
-					addresses: addresses.map((addr: IUserAddress) => addr.address)
+					addresses: addresses.map((addr: IUserAddress) => addr.address),
+					rank
 				} as IPublicUser;
 			})
 		);

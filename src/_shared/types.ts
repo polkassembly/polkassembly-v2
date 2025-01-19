@@ -132,6 +132,7 @@ export interface IPublicUser {
 	username: string;
 	profileScore: number;
 	addresses: string[];
+	rank: number;
 }
 
 export interface IAuthResponse {
