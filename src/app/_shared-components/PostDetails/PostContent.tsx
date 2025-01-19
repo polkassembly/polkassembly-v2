@@ -47,7 +47,7 @@ function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModa
 				>
 					{t('ActivityFeed.PostItem.showLess')}
 				</span>
-			) : (
+			) : !showMore && postData?.content?.blocks?.length && postData?.content?.blocks?.length > 4 ? (
 				<span
 					onClick={handleShowMore}
 					className='cursor-pointer text-sm font-medium text-text_pink'
@@ -55,7 +55,7 @@ function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModa
 				>
 					{t('ActivityFeed.PostItem.showMore')}
 				</span>
-			)}
+			) : null}
 		</div>
 	);
 }
