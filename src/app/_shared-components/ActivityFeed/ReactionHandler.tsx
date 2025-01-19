@@ -49,14 +49,6 @@ function ReactionHandler({
 	const { user } = useUser();
 	const t = useTranslations();
 
-	const UserReaction = postData?.userReaction?.userId === user?.id ? postData?.userReaction?.reaction : null;
-
-	const currentReactionState = {
-		...reactionState,
-		isLiked: UserReaction === EReaction.like,
-		isDisliked: UserReaction === EReaction.dislike
-	};
-
 	const handleAuthenticatedAction = (action: () => void) => {
 		if (!user?.id) {
 			router.push('/login');
@@ -88,13 +80,13 @@ function ReactionHandler({
 			<div className='flex space-x-4'>
 				<ReactionButton
 					type={EReaction.like}
-					isActive={currentReactionState.isLiked}
+					isActive={reactionState.isLiked} // Use reactionState directly
 					showGif={showLikeGif}
 					onClick={handleLike}
 				/>
 				<ReactionButton
 					type={EReaction.dislike}
-					isActive={currentReactionState.isDisliked}
+					isActive={reactionState.isDisliked} // Use reactionState directly
 					showGif={showDislikeGif}
 					onClick={handleDislike}
 				/>
