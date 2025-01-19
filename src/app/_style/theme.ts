@@ -48,7 +48,7 @@ export const THEME_COLORS = {
 		light_technical_text: '#75610E',
 		filter_dropdown: '#485F7D',
 		search_bg: '#E3E4E4',
-		page_background: '#F5F6F8',
+		page_background: '#F6F7F9',
 		small_btn_text: '#6D7F97',
 		bg_light_blue: '#E6F4FF',
 		voting_bar_bg: '#575255',
@@ -66,7 +66,8 @@ export const THEME_COLORS = {
 		post_btn_bg: '#EFF1F3',
 		active_proposal_bg: '#485F7D',
 		navbar_title: '#243A57',
-		yellow_primary: '#ffbf60'
+		yellow_primary: '#ffbf60',
+		wallet_disabled_bg: '#F6F7F9'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -129,6 +130,7 @@ export const THEME_COLORS = {
 		post_btn_bg: '#4B4B4B',
 		active_proposal_bg: '#262626',
 		navbar_title: '#fff',
-		yellow_primary: '#ffbf60'
+		yellow_primary: '#ffbf60',
+		wallet_disabled_bg: '#222222'
 	}
 };
