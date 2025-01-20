@@ -178,7 +178,7 @@ function Initializers({ userData, userPreferences }: { userData: IUserClientData
 
 	// set user
 	useEffect(() => {
-		if (!userData || !userClientData) {
+		if (!userData) {
 			return;
 		}
 
