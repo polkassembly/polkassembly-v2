@@ -104,4 +104,11 @@ export class OnChainDbService {
 
 		return [];
 	}
+
+	static async GetPostPreimage({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
+		const preimage = await SubsquidService.GetPostPreimage({ network, indexOrHash, proposalType });
+		if (preimage) return preimage;
+
+		return null;
+	}
 }

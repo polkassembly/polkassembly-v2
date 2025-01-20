@@ -481,4 +481,60 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	// preimage queries
+
+	protected static GET_PREIMAGE_BY_PROPOSAL_INDEX_AND_TYPE = `
+		query GetPreimageByProposalIndexAndType($type_eq: ProposalType!, $index_eq: Int!) {
+			proposals(where: {type_eq: $type_eq, index_eq: $index_eq}) {
+				preimage {
+					createdAt
+					createdAtBlock
+					deposit
+					hash
+					id
+					length
+					method
+					proposedCall {
+						args
+						description
+						method
+						section
+					}
+					proposer
+					section
+					status
+					updatedAt
+					updatedAtBlock
+				}
+			}
+		}
+	`;
+
+	protected static GET_PREIMAGE_BY_PROPOSAL_HASH_AND_TYPE = `
+		query GetPreimageByProposalHashAndType($type_eq: ProposalType!, $hash_eq: String!) {
+			proposals(where: {type_eq: $type_eq, hash_eq: $hash_eq}) {
+				preimage {
+					createdAt
+					createdAtBlock
+					deposit
+					hash
+					id
+					length
+					method
+					proposedCall {
+						args
+						description
+						method
+						section
+					}
+					proposer
+					section
+					status
+					updatedAt
+					updatedAtBlock
+				}
+			}
+		}
+	`;
 }

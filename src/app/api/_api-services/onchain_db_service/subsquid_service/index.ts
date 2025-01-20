@@ -10,6 +10,7 @@ import {
 	EVoteDecision,
 	IOnChainPostInfo,
 	IOnChainPostListing,
+	IPreimage,
 	IStatusHistoryItem,
 	IVoteCurve,
 	IVoteData,
@@ -20,6 +21,7 @@ import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -319,5 +321,27 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return subsquidData.curveData as IVoteCurve[];
+	}
+
+	static async GetPostPreimage({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPreimage | null> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = proposalType === EProposalType.TIP ? this.GET_PREIMAGE_BY_PROPOSAL_HASH_AND_TYPE : this.GET_PREIMAGE_BY_PROPOSAL_INDEX_AND_TYPE;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType })
+			.toPromise();
+
+		if (subsquidErr || !subsquidData?.proposals?.length) {
+			console.error(`Error fetching on-chain post preimage from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post preimage from Subsquid');
+		}
+
+		const proposer = subsquidData.proposals[0].preimage.proposer ? getSubstrateAddress(subsquidData.proposals[0].preimage.proposer) : '';
+
+		return {
+			...subsquidData.proposals[0].preimage,
+			proposer
+		} as IPreimage;
 	}
 }

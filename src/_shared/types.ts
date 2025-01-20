@@ -691,3 +691,24 @@ export interface IVoteCurve {
 	approvalPercent: number;
 	supportPercent: number;
 }
+
+export interface IPreimage {
+	createdAt: string;
+	createdAtBlock: number;
+	deposit: string;
+	hash: string;
+	id: string;
+	length: number;
+	method: string;
+	proposedCall: {
+		args: Record<string, unknown>;
+		description: string;
+		method: string;
+		section: string;
+	};
+	proposer: string;
+	section: string;
+	status: string;
+	updatedAt: string;
+	updatedAtBlock: number | null;
+}
