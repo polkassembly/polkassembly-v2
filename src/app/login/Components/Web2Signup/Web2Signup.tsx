@@ -4,7 +4,7 @@
 import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
-import { ESignupSteps, EWallet, IUserClientData } from '@/_shared/types';
+import { ESignupSteps, EWallet } from '@/_shared/types';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
@@ -90,7 +90,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 					return;
 				}
 
-				setUser(accessTokenPayload as IUserClientData);
+				setUser(accessTokenPayload);
 				setErrorMessage('');
 
 				router.back();

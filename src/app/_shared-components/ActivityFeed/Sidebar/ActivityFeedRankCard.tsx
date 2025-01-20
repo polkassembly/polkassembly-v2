@@ -42,7 +42,7 @@ function ActivityFeedRankCard() {
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
 					<p className='text-base font-semibold text-rank_card_text'>
-						{t('ActivityFeed.Rank')} {user?.rank}
+						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
 					</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
 						<div className='flex items-center gap-2'>
@@ -64,7 +64,7 @@ function ActivityFeedRankCard() {
 									width={16}
 									height={16}
 								/>
-								<span className='text-sm font-medium text-gray-800'>{user?.profileScore}</span>
+								<span className='text-sm font-medium text-gray-800'>{user?.publicUser?.profileScore}</span>
 							</div>
 						</div>
 					</div>

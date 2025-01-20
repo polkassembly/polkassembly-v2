@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWallet, IUserClientData } from '@/_shared/types';
+import { EWallet } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { Input } from '@ui/Input';
@@ -79,7 +79,7 @@ function Web2Login({
 				}
 
 				setErrorMessage('');
-				setUser(accessTokenPayload as IUserClientData);
+				setUser(accessTokenPayload);
 
 				router.back();
 			}

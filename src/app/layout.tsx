@@ -48,7 +48,7 @@ export default async function RootLayout({
 		>
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
 				<Initializers
-					userData={user ?? null}
+					userData={user || null}
 					userPreferences={userPreferences}
 				/>
 				<Providers
