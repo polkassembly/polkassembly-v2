@@ -84,10 +84,7 @@ function ListingCard({
 					<h3 className={styles.titleText}>{title}</h3>
 					<div className={styles.infoContainer}>
 						<div className='flex items-center gap-2'>
-							<Address
-								truncateCharLen={4}
-								address={proposer}
-							/>
+							<Address address={proposer} />
 							<span>|</span>
 							<span className={styles.infoItem}>
 								<FaRegClock className={styles.infoIcon} />

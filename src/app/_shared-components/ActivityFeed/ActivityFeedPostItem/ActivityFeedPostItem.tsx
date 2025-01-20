@@ -133,10 +133,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 			<div className='flex items-center justify-between gap-2'>
 				<div className='mb-3 flex items-center gap-2 text-xs text-btn_secondary_text'>
 					<span className='font-medium'>
-						<Address
-							truncateCharLen={4}
-							address={postData.onChainInfo?.proposer || ''}
-						/>
+						<Address address={postData.onChainInfo?.proposer || ''} />
 					</span>
 					<span>in</span>
 					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
