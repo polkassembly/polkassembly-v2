@@ -69,7 +69,8 @@ export const THEME_COLORS = {
 		active_proposal_bg: '#485F7D',
 		navbar_title: '#243A57',
 		yellow_primary: '#ffbf60',
-		wallet_disabled_bg: '#F6F7F9'
+		wallet_disabled_bg: '#F6F7F9',
+		footer_bg: '#FFF1F8'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -135,6 +136,7 @@ export const THEME_COLORS = {
 		active_proposal_bg: '#262626',
 		navbar_title: '#fff',
 		yellow_primary: '#ffbf60',
-		wallet_disabled_bg: '#222222'
+		wallet_disabled_bg: '#222222',
+		footer_bg: '#222222'
 	}
 };
