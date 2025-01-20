@@ -541,7 +541,7 @@ export interface IComment {
 }
 
 export interface ICommentResponse extends IComment {
-	user: IPublicUser;
+	user: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
 }
 

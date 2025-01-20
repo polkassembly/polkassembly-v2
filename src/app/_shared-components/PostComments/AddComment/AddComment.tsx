@@ -27,7 +27,7 @@ function AddComment({
 	proposalType: EProposalType;
 	proposalIndex: string;
 	parentCommentId?: string;
-	onConfirm?: (newComment: IComment, user: IPublicUser) => void;
+	onConfirm?: (newComment: IComment, user: Omit<IPublicUser, 'rank'>) => void;
 	onCancel?: () => void;
 	editorId: string;
 }) {
@@ -57,7 +57,7 @@ function AddComment({
 			}
 
 			if (data) {
-				const publicUser: IPublicUser = {
+				const publicUser = {
 					username: user.username,
 					id: user.id,
 					addresses: user.addresses,
