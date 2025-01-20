@@ -180,11 +180,6 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
-export interface IUserClientData extends IAccessTokenPayload {
-	profileScore: number;
-	rank: number;
-}
-
 export interface IAddressProxyForEntry {
 	address: string;
 	network: ENetwork;

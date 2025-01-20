@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECookieNames, IRefreshTokenPayload, IUserClientData } from '@/_shared/types';
+import { ECookieNames, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
 import { deleteCookie, getCookie } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
 
@@ -27,7 +27,7 @@ export class CookieClientService {
 
 	static getAccessTokenPayload() {
 		const accessToken = this.getCookieInClient(ECookieNames.ACCESS_TOKEN);
-		return this.decodeCookieToken<IUserClientData>(accessToken || '');
+		return this.decodeCookieToken<IAccessTokenPayload>(accessToken || '');
 	}
 
 	static getRefreshTokenPayload() {

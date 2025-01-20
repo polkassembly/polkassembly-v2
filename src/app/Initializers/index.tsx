@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IPublicUser, IRefreshTokenPayload, IUserClientData, IUserPreferences } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -19,9 +19,8 @@ import { IdentityService } from '../_client-services/identity_service';
 import { WalletClientService } from '../_client-services/wallet_service';
 import { walletAtom } from '../_atoms/wallet/walletAtom';
 import { userAtom } from '../_atoms/user/userAtom';
-import { NextApiClientService } from '../_client-services/next_api_client_service';
 
-function Initializers({ userData, userPreferences }: { userData: IUserClientData | null; userPreferences: IUserPreferences }) {
+function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
 
 	const user = useAtomValue(userAtom);
@@ -37,7 +36,6 @@ function Initializers({ userData, userPreferences }: { userData: IUserClientData
 	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(currentRefreshTokenPayload);
-	const [userClientData, setUserClientData] = useState<IPublicUser | null>(null);
 
 	const refreshAccessToken = async () => {
 		const { data, error } = await AuthClientService.refreshAccessToken();
@@ -50,29 +48,10 @@ function Initializers({ userData, userPreferences }: { userData: IUserClientData
 		const newRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
 		if (newUserPayload) {
-			setUserAtom({ ...newUserPayload, rank: userClientData?.rank || 0, profileScore: userClientData?.profileScore || 0 });
+			setUserAtom(newUserPayload);
 		}
 		if (newRefreshTokenPayload) {
 			setRefreshTokenData(newRefreshTokenPayload);
-		}
-	};
-
-	const fetchUserClientData = async () => {
-		try {
-			if (!userData?.id) {
-				console.warn('No user ID available to fetch user data');
-				return;
-			}
-			const userClientResponse = await NextApiClientService.getUserByIdApi(String(userData.id));
-			if (userClientResponse?.data) {
-				setUserClientData(userClientResponse.data);
-			} else {
-				console.error('Failed to fetch user data: No data returned');
-			}
-		} catch (error) {
-			console.error('Error fetching user data:', error);
-			// Prevent the error from breaking the app, but still set null data
-			setUserClientData(null);
 		}
 	};
 
@@ -176,27 +155,15 @@ function Initializers({ userData, userPreferences }: { userData: IUserClientData
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
 
+	// set user
 	useEffect(() => {
 		if (!userData) {
 			return;
 		}
-		fetchUserClientData();
+
+		setUserAtom(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
-
-	// set user
-	useEffect(() => {
-		if (!userData || !userClientData) {
-			return;
-		}
-
-		setUserAtom({
-			...userData,
-			profileScore: userClientData?.profileScore || 0,
-			rank: userClientData?.rank || 0
-		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userClientData]);
 
 	return null;
 }
