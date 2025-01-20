@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
+import { ETheme } from '@/_shared/types';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import { FaTwitter, FaTelegramPlane } from 'react-icons/fa';
 import { IoLogoDiscord } from 'react-icons/io5';
@@ -29,7 +30,7 @@ function Footer() {
 								className='flex'
 								href='/'
 							>
-								{theme === 'dark' ? (
+								{theme === ETheme.DARK ? (
 									<Image
 										src={PaLogoDark}
 										alt='Polkassembly Logo'

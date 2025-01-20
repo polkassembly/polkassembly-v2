@@ -88,7 +88,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
-			case EApiRoute.GET_USER_BY_ID:
+			case EApiRoute.GET_PUBLIC_USER_BY_ID:
 				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
@@ -212,8 +212,8 @@ export class NextApiClientService {
 	}
 
 	// get user by id users/id/{{userId}}
-	static async getUserByIdApi(userId: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_BY_ID, routeSegments: ['users', 'id', userId] });
+	static async getPublicUserById(userId: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PUBLIC_USER_BY_ID, routeSegments: ['users', 'id', userId?.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 

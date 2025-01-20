@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWeb3LoginScreens } from '@/_shared/types';
+import { EWeb3LoginScreens, IUserClientData } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -98,7 +98,7 @@ function Web3Login({
 					return;
 				}
 
-				setUser(accessTokenPayload);
+				setUser(accessTokenPayload as IUserClientData);
 				router.back();
 			}
 			setLoading(false);

@@ -503,7 +503,7 @@ export enum EApiRoute {
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	POST_REACTIONS = 'POST_REACTIONS',
 	DELETE_REACTION = 'DELETE_REACTION',
-	GET_USER_BY_ID = 'GET_USER_BY_ID'
+	GET_PUBLIC_USER_BY_ID = 'GET_PUBLIC_USER_BY_ID'
 }
 
 export enum EWeb3LoginScreens {
@@ -539,6 +539,11 @@ export interface IComment {
 	isDeleted: boolean;
 	address: string | null;
 	dataSource: EDataSource;
+}
+
+export interface IUserClientData extends IAccessTokenPayload, IPublicUser {
+	// profileScore?: number | undefined;
+	// rank?: number | undefined;
 }
 
 export interface ICommentResponse extends IComment {
