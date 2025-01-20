@@ -21,6 +21,7 @@ import {
 	IGenerateTFAResponse,
 	IOnChainPostListingResponse,
 	IPost,
+	IPublicUser,
 	IVoteData
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
@@ -87,6 +88,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_USER_BY_ID:
 				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
@@ -207,6 +209,12 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
 		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+	}
+
+	// get user by id users/id/{{userId}}
+	static async getUserByIdApi(userId: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_BY_ID, routeSegments: ['users', 'id', userId] });
+		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 
 	// Post Reactions

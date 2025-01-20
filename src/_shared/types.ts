@@ -180,6 +180,11 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
+export interface IUserClientData extends IAccessTokenPayload {
+	profileScore: number;
+	rank: number;
+}
+
 export interface IAddressProxyForEntry {
 	address: string;
 	network: ENetwork;
@@ -502,7 +507,8 @@ export enum EApiRoute {
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	POST_REACTIONS = 'POST_REACTIONS',
-	DELETE_REACTION = 'DELETE_REACTION'
+	DELETE_REACTION = 'DELETE_REACTION',
+	GET_USER_BY_ID = 'GET_USER_BY_ID'
 }
 
 export enum EWeb3LoginScreens {

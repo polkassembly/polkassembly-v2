@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { DM_Sans as dmSans } from 'next/font/google';
 import { getLocale, getMessages } from 'next-intl/server';
+import { IUserClientData } from '@/_shared/types';
 import { Providers } from './_shared-components/Providers';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
@@ -48,7 +49,7 @@ export default async function RootLayout({
 		>
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
 				<Initializers
-					userData={user || null}
+					userData={user as IUserClientData | null}
 					userPreferences={userPreferences}
 				/>
 				<Providers
