@@ -10,7 +10,7 @@ import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Loading from '@/app/loading';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
+import { SLATE_TIME } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -46,10 +46,10 @@ function ActivityFeedPostList() {
 			}
 			return undefined;
 		},
-		staleTime: ADDRESS_LOGIN_TTL
+		staleTime: SLATE_TIME
 	});
 
-	const allPosts = data?.pages.flatMap((page) => page.posts || []).filter((post): post is IActivityFeedPostListing => post !== undefined);
+	const allPosts = data?.pages?.flatMap((page) => page.posts || []).filter((post): post is IActivityFeedPostListing => post !== undefined);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(

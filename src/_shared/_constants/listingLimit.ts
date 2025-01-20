@@ -4,3 +4,4 @@
 
 export const DEFAULT_LISTING_LIMIT = 10;
 export const MAX_LISTING_LIMIT = 50;
+export const SLATE_TIME = 5 * 60; // 5 minutes
