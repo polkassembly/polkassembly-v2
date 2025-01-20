@@ -5,7 +5,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
-import { EReaction, IPostListing } from '@/_shared/types';
+import { EReaction, IActivityFeedPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { IoShareSocialOutline } from 'react-icons/io5';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
@@ -33,7 +33,7 @@ function ReactionHandler({
 	showDislikeGif,
 	handleReaction
 }: {
-	postData: IPostListing;
+	postData: IActivityFeedPostListing;
 	setIsDialogOpen: (value: boolean) => void;
 	reactionState: {
 		isLiked: boolean;

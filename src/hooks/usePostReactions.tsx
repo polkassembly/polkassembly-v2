@@ -2,18 +2,21 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IPostListing } from '@/_shared/types';
+import { EProposalType, EReaction, IActivityFeedPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState } from 'react';
+import { useUser } from './useUser';
 
-export const usePostReactions = (postData: IPostListing) => {
+export const usePostReactions = (postData: IActivityFeedPostListing) => {
+	const { user } = useUser();
 	const [reactionState, setReactionState] = useState({
-		isLiked: false,
-		isDisliked: false,
+		isLiked: postData?.userReaction?.userId === user?.id && postData?.userReaction?.reaction === EReaction.like,
+		isDisliked: postData?.userReaction?.userId === user?.id && postData?.userReaction?.reaction === EReaction.dislike,
 		likesCount: postData?.metrics?.reactions?.like || 0,
 		dislikesCount: postData?.metrics?.reactions?.dislike || 0
 	});
-	const [currentReactionId, setCurrentReactionId] = useState<string | null>(null);
+
+	const [currentReactionId, setCurrentReactionId] = useState<string | null>(postData?.userReaction?.userId === user?.id ? postData?.userReaction?.id || null : null);
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
 

@@ -19,7 +19,15 @@ import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
-function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { gov2LatestPosts: IPostListing[]; currentTab: string; setCurrentTab: (tab: string) => void }) {
+function ActivityFeedNavbar({
+	gov2LatestPosts,
+	currentTab,
+	setCurrentTab
+}: {
+	gov2LatestPosts: IPostListing[];
+	currentTab: EPostOrigin | 'All';
+	setCurrentTab: (tab: EPostOrigin | 'All') => void;
+}) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].tracks;
@@ -100,9 +108,9 @@ function ActivityFeedNavbar({ gov2LatestPosts, currentTab, setCurrentTab }: { go
 
 	const handleCategoryClick = (category: string) => {
 		if (category === ALL_CATEGORY) {
-			setCurrentTab(ALL_CATEGORY);
+			setCurrentTab('All');
 		} else if ([ROOT_CATEGORY, WISH_FOR_CHANGE_CATEGORY].includes(category)) {
-			setCurrentTab(category);
+			setCurrentTab(category as EPostOrigin);
 		} else {
 			setExpandedCategory(expandedCategory === category ? null : category);
 		}

@@ -4,46 +4,94 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { IOnChainPostListingResponse, IPostListing } from '@/_shared/types';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { EPostOrigin, IActivityFeedPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Loading from '@/app/loading';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { SLATE_TIME } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 
-function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostListingResponse; loading: boolean }) {
-	const [currentTab, setCurrentTab] = useState<string>('All');
+function ActivityFeedPostList() {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
-	const filteredPosts =
-		currentTab === 'All'
-			? postData.posts
-			: postData.posts.filter((post: IPostListing) => {
-					if (!(network in NETWORKS_DETAILS)) {
-						return false;
-					}
-					const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
-					if (!networkInfo) return false;
+	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
+	const observerTarget = useRef<HTMLDivElement>(null);
 
-					const trackName = Object.keys(networkInfo.tracks).find((key) => post?.onChainInfo?.origin === key);
-					return trackName === currentTab;
-				});
+	// Fetch activity feed API
+	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, origin === 'All' ? undefined : origin, 10);
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
+		}
+		return { ...data, page: pageParam };
+	};
+
+	// Infinite query
+	const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
+		queryKey: ['activityFeed', origin],
+		queryFn: getExploreActivityFeed,
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			if (lastPage.posts?.length === 10) {
+				return lastPage.page + 1;
+			}
+			return undefined;
+		},
+		staleTime: SLATE_TIME
+	});
+
+	const allPosts = data?.pages?.flatMap((page) => page.posts || []).filter((post): post is IActivityFeedPostListing => post !== undefined);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && !isLoading && hasNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		if (observerTarget.current) {
+			observer.observe(observerTarget.current);
+		}
+
+		return () => observer.disconnect();
+	}, [isLoading, hasNextPage, fetchNextPage]);
+	const filteredPosts = useMemo(() => {
+		if (origin === 'All') return allPosts;
+
+		return allPosts?.filter((post: IActivityFeedPostListing) => {
+			if (!(network in NETWORKS_DETAILS)) {
+				return false;
+			}
+			const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
+			if (!networkInfo) return false;
+
+			const trackName = Object.keys(networkInfo.tracks).find((key) => post?.onChainInfo?.origin === key);
+			return trackName === origin;
+		});
+	}, [allPosts, origin, network]);
+
 	return (
 		<div>
 			<ActivityFeedNavbar
-				gov2LatestPosts={postData?.posts}
-				currentTab={currentTab}
-				setCurrentTab={setCurrentTab}
+				gov2LatestPosts={allPosts || []}
+				currentTab={origin}
+				setCurrentTab={setOrigin}
 			/>
-			{loading ? (
+			{isLoading ? (
 				<Loading />
-			) : filteredPosts?.length === 0 || postData?.posts?.length === 0 ? (
+			) : filteredPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={NoActivity}
@@ -61,8 +109,11 @@ function ActivityFeedPostList({ postData, loading }: { postData: IOnChainPostLis
 					</p>
 				</div>
 			) : (
-				<div className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
-					{(currentTab === 'All' ? postData.posts : filteredPosts).map((post: IPostListing) => (
+				<div
+					ref={observerTarget}
+					className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'
+				>
+					{filteredPosts?.map((post: IActivityFeedPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}

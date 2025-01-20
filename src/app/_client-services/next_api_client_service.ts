@@ -9,6 +9,7 @@ import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EApiRoute,
+	EPostOrigin,
 	EProposalType,
 	EReaction,
 	EVoteDecision,
@@ -266,11 +267,15 @@ export class NextApiClientService {
 	}
 
 	// activity feed
-	static async fetchActivityFeedApi(page: number, limit: number = DEFAULT_LISTING_LIMIT) {
+	static async fetchActivityFeedApi(page: number, origin?: EPostOrigin, limit: number = DEFAULT_LISTING_LIMIT) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
 		});
+
+		if (origin) {
+			queryParams.append('origin', origin.toString());
+		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, routeSegments: ['activityFeed'], queryParams });
 		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });

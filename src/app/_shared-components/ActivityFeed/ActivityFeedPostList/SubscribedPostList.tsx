@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import JoinPA from '@assets/activityfeed/gifs/joinpa.gif';
 import NoActivity from '@assets/activityfeed/gifs/noactivity.gif';
 import { useUser } from '@/hooks/useUser';
-import { IOnChainPostListingResponse } from '@/_shared/types';
+import { EPostOrigin, IOnChainPostListingResponse } from '@/_shared/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './ActivityFeedPostList.module.scss';
@@ -24,7 +24,7 @@ function SubscribedPostList({ postData }: { postData: IOnChainPostListingRespons
 			{user?.id && (
 				<ActivityFeedNavbar
 					gov2LatestPosts={postData?.posts}
-					currentTab={currentTab}
+					currentTab={currentTab as EPostOrigin | 'All'}
 					setCurrentTab={setCurrentTab}
 				/>
 			)}

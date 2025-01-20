@@ -12,8 +12,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { SLATE_TIME } from '@/_shared/_constants/listingLimit';
 import { MdSearch } from 'react-icons/md';
-import { ADDRESS_LOGIN_TTL } from '@/app/api/_api-constants/timeConstants';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '../../LoadingSpinner';
@@ -105,7 +105,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		queryKey: ['listingData', proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins],
 		queryFn: fetchListingData,
 		placeholderData: (previousData) => previousData,
-		staleTime: ADDRESS_LOGIN_TTL
+		staleTime: SLATE_TIME
 	});
 
 	const handlePageChange = (page: number) => {

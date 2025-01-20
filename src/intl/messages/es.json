@@ -53,6 +53,7 @@
 			"LogoutAllCaughtUp": "Únete a Polkassembly para ver tu pestaña Suscrito!",
 			"LogoutAllCaughtUpDescription": "Discute, contribuye y obtén actualizaciones regulares de Polkassembly",
 			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
 			"loadMoreComments": "Cargar más comentarios",
 			"showLessComments": "Mostrar menos comentarios",
 			"commentingOnProposal": "Comentando en propuesta"
@@ -293,7 +294,8 @@
 		"added": "Añadido",
 		"notpassed": "No aprobado",
 		"started": "Empezado",
-		"passed": "Aprobado"
+		"passed": "Aprobado",
+		"proposed": "Propuesto"
 	},
 	"Pagination": {
 		"next": "Siguiente",

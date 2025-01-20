@@ -53,6 +53,7 @@
 			"LogoutAllCaughtUp": "Tritt Polkassembly bei, um dein Abonniertes Tab anzuzeigen!",
 			"LogoutAllCaughtUpDescription": "Diskutiere, beitrage und erhalte regelmäßige Updates von Polkassembly",
 			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
 			"loadMoreComments": "Mehr Kommentare anzeigen",
 			"showLessComments": "Weniger Kommentare anzeigen",
 			"commentingOnProposal": "Kommentieren auf Vorschlag"
@@ -293,7 +294,8 @@
 		"added": "Hinzugefügt",
 		"notpassed": "Nicht bestanden",
 		"started": "Gestartet",
-		"passed": "Bestanden"
+		"passed": "Bestanden",
+		"proposed": "Vorgeschlagen"
 	},
 	"Pagination": {
 		"next": "Weiter",

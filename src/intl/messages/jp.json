@@ -53,6 +53,7 @@
 			"LogoutAllCaughtUp": "Polkassemblyに参加して、購読済みタブを表示します！",
 			"LogoutAllCaughtUpDescription": "Polkassemblyで議論、投稿、および定期的な更新を受信",
 			"showMore": "もっと見る",
+			"showLess": "もっと見る",
 			"loadMoreComments": "もっとコメントを見る",
 			"showLessComments": "もっとコメントを見る",
 			"commentingOnProposal": "提案にコメントする"
@@ -293,7 +294,8 @@
 		"added": "追加済み",
 		"notpassed": "不承認",
 		"started": "開始",
-		"passed": "承認"
+		"passed": "承認",
+		"proposed": "提案"
 	},
 	"Pagination": {
 		"next": "次へ",

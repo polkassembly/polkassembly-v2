@@ -32,6 +32,8 @@ export const THEME_COLORS = {
 		sidebar_text: '#666666',
 		sidebar_menu_text: '#ff0080',
 		sidebar_menu_bg: '#FDE7F0',
+		sidebar_menu_active: '#FFF2F9',
+		sidebar_menu_active_text: '#E5007A',
 		create_proposal_btn_create: '#0A3EAF',
 		rank_card_text: '#243A57',
 		rank_card_bg: '#FCC636',
@@ -48,7 +50,7 @@ export const THEME_COLORS = {
 		light_technical_text: '#75610E',
 		filter_dropdown: '#485F7D',
 		search_bg: '#E3E4E4',
-		page_background: '#F5F6F8',
+		page_background: '#F6F7F9',
 		small_btn_text: '#6D7F97',
 		bg_light_blue: '#E6F4FF',
 		voting_bar_bg: '#575255',
@@ -66,7 +68,8 @@ export const THEME_COLORS = {
 		post_btn_bg: '#EFF1F3',
 		active_proposal_bg: '#485F7D',
 		navbar_title: '#243A57',
-		yellow_primary: '#ffbf60'
+		yellow_primary: '#ffbf60',
+		wallet_disabled_bg: '#F6F7F9'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -84,6 +87,8 @@ export const THEME_COLORS = {
 		btn_secondary_text: '#FFFFFF',
 		border_grey: '#3F3F46',
 		sidebar_menu_bg: '#FDE7F0',
+		sidebar_menu_active_text: '#FF45A8',
+		sidebar_menu_active: '#540E33',
 		dark_auction_bg: '#302234',
 		dark_auction_text: '#CCAED4',
 		dark_community_bg: '#1C2945',
@@ -129,6 +134,7 @@ export const THEME_COLORS = {
 		post_btn_bg: '#4B4B4B',
 		active_proposal_bg: '#262626',
 		navbar_title: '#fff',
-		yellow_primary: '#ffbf60'
+		yellow_primary: '#ffbf60',
+		wallet_disabled_bg: '#222222'
 	}
 };

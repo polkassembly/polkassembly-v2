@@ -30,7 +30,8 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 			size='icon'
 			disabled={disabled}
 			variant='outline'
-			className={cn(wallet === userPreferences.wallet && 'border border-navbar_border')}
+			// if it is disabled, we change the bg color to bg-page_bg
+			className={cn(wallet === userPreferences.wallet && 'border border-navbar_border', disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal')}
 		>
 			<WalletIcon wallet={wallet} />
 		</Button>
@@ -38,12 +39,13 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 		<Button
 			onClick={() => onWalletSelect(walletName)}
 			variant='outline'
-			className={cn(classes.walletButton, wallet === userPreferences.wallet && 'border border-navbar_border')}
+			className={cn(classes.walletButton, wallet === userPreferences.wallet && 'border border-navbar_border', disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal')}
 			leftIcon={<WalletIcon wallet={wallet} />}
 			disabled={disabled}
 			size='lg'
 		>
-			{label}
+			<span>{label}</span>
+			{disabled && <span className={cn(classes.notInstalled)}>Not Installed</span>}
 		</Button>
 	);
 }
