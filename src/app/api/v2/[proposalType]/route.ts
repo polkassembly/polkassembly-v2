@@ -8,7 +8,7 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EDataSource, EPostOrigin, EProposalStatus, EProposalType, IOffChainPost, IOnChainPostListing, IOnChainPostListingResponse, IPostListing } from '@shared/types';
+import { EDataSource, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IOffChainPost, IOnChainPostListing, IPostListing } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -56,7 +56,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins });
 
 		// Fetch off-chain data
-		const offChainDataPromises = onChainPostsListingResponse.posts.map((postInfo) => {
+		const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
 			return OffChainDbService.GetOffChainPostData({
 				network,
 				indexOrHash: proposalType !== EProposalType.TIP ? postInfo.index.toString() : postInfo.hash,
@@ -68,7 +68,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		const offChainData = await Promise.all(offChainDataPromises);
 
 		// Merge on-chain and off-chain data
-		posts = onChainPostsListingResponse.posts.map((postInfo, index) => ({
+		posts = onChainPostsListingResponse.items.map((postInfo, index) => ({
 			...offChainData[Number(index)],
 			dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 			network,
@@ -135,8 +135,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
 	}
 
-	const response: IOnChainPostListingResponse = {
-		posts,
+	const response: IGenericListingResponse<IPostListing> = {
+		items: posts,
 		totalCount
 	};
 

@@ -87,7 +87,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	});
 
 	// Fetch off-chain data
-	const offChainDataPromises = onChainPostsListingResponse.posts.map((postInfo) => {
+	const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
 		return OffChainDbService.GetOffChainPostData({
 			network,
 			indexOrHash: postInfo.index.toString(),
@@ -102,7 +102,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	if (isUserAuthenticated && accessToken && userId) {
 		// fetch user reaction for each post
-		const userReactionPromises = onChainPostsListingResponse.posts.map((postInfo) => {
+		const userReactionPromises = onChainPostsListingResponse.items.map((postInfo) => {
 			return OffChainDbService.GetUserReactionForPost({
 				network,
 				proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
@@ -115,7 +115,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	// Merge on-chain and off-chain data
-	posts = onChainPostsListingResponse.posts.map((postInfo, index) => ({
+	posts = onChainPostsListingResponse.items.map((postInfo, index) => ({
 		...offChainData[Number(index)],
 		dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 		network,

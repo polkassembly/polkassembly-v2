@@ -41,7 +41,7 @@ function ActivityFeedPostList() {
 		queryFn: getExploreActivityFeed,
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {
-			if (lastPage.posts?.length === 10) {
+			if (lastPage.items?.length === 10) {
 				return lastPage.page + 1;
 			}
 			return undefined;
@@ -49,7 +49,7 @@ function ActivityFeedPostList() {
 		staleTime: SLATE_TIME
 	});
 
-	const allPosts = data?.pages?.flatMap((page) => page.posts || []).filter((post): post is IActivityFeedPostListing => post !== undefined);
+	const allPosts = data?.pages?.flatMap((page) => page.items || []).filter((post): post is IActivityFeedPostListing => post !== undefined);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(

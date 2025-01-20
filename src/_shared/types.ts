@@ -453,8 +453,8 @@ export interface IActivityFeedPostListing extends IPostListing {
 	userReaction?: IReaction;
 }
 
-export interface IOnChainPostListingResponse {
-	posts: IPostListing[];
+export interface IGenericListingResponse<T> {
+	items: T[];
 	totalCount: number;
 }
 

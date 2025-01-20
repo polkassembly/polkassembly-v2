@@ -18,7 +18,8 @@ import {
 	ICommentResponse,
 	IErrorResponse,
 	IGenerateTFAResponse,
-	IOnChainPostListingResponse,
+	IGenericListingResponse,
+	IPostListing,
 	IPost,
 	IPublicUser,
 	IVoteData
@@ -212,7 +213,7 @@ export class NextApiClientService {
 		statuses?: string[],
 		origins?: string[],
 		tags: string[] = []
-	): Promise<{ data: IOnChainPostListingResponse | null; error: IErrorResponse | null }> {
+	): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
@@ -231,7 +232,7 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
-		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
 	// Post Reactions
@@ -303,7 +304,7 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, routeSegments: ['activityFeed'], queryParams });
-		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
 	// user data

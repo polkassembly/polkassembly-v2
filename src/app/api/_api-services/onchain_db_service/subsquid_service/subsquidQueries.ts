@@ -537,4 +537,32 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_PREIMAGES_LISTING = `
+		query GetPreimagesListing($limit: Int!, $offset: Int!) {
+			preimagesConnection(orderBy: createdAtBlock_DESC) {
+				totalCount
+			}
+			preimages(limit: $limit, offset: $offset, orderBy: createdAtBlock_DESC) {
+				hash
+				id
+				length
+				method
+				section
+				deposit
+				proposedCall {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				status
+				updatedAt
+				updatedAtBlock
+				createdAtBlock
+				createdAt
+			}
+		}
+	`;
 }

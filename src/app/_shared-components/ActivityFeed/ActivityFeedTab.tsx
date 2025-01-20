@@ -8,7 +8,7 @@ import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
 
 function ActivityFeedTab({ currentTab }: { currentTab: EActivityFeedTab }) {
-	return <div>{currentTab === EActivityFeedTab.EXPLORE ? <ActivityFeedPostList /> : <SubscribedPostList postData={{ posts: [], totalCount: 0 }} />}</div>;
+	return <div>{currentTab === EActivityFeedTab.EXPLORE ? <ActivityFeedPostList /> : <SubscribedPostList postData={{ items: [], totalCount: 0 }} />}</div>;
 }
 
 export default ActivityFeedTab;
