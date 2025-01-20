@@ -222,7 +222,7 @@ function ListingCard({
 									className={styles.requestedAmount}
 									key={assetId}
 								>
-									<span>
+									<span className='whitespace-nowrap'>
 										{formatUSDWithUnits(
 											formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
 										)}

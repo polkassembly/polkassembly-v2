@@ -112,15 +112,15 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 						<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
 					</Button>
 				</DialogTrigger>
-				<DialogTitle>
-					<DialogContent className='max-w-xl p-6'>
-						<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.voteHistory')}</DialogHeader>
-						<VoteHistory
-							proposalType={proposalType}
-							index={index}
-						/>
-					</DialogContent>
-				</DialogTitle>
+				<DialogContent className='max-w-xl p-6'>
+					<DialogHeader className='text-xl font-semibold text-text_primary'>
+						<DialogTitle>{t('PostDetails.voteHistory')}</DialogTitle>
+					</DialogHeader>
+					<VoteHistory
+						proposalType={proposalType}
+						index={index}
+					/>
+				</DialogContent>
 			</Dialog>
 		</div>
 	);
