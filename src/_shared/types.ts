@@ -132,6 +132,7 @@ export interface IPublicUser {
 	username: string;
 	profileScore: number;
 	addresses: string[];
+	rank: number;
 }
 
 export interface IAuthResponse {
@@ -540,7 +541,7 @@ export interface IComment {
 }
 
 export interface ICommentResponse extends IComment {
-	user: IPublicUser;
+	user: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
 }
 
