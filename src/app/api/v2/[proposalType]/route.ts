@@ -14,10 +14,12 @@ import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
+import { deepParseJson } from 'deep-parse-json';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
+import { RedisService } from '../../_api-services/redis_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -39,6 +41,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	const { page, limit, status: statuses, origin: origins, tags } = zodQuerySchema.parse(searchParamsObject);
 
 	const network = await getNetworkFromHeaders();
+
+	// Try to get from cache first
+	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
+	if (cachedData) {
+		return NextResponse.json(deepParseJson(cachedData));
+	}
 
 	let posts: IPostListing[] = [];
 	let totalCount = 0;
@@ -132,6 +140,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		totalCount
 	};
 
+	// Cache the response
+	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: JSON.stringify(response), statuses, origins, tags });
+
 	// 3. return the data
 	return NextResponse.json(response);
 });
@@ -164,6 +175,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content: formattedContent,
 		title
 	});
+
+	// Invalidate post listings since a new post was added
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

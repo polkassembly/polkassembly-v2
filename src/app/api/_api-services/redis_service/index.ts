@@ -18,7 +18,10 @@ enum ERedisKeys {
 	EMAIL_VERIFICATION_TOKEN = 'EVT',
 	TWO_FACTOR_AUTH_TOKEN = 'TFA',
 	SUBSCAN_DATA = 'SDT',
-	REFRESH_TOKEN = 'RFT'
+	REFRESH_TOKEN = 'RFT',
+	POST_DATA = 'PDT',
+	POSTS_LISTING = 'PLT',
+	ACTIVITY_FEED = 'AFD'
 }
 
 export class RedisService {
@@ -29,7 +32,21 @@ export class RedisService {
 		[ERedisKeys.EMAIL_VERIFICATION_TOKEN]: (token: string): string => `${ERedisKeys.EMAIL_VERIFICATION_TOKEN}-${token}`,
 		[ERedisKeys.TWO_FACTOR_AUTH_TOKEN]: (tfaToken: string): string => `${ERedisKeys.TWO_FACTOR_AUTH_TOKEN}-${tfaToken}`,
 		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
-		[ERedisKeys.REFRESH_TOKEN]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN}-${userId}`
+		[ERedisKeys.REFRESH_TOKEN]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN}-${userId}`,
+		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
+		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: string, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
+			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
+			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
+			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
+			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
+			return baseKey + statusesPart + originsPart + tagsPart;
+		},
+		[ERedisKeys.ACTIVITY_FEED]: (network: string, page: number, limit: number, userId?: number, origins?: string[]): string => {
+			const baseKey = `${ERedisKeys.ACTIVITY_FEED}-${network}-${page}-${limit}`;
+			const userPart = userId ? `-u:${userId}` : '';
+			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
+			return baseKey + userPart + originsPart;
+		}
 	};
 
 	// helper methods
@@ -116,5 +133,103 @@ export class RedisService {
 
 	static async DeleteResetPasswordToken(token: string): Promise<void> {
 		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
+	}
+
+	// Posts caching methods
+	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash));
+	}
+
+	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: string }): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash), data, ONE_DAY);
+	}
+
+	static async DeletePostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<void> {
+		await this.Delete(this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash));
+	}
+
+	static async GetPostsListing({
+		network,
+		proposalType,
+		page,
+		limit,
+		statuses,
+		origins,
+		tags
+	}: {
+		network: string;
+		proposalType: string;
+		page: number;
+		limit: number;
+		statuses?: string[];
+		origins?: string[];
+		tags?: string[];
+	}): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags));
+	}
+
+	static async SetPostsListing({
+		network,
+		proposalType,
+		page,
+		limit,
+		data,
+		statuses,
+		origins,
+		tags
+	}: {
+		network: string;
+		proposalType: string;
+		page: number;
+		limit: number;
+		data: string;
+		statuses?: string[];
+		origins?: string[];
+		tags?: string[];
+	}): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags), data, ONE_DAY);
+	}
+
+	static async DeletePostsListing({ network, proposalType }: { network: string; proposalType: string }): Promise<void> {
+		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*`);
+	}
+
+	// Activity feed caching methods
+	static async GetActivityFeed({
+		network,
+		page,
+		limit,
+		userId,
+		origins
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		userId?: number;
+		origins?: string[];
+	}): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins));
+	}
+
+	static async SetActivityFeed({
+		network,
+		page,
+		limit,
+		data,
+		userId,
+		origins
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		data: string;
+		userId?: number;
+		origins?: string[];
+	}): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), data, ONE_DAY);
+	}
+
+	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
+		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
 	}
 }

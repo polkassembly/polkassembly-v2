@@ -3,20 +3,25 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IReaction } from '@/_shared/types';
 import { z } from 'zod';
+import { deepParseJson } from 'deep-parse-json';
+import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IReaction } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
-import { getNetworkFromHeaders } from '../../_api-utils/getNetworkFromHeaders';
-import { withErrorHandling } from '../../_api-utils/withErrorHandling';
-import { AuthService } from '../../_api-services/auth_service';
-import { OnChainDbService } from '../../_api-services/onchain_db_service';
-import { OffChainDbService } from '../../_api-services/offchain_db_service';
+import { AuthService } from '@/app/api/_api-services/auth_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 // 1.1 if user is logged in fetch all posts where status is active and user has not voted, sorted by createdAt
 // 1.2 if user is not logged in fetch all posts where status is active, sorted by createdAt
 // 2. fetch offchain data for each post with metrics
 // 3. sort by comments as well
+
+const ACTIVITY_FEED_PROPOSAL_TYPE = EProposalType.REFERENDUM_V2;
+const COOKIE_HEADER_ACTION_NAME = 'Set-Cookie';
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const zodQuerySchema = z.object({
@@ -32,6 +37,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
 	let refreshToken: string | undefined;
+	let userId: number | undefined;
 
 	// 1. check if user is authenticated
 	try {
@@ -39,25 +45,40 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		isUserAuthenticated = true;
 		accessToken = newAccessToken;
 		refreshToken = newRefreshToken;
+		if (accessToken) {
+			userId = AuthService.GetUserIdFromAccessToken(accessToken);
+		}
 	} catch {
 		isUserAuthenticated = false;
 	}
 
-	let userAddresses: string[] = [];
+	const network = await getNetworkFromHeaders();
 
-	if (isUserAuthenticated && accessToken) {
-		const userId = AuthService.GetUserIdFromAccessToken(accessToken);
-		userAddresses = (await OffChainDbService.GetAddressesForUserId(userId)).map((a) => a.address);
+	// Try to get from cache first
+	const cachedData = await RedisService.GetActivityFeed({ network, page, limit, userId, origins });
+	if (cachedData) {
+		const response = NextResponse.json(deepParseJson(cachedData));
+		if (accessToken) {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
+		}
+		if (refreshToken) {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
+		}
+		return response;
 	}
 
-	const network = await getNetworkFromHeaders();
+	let userAddresses: string[] = [];
+
+	if (isUserAuthenticated && accessToken && userId) {
+		userAddresses = (await OffChainDbService.GetAddressesForUserId(userId)).map((a) => a.address);
+	}
 
 	let posts: IActivityFeedPostListing[] = [];
 	let totalCount = 0;
 
 	const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({
 		network,
-		proposalType: EProposalType.REFERENDUM_V2,
+		proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 		limit,
 		page,
 		statuses: ACTIVE_PROPOSAL_STATUSES,
@@ -70,7 +91,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		return OffChainDbService.GetOffChainPostData({
 			network,
 			indexOrHash: postInfo.index.toString(),
-			proposalType: EProposalType.REFERENDUM_V2,
+			proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 			proposer: postInfo.proposer || ''
 		});
 	});
@@ -79,14 +100,14 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	let userReactions: (IReaction | null)[] = [];
 
-	if (isUserAuthenticated && accessToken) {
+	if (isUserAuthenticated && accessToken && userId) {
 		// fetch user reaction for each post
 		const userReactionPromises = onChainPostsListingResponse.posts.map((postInfo) => {
 			return OffChainDbService.GetUserReactionForPost({
 				network,
-				proposalType: EProposalType.REFERENDUM_V2,
+				proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 				indexOrHash: postInfo.index.toString(),
-				userId: AuthService.GetUserIdFromAccessToken(accessToken)
+				userId
 			});
 		});
 
@@ -98,7 +119,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		...offChainData[Number(index)],
 		dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
 		network,
-		proposalType: EProposalType.REFERENDUM_V2,
+		proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 		onChainInfo: postInfo,
 		userReaction: userReactions[Number(index)] || undefined
 	}));
@@ -112,13 +133,18 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	totalCount = onChainPostsListingResponse.totalCount;
 
-	const response = NextResponse.json({ posts, totalCount });
+	const responseData = { posts, totalCount };
+
+	// Cache the response
+	await RedisService.SetActivityFeed({ network, page, limit, data: JSON.stringify(responseData), userId, origins });
+
+	const response = NextResponse.json(responseData);
 
 	if (accessToken) {
-		response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(accessToken));
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
 	}
 	if (refreshToken) {
-		response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(refreshToken));
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
 	}
 
 	return response;

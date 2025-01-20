@@ -11,6 +11,8 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { AuthService } from '@/app/api/_api-services/auth_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -31,13 +33,20 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 });
 
 export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; id: string }> }): Promise<NextResponse> => {
-	const { id } = zodParamsSchema.parse(await params);
+	const { proposalType, index, id } = zodParamsSchema.parse(await params);
+
+	const network = await getNetworkFromHeaders();
 
 	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	// 2. delete the reaction from the database
 	await OffChainDbService.DeletePostReaction(id);
+
+	// Invalidate caches since reaction metrics changed
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Reaction deleted successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
