@@ -91,7 +91,7 @@ function ActivityFeedPostList() {
 			/>
 			{isLoading ? (
 				<Loading />
-			) : allPosts?.length === 0 ? (
+			) : filteredPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={NoActivity}
