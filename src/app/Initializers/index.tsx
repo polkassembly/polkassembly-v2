@@ -176,23 +176,27 @@ function Initializers({ userData, userPreferences }: { userData: IUserClientData
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
 
-	// set user
 	useEffect(() => {
 		if (!userData) {
 			return;
 		}
-
-		const initializeUser = async () => {
-			await fetchUserClientData();
-			setUserAtom({
-				...userData,
-				profileScore: userClientData?.profileScore || 0,
-				rank: userClientData?.rank || 0
-			});
-		};
-		initializeUser();
+		fetchUserClientData();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
+
+	// set user
+	useEffect(() => {
+		if (!userData || !userClientData) {
+			return;
+		}
+
+		setUserAtom({
+			...userData,
+			profileScore: userClientData?.profileScore || 0,
+			rank: userClientData?.rank || 0
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userClientData]);
 
 	return null;
 }
