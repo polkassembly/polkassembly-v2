@@ -192,7 +192,7 @@ function Initializers({ userData, userPreferences }: { userData: IUserClientData
 		};
 		initializeUser();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData, userClientData]);
+	}, [userData]);
 
 	return null;
 }
