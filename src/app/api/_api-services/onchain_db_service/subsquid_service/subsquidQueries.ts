@@ -565,4 +565,29 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_PREIMAGE_BY_HASH = `
+		query GetPreimageByHash($hash_eq: String!) {
+			preimages(where: {hash_eq: $hash_eq}) {
+				hash
+				id
+				length
+				method
+				section
+				deposit
+				proposedCall {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				status
+				updatedAt
+				updatedAtBlock
+				createdAtBlock
+				createdAt
+			}
+		}
+	`;
 }

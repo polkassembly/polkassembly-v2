@@ -364,4 +364,17 @@ export class SubsquidService extends SubsquidUtils {
 			totalCount: subsquidData.preimagesConnection.totalCount
 		};
 	}
+
+	static async GetPreimageByHash({ network, hash }: { network: ENetwork; hash: string }): Promise<IPreimage | null> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(this.GET_PREIMAGE_BY_HASH, { hash_eq: hash }).toPromise();
+
+		if (subsquidErr || !subsquidData?.preimages?.length) {
+			console.error(`Error fetching on-chain preimage by hash from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain preimage by hash from Subsquid');
+		}
+
+		return subsquidData.preimages[0] as IPreimage;
+	}
 }
