@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { deepParseJson } from 'deep-parse-json';
-import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IReaction } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IGenericListingResponse, IReaction } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -134,7 +134,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	totalCount = onChainPostsListingResponse.totalCount;
 
-	const responseData = { posts, totalCount };
+	const responseData: IGenericListingResponse<IActivityFeedPostListing> = { items: posts, totalCount };
 
 	// Cache the response
 	if (IS_CACHE_ENABLED) {
