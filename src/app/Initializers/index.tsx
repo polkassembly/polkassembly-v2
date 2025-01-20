@@ -4,10 +4,11 @@
 
 'use client';
 
-import { IAccessTokenPayload, IPublicUser, IRefreshTokenPayload, IUserClientData, IUserPreferences } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useUser } from '@/hooks/useUser';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
@@ -18,13 +19,11 @@ import { PolkadotApiService } from '../_client-services/polkadot_api_service';
 import { IdentityService } from '../_client-services/identity_service';
 import { WalletClientService } from '../_client-services/wallet_service';
 import { walletAtom } from '../_atoms/wallet/walletAtom';
-import { userAtom } from '../_atoms/user/userAtom';
-import { NextApiClientService } from '../_client-services/next_api_client_service';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
 
-	const user = useAtomValue(userAtom);
+	const { user, setUser } = useUser();
 	const polkadotApi = useAtomValue(polkadotApiAtom);
 	const identityApi = useAtomValue(identityApiAtom);
 
@@ -32,35 +31,10 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
 	const setIdentityApiAtom = useSetAtom(identityApiAtom);
 	const setWalletServiceAtom = useSetAtom(walletAtom);
-	const setUserAtom = useSetAtom(userAtom);
 
 	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(currentRefreshTokenPayload);
-
-	const mergeAndSetUserData = async (accessTokenPayload: IAccessTokenPayload | null) => {
-		if (!accessTokenPayload) {
-			setUserAtom(null);
-			return;
-		}
-
-		try {
-			const response = await NextApiClientService.getPublicUserById(accessTokenPayload?.id);
-			console.log('response', response);
-			const publicUserData: IPublicUser | null = response.data;
-			console.log('publicUserData', publicUserData);
-			const userClientData: IUserClientData = {
-				...publicUserData,
-				...accessTokenPayload,
-				profileScore: publicUserData?.profileScore ?? 0,
-				rank: publicUserData?.rank ?? 0
-			};
-			console.log('userClientData', userClientData);
-			setUserAtom(userClientData);
-		} catch {
-			setUserAtom(accessTokenPayload as IUserClientData);
-		}
-	};
 
 	const refreshAccessToken = async () => {
 		const { data, error } = await AuthClientService.refreshAccessToken();
@@ -72,8 +46,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		const newUserPayload = CookieClientService.getAccessTokenPayload();
 		const newRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
-		await mergeAndSetUserData(newUserPayload);
-
+		if (newUserPayload) {
+			setUser(newUserPayload);
+		}
 		if (newRefreshTokenPayload) {
 			setRefreshTokenData(newRefreshTokenPayload);
 		}
@@ -91,7 +66,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				return;
 			}
 
-			AuthClientService.logout(() => setUserAtom(null));
+			AuthClientService.logout(() => setUser(null));
 		}
 	};
 
@@ -181,7 +156,11 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user
 	useEffect(() => {
-		mergeAndSetUserData(userData);
+		if (!userData) {
+			return;
+		}
+
+		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
 
