@@ -8,6 +8,7 @@ import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useUser } from '@/hooks/useUser';
 import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
@@ -18,12 +19,11 @@ import { PolkadotApiService } from '../_client-services/polkadot_api_service';
 import { IdentityService } from '../_client-services/identity_service';
 import { WalletClientService } from '../_client-services/wallet_service';
 import { walletAtom } from '../_atoms/wallet/walletAtom';
-import { userAtom } from '../_atoms/user/userAtom';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
 
-	const user = useAtomValue(userAtom);
+	const { user, setUser } = useUser();
 	const polkadotApi = useAtomValue(polkadotApiAtom);
 	const identityApi = useAtomValue(identityApiAtom);
 
@@ -31,7 +31,6 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
 	const setIdentityApiAtom = useSetAtom(identityApiAtom);
 	const setWalletServiceAtom = useSetAtom(walletAtom);
-	const setUserAtom = useSetAtom(userAtom);
 
 	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
@@ -48,7 +47,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		const newRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
 		if (newUserPayload) {
-			setUserAtom(newUserPayload);
+			setUser(newUserPayload);
 		}
 		if (newRefreshTokenPayload) {
 			setRefreshTokenData(newRefreshTokenPayload);
@@ -67,7 +66,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				return;
 			}
 
-			AuthClientService.logout(() => setUserAtom(null));
+			AuthClientService.logout(() => setUser(null));
 		}
 	};
 
@@ -161,7 +160,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			return;
 		}
 
-		setUserAtom(userData);
+		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
 
