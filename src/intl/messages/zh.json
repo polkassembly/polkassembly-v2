@@ -294,7 +294,8 @@
 		"added": "已添加",
 		"notpassed": "未通过",
 		"started": "已开始",
-		"passed": "已通过"
+		"passed": "已通过",
+		"proposed": "已提议"
 	},
 	"Pagination": {
 		"next": "下一页",

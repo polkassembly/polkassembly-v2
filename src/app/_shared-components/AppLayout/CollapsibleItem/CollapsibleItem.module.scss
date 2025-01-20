@@ -19,11 +19,12 @@
 }
 
 .iconWrapper {
-	@apply flex h-8 w-8 items-center justify-center;
+	@apply flex h-8 w-8 items-center justify-center fill-none;
 }
 
 .sidebar_selected_icon {
 	filter: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%);
+	fill: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%)
 }
 
 .newBadge {

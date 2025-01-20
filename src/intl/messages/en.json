@@ -305,7 +305,8 @@
 		"added": "Added",
 		"notpassed": "Not Passed",
 		"started": "Started",
-		"passed": "Passed"
+		"passed": "Passed",
+		"proposed": "Proposed"
 	},
 	"Pagination": {
 		"next": "Next",

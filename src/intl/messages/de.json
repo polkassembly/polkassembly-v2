@@ -294,7 +294,8 @@
 		"added": "Hinzugefügt",
 		"notpassed": "Nicht bestanden",
 		"started": "Gestartet",
-		"passed": "Bestanden"
+		"passed": "Bestanden",
+		"proposed": "Vorgeschlagen"
 	},
 	"Pagination": {
 		"next": "Weiter",
