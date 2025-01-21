@@ -6,25 +6,18 @@
 
 import React, { useState } from 'react';
 import { ETheme, IGenericListingResponse, IPreimage } from '@/_shared/types';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { MdContentCopy, MdListAlt } from 'react-icons/md';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import Image from 'next/image';
-import SubscanIcon from '@assets/icons/profile-subscan.svg';
 import ReactJson from 'react-json-view';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from '../../Table';
-import Address from '../../Profile/Address/Address';
+import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../Table';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import { Dialog, DialogContent, DialogTitle } from '../../Dialog/Dialog';
 import styles from './ListingTable.module.scss';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
+import PreimageRow from './PreimageRow';
 
 function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
-	const network = getCurrentNetwork();
 	const searchParams = useSearchParams();
 	const page = searchParams.get('page') || 1;
 	const { resolvedTheme: theme } = useTheme();
@@ -50,68 +43,20 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{data?.items?.map((preimage: IPreimage) => (
-						<TableRow
-							key={preimage?.id}
-							className='text-start'
-						>
-							<TableCell className={styles.table_content_cell}>
-								{preimage?.hash ? `${preimage.hash.slice(0, 5)}...${preimage.hash.slice(-5)}` : '-'}
-								<Tooltip>
-									<TooltipTrigger>
-										<MdContentCopy
-											onClick={() => {
-												navigator.clipboard.writeText(preimage.hash);
-											}}
-											className={styles.table_content_cell_1}
-										/>
-									</TooltipTrigger>
-									<TooltipContent className={styles.tooltipContent}>{t('copy')}</TooltipContent>
-								</Tooltip>
-								<Tooltip>
-									<TooltipTrigger>
-										<Image
-											src={SubscanIcon}
-											alt='copy'
-											width={18}
-											className='cursor-pointer'
-											onClick={() => window.open(`https://${network}.subscan.io/block/${preimage?.createdAtBlock}`, '_blank')}
-											height={18}
-										/>
-									</TooltipTrigger>
-									<TooltipContent className={styles.tooltipContent}>{t('subscan')}</TooltipContent>
-								</Tooltip>
-							</TableCell>
-							<TableCell className='px-6 py-5'>
-								<Address
-									truncateCharLen={5}
-									address={preimage?.proposer || ''}
-								/>
-							</TableCell>
-							<TableCell className='px-6 py-5'>
-								{preimage?.deposit
-									? formatBnBalance(
-											preimage.deposit,
-											{
-												withUnit: true,
-												numberAfterComma: 2,
-												compactNotation: true
-											},
-											network
-										)
-									: '-'}
-							</TableCell>
-							<TableCell className={styles.table_content_cell_2}>
-								<span className={styles.table_content_cell_2_content}>{preimage?.section && preimage?.method ? `${preimage.section}.${preimage.method.slice(0, 5)}...` : '-'}</span>
-								<MdListAlt
-									onClick={hanldeDialogOpen}
-									className={styles.mdlisticon}
-								/>
-							</TableCell>
-							<TableCell className='px-6 py-5'>{preimage?.length || '-'}</TableCell>
-							<TableCell className='px-6 py-5'>{preimage?.status || '-'}</TableCell>
-						</TableRow>
-					))}
+					{Array.isArray(data?.items) ? (
+						data.items.map((preimage: IPreimage) => (
+							<PreimageRow
+								key={preimage?.id}
+								preimage={preimage}
+								handleDialogOpen={hanldeDialogOpen}
+							/>
+						))
+					) : (
+						<PreimageRow
+							preimage={data as unknown as IPreimage}
+							handleDialogOpen={hanldeDialogOpen}
+						/>
+					)}
 				</TableBody>
 			</Table>
 			<div className='mt-5 flex w-full justify-end'>

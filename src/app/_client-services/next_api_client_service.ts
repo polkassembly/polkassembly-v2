@@ -327,10 +327,7 @@ export class NextApiClientService {
 			const response = await this.nextApiClientFetch<IPreimage>({ url, method });
 			if (response.data) {
 				return {
-					data: {
-						items: [response.data],
-						totalCount: 1
-					},
+					data: response.data,
 					error: null
 				};
 			}

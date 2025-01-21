@@ -19,7 +19,6 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
-
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<Header data={data as IGenericListingResponse<IPreimage>} />
