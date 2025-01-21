@@ -32,10 +32,10 @@ function Header({ data }: { data: { totalCount: number } }) {
 						value={inputValue}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
-								if (pathname.startsWith(preImagePath)) {
-									router.replace(`${pathname.split('/').slice(0, -1).join('/')}/${inputValue}`);
-								} else {
-									router.push(`${pathname}/${inputValue}`);
+								if (pathname === preImagePath) {
+									router.push(`${preImagePath}/${inputValue}`);
+								} else if (pathname.startsWith(`${preImagePath}/`)) {
+									router.replace(`${preImagePath}/${inputValue}`);
 								}
 							}
 						}}
@@ -44,10 +44,10 @@ function Header({ data }: { data: { totalCount: number } }) {
 					/>
 					<MdOutlineSearch
 						onClick={() => {
-							if (pathname.startsWith(preImagePath)) {
-								router.replace(`${pathname.split('/').slice(0, -1).join('/')}/${inputValue}`);
-							} else {
-								router.push(`${pathname}/${inputValue}`);
+							if (pathname === preImagePath) {
+								router.push(`${preImagePath}/${inputValue}`);
+							} else if (pathname.startsWith(`${preImagePath}/`)) {
+								router.replace(`${preImagePath}/${inputValue}`);
 							}
 						}}
 						className={styles.input_search}
