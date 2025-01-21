@@ -53,7 +53,7 @@ enum EApiRoute {
 	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA',
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
-	GET_PREIMAGE = 'GET_PREIMAGE'
+	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST'
 }
 
 export class NextApiClientService {
@@ -111,7 +111,7 @@ export class NextApiClientService {
 			// Dynamic routes
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
-			case EApiRoute.GET_PREIMAGE:
+			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
@@ -267,8 +267,8 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
 
-	static async getPreimageApi(proposalType: EProposalType, index: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE, routeSegments: [proposalType, index, 'preimage'] });
+	static async getPreimageForPostApi(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE_FOR_POST, routeSegments: [proposalType, index, 'preimage'] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
