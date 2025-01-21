@@ -48,7 +48,6 @@ enum EApiRoute {
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
-	FETCH_PREIMAGE_BY_HASH = 'FETCH_PREIMAGE_BY_HASH',
 	POST_REACTIONS = 'POST_REACTIONS',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA'
@@ -112,10 +111,10 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
-			case EApiRoute.FETCH_PREIMAGES:
-			case EApiRoute.FETCH_PREIMAGE_BY_HASH:
-				break;
 			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.FETCH_PREIMAGES:
+				path = '/preimages';
+				break;
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
 				break;
@@ -322,8 +321,8 @@ export class NextApiClientService {
 	static async fetchPreimagesApi(page: number, hashContains?: string, limit: number = PREIMAGES_LISTING_LIMIT) {
 		if (hashContains) {
 			const { url, method } = await this.getRouteConfig({
-				route: EApiRoute.FETCH_PREIMAGE_BY_HASH,
-				routeSegments: ['preimages', hashContains]
+				route: EApiRoute.FETCH_PREIMAGES,
+				routeSegments: [hashContains]
 			});
 			const response = await this.nextApiClientFetch<IPreimage>({ url, method });
 			if (response.data) {
@@ -344,7 +343,6 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.FETCH_PREIMAGES,
-			routeSegments: ['preimages'],
 			queryParams
 		});
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });

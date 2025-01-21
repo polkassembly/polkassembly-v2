@@ -10,12 +10,12 @@ import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals'
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
 
-async function Preimages({ searchParams }: { searchParams: Promise<{ page?: string; hash_contains?: string }> }) {
+async function Preimages({ searchParams }: { searchParams: Promise<{ page?: string; hash?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
-	const hashContains = searchParamsValue.hash_contains || '';
+	const hash = searchParamsValue.hash || '';
 
-	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(page), hashContains);
+	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(page), hash);
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}

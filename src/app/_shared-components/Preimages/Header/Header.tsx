@@ -17,7 +17,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pathname = usePathname();
-	const [inputValue, setInputValue] = useState(searchParams.get('hash_contains') || '');
+	const [inputValue, setInputValue] = useState(searchParams.get('hash') || '');
 
 	const createQueryString = (name: string, value: string) => {
 		const params = new URLSearchParams(searchParams.toString());
@@ -41,7 +41,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 						value={inputValue}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
-								router.push(`${pathname}?${createQueryString('hash_contains', inputValue)}`);
+								router.push(`${pathname}?${createQueryString('hash', inputValue)}`);
 							}
 						}}
 						onChange={(e) => setInputValue(e.target.value)}
@@ -49,16 +49,16 @@ function Header({ data }: { data: { totalCount: number } }) {
 					/>
 					<MdOutlineSearch
 						onClick={() => {
-							router.push(`${pathname}?${createQueryString('hash_contains', inputValue)}`);
+							router.push(`${pathname}?${createQueryString('hash', inputValue)}`);
 						}}
 						className={styles.input_search}
 					/>
 				</div>
-				{searchParams.get('hash_contains') && (
+				{searchParams.get('hash') && (
 					<Button
 						onClick={() => {
 							setInputValue('');
-							const url = createQueryString('hash_contains', '');
+							const url = createQueryString('hash', '');
 							router.push(url ? `${pathname}?${url}` : pathname);
 						}}
 					>
