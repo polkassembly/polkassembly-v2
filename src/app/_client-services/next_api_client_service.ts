@@ -117,6 +117,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_PREIMAGES:
+				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
@@ -338,32 +339,18 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
 	}
 
-	static async fetchPreimageByHash(hashContains: string) {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.FETCH_PREIMAGES,
-			routeSegments: ['preimages', hashContains]
-		});
-		const response = await this.nextApiClientFetch<IPreimage>({ url, method });
-		if (response.data && response.data.length > 0) {
-			return {
-				data: response.data,
-				error: null
-			};
-		}
-		return { data: null, error: response.error };
-	}
-
-	static async fetchPreimageListing(page: number, limit: number = PREIMAGES_LISTING_LIMIT) {
+	static async fetchPreimagesApi({ page }: { page: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
-			limit: limit.toString()
+			limit: PREIMAGES_LISTING_LIMIT.toString()
 		});
 
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.FETCH_PREIMAGES,
-			queryParams,
-			routeSegments: ['preimages']
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages'], queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
+	}
+
+	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages', hash] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 }

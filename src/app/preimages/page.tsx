@@ -14,7 +14,7 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
 
-	const { data, error } = await NextApiClientService.fetchPreimageListing(Number(page));
+	const { data, error } = await NextApiClientService.fetchPreimagesApi({ page: Number(page) });
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
