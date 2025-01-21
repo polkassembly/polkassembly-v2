@@ -4,21 +4,28 @@
 
 import React from 'react';
 import Header from '@ui/Preimages/Header';
+import { IGenericListingResponse, IPreimage } from '@/_shared/types';
 import ListingTable from '@ui/Preimages/ListingTable';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
+import { ClientError } from '../_client-utils/clientError';
 
-async function page({ params }: { params: Promise<{ page: string; hashContains: string }> }) {
-	const { page, hashContains } = await params;
-	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(page ?? 1), hashContains ?? '');
+async function Preimages({ searchParams }: { searchParams: Promise<{ page?: string; hash_contains?: string }> }) {
+	const searchParamsValue = await searchParams;
+	const page = parseInt(searchParamsValue.page || '1', 10);
+	const hashContains = searchParamsValue.hash_contains || '';
 
-	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
+	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(page), hashContains);
+	if (error || !data) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	}
 
 	return (
 		<div className='px-10 py-5'>
-			<Header data={data} />
-			<ListingTable data={data} />
+			<Header data={data as IGenericListingResponse<IPreimage>} />
+			<ListingTable data={data as IGenericListingResponse<IPreimage>} />
 		</div>
 	);
 }
 
-export default page;
+export default Preimages;

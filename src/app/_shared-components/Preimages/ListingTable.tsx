@@ -2,16 +2,23 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import React from 'react';
 import { IGenericListingResponse, IPreimage } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Table, TableHead, TableBody, TableRow, TableCell } from '../Table';
 import Address from '../Profile/Address/Address';
-import { Pagination } from '../Pagination';
+import { PaginationWithLinks } from '../PaginationWithLinks';
 
 function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const network = getCurrentNetwork();
+	const searchParams = useSearchParams();
+	const page = searchParams.get('page') || 1;
+	const router = useRouter();
 	return (
 		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
 			<Table>
@@ -43,8 +50,15 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 					))}
 				</TableBody>
 			</Table>
-			<div className='mt-5'>
-				<Pagination />
+			<div className='mt-5 flex w-full justify-end'>
+				<PaginationWithLinks
+					page={Number(page)}
+					pageSize={PREIMAGES_LISTING_LIMIT}
+					totalCount={data?.totalCount || 0}
+					onClick={(pageNumber) => {
+						router.push(`/preimages?page=${pageNumber}`);
+					}}
+				/>
 			</div>
 		</div>
 	);
