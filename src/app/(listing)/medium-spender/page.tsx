@@ -9,8 +9,9 @@ import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals'
 import { ClientError } from '@/app/_client-utils/clientError';
 
 async function MediumSpenderPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
-	const page = parseInt((await searchParams).page || '1', 10);
-	const statuses = (await searchParams).trackStatus === 'all' ? [] : (await searchParams).trackStatus?.split(',') || [];
+	const searchParamsValue = await searchParams;
+	const page = parseInt(searchParamsValue.page || '1', 10);
+	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
 
 	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.REFERENDUM_V2, page, statuses, [EPostOrigin.MEDIUM_SPENDER], []);
 
