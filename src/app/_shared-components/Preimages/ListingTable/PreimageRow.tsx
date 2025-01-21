@@ -25,7 +25,7 @@ function PreimageRow({ preimage, handleDialogOpen }: { preimage: IPreimage; hand
 			className='text-start'
 		>
 			<TableCell className={styles.table_content_cell}>
-				{preimage?.hash ? `${preimage.hash.slice(0, 5)}...${preimage.hash.slice(-5)}` : '-'}
+				<span>{preimage?.hash ? `${preimage.hash.slice(0, 5)}...${preimage.hash.slice(-5)}` : '-'}</span>
 				<Tooltip>
 					<TooltipTrigger>
 						<MdContentCopy
