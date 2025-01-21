@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import React from 'react';
 import rankCardBg from '@assets/profile/rankcard-bg.svg';
 import profileAvatar from '@assets/profile/user-icon.svg';
@@ -14,6 +16,8 @@ import { useUser } from '@/hooks/useUser';
 function ActivityFeedRankCard() {
 	const t = useTranslations();
 	const { user } = useUser();
+	if (!user?.publicUser) return null;
+
 	return (
 		<div className='relative'>
 			<div className='absolute inset-0 z-0'>
@@ -38,7 +42,9 @@ function ActivityFeedRankCard() {
 				</div>
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
-					<p className='text-base font-semibold text-rank_card_text'>{t('ActivityFeed.Rank')} 49</p>
+					<p className='text-base font-semibold text-rank_card_text'>
+						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
+					</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
 						<div className='flex items-center gap-2'>
 							<Image
@@ -59,7 +65,7 @@ function ActivityFeedRankCard() {
 									width={16}
 									height={16}
 								/>
-								<span className='text-sm font-medium text-gray-800'>{0}</span>
+								<span className='text-sm font-medium text-gray-800'>{user?.publicUser?.profileScore}</span>
 							</div>
 						</div>
 					</div>

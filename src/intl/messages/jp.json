@@ -315,5 +315,20 @@
 	},
 	"Balance": {
 		"voteBalance": "投票残高"
+	},
+	"Footer": {
+		"helpCenter": "ヘルプセンター",
+		"reportAnIssue": "問題を報告",
+		"feedback": "フィードバック",
+		"termsAndConditions": "利用規約",
+		"termsOfWebsite": "ウェブサイト利用規約",
+		"privacyPolicy": "プライバシーポリシー",
+		"ourServices": "サービス一覧",
+		"docs": "ドキュメント",
+		"github": "Github",
+		"allRightsReserved": "All rights reserved.",
+		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
+		"aHouseOfCommonsInitiative": "House of Commons イニシアチブ",
+		"allRightsReservedYear": "無断複写・転載を禁じます。"
 	}
 }
