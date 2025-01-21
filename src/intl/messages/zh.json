@@ -374,6 +374,7 @@
 		"subscan": "子扫描",
 		"close": "关闭",
 		"showAll": "显示全部",
-		"searchByHash": "按哈希搜索"
+		"searchByHash": "按哈希搜索",
+		"preimageNotFound": "预映像未找到"
 	}
 }

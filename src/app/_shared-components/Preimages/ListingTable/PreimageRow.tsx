@@ -57,7 +57,7 @@ function PreimageRow({ preimage, handleDialogOpen }: { preimage: IPreimage; hand
 					address={preimage?.proposer || ''}
 				/>
 			</TableCell>
-			<TableCell className='px-6 py-5'>
+			<TableCell className='whitespace-nowrap px-6 py-5'>
 				{preimage?.deposit
 					? formatBnBalance(
 							preimage.deposit,

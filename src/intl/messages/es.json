@@ -374,6 +374,7 @@
 		"subscan": "Subscan",
 		"close": "Cerrar",
 		"showAll": "Mostrar todos",
-		"searchByHash": "Buscar por hash"
+		"searchByHash": "Buscar por hash",
+		"preimageNotFound": "Vorabbild nicht gefunden"
 	}
 }

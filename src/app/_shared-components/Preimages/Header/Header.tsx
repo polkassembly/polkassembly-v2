@@ -18,6 +18,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [inputValue, setInputValue] = useState(searchParams.get('hash') || '');
+	const preImagePath = '/preimages';
 
 	return (
 		<div className={styles.header}>
@@ -31,8 +32,11 @@ function Header({ data }: { data: { totalCount: number } }) {
 						value={inputValue}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
-								// push roeuter to preimages/[hash]
-								router.push(`${pathname}/${inputValue}`);
+								if (pathname.startsWith(preImagePath)) {
+									router.replace(`${pathname.split('/').slice(0, -1).join('/')}/${inputValue}`);
+								} else {
+									router.push(`${pathname}/${inputValue}`);
+								}
 							}
 						}}
 						onChange={(e) => setInputValue(e.target.value)}
@@ -40,16 +44,20 @@ function Header({ data }: { data: { totalCount: number } }) {
 					/>
 					<MdOutlineSearch
 						onClick={() => {
-							router.push(`${pathname}/${inputValue}`);
+							if (pathname.startsWith(preImagePath)) {
+								router.replace(`${pathname.split('/').slice(0, -1).join('/')}/${inputValue}`);
+							} else {
+								router.push(`${pathname}/${inputValue}`);
+							}
 						}}
 						className={styles.input_search}
 					/>
 				</div>
-				{pathname.startsWith('/preimages/') && (
+				{pathname.startsWith(`${preImagePath}/`) && (
 					<Button
 						onClick={() => {
 							setInputValue('');
-							router.push('/preimages');
+							router.push(preImagePath);
 						}}
 					>
 						{t('Preimages.showAll')}

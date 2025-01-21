@@ -375,6 +375,7 @@
 		"subscan": "Subscan",
 		"close": "Close",
 		"showAll": "Show All",
-		"searchByHash": "Search by hash"
+		"searchByHash": "Search by hash",
+		"preimageNotFound": "Preimage not found"
 	}
 }
