@@ -46,8 +46,8 @@ const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string
 		.map(([trackKey, track]) => {
 			const formattedName = track.name
 				.split('_')
-				.map((word: string, index: number) => {
-					return index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+				.map((word: string) => {
+					return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 				})
 				.join('');
 			const translationKey = `ListingPage.${formattedName}`;

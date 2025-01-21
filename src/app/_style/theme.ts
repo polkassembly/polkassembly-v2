@@ -71,6 +71,7 @@ export const THEME_COLORS = {
 		navbar_title: '#243A57',
 		yellow_primary: '#ffbf60',
 		wallet_disabled_bg: '#F6F7F9',
+		grey_bg: '#F4F6F8',
 		footer_bg: '#FFF1F8',
 		activity_feed_active_proposal_bg: '#f6f8fa'
 	},
@@ -86,7 +87,7 @@ export const THEME_COLORS = {
 		link: '#1B61FF',
 		btn_primary_text: '#FFF',
 		btn_secondary_border: '#D2D8E0',
-		btn_secondary_background: '#FFF',
+		btn_secondary_background: '#000',
 		btn_secondary_text: '#FFFFFF',
 		border_grey: '#3F3F46',
 		sidebar_menu_bg: '#FDE7F0',
@@ -140,6 +141,7 @@ export const THEME_COLORS = {
 		navbar_title: '#fff',
 		yellow_primary: '#ffbf60',
 		wallet_disabled_bg: '#222222',
+		grey_bg: '#F4F6F8',
 		footer_bg: '#222222',
 		activity_feed_active_proposal_bg: '#262626'
 	}

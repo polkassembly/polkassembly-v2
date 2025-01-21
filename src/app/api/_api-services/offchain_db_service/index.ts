@@ -506,7 +506,7 @@ export class OffChainDbService {
 		// check if offchain post context exists
 		const offChainPostData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
-		if (!offChainPostData) {
+		if (!offChainPostData?.id) {
 			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title });
 			await this.saveUserActivity({
 				userId,
