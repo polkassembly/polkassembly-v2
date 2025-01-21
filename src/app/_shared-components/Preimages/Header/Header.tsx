@@ -45,11 +45,11 @@ function Header({ data }: { data: { totalCount: number } }) {
 						className={styles.input_search}
 					/>
 				</div>
-				{searchParams.get('hash') && (
+				{pathname.startsWith('/preimages/') && (
 					<Button
 						onClick={() => {
 							setInputValue('');
-							router.push(pathname);
+							router.push('/preimages');
 						}}
 					>
 						{t('Preimages.showAll')}
