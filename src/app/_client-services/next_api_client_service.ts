@@ -320,15 +320,33 @@ export class NextApiClientService {
 
 	// preimages
 	static async fetchPreimagesApi(page: number, hashContains?: string, limit: number = PREIMAGES_LISTING_LIMIT) {
+		if (hashContains) {
+			const { url, method } = await this.getRouteConfig({
+				route: EApiRoute.FETCH_PREIMAGE_BY_HASH,
+				routeSegments: ['preimages', hashContains]
+			});
+			const response = await this.nextApiClientFetch<IPreimage>({ url, method });
+			if (response.data) {
+				return {
+					data: {
+						items: [response.data],
+						totalCount: 1
+					},
+					error: null
+				};
+			}
+			return { data: null, error: response.error };
+		}
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
 		});
 
-		if (hashContains) {
-			queryParams.append('hash_contains', hashContains);
-		}
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages'], queryParams });
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_PREIMAGES,
+			routeSegments: ['preimages'],
+			queryParams
+		});
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 }

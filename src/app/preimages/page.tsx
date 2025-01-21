@@ -3,23 +3,23 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
+import Header from '@ui/Preimages/Header';
+import ListingTable from '@ui/Preimages/ListingTable';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
-import ListingTable from '../_shared-components/Preimages/ListingTable';
-import { Input } from '../_shared-components/Input';
 
 async function page({ searchParams }: { searchParams: { page: string; hash_contains: string } }) {
-	const { data, error } = await NextApiClientService.fetchPreimagesApi(1, searchParams.hash_contains);
+	const params = await searchParams;
+	const pageParam = params?.page;
+	const hashContains = params?.hash_contains;
+
+	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(pageParam ?? 1), hashContains ?? '');
+
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 
 	return (
 		<div className='px-10 py-5'>
-			<div>
-				<p className='text-2xl font-bold text-text_primary'>{data?.totalCount} Preimages</p>
-				<div>
-					<Input placeholder='Search by hash' />
-				</div>
-			</div>
-			<ListingTable data={data?.items} />
+			<Header data={data} />
+			<ListingTable data={data} />
 		</div>
 	);
 }

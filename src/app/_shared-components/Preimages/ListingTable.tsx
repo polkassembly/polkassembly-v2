@@ -3,13 +3,13 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { IPreimage } from '@/_shared/types';
+import { IGenericListingResponse, IPreimage } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Table, TableHead, TableBody, TableRow, TableCell } from '../Table';
 import Address from '../Profile/Address/Address';
 
-function ListingTable({ data }: { data: IPreimage[] }) {
+function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const network = getCurrentNetwork();
 	return (
 		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
@@ -23,23 +23,21 @@ function ListingTable({ data }: { data: IPreimage[] }) {
 					<TableHead className='px-6 py-5 last:rounded-tr-lg'>Status</TableHead>
 				</TableRow>
 				<TableBody>
-					{data?.map((preimage: IPreimage) => (
+					{data?.items?.map((preimage: IPreimage) => (
 						<TableRow
-							key={preimage.id}
+							key={preimage?.id}
 							className='text-start'
 						>
+							<TableCell className='px-6 py-5'>{preimage?.hash ? `${preimage.hash.slice(0, 5)}...${preimage.hash.slice(-5)}` : '-'}</TableCell>
 							<TableCell className='px-6 py-5'>
-								{preimage?.hash.slice(0, 5)}...{preimage?.hash.slice(-5)}
+								<Address address={preimage?.proposer || ''} />
 							</TableCell>
 							<TableCell className='px-6 py-5'>
-								<Address address={preimage?.proposer} />
+								{preimage?.deposit ? formatBnBalance(preimage.deposit, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network) : '-'}
 							</TableCell>
-							<TableCell className='px-6 py-5'>{formatBnBalance(preimage?.deposit, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}</TableCell>
-							<TableCell className='px-6 py-5'>
-								{preimage?.section}.{preimage?.method}
-							</TableCell>
-							<TableCell className='px-6 py-5'>{preimage?.length}</TableCell>
-							<TableCell className='px-6 py-5'>{preimage?.status}</TableCell>
+							<TableCell className='px-6 py-5'>{preimage?.section && preimage?.method ? `${preimage.section}.${preimage.method}` : '-'}</TableCell>
+							<TableCell className='px-6 py-5'>{preimage?.length || '-'}</TableCell>
+							<TableCell className='px-6 py-5'>{preimage?.status || '-'}</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
