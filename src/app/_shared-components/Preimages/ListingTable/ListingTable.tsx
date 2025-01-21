@@ -16,7 +16,7 @@ import ReactJson from 'react-json-view';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { Table, TableHead, TableBody, TableRow, TableCell } from '../../Table';
+import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from '../../Table';
 import Address from '../../Profile/Address/Address';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import { Dialog, DialogContent, DialogTitle } from '../../Dialog/Dialog';
@@ -39,14 +39,16 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	return (
 		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
 			<Table>
-				<TableRow className={styles.tableRow}>
-					<TableHead className={styles.tableCell_1}>{t('hash')}</TableHead>
-					<TableHead className={styles.tableCell_2}>{t('author')}</TableHead>
-					<TableHead className={styles.tableCell}>{t('deposit')}</TableHead>
-					<TableHead className={styles.tableCell}>{t('arguments')}</TableHead>
-					<TableHead className={styles.tableCell}>{t('size')}</TableHead>
-					<TableHead className={styles.tableCell}>{t('status')}</TableHead>
-				</TableRow>
+				<TableHeader>
+					<TableRow className={styles.tableRow}>
+						<TableHead className={styles.tableCell_1}>{t('hash')}</TableHead>
+						<TableHead className={styles.tableCell_2}>{t('author')}</TableHead>
+						<TableHead className={styles.tableCell}>{t('deposit')}</TableHead>
+						<TableHead className={styles.tableCell}>{t('arguments')}</TableHead>
+						<TableHead className={styles.tableCell}>{t('size')}</TableHead>
+						<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
+					</TableRow>
+				</TableHeader>
 				<TableBody>
 					{data?.items?.map((preimage: IPreimage) => (
 						<TableRow
@@ -87,7 +89,17 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 								/>
 							</TableCell>
 							<TableCell className='px-6 py-5'>
-								{preimage?.deposit ? formatBnBalance(preimage.deposit, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network) : '-'}
+								{preimage?.deposit
+									? formatBnBalance(
+											preimage.deposit,
+											{
+												withUnit: true,
+												numberAfterComma: 2,
+												compactNotation: true
+											},
+											network
+										)
+									: '-'}
 							</TableCell>
 							<TableCell className={styles.table_content_cell_2}>
 								<span className={styles.table_content_cell_2_content}>{preimage?.section && preimage?.method ? `${preimage.section}.${preimage.method.slice(0, 5)}...` : '-'}</span>

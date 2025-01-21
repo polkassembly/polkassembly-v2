@@ -30,6 +30,10 @@
     @apply p-6 first:rounded-tl-lg last:rounded-tr-lg
 }
 
+.tableCell_last {
+    @apply p-6 last:rounded-tr-lg
+}
+
 .tableCell_2 {
     @apply w-1/4 p-6;
 }
