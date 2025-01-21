@@ -43,7 +43,7 @@
 }
 
 .table_content_cell {
-    @apply flex items-center gap-3 mt-3
+    @apply flex items-center gap-3 mt-3 min-w-44
 }
 
 .table_content_cell_1 {

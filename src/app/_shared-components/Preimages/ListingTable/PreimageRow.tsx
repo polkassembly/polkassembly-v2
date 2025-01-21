@@ -43,7 +43,7 @@ function PreimageRow({ preimage, handleDialogOpen }: { preimage: IPreimage; hand
 							src={SubscanIcon}
 							alt='copy'
 							width={18}
-							className='cursor-pointer'
+							className='h-5 w-5 cursor-pointer'
 							onClick={() => window.open(`https://${network}.subscan.io/block/${preimage?.createdAtBlock}`, '_blank')}
 							height={18}
 						/>
