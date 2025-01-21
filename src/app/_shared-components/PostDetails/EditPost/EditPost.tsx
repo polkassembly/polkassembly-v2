@@ -29,9 +29,7 @@ function EditPost({ postData, onEditPostSuccess }: { postData: IPostListing; onE
 
 		const { data, error } = await NextApiClientService.editProposalDetailsApi(postData.proposalType, postData.index.toString(), { title, content });
 
-		console.log(data, error);
-
-		if (data) {
+		if (!error && data) {
 			onEditPostSuccess?.(title, content);
 		}
 		setIsLoading(false);

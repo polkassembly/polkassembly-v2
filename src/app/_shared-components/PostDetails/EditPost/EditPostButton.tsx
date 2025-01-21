@@ -15,7 +15,6 @@ import EditPost from './EditPost';
 function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing; onEditPostSuccess: (title: string, content: OutputData) => void }) {
 	const t = useTranslations();
 	const { user } = useUser();
-	console.log(user, postData.onChainInfo?.proposer);
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
