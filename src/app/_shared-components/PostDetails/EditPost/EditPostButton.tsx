@@ -34,7 +34,7 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 			</DialogTrigger>
 			<DialogContent className='max-w-3xl p-6'>
 				<DialogHeader>
-					<DialogTitle>{t('EditPost.editPost')}</DialogTitle>
+					<DialogTitle>{t('EditPost.edit')}</DialogTitle>
 				</DialogHeader>
 				<EditPost
 					postData={postData}

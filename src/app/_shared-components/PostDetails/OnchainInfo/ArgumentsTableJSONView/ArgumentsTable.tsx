@@ -2,24 +2,48 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ReactElement } from 'react';
 import classes from './ArgumentsTable.module.scss';
 
-const urlRegex = /(https?:\/\/[^\s]+)/g;
+const urlRegex = /\b(https?):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|]/gi;
 
-const constructAnchorTag = (value: string) => {
-	if (value && typeof value === 'string') {
-		const urls = value.match(urlRegex);
-		if (urls && Array.isArray(urls)) {
-			urls?.forEach((url) => {
-				if (url && typeof url === 'string') {
-					// eslint-disable-next-line no-param-reassign
-					value = value.replace(url, `<a class="text-pink_primary" href='${url}' target='_blank'>${url}</a>`);
-				}
-			});
+function UrlText({ text }: { text: string }) {
+	if (!text || typeof text !== 'string') return null;
+
+	const parts: (string | ReactElement)[] = [];
+	let lastIndex = 0;
+
+	text.replace(urlRegex, (url, index) => {
+		// Add text before the URL
+		if (index > lastIndex) {
+			parts.push(text.slice(lastIndex, index));
 		}
+
+		// Add the URL as a link
+		parts.push(
+			<a
+				key={url + index}
+				className='text-text_pink'
+				href={url}
+				target='_blank'
+				rel='noopener noreferrer'
+			>
+				{url}
+			</a>
+		);
+
+		lastIndex = index + url.length;
+		return url;
+	});
+
+	// Add remaining text after last URL
+	if (lastIndex < text.length) {
+		parts.push(text.slice(lastIndex));
 	}
-	return value;
-};
+
+	// eslint-disable-next-line react/jsx-no-useless-fragment
+	return <>{parts}</>;
+}
 
 function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unknown> }) {
 	if (!argumentsJSON) return null;
@@ -31,13 +55,9 @@ function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unkno
 						<tr className={classes.tableRow}>
 							<td className={classes.tableCell}>{name}</td>
 							{typeof value !== 'object' ? (
-								<td
-									// eslint-disable-next-line react/no-danger
-									dangerouslySetInnerHTML={{
-										__html: constructAnchorTag(value as string)
-									}}
-									className='col-span-3 truncate p-2 text-sm'
-								/>
+								<td className='col-span-3 truncate p-2 text-sm'>
+									<UrlText text={value as string} />
+								</td>
 							) : (
 								<td className='col-span-3 text-sm sm:w-auto'>
 									<ArgumentsTable argumentsJSON={value as Record<string, unknown>} />
