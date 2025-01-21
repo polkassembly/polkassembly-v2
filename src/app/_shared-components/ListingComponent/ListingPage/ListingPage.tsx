@@ -4,19 +4,15 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { EListingTab, EProposalStatus, EProposalType } from '@/_shared/types';
+import React, { useState } from 'react';
+import { EListingTab, EProposalStatus, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { SLATE_TIME } from '@/_shared/_constants/listingLimit';
 import { MdSearch } from 'react-icons/md';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
-import { LoadingSpinner } from '../../LoadingSpinner';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
@@ -29,12 +25,12 @@ enum EListingTabState {
 
 interface ListingPageProps {
 	proposalType: string;
-	origins?: string[];
 	title?: string;
 	description?: string;
+	initialData: IGenericListingResponse<IPostListing>;
 }
 
-function ListingPage({ proposalType, origins, title, description }: ListingPageProps) {
+function ListingPage({ proposalType, title, description, initialData }: ListingPageProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
@@ -55,6 +51,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		t('ListingPage_Status.TimedOut')
 	];
 
+	// TODO: get tags from backend
 	const TAGS = [
 		t('ListingPage_Tags.bounty'),
 		t('ListingPage_Tags.treasury'),
@@ -82,42 +79,26 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
-	const updateUrlParams = useCallback(
-		(page: number, statuses: EProposalStatus[]) => {
-			const params = new URLSearchParams(searchParams.toString());
-			params.set('page', page.toString());
-			params.set('trackStatus', statuses.length > 0 ? statuses.join(',') : 'all');
-			router.push(`?${params.toString()}`, { scroll: false });
-		},
-		[router, searchParams]
-	);
-
-	const fetchListingData = async () => {
-		const { data, error } = await NextApiClientService.fetchListingDataApi(proposalType, state.currentPage, state.selectedStatuses, origins, state.selectedTags);
-
-		if (error) {
-			throw new Error(error.message || 'Failed to fetch data');
-		}
-		return data;
-	};
-
-	const { data, isLoading, error } = useQuery({
-		queryKey: ['listingData', proposalType, state.currentPage, state.selectedStatuses, state.selectedTags, origins],
-		queryFn: fetchListingData,
-		placeholderData: (previousData) => previousData,
-		staleTime: SLATE_TIME
-	});
-
 	const handlePageChange = (page: number) => {
 		setState((prev) => ({ ...prev, currentPage: page }));
-		updateUrlParams(page, state.selectedStatuses);
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('page', page.toString());
+		params.set('trackStatus', state.selectedStatuses.length > 0 ? state.selectedStatuses.join(',') : 'all');
+		router.push(`?${params.toString()}`, { scroll: false });
 	};
+
 	const handleStatusToggle = (statusStr: string) => {
 		setState((prev) => {
 			const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
+			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
+
+			const params = new URLSearchParams(searchParams.toString());
+			params.set('trackStatus', newStatuses.length > 0 ? newStatuses.join(',') : 'all');
+			router.push(`?${params.toString()}`, { scroll: false });
+
 			return {
 				...prev,
-				selectedStatuses: prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status]
+				selectedStatuses: newStatuses
 			};
 		});
 	};
@@ -129,13 +110,11 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 		}));
 	};
 
-	if (error) return <p>Error: {error.message}</p>;
-
 	const renderHeader = () => (
 		<div className={styles.header}>
 			<div>
 				<h1 className={styles.title}>
-					{title} ({data?.totalCount || 0})
+					{title} ({initialData?.totalCount || 0})
 				</h1>
 				<p className={`${styles.subtitle} dark:text-white`}>{description}</p>
 			</div>
@@ -247,22 +226,18 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 				</div>
 			</div>
 			<div className={styles.content}>
-				{isLoading ? (
-					<LoadingSpinner />
-				) : (
-					<div>
-						{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
-							<ListingTab
-								data={data?.items || []}
-								totalCount={data?.totalCount || 0}
-								currentPage={state.currentPage}
-								setCurrentPage={handlePageChange}
-							/>
-						) : (
-							<ExternalTab />
-						)}
-					</div>
-				)}
+				<div>
+					{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
+						<ListingTab
+							data={initialData?.items || []}
+							totalCount={initialData?.totalCount || 0}
+							currentPage={state.currentPage}
+							setCurrentPage={handlePageChange}
+						/>
+					) : (
+						<ExternalTab />
+					)}
+				</div>
 			</div>
 		</div>
 	);

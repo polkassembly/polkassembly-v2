@@ -4,19 +4,30 @@
 
 import { EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
-import { useTranslations } from 'next-intl';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { ClientError } from '@/app/_client-utils/clientError';
 
-function Page() {
-	const t = useTranslations();
+async function ReferendaPage({ searchParams }: { searchParams: { page?: string; trackStatus?: string } }) {
+	const page = parseInt(searchParams.page || '1', 10);
+	const statuses = searchParams.trackStatus === 'all' ? [] : searchParams.trackStatus?.split(',') || [];
+
+	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.REFERENDUM, page, statuses, [], []);
+
+	if (error || !data) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	}
+
 	return (
 		<div>
 			<ListingPage
-				title={t('ListingPage.referenda')}
-				description={t('ListingPage.referendaDescription')}
+				title='Referenda'
+				description='View, create and vote on referenda'
 				proposalType={EProposalType.REFERENDUM}
+				initialData={data || { items: [], totalCount: 0 }}
 			/>
 		</div>
 	);
 }
 
-export default Page;
+export default ReferendaPage;
