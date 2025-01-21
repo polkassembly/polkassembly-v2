@@ -1,0 +1,51 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import React from 'react';
+import { IPreimage } from '@/_shared/types';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { Table, TableHead, TableBody, TableRow, TableCell } from '../Table';
+import Address from '../Profile/Address/Address';
+
+function ListingTable({ data }: { data: IPreimage[] }) {
+	const network = getCurrentNetwork();
+	return (
+		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
+			<Table>
+				<TableRow className='overflow-hidden rounded-t-lg bg-page_background'>
+					<TableHead className='px-6 py-5 first:rounded-tl-lg last:rounded-tr-lg'>Hash</TableHead>
+					<TableHead className='px-6 py-5'>Author</TableHead>
+					<TableHead className='px-6 py-5'>Deposit</TableHead>
+					<TableHead className='px-6 py-5'>Arguments</TableHead>
+					<TableHead className='px-6 py-5'>Size</TableHead>
+					<TableHead className='px-6 py-5 last:rounded-tr-lg'>Status</TableHead>
+				</TableRow>
+				<TableBody>
+					{data?.map((preimage: IPreimage) => (
+						<TableRow
+							key={preimage.id}
+							className='text-start'
+						>
+							<TableCell className='px-6 py-5'>
+								{preimage?.hash.slice(0, 5)}...{preimage?.hash.slice(-5)}
+							</TableCell>
+							<TableCell className='px-6 py-5'>
+								<Address address={preimage?.proposer} />
+							</TableCell>
+							<TableCell className='px-6 py-5'>{formatBnBalance(preimage?.deposit, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}</TableCell>
+							<TableCell className='px-6 py-5'>
+								{preimage?.section}.{preimage?.method}
+							</TableCell>
+							<TableCell className='px-6 py-5'>{preimage?.length}</TableCell>
+							<TableCell className='px-6 py-5'>{preimage?.status}</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</div>
+	);
+}
+
+export default ListingTable;

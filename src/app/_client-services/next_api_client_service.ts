@@ -4,7 +4,7 @@
 
 /* eslint-disable lines-between-class-members */
 
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
@@ -22,7 +22,8 @@ import {
 	IPostListing,
 	IPost,
 	IPublicUser,
-	IVoteData
+	IVoteData,
+	IPreimage
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -46,6 +47,8 @@ enum EApiRoute {
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
+	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	FETCH_PREIMAGE_BY_HASH = 'FETCH_PREIMAGE_BY_HASH',
 	POST_REACTIONS = 'POST_REACTIONS',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA'
@@ -109,6 +112,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.FETCH_PREIMAGES:
+			case EApiRoute.FETCH_PREIMAGE_BY_HASH:
 				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
@@ -311,5 +316,19 @@ export class NextApiClientService {
 	static async fetchPublicUserByIdApi(userId: number) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	// preimages
+	static async fetchPreimagesApi(page: number, hashContains?: string, limit: number = PREIMAGES_LISTING_LIMIT) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (hashContains) {
+			queryParams.append('hash_contains', hashContains);
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 }
