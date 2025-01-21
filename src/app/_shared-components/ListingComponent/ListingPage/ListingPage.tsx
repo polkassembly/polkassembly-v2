@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { EListingTab, EProposalStatus, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EListingTab, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
@@ -24,13 +24,12 @@ enum EListingTabState {
 }
 
 interface ListingPageProps {
-	proposalType: string;
-	title?: string;
-	description?: string;
+	proposalType: EProposalType;
+	origin?: EPostOrigin;
 	initialData: IGenericListingResponse<IPostListing>;
 }
 
-function ListingPage({ proposalType, title, description, initialData }: ListingPageProps) {
+function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
@@ -114,9 +113,9 @@ function ListingPage({ proposalType, title, description, initialData }: ListingP
 		<div className={styles.header}>
 			<div>
 				<h1 className={styles.title}>
-					{title} ({initialData?.totalCount || 0})
+					{t(`ListingPage.${origin || proposalType}`)} ({initialData?.totalCount || 0})
 				</h1>
-				<p className={`${styles.subtitle} dark:text-white`}>{description}</p>
+				<p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>
 			</div>
 			<button
 				type='button'

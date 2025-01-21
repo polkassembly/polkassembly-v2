@@ -8,12 +8,14 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 
+const origin = EPostOrigin.STAKING_ADMIN;
+
 async function StakingAdminPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
 	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
 
-	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.REFERENDUM_V2, page, statuses, [EPostOrigin.STAKING_ADMIN], []);
+	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.REFERENDUM_V2, page, statuses, [origin], []);
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -22,8 +24,7 @@ async function StakingAdminPage({ searchParams }: { searchParams: Promise<{ page
 	return (
 		<div>
 			<ListingPage
-				title='Staking Admin'
-				description='This page lists all Staking Admin referenda'
+				origin={origin}
 				proposalType={EProposalType.REFERENDUM_V2}
 				initialData={data || { items: [], totalCount: 0 }}
 			/>

@@ -22,8 +22,6 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 	return (
 		<div>
 			<ListingPage
-				title='Onchain Bounty'
-				description='View and participate in onchain bounties'
 				proposalType={EProposalType.BOUNTY}
 				initialData={data || { items: [], totalCount: 0 }}
 			/>

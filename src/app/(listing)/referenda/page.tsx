@@ -22,8 +22,6 @@ async function ReferendaPage({ searchParams }: { searchParams: Promise<{ page?: 
 	return (
 		<div>
 			<ListingPage
-				title='Referenda'
-				description='View, create and vote on referenda'
 				proposalType={EProposalType.REFERENDUM}
 				initialData={data || { items: [], totalCount: 0 }}
 			/>

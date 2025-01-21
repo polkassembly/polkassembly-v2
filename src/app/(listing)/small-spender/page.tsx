@@ -8,12 +8,14 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 
+const origin = EPostOrigin.SMALL_SPENDER;
+
 async function SmallSpenderPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
 	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
 
-	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.REFERENDUM_V2, page, statuses, [EPostOrigin.SMALL_SPENDER], []);
+	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.REFERENDUM_V2, page, statuses, [origin], []);
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -22,8 +24,7 @@ async function SmallSpenderPage({ searchParams }: { searchParams: Promise<{ page
 	return (
 		<div>
 			<ListingPage
-				title='Small Spender'
-				description='Proposals that can spend a small amount of treasury funds'
+				origin={origin}
 				proposalType={EProposalType.REFERENDUM_V2}
 				initialData={data || { items: [], totalCount: 0 }}
 			/>

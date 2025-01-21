@@ -22,8 +22,6 @@ async function DiscussionsPage({ searchParams }: { searchParams: Promise<{ page?
 	return (
 		<div>
 			<ListingPage
-				title='Discussions'
-				description='View and participate in discussions'
 				proposalType={EProposalType.DISCUSSION}
 				initialData={data || { items: [], totalCount: 0 }}
 			/>
