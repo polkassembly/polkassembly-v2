@@ -19,16 +19,6 @@ function Header({ data }: { data: { totalCount: number } }) {
 	const pathname = usePathname();
 	const [inputValue, setInputValue] = useState(searchParams.get('hash') || '');
 
-	const createQueryString = (name: string, value: string) => {
-		const params = new URLSearchParams(searchParams.toString());
-		if (value) {
-			params.set(name, value);
-		} else {
-			params.delete(name);
-		}
-		return params.toString();
-	};
-
 	return (
 		<div className={styles.header}>
 			<p className={styles.header_title}>
@@ -41,7 +31,8 @@ function Header({ data }: { data: { totalCount: number } }) {
 						value={inputValue}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
-								router.push(`${pathname}?${createQueryString('hash', inputValue)}`);
+								// push roeuter to preimages/[hash]
+								router.push(`${pathname}/${inputValue}`);
 							}
 						}}
 						onChange={(e) => setInputValue(e.target.value)}
@@ -49,7 +40,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 					/>
 					<MdOutlineSearch
 						onClick={() => {
-							router.push(`${pathname}?${createQueryString('hash', inputValue)}`);
+							router.push(`${pathname}/${inputValue}`);
 						}}
 						className={styles.input_search}
 					/>
@@ -58,8 +49,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 					<Button
 						onClick={() => {
 							setInputValue('');
-							const url = createQueryString('hash', '');
-							router.push(url ? `${pathname}?${url}` : pathname);
+							router.push(pathname);
 						}}
 					>
 						{t('Preimages.showAll')}

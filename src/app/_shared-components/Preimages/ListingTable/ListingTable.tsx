@@ -23,10 +23,12 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const { resolvedTheme: theme } = useTheme();
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
-	const modalarg = data?.items?.[0]?.proposedCall.args;
+	const [selectedPreimage, setSelectedPreimage] = useState<IPreimage | null>(null);
+	const modalarg = selectedPreimage?.proposedCall.args;
 	const t = useTranslations('Preimages');
 
-	const hanldeDialogOpen = () => {
+	const hanldeDialogOpen = (preimage: IPreimage) => {
+		setSelectedPreimage(preimage);
 		setOpen(true);
 	};
 	return (
@@ -48,13 +50,13 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							<PreimageRow
 								key={preimage?.id}
 								preimage={preimage}
-								handleDialogOpen={hanldeDialogOpen}
+								handleDialogOpen={() => hanldeDialogOpen(preimage)}
 							/>
 						))
 					) : (
 						<PreimageRow
 							preimage={data as unknown as IPreimage}
-							handleDialogOpen={hanldeDialogOpen}
+							handleDialogOpen={() => hanldeDialogOpen(data as unknown as IPreimage)}
 						/>
 					)}
 				</TableBody>

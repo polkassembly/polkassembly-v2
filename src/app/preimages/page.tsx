@@ -10,27 +10,13 @@ import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals'
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
 
-async function Preimages({ searchParams }: { searchParams: Promise<{ page?: string; hash?: string }> }) {
+async function Preimages({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
-	const hash = searchParamsValue.hash || '';
 
 	const { data, error } = await NextApiClientService.fetchPreimageListing(Number(page));
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
-	}
-
-	if (hash) {
-		const hashData = await NextApiClientService.fetchPreimageByHash(hash);
-		if (hashData.error || !hashData.data) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, hashData.error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
-		}
-		return (
-			<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
-				<Header data={data as IGenericListingResponse<IPreimage>} />
-				<ListingTable data={hashData?.data as unknown as IGenericListingResponse<IPreimage>} />
-			</div>
-		);
 	}
 
 	return (
