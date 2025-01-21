@@ -117,8 +117,6 @@ export class NextApiClientService {
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_PREIMAGES:
-				path = '/preimages';
-				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
@@ -343,7 +341,7 @@ export class NextApiClientService {
 	static async fetchPreimageByHash(hashContains: string) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.FETCH_PREIMAGES,
-			routeSegments: [hashContains]
+			routeSegments: ['preimages', hashContains]
 		});
 		const response = await this.nextApiClientFetch<IPreimage>({ url, method });
 		if (response.data && response.data.length > 0) {
@@ -363,7 +361,8 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.FETCH_PREIMAGES,
-			queryParams
+			queryParams,
+			routeSegments: ['preimages']
 		});
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
