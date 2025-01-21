@@ -4,9 +4,9 @@
 import * as React from 'react';
 import ReactJson from 'react-json-view';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import ArgumentsTable from './ArgumentsTable';
 import classes from './ArgumentsTable.module.scss';
 
@@ -21,7 +21,7 @@ enum Etabs {
 }
 
 function ArgumentsTableJSONView({ className, postArguments }: Props) {
-	const { userPreferences } = useUserPreferences();
+	const { resolvedTheme } = useTheme();
 	const t = useTranslations();
 	if (postArguments) {
 		return (
@@ -32,15 +32,18 @@ function ArgumentsTableJSONView({ className, postArguments }: Props) {
 						<TabsTrigger value={Etabs.JSON}>{t('PostDetails.OnchainInfo.json')}</TabsTrigger>
 					</TabsList>
 					<TabsContent value={Etabs.TABLE}>
-						<div>
+						<div className='max-h-[500px] w-full max-w-full overflow-auto border-b border-border_grey'>
 							<table
 								cellSpacing={0}
 								cellPadding={0}
+								className='w-full'
 							>
-								<article className={classes.tableHeader}>
-									<span className='col-span-1'>{t('PostDetails.OnchainInfo.name')}</span>
-									<span className='col-span-3'>{t('PostDetails.OnchainInfo.value')}</span>
-								</article>
+								<thead>
+									<tr className={classes.tableHeader}>
+										<th className='min-w-[160px] p-2'>{t('PostDetails.OnchainInfo.name')}</th>
+										<th className='w-full p-2'>{t('PostDetails.OnchainInfo.value')}</th>
+									</tr>
+								</thead>
 								<tbody className={classes.tableBody}>
 									<ArgumentsTable argumentsJSON={postArguments} />
 								</tbody>
@@ -50,7 +53,7 @@ function ArgumentsTableJSONView({ className, postArguments }: Props) {
 					<TabsContent value={Etabs.JSON}>
 						<div className={classes.jsonContainer}>
 							<ReactJson
-								theme={userPreferences.theme === ETheme.DARK ? 'monokai' : 'rjv-default'}
+								theme={resolvedTheme === ETheme.DARK ? 'monokai' : 'rjv-default'}
 								src={postArguments}
 								iconStyle='circle'
 								enableClipboard={false}

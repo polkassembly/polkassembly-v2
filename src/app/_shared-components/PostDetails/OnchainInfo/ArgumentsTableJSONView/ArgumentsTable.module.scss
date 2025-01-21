@@ -1,13 +1,5 @@
-.tableRow {
-	@apply grid grid-cols-4 gap-x-2 border-b border-border_grey text-text_primary;
-}
-
-.tableCell {
-	@apply col-span-1 flex items-center truncate border-r border-solid border-border_grey p-2 text-sm sm:w-auto;
-}
-
 .tableHeader {
-	@apply grid grid-cols-4 gap-x-2 rounded-t-md bg-grey_bg px-2 py-2 font-semibold text-text_primary;
+	@apply rounded-t-md bg-grey_bg px-2 py-2 font-semibold text-text_primary text-left
 }
 
 .tableBody {
@@ -16,4 +8,12 @@
 
 .jsonContainer {
 	@apply max-h-[500px] overflow-auto break-words
+}
+
+.tableCellName {
+	@apply min-w-[160px] break-words border-b border-r border-border_grey p-2 text-sm
+}
+
+.tableCellValue {
+	@apply w-full min-w-[160px] max-w-[400px] break-words border-b border-border_grey p-2 text-sm
 }

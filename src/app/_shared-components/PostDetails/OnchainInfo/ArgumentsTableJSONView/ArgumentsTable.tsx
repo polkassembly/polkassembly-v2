@@ -51,20 +51,21 @@ function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unkno
 		<>
 			{Object.entries(argumentsJSON).map(([name, value]) => {
 				return (
-					<div key={`${name}-${value}`}>
-						<tr className={classes.tableRow}>
-							<td className={classes.tableCell}>{name}</td>
-							{typeof value !== 'object' ? (
-								<td className='col-span-3 truncate p-2 text-sm'>
-									<UrlText text={value as string} />
-								</td>
-							) : (
-								<td className='col-span-3 text-sm sm:w-auto'>
-									<ArgumentsTable argumentsJSON={value as Record<string, unknown>} />
-								</td>
-							)}
-						</tr>
-					</div>
+					<tr
+						key={`${name}-${value}`}
+						// className={classes.tableRow}
+					>
+						<td className={classes.tableCellName}>{name}</td>
+						{typeof value !== 'object' ? (
+							<td className={classes.tableCellValue}>
+								<UrlText text={value as string} />
+							</td>
+						) : (
+							<td>
+								<ArgumentsTable argumentsJSON={value as Record<string, unknown>} />
+							</td>
+						)}
+					</tr>
 				);
 			})}
 		</>
