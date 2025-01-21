@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { deepParseJson } from 'deep-parse-json';
+import { IS_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -32,7 +33,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	// Try to get from cache first
 	const cachedData = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
-	if (cachedData) {
+	if (cachedData && IS_CACHE_ENABLED) {
 		return NextResponse.json(deepParseJson(cachedData));
 	}
 
@@ -45,7 +46,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		}
 
 		// Cache the response
-		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(offChainPostData) });
+		if (IS_CACHE_ENABLED) {
+			await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(offChainPostData) });
+		}
 		return NextResponse.json(offChainPostData);
 	}
 
@@ -65,7 +68,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	};
 
 	// Cache the response
-	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
+	if (IS_CACHE_ENABLED) {
+		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
+	}
 
 	return NextResponse.json(post);
 });
@@ -107,8 +112,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	}
 
 	// Invalidate caches
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-	await RedisService.DeletePostsListing({ network, proposalType });
+	if (IS_CACHE_ENABLED) {
+		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+		await RedisService.DeletePostsListing({ network, proposalType });
+	}
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

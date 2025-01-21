@@ -334,5 +334,20 @@
 		"content": "Content",
 		"editPost": "Edit Post",
 		"editPostButton": "Edit"
+	},
+	"Footer": {
+		"helpCenter": "Help Center",
+		"reportAnIssue": "Report an Issue",
+		"feedback": "Feedback",
+		"termsAndConditions": "Terms and Conditions",
+		"termsOfWebsite": "Terms of Website",
+		"privacyPolicy": "Privacy Policy",
+		"ourServices": "Our Services",
+		"docs": "Docs",
+		"github": "Github",
+		"allRightsReserved": "All rights reserved.",
+		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
+		"aHouseOfCommonsInitiative": "A House of Commons Initiative.",
+		"allRightsReservedYear": "All rights reserved."
 	}
 }

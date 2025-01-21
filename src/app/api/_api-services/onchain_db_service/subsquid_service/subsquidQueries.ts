@@ -481,4 +481,113 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	// preimage queries
+
+	protected static GET_PREIMAGE_BY_PROPOSAL_INDEX_AND_TYPE = `
+		query GetPreimageByProposalIndexAndType($type_eq: ProposalType!, $index_eq: Int!) {
+			proposals(where: {type_eq: $type_eq, index_eq: $index_eq}) {
+				preimage {
+					createdAt
+					createdAtBlock
+					deposit
+					hash
+					id
+					length
+					method
+					proposedCall {
+						args
+						description
+						method
+						section
+					}
+					proposer
+					section
+					status
+					updatedAt
+					updatedAtBlock
+				}
+			}
+		}
+	`;
+
+	protected static GET_PREIMAGE_BY_PROPOSAL_HASH_AND_TYPE = `
+		query GetPreimageByProposalHashAndType($type_eq: ProposalType!, $hash_eq: String!) {
+			proposals(where: {type_eq: $type_eq, hash_eq: $hash_eq}) {
+				preimage {
+					createdAt
+					createdAtBlock
+					deposit
+					hash
+					id
+					length
+					method
+					proposedCall {
+						args
+						description
+						method
+						section
+					}
+					proposer
+					section
+					status
+					updatedAt
+					updatedAtBlock
+				}
+			}
+		}
+	`;
+
+	protected static GET_PREIMAGES_LISTING = `
+		query GetPreimagesListing($limit: Int!, $offset: Int!) {
+			preimagesConnection(orderBy: createdAtBlock_DESC) {
+				totalCount
+			}
+			preimages(limit: $limit, offset: $offset, orderBy: createdAtBlock_DESC) {
+				hash
+				id
+				length
+				method
+				section
+				deposit
+				proposedCall {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				status
+				updatedAt
+				updatedAtBlock
+				createdAtBlock
+				createdAt
+			}
+		}
+	`;
+
+	protected static GET_PREIMAGE_BY_HASH = `
+		query GetPreimageByHash($hash_eq: String!) {
+			preimages(where: {hash_eq: $hash_eq}) {
+				hash
+				id
+				length
+				method
+				section
+				deposit
+				proposedCall {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				status
+				updatedAt
+				updatedAtBlock
+				createdAtBlock
+				createdAt
+			}
+		}
+	`;
 }

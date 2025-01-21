@@ -14,6 +14,7 @@ export const {
 	ACCESS_TOKEN_PASSPHRASE = '',
 	REFRESH_TOKEN_PASSPHRASE = '',
 	NOTIFICATION_ENGINE_API_KEY = '',
-	SUBSCAN_CACHE_ENABLED = 'true',
 	SUBSCAN_API_KEY = ''
 } = process.env;
+
+export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';

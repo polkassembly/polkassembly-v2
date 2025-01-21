@@ -8,7 +8,6 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
-	EApiRoute,
 	EPostOrigin,
 	EProposalType,
 	EReaction,
@@ -19,7 +18,8 @@ import {
 	ICommentResponse,
 	IErrorResponse,
 	IGenerateTFAResponse,
-	IOnChainPostListingResponse,
+	IGenericListingResponse,
+	IPostListing,
 	IPost,
 	IPublicUser,
 	IVoteData
@@ -29,6 +29,28 @@ import { StatusCodes } from 'http-status-codes';
 import { ClientError } from '../_client-utils/clientError';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
+
+enum EApiRoute {
+	WEB2_LOGIN = 'WEB2_LOGIN',
+	WEB2_SIGNUP = 'WEB2_SIGNUP',
+	WEB3_LOGIN = 'WEB3_LOGIN',
+	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
+	USER_EXISTS = 'USER_EXISTS',
+	TFA_LOGIN = 'TFA_LOGIN',
+	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
+	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
+	LOGOUT = 'LOGOUT',
+	POSTS_LISTING = 'POSTS_LISTING',
+	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
+	GET_COMMENTS = 'GET_COMMENTS',
+	ADD_COMMENT = 'ADD_COMMENT',
+	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
+	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
+	POST_REACTIONS = 'POST_REACTIONS',
+	DELETE_REACTION = 'DELETE_REACTION',
+	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA',
+	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS'
+}
 
 export class NextApiClientService {
 	private static async getRouteConfig({
@@ -96,11 +118,12 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_REACTION:
 				method = 'DELETE';
 				break;
-			case EApiRoute.GET_USER_BY_ID:
-				path = '/users/id';
-				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
 				method = 'PATCH';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA:
+				path = '/users/id';
+				method = 'GET';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -194,7 +217,7 @@ export class NextApiClientService {
 		statuses?: string[],
 		origins?: string[],
 		tags: string[] = []
-	): Promise<{ data: IOnChainPostListingResponse | null; error: IErrorResponse | null }> {
+	): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
@@ -213,7 +236,7 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
-		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
 	// Post Reactions
@@ -290,12 +313,12 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, routeSegments: ['activityFeed'], queryParams });
-		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
-	// user profile
-	protected static async getUserByIdApi({ userId }: { userId: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_BY_ID, routeSegments: [userId] });
+	// user data
+	static async fetchPublicUserByIdApi(userId: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 }

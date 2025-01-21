@@ -322,5 +322,20 @@
 		"content": "内容",
 		"editPost": "编辑帖子",
 		"editPostButton": "编辑"
+	},
+	"Footer": {
+		"helpCenter": "帮助中心",
+		"reportAnIssue": "报告问题",
+		"feedback": "反馈",
+		"termsAndConditions": "条款和条件",
+		"termsOfWebsite": "网站条款",
+		"privacyPolicy": "隐私政策",
+		"ourServices": "我们的服务",
+		"docs": "文档",
+		"github": "Github",
+		"allRightsReserved": "版权所有。",
+		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
+		"aHouseOfCommonsInitiative": "House of Commons 倡议。",
+		"allRightsReservedYear": "版权所有。"
 	}
 }

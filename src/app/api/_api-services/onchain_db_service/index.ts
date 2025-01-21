@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IVoteCurve } from '@shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostListing, IGenericListingResponse, IVoteCurve, IPreimage } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
@@ -46,7 +46,7 @@ export class OnChainDbService {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
-	}) {
+	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
@@ -69,7 +69,7 @@ export class OnChainDbService {
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
 
 		return {
-			posts: [],
+			items: [],
 			totalCount: 0
 		};
 	}
@@ -103,5 +103,29 @@ export class OnChainDbService {
 		if (voteCurves) return voteCurves;
 
 		return [];
+	}
+
+	static async GetPostPreimage({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
+		const preimage = await SubsquidService.GetPostPreimage({ network, indexOrHash, proposalType });
+		if (preimage) return preimage;
+
+		return null;
+	}
+
+	static async GetPreimageListing({ network, page, limit }: { network: ENetwork; page: number; limit: number }) {
+		const preimageListing = await SubsquidService.GetPreimageListing({ network, page, limit });
+		if (preimageListing) return preimageListing;
+
+		return {
+			items: [],
+			totalCount: 0
+		};
+	}
+
+	static async GetPreimageByHash({ network, hash }: { network: ENetwork; hash: string }): Promise<IPreimage | null> {
+		const preimage = await SubsquidService.GetPreimageByHash({ network, hash });
+		if (preimage) return preimage;
+
+		return null;
 	}
 }

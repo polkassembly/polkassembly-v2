@@ -180,6 +180,10 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
+export interface IUserClientData extends IAccessTokenPayload {
+	publicUser?: IPublicUser;
+}
+
 export interface IAddressProxyForEntry {
 	address: string;
 	network: ENetwork;
@@ -449,8 +453,8 @@ export interface IActivityFeedPostListing extends IPostListing {
 	userReaction?: IReaction;
 }
 
-export interface IOnChainPostListingResponse {
-	posts: IPostListing[];
+export interface IGenericListingResponse<T> {
+	items: T[];
 	totalCount: number;
 }
 
@@ -483,28 +487,6 @@ export interface IErrorResponse {
 	status: StatusCodes;
 	message: string;
 	name: string;
-}
-
-export enum EApiRoute {
-	WEB2_LOGIN = 'WEB2_LOGIN',
-	WEB2_SIGNUP = 'WEB2_SIGNUP',
-	WEB3_LOGIN = 'WEB3_LOGIN',
-	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
-	USER_EXISTS = 'USER_EXISTS',
-	TFA_LOGIN = 'TFA_LOGIN',
-	GEN_TFA_TOKEN = 'GEN_TFA_TOKEN',
-	VERIFY_TFA_TOKEN = 'VERIFY_TFA_TOKEN',
-	LOGOUT = 'LOGOUT',
-	POSTS_LISTING = 'POSTS_LISTING',
-	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
-	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
-	GET_COMMENTS = 'GET_COMMENTS',
-	ADD_COMMENT = 'ADD_COMMENT',
-	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
-	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
-	POST_REACTIONS = 'POST_REACTIONS',
-	DELETE_REACTION = 'DELETE_REACTION',
-	GET_USER_BY_ID = 'GET_USER_BY_ID'
 }
 
 export enum EWeb3LoginScreens {
@@ -713,4 +695,25 @@ export interface IVoteCurve {
 export enum EProfileTabs {
 	OVERVIEW = 'overview',
 	ACCOUNTS = 'accounts'
+}
+
+export interface IPreimage {
+	createdAt: string;
+	createdAtBlock: number;
+	deposit: string;
+	hash: string;
+	id: string;
+	length: number;
+	method: string;
+	proposedCall: {
+		args: Record<string, unknown>;
+		description: string;
+		method: string;
+		section: string;
+	};
+	proposer: string;
+	section: string;
+	status: string;
+	updatedAt: string;
+	updatedAtBlock: number | null;
 }

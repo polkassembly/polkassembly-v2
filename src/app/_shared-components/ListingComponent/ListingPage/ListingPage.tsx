@@ -253,7 +253,7 @@ function ListingPage({ proposalType, origins, title, description }: ListingPageP
 					<div>
 						{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
 							<ListingTab
-								data={data?.posts || []}
+								data={data?.items || []}
 								totalCount={data?.totalCount || 0}
 								currentPage={state.currentPage}
 								setCurrentPage={handlePageChange}

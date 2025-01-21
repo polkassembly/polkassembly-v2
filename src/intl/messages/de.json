@@ -322,5 +322,20 @@
 		"content": "Inhalt",
 		"editPost": "Beitrag bearbeiten",
 		"editPostButton": "Bearbeiten"
+	},
+	"Footer": {
+		"helpCenter": "Hilfezentrum",
+		"reportAnIssue": "Problem melden",
+		"feedback": "Feedback",
+		"termsAndConditions": "Allgemeine Geschäftsbedingungen",
+		"termsOfWebsite": "Website-Nutzungsbedingungen",
+		"privacyPolicy": "Datenschutzerklärung",
+		"ourServices": "Unsere Dienste",
+		"docs": "Dokumentation",
+		"github": "Github",
+		"allRightsReserved": "Alle Rechte vorbehalten.",
+		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
+		"aHouseOfCommonsInitiative": "Eine Initiative von House of Commons.",
+		"allRightsReservedYear": "Alle Rechte vorbehalten."
 	}
 }
