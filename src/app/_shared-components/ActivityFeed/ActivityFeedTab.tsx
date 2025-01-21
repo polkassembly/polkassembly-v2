@@ -7,7 +7,7 @@ import { EActivityFeedTab } from '@/_shared/types';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
 
-async function ActivityFeedTab({ currentTab }: { currentTab: EActivityFeedTab }) {
+function ActivityFeedTab({ currentTab }: { currentTab: EActivityFeedTab }) {
 	return <div>{currentTab === EActivityFeedTab.EXPLORE ? <ActivityFeedPostList /> : <SubscribedPostList postData={{ items: [], totalCount: 0 }} />}</div>;
 }
 
