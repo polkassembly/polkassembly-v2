@@ -9,6 +9,7 @@ import Navbar from '@ui/AppLayout/Navbar/Navbar';
 import dynamic from 'next/dynamic';
 import React from 'react';
 import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
+import Footer from './Footer/Footer';
 
 const AppSidebar = dynamic(() => import('./AppSidebar/AppSidebar'), { ssr: false });
 
@@ -22,6 +23,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 			<SidebarInset>
 				<Navbar />
 				<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
+				<Footer />
 			</SidebarInset>
 		</main>
 	);
