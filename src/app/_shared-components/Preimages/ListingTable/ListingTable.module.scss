@@ -23,19 +23,19 @@
 }
 
 .tableRow {
-    @apply overflow-hidden rounded-t-lg bg-page_background;
+    @apply overflow-hidden rounded-t-lg bg-page_background px-6;
 }
 
 .tableCell_1 {
-    @apply px-6 py-5 first:rounded-tl-lg last:rounded-tr-lg
+    @apply p-6 first:rounded-tl-lg last:rounded-tr-lg
 }
 
 .tableCell_2 {
-    @apply w-1/4 px-6 py-5;
+    @apply w-1/4 p-6;
 }
 
 .tableCell {
-    @apply px-6 py-5;
+    @apply p-6;
 }
 
 .table_content_cell {
@@ -47,7 +47,7 @@
 }
 
 .table_content_cell_2 {
-    @apply flex items-center gap-3 px-6 py-5;
+    @apply flex items-center gap-3 p-6;
 }
 
 .table_content_cell_2_content {
