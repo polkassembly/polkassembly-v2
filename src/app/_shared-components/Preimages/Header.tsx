@@ -30,7 +30,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 
 	return (
 		<div className='flex items-center justify-between'>
-			<p className='text-2xl font-bold text-text_primary'>
+			<p className='text-2xl font-bold text-navbar_title'>
 				{data?.totalCount} {t('Sidebar.preimages')}
 			</p>
 			<div className='flex items-center gap-2'>

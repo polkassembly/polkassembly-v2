@@ -315,5 +315,20 @@
 	},
 	"Balance": {
 		"voteBalance": "Saldo de votación"
+	},
+	"Footer": {
+		"helpCenter": "Centro de Ayuda",
+		"reportAnIssue": "Reportar un Problema",
+		"feedback": "Comentarios",
+		"termsAndConditions": "Términos y Condiciones",
+		"termsOfWebsite": "Términos del Sitio Web",
+		"privacyPolicy": "Política de Privacidad",
+		"ourServices": "Nuestros Servicios",
+		"docs": "Documentación",
+		"github": "Github",
+		"allRightsReserved": "Todos los derechos reservados.",
+		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
+		"aHouseOfCommonsInitiative": "Una iniciativa de House of Commons.",
+		"allRightsReservedYear": "Todos los derechos reservados."
 	}
 }
