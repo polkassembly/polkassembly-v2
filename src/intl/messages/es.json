@@ -243,7 +243,21 @@
 		"votingPower": "Poder de Voto",
 		"capital": "Capital",
 		"account": "Cuenta",
-		"abstain": "Abstención"
+		"abstain": "Abstención",
+		"onchainInfo": "Información en cadena",
+		"OnchainInfo": {
+			"metadata": "Metadatos",
+			"table": "Tabla",
+			"json": "JSON",
+			"origin": "Origen",
+			"method": "Método",
+			"proposalHash": "Hash de propuesta",
+			"preimage": "Preimagen",
+			"description": "Descripción",
+			"section": "Sección",
+			"name": "Nombre",
+			"value": "Valor"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -326,6 +340,13 @@
 	},
 	"Balance": {
 		"voteBalance": "Saldo de Votación"
+	},
+	"EditPost": {
+		"edit": "Editar",
+		"title": "Título",
+		"content": "Contenido",
+		"save": "Guardar",
+		"editPostButton": "Editar"
 	},
 	"Footer": {
 		"helpCenter": "Centro de Ayuda",

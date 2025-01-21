@@ -243,7 +243,21 @@
 		"votingPower": "投票权重",
 		"capital": "资本",
 		"account": "账户",
-		"abstain": "弃权"
+		"abstain": "弃权",
+		"OnchainInfo": {
+			"metadata": "元数据",
+			"table": "表格",
+			"json": "JSON",
+			"origin": "来源",
+			"method": "方法",
+			"proposalHash": "提案哈希",
+			"preimage": "预映像",
+			"description": "描述",
+			"section": "部分",
+			"name": "名称",
+			"value": "值"
+		},
+		"onchainInfo": "链上信息"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -326,6 +340,13 @@
 	},
 	"Balance": {
 		"voteBalance": "投票余额"
+	},
+	"EditPost": {
+		"edit": "编辑",
+		"title": "标题",
+		"content": "内容",
+		"save": "保存",
+		"editPostButton": "编辑"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",

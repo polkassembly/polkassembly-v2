@@ -14,7 +14,7 @@ export const buttonVariants = {
 	outline:
 		'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	secondary: 'bg-btn_secondary_background text-text_pink rounded-lg border border-navbar_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
-	ghost: 'hover:bg-accent hover:text-accent-foreground',
+	ghost: '',
 	link: 'text-primary underline-offset-4 hover:underline'
 };
 

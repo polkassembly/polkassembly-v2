@@ -102,7 +102,8 @@
 		"next": "Next",
 		"alreadyHaveAnAccount": "Already have an Account?",
 		"loginwithusername": "Login with Username",
-		"loginToPolkassembly": "Login to Polkassembly"
+		"loginToPolkassembly": "Login to Polkassembly",
+		"profile": "Profile"
 	},
 	"ListingTab": {
 		"Analytics": "Analytics",
@@ -216,6 +217,7 @@
 		"beneficiary": "Beneficiary",
 		"description": "Description",
 		"timeline": "Timeline",
+		"onchainInfo": "Onchain info",
 		"more": "more",
 		"referendum": "Referendum",
 		"comments": "Comments",
@@ -243,7 +245,20 @@
 		"votingPower": "Voting Power",
 		"capital": "Capital",
 		"account": "Account",
-		"abstain": "Abstain"
+		"abstain": "Abstain",
+		"OnchainInfo": {
+			"metadata": "Metadata",
+			"table": "Table",
+			"json": "JSON",
+			"origin": "Origin",
+			"method": "Method",
+			"proposalHash": "Proposal Hash",
+			"preimage": "Preimage",
+			"description": "Description",
+			"section": "Section",
+			"name": "Name",
+			"value": "Value"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelled",
@@ -326,6 +341,13 @@
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance"
+	},
+	"EditPost": {
+		"edit": "Edit",
+		"title": "Title",
+		"content": "Content",
+		"save": "Save",
+		"editPostButton": "Edit"
 	},
 	"Footer": {
 		"helpCenter": "Help Center",

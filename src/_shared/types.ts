@@ -692,6 +692,11 @@ export interface IVoteCurve {
 	supportPercent: number;
 }
 
+export enum EProfileTabs {
+	OVERVIEW = 'overview',
+	ACCOUNTS = 'accounts'
+}
+
 export interface IPreimage {
 	createdAt: string;
 	createdAtBlock: number;

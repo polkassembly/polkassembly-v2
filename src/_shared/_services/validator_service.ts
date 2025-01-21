@@ -12,6 +12,7 @@ import { ELocales, ENetwork, EProposalType, ETheme, EWallet } from '@shared/type
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
+import { OutputData } from '@editorjs/editorjs';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -215,5 +216,10 @@ export class ValidatorService {
 		if (mightBePlainText && indicators < 2) return false;
 
 		return indicators >= options.minIndicators;
+	}
+
+	// TODO: Add more checks for the content
+	static isValidBlockContent(content: OutputData): boolean {
+		return content.blocks.length > 0;
 	}
 }

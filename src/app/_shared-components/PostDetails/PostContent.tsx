@@ -9,9 +9,20 @@ import { OutputData } from '@editorjs/editorjs';
 import { IPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import BlockEditor from '../BlockEditor/BlockEditor';
+import { Separator } from '../Separator';
+import EditPostButton from './EditPost/EditPostButton';
 
-function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
+function PostContent({
+	postData,
+	isModalOpen,
+	onEditPostSuccess
+}: {
+	postData: IPostListing;
+	isModalOpen: boolean;
+	onEditPostSuccess: (title: string, content: OutputData) => void;
+}) {
 	const [showMore, setShowMore] = useState(false);
+
 	const t = useTranslations();
 
 	const handleShowMore = () => {
@@ -56,6 +67,16 @@ function PostContent({ postData, isModalOpen }: { postData: IPostListing; isModa
 					{t('ActivityFeed.PostItem.showMore')}
 				</span>
 			) : null}
+			<Separator className='my-4 bg-border_grey' />
+			<div className='flex items-center justify-between'>
+				<div />
+				<div>
+					<EditPostButton
+						postData={postData}
+						onEditPostSuccess={onEditPostSuccess}
+					/>
+				</div>
+			</div>
 		</div>
 	);
 }

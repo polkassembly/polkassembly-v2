@@ -2,6 +2,10 @@
 	@apply flex w-full items-center justify-center gap-x-2 rounded text-sm text-wallet_btn_text;
 }
 
-.tabsContent {
-	@apply flex max-h-[500px] flex-col
+.tableContainer {
+	@apply flex max-h-[500px] flex-col relative;
+}
+
+.table {
+	@apply min-h-[200px];
 }

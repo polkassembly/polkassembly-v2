@@ -7,11 +7,13 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { DM_Sans as dmSans } from 'next/font/google';
 import { getLocale, getMessages } from 'next-intl/server';
+import NextTopLoader from 'nextjs-toploader';
 import { Providers } from './_shared-components/Providers';
 import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
 import { CookieService } from '../_shared/_services/cookie_service';
+import { THEME_COLORS } from './_style/theme';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -47,6 +49,7 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
+				<NextTopLoader color={THEME_COLORS.light.navbar_border} />
 				<Initializers
 					userData={user || null}
 					userPreferences={userPreferences}
