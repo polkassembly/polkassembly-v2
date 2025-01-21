@@ -8,6 +8,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
@@ -21,8 +22,17 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 	const { user } = useUser();
 
 	const editPost = async () => {
-		if (!title || !content || !postData?.index || !postData?.proposalType || !user || !user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || ''))
+		if (
+			!title.trim() ||
+			!content ||
+			!ValidatorService.isValidBlockContent(content) ||
+			!postData?.index ||
+			!postData?.proposalType ||
+			!user ||
+			!user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')
+		)
 			return;
+
 		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content)) return;
 
 		setIsLoading(true);
@@ -64,7 +74,12 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 			</div>
 			<div className='flex justify-end'>
 				<Button
-					disabled={!title || !content || (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content))}
+					disabled={
+						!title.trim() ||
+						!content ||
+						!ValidatorService.isValidBlockContent(content) ||
+						(title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content))
+					}
 					onClick={editPost}
 					isLoading={isLoading}
 				>
