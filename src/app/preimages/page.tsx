@@ -7,12 +7,9 @@ import Header from '@ui/Preimages/Header';
 import ListingTable from '@ui/Preimages/ListingTable';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 
-async function page({ searchParams }: { searchParams: { page: string; hash_contains: string } }) {
-	const params = await searchParams;
-	const pageParam = params?.page;
-	const hashContains = params?.hash_contains;
-
-	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(pageParam ?? 1), hashContains ?? '');
+async function page({ params }: { params: Promise<{ page: string; hashContains: string }> }) {
+	const { page, hashContains } = await params;
+	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(page ?? 1), hashContains ?? '');
 
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 

@@ -8,6 +8,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Table, TableHead, TableBody, TableRow, TableCell } from '../Table';
 import Address from '../Profile/Address/Address';
+import { Pagination } from '../Pagination';
 
 function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const network = getCurrentNetwork();
@@ -42,6 +43,9 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 					))}
 				</TableBody>
 			</Table>
+			<div className='mt-5'>
+				<Pagination />
+			</div>
 		</div>
 	);
 }
