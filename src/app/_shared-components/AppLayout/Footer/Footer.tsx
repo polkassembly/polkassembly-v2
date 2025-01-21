@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { ETheme } from '@/_shared/types';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
+import { useTranslations } from 'next-intl';
 import { FaTwitter, FaTelegramPlane } from 'react-icons/fa';
 import { IoLogoDiscord } from 'react-icons/io5';
 import { TbWorld } from 'react-icons/tb';
@@ -16,6 +17,7 @@ import styles from './Footer.module.scss';
 
 function Footer() {
 	const { resolvedTheme: theme } = useTheme();
+	const t = useTranslations();
 
 	return (
 		<footer
@@ -84,7 +86,7 @@ function Footer() {
 					{/* Terms Links */}
 					<div className={styles.footer_container_2}>
 						<div className='text-center sm:text-left'>
-							<p className='text-lg font-bold'>Help Center</p>
+							<p className='text-lg font-bold'>{t('Footer.helpCenter')}</p>
 
 							<nav
 								aria-label='Footer About Nav'
@@ -98,7 +100,7 @@ function Footer() {
 											rel='noreferrer'
 											className='flex items-center gap-x-1'
 										>
-											Report an Issue
+											{t('Footer.reportAnIssue')}
 											<BsArrowUpRight className='ml-3' />
 										</a>
 									</div>
@@ -109,12 +111,12 @@ function Footer() {
 											rel='noreferrer'
 											className='flex items-center gap-x-1'
 										>
-											Feedback
+											{t('Footer.feedback')}
 											<BsArrowUpRight className='ml-3' />
 										</a>
 									</div>
 									<div className='hidden sm:block'>
-										<Link href='/terms-and-conditions'>Terms and Conditions</Link>
+										<Link href='/terms-and-conditions'>{t('Footer.termsAndConditions')}</Link>
 									</div>
 									<div>
 										<a
@@ -123,7 +125,7 @@ function Footer() {
 											rel='noreferrer'
 											className='flex items-center gap-x-1'
 										>
-											Github
+											{t('Footer.github')}
 											<BsArrowUpRight className='ml-3' />
 										</a>
 									</div>
@@ -132,7 +134,7 @@ function Footer() {
 						</div>
 
 						<div className='text-center font-normal sm:text-left'>
-							<p className='text-lg font-bold'>Our Services</p>
+							<p className='text-lg font-bold'>{t('Footer.ourServices')}</p>
 
 							<nav
 								aria-label='Footer Services Nav'
@@ -146,17 +148,17 @@ function Footer() {
 											rel='noreferrer'
 											className='flex items-center gap-x-1'
 										>
-											Docs
+											{t('Footer.docs')}
 											<BsArrowUpRight className='ml-3' />
 										</a>
 									</div>
 
 									<div className='hidden sm:block'>
-										<Link href='/terms-of-website'>Terms of Website</Link>
+										<Link href='/terms-of-website'>{t('Footer.termsOfWebsite')}</Link>
 									</div>
 
 									<div className='hidden sm:block'>
-										<Link href='/privacy'>Privacy Policy</Link>
+										<Link href='/privacy'>{t('Footer.privacyPolicy')}</Link>
 									</div>
 								</div>
 							</nav>
@@ -170,11 +172,13 @@ function Footer() {
 					<div>
 						<div className={styles.footer_container_2_link_a_p}>
 							<div className='flex flex-col gap-2 lg:flex-row'>
-								<p>A House of Commons Initiative.</p>
-								<p>Polka Labs Private Limited {new Date().getFullYear()}</p>
+								<p>{t('Footer.aHouseOfCommonsInitiative')}</p>
+								<p>
+									{t('Footer.polkaLabsPrivateLimited')} {new Date().getFullYear()}
+								</p>
 							</div>
 							<div>
-								<p className='block sm:inline'>All rights reserved.</p>
+								<p className='block sm:inline'>{t('Footer.allRightsReservedYear')}</p>
 							</div>
 						</div>
 					</div>
@@ -218,19 +222,19 @@ function Footer() {
 
 					<div className={styles.footer_container_2_link_a_p_p}>
 						<div className='flex justify-center'>
-							<Link href='/terms-and-conditions'>Terms and Conditions</Link>
+							<Link href='/terms-and-conditions'>{t('Footer.termsAndConditions')}</Link>
 							<Link
 								href='/terms-of-website'
 								className='pl-2'
 							>
-								Terms of Website
+								{t('Footer.termsOfWebsite')}
 							</Link>
 						</div>
 						<Link
 							href='/privacy'
 							className='mx-auto pt-2'
 						>
-							Privacy Policy
+							{t('Footer.privacyPolicy')}
 						</Link>
 					</div>
 				</div>

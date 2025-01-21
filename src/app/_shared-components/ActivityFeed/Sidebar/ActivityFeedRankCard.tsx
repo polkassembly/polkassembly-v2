@@ -16,7 +16,7 @@ import { useUser } from '@/hooks/useUser';
 function ActivityFeedRankCard() {
 	const t = useTranslations();
 	const { user } = useUser();
-	if (!user) return null;
+	if (!user?.publicUser) return null;
 
 	return (
 		<div className='relative'>
