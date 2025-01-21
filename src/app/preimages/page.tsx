@@ -15,14 +15,20 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 	const page = parseInt(searchParamsValue.page || '1', 10);
 	const hash = searchParamsValue.hash || '';
 
-	const { data, error } = await NextApiClientService.fetchPreimagesApi(Number(page), hash);
+	const { data, error } = await NextApiClientService.fetchPreimageListing(Number(page));
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
+
+	const hashData = await NextApiClientService.fetchPreimageByHash(hash);
+	if (hashData.error || !hashData.data) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, hashData.error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	}
+
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<Header data={data as IGenericListingResponse<IPreimage>} />
-			<ListingTable data={data as IGenericListingResponse<IPreimage>} />
+			{hash ? <ListingTable data={hashData as unknown as IGenericListingResponse<IPreimage>} /> : <ListingTable data={data as IGenericListingResponse<IPreimage>} />}
 		</div>
 	);
 }
