@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
+import React, { useState } from 'react';
 import { IPostListing } from '@/_shared/types';
 import { Pencil } from 'lucide-react';
 import { OutputData } from '@editorjs/editorjs';
@@ -15,8 +15,12 @@ import EditPost from './EditPost';
 function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing; onEditPostSuccess: (title: string, content: OutputData) => void }) {
 	const t = useTranslations();
 	const { user } = useUser();
+	const [isOpen, setIsOpen] = useState(false);
 	return (
-		<Dialog>
+		<Dialog
+			open={isOpen}
+			onOpenChange={setIsOpen}
+		>
 			<DialogTrigger asChild>
 				<Button
 					variant='ghost'
@@ -35,6 +39,7 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 				<EditPost
 					postData={postData}
 					onEditPostSuccess={onEditPostSuccess}
+					onClose={() => setIsOpen(false)}
 				/>
 			</DialogContent>
 		</Dialog>

@@ -234,7 +234,21 @@
 		"abstain": "Abstención",
 		"castYourVote": "Emita su voto",
 		"loginToVote": "Inicie sesión para votar",
-		"split": "Dividir"
+		"split": "Dividir",
+		"onchainInfo": "Información en cadena",
+		"OnchainInfo": {
+			"metadata": "Metadatos",
+			"table": "Tabla",
+			"json": "JSON",
+			"origin": "Origen",
+			"method": "Método",
+			"proposalHash": "Hash de propuesta",
+			"preimage": "Preimagen",
+			"description": "Descripción",
+			"section": "Sección",
+			"name": "Nombre",
+			"value": "Valor"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -320,7 +334,7 @@
 		"edit": "Editar",
 		"title": "Título",
 		"content": "Contenido",
-		"editPost": "Editar Publicación",
+		"save": "Guardar",
 		"editPostButton": "Editar"
 	},
 	"Footer": {

@@ -217,6 +217,7 @@
 		"beneficiary": "Beneficiary",
 		"description": "Description",
 		"timeline": "Timeline",
+		"onchainInfo": "Onchain info",
 		"more": "more",
 		"referendum": "Referendum",
 		"comments": "Comments",
@@ -244,7 +245,20 @@
 		"votingPower": "Voting Power",
 		"capital": "Capital",
 		"account": "Account",
-		"abstain": "Abstain"
+		"abstain": "Abstain",
+		"OnchainInfo": {
+			"metadata": "Metadata",
+			"table": "Table",
+			"json": "JSON",
+			"origin": "Origin",
+			"method": "Method",
+			"proposalHash": "Proposal Hash",
+			"preimage": "Preimage",
+			"description": "Description",
+			"section": "Section",
+			"name": "Name",
+			"value": "Value"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelled",
@@ -332,7 +346,7 @@
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
-		"editPost": "Edit Post",
+		"save": "Save",
 		"editPostButton": "Edit"
 	},
 	"Footer": {

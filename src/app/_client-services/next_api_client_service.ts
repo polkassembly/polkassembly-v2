@@ -22,7 +22,9 @@ import {
 	IPostListing,
 	IPost,
 	IPublicUser,
-	IVoteData
+	IVoteData,
+	IUserActivity,
+	IPreimage
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -49,7 +51,9 @@ enum EApiRoute {
 	POST_REACTIONS = 'POST_REACTIONS',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA',
-	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS'
+	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
+	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
+	GET_PREIMAGE = 'GET_PREIMAGE'
 }
 
 export class NextApiClientService {
@@ -107,6 +111,7 @@ export class NextApiClientService {
 			// Dynamic routes
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
+			case EApiRoute.GET_PREIMAGE:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
@@ -122,8 +127,8 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA:
+			case EApiRoute.FETCH_USER_ACTIVITY:
 				path = '/users/id';
-				method = 'GET';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -262,6 +267,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
 
+	static async getPreimageApi(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE, routeSegments: [proposalType, index, 'preimage'] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
 	// comments
 	protected static async getCommentsOfPostApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_COMMENTS, routeSegments: [proposalType, index, 'comments'] });
@@ -317,8 +327,13 @@ export class NextApiClientService {
 	}
 
 	// user data
-	static async fetchPublicUserByIdApi(userId: number) {
+	protected static async fetchPublicUserByIdApi({ userId }: { userId: number | string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	protected static async fetchUserActivityApi({ userId }: { userId: number | string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_ACTIVITY, routeSegments: [userId.toString(), 'activities'] });
+		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
 	}
 }

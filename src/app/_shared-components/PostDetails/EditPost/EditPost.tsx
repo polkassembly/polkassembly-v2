@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useState } from 'react';
-import { IPostListing } from '@/_shared/types';
+import { EProposalType, IPostListing } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
@@ -12,7 +12,7 @@ import BlockEditor from '../../BlockEditor/BlockEditor';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
-function EditPost({ postData, onEditPostSuccess }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: OutputData) => void }) {
+function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: OutputData) => void; onClose?: () => void }) {
 	const t = useTranslations();
 	const [content, setContent] = useState<OutputData | null>(postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
@@ -27,10 +27,15 @@ function EditPost({ postData, onEditPostSuccess }: { postData: IPostListing; onE
 
 		setIsLoading(true);
 
-		const { data, error } = await NextApiClientService.editProposalDetailsApi(postData.proposalType, postData.index.toString(), { title, content });
+		const { data, error } = await NextApiClientService.editProposalDetailsApi(
+			postData.proposalType,
+			postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
+			{ title, content }
+		);
 
 		if (!error && data) {
 			onEditPostSuccess?.(title, content);
+			onClose?.();
 		}
 		setIsLoading(false);
 	};
@@ -63,7 +68,7 @@ function EditPost({ postData, onEditPostSuccess }: { postData: IPostListing; onE
 					onClick={editPost}
 					isLoading={isLoading}
 				>
-					{t('EditPost.editPost')}
+					{t('EditPost.save')}
 				</Button>
 			</div>
 		</div>

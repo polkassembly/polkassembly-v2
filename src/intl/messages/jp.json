@@ -234,7 +234,21 @@
 		"abstain": "棄権",
 		"castYourVote": "投票してください",
 		"loginToVote": "投票するにはログインしてください",
-		"split": "分割"
+		"split": "分割",
+		"onchainInfo": "オンチェーン情報",
+		"OnchainInfo": {
+			"metadata": "メタデータ",
+			"table": "テーブル",
+			"json": "JSON",
+			"origin": "オリジン",
+			"method": "メソッド",
+			"proposalHash": "提案ハッシュ",
+			"preimage": "プレイメージ",
+			"description": "説明",
+			"section": "セクション",
+			"name": "名前",
+			"value": "値"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル",
@@ -320,7 +334,7 @@
 		"edit": "編集",
 		"title": "タイトル",
 		"content": "内容",
-		"editPost": "投稿を編集",
+		"save": "保存",
 		"editPostButton": "編集"
 	},
 	"Footer": {

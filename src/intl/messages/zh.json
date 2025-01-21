@@ -234,7 +234,21 @@
 		"abstain": "弃权",
 		"castYourVote": "投出您的一票",
 		"loginToVote": "登录以投票",
-		"split": "分割"
+		"split": "分割",
+		"OnchainInfo": {
+			"metadata": "元数据",
+			"table": "表格",
+			"json": "JSON",
+			"origin": "来源",
+			"method": "方法",
+			"proposalHash": "提案哈希",
+			"preimage": "预映像",
+			"description": "描述",
+			"section": "部分",
+			"name": "名称",
+			"value": "值"
+		},
+		"onchainInfo": "链上信息"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "取消",
@@ -320,7 +334,7 @@
 		"edit": "编辑",
 		"title": "标题",
 		"content": "内容",
-		"editPost": "编辑帖子",
+		"save": "保存",
 		"editPostButton": "编辑"
 	},
 	"Footer": {
