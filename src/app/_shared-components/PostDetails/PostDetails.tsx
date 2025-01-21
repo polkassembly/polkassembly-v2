@@ -17,6 +17,7 @@ import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
+import OnchainInfo from './OnchainInfo/OnchainInfo';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
 	const [post, setPost] = useState<IPost>(postData || ({} as IPost));
@@ -45,6 +46,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
 							<Timeline timeline={postData?.onChainInfo?.timeline} />
+						</TabsContent>
+						<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
+							<OnchainInfo
+								proposalType={EProposalType.REFERENDUM_V2}
+								index={index}
+								onchainInfo={postData?.onChainInfo}
+							/>
 						</TabsContent>
 					</div>
 					{isModalOpen && (

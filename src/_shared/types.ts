@@ -568,7 +568,8 @@ export enum EAssets {
 
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
-	TIMELINE = 'timeline'
+	TIMELINE = 'timeline',
+	ONCHAIN_INFO = 'onchain info'
 }
 
 export enum EActivityName {
@@ -694,6 +695,7 @@ export interface IVoteCurve {
 
 export enum EProfileTabs {
 	OVERVIEW = 'overview',
+	ACTIVITY = 'activity',
 	ACCOUNTS = 'accounts'
 }
 

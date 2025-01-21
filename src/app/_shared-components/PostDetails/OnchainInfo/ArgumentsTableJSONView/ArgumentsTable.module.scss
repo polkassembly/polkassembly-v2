@@ -1,0 +1,19 @@
+.tableRow {
+	@apply grid grid-cols-4 gap-x-2 border-b border-border_grey text-text_primary;
+}
+
+.tableCell {
+	@apply col-span-1 flex items-center truncate border-r border-solid border-border_grey p-2 text-sm sm:w-auto;
+}
+
+.tableHeader {
+	@apply grid grid-cols-4 gap-x-2 rounded-t-md bg-grey_bg px-2 py-2 font-semibold text-text_primary;
+}
+
+.tableBody {
+	@apply border-l border-r border-border_grey
+}
+
+.jsonContainer {
+	@apply max-h-[500px] overflow-auto break-words
+}
