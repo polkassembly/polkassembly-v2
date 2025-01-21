@@ -315,5 +315,12 @@
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben"
+	},
+	"EditPost": {
+		"edit": "Bearbeiten",
+		"title": "Titel",
+		"content": "Inhalt",
+		"editPost": "Beitrag bearbeiten",
+		"editPostButton": "Bearbeiten"
 	}
 }

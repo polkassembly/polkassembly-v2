@@ -315,5 +315,12 @@
 	},
 	"Balance": {
 		"voteBalance": "投票残高"
+	},
+	"EditPost": {
+		"edit": "編集",
+		"title": "タイトル",
+		"content": "内容",
+		"editPost": "投稿を編集",
+		"editPostButton": "編集"
 	}
 }

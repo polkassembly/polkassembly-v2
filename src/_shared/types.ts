@@ -497,12 +497,14 @@ export enum EApiRoute {
 	LOGOUT = 'LOGOUT',
 	POSTS_LISTING = 'POSTS_LISTING',
 	FETCH_PROPOSAL_DETAILS = 'FETCH_PROPOSAL_DETAILS',
+	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	GET_COMMENTS = 'GET_COMMENTS',
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	POST_REACTIONS = 'POST_REACTIONS',
-	DELETE_REACTION = 'DELETE_REACTION'
+	DELETE_REACTION = 'DELETE_REACTION',
+	GET_USER_BY_ID = 'GET_USER_BY_ID'
 }
 
 export enum EWeb3LoginScreens {
@@ -706,4 +708,9 @@ export interface IVoteCurve {
 	timestamp: string;
 	approvalPercent: number;
 	supportPercent: number;
+}
+
+export enum EProfileTabs {
+	OVERVIEW = 'overview',
+	ACCOUNTS = 'accounts'
 }

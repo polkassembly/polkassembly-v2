@@ -102,7 +102,8 @@
 		"next": "Next",
 		"alreadyHaveAnAccount": "Already have an Account?",
 		"loginwithusername": "Login with Username",
-		"loginToPolkassembly": "Login to Polkassembly"
+		"loginToPolkassembly": "Login to Polkassembly",
+		"profile": "Profile"
 	},
 	"ListingTab": {
 		"Analytics": "Analytics",
@@ -326,5 +327,12 @@
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance"
+	},
+	"EditPost": {
+		"edit": "Edit",
+		"title": "Title",
+		"content": "Content",
+		"editPost": "Edit Post",
+		"editPostButton": "Edit"
 	}
 }

@@ -315,5 +315,12 @@
 	},
 	"Balance": {
 		"voteBalance": "投票余额"
+	},
+	"EditPost": {
+		"edit": "编辑",
+		"title": "标题",
+		"content": "内容",
+		"editPost": "编辑帖子",
+		"editPostButton": "编辑"
 	}
 }

@@ -315,5 +315,12 @@
 	},
 	"Balance": {
 		"voteBalance": "Saldo de votación"
+	},
+	"EditPost": {
+		"edit": "Editar",
+		"title": "Título",
+		"content": "Contenido",
+		"editPost": "Editar Publicación",
+		"editPostButton": "Editar"
 	}
 }

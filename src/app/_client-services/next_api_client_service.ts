@@ -21,6 +21,7 @@ import {
 	IGenerateTFAResponse,
 	IOnChainPostListingResponse,
 	IPost,
+	IPublicUser,
 	IVoteData
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
@@ -94,6 +95,12 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.DELETE_REACTION:
 				method = 'DELETE';
+				break;
+			case EApiRoute.GET_USER_BY_ID:
+				path = '/users/id';
+				break;
+			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+				method = 'PATCH';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -227,6 +234,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
+	static async editProposalDetailsApi(proposalType: EProposalType, index: string, data: { title: string; content: OutputData }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
+	}
+
 	// comments
 	protected static async getCommentsOfPostApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_COMMENTS, routeSegments: [proposalType, index, 'comments'] });
@@ -279,5 +291,11 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, routeSegments: ['activityFeed'], queryParams });
 		return this.nextApiClientFetch<IOnChainPostListingResponse>({ url, method });
+	}
+
+	// user profile
+	protected static async getUserByIdApi({ userId }: { userId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_BY_ID, routeSegments: [userId] });
+		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 }
