@@ -141,7 +141,7 @@ export const THEME_COLORS = {
 		navbar_title: '#fff',
 		yellow_primary: '#ffbf60',
 		wallet_disabled_bg: '#222222',
-		grey_bg: '#F4F6F8',
+		grey_bg: '#222222',
 		footer_bg: '#222222',
 		activity_feed_active_proposal_bg: '#262626'
 	}

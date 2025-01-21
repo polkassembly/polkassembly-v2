@@ -1,0 +1,19 @@
+.tableHeader {
+	@apply rounded-t-md bg-grey_bg px-2 py-2 font-semibold text-text_primary text-left
+}
+
+.tableBody {
+	@apply border-l border-r border-border_grey
+}
+
+.jsonContainer {
+	@apply max-h-[500px] overflow-auto break-words
+}
+
+.tableCellName {
+	@apply min-w-[160px] break-words border-b border-r border-border_grey p-2 text-sm
+}
+
+.tableCellValue {
+	@apply w-full min-w-[160px] max-w-[400px] break-words border-b border-border_grey p-2 text-sm
+}
