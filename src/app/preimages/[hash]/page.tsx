@@ -10,8 +10,9 @@ import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals'
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 
-async function Preimages({ params }: { params: { hash: string } }) {
-	const hash = params.hash || '';
+async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
+	const paramsValue = await params;
+	const hash = paramsValue.hash || '';
 	const hashData = await NextApiClientService.fetchPreimageByHash(hash);
 	if (hashData.error || !hashData.data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, hashData.error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
