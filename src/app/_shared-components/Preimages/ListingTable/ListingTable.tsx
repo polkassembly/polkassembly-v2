@@ -59,17 +59,18 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 					)}
 				</TableBody>
 			</Table>
-			<div className='mt-5 flex w-full justify-end'>
-				<PaginationWithLinks
-					page={Number(page)}
-					pageSize={PREIMAGES_LISTING_LIMIT}
-					totalCount={data?.totalCount || 0}
-					onClick={(pageNumber) => {
-						router.push(`/preimages?page=${pageNumber}`);
-					}}
-				/>
-			</div>
-
+			{data?.totalCount && data?.totalCount > PREIMAGES_LISTING_LIMIT && (
+				<div className='mt-5 flex w-full justify-end'>
+					<PaginationWithLinks
+						page={Number(page)}
+						pageSize={PREIMAGES_LISTING_LIMIT}
+						totalCount={data?.totalCount || 0}
+						onClick={(pageNumber) => {
+							router.push(`/preimages?page=${pageNumber}`);
+						}}
+					/>
+				</div>
+			)}
 			<Dialog
 				open={open}
 				onOpenChange={() => setOpen(false)}
