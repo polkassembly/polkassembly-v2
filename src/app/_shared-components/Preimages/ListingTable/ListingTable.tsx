@@ -39,13 +39,13 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	return (
 		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
 			<Table>
-				<TableRow className='overflow-hidden rounded-t-lg bg-page_background'>
-					<TableHead className='px-6 py-5 first:rounded-tl-lg last:rounded-tr-lg'>{t('hash')}</TableHead>
-					<TableHead className='w-1/4 px-6 py-5'>{t('author')}</TableHead>
-					<TableHead className='px-6 py-5'>{t('deposit')}</TableHead>
-					<TableHead className='px-6 py-5'>{t('arguments')}</TableHead>
-					<TableHead className='px-6 py-5'>{t('size')}</TableHead>
-					<TableHead className='px-6 py-5 last:rounded-tr-lg'>{t('status')}</TableHead>
+				<TableRow className={styles.tableRow}>
+					<TableHead className={styles.tableCell_1}>{t('hash')}</TableHead>
+					<TableHead className={styles.tableCell_2}>{t('author')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('deposit')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('arguments')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('size')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('status')}</TableHead>
 				</TableRow>
 				<TableBody>
 					{data?.items?.map((preimage: IPreimage) => (
@@ -53,7 +53,7 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							key={preimage?.id}
 							className='text-start'
 						>
-							<TableCell className='flex items-center gap-3 px-6 py-5'>
+							<TableCell className={styles.table_content_cell}>
 								{preimage?.hash ? `${preimage.hash.slice(0, 5)}...${preimage.hash.slice(-5)}` : '-'}
 								<Tooltip>
 									<TooltipTrigger>
@@ -61,7 +61,7 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 											onClick={() => {
 												navigator.clipboard.writeText(preimage.hash);
 											}}
-											className='cursor-pointer text-base text-wallet_btn_text'
+											className={styles.table_content_cell_1}
 										/>
 									</TooltipTrigger>
 									<TooltipContent className={styles.tooltipContent}>{t('copy')}</TooltipContent>
@@ -89,13 +89,11 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							<TableCell className='px-6 py-5'>
 								{preimage?.deposit ? formatBnBalance(preimage.deposit, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network) : '-'}
 							</TableCell>
-							<TableCell className='flex items-center gap-3 px-6 py-5'>
-								<span className='rounded-lg bg-wallet_disabled_bg px-2 py-1'>
-									{preimage?.section && preimage?.method ? `${preimage.section}.${preimage.method.slice(0, 5)}...` : '-'}
-								</span>
+							<TableCell className={styles.table_content_cell_2}>
+								<span className={styles.table_content_cell_2_content}>{preimage?.section && preimage?.method ? `${preimage.section}.${preimage.method.slice(0, 5)}...` : '-'}</span>
 								<MdListAlt
 									onClick={hanldeDialogOpen}
-									className='cursor-pointer text-lg text-wallet_btn_text hover:text-text_pink'
+									className={styles.mdlisticon}
 								/>
 							</TableCell>
 							<TableCell className='px-6 py-5'>{preimage?.length || '-'}</TableCell>
@@ -120,9 +118,9 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 				onOpenChange={() => setOpen(false)}
 			>
 				<DialogContent className={styles.popoverContent}>
-					<DialogTitle className='text-xl font-semibold text-text_primary'>{t('arguments')}</DialogTitle>
+					<DialogTitle className={styles.modalContent_title}>{t('arguments')}</DialogTitle>
 					{modalarg && (
-						<div className='max-h-[60vh] w-full overflow-auto'>
+						<div className={styles.modalContent}>
 							<ReactJson
 								theme={theme === ETheme.DARK ? 'bright' : 'rjv-default'}
 								style={{ color: 'white', background: 'var(--section-dark-overlay)' }}
@@ -137,7 +135,7 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 						<button
 							type='button'
 							onClick={() => setOpen(false)}
-							className='cursor-pointer text-base font-medium text-text_pink'
+							className={styles.closeButton}
 						>
 							{t('close')}
 						</button>

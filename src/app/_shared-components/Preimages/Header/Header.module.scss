@@ -7,9 +7,9 @@
 }
 
 .input_container {
-    @apply h-8 overflow-x-auto pr-10;
+    @apply h-8 w-60 overflow-x-auto pr-20;
 }
 
 .input_search {
-    @apply -translate-y-1/2 h-7 absolute right-2 top-4 cursor-pointer border-l border-border_grey pl-1 text-2xl text-gray-500;
+    @apply -translate-y-1/2 h-8 absolute right-2 top-4 cursor-pointer border-l border-border_grey pl-1 text-2xl text-gray-500;
 }
