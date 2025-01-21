@@ -21,7 +21,7 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 	}
 
 	return (
-		<div className='px-10 py-5'>
+		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<Header data={data as IGenericListingResponse<IPreimage>} />
 			<ListingTable data={data as IGenericListingResponse<IPreimage>} />
 		</div>

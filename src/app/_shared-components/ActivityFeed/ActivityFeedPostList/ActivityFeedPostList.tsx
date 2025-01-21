@@ -28,7 +28,8 @@ function ActivityFeedPostList() {
 
 	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, origin === 'All' ? undefined : origin, 10);
+		const formattedOrigin = origin === 'All' ? undefined : origin.replace(/\s+/g, '');
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, formattedOrigin as EPostOrigin, 10);
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
