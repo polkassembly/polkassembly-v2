@@ -1,0 +1,7 @@
+.popoverContent {
+    @apply max-w-lg border-none bg-[var(--sidebar-primary-foreground)] p-6 shadow-lg !important;
+}
+
+.tooltipContent {
+    @apply relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg;
+}

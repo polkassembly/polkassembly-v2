@@ -3,9 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import Header from '@ui/Preimages/Header';
+import Header from '@ui/Preimages/Header/Header';
 import { IGenericListingResponse, IPreimage } from '@/_shared/types';
-import ListingTable from '@ui/Preimages/ListingTable';
+import ListingTable from '@/app/_shared-components/Preimages/ListingTable/ListingTable';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
