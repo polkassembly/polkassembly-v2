@@ -38,7 +38,7 @@ function IdentityBadge({ onChainIdentity, iconSize = 12 }: Props) {
 	return (
 		<Icon
 			name={isGood ? 'icons/verified-check-green' : 'icons/minus-circle-red'}
-			className='h-6 w-6'
+			className='h-4 w-4'
 			width={minifiedIconSize}
 			height={minifiedIconSize}
 		/>
