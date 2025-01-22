@@ -8,10 +8,9 @@ import { IStatusHistoryItem } from '@/_shared/types';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { Separator } from '@ui/Separator';
 import StatusTag from '@ui/StatusTag/StatusTag';
-import ReferendaIcon from '@assets/icons/timeline-referenda-icon.svg';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import classes from './Timeline.module.scss';
+import { Icon } from '../../Icon';
 
 function Timeline({ timeline }: { timeline?: IStatusHistoryItem[] }) {
 	const t = useTranslations();
@@ -19,11 +18,9 @@ function Timeline({ timeline }: { timeline?: IStatusHistoryItem[] }) {
 		<div className={classes.timelineWrapper}>
 			<div className={classes.timelineHeader}>
 				<span className={classes.timelineIconAndLine}>
-					<Image
-						src={ReferendaIcon}
-						alt='referendum icon'
-						width={24}
-						height={24}
+					<Icon
+						name='icons/timeline-referenda-icon'
+						className='h-6 w-6'
 					/>
 				</span>
 				<span className={classes.timelineTitle}>{t('PostDetails.referendum')}</span>

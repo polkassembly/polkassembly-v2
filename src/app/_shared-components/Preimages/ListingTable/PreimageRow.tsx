@@ -9,12 +9,11 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { MdContentCopy, MdListAlt } from 'react-icons/md';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import SubscanIcon from '@assets/icons/profile-subscan.svg';
-import Image from 'next/image';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TableRow, TableCell } from '../../Table';
 import styles from './ListingTable.module.scss';
 import Address from '../../Profile/Address/Address';
+import { Icon } from '../../Icon';
 
 function PreimageRow({ preimage, handleDialogOpen }: { preimage: IPreimage; handleDialogOpen: () => void }) {
 	const network = getCurrentNetwork();
@@ -39,9 +38,8 @@ function PreimageRow({ preimage, handleDialogOpen }: { preimage: IPreimage; hand
 				</Tooltip>
 				<Tooltip>
 					<TooltipTrigger>
-						<Image
-							src={SubscanIcon}
-							alt='copy'
+						<Icon
+							name='icons/profile-subscan'
 							width={18}
 							className='h-5 w-5 cursor-pointer'
 							onClick={() => window.open(`https://${network}.subscan.io/block/${preimage?.createdAtBlock}`, '_blank')}

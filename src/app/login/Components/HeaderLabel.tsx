@@ -3,19 +3,16 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import Image from 'next/image';
-import LoginToPaIcon from '@assets/icons/login-to-pa-icon.svg';
 import { useTranslations } from 'next-intl';
+import { Icon } from '@ui/Icon';
 
 function HeaderLabel() {
 	const t = useTranslations();
 	return (
 		<p className='flex items-center gap-x-2 text-lg font-semibold text-text_primary sm:text-xl'>
-			<Image
-				src={LoginToPaIcon}
-				alt='login to polkassembly'
-				height={24}
-				width={24}
+			<Icon
+				name='icons/login-to-pa-icon'
+				className='h-6 w-6'
 			/>
 			{t('Profile.loginToPolkassembly')}
 		</p>

@@ -3,11 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import Image from 'next/image';
 import { IOnChainIdentity } from '@/_shared/types';
 import GreenCheck from '@assets/icons/verified-check-green.svg';
 import RedMinus from '@assets/icons/minus-circle-red.svg';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
+import { Icon } from '../../Icon';
 
 interface Props {
 	onChainIdentity?: IOnChainIdentity;
@@ -36,9 +36,8 @@ function IdentityBadge({ onChainIdentity, iconSize = 12 }: Props) {
 	if (!iconUrl) return null;
 
 	return (
-		<Image
-			alt='Identity Verification Badge'
-			src={iconUrl}
+		<Icon
+			name={isGood ? 'icons/verified-check-green' : 'icons/minus-circle-red'}
 			width={minifiedIconSize}
 			height={minifiedIconSize}
 		/>

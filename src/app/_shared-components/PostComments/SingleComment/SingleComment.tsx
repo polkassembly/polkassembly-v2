@@ -7,8 +7,6 @@
 import { EProposalType, ICommentResponse } from '@/_shared/types';
 import React, { useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
-import ReplyIcon from '@assets/icons/Vote.svg';
-import Image from 'next/image';
 import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
@@ -19,6 +17,7 @@ import { useTranslations } from 'next-intl';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
+import { Icon } from '../../Icon';
 
 function SingleComment({ commentData, proposalType, index }: { commentData: ICommentResponse; proposalType: EProposalType; index: string }) {
 	const [reply, setReply] = useState<boolean>(false);
@@ -67,9 +66,9 @@ function SingleComment({ commentData, proposalType, index }: { commentData: ICom
 							onClick={() => setReply(true)}
 							size='sm'
 							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
+								<Icon
+									name='icons/Vote'
+									className='h-4 w-4'
 								/>
 							}
 						>

@@ -10,8 +10,6 @@ import { Separator } from '@ui/Separator';
 import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import Image from 'next/image';
-import BeneficiaryIcon from '@assets/icons/beneficiary-icon.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { BN } from '@polkadot/util';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
@@ -26,6 +24,7 @@ import PostTags from '../PostTags/PostTags';
 import StatusTag from '../../StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import VotingProgress from '../../ActivityFeed/VotingProgress/VotingProgress';
+import { Icon } from '../../Icon';
 
 function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
@@ -112,11 +111,9 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 								className='hidden h-3 lg:block'
 							/>
 							<div className='flex items-center gap-x-1'>
-								<Image
-									src={BeneficiaryIcon}
-									alt='Beneficiary'
-									width={14}
-									height={14}
+								<Icon
+									name='icons/beneficiary-icon'
+									className='h-4 w-4'
 								/>
 								<span className={classes.beneficiaryText}>{t('PostDetails.beneficiary')}:</span>
 							</div>

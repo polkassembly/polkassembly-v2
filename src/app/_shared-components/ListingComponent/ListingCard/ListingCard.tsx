@@ -7,9 +7,7 @@ import { FaRegClock } from 'react-icons/fa6';
 import { EProposalType, ETheme, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import Image from 'next/image';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
-import CommentIcon from '@assets/icons/Comment.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import Address from '@ui/Profile/Address/Address';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
@@ -28,6 +26,7 @@ import DOTIcon from '@assets/icons/dot.png';
 import { MouseEvent } from 'react';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
+import { Icon } from '../../Icon';
 
 function ListingCard({
 	title,
@@ -100,12 +99,9 @@ function ListingCard({
 						<div className='flex items-center gap-2'>
 							<div className={styles.commentContainer}>
 								<span className='hidden lg:block'>|</span>
-								<Image
-									src={CommentIcon}
-									alt='comments'
-									width={16}
+								<Icon
+									name='icons/Comment'
 									className={theme === ETheme.DARK ? 'dark-icons' : ''}
-									height={16}
 								/>
 								<span className='text-text_primary'>{metrics?.comments || 0}</span>
 							</div>
@@ -180,12 +176,10 @@ function ListingCard({
 												const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
 												const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DOTIcon;
 												return (
-													<Image
+													<Icon
 														key={assetId}
-														src={icon}
-														alt={unit}
-														width={18}
-														height={18}
+														name={icon}
+														className='h-4 w-4'
 													/>
 												);
 											})}

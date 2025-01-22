@@ -6,18 +6,16 @@
 
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
-import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import { ETheme } from '@/_shared/types';
-import LeftIcon from '@assets/sidebar/lefticon.svg';
-import RightIcon from '@assets/sidebar/righticon.svg';
 import { ComponentProps, createContext, CSSProperties, ElementRef, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import styles from './Sidebar.module.scss';
+import { Icon } from '../Icon';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -267,15 +265,13 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			}}
 			{...props}
 		>
-			<Image
-				src={isMobile ? RightIcon : state === 'expanded' ? LeftIcon : RightIcon}
-				alt={state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}
+			<Icon
+				name={isMobile ? 'sidebar/righticon' : state === 'expanded' ? 'sidebar/lefticon' : 'sidebar/righticon'}
 				className={cn('h-5 w-5', {
 					'dark-icons': theme === ETheme.DARK
 				})}
 				width={20}
 				height={20}
-				priority
 			/>
 			<span className='sr-only'>{state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}</span>
 		</Button>
