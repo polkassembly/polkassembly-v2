@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { type SVGProps } from 'react';
-import { cn } from '@/lib/utils.js';
+import { cn } from '@/lib/utils';
 import type { IconName } from '../../../types/name.js';
 
 export { type IconName };
@@ -34,7 +34,7 @@ export function Icon({
 			{...props}
 			className={cn('inline h-[1em] w-[1em] self-center', className)}
 		>
-			<use href={`./icons/sprite.svg#${name}`} />
+			<use href={`../../_assets/${name}.svg`} />
 		</svg>
 	);
 }

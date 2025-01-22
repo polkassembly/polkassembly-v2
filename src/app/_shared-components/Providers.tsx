@@ -22,6 +22,7 @@ export function Providers({ children, messages, locale }: { children: ReactNode;
 		<NextIntlClientProvider
 			messages={messages}
 			locale={locale}
+			timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
 		>
 			<QueryClientProvider client={queryClient}>
 				<ThemeProvider
