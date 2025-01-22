@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { IconName } from '@/app/_shared-components/Icon';
 import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
@@ -34,7 +35,7 @@ const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string
 		});
 };
 
-const getOriginIcon = (key: string) => {
+const getOriginIcon = (key: string): IconName | undefined => {
 	switch (key) {
 		case EPostOrigin.ROOT:
 			return 'sidebar/root-icon';
@@ -51,7 +52,7 @@ const getOriginIcon = (key: string) => {
 		case EPostOrigin.FELLOWSHIP_ADMIN:
 			return 'sidebar/fellowship-admin-icon';
 		default:
-			return null;
+			return undefined;
 	}
 };
 
