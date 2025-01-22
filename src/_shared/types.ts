@@ -6,6 +6,7 @@ import { OutputData } from '@editorjs/editorjs';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { StatusCodes } from 'http-status-codes';
+import { IconName } from '../../types/name';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
@@ -475,7 +476,7 @@ export type TRPCEndpoint = {
 export interface ISidebarMenuItem {
 	title: string;
 	url: string;
-	icon?: string;
+	icon?: IconName;
 	isNew?: boolean;
 	count?: number;
 	items?: ISidebarMenuItem[];
