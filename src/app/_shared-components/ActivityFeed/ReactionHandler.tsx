@@ -11,6 +11,7 @@ import { IoShareSocialOutline } from 'react-icons/io5';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import Image from 'next/image';
 import ReactionButton from './ReactionButton/ReactionButton';
+import { Icon } from '../Icon';
 
 function ActionButton({ icon: Icon, text, onClick }: { icon: React.ReactNode; text: string; onClick: () => void }) {
 	return (
@@ -97,12 +98,9 @@ function ReactionHandler({
 				/>
 				<ActionButton
 					icon={
-						<Image
-							src={CommentIcon}
+						<Icon
+							name='activityfeed/commentdark'
 							className='mr-2'
-							alt='Comment'
-							width={16}
-							height={16}
 						/>
 					}
 					text={t('ActivityFeed.PostItem.comment')}
