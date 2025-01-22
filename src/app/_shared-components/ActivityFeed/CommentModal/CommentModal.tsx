@@ -12,10 +12,11 @@ import { useTranslations } from 'next-intl';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
 import { FaRegClock } from 'react-icons/fa';
+import Image from 'next/image';
+import userIcon from '@assets/icons/user-profile.png';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import styles from './CommentModal.module.scss';
 import { Button } from '../../Button';
-import { Icon } from '../../Icon';
 
 const BlockEditor = dynamic(() => import('../../BlockEditor/BlockEditor'), { ssr: false });
 
@@ -73,15 +74,21 @@ function CommentModal({
 					<DialogContent className='max-w-lg p-6 lg:max-w-xl'>
 						<DialogHeader>
 							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
-								<div className='flex w-10 flex-col gap-5'>
-									<Icon
-										name='profile/user-icon'
+								<div className='flex w-14 flex-col gap-5'>
+									<Image
+										src={userIcon}
+										alt='User Icon'
 										className='h-14 w-14 rounded-full'
+										width={32}
+										height={32}
 									/>
 									<hr className='w-full rotate-90 border-border_grey' />
-									<Icon
-										name='profile/user-icon'
+									<Image
+										src={userIcon}
+										alt='User Icon'
 										className='h-14 w-14 rounded-full'
+										width={32}
+										height={32}
 									/>
 								</div>
 

@@ -7,6 +7,8 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
+import Image from 'next/image';
+import userIcon from '@assets/icons/user-profile.png';
 import { Icon } from '../../Icon';
 
 function ActivityFeedRankCard() {
@@ -19,7 +21,7 @@ function ActivityFeedRankCard() {
 			<div className='absolute inset-0 z-0'>
 				<Icon
 					name='profile/rankcard-bg'
-					className='w-full object-cover'
+					className='h-28 w-full object-cover'
 				/>
 			</div>
 
@@ -27,7 +29,7 @@ function ActivityFeedRankCard() {
 				<div className='absolute top-9'>
 					<Icon
 						name='profile/rankcard-inner'
-						className='filter dark:brightness-0 dark:saturate-100'
+						className='h-24 w-full filter dark:brightness-0 dark:saturate-100'
 					/>
 				</div>
 
@@ -37,9 +39,12 @@ function ActivityFeedRankCard() {
 					</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
 						<div className='flex items-center gap-2'>
-							<Icon
-								name='profile/user-icon'
-								className='h-10 w-10'
+							<Image
+								src={userIcon}
+								alt='User Icon'
+								className='h-10 w-10 rounded-full'
+								width={32}
+								height={32}
 							/>
 							<p className='text-base font-semibold text-btn_secondary_text'>{user?.username}</p>
 						</div>
@@ -48,7 +53,7 @@ function ActivityFeedRankCard() {
 							<div className='flex items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
 								<Icon
 									name='profile/rank-star'
-									className='h-10 w-10'
+									className='h-4 w-4'
 								/>
 								<span className='text-sm font-medium text-gray-800'>{user?.publicUser?.profileScore}</span>
 							</div>

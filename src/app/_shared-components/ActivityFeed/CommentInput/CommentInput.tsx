@@ -3,9 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import Image from 'next/image';
-import userIcon from '@assets/profile/user-icon.svg';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import userIcon from '@assets/icons/user-profile.png';
 import styles from './CommentInput.module.scss';
 
 function CommentInput({ inputRef, onClick }: { inputRef: React.RefObject<HTMLInputElement>; onClick: () => void }) {

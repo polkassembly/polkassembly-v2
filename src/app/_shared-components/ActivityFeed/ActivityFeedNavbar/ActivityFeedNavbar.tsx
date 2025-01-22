@@ -38,12 +38,12 @@ function ActivityFeedNavbar({
 	const categoryIconPaths: Record<string, IconName> = useMemo(
 		() => ({
 			[ALL_CATEGORY]: 'activityfeed/All' as IconName,
-			[ROOT_CATEGORY]: 'activityfeed/root' as IconName,
-			[WISH_FOR_CHANGE_CATEGORY]: 'activityfeed/wish-for-change' as IconName,
+			[ROOT_CATEGORY]: 'sidebar/root-icon' as IconName,
+			[WISH_FOR_CHANGE_CATEGORY]: 'sidebar/wish-for-change-icon' as IconName,
 			[ADMIN_CATEGORY]: 'activityfeed/admin' as IconName,
-			[GOVERNANCE_CATEGORY]: 'activityfeed/governance' as IconName,
-			[TREASURY_CATEGORY]: 'activityfeed/treasury' as IconName,
-			[WHITELIST_CATEGORY]: 'activityfeed/whitelisted-caller' as IconName
+			[GOVERNANCE_CATEGORY]: 'sidebar/admin-icon' as IconName,
+			[TREASURY_CATEGORY]: 'sidebar/treasury-icon' as IconName,
+			[WHITELIST_CATEGORY]: 'sidebar/whitelisted-caller-icon' as IconName
 		}),
 		[t]
 	);
@@ -142,7 +142,7 @@ function ActivityFeedNavbar({
 									<span className='flex items-center whitespace-nowrap'>
 										<Icon
 											name={categoryIconPaths[category as IconName]}
-											className='dark:brightness-0 dark:invert'
+											className='h-5 w-5 dark:brightness-0 dark:invert'
 										/>
 										<span className='ml-2'>{category}</span>
 										{tracks?.length > 1 && (

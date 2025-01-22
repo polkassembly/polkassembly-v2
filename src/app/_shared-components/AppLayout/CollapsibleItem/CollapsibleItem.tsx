@@ -41,7 +41,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 						<div className={style.iconWrapper}>
 							<Icon
 								name={item.icon}
-								className={style.image}
+								className='h-8 w-8'
 							/>
 						</div>
 					)}
@@ -168,7 +168,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 									<div className={style.iconWrapper}>
 										<Icon
 											name={item.icon}
-											className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
+											className={`h-6 w-6 ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
 										/>
 									</div>
 								)}
@@ -228,7 +228,7 @@ function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMen
 				<div className={style.iconWrapper}>
 					<Icon
 						name={item.icon}
-						className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
+						className={`h-6 w-6 ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
 					/>
 				</div>
 			)}
