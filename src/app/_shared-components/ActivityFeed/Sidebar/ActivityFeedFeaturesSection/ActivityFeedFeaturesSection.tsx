@@ -120,7 +120,7 @@ function ActivityFeedFeaturesSection() {
 								>
 									<Icon
 										name={feature.image}
-										className='h-24 w-60'
+										className='h-28 w-full'
 									/>
 									<div className='mt-3'>
 										<p className='text-base font-semibold dark:text-white'>{feature.title}</p>

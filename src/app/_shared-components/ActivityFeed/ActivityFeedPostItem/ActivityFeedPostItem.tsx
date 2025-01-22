@@ -98,7 +98,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 								<span className={`${styles.castVoteButton} cursor-pointer`}>
 									<Icon
 										name='activityfeed/vote'
-										childClassName='w-5 h-5'
+										childClassName='w-6 h-6'
 									/>
 									<span>{t('PostDetails.castVote')}</span>
 								</span>
@@ -115,7 +115,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 							<span className={`${styles.castVoteButton} cursor-pointer`}>
 								<Icon
 									name='activityfeed/vote'
-									childClassName='w-5 h-5'
+									childClassName='w-6 h-6'
 								/>
 								<span>{t('PostDetails.loginToVote')}</span>
 							</span>
