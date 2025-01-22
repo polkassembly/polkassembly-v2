@@ -8,8 +8,6 @@ import { useUser } from '@/hooks/useUser';
 import { EReaction, IActivityFeedPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { IoShareSocialOutline } from 'react-icons/io5';
-import CommentIcon from '@assets/activityfeed/commentdark.svg';
-import Image from 'next/image';
 import ReactionButton from './ReactionButton/ReactionButton';
 import { Icon } from '../Icon';
 
