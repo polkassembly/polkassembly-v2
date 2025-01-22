@@ -4,8 +4,6 @@
 
 import React, { useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
-import Image from 'next/image';
-import userIcon from '@assets/profile/user-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { EProposalType, IPostListing } from '@/_shared/types';
@@ -17,6 +15,7 @@ import { FaRegClock } from 'react-icons/fa';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import styles from './CommentModal.module.scss';
 import { Button } from '../../Button';
+import { Icon } from '../../Icon';
 
 const BlockEditor = dynamic(() => import('../../BlockEditor/BlockEditor'), { ssr: false });
 
@@ -75,20 +74,14 @@ function CommentModal({
 						<DialogHeader>
 							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
 								<div className='flex w-10 flex-col gap-5'>
-									<Image
-										src={userIcon}
-										alt='User Icon'
+									<Icon
+										name='profile/user-icon'
 										className='h-14 w-14 rounded-full'
-										width={56}
-										height={56}
 									/>
 									<hr className='w-full rotate-90 border-border_grey' />
-									<Image
-										src={userIcon}
-										alt='User Icon'
+									<Icon
+										name='profile/user-icon'
 										className='h-14 w-14 rounded-full'
-										width={10}
-										height={10}
 									/>
 								</div>
 

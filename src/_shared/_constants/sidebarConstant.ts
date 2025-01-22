@@ -2,33 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import Home from '@assets/sidebar/homeicon.svg';
-import Discussion from '@assets/sidebar/discussion-icon.svg';
-import Preimages from '@assets/sidebar/preimages.svg';
-import Delegation from '@assets/sidebar/delegation.svg';
-import Bounty from '@assets/sidebar/bounty.svg';
-import BatchVoting from '@assets/sidebar/batch-voting.svg';
-import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
-import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
-import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
-import CommunityIcon from '@assets/sidebar/community-icon.svg';
-import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
-import ArchivedIcon from '@assets/sidebar/archived-icon.svg';
-import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
-import RootIcon from '@assets/sidebar/root-icon.svg';
-import TreasurerIcon from '@assets/sidebar/treasurer-icon.svg';
-import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
-import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.svg';
-import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
-import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
-import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
-import DemocraryProposalIcon from '@assets/sidebar/democracy-proposal-icon.svg';
-import DemocraryReferendumIcon from '@assets/sidebar/democracy-referenda-icon.svg';
-import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal-icon.svg';
-import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
-import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
-import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
-import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
 import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
@@ -64,35 +37,35 @@ const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string
 const getOriginIcon = (key: string) => {
 	switch (key) {
 		case EPostOrigin.ROOT:
-			return RootIcon;
+			return 'sidebar/root-icon';
 		case EPostOrigin.TREASURER:
-			return TreasurerIcon;
+			return 'sidebar/treasurer-icon';
 		case EPostOrigin.WISH_FOR_CHANGE:
-			return WishForChangeIcon;
+			return 'sidebar/wish-for-change-icon';
 		case EPostOrigin.REFERENDUM_CANCELLER:
-			return ReferendumCancellorIcon;
+			return 'sidebar/referendum-cancellor-icon';
 		case EPostOrigin.REFERENDUM_KILLER:
-			return ReferendumKillerIcon;
+			return 'sidebar/referendum-killer-icon';
 		case EPostOrigin.WHITELISTED_CALLER:
-			return WhitelistedCallerIcon;
+			return 'sidebar/whitelisted-caller-icon';
 		case EPostOrigin.FELLOWSHIP_ADMIN:
-			return FellowshipAdminIcon;
+			return 'sidebar/fellowship-admin-icon';
 		default:
 			return null;
 	}
 };
 
 const getOriginsItems = (networkKey: ENetwork, t: (key: string) => string) => {
-	// eslint-disable-next-line
 	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === 'Origin')
 		.map(([key, track]) => {
 			const translationKey = `Sidebar.${key}`;
+			const icon = getOriginIcon(key);
 			return {
 				title: t(translationKey),
 				url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
-				icon: getOriginIcon(key)
+				icon: icon || undefined
 			};
 		});
 };
@@ -107,8 +80,8 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 		heading: t('Sidebar.main'),
 		initalItems: ActiveItems(
 			[
-				{ title: t('Sidebar.home'), url: '/', icon: Home },
-				{ title: t('Sidebar.discussions'), url: '/discussions', icon: Discussion }
+				{ title: t('Sidebar.home'), url: '/', icon: 'sidebar/homeicon' },
+				{ title: t('Sidebar.discussions'), url: '/discussions', icon: 'sidebar/discussion-icon' }
 			],
 			pathname
 		),
@@ -123,12 +96,12 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				initalItems: ActiveItems(
 					[
 						...baseConfig.initalItems,
-						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
-						{ title: t('Sidebar.delegation'), url: '#', icon: Delegation },
+						{ title: t('Sidebar.preimages'), url: '/preimages', icon: 'sidebar/preimages' },
+						{ title: t('Sidebar.delegation'), url: '#', icon: 'sidebar/delegation' },
 						{
 							title: t('Sidebar.bounty'),
 							url: '',
-							icon: Bounty,
+							icon: 'sidebar/bounty',
 							isNew: true,
 							items: [
 								{
@@ -139,7 +112,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 								{ title: t('Sidebar.onChainBounties'), url: '/bounty/onchain-bounty' }
 							]
 						},
-						{ title: t('Sidebar.batchVoting'), url: '#', icon: BatchVoting, isNew: true }
+						{ title: t('Sidebar.batchVoting'), url: '#', icon: 'sidebar/batch-voting', isNew: true }
 					],
 					pathname
 				),
@@ -154,13 +127,13 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 									{
 										title: t('Sidebar.treasury'),
 										url: '',
-										icon: TreasuryIcon,
+										icon: 'sidebar/treasury-icon',
 										items: getTrackItems(networkKey, 'Treasury', t, trackCounts)
 									},
 									{
 										title: t('Sidebar.administration'),
 										url: '',
-										icon: AdministrationIcon,
+										icon: 'sidebar/admin-icon',
 										items: getTrackItems(networkKey, 'Main', t, trackCounts)
 									}
 								],
@@ -178,51 +151,51 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				),
 				endItems: ActiveItems(
 					[
-						{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics', icon: GovAnalytics },
-						{ title: t('Sidebar.calendar'), url: '/calendar', icon: CalendarIcon },
+						{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics', icon: 'sidebar/gov-analytics-icon' },
+						{ title: t('Sidebar.calendar'), url: '/calendar', icon: 'sidebar/calendar-icon' },
 						{
 							title: t('Sidebar.community'),
 							url: '/community',
-							icon: CommunityIcon,
+							icon: 'sidebar/community-icon',
 							items: [
 								{ title: t('Sidebar.members'), url: '/members' },
 								{ title: t('Sidebar.ecosystemProjects'), url: '/ecosystem-projects' }
 							]
 						},
-						{ title: t('Sidebar.parachains'), url: '/parachains', icon: ParachainsIcon },
+						{ title: t('Sidebar.parachains'), url: '/parachains', icon: 'sidebar/parachains-icon' },
 						{
 							title: t('Sidebar.archived'),
 							url: '/archived',
-							icon: ArchivedIcon,
+							icon: 'sidebar/archived-icon',
 							items: [
 								{
 									title: t('Sidebar.democracy'),
 									url: '#',
 									items: [
-										{ title: t('Sidebar.proposals'), url: '/proposals', icon: DemocraryProposalIcon },
-										{ title: t('Sidebar.referenda'), url: '/referenda', icon: DemocraryReferendumIcon }
+										{ title: t('Sidebar.proposals'), url: '/proposals', icon: 'sidebar/democracy-proposal-icon' },
+										{ title: t('Sidebar.referenda'), url: '/referenda', icon: 'sidebar/democracy-referenda-icon' }
 									]
 								},
 								{
 									title: t('Sidebar.treasury'),
 									url: '#',
 									items: [
-										{ title: t('Sidebar.treasuryProposals'), url: '/treasury-proposals', icon: TreasuryProposalIcon },
-										{ title: t('Sidebar.tips'), url: '/tips', icon: TreasuryTipIcon }
+										{ title: t('Sidebar.treasuryProposals'), url: '/treasury-proposals', icon: 'sidebar/treasury-proposal-icon' },
+										{ title: t('Sidebar.tips'), url: '/tips', icon: 'sidebar/tips-icon' }
 									]
 								},
 								{
 									title: t('Sidebar.council'),
 									url: '#',
 									items: [
-										{ title: t('Sidebar.motions'), url: '/motions', icon: CouncilMotionIcon },
-										{ title: t('Sidebar.members'), url: '/members', icon: CouncilMemberIcon }
+										{ title: t('Sidebar.motions'), url: '/motions', icon: 'sidebar/council-motion-icon' },
+										{ title: t('Sidebar.members'), url: '/members', icon: 'sidebar/council-members-icon' }
 									]
 								},
 								{
 									title: t('Sidebar.techComm'),
 									url: '#',
-									items: [{ title: t('Sidebar.techCommProposals'), url: '/tech-comm-proposals', icon: TechCommIcon }]
+									items: [{ title: t('Sidebar.techCommProposals'), url: '/tech-comm-proposals', icon: 'sidebar/tech-comm-proposals-icon' }]
 								}
 							]
 						}

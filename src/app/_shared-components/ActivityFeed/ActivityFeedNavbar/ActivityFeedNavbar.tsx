@@ -7,17 +7,10 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import Home from '@assets/activityfeed/All.svg';
-import RootIcon from '@assets/sidebar/root-icon.svg';
-import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
-import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
-import GovernanceIcon from '@assets/sidebar/admin-icon.svg';
-import AdminIcon from '@assets/activityfeed/admin.svg';
-import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
-import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
+import { Icon, IconName } from '../../Icon';
 
 function ActivityFeedNavbar({
 	gov2LatestPosts,
@@ -42,17 +35,16 @@ function ActivityFeedNavbar({
 	const TREASURY_CATEGORY = t('ActivityFeed.Navbar.Treasury');
 	const WHITELIST_CATEGORY = t('ActivityFeed.Navbar.Whitelist');
 
-	const categoryIconPaths = useMemo(
+	const categoryIconPaths: Record<string, IconName> = useMemo(
 		() => ({
-			[ALL_CATEGORY]: Home,
-			[ROOT_CATEGORY]: RootIcon,
-			[WISH_FOR_CHANGE_CATEGORY]: WishForChangeIcon,
-			[ADMIN_CATEGORY]: AdminIcon,
-			[GOVERNANCE_CATEGORY]: GovernanceIcon,
-			[TREASURY_CATEGORY]: TreasuryIcon,
-			[WHITELIST_CATEGORY]: WhitelistedCallerIcon
+			[ALL_CATEGORY]: 'activityfeed/All' as IconName,
+			[ROOT_CATEGORY]: 'activityfeed/root' as IconName,
+			[WISH_FOR_CHANGE_CATEGORY]: 'activityfeed/wish-for-change' as IconName,
+			[ADMIN_CATEGORY]: 'activityfeed/admin' as IconName,
+			[GOVERNANCE_CATEGORY]: 'activityfeed/governance' as IconName,
+			[TREASURY_CATEGORY]: 'activityfeed/treasury' as IconName,
+			[WHITELIST_CATEGORY]: 'activityfeed/whitelisted-caller' as IconName
 		}),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[t]
 	);
 
@@ -148,11 +140,8 @@ function ActivityFeedNavbar({
 									onClick={() => handleCategoryClick(category)}
 								>
 									<span className='flex items-center whitespace-nowrap'>
-										<Image
-											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
-											alt={category}
-											width={20}
-											height={20}
+										<Icon
+											name={categoryIconPaths[category as IconName]}
 											className='dark:brightness-0 dark:invert'
 										/>
 										<span className='ml-2'>{category}</span>

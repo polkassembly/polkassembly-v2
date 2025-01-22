@@ -5,7 +5,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { ETheme } from '@/_shared/types';
@@ -15,11 +14,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Colla
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar/Sidebar';
 import style from './CollapsibleItem.module.scss';
+import { Icon, IconName } from '../../Icon';
 
 interface ISidebarMenuItem {
 	title?: string;
 	url?: string;
-	icon?: string;
+	icon?: IconName;
 	isActive?: boolean;
 	isNew?: boolean;
 	count?: number;
@@ -39,11 +39,9 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 				<div className={style.nestedTrigger}>
 					{item.icon && (
 						<div className={style.iconWrapper}>
-							<Image
-								src={item.icon}
-								alt={item.title || 'icon'}
-								width={24}
-								height={24}
+							<Icon
+								name={item.icon}
+								className={style.image}
 							/>
 						</div>
 					)}
@@ -69,11 +67,9 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 									<span className='flex items-center'>
 										{subItem.icon && (
 											<div className={style.iconWrapper}>
-												<Image
-													src={subItem.icon || ''}
-													alt={subItem.title || 'icon'}
-													width={24}
-													height={24}
+												<Icon
+													name={subItem.icon}
+													className={style.image}
 												/>
 											</div>
 										)}
@@ -105,11 +101,9 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 					<div className={style.nestedTrigger}>
 						{item.icon && (
 							<div className={style.iconWrapper}>
-								<Image
-									src={item.icon}
-									alt={item.title || 'icon'}
-									width={24}
-									height={24}
+								<Icon
+									name={item.icon}
+									className={style.image}
 								/>
 							</div>
 						)}
@@ -132,12 +126,9 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 									<span className='flex items-center'>
 										{subItem.icon && (
 											<div className={style.iconWrapper}>
-												<Image
-													src={subItem.icon}
-													alt={subItem.title || 'icon'}
+												<Icon
+													name={subItem.icon}
 													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !subItem.isActive ? DARK_THEME_CLASS : ''}`}
-													width={20}
-													height={20}
 												/>
 											</div>
 										)}
@@ -175,12 +166,9 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 							>
 								{item.icon && (
 									<div className={style.iconWrapper}>
-										<Image
-											src={item.icon}
-											alt={item.title || 'icon'}
+										<Icon
+											name={item.icon}
 											className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
-											width={24}
-											height={24}
 										/>
 									</div>
 								)}
@@ -206,12 +194,9 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 											>
 												{subItem.icon && (
 													<div className={style.iconWrapper}>
-														<Image
-															src={subItem.icon}
-															alt={subItem.title || 'icon'}
+														<Icon
+															name={subItem.icon}
 															className={`${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
-															width={24}
-															height={24}
 														/>
 													</div>
 												)}
@@ -241,12 +226,9 @@ function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMen
 		>
 			{item.icon && (
 				<div className={style.iconWrapper}>
-					<Image
-						src={item.icon}
-						alt={item.title || 'icon'}
+					<Icon
+						name={item.icon}
 						className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
-						width={24}
-						height={24}
 					/>
 				</div>
 			)}

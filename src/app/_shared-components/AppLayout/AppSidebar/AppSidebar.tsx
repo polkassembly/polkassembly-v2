@@ -4,24 +4,13 @@
 
 'use client';
 
-import Image from 'next/image';
 import React from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
-import Head1 from '@assets/sidebar/head1.svg';
-import Head2 from '@assets/sidebar/head2.svg';
-import Head3 from '@assets/sidebar/head3.svg';
-import Head4 from '@assets/sidebar/head4.svg';
-import Foot1 from '@assets/sidebar/foot1.svg';
-import Foot2 from '@assets/sidebar/foot2.svg';
-import Foot3 from '@assets/sidebar/foot3.svg';
-import Foot4 from '@assets/sidebar/foot4.svg';
 import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -29,6 +18,7 @@ import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
+import { Icon, IconName } from '../../Icon';
 
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
@@ -45,16 +35,16 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 		}
 		if (state === 'expanded') {
 			return (
-				<Image
-					src={PaLogoDark}
-					alt='Polkassembly Logo'
+				<Icon
+					name='logos/PALogoDark'
+					className='h-10 w-10'
 				/>
 			);
 		}
 		return <PaLogo variant='compact' />;
 	};
 
-	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (
+	const generateGridData = (data: { src: IconName; alt: string; bgColor: string; tooltip: string }[]) => (
 		<DynamicImageGrid
 			items={data}
 			rowSize={2}
@@ -64,19 +54,19 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	);
 	const data = getSidebarData(network, pathname, t);
 
-	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
-		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard') },
-		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation') },
-		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile') }
+	const headerData: { src: IconName; alt: string; bgColor: string; tooltip: string }[] = [
+		{ src: 'sidebar/head1', alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
+		{ src: 'sidebar/head2', alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard') },
+		{ src: 'sidebar/head3', alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation') },
+		{ src: 'sidebar/head4', alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile') }
 	];
 
 	const bgColor = 'bg-sidebar_footer';
-	const footerData = [
-		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'TownHall', url: 'https://townhallgov.com/' },
-		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Polkasafe', url: 'https://polkasafe.xyz/' },
-		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Fellowship', url: 'https://collectives.polkassembly.io/' },
-		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Staking', url: 'https://staking.polkadot.cloud/#/overview' }
+	const footerData: { src: IconName; alt: string; bgColor: string; tooltip: string; url: string }[] = [
+		{ src: 'sidebar/foot1', alt: 'Foot 1', bgColor, tooltip: 'TownHall', url: 'https://townhallgov.com/' },
+		{ src: 'sidebar/foot2', alt: 'Foot 2', bgColor, tooltip: 'Polkasafe', url: 'https://polkasafe.xyz/' },
+		{ src: 'sidebar/foot3', alt: 'Foot 3', bgColor, tooltip: 'Fellowship', url: 'https://collectives.polkassembly.io/' },
+		{ src: 'sidebar/foot4', alt: 'Foot 4', bgColor, tooltip: 'Staking', url: 'https://staking.polkadot.cloud/#/overview' }
 	];
 
 	return (
@@ -107,11 +97,9 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						rel='noreferrer'
 					>
 						<div className={styles.create_proposal_button}>
-							<Image
-								src={CautionIcon}
-								alt=''
-								width={30}
-								height={30}
+							<Icon
+								name='sidebar/caution-icon'
+								className='h-10 w-10'
 							/>
 							<div className='flex flex-col'>
 								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>{t('Sidebar.ReportAnIssue')}</span>

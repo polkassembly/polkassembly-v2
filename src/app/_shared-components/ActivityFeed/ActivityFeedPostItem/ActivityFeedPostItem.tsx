@@ -3,11 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { RefObject, useRef, useState } from 'react';
-import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import VoteIcon from '@assets/activityfeed/vote.svg';
 import { IActivityFeedPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -32,6 +30,7 @@ import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../../Dialog/Dialog';
 import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
+import { Icon } from '../../Icon';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -97,11 +96,9 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 						<Dialog>
 							<DialogTrigger asChild>
 								<span className={`${styles.castVoteButton} cursor-pointer`}>
-									<Image
-										src={VoteIcon}
-										alt=''
-										width={20}
-										height={20}
+									<Icon
+										name='activityfeed/vote'
+										childClassName='w-5 h-5'
 									/>
 									<span>{t('PostDetails.castVote')}</span>
 								</span>
@@ -116,11 +113,9 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					) : (
 						<Link href='/login'>
 							<span className={`${styles.castVoteButton} cursor-pointer`}>
-								<Image
-									src={VoteIcon}
-									alt=''
-									width={20}
-									height={20}
+								<Icon
+									name='activityfeed/vote'
+									childClassName='w-5 h-5'
 								/>
 								<span>{t('PostDetails.loginToVote')}</span>
 							</span>

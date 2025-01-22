@@ -4,13 +4,9 @@
 
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { MouseEvent, useEffect, useState } from 'react';
-import delegationDashboard from '@assets/activityfeed/features/features1.svg';
-import batchVoting from '@assets/activityfeed/features/features2.svg';
-import bounty from '@assets/activityfeed/features/features3.svg';
-import identity from '@assets/activityfeed/features/features4.svg';
+import { Icon, IconName } from '@/app/_shared-components/Icon';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/carousel';
 import { useTranslations } from 'next-intl';
 import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
@@ -20,7 +16,7 @@ import styles from './ActivityFeedFeaturesSection.module.scss';
 interface IFeature {
 	title: string;
 	description: string;
-	image: string;
+	image: IconName;
 	path: string;
 	id: string;
 }
@@ -32,32 +28,32 @@ function ActivityFeedFeaturesSection() {
 
 	const [current, setCurrent] = useState(0);
 	const t = useTranslations();
-	const features = [
+	const features: IFeature[] = [
 		{
 			id: 'delegation-dashboard',
 			description: t('ActivityFeed.DelegationDashboardDescription'),
-			image: delegationDashboard,
+			image: 'activityfeed/features/features1',
 			path: '/delegation',
 			title: t('ActivityFeed.DelegationDashboard')
 		},
 		{
 			id: 'batch-voting',
 			description: t('ActivityFeed.BatchVotingDescription'),
-			image: batchVoting,
+			image: 'activityfeed/features/features2',
 			path: '/batch-voting',
 			title: t('ActivityFeed.BatchVoting')
 		},
 		{
 			id: 'bounty',
 			description: t('ActivityFeed.BountyDescription'),
-			image: bounty,
+			image: 'activityfeed/features/features3',
 			path: 'bounty',
 			title: t('ActivityFeed.Bounty')
 		},
 		{
 			id: 'identity',
 			description: t('ActivityFeed.IdentityDescription'),
-			image: identity,
+			image: 'activityfeed/features/features4',
 			path: '',
 			title: t('ActivityFeed.Identity')
 		}
@@ -122,11 +118,9 @@ function ActivityFeedFeaturesSection() {
 									href={feature.path}
 									onClick={(e) => handleFeatureClick(e, feature)}
 								>
-									<Image
-										src={feature.image}
-										alt={feature.title}
-										width={800}
-										height={800}
+									<Icon
+										name={feature.image}
+										className='h-24 w-56'
 									/>
 									<div className='mt-3'>
 										<p className='text-base font-semibold dark:text-white'>{feature.title}</p>

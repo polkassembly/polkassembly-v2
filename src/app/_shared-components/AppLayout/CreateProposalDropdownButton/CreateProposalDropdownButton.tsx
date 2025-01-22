@@ -5,10 +5,8 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
-import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
 import { useTheme } from 'next-themes';
@@ -17,6 +15,7 @@ import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import style from './CreateProposalDropdownButton.module.scss';
+import { Icon } from '../../Icon';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
@@ -33,11 +32,9 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 			<Popover>
 				<PopoverTrigger asChild>
 					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}>
-						<Image
-							src={PencilIcon}
-							alt='Create Pencil Icon'
-							width={20}
-							height={20}
+						<Icon
+							name='sidebar/create-pencil-icon'
+							className='h-5 w-5'
 						/>
 						{state !== 'collapsed' && (
 							<>
@@ -58,11 +55,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 								key={item.title}
 								className={style.menuItem}
 							>
-								<Image
-									src={item.icon}
-									alt='Dropdown Icon'
-									width={20}
-									height={20}
+								<Icon
+									name={item.icon}
 									className={`${theme === ETheme.DARK ? 'dark-icons' : ''}`}
 								/>
 

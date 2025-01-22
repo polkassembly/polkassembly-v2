@@ -5,13 +5,13 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import style from './DynamicImageGrid.module.scss';
+import { Icon, IconName } from '../../Icon';
 
 interface ImageGridItem {
-	src: string;
+	src: IconName;
 	alt: string;
 	bgColor: string;
 	tooltip: string;
@@ -48,12 +48,9 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 								{item.url ? (
 									<Link href={item.url}>
 										<div className={`${style.iconWrapper} ${item.bgColor}`}>
-											<Image
-												src={item.src}
-												alt={item.alt}
+											<Icon
+												name={item.src}
 												className={style.image}
-												width={40}
-												height={40}
 											/>
 										</div>
 									</Link>
@@ -67,12 +64,9 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 											if (e.key === 'Enter' || e.key === ' ') handleClick(item);
 										}}
 									>
-										<Image
-											src={item.src}
-											alt={item.alt}
+										<Icon
+											name={item.src}
 											className={style.image}
-											width={40}
-											height={40}
 										/>
 									</div>
 								)}
