@@ -52,7 +52,6 @@ export interface IUserBadgeDetails {
 }
 
 export interface IProfileDetails {
-	customUsername?: boolean;
 	bio?: string;
 	badges?: string[];
 	title?: string;
@@ -112,7 +111,6 @@ export interface IUser {
 	id: number;
 	createdAt?: Date;
 	updatedAt?: Date;
-	isCustomUsername?: boolean;
 	email: string;
 	isEmailVerified: boolean;
 	password: string;
@@ -194,9 +192,9 @@ export interface IUserAddress {
 	default: boolean;
 	network: ENetwork;
 	userId: number;
-	createdAt: Date;
-	updatedAt: Date;
-	wallet?: string;
+	createdAt?: Date;
+	updatedAt?: Date;
+	wallet?: EWallet;
 	isMultisig?: boolean;
 	proxyFor?: IAddressProxyForEntry[];
 }
@@ -583,7 +581,6 @@ export enum EActivityName {
 	CLAIMED_BOUNTY = 'claimed_bounty',
 	SIGNED_UP_FOR_IDENTITY_VERIFICATION = 'signed_up_for_identity_verification',
 	APPROVED_BOUNTY = 'approved_bounty',
-	LINKED_ADDRESS = 'linked_address',
 	VERIFIED_IDENTITY = 'verified_identity',
 	COMPLETED_IDENTITY_JUDGEMENT = 'completed_identity_judgement',
 	DELEGATED_VOTE = 'delegated_vote',
@@ -598,9 +595,9 @@ export enum EActivityName {
 	PROPOSAL_PASSED = 'proposal_passed',
 	VOTE_PASSED = 'vote_passed',
 	VOTE_FAILED = 'vote_failed',
-	QUIZ_ANSWERED_CORRECTLY = 'quiz_answered_correctly',
 
 	// Off-chain Activities
+	QUIZ_ANSWERED_CORRECTLY = 'quiz_answered_correctly',
 	REACTED_TO_POST = 'reacted_to_post',
 	REACTED_TO_COMMENT = 'reacted_to_comment',
 	COMMENTED_ON_POST = 'commented_on_post',
@@ -625,7 +622,10 @@ export enum EActivityName {
 	COMMENT_TAKEN_DOWN = 'comment_taken_down',
 	POST_TAKEN_DOWN = 'post_taken_down',
 	POST_MARKED_AS_SPAM = 'post_marked_as_spam',
-	LINKED_MULTIPLE_ADDRESSES = 'linked_multiple_addresses'
+	LINKED_ADDRESS = 'linked_address',
+	LINKED_MULTIPLE_ADDRESSES = 'linked_multiple_addresses',
+	UNLINKED_ADDRESS = 'unlinked_address',
+	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses'
 }
 
 export enum EActivityCategory {
@@ -682,6 +682,7 @@ export interface IUserActivity {
 	metadata?: IActivityMetadata;
 	createdAt: Date;
 	updatedAt: Date;
+	message?: string;
 }
 
 export interface IVoteCurve {
