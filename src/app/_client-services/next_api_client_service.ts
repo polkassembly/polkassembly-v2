@@ -4,7 +4,7 @@
 
 /* eslint-disable lines-between-class-members */
 
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
@@ -53,7 +53,8 @@ enum EApiRoute {
 	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA',
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
-	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST'
+	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
+	FETCH_PREIMAGES = 'FETCH_PREIMAGES'
 }
 
 export class NextApiClientService {
@@ -115,6 +116,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.FETCH_PREIMAGES:
 				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
@@ -335,5 +337,20 @@ export class NextApiClientService {
 	protected static async fetchUserActivityApi({ userId }: { userId: number | string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_ACTIVITY, routeSegments: [userId.toString(), 'activities'] });
 		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
+	}
+
+	static async fetchPreimagesApi({ page }: { page: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: PREIMAGES_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
+	}
+
+	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages', hash] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 }

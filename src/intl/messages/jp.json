@@ -362,5 +362,19 @@
 		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
 		"aHouseOfCommonsInitiative": "House of Commons イニシアチブ",
 		"allRightsReservedYear": "無断複写・転載を禁じます。"
+	},
+	"Preimages": {
+		"hash": "ハッシュ",
+		"author": "著者",
+		"deposit": "デポジット",
+		"arguments": "引数",
+		"size": "サイズ",
+		"status": "ステータス",
+		"copy": "コピー",
+		"subscan": "サブスキャン",
+		"close": "閉じる",
+		"showAll": "すべて表示",
+		"searchByHash": "ハッシュで検索",
+		"preimageNotFound": "プレイメージが見つかりません"
 	}
 }
