@@ -14,6 +14,7 @@ import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
 import { CookieService } from '../_shared/_services/cookie_service';
 import { THEME_COLORS } from './_style/theme';
+import { PreloadResources } from './_shared-components/preload-resources';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
@@ -48,6 +49,8 @@ export default async function RootLayout({
 			className={userPreferences.theme}
 			suppressHydrationWarning
 		>
+			<PreloadResources />
+
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
 				<NextTopLoader color={THEME_COLORS.light.navbar_border} />
 				<Initializers
