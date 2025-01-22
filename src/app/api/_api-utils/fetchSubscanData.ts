@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { SUBSCAN_API_KEY, IS_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
+import { SUBSCAN_API_KEY } from '@/app/api/_api-constants/apiEnvVars';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { deepParseJson } from 'deep-parse-json';
 
@@ -21,7 +21,7 @@ export const fetchSubscanData = async (url: string | URL, network: string, body?
 	try {
 		const redisData = await RedisService.GetSubscanData(network, url.toString());
 
-		if (redisData && IS_CACHE_ENABLED) {
+		if (redisData) {
 			return deepParseJson(redisData);
 		}
 
@@ -33,7 +33,7 @@ export const fetchSubscanData = async (url: string | URL, network: string, body?
 			})
 		).json();
 
-		if (data?.message === 'Success' && IS_CACHE_ENABLED) {
+		if (data?.message === 'Success') {
 			await RedisService.SetSubscanData(network, url.toString(), JSON.stringify(data));
 		}
 

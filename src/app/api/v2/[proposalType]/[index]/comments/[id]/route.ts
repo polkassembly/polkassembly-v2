@@ -17,7 +17,6 @@ import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertCo
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { IS_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	id: z.string(),
@@ -72,11 +71,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	// Invalidate caches since comment content changed
 	const network = await getNetworkFromHeaders();
-	if (IS_CACHE_ENABLED) {
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network });
-	}
+
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Comment updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
@@ -107,12 +105,10 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	await OffChainDbService.DeleteComment(id);
 
 	// Invalidate caches since comment was deleted
-	if (IS_CACHE_ENABLED) {
-		const network = await getNetworkFromHeaders();
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network });
-	}
+	const network = await getNetworkFromHeaders();
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Comment deleted successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

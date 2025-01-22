@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { REDIS_URL } from '@api/_api-constants/apiEnvVars';
+import { IS_CACHE_ENABLED, REDIS_URL } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
@@ -52,10 +52,13 @@ export class RedisService {
 	// helper methods
 
 	private static async Get(key: string): Promise<string | null> {
+		if (!IS_CACHE_ENABLED) return null;
 		return this.client.get(key);
 	}
 
 	private static async Set(key: string, value: string, ttlSeconds?: number): Promise<string | null> {
+		if (!IS_CACHE_ENABLED) return null;
+
 		if (ttlSeconds) {
 			return this.client.set(key, value, 'EX', ttlSeconds);
 		}
@@ -64,10 +67,14 @@ export class RedisService {
 	}
 
 	private static async Delete(key: string): Promise<number> {
+		if (!IS_CACHE_ENABLED) return 0;
+
 		return this.client.del(key);
 	}
 
 	private static async DeleteKeys(pattern: string): Promise<void> {
+		if (!IS_CACHE_ENABLED) return;
+
 		const stream = this.client.scanStream({
 			count: 200,
 			match: pattern
