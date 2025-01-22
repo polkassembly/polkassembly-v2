@@ -10,6 +10,7 @@ import { SidebarGroup, SidebarMenu, useSidebar } from '@/app/_shared-components/
 import React from 'react';
 import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
 import styles from './NavItems.module.scss';
+import { IconName } from '../../Icon';
 
 export function NavMain({
 	sections
@@ -18,7 +19,7 @@ export function NavMain({
 		initalItems?: {
 			title?: string;
 			url: string;
-			icon?: string;
+			icon?: IconName;
 			isActive?: boolean;
 			count?: number;
 			isNew?: boolean;
@@ -26,7 +27,7 @@ export function NavMain({
 				title: string;
 				url: string;
 				isNew?: boolean;
-				icon?: string;
+				icon?: IconName;
 				isActive?: boolean;
 				count?: number;
 			}[];
@@ -35,7 +36,7 @@ export function NavMain({
 			heading?: string;
 			title: string;
 			url: string;
-			icon?: string;
+			icon?: IconName;
 			isNew?: boolean;
 			isActive?: boolean;
 			count?: number;
@@ -43,14 +44,14 @@ export function NavMain({
 				title: string;
 				url: string;
 				isNew?: boolean;
-				icon?: string;
+				icon?: IconName;
 				isActive?: boolean;
 				count?: number;
 				items?: {
 					title: string;
 					url: string;
 					isNew?: boolean;
-					icon?: string;
+					icon?: IconName;
 					count?: number;
 				}[];
 			}[];
@@ -58,7 +59,7 @@ export function NavMain({
 		endItems?: {
 			title: string;
 			url: string;
-			icon?: string;
+			icon?: IconName;
 			isActive?: boolean;
 			isNew?: boolean;
 			count?: number;
@@ -66,13 +67,13 @@ export function NavMain({
 				title: string;
 				url: string;
 				isNew?: boolean;
-				icon?: string;
+				icon?: IconName;
 				count?: number;
 				items?: {
 					title: string;
 					url: string;
 					isNew?: boolean;
-					icon?: string;
+					icon?: IconName;
 					count?: number;
 				}[];
 			}[];
