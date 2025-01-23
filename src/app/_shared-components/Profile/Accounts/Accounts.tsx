@@ -16,12 +16,13 @@ function Accounts({ addresses }: { addresses: string[] }) {
 			</div>
 			<Separator className='mb-4' />
 			<div className={classes.accountsList}>
-				{addresses.map((address) => (
-					<Account
-						key={address}
-						address={address}
-					/>
-				))}
+				{addresses.length > 0 &&
+					addresses.map((address) => (
+						<Account
+							key={address}
+							address={address}
+						/>
+					))}
 			</div>
 		</div>
 	);
