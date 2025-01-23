@@ -24,5 +24,5 @@ export const DELETE = withErrorHandling(async (): Promise<NextResponse> => {
 
 	await RedisService.ClearCacheForAllPostsForNetwork(network);
 
-	return NextResponse.json({ message: 'Posts cache cleared' });
+	return NextResponse.json({ message: `Posts cache cleared for network: ${network}` });
 });
