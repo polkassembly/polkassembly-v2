@@ -7,6 +7,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
+import { ENetwork } from '@/_shared/types';
 import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -237,6 +238,13 @@ export class RedisService {
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
+		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+	}
+
+	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
+		// clear everything posts related
+		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-*`);
+		await this.DeleteKeys(`${ERedisKeys.POST_DATA}-${network}-*`);
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
 	}
 }
