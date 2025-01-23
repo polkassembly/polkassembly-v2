@@ -92,7 +92,7 @@ export class SubscanOnChainService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 	}): Promise<IOnChainPostInfo | null> {
-		if (proposalType !== EProposalType.TIP && isNaN(Number(indexOrHash))) {
+		if (proposalType !== EProposalType.TIP && !ValidatorService.isValidNumber(indexOrHash)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
 
