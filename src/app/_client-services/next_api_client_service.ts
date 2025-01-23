@@ -28,7 +28,10 @@ import {
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ClientError } from '../_client-utils/clientError';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -161,13 +164,15 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
+		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
+
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-api-key': process.env.NEXT_PUBLIC_POLKASSEMBLY_API_KEY || '',
-				'x-network': process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ''
+				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				'x-network': currentNetwork
 			},
 			method
 		});
