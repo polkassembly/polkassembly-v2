@@ -143,7 +143,8 @@ export class OffChainDbService {
 			proposalType,
 			network,
 			metrics: postMetrics,
-			allowedCommentor: EAllowedCommentor.ALL
+			allowedCommentor: EAllowedCommentor.ALL,
+			isDeleted: false
 		} as IOffChainPost;
 	}
 

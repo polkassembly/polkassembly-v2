@@ -213,6 +213,7 @@ export class FirestoreService extends FirestoreRefs {
 			.where('proposalType', '==', proposalType)
 			.where('index', '==', Number(indexOrHash))
 			.where('network', '==', network)
+			.where('isDeleted', '==', false)
 			.limit(1)
 			.get();
 
@@ -222,6 +223,7 @@ export class FirestoreService extends FirestoreRefs {
 				.where('proposalType', '==', proposalType)
 				.where('hash', '==', indexOrHash)
 				.where('network', '==', network)
+				.where('isDeleted', '==', false)
 				.limit(1)
 				.get();
 		}
@@ -273,7 +275,10 @@ export class FirestoreService extends FirestoreRefs {
 			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
 		}
 
-		postsQuery = postsQuery.limit(limit).offset((page - 1) * limit);
+		postsQuery = postsQuery
+			.where('isDeleted', '==', false)
+			.limit(limit)
+			.offset((page - 1) * limit);
 
 		const postsQuerySnapshot = await postsQuery.get();
 
@@ -313,6 +318,8 @@ export class FirestoreService extends FirestoreRefs {
 		if (tags?.length) {
 			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
 		}
+
+		postsQuery = postsQuery.where('isDeleted', '==', false);
 
 		const countSnapshot = await postsQuery.count().get();
 		return countSnapshot.data().count || 0;
@@ -710,7 +717,8 @@ export class FirestoreService extends FirestoreRefs {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY,
-			allowedCommentor
+			allowedCommentor,
+			isDeleted: false
 		};
 
 		if (proposalType === EProposalType.TIP) {

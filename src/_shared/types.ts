@@ -298,6 +298,11 @@ export enum EAllowedCommentor {
 	NONE = 'none'
 }
 
+export interface IPostLink {
+	indexOrHash: string;
+	proposalType: EProposalType;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -305,7 +310,7 @@ export interface IOffChainPost {
 	userId?: number;
 	title?: string;
 	content?: OutputData;
-	htmlContent: string; // TODO: make this optional
+	htmlContent: string;
 	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -316,6 +321,9 @@ export interface IOffChainPost {
 	metrics?: IPostOffChainMetrics;
 	allowedCommentor: EAllowedCommentor;
 	lastCommentAt?: Date;
+	isDeleted: boolean;
+	createdOnPolkassembly?: boolean;
+	linkedPost?: IPostLink;
 }
 
 export enum EProposalStatus {

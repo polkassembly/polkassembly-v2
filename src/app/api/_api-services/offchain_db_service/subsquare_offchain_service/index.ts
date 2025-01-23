@@ -82,7 +82,8 @@ export class SubsquareOffChainService {
 				proposalType,
 				network,
 				dataSource: EDataSource.SUBSQUARE,
-				allowedCommentor: EAllowedCommentor.ALL
+				allowedCommentor: EAllowedCommentor.ALL,
+				isDeleted: false
 			};
 		} catch {
 			return null;
