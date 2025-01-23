@@ -315,6 +315,7 @@ export interface IOffChainPost {
 	network: ENetwork;
 	metrics?: IPostOffChainMetrics;
 	allowedCommentor: EAllowedCommentor;
+	lastCommentAt?: Date;
 }
 
 export enum EProposalStatus {

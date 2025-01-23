@@ -740,4 +740,27 @@ export class FirestoreService extends FirestoreRefs {
 	static async UpdateUserPassword(userId: number, password: string, salt: string) {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ password, salt }, { merge: true });
 	}
+
+	static async UpdateLastCommentAtPost({
+		network,
+		indexOrHash,
+		proposalType,
+		lastCommentAt
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		lastCommentAt: Date;
+	}) {
+		const post = await FirestoreRefs.postsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.limit(1)
+			.get();
+
+		if (post.docs.length) {
+			await post.docs[0].ref.set({ lastCommentAt }, { merge: true });
+		}
+	}
 }
