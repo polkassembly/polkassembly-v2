@@ -143,6 +143,9 @@ function Navbar() {
 						<Link href='/settings'>
 							<Button variant='secondary'>{t('Profile.settings')}</Button>
 						</Link>
+						<Link href={`/user/id/${user.id}`}>
+							<Button variant='secondary'>{t('Profile.profile')}</Button>
+						</Link>
 						<Button onClick={() => AuthClientService.logout(() => setUser(null))}>{t('Profile.logout')}</Button>
 					</>
 				) : (

@@ -349,7 +349,7 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, parentCommentId }
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) }
 		});
 
 		return comment;

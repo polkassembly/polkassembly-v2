@@ -50,7 +50,9 @@ enum EApiRoute {
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	POST_REACTIONS = 'POST_REACTIONS',
 	DELETE_REACTION = 'DELETE_REACTION',
-	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA',
+	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
+	PUBLIC_USER_DATA_BY_ADDRESS = 'PUBLIC_USER_DATA_BY_ADDRESS',
+	PUBLIC_USER_DATA_BY_USERNAME = 'PUBLIC_USER_DATA_BY_USERNAME',
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST'
@@ -126,9 +128,15 @@ export class NextApiClientService {
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
 				method = 'PATCH';
 				break;
-			case EApiRoute.PUBLIC_USER_DATA:
+			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
 				path = '/users/id';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+				path = '/users/address';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
+				path = '/users/username';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -328,7 +336,17 @@ export class NextApiClientService {
 
 	// user data
 	protected static async fetchPublicUserByIdApi({ userId }: { userId: number | string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA, routeSegments: [userId.toString()] });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ID, routeSegments: [userId.toString()] });
+		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	protected static async fetchPublicUserByAddressApi({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address] });
+		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	protected static async fetchPublicUserByUsernameApi({ username }: { username: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_USERNAME, routeSegments: [username] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 

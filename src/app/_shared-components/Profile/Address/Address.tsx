@@ -19,9 +19,10 @@ interface Props {
 	iconSize?: number;
 	showIdenticon?: boolean;
 	walletAddressName?: string;
+	textClassName?: string;
 }
 
-function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName }: Props) {
+function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName }: Props) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
@@ -53,6 +54,7 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 				addressDisplayText={displayText}
 				iconSize={iconSize}
 				showIdenticon={showIdenticon}
+				textClassName={textClassName}
 			/>
 		</div>
 	);

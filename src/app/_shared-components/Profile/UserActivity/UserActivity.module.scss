@@ -1,0 +1,19 @@
+.userActivityWrapper {
+    @apply flex flex-col gap-y-4
+}
+
+.userActivityHeader {
+    @apply flex items-center gap-x-2 px-6 text-text_primary
+}
+
+.userActivityHeaderTitle {
+    @apply text-2xl font-semibold
+}
+
+.userActivitySkeleton {
+    @apply flex flex-col gap-y-4 px-6
+}
+
+.userActivitySkeletonItem {
+    @apply h-4 w-full
+}

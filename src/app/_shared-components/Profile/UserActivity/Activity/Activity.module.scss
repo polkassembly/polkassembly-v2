@@ -1,0 +1,23 @@
+.activityWrapper {
+    @apply relative border-t border-border_grey px-6 py-4
+}
+
+.activityTime {
+    @apply absolute left-6 top-[-17px] rounded-[20px] border border-border_grey bg-bg_modal bg-btn_secondary_background px-4 py-2
+}
+
+.activityContent {
+    @apply py-4 text-sm font-medium text-text_primary
+}
+
+.activityContentInner {
+    @apply flex items-center gap-x-2
+}
+
+.activityContentText {
+    @apply flex items-center gap-x-1
+}
+
+.activityContentTextLink {
+    @apply text-text_pink
+}
