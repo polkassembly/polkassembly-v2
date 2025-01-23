@@ -19,6 +19,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Input } from '@/app/_shared-components/Input';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './Navbar.module.scss';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 const RPCSwitchDropdown = dynamic(() => import('../RpcSwitch/RPCSwitchDropdown'), { ssr: false });
 const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
@@ -33,6 +34,7 @@ const LANGUAGES = {
 
 function Navbar() {
 	const { user, setUser } = useUser();
+	console.log('user', user);
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const [searchTerm, setSearchTerm] = useState('');
@@ -140,15 +142,34 @@ function Navbar() {
 				</div>
 
 				{user?.id ? (
-					<>
-						<Link href='/settings'>
-							<Button variant='secondary'>{t('Profile.settings')}</Button>
-						</Link>
-						<Link href={`/user/id/${user.id}`}>
-							<Button variant='secondary'>{t('Profile.profile')}</Button>
-						</Link>
-						<Button onClick={() => AuthClientService.logout(() => setUser(null))}>{t('Profile.logout')}</Button>
-					</>
+					<DropdownMenu>
+						<DropdownMenuTrigger>
+							<Button
+								variant='ghost'
+								className='rounded-xl border border-border_grey text-sm text-text_primary'
+								size='sm'
+							>
+								{user.username}
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<DropdownMenuItem>
+								<Link href='/settings'>{t('Profile.settings')}</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Link href={`/user/id/${user.id}`}>{t('Profile.profile')}</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Button
+									variant='ghost'
+									className='p-0'
+									onClick={() => AuthClientService.logout(() => setUser(null))}
+								>
+									{t('Profile.logout')}
+								</Button>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				) : (
 					<Link href='/login'>
 						<Button>{t('Profile.login')}</Button>
