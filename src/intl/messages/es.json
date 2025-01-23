@@ -422,5 +422,19 @@
 		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
 		"aHouseOfCommonsInitiative": "Una iniciativa de House of Commons.",
 		"allRightsReservedYear": "Todos los derechos reservados."
+	},
+	"Preimages": {
+		"hash": "Hash",
+		"author": "Autor",
+		"deposit": "Depósito",
+		"arguments": "Argumentos",
+		"size": "Tamaño",
+		"status": "Estado",
+		"copy": "Copiar",
+		"subscan": "Subscan",
+		"close": "Cerrar",
+		"showAll": "Mostrar todos",
+		"searchByHash": "Buscar por hash",
+		"preimageNotFound": "Vorabbild nicht gefunden"
 	}
 }

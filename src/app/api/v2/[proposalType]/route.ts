@@ -20,7 +20,6 @@ import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 import { RedisService } from '../../_api-services/redis_service';
-import { IS_CACHE_ENABLED } from '../../_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -45,7 +44,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// Try to get from cache first
 	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
-	if (cachedData && IS_CACHE_ENABLED) {
+	if (cachedData) {
 		return NextResponse.json(deepParseJson(cachedData));
 	}
 
@@ -142,9 +141,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	};
 
 	// Cache the response
-	if (IS_CACHE_ENABLED) {
-		await RedisService.SetPostsListing({ network, proposalType, page, limit, data: JSON.stringify(response), statuses, origins, tags });
-	}
+	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: JSON.stringify(response), statuses, origins, tags });
 
 	// 3. return the data
 	return NextResponse.json(response);
@@ -180,10 +177,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	});
 
 	// Invalidate post listings since a new post was added
-	if (IS_CACHE_ENABLED) {
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
-	}
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

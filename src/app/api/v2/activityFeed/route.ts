@@ -14,7 +14,6 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
-import { IS_CACHE_ENABLED } from '../../_api-constants/apiEnvVars';
 
 // 1.1 if user is logged in fetch all posts where status is active and user has not voted, sorted by createdAt
 // 1.2 if user is not logged in fetch all posts where status is active, sorted by createdAt
@@ -57,7 +56,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	// Try to get from cache first
 	const cachedData = await RedisService.GetActivityFeed({ network, page, limit, userId, origins });
-	if (cachedData && IS_CACHE_ENABLED) {
+	if (cachedData) {
 		const response = NextResponse.json(deepParseJson(cachedData));
 		if (accessToken) {
 			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
@@ -137,9 +136,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const responseData: IGenericListingResponse<IActivityFeedPostListing> = { items: posts, totalCount };
 
 	// Cache the response
-	if (IS_CACHE_ENABLED) {
-		await RedisService.SetActivityFeed({ network, page, limit, data: JSON.stringify(responseData), userId, origins });
-	}
+	await RedisService.SetActivityFeed({ network, page, limit, data: JSON.stringify(responseData), userId, origins });
 
 	const response = NextResponse.json(responseData);
 
