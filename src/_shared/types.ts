@@ -292,6 +292,12 @@ export interface IPostOffChainMetrics {
 	comments: number;
 }
 
+export enum EAllowedCommentor {
+	ALL = 'all',
+	ONCHAIN_VERIFIED = 'onchain_verified',
+	NONE = 'none'
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -308,6 +314,7 @@ export interface IOffChainPost {
 	proposalType: EProposalType;
 	network: ENetwork;
 	metrics?: IPostOffChainMetrics;
+	allowedCommentor: EAllowedCommentor;
 }
 
 export enum EProposalStatus {

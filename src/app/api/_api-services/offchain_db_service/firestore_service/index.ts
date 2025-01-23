@@ -16,7 +16,8 @@ import {
 	IReaction,
 	EReaction,
 	IPostOffChainMetrics,
-	IUserActivity
+	IUserActivity,
+	EAllowedCommentor
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -248,7 +249,8 @@ export class FirestoreService extends FirestoreRefs {
 			markdownContent,
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
-			updatedAt: postData.updatedAt?.toDate()
+			updatedAt: postData.updatedAt?.toDate(),
+			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL
 		} as IOffChainPost;
 	}
 
@@ -297,7 +299,8 @@ export class FirestoreService extends FirestoreRefs {
 				markdownContent,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
-				metrics
+				metrics,
+				allowedCommentor: data.allowedCommentor || EAllowedCommentor.ALL
 			} as IOffChainPost;
 		});
 
@@ -663,10 +666,13 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.getReactionDocRefById(id).delete();
 	}
 
-	static async UpdatePost({ id, content, title }: { id?: string; content: OutputData; title: string }) {
+	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: OutputData; title: string; allowedCommentor: EAllowedCommentor }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
-		await FirestoreRefs.getPostDocRefById(String(id)).set({ content, htmlContent: html, markdownContent: markdown, title, updatedAt: new Date() }, { merge: true });
+		await FirestoreRefs.getPostDocRefById(String(id)).set(
+			{ content, htmlContent: html, markdownContent: markdown, title, allowedCommentor, updatedAt: new Date() },
+			{ merge: true }
+		);
 	}
 
 	static async CreatePost({
@@ -675,7 +681,8 @@ export class FirestoreService extends FirestoreRefs {
 		userId,
 		content,
 		indexOrHash,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -683,6 +690,7 @@ export class FirestoreService extends FirestoreRefs {
 		content: OutputData;
 		indexOrHash?: string;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
 
@@ -701,7 +709,8 @@ export class FirestoreService extends FirestoreRefs {
 			title,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			dataSource: EDataSource.POLKASSEMBLY
+			dataSource: EDataSource.POLKASSEMBLY,
+			allowedCommentor
 		};
 
 		if (proposalType === EProposalType.TIP) {

@@ -19,7 +19,8 @@ import {
 	IUserActivity,
 	EActivityName,
 	EActivityCategory,
-	IActivityMetadata
+	IActivityMetadata,
+	EAllowedCommentor
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -141,7 +142,8 @@ export class OffChainDbService {
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,
 			network,
-			metrics: postMetrics
+			metrics: postMetrics,
+			allowedCommentor: EAllowedCommentor.ALL
 		} as IOffChainPost;
 	}
 
@@ -341,6 +343,13 @@ export class OffChainDbService {
 		parentCommentId?: string;
 		address?: string;
 	}) {
+		// check if the post is allowed to be commented on
+		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
+		if (post.allowedCommentor === EAllowedCommentor.NONE) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Post is not allowed to be commented on');
+		}
+		// TODO: implement on-chain check
+
 		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 
 		await this.saveUserActivity({
@@ -424,19 +433,21 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
 		content: OutputData;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
 		}
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title });
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor });
 
 		await this.saveUserActivity({
 			userId,
@@ -455,7 +466,8 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -463,6 +475,7 @@ export class OffChainDbService {
 		userId: number;
 		content: OutputData;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}) {
 		const postData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
@@ -474,7 +487,7 @@ export class OffChainDbService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 		}
 
-		await FirestoreService.UpdatePost({ id: postData.id, content, title });
+		await FirestoreService.UpdatePost({ id: postData.id, content, title, allowedCommentor });
 	}
 
 	static async UpdateOnChainPost({
@@ -483,7 +496,8 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -491,6 +505,7 @@ export class OffChainDbService {
 		userId: number;
 		content: OutputData;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}) {
 		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
 		if (!onChainPostInfo || !onChainPostInfo.proposer) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
@@ -507,7 +522,7 @@ export class OffChainDbService {
 		const offChainPostData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
 		if (!offChainPostData?.id) {
-			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title });
+			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title, allowedCommentor });
 			await this.saveUserActivity({
 				userId,
 				name: EActivityName.ADDED_CONTEXT_TO_PROPOSAL,
@@ -516,7 +531,7 @@ export class OffChainDbService {
 				indexOrHash
 			});
 		} else {
-			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title });
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title, allowedCommentor: offChainPostData.allowedCommentor });
 		}
 	}
 
