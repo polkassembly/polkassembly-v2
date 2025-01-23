@@ -34,7 +34,6 @@ const LANGUAGES = {
 
 function Navbar() {
 	const { user, setUser } = useUser();
-	console.log('user', user);
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const [searchTerm, setSearchTerm] = useState('');
