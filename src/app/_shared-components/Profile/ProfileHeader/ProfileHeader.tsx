@@ -37,6 +37,7 @@ function ProfileHeader({ address }: { address: string }) {
 							variant='secondary'
 							className='rounded-3xl font-medium'
 							size='lg'
+							disabled
 							leftIcon={<UserPlus fill={THEME_COLORS[`${resolvedTheme || ETheme.LIGHT}` as ETheme].bg_pink} />}
 						>
 							{t('Profile.delegate')}
@@ -45,6 +46,7 @@ function ProfileHeader({ address }: { address: string }) {
 							size='lg'
 							className='rounded-3xl'
 							leftIcon={<ShieldPlus />}
+							disabled
 						>
 							{t('Profile.follow')}
 						</Button>
