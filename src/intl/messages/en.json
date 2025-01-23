@@ -161,7 +161,9 @@
 			"linkedMultipleAddresses": "Linked Multiple Addresses",
 			"postMarkedAsSpam": "Post Marked as Spam",
 			"commentTakenDown": "Comment Taken Down",
-			"postTakenDown": "Post Taken Down"
+			"postTakenDown": "Post Taken Down",
+			"unlinkedAddress": "Unlinked Address",
+			"unlinkedMultipleAddresses": "Unlinked Multiple Addresses"
 		}
 	},
 	"ListingTab": {

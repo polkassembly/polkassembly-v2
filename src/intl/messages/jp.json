@@ -161,7 +161,9 @@
 			"linkedMultipleAddresses": "複数のアドレスをリンク",
 			"postMarkedAsSpam": "投稿をスパムとしてマーク",
 			"commentTakenDown": "コメントを削除",
-			"postTakenDown": "投稿を削除"
+			"postTakenDown": "投稿を削除",
+			"unlinkedAddress": "リンク解除されたアドレス",
+			"unlinkedMultipleAddresses": "複数のアドレスのリンクを解除"
 		}
 	},
 	"ListingTab": {

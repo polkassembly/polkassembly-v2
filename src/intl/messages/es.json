@@ -161,7 +161,9 @@
 			"linkedMultipleAddresses": "Vinculó múltiples direcciones",
 			"postMarkedAsSpam": "Publicación marcada como spam",
 			"commentTakenDown": "Comentario eliminado",
-			"postTakenDown": "Publicación eliminada"
+			"postTakenDown": "Publicación eliminada",
+			"unlinkedAddress": "Dirección desvinculada",
+			"unlinkedMultipleAddresses": "Direcciones múltiples desvinculadas"
 		}
 	},
 	"ListingTab": {

@@ -465,6 +465,24 @@ const activityText: Record<EActivityName, { title: string; icon: ReactNode; icon
 				className='text-text_pink'
 			/>
 		)
+	},
+	[EActivityName.UNLINKED_ADDRESS]: {
+		title: 'unlinkedAddress',
+		icon: (
+			<MessageCircleMore
+				size={16}
+				className='text-text_pink'
+			/>
+		)
+	},
+	[EActivityName.UNLINKED_MULTIPLE_ADDRESSES]: {
+		title: 'unlinkedMultipleAddresses',
+		icon: (
+			<MessageCircleMore
+				size={16}
+				className='text-text_pink'
+			/>
+		)
 	}
 };
 

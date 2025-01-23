@@ -161,7 +161,9 @@
 			"linkedMultipleAddresses": "Mehrere Adressen verknüpft",
 			"postMarkedAsSpam": "Beitrag als Spam markiert",
 			"commentTakenDown": "Kommentar entfernt",
-			"postTakenDown": "Beitrag entfernt"
+			"postTakenDown": "Beitrag entfernt",
+			"unlinkedAddress": "Nicht verknüpfte Adresse",
+			"unlinkedMultipleAddresses": "Mehrere Adressen nicht verknüpft"
 		}
 	},
 	"ListingTab": {

@@ -161,7 +161,9 @@
 			"linkedMultipleAddresses": "关联多个地址",
 			"postMarkedAsSpam": "帖子被标记为垃圾信息",
 			"commentTakenDown": "评论被下架",
-			"postTakenDown": "帖子被下架"
+			"postTakenDown": "帖子被下架",
+			"unlinkedAddress": "已取消链接地址",
+			"unlinkedMultipleAddresses": "已取消链接多个地址"
 		}
 	},
 	"ListingTab": {
