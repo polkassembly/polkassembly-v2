@@ -17,6 +17,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Input } from '@/app/_shared-components/Input';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './Navbar.module.scss';
 
 const RPCSwitchDropdown = dynamic(() => import('../RpcSwitch/RPCSwitchDropdown'), { ssr: false });
@@ -35,7 +36,7 @@ function Navbar() {
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const [searchTerm, setSearchTerm] = useState('');
-	const [selectedNetwork, setSelectedNetwork] = useState<ENetwork>(ENetwork.POLKADOT);
+	const [selectedNetwork, setSelectedNetwork] = useState<ENetwork>(getCurrentNetwork());
 	const [isOpen, setIsOpen] = useState(false);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 

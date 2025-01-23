@@ -9,7 +9,8 @@ import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
-	POLKADOT = 'polkadot'
+	POLKADOT = 'polkadot',
+	WESTEND = 'westend'
 }
 
 export enum EGovType {
@@ -464,11 +465,6 @@ export enum ESignupSteps {
 export interface IGenerateTFAResponse extends Omit<IUserTFADetails, 'url' | 'enabled' | 'verified'> {
 	otpauthUrl: string;
 }
-
-export type TRPCEndpoint = {
-	key: string;
-	label: string;
-};
 
 export interface ISidebarMenuItem {
 	title: string;
