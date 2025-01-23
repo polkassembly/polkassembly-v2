@@ -359,7 +359,7 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, parentCommentId }
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) }
 		});
 
 		await FirestoreService.UpdateLastCommentAtPost({ network, indexOrHash, proposalType, lastCommentAt: comment.createdAt });

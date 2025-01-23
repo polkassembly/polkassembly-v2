@@ -7,6 +7,8 @@
 import React from 'react';
 import Identicon from '@polkadot/react-identicon';
 import { IOnChainIdentity } from '@/_shared/types';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import IdentityBadge from '../IdentityBadge';
 import styles from './AddressInline.module.scss';
 
@@ -17,9 +19,10 @@ interface Props {
 	addressDisplayText?: string;
 	iconSize?: number;
 	showIdenticon?: boolean;
+	textClassName?: string;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true }: Props) {
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName }: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
@@ -33,13 +36,17 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					theme='polkadot'
 				/>
 			)}
+			<Link
+				className={styles.container}
+				href={`/user/address/${address}`}
+			>
+				<IdentityBadge
+					onChainIdentity={onChainIdentity}
+					iconSize={iconSize}
+				/>
 
-			<IdentityBadge
-				onChainIdentity={onChainIdentity}
-				iconSize={iconSize}
-			/>
-
-			<p className={styles.displaytext}>{addressDisplayText}</p>
+				<p className={cn(styles.displaytext, 'text-xs font-medium lg:text-sm', textClassName)}>{addressDisplayText}</p>
+			</Link>
 		</div>
 	);
 }

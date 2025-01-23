@@ -1,0 +1,11 @@
+.profileHeaderWrapper {
+    @apply mb-2 flex items-start gap-x-4
+}
+
+.profileHeaderInner {
+    @apply flex w-full justify-between
+}
+
+.profileHeaderButtons {
+    @apply flex items-center gap-x-2
+}

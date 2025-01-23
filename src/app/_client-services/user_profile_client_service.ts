@@ -9,6 +9,14 @@ export class UserProfileClientService extends NextApiClientService {
 		return this.fetchPublicUserByIdApi({ userId });
 	}
 
+	static async fetchPublicUserByAddress({ address }: { address: string }) {
+		return this.fetchPublicUserByAddressApi({ address });
+	}
+
+	static async fetchPublicUserByUsername({ username }: { username: string }) {
+		return this.fetchPublicUserByUsernameApi({ username });
+	}
+
 	static async fetchUserActivity({ userId }: { userId: string | number }) {
 		return this.fetchUserActivityApi({ userId });
 	}
