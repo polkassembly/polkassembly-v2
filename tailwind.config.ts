@@ -4,6 +4,7 @@
 
 import type { Config } from 'tailwindcss';
 // eslint-disable-next-line import/no-extraneous-dependencies
+
 import { createThemes } from 'tw-colors';
 import { THEME_COLORS } from './src/app/_style/theme';
 
