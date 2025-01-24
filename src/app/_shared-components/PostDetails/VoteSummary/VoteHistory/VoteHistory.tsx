@@ -14,7 +14,7 @@ import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLink
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
-import VoteHistoryTable from '../VoteHistoryTable';
+import VoteHistoryTable from './VoteHistoryTable';
 import classes from './VoteHistory.module.scss';
 
 function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
@@ -41,8 +41,8 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 		<div>
 			<Tabs
 				defaultValue={tab}
-				onValueChange={(t) => {
-					setTab(t as EVoteDecision);
+				onValueChange={(voteTab) => {
+					setTab(voteTab as EVoteDecision);
 					setPage(1);
 				}}
 			>
@@ -75,28 +75,19 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						{t('PostDetails.abstain')}
 					</TabsTrigger>
 				</TabsList>
-				<TabsContent
-					value={EVoteDecision.AYE}
-					className={classes.tabsContent}
-				>
+				<TabsContent value={EVoteDecision.AYE}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
 						loading={isFetching}
 					/>
 				</TabsContent>
-				<TabsContent
-					value={EVoteDecision.NAY}
-					className={classes.tabsContent}
-				>
+				<TabsContent value={EVoteDecision.NAY}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
 						loading={isFetching}
 					/>
 				</TabsContent>
-				<TabsContent
-					value={EVoteDecision.ABSTAIN}
-					className={classes.tabsContent}
-				>
+				<TabsContent value={EVoteDecision.ABSTAIN}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
 						loading={isFetching}

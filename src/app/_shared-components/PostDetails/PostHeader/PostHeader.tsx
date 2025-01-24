@@ -84,7 +84,12 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
-						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
+						{postData?.onChainInfo?.proposer && (
+							<Address
+								truncateCharLen={4}
+								address={postData.onChainInfo?.proposer}
+							/>
+						)}
 						<Separator
 							orientation='vertical'
 							className='h-3'
@@ -120,7 +125,10 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 									key={`${beneficiary.amount}-${beneficiary.address}-${beneficiary.assetId}`}
 									className='flex items-center gap-x-1'
 								>
-									<Address address={beneficiary.address} />
+									<Address
+										truncateCharLen={4}
+										address={beneficiary.address}
+									/>
 									<span className='text-xs text-wallet_btn_text'>
 										({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 									</span>
@@ -139,7 +147,10 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 												key={beneficiary.amount}
 												className='flex items-center gap-x-1'
 											>
-												<Address address={beneficiary.address} />
+												<Address
+													truncateCharLen={4}
+													address={beneficiary.address}
+												/>
 												<span className='text-xs text-wallet_btn_text'>
 													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 												</span>
@@ -180,6 +191,12 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 					value={EPostDetailsTab.TIMELINE}
 				>
 					{t('PostDetails.timeline')}
+				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
+					value={EPostDetailsTab.ONCHAIN_INFO}
+				>
+					{t('PostDetails.onchainInfo')}
 				</TabsTrigger>
 			</TabsList>
 		</div>

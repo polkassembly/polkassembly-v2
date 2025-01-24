@@ -88,5 +88,6 @@ export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			href: 'https://kusama.network/',
 			label: 'Kusama Homepage'
 		}
-	]
+	],
+	[ENetwork.WESTEND]: []
 } as const;

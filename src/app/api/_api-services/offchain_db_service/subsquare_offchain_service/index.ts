@@ -6,7 +6,7 @@
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
 import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
@@ -41,10 +41,9 @@ export class SubsquareOffChainService {
 		try {
 			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-			// TODO: ENABLE THIS FOR PROD
-			// if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
-			// return null;
-			// }
+			if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
+				return null;
+			}
 
 			if (!data) {
 				return null;
@@ -82,7 +81,9 @@ export class SubsquareOffChainService {
 				tags: [],
 				proposalType,
 				network,
-				dataSource: EDataSource.SUBSQUARE
+				dataSource: EDataSource.SUBSQUARE,
+				allowedCommentor: EAllowedCommentor.ALL,
+				isDeleted: false
 			};
 		} catch {
 			return null;

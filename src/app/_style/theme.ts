@@ -38,7 +38,7 @@ export const THEME_COLORS = {
 		rank_card_text: '#243A57',
 		rank_card_bg: '#FCC636',
 		listing_page_btn: '#334D6E',
-		listing_card1: '#F5F6F8',
+		listing_card1: '#fbfbfb',
 		listing_page_border: '#CED4DE',
 		light_auction_text: '#AC6A30',
 		light_council_bg: '#FFEDF2',
@@ -67,9 +67,13 @@ export const THEME_COLORS = {
 		activity_selected_tab: '#F2F4F7',
 		post_btn_bg: '#EFF1F3',
 		active_proposal_bg: '#485F7D',
+		sidebar_title: '#485F7D',
 		navbar_title: '#243A57',
 		yellow_primary: '#ffbf60',
-		wallet_disabled_bg: '#F6F7F9'
+		wallet_disabled_bg: '#F6F7F9',
+		grey_bg: '#F4F6F8',
+		footer_bg: '#FFF1F8',
+		activity_feed_active_proposal_bg: '#f6f8fa'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -83,7 +87,7 @@ export const THEME_COLORS = {
 		link: '#1B61FF',
 		btn_primary_text: '#FFF',
 		btn_secondary_border: '#D2D8E0',
-		btn_secondary_background: '#FFF',
+		btn_secondary_background: '#000',
 		btn_secondary_text: '#FFFFFF',
 		border_grey: '#3F3F46',
 		sidebar_menu_bg: '#FDE7F0',
@@ -106,7 +110,7 @@ export const THEME_COLORS = {
 		success: '#2ED47A',
 		failure: '#FF3C5F',
 		listing_page_border: '#4B4B4B',
-		listing_card1: '#4B4B4B',
+		listing_card1: '#2A2929',
 		rank_card_bg: '#FCC636',
 		text_grey: '#7587A0',
 		create_proposal_btn_create: '#49CFFC',
@@ -133,8 +137,12 @@ export const THEME_COLORS = {
 		activity_selected_tab: '#2E2E2E',
 		post_btn_bg: '#4B4B4B',
 		active_proposal_bg: '#262626',
+		sidebar_title: '#9E9E9E',
 		navbar_title: '#fff',
 		yellow_primary: '#ffbf60',
-		wallet_disabled_bg: '#222222'
+		wallet_disabled_bg: '#222222',
+		grey_bg: '#222222',
+		footer_bg: '#222222',
+		activity_feed_active_proposal_bg: '#262626'
 	}
 };

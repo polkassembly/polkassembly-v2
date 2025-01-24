@@ -2,27 +2,36 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { Suspense } from 'react';
+import { useState } from 'react';
+import { OutputData } from '@editorjs/editorjs';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
-import { Skeleton } from '../Skeleton';
 import { Tabs, TabsContent } from '../Tabs';
 import Timeline from './Timeline/Timeline';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
+import OnchainInfo from './OnchainInfo/OnchainInfo';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
+	const [post, setPost] = useState<IPost>(postData || ({} as IPost));
+
+	const onEditPostSuccess = (title: string, content: OutputData) => {
+		setPost((prev) => ({ ...prev, title, content }));
+	};
+
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
 				<PostHeader
 					isModalOpen={isModalOpen ?? false}
-					postData={postData as IPostListing}
+					postData={post as IPostListing}
 				/>
 			</div>
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3')}>
@@ -30,12 +39,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					<div className={classes.descBox}>
 						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
 							<PostContent
-								postData={postData as IPostListing}
+								postData={post as IPostListing}
 								isModalOpen={isModalOpen ?? false}
+								onEditPostSuccess={onEditPostSuccess}
 							/>
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
 							<Timeline timeline={postData?.onChainInfo?.timeline} />
+						</TabsContent>
+						<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
+							<OnchainInfo
+								proposalType={EProposalType.REFERENDUM_V2}
+								index={index}
+								onchainInfo={postData?.onChainInfo}
+							/>
 						</TabsContent>
 					</div>
 					{isModalOpen && (
@@ -46,18 +63,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 					{!isModalOpen && (
 						<div className={classes.commentsBox}>
-							<Suspense
-								fallback={
-									<div className='p-6'>
-										<Skeleton className='h-4' />
-									</div>
-								}
-							>
-								<PostComments
-									proposalType={EProposalType.REFERENDUM_V2}
-									index={index}
-								/>
-							</Suspense>
+							<PostComments
+								proposalType={EProposalType.REFERENDUM_V2}
+								index={index}
+							/>
 						</div>
 					)}
 				</div>

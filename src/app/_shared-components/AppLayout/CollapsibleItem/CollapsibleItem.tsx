@@ -141,7 +141,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 												/>
 											</div>
 										)}
-										<span className='whitespace-nowrap'>{subItem.title}</span>
+										<span className='whitespace-nowrap text-sidebar_title'>{subItem.title}</span>
 									</span>
 									{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 								</Link>
@@ -215,7 +215,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 														/>
 													</div>
 												)}
-												<span>{subItem.title}</span>
+												<span className='text-sidebar_title'>{subItem.title}</span>
 												{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 											</Link>
 										)}
@@ -251,7 +251,7 @@ function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMen
 				</div>
 			)}
 			<span className={style.mainTitle}>
-				<span className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? 'text-sidebar_menu_active_text' : ''}`}>{item.title}</span>
+				<span className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? 'text-sidebar_menu_active_text' : 'text-sidebar_title'}`}>{item.title}</span>
 				{item.isNew && <span className={style.newBadge_expanded}>{t(NEW_BADGE_TEXT)}</span>}
 			</span>
 			{item.items && (
@@ -307,7 +307,7 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 										) : (
 											<Link
 												href={subItem.url || '#'}
-												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : 'text-text_primary'}`}
+												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : 'text-sidebar_title'}`}
 											>
 												<div className='flex items-center'>
 													{subItem.title}

@@ -2,11 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { REDIS_URL } from '@api/_api-constants/apiEnvVars';
+import { IS_CACHE_ENABLED, REDIS_URL } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
+import { ENetwork } from '@/_shared/types';
 import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -52,10 +53,13 @@ export class RedisService {
 	// helper methods
 
 	private static async Get(key: string): Promise<string | null> {
+		if (!IS_CACHE_ENABLED) return null;
 		return this.client.get(key);
 	}
 
 	private static async Set(key: string, value: string, ttlSeconds?: number): Promise<string | null> {
+		if (!IS_CACHE_ENABLED) return null;
+
 		if (ttlSeconds) {
 			return this.client.set(key, value, 'EX', ttlSeconds);
 		}
@@ -64,10 +68,14 @@ export class RedisService {
 	}
 
 	private static async Delete(key: string): Promise<number> {
+		if (!IS_CACHE_ENABLED) return 0;
+
 		return this.client.del(key);
 	}
 
 	private static async DeleteKeys(pattern: string): Promise<void> {
+		if (!IS_CACHE_ENABLED) return;
+
 		const stream = this.client.scanStream({
 			count: 200,
 			match: pattern
@@ -230,6 +238,13 @@ export class RedisService {
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
+		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+	}
+
+	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
+		// clear everything posts related
+		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-*`);
+		await this.DeleteKeys(`${ERedisKeys.POST_DATA}-${network}-*`);
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
 	}
 }

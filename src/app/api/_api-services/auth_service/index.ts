@@ -70,7 +70,6 @@ export class AuthService {
 		username,
 		isWeb3Signup,
 		network,
-		isCustomUsername = false,
 		address,
 		wallet
 	}: {
@@ -79,7 +78,6 @@ export class AuthService {
 		username: string;
 		isWeb3Signup: boolean;
 		network: ENetwork;
-		isCustomUsername: boolean;
 		address?: string;
 		wallet?: EWallet;
 	}): Promise<IUser> {
@@ -92,7 +90,6 @@ export class AuthService {
 		const newUserId = (await OffChainDbService.GetTotalUsersCount()) + 1;
 		const newUser: IUser = {
 			createdAt: new Date(),
-			isCustomUsername,
 			email,
 			isEmailVerified: false,
 			id: newUserId,
@@ -113,7 +110,6 @@ export class AuthService {
 				isDefault: true,
 				network,
 				userId: newUserId,
-				// todo: wallet || EWallet.OTHER
 				wallet: wallet || EWallet.OTHER
 			});
 		}
@@ -288,8 +284,7 @@ export class AuthService {
 			newPassword: password,
 			username,
 			isWeb3Signup: false,
-			network,
-			isCustomUsername: true
+			network
 		});
 
 		await this.CreateAndSendEmailVerificationToken(user);
@@ -370,7 +365,6 @@ export class AuthService {
 			username,
 			isWeb3Signup: true,
 			network,
-			isCustomUsername: false,
 			address: formattedAddress,
 			wallet
 		});

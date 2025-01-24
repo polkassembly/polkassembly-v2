@@ -10,10 +10,11 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
-import Address from '../../Profile/Address/Address';
-import { Button } from '../../Button';
-import LoadingLayover from '../../LoadingLayover';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
+import Address from '../../../Profile/Address/Address';
+import { Button } from '../../../Button';
+import LoadingLayover from '../../../LoadingLayover';
+import classes from './VoteHistory.module.scss';
 
 function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	return sort === 'asc' ? (
@@ -95,45 +96,44 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
 	};
 
-	if (loading) {
-		return <LoadingLayover />;
-	}
-
 	return (
-		<Table className='relative min-h-[200px]'>
-			<TableHeader className='w-full'>
-				{table.getHeaderGroups().map((headerGroup) => (
-					<TableRow key={headerGroup.id}>
-						{headerGroup.headers.map((header) => (
-							<TableHead
-								className='text-xs font-medium text-wallet_btn_text'
-								key={header.id}
-							>
-								{flexRender(header.column.columnDef.header, header.getContext())}
-							</TableHead>
-						))}
-					</TableRow>
-				))}
-			</TableHeader>
-			<TableBody className='flex-1 overflow-y-auto'>
-				{table.getRowModel().rows.map((vote) => (
-					<TableRow key={`${vote.original.balanceValue}-${vote.original.voterAddress}`}>
-						<TableCell className='py-4'>
-							<Address address={vote.original.voterAddress} />
-						</TableCell>
-						<TableCell className='py-4'>
-							{formatBalance(vote.original.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-						</TableCell>
-						<TableCell className='py-4'>
-							{formatBalance(vote.original.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-						</TableCell>
-						<TableCell className='py-4'>
-							{formatBalance(vote.original.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-						</TableCell>
-					</TableRow>
-				))}
-			</TableBody>
-		</Table>
+		<div className={classes.tableContainer}>
+			{loading && <LoadingLayover />}
+			<Table className={classes.table}>
+				<TableHeader className='w-full'>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow key={headerGroup.id}>
+							{headerGroup.headers.map((header) => (
+								<TableHead
+									className='text-xs font-medium text-wallet_btn_text'
+									key={header.id}
+								>
+									{flexRender(header.column.columnDef.header, header.getContext())}
+								</TableHead>
+							))}
+						</TableRow>
+					))}
+				</TableHeader>
+				<TableBody className='flex-1 overflow-y-auto'>
+					{table.getRowModel().rows.map((vote) => (
+						<TableRow key={`${vote.original.balanceValue}-${vote.original.voterAddress}`}>
+							<TableCell className='max-w-[200px] py-4'>
+								<Address address={vote.original.voterAddress} />
+							</TableCell>
+							<TableCell className='py-4'>
+								{formatBalance(vote.original.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+							</TableCell>
+							<TableCell className='py-4'>
+								{formatBalance(vote.original.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+							</TableCell>
+							<TableCell className='py-4'>
+								{formatBalance(vote.original.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</div>
 	);
 }
 
