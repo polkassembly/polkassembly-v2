@@ -56,7 +56,8 @@ enum EApiRoute {
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
-	FETCH_PREIMAGES = 'FETCH_PREIMAGES'
+	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	DELETE_COMMENT = 'DELETE_COMMENT'
 }
 
 export class NextApiClientService {
@@ -139,6 +140,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.DELETE_COMMENT:
+				method = 'DELETE';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -308,6 +312,11 @@ export class NextApiClientService {
 				parentCommentId
 			}
 		});
+	}
+
+	protected static async deleteCommentFromPostApi({ id, proposalType, index }: { id: string; proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_COMMENT, routeSegments: [proposalType, index, 'comments', id] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	// votes

@@ -319,7 +319,12 @@
 			"name": "名称",
 			"value": "值"
 		},
-		"onchainInfo": "链上信息"
+		"onchainInfo": "链上信息",
+		"deleteComment": "删除评论",
+		"deleteCommentConfirmation": "您确定要删除此评论吗？",
+		"delete": "删除",
+		"hideReplies": "隐藏回复",
+		"viewReplies": "查看回复"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
