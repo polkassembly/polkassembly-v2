@@ -67,4 +67,12 @@ export class AuthClientService extends NextApiClientService {
 		CookieClientService.deleteAccessToken();
 		CookieClientService.deleteRefreshToken();
 	}
+
+	static async linkAddressStart({ address }: { address: string }) {
+		return this.linkAddressStartApi({ address });
+	}
+
+	static async linkAddressConfirm({ address, signature, signMessage, wallet }: { address: string; signature: string; signMessage: string; wallet: EWallet }) {
+		return this.linkAddressConfirmApi({ address, signature, signMessage, wallet });
+	}
 }

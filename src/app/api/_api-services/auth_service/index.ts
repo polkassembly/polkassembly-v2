@@ -25,6 +25,7 @@ import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetail
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
 import { cookies } from 'next/headers';
+import { v4 as uuidv4 } from 'uuid';
 import { OffChainDbService } from '../offchain_db_service';
 import { RedisService } from '../redis_service';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
@@ -612,5 +613,9 @@ export class AuthService {
 		await OffChainDbService.UpdateUserPassword(user.id, password, salt);
 
 		await RedisService.DeleteResetPasswordToken(token);
+	}
+
+	static async getLinkAddressSignMessage(address: string) {
+		return address.startsWith('0x') ? `Link account with polkassembly ${uuidv4()}` : `<Bytes>${uuidv4()}</Bytes>`;
 	}
 }

@@ -56,6 +56,12 @@ function ProfileHeader({ address }: { address: string }) {
 			<TabsList>
 				<TabsTrigger
 					className='uppercase'
+					value={EProfileTabs.OVERVIEW}
+				>
+					{t('Profile.overview')}
+				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
 					value={EProfileTabs.ACTIVITY}
 				>
 					{t('Profile.activity')}

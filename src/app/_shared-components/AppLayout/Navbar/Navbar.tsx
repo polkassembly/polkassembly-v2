@@ -18,8 +18,10 @@ import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Input } from '@/app/_shared-components/Input';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ChevronDown } from 'lucide-react';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
+import Address from '../../Profile/Address/Address';
 
 const RPCSwitchDropdown = dynamic(() => import('../RpcSwitch/RPCSwitchDropdown'), { ssr: false });
 const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
@@ -145,10 +147,14 @@ function Navbar() {
 						<DropdownMenuTrigger>
 							<Button
 								variant='ghost'
-								className='rounded-xl border border-border_grey text-sm text-text_primary'
+								className='rounded-3xl border border-border_grey bg-wallet_disabled_bg text-sm text-text_primary'
 								size='sm'
+								rightIcon={<ChevronDown size={12} />}
 							>
-								{user.username}
+								<Address
+									address={user.addresses[0]}
+									walletAddressName={user.username}
+								/>
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent>

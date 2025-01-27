@@ -771,4 +771,9 @@ export class FirestoreService extends FirestoreRefs {
 			await post.docs[0].ref.set({ lastCommentAt }, { merge: true });
 		}
 	}
+
+	static async checkIfAddressIsLinked(address: string) {
+		const addressDocSnapshot = await FirestoreRefs.getAddressDocRefByAddress(address).get();
+		return addressDocSnapshot.exists;
+	}
 }

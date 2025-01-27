@@ -32,7 +32,6 @@ import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ClientError } from '../_client-utils/clientError';
-import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -63,7 +62,9 @@ enum EApiRoute {
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
-	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION'
+	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
+	LINK_ADDRESS_START = 'LINK_ADDRESS_START',
+	LINK_ADDRESS_CONFIRM = 'LINK_ADDRESS_CONFIRM'
 }
 
 export class NextApiClientService {
@@ -116,6 +117,14 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.LOGOUT:
 				path = '/auth/actions/logout';
+				method = 'POST';
+				break;
+			case EApiRoute.LINK_ADDRESS_START:
+				path = '/auth/actions/linkAddress/start';
+				method = 'POST';
+				break;
+			case EApiRoute.LINK_ADDRESS_CONFIRM:
+				path = '/auth/actions/linkAddress/confirm';
 				method = 'POST';
 				break;
 			// Dynamic routes
@@ -179,7 +188,7 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
-		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
+		const currentNetwork = getCurrentNetwork();
 
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
@@ -244,6 +253,16 @@ export class NextApiClientService {
 	protected static async logoutApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LOGOUT });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async linkAddressStartApi({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS_START });
+		return this.nextApiClientFetch<{ signMessage: string }>({ url, method, data: { address } });
+	}
+
+	protected static async linkAddressConfirmApi({ address, signature, signMessage, wallet }: { address: string; signature: string; signMessage: string; wallet: EWallet }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS_CONFIRM });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, signMessage, wallet } });
 	}
 
 	static async fetchListingDataApi(
