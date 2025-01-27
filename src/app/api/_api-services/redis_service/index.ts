@@ -14,7 +14,7 @@ if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
 }
 
-enum ERedisKeys {
+export enum ERedisKeys {
 	PASSWORD_RESET_TOKEN = 'PRT',
 	EMAIL_VERIFICATION_TOKEN = 'EVT',
 	TWO_FACTOR_AUTH_TOKEN = 'TFA',
@@ -22,7 +22,8 @@ enum ERedisKeys {
 	REFRESH_TOKEN = 'RFT',
 	POST_DATA = 'PDT',
 	POSTS_LISTING = 'PLT',
-	ACTIVITY_FEED = 'AFD'
+	ACTIVITY_FEED = 'AFD',
+	QR_SESSION = 'QRS'
 }
 
 export class RedisService {
@@ -47,8 +48,9 @@ export class RedisService {
 			const userPart = userId ? `-u:${userId}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			return baseKey + userPart + originsPart;
-		}
-	};
+		},
+		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`
+	} as const;
 
 	// helper methods
 
@@ -246,5 +248,18 @@ export class RedisService {
 		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-*`);
 		await this.DeleteKeys(`${ERedisKeys.POST_DATA}-${network}-*`);
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+	}
+
+	static async SetQRSession(sessionId: string, data: { userId: number; timestamp: number; expiresIn: number }): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), JSON.stringify(data), data.expiresIn);
+	}
+
+	static async GetQRSession(sessionId: string): Promise<{ userId: number; timestamp: number; expiresIn: number } | null> {
+		const data = await this.Get(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId));
+		return data ? JSON.parse(data) : null;
+	}
+
+	static async DeleteQRSession(sessionId: string): Promise<void> {
+		await this.Delete(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId));
 	}
 }
