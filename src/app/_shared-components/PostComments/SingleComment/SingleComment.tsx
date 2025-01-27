@@ -5,7 +5,7 @@
 'use client';
 
 import { EProposalType, ICommentResponse } from '@/_shared/types';
-import React, { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -34,7 +34,7 @@ function SingleComment({
 	commentData: ICommentResponse;
 	proposalType: EProposalType;
 	index: string;
-	setParentComment?: React.Dispatch<React.SetStateAction<ICommentResponse | null>>;
+	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
 }) {
 	const [reply, setReply] = useState<boolean>(false);
 	const t = useTranslations();
@@ -58,26 +58,24 @@ function SingleComment({
 			index
 		});
 
-		if (error) {
+		if (error || !data) {
 			setLoading(false);
-			throw new ClientError(error.message);
+			throw new ClientError(error?.message || 'Failed to delete comment');
 		}
 
 		setLoading(false);
 
-		if (data) {
-			setOpenDeleteModal(false);
-			if (comment.parentCommentId && setParentComment) {
-				setParentComment((prev) => {
-					if (!prev) return null;
-					return {
-						...prev,
-						children: prev.children?.filter((child) => child.id !== comment.id)
-					};
-				});
-			} else {
-				setComment(null);
-			}
+		setOpenDeleteModal(false);
+		if (comment.parentCommentId && setParentComment) {
+			setParentComment((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					children: prev.children?.filter((child) => child.id !== comment.id)
+				};
+			});
+		} else {
+			setComment(null);
 		}
 	};
 
