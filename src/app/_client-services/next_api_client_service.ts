@@ -24,7 +24,8 @@ import {
 	IPublicUser,
 	IVoteData,
 	IUserActivity,
-	IPreimage
+	IPreimage,
+	IQRSessionPayload
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -59,7 +60,9 @@ enum EApiRoute {
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
-	FETCH_PREIMAGES = 'FETCH_PREIMAGES'
+	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
+	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION'
 }
 
 export class NextApiClientService {
@@ -142,6 +145,14 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.GENERATE_QR_SESSION:
+				path = '/auth/actions/qr-session';
+				method = 'GET';
+				break;
+			case EApiRoute.CLAIM_QR_SESSION:
+				path = '/auth/actions/qr-session';
+				method = 'POST';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -375,5 +386,10 @@ export class NextApiClientService {
 	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages', hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	protected static async generateQRSessionApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
+		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
 }

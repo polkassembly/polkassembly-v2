@@ -450,14 +450,16 @@ export class OffChainDbService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
 		}
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor });
+		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
+
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
 
 		await this.saveUserActivity({
 			userId,
 			name: OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType) ? EActivityName.CREATED_OFFCHAIN_POST : EActivityName.CREATED_PROPOSAL,
 			network,
 			proposalType,
-			indexOrHash: post.indexOrHash || post.id
+			indexOrHash: post.indexOrHash
 		});
 
 		return post;

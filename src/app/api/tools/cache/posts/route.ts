@@ -6,11 +6,11 @@ import { NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { RedisService } from '../../_api-services/redis_service';
-import { withErrorHandling } from '../../_api-utils/withErrorHandling';
-import { getNetworkFromHeaders } from '../../_api-utils/getNetworkFromHeaders';
-import { APIError } from '../../_api-utils/apiError';
-import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
+import { RedisService } from '../../../_api-services/redis_service';
+import { withErrorHandling } from '../../../_api-utils/withErrorHandling';
+import { getNetworkFromHeaders } from '../../../_api-utils/getNetworkFromHeaders';
+import { APIError } from '../../../_api-utils/apiError';
+import { TOOLS_PASSPHRASE } from '../../../_api-constants/apiEnvVars';
 
 export const DELETE = withErrorHandling(async (): Promise<NextResponse> => {
 	const readonlyHeaders = await headers();
