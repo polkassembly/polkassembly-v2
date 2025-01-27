@@ -292,6 +292,17 @@ export interface IPostOffChainMetrics {
 	comments: number;
 }
 
+export enum EAllowedCommentor {
+	ALL = 'all',
+	ONCHAIN_VERIFIED = 'onchain_verified',
+	NONE = 'none'
+}
+
+export interface IPostLink {
+	indexOrHash: string;
+	proposalType: EProposalType;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -299,7 +310,7 @@ export interface IOffChainPost {
 	userId?: number;
 	title?: string;
 	content?: OutputData;
-	htmlContent: string; // TODO: make this optional
+	htmlContent: string;
 	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -308,6 +319,11 @@ export interface IOffChainPost {
 	proposalType: EProposalType;
 	network: ENetwork;
 	metrics?: IPostOffChainMetrics;
+	allowedCommentor: EAllowedCommentor;
+	lastCommentAt?: Date;
+	isDeleted: boolean;
+	createdOnPolkassembly?: boolean;
+	linkedPost?: IPostLink;
 }
 
 export enum EProposalStatus {
@@ -715,4 +731,10 @@ export interface IPreimage {
 	status: string;
 	updatedAt: string;
 	updatedAtBlock: number | null;
+}
+
+export interface IQRSessionPayload {
+	sessionId: string;
+	timestamp: number;
+	expiresIn: number;
 }

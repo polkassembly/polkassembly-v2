@@ -23,6 +23,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -179,7 +180,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		// fetch vote counts for each post
 		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number }) => {
-			if (!proposal.index) {
+			if (!ValidatorService.isValidNumber(proposal.index)) {
 				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index for proposal');
 			}
 

@@ -44,6 +44,11 @@ export function convertContentForFirestoreServer(content: string | Record<string
 		contentBlocks = convertHtmlToEditorJsServer(content as string).blocks;
 	}
 
+	// if is plain text
+	if (typeof content === 'string') {
+		contentBlocks = convertMarkdownToEditorJsServer(content).blocks;
+	}
+
 	if (!contentBlocks.length) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid content');
 	}

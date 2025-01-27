@@ -8,7 +8,17 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EDataSource, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IOffChainPost, IOnChainPostListing, IPostListing } from '@shared/types';
+import {
+	EAllowedCommentor,
+	EDataSource,
+	EPostOrigin,
+	EProposalStatus,
+	EProposalType,
+	IGenericListingResponse,
+	IOffChainPost,
+	IOnChainPostListing,
+	IPostListing
+} from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -157,10 +167,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content')
+		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
 	});
 
-	const { content, title } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
@@ -173,7 +184,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		proposalType,
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content: formattedContent,
-		title
+		title,
+		allowedCommentor
 	});
 
 	// Invalidate post listings since a new post was added

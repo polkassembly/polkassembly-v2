@@ -222,4 +222,8 @@ export class ValidatorService {
 	static isValidBlockContent(content: OutputData): boolean {
 		return content.blocks.length > 0;
 	}
+
+	static isValidNumber(number: unknown): boolean {
+		return number !== null && number !== undefined && Number.isFinite(Number(number));
+	}
 }

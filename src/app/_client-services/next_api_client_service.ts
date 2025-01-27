@@ -24,11 +24,15 @@ import {
 	IPublicUser,
 	IVoteData,
 	IUserActivity,
-	IPreimage
+	IPreimage,
+	IQRSessionPayload
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ClientError } from '../_client-utils/clientError';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -57,7 +61,9 @@ enum EApiRoute {
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
-	DELETE_COMMENT = 'DELETE_COMMENT'
+	DELETE_COMMENT = 'DELETE_COMMENT',
+	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
+	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION'
 }
 
 export class NextApiClientService {
@@ -144,6 +150,14 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_COMMENT:
 				method = 'DELETE';
 				break;
+			case EApiRoute.GENERATE_QR_SESSION:
+				path = '/auth/actions/qr-session';
+				method = 'GET';
+				break;
+			case EApiRoute.CLAIM_QR_SESSION:
+				path = '/auth/actions/qr-session';
+				method = 'POST';
+				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
 		}
@@ -165,13 +179,15 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
+		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
+
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-api-key': process.env.NEXT_PUBLIC_POLKASSEMBLY_API_KEY || '',
-				'x-network': process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ''
+				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				'x-network': currentNetwork
 			},
 			method
 		});
@@ -379,5 +395,10 @@ export class NextApiClientService {
 	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages', hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	protected static async generateQRSessionApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
+		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
 }
