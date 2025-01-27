@@ -14,7 +14,7 @@ if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
 }
 
-export enum ERedisKeys {
+enum ERedisKeys {
 	PASSWORD_RESET_TOKEN = 'PRT',
 	EMAIL_VERIFICATION_TOKEN = 'EVT',
 	TWO_FACTOR_AUTH_TOKEN = 'TFA',
