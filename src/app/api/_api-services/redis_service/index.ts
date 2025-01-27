@@ -54,13 +54,13 @@ export class RedisService {
 
 	// helper methods
 
-	private static async Get(key: string): Promise<string | null> {
-		if (!IS_CACHE_ENABLED) return null;
+	private static async Get(key: string, forceCache?: boolean): Promise<string | null> {
+		if (!IS_CACHE_ENABLED && !forceCache) return null;
 		return this.client.get(key);
 	}
 
-	private static async Set(key: string, value: string, ttlSeconds?: number): Promise<string | null> {
-		if (!IS_CACHE_ENABLED) return null;
+	private static async Set(key: string, value: string, ttlSeconds?: number, forceCache?: boolean): Promise<string | null> {
+		if (!IS_CACHE_ENABLED && !forceCache) return null;
 
 		if (ttlSeconds) {
 			return this.client.set(key, value, 'EX', ttlSeconds);
@@ -69,14 +69,14 @@ export class RedisService {
 		return this.client.set(key, value);
 	}
 
-	private static async Delete(key: string): Promise<number> {
-		if (!IS_CACHE_ENABLED) return 0;
+	private static async Delete(key: string, forceCache?: boolean): Promise<number> {
+		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
 		return this.client.del(key);
 	}
 
-	private static async DeleteKeys(pattern: string): Promise<void> {
-		if (!IS_CACHE_ENABLED) return;
+	private static async DeleteKeys(pattern: string, forceCache?: boolean): Promise<void> {
+		if (!IS_CACHE_ENABLED && !forceCache) return;
 
 		const stream = this.client.scanStream({
 			count: 200,
@@ -101,27 +101,27 @@ export class RedisService {
 
 	// static methods
 	static async SetEmailVerificationToken(token: string, email: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY);
+		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY, true);
 	}
 
 	static async SetRefreshToken(userId: number, refreshToken: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), refreshToken, REFRESH_TOKEN_LIFE_IN_SECONDS);
+		await this.Set(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), refreshToken, REFRESH_TOKEN_LIFE_IN_SECONDS, true);
 	}
 
 	static async GetRefreshToken(userId: number): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId));
+		return this.Get(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), true);
 	}
 
 	static async DeleteRefreshToken(userId: number): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId));
+		await this.Delete(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), true);
 	}
 
 	static async SetTfaToken(tfaToken: string, userId: number): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), userId.toString(), FIVE_MIN);
+		await this.Set(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), userId.toString(), FIVE_MIN, true);
 	}
 
 	static async GetTfaToken(tfaToken: string): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken));
+		return this.Get(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), true);
 	}
 
 	static async GetSubscanData(network: string, url: string): Promise<string | null> {
@@ -133,16 +133,16 @@ export class RedisService {
 	}
 
 	static async SetResetPasswordToken(token: string, userId: number): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), userId.toString(), ONE_DAY);
+		await this.Set(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), userId.toString(), ONE_DAY, true);
 	}
 
 	static async GetUserIdFromResetPasswordToken(token: string): Promise<number | null> {
-		const userId = await this.Get(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
+		const userId = await this.Get(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), true);
 		return userId ? Number(userId) : null;
 	}
 
 	static async DeleteResetPasswordToken(token: string): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
+		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), true);
 	}
 
 	// Posts caching methods
@@ -250,16 +250,18 @@ export class RedisService {
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
 	}
 
+	// QR session caching methods
+
 	static async SetQRSession(sessionId: string, data: { userId: number; timestamp: number; expiresIn: number }): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), JSON.stringify(data), data.expiresIn);
+		await this.Set(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), JSON.stringify(data), data.expiresIn, true);
 	}
 
 	static async GetQRSession(sessionId: string): Promise<{ userId: number; timestamp: number; expiresIn: number } | null> {
-		const data = await this.Get(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId));
+		const data = await this.Get(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), true);
 		return data ? JSON.parse(data) : null;
 	}
 
 	static async DeleteQRSession(sessionId: string): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId));
+		await this.Delete(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), true);
 	}
 }
