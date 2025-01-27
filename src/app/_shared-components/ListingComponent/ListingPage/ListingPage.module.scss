@@ -7,11 +7,11 @@
 }
 
 .title {
-    @apply lg:text-2xl text-lg font-bold;
+    @apply lg:text-2xl text-lg font-bold text-btn_secondary_text;
 }
 
 .subtitle {
-    @apply text-sm text-gray-600 pt-5;
+    @apply text-sm text-gray-600 pt-5 text-btn_secondary_text;
 }
 
 .button {

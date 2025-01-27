@@ -16,6 +16,8 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
+
+	if (!user || !user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')) return null;
 	return (
 		<Dialog
 			open={isOpen}
