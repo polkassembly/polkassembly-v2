@@ -732,3 +732,9 @@ export interface IPreimage {
 	updatedAt: string;
 	updatedAtBlock: number | null;
 }
+
+export interface IQRSessionPayload {
+	sessionId: string;
+	timestamp: number;
+	expiresIn: number;
+}
