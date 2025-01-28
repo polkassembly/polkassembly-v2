@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { IPublicUser } from '@/_shared/types';
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
@@ -13,6 +13,7 @@ import LinkAddress from './LinkAddress/LinkAddress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 
 function Overview({ profileData }: { profileData: IPublicUser }) {
+	const [userProfile, setUserProfile] = useState<IPublicUser>(profileData);
 	const t = useTranslations();
 	const { user } = useUser();
 	return (
@@ -40,13 +41,20 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 								<DialogHeader>
 									<DialogTitle>Link Address</DialogTitle>
 								</DialogHeader>
-								<LinkAddress />
+								<LinkAddress
+									onSuccess={(address) => {
+										setUserProfile({
+											...userProfile,
+											addresses: [...userProfile.addresses, address]
+										});
+									}}
+								/>
 							</DialogContent>
 						</Dialog>
 					)}
 				</div>
 				<div className='flex flex-col gap-y-2'>
-					{profileData.addresses.map((address) => (
+					{userProfile.addresses.map((address) => (
 						<Address
 							key={address}
 							address={address}

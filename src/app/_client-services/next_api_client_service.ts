@@ -63,8 +63,7 @@ enum EApiRoute {
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
-	LINK_ADDRESS_START = 'LINK_ADDRESS_START',
-	LINK_ADDRESS_CONFIRM = 'LINK_ADDRESS_CONFIRM'
+	LINK_ADDRESS = 'LINK_ADDRESS'
 }
 
 export class NextApiClientService {
@@ -119,12 +118,8 @@ export class NextApiClientService {
 				path = '/auth/actions/logout';
 				method = 'POST';
 				break;
-			case EApiRoute.LINK_ADDRESS_START:
-				path = '/auth/actions/linkAddress/start';
-				method = 'POST';
-				break;
-			case EApiRoute.LINK_ADDRESS_CONFIRM:
-				path = '/auth/actions/linkAddress/confirm';
+			case EApiRoute.LINK_ADDRESS:
+				path = '/auth/actions/linkAddress';
 				method = 'POST';
 				break;
 			// Dynamic routes
@@ -255,14 +250,9 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	protected static async linkAddressStartApi({ address }: { address: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS_START });
-		return this.nextApiClientFetch<{ signMessage: string }>({ url, method, data: { address } });
-	}
-
-	protected static async linkAddressConfirmApi({ address, signature, signMessage, wallet }: { address: string; signature: string; signMessage: string; wallet: EWallet }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS_CONFIRM });
-		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, signMessage, wallet } });
+	protected static async linkAddressApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, wallet } });
 	}
 
 	static async fetchListingDataApi(

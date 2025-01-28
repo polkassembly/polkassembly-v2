@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { EWallet } from '@/_shared/types';
@@ -31,7 +32,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	const bodyRaw = await getReqBody(req);
 
-	const { address, signature, signMessage, wallet } = zodBodySchema.parse(bodyRaw);
+	const { address, signature, wallet } = zodBodySchema.parse(bodyRaw);
 
 	const formattedAddress = ValidatorService.isValidEVMAddress(address) ? address : getSubstrateAddress(address);
 	if (!formattedAddress) throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid address');
@@ -42,7 +43,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Address already linked');
 	}
 
-	const isValidSignature = await ValidatorService.isValidSignatureForMessage(address, signature, signMessage);
+	const isValidSignature = await ValidatorService.isValidSignatureForMessage(address, signature, WEB3_AUTH_SIGN_MESSAGE);
 
 	if (!isValidSignature) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid signature');
