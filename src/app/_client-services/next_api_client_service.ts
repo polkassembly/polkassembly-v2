@@ -25,7 +25,10 @@ import {
 	IVoteData,
 	IUserActivity,
 	IPreimage,
-	IQRSessionPayload
+	IQRSessionPayload,
+	ITag,
+	EAllowedCommentor,
+	EOffchainPostTopic
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -63,7 +66,10 @@ enum EApiRoute {
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
-	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION'
+	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
+	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
+	CREATE_TAGS = 'CREATE_TAGS',
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
 }
 
 export class NextApiClientService {
@@ -127,6 +133,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
+			case EApiRoute.CREATE_OFFCHAIN_POST:
+				method = 'POST';
+				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
@@ -157,6 +166,14 @@ export class NextApiClientService {
 			case EApiRoute.CLAIM_QR_SESSION:
 				path = '/auth/actions/qr-session';
 				method = 'POST';
+				break;
+			case EApiRoute.FETCH_ALL_TAGS:
+				method = 'GET';
+				path = '/meta/tags';
+				break;
+			case EApiRoute.CREATE_TAGS:
+				method = 'POST';
+				path = '/meta/tags';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -400,5 +417,32 @@ export class NextApiClientService {
 	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
+	}
+	static async fetchAllTagsApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
+		return this.nextApiClientFetch<ITag[]>({ url, method });
+	}
+
+	static async createTagsApi(tags: string[]) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_TAGS });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
+	}
+	static async createOffChainPostApi({
+		proposalType,
+		allowedCommentor,
+		content,
+		title,
+		tags,
+		topic
+	}: {
+		proposalType: EProposalType;
+		content: OutputData;
+		title: string;
+		allowedCommentor: EAllowedCommentor;
+		tags?: string[];
+		topic?: EOffchainPostTopic;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
+		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
 	}
 }

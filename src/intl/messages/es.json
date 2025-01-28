@@ -443,5 +443,27 @@
 		"showAll": "Mostrar todos",
 		"searchByHash": "Buscar por hash",
 		"preimageNotFound": "Vorabbild nicht gefunden"
+	},
+	"Create": {
+		"createDiscussionTitle": "Create Discussion",
+		"title": "Title",
+		"description": "Description",
+		"create": "Create",
+		"createTag": "Create Tag",
+		"addTags": "Add Tags",
+		"searchTags": "Search tags",
+		"noTagsFound": "No tags found.",
+		"selectTags": "Select tags",
+		"selectTopic": "Select Topic",
+		"tagsLeftText": "Tags left",
+		"allowCommentors": {
+			"title": "Who can comment ?",
+			"all": "All",
+			"onchainVerified": "Onchain Verified",
+			"none": "None",
+			"tooltip": "Choose who can comment and reply to this post"
+		}
 	}
 }
+
+

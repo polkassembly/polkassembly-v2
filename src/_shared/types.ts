@@ -303,6 +303,17 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
+export enum EOffchainPostTopic {
+	GENERAL = 'general',
+	AUCTION_ADMIN = 'auction_admin',
+	GENERAL_ADMIN = 'general_admin',
+	GOVERNANCE = 'governance',
+	ROOT = 'root',
+	STAKING_ADMIN = 'staking_admin',
+	TREASURY = 'treasury',
+	FELLOWSHIP = 'fellowship'
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -324,6 +335,7 @@ export interface IOffChainPost {
 	isDeleted: boolean;
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
+	topic?: EOffchainPostTopic;
 }
 
 export enum EProposalStatus {
@@ -737,4 +749,16 @@ export interface IQRSessionPayload {
 	sessionId: string;
 	timestamp: number;
 	expiresIn: number;
+}
+export interface IWritePostFormFields {
+	title: string;
+	description: OutputData;
+	tags: { value: string; label: string }[];
+	topic: EOffchainPostTopic;
+	allowCommentors: EAllowedCommentor;
+}
+
+export interface ITag {
+	lastUsedAt: Date;
+	name: string;
 }

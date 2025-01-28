@@ -443,5 +443,27 @@
 		"showAll": "すべて表示",
 		"searchByHash": "ハッシュで検索",
 		"preimageNotFound": "プレイメージが見つかりません"
+	},
+	"Create": {
+		"createDiscussionTitle": "Create Discussion",
+		"title": "Title",
+		"description": "Description",
+		"create": "Create",
+		"createTag": "Create Tag",
+		"addTags": "Add Tags",
+		"searchTags": "Search tags",
+		"noTagsFound": "No tags found.",
+		"selectTags": "Select tags",
+		"selectTopic": "Select Topic",
+		"tagsLeftText": "Tags left",
+		"allowCommentors": {
+			"title": "誰がコメントできますか？",
+			"all": "すべて",
+			"onchainVerified": "オンチェーン検証済み",
+			"none": "なし",
+			"tooltip": "誰がコメントと返信できるか選択"
+		}
 	}
 }
+
+

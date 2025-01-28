@@ -1,0 +1,42 @@
+  
+.container{
+        @apply flex gap-2 w-full;
+    }
+.noTagFoundText{
+    @apply text-basic_text text-sm flex items-center justify-center py-6;
+}
+.commandInput{
+    div{
+        @apply border-none text-text_grey text-sm border-pink-500;
+    }
+}
+.command {
+    @apply border-white;
+    div{
+        @apply text-basic_text text-sm border-basic_text;
+    }
+    }
+    .popoverContent {
+        @apply w-56 border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-2 border-none shadow-md z-50 ;
+    }
+    .addTagInput{
+        @apply text-muted-foreground text-input_text;
+    }
+    .addTagButton{
+        @apply flex gap-1;
+    }
+    .popoverTrigger{
+        @apply w-full justify-between hover:bg-transparent h-auto border-post_btn_bg border-solid border-[1px] flex items-center text-sm py-1 min-h-9 rounded-md px-2 ;
+    }
+    .tagLabel{
+        @apply inline-flex cursor-pointer items-center gap-1 rounded-md bg-secondary px-2 text-sm text-secondary-foreground;
+    }
+    .tagRemoveButton{
+        @apply rounded-sm bg-btn_primary_background h-4 w-3 hover:bg-transparent bg-transparent px-1;
+    }
+    .selectTagsText{
+        @apply text-muted-foreground text-basic_text;
+    }
+    .commandItem{
+        @apply cursor-pointer;;
+    }

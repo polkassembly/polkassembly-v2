@@ -20,7 +20,8 @@ import {
 	EActivityName,
 	EActivityCategory,
 	IActivityMetadata,
-	EAllowedCommentor
+	EAllowedCommentor,
+	EOffchainPostTopic
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -247,8 +248,7 @@ export class OffChainDbService {
 		subActivityName?: EActivityName;
 	}) {
 		// TODO: calculate score based on activity name and sub activity name
-		console.log('TODO: calculateProfileScoreIncrement fire and forget a cloud function maybe ?');
-		console.log({ userId, activityName, activityMetadata, subActivityName });
+		console.log('TODO: calculateProfileScoreIncrement fire and forget a cloud function maybe ?', { userId, activityName, activityMetadata, subActivityName });
 		return 1;
 	}
 
@@ -437,7 +437,9 @@ export class OffChainDbService {
 		userId,
 		content,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -445,6 +447,8 @@ export class OffChainDbService {
 		content: OutputData;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: string[];
+		topic?: EOffchainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -452,7 +456,7 @@ export class OffChainDbService {
 
 		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, tags: tags || [], topic, indexOrHash: index.toString() });
 
 		await this.saveUserActivity({
 			userId,
@@ -542,5 +546,13 @@ export class OffChainDbService {
 
 	static async UpdateUserPassword(userId: number, password: string, salt: string) {
 		return FirestoreService.UpdateUserPassword(userId, password, salt);
+	}
+
+	static async GetAllTags() {
+		return FirestoreService.GetAllTags();
+	}
+
+	static async CreateTags(tags: string[]) {
+		return FirestoreService.CreateTags(tags);
 	}
 }

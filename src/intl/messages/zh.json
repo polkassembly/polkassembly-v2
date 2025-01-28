@@ -443,5 +443,25 @@
 		"showAll": "显示全部",
 		"searchByHash": "按哈希搜索",
 		"preimageNotFound": "预映像未找到"
+	},
+	"Create": {
+		"createDiscussionTitle": "创建讨论",
+		"title": "标题",
+		"description": "描述",
+		"create": "创建",
+		"createTag": "创建标签",
+		"addTags": "添加标签",
+		"searchTags": "搜索标签",
+		"noTagsFound": "未找到标签。",
+		"selectTags": "选择标签",
+		"selectTopic": "选择主题",
+		"tagsLeftText": "标签剩余",
+		"allowCommentors": {
+			"title": "谁可以评论 ？",
+			"all": "全部",
+			"onchainVerified": "链上验证",
+			"none": "无",
+			"tooltip": "选择谁可以评论和回复此帖子"
+		}
 	}
 }

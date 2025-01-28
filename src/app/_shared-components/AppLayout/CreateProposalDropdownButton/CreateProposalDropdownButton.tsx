@@ -23,7 +23,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 	const menuItems = [
 		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
 		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '#' }
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '/create/discussion' }
 	];
 
 	const { resolvedTheme: theme } = useTheme();

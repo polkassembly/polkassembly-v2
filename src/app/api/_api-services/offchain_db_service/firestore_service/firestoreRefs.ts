@@ -48,6 +48,8 @@ export class FirestoreRefs {
 
 	protected static userActivityCollectionRef = () => this.firestoreDb.collection('user_activities');
 
+	protected static tagsCollectionRef = () => this.firestoreDb.collection('tags');
+
 	// document reference methods
 	protected static getUserDocRefById = (userId: number) => this.usersCollectionRef().doc(userId.toString());
 
