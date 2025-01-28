@@ -319,7 +319,12 @@
 			"section": "Sección",
 			"name": "Nombre",
 			"value": "Valor"
-		}
+		},
+		"deleteComment": "Eliminar comentario",
+		"deleteCommentConfirmation": "¿Estás seguro de que quieres eliminar este comentario?",
+		"delete": "Eliminar",
+		"hideReplies": "Ocultar respuestas",
+		"viewReplies": "Ver respuestas"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

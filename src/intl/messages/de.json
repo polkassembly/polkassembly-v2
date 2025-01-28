@@ -319,7 +319,12 @@
 			"section": "Abschnitt",
 			"name": "Name",
 			"value": "Wert"
-		}
+		},
+		"deleteComment": "Kommentar löschen",
+		"deleteCommentConfirmation": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?",
+		"delete": "Löschen",
+		"hideReplies": "Antworten ausblenden",
+		"viewReplies": "Antworten anzeigen"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
