@@ -99,21 +99,6 @@ export class ValidatorService {
 		}
 	}
 
-	static async isValidSignatureForMessage(address: string, signature: string, message: string): Promise<boolean> {
-		try {
-			if (!this.isValidSubstrateAddress(address)) {
-				return false;
-			}
-
-			const publicKey = await getSubstrateAddressPublicKey(address);
-
-			await cryptoWaitReady();
-			return signatureVerify(message, signature, publicKey).isValid;
-		} catch {
-			return false;
-		}
-	}
-
 	static isValidUserId(userId: number): boolean {
 		return !isNaN(userId) && userId > 0;
 	}

@@ -25,7 +25,6 @@ import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetail
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
 import { cookies } from 'next/headers';
-import { v4 as uuidv4 } from 'uuid';
 import { OffChainDbService } from '../offchain_db_service';
 import { RedisService } from '../redis_service';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
@@ -615,7 +614,19 @@ export class AuthService {
 		await RedisService.DeleteResetPasswordToken(token);
 	}
 
-	static async getLinkAddressSignMessage(address: string) {
-		return address.startsWith('0x') ? `Link account with polkassembly ${uuidv4()}` : `<Bytes>${uuidv4()}</Bytes>`;
+	static async LinkAddress({ address, wallet, network }: { address: string; wallet: EWallet; network: ENetwork }) {
+		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		const userId = this.GetUserIdFromAccessToken(newAccessToken);
+
+		if (!userId) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
+		}
+
+		await OffChainDbService.AddNewAddress({ address, userId, isDefault: false, wallet, network });
+
+		return {
+			newAccessToken,
+			newRefreshToken
+		};
 	}
 }

@@ -151,10 +151,14 @@ function Navbar() {
 								size='sm'
 								rightIcon={<ChevronDown size={12} />}
 							>
-								<Address
-									address={user.addresses[0]}
-									walletAddressName={user.username}
-								/>
+								{user.addresses && user.addresses.length > 0 ? (
+									<Address
+										address={user.addresses[0]}
+										walletAddressName={user.username}
+									/>
+								) : (
+									<p>{user.username}</p>
+								)}
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent>

@@ -32,6 +32,7 @@ import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ClientError } from '../_client-utils/clientError';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -119,7 +120,7 @@ export class NextApiClientService {
 				method = 'POST';
 				break;
 			case EApiRoute.LINK_ADDRESS:
-				path = '/auth/actions/linkAddress';
+				path = '/auth/actions/link-address';
 				method = 'POST';
 				break;
 			// Dynamic routes
@@ -183,7 +184,7 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
-		const currentNetwork = getCurrentNetwork();
+		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
 
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
