@@ -120,6 +120,13 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			<button
 				type='button'
 				className={styles.button}
+				onClick={() => {
+					if (proposalType === EProposalType.DISCUSSION) {
+						router.push('/create/discussion');
+					} else {
+						router.push('/create/treasury-proposal');
+					}
+				}}
 			>
 				<span className='text-xl'>+</span>
 				<span className='whitespace-nowrap text-sm'>{t(`CreateProposalDropdownButton.create${proposalType === EProposalType.DISCUSSION ? 'Post' : 'Proposal'}`)}</span>
