@@ -13,7 +13,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { OutputData } from '@editorjs/editorjs';
 import { useRouter } from 'next/navigation';
 import classes from './CreateDiscussion.module.scss';
-import HeaderLabel from '../HeaderLable';
+import HeaderLabel from '../HeaderLabel';
 
 function CreateDiscussion({ isModal }: { isModal?: boolean }) {
 	const router = useRouter();

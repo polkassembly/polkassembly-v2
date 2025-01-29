@@ -7,7 +7,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import HeaderLabel from '@/app/create/discussion/Component/HeaderLable';
+import HeaderLabel from '@/app/create/discussion/Component/HeaderLabel';
 import CreateDiscussion from '@/app/create/discussion/Component/CreateDiscussion/CreateDiscussion';
 import classes from './discussion.module.scss';
 
