@@ -17,13 +17,15 @@ import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import style from './CreateProposalDropdownButton.module.scss';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
+	const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 	const menuItems = [
 		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
 		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '/create/discussion' }
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: accessTokenPayload ? '/create/discussion' : '/login?nextUrl=create/discussion' }
 	];
 
 	const { resolvedTheme: theme } = useTheme();

@@ -148,7 +148,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		setUserPreferencesAtom({
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
-			// address: user?.defaultAddress, TODO: fix this @aadarsh012
+			address: {address: user?.loginAddress || user?.addresses?.[0] || '', name: user?.username}, //TODO: fix this @aadarsh012
 			wallet: user?.loginWallet
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps

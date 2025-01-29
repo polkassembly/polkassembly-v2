@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 
 // Constants
 enum EListingTabState {
@@ -35,6 +36,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const searchParams = useSearchParams();
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
+	const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
 	const STATUSES = [
 		t('ListingPage_Status.Cancelled'),
@@ -122,9 +124,9 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 				className={styles.button}
 				onClick={() => {
 					if (proposalType === EProposalType.DISCUSSION) {
-						router.push('/create/discussion');
+						router.push(!accessTokenPayload?'/login?nextUrl=create/discussion':'/create/discussion');
 					} else {
-						router.push('/create/treasury-proposal');
+						router.push(!accessTokenPayload ? '/login?nextUrl=create/treasury-proposal' : '/create/treasury-proposal');
 					}
 				}}
 			>
