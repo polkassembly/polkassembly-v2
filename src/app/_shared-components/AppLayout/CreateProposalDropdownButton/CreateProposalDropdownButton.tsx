@@ -7,22 +7,19 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
-import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
-import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
 import { useTheme } from 'next-themes';
 import { ETheme } from '@/_shared/types';
-import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import style from './CreateProposalDropdownButton.module.scss';
-import { Icon } from '../../Icon';
+import { Icon, IconName } from '../../Icon';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
 	const menuItems = [
-		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '#' }
+		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: 'sidebar/treasury-proposal', url: '#' },
+		{ title: t('CreateProposalDropdownButton.proposal'), icon: 'sidebar/proposal-icon', url: '#' },
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: 'sidebar/discussion-icon', url: '#' }
 	];
 
 	const { resolvedTheme: theme } = useTheme();
@@ -56,8 +53,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 								className={style.menuItem}
 							>
 								<Icon
-									name={item.icon}
-									className={`${theme === ETheme.DARK ? 'dark-icons' : ''}`}
+									name={item.icon as IconName}
+									className={`h-5 w-5 ${theme === ETheme.DARK ? 'dark-icons' : ''}`}
 								/>
 
 								<Link
