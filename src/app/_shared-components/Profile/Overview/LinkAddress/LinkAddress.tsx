@@ -11,9 +11,12 @@ import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/Wall
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import classes from './LinkAddress.module.scss';
 
 function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
+	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
 	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(userPreferences?.wallet || EWallet.POLKADOT);
 	const [selectedAccount, setSelectedAccount] = useState<InjectedAccount | null>(userPreferences?.address || null);
@@ -56,19 +59,19 @@ function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
 	};
 
 	return (
-		<div className='flex flex-col gap-y-4'>
+		<div className={classes.wrapper}>
 			<WalletButtons
 				small
 				onWalletChange={(wallet) => setSelectedWallet(wallet)}
 			/>
 			<AddressDropdown onChange={(account) => setSelectedAccount(account)} />
 			<Separator />
-			<div className='flex justify-end'>
+			<div className={classes.footer}>
 				<Button
 					isLoading={loading}
 					onClick={handleAddressLink}
 				>
-					Link Address
+					{t('Profile.linkAddress')}
 				</Button>
 			</div>
 		</div>
