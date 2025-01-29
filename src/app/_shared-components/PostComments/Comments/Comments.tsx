@@ -32,7 +32,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 
 	return (
 		<div className={classes.wrapper}>
-			<div className='px-6'>
+			<div className='flex flex-col gap-y-4 px-6'>
 				{commentsToShow.map((item) => (
 					<SingleComment
 						proposalType={proposalType}

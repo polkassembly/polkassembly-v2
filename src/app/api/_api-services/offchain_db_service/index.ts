@@ -19,7 +19,8 @@ import {
 	IUserActivity,
 	EActivityName,
 	EActivityCategory,
-	IActivityMetadata
+	IActivityMetadata,
+	EAllowedCommentor
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -131,7 +132,7 @@ export class OffChainDbService {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		return {
-			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && !isNaN(Number(indexOrHash)) ? Number(indexOrHash) : undefined,
+			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && ValidatorService.isValidNumber(indexOrHash) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 			title: DEFAULT_POST_TITLE,
 			content,
@@ -141,7 +142,9 @@ export class OffChainDbService {
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,
 			network,
-			metrics: postMetrics
+			metrics: postMetrics,
+			allowedCommentor: EAllowedCommentor.ALL,
+			isDeleted: false
 		} as IOffChainPost;
 	}
 
@@ -341,6 +344,13 @@ export class OffChainDbService {
 		parentCommentId?: string;
 		address?: string;
 	}) {
+		// check if the post is allowed to be commented on
+		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
+		if (post.allowedCommentor === EAllowedCommentor.NONE) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Post is not allowed to be commented on');
+		}
+		// TODO: implement on-chain check
+
 		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
 
 		await this.saveUserActivity({
@@ -349,8 +359,10 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, parentCommentId }
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) }
 		});
+
+		await FirestoreService.UpdateLastCommentAtPost({ network, indexOrHash, proposalType, lastCommentAt: comment.createdAt });
 
 		return comment;
 	}
@@ -424,26 +436,30 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
 		content: OutputData;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
 		}
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title });
+		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
+
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
 
 		await this.saveUserActivity({
 			userId,
 			name: OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType) ? EActivityName.CREATED_OFFCHAIN_POST : EActivityName.CREATED_PROPOSAL,
 			network,
 			proposalType,
-			indexOrHash: post.indexOrHash || post.id
+			indexOrHash: post.indexOrHash
 		});
 
 		return post;
@@ -455,7 +471,8 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -463,6 +480,7 @@ export class OffChainDbService {
 		userId: number;
 		content: OutputData;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}) {
 		const postData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
@@ -474,7 +492,7 @@ export class OffChainDbService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 		}
 
-		await FirestoreService.UpdatePost({ id: postData.id, content, title });
+		await FirestoreService.UpdatePost({ id: postData.id, content, title, allowedCommentor });
 	}
 
 	static async UpdateOnChainPost({
@@ -483,7 +501,8 @@ export class OffChainDbService {
 		proposalType,
 		userId,
 		content,
-		title
+		title,
+		allowedCommentor
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -491,6 +510,7 @@ export class OffChainDbService {
 		userId: number;
 		content: OutputData;
 		title: string;
+		allowedCommentor: EAllowedCommentor;
 	}) {
 		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
 		if (!onChainPostInfo || !onChainPostInfo.proposer) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
@@ -506,8 +526,8 @@ export class OffChainDbService {
 		// check if offchain post context exists
 		const offChainPostData = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
 
-		if (!offChainPostData) {
-			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title });
+		if (!offChainPostData?.id) {
+			await FirestoreService.CreatePost({ network, proposalType, userId, content, indexOrHash, title, allowedCommentor });
 			await this.saveUserActivity({
 				userId,
 				name: EActivityName.ADDED_CONTEXT_TO_PROPOSAL,
@@ -516,7 +536,7 @@ export class OffChainDbService {
 				indexOrHash
 			});
 		} else {
-			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title });
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title, allowedCommentor: offChainPostData.allowedCommentor });
 		}
 	}
 

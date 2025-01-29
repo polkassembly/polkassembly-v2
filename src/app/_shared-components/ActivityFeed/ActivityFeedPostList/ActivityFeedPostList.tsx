@@ -8,13 +8,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { EPostOrigin, IActivityFeedPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
-import Loading from '@/app/loading';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { SLATE_TIME } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
@@ -28,7 +28,8 @@ function ActivityFeedPostList() {
 
 	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, origin === 'All' ? undefined : origin, 10);
+		const formattedOrigin = origin === 'All' ? undefined : origin.replace(/\s+/g, '');
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, formattedOrigin as EPostOrigin, 10);
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
@@ -90,7 +91,9 @@ function ActivityFeedPostList() {
 				setCurrentTab={setOrigin}
 			/>
 			{isLoading ? (
-				<Loading />
+				<div className='flex h-full items-center justify-center'>
+					<LoadingSpinner />
+				</div>
 			) : filteredPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image

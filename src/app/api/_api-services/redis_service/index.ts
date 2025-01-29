@@ -2,11 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { REDIS_URL } from '@api/_api-constants/apiEnvVars';
+import { IS_CACHE_ENABLED, REDIS_URL } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
+import { ENetwork } from '@/_shared/types';
 import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -21,7 +22,8 @@ enum ERedisKeys {
 	REFRESH_TOKEN = 'RFT',
 	POST_DATA = 'PDT',
 	POSTS_LISTING = 'PLT',
-	ACTIVITY_FEED = 'AFD'
+	ACTIVITY_FEED = 'AFD',
+	QR_SESSION = 'QRS'
 }
 
 export class RedisService {
@@ -46,16 +48,20 @@ export class RedisService {
 			const userPart = userId ? `-u:${userId}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			return baseKey + userPart + originsPart;
-		}
-	};
+		},
+		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`
+	} as const;
 
 	// helper methods
 
-	private static async Get(key: string): Promise<string | null> {
+	private static async Get(key: string, forceCache?: boolean): Promise<string | null> {
+		if (!IS_CACHE_ENABLED && !forceCache) return null;
 		return this.client.get(key);
 	}
 
-	private static async Set(key: string, value: string, ttlSeconds?: number): Promise<string | null> {
+	private static async Set(key: string, value: string, ttlSeconds?: number, forceCache?: boolean): Promise<string | null> {
+		if (!IS_CACHE_ENABLED && !forceCache) return null;
+
 		if (ttlSeconds) {
 			return this.client.set(key, value, 'EX', ttlSeconds);
 		}
@@ -63,11 +69,15 @@ export class RedisService {
 		return this.client.set(key, value);
 	}
 
-	private static async Delete(key: string): Promise<number> {
+	private static async Delete(key: string, forceCache?: boolean): Promise<number> {
+		if (!IS_CACHE_ENABLED && !forceCache) return 0;
+
 		return this.client.del(key);
 	}
 
-	private static async DeleteKeys(pattern: string): Promise<void> {
+	private static async DeleteKeys(pattern: string, forceCache?: boolean): Promise<void> {
+		if (!IS_CACHE_ENABLED && !forceCache) return;
+
 		const stream = this.client.scanStream({
 			count: 200,
 			match: pattern
@@ -91,27 +101,27 @@ export class RedisService {
 
 	// static methods
 	static async SetEmailVerificationToken(token: string, email: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY);
+		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY, true);
 	}
 
 	static async SetRefreshToken(userId: number, refreshToken: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), refreshToken, REFRESH_TOKEN_LIFE_IN_SECONDS);
+		await this.Set(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), refreshToken, REFRESH_TOKEN_LIFE_IN_SECONDS, true);
 	}
 
 	static async GetRefreshToken(userId: number): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId));
+		return this.Get(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), true);
 	}
 
 	static async DeleteRefreshToken(userId: number): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId));
+		await this.Delete(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), true);
 	}
 
 	static async SetTfaToken(tfaToken: string, userId: number): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), userId.toString(), FIVE_MIN);
+		await this.Set(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), userId.toString(), FIVE_MIN, true);
 	}
 
 	static async GetTfaToken(tfaToken: string): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken));
+		return this.Get(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), true);
 	}
 
 	static async GetSubscanData(network: string, url: string): Promise<string | null> {
@@ -123,16 +133,16 @@ export class RedisService {
 	}
 
 	static async SetResetPasswordToken(token: string, userId: number): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), userId.toString(), ONE_DAY);
+		await this.Set(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), userId.toString(), ONE_DAY, true);
 	}
 
 	static async GetUserIdFromResetPasswordToken(token: string): Promise<number | null> {
-		const userId = await this.Get(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
+		const userId = await this.Get(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), true);
 		return userId ? Number(userId) : null;
 	}
 
 	static async DeleteResetPasswordToken(token: string): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token));
+		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), true);
 	}
 
 	// Posts caching methods
@@ -231,5 +241,27 @@ export class RedisService {
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+	}
+
+	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
+		// clear everything posts related
+		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-*`);
+		await this.DeleteKeys(`${ERedisKeys.POST_DATA}-${network}-*`);
+		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+	}
+
+	// QR session caching methods
+
+	static async SetQRSession(sessionId: string, data: { userId: number; timestamp: number; expiresIn: number }): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), JSON.stringify(data), data.expiresIn, true);
+	}
+
+	static async GetQRSession(sessionId: string): Promise<{ userId: number; timestamp: number; expiresIn: number } | null> {
+		const data = await this.Get(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), true);
+		return data ? JSON.parse(data) : null;
+	}
+
+	static async DeleteQRSession(sessionId: string): Promise<void> {
+		await this.Delete(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), true);
 	}
 }

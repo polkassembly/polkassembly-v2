@@ -23,7 +23,13 @@ export const withErrorHandling = (handler: { (req: NextRequest, context?: any): 
 			return await handler(req, context);
 		} catch (error) {
 			console.log('Error in API call : ', req.nextUrl);
-			consolePretty({ error }, true);
+
+			try {
+				consolePretty({ error }, true);
+			} catch {
+				console.error('Failed to pretty-print error in consolePretty due to nextJS bug\n ');
+				console.error('Error stack: ', (error as Error)?.stack);
+			}
 
 			let err: APIError;
 

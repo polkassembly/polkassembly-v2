@@ -8,7 +8,17 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@shared/_constants/listingLimit';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EDataSource, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IOffChainPost, IOnChainPostListing, IPostListing } from '@shared/types';
+import {
+	EAllowedCommentor,
+	EDataSource,
+	EPostOrigin,
+	EProposalStatus,
+	EProposalType,
+	IGenericListingResponse,
+	IOffChainPost,
+	IOnChainPostListing,
+	IPostListing
+} from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -20,7 +30,6 @@ import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 import { RedisService } from '../../_api-services/redis_service';
-import { IS_CACHE_ENABLED } from '../../_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -45,7 +54,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// Try to get from cache first
 	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
-	if (cachedData && IS_CACHE_ENABLED) {
+	if (cachedData) {
 		return NextResponse.json(deepParseJson(cachedData));
 	}
 
@@ -142,9 +151,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	};
 
 	// Cache the response
-	if (IS_CACHE_ENABLED) {
-		await RedisService.SetPostsListing({ network, proposalType, page, limit, data: JSON.stringify(response), statuses, origins, tags });
-	}
+	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: JSON.stringify(response), statuses, origins, tags });
 
 	// 3. return the data
 	return NextResponse.json(response);
@@ -160,10 +167,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content')
+		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
 	});
 
-	const { content, title } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
@@ -176,14 +184,13 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		proposalType,
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content: formattedContent,
-		title
+		title,
+		allowedCommentor
 	});
 
 	// Invalidate post listings since a new post was added
-	if (IS_CACHE_ENABLED) {
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
-	}
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

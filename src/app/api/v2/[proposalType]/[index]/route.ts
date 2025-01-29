@@ -12,14 +12,13 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EDataSource, ENetwork, EProposalType, IPost } from '@shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, IPost } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { deepParseJson } from 'deep-parse-json';
-import { IS_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -33,7 +32,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	// Try to get from cache first
 	const cachedData = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
-	if (cachedData && IS_CACHE_ENABLED) {
+	if (cachedData) {
 		return NextResponse.json(deepParseJson(cachedData));
 	}
 
@@ -46,9 +45,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		}
 
 		// Cache the response
-		if (IS_CACHE_ENABLED) {
-			await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(offChainPostData) });
-		}
+		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(offChainPostData) });
+
 		return NextResponse.json(offChainPostData);
 	}
 
@@ -68,13 +66,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	};
 
 	// Cache the response
-	if (IS_CACHE_ENABLED) {
-		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
-	}
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
 
 	return NextResponse.json(post);
 });
 
+// update post
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
@@ -84,10 +81,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content')
+		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
 	});
 
-	const { content, title } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
@@ -98,7 +96,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 			content: formattedContent,
-			title
+			title,
+			allowedCommentor
 		});
 	} else {
 		await OffChainDbService.UpdateOnChainPost({
@@ -107,15 +106,14 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 			content: formattedContent,
-			title
+			title,
+			allowedCommentor
 		});
 	}
 
 	// Invalidate caches
-	if (IS_CACHE_ENABLED) {
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-		await RedisService.DeletePostsListing({ network, proposalType });
-	}
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

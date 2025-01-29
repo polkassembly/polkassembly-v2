@@ -22,4 +22,12 @@ export class CommentClientService extends NextApiClientService {
 			parentCommentId
 		});
 	}
+
+	static async deleteCommentFromPost({ id, proposalType, index }: { id: string; proposalType: EProposalType; index: string }) {
+		return this.deleteCommentFromPostApi({
+			id,
+			proposalType,
+			index
+		});
+	}
 }

@@ -1,0 +1,19 @@
+.metadataHeading {
+	@apply mb-2 text-lg font-semibold text-text_primary;
+}
+
+.infoContainer {
+	@apply flex flex-col gap-y-2 text-sm text-text_primary;
+}
+
+.infoRow {
+	@apply grid grid-cols-4 gap-x-4 border-b border-border_grey py-4;
+}
+
+.infoRowLabel {
+	@apply col-span-1
+}
+
+.infoRowValue {
+	@apply col-span-3;
+}

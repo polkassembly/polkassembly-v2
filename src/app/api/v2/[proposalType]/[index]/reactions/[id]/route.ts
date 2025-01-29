@@ -13,7 +13,6 @@ import { z } from 'zod';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { IS_CACHE_ENABLED } from '@/app/api/_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -45,11 +44,9 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	await OffChainDbService.DeletePostReaction(id);
 
 	// Invalidate caches since reaction metrics changed
-	if (IS_CACHE_ENABLED) {
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network });
-	}
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Reaction deleted successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

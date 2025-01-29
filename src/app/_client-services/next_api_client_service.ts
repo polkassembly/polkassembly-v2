@@ -4,7 +4,7 @@
 
 /* eslint-disable lines-between-class-members */
 
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
@@ -22,11 +22,17 @@ import {
 	IPostListing,
 	IPost,
 	IPublicUser,
-	IVoteData
+	IVoteData,
+	IUserActivity,
+	IPreimage,
+	IQRSessionPayload
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ClientError } from '../_client-utils/clientError';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -48,7 +54,16 @@ enum EApiRoute {
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	POST_REACTIONS = 'POST_REACTIONS',
 	DELETE_REACTION = 'DELETE_REACTION',
-	PUBLIC_USER_DATA = 'PUBLIC_USER_DATA'
+	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
+	PUBLIC_USER_DATA_BY_ADDRESS = 'PUBLIC_USER_DATA_BY_ADDRESS',
+	PUBLIC_USER_DATA_BY_USERNAME = 'PUBLIC_USER_DATA_BY_USERNAME',
+	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
+	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
+	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
+	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	DELETE_COMMENT = 'DELETE_COMMENT',
+	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
+	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION'
 }
 
 export class NextApiClientService {
@@ -106,9 +121,11 @@ export class NextApiClientService {
 			// Dynamic routes
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
+			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.FETCH_PREIMAGES:
 				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
@@ -117,9 +134,29 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_REACTION:
 				method = 'DELETE';
 				break;
-			case EApiRoute.PUBLIC_USER_DATA:
+			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+				method = 'PATCH';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
+			case EApiRoute.FETCH_USER_ACTIVITY:
 				path = '/users/id';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+				path = '/users/address';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
+				path = '/users/username';
+				break;
+			case EApiRoute.DELETE_COMMENT:
+				method = 'DELETE';
+				break;
+			case EApiRoute.GENERATE_QR_SESSION:
+				path = '/auth/actions/qr-session';
 				method = 'GET';
+				break;
+			case EApiRoute.CLAIM_QR_SESSION:
+				path = '/auth/actions/qr-session';
+				method = 'POST';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -142,13 +179,15 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
+		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
+
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-api-key': process.env.NEXT_PUBLIC_POLKASSEMBLY_API_KEY || '',
-				'x-network': process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ''
+				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				'x-network': currentNetwork
 			},
 			method
 		});
@@ -253,6 +292,16 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
+	static async editProposalDetailsApi(proposalType: EProposalType, index: string, data: { title: string; content: OutputData }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
+	}
+
+	static async getPreimageForPostApi(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE_FOR_POST, routeSegments: [proposalType, index, 'preimage'] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
 	// comments
 	protected static async getCommentsOfPostApi({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_COMMENTS, routeSegments: [proposalType, index, 'comments'] });
@@ -279,6 +328,11 @@ export class NextApiClientService {
 				parentCommentId
 			}
 		});
+	}
+
+	protected static async deleteCommentFromPostApi({ id, proposalType, index }: { id: string; proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_COMMENT, routeSegments: [proposalType, index, 'comments', id] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	// votes
@@ -308,8 +362,43 @@ export class NextApiClientService {
 	}
 
 	// user data
-	static async fetchPublicUserByIdApi(userId: number) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA, routeSegments: [userId.toString()] });
+	protected static async fetchPublicUserByIdApi({ userId }: { userId: number | string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ID, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	protected static async fetchPublicUserByAddressApi({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address] });
+		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	protected static async fetchPublicUserByUsernameApi({ username }: { username: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_USERNAME, routeSegments: [username] });
+		return this.nextApiClientFetch<IPublicUser>({ url, method });
+	}
+
+	protected static async fetchUserActivityApi({ userId }: { userId: number | string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_ACTIVITY, routeSegments: [userId.toString(), 'activities'] });
+		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
+	}
+
+	static async fetchPreimagesApi({ page }: { page: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: PREIMAGES_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
+	}
+
+	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages', hash] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	protected static async generateQRSessionApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
+		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
 }

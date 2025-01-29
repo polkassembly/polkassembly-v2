@@ -1,0 +1,19 @@
+.accountWrapper {
+    @apply flex items-start gap-x-4 rounded-xl border border-border_grey p-4
+}
+
+.accountDetails {
+    @apply flex flex-col gap-y-2
+}
+
+.accountBalance {
+    @apply flex items-center gap-x-2
+}
+
+.accountBalanceWrapper {
+    @apply flex flex-col items-center gap-y-1
+}
+
+.accountBalanceText {
+    @apply font-semibold text-text_primary
+}
