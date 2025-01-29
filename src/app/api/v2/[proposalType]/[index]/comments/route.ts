@@ -30,6 +30,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	return NextResponse.json(comments);
 });
 
+// add comment
 export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 

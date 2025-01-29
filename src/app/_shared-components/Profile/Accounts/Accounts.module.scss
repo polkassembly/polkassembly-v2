@@ -1,0 +1,15 @@
+.accountsWrapper {
+    @apply flex flex-col gap-y-4
+}
+
+.accountsHeader {
+    @apply flex items-center gap-x-2 px-6 text-text_primary
+}
+
+.accountsHeaderText {
+    @apply text-2xl font-semibold
+}
+
+.accountsList {
+    @apply flex flex-col gap-y-4 px-6
+}

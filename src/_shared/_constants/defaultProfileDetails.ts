@@ -9,5 +9,7 @@ export const DEFAULT_PROFILE_DETAILS: IProfileDetails = {
 	badges: [],
 	bio: '',
 	image: '',
-	title: ''
+	title: '',
+	coverImage: '',
+	socialLinks: []
 };
