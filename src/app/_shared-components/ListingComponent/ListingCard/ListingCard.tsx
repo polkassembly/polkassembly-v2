@@ -235,9 +235,11 @@ function ListingCard({
 						)}
 					</div>
 				)}
-				{!!status && <div className='flex'>
-					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
-				</div>}
+				{!!status && (
+					<div className='flex'>
+						<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
+					</div>
+				)}
 			</div>
 		</button>
 	);

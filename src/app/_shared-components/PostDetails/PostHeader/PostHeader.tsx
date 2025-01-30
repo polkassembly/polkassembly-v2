@@ -192,12 +192,14 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				>
 					{t('PostDetails.timeline')}
 				</TabsTrigger>
-				{postData?.proposalType !== EProposalType.DISCUSSION && <TabsTrigger
-					className='uppercase'
-					value={EPostDetailsTab.ONCHAIN_INFO}
-				>
-					{t('PostDetails.onchainInfo')}
-				</TabsTrigger>}
+				{postData?.proposalType !== EProposalType.DISCUSSION && (
+					<TabsTrigger
+						className='uppercase'
+						value={EPostDetailsTab.ONCHAIN_INFO}
+					>
+						{t('PostDetails.onchainInfo')}
+					</TabsTrigger>
+				)}
 			</TabsList>
 		</div>
 	);
