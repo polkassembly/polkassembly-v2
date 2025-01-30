@@ -179,8 +179,7 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
-		const currentNetwork = getCurrentNetwork() || (await getNetworkFromHeaders());
-
+		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
