@@ -180,6 +180,7 @@ export class NextApiClientService {
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
+
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
