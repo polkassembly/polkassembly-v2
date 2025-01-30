@@ -59,7 +59,7 @@ function ListingTab({ data, currentPage, setCurrentPage, totalCount }: ListingTa
 				createdAt: item.onChainInfo?.createdAt ? new Date(item.onChainInfo.createdAt) : new Date(),
 				proposer: item.onChainInfo?.proposer || 'Unknown Proposer',
 				origin: item.onChainInfo?.origin || 'Unknown Origin',
-				status: (item.onChainInfo?.status as EProposalStatus),
+				status: (item.onChainInfo?.status as EProposalStatus) || EProposalStatus.Submitted,
 				description: item.onChainInfo?.description || '',
 				index: item.onChainInfo?.index || 0,
 				type: (item.onChainInfo?.type as EProposalType) || EProposalType.REFERENDUM_V2,

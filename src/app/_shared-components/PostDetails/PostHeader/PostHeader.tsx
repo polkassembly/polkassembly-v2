@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, EProposalType, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -79,7 +79,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 							/>
 						</div>
 					)}
-					{postData?.onChainInfo?.status && <StatusTag status={postData?.onChainInfo?.status?.toLowerCase().replace(/\s+/g, '_')} />}
+					<StatusTag status={postData?.onChainInfo?.status?.toLowerCase().replace(/\s+/g, '_')} />
 				</div>
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
@@ -192,12 +192,12 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				>
 					{t('PostDetails.timeline')}
 				</TabsTrigger>
-				{postData?.proposalType !== EProposalType.DISCUSSION && <TabsTrigger
+				<TabsTrigger
 					className='uppercase'
 					value={EPostDetailsTab.ONCHAIN_INFO}
 				>
 					{t('PostDetails.onchainInfo')}
-				</TabsTrigger>}
+				</TabsTrigger>
 			</TabsList>
 		</div>
 	);

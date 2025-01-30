@@ -68,8 +68,7 @@ function ListingCard({
 		e.preventDefault();
 		e.stopPropagation();
 		setTimeout(() => {
-			const url = proposalType === EProposalType.DISCUSSION ? `/post/${index}` : `/referenda/${index}`;
-			window.location.href = url;
+			window.location.href = `/referenda/${index}`;
 		}, 100);
 	};
 
@@ -235,9 +234,9 @@ function ListingCard({
 						)}
 					</div>
 				)}
-				{!!status && <div className='flex'>
+				<div className='flex'>
 					<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
-				</div>}
+				</div>
 			</div>
 		</button>
 	);
