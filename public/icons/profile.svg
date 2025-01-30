@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is auto-generated from profile folder -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0">
+<defs>
+<symbol fill="none" viewBox="0 0 16 16" id="rank-star"><path fill="#534930" fill-rule="evenodd" d="M8 .875C6.697 4.38 4.337 6.718.87 8 4.38 9.295 6.713 11.662 8 15.125z" clip-rule="evenodd"></path><path fill="#534930" fill-rule="evenodd" d="M7.999.875c1.3 3.505 3.66 5.843 7.128 7.125-3.508 1.295-5.842 3.662-7.128 7.125z" clip-rule="evenodd" opacity=".6"></path></symbol>
+<symbol fill="none" viewBox="0 0 292 118" id="rankcard-bg"><path fill="url(#a)" stroke="#D2D8E0" d="M291.5 102V27.242c0-8.56-6.921-15.5-15.483-15.5h-61.261c-3.754 0-6.226-1.705-8.667-3.886-.48-.428-.96-.878-1.45-1.336-1.983-1.855-4.117-3.851-6.973-5.18-1.432-.666-3.005-.84-4.512-.84h-89.531c-1.357 0-2.78.15-4.078.757-1.628.762-3.129 1.816-4.576 2.95-.685.537-1.362 1.095-2.036 1.65l-.117.097a92 92 0 0 1-2.15 1.734c-2.897 2.245-5.922 4.054-9.766 4.054H15.99c-8.562 0-15.49 6.94-15.49 15.5V102c0 8.56 6.94 15.5 15.5 15.5h260c8.56 0 15.5-6.94 15.5-15.5z"></path><defs><linearGradient id="a" x1="8" x2="194.056" y1="10.5" y2="210.283" gradientUnits="userSpaceOnUse"><stop stop-color="#DDE8FF"></stop><stop offset=".536" stop-color="#9FBDFF"></stop><stop offset=".74" stop-color="#5388FF"></stop></linearGradient></defs></symbol>
+<symbol fill="none" viewBox="0 0 290 86" id="rankcard-inner"><path fill="#000" d="M0 15C0 6.716 6.694 0 14.978 0H75.9c8.797 0 14.192 13.45 20.724 13.45h100.754c9.053 0 10.761-13.45 19.378-13.45h58.251C283.291 0 290 6.716 290 15v56c0 8.284-6.716 15-15 15H15C6.716 86 0 79.284 0 71z"></path><path fill="#fff" d="M0 15C0 6.716 6.694 0 14.978 0H75.9c8.797 0 14.192 13.45 20.724 13.45h100.754c9.053 0 10.761-13.45 19.378-13.45h58.251C283.291 0 290 6.716 290 15v56c0 8.284-6.716 15-15 15H15C6.716 86 0 79.284 0 71z"></path></symbol>
+</defs>
+</svg>
