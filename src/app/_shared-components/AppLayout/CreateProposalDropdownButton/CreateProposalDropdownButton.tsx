@@ -16,8 +16,8 @@ import { ETheme } from '@/_shared/types';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import style from './CreateProposalDropdownButton.module.scss';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();

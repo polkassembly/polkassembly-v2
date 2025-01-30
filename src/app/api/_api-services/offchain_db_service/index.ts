@@ -248,7 +248,8 @@ export class OffChainDbService {
 		subActivityName?: EActivityName;
 	}) {
 		// TODO: calculate score based on activity name and sub activity name
-		console.log('TODO: calculateProfileScoreIncrement fire and forget a cloud function maybe ?', { userId, activityName, activityMetadata, subActivityName });
+		console.log('TODO: calculateProfileScoreIncrement fire and forget a cloud function maybe ?');
+		console.log({ userId, activityName, activityMetadata, subActivityName });
 		return 1;
 	}
 

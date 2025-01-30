@@ -6,16 +6,16 @@
 
 import React, { useEffect } from 'react';
 import CreateDiscussionComponent from '@/app/create/discussion/Component/CreateDiscussion/CreateDiscussion';
-import classes from './Component/CreateDiscussion/CreateDiscussion.module.scss';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
+import classes from './Component/CreateDiscussion/CreateDiscussion.module.scss';
 
 function Discussion() {
 	const router = useRouter();
 	const { user } = useUser();
 
 	useEffect(() => {
-		if(!user?.id){
+		if (!user?.id) {
 			router.replace('/');
 		}
 	}, [user, router]);

@@ -21,7 +21,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
 	const walletService = useWalletService();
-	
+
 	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
 
 	const getAccounts = async (chosenWallet: EWallet): Promise<undefined> => {
@@ -77,7 +77,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 				<DropdownMenuTrigger className={classes.dropdownTrigger}>
 					<Address
 						address={userPreferences?.address?.address || ''}
-						walletAddressName={userPreferences?.address?.name ||  ''}
+						walletAddressName={userPreferences?.address?.name || ''}
 						iconSize={25}
 					/>
 				</DropdownMenuTrigger>

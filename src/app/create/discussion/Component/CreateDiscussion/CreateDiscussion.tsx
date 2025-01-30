@@ -36,7 +36,7 @@ function CreateDiscussion({ isModal }: { isModal?: boolean }) {
 		if (data?.data && data.data?.index) {
 			formData.reset();
 			// redirect to the discussion page
-			router.push(`/discussion/${data?.data?.index}`);
+			router.replace(`/post/${data?.data?.index}`);
 		}
 	};
 	return (

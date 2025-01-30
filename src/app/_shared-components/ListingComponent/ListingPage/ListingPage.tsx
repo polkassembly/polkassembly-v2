@@ -13,10 +13,10 @@ import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
-import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 
 // Constants
 enum EListingTabState {
@@ -124,9 +124,9 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 				className={styles.button}
 				onClick={() => {
 					if (proposalType === EProposalType.DISCUSSION) {
-						router.push(!accessTokenPayload?'/login?nextUrl=create/discussion':'/create/discussion');
+						router.replace(!accessTokenPayload ? '/login?nextUrl=create/discussion' : '/create/discussion');
 					} else {
-						router.push(!accessTokenPayload ? '/login?nextUrl=create/treasury-proposal' : '/create/treasury-proposal');
+						router.replace(!accessTokenPayload ? '/login?nextUrl=create/treasury-proposal' : '/create/treasury-proposal');
 					}
 				}}
 			>
