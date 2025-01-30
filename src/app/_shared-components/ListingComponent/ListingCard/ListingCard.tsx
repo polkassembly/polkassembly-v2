@@ -21,6 +21,10 @@ import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
 import { MouseEvent } from 'react';
+import Image from 'next/image';
+import DotIcon from '@assets/icons/dot.png';
+import WestendIcon from '@assets/icons/westend-logo.jpg';
+import DEDIcon from '@assets/icons/ded-asset.png';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 import { Icon, IconName } from '../../Icon';
@@ -51,8 +55,9 @@ function ListingCard({
 	const ICONS = {
 		usdc: 'icons/usdc',
 		usdt: 'icons/usdt',
-		dot: 'icons/dot',
-		wnd: 'icons/wnd'
+		dot: DotIcon,
+		wnd: WestendIcon,
+		ded: DEDIcon
 	};
 	const decisionPeriodPercentage = decisionPeriodEndsAt ? calculateDecisionProgress(decisionPeriodEndsAt) : 0;
 
@@ -172,12 +177,22 @@ function ListingCard({
 										<div className='flex items-center -space-x-1.5'>
 											{Object.entries(groupedByAsset).map(([assetId]) => {
 												const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-												const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || 'icons/usdt';
-												return (
+												const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DotIcon;
+												const isImage = typeof icon === 'object' && icon?.src;
+												return isImage ? (
+													<Image
+														key={assetId}
+														src={icon.src}
+														alt={unit}
+														width={20}
+														height={20}
+														className='h-5 w-5'
+													/>
+												) : (
 													<Icon
 														key={assetId}
 														name={icon as IconName}
-														className='h-10 w-10'
+														className='h-5 w-5'
 													/>
 												);
 											})}

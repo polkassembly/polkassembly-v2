@@ -84,7 +84,7 @@ interface INetworkDetails {
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
-	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
+	[EAssets.DED]: { name: 'ded', tokenDecimal: 10, symbol: 'DED' },
 	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT' },
 	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' }
 } as const;
