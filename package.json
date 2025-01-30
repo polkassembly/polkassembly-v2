@@ -11,7 +11,7 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
-    "build:icons": "npx tsx ./build-icons.mts",
+    "build:icons": "npx tsx ./build-icons.mts"
   },
   "engines": {
     "node": "20"
