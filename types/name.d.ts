@@ -21,6 +21,8 @@ export type IconName =
 	| 'icons/timeline-referenda-icon'
 	| 'icons/usdc'
 	| 'icons/usdt'
+	| 'icons/dot'
+	| 'icons/wnd'
 	| 'icons/verified-check-green'
 	| 'icons/Vote'
 	| 'logos/pa-logo-black'

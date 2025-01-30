@@ -18,15 +18,12 @@ import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecision
 import { Progress } from '@ui/progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
-import USDTIcon from '@assets/icons/usdt.svg';
-import USDCIcon from '@assets/icons/usdc.svg';
 import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
-import DOTIcon from '@assets/icons/dot.png';
 import { MouseEvent } from 'react';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
-import { Icon } from '../../Icon';
+import { Icon, IconName } from '../../Icon';
 
 function ListingCard({
 	title,
@@ -52,9 +49,10 @@ function ListingCard({
 	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
 	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
 	const ICONS = {
-		usdc: USDCIcon,
-		usdt: USDTIcon,
-		dot: DOTIcon
+		usdc: 'icons/usdc',
+		usdt: 'icons/usdt',
+		dot: 'icons/dot',
+		wnd: 'icons/wnd'
 	};
 	const decisionPeriodPercentage = decisionPeriodEndsAt ? calculateDecisionProgress(decisionPeriodEndsAt) : 0;
 
@@ -101,7 +99,7 @@ function ListingCard({
 								<span className='hidden lg:block'>|</span>
 								<Icon
 									name='icons/Comment'
-									className={theme === ETheme.DARK ? 'dark-icons' : ''}
+									className={`h-5 w-5 ${theme === ETheme.DARK ? 'dark-icons' : ''}`}
 								/>
 								<span className='text-text_primary'>{metrics?.comments || 0}</span>
 							</div>
@@ -174,12 +172,12 @@ function ListingCard({
 										<div className='flex items-center -space-x-1.5'>
 											{Object.entries(groupedByAsset).map(([assetId]) => {
 												const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-												const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DOTIcon;
+												const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || 'icons/usdt';
 												return (
 													<Icon
 														key={assetId}
-														name={icon}
-														className='h-4 w-4'
+														name={icon as IconName}
+														className='h-10 w-10'
 													/>
 												);
 											})}
