@@ -37,7 +37,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			return (
 				<Icon
 					name='logos/PALogoDark'
-					className='h-10 w-10'
+					className='h-10 w-56'
 				/>
 			);
 		}

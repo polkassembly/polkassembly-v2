@@ -6,9 +6,12 @@
 
 import ReactDOM from 'react-dom';
 
+// List of all sprite files to preload
+const spriteFiles = ['/icons/activityfeed.svg', '/icons/icons.svg', '/icons/logos.svg', '/icons/profile.svg', '/icons/sidebar.svg', '/icons/wallet-icons.svg'];
+
 export function PreloadResources() {
-	ReactDOM.preload('/icons/sprite.svg', {
-		as: 'image'
+	spriteFiles.forEach((sprite) => {
+		ReactDOM.preload(sprite, { as: 'image' });
 	});
 
 	return null;

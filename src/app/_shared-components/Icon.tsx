@@ -8,13 +8,19 @@ import { type IconName } from '../../../types/name';
 
 export { IconName };
 
-const SPRITE_URL = '/icons/sprite.svg';
+// Function to determine the correct sprite file based on the icon name
+const getSpritePath = (name: string) => {
+	// Expecting name format like "folder/iconName"
+	const [folder, icon] = name.split('/');
+
+	// If folder isn't specified, fallback to a default sprite
+	const spritePath = folder ? `/icons/${folder}.svg` : '/icons/default.svg';
+
+	return `${spritePath}#${icon || name}`;
+};
 
 /**
  * Renders an SVG icon using a sprite sheet.
- *
- * - Uses an absolute path to avoid issues with relative paths during navigation.
- * - Supports nested icons when children are provided.
  */
 export function Icon({
 	name,
@@ -26,10 +32,8 @@ export function Icon({
 	name: IconName;
 	childClassName?: string;
 }) {
-	// Ensure the sprite URL is absolute and prevent caching issues
-	const spriteHref = `${SPRITE_URL}?v=1#${name}`;
+	const spriteHref = getSpritePath(name);
 
-	// Handles nested icons
 	if (children) {
 		return (
 			<span className={cn('font inline-flex items-center gap-1.5', childClassName)}>

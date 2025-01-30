@@ -34,7 +34,7 @@ function Footer() {
 								{theme === ETheme.DARK ? (
 									<Icon
 										name='logos/PALogoDark'
-										className='h-auto w-[180px]'
+										className='h-12 w-[130px]'
 									/>
 								) : (
 									<PaLogo
