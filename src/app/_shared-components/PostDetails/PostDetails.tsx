@@ -47,13 +47,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
 							<Timeline timeline={postData?.onChainInfo?.timeline} />
 						</TabsContent>
-						<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
+						{postData?.proposalType !== EProposalType.DISCUSSION && <TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
 							<OnchainInfo
 								proposalType={EProposalType.REFERENDUM_V2}
 								index={index}
 								onchainInfo={postData?.onChainInfo}
 							/>
-						</TabsContent>
+						</TabsContent>}
 					</div>
 					{isModalOpen && (
 						<div className='pt-5'>
@@ -64,13 +64,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					{!isModalOpen && (
 						<div className={classes.commentsBox}>
 							<PostComments
-								proposalType={EProposalType.REFERENDUM_V2}
+								proposalType={ postData?.proposalType || EProposalType.REFERENDUM_V2}
 								index={index}
 							/>
 						</div>
 					)}
 				</div>
-				{!isModalOpen && (
+				{!isModalOpen && postData?.proposalType !== EProposalType.DISCUSSION && (
 					<div className={classes.rightWrapper}>
 						<VoteReferendumButton index={index} />
 						<ProposalPeriods
