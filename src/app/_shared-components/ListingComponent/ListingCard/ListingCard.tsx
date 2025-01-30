@@ -68,8 +68,7 @@ function ListingCard({
 		e.preventDefault();
 		e.stopPropagation();
 		setTimeout(() => {
-			const url = proposalType === EProposalType.DISCUSSION ? `/post/${index}` : `/referenda/${index}`;
-			window.location.href = url;
+			window.location.href = `/referenda/${index}`;
 		}, 100);
 	};
 

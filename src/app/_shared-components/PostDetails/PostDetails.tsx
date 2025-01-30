@@ -72,7 +72,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</div>
 					)}
 				</div>
-				{!isModalOpen && postData?.proposalType !== EProposalType.DISCUSSION && (
+				{!isModalOpen && (
 					<div className={classes.rightWrapper}>
 						<VoteReferendumButton index={index} />
 						<ProposalPeriods
