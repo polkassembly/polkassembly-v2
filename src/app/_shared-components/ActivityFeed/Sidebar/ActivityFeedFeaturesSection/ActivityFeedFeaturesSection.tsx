@@ -32,28 +32,28 @@ function ActivityFeedFeaturesSection() {
 		{
 			id: 'delegation-dashboard',
 			description: t('ActivityFeed.DelegationDashboardDescription'),
-			image: 'activityfeed/features/features1',
+			image: 'activityfeed/features1',
 			path: '/delegation',
 			title: t('ActivityFeed.DelegationDashboard')
 		},
 		{
 			id: 'batch-voting',
 			description: t('ActivityFeed.BatchVotingDescription'),
-			image: 'activityfeed/features/features2',
+			image: 'activityfeed/features2',
 			path: '/batch-voting',
 			title: t('ActivityFeed.BatchVoting')
 		},
 		{
 			id: 'bounty',
 			description: t('ActivityFeed.BountyDescription'),
-			image: 'activityfeed/features/features3',
+			image: 'activityfeed/features3',
 			path: 'bounty',
 			title: t('ActivityFeed.Bounty')
 		},
 		{
 			id: 'identity',
 			description: t('ActivityFeed.IdentityDescription'),
-			image: 'activityfeed/features/features4',
+			image: 'activityfeed/features4',
 			path: '',
 			title: t('ActivityFeed.Identity')
 		}
@@ -120,7 +120,7 @@ function ActivityFeedFeaturesSection() {
 								>
 									<Icon
 										name={feature.image}
-										className='h-28 w-full'
+										className='h-28 w-full rounded-lg'
 									/>
 									<div className='mt-3'>
 										<p className='text-base font-semibold dark:text-white'>{feature.title}</p>
