@@ -39,7 +39,7 @@ function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
 				return;
 			}
 
-			const { data: confirmData, error: confirmError } = await AuthClientService.linkAddress({
+			const { data, error } = await AuthClientService.linkAddress({
 				address: selectedAccount.address,
 				signature,
 				wallet: selectedWallet
@@ -47,11 +47,9 @@ function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
 
 			setLoading(false);
 
-			if (confirmData) {
+			if (data && !error) {
 				onSuccess?.(selectedAccount.address);
 			}
-
-			console.log(confirmData, confirmError);
 		} catch (error) {
 			console.log(error);
 			setLoading(false);
