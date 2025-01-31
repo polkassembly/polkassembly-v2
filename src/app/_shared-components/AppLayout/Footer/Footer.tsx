@@ -5,20 +5,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useTheme } from 'next-themes';
-import Image from 'next/image';
-import { ETheme } from '@/_shared/types';
-import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import { useTranslations } from 'next-intl';
 import { FaTwitter, FaTelegramPlane } from 'react-icons/fa';
 import { IoLogoDiscord } from 'react-icons/io5';
 import { TbWorld } from 'react-icons/tb';
 import { BsArrowUpRight } from 'react-icons/bs';
-import PaLogo from '../PaLogo';
 import styles from './Footer.module.scss';
+import PaLogo from '../PaLogo';
 
 function Footer() {
-	const { resolvedTheme: theme } = useTheme();
 	const t = useTranslations();
 
 	return (
@@ -34,17 +29,12 @@ function Footer() {
 								className='flex'
 								href='/'
 							>
-								{theme === ETheme.DARK ? (
-									<Image
-										src={PaLogoDark}
-										alt='Polkassembly Logo'
-									/>
-								) : (
+								<div className='relative h-[40px] w-[180px]'>
 									<PaLogo
 										variant='full'
-										className='h-auto w-[180px]'
+										className='h-full w-full'
 									/>
-								)}
+								</div>
 							</Link>
 						</div>
 
