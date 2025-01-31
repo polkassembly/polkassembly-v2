@@ -21,8 +21,7 @@ function StatusTag({ className = '', status, colorInverted }: Props) {
 
 	return (
 		<div
-			// eslint-disable-next-line
-			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus] : ''} ${colorInverted ? styles.inverted : ''} ${
+			className={`${styles.base} ${normalizedStatus ? styles[String(normalizedStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${
 				theme === ETheme.DARK ? styles.dark : styles.light
 			} ${className}`}
 		>

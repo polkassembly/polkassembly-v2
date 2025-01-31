@@ -49,7 +49,13 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
-				<NextTopLoader color={THEME_COLORS.light.navbar_border} />
+				<NextTopLoader
+					color={THEME_COLORS.light.navbar_border}
+					initialPosition={0.55}
+					crawlSpeed={100}
+					speed={300}
+					showSpinner={false}
+				/>
 				<Initializers
 					userData={user || null}
 					userPreferences={userPreferences}
