@@ -243,7 +243,7 @@ export enum ELocales {
 	ENGLISH = 'en',
 	CHINESE = 'zh',
 	GERMAN = 'de',
-	JAPANESE = 'jp'
+	JAPANESE = 'ja'
 }
 
 export enum ECookieNames {

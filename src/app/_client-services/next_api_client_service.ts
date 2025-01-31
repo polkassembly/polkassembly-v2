@@ -123,12 +123,15 @@ export class NextApiClientService {
 				path = '/auth/actions/link-address';
 				method = 'POST';
 				break;
+			case EApiRoute.GET_ACTIVITY_FEED:
+				path = '/activityFeed';
+				method = 'GET';
+				break;
 			// Dynamic routes
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
-			case EApiRoute.GET_ACTIVITY_FEED:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
@@ -357,7 +360,7 @@ export class NextApiClientService {
 	}
 
 	// activity feed
-	static async fetchActivityFeedApi(page: number, origin?: EPostOrigin, limit: number = DEFAULT_LISTING_LIMIT) {
+	static async fetchActivityFeedApi({ page, origin, limit = DEFAULT_LISTING_LIMIT }: { page: number; origin?: EPostOrigin; limit?: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
@@ -367,7 +370,7 @@ export class NextApiClientService {
 			queryParams.append('origin', origin.toString());
 		}
 
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, routeSegments: ['activityFeed'], queryParams });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 

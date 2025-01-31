@@ -28,8 +28,8 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 
 	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
-		const formattedOrigin = origin === 'All' ? undefined : origin.replace(/\s+/g, '');
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, formattedOrigin as EPostOrigin, DEFAULT_LISTING_LIMIT);
+		const formattedOrigin = origin === 'All' ? undefined : origin;
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi({ page: pageParam, origin: formattedOrigin, limit: DEFAULT_LISTING_LIMIT });
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
@@ -46,7 +46,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 			pageParams: [1]
 		},
 		getNextPageParam: (lastPage) => {
-			if (lastPage.items?.length === 10) {
+			if (lastPage.items?.length === DEFAULT_LISTING_LIMIT) {
 				return lastPage.page + 1;
 			}
 			return undefined;

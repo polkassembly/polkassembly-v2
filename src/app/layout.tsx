@@ -39,8 +39,10 @@ export default async function RootLayout({
 	const user = await CookieService.getUserFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
 
-	const messages = await getMessages();
 	const locale = await getLocale();
+	const messages = await getMessages({
+		locale
+	});
 
 	return (
 		<html
@@ -63,6 +65,7 @@ export default async function RootLayout({
 				<Providers
 					messages={messages}
 					locale={locale}
+					userPreferences={userPreferences}
 				>
 					{modal}
 					<AppLayout>{children}</AppLayout>
