@@ -194,6 +194,30 @@ export class FirestoreService extends FirestoreRefs {
 		return this.GetUserById(addressData.userId);
 	}
 
+	static async getAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+		const substrAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
+
+		if (!substrAddress) {
+			return null;
+		}
+
+		const addressDocSnapshot = await FirestoreRefs.getAddressDocRefByAddress(substrAddress).get();
+		if (!addressDocSnapshot.exists) {
+			return null;
+		}
+
+		const data = addressDocSnapshot.data();
+		if (!data) {
+			return null;
+		}
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IUserAddress;
+	}
+
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {
 		const addressesQuery = FirestoreRefs.addressesCollectionRef().where('userId', '==', userId);
 		const addressesQuerySnapshot = await addressesQuery.get();

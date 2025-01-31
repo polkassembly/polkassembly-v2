@@ -12,10 +12,11 @@ import ProfileHeader from './ProfileHeader/ProfileHeader';
 import classes from './Profile.module.scss';
 import UserActivity from './UserActivity/UserActivity';
 import Accounts from './Accounts/Accounts';
+import Overview from './Overview/Overview';
 
 function Profile({ profileData }: { profileData: IPublicUser }) {
 	return (
-		<Tabs defaultValue={EProfileTabs.ACTIVITY}>
+		<Tabs defaultValue={EProfileTabs.OVERVIEW}>
 			<div>
 				<Image
 					src={ProfileRect}
@@ -27,14 +28,15 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 				<ProfileHeader address={profileData.addresses[0]} />
 			</div>
 			<div className={classes.contentWrapper}>
-				<div className={classes.contentInner}>
-					<TabsContent value={EProfileTabs.ACTIVITY}>
-						<UserActivity userId={profileData.id} />
-					</TabsContent>
-					<TabsContent value={EProfileTabs.ACCOUNTS}>
-						<Accounts addresses={profileData.addresses} />
-					</TabsContent>
-				</div>
+				<TabsContent value={EProfileTabs.OVERVIEW}>
+					<Overview profileData={profileData} />
+				</TabsContent>
+				<TabsContent value={EProfileTabs.ACTIVITY}>
+					<UserActivity userId={profileData.id} />
+				</TabsContent>
+				<TabsContent value={EProfileTabs.ACCOUNTS}>
+					<Accounts addresses={profileData.addresses} />
+				</TabsContent>
 			</div>
 		</Tabs>
 	);
