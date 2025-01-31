@@ -15,6 +15,7 @@ import classes from './Overview.module.scss';
 
 function Overview({ profileData }: { profileData: IPublicUser }) {
 	const [userProfile, setUserProfile] = useState<IPublicUser>(profileData);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const t = useTranslations();
 	const { user } = useUser();
 	return (
@@ -28,7 +29,10 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 				<div className={classes.onchainIdentityCardHeader}>
 					<p className={classes.onchainIdentityCardHeaderTitle}>{t('Profile.onchainIdentity')}</p>
 					{user && profileData.id === user.id && (
-						<Dialog>
+						<Dialog
+							open={isModalOpen}
+							onOpenChange={setIsModalOpen}
+						>
 							<DialogTrigger>
 								<Button
 									variant='secondary'
@@ -44,6 +48,7 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 								</DialogHeader>
 								<LinkAddress
 									onSuccess={(address) => {
+										setIsModalOpen(false);
 										setUserProfile({
 											...userProfile,
 											addresses: [...userProfile.addresses, address]

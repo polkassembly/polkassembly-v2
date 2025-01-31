@@ -205,7 +205,16 @@ export class FirestoreService extends FirestoreRefs {
 			return null;
 		}
 
-		return addressDocSnapshot.data() as IUserAddress;
+		const data = addressDocSnapshot.data();
+		if (!data) {
+			return null;
+		}
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IUserAddress;
 	}
 
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {

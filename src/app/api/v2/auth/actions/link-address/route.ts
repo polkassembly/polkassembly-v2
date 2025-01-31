@@ -18,7 +18,9 @@ import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
-	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+	const newTokens = await AuthService.ValidateAuthAndRefreshTokens();
+	let { newAccessToken } = newTokens;
+	const { newRefreshToken } = newTokens;
 
 	const zodBodySchema = z.object({
 		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address'),
@@ -45,7 +47,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid signature');
 	}
 
-	({ newAccessToken, newRefreshToken } = await AuthService.LinkAddress({ address, wallet, network }));
+	newAccessToken = await AuthService.LinkAddress({ address, wallet, network, accessToken: newAccessToken });
 
 	const response = NextResponse.json({ message: 'Address linked successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
