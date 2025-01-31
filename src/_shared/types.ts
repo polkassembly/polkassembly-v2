@@ -739,3 +739,8 @@ export interface IQRSessionPayload {
 	timestamp: number;
 	expiresIn: number;
 }
+
+export enum EAppEnv {
+	PRODUCTION = 'production',
+	DEVELOPMENT = 'development'
+}
