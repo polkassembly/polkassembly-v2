@@ -5,7 +5,7 @@
 'use server';
 
 import { ValidatorService } from '@shared/_services/validator_service';
-import { ENetwork } from '@shared/types';
+import { EAppEnv, ENetwork } from '@shared/types';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
@@ -15,7 +15,7 @@ import { APIError } from './apiError';
 export async function getNetworkFromHeaders(): Promise<ENetwork> {
 	const readonlyHeaders = await headers();
 
-	const { NEXT_PUBLIC_DEFAULT_NETWORK: defaultNetwork } = getSharedEnvVars();
+	const { NEXT_PUBLIC_APP_ENV, NEXT_PUBLIC_DEFAULT_NETWORK: defaultNetwork } = getSharedEnvVars();
 
 	const headerNetwork = readonlyHeaders.get('x-network');
 	const host = readonlyHeaders.get('host');
@@ -27,11 +27,10 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 			? (subdomain as ENetwork)
 			: null;
 
-	// TODO: use vercel env variables for this check instead
-	// check if it is vercel preview link
-	const isDevelopmentOrPreview = host?.includes('.vercel.app') || host?.includes('localhost');
+	// check if it is vercel preview link or localhost
+	const isDevelopmentOrPreviewEnv = NEXT_PUBLIC_APP_ENV !== EAppEnv.PRODUCTION;
 
-	if (isDevelopmentOrPreview) {
+	if (isDevelopmentOrPreviewEnv) {
 		return defaultNetwork as ENetwork;
 	}
 
