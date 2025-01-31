@@ -24,7 +24,7 @@ function CreateDiscussion({ isModal }: { isModal?: boolean }) {
 			proposalType: EProposalType.DISCUSSION,
 			content: values.description as unknown as OutputData,
 			title: values.title || '',
-			allowedCommentor: values.AllowedCommentors,
+			allowedCommentor: values.allowCommentors,
 			tags: values?.tags?.map((tag) => tag?.value) || [],
 			topic: values.topic || EOffchainPostTopic.GENERAL
 		});
