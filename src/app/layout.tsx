@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 	description: 'Polkassembly but so much better'
 };
 
-export const fontDmSans = dmSans({
+const fontDmSans = dmSans({
 	adjustFontFallback: false,
 	display: 'swap',
 	style: ['italic', 'normal'],
