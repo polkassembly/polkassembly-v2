@@ -6,8 +6,9 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 import { identityApiAtom, identityCacheAtom } from '@/app/_atoms/polkadotJsApi/identityApiAtom';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const CACHE_DURATION = FIVE_MIN_IN_MILLI;
 
 export const useIdentityService = () => {
 	const [api] = useAtom(identityApiAtom);

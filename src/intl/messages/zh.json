@@ -164,7 +164,10 @@
 			"linked_multiple_addresses": "链接多个地址",
 			"unlinked_address": "取消链接地址",
 			"unlinked_multiple_addresses": "取消链接多个地址"
-		}
+		},
+		"overview": "概览",
+		"onchainIdentity": "链上身份",
+		"linkAddress": "链接地址"
 	},
 	"ListingTab": {
 		"Analytics": "分析",

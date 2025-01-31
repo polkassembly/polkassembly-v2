@@ -63,7 +63,8 @@ enum EApiRoute {
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
-	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION'
+	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
+	LINK_ADDRESS = 'LINK_ADDRESS'
 }
 
 export class NextApiClientService {
@@ -116,6 +117,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.LOGOUT:
 				path = '/auth/actions/logout';
+				method = 'POST';
+				break;
+			case EApiRoute.LINK_ADDRESS:
+				path = '/auth/actions/link-address';
 				method = 'POST';
 				break;
 			// Dynamic routes
@@ -244,6 +249,11 @@ export class NextApiClientService {
 	protected static async logoutApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LOGOUT });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async linkAddressApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, wallet } });
 	}
 
 	static async fetchListingDataApi(
