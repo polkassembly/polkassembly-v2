@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { IStatusHistoryItem } from '@/_shared/types';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { Separator } from '@ui/Separator';

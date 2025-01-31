@@ -1,6 +1,9 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
+'use client';
+
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { EWallet } from '@/_shared/types';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';

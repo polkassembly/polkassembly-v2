@@ -2,16 +2,14 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import React from 'react';
 import rankCardBg from '@assets/profile/rankcard-bg.svg';
-import profileAvatar from '@assets/profile/user-icon.svg';
 import rankCardInner from '@assets/profile/rankcard-inner.svg';
 import rankStar from '@assets/profile/rank-star.svg';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
+import Address from '../../Profile/Address/Address';
 
 function ActivityFeedRankCard() {
 	const t = useTranslations();
@@ -46,16 +44,9 @@ function ActivityFeedRankCard() {
 						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
 					</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
-						<div className='flex items-center gap-2'>
-							<Image
-								src={profileAvatar}
-								alt='User Avatar'
-								className=''
-								width={32}
-								height={32}
-							/>
-							<p className='text-base font-semibold text-btn_secondary_text'>{user?.username}</p>
-						</div>
+						<p className='text-base font-semibold text-btn_secondary_text'>
+							<Address address={user?.publicUser?.addresses[0] || ''} />
+						</p>
 
 						<div>
 							<div className='flex items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
