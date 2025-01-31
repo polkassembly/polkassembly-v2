@@ -5,11 +5,11 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { EPostOrigin, IActivityFeedPostListing } from '@/_shared/types';
+import { EPostOrigin, IActivityFeedPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { SLATE_TIME } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, SLATE_TIME } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -19,7 +19,7 @@ import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 
-function ActivityFeedPostList() {
+function ActivityFeedPostList({ initialData }: { initialData: IGenericListingResponse<IActivityFeedPostListing> }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
@@ -29,7 +29,7 @@ function ActivityFeedPostList() {
 	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
 		const formattedOrigin = origin === 'All' ? undefined : origin.replace(/\s+/g, '');
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, formattedOrigin as EPostOrigin, 10);
+		const { data, error } = await NextApiClientService.fetchActivityFeedApi(pageParam, formattedOrigin as EPostOrigin, DEFAULT_LISTING_LIMIT);
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
@@ -41,6 +41,10 @@ function ActivityFeedPostList() {
 		queryKey: ['activityFeed', origin],
 		queryFn: getExploreActivityFeed,
 		initialPageParam: 1,
+		initialData: {
+			pages: [{ ...initialData, page: 1 }],
+			pageParams: [1]
+		},
 		getNextPageParam: (lastPage) => {
 			if (lastPage.items?.length === 10) {
 				return lastPage.page + 1;
