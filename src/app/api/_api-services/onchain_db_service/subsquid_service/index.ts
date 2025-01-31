@@ -20,8 +20,10 @@ import {
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { APIError } from '@api/_api-utils/apiError';
+import dayjs from 'dayjs';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { SubsquidUtils } from './subsquidUtils';
@@ -377,5 +379,38 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return subsquidData.preimages[0] as IPreimage;
+	}
+
+	static async getActiveProposal(network: ENetwork, type: EProposalType, days: number) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(this.GET_ACTIVE_PROPOSAL_COUNT, {
+				createdAt_gte: dayjs().subtract(days, 'day').toISOString(),
+				type_eq: type,
+				status_in: ACTIVE_PROPOSAL_STATUSES
+			})
+			.toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain active proposal count from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain active proposal count from Subsquid');
+		}
+
+		return subsquidData.proposals;
+	}
+
+	static async getVoteCountFromProposalIndexes(network: ENetwork, proposalIndexes: number[], voterAddresses: string[], type: EProposalType) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(this.GET_VOTE_COUNT_FROM_PROPOSAL_INDEXES, { proposalIndexes, voter_in: voterAddresses, type_eq: type })
+			.toPromise();
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching vote count from Subsquid for proposal indexes: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching vote count from Subsquid');
+		}
+
+		return subsquidData.flattenedConvictionVotesConnection.totalCount;
 	}
 }

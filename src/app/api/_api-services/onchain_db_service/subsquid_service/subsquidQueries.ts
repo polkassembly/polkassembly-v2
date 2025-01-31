@@ -590,4 +590,23 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_ACTIVE_PROPOSAL_COUNT = `
+		query GetActiveProposalCount($createdAt_gte: DateTime!, $type: ProposalType, $status_in: [ProposalStatus!]) {
+			proposals(where: {status_in: $status_in, createdAt_gte:  $createdAt_gte, type_eq: $type}){
+				index
+			}
+		}
+	`;
+
+	protected static GET_VOTE_COUNT_FROM_PROPOSAL_INDEXES = `
+		query GetVoteCountFromProposalIndexes($type: VoteType, $voter_in:[String!], $proposalIndexes: [Int!] ) {
+			flattenedConvictionVotesConnection(orderBy: id_ASC, where:
+				{proposal:{index_in: $proposalIndexes},
+				type_eq: $type, removedAtBlock_isNull: true,
+				voter_in: $voter_in}) {
+				totalCount
+			}
+		}
+	`;
 }

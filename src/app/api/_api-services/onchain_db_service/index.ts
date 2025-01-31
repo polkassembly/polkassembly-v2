@@ -128,4 +128,18 @@ export class OnChainDbService {
 
 		return null;
 	}
+
+	static async getActiveProposal(network: ENetwork, type: EProposalType, days: number) {
+		const activeProposal = await SubsquidService.getActiveProposal(network, type, days);
+		if (activeProposal) return activeProposal;
+
+		return null;
+	}
+
+	static async getVoteCountFromProposalIndexes(network: ENetwork, proposalIndexes: number[], voterAddresses: string[], type: EProposalType) {
+		const voteCount = await SubsquidService.getVoteCountFromProposalIndexes(network, proposalIndexes, voterAddresses, type);
+		if (voteCount) return voteCount;
+
+		return 0;
+	}
 }
