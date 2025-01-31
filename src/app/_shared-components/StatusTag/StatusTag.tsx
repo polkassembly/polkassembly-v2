@@ -2,8 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useTheme } from 'next-themes';
-import { ETheme } from '@/_shared/types';
+'use client';
+
 import { useTranslations } from 'next-intl';
 import styles from './StatusTag.module.scss';
 
@@ -14,17 +14,12 @@ interface Props {
 }
 
 function StatusTag({ className = '', status, colorInverted }: Props) {
-	const { resolvedTheme: theme } = useTheme();
 	const t = useTranslations();
 
 	const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
 
 	return (
-		<div
-			className={`${styles.base} ${normalizedStatus ? styles[String(normalizedStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${
-				theme === ETheme.DARK ? styles.dark : styles.light
-			} ${className}`}
-		>
+		<div className={`${styles.base} ${normalizedStatus ? styles[String(normalizedStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${className}`}>
 			{t(`ProposalStatus.${status?.toLowerCase()}`)}
 		</div>
 	);
