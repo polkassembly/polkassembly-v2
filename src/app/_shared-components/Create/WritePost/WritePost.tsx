@@ -19,6 +19,7 @@ import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
 import classes from './WritePost.module.scss';
+import LoadingLayover from '../../LoadingLayover';
 
 const MAX_TAGS = 5;
 function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWritePostFormFields>; handleSubmit: (values: IWritePostFormFields) => Promise<void> }) {
@@ -27,15 +28,15 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 
 	const allowCommentorsOptions = [
 		{
-			label: t('Create.allowCommentors.all'),
+			label: t('Create.AllowedCommentors.all'),
 			value: EAllowedCommentor.ALL
 		},
 		{
-			label: t('Create.allowCommentors.onchainVerified'),
+			label: t('Create.AllowedCommentors.onchainVerified'),
 			value: EAllowedCommentor.ONCHAIN_VERIFIED
 		},
 		{
-			label: t('Create.allowCommentors.none'),
+			label: t('Create.AllowedCommentors.none'),
 			value: EAllowedCommentor.NONE
 		}
 	];
@@ -47,7 +48,9 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 	};
 
 	return (
+		
 		<div className={classes.container}>
+			{loading && <LoadingLayover />}
 			<Form {...formData}>
 				<form onSubmit={formData.handleSubmit(onSubmit)}>
 					<div className={classes.form}>
@@ -170,14 +173,14 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className='flex items-center gap-1'>
-										<span>{t('Create.allowCommentors.title')} </span>
+										<span>{t('Create.AllowedCommentors.title')} </span>
 										<TooltipProvider>
 											<Tooltip>
 												<TooltipTrigger>
 													<MessageCircleWarning className='text-text-grey h-4 w-4' />
 												</TooltipTrigger>
 												<TooltipContent className='bg-tooltip_background p-2 text-white'>
-													<p>{t('Create.allowCommentors.tooltip')}</p>
+													<p>{t('Create.AllowedCommentors.tooltip')}</p>
 												</TooltipContent>
 											</Tooltip>
 										</TooltipProvider>
@@ -187,7 +190,7 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 											disabled={loading}
 											defaultValue={EAllowedCommentor.ALL}
 											className={classes.radioGroup}
-											onChange={(e) => field.onChange(e)}
+											onValueChange={(e) => field.onChange(e)}
 										>
 											{allowCommentorsOptions?.map((option) => {
 												return (

@@ -110,6 +110,8 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 									>
 										{option.label}
 										<Button
+											type='button'
+											disabled={disabled}
 											className={classes.tagRemoveButton}
 											onClick={(e) => {
 												e.stopPropagation();

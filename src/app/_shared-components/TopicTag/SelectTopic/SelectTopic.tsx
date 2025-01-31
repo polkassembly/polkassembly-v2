@@ -18,6 +18,7 @@ function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffchainPostTo
 				<Button
 					disabled={disabled}
 					key={key}
+					type='button'
 					className={`${classes.topicButton} ${selectedTopic === EOffchainPostTopic[key as keyof typeof EOffchainPostTopic] ? 'bg-btn_primary_background text-white' : 'bg-selected_topic_bg text-basic_text hover:bg-selected_topic_bg'}`}
 					onClick={() => {
 						setSelectedTopic(EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]);

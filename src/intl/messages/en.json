@@ -456,7 +456,7 @@
 		"selectTags": "Select tags",
 		"selectTopic": "Select Topic",
 		"tagsLeftText": "Tags left",
-		"allowCommentors": {
+		"AllowedCommentors": {
 			"title": "Who can comment ?",
 			"all": "All",
 			"onchainVerified": "Onchain Verified",

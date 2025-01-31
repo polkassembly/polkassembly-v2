@@ -444,24 +444,25 @@
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
+	
 	"Create": {
-		"createDiscussionTitle": "Create Discussion",
-		"title": "Title",
-		"description": "Description",
-		"create": "Create",
-		"createTag": "Create Tag",
-		"addTags": "Add Tags",
-		"searchTags": "Search tags",
-		"noTagsFound": "No tags found.",
-		"selectTags": "Select tags",
-		"selectTopic": "Select Topic",
-		"tagsLeftText": "Tags left",
-		"allowCommentors": {
-			"title": "Who can comment ?",
-			"all": "All",
-			"onchainVerified": "Onchain Verified",
-			"none": "None",
-			"tooltip": "Choose who can comment and reply to this post"
+		"createDiscussionTitle": "Diskussion erstellen",
+		"title": "Titel",
+		"description": "Beschreibung",
+		"create": "Erstellen",
+		"createTag": "Tag erstellen",
+		"addTags": "Tags hinzufügen",
+		"searchTags": "Tags suchen",
+		"noTagsFound": "Keine Tags gefunden.",
+		"selectTags": "Tags auswählen",
+		"selectTopic": "Thema auswählen",
+		"tagsLeftText": "Tags übrig",
+		"AllowedCommentors": {
+			"title": "Wer darf kommentieren?",
+			"all": "Alle",
+			"onchainVerified": "Onchain-Verifizierte",
+			"none": "Niemand",
+			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten darf"
 		}
 	}
 }

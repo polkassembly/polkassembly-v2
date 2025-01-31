@@ -762,3 +762,8 @@ export interface ITag {
 	lastUsedAt: Date;
 	name: string;
 }
+
+export enum EAppEnv {
+	PRODUCTION = 'production',
+	DEVELOPMENT = 'development'
+}

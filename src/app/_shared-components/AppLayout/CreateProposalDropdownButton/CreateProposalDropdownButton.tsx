@@ -18,14 +18,15 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import style from './CreateProposalDropdownButton.module.scss';
+import { useUser } from '@/hooks/useUser';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
-	const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+	const { user } = useUser();
 	const menuItems = [
 		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
 		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: accessTokenPayload ? '/create/discussion' : '/login?nextUrl=create/discussion' }
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: user?.id ? '/create/discussion' : '/login?nextUrl=create/discussion' }
 	];
 
 	const { resolvedTheme: theme } = useTheme();

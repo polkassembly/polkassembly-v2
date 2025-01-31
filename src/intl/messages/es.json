@@ -445,25 +445,25 @@
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
 	"Create": {
-		"createDiscussionTitle": "Create Discussion",
-		"title": "Title",
-		"description": "Description",
-		"create": "Create",
-		"createTag": "Create Tag",
-		"addTags": "Add Tags",
-		"searchTags": "Search tags",
-		"noTagsFound": "No tags found.",
-		"selectTags": "Select tags",
-		"selectTopic": "Select Topic",
-		"tagsLeftText": "Tags left",
-		"allowCommentors": {
-			"title": "Who can comment ?",
-			"all": "All",
-			"onchainVerified": "Onchain Verified",
-			"none": "None",
-			"tooltip": "Choose who can comment and reply to this post"
-		}
-	}
+    "createDiscussionTitle": "Crear Discusión",
+    "title": "Título",
+    "description": "Descripción",
+    "create": "Crear",
+    "createTag": "Crear Etiqueta",
+    "addTags": "Agregar Etiquetas",
+    "searchTags": "Buscar etiquetas",
+    "noTagsFound": "No se encontraron etiquetas.",
+    "selectTags": "Seleccionar etiquetas",
+    "selectTopic": "Seleccionar Tema",
+    "tagsLeftText": "Etiquetas restantes",
+    "AllowedCommentors": {
+        "title": "¿Quién puede comentar?",
+        "all": "Todos",
+        "onchainVerified": "Verificados en Cadena",
+        "none": "Ninguno",
+        "tooltip": "Elija quién puede comentar y responder a esta publicación"
+    }
+}
 }
 
 
