@@ -11,6 +11,10 @@ export function convertMarkdownToHtml(markdown: string): string {
 			gfm: true
 		});
 
+		if (!markdown) {
+			return '';
+		}
+
 		return marked.parse(markdown, { async: false });
 	} catch (error) {
 		console.error('Error converting markdown to HTML:', error);
