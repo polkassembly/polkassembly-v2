@@ -4,10 +4,9 @@
 
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
+import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '../../../_api-utils/withErrorHandling';
 import { OffChainDbService } from '../../../_api-services/offchain_db_service';
-import { getReqBody } from '@/app/api/_api-utils/getReqBody';
-
 
 export const GET = withErrorHandling(async () => {
 	const alltags = await OffChainDbService.GetAllTags();
@@ -24,7 +23,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	});
 
 	const { tags } = zodQuerySchema.parse(await getReqBody(req));
-	
+
 	await OffChainDbService.CreateTags(tags);
 	return NextResponse.json({ message: 'Tags updated successfully' });
 });

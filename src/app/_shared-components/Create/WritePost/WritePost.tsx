@@ -48,7 +48,6 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 	};
 
 	return (
-		
 		<div className={classes.container}>
 			{loading && <LoadingLayover />}
 			<Form {...formData}>
