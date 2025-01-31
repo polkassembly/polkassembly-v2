@@ -27,6 +27,7 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 			? (subdomain as ENetwork)
 			: null;
 
+	// TODO: use vercel env variables for this check instead
 	// check if it is vercel preview link
 	const isDevelopmentOrPreview = host?.includes('.vercel.app') || host?.includes('localhost');
 
