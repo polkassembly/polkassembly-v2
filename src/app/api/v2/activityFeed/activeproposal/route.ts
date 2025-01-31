@@ -41,7 +41,7 @@ export const GET = withErrorHandling(async () => {
 	}
 	const activeProposalIndexes: number[] = activeProposal?.map((proposal: { index: number }) => proposal?.index) || [];
 	const activeProposalCount = activeProposalIndexes.length;
-	if (userAddresses.length > 0) {
+	if (isUserAuthenticated && userAddresses.length > 0) {
 		const voteCount = await OnChainDbService.getVoteCountFromProposalIndexes(network, activeProposalIndexes, userAddresses, ACTIVITY_FEED_PROPOSAL_TYPE);
 		return NextResponse.json({ activeProposalCount, voteCount });
 	}

@@ -4,11 +4,16 @@
 
 import React from 'react';
 import { FaAngleRight } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import styles from './ActivityFeedActiveProposal.module.scss';
 
 function ActivityFeedActiveProposal() {
 	const t = useTranslations();
+	const { data: activeProposalCount } = useQuery({
+		queryKey: ['activeProposalCount'],
+		queryFn: () => fetch('/api/v2/activityFeed/activeproposal').then((res) => res.json())
+	});
 	return (
 		<div className={styles.activeProposalContainer}>
 			<div className={styles.activeProposalTitle}>
@@ -19,7 +24,8 @@ function ActivityFeedActiveProposal() {
 			</div>
 			<div className='text-sm'>
 				<span className='text-xs text-wallet_btn_text'>
-					<span className='text-xl font-semibold text-navbar_border'>09</span> out of <span className='text-sm font-semibold'>12</span> {t('ActivityFeed.ActiveProposals')}
+					<span className='text-xl font-semibold text-navbar_border'>{activeProposalCount?.voteCount || 0}</span> out of{' '}
+					<span className='text-sm font-semibold'>{activeProposalCount?.activeProposalCount || 0}</span> {t('ActivityFeed.ActiveProposals')}
 				</span>
 			</div>
 		</div>
