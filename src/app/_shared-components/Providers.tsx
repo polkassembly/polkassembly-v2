@@ -10,6 +10,7 @@ import { ETheme, IUserPreferences } from '@/_shared/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
+import { getTimeZoneForLocale } from '@/_shared/_utils/getTimeZoneForLocale';
 import { SidebarProvider } from './Sidebar/Sidebar';
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ export function Providers({
 		<NextIntlClientProvider
 			messages={messages}
 			locale={locale}
+			timeZone={getTimeZoneForLocale(locale)}
 		>
 			<QueryClientProvider client={queryClient}>
 				<ThemeProvider
