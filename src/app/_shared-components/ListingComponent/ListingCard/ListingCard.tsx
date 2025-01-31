@@ -26,6 +26,7 @@ import { BN } from '@polkadot/util';
 import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
+import Link from 'next/link';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -65,10 +66,14 @@ function ListingCard({
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 
 	return (
-		<button
+		<Link
+			href={`/referenda/${index}`}
 			className='w-full'
-			type='button'
-			onClick={() => redirectFromServer(`/referenda/${index}`)}
+			onClick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+				redirectFromServer(`/referenda/${index}`);
+			}}
 		>
 			<div className={`${styles.listingCard} ${backgroundColor}`}>
 				<div className='flex items-start lg:gap-4'>
@@ -239,7 +244,7 @@ function ListingCard({
 					</div>
 				</div>
 			</div>
-		</button>
+		</Link>
 	);
 }
 
