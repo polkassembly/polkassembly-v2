@@ -8,6 +8,7 @@ import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/t
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -26,7 +27,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		setPost((prev) => ({ ...prev, title, content }));
 	};
 
-	const isOffchainPost = [EProposalType.DISCUSSION].includes(post.proposalType);
+	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post.proposalType);
 
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>

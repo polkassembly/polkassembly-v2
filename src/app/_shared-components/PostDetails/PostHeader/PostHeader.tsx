@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, EProposalType, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import classes from './PostHeader.module.scss';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
@@ -48,7 +49,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
-	const isOffchainPost = [EProposalType.DISCUSSION].includes(postData.proposalType);
+	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	return (
 		<div>

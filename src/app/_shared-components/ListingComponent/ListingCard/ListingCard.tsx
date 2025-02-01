@@ -27,6 +27,7 @@ import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import Link from 'next/link';
+import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -65,7 +66,7 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 
-	const redirectUrl = [EProposalType.DISCUSSION].includes(proposalType) ? `/post/${index}` : `/referenda/${index}`;
+	const redirectUrl = getPostDetailsUrl(proposalType, index);
 	return (
 		<Link
 			href={redirectUrl}
