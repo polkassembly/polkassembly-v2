@@ -27,6 +27,7 @@ import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import Link from 'next/link';
+import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -41,7 +42,7 @@ function ListingCard({
 	title: string;
 	onChainInfo: IOnChainPostListing;
 	backgroundColor: string;
-	proposalType: string;
+	proposalType: EProposalType;
 	metrics?: IPostOffChainMetrics;
 	index: number;
 }) {
@@ -65,14 +66,15 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 
+	const redirectUrl = getPostDetailsUrl(proposalType, index);
 	return (
 		<Link
-			href={`/referenda/${index}`}
+			href={redirectUrl}
 			className='w-full'
 			onClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
-				redirectFromServer(`/referenda/${index}`);
+				redirectFromServer(redirectUrl);
 			}}
 		>
 			<div className={`${styles.listingCard} ${backgroundColor}`}>

@@ -390,7 +390,8 @@
 		"notpassed": "未通过",
 		"started": "已开始",
 		"passed": "已通过",
-		"proposed": "已提议"
+		"proposed": "已提议",
+		"created": "已创建"
 	},
 	"Pagination": {
 		"next": "下一页",
@@ -465,6 +466,36 @@
 			"onchainVerified": "链上验证",
 			"none": "无",
 			"tooltip": "选择谁可以评论和回复此帖子"
+		},
+		"Topic": {
+			"general": "一般",
+			"auction_admin": "拍卖管理员",
+			"general_admin": "总管理员",
+			"governance": "治理",
+			"root": "根节点",
+			"staking_admin": "质押管理员",
+			"treasury": "国库",
+			"fellowship": "研究员"
 		}
+	},
+	"ProposalType": {
+		"discussion": "讨论",
+		"referendum": "公投",
+		"referendumv2": "公投",
+		"councilmotion": "理事会动议",
+		"techcommitteeproposal": "技术委员会提案",
+		"treasuryproposal": "国库提案",
+		"bounty": "赏金",
+		"childbounty": "子赏金",
+		"tip": "小费",
+		"fellowshipreferendum": "研究员公投",
+		"alliancemotion": "联盟动议",
+		"announcement": "公告",
+		"democracyproposal": "民主提案",
+		"upgradecommittee": "升级委员会",
+		"advisorycommittee": "咨询委员会",
+		"grant": "资助",
+		"community": "社区",
+		"technicalcommittee": "技术委员会"
 	}
 }

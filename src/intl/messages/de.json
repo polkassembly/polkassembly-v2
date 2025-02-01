@@ -390,7 +390,8 @@
 		"notpassed": "Nicht bestanden",
 		"started": "Gestartet",
 		"passed": "Bestanden",
-		"proposed": "Vorgeschlagen"
+		"proposed": "Vorgeschlagen",
+		"created": "Erstellt"
 	},
 	"Pagination": {
 		"next": "Weiter",
@@ -466,6 +467,46 @@
 			"onchainVerified": "Onchain-Verifizierte",
 			"none": "Niemand",
 			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten darf"
+		},
+		"Topic": {
+			"general": "Allgemein",
+			"auction_admin": "Auktions-Administrator",
+			"general_admin": "Allgemeiner Administrator",
+			"governance": "Verwaltung",
+			"root": "Root",
+			"staking_admin": "Staking-Administrator",
+			"treasury": "Finanzverwaltung",
+			"fellowship": "Fellowship"
+		}
+	},
+	"ProposalType": {
+		"discussion": "Diskussion",
+		"referendum": "Referendum",
+		"referendumv2": "Referendum",
+		"councilmotion": "Ratsantrag",
+		"techcommitteeproposal": "Technikkomitee-Vorschlag",
+		"treasuryproposal": "Finanzvorschlag",
+		"bounty": "Prämie",
+		"childbounty": "Untergeordnete Prämie",
+		"tip": "Trinkgeld",
+		"fellowshipreferendum": "Fellowship-Referendum",
+		"alliancemotion": "Allianz-Antrag",
+		"announcement": "Ankündigung",
+		"democracyproposal": "Demokratie-Vorschlag",
+		"upgradecommittee": "Upgrade-Komitee",
+		"advisorycommittee": "Beratungsausschuss",
+		"grant": "Zuschuss",
+		"community": "Gemeinschaft",
+		"technicalcommittee": "Technisches Komitee",
+		"Topic": {
+			"general": "Allgemein",
+			"auction_admin": "Auktions-Administrator",
+			"general_admin": "Allgemeiner Administrator",
+			"governance": "Verwaltung",
+			"root": "Root",
+			"staking_admin": "Staking-Administrator",
+			"treasury": "Finanzverwaltung",
+			"fellowship": "Fellowship"
 		}
 	}
 }

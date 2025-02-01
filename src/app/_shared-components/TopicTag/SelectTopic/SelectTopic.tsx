@@ -6,10 +6,13 @@
 
 import { useState } from 'react';
 import { EOffchainPostTopic } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import classes from './SelectTopic.module.scss';
 import { Button } from '../../Button';
 
 function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffchainPostTopic) => void; disabled: boolean }) {
+	const t = useTranslations('Create');
 	const [selectedTopic, setSelectedTopic] = useState<EOffchainPostTopic>(EOffchainPostTopic.GENERAL);
 
 	return (
@@ -19,13 +22,18 @@ function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffchainPostTo
 					disabled={disabled}
 					key={key}
 					type='button'
-					className={`${classes.topicButton} ${selectedTopic === EOffchainPostTopic[key as keyof typeof EOffchainPostTopic] ? 'bg-btn_primary_background text-white' : 'bg-selected_topic_bg text-basic_text hover:bg-selected_topic_bg'}`}
+					className={cn(
+						classes.topicButton,
+						selectedTopic === EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]
+							? 'bg-btn_primary_background text-white'
+							: 'bg-selected_topic_bg text-basic_text hover:bg-selected_topic_bg'
+					)}
 					onClick={() => {
 						setSelectedTopic(EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]);
 						onChange(EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]);
 					}}
 				>
-					{key?.toLowerCase()?.split('_').join(' ')}
+					{t(`Topic.${key.toLowerCase()}`)}
 				</Button>
 			))}
 		</div>

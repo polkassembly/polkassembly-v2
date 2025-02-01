@@ -13,7 +13,7 @@ import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
-import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import { useUser } from '@/hooks/useUser';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
@@ -36,7 +36,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const searchParams = useSearchParams();
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
-	const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+	const { user } = useUser();
 
 	const STATUSES = [
 		t('ListingPage_Status.Cancelled'),
@@ -124,9 +124,9 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 				className={styles.button}
 				onClick={() => {
 					if (proposalType === EProposalType.DISCUSSION) {
-						router.replace(!accessTokenPayload ? '/login?nextUrl=create/discussion' : '/create/discussion');
+						router.replace(!user?.id ? '/login?nextUrl=create/discussion' : '/create/discussion');
 					} else {
-						router.replace(!accessTokenPayload ? '/login?nextUrl=create/treasury-proposal' : '/create/treasury-proposal');
+						router.replace(!user?.id ? '/login?nextUrl=create/treasury-proposal' : '/create/treasury-proposal');
 					}
 				}}
 			>

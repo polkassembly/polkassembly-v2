@@ -390,7 +390,8 @@
 		"notpassed": "否決",
 		"started": "開始",
 		"passed": "可決",
-		"proposed": "提案済み"
+		"proposed": "提案済み",
+		"created": "作成済み"
 	},
 	"Pagination": {
 		"next": "次へ",
@@ -465,7 +466,37 @@
 			"onchainVerified": "オンチェーン検証済み",
 			"none": "なし",
 			"tooltip": "誰がコメントと返信できるか選択"
+		},
+		"Topic": {
+			"general": "一般",
+			"auction_admin": "オークション管理者",
+			"general_admin": "一般管理者",
+			"governance": "ガバナンス",
+			"root": "ルート",
+			"staking_admin": "ステーキング管理者",
+			"treasury": "財務",
+			"fellowship": "フェローシップ"
 		}
+	},
+	"ProposalType": {
+		"discussion": "ディスカッション",
+		"referendum": "レファレンダム",
+		"referendumv2": "レファレンダム",
+		"councilmotion": "評議会モーション",
+		"techcommitteeproposal": "技術委員会提案",
+		"treasuryproposal": "財務提案",
+		"bounty": "報奨金",
+		"childbounty": "子報奨金",
+		"tip": "チップ",
+		"fellowshipreferendum": "フェローシップレファレンダム",
+		"alliancemotion": "アライアンスモーション",
+		"announcement": "発表",
+		"democracyproposal": "民主主義提案",
+		"upgradecommittee": "アップグレード委員会",
+		"advisorycommittee": "諮問委員会",
+		"grant": "助成金",
+		"community": "コミュニティ",
+		"technicalcommittee": "技術委員会"
 	}
 }
 

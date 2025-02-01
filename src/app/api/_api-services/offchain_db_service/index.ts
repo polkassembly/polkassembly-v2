@@ -106,6 +106,11 @@ export class OffChainDbService {
 
 		// 2. if not found, get post from subsquare
 		if (!post) {
+			// if is off-chain and not found in our db, throw error
+			if (ValidatorService.isValidOffChainProposalType(proposalType)) {
+				throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Post not found');
+			}
+
 			post = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		}
 

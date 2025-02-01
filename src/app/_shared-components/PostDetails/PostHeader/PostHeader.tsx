@@ -19,6 +19,7 @@ import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import classes from './PostHeader.module.scss';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
@@ -47,6 +48,8 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+
+	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	return (
 		<div>
@@ -79,7 +82,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 							/>
 						</div>
 					)}
-					<StatusTag status={postData?.onChainInfo?.status?.toLowerCase().replace(/\s+/g, '_')} />
+					{postData?.onChainInfo?.status && <StatusTag status={postData.onChainInfo.status.toLowerCase().replace(/\s+/g, '_')} />}
 				</div>
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
@@ -181,12 +184,14 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				>
 					{t('PostDetails.timeline')}
 				</TabsTrigger>
-				<TabsTrigger
-					className='uppercase'
-					value={EPostDetailsTab.ONCHAIN_INFO}
-				>
-					{t('PostDetails.onchainInfo')}
-				</TabsTrigger>
+				{!isOffchainPost && (
+					<TabsTrigger
+						className='uppercase'
+						value={EPostDetailsTab.ONCHAIN_INFO}
+					>
+						{t('PostDetails.onchainInfo')}
+					</TabsTrigger>
+				)}
 			</TabsList>
 		</div>
 	);

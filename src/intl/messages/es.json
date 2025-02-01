@@ -390,7 +390,8 @@
 		"notpassed": "No Aprobado",
 		"started": "Iniciado",
 		"passed": "Aprobado",
-		"proposed": "Propuesto"
+		"proposed": "Propuesto",
+		"created": "Creado"
 	},
 	"Pagination": {
 		"next": "Siguiente",
@@ -465,8 +466,35 @@
         "onchainVerified": "Verificados en Cadena",
         "none": "Ninguno",
         "tooltip": "Elija quién puede comentar y responder a esta publicación"
-    }
-}
+		},
+		"Topic": {
+			"general": "General",
+			"auction_admin": "Administrador de Subastas",
+			"general_admin": "Administrador General",
+			"governance": "Gobernanza",
+			"root": "Root",
+			"staking_admin": "Administrador de Staking",
+			"treasury": "Tesorería",
+			"fellowship": "Fellowship"
+		}
+	},
+	"ProposalType": {
+		"discussion": "Discusión",
+		"referendum": "Referendo",
+		"treasuryproposal": "Propuesta de Tesorería",
+		"bounty": "Recompensa",
+		"childbounty": "Recompensa Secundaria",
+		"tip": "Propina",
+		"fellowshipreferendum": "Referendo de Fellowship",
+		"alliancemotion": "Moción de Alianza",
+		"announcement": "Anuncio",
+		"democracyproposal": "Propuesta de Democracia",
+		"upgradecommittee": "Comité de Actualización",
+		"advisorycommittee": "Comité Asesor",
+		"grant": "Subvención",
+		"community": "Comunidad",
+		"technicalcommittee": "Comité Técnico"
+	}
 }
 
 

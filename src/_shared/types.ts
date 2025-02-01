@@ -243,7 +243,7 @@ export enum ELocales {
 	ENGLISH = 'en',
 	CHINESE = 'zh',
 	GERMAN = 'de',
-	JAPANESE = 'jp'
+	JAPANESE = 'ja'
 }
 
 export enum ECookieNames {
@@ -305,11 +305,11 @@ export interface IPostLink {
 
 export enum EOffchainPostTopic {
 	GENERAL = 'general',
-	AUCTION_ADMIN = 'auction_admin',
-	GENERAL_ADMIN = 'general_admin',
+	AUCTION_ADMIN = 'auctionAdmin',
+	GENERAL_ADMIN = 'generalAdmin',
 	GOVERNANCE = 'governance',
 	ROOT = 'root',
-	STAKING_ADMIN = 'staking_admin',
+	STAKING_ADMIN = 'stakingAdmin',
 	TREASURY = 'treasury',
 	FELLOWSHIP = 'fellowship'
 }
@@ -378,7 +378,8 @@ export enum EProposalStatus {
 	Confirmed = 'Confirmed',
 	DecisionDepositPlaced = 'DecisionDepositPlaced',
 	TimedOut = 'TimedOut',
-	Opened = 'Opened'
+	Opened = 'Opened',
+	Created = 'Created'
 }
 
 export enum EPostOrigin {
