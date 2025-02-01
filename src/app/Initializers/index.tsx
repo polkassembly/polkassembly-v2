@@ -9,7 +9,8 @@ import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
-import { userPreferencesAtom } from '../_atoms/user/userPreferencesAtom';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
 import { ClientError } from '../_client-utils/clientError';
@@ -24,10 +25,11 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const network = getCurrentNetwork();
 
 	const { user, setUser } = useUser();
+	const { setUserPreferences } = useUserPreferences();
+
 	const polkadotApi = useAtomValue(polkadotApiAtom);
 	const identityApi = useAtomValue(identityApiAtom);
 
-	const setUserPreferencesAtom = useSetAtom(userPreferencesAtom);
 	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
 	const setIdentityApiAtom = useSetAtom(identityApiAtom);
 	const setWalletServiceAtom = useSetAtom(walletAtom);
@@ -145,12 +147,14 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user preferences
 	useEffect(() => {
-		setUserPreferencesAtom({
+		setUserPreferences({
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
 			// address: user?.defaultAddress, TODO: fix this @aadarsh012
 			wallet: user?.loginWallet
 		});
+
+		dayjs.locale(userPreferences.locale);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
 
