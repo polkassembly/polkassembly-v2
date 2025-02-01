@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, EProposalType, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -47,6 +47,8 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+
+	const isOffchainPost = [EProposalType.DISCUSSION].includes(postData.proposalType);
 
 	return (
 		<div>
@@ -181,12 +183,14 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				>
 					{t('PostDetails.timeline')}
 				</TabsTrigger>
-				<TabsTrigger
-					className='uppercase'
-					value={EPostDetailsTab.ONCHAIN_INFO}
-				>
-					{t('PostDetails.onchainInfo')}
-				</TabsTrigger>
+				{!isOffchainPost && (
+					<TabsTrigger
+						className='uppercase'
+						value={EPostDetailsTab.ONCHAIN_INFO}
+					>
+						{t('PostDetails.onchainInfo')}
+					</TabsTrigger>
+				)}
 			</TabsList>
 		</div>
 	);

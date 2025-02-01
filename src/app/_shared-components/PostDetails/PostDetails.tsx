@@ -26,6 +26,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		setPost((prev) => ({ ...prev, title, content }));
 	};
 
+	const isOffchainPost = [EProposalType.DISCUSSION].includes(post.proposalType);
+
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 			<div className={classes.headerWrapper}>
@@ -55,7 +57,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							/>
 						</TabsContent>
 					</div>
-					{isModalOpen && (
+					{isModalOpen && !isOffchainPost && (
 						<div className='pt-5'>
 							{' '}
 							<VoteReferendumButton index={index} />
@@ -70,7 +72,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</div>
 					)}
 				</div>
-				{!isModalOpen && (
+				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>
 						<VoteReferendumButton index={index} />
 						<ProposalPeriods

@@ -41,7 +41,7 @@ function ListingCard({
 	title: string;
 	onChainInfo: IOnChainPostListing;
 	backgroundColor: string;
-	proposalType: string;
+	proposalType: EProposalType;
 	metrics?: IPostOffChainMetrics;
 	index: number;
 }) {
@@ -65,14 +65,15 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
 
+	const redirectUrl = [EProposalType.DISCUSSION].includes(proposalType) ? `/post/${index}` : `/referenda/${index}`;
 	return (
 		<Link
-			href={`/referenda/${index}`}
+			href={redirectUrl}
 			className='w-full'
 			onClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
-				redirectFromServer(`/referenda/${index}`);
+				redirectFromServer(redirectUrl);
 			}}
 		>
 			<div className={`${styles.listingCard} ${backgroundColor}`}>
