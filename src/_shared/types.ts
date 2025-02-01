@@ -366,7 +366,8 @@ export enum EProposalStatus {
 	Confirmed = 'Confirmed',
 	DecisionDepositPlaced = 'DecisionDepositPlaced',
 	TimedOut = 'TimedOut',
-	Opened = 'Opened'
+	Opened = 'Opened',
+	Created = 'Created'
 }
 
 export enum EPostOrigin {
