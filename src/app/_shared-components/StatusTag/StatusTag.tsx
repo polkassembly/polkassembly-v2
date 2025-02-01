@@ -21,10 +21,9 @@ function StatusTag({ className = '', status, colorInverted }: Props) {
 
 	return (
 		<div
-			// eslint-disable-next-line
-			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus] : ''} ${colorInverted ? styles.inverted : ''} ${
-				theme === ETheme.DARK ? styles.dark : styles.light
-			} ${className}`}
+			className={`${styles.base} ${normalizedStatus ? styles[normalizedStatus as keyof typeof styles] : ''} ${
+				colorInverted ? styles.inverted : ''
+			} ${theme === ETheme.DARK ? styles.dark : styles.light} ${className}`}
 		>
 			{t(`ProposalStatus.${status?.toLowerCase()}`)}
 		</div>
