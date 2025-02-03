@@ -167,7 +167,11 @@
 		},
 		"overview": "Overview",
 		"onchainIdentity": "Onchain Identity",
-		"linkAddress": "Link Address"
+		"linkAddress": "Link Address",
+		"badges": "Badges",
+		"badgesDescription": "Unlock, receive and earn badges as you engage in polkassembly",
+		"userSince": "User Since",
+		"rank": "Rank"
 	},
 	"ListingTab": {
 		"Analytics": "Analytics",

@@ -25,7 +25,12 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 				/>
 			</div>
 			<div className={classes.headerWrapper}>
-				<ProfileHeader address={profileData.addresses[0]} />
+				<ProfileHeader
+					address={profileData.addresses[0]}
+					username={profileData.username}
+					createdAt={profileData.createdAt}
+					rank={profileData.rank}
+				/>
 			</div>
 			<div className={classes.contentWrapper}>
 				<TabsContent value={EProfileTabs.OVERVIEW}>
