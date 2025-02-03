@@ -21,12 +21,14 @@ function ActivityFeedAbout() {
 			<span className={`${styles.aboutTitle} dark:text-white`}>{t('ActivityFeed.About')}</span>
 			<div className={styles.aboutDescription}>
 				<span className='dark:text-white'>{t('ActivityFeed.AboutDescription')} </span>
-				<Link
-					href='https://polkadot.network/about'
-					className={styles.knowMoreLink}
-				>
-					{t('ActivityFeed.KnowMore')} <MdOpenInNew className='text-lg' />
-				</Link>
+				<span className='hover:underline'>
+					<Link
+						href='https://polkadot.network/about'
+						className={styles.knowMoreLink}
+					>
+						{t('ActivityFeed.KnowMore')} <MdOpenInNew />
+					</Link>
+				</span>
 			</div>
 			<div className={styles.aboutSocialContainer}>
 				{socialLinks.map((link) => (
