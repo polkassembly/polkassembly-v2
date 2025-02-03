@@ -33,10 +33,10 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction;
 						/>
 					</div>
 				) : (
-					<Icon className={`${styles.activity_icons} text-lg ${isActive ? 'text-text_pink' : ''}`} />
+					<Icon className={`${styles.activity_icons} text-lg text-bg_pink`} />
 				)}
 			</div>
-			<span className={isActive ? 'text-text_pink' : ''}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
+			<span className='text-bg_pink'>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
 		</button>
 	);
 }
