@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { convertHtmlToEditorJs } from '@/app/_client-utils/convertHtmlToEditorJs';
+import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
@@ -40,10 +41,17 @@ function BlockEditor({
 
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
+	const blockEditorId = `block-editor-${id}`;
+
+	const blockEditorSavedContent = LocalStorageClientService.getBlockEditorContent(blockEditorId);
+
+	const blockEditorContent = data || (blockEditorSavedContent && (JSON.parse(blockEditorSavedContent) as OutputData));
+
 	const clearEditor = async () => {
 		try {
 			if (blockEditorRef.current?.blocks) {
 				await blockEditorRef.current.blocks.clear();
+				LocalStorageClientService.removeBlockEditorContent(blockEditorId);
 			}
 		} catch (error) {
 			console.error('Error clearing editor:', error);
@@ -61,7 +69,7 @@ function BlockEditor({
 				const editor = new EditorJS({
 					readOnly,
 					minHeight: 400,
-					holder: `block-editor-${id}`,
+					holder: blockEditorId,
 					inlineToolbar: true,
 					tools: {
 						header: {
@@ -112,7 +120,7 @@ function BlockEditor({
 							}
 						}
 					},
-					data: data as OutputData,
+					data: blockEditorContent as OutputData,
 					onReady: async () => {
 						if (data) {
 							try {
@@ -133,6 +141,7 @@ function BlockEditor({
 						try {
 							const edJsData = await api.saver.save();
 							onChange?.(edJsData);
+							LocalStorageClientService.setBlockEditorContent(blockEditorId, edJsData);
 						} catch (error) {
 							console.error('Error in onChange:', error);
 						}
@@ -204,7 +213,7 @@ function BlockEditor({
 				classes.blockEditor,
 				className
 			)}
-			id={`block-editor-${id}`}
+			id={blockEditorId}
 		/>
 	);
 }
