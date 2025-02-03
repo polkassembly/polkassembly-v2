@@ -8,9 +8,12 @@ import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIn
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
+import { StatusCodes } from 'http-status-codes';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
+import { APIError } from '../../_api-utils/apiError';
 
 if (!IS_AI_ENABLED) {
 	console.log(`
@@ -227,12 +230,15 @@ export class AIService {
 		return response?.toLowerCase() === 'true';
 	}
 
-	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
 
 		let onChainPostInfo: IOnChainPostInfo | null = null;
 		if (ValidatorService.isValidOnChainProposalType(proposalType)) {
 			onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
+			if (!onChainPostInfo) {
+				throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND, 'Post not found');
+			}
 		}
 
 		const mdContent = offChainPostData.content ? htmlAndMarkdownFromEditorJs(offChainPostData.content).markdown : undefined;
@@ -255,7 +261,7 @@ export class AIService {
 			title: offChainPostData.title
 		});
 
-		if (!postSummary?.trim() && !isSpam) return;
+		if (!postSummary?.trim() && !isSpam) return null;
 
 		// check if content summary already exists
 		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
@@ -273,6 +279,8 @@ export class AIService {
 		};
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
+
+		return updatedContentSummary;
 	}
 
 	static async UpdatePostCommentsSummary({
@@ -285,12 +293,12 @@ export class AIService {
 		proposalType: EProposalType;
 		indexOrHash: string;
 		newCommentId?: string;
-	}) {
+	}): Promise<IContentSummary | null> {
 		const commentsTree = await OffChainDbService.GetPostComments({ network, indexOrHash, proposalType });
 
 		const flattenedComments = commentsTree.flatMap((comment) => comment.children || [comment]);
 
-		if (!flattenedComments.length) return;
+		if (!flattenedComments.length) return null;
 
 		// check if new comment is spam
 		if (newCommentId) {
@@ -306,7 +314,7 @@ export class AIService {
 
 		const commentsSummary = await this.getCommentsSummary({ comments: flattenedComments });
 
-		if (!commentsSummary?.trim()) return;
+		if (!commentsSummary?.trim()) return null;
 
 		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
 
@@ -321,5 +329,7 @@ export class AIService {
 		};
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
+
+		return updatedContentSummary;
 	}
 }
