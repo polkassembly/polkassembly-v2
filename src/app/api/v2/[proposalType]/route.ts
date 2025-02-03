@@ -30,6 +30,7 @@ import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 import { RedisService } from '../../_api-services/redis_service';
+import { AIService } from '../../_api-services/ai_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -187,6 +188,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		title,
 		allowedCommentor
 	});
+
+	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
