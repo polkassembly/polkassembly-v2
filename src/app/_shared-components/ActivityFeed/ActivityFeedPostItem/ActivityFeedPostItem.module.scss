@@ -19,10 +19,14 @@
 }
 
 .castVoteButton {
-    @apply flex gap-1 rounded-md border-[1px] border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border;
+    @apply flex gap-1 rounded-md border-[1px] hover:bg-progress_pink_bg border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border;
 }
 
 .beneficiaryContainer {
     @apply flex flex-wrap gap-2 items-center;
 
+}
+
+.container {
+    @apply cursor-pointer rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg
 }

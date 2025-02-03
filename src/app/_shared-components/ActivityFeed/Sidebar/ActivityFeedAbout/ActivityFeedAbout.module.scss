@@ -7,7 +7,7 @@
 }
 
 .aboutDescription {
-    @apply text-base text-text_primary;
+    @apply text-sm text-text_primary;
 }
 
 .aboutSocialLink {
@@ -16,4 +16,8 @@
 
 .aboutSocialContainer {
     @apply flex flex-wrap gap-5 text-xl
+}
+
+.knowMoreLink {
+    @apply flex cursor-pointer gap-0.5 items-center text-sm font-medium text-text_pink
 }

@@ -71,8 +71,8 @@ function CommentModal({
 				onOpenChange={setIsDialogOpen}
 			>
 				<DialogTitle>
-					<DialogContent className='max-w-lg p-6 lg:max-w-xl'>
-						<DialogHeader>
+					<DialogContent className='max-w-lg pb-4 pt-3 lg:max-w-xl'>
+						<DialogHeader className='px-4'>
 							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
 								<div className='flex w-10 flex-col gap-5'>
 									<Image
@@ -107,7 +107,7 @@ function CommentModal({
 										</span>
 									</div>
 									<span className='text-sm font-medium text-text_primary'>
-										#{postData.index} {postData.title?.slice(0, 80).concat('...')}
+										#{postData.index} <span className='font-semibold'>{postData.title?.slice(0, 80).concat('...')}</span>
 									</span>
 									<span className='text-xs text-text_pink'>{t('ActivityFeed.PostItem.commentingOnProposal')}</span>
 									<div className='w-full pt-5'>

@@ -70,7 +70,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 	};
 
 	return (
-		<div className='rounded-xl border border-border_grey bg-bg_modal p-5'>
+		<div className={styles.container}>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>
@@ -175,21 +175,25 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 			</div>
 
 			{/* Metrics Section */}
-			<div className='flex items-center justify-end'>
-				<div className='flex items-center gap-2 text-xs text-text_primary'>
-					<span>
-						{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
-					</span>
-					<span>|</span>
-					<span>
-						{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
-					</span>
-					<span>|</span>
-					<span>
-						{commentCount} {t('ActivityFeed.PostItem.comments')}
-					</span>
+			{(reactionState.likesCount > 0 || reactionState.dislikesCount > 0 || commentCount > 0) && (
+				<div className='flex items-center justify-end'>
+					<div className='flex items-center gap-2 text-xs text-text_primary'>
+						<span>
+							{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+						</span>
+						<span>|</span>
+
+						<span>
+							{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+						</span>
+						<span>|</span>
+
+						<span>
+							{commentCount} {t('ActivityFeed.PostItem.comments')}
+						</span>
+					</div>
 				</div>
-			</div>
+			)}
 
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
