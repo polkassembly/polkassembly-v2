@@ -85,46 +85,46 @@ export class NextApiClientService {
 		switch (route) {
 			// Static routes
 			case EApiRoute.WEB2_LOGIN:
-				path = '/auth/actions/web2Login';
+				path = '/auth/web2-auth/login';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB2_SIGNUP:
-				path = '/auth/actions/web2Signup';
+				path = '/auth/web2-auth/signup';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB3_LOGIN:
-				path = '/auth/actions/web3LoginOrSignup';
+				path = '/auth/web3-auth';
 				method = 'POST';
 				break;
 			case EApiRoute.REFRESH_ACCESS_TOKEN:
-				path = '/auth/actions/refreshAccessToken';
+				path = '/auth/refresh-access-token';
 				break;
 			case EApiRoute.USER_EXISTS:
-				path = '/auth/actions/usernameExists';
+				path = '/auth/username-exists';
 				method = 'POST';
 				break;
 			case EApiRoute.TFA_LOGIN:
-				path = '/auth/actions/tfa/login';
+				path = '/auth/tfa/login';
 				method = 'POST';
 				break;
 			case EApiRoute.GEN_TFA_TOKEN:
-				path = '/auth/actions/tfa/setup/generate';
+				path = '/auth/tfa/setup/generate';
 				method = 'POST';
 				break;
 			case EApiRoute.VERIFY_TFA_TOKEN:
-				path = '/auth/actions/tfa/setup/verify';
+				path = '/auth/tfa/setup/verify';
 				method = 'POST';
 				break;
 			case EApiRoute.LOGOUT:
-				path = '/auth/actions/logout';
+				path = '/auth/logout';
 				method = 'POST';
 				break;
 			case EApiRoute.LINK_ADDRESS:
-				path = '/auth/actions/link-address';
+				path = '/auth/link-address';
 				method = 'POST';
 				break;
 			case EApiRoute.GET_ACTIVITY_FEED:
-				path = '/activityFeed';
+				path = '/activity-feed';
 				method = 'GET';
 				break;
 			// Dynamic routes
@@ -159,11 +159,11 @@ export class NextApiClientService {
 				method = 'DELETE';
 				break;
 			case EApiRoute.GENERATE_QR_SESSION:
-				path = '/auth/actions/qr-session';
+				path = '/auth/qr-session';
 				method = 'GET';
 				break;
 			case EApiRoute.CLAIM_QR_SESSION:
-				path = '/auth/actions/qr-session';
+				path = '/auth/qr-session';
 				method = 'POST';
 				break;
 			default:
