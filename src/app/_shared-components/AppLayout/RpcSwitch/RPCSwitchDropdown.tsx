@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MdOutlineSignalCellularAlt } from 'react-icons/md';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
