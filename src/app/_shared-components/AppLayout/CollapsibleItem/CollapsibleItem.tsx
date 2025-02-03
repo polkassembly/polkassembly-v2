@@ -197,7 +197,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 													<div className={style.iconWrapper}>
 														<Icon
 															name={subItem.icon}
-															className={`${theme === ETheme.DARK ? DARK_ICON_CLASS : ''}`}
+															className={`${theme === ETheme.DARK && DARK_ICON_CLASS}`}
 														/>
 													</div>
 												)}

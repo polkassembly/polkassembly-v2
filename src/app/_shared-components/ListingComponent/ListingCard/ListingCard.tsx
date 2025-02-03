@@ -101,7 +101,7 @@ function ListingCard({
 									<span className='hidden lg:block'>|</span>
 									<Icon
 										name='icons/Comment'
-										className={`h-5 w-5 ${theme === ETheme.DARK ? 'dark-icons' : ''}`}
+										className={`h-5 w-5 ${theme === ETheme.DARK && 'dark-icons'}`}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
 								</div>

@@ -54,7 +54,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 							>
 								<Icon
 									name={item.icon as IconName}
-									className={`h-5 w-5 ${theme === ETheme.DARK ? 'dark-icons' : ''}`}
+									className={`h-5 w-5 ${theme === ETheme.DARK && 'dark-icons'}`}
 								/>
 
 								<Link
