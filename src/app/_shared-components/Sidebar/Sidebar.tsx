@@ -366,7 +366,7 @@ const sidebarMenuButtonVariants = cva(
 	cn(
 		styles.menuButton,
 		'transition-[width, height, padding]',
-		'ring-sidebar-ring peer/menu-button focus-visible:ring-2 active:bg-white-accent active:text-sidebar-accent-foreground group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 data-[active=true]:bg-white-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-white-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2'
+		'ring-sidebar-ring peer/menu-button focus-visible:ring-2 active:bg-white-accent active:text-sidebar-accent-foreground group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 data-[active=true]:bg-white-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-white-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-[46px] group-data-[collapsible=icon]:!p-2'
 	),
 	{
 		variants: {
