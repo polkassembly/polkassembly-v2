@@ -69,8 +69,23 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
+	const handleContainerClick = (e: React.MouseEvent) => {
+		if (!(e.target instanceof Element)) return;
+
+		const isExcludedSection =
+			e.target.closest(`.${styles.castVoteButton}`) || e.target.closest('[data-reaction-handler="true"]') || e.target.closest('[data-comment-input="true"]');
+
+		if (!isExcludedSection) {
+			router.push(`/referenda/${postData.index}`);
+		}
+	};
+
 	return (
-		<div className={styles.container}>
+		<div
+			aria-hidden='true'
+			onClick={handleContainerClick}
+			className={styles.container}
+		>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>
@@ -92,7 +107,10 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					</span>
 					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
 				</div>
-				<div>
+				<button
+					type='button'
+					onClick={(e) => e.stopPropagation()}
+				>
 					{user?.id ? (
 						<Dialog>
 							<DialogTrigger asChild>
@@ -126,7 +144,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 							</span>
 						</Link>
 					)}
-				</div>
+				</button>
 			</div>
 
 			{/* Post Info Section */}
@@ -198,19 +216,25 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<ReactionHandler
-				postData={postData}
-				setIsDialogOpen={setIsDialogOpen}
-				reactionState={reactionState}
-				showLikeGif={showLikeGif}
-				showDislikeGif={showDislikeGif}
-				handleReaction={handleReaction}
-			/>
+			<div
+				aria-hidden='true'
+				onClick={(e) => e.stopPropagation()}
+				data-comment-input='true'
+			>
+				<ReactionHandler
+					postData={postData}
+					setIsDialogOpen={setIsDialogOpen}
+					reactionState={reactionState}
+					showLikeGif={showLikeGif}
+					showDislikeGif={showDislikeGif}
+					handleReaction={handleReaction}
+				/>
 
-			<CommentInput
-				inputRef={inputRef as RefObject<HTMLInputElement>}
-				onClick={handleCommentClick}
-			/>
+				<CommentInput
+					inputRef={inputRef as RefObject<HTMLInputElement>}
+					onClick={handleCommentClick}
+				/>
+			</div>
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}
