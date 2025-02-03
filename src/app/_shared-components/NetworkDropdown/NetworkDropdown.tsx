@@ -200,8 +200,8 @@ function NetworkDropdown() {
 				}}
 			>
 				<SelectValue>
-					<div className={styles.selectContent}>
-						<div className={styles.selectValueContainer}>
+					<div className={styles.selectValueContainer}>
+						<div className={styles.selectValue}>
 							<Image
 								src={getNetworkLogo(selectedNetwork) || WestendLogo}
 								alt={getNetworkDisplayName(selectedNetwork)}
