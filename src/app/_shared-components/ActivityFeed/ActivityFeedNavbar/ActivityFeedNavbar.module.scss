@@ -4,7 +4,7 @@
 }
 
 .popoverTrigger {
-    @apply flex h-9 items-center justify-between rounded-lg px-2 text-sm font-medium;
+    @apply flex h-9 items-center justify-between rounded-lg px-2 text-base hover:bg-activity_selected_tab;
 
 }
 
@@ -13,11 +13,11 @@
 }
 
 .popoverContent {
-    @apply w-52 border-none bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
+    @apply w-52 border-primary_border bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
 }
 
 .trackName {
-    @apply w-full rounded-lg px-2 py-2 text-start text-sm font-medium;
+    @apply w-full rounded-lg px-1 py-2 text-start text-sm font-medium text-wallet_btn_text hover:bg-activity_selected_tab;
 }
 
 @media (max-width: 768px) {
@@ -26,6 +26,6 @@
     }
 
     .popoverTrigger {
-        @apply px-1.5;
+        @apply px-1;
     }
 }

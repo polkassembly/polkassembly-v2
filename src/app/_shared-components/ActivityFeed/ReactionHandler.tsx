@@ -16,7 +16,7 @@ function ActionButton({ icon: Icon, text, onClick }: { icon: React.ReactNode; te
 	return (
 		<button
 			type='button'
-			className='flex cursor-pointer items-center'
+			className='flex cursor-pointer items-center text-bg_pink transition-all duration-300 hover:scale-110'
 			onClick={onClick}
 		>
 			{Icon}
@@ -76,8 +76,8 @@ function ReactionHandler({
 		}
 	};
 	return (
-		<div className='mb-4 flex items-center justify-between text-sm text-navbar_border'>
-			<div className='flex space-x-4'>
+		<div className='mb-4 flex items-center justify-between text-xs text-navbar_border'>
+			<div className='flex space-x-5'>
 				<ReactionButton
 					type={EReaction.like}
 					isActive={reactionState.isLiked}
@@ -91,7 +91,7 @@ function ReactionHandler({
 					onClick={handleDislike}
 				/>
 				<ActionButton
-					icon={<IoShareSocialOutline className='mr-2 text-lg' />}
+					icon={<IoShareSocialOutline className='mr-2 text-lg text-bg_pink' />}
 					text={t('ActivityFeed.PostItem.share')}
 					onClick={handleShare}
 				/>
