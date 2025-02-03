@@ -10,7 +10,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
+import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { APIError } from '../../_api-utils/apiError';
@@ -23,8 +23,12 @@ if (!IS_AI_ENABLED) {
 	`);
 }
 
+if (IS_AI_ENABLED && !AI_SERVICE_URL.trim()) {
+	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'AI_SERVICE_URL is not set');
+}
+
 export class AIService {
-	private static AI_SERVICE_URL = 'https://example.com';
+	private static AI_SERVICE_URL = AI_SERVICE_URL;
 
 	private static BASE_PROMPTS = {
 		POST_SUMMARY: `
