@@ -142,6 +142,7 @@ export class FirestoreService extends FirestoreRefs {
 			id: user.id,
 			username: user.username,
 			profileScore: user.profileScore,
+			createdAt: user.createdAt,
 			rank,
 			addresses: addresses.map((addr) => addr.address),
 			profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
@@ -175,6 +176,7 @@ export class FirestoreService extends FirestoreRefs {
 					profileScore: data.profileScore,
 					addresses: addresses.map((addr: IUserAddress) => addr.address),
 					rank,
+					createdAt: data.createdAt,
 					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
 				} as IPublicUser;
 			})

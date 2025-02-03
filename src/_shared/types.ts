@@ -39,8 +39,8 @@ export enum EUserBadge {
 	DECENTRALISED_VOICE = 'decentralised_voice',
 	FELLOW = 'fellow',
 	COUNCIL = 'council',
-	ACTIVE_VOTER = 'active_voter'
-	// WHALE = 'whale'
+	ACTIVE_VOTER = 'active_voter',
+	WHALE = 'whale'
 	// STEADFAST_COMMENTOR = 'Steadfast Commentor',
 	// GM_VOTER = 'GM Voter',
 	// POPULAR_DELEGATE = 'Popular Delegate'

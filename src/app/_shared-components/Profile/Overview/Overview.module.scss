@@ -55,7 +55,7 @@
 }
 
 .badgesCardContentItem {
-	@apply flex flex-col items-center gap-y-2 rounded-xl bg-page_background py-3
+	@apply flex flex-col items-center justify-between gap-y-2 rounded-xl bg-page_background py-3
 }
 
 .badgesCardContentItemTitle {

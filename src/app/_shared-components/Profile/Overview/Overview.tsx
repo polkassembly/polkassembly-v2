@@ -7,29 +7,15 @@ import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import DecentralisedVoice from '@assets/icons/decentralized-voice-badge.svg';
-import Fellow from '@assets/icons/fellow-badge.svg';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import MedalIcon from '@assets/icons/medal-icon.svg';
+import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import { Button } from '../../Button';
 import Address from '../Address/Address';
 import LinkAddress from './LinkAddress/LinkAddress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import classes from './Overview.module.scss';
-
-const badgeImages = {
-	[EUserBadge.DECENTRALISED_VOICE]: DecentralisedVoice,
-	[EUserBadge.FELLOW]: Fellow,
-	[EUserBadge.COUNCIL]: DecentralisedVoice,
-	[EUserBadge.ACTIVE_VOTER]: Fellow
-};
-
-const achievementBadges = Object.values(EUserBadge).map((badge) => ({
-	name: badge,
-	label: badge.replace('_', ' '),
-	image: badgeImages[`${badge}`]
-}));
 
 function Overview({ profileData }: { profileData: IPublicUser }) {
 	const [userProfile, setUserProfile] = useState<IPublicUser>(profileData);
@@ -61,24 +47,29 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 								height={24}
 							/>
 							<span className='text-xl font-semibold'>{t('Profile.badges')}</span>
-							<span className='text-sm'>({achievementBadges.length})</span>
+							<span className='text-sm'>({Object.keys(achievementBadges).length})</span>
 						</p>
 						<p className='text-sm'>{t('Profile.badgesDescription')}</p>
 					</div>
 					<div className={classes.badgesCardContent}>
-						{achievementBadges.map((badge) => (
-							<div
-								key={badge.name}
-								className={classes.badgesCardContentItem}
-							>
-								<Image
-									src={badge.image}
-									alt={badge.name}
-									className={cn(!userBadges[badge.name] && 'grayscale-[85%]')}
-								/>
-								<p className={classes.badgesCardContentItemTitle}>{badge.label}</p>
-							</div>
-						))}
+						{Object.keys(achievementBadges).map((badge) => {
+							const badgeDetails = achievementBadges[`${badge}` as EUserBadge];
+							return (
+								<div
+									key={badgeDetails.name}
+									className={classes.badgesCardContentItem}
+								>
+									<div className={[EUserBadge.COUNCIL, EUserBadge.WHALE].includes(badgeDetails.name) ? 'w-24' : 'w-32'}>
+										<Image
+											src={badgeDetails.image}
+											alt={badgeDetails.name}
+											className={cn(!userBadges[badgeDetails.name] && 'grayscale-[85%]')}
+										/>
+									</div>
+									<p className={classes.badgesCardContentItemTitle}>{badgeDetails.displayName}</p>
+								</div>
+							);
+						})}
 					</div>
 				</div>
 			</div>
