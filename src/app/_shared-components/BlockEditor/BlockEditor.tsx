@@ -40,6 +40,8 @@ function BlockEditor({
 
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
+	const blockEditorId = `block-editor-${id}`;
+
 	const clearEditor = async () => {
 		try {
 			if (blockEditorRef.current?.blocks) {
@@ -61,7 +63,7 @@ function BlockEditor({
 				const editor = new EditorJS({
 					readOnly,
 					minHeight: 400,
-					holder: `block-editor-${id}`,
+					holder: blockEditorId,
 					inlineToolbar: true,
 					tools: {
 						header: {
@@ -192,7 +194,8 @@ function BlockEditor({
 		};
 
 		updateContent();
-	}, [data, renderFromHtml]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [renderFromHtml]);
 
 	return (
 		<div
@@ -204,7 +207,7 @@ function BlockEditor({
 				classes.blockEditor,
 				className
 			)}
-			id={`block-editor-${id}`}
+			id={blockEditorId}
 		/>
 	);
 }
