@@ -8,7 +8,9 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { useTranslations } from 'next-intl';
+import { ETheme } from '@/_shared/types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '../../Sidebar/Sidebar';
@@ -28,9 +30,10 @@ type State = 'collapsed' | 'expanded';
 
 const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
 const NEW_BADGE_TEXT = 'Sidebar.Tag.new';
-const DARK_ICON_CLASS = 'dark:dark-icons';
+const DARK_ICON_CLASS = 'dark-icons';
 
 function NestedPopover({ item }: { item: ISidebarMenuItem }) {
+	const { resolvedTheme: theme } = useTheme();
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -72,7 +75,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 													alt={subItem.title || 'icon'}
 													width={24}
 													height={24}
-													className={DARK_ICON_CLASS}
+													className={theme === ETheme.DARK ? DARK_ICON_CLASS : ''}
 												/>
 											</div>
 										)}
@@ -91,6 +94,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 
 function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 	const [isNestedOpen, setIsNestedOpen] = useState(false);
+	const { resolvedTheme: theme } = useTheme();
 
 	return (
 		<Collapsible
@@ -133,7 +137,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 												<Image
 													src={subItem.icon}
 													alt={subItem.title || 'icon'}
-													className={`${subItem.isActive ? SELECTED_ICON_CLASS : DARK_ICON_CLASS}`}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK ? DARK_ICON_CLASS : ''}`}
 													width={20}
 													height={20}
 												/>
@@ -154,6 +158,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 
 function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 	const t = useTranslations();
+	const { resolvedTheme: theme } = useTheme();
 	return (
 		<SidebarMenuItem>
 			<div className={style.sidebarTrigger}>
@@ -176,7 +181,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 										<Image
 											src={item.icon}
 											alt={item.title || 'icon'}
-											className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : DARK_ICON_CLASS}`}
+											className={`${item.isActive || (item.items?.some((subItem) => subItem.isActive) && SELECTED_ICON_CLASS)} ${theme === ETheme.DARK ? DARK_ICON_CLASS : ''}`}
 											width={24}
 											height={24}
 										/>
@@ -207,7 +212,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 														<Image
 															src={subItem.icon}
 															alt={subItem.title || 'icon'}
-															className={DARK_ICON_CLASS}
+															className={theme === ETheme.DARK ? DARK_ICON_CLASS : ''}
 															width={24}
 															height={24}
 														/>

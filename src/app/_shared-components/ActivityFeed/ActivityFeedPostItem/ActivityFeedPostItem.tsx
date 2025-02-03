@@ -62,8 +62,8 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 	const decisionPeriodPercentage = postData.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(postData.onChainInfo?.decisionPeriodEndsAt) : 0;
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
-	// const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-	const formattedTime = useMemo(() => dayjs.utc(postData.onChainInfo?.createdAt).fromNow(), [postData]);
+	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+	const formattedprogress = useMemo(() => dayjs.utc(postData.onChainInfo?.createdAt).fromNow(), [postData]);
 
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
@@ -109,7 +109,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					<span>|</span>
 					<span className='flex items-center gap-2'>
 						<FaRegClock className='text-sm' />
-						{formattedTime}
+						{formattedprogress}
 					</span>
 				</div>
 				<VotingProgress
