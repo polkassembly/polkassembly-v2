@@ -31,9 +31,9 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 		setIsLoading(true);
 		try {
 			await api.switchToNewRpcEndpoint(index);
-			setUserPreferences((prev) => ({ ...prev, rpcIndex: index }));
-		} catch (error) {
-			console.error('Failed to switch RPC:', error);
+			setUserPreferences({ ...userPreferences, rpcIndex: index });
+		} catch {
+			// TODO: show notification
 		} finally {
 			setIsLoading(false);
 		}

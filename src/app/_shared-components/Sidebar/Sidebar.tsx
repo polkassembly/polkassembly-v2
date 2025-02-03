@@ -6,12 +6,10 @@
 
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
-import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
-import { ETheme } from '@/_shared/types';
 import { ComponentProps, createContext, CSSProperties, ElementRef, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import styles from './Sidebar.module.scss';
@@ -249,7 +247,6 @@ Sidebar.displayName = 'Sidebar';
 
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
-	const { resolvedTheme: theme } = useTheme();
 	const isMobile = useIsMobile();
 
 	return (
@@ -267,9 +264,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 		>
 			<Icon
 				name={isMobile ? 'sidebar/righticon' : state === 'expanded' ? 'sidebar/lefticon' : 'sidebar/righticon'}
-				className={cn('h-5 w-5', {
-					'dark-icons': theme === ETheme.DARK
-				})}
+				className='dark:dark-icons h-5 w-5'
 				width={20}
 				height={20}
 			/>

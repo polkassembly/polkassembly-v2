@@ -164,7 +164,10 @@
 			"linked_multiple_addresses": "链接多个地址",
 			"unlinked_address": "取消链接地址",
 			"unlinked_multiple_addresses": "取消链接多个地址"
-		}
+		},
+		"overview": "概览",
+		"onchainIdentity": "链上身份",
+		"linkAddress": "链接地址"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
@@ -387,7 +390,8 @@
 		"notpassed": "未通过",
 		"started": "已开始",
 		"passed": "已通过",
-		"proposed": "已提议"
+		"proposed": "已提议",
+		"created": "已创建"
 	},
 	"Pagination": {
 		"next": "下一页",
@@ -443,5 +447,25 @@
 		"showAll": "显示全部",
 		"searchByHash": "按哈希搜索",
 		"preimageNotFound": "预映像未找到"
+	},
+	"ProposalType": {
+		"discussion": "讨论",
+		"referendum": "公投",
+		"referendumv2": "公投",
+		"councilmotion": "理事会动议",
+		"techcommitteeproposal": "技术委员会提案",
+		"treasuryproposal": "国库提案",
+		"bounty": "赏金",
+		"childbounty": "子赏金",
+		"tip": "小费",
+		"fellowshipreferendum": "研究员公投",
+		"alliancemotion": "联盟动议",
+		"announcement": "公告",
+		"democracyproposal": "民主提案",
+		"upgradecommittee": "升级委员会",
+		"advisorycommittee": "咨询委员会",
+		"grant": "资助",
+		"community": "社区",
+		"technicalcommittee": "技术委员会"
 	}
 }

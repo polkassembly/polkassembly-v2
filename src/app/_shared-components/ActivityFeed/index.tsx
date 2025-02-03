@@ -4,16 +4,17 @@
 
 'use client';
 
-import { EActivityFeedTab } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IActivityFeedPostListing } from '@/_shared/types';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
-import LatestActivity from './ActivityFeedTab';
 import { Tabs, TabsContent } from '../Tabs/Tabs';
 import styles from './ActivityFeed.module.scss';
+import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
+import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeed() {
+function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IActivityFeedPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
 
@@ -38,12 +39,14 @@ function ActivityFeed() {
 					<Tabs
 						className={styles.activityFeedTabsContent}
 						value={activeTab}
+						defaultValue={activeTab}
 					>
 						<TabsContent value={EActivityFeedTab.EXPLORE}>
-							<LatestActivity currentTab={EActivityFeedTab.EXPLORE} />
+							<ActivityFeedPostList initialData={initialData} />
 						</TabsContent>
 						<TabsContent value={EActivityFeedTab.FOLLOWING}>
-							<LatestActivity currentTab={EActivityFeedTab.FOLLOWING} />
+							{/* TODO: add subscribed post list */}
+							<SubscribedPostList postData={initialData} />
 						</TabsContent>
 					</Tabs>
 				</div>

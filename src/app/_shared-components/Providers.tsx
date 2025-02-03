@@ -6,23 +6,31 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode } from 'react';
-import { ETheme } from '@/_shared/types';
+import { ETheme, IUserPreferences } from '@/_shared/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { getTimeZoneForLocale } from '@/_shared/_utils/getTimeZoneForLocale';
 import { SidebarProvider } from './Sidebar/Sidebar';
 
 const queryClient = new QueryClient();
 
-export function Providers({ children, messages, locale }: { children: ReactNode; messages: AbstractIntlMessages; locale: string }) {
-	const { userPreferences } = useUserPreferences();
-
+export function Providers({
+	children,
+	messages,
+	locale,
+	userPreferences
+}: {
+	children: ReactNode;
+	messages: AbstractIntlMessages;
+	locale: string;
+	userPreferences: IUserPreferences;
+}) {
 	return (
 		<NextIntlClientProvider
 			messages={messages}
 			locale={locale}
-			timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
+			timeZone={getTimeZoneForLocale(locale)}
 		>
 			<QueryClientProvider client={queryClient}>
 				<ThemeProvider

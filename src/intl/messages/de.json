@@ -164,7 +164,10 @@
 			"linked_multiple_addresses": "Mehrere Adressen verknüpft",
 			"unlinked_address": "Adresse getrennt",
 			"unlinked_multiple_addresses": "Mehrere Adressen getrennt"
-		}
+		},
+		"overview": "Übersicht",
+		"onchainIdentity": "Onchain-Identität",
+		"linkAddress": "Adresse verknüpfen"
 	},
 	"ListingTab": {
 		"Analytics": "Analysen",
@@ -387,7 +390,8 @@
 		"notpassed": "Nicht bestanden",
 		"started": "Gestartet",
 		"passed": "Bestanden",
-		"proposed": "Vorgeschlagen"
+		"proposed": "Vorgeschlagen",
+		"created": "Erstellt"
 	},
 	"Pagination": {
 		"next": "Weiter",
@@ -443,5 +447,25 @@
 		"showAll": "Alle anzeigen",
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
+	},
+	"ProposalType": {
+		"discussion": "Diskussion",
+		"referendum": "Referendum",
+		"referendumv2": "Referendum",
+		"councilmotion": "Ratsantrag",
+		"techcommitteeproposal": "Technikkomitee-Vorschlag",
+		"treasuryproposal": "Finanzvorschlag",
+		"bounty": "Prämie",
+		"childbounty": "Untergeordnete Prämie",
+		"tip": "Trinkgeld",
+		"fellowshipreferendum": "Fellowship-Referendum",
+		"alliancemotion": "Allianz-Antrag",
+		"announcement": "Ankündigung",
+		"democracyproposal": "Demokratie-Vorschlag",
+		"upgradecommittee": "Upgrade-Komitee",
+		"advisorycommittee": "Beratungsausschuss",
+		"grant": "Zuschuss",
+		"community": "Gemeinschaft",
+		"technicalcommittee": "Technisches Komitee"
 	}
 }

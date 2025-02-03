@@ -164,7 +164,10 @@
 			"linked_multiple_addresses": "Vinculó múltiples direcciones",
 			"unlinked_address": "Desvinculó dirección",
 			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones"
-		}
+		},
+		"overview": "Resumen",
+		"onchainIdentity": "Identidad en cadena",
+		"linkAddress": "Vincular dirección"
 	},
 	"ListingTab": {
 		"Analytics": "Analíticas",
@@ -387,7 +390,8 @@
 		"notpassed": "No Aprobado",
 		"started": "Iniciado",
 		"passed": "Aprobado",
-		"proposed": "Propuesto"
+		"proposed": "Propuesto",
+		"created": "Creado"
 	},
 	"Pagination": {
 		"next": "Siguiente",
@@ -443,5 +447,25 @@
 		"showAll": "Mostrar todos",
 		"searchByHash": "Buscar por hash",
 		"preimageNotFound": "Vorabbild nicht gefunden"
+	},
+	"ProposalType": {
+		"discussion": "Discusión",
+		"referendum": "Referendo",
+		"referendumv2": "Referendo",
+		"councilmotion": "Moción del Consejo",
+		"techcommitteeproposal": "Propuesta del Comité Técnico",
+		"treasuryproposal": "Propuesta de Tesorería",
+		"bounty": "Recompensa",
+		"childbounty": "Recompensa Secundaria",
+		"tip": "Propina",
+		"fellowshipreferendum": "Referendo de Fellowship",
+		"alliancemotion": "Moción de Alianza",
+		"announcement": "Anuncio",
+		"democracyproposal": "Propuesta de Democracia",
+		"upgradecommittee": "Comité de Actualización",
+		"advisorycommittee": "Comité Asesor",
+		"grant": "Subvención",
+		"community": "Comunidad",
+		"technicalcommittee": "Comité Técnico"
 	}
 }

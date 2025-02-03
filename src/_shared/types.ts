@@ -244,7 +244,7 @@ export enum ELocales {
 	ENGLISH = 'en',
 	CHINESE = 'zh',
 	GERMAN = 'de',
-	JAPANESE = 'jp'
+	JAPANESE = 'ja'
 }
 
 export enum ECookieNames {
@@ -367,7 +367,8 @@ export enum EProposalStatus {
 	Confirmed = 'Confirmed',
 	DecisionDepositPlaced = 'DecisionDepositPlaced',
 	TimedOut = 'TimedOut',
-	Opened = 'Opened'
+	Opened = 'Opened',
+	Created = 'Created'
 }
 
 export enum EPostOrigin {
