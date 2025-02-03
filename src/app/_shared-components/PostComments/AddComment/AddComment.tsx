@@ -14,6 +14,8 @@ import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import Identicon from '@polkadot/react-identicon';
 import { useTranslations } from 'next-intl';
+import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
+import { deepParseJson } from 'deep-parse-json';
 import classes from './AddComment.module.scss';
 
 function AddComment({
@@ -32,7 +34,8 @@ function AddComment({
 	editorId: string;
 }) {
 	const t = useTranslations();
-	const [content, setContent] = useState<OutputData | null>(null);
+	const savedContent = parentCommentId ? LocalStorageClientService.getReplyData(proposalIndex, parentCommentId) : LocalStorageClientService.getCommentData(proposalIndex);
+	const [content, setContent] = useState<OutputData | null>(savedContent ? deepParseJson(savedContent) : null);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
@@ -67,6 +70,11 @@ function AddComment({
 				onConfirm?.({ ...data, content }, publicUser);
 
 				setContent(null);
+				if (parentCommentId) {
+					LocalStorageClientService.deleteReplyData(proposalIndex, parentCommentId);
+				} else {
+					LocalStorageClientService.deleteCommentData(proposalIndex);
+				}
 				blockEditorActionsRef.current?.clearEditor?.();
 			}
 			setLoading(false);
@@ -87,8 +95,14 @@ function AddComment({
 				<div className={classes.editorWrapper}>
 					<div className='flex-1'>
 						<BlockEditor
+							data={content || undefined}
 							onChange={(data) => {
 								setContent(data);
+								if (parentCommentId) {
+									LocalStorageClientService.setReplyData(proposalIndex, parentCommentId, data);
+								} else {
+									LocalStorageClientService.setCommentData(proposalIndex, data);
+								}
 							}}
 							id={editorId}
 							ref={blockEditorActionsRef}

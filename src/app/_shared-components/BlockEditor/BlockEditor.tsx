@@ -15,7 +15,6 @@ import { cn } from '@/lib/utils';
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { convertHtmlToEditorJs } from '@/app/_client-utils/convertHtmlToEditorJs';
-import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
@@ -43,15 +42,10 @@ function BlockEditor({
 
 	const blockEditorId = `block-editor-${id}`;
 
-	const blockEditorSavedContent = LocalStorageClientService.getBlockEditorContent(blockEditorId);
-
-	const blockEditorContent = data || (blockEditorSavedContent && (JSON.parse(blockEditorSavedContent) as OutputData));
-
 	const clearEditor = async () => {
 		try {
 			if (blockEditorRef.current?.blocks) {
 				await blockEditorRef.current.blocks.clear();
-				LocalStorageClientService.removeBlockEditorContent(blockEditorId);
 			}
 		} catch (error) {
 			console.error('Error clearing editor:', error);
@@ -120,7 +114,7 @@ function BlockEditor({
 							}
 						}
 					},
-					data: blockEditorContent as OutputData,
+					data: data as OutputData,
 					onReady: async () => {
 						if (data) {
 							try {
@@ -141,7 +135,6 @@ function BlockEditor({
 						try {
 							const edJsData = await api.saver.save();
 							onChange?.(edJsData);
-							LocalStorageClientService.setBlockEditorContent(blockEditorId, edJsData);
 						} catch (error) {
 							console.error('Error in onChange:', error);
 						}
@@ -201,7 +194,8 @@ function BlockEditor({
 		};
 
 		updateContent();
-	}, [data, renderFromHtml]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [renderFromHtml]);
 
 	return (
 		<div
