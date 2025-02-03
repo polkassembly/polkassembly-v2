@@ -167,7 +167,11 @@
 		},
 		"overview": "Resumen",
 		"onchainIdentity": "Identidad en cadena",
-		"linkAddress": "Vincular dirección"
+		"linkAddress": "Vincular dirección",
+		"badges": "Insignias",
+		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
+		"userSince": "Usuario desde",
+		"rank": "Rango"
 	},
 	"ListingTab": {
 		"Analytics": "Analíticas",

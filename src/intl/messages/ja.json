@@ -167,7 +167,11 @@
 		},
 		"overview": "概要",
 		"onchainIdentity": "オンチェーンID",
-		"linkAddress": "アドレスをリンク"
+		"linkAddress": "アドレスをリンク",
+		"badges": "バッジ",
+		"badgesDescription": "Polkassemblyで活動しながらバッジを解除、受け取り、獲得する",
+		"userSince": "ユーザー登録日",
+		"rank": "ランク"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
