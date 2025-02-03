@@ -128,7 +128,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 											<div className={style.iconWrapper}>
 												<Icon
 													name={subItem.icon}
-													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !subItem.isActive ? DARK_ICON_CLASS : ''}`}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !subItem.isActive && DARK_ICON_CLASS}`}
 												/>
 											</div>
 										)}
@@ -197,7 +197,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 													<div className={style.iconWrapper}>
 														<Icon
 															name={subItem.icon}
-															className={`${theme === ETheme.DARK && DARK_ICON_CLASS}`}
+															className={DARK_ICON_CLASS}
 														/>
 													</div>
 												)}
