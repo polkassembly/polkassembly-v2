@@ -11,6 +11,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
 import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -138,9 +139,10 @@ export class SubsquareOffChainService {
 					userId: publicUser?.id ?? 0,
 					user: publicUser ?? {
 						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
-						id: 0,
+						id: -1,
 						username: '',
-						profileScore: 0
+						profileScore: 0,
+						profileDetails: DEFAULT_PROFILE_DETAILS
 					},
 					createdAt: new Date(comment.createdAt),
 					updatedAt: new Date(comment.updatedAt),

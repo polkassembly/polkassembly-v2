@@ -47,8 +47,8 @@ function BlockEditor({
 			if (blockEditorRef.current?.blocks) {
 				await blockEditorRef.current.blocks.clear();
 			}
-		} catch (error) {
-			console.error('Error clearing editor:', error);
+		} catch {
+			// TODO: show notification
 		}
 	};
 
@@ -125,8 +125,8 @@ function BlockEditor({
 								} else {
 									await editor.blocks.render(data as OutputData);
 								}
-							} catch (error) {
-								console.error('Error rendering initial data:', error);
+							} catch {
+								// TODO: show notification
 							}
 						}
 					},
@@ -135,8 +135,8 @@ function BlockEditor({
 						try {
 							const edJsData = await api.saver.save();
 							onChange?.(edJsData);
-						} catch (error) {
-							console.error('Error in onChange:', error);
+						} catch {
+							// TODO: show notification
 						}
 					},
 					placeholder: readOnly ? '' : 'Type your comment here'

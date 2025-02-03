@@ -54,7 +54,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 			const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
 			if (!accessTokenPayload) {
-				console.log('No Access token found.');
+				// TODO: show notification
 				setLoading(false);
 				return;
 			}
