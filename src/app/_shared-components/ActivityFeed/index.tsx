@@ -22,7 +22,7 @@ function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IA
 	const { state } = useSidebar();
 
 	return (
-		<div className={cn('min-h-screen bg-page_background pt-5', state === 'expanded' ? 'px-16' : 'px-20')}>
+		<div className={cn('min-h-screen bg-page_background pt-5', state === 'expanded' ? 'px-10 lg:px-16' : 'px-10 lg:px-20')}>
 			<div className='container mx-auto grid grid-cols-12 gap-5'>
 				<div className='col-span-12'>
 					<div className={styles.activityFeedContainer}>

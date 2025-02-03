@@ -217,7 +217,7 @@ function NetworkDropdown() {
 			onOpenChange={setIsOpen}
 		>
 			<SelectTrigger
-				className='bg-network_dropdown_bg w-full rounded-full border-border_grey'
+				className='w-full rounded-full border-border_grey bg-network_dropdown_bg'
 				onClick={() => {
 					setIsOpen(true);
 					setTimeout(() => {

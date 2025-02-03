@@ -49,7 +49,7 @@ function Navbar() {
 					value={userPreferences.locale}
 					onValueChange={(value: ELocales) => handleLocaleChange(value)}
 				>
-					<SelectTrigger className='bg-network_dropdown_bg w-[180px] border-border_grey'>
+					<SelectTrigger className='w-[180px] border-border_grey bg-network_dropdown_bg'>
 						<SelectValue placeholder='Select Language' />
 					</SelectTrigger>
 					<SelectContent className='border-border_grey'>
