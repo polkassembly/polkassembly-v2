@@ -11,7 +11,7 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import {
 	EAllowedCommentor,
 	EDataSource,
-	EOffchainPostTopic,
+	EOffChainPostTopic,
 	EPostOrigin,
 	EProposalStatus,
 	EProposalType,
@@ -171,7 +171,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
 		tags: z.array(z.string()).optional(),
-		topic: z.nativeEnum(EOffchainPostTopic).optional().default(EOffchainPostTopic.GENERAL)
+		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
 	});
 
 	const { content, title, allowedCommentor, topic, tags } = zodBodySchema.parse(await getReqBody(req));
@@ -189,7 +189,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content: formattedContent,
 		title,
 		tags: tags || [],
-		topic: topic || EOffchainPostTopic.GENERAL,
+		topic: topic || EOffChainPostTopic.GENERAL,
 		allowedCommentor
 	});
 
@@ -202,7 +202,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 
 	// Create tags
-	await OffChainDbService.CreateTags(tags || []);
-
+	if (tags && ValidatorService.isValidTags(tags)) {
+		await OffChainDbService.CreateTags(tags);
+	}
 	return response;
 });

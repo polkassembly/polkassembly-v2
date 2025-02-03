@@ -4,13 +4,14 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { X, ChevronsUpDown, PlusIcon } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/app/_shared-components/Command/Command';
 import { useTranslations } from 'next-intl';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { useQuery } from '@tanstack/react-query';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import classes from './AddTags.module.scss';
 import { Input } from '../../Input';
@@ -26,20 +27,18 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 	const [open, setOpen] = React.useState(false);
 	const [selectedValues, setSelectedValues] = React.useState<Option[]>([]);
 	const [pressedAddTag, setPressedAddTag] = React.useState(false);
-	const [allTags, setAllTags] = useState<Option[]>([]);
-	const [loading, setLoading] = useState(false);
 	const addTagInputRef = React.useRef<HTMLInputElement>(null);
 
-	const getAllTags = async () => {
-		setLoading(true);
-		const { data, error } = await NextApiClientService.fetchAllTagsApi();
-		if (error) {
-			setLoading(false);
-			throw new ClientError(error.message || 'Failed to fetch data');
+	const { data: allTags = [], isLoading } = useQuery({
+		queryKey: ['tags'],
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.fetchAllTagsApi();
+			if (error) {
+				throw new ClientError(error.message || 'Failed to fetch data');
+			}
+			return data?.map((tag) => ({ value: tag.name, label: tag.name })) || [];
 		}
-		setAllTags(data?.map((tag) => ({ value: tag.name, label: tag.name })) || []);
-		setLoading(false);
-	};
+	});
 
 	const handleSelect = (option: Option) => {
 		if (selectedValues?.length >= MAX_TAGS) return;
@@ -53,10 +52,6 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 		setSelectedValues(newTags);
 		onChange(newTags);
 	};
-
-	useEffect(() => {
-		getAllTags();
-	}, []);
 
 	return (
 		<div className={classes.container}>
@@ -140,7 +135,11 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 								disabled={disabled}
 							/>
 							<CommandList>
-								{!loading ? <CommandEmpty className={classes.noTagFoundText}>{t('Create.noTagsFound')}.</CommandEmpty> : <div className={classes.noTagFoundText}>Loading....</div>}
+								{!isLoading ? (
+									<CommandEmpty className={classes.noTagFoundText}>{t('Create.noTagsFound')}.</CommandEmpty>
+								) : (
+									<div className={classes.noTagFoundText}>Loading....</div>
+								)}
 								<CommandGroup>
 									{allTags?.map((tag) => (
 										<CommandItem

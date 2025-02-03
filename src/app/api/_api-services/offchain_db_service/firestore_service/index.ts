@@ -18,7 +18,7 @@ import {
 	IPostOffChainMetrics,
 	IUserActivity,
 	EAllowedCommentor,
-	EOffchainPostTopic
+	EOffChainPostTopic
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -726,7 +726,7 @@ export class FirestoreService extends FirestoreRefs {
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: string[];
-		topic?: EOffchainPostTopic;
+		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
@@ -742,14 +742,14 @@ export class FirestoreService extends FirestoreRefs {
 			htmlContent: html,
 			markdownContent: markdown,
 			title,
-			tags,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY,
 			allowedCommentor,
 			isDeleted: false
 		};
-		if (topic && Object.values(EOffchainPostTopic).includes(topic)) newPost.topic = topic;
+		if (tags && ValidatorService.isValidTags(tags)) newPost.tags = tags;
+		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
 
 		if (proposalType === EProposalType.TIP) {
 			newPost.hash = indexOrHash;
@@ -803,13 +803,16 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async GetAllTags() {
 		const tags = await FirestoreRefs.tagsCollectionRef().get();
-		return tags.docs.map((doc) => doc.data());
+		return tags.docs.map((doc) => ({ lastUsedAt: doc.data().lastUsedAt?.toDate ? doc.data().lastUsedAt.toDate() : doc.data().lastUsedAt, name: doc.data().name || '' }));
 	}
 
 	static async CreateTags(tags: string[]) {
+		if (!tags || !ValidatorService.isValidTags(tags)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
+		}
 		const batch = this.firestoreDb.batch();
 		tags?.forEach((tag) => {
-			batch.set(FirestoreRefs.tagsCollectionRef().doc(tag), { name: tag, last_used_at: new Date() }, { merge: true });
+			batch.set(FirestoreRefs.tagsCollectionRef().doc(tag), { name: tag, lastUsedAt: new Date() }, { merge: true });
 		});
 		await batch.commit();
 	}

@@ -8,7 +8,7 @@ import { OFF_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/offChainProposalTyp
 import { WEB3_AUTH_SIGN_MESSAGE } from '@shared/_constants/signMessage';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { getSubstrateAddressPublicKey } from '@shared/_utils/getSubstrateAddressPublicKey';
-import { ELocales, ENetwork, EProposalType, ETheme, EWallet } from '@shared/types';
+import { ELocales, ENetwork, EOffChainPostTopic, EProposalType, ETheme, EWallet } from '@shared/types';
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
@@ -225,5 +225,13 @@ export class ValidatorService {
 
 	static isValidNumber(number: unknown): boolean {
 		return number !== null && number !== undefined && Number.isFinite(Number(number));
+	}
+
+	static isValidTags(tags: string[]): boolean {
+		return tags.length > 0 && tags.every((tag) => typeof tag === 'string');
+	}
+
+	static isValidOffChainPostTopic(topic: string): boolean {
+		return Object.values(EOffChainPostTopic).includes(topic as EOffChainPostTopic);
 	}
 }

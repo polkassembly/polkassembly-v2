@@ -28,12 +28,13 @@ import {
 	IQRSessionPayload,
 	ITag,
 	EAllowedCommentor,
-	EOffchainPostTopic
+	EOffChainPostTopic
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
@@ -437,9 +438,13 @@ export class NextApiClientService {
 	}
 
 	static async createTagsApi(tags: string[]) {
+		if (tags && !ValidatorService.isValidTags(tags)) {
+			throw new ClientError('Invalid tags');
+		}
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_TAGS });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
 	}
+
 	static async createOffChainPostApi({
 		proposalType,
 		allowedCommentor,
@@ -453,7 +458,7 @@ export class NextApiClientService {
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: string[];
-		topic?: EOffchainPostTopic;
+		topic?: EOffChainPostTopic;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
 		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });

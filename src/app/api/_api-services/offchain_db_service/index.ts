@@ -21,7 +21,7 @@ import {
 	EActivityCategory,
 	IActivityMetadata,
 	EAllowedCommentor,
-	EOffchainPostTopic
+	EOffChainPostTopic
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -454,7 +454,7 @@ export class OffChainDbService {
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: string[];
-		topic?: EOffchainPostTopic;
+		topic?: EOffChainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -559,6 +559,9 @@ export class OffChainDbService {
 	}
 
 	static async CreateTags(tags: string[]) {
+		if (!tags || !ValidatorService.isValidTags(tags)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
+		}
 		return FirestoreService.CreateTags(tags);
 	}
 }

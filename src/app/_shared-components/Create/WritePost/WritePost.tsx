@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EOffchainPostTopic, IWritePostFormFields } from '@/_shared/types';
+import { EAllowedCommentor, EOffChainPostTopic, IWritePostFormFields } from '@/_shared/types';
 import { UseFormReturn } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { Input } from '@ui/Input';
@@ -26,7 +26,7 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 	const t = useTranslations();
 	const [loading, setLoading] = useState(false);
 
-	const allowCommentorsOptions = [
+	const allowedCommentorsOptions = [
 		{
 			label: t('Create.AllowedCommentors.all'),
 			value: EAllowedCommentor.ALL
@@ -143,7 +143,7 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 							control={formData.control}
 							name='topic'
 							key='topic'
-							defaultValue={EOffchainPostTopic.GENERAL}
+							defaultValue={EOffChainPostTopic.GENERAL}
 							disabled={loading}
 							render={({ field }) => (
 								<FormItem>
@@ -153,7 +153,7 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 									<FormControl>
 										<SelectTopic
 											disabled={loading}
-											onChange={(topic: EOffchainPostTopic) => {
+											onChange={(topic: EOffChainPostTopic) => {
 												field.onChange(topic);
 											}}
 										/>
@@ -165,8 +165,8 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 
 						<FormField
 							control={formData.control}
-							name='allowCommentors'
-							key='allowCommentors'
+							name='allowedCommentors'
+							key='allowedCommentors'
 							disabled={loading}
 							defaultValue={EAllowedCommentor.ALL}
 							render={({ field }) => (
@@ -191,7 +191,7 @@ function WritePost({ formData, handleSubmit }: { formData: UseFormReturn<IWriteP
 											className={classes.radioGroup}
 											onValueChange={(e) => field.onChange(e)}
 										>
-											{allowCommentorsOptions?.map((option) => {
+											{allowedCommentorsOptions?.map((option) => {
 												return (
 													<div
 														key={option.value}

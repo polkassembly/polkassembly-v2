@@ -7,10 +7,9 @@
 import React from 'react';
 import WritePost from '@/app/_shared-components/Create/WritePost/WritePost';
 import { useForm } from 'react-hook-form';
-import { EOffchainPostTopic, EProposalType, IWritePostFormFields } from '@/_shared/types';
+import { EOffChainPostTopic, EProposalType, IWritePostFormFields } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
-import { OutputData } from '@editorjs/editorjs';
 import { useRouter } from 'next/navigation';
 import classes from './CreateDiscussion.module.scss';
 import HeaderLabel from '../HeaderLabel';
@@ -22,22 +21,20 @@ function CreateDiscussion({ isModal }: { isModal?: boolean }) {
 	const handleSubmit = async (values: IWritePostFormFields) => {
 		const { data, error } = await NextApiClientService.createOffChainPostApi({
 			proposalType: EProposalType.DISCUSSION,
-			content: values.description as unknown as OutputData,
+			content: values.description,
 			title: values.title || '',
-			allowedCommentor: values.allowCommentors,
+			allowedCommentor: values.allowedCommentors,
 			tags: values?.tags?.map((tag) => tag?.value) || [],
-			topic: values.topic || EOffchainPostTopic.GENERAL
+			topic: values.topic || EOffChainPostTopic.GENERAL
 		});
 
-		if (error) {
-			throw new ClientError(error.message || 'Failed to fetch data');
+		if (error || !data || !data?.data?.index) {
+			throw new ClientError(error?.message || 'Failed to fetch data');
 		}
 
-		if (data?.data && data.data?.index) {
-			formData.reset();
-			// redirect to the discussion page
-			router.replace(`/post/${data?.data?.index}`);
-		}
+		formData.reset();
+		// redirect to the discussion page
+		router.replace(`/post/${data?.data?.index}`);
 	};
 	return (
 		<div className={classes.container}>

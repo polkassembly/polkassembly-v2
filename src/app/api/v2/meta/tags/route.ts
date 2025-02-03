@@ -9,11 +9,7 @@ import { withErrorHandling } from '../../../_api-utils/withErrorHandling';
 import { OffChainDbService } from '../../../_api-services/offchain_db_service';
 
 export const GET = withErrorHandling(async () => {
-	const alltags = await OffChainDbService.GetAllTags();
-	const tags = alltags.map((tag) => {
-		return { lastUsedAt: tag?.last_used_at?.toDate ? tag.last_used_at.toDate() : tag?.last_used_at, name: tag?.name || '' };
-	});
-
+	const tags = await OffChainDbService.GetAllTags();
 	return NextResponse.json(tags);
 });
 

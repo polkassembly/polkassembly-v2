@@ -460,7 +460,7 @@
 		"selectTags": "选择标签",
 		"selectTopic": "选择主题",
 		"tagsLeftText": "标签剩余",
-		"allowCommentors": {
+		"AllowedCommentors": {
 			"title": "谁可以评论 ？",
 			"all": "全部",
 			"onchainVerified": "链上验证",

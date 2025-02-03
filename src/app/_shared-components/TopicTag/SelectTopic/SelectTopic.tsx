@@ -5,32 +5,32 @@
 'use client';
 
 import { useState } from 'react';
-import { EOffchainPostTopic } from '@/_shared/types';
+import { EOffChainPostTopic } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import classes from './SelectTopic.module.scss';
 import { Button } from '../../Button';
 
-function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffchainPostTopic) => void; disabled: boolean }) {
+function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffChainPostTopic) => void; disabled: boolean }) {
 	const t = useTranslations('Create');
-	const [selectedTopic, setSelectedTopic] = useState<EOffchainPostTopic>(EOffchainPostTopic.GENERAL);
+	const [selectedTopic, setSelectedTopic] = useState<EOffChainPostTopic>(EOffChainPostTopic.GENERAL);
 
 	return (
 		<div className={classes.topicContainer}>
-			{Object.keys(EOffchainPostTopic).map((key: string) => (
+			{Object.keys(EOffChainPostTopic).map((key: string) => (
 				<Button
 					disabled={disabled}
 					key={key}
 					type='button'
 					className={cn(
 						classes.topicButton,
-						selectedTopic === EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]
+						selectedTopic === EOffChainPostTopic[key as keyof typeof EOffChainPostTopic]
 							? 'bg-btn_primary_background text-white'
 							: 'bg-selected_topic_bg text-basic_text hover:bg-selected_topic_bg'
 					)}
 					onClick={() => {
-						setSelectedTopic(EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]);
-						onChange(EOffchainPostTopic[key as keyof typeof EOffchainPostTopic]);
+						setSelectedTopic(EOffChainPostTopic[key as keyof typeof EOffChainPostTopic]);
+						onChange(EOffChainPostTopic[key as keyof typeof EOffChainPostTopic]);
 					}}
 				>
 					{t(`Topic.${key.toLowerCase()}`)}

@@ -303,7 +303,7 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
-export enum EOffchainPostTopic {
+export enum EOffChainPostTopic {
 	GENERAL = 'general',
 	AUCTION_ADMIN = 'auctionAdmin',
 	GENERAL_ADMIN = 'generalAdmin',
@@ -335,7 +335,7 @@ export interface IOffChainPost {
 	isDeleted: boolean;
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
-	topic?: EOffchainPostTopic;
+	topic?: EOffChainPostTopic;
 }
 
 export enum EProposalStatus {
@@ -755,8 +755,8 @@ export interface IWritePostFormFields {
 	title: string;
 	description: OutputData;
 	tags: { value: string; label: string }[];
-	topic: EOffchainPostTopic;
-	allowCommentors: EAllowedCommentor;
+	topic: EOffChainPostTopic;
+	allowedCommentors: EAllowedCommentor;
 }
 
 export interface ITag {

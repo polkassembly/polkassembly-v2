@@ -4,13 +4,13 @@
 
 import React from 'react';
 import CreateDiscussionComponent from '@/app/create/discussion/Component/CreateDiscussion/CreateDiscussion';
-import { useUser } from '@/hooks/useUser';
+import { CookieService } from '@/_shared/_services/cookie_service';
 import classes from './Component/CreateDiscussion/CreateDiscussion.module.scss';
 
 function Discussion() {
-	const { user } = useUser();
+	const accessToken = CookieService.getUserFromCookie();
 
-	if (!user?.id) {
+	if (!accessToken) {
 		return {
 			redirect: {
 				destination: '/',
