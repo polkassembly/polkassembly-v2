@@ -1,9 +1,5 @@
 .activity_icons {
-    @apply transition-all duration-200 ease-in-out w-5 h-5 block;
-
-    &:hover {
-        @apply scale-110;
-    }
+    @apply w-5 h-5 block;
 }
 
 .likeGifContainer {

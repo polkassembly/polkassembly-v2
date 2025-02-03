@@ -16,7 +16,7 @@ function ActionButton({ icon: Icon, text, onClick }: { icon: React.ReactNode; te
 	return (
 		<button
 			type='button'
-			className='flex cursor-pointer items-center'
+			className='flex cursor-pointer items-center transition-all duration-300 hover:scale-110'
 			onClick={onClick}
 		>
 			{Icon}

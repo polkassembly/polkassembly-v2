@@ -96,7 +96,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 	}
 
 	return (
-		<div className='rounded-xl border border-border_grey bg-bg_modal p-5'>
+		<div className={styles.container}>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center space-x-2 text-wallet_btn_text'>

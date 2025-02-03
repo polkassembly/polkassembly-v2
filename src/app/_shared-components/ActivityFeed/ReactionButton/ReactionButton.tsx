@@ -16,7 +16,7 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction;
 
 	return (
 		<button
-			className='relative flex cursor-pointer items-center'
+			className='relative flex scale-110 cursor-pointer items-center transition-all duration-300'
 			onClick={onClick}
 			type='button'
 		>
