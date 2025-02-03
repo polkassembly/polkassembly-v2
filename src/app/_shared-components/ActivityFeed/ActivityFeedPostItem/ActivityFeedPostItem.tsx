@@ -105,7 +105,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 							</div>
 						)}
 					</span>
-					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
+					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
 				<button
 					type='button'

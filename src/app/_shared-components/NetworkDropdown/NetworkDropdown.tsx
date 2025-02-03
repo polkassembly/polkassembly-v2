@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import AstarLogo from '@assets/parachain-logos/astar-logo.png';
 import AcalaLogo from '@assets/parachain-logos/acala-logo.jpg';
@@ -61,8 +61,10 @@ import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
 import Image, { StaticImageData } from 'next/image';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select/Select';
+import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 import { Input } from '../Input';
+import RenderNetworkSection from './RenderNetworkSection';
+import styles from './NetworkDropdown.module.scss';
 
 interface NetworkDataType {
 	[key: string]: {
@@ -169,45 +171,20 @@ function NetworkDropdown() {
 		window.location.href = `https://${network.toLowerCase()}.polkassembly.io/`;
 		setSearchTerm('');
 	};
-
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
 		e.stopPropagation();
 		setSearchTerm(e.target.value);
+		if (searchInputRef.current) {
+			searchInputRef.current.value = e.target.value;
+			searchInputRef.current.focus();
+		}
 	};
 
-	const renderNetworkSection = (title: string, networks: Record<string, StaticImageData>) => {
-		const filteredNetworks = Object.entries(networks).filter(([key]) => key.toLowerCase().includes(searchTerm.toLowerCase()));
-
-		if (filteredNetworks.length === 0) return null;
-
-		return (
-			<div className='mb-4'>
-				<h3 className='bg-background_secondary px-4 py-2 text-sm font-medium text-btn_secondary_text'>{title}</h3>
-				<div className='grid grid-cols-2 gap-2 px-2'>
-					{filteredNetworks.map(([key, logo]) => (
-						<SelectItem
-							key={key}
-							value={key.toLowerCase()}
-							className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-						>
-							<div className='flex items-center gap-2 py-2'>
-								<div className='h-6 w-6 overflow-hidden rounded-full'>
-									<Image
-										src={logo}
-										alt={key}
-										width={24}
-										height={24}
-										className='object-cover'
-									/>
-								</div>
-								<span className='text-sm text-btn_secondary_text'>{key}</span>
-							</div>
-						</SelectItem>
-					))}
-				</div>
-			</div>
-		);
-	};
+	useEffect(() => {
+		if (isOpen && searchInputRef.current) {
+			searchInputRef.current.focus();
+		}
+	}, [isOpen]);
 
 	return (
 		<Select
@@ -217,17 +194,14 @@ function NetworkDropdown() {
 			onOpenChange={setIsOpen}
 		>
 			<SelectTrigger
-				className='w-full rounded-full border-border_grey bg-network_dropdown_bg'
+				className={styles.selectTrigger}
 				onClick={() => {
 					setIsOpen(true);
-					setTimeout(() => {
-						searchInputRef.current?.focus();
-					}, 0);
 				}}
 			>
 				<SelectValue>
-					<div className='flex items-center gap-2 pr-2 text-xs font-semibold text-text_primary'>
-						<div className='h-6 w-6 overflow-hidden rounded-full'>
+					<div className={styles.selectContent}>
+						<div className={styles.selectValueContainer}>
 							<Image
 								src={getNetworkLogo(selectedNetwork) || WestendLogo}
 								alt={getNetworkDisplayName(selectedNetwork)}
@@ -241,12 +215,11 @@ function NetworkDropdown() {
 				</SelectValue>
 			</SelectTrigger>
 			<SelectContent
-				className='max-h-[440px] w-[320px] border-border_grey p-0'
-				onCloseAutoFocus={(e) => {
-					e.preventDefault();
-				}}
+				className={styles.selectContentContainer}
+				onPointerDown={(e) => e.stopPropagation()}
+				onCloseAutoFocus={(e) => e.preventDefault()}
 			>
-				<div className='sticky top-0 z-10 border-b border-border_grey bg-bg_modal p-2'>
+				<div className={styles.selectContent}>
 					<Input
 						ref={searchInputRef}
 						type='text'
@@ -260,10 +233,10 @@ function NetworkDropdown() {
 					/>
 				</div>
 				<div className='overflow-y-auto p-2'>
-					{renderNetworkSection('Polkadot & Parachains', NetworkData.polkadot)}
-					{renderNetworkSection('Kusama & Parachains', NetworkData.kusama)}
-					{renderNetworkSection('Solo Chains', NetworkData.soloChains)}
-					{renderNetworkSection('Test Chains', NetworkData.testChains)}
+					{RenderNetworkSection('Polkadot & Parachains', NetworkData.polkadot, searchTerm)}
+					{RenderNetworkSection('Kusama & Parachains', NetworkData.kusama, searchTerm)}
+					{RenderNetworkSection('Solo Chains', NetworkData.soloChains, searchTerm)}
+					{RenderNetworkSection('Test Chains', NetworkData.testChains, searchTerm)}
 				</div>
 			</SelectContent>
 		</Select>

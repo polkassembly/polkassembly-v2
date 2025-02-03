@@ -745,3 +745,8 @@ export enum EAppEnv {
 	PRODUCTION = 'production',
 	DEVELOPMENT = 'development'
 }
+
+export enum SidebarState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed'
+}

@@ -1,0 +1,20 @@
+.selectTrigger {
+    @apply 'w-full rounded-full border-border_grey bg-network_dropdown_bg;
+
+}
+
+.selectValueContainer {
+    @apply flex items-center gap-2 pr-2 text-xs font-semibold text-text_primary;
+}
+
+.selectValue {
+    @apply h-6 w-6 overflow-hidden rounded-full;
+}
+
+.selectContentContainer {
+    @apply m-0 max-h-[440px] w-[320px] border-border_grey p-0;
+}
+
+.selectContent {
+    @apply sticky top-0 z-10 border-b border-border_grey bg-bg_modal;
+}

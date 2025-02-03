@@ -4,7 +4,6 @@
 
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
