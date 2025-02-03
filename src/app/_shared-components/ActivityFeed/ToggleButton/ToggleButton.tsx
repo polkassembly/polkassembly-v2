@@ -39,14 +39,14 @@ function ToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
 			<button
 				type='button'
 				onClick={() => handleTabClick(EActivityFeedTab.EXPLORE)}
-				className={`${styles.button} ${activeTab === EActivityFeedTab.EXPLORE ? 'bg-section_dark_overlay text-navbar_border' : 'text-sidebar_text'}`}
+				className={`${styles.button} ${activeTab === EActivityFeedTab.EXPLORE ? 'bg-section_dark_overlay font-semibold text-navbar_border' : 'font-medium text-sidebar_text'}`}
 			>
 				{t('ActivityFeed.ExploreTab')}
 			</button>
 			<button
 				type='button'
 				onClick={() => handleTabClick(EActivityFeedTab.FOLLOWING)}
-				className={`${styles.button} ${activeTab === EActivityFeedTab.FOLLOWING ? 'bg-section_dark_overlay text-navbar_border' : 'text-sidebar_text'}`}
+				className={`${styles.button} ${activeTab === EActivityFeedTab.FOLLOWING ? 'bg-section_dark_overlay font-semibold text-navbar_border' : 'font-medium text-sidebar_text'}`}
 			>
 				{t('ActivityFeed.SubscribedTab')}
 			</button>

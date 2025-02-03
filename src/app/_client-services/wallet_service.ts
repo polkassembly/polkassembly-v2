@@ -76,8 +76,8 @@ export class WalletClientService {
 				this.apiService.setSigner(injected.signer as Signer);
 			}
 			return await injected.accounts.get();
-		} catch (err) {
-			console.log(err);
+		} catch {
+			// TODO: show notification
 			return [];
 		}
 	}
@@ -97,7 +97,7 @@ export class WalletClientService {
 
 		const signRaw = injected && injected.signer && injected.signer.signRaw;
 		if (!signRaw) {
-			console.error('Signer not available');
+			// TODO: show notification
 			return null;
 		}
 
@@ -105,7 +105,7 @@ export class WalletClientService {
 		if (!address.startsWith('0x')) {
 			substrateAddress = getSubstrateAddress(address);
 			if (!substrateAddress) {
-				console.error('Invalid address');
+				// TODO: show notification
 				return null;
 			}
 		} else {

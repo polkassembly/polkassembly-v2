@@ -167,7 +167,11 @@
 		},
 		"overview": "Übersicht",
 		"onchainIdentity": "Onchain-Identität",
-		"linkAddress": "Adresse verknüpfen"
+		"linkAddress": "Adresse verknüpfen",
+		"badges": "Abzeichen",
+		"badgesDescription": "Schalte Abzeichen frei, erhalte und verdiene sie, während du dich in Polkassembly engagierst",
+		"userSince": "Benutzer seit",
+		"rank": "Rang"
 	},
 	"ListingTab": {
 		"Analytics": "Analysen",

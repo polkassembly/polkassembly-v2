@@ -27,6 +27,7 @@ import { firestoreContentToEditorJs } from '@/app/api/_api-utils/firestoreConten
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { OutputData } from '@editorjs/editorjs';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreRefs } from './firestoreRefs';
 
 export class FirestoreService extends FirestoreRefs {
@@ -103,7 +104,9 @@ export class FirestoreService extends FirestoreRefs {
 			username: user.username,
 			profileScore: user.profileScore,
 			addresses: addresses.map((address) => address.address),
-			rank
+			rank,
+			createdAt: user.createdAt,
+			profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
 		};
 	}
 
@@ -139,8 +142,10 @@ export class FirestoreService extends FirestoreRefs {
 			id: user.id,
 			username: user.username,
 			profileScore: user.profileScore,
+			createdAt: user.createdAt,
 			rank,
-			addresses: addresses.map((addr) => addr.address)
+			addresses: addresses.map((addr) => addr.address),
+			profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
 		};
 	}
 
@@ -170,7 +175,9 @@ export class FirestoreService extends FirestoreRefs {
 					username: data.username,
 					profileScore: data.profileScore,
 					addresses: addresses.map((addr: IUserAddress) => addr.address),
-					rank
+					rank,
+					createdAt: data.createdAt,
+					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
 				} as IPublicUser;
 			})
 		);

@@ -48,8 +48,7 @@ export enum EUserBadge {
 
 export interface IUserBadgeDetails {
 	name: EUserBadge;
-	check: boolean;
-	unlockedAt: string;
+	unlockedAt: Date;
 }
 
 export interface IProfileDetails {
@@ -128,10 +127,12 @@ export interface IUser {
 
 export interface IPublicUser {
 	id: number;
+	createdAt?: Date;
 	username: string;
 	profileScore: number;
 	addresses: string[];
 	rank: number;
+	profileDetails: IProfileDetails;
 }
 
 export interface IAuthResponse {

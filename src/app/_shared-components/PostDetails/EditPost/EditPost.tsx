@@ -9,13 +9,15 @@ import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
 function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: OutputData) => void; onClose?: () => void }) {
 	const t = useTranslations();
-	const [content, setContent] = useState<OutputData | null>(postData?.content || null);
+	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
+	const [content, setContent] = useState<OutputData | null>(savedContent || postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -45,6 +47,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 		if (!error && data) {
 			onEditPostSuccess?.(title, content);
+			LocalStorageClientService.deleteEditPostData({ postId: postData.index.toString() });
 			onClose?.();
 		}
 		setIsLoading(false);
@@ -69,6 +72,9 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 					id='post-content-edit'
 					onChange={(data) => {
 						setContent(data);
+						if (postData.index) {
+							LocalStorageClientService.setEditPostData({ postId: postData.index.toString(), data });
+						}
 					}}
 				/>
 			</div>

@@ -57,8 +57,8 @@ export const usePostReactions = (postData: IActivityFeedPostListing) => {
 				const response = await NextApiClientService.postReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
 				setCurrentReactionId(response?.data?.reactionId || null);
 			}
-		} catch (error) {
-			console.error('Error updating reaction:', error);
+		} catch {
+			// TODO: show notification
 			// Revert on error
 			setReactionState((prev) => ({
 				...prev,

@@ -33,7 +33,7 @@ function Settings() {
 			const { data, error } = await AuthClientService.generateTfaToken();
 
 			if (error) {
-				console.log('error', error.message);
+				// TODO: show notification
 				return;
 			}
 
@@ -53,12 +53,11 @@ function Settings() {
 		});
 
 		if (error) {
-			console.log('error', error.message);
+			// TODO: show notification
 			return;
 		}
 
 		if (data && user) {
-			console.log(data.message);
 			setUser({
 				...user,
 				isTFAEnabled: true

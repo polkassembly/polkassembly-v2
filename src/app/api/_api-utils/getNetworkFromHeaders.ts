@@ -35,6 +35,11 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 	}
 
 	if (!network) {
+		// if still no network found and is vercel (main deployment) link, return default network
+		if (host?.includes('vercel.app')) {
+			return defaultNetwork as ENetwork;
+		}
+
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request headers');
 	}
 

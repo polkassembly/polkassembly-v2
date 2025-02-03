@@ -11,6 +11,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
 import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -45,24 +46,25 @@ export class SubsquareOffChainService {
 				return null;
 			}
 
-			if (!data) {
-				return null;
-			}
-
 			let title = data?.title || '';
 
 			if (title.includes('Untitled')) {
 				title = '';
 			}
 
-			if (title && title.includes('[Root] Referendum #')) {
-				title = title.replace(/\[Root\] Referendum #\d+: /, '');
+			if (title && title.includes('[')) {
+				title = title.replace(/\[[^\]]*\] Referendum #\d+: /, '');
 			}
 
-			const content = data?.content || getDefaultPostContent(proposalType, data?.proposer);
-			const editorJsContent = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+			let content = data?.content;
 
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(editorJsContent);
+			if (!content) {
+				content = getDefaultPostContent(proposalType, data?.proposer);
+			} else {
+				content = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+			}
+
+			const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 			if (!title && !content) {
 				return null;
@@ -73,7 +75,7 @@ export class SubsquareOffChainService {
 				index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
 				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 				title: title || DEFAULT_POST_TITLE,
-				content: editorJsContent,
+				content,
 				htmlContent: html,
 				markdownContent: markdown,
 				createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
@@ -138,9 +140,10 @@ export class SubsquareOffChainService {
 					userId: publicUser?.id ?? 0,
 					user: publicUser ?? {
 						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
-						id: 0,
+						id: -1,
 						username: '',
-						profileScore: 0
+						profileScore: 0,
+						profileDetails: DEFAULT_PROFILE_DETAILS
 					},
 					createdAt: new Date(comment.createdAt),
 					updatedAt: new Date(comment.updatedAt),
