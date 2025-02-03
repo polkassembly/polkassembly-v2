@@ -44,7 +44,10 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 	return (
 		<div className={cn(className)}>
 			<DropdownMenu>
-				<DropdownMenuTrigger disabled={isLoading}>
+				<DropdownMenuTrigger
+					className='bg-network_dropdown_bg'
+					disabled={isLoading}
+				>
 					<div className='cursor-pointer'>
 						<div className='relative rounded-md border-[1px] border-border_grey p-1.5'>
 							{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
