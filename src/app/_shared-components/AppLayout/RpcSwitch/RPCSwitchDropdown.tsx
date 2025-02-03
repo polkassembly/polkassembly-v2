@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MdOutlineSignalCellularAlt } from 'react-icons/md';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';

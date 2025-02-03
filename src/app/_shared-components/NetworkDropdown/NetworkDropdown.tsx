@@ -233,10 +233,26 @@ function NetworkDropdown() {
 					/>
 				</div>
 				<div className='overflow-y-auto p-2'>
-					{RenderNetworkSection('Polkadot & Parachains', NetworkData.polkadot, searchTerm)}
-					{RenderNetworkSection('Kusama & Parachains', NetworkData.kusama, searchTerm)}
-					{RenderNetworkSection('Solo Chains', NetworkData.soloChains, searchTerm)}
-					{RenderNetworkSection('Test Chains', NetworkData.testChains, searchTerm)}
+					{RenderNetworkSection({
+						title: 'Polkadot & Parachains',
+						networks: NetworkData.polkadot,
+						searchTerm
+					})}
+					{RenderNetworkSection({
+						title: 'Kusama & Parachains',
+						networks: NetworkData.kusama,
+						searchTerm
+					})}
+					{RenderNetworkSection({
+						title: 'Solo Chains',
+						networks: NetworkData.soloChains,
+						searchTerm
+					})}
+					{RenderNetworkSection({
+						title: 'Test Chains',
+						networks: NetworkData.testChains,
+						searchTerm
+					})}
 				</div>
 			</SelectContent>
 		</Select>

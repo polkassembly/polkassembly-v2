@@ -2,10 +2,17 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import React from 'react';
 import { SelectItem } from '@ui/Select/Select';
 import Image, { StaticImageData } from 'next/image';
 
-function RenderNetworkSection(title: string, networks: Record<string, StaticImageData>, searchTerm: string) {
+interface RenderNetworkSectionProps {
+	title: string;
+	networks: Record<string, StaticImageData>;
+	searchTerm: string;
+}
+
+function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSectionProps) {
 	const filteredNetworks = Object.entries(networks).filter(([key]) => key.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	if (filteredNetworks.length === 0) return null;
