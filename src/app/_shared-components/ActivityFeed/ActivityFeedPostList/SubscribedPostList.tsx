@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import JoinPA from '@assets/activityfeed/gifs/joinpa.gif';
 import NoActivity from '@assets/activityfeed/gifs/noactivity.gif';
