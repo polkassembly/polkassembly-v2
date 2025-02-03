@@ -7,7 +7,7 @@
 }
 
 .aboutDescription {
-    @apply text-sm text-text_primary;
+    @apply text-sm text-text_primary hover:underline;
 }
 
 .aboutSocialLink {
@@ -19,5 +19,5 @@
 }
 
 .knowMoreLink {
-    @apply flex cursor-pointer gap-1 items-center text-sm font-medium text-text_pink hover:underline
+    @apply flex cursor-pointer gap-0.5 items-center text-sm font-medium text-text_pink
 }

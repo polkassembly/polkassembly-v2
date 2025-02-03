@@ -25,7 +25,7 @@ function ActivityFeedAbout() {
 					href='https://polkadot.network/about'
 					className={styles.knowMoreLink}
 				>
-					{t('ActivityFeed.KnowMore')} <MdOpenInNew />
+					{t('ActivityFeed.KnowMore')} <MdOpenInNew className='text-lg' />
 				</Link>
 			</div>
 			<div className={styles.aboutSocialContainer}>
