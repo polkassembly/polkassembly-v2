@@ -30,7 +30,7 @@ type State = 'collapsed' | 'expanded';
 
 const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
 const NEW_BADGE_TEXT = 'Sidebar.Tag.new';
-const DARK_ICON_CLASS = 'dark:dark-icons';
+const DARK_ICON_CLASS = 'dark-icons';
 
 function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
@@ -62,7 +62,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 							) : (
 								<Link
 									href={subItem.url || '#'}
-									className={`${style.menuItem} ${subItem.isActive && style.sidebarActive}`}
+									className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
 								>
 									<span className='flex items-center'>
 										{subItem.icon && (
@@ -108,7 +108,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 							</div>
 						)}
 						<span className={style.itemTitle}>{item.title}</span>
-						<ChevronRight className={`${style.chevron} ${isNestedOpen && style.chevronRotate}`} />
+						<ChevronRight className={`${style.chevron} ${isNestedOpen ? style.chevronRotate : ''}`} />
 					</div>
 				</SidebarMenuSubButton>
 			</CollapsibleTrigger>
@@ -128,7 +128,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 											<div className={style.iconWrapper}>
 												<Icon
 													name={subItem.icon}
-													className={`${subItem.isActive && SELECTED_ICON_CLASS} ${theme === ETheme.DARK && !subItem.isActive && DARK_ICON_CLASS}`}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !subItem.isActive ? DARK_ICON_CLASS : ''}`}
 												/>
 											</div>
 										)}
@@ -158,7 +158,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 							<SidebarMenuButton
 								size='lg'
 								tooltip={item.title}
-								className={`${style.sidebarButtonCollapse} ${item.isActive || (item.items?.some((subItem) => subItem.isActive) && style.sidebarActive)}`}
+								className={`${style.sidebarButtonCollapse} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.sidebarActive : ''}`}
 								onClick={() => {
 									if (!item.items?.length) {
 										window.location.href = item.url || '#';
@@ -169,7 +169,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 									<div className={style.iconWrapper}>
 										<Icon
 											name={item.icon}
-											className={`h-6 w-6 ${item.isActive || (item.items?.some((subItem) => subItem.isActive) && SELECTED_ICON_CLASS)} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) && DARK_ICON_CLASS}`}
+											className={`h-6 w-6 ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_ICON_CLASS : ''}`}
 										/>
 									</div>
 								)}
@@ -191,13 +191,13 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 										) : (
 											<Link
 												href={subItem.url || '#'}
-												className={`${style.menuItem} ${subItem.isActive && style.sidebarActive}`}
+												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : ''}`}
 											>
 												{subItem.icon && (
 													<div className={style.iconWrapper}>
 														<Icon
 															name={subItem.icon}
-															className={DARK_ICON_CLASS}
+															className=''
 														/>
 													</div>
 												)}
@@ -223,14 +223,14 @@ function CollapsibleButton({ item, isOpen, onClick }: { item: ISidebarMenuItem; 
 		<SidebarMenuButton
 			size='default'
 			tooltip={item.title}
-			className={`${style.mainButton} ${item.isActive || (item.items?.some((subItem) => subItem.isActive) && style.sidebarActive)}`}
+			className={`${style.mainButton} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.sidebarActive : ''}`}
 			onClick={onClick}
 		>
 			{item.icon && (
 				<div className={style.iconWrapper}>
 					<Icon
 						name={item.icon}
-						className={`h-6 w-6 ${item.isActive || (item.items?.some((subItem) => subItem.isActive) && SELECTED_ICON_CLASS)} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) && DARK_ICON_CLASS}`}
+						className={`h-6 w-6 ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_ICON_CLASS : ''}`}
 					/>
 				</div>
 			)}
@@ -240,7 +240,7 @@ function CollapsibleButton({ item, isOpen, onClick }: { item: ISidebarMenuItem; 
 			</span>
 			{item.items && (
 				<ChevronRight
-					className={`${style.chevron} ${isOpen && style.chevronRotate} ${item.isActive || (item.items?.some((subItem) => subItem.isActive) && style.chevron_active)}`}
+					className={`${style.chevron} ${isOpen ? style.chevronRotate : ''} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.chevron_active : ''}`}
 				/>
 			)}
 		</SidebarMenuButton>
