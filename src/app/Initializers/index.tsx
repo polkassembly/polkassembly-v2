@@ -150,7 +150,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		setUserPreferences({
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
-			address: { address: user?.loginAddress || user?.addresses?.[0] || '', name: user?.username }, // TODO: fix this @aadarsh012
+			address: { address: user?.loginAddress || user?.addresses?.[0] || '' }, // TODO: fix this @aadarsh012
 			wallet: user?.loginWallet
 		});
 

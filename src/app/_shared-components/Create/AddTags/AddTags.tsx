@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, ChevronsUpDown, PlusIcon } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/app/_shared-components/Command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/app/_shared-components/Command/Command';
 import { useTranslations } from 'next-intl';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';

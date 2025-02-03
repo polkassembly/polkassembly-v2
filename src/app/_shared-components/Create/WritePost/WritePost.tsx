@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/To
 import { MessageCircleWarning } from 'lucide-react';
 import { Button } from '../../Button';
 import BlockEditor from '../../BlockEditor/BlockEditor';
-import { RadioGroup, RadioGroupItem } from '../../RadioGroup';
+import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
