@@ -105,6 +105,7 @@ export class FirestoreService extends FirestoreRefs {
 			profileScore: user.profileScore,
 			addresses: addresses.map((address) => address.address),
 			rank,
+			createdAt: user.createdAt,
 			profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
 		};
 	}

@@ -167,7 +167,11 @@
 		},
 		"overview": "概览",
 		"onchainIdentity": "链上身份",
-		"linkAddress": "链接地址"
+		"linkAddress": "链接地址",
+		"badges": "徽章",
+		"badgesDescription": "在Polkassembly中参与时解锁、接收和赚取徽章",
+		"userSince": "用户自",
+		"rank": "等级"
 	},
 	"ListingTab": {
 		"Analytics": "分析",

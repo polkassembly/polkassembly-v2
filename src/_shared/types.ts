@@ -39,8 +39,8 @@ export enum EUserBadge {
 	DECENTRALISED_VOICE = 'decentralised_voice',
 	FELLOW = 'fellow',
 	COUNCIL = 'council',
-	ACTIVE_VOTER = 'active_voter',
-	WHALE = 'whale'
+	ACTIVE_VOTER = 'active_voter'
+	// WHALE = 'whale'
 	// STEADFAST_COMMENTOR = 'Steadfast Commentor',
 	// GM_VOTER = 'GM Voter',
 	// POPULAR_DELEGATE = 'Popular Delegate'
@@ -48,8 +48,7 @@ export enum EUserBadge {
 
 export interface IUserBadgeDetails {
 	name: EUserBadge;
-	check: boolean;
-	unlockedAt: string;
+	unlockedAt: Date;
 }
 
 export interface IProfileDetails {
@@ -128,6 +127,7 @@ export interface IUser {
 
 export interface IPublicUser {
 	id: number;
+	createdAt?: Date;
 	username: string;
 	profileScore: number;
 	addresses: string[];
