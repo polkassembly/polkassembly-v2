@@ -47,7 +47,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 							<TooltipTrigger asChild>
 								{item.url ? (
 									<Link href={item.url}>
-										<div className={`${style.iconWrapper} ${item.bgColor}`}>
+										<div className={`${style.iconWrapper} ${item.bgColor} border border-transparent hover:border-navbar_border`}>
 											<Image
 												src={item.src}
 												alt={item.alt}
@@ -59,7 +59,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 									</Link>
 								) : (
 									<div
-										className={`${style.iconWrapper} ${item.bgColor}`}
+										className={`${style.iconWrapper} ${item.bgColor} border border-transparent hover:border-navbar_border`}
 										onClick={() => handleClick(item)}
 										role='button'
 										tabIndex={0}
