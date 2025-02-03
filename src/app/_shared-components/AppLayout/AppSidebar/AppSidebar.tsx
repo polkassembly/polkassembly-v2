@@ -37,14 +37,13 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const pathname = usePathname();
 
 	const network = getCurrentNetwork();
+	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		setIsLoading(true);
+	}, []);
 
 	const getLogo = () => {
-		const [isLoading, setIsLoading] = useState(false);
-
-		useEffect(() => {
-			setIsLoading(true);
-		}, []);
-
 		if (!isLoading) {
 			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
 		}

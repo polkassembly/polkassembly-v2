@@ -5,8 +5,8 @@
 import React from 'react';
 import { FaAngleRight } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
-import styles from './ActivityFeedActiveProposal.module.scss';
 import { useUser } from '@/hooks/useUser';
+import styles from './ActivityFeedActiveProposal.module.scss';
 
 function ActivityFeedActiveProposal() {
 	const t = useTranslations();
