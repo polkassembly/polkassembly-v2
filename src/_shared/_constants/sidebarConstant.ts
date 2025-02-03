@@ -129,7 +129,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							title: t('Sidebar.bounty'),
 							url: '',
 							icon: Bounty,
-							isNew: true,
+							isNew: false,
 							items: [
 								{
 									title: t('Sidebar.bountyDashboard'),
@@ -139,7 +139,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 								{ title: t('Sidebar.onChainBounties'), url: '/bounty/onchain-bounty' }
 							]
 						},
-						{ title: t('Sidebar.batchVoting'), url: '#', icon: BatchVoting, isNew: true }
+						{ title: t('Sidebar.batchVoting'), url: '#', icon: BatchVoting, isNew: false }
 					],
 					pathname
 				),
