@@ -4,12 +4,10 @@
 
 'use client';
 
-import React, { RefObject, useRef, useState } from 'react';
-import Image from 'next/image';
+import React, { RefObject, useMemo, useRef, useState } from 'react';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import VoteIcon from '@assets/activityfeed/vote.svg';
 import { IActivityFeedPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -32,10 +30,9 @@ import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../../Dialog/Dialog';
-import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
+const VoteButton = dynamic(() => import('./VoteButton'), { ssr: false });
 
 function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing }) {
 	const { user } = useUser();
@@ -65,7 +62,8 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 	const decisionPeriodPercentage = postData.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(postData.onChainInfo?.decisionPeriodEndsAt) : 0;
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
-	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+	// const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+	const formattedTime = useMemo(() => dayjs.utc(postData.onChainInfo?.createdAt).fromNow(), [postData]);
 
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
@@ -94,41 +92,10 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					</span>
 					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
 				</div>
-				<div>
-					{user?.id ? (
-						<Dialog>
-							<DialogTrigger asChild>
-								<span className={`${styles.castVoteButton} cursor-pointer`}>
-									<Image
-										src={VoteIcon}
-										alt=''
-										width={20}
-										height={20}
-									/>
-									<span>{t('PostDetails.castVote')}</span>
-								</span>
-							</DialogTrigger>
-							<DialogTitle>
-								<DialogContent className='max-w-xl p-6'>
-									<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-									<VoteReferendum index={postData?.index?.toString() || ''} />
-								</DialogContent>
-							</DialogTitle>
-						</Dialog>
-					) : (
-						<Link href='/login'>
-							<span className={`${styles.castVoteButton} cursor-pointer`}>
-								<Image
-									src={VoteIcon}
-									alt=''
-									width={20}
-									height={20}
-								/>
-								<span>{t('PostDetails.loginToVote')}</span>
-							</span>
-						</Link>
-					)}
-				</div>
+				<VoteButton
+					postIndex={postData?.index?.toString() || ''}
+					isLoggedIn={!!user?.id}
+				/>
 			</div>
 
 			{/* Post Info Section */}
@@ -142,7 +109,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					<span>|</span>
 					<span className='flex items-center gap-2'>
 						<FaRegClock className='text-sm' />
-						{dayjs.utc(postData.onChainInfo?.createdAt).fromNow()}
+						{formattedTime}
 					</span>
 				</div>
 				<VotingProgress

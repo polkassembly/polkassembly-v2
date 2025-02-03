@@ -71,14 +71,12 @@ function ActivityFeedFeaturesSection() {
 	};
 
 	useEffect(() => {
-		if (!api) {
-			return () => {};
-		}
+		if (!api) return () => {};
 		const handleSelect = () => setCurrent(api.selectedScrollSnap());
 		api.on('select', handleSelect);
 
 		const autoplayInterval = setInterval(() => {
-			api.scrollNext();
+			api?.scrollNext();
 		}, 5000);
 		return () => {
 			clearInterval(autoplayInterval);
@@ -86,8 +84,11 @@ function ActivityFeedFeaturesSection() {
 		};
 	}, [api]);
 
+	const containerClassName = `${state === 'collapsed' ? styles.featuresContainerClosed : styles.featuresContainerOpen} ${!user?.id ? styles.featuresContainerNotLogin : ''}`;
+	const carouselClassName = `${state === 'collapsed' ? 'xl:w-66' : 'w-54 2xl:w-72'} m-0 p-0`;
+
 	return (
-		<div className={`${state === 'collapsed' ? styles.featuresContainerClosed : styles.featuresContainerOpen} ${!user?.id ? styles.featuresContainerNotLogin : ''}`}>
+		<div className={containerClassName}>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
 					<p className={`${styles.featuresTitle} dark:text-white`}>{t('ActivityFeed.Features')}</p>
@@ -108,9 +109,13 @@ function ActivityFeedFeaturesSection() {
 
 			<div className='mt-2'>
 				<Carousel
-					opts={{ loop: true, align: 'start' }}
+					opts={{
+						loop: true,
+						align: 'start',
+						startIndex: 0
+					}}
 					setApi={setApi}
-					className={`${state === 'collapsed' ? 'xl:w-66' : 'w-54 2xl:w-72'} m-0 p-0`}
+					className={carouselClassName}
 				>
 					<CarouselContent className='m-0 p-0'>
 						{features.map((feature) => (

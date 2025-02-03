@@ -5,7 +5,7 @@
 'use client';
 
 import Image from 'next/image';
-import React from 'react';
+import React, { ComponentProps, useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -30,7 +30,7 @@ import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
 
-function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const t = useTranslations();
 	const { resolvedTheme: theme } = useTheme();
@@ -38,20 +38,27 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 	const network = getCurrentNetwork();
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
-		if (theme === ETheme.LIGHT) {
+		const [isLoading, setIsLoading] = useState(false);
+
+		useEffect(() => {
+			setIsLoading(true);
+		}, []);
+
+		if (!isLoading) {
 			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
 		}
-		if (state === 'expanded') {
-			return (
-				<Image
-					src={PaLogoDark}
-					alt='Polkassembly Logo'
-				/>
-			);
-		}
-		return <PaLogo variant='compact' />;
+
+		return theme === ETheme.DARK ? (
+			<Image
+				src={PaLogoDark}
+				alt='Polkassembly Logo'
+				width={129}
+				height={40}
+			/>
+		) : (
+			<PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />
+		);
 	};
 
 	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (

@@ -44,9 +44,9 @@ function ActivityFeedRankCard() {
 						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
 					</p>
 					<div className='flex items-center justify-between gap-4 pt-8'>
-						<p className='text-base font-semibold text-btn_secondary_text'>
+						<span className='text-base font-semibold text-btn_secondary_text'>
 							<Address address={user?.publicUser?.addresses[0] || ''} />
-						</p>
+						</span>
 
 						<div>
 							<div className='flex items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>

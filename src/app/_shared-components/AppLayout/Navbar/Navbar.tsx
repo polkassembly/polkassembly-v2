@@ -144,7 +144,7 @@ function Navbar() {
 
 				{user?.id ? (
 					<DropdownMenu>
-						<DropdownMenuTrigger>
+						<DropdownMenuTrigger asChild>
 							<Button
 								variant='ghost'
 								className='rounded-3xl border border-border_grey bg-wallet_disabled_bg text-sm text-text_primary'

@@ -48,7 +48,11 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							/>
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
-							<Timeline timeline={postData?.onChainInfo?.timeline} />
+							<Timeline
+								proposalType={postData?.proposalType}
+								timeline={postData?.onChainInfo?.timeline}
+								createdAt={postData?.createdAt}
+							/>
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
 							<OnchainInfo

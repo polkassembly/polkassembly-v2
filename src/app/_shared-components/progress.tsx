@@ -2,12 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import * as React from 'react';
+'use client';
+
 import * as ProgressPrimitive from '@radix-ui/react-progress';
-
 import { cn } from '@/lib/utils';
+import { forwardRef } from 'react';
 
-const Progress = React.forwardRef<React.ElementRef<typeof ProgressPrimitive.Root>, React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & { indicatorClassName?: string }>(
+const Progress = forwardRef<React.ElementRef<typeof ProgressPrimitive.Root>, React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & { indicatorClassName?: string }>(
 	({ className, value, indicatorClassName, ...props }, ref) => (
 		<ProgressPrimitive.Root
 			ref={ref}

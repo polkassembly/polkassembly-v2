@@ -6,9 +6,12 @@ import React from 'react';
 import { FaAngleRight } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 import styles from './ActivityFeedActiveProposal.module.scss';
+import { useUser } from '@/hooks/useUser';
 
 function ActivityFeedActiveProposal() {
 	const t = useTranslations();
+	const user = useUser();
+	if (!user) return null;
 	return (
 		<div className={styles.activeProposalContainer}>
 			<div className={styles.activeProposalTitle}>
