@@ -46,24 +46,25 @@ export class SubsquareOffChainService {
 				return null;
 			}
 
-			if (!data) {
-				return null;
-			}
-
 			let title = data?.title || '';
 
 			if (title.includes('Untitled')) {
 				title = '';
 			}
 
-			if (title && title.includes('[Root] Referendum #')) {
-				title = title.replace(/\[Root\] Referendum #\d+: /, '');
+			if (title && title.includes('[')) {
+				title = title.replace(/\[[^\]]*\] Referendum #\d+: /, '');
 			}
 
-			const content = data?.content || getDefaultPostContent(proposalType, data?.proposer);
-			const editorJsContent = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+			let content = data?.content;
 
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(editorJsContent);
+			if (!content) {
+				content = getDefaultPostContent(proposalType, data?.proposer);
+			} else {
+				content = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+			}
+
+			const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 			if (!title && !content) {
 				return null;
@@ -74,7 +75,7 @@ export class SubsquareOffChainService {
 				index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
 				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 				title: title || DEFAULT_POST_TITLE,
-				content: editorJsContent,
+				content,
 				htmlContent: html,
 				markdownContent: markdown,
 				createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
