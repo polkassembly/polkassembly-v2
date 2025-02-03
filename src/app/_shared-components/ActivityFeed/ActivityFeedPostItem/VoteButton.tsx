@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@ui/Dialog/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import VoteReferendum from '../../PostDetails/VoteReferendum/VoteReferendum';
 import styles from './ActivityFeedPostItem.module.scss';
 
@@ -33,7 +33,9 @@ export default function VoteButton({ postIndex, isLoggedIn }: VoteButtonProps) {
 					</span>
 				</DialogTrigger>
 				<DialogContent className='max-w-xl p-6'>
-					<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+					<DialogHeader>
+						<DialogTitle className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogTitle>
+					</DialogHeader>
 					<VoteReferendum index={postIndex} />
 				</DialogContent>
 			</Dialog>
