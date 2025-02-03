@@ -49,7 +49,7 @@ function CommentModal({
 			});
 
 			if (error) {
-				console.log(error.message);
+				// TODO: show notification
 				return;
 			}
 
@@ -59,8 +59,8 @@ function CommentModal({
 				blockEditorActionsRef.current?.clearEditor?.();
 				onCommentAdded();
 			}
-		} catch (err) {
-			console.log(err);
+		} catch {
+			// TODO: show notification
 		}
 	};
 

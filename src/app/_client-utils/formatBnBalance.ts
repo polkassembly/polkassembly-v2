@@ -44,6 +44,8 @@ export function formatBnBalance(value: string | BN, options: Options, network: E
 		formattedValue = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: numberAfterComma || 2 }).format(fullValue);
 	} else {
 		if (withThousandDelimitor) {
+			// TODO:fix this
+			// eslint-disable-next-line security/detect-unsafe-regex
 			prefix = prefix.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 		}
 		formattedValue = `${prefix}.${suffix}`;

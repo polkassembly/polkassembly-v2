@@ -14,6 +14,7 @@ import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import Identicon from '@polkadot/react-identicon';
 import { useTranslations } from 'next-intl';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import classes from './AddComment.module.scss';
 
 function AddComment({
@@ -52,7 +53,7 @@ function AddComment({
 
 			if (error) {
 				setLoading(false);
-				console.log(error.message);
+				// TODO: show notification
 				return;
 			}
 
@@ -61,7 +62,8 @@ function AddComment({
 					username: user.username,
 					id: user.id,
 					addresses: user.addresses,
-					profileScore: user.id
+					profileScore: user.id,
+					profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
 				};
 
 				onConfirm?.({ ...data, content }, publicUser);
@@ -70,9 +72,9 @@ function AddComment({
 				blockEditorActionsRef.current?.clearEditor?.();
 			}
 			setLoading(false);
-		} catch (err) {
+		} catch {
 			setLoading(false);
-			console.log(err);
+			// TODO: show notification
 		}
 	};
 

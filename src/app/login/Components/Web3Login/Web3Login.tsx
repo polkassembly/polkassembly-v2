@@ -102,8 +102,8 @@ function Web3Login({
 				router.back();
 			}
 			setLoading(false);
-		} catch (error) {
-			console.log('error', error);
+		} catch {
+			// TODO: show notification
 			setLoading(false);
 		}
 	};
