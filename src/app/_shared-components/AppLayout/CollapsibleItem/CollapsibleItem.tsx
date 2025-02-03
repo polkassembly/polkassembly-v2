@@ -32,7 +32,7 @@ const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
 const NEW_BADGE_TEXT = 'Sidebar.Tag.new';
 const DARK_ICON_CLASS = 'dark-icons';
 
-function ThemeAwareIcon({ name, className, isActive }: { name: IconName; className?: string; isActive?: boolean }) {
+function DarkIcon({ name, className, isActive }: { name: IconName; className?: string; isActive?: boolean }) {
 	const { resolvedTheme: theme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
@@ -191,7 +191,7 @@ function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 							>
 								{item.icon && (
 									<div className={style.iconWrapper}>
-										<ThemeAwareIcon
+										<DarkIcon
 											name={item.icon}
 											className='h-6 w-6'
 											isActive={item.isActive || item.items?.some((subItem) => subItem.isActive)}
@@ -252,7 +252,7 @@ function CollapsibleButton({ item, isOpen, onClick }: { item: ISidebarMenuItem; 
 		>
 			{item.icon && (
 				<div className={style.iconWrapper}>
-					<ThemeAwareIcon
+					<DarkIcon
 						name={item.icon}
 						className='h-6 w-6'
 						isActive={item.isActive || item.items?.some((subItem) => subItem.isActive)}
