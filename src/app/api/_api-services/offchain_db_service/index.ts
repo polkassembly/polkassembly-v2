@@ -20,7 +20,8 @@ import {
 	EActivityName,
 	EActivityCategory,
 	IActivityMetadata,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IContentSummary
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -239,6 +240,10 @@ export class OffChainDbService {
 		return FirestoreService.GetUserReactionForPost({ network, indexOrHash, proposalType, userId });
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
+		return FirestoreService.GetContentSummary({ network, indexOrHash, proposalType });
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -372,8 +377,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
-		return FirestoreService.UpdateComment({ commentId, content });
+	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -550,5 +555,9 @@ export class OffChainDbService {
 
 	static async UpdateUserPassword(userId: number, password: string, salt: string) {
 		return FirestoreService.UpdateUserPassword(userId, password, salt);
+	}
+
+	static async UpdateContentSummary(contentSummary: IContentSummary) {
+		return FirestoreService.UpdateContentSummary(contentSummary);
 	}
 }

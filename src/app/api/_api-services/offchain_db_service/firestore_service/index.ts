@@ -17,7 +17,8 @@ import {
 	EReaction,
 	IPostOffChainMetrics,
 	IUserActivity,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IContentSummary
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -565,6 +566,26 @@ export class FirestoreService extends FirestoreRefs {
 		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
+		const contentSummaryQuery = FirestoreRefs.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.limit(1);
+
+		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
+
+		if (contentSummaryQuerySnapshot.empty) {
+			return null;
+		}
+
+		return {
+			...contentSummaryQuerySnapshot.docs[0].data(),
+			createdAt: contentSummaryQuerySnapshot.docs[0].data().createdAt?.toDate() || new Date(),
+			updatedAt: contentSummaryQuerySnapshot.docs[0].data().updatedAt?.toDate() || new Date()
+		} as IContentSummary;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -646,10 +667,18 @@ export class FirestoreService extends FirestoreRefs {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
+	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
-		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, htmlContent: html, markdownContent: markdown, updatedAt: new Date() }, { merge: true });
+		const newCommentData: Partial<IComment> = {
+			content,
+			htmlContent: html,
+			markdownContent: markdown,
+			...(isSpam && { isSpam }),
+			updatedAt: new Date()
+		};
+
+		await FirestoreRefs.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -801,5 +830,12 @@ export class FirestoreService extends FirestoreRefs {
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ lastCommentAt }, { merge: true });
 		}
+	}
+
+	static async UpdateContentSummary(contentSummary: IContentSummary) {
+		const contentSummaryId = contentSummary.id || FirestoreRefs.contentSummariesCollectionRef().doc().id;
+		await FirestoreRefs.contentSummariesCollectionRef()
+			.doc(contentSummaryId)
+			.set({ ...contentSummary, id: contentSummaryId }, { merge: true });
 	}
 }

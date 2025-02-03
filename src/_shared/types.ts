@@ -305,12 +305,15 @@ export interface IPostLink {
 }
 
 export interface IContentSummary {
+	id: string;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;
-	postSummary: string;
-	commentsSummary: string;
-	isSpam: boolean;
+	postSummary?: string;
+	commentsSummary?: string;
+	isSpam?: boolean;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface IOffChainPost {
@@ -544,7 +547,7 @@ export interface IComment {
 	isDeleted: boolean;
 	address: string | null;
 	dataSource: EDataSource;
-	isSpam: boolean;
+	isSpam?: boolean;
 }
 
 export interface ICommentResponse extends IComment {

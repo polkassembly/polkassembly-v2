@@ -3,12 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { ENetwork, EProposalType, IBeneficiary, IComment } from '@/_shared/types';
+import { ENetwork, EProposalType, IBeneficiary, ICommentResponse, IContentSummary, IOnChainPostInfo } from '@/_shared/types';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
+import { OffChainDbService } from '../offchain_db_service';
+import { OnChainDbService } from '../onchain_db_service';
 
 if (!IS_AI_ENABLED) {
 	console.log(`
@@ -109,7 +111,7 @@ export class AIService {
 		content?: string;
 		title?: string;
 		additionalData: { proposer?: string; proposalType?: EProposalType; preimageArgs?: Record<string, unknown>; onChainDescription?: string; beneficiaries?: IBeneficiary[] };
-	}): Promise<{ summary: string } | null> {
+	}): Promise<string | null> {
 		if (!content && !additionalData.onChainDescription && !additionalData.preimageArgs && !additionalData.beneficiaries?.length) {
 			return null;
 		}
@@ -171,10 +173,10 @@ export class AIService {
 			return null;
 		}
 
-		return { summary: summaryResponse };
+		return summaryResponse;
 	}
 
-	private static async getCommentsSummary({ comments }: { comments: IComment[] }): Promise<{ summary: string } | null> {
+	private static async getCommentsSummary({ comments }: { comments: ICommentResponse[] }): Promise<string | null> {
 		if (!comments?.length) {
 			return null;
 		}
@@ -196,20 +198,24 @@ export class AIService {
 			return null;
 		}
 
-		return { summary: summaryResponse };
+		return summaryResponse;
 	}
 
-	private static async getContentSpamCheck({ mdContent, title }: { mdContent: string; title: string }): Promise<{ isSpam: boolean } | null> {
-		if (!mdContent || !title) {
+	private static async getContentSpamCheck({ mdContent, title }: { mdContent?: string; title?: string }): Promise<boolean | null> {
+		if (!mdContent && !title) {
 			return null;
 		}
 
 		// Construct the prompt with the content
 		let fullPrompt = `${this.BASE_PROMPTS.CONTENT_SPAM_CHECK}\n\nAnalyze the following content:\n\n`;
 
-		fullPrompt += `\n\n### Title:\n${title}`;
+		if (title) {
+			fullPrompt += `\n\n### Title:\n${title}`;
+		}
 
-		fullPrompt += `\n\n### Main Content:\n${mdContent}\n\n`;
+		if (mdContent) {
+			fullPrompt += `\n\n### Main Content:\n${mdContent}\n\n`;
+		}
 
 		const response = await this.getAIResponse(fullPrompt);
 
@@ -218,6 +224,102 @@ export class AIService {
 		}
 
 		// Check if response is exactly 'true' or 'false'
-		return { isSpam: response?.toLowerCase() === 'true' };
+		return response?.toLowerCase() === 'true';
+	}
+
+	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
+
+		let onChainPostInfo: IOnChainPostInfo | null = null;
+		if (ValidatorService.isValidOnChainProposalType(proposalType)) {
+			onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash, proposalType });
+		}
+
+		const mdContent = offChainPostData.content ? htmlAndMarkdownFromEditorJs(offChainPostData.content).markdown : undefined;
+
+		const postSummary = await this.getPostSummary({
+			network,
+			content: mdContent,
+			title: offChainPostData.title,
+			additionalData: {
+				proposer: onChainPostInfo?.proposer,
+				proposalType,
+				preimageArgs: onChainPostInfo?.preimageArgs,
+				onChainDescription: onChainPostInfo?.description,
+				beneficiaries: onChainPostInfo?.beneficiaries
+			}
+		});
+
+		const isSpam = await this.getContentSpamCheck({
+			mdContent,
+			title: offChainPostData.title
+		});
+
+		if (!postSummary?.trim() && !isSpam) return;
+
+		// check if content summary already exists
+		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
+
+		const updatedContentSummary: IContentSummary = {
+			id: existingContentSummary?.id || '', // if new will be set by firestore
+			network,
+			indexOrHash,
+			proposalType,
+			...(postSummary && { postSummary }),
+			...(isSpam && { isSpam }),
+			...(existingContentSummary?.commentsSummary && { commentsSummary: existingContentSummary.commentsSummary }),
+			createdAt: existingContentSummary?.createdAt || new Date(),
+			updatedAt: new Date()
+		};
+
+		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
+	}
+
+	static async UpdatePostCommentsSummary({
+		network,
+		proposalType,
+		indexOrHash,
+		newCommentId
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+		newCommentId?: string;
+	}) {
+		const commentsTree = await OffChainDbService.GetPostComments({ network, indexOrHash, proposalType });
+
+		const flattenedComments = commentsTree.flatMap((comment) => comment.children || [comment]);
+
+		if (!flattenedComments.length) return;
+
+		// check if new comment is spam
+		if (newCommentId) {
+			const newComment = flattenedComments.find((comment) => comment.id === newCommentId);
+
+			if (newComment) {
+				const isSpam = await this.getContentSpamCheck({ mdContent: newComment.markdownContent });
+				if (isSpam) {
+					await OffChainDbService.UpdateComment({ commentId: newCommentId, content: newComment.content, isSpam });
+				}
+			}
+		}
+
+		const commentsSummary = await this.getCommentsSummary({ comments: flattenedComments });
+
+		if (!commentsSummary?.trim()) return;
+
+		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
+
+		const updatedContentSummary: IContentSummary = {
+			id: existingContentSummary?.id || '',
+			network,
+			indexOrHash,
+			proposalType,
+			...(commentsSummary && { commentsSummary }),
+			createdAt: existingContentSummary?.createdAt || new Date(),
+			updatedAt: new Date()
+		};
+
+		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
 	}
 }

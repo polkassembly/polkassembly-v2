@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { deepParseJson } from 'deep-parse-json';
+import { AIService } from '@/app/api/_api-services/ai_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -110,6 +111,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			allowedCommentor
 		});
 	}
+
+	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
 
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
