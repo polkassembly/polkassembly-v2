@@ -32,7 +32,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 		<div className={`${style.card} ${state === 'collapsed' ? 'w-full' : 'lg:w-[200px]'}`}>
 			<Popover>
 				<PopoverTrigger asChild>
-					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}>
+					<div className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded} h-[32px] md:h-[42px]`}>
 						<Image
 							src={PencilIcon}
 							alt='Create Pencil Icon'
