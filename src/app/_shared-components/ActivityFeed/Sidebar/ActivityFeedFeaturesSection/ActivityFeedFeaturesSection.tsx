@@ -6,17 +6,21 @@
 
 import Link from 'next/link';
 import { MouseEvent, useEffect, useState } from 'react';
-import { Icon, IconName } from '@/app/_shared-components/Icon';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/carousel';
 import { useTranslations } from 'next-intl';
 import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { useUser } from '@/hooks/useUser';
+import Feature1 from '@assets/activityfeed/feature1.png';
+import Feature2 from '@assets/activityfeed/feature2.png';
+import Feature3 from '@assets/activityfeed/feature3.png';
+import Feature4 from '@assets/activityfeed/feature4.png';
+import Image, { StaticImageData } from 'next/image';
 import styles from './ActivityFeedFeaturesSection.module.scss';
 
 interface IFeature {
 	title: string;
 	description: string;
-	image: IconName;
+	image: StaticImageData;
 	path: string;
 	id: string;
 }
@@ -32,28 +36,28 @@ function ActivityFeedFeaturesSection() {
 		{
 			id: 'delegation-dashboard',
 			description: t('ActivityFeed.DelegationDashboardDescription'),
-			image: 'activityfeed/features1',
+			image: Feature1,
 			path: '/delegation',
 			title: t('ActivityFeed.DelegationDashboard')
 		},
 		{
 			id: 'batch-voting',
 			description: t('ActivityFeed.BatchVotingDescription'),
-			image: 'activityfeed/features2',
+			image: Feature2,
 			path: '/batch-voting',
 			title: t('ActivityFeed.BatchVoting')
 		},
 		{
 			id: 'bounty',
 			description: t('ActivityFeed.BountyDescription'),
-			image: 'activityfeed/features3',
+			image: Feature3,
 			path: 'bounty',
 			title: t('ActivityFeed.Bounty')
 		},
 		{
 			id: 'identity',
 			description: t('ActivityFeed.IdentityDescription'),
-			image: 'activityfeed/features4',
+			image: Feature4,
 			path: '',
 			title: t('ActivityFeed.Identity')
 		}
@@ -118,9 +122,12 @@ function ActivityFeedFeaturesSection() {
 									href={feature.path}
 									onClick={(e) => handleFeatureClick(e, feature)}
 								>
-									<Icon
-										name={feature.image}
+									<Image
+										src={feature.image}
 										className='h-28 w-full rounded-lg'
+										alt={feature.title}
+										width={100}
+										height={100}
 									/>
 									<div className='mt-3'>
 										<p className='text-base font-semibold dark:text-white'>{feature.title}</p>
