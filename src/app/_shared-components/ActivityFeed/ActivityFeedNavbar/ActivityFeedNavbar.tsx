@@ -144,16 +144,16 @@ function ActivityFeedNavbar({
 							<div className='flex-shrink-0'>
 								<button
 									type='button'
-									className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab' : ''}`}
+									className={`${styles.popoverTrigger} ${isActiveCategory(category, tracks) ? 'bg-activity_selected_tab font-medium' : 'hover:bg-activity_selected_tab'}`}
 									onClick={() => handleCategoryClick(category)}
 								>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
 											alt={category}
-											width={20}
-											height={20}
-											className='dark:brightness-0 dark:invert'
+											width={25}
+											height={23}
+											className='h-6 w-6 dark:brightness-0 dark:invert'
 										/>
 										<span className='ml-2'>{category}</span>
 										{tracks?.length > 1 && (
@@ -175,7 +175,7 @@ function ActivityFeedNavbar({
 										<div key={track}>
 											<button
 												type='button'
-												className={`${styles.trackName} ${currentTab === track ? 'bg-activity_selected_tab' : ''}`}
+												className={`${styles.trackName} ${currentTab === track ? 'bg-activity_selected_tab' : 'hover:bg-activity_selected_tab'}`}
 												onClick={() => setCurrentTab(track)}
 											>
 												{formatTrackName(track)} {getPostCount(track)}

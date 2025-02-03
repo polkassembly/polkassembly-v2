@@ -7,7 +7,7 @@
 }
 
 .aboutDescription {
-    @apply text-base text-text_primary;
+    @apply text-sm text-text_primary flex flex-col;
 }
 
 .aboutSocialLink {

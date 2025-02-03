@@ -69,6 +69,32 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
+	const reactions = [];
+
+	if (reactionState.likesCount > 0) {
+		reactions.push(
+			<span key='likes'>
+				{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+			</span>
+		);
+	}
+
+	if (reactionState.dislikesCount > 0) {
+		reactions.push(
+			<span key='dislikes'>
+				{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+			</span>
+		);
+	}
+
+	if (commentCount > 0) {
+		reactions.push(
+			<span key='comments'>
+				{commentCount} {t('ActivityFeed.PostItem.comments')}
+			</span>
+		);
+	}
+
 	return (
 		<div className='rounded-xl border border-border_grey bg-bg_modal p-5'>
 			{/* Header Section */}
@@ -156,7 +182,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 			{/* Post Content Section */}
 			<div className='flex gap-2'>
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
+				<h3 className='mb-2 text-sm font-semibold text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
 				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
@@ -168,27 +194,19 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 				</div>
 				<Link
 					href={`/referenda/${postData.index}`}
-					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
+					className='ml-1 cursor-pointer text-sm font-medium text-blue-600'
 				>
 					{t('ActivityFeed.PostItem.readMore')}
 				</Link>
 			</div>
 
-			{/* Metrics Section */}
-			<div className='flex items-center justify-end'>
-				<div className='flex items-center gap-2 text-xs text-text_primary'>
-					<span>
-						{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
-					</span>
-					<span>|</span>
-					<span>
-						{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
-					</span>
-					<span>|</span>
-					<span>
-						{commentCount} {t('ActivityFeed.PostItem.comments')}
-					</span>
-				</div>
+			<div className='flex items-center gap-2 text-xs text-text_primary'>
+				{reactions.map((reaction, index) => (
+					<React.Fragment key={reaction.key}>
+						{index > 0 && <span>|</span>}
+						{reaction}
+					</React.Fragment>
+				))}
 			</div>
 
 			<hr className='my-4 border-[0.7px] border-primary_border' />
