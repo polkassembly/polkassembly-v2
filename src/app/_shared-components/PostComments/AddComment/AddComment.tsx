@@ -15,7 +15,6 @@ import { Button } from '@ui/Button';
 import Identicon from '@polkadot/react-identicon';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
-import { deepParseJson } from 'deep-parse-json';
 import classes from './AddComment.module.scss';
 
 function AddComment({
@@ -35,7 +34,7 @@ function AddComment({
 }) {
 	const t = useTranslations();
 	const savedContent = parentCommentId ? LocalStorageClientService.getReplyData(proposalIndex, parentCommentId) : LocalStorageClientService.getCommentData(proposalIndex);
-	const [content, setContent] = useState<OutputData | null>(savedContent ? deepParseJson(savedContent) : null);
+	const [content, setContent] = useState<OutputData | null>(savedContent);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);

@@ -2,7 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { OutputData } from '@editorjs/editorjs';
+import { deepParseJson } from 'deep-parse-json';
 
 enum ELocalStorageKeys {
 	DISCUSSION_POST_DATA = 'DPD',
@@ -41,7 +43,12 @@ export class LocalStorageClientService {
 	}
 
 	static getDiscussionPostData() {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA]());
+		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA]());
+		const parsedData = data ? deepParseJson(data) : null;
+		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
+			return parsedData as OutputData;
+		}
+		return null;
 	}
 
 	static deleteDiscussionPostData() {
@@ -54,7 +61,12 @@ export class LocalStorageClientService {
 	}
 
 	static getCommentData(postId: string) {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId));
+		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId));
+		const parsedData = data ? deepParseJson(data) : null;
+		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
+			return parsedData as OutputData;
+		}
+		return null;
 	}
 
 	static deleteCommentData(postId: string) {
@@ -67,7 +79,12 @@ export class LocalStorageClientService {
 	}
 
 	static getReplyData(postId: string, parentCommentId: string) {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.REPLY_DATA](postId, parentCommentId));
+		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.REPLY_DATA](postId, parentCommentId));
+		const parsedData = data ? deepParseJson(data) : null;
+		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
+			return parsedData as OutputData;
+		}
+		return null;
 	}
 
 	static deleteReplyData(postId: string, parentCommentId: string) {
@@ -80,7 +97,12 @@ export class LocalStorageClientService {
 	}
 
 	static getEditPostData(postId: string) {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId));
+		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId));
+		const parsedData = data ? deepParseJson(data) : null;
+		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
+			return parsedData as OutputData;
+		}
+		return null;
 	}
 
 	static deleteEditPostData(postId: string) {
