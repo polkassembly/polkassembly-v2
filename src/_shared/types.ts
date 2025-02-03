@@ -304,6 +304,15 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
+export interface IContentSummary {
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	postSummary: string;
+	commentsSummary: string;
+	isSpam: boolean;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -442,6 +451,7 @@ export interface IOnChainPostInfo {
 	decisionPeriodEndsAt?: Date;
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
+	preimageArgs?: Record<string, unknown>;
 }
 
 export interface IPost extends IOffChainPost {
@@ -534,6 +544,7 @@ export interface IComment {
 	isDeleted: boolean;
 	address: string | null;
 	dataSource: EDataSource;
+	isSpam: boolean;
 }
 
 export interface ICommentResponse extends IComment {

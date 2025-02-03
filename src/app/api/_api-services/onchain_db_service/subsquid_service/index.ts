@@ -114,7 +114,8 @@ export class SubsquidService extends SubsquidUtils {
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 			confirmationPeriodEndsAt: allPeriodEnds?.confirmationPeriodEnd ?? undefined,
-			timeline: proposal.statusHistory as IStatusHistoryItem[]
+			timeline: proposal.statusHistory as IStatusHistoryItem[],
+			preimageArgs: proposal.preimage?.proposedCall?.args
 		};
 	}
 

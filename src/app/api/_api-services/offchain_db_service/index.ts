@@ -459,6 +459,9 @@ export class OffChainDbService {
 
 		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
 
+		// create content summary
+		// await AIService.createPostSummary({ network, proposalType, indexOrHash: post.indexOrHash });
+
 		await this.saveUserActivity({
 			userId,
 			name: OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType) ? EActivityName.CREATED_OFFCHAIN_POST : EActivityName.CREATED_PROPOSAL,
