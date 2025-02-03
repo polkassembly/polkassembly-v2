@@ -16,8 +16,7 @@ enum ELocalStorageKeys {
 export class LocalStorageClientService {
 	private static readonly localStorageKeysMap = {
 		[ELocalStorageKeys.DISCUSSION_POST_DATA]: (): string => `${ELocalStorageKeys.DISCUSSION_POST_DATA}`,
-		[ELocalStorageKeys.COMMENT_DATA]: (postId: string): string => `${ELocalStorageKeys.COMMENT_DATA}-${postId}`,
-		[ELocalStorageKeys.REPLY_DATA]: (postId: string, parentCommentId: string): string => `${ELocalStorageKeys.REPLY_DATA}-${postId}-${parentCommentId}`,
+		[ELocalStorageKeys.COMMENT_DATA]: (postId: string, parentCommentId?: string): string => `${ELocalStorageKeys.COMMENT_DATA}-${postId}-${parentCommentId || ''}`,
 		[ELocalStorageKeys.EDIT_POST_DATA]: (postId: string): string => `${ELocalStorageKeys.EDIT_POST_DATA}-${postId}`
 	} as const;
 
@@ -38,7 +37,7 @@ export class LocalStorageClientService {
 	}
 
 	// Discussion Post Data
-	static setDiscussionPostData(data: OutputData) {
+	static setDiscussionPostData({ data }: { data: OutputData }) {
 		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA](), JSON.stringify(data));
 	}
 
@@ -56,12 +55,12 @@ export class LocalStorageClientService {
 	}
 
 	// Comment Data
-	static setCommentData(postId: string, data: OutputData) {
-		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId), JSON.stringify(data));
+	static setCommentData({ postId, parentCommentId, data }: { postId: string; parentCommentId?: string; data: OutputData }) {
+		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId), JSON.stringify(data));
 	}
 
-	static getCommentData(postId: string) {
-		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId));
+	static getCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
+		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId));
 		const parsedData = data ? deepParseJson(data) : null;
 		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
 			return parsedData as OutputData;
@@ -69,34 +68,16 @@ export class LocalStorageClientService {
 		return null;
 	}
 
-	static deleteCommentData(postId: string) {
-		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId));
-	}
-
-	// Reply Data
-	static setReplyData(postId: string, parentCommentId: string, data: OutputData) {
-		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.REPLY_DATA](postId, parentCommentId), JSON.stringify(data));
-	}
-
-	static getReplyData(postId: string, parentCommentId: string) {
-		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.REPLY_DATA](postId, parentCommentId));
-		const parsedData = data ? deepParseJson(data) : null;
-		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
-			return parsedData as OutputData;
-		}
-		return null;
-	}
-
-	static deleteReplyData(postId: string, parentCommentId: string) {
-		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.REPLY_DATA](postId, parentCommentId));
+	static deleteCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
+		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId));
 	}
 
 	// Edit Post Data
-	static setEditPostData(postId: string, data: OutputData) {
+	static setEditPostData({ postId, data }: { postId: string; data: OutputData }) {
 		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId), JSON.stringify(data));
 	}
 
-	static getEditPostData(postId: string) {
+	static getEditPostData({ postId }: { postId: string }) {
 		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId));
 		const parsedData = data ? deepParseJson(data) : null;
 		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
@@ -105,7 +86,7 @@ export class LocalStorageClientService {
 		return null;
 	}
 
-	static deleteEditPostData(postId: string) {
+	static deleteEditPostData({ postId }: { postId: string }) {
 		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId));
 	}
 }

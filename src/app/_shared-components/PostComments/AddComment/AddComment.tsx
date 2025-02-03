@@ -33,7 +33,7 @@ function AddComment({
 	editorId: string;
 }) {
 	const t = useTranslations();
-	const savedContent = parentCommentId ? LocalStorageClientService.getReplyData(proposalIndex, parentCommentId) : LocalStorageClientService.getCommentData(proposalIndex);
+	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, parentCommentId });
 	const [content, setContent] = useState<OutputData | null>(savedContent);
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -69,11 +69,7 @@ function AddComment({
 				onConfirm?.({ ...data, content }, publicUser);
 
 				setContent(null);
-				if (parentCommentId) {
-					LocalStorageClientService.deleteReplyData(proposalIndex, parentCommentId);
-				} else {
-					LocalStorageClientService.deleteCommentData(proposalIndex);
-				}
+				LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
 				blockEditorActionsRef.current?.clearEditor?.();
 			}
 			setLoading(false);
@@ -97,11 +93,7 @@ function AddComment({
 							data={content || undefined}
 							onChange={(data) => {
 								setContent(data);
-								if (parentCommentId) {
-									LocalStorageClientService.setReplyData(proposalIndex, parentCommentId, data);
-								} else {
-									LocalStorageClientService.setCommentData(proposalIndex, data);
-								}
+								LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
 							}}
 							id={editorId}
 							ref={blockEditorActionsRef}

@@ -16,7 +16,7 @@ import { Button } from '../../Button';
 
 function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: OutputData) => void; onClose?: () => void }) {
 	const t = useTranslations();
-	const savedContent = LocalStorageClientService.getEditPostData(postData.index?.toString() || '');
+	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
 	const [content, setContent] = useState<OutputData | null>(savedContent || postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
 	const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +47,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 		if (!error && data) {
 			onEditPostSuccess?.(title, content);
-			LocalStorageClientService.deleteEditPostData(postData.index?.toString() || '');
+			LocalStorageClientService.deleteEditPostData({ postId: postData.index.toString() });
 			onClose?.();
 		}
 		setIsLoading(false);
@@ -72,7 +72,9 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 					id='post-content-edit'
 					onChange={(data) => {
 						setContent(data);
-						LocalStorageClientService.setEditPostData(postData.index?.toString() || '', data);
+						if (postData.index) {
+							LocalStorageClientService.setEditPostData({ postId: postData.index.toString(), data });
+						}
 					}}
 				/>
 			</div>
