@@ -15,7 +15,6 @@ import CollectivesLogo from '@assets/parachain-logos/collectives-logo.png';
 import AmplitudeLogo from '@assets/parachain-logos/amplitude-logo.png';
 import BasiliskLogo from '@assets/parachain-logos/basilisk-logo.jpg';
 import CalamariLogo from '@assets/parachain-logos/calamari-logo.png';
-import CrustshadowLogo from '@assets/parachain-logos/crust-logo.png';
 import HeikoLogo from '@assets/parachain-logos/heiko-logo.png';
 import IntegriteeLogo from '@assets/parachain-logos/integritee-logo.png';
 import KaruraLogo from '@assets/parachain-logos/karura-logo.jpg';
@@ -43,15 +42,10 @@ import AltairLogo from '@assets/parachain-logos/altair-logo.jpeg';
 import GenshiroLogo from '@assets/parachain-logos/genshiro.png';
 import GmordieLogo from '@assets/parachain-logos/gmordie-logo.png';
 import MoonbaseLogo from '@assets/parachain-logos/moonbase-logo.png';
-import ShibuyaLogo from '@assets/parachain-logos/shiden-logo.jpg';
 import TidechainLogo from '@assets/parachain-logos/tidechain-logo.png';
 import PichiuLogo from '@assets/parachain-logos/pichiu-logo.png';
-import PichiuRococoLogo from '@assets/parachain-logos/kylin-logo.png';
-import PolymeshTestLogo from '@assets/parachain-logos/polimec-logo.png';
-import RococoLogo from '@assets/parachain-logos/westend-logo.jpg';
 import VaraLogo from '@assets/parachain-logos/vara-logo.png';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
-import WestendCollectivesLogo from '@assets/parachain-logos/westend-logo.jpg';
 import LaossigmaLogo from '@assets/parachain-logos/laossigma-logo.png';
 import AcuityLogo from '@assets/parachain-logos/acuity-logo.jpg';
 import AutomataLogo from '@assets/parachain-logos/automata-logo.jpg';
@@ -66,8 +60,6 @@ import PhykenLogo from '@assets/parachain-logos/phyken-logo.png';
 import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
-import PaseoLogo from '@assets/parachain-logos/westend-logo.jpg';
-import RolimecLogo from '@assets/parachain-logos/polimec-logo.png';
 import Image, { StaticImageData } from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select/Select';
 import { Input } from '../Input';
@@ -111,7 +103,7 @@ function NetworkDropdown() {
 			Amplitude: AmplitudeLogo,
 			Basilisk: BasiliskLogo,
 			Calamari: CalamariLogo,
-			Crustshadow: CrustshadowLogo,
+			Crustshadow: CrustLogo,
 			Heiko: HeikoLogo,
 			Integritee: IntegriteeLogo,
 			Karura: KaruraLogo,
@@ -140,20 +132,20 @@ function NetworkDropdown() {
 			Mandala: MandalaLogo
 		},
 		testChains: {
-			Paseo: PaseoLogo,
+			Paseo: WestendLogo,
 			Genshiro: GenshiroLogo,
 			Gmordie: GmordieLogo,
 			Moonbase: MoonbaseLogo,
-			Rolimec: RolimecLogo,
-			Shibuya: ShibuyaLogo,
+			Rolimec: PolimecLogo,
+			Shibuya: ShidenLogo,
 			Tidechain: TidechainLogo,
 			Pichiu: PichiuLogo,
-			'Pichiu-Rococo': PichiuRococoLogo,
-			'Polymesh-Test': PolymeshTestLogo,
-			Rococo: RococoLogo,
+			'Pichiu-Rococo': KylinLogo,
+			'Polymesh-Test': PolimecLogo,
+			Rococo: WestendLogo,
 			Vara: VaraLogo,
 			Westend: WestendLogo,
-			'Westend-Collectives': WestendCollectivesLogo,
+			'Westend-Collectives': WestendLogo,
 			Laossigma: LaossigmaLogo
 		}
 	};
@@ -165,16 +157,11 @@ function NetworkDropdown() {
 				.find((key) => key.toLowerCase() === lowerNetworkKey) || networkKey
 		);
 	};
-
 	const getNetworkLogo = (networkKey: string): StaticImageData | undefined => {
-		for (const category of Object.values(NetworkData)) {
-			for (const [key, logo] of Object.entries(category)) {
-				if (key.toLowerCase() === networkKey.toLowerCase()) {
-					return logo;
-				}
-			}
-		}
-		return undefined;
+		const lowerNetworkKey = networkKey.toLowerCase();
+		return Object.values(NetworkData)
+			.flatMap((category) => Object.entries(category))
+			.find(([key]) => key.toLowerCase() === lowerNetworkKey)?.[1];
 	};
 
 	const handleNetworkChange = (network: string) => {
