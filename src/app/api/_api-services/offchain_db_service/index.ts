@@ -88,7 +88,7 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
 
@@ -258,10 +258,6 @@ export class OffChainDbService {
 
 	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
 		return FirestoreService.GetFollowing(userId);
-	}
-
-	static async GetLeaderboard({ page, limit }: { page: number; limit: number }): Promise<IGenericListingResponse<IPublicUser>> {
-		return FirestoreService.GetLeaderboard({ page, limit });
 	}
 
 	// helper methods
