@@ -16,11 +16,7 @@ import { OnChainDbService } from '../onchain_db_service';
 import { APIError } from '../../_api-utils/apiError';
 
 if (!IS_AI_ENABLED) {
-	console.log(`
-		\n========================== ==========================\n
-		Info: AI service is not enabled, AI content will not be generated and/or included in the api data\n
-		========================== ==========================\n
-	`);
+	console.log('\n ℹ️ Info: AI service is not enabled, AI content will not be generated and/or included in the api data\n');
 }
 
 if (IS_AI_ENABLED && !AI_SERVICE_URL.trim()) {

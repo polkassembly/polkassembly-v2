@@ -337,6 +337,7 @@ export interface IOffChainPost {
 	isDeleted: boolean;
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
+	publicUser?: IPublicUser;
 }
 
 export enum EProposalStatus {
@@ -459,6 +460,7 @@ export interface IOnChainPostInfo {
 
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
+	publicUser?: IPublicUser;
 }
 
 export interface IOnChainPostListing {
@@ -477,6 +479,7 @@ export interface IOnChainPostListing {
 
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
+	publicUser?: IPublicUser;
 }
 
 export interface IActivityFeedPostListing extends IPostListing {

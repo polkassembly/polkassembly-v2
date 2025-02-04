@@ -17,7 +17,8 @@ import {
 	IGenericListingResponse,
 	IOffChainPost,
 	IOnChainPostListing,
-	IPostListing
+	IPostListing,
+	IPublicUser
 } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -145,6 +146,23 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
 	}
+
+	const publicUserPromises = posts.map((post) => {
+		if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
+			return OffChainDbService.GetPublicUserById(Number(post.userId));
+		}
+		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
+			return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
+		}
+		return null;
+	});
+
+	const publicUsers = await Promise.all(publicUserPromises);
+
+	posts = posts.map((post, index) => ({
+		...post,
+		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
+	}));
 
 	const response: IGenericListingResponse<IPostListing> = {
 		items: posts,
