@@ -99,7 +99,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				<NavMain sections={data} />
 			</SidebarContent>
 
-			<SidebarFooter className='mb-3 pt-2 shadow-[-4px_1px_15px_1px_rgba(112,105,105,0.75)]'>
+			<SidebarFooter className='pb-3 pt-2 shadow-[-4px_1px_15px_1px_rgba(112,105,105,0.75)]'>
 				{state === 'expanded' && (
 					<Link
 						href='https://polkassembly.hellonext.co/'
