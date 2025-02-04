@@ -21,7 +21,8 @@ import {
 	EActivityCategory,
 	IActivityMetadata,
 	EAllowedCommentor,
-	IContentSummary
+	IContentSummary,
+	IProfileDetails
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -335,6 +336,10 @@ export class OffChainDbService {
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
+	}
+
+	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
+		return FirestoreService.UpdateUserProfile(userId, newProfileDetails);
 	}
 
 	static async AddNewComment({

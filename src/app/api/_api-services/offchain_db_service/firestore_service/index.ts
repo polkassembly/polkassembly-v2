@@ -18,7 +18,8 @@ import {
 	IPostOffChainMetrics,
 	IUserActivity,
 	EAllowedCommentor,
-	IContentSummary
+	IContentSummary,
+	IProfileDetails
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -622,6 +623,10 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
+	}
+
+	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails: newProfileDetails }, { merge: true });
 	}
 
 	static async AddNewComment({

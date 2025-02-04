@@ -31,8 +31,8 @@ export interface ITrackCounts {
 }
 
 export interface IUserSocialDetails {
-	type: ESocial;
-	link: string;
+	platform: ESocial;
+	url: string;
 }
 
 export enum EUserBadge {
@@ -56,9 +56,9 @@ export interface IProfileDetails {
 	badges?: string[];
 	title?: string;
 	image?: string;
-	socialLinks?: IUserSocialDetails[];
+	publicSocialLinks?: IUserSocialDetails[];
 	coverImage?: string;
-	achievementBadges: IUserBadgeDetails[];
+	achievementBadges?: IUserBadgeDetails[];
 }
 
 export interface IUserTFADetails {
