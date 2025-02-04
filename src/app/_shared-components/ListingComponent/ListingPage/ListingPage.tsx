@@ -113,7 +113,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 		<div className={styles.header}>
 			<div>
 				<h1 className={styles.title}>
-					{t(`ListingPage.${origin || proposalType}`)} ({initialData?.totalCount || 0})
+					{t(`ListingPage.${origin || proposalType}`)} <span className='text-lg text-filter_dropdown'>({initialData?.totalCount || 0})</span>
 				</h1>
 				<p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>
 			</div>
@@ -190,7 +190,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 							<button
 								key={key}
 								type='button'
-								className={`${styles['tab-button']} ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
+								className={`${styles['tab-button']} uppercase ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
 								onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
 							>
 								{value}
