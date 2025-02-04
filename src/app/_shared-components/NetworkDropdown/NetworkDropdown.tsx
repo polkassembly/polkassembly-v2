@@ -61,6 +61,7 @@ import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
 import Image, { StaticImageData } from 'next/image';
+import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 import { Input } from '../Input';
 import RenderNetworkSection from './RenderNetworkSection';
@@ -202,7 +203,7 @@ function NetworkDropdown() {
 			onOpenChange={setIsOpen}
 		>
 			<SelectTrigger
-				className={styles.selectTrigger}
+				className='w-full rounded-full border-border_grey bg-network_dropdown_bg'
 				onClick={() => {
 					setIsOpen(true);
 				}}
