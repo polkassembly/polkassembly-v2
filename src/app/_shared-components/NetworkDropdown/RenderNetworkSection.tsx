@@ -28,7 +28,7 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 						className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
 					>
 						<div className='flex items-center gap-2'>
-							<div className='h-6 w-6 overflow-hidden rounded-full'>
+							<div className='h-6 w-6 flex-shrink-0 overflow-hidden rounded-full'>
 								<Image
 									src={logo}
 									alt={key}

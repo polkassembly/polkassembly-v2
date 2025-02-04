@@ -181,6 +181,14 @@ function NetworkDropdown({ className }: { className?: string }) {
 		}
 	};
 
+	const handleBlur = () => {
+		setTimeout(() => {
+			if (searchInputRef.current && !searchInputRef.current.contains(document.activeElement)) {
+				searchInputRef.current.focus();
+			}
+		}, 10);
+	};
+
 	useEffect(() => {
 		if (isOpen && searchInputRef.current) {
 			searchInputRef.current.focus();
@@ -231,6 +239,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 						onKeyDown={(e) => {
 							e.stopPropagation();
 						}}
+						onBlur={handleBlur}
 					/>
 				</div>
 				<div className='overflow-y-auto p-2'>
