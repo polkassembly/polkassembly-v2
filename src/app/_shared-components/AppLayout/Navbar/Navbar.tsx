@@ -161,10 +161,7 @@ function Navbar() {
 								)}
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent>
-							<DropdownMenuItem>
-								<Link href='/settings'>{t('Profile.settings')}</Link>
-							</DropdownMenuItem>
+						<DropdownMenuContent className='min-w-[100px]'>
 							<DropdownMenuItem>
 								<Link href={`/user/id/${user.id}`}>{t('Profile.profile')}</Link>
 							</DropdownMenuItem>

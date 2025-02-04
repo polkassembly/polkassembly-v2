@@ -54,7 +54,7 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 							size={90}
 							value={userProfileData.addresses[0]}
 							theme='polkadot'
-							className='border-[5px] border-border_blue'
+							className='rounded-full border-[5px] border-border_blue'
 						/>
 					) : (
 						<div className='w-[90px]'>
