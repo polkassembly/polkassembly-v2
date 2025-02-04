@@ -57,7 +57,7 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 						</div>
 					</div>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className='border-border_grey'>
+				<DropdownMenuContent className='w-96 border-border_grey sm:w-60'>
 					{rpcEndpoints.map((endpoint, index) => (
 						<DropdownMenuItem
 							key={endpoint?.url}
