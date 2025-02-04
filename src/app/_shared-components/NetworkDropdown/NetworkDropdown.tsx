@@ -180,6 +180,14 @@ function NetworkDropdown() {
 		}
 	};
 
+	const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+		setTimeout(() => {
+			if (searchInputRef.current && !searchInputRef.current.contains(document.activeElement)) {
+				searchInputRef.current.focus();
+			}
+		}, 10);
+	};
+
 	useEffect(() => {
 		if (isOpen && searchInputRef.current) {
 			searchInputRef.current.focus();
@@ -230,6 +238,7 @@ function NetworkDropdown() {
 						onKeyDown={(e) => {
 							e.stopPropagation();
 						}}
+						onBlur={handleBlur}
 					/>
 				</div>
 				<div className='overflow-y-auto p-2'>
