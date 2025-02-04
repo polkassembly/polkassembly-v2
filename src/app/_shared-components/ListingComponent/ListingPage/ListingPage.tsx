@@ -36,7 +36,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
 
-	const STATUSES = [
+	/* const STATUSES = [
 		t('ListingPage_Status.Cancelled'),
 		t('ListingPage_Status.Confirmed'),
 		t('ListingPage_Status.ConfirmAborted'),
@@ -48,7 +48,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 		t('ListingPage_Status.Rejected'),
 		t('ListingPage_Status.Submitted'),
 		t('ListingPage_Status.TimedOut')
-	];
+	]; */
 
 	// TODO: get tags from backend
 	const TAGS = [
@@ -86,9 +86,10 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 		router.push(`?${params.toString()}`, { scroll: false });
 	};
 
-	const handleStatusToggle = (statusStr: string) => {
+	/* const handleStatusToggle = (statusStr: string) => {
 		setState((prev) => {
 			const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
+
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
 			const params = new URLSearchParams(searchParams.toString());
@@ -100,7 +101,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 				selectedStatuses: newStatuses
 			};
 		});
-	};
+	}; */
 
 	const handleTagToggle = (tag: string) => {
 		setState((prev) => ({
@@ -131,10 +132,11 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 		<div className='p-4'>
 			<h3 className='text-sm font-semibold uppercase text-filter_dropdown'>{t('CreateProposalDropdownButton.status')}</h3>
 			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
-				{STATUSES.map((status) => (
+				{/* {STATUSES.map((status) => (
 					<span
 						key={status}
 						className='flex items-center'
+
 					>
 						<input
 							type='checkbox'
@@ -144,7 +146,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 						/>
 						<span className='text-sm text-filter_dropdown'>{status}</span>
 					</span>
-				))}
+				))} */}
 			</div>
 
 			<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>{t('CreateProposalDropdownButton.tags')}</h3>
