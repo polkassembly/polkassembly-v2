@@ -471,5 +471,39 @@
 		"grant": "助成金",
 		"community": "コミュニティ",
 		"technicalcommittee": "技術委員会"
+	},
+	"Settings": {
+		"settings": "設定",
+		"deleteAccount": "アカウントを削除",
+		"profileSettings": "プロフィール設定",
+		"username": "ユーザー名",
+		"edit": "編集",
+		"editUsername": "ユーザー名を編集",
+		"email": "メール",
+		"editEmail": "メールを編集",
+		"enableTfa": "二要素認証を有効にする",
+		"enableTfaDescription": "二要素認証でアカウントのセキュリティを強化します。追加のステップで身元を確認し、保護を強化します。",
+		"tfaAuth": "二要素認証",
+		"accountSettings": "アカウント設定",
+		"linkAddress": "アドレスをリンク",
+		"linkAddressDescription": "ウォレットアドレスでガバナンス活動に参加するため",
+		"deleteAccountDescription": "この操作は取り消しできず、アカウントに関連するすべてのデータが永久に削除されることに注意してください。",
+		"deleteMyAccount": "アカウントを削除",
+		"oldUsername": "旧ユーザー名",
+		"newUsername": "新しいユーザー名",
+		"save": "保存",
+		"oldEmail": "旧メール",
+		"newEmail": "新しいメール",
+		"TFA": {
+			"configuringGoogleAuthenticator": "Google Authenticatorを設定",
+			"installGoogleAuthenticator": "1. Google Authenticatorをインストール（iOS/Android）。",
+			"selectAddIcon": "2. 認証アプリで「+」アイコンを選択。",
+			"scanQRCode": "3. 「QRコードをスキャン」を選択し、電話のカメラでこのQRコードをスキャンします。",
+			"scanQRCodeDescription": "QRコードをスキャン",
+			"orEnterTheCodeToYourApp": "または、アプリにコードを入力（base32エンコード） :",
+			"verifyCode": "コードを確認",
+			"verifyCodeDescription": "認証コードを入力してください :",
+			"verify": "確認"
+		}
 	}
 }

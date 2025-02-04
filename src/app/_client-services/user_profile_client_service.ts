@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ESocial } from '@/_shared/types';
 import { NextApiClientService } from './next_api_client_service';
 
 export class UserProfileClientService extends NextApiClientService {
@@ -19,5 +20,33 @@ export class UserProfileClientService extends NextApiClientService {
 
 	static async fetchUserActivity({ userId }: { userId: string | number }) {
 		return this.fetchUserActivityApi({ userId });
+	}
+
+	static async editUserProfile({
+		userId,
+		bio,
+		badges,
+		title,
+		image,
+		coverImage,
+		publicSocialLinks,
+		email,
+		username
+	}: {
+		userId: string | number;
+		bio?: string;
+		badges?: string[];
+		title?: string;
+		image?: string;
+		coverImage?: string;
+		publicSocialLinks?: { platform: ESocial; url: string }[];
+		email?: string;
+		username?: string;
+	}) {
+		return this.editUserProfileApi({ userId, bio, badges, title, image, coverImage, publicSocialLinks, email, username });
+	}
+
+	static async deleteAccount({ userId }: { userId: string | number }) {
+		return this.deleteAccountApi({ userId });
 	}
 }

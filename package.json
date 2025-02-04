@@ -91,6 +91,7 @@
     "react-json-view": "^1.21.3",
     "react-jwt": "^1.2.2",
     "react-minimal-pie-chart": "^9.1.0",
+    "react-qr-code": "^2.0.15",
     "react-toastify": "^10.0.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",

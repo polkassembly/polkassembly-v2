@@ -728,7 +728,8 @@ export interface IVoteCurve {
 export enum EProfileTabs {
 	OVERVIEW = 'overview',
 	ACTIVITY = 'activity',
-	ACCOUNTS = 'accounts'
+	ACCOUNTS = 'accounts',
+	SETTINGS = 'settings'
 }
 
 export interface IPreimage {

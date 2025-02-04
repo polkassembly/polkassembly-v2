@@ -7,20 +7,27 @@
 import { EProfileTabs, IPublicUser } from '@/_shared/types';
 import Image from 'next/image';
 import ProfileRect from '@assets/profile/profile-rect.png';
+import { useState } from 'react';
 import { Tabs, TabsContent } from '../Tabs';
 import ProfileHeader from './ProfileHeader/ProfileHeader';
 import classes from './Profile.module.scss';
 import UserActivity from './UserActivity/UserActivity';
 import Accounts from './Accounts/Accounts';
 import Overview from './Overview/Overview';
+import Settings from './Settings/Settings';
 
 function Profile({ profileData }: { profileData: IPublicUser }) {
+	const [userProfileData, setUserProfileData] = useState<IPublicUser>(profileData);
+	const handleUserProfileDataChange = (data: IPublicUser) => {
+		setUserProfileData((prev) => ({ ...prev, ...data }));
+	};
+
 	return (
 		<Tabs defaultValue={EProfileTabs.OVERVIEW}>
 			<div>
 				<Image
-					src={ProfileRect}
-					alt='profile'
+					src={profileData.profileDetails.coverImage || ProfileRect}
+					alt='profile-cover-image'
 					className='w-full object-cover'
 				/>
 			</div>
@@ -30,6 +37,7 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 					username={profileData.username}
 					createdAt={profileData.createdAt}
 					rank={profileData.rank}
+					userId={profileData.id}
 				/>
 			</div>
 			<div className={classes.contentWrapper}>
@@ -41,6 +49,12 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 				</TabsContent>
 				<TabsContent value={EProfileTabs.ACCOUNTS}>
 					<Accounts addresses={profileData.addresses} />
+				</TabsContent>
+				<TabsContent value={EProfileTabs.SETTINGS}>
+					<Settings
+						userProfileData={userProfileData}
+						setUserProfileData={handleUserProfileDataChange}
+					/>
 				</TabsContent>
 			</div>
 		</Tabs>

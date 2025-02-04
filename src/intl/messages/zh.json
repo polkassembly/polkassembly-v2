@@ -171,7 +171,41 @@
 		"badges": "徽章",
 		"badgesDescription": "在Polkassembly中参与时解锁、接收和赚取徽章",
 		"userSince": "用户自",
-		"rank": "等级"
+		"rank": "等级",
+		"Settings": {
+			"settings": "设置",
+			"deleteAccount": "删除账户",
+			"profileSettings": "个人资料设置",
+			"username": "用户名",
+			"edit": "编辑",
+			"editUsername": "编辑用户名",
+			"email": "电子邮件",
+			"editEmail": "编辑电子邮件",
+			"enableTfa": "启用双因素认证",
+			"enableTfaDescription": "通过双因素认证增强账户安全性。通过额外的步骤验证您的身份以获得额外的保护。",
+			"tfaAuth": "双因素认证",
+			"accountSettings": "账户设置",
+			"linkAddress": "链接地址",
+			"linkAddressDescription": "使用您的钱包地址参与治理活动",
+			"deleteAccountDescription": "请注意，此操作不可逆，所有与您的账户相关的数据将被永久删除。",
+			"deleteMyAccount": "删除我的账户",
+			"oldUsername": "旧用户名",
+			"newUsername": "新用户名",
+			"save": "保存",
+			"oldEmail": "旧电子邮件",
+			"newEmail": "新电子邮件",
+			"TFA": {
+				"configuringGoogleAuthenticator": "配置Google Authenticator",
+				"installGoogleAuthenticator": "1. 安装Google Authenticator（iOS/Android）。",
+				"selectAddIcon": "2. 在认证应用中选择+图标。",
+				"scanQRCode": "3. 选择扫描QR码，并使用手机摄像头扫描此QR码。",
+				"scanQRCodeDescription": "扫描QR码",
+				"orEnterTheCodeToYourApp": "或将代码输入到您的应用程序（base32编码）:",
+				"verifyCode": "验证代码",
+				"verifyCodeDescription": "请输入认证代码 :",
+				"verify": "验证"
+			}
+		}
 	},
 	"ListingTab": {
 		"Analytics": "分析",
