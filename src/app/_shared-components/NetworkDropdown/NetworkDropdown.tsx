@@ -61,7 +61,6 @@ import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
 import Image, { StaticImageData } from 'next/image';
-import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 import { Input } from '../Input';
 import RenderNetworkSection from './RenderNetworkSection';
