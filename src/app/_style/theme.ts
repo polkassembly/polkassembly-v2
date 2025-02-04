@@ -74,6 +74,8 @@ export const THEME_COLORS = {
 		grey_bg: '#F4F6F8',
 		footer_bg: '#FFF1F8',
 		activity_feed_active_proposal_bg: '#f6f8fa',
+		bg_blue: '#5489FF',
+		border_blue: '#407BFF',
 		activity_comment: '#798AA2'
 	},
 	dark: {
@@ -145,6 +147,8 @@ export const THEME_COLORS = {
 		grey_bg: '#222222',
 		footer_bg: '#222222',
 		activity_feed_active_proposal_bg: '#262626',
+		bg_blue: '#5489FF',
+		border_blue: '#407BFF',
 		activity_comment: '#4a4a4a'
 	}
 };

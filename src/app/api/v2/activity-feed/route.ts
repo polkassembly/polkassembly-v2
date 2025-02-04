@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { deepParseJson } from 'deep-parse-json';
-import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IGenericListingResponse, IReaction } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IGenericListingResponse, IPublicUser, IReaction } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -14,6 +14,7 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 // 1.1 if user is logged in fetch all posts where status is active and user has not voted, sorted by createdAt
 // 1.2 if user is not logged in fetch all posts where status is active, sorted by createdAt
@@ -130,6 +131,24 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		const commentsB = b.metrics?.comments || 0;
 		return commentsB - commentsA;
 	});
+
+	// fetch public user for each post
+	const publicUserPromises = posts.map((post) => {
+		if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
+			return OffChainDbService.GetPublicUserById(Number(post.userId));
+		}
+		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
+			return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
+		}
+		return null;
+	});
+
+	const publicUsers = await Promise.all(publicUserPromises);
+
+	posts = posts.map((post, index) => ({
+		...post,
+		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
+	}));
 
 	totalCount = onChainPostsListingResponse.totalCount;
 

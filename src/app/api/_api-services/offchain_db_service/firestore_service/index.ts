@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -17,7 +18,9 @@ import {
 	EReaction,
 	IPostOffChainMetrics,
 	IUserActivity,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IContentSummary,
+	IProfileDetails
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -105,6 +108,7 @@ export class FirestoreService extends FirestoreRefs {
 			profileScore: user.profileScore,
 			addresses: addresses.map((address) => address.address),
 			rank,
+			createdAt: user.createdAt,
 			profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
 		};
 	}
@@ -141,6 +145,7 @@ export class FirestoreService extends FirestoreRefs {
 			id: user.id,
 			username: user.username,
 			profileScore: user.profileScore,
+			createdAt: user.createdAt,
 			rank,
 			addresses: addresses.map((addr) => addr.address),
 			profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
@@ -174,6 +179,7 @@ export class FirestoreService extends FirestoreRefs {
 					profileScore: data.profileScore,
 					addresses: addresses.map((addr: IUserAddress) => addr.address),
 					rank,
+					createdAt: data.createdAt,
 					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
 				} as IPublicUser;
 			})
@@ -562,6 +568,26 @@ export class FirestoreService extends FirestoreRefs {
 		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
+		const contentSummaryQuery = FirestoreRefs.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.limit(1);
+
+		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
+
+		if (contentSummaryQuerySnapshot.empty) {
+			return null;
+		}
+
+		return {
+			...contentSummaryQuerySnapshot.docs[0].data(),
+			createdAt: contentSummaryQuerySnapshot.docs[0].data().createdAt?.toDate() || new Date(),
+			updatedAt: contentSummaryQuerySnapshot.docs[0].data().updatedAt?.toDate() || new Date()
+		} as IContentSummary;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -598,6 +624,106 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
+	}
+
+	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails: newProfileDetails }, { merge: true });
+	}
+
+	static async UpdateUserEmail(userId: number, email: string) {
+		// check if email is already in use
+		const user = await this.GetUserByEmail(email);
+		if (user) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Email already in use');
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ email, isEmailVerified: false }, { merge: true });
+	}
+
+	static async UpdateUserUsername(userId: number, username: string) {
+		// check if username is already in use
+		const user = await this.GetUserByUsername(username);
+		if (user) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Username already in use');
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ username }, { merge: true });
+	}
+
+	// Helper function to process documents in batches
+	private static async processBatch({
+		querySnapshot,
+		batchOperation,
+		batchSize = 400 // limit is 500
+	}: {
+		querySnapshot: QuerySnapshot;
+		batchOperation: (batch: WriteBatch, doc: QueryDocumentSnapshot) => void;
+		batchSize?: number;
+	}) {
+		const batches: WriteBatch[] = [];
+		let currentBatch = FirestoreRefs.firestoreDb.batch();
+		let operationCount = 0;
+
+		querySnapshot.docs.forEach((doc) => {
+			if (operationCount === batchSize) {
+				batches.push(currentBatch);
+				currentBatch = FirestoreRefs.firestoreDb.batch();
+				operationCount = 0;
+			}
+			batchOperation(currentBatch, doc);
+			operationCount += 1;
+		});
+
+		if (operationCount > 0) {
+			batches.push(currentBatch);
+		}
+
+		// Execute all batches
+		await Promise.all(batches.map((batch) => batch.commit()));
+	}
+
+	static async DeleteUser(userId: number) {
+		// Delete user document
+		const userBatch = FirestoreRefs.firestoreDb.batch();
+		userBatch.delete(FirestoreRefs.usersCollectionRef().doc(userId.toString()));
+		await userBatch.commit();
+
+		// Fetch and delete all related collections
+		const collections = [
+			{
+				query: FirestoreRefs.addressesCollectionRef().where('userId', '==', userId),
+				name: 'addresses'
+			},
+			{
+				query: FirestoreRefs.userActivityCollectionRef().where('userId', '==', userId),
+				name: 'user activities'
+			},
+			{
+				query: FirestoreRefs.commentsCollectionRef().where('userId', '==', userId),
+				name: 'comments'
+			},
+			{
+				query: FirestoreRefs.reactionsCollectionRef().where('userId', '==', userId),
+				name: 'reactions'
+			},
+			{
+				query: FirestoreRefs.notificationsCollectionRef().where('userId', '==', userId),
+				name: 'notifications'
+			}
+		];
+
+		await Promise.all(
+			collections.map(async (collection) => {
+				const querySnapshot = await collection.query.get();
+				if (!querySnapshot.empty) {
+					console.log(`Deleting ${querySnapshot.size} ${collection.name} documents`);
+					await this.processBatch({
+						querySnapshot,
+						batchOperation: (batch, doc) => batch.delete(doc.ref)
+					});
+				}
+			})
+		);
 	}
 
 	static async AddNewComment({
@@ -643,10 +769,18 @@ export class FirestoreService extends FirestoreRefs {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
+	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
-		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, htmlContent: html, markdownContent: markdown, updatedAt: new Date() }, { merge: true });
+		const newCommentData: Partial<IComment> = {
+			content,
+			htmlContent: html,
+			markdownContent: markdown,
+			...(isSpam && { isSpam }),
+			updatedAt: new Date()
+		};
+
+		await FirestoreRefs.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -798,5 +932,12 @@ export class FirestoreService extends FirestoreRefs {
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ lastCommentAt }, { merge: true });
 		}
+	}
+
+	static async UpdateContentSummary(contentSummary: IContentSummary) {
+		const contentSummaryId = contentSummary.id || FirestoreRefs.contentSummariesCollectionRef().doc().id;
+		await FirestoreRefs.contentSummariesCollectionRef()
+			.doc(contentSummaryId)
+			.set({ ...contentSummary, id: contentSummaryId }, { merge: true });
 	}
 }

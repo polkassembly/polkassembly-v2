@@ -1,0 +1,53 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { EProposalType } from '@/_shared/types';
+import { AIService } from '@/app/api/_api-services/ai_service';
+import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { SubsquareOffChainService } from '@/app/api/_api-services/offchain_db_service/subsquare_offchain_service';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { StatusCodes } from 'http-status-codes';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
+const zodParamsSchema = z.object({
+	proposalType: z.nativeEnum(EProposalType),
+	index: z.string()
+});
+
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType, index } = zodParamsSchema.parse(await params);
+
+	const network = await getNetworkFromHeaders();
+
+	let contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType });
+
+	if (!contentSummary?.postSummary) {
+		// try and generate content summary
+		contentSummary = await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
+	}
+
+	if (!contentSummary?.commentsSummary) {
+		const newContentSummary = await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index });
+		if (newContentSummary) {
+			contentSummary = newContentSummary;
+		}
+	}
+
+	if (!contentSummary) {
+		const subsquareContentSummary = await SubsquareOffChainService.GetContentSummary({ network, proposalType, indexOrHash: index });
+		if (subsquareContentSummary) {
+			contentSummary = subsquareContentSummary;
+		}
+	}
+
+	if (!contentSummary) {
+		throw new APIError(ERROR_CODES.CONTENT_SUMMARY_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
+	}
+
+	return NextResponse.json(contentSummary);
+});

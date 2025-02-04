@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from 'react-icons/fa6';
-import { EProposalType, ETheme, IOnChainPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -28,19 +28,20 @@ import DOTIcon from '@assets/icons/dot.png';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import Link from 'next/link';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
 function ListingCard({
 	title,
-	onChainInfo: { proposer, createdAt, origin, status, voteMetrics, decisionPeriodEndsAt, beneficiaries },
+	data,
 	backgroundColor,
 	proposalType,
 	metrics = { reactions: { like: 0, dislike: 0 }, comments: 0 },
 	index
 }: {
 	title: string;
-	onChainInfo: IOnChainPostListing;
+	data: IPostListing;
 	backgroundColor: string;
 	proposalType: EProposalType;
 	metrics?: IPostOffChainMetrics;
@@ -48,23 +49,24 @@ function ListingCard({
 }) {
 	const network = getCurrentNetwork();
 	const { resolvedTheme: theme } = useTheme();
-	const formattedCreatedAt = dayjs(createdAt).fromNow();
-	const ayeValue = new BN(voteMetrics?.aye.value || '0');
-	const nayValue = new BN(voteMetrics?.nay.value || '0');
+
+	const formattedCreatedAt = dayjs(data.createdAt || data.onChainInfo?.createdAt || new Date()).fromNow();
+	const ayeValue = new BN(data.onChainInfo?.voteMetrics?.aye.value || '0');
+	const nayValue = new BN(data.onChainInfo?.voteMetrics?.nay.value || '0');
 	const totalValue = ayeValue.add(nayValue);
-	const ayePercent = calculatePercentage(voteMetrics?.aye.value || '0', totalValue);
-	const nayPercent = calculatePercentage(voteMetrics?.nay.value || '0', totalValue);
+	const ayePercent = calculatePercentage(ayeValue.toString(), totalValue);
+	const nayPercent = calculatePercentage(nayValue.toString(), totalValue);
 	const ICONS = {
 		usdc: USDCIcon,
 		usdt: USDTIcon,
 		dot: DOTIcon
 	};
-	const decisionPeriodPercentage = decisionPeriodEndsAt ? calculateDecisionProgress(decisionPeriodEndsAt) : 0;
+	const decisionPeriodPercentage = data.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(data.onChainInfo?.decisionPeriodEndsAt) : 0;
 
-	const timeRemaining = decisionPeriodEndsAt ? getTimeRemaining(decisionPeriodEndsAt) : null;
+	const timeRemaining = data.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(data.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
-	const groupedByAsset = groupBeneficiariesByAsset(beneficiaries, network);
+	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
 
 	const redirectUrl = getPostDetailsUrl(proposalType, index);
 	return (
@@ -84,19 +86,35 @@ function ListingCard({
 						<h3 className={styles.titleText}>{title}</h3>
 						<div className={styles.infoContainer}>
 							<div className='flex items-center gap-2'>
-								<Address address={proposer} />
-								<span>|</span>
-								<span className={styles.infoItem}>
-									<FaRegClock className={styles.infoIcon} />
-									<span className={styles.infoTimer}>{formattedCreatedAt}</span>
-								</span>
-								{proposalType === EProposalType.DISCUSSION && (
+								{data.onChainInfo?.proposer && (
+									<>
+										<Address address={data.onChainInfo?.proposer} />
+										<span>|</span>
+									</>
+								)}
+
+								{!data.onChainInfo?.proposer && data.publicUser?.username && (
+									<>
+										<span>{data.publicUser?.username}</span>
+										<span>|</span>
+									</>
+								)}
+
+								{(data.onChainInfo?.createdAt || data.createdAt) && (
+									<span className={styles.infoItem}>
+										<FaRegClock className={styles.infoIcon} />
+										<span className={styles.infoTimer}>{formattedCreatedAt}</span>
+									</span>
+								)}
+
+								{ValidatorService.isValidOnChainProposalType(proposalType) && (
 									<>
 										<span>|</span>
-										<span className={`${getSpanStyle(origin, 1)} ${styles.originStyle}`}>{origin}</span>
+										<span className={`${getSpanStyle(data.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{data.onChainInfo?.origin}</span>
 									</>
 								)}
 							</div>
+
 							<div className='flex items-center gap-2'>
 								<div className={styles.commentContainer}>
 									<span className='hidden lg:block'>|</span>
@@ -109,6 +127,7 @@ function ListingCard({
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
 								</div>
+
 								{timeRemaining && (
 									<>
 										<span>|</span>
@@ -134,6 +153,7 @@ function ListingCard({
 										</Tooltip>
 									</>
 								)}
+
 								{ayePercent > 0 && nayPercent > 0 && (
 									<>
 										<span>|</span>
@@ -153,13 +173,17 @@ function ListingCard({
 												<div className={styles.progressBarContainer}>
 													<p>
 														Aye ={' '}
-														{formatUSDWithUnits(formatBnBalance(voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-														{ayePercent.toFixed(2)}%)
+														{formatUSDWithUnits(
+															formatBnBalance(data.onChainInfo?.voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
+														)}{' '}
+														({ayePercent.toFixed(2)}%)
 													</p>
 													<p>
 														Nay ={' '}
-														{formatUSDWithUnits(formatBnBalance(voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-														{nayPercent.toFixed(2)}%)
+														{formatUSDWithUnits(
+															formatBnBalance(data.onChainInfo?.voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
+														)}{' '}
+														({nayPercent.toFixed(2)}%)
 													</p>
 												</div>
 											</TooltipContent>
@@ -170,10 +194,11 @@ function ListingCard({
 						</div>
 					</div>
 				</div>
+
 				<div className={styles.tagContainer}>
-					{beneficiaries && beneficiaries.length > 0 && groupBeneficiariesByAsset(beneficiaries, network) && (
+					{data.onChainInfo?.beneficiaries && data.onChainInfo?.beneficiaries.length > 0 && groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries, network) && (
 						<div className={styles.beneficiaryContainer}>
-							{beneficiaries.length > 1 ? (
+							{data.onChainInfo?.beneficiaries.length > 1 ? (
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<div className='flex items-center gap-1'>
@@ -241,9 +266,12 @@ function ListingCard({
 							)}
 						</div>
 					)}
-					<div className='flex'>
-						<StatusTag status={status.toLowerCase().replace(/\s+/g, '_')} />
-					</div>
+
+					{data.onChainInfo?.status && (
+						<div className='flex'>
+							<StatusTag status={data.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_')} />
+						</div>
+					)}
 				</div>
 			</div>
 		</Link>

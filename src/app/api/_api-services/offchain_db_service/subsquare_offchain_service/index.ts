@@ -6,7 +6,7 @@
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IContentSummary, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
 import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
@@ -180,5 +180,33 @@ export class SubsquareOffChainService {
 			},
 			comments: await this.GetPostComments({ network, indexOrHash, proposalType }).then((comments) => comments.length)
 		};
+	}
+
+	static async GetContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
+		const mappedUrl = this.postDetailsUrlMap[proposalType as keyof typeof this.postDetailsUrlMap]?.(indexOrHash, network);
+
+		if (!mappedUrl) {
+			return null;
+		}
+
+		try {
+			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
+
+			if (!data || !data?.contentSummary?.summary) {
+				return null;
+			}
+
+			return {
+				id: '',
+				network,
+				proposalType,
+				indexOrHash,
+				postSummary: data.contentSummary.summary,
+				createdAt: data.contentSummary.postUpdatedAt ? new Date(data.contentSummary.postUpdatedAt) : new Date(),
+				updatedAt: data.contentSummary.postUpdatedAt ? new Date(data.contentSummary.postUpdatedAt) : new Date()
+			};
+		} catch {
+			return null;
+		}
 	}
 }

@@ -17,7 +17,8 @@ import {
 	IGenericListingResponse,
 	IOffChainPost,
 	IOnChainPostListing,
-	IPostListing
+	IPostListing,
+	IPublicUser
 } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -30,6 +31,7 @@ import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 import { RedisService } from '../../_api-services/redis_service';
+import { AIService } from '../../_api-services/ai_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -145,6 +147,23 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
 	}
 
+	const publicUserPromises = posts.map((post) => {
+		if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
+			return OffChainDbService.GetPublicUserById(Number(post.userId));
+		}
+		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
+			return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
+		}
+		return null;
+	});
+
+	const publicUsers = await Promise.all(publicUserPromises);
+
+	posts = posts.map((post, index) => ({
+		...post,
+		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
+	}));
+
 	const response: IGenericListingResponse<IPostListing> = {
 		items: posts,
 		totalCount
@@ -187,6 +206,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		title,
 		allowedCommentor
 	});
+
+	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
