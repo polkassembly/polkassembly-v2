@@ -630,6 +630,26 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails: newProfileDetails }, { merge: true });
 	}
 
+	static async UpdateUserEmail(userId: number, email: string) {
+		// check if email is already in use
+		const user = await this.GetUserByEmail(email);
+		if (user) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Email already in use');
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ email, isEmailVerified: false }, { merge: true });
+	}
+
+	static async UpdateUserUsername(userId: number, username: string) {
+		// check if username is already in use
+		const user = await this.GetUserByUsername(username);
+		if (user) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Username already in use');
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ username }, { merge: true });
+	}
+
 	// Helper function to process documents in batches
 	private static async processBatch({
 		querySnapshot,

@@ -3,21 +3,21 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
-import { NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
+import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { fetchPF } from '@shared/_utils/fetchPF';
-import { ENotificationTrigger, IUser } from '@shared/types';
+import { ENetwork, ENotificationTrigger, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 
-if (!NOTIFICATION_ENGINE_API_KEY) {
-	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'NOTIFICATION_ENGINE_API_KEY is not set');
+if (IS_NOTIFICATION_SERVICE_ENABLED && !NOTIFICATION_ENGINE_API_KEY) {
+	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED is true but NOTIFICATION_ENGINE_API_KEY is not set');
 }
 
 export class NotificationService {
 	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-polkassembly-dev.cloudfunctions.net/notify';
 
-	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK;
+	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK as ENetwork;
 
 	private static firebaseFunctionsHeader = (network: string) => ({
 		Accept: 'application/json',
@@ -27,31 +27,48 @@ export class NotificationService {
 		'x-source': 'polkassembly'
 	});
 
-	static async SendVerificationEmail(user: IUser, token: string): Promise<void> {
+	private static async sendNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		trigger,
+		args
+	}: {
+		network?: ENetwork;
+		trigger: ENotificationTrigger;
+		args: Record<string, string>;
+	}) {
+		if (!IS_NOTIFICATION_SERVICE_ENABLED) {
+			return;
+		}
+
 		await fetchPF(`${this.NOTIFICATION_ENGINE_URL}`, {
 			body: JSON.stringify({
-				args: {
-					email: user.email,
-					verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
-				},
-				trigger: ENotificationTrigger.VERIFY_EMAIL
+				args,
+				trigger
 			}),
-			headers: this.firebaseFunctionsHeader(user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK),
+			headers: this.firebaseFunctionsHeader(network),
 			method: 'POST'
-		}).catch((e) => console.error('Verification Email not sent', e));
+		}).catch((e) => console.error('Notification not sent', e));
+	}
+
+	static async SendVerificationEmail(user: IUser, token: string): Promise<void> {
+		await this.sendNotification({
+			network: user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK,
+			trigger: ENotificationTrigger.VERIFY_EMAIL,
+			args: {
+				email: user.email,
+				verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
+			}
+		});
 	}
 
 	static async SendResetPasswordEmail(user: IUser, token: string) {
-		await fetchPF(`${this.NOTIFICATION_ENGINE_URL}`, {
-			body: JSON.stringify({
-				args: {
-					email: user.email,
-					resetUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/reset-password?token=${token}`
-				},
-				trigger: ENotificationTrigger.RESET_PASSWORD
-			}),
-			headers: this.firebaseFunctionsHeader(user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK),
-			method: 'POST'
-		}).catch((e) => console.error('Reset Password Email not sent', e));
+		await this.sendNotification({
+			network: user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK,
+			trigger: ENotificationTrigger.RESET_PASSWORD,
+			args: {
+				email: user.email,
+				resetUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/reset-password?token=${token}`
+			}
+		});
 	}
 }

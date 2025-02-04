@@ -428,6 +428,67 @@ export class AuthService {
 		await OffChainDbService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
+	static async UpdateUserEmail({ email, accessToken }: { email: string; accessToken: string }) {
+		const accessTokenPayload = this.GetAccessTokenPayload(accessToken);
+
+		if (!ValidatorService.isValidUserId(accessTokenPayload.id) || !ValidatorService.isValidEmail(email)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or email');
+		}
+
+		let user = await OffChainDbService.GetUserById(accessTokenPayload.id);
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
+		}
+
+		await OffChainDbService.UpdateUserEmail(accessTokenPayload.id, email);
+
+		user = { ...user, email, isEmailVerified: false };
+
+		// send verification email
+		const verifyToken = createCuid();
+		await RedisService.SetEmailVerificationToken(verifyToken, user.email);
+		await NotificationService.SendVerificationEmail(user, verifyToken);
+
+		// regenerate access and refresh tokens
+		return {
+			newAccessToken: await this.GetSignedAccessToken({
+				...user,
+				loginAddress: accessTokenPayload.loginAddress,
+				loginWallet: accessTokenPayload.loginWallet
+			}),
+			newRefreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: accessTokenPayload.loginAddress, loginWallet: accessTokenPayload.loginWallet })
+		};
+	}
+
+	static async UpdateUserUsername({ username, accessToken }: { username: string; accessToken: string }) {
+		const accessTokenPayload = this.GetAccessTokenPayload(accessToken);
+
+		if (!ValidatorService.isValidUserId(accessTokenPayload.id) || !ValidatorService.isValidUsername(username)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or username');
+		}
+
+		let user = await OffChainDbService.GetUserById(accessTokenPayload.id);
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
+		}
+
+		await OffChainDbService.UpdateUserUsername(accessTokenPayload.id, username);
+
+		user = { ...user, username };
+
+		// regenerate access and refresh tokens
+		return {
+			newAccessToken: await this.GetSignedAccessToken({
+				...user,
+				loginAddress: accessTokenPayload.loginAddress,
+				loginWallet: accessTokenPayload.loginWallet
+			}),
+			newRefreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: accessTokenPayload.loginAddress, loginWallet: accessTokenPayload.loginWallet })
+		};
+	}
+
 	static async GenerateTfaOtp(userId: number) {
 		const base32Secret = generateRandomBase32();
 

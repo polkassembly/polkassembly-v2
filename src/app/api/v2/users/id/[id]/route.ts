@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ECookieNames, ESocial } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
@@ -33,10 +34,17 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const zodBodySchema = z
 		.object({
+			email: z.string().email().optional(),
+			username: z
+				.string()
+				.refine((val) => ValidatorService.isValidUsername(val), {
+					message: 'Invalid username'
+				})
+				.optional(),
 			bio: z.string().min(3).optional(),
 			badges: z.array(z.string().min(1)).min(1).optional(),
 			title: z.string().min(1).optional(),
@@ -64,9 +72,21 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			}
 		);
 
-	const { bio, badges, title, image, coverImage, publicSocialLinks } = zodBodySchema.parse(await getReqBody(req));
+	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username } = zodBodySchema.parse(await getReqBody(req));
 
 	await OffChainDbService.UpdateUserProfile(id, { bio, badges, title, image, coverImage, ...(publicSocialLinks?.length ? { publicSocialLinks } : {}) });
+
+	if (email) {
+		const result = await AuthService.UpdateUserEmail({ accessToken: newAccessToken, email });
+		newAccessToken = result.newAccessToken;
+		newRefreshToken = result.newRefreshToken;
+	}
+
+	if (username) {
+		const result = await AuthService.UpdateUserUsername({ accessToken: newAccessToken, username });
+		newAccessToken = result.newAccessToken;
+		newRefreshToken = result.newRefreshToken;
+	}
 
 	const response = NextResponse.json({ message: 'User profile updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

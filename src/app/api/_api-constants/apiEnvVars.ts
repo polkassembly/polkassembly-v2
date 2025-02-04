@@ -21,3 +21,4 @@ export const {
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';
 export const IS_AI_ENABLED = process.env.IS_AI_ENABLED === 'true';
+export const IS_NOTIFICATION_SERVICE_ENABLED = process.env.IS_NOTIFICATION_SERVICE_ENABLED === 'true';

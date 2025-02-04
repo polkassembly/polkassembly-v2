@@ -346,6 +346,22 @@ export class OffChainDbService {
 		return FirestoreService.DeleteUser(userId);
 	}
 
+	static async UpdateUserEmail(userId: number, email: string) {
+		if (!ValidatorService.isValidUserId(userId) || !ValidatorService.isValidEmail(email)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or email');
+		}
+
+		return FirestoreService.UpdateUserEmail(userId, email);
+	}
+
+	static async UpdateUserUsername(userId: number, username: string) {
+		if (!ValidatorService.isValidUserId(userId) || !ValidatorService.isValidUsername(username)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or username');
+		}
+
+		return FirestoreService.UpdateUserUsername(userId, username);
+	}
+
 	static async AddNewComment({
 		network,
 		indexOrHash,
