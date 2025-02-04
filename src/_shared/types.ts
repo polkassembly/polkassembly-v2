@@ -31,8 +31,8 @@ export interface ITrackCounts {
 }
 
 export interface IUserSocialDetails {
-	type: ESocial;
-	link: string;
+	platform: ESocial;
+	url: string;
 }
 
 export enum EUserBadge {
@@ -56,9 +56,9 @@ export interface IProfileDetails {
 	badges?: string[];
 	title?: string;
 	image?: string;
-	socialLinks?: IUserSocialDetails[];
+	publicSocialLinks?: IUserSocialDetails[];
 	coverImage?: string;
-	achievementBadges: IUserBadgeDetails[];
+	achievementBadges?: IUserBadgeDetails[];
 }
 
 export interface IUserTFADetails {
@@ -304,6 +304,18 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
+export interface IContentSummary {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	postSummary?: string;
+	commentsSummary?: string;
+	isSpam?: boolean;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -325,6 +337,7 @@ export interface IOffChainPost {
 	isDeleted: boolean;
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
+	publicUser?: IPublicUser;
 }
 
 export enum EProposalStatus {
@@ -442,10 +455,12 @@ export interface IOnChainPostInfo {
 	decisionPeriodEndsAt?: Date;
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
+	preimageArgs?: Record<string, unknown>;
 }
 
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
+	publicUser?: IPublicUser;
 }
 
 export interface IOnChainPostListing {
@@ -464,6 +479,7 @@ export interface IOnChainPostListing {
 
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
+	publicUser?: IPublicUser;
 }
 
 export interface IActivityFeedPostListing extends IPostListing {
@@ -534,6 +550,7 @@ export interface IComment {
 	isDeleted: boolean;
 	address: string | null;
 	dataSource: EDataSource;
+	isSpam?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
