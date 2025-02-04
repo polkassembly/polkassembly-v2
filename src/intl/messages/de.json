@@ -207,7 +207,25 @@
 				"verifyCodeDescription": "Bitte geben Sie den Authentifizierungscode ein :",
 				"verify": "Überprüfen"
 			}
-		}
+		},
+		"edit": "Bearbeiten",
+		"editProfile": "Profil bearbeiten",
+		"basicInformation": "Grundinformationen",
+		"socials": "Soziale Netzwerke",
+		"coverImage": "Titelbild",
+		"uploadCover": "Titelbild hochladen",
+		"profileImage": "Profilbild",
+		"uploadProfileImageDescription": "Laden Sie eine Datei mit einer Größe von 1600px oder mehr hoch",
+		"invalidUsername": "Ungültiger Benutzername",
+		"displayName": "Anzeigename",
+		"jobTitle": "Berufsbezeichnung",
+		"about": "Über",
+		"email": "E-Mail",
+		"twitter": "Twitter",
+		"telegram": "Telegram",
+		"riot": "Riot",
+		"discord": "Discord",
+		"saveChanges": "Speichern"
 	},
 	"ListingTab": {
 		"Analytics": "Analysen",

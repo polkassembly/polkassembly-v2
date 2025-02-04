@@ -18,6 +18,56 @@ const zodParamsSchema = z.object({
 	id: z.coerce.number()
 });
 
+const socialLinkSchema = z
+	.object({
+		platform: z.nativeEnum(ESocial),
+		url: z.string()
+	})
+	.superRefine((data, ctx) => {
+		if (data.platform === ESocial.EMAIL) {
+			if (!z.string().email().safeParse(data.url).success) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Invalid email for platform EMAIL'
+				});
+			}
+		} else if (!z.string().url().safeParse(data.url).success) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'Invalid URL for platform'
+			});
+		}
+	});
+
+const zodSchema = z
+	.object({
+		publicSocialLinks: z.array(socialLinkSchema).optional(),
+		email: z.string().email().optional(),
+		username: z
+			.string()
+			.refine((val) => ValidatorService.isValidUsername(val), {
+				message: 'Invalid username'
+			})
+			.optional(),
+		bio: z.string().min(3).optional(),
+		badges: z.array(z.string().min(1)).min(1).optional(),
+		title: z.string().min(1).optional(),
+		image: z.string().url().optional(),
+		coverImage: z.string().url().optional()
+	})
+	.refine(
+		(data) =>
+			Object.values(data).some((value) => {
+				if (Array.isArray(value)) {
+					return value.length > 0;
+				}
+				return value !== undefined && value !== '';
+			}),
+		{
+			message: 'At least one valid field must be provided'
+		}
+	);
+
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
@@ -36,43 +86,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
-	const zodBodySchema = z
-		.object({
-			email: z.string().email().optional(),
-			username: z
-				.string()
-				.refine((val) => ValidatorService.isValidUsername(val), {
-					message: 'Invalid username'
-				})
-				.optional(),
-			bio: z.string().min(3).optional(),
-			badges: z.array(z.string().min(1)).min(1).optional(),
-			title: z.string().min(1).optional(),
-			image: z.string().url().optional(),
-			coverImage: z.string().url().optional(),
-			publicSocialLinks: z
-				.array(
-					z.object({
-						platform: z.nativeEnum(ESocial),
-						url: z.string().url()
-					})
-				)
-				.optional()
-		})
-		.refine(
-			(data) =>
-				Object.values(data).some((value) => {
-					if (Array.isArray(value)) {
-						return value.length > 0;
-					}
-					return value !== undefined && value !== '';
-				}),
-			{
-				message: 'At least one valid field must be provided'
-			}
-		);
-
-	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username } = zodBodySchema.parse(await getReqBody(req));
+	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username } = zodSchema.parse(await getReqBody(req));
 
 	await OffChainDbService.UpdateUserProfile(id, { bio, badges, title, image, coverImage, ...(publicSocialLinks?.length ? { publicSocialLinks } : {}) });
 

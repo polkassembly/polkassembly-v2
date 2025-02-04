@@ -24,20 +24,19 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 
 	return (
 		<Tabs defaultValue={EProfileTabs.OVERVIEW}>
-			<div>
+			<div className='relative'>
 				<Image
-					src={profileData.profileDetails.coverImage || ProfileRect}
+					src={userProfileData.profileDetails.coverImage || ProfileRect}
 					alt='profile-cover-image'
-					className='w-full object-cover'
+					className='h-[150px] w-full'
+					width={100}
+					height={150}
 				/>
 			</div>
 			<div className={classes.headerWrapper}>
 				<ProfileHeader
-					address={profileData.addresses[0]}
-					username={userProfileData.username}
-					createdAt={profileData.createdAt}
-					rank={profileData.rank}
-					userId={profileData.id}
+					userProfileData={userProfileData}
+					handleUserProfileDataChange={handleUserProfileDataChange}
 				/>
 			</div>
 			<div className={classes.contentWrapper}>

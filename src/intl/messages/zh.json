@@ -207,7 +207,25 @@
 				"verifyCodeDescription": "请输入认证代码 :",
 				"verify": "验证"
 			}
-		}
+		},
+		"edit": "编辑",
+		"editProfile": "编辑个人资料",
+		"basicInformation": "基本信息",
+		"socials": "社交",
+		"coverImage": "封面图片",
+		"uploadCover": "上传封面",
+		"profileImage": "个人资料图片",
+		"uploadProfileImageDescription": "上传1600px或以上的文件",
+		"invalidUsername": "无效的用户名",
+		"displayName": "显示名称",
+		"jobTitle": "职位",
+		"about": "关于",
+		"email": "电子邮件",
+		"twitter": "Twitter",
+		"telegram": "Telegram",
+		"riot": "Riot",
+		"discord": "Discord",
+		"saveChanges": "保存"
 	},
 	"ListingTab": {
 		"Analytics": "分析",

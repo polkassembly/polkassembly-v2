@@ -226,4 +226,8 @@ export class ValidatorService {
 	static isValidNumber(number: unknown): boolean {
 		return number !== null && number !== undefined && Number.isFinite(Number(number));
 	}
+
+	static isUrl(url: string): boolean {
+		return validator.isURL(url);
+	}
 }
