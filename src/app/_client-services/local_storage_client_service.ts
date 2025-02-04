@@ -89,4 +89,9 @@ export class LocalStorageClientService {
 	static deleteEditPostData({ postId }: { postId: string }) {
 		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId));
 	}
+
+	// logout
+	static logout() {
+		this.clear();
+	}
 }

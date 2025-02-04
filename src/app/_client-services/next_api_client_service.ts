@@ -25,7 +25,8 @@ import {
 	IVoteData,
 	IUserActivity,
 	IPreimage,
-	IQRSessionPayload
+	IQRSessionPayload,
+	ESocial
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -64,7 +65,9 @@ enum EApiRoute {
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
-	LINK_ADDRESS = 'LINK_ADDRESS'
+	LINK_ADDRESS = 'LINK_ADDRESS',
+	EDIT_USER_PROFILE = 'EDIT_USER_PROFILE',
+	DELETE_ACCOUNT = 'DELETE_ACCOUNT'
 }
 
 export class NextApiClientService {
@@ -148,6 +151,14 @@ export class NextApiClientService {
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
 				path = '/users/id';
+				break;
+			case EApiRoute.EDIT_USER_PROFILE:
+				path = '/users/id';
+				method = 'PATCH';
+				break;
+			case EApiRoute.DELETE_ACCOUNT:
+				path = '/users/id';
+				method = 'DELETE';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 				path = '/users/address';
@@ -375,7 +386,7 @@ export class NextApiClientService {
 	}
 
 	// user data
-	protected static async fetchPublicUserByIdApi({ userId }: { userId: number | string }) {
+	protected static async fetchPublicUserByIdApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ID, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
@@ -390,9 +401,39 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 
-	protected static async fetchUserActivityApi({ userId }: { userId: number | string }) {
+	protected static async fetchUserActivityApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_ACTIVITY, routeSegments: [userId.toString(), 'activities'] });
 		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
+	}
+
+	protected static async editUserProfileApi({
+		userId,
+		bio,
+		badges,
+		title,
+		image,
+		coverImage,
+		publicSocialLinks,
+		email,
+		username
+	}: {
+		userId: number;
+		bio?: string;
+		badges?: string[];
+		title?: string;
+		image?: string;
+		coverImage?: string;
+		publicSocialLinks?: { platform: ESocial; url: string }[];
+		email?: string;
+		username?: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_USER_PROFILE, routeSegments: [userId.toString()] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { bio, badges, title, image, coverImage, publicSocialLinks, email, username } });
+	}
+
+	protected static async deleteAccountApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_ACCOUNT, routeSegments: [userId.toString()] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	static async fetchPreimagesApi({ page }: { page: number }) {

@@ -13,7 +13,7 @@ import Activity from './Activity/Activity';
 import { Separator } from '../../Separator';
 import classes from './UserActivity.module.scss';
 
-function UserActivity({ userId }: { userId: number | string }) {
+function UserActivity({ userId }: { userId: number }) {
 	const t = useTranslations();
 	const fetchUserActivity = async () => {
 		const { data, error } = await UserProfileClientService.fetchUserActivity({ userId });
