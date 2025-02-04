@@ -152,7 +152,7 @@ function Navbar() {
 
 			{isMobile && isModalOpen && (
 				<div
-					className='fixed inset-0 bg-black bg-opacity-40'
+					className='fixed inset-0 top-20 bg-black bg-opacity-40'
 					onClick={closeModal}
 					role='button'
 					tabIndex={0}
