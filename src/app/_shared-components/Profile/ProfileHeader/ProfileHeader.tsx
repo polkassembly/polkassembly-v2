@@ -97,7 +97,7 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 										key={social.platform}
 										href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
 										target='_blank'
-										className='bg-social_green flex h-8 w-8 items-center justify-center rounded-full'
+										className='flex h-8 w-8 items-center justify-center rounded-full bg-social_green'
 										rel='noreferrer'
 									>
 										<Image
