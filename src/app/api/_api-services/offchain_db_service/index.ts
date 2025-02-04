@@ -22,7 +22,9 @@ import {
 	IActivityMetadata,
 	EAllowedCommentor,
 	IContentSummary,
-	IProfileDetails
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -245,6 +247,18 @@ export class OffChainDbService {
 		return FirestoreService.GetContentSummary({ network, indexOrHash, proposalType });
 	}
 
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		return FirestoreService.IsUserFollowing({ userId, userIdToFollow });
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowers(userId);
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowing(userId);
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -338,8 +352,16 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
-	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
-		return FirestoreService.UpdateUserProfile(userId, newProfileDetails);
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		return FirestoreService.UpdateUserProfile({ userId, newProfileDetails, notificationPreferences });
 	}
 
 	static async DeleteUser(userId: number) {
@@ -584,5 +606,13 @@ export class OffChainDbService {
 
 	static async UpdateContentSummary(contentSummary: IContentSummary) {
 		return FirestoreService.UpdateContentSummary(contentSummary);
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		return FirestoreService.FollowUser({ userId, userIdToFollow });
+	}
+
+	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		return FirestoreService.UnfollowUser({ userId, userIdToFollow });
 	}
 }

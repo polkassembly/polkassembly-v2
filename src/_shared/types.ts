@@ -763,3 +763,11 @@ export enum EAppEnv {
 	PRODUCTION = 'production',
 	DEVELOPMENT = 'development'
 }
+
+export interface IFollowEntry {
+	id: string;
+	createdAt: Date;
+	followerUserId: number;
+	followedUserId: number;
+	updatedAt: Date;
+}

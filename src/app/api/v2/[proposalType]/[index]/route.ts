@@ -140,6 +140,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

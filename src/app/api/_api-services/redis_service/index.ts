@@ -23,7 +23,8 @@ enum ERedisKeys {
 	POST_DATA = 'PDT',
 	POSTS_LISTING = 'PLT',
 	ACTIVITY_FEED = 'AFD',
-	QR_SESSION = 'QRS'
+	QR_SESSION = 'QRS',
+	CONTENT_SUMMARY = 'CSM'
 }
 
 export class RedisService {
@@ -49,7 +50,8 @@ export class RedisService {
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			return baseKey + userPart + originsPart;
 		},
-		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`
+		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
+		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`
 	} as const;
 
 	// helper methods
@@ -204,6 +206,18 @@ export class RedisService {
 		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*`);
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<string | null> {
+		return this.Get(this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType));
+	}
+
+	static async SetContentSummary({ network, indexOrHash, proposalType, data }: { network: string; indexOrHash: string; proposalType: string; data: string }): Promise<void> {
+		await this.Set(this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), data, ONE_DAY);
+	}
+
+	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
+		await this.DeleteKeys(`${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`);
+	}
+
 	// Activity feed caching methods
 	static async GetActivityFeed({
 		network,
@@ -243,11 +257,14 @@ export class RedisService {
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
 	}
 
+	// toolkit methods
+
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
 		// clear everything posts related
 		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-*`);
 		await this.DeleteKeys(`${ERedisKeys.POST_DATA}-${network}-*`);
 		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+		await this.DeleteKeys(`${ERedisKeys.CONTENT_SUMMARY}-${network}-*`);
 	}
 
 	// QR session caching methods

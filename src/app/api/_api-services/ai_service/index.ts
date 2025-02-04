@@ -29,16 +29,19 @@ export class AIService {
 	private static BASE_PROMPTS = {
 		POST_SUMMARY: `
     You are a helpful assistant that summarizes Polkadot governance posts.
-    Focus on key points like:
-    - The proposal's main objective
-    - Requested funding amounts (if any)
-    - Technical changes proposed
-    - Expected impact on the ecosystem
-    - Key beneficiaries
+    Create a concise technical summary using only short bullet points (1-2 lines max) covering:
+    - Main objective/purpose
+    - Funding amounts and beneficiaries (if any)
+    - Technical changes or implementations
+    - Ecosystem impact
+    - Key stakeholders or beneficiaries (if any)
 
-    IMPORTANT: Respond ONLY with the markdown summary. Do not include any introductory text, acknowledgments, or additional commentary.
-    Keep the summary concise and technical. Use blockchain terminology appropriately but do not overdo it.
-    Format your response in markdown with appropriate headers and bullet points.
+    STRICT RULES:
+    - Return ONLY bullet points in markdown format
+    - Each bullet point must be 1-2 lines maximum
+    - No introductory text or commentary
+    - Use technical/blockchain terminology appropriately
+    - Keep information factual and objective
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
@@ -56,8 +59,9 @@ export class AIService {
     Key questions from the community:
     - [List main questions]
 
-    IMPORTANT: Respond ONLY with the markdown formatted analysis. Do not include any introductory text, acknowledgments, or additional commentary.
-    Format the response in markdown and maintain objectivity in the analysis.
+    STRICT RULES: 
+		- Respond ONLY with the markdown formatted analysis. Do not include any introductory text, acknowledgments, or additional commentary.
+		- Format the response in markdown and maintain objectivity in the analysis.
     `,
 		CONTENT_SPAM_CHECK: `
     You are a helpful assistant that evaluates Polkadot governance content for spam.
@@ -75,9 +79,10 @@ export class AIService {
     - Excessive cross-posting
     - Unrelated commercial advertising
 
-    IMPORTANT: Return ONLY the word 'true' or 'false' without any additional text or explanation.
-    Consider the technical nature of governance discussions when evaluating.
-    A post being controversial or having strong opinions does not make it spam.
+    STRICT RULES:
+    - Consider the technical nature of governance discussions when evaluating.
+    - A post being controversial or having strong opinions does not make it spam.
+    - Return ONLY ONE WORD, either 'true' or 'false' without ANY additional text or explanation.
   `
 	} as const;
 
@@ -86,22 +91,32 @@ export class AIService {
 			return null;
 		}
 
-		const response = await fetchPF(this.AI_SERVICE_URL, {
-			method: 'POST',
-			body: JSON.stringify({ prompt })
-		});
+		try {
+			const response = await fetchPF(this.AI_SERVICE_URL, {
+				method: 'POST',
+				body: JSON.stringify({ text: prompt }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
 
-		if (!response.ok) {
+			const { response: aiResponse = '' } = await response.json();
+
+			if (!response.ok) {
+				console.log('AI service returned non-OK status', response.status);
+				return null;
+			}
+
+			if (!aiResponse.trim()) {
+				console.log('AI service returned empty response');
+				return null;
+			}
+
+			return aiResponse;
+		} catch (error) {
+			console.error('Error in generating AI response', error);
 			return null;
 		}
-
-		const data = await response.json();
-
-		if (!data || typeof data !== 'string') {
-			return null;
-		}
-
-		return data;
 	}
 
 	private static async getPostSummary({
@@ -171,8 +186,8 @@ export class AIService {
 
 		const summaryResponse = await this.getAIResponse(fullPrompt);
 
-		// check if response is valid and is markdown
-		if (!summaryResponse || !ValidatorService.isMarkdown(summaryResponse)) {
+		if (!summaryResponse?.trim()) {
+			console.log('No summary response from AI');
 			return null;
 		}
 
@@ -196,8 +211,8 @@ export class AIService {
 
 		const summaryResponse = await this.getAIResponse(fullPrompt);
 
-		// check if response is valid and is markdown
-		if (!summaryResponse || !ValidatorService.isMarkdown(summaryResponse)) {
+		if (!summaryResponse?.trim()) {
+			console.log('No summary response from AI');
 			return null;
 		}
 
@@ -225,6 +240,8 @@ export class AIService {
 		if (!response || typeof response !== 'string' || !['true', 'false'].includes(response.toLowerCase())) {
 			return null;
 		}
+
+		console.log('spam check response', response);
 
 		// Check if response is exactly 'true' or 'false'
 		return response?.toLowerCase() === 'true';

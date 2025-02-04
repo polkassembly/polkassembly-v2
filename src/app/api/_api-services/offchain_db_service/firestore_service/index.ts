@@ -20,7 +20,9 @@ import {
 	IUserActivity,
 	EAllowedCommentor,
 	IContentSummary,
-	IProfileDetails
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -588,6 +590,38 @@ export class FirestoreService extends FirestoreRefs {
 		} as IContentSummary;
 	}
 
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1);
+		const followingQuerySnapshot = await followingQuery.get();
+		return followingQuerySnapshot.docs.length > 0;
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		const followersQuery = FirestoreRefs.followersCollectionRef().where('followedUserId', '==', userId);
+		const followersQuerySnapshot = await followersQuery.get();
+		return followersQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IFollowEntry;
+		});
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId);
+		const followingQuerySnapshot = await followingQuery.get();
+		return followingQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IFollowEntry;
+		});
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -626,7 +660,17 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
 	}
 
-	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		let payload: Partial<IUser> = {};
+
 		const profileDetails: IProfileDetails = {
 			...(newProfileDetails?.badges?.length ? { badges: newProfileDetails.badges } : {}),
 			...(newProfileDetails?.bio ? { bio: newProfileDetails.bio } : {}),
@@ -636,11 +680,15 @@ export class FirestoreService extends FirestoreRefs {
 			...(newProfileDetails?.publicSocialLinks?.length ? { publicSocialLinks: newProfileDetails.publicSocialLinks } : {})
 		};
 
-		if (!Object.keys(profileDetails).length) {
-			return;
+		if (Object.keys(profileDetails).length) {
+			payload = { ...payload, profileDetails };
 		}
 
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails }, { merge: true });
+		if (Object.keys(notificationPreferences?.channelPreferences || {}).length || Object.keys(notificationPreferences?.triggerPreferences || {}).length) {
+			payload = { ...payload, notificationPreferences };
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
 	}
 
 	static async UpdateUserEmail(userId: number, email: string) {
@@ -952,5 +1000,27 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.contentSummariesCollectionRef()
 			.doc(contentSummaryId)
 			.set({ ...contentSummary, id: contentSummaryId }, { merge: true });
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		const newFollowEntryId = FirestoreRefs.followersCollectionRef().doc().id;
+
+		const followEntry: IFollowEntry = {
+			id: newFollowEntryId,
+			createdAt: new Date(),
+			followerUserId: userId,
+			followedUserId: userIdToFollow,
+			updatedAt: new Date()
+		};
+
+		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
+	}
+
+	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1).get();
+
+		if (followEntry.docs.length) {
+			await followEntry.docs[0].ref.delete();
+		}
 	}
 }

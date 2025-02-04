@@ -4,7 +4,7 @@
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ECookieNames, ESocial } from '@/_shared/types';
+import { ECookieNames, ESocial, ENotificationChannel } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const zodParamsSchema = z.object({
-	id: z.coerce.number()
+	id: z.coerce.number().refine((val) => ValidatorService.isValidUserId(val), 'Invalid user ID')
 });
 
 const socialLinkSchema = z
@@ -39,7 +39,7 @@ const socialLinkSchema = z
 		}
 	});
 
-const zodSchema = z
+const zodEditSchema = z
 	.object({
 		publicSocialLinks: z.array(socialLinkSchema).optional(),
 		email: z.string().email().optional(),
@@ -53,7 +53,28 @@ const zodSchema = z
 		badges: z.array(z.string().min(1)).min(1).optional(),
 		title: z.string().min(1).optional(),
 		image: z.string().url().optional(),
-		coverImage: z.string().url().optional()
+		coverImage: z.string().url().optional(),
+		notificationPreferences: z
+			.object({
+				channelPreferences: z.record(
+					z.object({
+						name: z.nativeEnum(ENotificationChannel),
+						enabled: z.boolean(),
+						handle: z.string(),
+						verified: z.boolean(),
+						verification_token: z.string().optional()
+					})
+				),
+				triggerPreferences: z.record(
+					z.record(
+						z.object({
+							name: z.string(),
+							enabled: z.boolean()
+						})
+					)
+				)
+			})
+			.optional()
 	})
 	.refine(
 		(data) =>
@@ -86,9 +107,21 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
-	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username } = zodSchema.parse(await getReqBody(req));
+	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username, notificationPreferences } = zodEditSchema.parse(await getReqBody(req));
 
-	await OffChainDbService.UpdateUserProfile(id, { bio, badges, title, image, coverImage, ...(publicSocialLinks?.length ? { publicSocialLinks } : {}) });
+	// Update profile details
+	await OffChainDbService.UpdateUserProfile({
+		userId: id,
+		newProfileDetails: {
+			bio,
+			badges,
+			title,
+			image,
+			coverImage,
+			...(publicSocialLinks?.length ? { publicSocialLinks } : {})
+		},
+		notificationPreferences
+	});
 
 	if (email) {
 		const result = await AuthService.UpdateUserEmail({ accessToken: newAccessToken, email });
