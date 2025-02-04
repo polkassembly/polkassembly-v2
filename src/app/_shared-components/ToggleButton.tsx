@@ -8,6 +8,7 @@ import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface ToggleButtonProps {
 	className?: string;
@@ -17,6 +18,7 @@ function ToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
 
 	const isDark = resolvedTheme === ETheme.DARK;
+	const isMobile = useIsMobile();
 
 	return (
 		<button
@@ -35,17 +37,31 @@ function ToggleButton({ className }: ToggleButtonProps) {
 			aria-label={`Switch to ${isDark ? ETheme.LIGHT : ETheme.DARK} theme`}
 		>
 			{isDark ? (
-				<FiMoon
-					className='h-4 w-4 text-[#90A0B7] transition-transform duration-200 hover:scale-110'
-					strokeWidth={2}
-					aria-hidden='true'
-				/>
+				<div className='flex items-center gap-2'>
+					<FiMoon
+						className='h-4 w-4 text-[#90A0B7] transition-transform duration-200 hover:scale-110'
+						strokeWidth={2}
+						aria-hidden='true'
+					/>
+					{isMobile && (
+						<p className='text-xs text-text_primary'>
+							Switch to <span className='font-semibold'>Dark Mode</span>
+						</p>
+					)}
+				</div>
 			) : (
-				<IoSunnyOutline
-					className='h-5 w-5 text-[#888888] transition-transform duration-200 hover:scale-110'
-					strokeWidth={2}
-					aria-hidden='true'
-				/>
+				<div className='flex items-center gap-2'>
+					<IoSunnyOutline
+						className='h-5 w-5 text-[#888888] transition-transform duration-200 hover:scale-110'
+						strokeWidth={2}
+						aria-hidden='true'
+					/>
+					{isMobile && (
+						<p className='text-xs text-text_primary'>
+							Switch to <span className='font-semibold'>Light Mode</span>
+						</p>
+					)}
+				</div>
 			)}
 		</button>
 	);

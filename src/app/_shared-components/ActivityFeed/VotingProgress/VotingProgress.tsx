@@ -20,7 +20,7 @@ interface VotingProgressProps {
 
 function VotingProgress({ timeRemaining, decisionPeriodPercentage, formattedTime, ayePercent, nayPercent, postData }: VotingProgressProps) {
 	return (
-		<div className='flex items-center gap-2'>
+		<div className='hidden items-center gap-2 sm:flex'>
 			{timeRemaining && (
 				<Tooltip>
 					<TooltipTrigger asChild>

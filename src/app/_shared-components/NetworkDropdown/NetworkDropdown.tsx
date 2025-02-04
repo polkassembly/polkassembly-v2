@@ -60,6 +60,7 @@ import PhykenLogo from '@assets/parachain-logos/phyken-logo.png';
 import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
+import { cn } from '@/lib/utils';
 import Image, { StaticImageData } from 'next/image';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 import { Input } from '../Input';
@@ -72,7 +73,7 @@ interface NetworkDataType {
 	};
 }
 
-function NetworkDropdown() {
+function NetworkDropdown({ className }: { className?: string }) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedNetwork, setSelectedNetwork] = useState<string>('westend');
 	const [isOpen, setIsOpen] = useState(false);
@@ -194,7 +195,7 @@ function NetworkDropdown() {
 			onOpenChange={setIsOpen}
 		>
 			<SelectTrigger
-				className={styles.selectTrigger}
+				className={cn('rounded-lg border-border_grey bg-network_dropdown_bg md:rounded-full', className)}
 				onClick={() => {
 					setIsOpen(true);
 				}}

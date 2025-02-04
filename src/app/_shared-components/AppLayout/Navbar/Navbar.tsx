@@ -16,12 +16,15 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ChevronDown } from 'lucide-react';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { FaBars } from 'react-icons/fa';
+import { IoMdClose } from 'react-icons/io';
+import { useState, useEffect } from 'react';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
 import NetworkDropdown from '../../NetworkDropdown/NetworkDropdown';
 import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
 import ToggleButton from '../../ToggleButton';
+import PaLogo from '../PaLogo';
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -36,43 +39,68 @@ function Navbar() {
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const isMobile = useIsMobile();
+	const [isModalOpen, setModalOpen] = useState(false);
 
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
 		setUserPreferences({ ...userPreferences, locale });
 	};
 
+	useEffect(() => {
+		if (isModalOpen) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = 'auto';
+		}
+		return () => {
+			document.body.style.overflow = 'auto';
+		};
+	}, [isModalOpen]);
+
+	const closeModal = () => setModalOpen(false);
+
 	return (
 		<nav className={classes.navbar}>
-			<p className='pl-8 font-semibold text-navbar_title md:pl-0'>OpenGov</p>
-			{!isMobile ? (
+			<div className='flex items-center pl-8 md:pl-0'>
+				<PaLogo
+					variant='full'
+					className='sm:hidden'
+				/>
+				<div className='border-l-[1px] border-bg_pink pl-3 font-semibold text-navbar_title sm:border-none sm:pl-0'>OpenGov</div>
+			</div>
+
+			{isMobile ? (
+				<div
+					aria-hidden
+					className='rounded-md border border-border_grey bg-network_dropdown_bg p-2'
+					onClick={() => setModalOpen(!isModalOpen)}
+				>
+					{isModalOpen ? <IoMdClose className='text-text_primary' /> : <FaBars className='text-text_primary' />}
+				</div>
+			) : (
 				<div className='flex items-center gap-x-4'>
 					<Select
 						value={userPreferences.locale}
-						onValueChange={(value: ELocales) => handleLocaleChange(value)}
+						onValueChange={handleLocaleChange}
 					>
 						<SelectTrigger className='w-[180px] border-border_grey bg-network_dropdown_bg'>
 							<SelectValue placeholder='Select Language' />
 						</SelectTrigger>
 						<SelectContent className='border-border_grey'>
-							<div>
-								{Object.entries(LANGUAGES).map(([locale, label]) => (
-									<SelectItem
-										key={locale}
-										value={locale}
-										className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-									>
-										{label}
-									</SelectItem>
-								))}
-							</div>
+							{Object.entries(LANGUAGES).map(([locale, label]) => (
+								<SelectItem
+									key={locale}
+									value={locale}
+									className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+								>
+									{label}
+								</SelectItem>
+							))}
 						</SelectContent>
 					</Select>
-
-					<div className='relative'>
+					<span>
 						<NetworkDropdown />
-					</div>
-
+					</span>
 					{user?.id ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger>
@@ -116,10 +144,45 @@ function Navbar() {
 						</Link>
 					)}
 					<RPCSwitchDropdown />
-					<ToggleButton />
+					<span>
+						<ToggleButton />
+					</span>
 				</div>
-			) : (
-				<FaBars />
+			)}
+
+			{isMobile && isModalOpen && (
+				<div
+					className='fixed inset-0 bg-black bg-opacity-40'
+					onClick={closeModal}
+					role='button'
+					tabIndex={0}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							closeModal();
+						}
+					}}
+				/>
+			)}
+
+			{isMobile && isModalOpen && (
+				<div className='absolute left-0 top-full z-50 w-full border-t-[3px] border-navbar_border bg-bg_modal p-4 pb-10 shadow-md'>
+					<div className='flex flex-col gap-5'>
+						<div>
+							<p className='pb-1 text-sm text-text_primary'>Network</p>
+							<NetworkDropdown className='w-full' />
+						</div>
+						<div>
+							<p className='pb-1 text-sm text-text_primary'>Node</p>
+							<RPCSwitchDropdown className='w-full' />
+						</div>
+						<ToggleButton className='w-full' />
+						<div>
+							<Link href='/login'>
+								<Button className='w-full'>{t('Profile.login')}</Button>
+							</Link>
+						</div>
+					</div>
+				</div>
 			)}
 		</nav>
 	);
