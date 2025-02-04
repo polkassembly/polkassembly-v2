@@ -627,7 +627,20 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails: newProfileDetails }, { merge: true });
+		const profileDetails: IProfileDetails = {
+			...(newProfileDetails?.badges?.length ? { badges: newProfileDetails.badges } : {}),
+			...(newProfileDetails?.bio ? { bio: newProfileDetails.bio } : {}),
+			...(newProfileDetails?.coverImage ? { coverImage: newProfileDetails.coverImage } : {}),
+			...(newProfileDetails?.image ? { image: newProfileDetails.image } : {}),
+			...(newProfileDetails?.title ? { title: newProfileDetails.title } : {}),
+			...(newProfileDetails?.publicSocialLinks?.length ? { publicSocialLinks: newProfileDetails.publicSocialLinks } : {})
+		};
+
+		if (!Object.keys(profileDetails).length) {
+			return;
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails }, { merge: true });
 	}
 
 	static async UpdateUserEmail(userId: number, email: string) {
