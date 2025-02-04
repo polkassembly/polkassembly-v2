@@ -205,10 +205,10 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 									role='button'
 									tabIndex={0}
 								>
-									<span className={state.filterActive ? styles.selectedicon : ''}>
-										<FaFilter className='text-text_primary' />
-									</span>
 									<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
+									<span className={state.filterActive ? styles.selectedicon : ''}>
+										<FaFilter className='text-sm text-text_primary' />
+									</span>
 								</div>
 							</PopoverTrigger>
 							<PopoverContent
