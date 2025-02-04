@@ -108,6 +108,7 @@
 		"accounts": "Accounts",
 		"delegate": "Delegate",
 		"follow": "Follow",
+		"unfollow": "Unfollow",
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",

@@ -2,9 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProfileTabs, ESocial, IPublicUser } from '@/_shared/types';
+import { EProfileTabs, ESocial, IFollowEntry, IPublicUser } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
-import { Pencil, ShieldPlus, UserPlus } from 'lucide-react';
+import { Pencil, ShieldPlus } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
@@ -16,11 +16,16 @@ import { useState } from 'react';
 import EmailIcon from '@assets/icons/email-icon.svg';
 import TwitterIcon from '@assets/icons/twitter-icon.svg';
 import TelegramIcon from '@assets/icons/telegram-icon.svg';
+import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
 import classes from './ProfileHeader.module.scss';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import EditProfile from '../EditProfile/EditProfile';
+import { Separator } from '../../Separator';
+import { Skeleton } from '../../Skeleton';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
@@ -34,6 +39,87 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 	const t = useTranslations();
 	const { user } = useUser();
 	const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
+	const [loading, setLoading] = useState(false);
+
+	const queryClient = useQueryClient();
+
+	// followers
+	const fetchFollowers = async () => {
+		const { data, error } = await UserProfileClientService.getFollowers({ userId: userProfileData.id });
+
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
+		}
+		return data;
+	};
+
+	const { data: followers, isFetching: isFetchingFollowers } = useQuery({
+		queryKey: ['followers', userProfileData.id, user?.id],
+		queryFn: () => fetchFollowers(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI
+	});
+
+	// following
+	const fetchFollowing = async () => {
+		const { data, error } = await UserProfileClientService.getFollowing({ userId: userProfileData.id });
+
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
+		}
+		return data;
+	};
+
+	const { data: following, isFetching: isFetchingFollowing } = useQuery({
+		queryKey: ['following', userProfileData.id, user?.id],
+		queryFn: () => fetchFollowing(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI
+	});
+
+	const followUser = async () => {
+		if (!user?.id || user.id === userProfileData.id) return;
+		setLoading(true);
+
+		const { data, error } = await UserProfileClientService.followUser({ userId: userProfileData.id });
+
+		setLoading(false);
+
+		if (data && !error) {
+			queryClient.setQueryData(['followers', userProfileData.id, user?.id], (oldData: { followers: IFollowEntry[] }) => {
+				console.log('oldData', oldData);
+				return {
+					followers: [
+						...(oldData?.followers || []),
+						{
+							id: userProfileData.id,
+							createdAt: userProfileData.createdAt,
+							followerUserId: user.id,
+							followedUserId: userProfileData.id,
+							updatedAt: new Date()
+						}
+					]
+				};
+			});
+		}
+	};
+
+	const unfollowUser = async () => {
+		if (!user?.id || user.id === userProfileData.id) return;
+		setLoading(true);
+
+		const { data, error } = await UserProfileClientService.unfollowUser({ userId: userProfileData.id });
+
+		setLoading(false);
+
+		if (data && !error) {
+			queryClient.setQueryData(['followers', userProfileData.id, user?.id], (oldData: { followers: IFollowEntry[] }) => {
+				return { ...oldData, followers: oldData.followers.filter((item) => item.followerUserId !== user.id) };
+			});
+		}
+	};
+
+	const isFollowing = followers?.followers.some((item) => item.followerUserId === user?.id);
 
 	return (
 		<div>
@@ -75,20 +161,38 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 					<div className='flex items-start justify-between gap-x-2'>
 						<div className='flex flex-col gap-y-1'>
 							<p className={classes.profileHeaderTextTitle}>{userProfileData.username}</p>
-							{userProfileData.createdAt && (
-								<p className={classes.profileHeaderTextSince}>
-									<span>{t('Profile.userSince')}: </span>{' '}
-									<span className='flex items-center gap-x-1 text-xs'>
-										<Image
-											src={CalendarIcon}
-											alt='calendar'
-											width={20}
-											height={20}
-										/>
-										{dayjs(userProfileData.createdAt).format("Do MMM 'YY")}
-									</span>
-								</p>
-							)}
+							<div className='flex flex-wrap items-center gap-x-2'>
+								{userProfileData.createdAt && (
+									<p className={classes.profileHeaderTextSince}>
+										<span>{t('Profile.userSince')}: </span>{' '}
+										<span className='flex items-center gap-x-1 text-xs'>
+											<Image
+												src={CalendarIcon}
+												alt='calendar'
+												width={20}
+												height={20}
+											/>
+											{dayjs(userProfileData.createdAt).format("Do MMM 'YY")}
+										</span>
+									</p>
+								)}
+								<Separator
+									className='h-4'
+									orientation='vertical'
+								/>
+								<div className={classes.profileHeaderTextFollowing}>
+									{t('Profile.following')}:{' '}
+									{isFetchingFollowing ? <Skeleton className='h-4 w-6' /> : <span className='font-medium text-text_pink'>{following?.following?.length || 0}</span>}
+								</div>
+								<Separator
+									className='h-4'
+									orientation='vertical'
+								/>
+								<div className={classes.profileHeaderTextFollowing}>
+									{t('Profile.followers')}:{' '}
+									{isFetchingFollowers ? <Skeleton className='h-4 w-6' /> : <span className='font-medium text-text_pink'>{followers?.followers?.length || 0}</span>}
+								</div>
+							</div>
 						</div>
 						<div className={classes.profileHeaderButtons}>
 							<div className='flex items-center gap-x-4'>
@@ -141,25 +245,16 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 									</DialogContent>
 								</Dialog>
 							) : (
-								<>
-									<Button
-										variant='secondary'
-										className='rounded-3xl font-medium'
-										size='lg'
-										disabled
-										leftIcon={<UserPlus fill={THEME_COLORS.light.bg_pink} />}
-									>
-										{t('Profile.delegate')}
-									</Button>
-									<Button
-										size='lg'
-										className='rounded-3xl'
-										leftIcon={<ShieldPlus />}
-										disabled
-									>
-										{t('Profile.follow')}
-									</Button>
-								</>
+								<Button
+									size='lg'
+									className='rounded-3xl'
+									leftIcon={<ShieldPlus />}
+									isLoading={loading}
+									onClick={isFollowing ? unfollowUser : followUser}
+									disabled={!user?.id}
+								>
+									{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
+								</Button>
 							)}
 						</div>
 					</div>
