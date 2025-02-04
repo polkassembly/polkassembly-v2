@@ -4,7 +4,7 @@
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ECookieNames, ESocial } from '@/_shared/types';
+import { ECookieNames, ESocial, ENotificationChannel } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -57,6 +57,27 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 						url: z.string().url()
 					})
 				)
+				.optional(),
+			notificationPreferences: z
+				.object({
+					channelPreferences: z.record(
+						z.object({
+							name: z.nativeEnum(ENotificationChannel),
+							enabled: z.boolean(),
+							handle: z.string(),
+							verified: z.boolean(),
+							verification_token: z.string().optional()
+						})
+					),
+					triggerPreferences: z.record(
+						z.record(
+							z.object({
+								name: z.string(),
+								enabled: z.boolean()
+							})
+						)
+					)
+				})
 				.optional()
 		})
 		.refine(
@@ -72,9 +93,21 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			}
 		);
 
-	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username } = zodBodySchema.parse(await getReqBody(req));
+	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username, notificationPreferences } = zodBodySchema.parse(await getReqBody(req));
 
-	await OffChainDbService.UpdateUserProfile(id, { bio, badges, title, image, coverImage, ...(publicSocialLinks?.length ? { publicSocialLinks } : {}) });
+	// Update profile details
+	await OffChainDbService.UpdateUserProfile({
+		userId: id,
+		newProfileDetails: {
+			bio,
+			badges,
+			title,
+			image,
+			coverImage,
+			...(publicSocialLinks?.length ? { publicSocialLinks } : {})
+		},
+		notificationPreferences
+	});
 
 	if (email) {
 		const result = await AuthService.UpdateUserEmail({ accessToken: newAccessToken, email });

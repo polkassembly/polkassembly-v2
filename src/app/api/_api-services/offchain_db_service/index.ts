@@ -22,7 +22,8 @@ import {
 	IActivityMetadata,
 	EAllowedCommentor,
 	IContentSummary,
-	IProfileDetails
+	IProfileDetails,
+	IUserNotificationSettings
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -338,8 +339,16 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
-	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
-		return FirestoreService.UpdateUserProfile(userId, newProfileDetails);
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		return FirestoreService.UpdateUserProfile({ userId, newProfileDetails, notificationPreferences });
 	}
 
 	static async DeleteUser(userId: number) {
