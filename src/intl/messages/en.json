@@ -109,6 +109,8 @@
 		"delegate": "Delegate",
 		"follow": "Follow",
 		"unfollow": "Unfollow",
+		"following": "Following",
+		"followers": "Followers",
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
