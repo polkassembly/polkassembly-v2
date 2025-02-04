@@ -180,7 +180,7 @@ function NetworkDropdown() {
 		}
 	};
 
-	const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+	const handleBlur = () => {
 		setTimeout(() => {
 			if (searchInputRef.current && !searchInputRef.current.contains(document.activeElement)) {
 				searchInputRef.current.focus();
