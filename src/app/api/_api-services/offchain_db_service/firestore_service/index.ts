@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -627,6 +628,82 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails: newProfileDetails }, { merge: true });
+	}
+
+	// Helper function to process documents in batches
+	private static async processBatch({
+		querySnapshot,
+		batchOperation,
+		batchSize = 400 // limit is 500
+	}: {
+		querySnapshot: QuerySnapshot;
+		batchOperation: (batch: WriteBatch, doc: QueryDocumentSnapshot) => void;
+		batchSize?: number;
+	}) {
+		const batches: WriteBatch[] = [];
+		let currentBatch = FirestoreRefs.firestoreDb.batch();
+		let operationCount = 0;
+
+		querySnapshot.docs.forEach((doc) => {
+			if (operationCount === batchSize) {
+				batches.push(currentBatch);
+				currentBatch = FirestoreRefs.firestoreDb.batch();
+				operationCount = 0;
+			}
+			batchOperation(currentBatch, doc);
+			operationCount += 1;
+		});
+
+		if (operationCount > 0) {
+			batches.push(currentBatch);
+		}
+
+		// Execute all batches
+		await Promise.all(batches.map((batch) => batch.commit()));
+	}
+
+	static async DeleteUser(userId: number) {
+		// Delete user document
+		const userBatch = FirestoreRefs.firestoreDb.batch();
+		userBatch.delete(FirestoreRefs.usersCollectionRef().doc(userId.toString()));
+		await userBatch.commit();
+
+		// Fetch and delete all related collections
+		const collections = [
+			{
+				query: FirestoreRefs.addressesCollectionRef().where('userId', '==', userId),
+				name: 'addresses'
+			},
+			{
+				query: FirestoreRefs.userActivityCollectionRef().where('userId', '==', userId),
+				name: 'user activities'
+			},
+			{
+				query: FirestoreRefs.commentsCollectionRef().where('userId', '==', userId),
+				name: 'comments'
+			},
+			{
+				query: FirestoreRefs.reactionsCollectionRef().where('userId', '==', userId),
+				name: 'reactions'
+			},
+			{
+				query: FirestoreRefs.notificationsCollectionRef().where('userId', '==', userId),
+				name: 'notifications'
+			}
+		];
+
+		await Promise.all(
+			collections.map(async (collection) => {
+				const querySnapshot = await collection.query.get();
+				if (!querySnapshot.empty) {
+					console.log(`Deleting ${querySnapshot.size} ${collection.name} documents`);
+					await this.processBatch({
+						querySnapshot,
+						batchOperation: (batch, doc) => batch.delete(doc.ref)
+					});
+				}
+			})
+		);
 	}
 
 	static async AddNewComment({

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
-import { ESocial } from '@/_shared/types';
+import { ECookieNames, ESocial } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -71,6 +71,20 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const response = NextResponse.json({ message: 'User profile updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
+});
+
+// delete account
+export const DELETE = withErrorHandling(async (): Promise<NextResponse> => {
+	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	await AuthService.DeleteUser(newAccessToken);
+
+	// send response with cleared cookies
+	const response = NextResponse.json({ message: 'Account deleted successfully' });
+	response.cookies.delete(ECookieNames.ACCESS_TOKEN);
+	response.cookies.delete(ECookieNames.REFRESH_TOKEN);
 
 	return response;
 });

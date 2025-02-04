@@ -342,6 +342,10 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserProfile(userId, newProfileDetails);
 	}
 
+	static async DeleteUser(userId: number) {
+		return FirestoreService.DeleteUser(userId);
+	}
+
 	static async AddNewComment({
 		network,
 		indexOrHash,

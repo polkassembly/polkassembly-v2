@@ -630,4 +630,18 @@ export class AuthService {
 			loginWallet: accessTokenPayload.loginWallet
 		});
 	}
+
+	static async DeleteUser(accessToken: string) {
+		const user = await this.GetUserWithAccessToken(accessToken);
+
+		if (!user) {
+			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
+		}
+
+		// delete any redis keys for the user to revoke access
+		await RedisService.DeleteRefreshToken(user.id);
+
+		// delete user from offchain db
+		await OffChainDbService.DeleteUser(user.id);
+	}
 }
