@@ -63,7 +63,7 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 										<Image
 											src={badgeDetails.image}
 											alt={badgeDetails.name}
-											className={cn(!userBadges[badgeDetails.name] && 'grayscale-[85%]')}
+											className={cn(!userBadges[badgeDetails.name] && 'grayscale')}
 										/>
 									</div>
 									<p className={classes.badgesCardContentItemTitle}>{badgeDetails.displayName}</p>
