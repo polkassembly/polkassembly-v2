@@ -130,9 +130,9 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	const renderFilterContent = () => (
 		<div className='p-4'>
-			<h3 className='text-sm font-semibold uppercase text-filter_dropdown'>{t('CreateProposalDropdownButton.status')}</h3>
+			{/* <h3 className='text-sm font-semibold uppercase text-filter_dropdown'>{t('CreateProposalDropdownButton.status')}</h3>
 			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
-				{/* {STATUSES.map((status) => (
+				{STATUSES.map((status) => (
 					<span
 						key={status}
 						className='flex items-center'
@@ -146,10 +146,10 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 						/>
 						<span className='text-sm text-filter_dropdown'>{status}</span>
 					</span>
-				))} */}
-			</div>
+				))}
+			</div> */}
 
-			<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>{t('CreateProposalDropdownButton.tags')}</h3>
+			<h3 className='text-sm font-semibold text-filter_dropdown'>{t('CreateProposalDropdownButton.tags')}</h3>
 			<div className='relative mt-2'>
 				<input
 					type='text'
