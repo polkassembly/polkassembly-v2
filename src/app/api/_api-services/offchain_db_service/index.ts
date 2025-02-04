@@ -24,7 +24,8 @@ import {
 	IContentSummary,
 	IProfileDetails,
 	IUserNotificationSettings,
-	IFollowEntry
+	IFollowEntry,
+	IGenericListingResponse
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -257,6 +258,10 @@ export class OffChainDbService {
 
 	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
 		return FirestoreService.GetFollowing(userId);
+	}
+
+	static async GetLeaderboard({ page, limit }: { page: number; limit: number }): Promise<IGenericListingResponse<IPublicUser>> {
+		return FirestoreService.GetLeaderboard({ page, limit });
 	}
 
 	// helper methods

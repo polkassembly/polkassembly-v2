@@ -22,7 +22,8 @@ import {
 	IContentSummary,
 	IProfileDetails,
 	IUserNotificationSettings,
-	IFollowEntry
+	IFollowEntry,
+	IGenericListingResponse
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -620,6 +621,35 @@ export class FirestoreService extends FirestoreRefs {
 				updatedAt: data.updatedAt?.toDate()
 			} as IFollowEntry;
 		});
+	}
+
+	static async GetLeaderboard({ page, limit }: { page: number; limit: number }): Promise<IGenericListingResponse<IPublicUser>> {
+		const leaderboardQuerySnapshot = await FirestoreRefs.usersCollectionRef()
+			.orderBy('profileScore', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit)
+			.get();
+
+		const totalUsersCount = (await FirestoreRefs.usersCollectionRef().count().get()).data().count || 0;
+
+		return {
+			items: leaderboardQuerySnapshot.docs.map((doc) => {
+				const data = doc.data();
+
+				const publicUser: IPublicUser = {
+					id: data.id,
+					createdAt: data.createdAt?.toDate(),
+					username: data.username,
+					profileScore: data.profileScore,
+					addresses: data.addresses,
+					rank: data.rank,
+					profileDetails: data.profileDetails
+				};
+
+				return publicUser;
+			}),
+			totalCount: totalUsersCount
+		};
 	}
 
 	// write methods
