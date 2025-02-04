@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ChevronDown } from 'lucide-react';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -33,6 +34,7 @@ function Navbar() {
 	const { user, setUser } = useUser();
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
+	const isMobile = useIsMobile();
 
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
