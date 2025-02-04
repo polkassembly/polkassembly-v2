@@ -23,7 +23,8 @@ import {
 	EAllowedCommentor,
 	IContentSummary,
 	IProfileDetails,
-	IUserNotificationSettings
+	IUserNotificationSettings,
+	IFollowEntry
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -244,6 +245,18 @@ export class OffChainDbService {
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
 		return FirestoreService.GetContentSummary({ network, indexOrHash, proposalType });
+	}
+
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		return FirestoreService.IsUserFollowing({ userId, userIdToFollow });
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowers(userId);
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowing(userId);
 	}
 
 	// helper methods
@@ -593,5 +606,13 @@ export class OffChainDbService {
 
 	static async UpdateContentSummary(contentSummary: IContentSummary) {
 		return FirestoreService.UpdateContentSummary(contentSummary);
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		return FirestoreService.FollowUser({ userId, userIdToFollow });
+	}
+
+	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		return FirestoreService.UnfollowUser({ userId, userIdToFollow });
 	}
 }

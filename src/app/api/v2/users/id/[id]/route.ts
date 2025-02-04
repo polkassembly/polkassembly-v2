@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const zodParamsSchema = z.object({
-	id: z.coerce.number()
+	id: z.coerce.number().refine((val) => ValidatorService.isValidUserId(val), 'Invalid user ID')
 });
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
