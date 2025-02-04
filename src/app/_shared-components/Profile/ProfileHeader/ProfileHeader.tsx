@@ -2,11 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProfileTabs, ETheme } from '@/_shared/types';
+import { EProfileTabs } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
 import { ShieldPlus, UserPlus } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
-import { useTheme } from 'next-themes';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
@@ -34,7 +33,6 @@ function ProfileHeader({
 	bio?: string;
 	userId: number;
 }) {
-	const { resolvedTheme } = useTheme();
 	const t = useTranslations();
 	const { user } = useUser();
 	return (
@@ -93,7 +91,7 @@ function ProfileHeader({
 								className='rounded-3xl font-medium'
 								size='lg'
 								disabled
-								leftIcon={<UserPlus fill={THEME_COLORS[`${resolvedTheme || ETheme.LIGHT}` as ETheme].bg_pink} />}
+								leftIcon={<UserPlus fill={THEME_COLORS.light.bg_pink} />}
 							>
 								{t('Profile.delegate')}
 							</Button>

@@ -6,7 +6,7 @@ import { ESocial } from '@/_shared/types';
 import { NextApiClientService } from './next_api_client_service';
 
 export class UserProfileClientService extends NextApiClientService {
-	static async fetchPublicUserById({ userId }: { userId: string | number }) {
+	static async fetchPublicUserById({ userId }: { userId: number }) {
 		return this.fetchPublicUserByIdApi({ userId });
 	}
 
@@ -18,7 +18,7 @@ export class UserProfileClientService extends NextApiClientService {
 		return this.fetchPublicUserByUsernameApi({ username });
 	}
 
-	static async fetchUserActivity({ userId }: { userId: string | number }) {
+	static async fetchUserActivity({ userId }: { userId: number }) {
 		return this.fetchUserActivityApi({ userId });
 	}
 
@@ -33,7 +33,7 @@ export class UserProfileClientService extends NextApiClientService {
 		email,
 		username
 	}: {
-		userId: string | number;
+		userId: number;
 		bio?: string;
 		badges?: string[];
 		title?: string;
@@ -46,7 +46,7 @@ export class UserProfileClientService extends NextApiClientService {
 		return this.editUserProfileApi({ userId, bio, badges, title, image, coverImage, publicSocialLinks, email, username });
 	}
 
-	static async deleteAccount({ userId }: { userId: string | number }) {
+	static async deleteAccount({ userId }: { userId: number }) {
 		return this.deleteAccountApi({ userId });
 	}
 }

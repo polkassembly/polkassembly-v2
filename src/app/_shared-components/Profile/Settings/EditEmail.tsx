@@ -16,8 +16,9 @@ function EditEmail({ oldEmail, onSuccess, userId, onClose }: { oldEmail: string;
 
 	const handleEditEmail = async () => {
 		if (!newEmail || !user?.id || user.id !== userId) return;
+		setLoading(true);
 
-		const { data, error } = await UserProfileClientService.editUserProfile({ userId: user?.id, email: newEmail });
+		const { data, error } = await UserProfileClientService.editUserProfile({ userId: user.id, email: newEmail });
 
 		if (data && !error) {
 			onSuccess?.(newEmail);

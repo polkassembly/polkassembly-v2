@@ -34,7 +34,7 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 			<div className={classes.headerWrapper}>
 				<ProfileHeader
 					address={profileData.addresses[0]}
-					username={profileData.username}
+					username={userProfileData.username}
 					createdAt={profileData.createdAt}
 					rank={profileData.rank}
 					userId={profileData.id}

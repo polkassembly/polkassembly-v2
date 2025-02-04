@@ -194,6 +194,8 @@
 			"save": "Guardar",
 			"oldEmail": "Correo electrónico anterior",
 			"newEmail": "Nuevo correo electrónico",
+			"type": "Tipo",
+			"belowToConfirm": "abajo para confirmar",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configurando Google Authenticator",
 				"installGoogleAuthenticator": "1. Instale Google Authenticator (iOS/Android).",

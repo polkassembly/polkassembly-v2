@@ -386,7 +386,7 @@ export class NextApiClientService {
 	}
 
 	// user data
-	protected static async fetchPublicUserByIdApi({ userId }: { userId: number | string }) {
+	protected static async fetchPublicUserByIdApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ID, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
@@ -401,7 +401,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 
-	protected static async fetchUserActivityApi({ userId }: { userId: number | string }) {
+	protected static async fetchUserActivityApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_ACTIVITY, routeSegments: [userId.toString(), 'activities'] });
 		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
 	}
@@ -417,7 +417,7 @@ export class NextApiClientService {
 		email,
 		username
 	}: {
-		userId: number | string;
+		userId: number;
 		bio?: string;
 		badges?: string[];
 		title?: string;
@@ -431,7 +431,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { bio, badges, title, image, coverImage, publicSocialLinks, email, username } });
 	}
 
-	protected static async deleteAccountApi({ userId }: { userId: number | string }) {
+	protected static async deleteAccountApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_ACCOUNT, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}

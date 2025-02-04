@@ -16,8 +16,9 @@ function EditUsername({ oldUsername, onSuccess, userId, onClose }: { oldUsername
 
 	const handleEditUsername = async () => {
 		if (!newUsername || !user?.id || user.id !== userId) return;
+		setLoading(true);
 
-		const { data, error } = await UserProfileClientService.editUserProfile({ userId: user?.id, username: newUsername });
+		const { data, error } = await UserProfileClientService.editUserProfile({ userId: user.id, username: newUsername });
 
 		if (data && !error) {
 			onSuccess?.(newUsername);
