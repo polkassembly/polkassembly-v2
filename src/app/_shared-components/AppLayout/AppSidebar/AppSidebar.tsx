@@ -85,7 +85,12 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			{...props}
 		>
 			<SidebarHeader>
-				<div className={styles.sidebar_logo}>{getLogo()}</div>
+				<Link
+					href='/'
+					className={styles.sidebar_logo}
+				>
+					{getLogo()}
+				</Link>
 			</SidebarHeader>
 
 			<hr className='text-border_grey' />
