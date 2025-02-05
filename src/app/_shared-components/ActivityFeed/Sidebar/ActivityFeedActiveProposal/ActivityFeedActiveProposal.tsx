@@ -12,9 +12,11 @@ import styles from './ActivityFeedActiveProposal.module.scss';
 function ActivityFeedActiveProposal() {
 	const t = useTranslations();
 	const { user } = useUser();
+
 	const { data } = useQuery({
 		queryKey: ['votedActiveProposalsCount', user?.id],
-		queryFn: () => fetch(`/api/v2/users/id/${user?.id}/voted-active-proposals-count`).then((res) => res.json())
+		queryFn: () => fetch(`/api/v2/users/id/${user?.id}/voted-active-proposals-count`).then((res) => res.json()),
+		enabled: !!user?.id
 	});
 	return (
 		<div className={styles.activeProposalContainer}>
