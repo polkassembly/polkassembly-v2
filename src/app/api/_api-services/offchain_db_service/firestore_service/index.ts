@@ -185,7 +185,7 @@ export class FirestoreService extends FirestoreRefs {
 						profileScore: data.profileScore,
 						addresses: addresses.map((addr: IUserAddress) => addr.address),
 						rank,
-						createdAt: data.createdAt,
+						createdAt: data.createdAt?.toDate?.(),
 						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
 					} as IPublicUser;
 				})
@@ -889,7 +889,7 @@ export class FirestoreService extends FirestoreRefs {
 				proposalType,
 				userId,
 				reaction,
-				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt.toDate() : new Date(),
+				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt?.toDate() : new Date(),
 				updatedAt: new Date()
 			},
 			{ merge: true }

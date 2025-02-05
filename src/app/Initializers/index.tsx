@@ -148,9 +148,16 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	// set user preferences
 	useEffect(() => {
 		setUserPreferences({
+			...userPreferences,
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
-			// address: user?.defaultAddress, TODO: fix this @aadarsh012
+			...(user?.loginAddress
+				? {
+						address: {
+							address: user?.loginAddress
+						}
+					}
+				: {}),
 			wallet: user?.loginWallet
 		});
 
