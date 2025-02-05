@@ -242,7 +242,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 						onBlur={handleBlur}
 					/>
 				</div>
-				<div className='overflow-y-auto p-2'>
+				<div className='p-2'>
 					<RenderNetworkSection
 						title='Polkadot & Parachains'
 						networks={NetworkData.polkadot}

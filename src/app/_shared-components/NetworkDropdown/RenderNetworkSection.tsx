@@ -18,7 +18,7 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 	if (filteredNetworks.length === 0) return null;
 
 	return (
-		<div className='mb-4'>
+		<div className='mb-4 overflow-y-auto'>
 			<h3 className='bg-background_secondary px-4 py-2 text-sm font-medium text-btn_secondary_text'>{title}</h3>
 			<div className='grid grid-cols-2 gap-2 px-2'>
 				{filteredNetworks.map(([key, logo]) => (
