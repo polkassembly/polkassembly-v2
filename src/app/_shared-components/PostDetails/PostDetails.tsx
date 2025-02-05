@@ -64,11 +64,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</TabsContent>
 					</div>
 					{isModalOpen && !isOffchainPost && (
-						<div className='pt-5'>
-							{postData?.onChainInfo?.status && postData?.onChainInfo?.preparePeriodEndsAt && canVote(postData.onChainInfo.status, postData.onChainInfo.preparePeriodEndsAt) && (
-								<VoteReferendumButton index={index} />
-							)}
-						</div>
+						<div className='pt-5'>{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}</div>
 					)}
 					{!isModalOpen && (
 						<div className={classes.commentsBox}>
@@ -81,9 +77,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				</div>
 				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>
-						{postData?.onChainInfo?.status && postData?.onChainInfo?.preparePeriodEndsAt && canVote(postData.onChainInfo.status, postData.onChainInfo.preparePeriodEndsAt) && (
-							<VoteReferendumButton index={index} />
-						)}
+						{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}
 						<ProposalPeriods
 							confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}

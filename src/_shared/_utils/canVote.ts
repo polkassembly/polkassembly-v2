@@ -5,6 +5,6 @@ import { dayjs } from '@shared/_utils/dayjsInit';
 import { ACTIVE_PROPOSAL_STATUSES } from '../_constants/activeProposalStatuses';
 import { EProposalStatus } from '../types';
 
-export const canVote = (status: EProposalStatus, preparePeriodEndsAt: Date) => {
-	return !!(ACTIVE_PROPOSAL_STATUSES.includes(status) && dayjs().isAfter(dayjs(preparePeriodEndsAt)));
+export const canVote = (status?: EProposalStatus, preparePeriodEndsAt?: Date) => {
+	return !!(status && preparePeriodEndsAt && ACTIVE_PROPOSAL_STATUSES.includes(status) && dayjs().isAfter(dayjs(preparePeriodEndsAt)));
 };

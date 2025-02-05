@@ -93,7 +93,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					</span>
 					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
 				</div>
-				{postData.onChainInfo?.preparePeriodEndsAt && postData.onChainInfo?.status && canVote(postData.onChainInfo.status, postData.onChainInfo.preparePeriodEndsAt) && (
+				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
 					<div>
 						{user?.id ? (
 							<Dialog>
