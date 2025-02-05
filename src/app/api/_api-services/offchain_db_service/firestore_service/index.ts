@@ -1036,9 +1036,16 @@ export class FirestoreService extends FirestoreRefs {
 		}
 	}
 
-	static async GetAllTags() {
-		const tags = await FirestoreRefs.tagsCollectionRef().get();
-		return tags.docs.map((doc) => ({ lastUsedAt: doc.data().lastUsedAt?.toDate ? doc.data().lastUsedAt.toDate() : doc.data().lastUsedAt, name: doc.data().name || '' }));
+	static async GetAllTags(network: ENetwork): Promise<IGenericListingResponse<ITag>> {
+		const tags = await FirestoreRefs.tagsCollectionRef().where('network', '==', network).get();
+		return {
+			items: tags.docs.map((doc) => ({
+				lastUsedAt: doc.data().lastUsedAt?.toDate ? doc.data().lastUsedAt.toDate() : doc.data().lastUsedAt,
+				value: doc.data().value || '',
+				network: doc.data().network
+			})),
+			totalCount: tags.size
+		};
 	}
 
 	static async CreateTags(tags: ITag[]) {

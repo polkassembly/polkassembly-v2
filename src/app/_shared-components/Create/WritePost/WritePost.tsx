@@ -12,7 +12,6 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import { MessageCircleWarning } from 'lucide-react';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useRouter } from 'next/navigation';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
@@ -24,7 +23,7 @@ import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
 import classes from './WritePost.module.scss';
-import LoadingLayover from '../../LoadingLayover';
+import ErrorMessage from '../../ErrorMessage';
 
 interface IWritePostFormFields {
 	title: string;
@@ -39,6 +38,7 @@ function WritePost() {
 	const router = useRouter();
 	const formData = useForm<IWritePostFormFields>();
 	const [loading, setLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const allowedCommentorsOptions = [
 		{
@@ -71,7 +71,8 @@ function WritePost() {
 
 		if (error || !data || !data?.data?.index) {
 			setLoading(false);
-			throw new ClientError(error?.message || 'Failed to create discussion');
+			setErrorMessage(error?.message || 'Failed to create discussion');
+			return;
 		}
 
 		formData.reset();
@@ -82,7 +83,7 @@ function WritePost() {
 
 	return (
 		<div className={classes.container}>
-			{loading && <LoadingLayover />}
+			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 			<Form {...formData}>
 				<form onSubmit={formData.handleSubmit(handleCreateDiscussionPost)}>
 					<div className={classes.form}>

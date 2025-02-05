@@ -30,7 +30,7 @@ export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) =>
 		if (error) {
 			throw new ClientError(error.message || 'Failed to fetch data');
 		}
-		return data;
+		return data?.items;
 	};
 
 	const { data: allTags = [], isFetching } = useQuery({

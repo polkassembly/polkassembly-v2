@@ -521,54 +521,44 @@
 		"noTagsFound": "Keine Tags gefunden.",
 		"selectTags": "Tags auswählen",
 		"selectTopic": "Thema auswählen",
-		"tagsLeftText": "Tags übrig",
+		"tagsLeftText": "Verbleibende Tags",
 		"AllowedCommentors": {
-			"title": "Wer darf kommentieren?",
+			"title": "Wer kann kommentieren?",
 			"all": "Alle",
-			"onchainVerified": "Onchain-Verifizierte",
-			"none": "Niemand",
-			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten darf"
+			"onchainVerified": "Onchain verifiziert",
+			"none": "Keine",
+			"tooltip": "Wählen Sie, wer kommentieren und auf diesen Beitrag antworten kann"
 		},
 		"Topic": {
 			"general": "Allgemein",
-			"auctionadmin": "Auktions-Administrator",
+			"auctionadmin": "Auktionsadministrator",
 			"generaladmin": "Allgemeiner Administrator",
-			"governance": "Verwaltung",
+			"governance": "Governance",
 			"root": "Root",
 			"stakingadmin": "Staking-Administrator",
-			"treasury": "Finanzverwaltung",
-			"fellowship": "Fellowship"
+			"treasury": "Schatzamt",
+			"fellowship": "Gemeinschaft"
 		}
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",
 		"referendum": "Referendum",
 		"referendumv2": "Referendum",
-		"councilmotion": "Ratsantrag",
+		"councilmotion": "Ratsbewegung",
 		"techcommitteeproposal": "Technikkomitee-Vorschlag",
-		"treasuryproposal": "Finanzvorschlag",
+		"treasuryproposal": "Schatzamtsvorschlag",
 		"bounty": "Prämie",
-		"childbounty": "Untergeordnete Prämie",
-		"tip": "Trinkgeld",
-		"fellowshipreferendum": "Fellowship-Referendum",
-		"alliancemotion": "Allianz-Antrag",
+		"childbounty": "Kinderprämie",
+		"tip": "Tipp",
+		"fellowshipreferendum": "Gemeinschaftsreferendum",
+		"alliancemotion": "Allianzbewegung",
 		"announcement": "Ankündigung",
-		"democracyproposal": "Demokratie-Vorschlag",
+		"democracyproposal": "Demokratievorschlag",
 		"upgradecommittee": "Upgrade-Komitee",
 		"advisorycommittee": "Beratungsausschuss",
 		"grant": "Zuschuss",
 		"community": "Gemeinschaft",
-		"technicalcommittee": "Technisches Komitee",
-		"Topic": {
-			"general": "Allgemein",
-			"auction_admin": "Auktions-Administrator",
-			"general_admin": "Allgemeiner Administrator",
-			"governance": "Verwaltung",
-			"root": "Root",
-			"staking_admin": "Staking-Administrator",
-			"treasury": "Finanzverwaltung",
-			"fellowship": "Fellowship"
-		}
+		"technicalcommittee": "Technikkomitee"
 	}
 }
 

@@ -1,5 +1,5 @@
 .container{
-    @apply flex flex-col gap-4;
+    @apply relative flex flex-col gap-4;
 }
 .form{
     @apply flex flex-col gap-4;

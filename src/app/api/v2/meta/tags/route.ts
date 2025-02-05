@@ -10,11 +10,13 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { ITag } from '@/_shared/types';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { OffChainDbService } from '../../../_api-services/offchain_db_service';
 import { withErrorHandling } from '../../../_api-utils/withErrorHandling';
 
 export const GET = withErrorHandling(async () => {
-	const tags = await OffChainDbService.GetAllTags();
+	const network = await getNetworkFromHeaders();
+	const tags = await OffChainDbService.GetAllTags(network);
 	return NextResponse.json(tags);
 });
 

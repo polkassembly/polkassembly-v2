@@ -26,7 +26,8 @@ import {
 	IUserNotificationSettings,
 	IFollowEntry,
 	IGenericListingResponse,
-	EOffChainPostTopic
+	EOffChainPostTopic,
+	ITag
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -506,7 +507,7 @@ export class OffChainDbService {
 		content: OutputData;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
-		tags?: string[];
+		tags?: ITag[];
 		topic?: EOffChainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
@@ -518,7 +519,7 @@ export class OffChainDbService {
 		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, tags: tags || [], topic, indexOrHash: index.toString() });
 
 		// Create tags
-		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag))) {
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) {
 			await this.CreateTags(tags);
 		}
 
@@ -627,11 +628,11 @@ export class OffChainDbService {
 		return FirestoreService.UnfollowUser({ userId, userIdToFollow });
 	}
 
-	static async GetAllTags() {
-		return FirestoreService.GetAllTags();
+	static async GetAllTags(network: ENetwork) {
+		return FirestoreService.GetAllTags(network);
 	}
 
-	static async CreateTags(tags: string[]) {
+	static async CreateTags(tags: ITag[]) {
 		return FirestoreService.CreateTags(tags);
 	}
 }

@@ -109,9 +109,8 @@ function Web3Login({
 				}
 				setLoading(false);
 			}
-		} catch (error) {
-			console.log('error', error);
-			setLoading(false);
+		} catch {
+			// TODO: show notification
 		}
 	};
 

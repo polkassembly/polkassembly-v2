@@ -512,7 +512,7 @@ export class NextApiClientService {
 	}
 	static async fetchAllTagsApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
-		return this.nextApiClientFetch<ITag[]>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<ITag>>({ url, method });
 	}
 
 	static async createTagsApi(tags: string[]) {
