@@ -8,6 +8,7 @@ import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 
 interface ToggleButtonProps {
 	className?: string;
@@ -15,6 +16,7 @@ interface ToggleButtonProps {
 
 function ThemeToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
+	const t = useTranslations('Header');
 
 	const isDark = resolvedTheme === ETheme.DARK;
 
@@ -32,7 +34,7 @@ function ThemeToggleButton({ className }: ToggleButtonProps) {
 				'border-border_grey',
 				className
 			)}
-			aria-label={`Switch to ${isDark ? ETheme.LIGHT : ETheme.DARK} theme`}
+			aria-label={`${t('switchTo')} ${isDark ? t('lightMode') : t('darkMode')}`}
 		>
 			{isDark ? (
 				<div className='flex items-center gap-2'>
@@ -42,7 +44,7 @@ function ThemeToggleButton({ className }: ToggleButtonProps) {
 						aria-hidden='true'
 					/>
 					<p className='block text-xs text-text_primary md:hidden'>
-						Switch to <span className='font-semibold'>Light Mode</span>
+						{t('switchTo')} <span className='font-semibold'>{t('lightMode')}</span>
 					</p>
 				</div>
 			) : (
@@ -53,7 +55,7 @@ function ThemeToggleButton({ className }: ToggleButtonProps) {
 						aria-hidden='true'
 					/>
 					<p className='block text-xs text-text_primary md:hidden'>
-						Switch to <span className='font-semibold'>Dark Mode</span>
+						{t('switchTo')} <span className='font-semibold'>{t('darkMode')}</span>
 					</p>
 				</div>
 			)}

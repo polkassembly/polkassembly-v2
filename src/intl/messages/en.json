@@ -117,7 +117,7 @@
 		"Activity": {
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
-			"created_tip": "Created Tip", 
+			"created_tip": "Created Tip",
 			"gave_tip": "Gave Tip",
 			"created_bounty": "Created Bounty",
 			"created_child_bounty": "Created Child Bounty",
@@ -528,5 +528,17 @@
 		"showAll": "Show All",
 		"searchByHash": "Search by hash",
 		"preimageNotFound": "Preimage not found"
+	},
+	"Header": {
+		"polkadot": "Polkadot & Parachains",
+		"kusama": "Kusama & Parachains",
+		"soloChains": "Solo Chains",
+		"testChains": "Test Chains",
+		"switchTo": "Switch to",
+		"lightMode": "Light Mode",
+		"darkMode": "Dark Mode",
+		"language": "Language",
+		"node": "Node",
+		"network": "Network"
 	}
 }

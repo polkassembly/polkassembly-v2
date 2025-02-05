@@ -61,6 +61,7 @@ import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image, { StaticImageData } from 'next/image';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
@@ -148,13 +149,6 @@ const networkData: NetworkDataType = {
 	}
 };
 
-const categoryDisplayNames: { [key: string]: string } = {
-	polkadot: 'Polkadot & Parachains',
-	kusama: 'Kusama & Parachains',
-	soloChains: 'Solo Chains',
-	testChains: 'Test Chains'
-};
-
 const getNetworkDisplayName = (networkKey: string): string => {
 	const lowerNetworkKey = networkKey.toLowerCase();
 	return (
@@ -180,7 +174,13 @@ function NetworkDropdown({ className }: { className?: string }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const network = getCurrentNetwork();
 	const searchInputRef = useRef<HTMLInputElement>(null);
-
+	const t = useTranslations('Header');
+	const categoryDisplayNames: { [key: string]: string } = {
+		polkadot: t('polkadot'),
+		kusama: t('kusama'),
+		soloChains: t('soloChains'),
+		testChains: t('testChains')
+	};
 	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
 	};

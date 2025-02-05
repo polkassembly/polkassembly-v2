@@ -167,12 +167,34 @@ function Navbar() {
 				<div className='absolute left-0 top-full z-50 w-full border-t-[3px] border-navbar_border bg-bg_modal p-4 pb-10 shadow-md md:hidden'>
 					<div className='flex flex-col gap-5 pt-10'>
 						<div>
-							<p className='pb-1 text-sm text-text_primary'>Network</p>
+							<p className='pb-1 text-sm text-text_primary'>{t('Header.network')}</p>
 							<NetworkDropdown className='w-full' />
 						</div>
 						<div>
-							<p className='pb-1 text-sm text-text_primary'>Node</p>
+							<p className='pb-1 text-sm text-text_primary'>{t('Header.node')}</p>
 							<RPCSwitchDropdown className='w-full' />
+						</div>
+						<div className='w-full'>
+							<p className='pb-1 text-sm text-text_primary'>{t('Header.language')}</p>
+							<Select
+								value={userPreferences.locale}
+								onValueChange={handleLocaleChange}
+							>
+								<SelectTrigger className='w-full border-border_grey bg-network_dropdown_bg md:w-[180px]'>
+									<SelectValue placeholder='Select Language' />
+								</SelectTrigger>
+								<SelectContent className='border-border_grey'>
+									{Object.entries(LANGUAGES).map(([locale, label]) => (
+										<SelectItem
+											key={locale}
+											value={locale}
+											className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+										>
+											{label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						</div>
 						<ThemeToggleButton className='w-full' />
 						<div>
