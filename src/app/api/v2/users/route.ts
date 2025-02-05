@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { MAX_LISTING_LIMIT, DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { IPublicUser } from '@/_shared/types';
+import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +17,7 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 
 	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
-	const users: IPublicUser[] = await OffChainDbService.GetPublicUsers(page, limit);
+	const usersListing: IGenericListingResponse<IPublicUser> = await OffChainDbService.GetPublicUsers(page, limit);
 
-	return NextResponse.json(users);
+	return NextResponse.json(usersListing);
 });

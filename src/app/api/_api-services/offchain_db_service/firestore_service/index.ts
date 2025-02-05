@@ -22,7 +22,8 @@ import {
 	IContentSummary,
 	IProfileDetails,
 	IUserNotificationSettings,
-	IFollowEntry
+	IFollowEntry,
+	IGenericListingResponse
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -154,7 +155,7 @@ export class FirestoreService extends FirestoreRefs {
 		};
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		const usersQuery = FirestoreRefs.usersCollectionRef()
 			.orderBy('profileScore', 'desc')
 			.limit(limit)
@@ -162,30 +163,35 @@ export class FirestoreService extends FirestoreRefs {
 
 		const usersQuerySnapshot = await usersQuery.get();
 
-		return Promise.all(
-			usersQuerySnapshot.docs.map(async (doc) => {
-				const data = doc.data();
+		const totalUsersCount = (await FirestoreRefs.usersCollectionRef().count().get()).data().count || 0;
 
-				const addresses = await this.GetAddressesForUserId(data.id);
-				const rank =
-					(
-						await FirestoreRefs.usersCollectionRef()
-							.where('profileScore', '>', Number(data.profileScore || 0))
-							.count()
-							.get()
-					).data().count + 1;
+		return {
+			items: await Promise.all(
+				usersQuerySnapshot.docs.map(async (doc) => {
+					const data = doc.data();
 
-				return {
-					id: data.id,
-					username: data.username,
-					profileScore: data.profileScore,
-					addresses: addresses.map((addr: IUserAddress) => addr.address),
-					rank,
-					createdAt: data.createdAt,
-					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
-				} as IPublicUser;
-			})
-		);
+					const addresses = await this.GetAddressesForUserId(data.id);
+					const rank =
+						(
+							await FirestoreRefs.usersCollectionRef()
+								.where('profileScore', '>', Number(data.profileScore || 0))
+								.count()
+								.get()
+						).data().count + 1;
+
+					return {
+						id: data.id,
+						username: data.username,
+						profileScore: data.profileScore,
+						addresses: addresses.map((addr: IUserAddress) => addr.address),
+						rank,
+						createdAt: data.createdAt,
+						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
+					} as IPublicUser;
+				})
+			),
+			totalCount: totalUsersCount
+		};
 	}
 
 	static async GetUserByAddress(address: string): Promise<IUser | null> {

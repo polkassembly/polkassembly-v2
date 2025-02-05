@@ -24,7 +24,8 @@ import {
 	IContentSummary,
 	IProfileDetails,
 	IUserNotificationSettings,
-	IFollowEntry
+	IFollowEntry,
+	IGenericListingResponse
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -87,7 +88,7 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
 

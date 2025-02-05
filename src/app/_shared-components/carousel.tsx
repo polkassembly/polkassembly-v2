@@ -55,13 +55,13 @@ const Carousel = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & Car
 		const [canScrollPrev, setCanScrollPrev] = useState(false);
 		const [canScrollNext, setCanScrollNext] = useState(false);
 
-		const onSelect = useCallback((api: CarouselApi) => {
-			if (!api) {
+		const onSelect = useCallback((carouselApi: CarouselApi) => {
+			if (!carouselApi) {
 				return;
 			}
 
-			setCanScrollPrev(api.canScrollPrev());
-			setCanScrollNext(api.canScrollNext());
+			setCanScrollPrev(carouselApi.canScrollPrev());
+			setCanScrollNext(carouselApi.canScrollNext());
 		}, []);
 
 		const scrollPrev = useCallback(() => {

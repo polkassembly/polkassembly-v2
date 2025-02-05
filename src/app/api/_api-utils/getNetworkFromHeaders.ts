@@ -27,6 +27,8 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 			? (subdomain as ENetwork)
 			: null;
 
+	if (network) return network;
+
 	// check if it is vercel preview link or localhost
 	const isDevelopmentOrPreviewEnv = NEXT_PUBLIC_APP_ENV !== EAppEnv.PRODUCTION;
 
