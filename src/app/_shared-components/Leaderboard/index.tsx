@@ -14,19 +14,22 @@ import UserIcon from '@assets/profile/user-icon.svg';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { IoPersonAdd } from 'react-icons/io5';
+import { MdOutlineSearch } from 'react-icons/md';
+import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
+import { useTranslations } from 'next-intl';
 import styles from './Leaderboard.module.scss';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
-import { MdOutlineSearch } from 'react-icons/md';
 import { Input } from '../Input';
 import { PaginationWithLinks } from '../PaginationWithLinks';
-import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import RankCard from './RankCard';
 
 function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
 	const page = searchParams.get('page') || 1;
 	const router = useRouter();
-	const displayedItems = page == 1 ? data.items.slice(3, 10) : data.items;
+	const displayedItems = page === '1' ? data.items.slice(3, 10) : data.items;
+	const t = useTranslations();
 	return (
 		<div className='bg-page_background'>
 			<div className={styles.Card}>
@@ -46,15 +49,25 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 					</div>
 				</div>
 			</div>
-
-			<div className='mt-10 rounded-lg bg-bg_modal p-6'>
+			<div className='my-5 flex flex-wrap items-center justify-center gap-4 xl:my-10 xl:flex-nowrap'>
+				{data.items.slice(0, 3).map((item, index) => {
+					return (
+						<RankCard
+							key={item.id}
+							item={item}
+							place={index + 1}
+						/>
+					);
+				})}
+			</div>
+			<div className='rounded-lg bg-bg_modal p-6'>
 				<div className='flex items-center justify-between'>
 					<p className='text-xl font-semibold text-text_primary'>Top 50 Ranks</p>
 					<div className='flex items-center gap-2'>
 						<div className='relative'>
 							<Input
 								className={styles.input_container}
-								placeholder={'Enter username to search'}
+								placeholder='Enter username to search'
 							/>
 							<MdOutlineSearch className={styles.input_search} />
 						</div>
@@ -64,11 +77,11 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 					<Table>
 						<TableHeader>
 							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>Rank</TableHead>
-								<TableHead className={styles.tableCell_2}>User</TableHead>
-								<TableHead className={styles.tableCell}>Astrals</TableHead>
-								<TableHead className={styles.tableCell}>User Since</TableHead>
-								<TableHead className={styles.tableCell_last}>Actions</TableHead>
+								<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
+								<TableHead className={styles.tableCell_2}>{t('Profile.username')}</TableHead>
+								<TableHead className={styles.tableCell}>{t('Profile.astrals')}</TableHead>
+								<TableHead className={styles.tableCell}>{t('Profile.userSince')}</TableHead>
+								<TableHead className={styles.tableCell_last}>{t('Profile.actions')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -96,7 +109,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 													width={16}
 													height={16}
 												/>
-												<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
+												<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
 											</span>
 										</TableCell>
 										<TableCell className={styles.tableCell}>
