@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { AIService } from '@/app/api/_api-services/ai_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -63,10 +64,13 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		address
 	});
 
+	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
+
 	// Invalidate caches since comment count changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network });
+	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
 	const response = NextResponse.json(newComment);
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

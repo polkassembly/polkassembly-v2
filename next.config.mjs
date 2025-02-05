@@ -6,7 +6,11 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+	images: {
+		domains: ['i.ibb.co']
+	}
+};
 
 // eslint-disable-next-line import/no-default-export
 export default withNextIntl(nextConfig);

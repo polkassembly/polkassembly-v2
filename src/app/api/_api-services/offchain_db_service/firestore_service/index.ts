@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -17,7 +18,12 @@ import {
 	EReaction,
 	IPostOffChainMetrics,
 	IUserActivity,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IContentSummary,
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry,
+	IGenericListingResponse
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -149,7 +155,7 @@ export class FirestoreService extends FirestoreRefs {
 		};
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		const usersQuery = FirestoreRefs.usersCollectionRef()
 			.orderBy('profileScore', 'desc')
 			.limit(limit)
@@ -157,30 +163,35 @@ export class FirestoreService extends FirestoreRefs {
 
 		const usersQuerySnapshot = await usersQuery.get();
 
-		return Promise.all(
-			usersQuerySnapshot.docs.map(async (doc) => {
-				const data = doc.data();
+		const totalUsersCount = (await FirestoreRefs.usersCollectionRef().count().get()).data().count || 0;
 
-				const addresses = await this.GetAddressesForUserId(data.id);
-				const rank =
-					(
-						await FirestoreRefs.usersCollectionRef()
-							.where('profileScore', '>', Number(data.profileScore || 0))
-							.count()
-							.get()
-					).data().count + 1;
+		return {
+			items: await Promise.all(
+				usersQuerySnapshot.docs.map(async (doc) => {
+					const data = doc.data();
 
-				return {
-					id: data.id,
-					username: data.username,
-					profileScore: data.profileScore,
-					addresses: addresses.map((addr: IUserAddress) => addr.address),
-					rank,
-					createdAt: data.createdAt,
-					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
-				} as IPublicUser;
-			})
-		);
+					const addresses = await this.GetAddressesForUserId(data.id);
+					const rank =
+						(
+							await FirestoreRefs.usersCollectionRef()
+								.where('profileScore', '>', Number(data.profileScore || 0))
+								.count()
+								.get()
+						).data().count + 1;
+
+					return {
+						id: data.id,
+						username: data.username,
+						profileScore: data.profileScore,
+						addresses: addresses.map((addr: IUserAddress) => addr.address),
+						rank,
+						createdAt: data.createdAt,
+						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
+					} as IPublicUser;
+				})
+			),
+			totalCount: totalUsersCount
+		};
 	}
 
 	static async GetUserByAddress(address: string): Promise<IUser | null> {
@@ -565,6 +576,58 @@ export class FirestoreService extends FirestoreRefs {
 		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
+		const contentSummaryQuery = FirestoreRefs.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.limit(1);
+
+		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
+
+		if (contentSummaryQuerySnapshot.empty) {
+			return null;
+		}
+
+		return {
+			...contentSummaryQuerySnapshot.docs[0].data(),
+			createdAt: contentSummaryQuerySnapshot.docs[0].data().createdAt?.toDate() || new Date(),
+			updatedAt: contentSummaryQuerySnapshot.docs[0].data().updatedAt?.toDate() || new Date()
+		} as IContentSummary;
+	}
+
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1);
+		const followingQuerySnapshot = await followingQuery.get();
+		return followingQuerySnapshot.docs.length > 0;
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		const followersQuery = FirestoreRefs.followersCollectionRef().where('followedUserId', '==', userId);
+		const followersQuerySnapshot = await followersQuery.get();
+		return followersQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IFollowEntry;
+		});
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId);
+		const followingQuerySnapshot = await followingQuery.get();
+		return followingQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IFollowEntry;
+		});
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -601,6 +664,133 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
+	}
+
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		let payload: Partial<IUser> = {};
+
+		const profileDetails: IProfileDetails = {
+			...(newProfileDetails?.badges?.length ? { badges: newProfileDetails.badges } : {}),
+			...(newProfileDetails?.bio ? { bio: newProfileDetails.bio } : {}),
+			...(newProfileDetails?.coverImage ? { coverImage: newProfileDetails.coverImage } : {}),
+			...(newProfileDetails?.image ? { image: newProfileDetails.image } : {}),
+			...(newProfileDetails?.title ? { title: newProfileDetails.title } : {}),
+			...(newProfileDetails?.publicSocialLinks?.length ? { publicSocialLinks: newProfileDetails.publicSocialLinks } : {})
+		};
+
+		if (Object.keys(profileDetails).length) {
+			payload = { ...payload, profileDetails };
+		}
+
+		if (Object.keys(notificationPreferences?.channelPreferences || {}).length || Object.keys(notificationPreferences?.triggerPreferences || {}).length) {
+			payload = { ...payload, notificationPreferences };
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
+	}
+
+	static async UpdateUserEmail(userId: number, email: string) {
+		// check if email is already in use
+		const user = await this.GetUserByEmail(email);
+		if (user) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Email already in use');
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ email, isEmailVerified: false }, { merge: true });
+	}
+
+	static async UpdateUserUsername(userId: number, username: string) {
+		// check if username is already in use
+		const user = await this.GetUserByUsername(username);
+		if (user) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Username already in use');
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ username }, { merge: true });
+	}
+
+	// Helper function to process documents in batches
+	private static async processBatch({
+		querySnapshot,
+		batchOperation,
+		batchSize = 400 // limit is 500
+	}: {
+		querySnapshot: QuerySnapshot;
+		batchOperation: (batch: WriteBatch, doc: QueryDocumentSnapshot) => void;
+		batchSize?: number;
+	}) {
+		const batches: WriteBatch[] = [];
+		let currentBatch = FirestoreRefs.firestoreDb.batch();
+		let operationCount = 0;
+
+		querySnapshot.docs.forEach((doc) => {
+			if (operationCount === batchSize) {
+				batches.push(currentBatch);
+				currentBatch = FirestoreRefs.firestoreDb.batch();
+				operationCount = 0;
+			}
+			batchOperation(currentBatch, doc);
+			operationCount += 1;
+		});
+
+		if (operationCount > 0) {
+			batches.push(currentBatch);
+		}
+
+		// Execute all batches
+		await Promise.all(batches.map((batch) => batch.commit()));
+	}
+
+	static async DeleteUser(userId: number) {
+		// Delete user document
+		const userBatch = FirestoreRefs.firestoreDb.batch();
+		userBatch.delete(FirestoreRefs.usersCollectionRef().doc(userId.toString()));
+		await userBatch.commit();
+
+		// Fetch and delete all related collections
+		const collections = [
+			{
+				query: FirestoreRefs.addressesCollectionRef().where('userId', '==', userId),
+				name: 'addresses'
+			},
+			{
+				query: FirestoreRefs.userActivityCollectionRef().where('userId', '==', userId),
+				name: 'user activities'
+			},
+			{
+				query: FirestoreRefs.commentsCollectionRef().where('userId', '==', userId),
+				name: 'comments'
+			},
+			{
+				query: FirestoreRefs.reactionsCollectionRef().where('userId', '==', userId),
+				name: 'reactions'
+			},
+			{
+				query: FirestoreRefs.notificationsCollectionRef().where('userId', '==', userId),
+				name: 'notifications'
+			}
+		];
+
+		await Promise.all(
+			collections.map(async (collection) => {
+				const querySnapshot = await collection.query.get();
+				if (!querySnapshot.empty) {
+					console.log(`Deleting ${querySnapshot.size} ${collection.name} documents`);
+					await this.processBatch({
+						querySnapshot,
+						batchOperation: (batch, doc) => batch.delete(doc.ref)
+					});
+				}
+			})
+		);
 	}
 
 	static async AddNewComment({
@@ -646,10 +836,18 @@ export class FirestoreService extends FirestoreRefs {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
+	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
-		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ content, htmlContent: html, markdownContent: markdown, updatedAt: new Date() }, { merge: true });
+		const newCommentData: Partial<IComment> = {
+			content,
+			htmlContent: html,
+			markdownContent: markdown,
+			...(isSpam && { isSpam }),
+			updatedAt: new Date()
+		};
+
+		await FirestoreRefs.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -800,6 +998,35 @@ export class FirestoreService extends FirestoreRefs {
 
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ lastCommentAt }, { merge: true });
+		}
+	}
+
+	static async UpdateContentSummary(contentSummary: IContentSummary) {
+		const contentSummaryId = contentSummary.id || FirestoreRefs.contentSummariesCollectionRef().doc().id;
+		await FirestoreRefs.contentSummariesCollectionRef()
+			.doc(contentSummaryId)
+			.set({ ...contentSummary, id: contentSummaryId }, { merge: true });
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		const newFollowEntryId = FirestoreRefs.followersCollectionRef().doc().id;
+
+		const followEntry: IFollowEntry = {
+			id: newFollowEntryId,
+			createdAt: new Date(),
+			followerUserId: userId,
+			followedUserId: userIdToFollow,
+			updatedAt: new Date()
+		};
+
+		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
+	}
+
+	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1).get();
+
+		if (followEntry.docs.length) {
+			await followEntry.docs[0].ref.delete();
 		}
 	}
 }

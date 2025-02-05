@@ -1,0 +1,43 @@
+.accountsWrapper {
+    @apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal py-4
+}
+
+.accountsHeader {
+    @apply flex items-center gap-x-2 px-6 text-text_primary
+}
+
+.accountsHeaderText {
+    @apply text-2xl font-semibold
+}
+
+.accountsList {
+    @apply flex flex-col gap-y-4 px-6
+}
+
+.settingsContent {
+    @apply flex flex-col gap-y-4 px-6 pb-12
+}
+
+.settingsCollapsible {
+    @apply rounded-2xl border border-border_grey
+}
+
+.collapsibleTrigger {
+    @apply flex items-center justify-between p-6
+}
+
+.collapsibleTriggerText {
+    @apply flex items-center gap-x-2 font-semibold text-text_primary
+}
+
+.collapsibleTriggerIcon {
+    @apply text-lg font-semibold text-text_primary
+}
+
+.collapsibleContent {
+    @apply flex flex-col gap-y-6 p-6
+}
+
+.collapsibleContentItem {
+    @apply flex items-center justify-between
+}

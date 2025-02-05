@@ -20,7 +20,12 @@ import {
 	EActivityName,
 	EActivityCategory,
 	IActivityMetadata,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IContentSummary,
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry,
+	IGenericListingResponse
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -83,7 +88,7 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
 
@@ -239,6 +244,22 @@ export class OffChainDbService {
 		return FirestoreService.GetUserReactionForPost({ network, indexOrHash, proposalType, userId });
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
+		return FirestoreService.GetContentSummary({ network, indexOrHash, proposalType });
+	}
+
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		return FirestoreService.IsUserFollowing({ userId, userIdToFollow });
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowers(userId);
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowing(userId);
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -332,6 +353,38 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		return FirestoreService.UpdateUserProfile({ userId, newProfileDetails, notificationPreferences });
+	}
+
+	static async DeleteUser(userId: number) {
+		return FirestoreService.DeleteUser(userId);
+	}
+
+	static async UpdateUserEmail(userId: number, email: string) {
+		if (!ValidatorService.isValidUserId(userId) || !ValidatorService.isValidEmail(email)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or email');
+		}
+
+		return FirestoreService.UpdateUserEmail(userId, email);
+	}
+
+	static async UpdateUserUsername(userId: number, username: string) {
+		if (!ValidatorService.isValidUserId(userId) || !ValidatorService.isValidUsername(username)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or username');
+		}
+
+		return FirestoreService.UpdateUserUsername(userId, username);
+	}
+
 	static async AddNewComment({
 		network,
 		indexOrHash,
@@ -372,8 +425,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
-		return FirestoreService.UpdateComment({ commentId, content });
+	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -458,6 +511,9 @@ export class OffChainDbService {
 		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
 
 		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
+
+		// create content summary
+		// await AIService.createPostSummary({ network, proposalType, indexOrHash: post.indexOrHash });
 
 		await this.saveUserActivity({
 			userId,
@@ -547,5 +603,17 @@ export class OffChainDbService {
 
 	static async UpdateUserPassword(userId: number, password: string, salt: string) {
 		return FirestoreService.UpdateUserPassword(userId, password, salt);
+	}
+
+	static async UpdateContentSummary(contentSummary: IContentSummary) {
+		return FirestoreService.UpdateContentSummary(contentSummary);
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		return FirestoreService.FollowUser({ userId, userIdToFollow });
+	}
+
+	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		return FirestoreService.UnfollowUser({ userId, userIdToFollow });
 	}
 }

@@ -25,7 +25,7 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 
 	const userBadges = {} as Record<EUserBadge, IUserBadgeDetails>;
 
-	userProfile.profileDetails.achievementBadges.forEach((badge) => {
+	userProfile.profileDetails.achievementBadges?.forEach((badge) => {
 		userBadges[badge.name] = badge;
 	});
 
@@ -47,12 +47,12 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 								height={24}
 							/>
 							<span className='text-xl font-semibold'>{t('Profile.badges')}</span>
-							<span className='text-sm'>({Object.keys(achievementBadges).length})</span>
+							<span className='text-sm'>({Object.keys(achievementBadges || []).length})</span>
 						</p>
 						<p className='text-sm'>{t('Profile.badgesDescription')}</p>
 					</div>
 					<div className={classes.badgesCardContent}>
-						{Object.keys(achievementBadges).map((badge) => {
+						{Object.keys(achievementBadges || []).map((badge) => {
 							const badgeDetails = achievementBadges[`${badge}` as EUserBadge];
 							return (
 								<div
@@ -63,7 +63,7 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 										<Image
 											src={badgeDetails.image}
 											alt={badgeDetails.name}
-											className={cn(!userBadges[badgeDetails.name] && 'grayscale-[85%]')}
+											className={cn(!userBadges[badgeDetails.name] && 'grayscale')}
 										/>
 									</div>
 									<p className={classes.badgesCardContentItemTitle}>{badgeDetails.displayName}</p>

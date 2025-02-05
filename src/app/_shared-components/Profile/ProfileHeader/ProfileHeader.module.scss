@@ -1,9 +1,9 @@
 .profileHeaderWrapper {
-    @apply mb-2 flex items-start gap-x-4
+    @apply mb-4 flex items-start gap-x-6
 }
 
 .profileHeaderInner {
-    @apply flex w-full justify-between
+    @apply flex justify-between
 }
 
 .profileHeaderButtons {
@@ -19,7 +19,7 @@
 }
 
 .profileHeaderText {
-    @apply flex flex-col gap-y-2
+    @apply flex flex-col gap-y-4
 }
 
 .profileHeaderTextTitle {
