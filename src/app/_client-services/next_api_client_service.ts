@@ -25,12 +25,19 @@ import {
 	IVoteData,
 	IUserActivity,
 	IPreimage,
-	IQRSessionPayload
+	IQRSessionPayload,
+	ESocial,
+	IFollowEntry,
+	ITag,
+	EAllowedCommentor,
+	EOffChainPostTopic
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
@@ -64,7 +71,16 @@ enum EApiRoute {
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
-	LINK_ADDRESS = 'LINK_ADDRESS'
+	LINK_ADDRESS = 'LINK_ADDRESS',
+	EDIT_USER_PROFILE = 'EDIT_USER_PROFILE',
+	DELETE_ACCOUNT = 'DELETE_ACCOUNT',
+	FOLLOW_USER = 'FOLLOW_USER',
+	UNFOLLOW_USER = 'UNFOLLOW_USER',
+	GET_FOLLOWING = 'GET_FOLLOWING',
+	GET_FOLLOWERS = 'GET_FOLLOWERS',
+	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
+	CREATE_TAGS = 'CREATE_TAGS',
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
 }
 
 export class NextApiClientService {
@@ -135,6 +151,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
+			case EApiRoute.CREATE_OFFCHAIN_POST:
+				method = 'POST';
+				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
@@ -147,6 +166,25 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
+				path = '/users/id';
+				break;
+			case EApiRoute.EDIT_USER_PROFILE:
+				path = '/users/id';
+				method = 'PATCH';
+				break;
+			case EApiRoute.DELETE_ACCOUNT:
+			case EApiRoute.UNFOLLOW_USER:
+				path = '/users/id';
+				method = 'DELETE';
+				break;
+			case EApiRoute.FOLLOW_USER:
+				path = '/users/id';
+				method = 'POST';
+				break;
+			case EApiRoute.GET_FOLLOWING:
+				path = '/users/id';
+				break;
+			case EApiRoute.GET_FOLLOWERS:
 				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
@@ -165,6 +203,14 @@ export class NextApiClientService {
 			case EApiRoute.CLAIM_QR_SESSION:
 				path = '/auth/qr-session';
 				method = 'POST';
+				break;
+			case EApiRoute.FETCH_ALL_TAGS:
+				method = 'GET';
+				path = '/meta/tags';
+				break;
+			case EApiRoute.CREATE_TAGS:
+				method = 'POST';
+				path = '/meta/tags';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -375,7 +421,7 @@ export class NextApiClientService {
 	}
 
 	// user data
-	protected static async fetchPublicUserByIdApi({ userId }: { userId: number | string }) {
+	protected static async fetchPublicUserByIdApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ID, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
@@ -390,9 +436,59 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPublicUser>({ url, method });
 	}
 
-	protected static async fetchUserActivityApi({ userId }: { userId: number | string }) {
+	protected static async fetchUserActivityApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_ACTIVITY, routeSegments: [userId.toString(), 'activities'] });
 		return this.nextApiClientFetch<IUserActivity[]>({ url, method });
+	}
+
+	protected static async editUserProfileApi({
+		userId,
+		bio,
+		badges,
+		title,
+		image,
+		coverImage,
+		publicSocialLinks,
+		email,
+		username
+	}: {
+		userId: number;
+		bio?: string;
+		badges?: string[];
+		title?: string;
+		image?: string;
+		coverImage?: string;
+		publicSocialLinks?: { platform: ESocial; url: string }[];
+		email?: string;
+		username?: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_USER_PROFILE, routeSegments: [userId.toString()] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { bio, badges, title, image, coverImage, publicSocialLinks, email, username } });
+	}
+
+	protected static async deleteAccountApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_ACCOUNT, routeSegments: [userId.toString()] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async followUserApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FOLLOW_USER, routeSegments: [userId.toString(), 'followers'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async unfollowUserApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UNFOLLOW_USER, routeSegments: [userId.toString(), 'followers'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async getFollowingApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_FOLLOWING, routeSegments: [userId.toString(), 'following'] });
+		return this.nextApiClientFetch<{ following: IFollowEntry[] }>({ url, method });
+	}
+
+	protected static async getFollowersApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_FOLLOWERS, routeSegments: [userId.toString(), 'followers'] });
+		return this.nextApiClientFetch<{ followers: IFollowEntry[] }>({ url, method });
 	}
 
 	static async fetchPreimagesApi({ page }: { page: number }) {
@@ -413,5 +509,39 @@ export class NextApiClientService {
 	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
+	}
+	static async fetchAllTagsApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
+		return this.nextApiClientFetch<IGenericListingResponse<ITag>>({ url, method });
+	}
+
+	static async createTagsApi(tags: string[]) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_TAGS });
+		if (!tags.length || tags.some((tag) => !ValidatorService.isValidTag(tag))) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
+	}
+
+	static async createOffChainPostApi({
+		proposalType,
+		allowedCommentor,
+		content,
+		title,
+		tags,
+		topic
+	}: {
+		proposalType: EProposalType;
+		content: OutputData;
+		title: string;
+		allowedCommentor: EAllowedCommentor;
+		tags?: ITag[];
+		topic?: EOffChainPostTopic;
+	}) {
+		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
+		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
 	}
 }

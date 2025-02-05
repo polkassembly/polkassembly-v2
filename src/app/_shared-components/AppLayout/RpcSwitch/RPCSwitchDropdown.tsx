@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { useState } from 'react';
 import { MdOutlineSignalCellularAlt } from 'react-icons/md';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -10,7 +12,6 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ENetwork } from '@/_shared/types';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
 export default function RPCSwitchDropdown({ className }: { className?: string }) {
@@ -23,7 +24,7 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 		return null;
 	}
 
-	const { rpcEndpoints } = NETWORKS_DETAILS[network as ENetwork];
+	const { rpcEndpoints } = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
 	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	const handleRpcSwitch = async (index: number) => {
@@ -40,16 +41,20 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 	};
 
 	return (
-		<div className={cn(className)}>
+		<div>
 			<DropdownMenu>
-				<DropdownMenuTrigger disabled={isLoading}>
+				<DropdownMenuTrigger
+					className={cn(className, 'w-full bg-network_dropdown_bg')}
+					disabled={isLoading}
+				>
 					<div className='cursor-pointer'>
-						<div className='relative rounded-md border-[1px] border-border_grey p-1.5'>
+						<div className='relative flex items-center gap-3 rounded-md border-[1px] border-border_grey p-1.5'>
 							{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
+							<span className='block text-xs font-semibold text-text_primary md:hidden'>{currentEndpoint.name}</span>
 						</div>
 					</div>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className='border-border_grey'>
+				<DropdownMenuContent className='w-96 border-border_grey sm:w-60'>
 					{rpcEndpoints.map((endpoint, index) => (
 						<DropdownMenuItem
 							key={endpoint?.url}

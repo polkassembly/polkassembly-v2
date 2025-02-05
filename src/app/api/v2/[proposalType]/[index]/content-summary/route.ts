@@ -7,9 +7,11 @@ import { EProposalType } from '@/_shared/types';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { SubsquareOffChainService } from '@/app/api/_api-services/offchain_db_service/subsquare_offchain_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { deepParseJson } from 'deep-parse-json';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -23,6 +25,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
+
+	// Try to get from cache first
+	const cachedData = await RedisService.GetContentSummary({ network, indexOrHash: index, proposalType });
+	if (cachedData) {
+		return NextResponse.json(deepParseJson(cachedData));
+	}
 
 	let contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType });
 
@@ -48,6 +56,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	if (!contentSummary) {
 		throw new APIError(ERROR_CODES.CONTENT_SUMMARY_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
 	}
+
+	// Cache the response
+	await RedisService.SetContentSummary({ network, indexOrHash: index, proposalType, data: JSON.stringify(contentSummary) });
 
 	return NextResponse.json(contentSummary);
 });

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { RefObject, useMemo, useRef, useState } from 'react';
+import React, { RefObject, useMemo, useRef, useState } from 'react';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
@@ -25,6 +25,7 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
+import { canVote } from '@/_shared/_utils/canVote';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -69,14 +70,29 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
+	const handleContainerClick = (e: React.MouseEvent) => {
+		if (!(e.target instanceof Element)) return;
+
+		const isExcludedSection =
+			e.target.closest(`.${styles.castVoteButton}`) || e.target.closest('[data-reaction-handler="true"]') || e.target.closest('[data-comment-input="true"]');
+
+		if (!isExcludedSection) {
+			router.push(`/referenda/${postData.index}`);
+		}
+	};
+
 	return (
-		<div className={styles.container}>
+		<div
+			aria-hidden='true'
+			onClick={handleContainerClick}
+			className={styles.container}
+		>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
-				<div className='flex items-center space-x-2 text-wallet_btn_text'>
+				<div className='flex items-center text-wallet_btn_text'>
 					<span className='text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
-							<div className={`${styles.beneficiaryContainer} text-xl font-semibold text-wallet_btn_text`}>
+							<div className={`${styles.beneficiaryContainer} mr-2 text-xl font-semibold text-wallet_btn_text`}>
 								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network))
 									.map(([assetId, amount]) =>
 										formatBnBalance(
@@ -90,12 +106,15 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 							</div>
 						)}
 					</span>
-					<StatusTag status={postData.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_') || ''} />
+					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				<VoteButton
-					postIndex={postData?.index?.toString() || ''}
-					isLoggedIn={!!user?.id}
-				/>
+
+				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					<VoteButton
+						postIndex={postData?.index?.toString() || ''}
+						isLoggedIn={!!user?.id}
+					/>
+				)}
 			</div>
 
 			{/* Post Info Section */}
@@ -167,19 +186,25 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<ReactionHandler
-				postData={postData}
-				setIsDialogOpen={setIsDialogOpen}
-				reactionState={reactionState}
-				showLikeGif={showLikeGif}
-				showDislikeGif={showDislikeGif}
-				handleReaction={handleReaction}
-			/>
+			<div
+				aria-hidden='true'
+				onClick={(e) => e.stopPropagation()}
+				data-comment-input='true'
+			>
+				<ReactionHandler
+					postData={postData}
+					setIsDialogOpen={setIsDialogOpen}
+					reactionState={reactionState}
+					showLikeGif={showLikeGif}
+					showDislikeGif={showDislikeGif}
+					handleReaction={handleReaction}
+				/>
 
-			<CommentInput
-				inputRef={inputRef as RefObject<HTMLInputElement>}
-				onClick={handleCommentClick}
-			/>
+				<CommentInput
+					inputRef={inputRef as RefObject<HTMLInputElement>}
+					onClick={handleCommentClick}
+				/>
+			</div>
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}

@@ -590,4 +590,16 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_ACTIVE_VOTED_PROPOSALS_COUNT = `
+		query GetActiveVotedProposalsCount($status_in: [ProposalStatus!]!, $voter_in: [String!]!) {
+			votedProposalsCount: convictionVotesConnection(orderBy: id_ASC, where: {proposal: {status_in: $status_in}, voter_in: $voter_in}) {
+				totalCount
+			}
+
+			activeProposalsCount: proposalsConnection(orderBy: id_ASC, where: {status_in: $status_in}) {
+				totalCount
+			}
+		}
+	`;
 }

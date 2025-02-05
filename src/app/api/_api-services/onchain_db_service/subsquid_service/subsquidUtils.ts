@@ -6,7 +6,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { VOTING_PROPOSAL_STATUSES } from '@/_shared/_constants/votingProposalStatuses';
+import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ENetwork, EPostOrigin, EProposalStatus, IBeneficiary } from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
@@ -124,7 +124,7 @@ export class SubsquidUtils extends SubsquidQueries {
 			}
 
 			// Calculate decision period end
-			const decidingStatus = statusHistory.find((status) => VOTING_PROPOSAL_STATUSES.includes(status.status));
+			const decidingStatus = statusHistory.find((status) => DECIDING_PROPOSAL_STATUSES.includes(status.status));
 			if (decidingStatus?.timestamp && trackData.decisionPeriod) {
 				const decisionPeriodMs = Number(trackData.decisionPeriod) * blockTime;
 				result.decisionPeriodEnd = dayjs(decidingStatus.timestamp).add(decisionPeriodMs, 'millisecond').toDate();

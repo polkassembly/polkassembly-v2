@@ -22,7 +22,12 @@ import {
 	IActivityMetadata,
 	EAllowedCommentor,
 	IContentSummary,
-	IProfileDetails
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry,
+	IGenericListingResponse,
+	EOffChainPostTopic,
+	ITag
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -85,7 +90,7 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
 
@@ -245,6 +250,18 @@ export class OffChainDbService {
 		return FirestoreService.GetContentSummary({ network, indexOrHash, proposalType });
 	}
 
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		return FirestoreService.IsUserFollowing({ userId, userIdToFollow });
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowers(userId);
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowing(userId);
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -338,8 +355,16 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
-	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
-		return FirestoreService.UpdateUserProfile(userId, newProfileDetails);
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		return FirestoreService.UpdateUserProfile({ userId, newProfileDetails, notificationPreferences });
 	}
 
 	static async DeleteUser(userId: number) {
@@ -472,7 +497,9 @@ export class OffChainDbService {
 		userId,
 		content,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -480,6 +507,8 @@ export class OffChainDbService {
 		content: OutputData;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: ITag[];
+		topic?: EOffChainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -487,7 +516,12 @@ export class OffChainDbService {
 
 		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, tags: tags || [], topic, indexOrHash: index.toString() });
+
+		// Create tags
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) {
+			await this.CreateTags(tags);
+		}
 
 		// create content summary
 		// await AIService.createPostSummary({ network, proposalType, indexOrHash: post.indexOrHash });
@@ -584,5 +618,35 @@ export class OffChainDbService {
 
 	static async UpdateContentSummary(contentSummary: IContentSummary) {
 		return FirestoreService.UpdateContentSummary(contentSummary);
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		await FirestoreService.FollowUser({ userId, userIdToFollow });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.FOLLOWED_USER,
+			metadata: {
+				userId: userIdToFollow
+			}
+		});
+	}
+
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		await FirestoreService.UnfollowUser({ userId, userIdToUnfollow });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.UNFOLLOWED_USER,
+			metadata: { userId: userIdToUnfollow }
+		});
+	}
+
+	static async GetAllTags(network: ENetwork) {
+		return FirestoreService.GetAllTags(network);
+	}
+
+	static async CreateTags(tags: ITag[]) {
+		return FirestoreService.CreateTags(tags);
 	}
 }

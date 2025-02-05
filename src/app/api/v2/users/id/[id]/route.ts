@@ -4,7 +4,7 @@
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ECookieNames, ESocial } from '@/_shared/types';
+import { ECookieNames, ESocial, ENotificationChannel } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -15,8 +15,79 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const zodParamsSchema = z.object({
-	id: z.coerce.number()
+	id: z.coerce.number().refine((val) => ValidatorService.isValidUserId(val), 'Invalid user ID')
 });
+
+const socialLinkSchema = z
+	.object({
+		platform: z.nativeEnum(ESocial),
+		url: z.string()
+	})
+	.superRefine((data, ctx) => {
+		if (data.platform === ESocial.EMAIL) {
+			if (!z.string().email().safeParse(data.url).success) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Invalid email for platform EMAIL'
+				});
+			}
+		} else if (!z.string().url().safeParse(data.url).success) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'Invalid URL for platform'
+			});
+		}
+	});
+
+const zodEditSchema = z
+	.object({
+		publicSocialLinks: z.array(socialLinkSchema).optional(),
+		email: z.string().email().optional(),
+		username: z
+			.string()
+			.refine((val) => ValidatorService.isValidUsername(val), {
+				message: 'Invalid username'
+			})
+			.optional(),
+		bio: z.string().min(3).optional(),
+		badges: z.array(z.string().min(1)).min(1).optional(),
+		title: z.string().min(1).optional(),
+		image: z.string().url().optional(),
+		coverImage: z.string().url().optional(),
+		notificationPreferences: z
+			.object({
+				channelPreferences: z.record(
+					z.object({
+						name: z.nativeEnum(ENotificationChannel),
+						enabled: z.boolean(),
+						handle: z.string(),
+						verified: z.boolean(),
+						verification_token: z.string().optional()
+					})
+				),
+				triggerPreferences: z.record(
+					z.record(
+						z.object({
+							name: z.string(),
+							enabled: z.boolean()
+						})
+					)
+				)
+			})
+			.optional()
+	})
+	.refine(
+		(data) =>
+			Object.values(data).some((value) => {
+				if (Array.isArray(value)) {
+					return value.length > 0;
+				}
+				return value !== undefined && value !== '';
+			}),
+		{
+			message: 'At least one valid field must be provided'
+		}
+	);
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
@@ -36,45 +107,21 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
-	const zodBodySchema = z
-		.object({
-			email: z.string().email().optional(),
-			username: z
-				.string()
-				.refine((val) => ValidatorService.isValidUsername(val), {
-					message: 'Invalid username'
-				})
-				.optional(),
-			bio: z.string().min(3).optional(),
-			badges: z.array(z.string().min(1)).min(1).optional(),
-			title: z.string().min(1).optional(),
-			image: z.string().url().optional(),
-			coverImage: z.string().url().optional(),
-			publicSocialLinks: z
-				.array(
-					z.object({
-						platform: z.nativeEnum(ESocial),
-						url: z.string().url()
-					})
-				)
-				.optional()
-		})
-		.refine(
-			(data) =>
-				Object.values(data).some((value) => {
-					if (Array.isArray(value)) {
-						return value.length > 0;
-					}
-					return value !== undefined && value !== '';
-				}),
-			{
-				message: 'At least one valid field must be provided'
-			}
-		);
+	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username, notificationPreferences } = zodEditSchema.parse(await getReqBody(req));
 
-	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username } = zodBodySchema.parse(await getReqBody(req));
-
-	await OffChainDbService.UpdateUserProfile(id, { bio, badges, title, image, coverImage, ...(publicSocialLinks?.length ? { publicSocialLinks } : {}) });
+	// Update profile details
+	await OffChainDbService.UpdateUserProfile({
+		userId: id,
+		newProfileDetails: {
+			bio,
+			badges,
+			title,
+			image,
+			coverImage,
+			...(publicSocialLinks?.length ? { publicSocialLinks } : {})
+		},
+		notificationPreferences
+	});
 
 	if (email) {
 		const result = await AuthService.UpdateUserEmail({ accessToken: newAccessToken, email });

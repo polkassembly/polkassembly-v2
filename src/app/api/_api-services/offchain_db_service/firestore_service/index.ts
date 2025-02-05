@@ -20,7 +20,12 @@ import {
 	IUserActivity,
 	EAllowedCommentor,
 	IContentSummary,
-	IProfileDetails
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry,
+	IGenericListingResponse,
+	EOffChainPostTopic,
+	ITag
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -152,7 +157,7 @@ export class FirestoreService extends FirestoreRefs {
 		};
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		const usersQuery = FirestoreRefs.usersCollectionRef()
 			.orderBy('profileScore', 'desc')
 			.limit(limit)
@@ -160,30 +165,35 @@ export class FirestoreService extends FirestoreRefs {
 
 		const usersQuerySnapshot = await usersQuery.get();
 
-		return Promise.all(
-			usersQuerySnapshot.docs.map(async (doc) => {
-				const data = doc.data();
+		const totalUsersCount = (await FirestoreRefs.usersCollectionRef().count().get()).data().count || 0;
 
-				const addresses = await this.GetAddressesForUserId(data.id);
-				const rank =
-					(
-						await FirestoreRefs.usersCollectionRef()
-							.where('profileScore', '>', Number(data.profileScore || 0))
-							.count()
-							.get()
-					).data().count + 1;
+		return {
+			items: await Promise.all(
+				usersQuerySnapshot.docs.map(async (doc) => {
+					const data = doc.data();
 
-				return {
-					id: data.id,
-					username: data.username,
-					profileScore: data.profileScore,
-					addresses: addresses.map((addr: IUserAddress) => addr.address),
-					rank,
-					createdAt: data.createdAt,
-					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
-				} as IPublicUser;
-			})
-		);
+					const addresses = await this.GetAddressesForUserId(data.id);
+					const rank =
+						(
+							await FirestoreRefs.usersCollectionRef()
+								.where('profileScore', '>', Number(data.profileScore || 0))
+								.count()
+								.get()
+						).data().count + 1;
+
+					return {
+						id: data.id,
+						username: data.username,
+						profileScore: data.profileScore,
+						addresses: addresses.map((addr: IUserAddress) => addr.address),
+						rank,
+						createdAt: data.createdAt?.toDate?.(),
+						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
+					} as IPublicUser;
+				})
+			),
+			totalCount: totalUsersCount
+		};
 	}
 
 	static async GetUserByAddress(address: string): Promise<IUser | null> {
@@ -588,6 +598,38 @@ export class FirestoreService extends FirestoreRefs {
 		} as IContentSummary;
 	}
 
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1);
+		const followingQuerySnapshot = await followingQuery.get();
+		return followingQuerySnapshot.docs.length > 0;
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		const followersQuery = FirestoreRefs.followersCollectionRef().where('followedUserId', '==', userId);
+		const followersQuerySnapshot = await followersQuery.get();
+		return followersQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IFollowEntry;
+		});
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId);
+		const followingQuerySnapshot = await followingQuery.get();
+		return followingQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IFollowEntry;
+		});
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -626,8 +668,35 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
 	}
 
-	static async UpdateUserProfile(userId: number, newProfileDetails: IProfileDetails) {
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ profileDetails: newProfileDetails }, { merge: true });
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		let payload: Partial<IUser> = {};
+
+		const profileDetails: IProfileDetails = {
+			...(newProfileDetails?.badges?.length ? { badges: newProfileDetails.badges } : {}),
+			...(newProfileDetails?.bio ? { bio: newProfileDetails.bio } : {}),
+			...(newProfileDetails?.coverImage ? { coverImage: newProfileDetails.coverImage } : {}),
+			...(newProfileDetails?.image ? { image: newProfileDetails.image } : {}),
+			...(newProfileDetails?.title ? { title: newProfileDetails.title } : {}),
+			...(newProfileDetails?.publicSocialLinks?.length ? { publicSocialLinks: newProfileDetails.publicSocialLinks } : {})
+		};
+
+		if (Object.keys(profileDetails).length) {
+			payload = { ...payload, profileDetails };
+		}
+
+		if (Object.keys(notificationPreferences?.channelPreferences || {}).length || Object.keys(notificationPreferences?.triggerPreferences || {}).length) {
+			payload = { ...payload, notificationPreferences };
+		}
+
+		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
 	}
 
 	static async UpdateUserEmail(userId: number, email: string) {
@@ -822,7 +891,7 @@ export class FirestoreService extends FirestoreRefs {
 				proposalType,
 				userId,
 				reaction,
-				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt.toDate() : new Date(),
+				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt?.toDate() : new Date(),
 				updatedAt: new Date()
 			},
 			{ merge: true }
@@ -851,7 +920,9 @@ export class FirestoreService extends FirestoreRefs {
 		content,
 		indexOrHash,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -860,9 +931,10 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash?: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: ITag[];
+		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
-
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
@@ -882,13 +954,14 @@ export class FirestoreService extends FirestoreRefs {
 			allowedCommentor,
 			isDeleted: false
 		};
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
+		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
 
 		if (proposalType === EProposalType.TIP) {
 			newPost.hash = indexOrHash;
 		} else {
 			newPost.index = Number(newIndex);
 		}
-
 		await FirestoreRefs.getPostDocRefById(newPostId).set(newPost, { merge: true });
 
 		return { id: newPostId, indexOrHash: String(newIndex) };
@@ -939,5 +1012,55 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.contentSummariesCollectionRef()
 			.doc(contentSummaryId)
 			.set({ ...contentSummary, id: contentSummaryId }, { merge: true });
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		const newFollowEntryId = FirestoreRefs.followersCollectionRef().doc().id;
+
+		const followEntry: IFollowEntry = {
+			id: newFollowEntryId,
+			createdAt: new Date(),
+			followerUserId: userId,
+			followedUserId: userIdToFollow,
+			updatedAt: new Date()
+		};
+
+		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
+	}
+
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToUnfollow).limit(1).get();
+
+		if (followEntry.docs.length) {
+			await followEntry.docs[0].ref.delete();
+		}
+	}
+
+	static async GetAllTags(network: ENetwork): Promise<IGenericListingResponse<ITag>> {
+		const tags = await FirestoreRefs.tagsCollectionRef().where('network', '==', network).get();
+		return {
+			items: tags.docs
+				.filter((doc) => doc.data().value)
+				.map((doc) => {
+					const data = doc.data();
+					return {
+						lastUsedAt: data.lastUsedAt?.toDate?.() || new Date(),
+						value: data.value,
+						network: data.network
+					} as ITag;
+				}),
+			totalCount: tags.size
+		};
+	}
+
+	static async CreateTags(tags: ITag[]) {
+		const batch = this.firestoreDb.batch();
+
+		tags?.forEach((tag) => {
+			const docId = `${tag.value}_${tag.network}`;
+			batch.set(FirestoreRefs.tagsCollectionRef().doc(docId), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
+		});
+
+		await batch.commit();
 	}
 }

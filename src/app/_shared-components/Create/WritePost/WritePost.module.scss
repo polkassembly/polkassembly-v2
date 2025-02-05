@@ -1,0 +1,18 @@
+.container{
+    @apply relative flex flex-col gap-4;
+}
+.form{
+    @apply flex flex-col gap-4;
+}
+.radioGroup{
+    @apply flex gap-2;
+}
+.radioGroupItem{
+    @apply text-allowed_commentor_text text-sm;
+}
+.titleInput {
+ @apply text-input_text;
+}
+.editor{
+    @apply text-sm;
+}

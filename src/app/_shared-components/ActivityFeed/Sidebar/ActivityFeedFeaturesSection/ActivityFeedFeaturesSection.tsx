@@ -11,7 +11,7 @@ import delegationDashboard from '@assets/activityfeed/features/features1.svg';
 import batchVoting from '@assets/activityfeed/features/features2.svg';
 import bounty from '@assets/activityfeed/features/features3.svg';
 import identity from '@assets/activityfeed/features/features4.svg';
-import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/carousel';
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/Carousel';
 import { useTranslations } from 'next-intl';
 import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { useUser } from '@/hooks/useUser';

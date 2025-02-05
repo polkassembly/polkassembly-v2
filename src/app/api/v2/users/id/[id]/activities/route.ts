@@ -6,9 +6,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { z } from 'zod';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 const zodParamsSchema = z.object({
-	id: z.coerce.number()
+	id: z.coerce.number().refine((val) => ValidatorService.isValidUserId(val), 'Invalid user ID')
 });
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {

@@ -1,0 +1,15 @@
+.contentWrapper {
+	@apply max-h-[75vh] overflow-y-auto py-4
+}
+
+.footer {
+	@apply flex justify-end border-t border-border_grey pt-2
+}
+
+.tabContent {
+	@apply flex flex-col gap-y-6
+}
+
+.label {
+	@apply text-sm font-medium text-text_primary
+}

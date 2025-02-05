@@ -128,4 +128,14 @@ export class OnChainDbService {
 
 		return null;
 	}
+
+	static async GetActiveVotedProposalsCount({
+		addresses,
+		network
+	}: {
+		addresses: string[];
+		network: ENetwork;
+	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
+		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
+	}
 }
