@@ -1022,8 +1022,8 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
 	}
 
-	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
-		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1).get();
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToUnfollow).limit(1).get();
 
 		if (followEntry.docs.length) {
 			await followEntry.docs[0].ref.delete();

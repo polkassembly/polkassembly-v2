@@ -610,10 +610,24 @@ export class OffChainDbService {
 	}
 
 	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
-		return FirestoreService.FollowUser({ userId, userIdToFollow });
+		await FirestoreService.FollowUser({ userId, userIdToFollow });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.FOLLOWED_USER,
+			metadata: {
+				userId: userIdToFollow
+			}
+		});
 	}
 
-	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
-		return FirestoreService.UnfollowUser({ userId, userIdToFollow });
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		await FirestoreService.UnfollowUser({ userId, userIdToUnfollow });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.UNFOLLOWED_USER,
+			metadata: { userId: userIdToUnfollow }
+		});
 	}
 }
