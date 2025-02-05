@@ -777,3 +777,8 @@ export interface IFollowEntry {
 	followedUserId: number;
 	updatedAt: Date;
 }
+
+export enum ESidebarState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed'
+}

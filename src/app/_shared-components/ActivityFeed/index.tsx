@@ -4,22 +4,25 @@
 
 'use client';
 
-import { EActivityFeedTab, IGenericListingResponse, IActivityFeedPostListing } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IActivityFeedPostListing, ESidebarState } from '@/_shared/types';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
+import { cn } from '@/lib/utils';
+import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
 import { Tabs, TabsContent } from '../Tabs/Tabs';
 import styles from './ActivityFeed.module.scss';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
+import { useSidebar } from '../Sidebar/Sidebar';
 
 function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IActivityFeedPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
+	const { state } = useSidebar();
 
 	return (
-		<div className='min-h-screen bg-page_background px-16 pt-5'>
+		<div className={cn('min-h-screen bg-page_background pt-5', state === ESidebarState.EXPANDED ? 'px-10 lg:px-16' : 'px-10 lg:px-20')}>
 			<div className='container mx-auto grid grid-cols-12 gap-5'>
 				<div className='col-span-12'>
 					<div className={styles.activityFeedContainer}>

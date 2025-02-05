@@ -528,5 +528,18 @@
 		"grant": "Subvención",
 		"community": "Comunidad",
 		"technicalcommittee": "Comité Técnico"
+	},
+	"Header": {
+		"polkadot": "Polkadot y Parachains",
+		"kusama": "Kusama y Parachains",
+		"soloChains": "Cadenas en solitario",
+		"testChains": "Cadenas de prueba",
+		"switchTo": "Cambiar a",
+		"lightMode": "Modo claro",
+		"darkMode": "Modo oscuro",
+		"language": "Idioma",
+		"node": "Nodo",
+		"network": "Red",
+		"searchNetworks": "Buscar redes..."
 	}
 }

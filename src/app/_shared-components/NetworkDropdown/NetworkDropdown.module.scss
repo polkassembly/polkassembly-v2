@@ -1,0 +1,23 @@
+.selectTrigger {
+    @apply w-full rounded-full border-border_grey bg-network_dropdown_bg;
+}
+
+.selectValueContainer {
+    @apply flex items-center gap-2 pr-2 text-xs font-semibold text-text_primary;
+}
+
+.selectValue {
+    @apply h-6 w-6 overflow-hidden rounded-full;
+}
+
+.selectContentContainer {
+    @apply m-0 w-[360px] sm:w-[320px] border-border_grey p-0 py-1;
+}
+
+.selectContent {
+    @apply border-b border-border_grey bg-none;
+}
+
+.fixedInputContainer {
+    @apply sticky top-0 z-10 p-2 bg-[var(--sidebar-primary-foreground)];
+}

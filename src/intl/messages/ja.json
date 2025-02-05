@@ -528,5 +528,18 @@
 		"grant": "助成金",
 		"community": "コミュニティ",
 		"technicalcommittee": "技術委員会"
+	},
+	"Header": {
+		"polkadot": "ポルカドット＆パラチェーン",
+		"kusama": "クサマ＆パラチェーン",
+		"soloChains": "ソロチェーン",
+		"testChains": "テストチェーン",
+		"switchTo": "切り替え",
+		"lightMode": "ライトモード",
+		"darkMode": "ダークモード",
+		"language": "言語",
+		"node": "ノード",
+		"network": "ネットワーク",
+		"searchNetworks": "ネットワークを検索..."
 	}
 }

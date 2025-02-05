@@ -45,8 +45,8 @@ function ActivityFeedRankCard() {
 					<p className='text-base font-semibold text-rank_card_text'>
 						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
 					</p>
-					<div className='flex items-center justify-between gap-4 pt-8'>
-						<div className='flex items-center gap-2'>
+					<div className='flex items-center gap-2 pt-8'>
+						<div className='flex items-center'>
 							<Image
 								src={profileAvatar}
 								alt='User Avatar'
@@ -54,7 +54,7 @@ function ActivityFeedRankCard() {
 								width={32}
 								height={32}
 							/>
-							<p className='text-base font-semibold text-btn_secondary_text'>{user?.username}</p>
+							<p className='w-36 truncate font-semibold text-btn_secondary_text'>{user.username}</p>
 						</div>
 
 						<div>

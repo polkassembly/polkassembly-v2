@@ -528,5 +528,18 @@
 		"grant": "资助",
 		"community": "社区",
 		"technicalcommittee": "技术委员会"
+	},
+	"Header": {
+		"polkadot": "波卡点＆平行链",
+		"kusama": "库萨马＆平行链",
+		"soloChains": "独立链",
+		"testChains": "测试链",
+		"switchTo": "切换到",
+		"lightMode": "亮色模式",
+		"darkMode": "暗色模式",
+		"language": "语言",
+		"node": "节点",
+		"network": "网络",
+		"searchNetworks": "搜索网络..."
 	}
 }

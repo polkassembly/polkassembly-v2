@@ -6,7 +6,6 @@
 
 import Image from 'next/image';
 import React from 'react';
-import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
@@ -19,7 +18,6 @@ import Foot1 from '@assets/sidebar/foot1.svg';
 import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
-import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
@@ -33,25 +31,25 @@ import styles from './AppSidebar.module.scss';
 function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const t = useTranslations();
-	const { resolvedTheme: theme } = useTheme();
 	const pathname = usePathname();
 
 	const network = getCurrentNetwork();
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
-		if (theme === ETheme.LIGHT) {
-			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
-		}
-		if (state === 'expanded') {
-			return (
-				<Image
-					src={PaLogoDark}
-					alt='Polkassembly Logo'
-				/>
-			);
-		}
-		return <PaLogo variant='compact' />;
+		return (
+			<>
+				<div className={state === 'expanded' ? 'dark:hidden' : ''}>
+					<PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />
+				</div>
+				<div className={`${state === 'expanded' ? 'hidden dark:block' : 'hidden'}`}>
+					<Image
+						src={PaLogoDark}
+						alt='Polkassembly Logo'
+					/>
+				</div>
+			</>
+		);
 	};
 
 	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (
@@ -85,7 +83,12 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			{...props}
 		>
 			<SidebarHeader>
-				<div className={styles.sidebar_logo}>{getLogo()}</div>
+				<Link
+					href='/'
+					className={styles.sidebar_logo}
+				>
+					{getLogo()}
+				</Link>
 			</SidebarHeader>
 
 			<hr className='text-border_grey' />
