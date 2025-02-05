@@ -15,7 +15,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { IoPersonAdd } from 'react-icons/io5';
 // import { MdOutlineSearch } from 'react-icons/md';
-import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -135,11 +135,11 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 							})}
 						</TableBody>
 					</Table>
-					{data.totalCount && data.totalCount > PREIMAGES_LISTING_LIMIT && (
+					{data.totalCount && data.totalCount > DEFAULT_LISTING_LIMIT && (
 						<div className='mt-5 w-full'>
 							<PaginationWithLinks
 								page={Number(page)}
-								pageSize={PREIMAGES_LISTING_LIMIT}
+								pageSize={DEFAULT_LISTING_LIMIT}
 								totalCount={data.totalCount}
 								onClick={(pageNumber) => {
 									router.push(`/leaderboard?page=${pageNumber}`);
