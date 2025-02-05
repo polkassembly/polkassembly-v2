@@ -14,13 +14,13 @@ import UserIcon from '@assets/profile/user-icon.svg';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { IoPersonAdd } from 'react-icons/io5';
-import { MdOutlineSearch } from 'react-icons/md';
+// import { MdOutlineSearch } from 'react-icons/md';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
 import styles from './Leaderboard.module.scss';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
-import { Input } from '../Input';
+// import { Input } from '../Input';
 import { PaginationWithLinks } from '../PaginationWithLinks';
 import RankCard from './RankCard';
 

@@ -20,6 +20,7 @@ import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { useTranslations } from 'next-intl';
 import { useSidebar } from '../Sidebar/Sidebar';
+import styles from './Leaderboard.module.scss';
 
 function RankCard({ place, className, item }: { place: number; className?: string; item: IPublicUser }) {
 	const { resolvedTheme: theme } = useTheme();
@@ -52,10 +53,10 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 			/>
 			<div className='absolute left-0 top-0 h-full w-full'>
 				<div className={`flex flex-col items-center pt-1 ${state === 'expanded' ? 'xl:pt-3' : ''}`}>
-					<p className='m-0 flex justify-center text-base font-semibold text-rank_card_text'>
+					<p className={styles.rankCardText}>
 						{t('Profile.rank')} 0{place}
 					</p>
-					<span className='flex w-20 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium'>
+					<span className={styles.rankStar}>
 						<Image
 							src={rankStar}
 							alt='Rank Star'

@@ -50,3 +50,11 @@
 .input_search {
     @apply -translate-y-1/2 h-8 absolute right-2 top-4 cursor-pointer border-l border-border_grey pl-1 text-2xl text-gray-500;
 }
+
+.rankStar {
+    @apply flex w-20 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium;
+}
+
+.rankCardText {
+    @apply m-0 flex justify-center text-base font-semibold text-rank_card_text;
+}
