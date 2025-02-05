@@ -228,7 +228,8 @@ export class SubsquidService extends SubsquidUtils {
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
-					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined
+					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
+					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
 				});
 			}
 		);
