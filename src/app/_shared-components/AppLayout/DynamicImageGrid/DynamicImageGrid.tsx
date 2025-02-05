@@ -79,7 +79,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 							</TooltipTrigger>
 							<TooltipContent
 								side={isExpanded ? tooltipPosition : 'right'}
-								className={style.tooltipContent}
+								className='relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg'
 							>
 								<span className={style.tooltipText}>{item.tooltip}</span>
 								<div

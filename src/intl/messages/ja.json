@@ -163,7 +163,9 @@
 			"linked_address": "アドレスをリンク",
 			"linked_multiple_addresses": "複数のアドレスをリンク",
 			"unlinked_address": "アドレスのリンクを解除",
-			"unlinked_multiple_addresses": "複数のアドレスのリンクを解除"
+			"unlinked_multiple_addresses": "複数のアドレスのリンクを解除",
+			"followed_user": "ユーザーをフォロー",
+			"unfollowed_user": "ユーザーをフォロー解除"
 		},
 		"overview": "概要",
 		"onchainIdentity": "オンチェーンID",
@@ -558,6 +560,19 @@
 		"grant": "助成金",
 		"community": "コミュニティ",
 		"technicalcommittee": "技術委員会"
+	},
+	"Header": {
+		"polkadot": "ポルカドット＆パラチェーン",
+		"kusama": "クサマ＆パラチェーン",
+		"soloChains": "ソロチェーン",
+		"testChains": "テストチェーン",
+		"switchTo": "切り替え",
+		"lightMode": "ライトモード",
+		"darkMode": "ダークモード",
+		"language": "言語",
+		"node": "ノード",
+		"network": "ネットワーク",
+		"searchNetworks": "ネットワークを検索..."
 	}
 }
 

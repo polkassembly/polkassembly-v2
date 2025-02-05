@@ -163,7 +163,9 @@
 			"linked_address": "Vinculó dirección",
 			"linked_multiple_addresses": "Vinculó múltiples direcciones",
 			"unlinked_address": "Desvinculó dirección",
-			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones"
+			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones",
+			"followed_user": "Seguido",
+			"unfollowed_user": "Dejó de seguir"
 		},
 		"overview": "Resumen",
 		"onchainIdentity": "Identidad en cadena",
@@ -557,7 +559,20 @@
 		"advisorycommittee": "Comité asesor",
 		"grant": "Subvención",
 		"community": "Comunidad",
-		"technicalcommittee": "Comité técnico"
+		"technicalcommittee": "Comité Técnico"
+	},
+	"Header": {
+		"polkadot": "Polkadot y Parachains",
+		"kusama": "Kusama y Parachains",
+		"soloChains": "Cadenas en solitario",
+		"testChains": "Cadenas de prueba",
+		"switchTo": "Cambiar a",
+		"lightMode": "Modo claro",
+		"darkMode": "Modo oscuro",
+		"language": "Idioma",
+		"node": "Nodo",
+		"network": "Red",
+		"searchNetworks": "Buscar redes..."
 	}
 }
 

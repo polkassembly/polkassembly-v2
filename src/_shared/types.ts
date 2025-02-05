@@ -675,7 +675,9 @@ export enum EActivityName {
 	LINKED_ADDRESS = 'linked_address',
 	LINKED_MULTIPLE_ADDRESSES = 'linked_multiple_addresses',
 	UNLINKED_ADDRESS = 'unlinked_address',
-	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses'
+	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses',
+	FOLLOWED_USER = 'followed_user',
+	UNFOLLOWED_USER = 'unfollowed_user'
 }
 
 export enum EActivityCategory {
@@ -718,6 +720,9 @@ export interface IActivityMetadata {
 
 	// for identity and link address
 	address?: string;
+
+	// for follow/unfollow
+	userId?: number;
 }
 
 export interface IUserActivity {
@@ -789,4 +794,9 @@ export interface IFollowEntry {
 	followerUserId: number;
 	followedUserId: number;
 	updatedAt: Date;
+}
+
+export enum ESidebarState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed'
 }

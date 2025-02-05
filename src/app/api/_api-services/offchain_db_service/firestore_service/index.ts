@@ -187,7 +187,7 @@ export class FirestoreService extends FirestoreRefs {
 						profileScore: data.profileScore,
 						addresses: addresses.map((addr: IUserAddress) => addr.address),
 						rank,
-						createdAt: data.createdAt,
+						createdAt: data.createdAt?.toDate?.(),
 						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
 					} as IPublicUser;
 				})
@@ -891,7 +891,7 @@ export class FirestoreService extends FirestoreRefs {
 				proposalType,
 				userId,
 				reaction,
-				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt.toDate() : new Date(),
+				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt?.toDate() : new Date(),
 				updatedAt: new Date()
 			},
 			{ merge: true }
@@ -1028,8 +1028,8 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
 	}
 
-	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
-		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1).get();
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToUnfollow).limit(1).get();
 
 		if (followEntry.docs.length) {
 			await followEntry.docs[0].ref.delete();

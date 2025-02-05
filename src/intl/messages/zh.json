@@ -163,7 +163,9 @@
 			"linked_address": "链接地址",
 			"linked_multiple_addresses": "链接多个地址",
 			"unlinked_address": "取消链接地址",
-			"unlinked_multiple_addresses": "取消链接多个地址"
+			"unlinked_multiple_addresses": "取消链接多个地址",
+			"followed_user": "关注用户",
+			"unfollowed_user": "取消关注用户"
 		},
 		"overview": "概览",
 		"onchainIdentity": "链上身份",
@@ -558,5 +560,18 @@
 		"grant": "拨款",
 		"community": "社区",
 		"technicalcommittee": "技术委员会"
+	},
+	"Header": {
+		"polkadot": "波卡点＆平行链",
+		"kusama": "库萨马＆平行链",
+		"soloChains": "独立链",
+		"testChains": "测试链",
+		"switchTo": "切换到",
+		"lightMode": "亮色模式",
+		"darkMode": "暗色模式",
+		"language": "语言",
+		"node": "节点",
+		"network": "网络",
+		"searchNetworks": "搜索网络..."
 	}
 }

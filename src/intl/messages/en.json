@@ -117,7 +117,7 @@
 		"Activity": {
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
-			"created_tip": "Created Tip", 
+			"created_tip": "Created Tip",
 			"gave_tip": "Gave Tip",
 			"created_bounty": "Created Bounty",
 			"created_child_bounty": "Created Child Bounty",
@@ -166,7 +166,9 @@
 			"linked_address": "Linked Address",
 			"linked_multiple_addresses": "Linked Multiple Addresses",
 			"unlinked_address": "Unlinked Address",
-			"unlinked_multiple_addresses": "Unlinked Multiple Addresses"
+			"unlinked_multiple_addresses": "Unlinked Multiple Addresses",
+			"followed_user": "Followed User",
+			"unfollowed_user": "Unfollowed User"
 		},
 		"overview": "Overview",
 		"onchainIdentity": "Onchain Identity",
@@ -578,5 +580,18 @@
 		"grant": "Grant",
 		"community": "Community",
 		"technicalcommittee": "Technical Committee"
+	},
+	"Header": {
+		"polkadot": "Polkadot & Parachains",
+		"kusama": "Kusama & Parachains",
+		"soloChains": "Solo Chains",
+		"testChains": "Test Chains",
+		"switchTo": "Switch to",
+		"lightMode": "Light Mode",
+		"darkMode": "Dark Mode",
+		"language": "Language",
+		"node": "Node",
+		"network": "Network",
+		"searchNetworks": "Search networks..."
 	}
 }

@@ -148,6 +148,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	// set user preferences
 	useEffect(() => {
 		setUserPreferences({
+			...userPreferences,
 			locale: userPreferences.locale,
 			theme: userPreferences.theme,
 			...(user?.loginAddress
