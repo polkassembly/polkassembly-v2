@@ -5,32 +5,25 @@
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import React from 'react';
-import Card from '@assets/leaderboard/card.svg';
 import Cup from '@assets/leaderboard/cup.svg';
 import Image from 'next/image';
+import styles from './Leaderboard.module.scss';
 
 function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 	return (
 		<div className='bg-page_background px-8 pt-6 lg:px-12'>
-			<div className='relative w-full'>
-				<Image
-					src={Card}
-					alt='Leaderboard'
-					className='h-auto w-full'
-					width={100}
-					height={100}
-				/>
-				<div className='absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center'>
+			<div className={styles.Card}>
+				<div className='flex items-center justify-center'>
 					<Image
 						src={Cup}
 						alt='Cup'
-						className='h-56 w-56'
+						className='absolute left-72 top-8 h-56 w-56'
 						width={100}
 						height={100}
 					/>
-					<div className='flex flex-col gap-2'>
-						<p className='text-2xl font-bold text-white'>Leaderboard</p>
-						<p className='text-sm text-white'>Find your rank in the ecosystem</p>
+					<div className='flex flex-col gap-0.5 text-center'>
+						<p className='text-4xl font-semibold text-white'>Leaderboard</p>
+						<p className='text-xl text-white'>Find your rank in the ecosystem</p>
 					</div>
 				</div>
 			</div>
