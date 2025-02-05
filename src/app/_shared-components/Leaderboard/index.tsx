@@ -2,41 +2,137 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import React from 'react';
-import Cup from '@assets/leaderboard/cup.svg';
+import Trophy from '@assets/leaderboard/Trophy.png';
+import rankStar from '@assets/profile/rank-star.svg';
+import CalendarIcon from '@assets/icons/calendar-icon.svg';
+import UserIcon from '@assets/profile/user-icon.svg';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { IoPersonAdd } from 'react-icons/io5';
+import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import styles from './Leaderboard.module.scss';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
+import { MdOutlineSearch } from 'react-icons/md';
+import { Input } from '../Input';
+import { PaginationWithLinks } from '../PaginationWithLinks';
+import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
+	const searchParams = useSearchParams();
+	const page = searchParams.get('page') || 1;
+	const router = useRouter();
+	const displayedItems = page == 1 ? data.items.slice(3, 10) : data.items;
 	return (
-		<div className='bg-page_background px-8 pt-6 lg:px-12'>
+		<div className='bg-page_background'>
 			<div className={styles.Card}>
-				<div className='flex items-center justify-center'>
-					<Image
-						src={Cup}
-						alt='Cup'
-						className='absolute left-72 top-8 h-56 w-56'
-						width={100}
-						height={100}
-					/>
-					<div className='flex flex-col gap-0.5 text-center'>
+				<div className='relative flex flex-row items-center justify-center'>
+					<div className='relative flex justify-center md:justify-start'>
+						<Image
+							src={Trophy}
+							alt='Cup'
+							className='z-10 h-auto w-40 md:w-60 lg:w-72'
+							width={100}
+							height={100}
+						/>
+					</div>
+					<div className='flex flex-col items-center gap-1 text-center md:items-start md:text-left'>
 						<p className='text-4xl font-semibold text-white'>Leaderboard</p>
-						<p className='text-xl text-white'>Find your rank in the ecosystem</p>
+						<p className='text-white'>Find your rank in the ecosystem</p>
 					</div>
 				</div>
 			</div>
 
-			{data.items.map((item) => {
-				return (
-					<div key={item.id}>
-						<h1>{item.username}</h1>
-						<h1>{item.rank}</h1>
-						{dayjs(item.createdAt).format("Do MMM 'YY")}
+			<div className='mt-10 rounded-lg bg-bg_modal p-6'>
+				<div className='flex items-center justify-between'>
+					<p className='text-xl font-semibold text-text_primary'>Top 50 Ranks</p>
+					<div className='flex items-center gap-2'>
+						<div className='relative'>
+							<Input
+								className={styles.input_container}
+								placeholder={'Enter username to search'}
+							/>
+							<MdOutlineSearch className={styles.input_search} />
+						</div>
 					</div>
-				);
-			})}
+				</div>
+				<div className='pt-5'>
+					<Table>
+						<TableHeader>
+							<TableRow className={styles.tableRow}>
+								<TableHead className={styles.tableCell_1}>Rank</TableHead>
+								<TableHead className={styles.tableCell_2}>User</TableHead>
+								<TableHead className={styles.tableCell}>Astrals</TableHead>
+								<TableHead className={styles.tableCell}>User Since</TableHead>
+								<TableHead className={styles.tableCell_last}>Actions</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{displayedItems.map((item) => {
+								return (
+									<TableRow key={item.id}>
+										<TableCell className={styles.tableCell_1}>{item.rank}</TableCell>
+										<TableCell className={styles.tableCell_2}>
+											<span className='flex items-center gap-x-2'>
+												<Image
+													src={UserIcon}
+													alt='User Icon'
+													className='h-6 w-6'
+													width={20}
+													height={20}
+												/>
+												<span className='text-sm font-medium'>{item?.username}</span>
+											</span>
+										</TableCell>
+										<TableCell className='p-4'>
+											<span className='flex w-20 items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
+												<Image
+													src={rankStar}
+													alt='Rank Star'
+													width={16}
+													height={16}
+												/>
+												<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
+											</span>
+										</TableCell>
+										<TableCell className={styles.tableCell}>
+											<span className='flex items-center gap-x-2 text-xs'>
+												<Image
+													src={CalendarIcon}
+													alt='calendar'
+													width={20}
+													height={20}
+												/>
+												<span className='whitespace-nowrap'>{dayjs(item.createdAt).format("Do MMM 'YY")}</span>
+											</span>
+										</TableCell>
+										<TableCell className={styles.tableContentCell_last}>
+											<IoPersonAdd className='text-lg text-text_primary' />
+											<HiMiniCurrencyDollar className='text-2xl text-text_primary' />
+										</TableCell>
+									</TableRow>
+								);
+							})}
+						</TableBody>
+					</Table>
+					{data.totalCount && data.totalCount > PREIMAGES_LISTING_LIMIT && (
+						<div className='mt-5 w-full'>
+							<PaginationWithLinks
+								page={Number(page)}
+								pageSize={PREIMAGES_LISTING_LIMIT}
+								totalCount={data.totalCount}
+								onClick={(pageNumber) => {
+									router.push(`/leaderboard?page=${pageNumber}`);
+								}}
+							/>
+						</div>
+					)}
+				</div>
+			</div>
 		</div>
 	);
 }

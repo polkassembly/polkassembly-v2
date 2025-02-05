@@ -77,7 +77,8 @@ export const THEME_COLORS = {
 		bg_blue: '#5489FF',
 		border_blue: '#407BFF',
 		activity_comment: '#798AA2',
-		social_green: '#51D36E'
+		social_green: '#51D36E',
+		leaderboard_score: '#534930'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -151,6 +152,7 @@ export const THEME_COLORS = {
 		bg_blue: '#5489FF',
 		border_blue: '#407BFF',
 		activity_comment: '#4a4a4a',
-		social_green: '#51D36E'
+		social_green: '#51D36E',
+		leaderboard_score: '#534930'
 	}
 };
