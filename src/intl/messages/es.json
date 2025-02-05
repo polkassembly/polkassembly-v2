@@ -577,10 +577,17 @@
 		"network": "Red",
 		"searchNetworks": "Buscar redes..."
 	},
+	"Leaderboard": {
+		"username": "Nombre de usuario",
+		"astrals": "Astrals",
+		"userSince": "Usuario desde",
+		"actions": "Acciones",
+		"leaderboard": "Tabla de Clasificación",
+		"findYourRank": "Encuentra tu rango en el ecosistema",
+		"searchUsername": "Buscar nombre de usuario"
+	},
 	"BlockEditor": {
 		"placeholder": "Escribe / para comenzar",
 		"errorUpdatingContent": "Error al actualizar el contenido"
 	}
 }
-
-

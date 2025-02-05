@@ -22,7 +22,10 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 			<h3 className='bg-background_secondary px-2 py-2 text-sm font-medium text-btn_secondary_text'>{title}</h3>
 			<div className='grid grid-cols-2 gap-2 px-2'>
 				{filteredNetworks.map(([key, logo]) => (
-					<div className='cursor-pointer rounded-md py-1 text-btn_secondary_text hover:text-text_pink'>
+					<div
+						key={key}
+						className='cursor-pointer rounded-md py-1 text-btn_secondary_text hover:text-text_pink'
+					>
 						<Link
 							href={`https://${key.toLowerCase()}.polkassembly.io/`}
 							className='flex items-center gap-2'

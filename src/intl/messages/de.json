@@ -511,7 +511,7 @@
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
-	
+
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
 		"title": "Titel",
@@ -578,10 +578,17 @@
 		"network": "Netzwerk",
 		"searchNetworks": "Netzwerke suchen..."
 	},
+	"Leaderboard": {
+		"username": "Benutzername",
+		"astrals": "Astrals",
+		"userSince": "Benutzer seit",
+		"actions": "Aktionen",
+		"leaderboard": "Bestenliste",
+		"findYourRank": "Finde deinen Rang in der Ökosystem",
+		"searchUsername": "Benutzername suchen"
+	},
 	"BlockEditor": {
 		"placeholder": "Geben Sie / ein, um zu starten",
 		"errorUpdatingContent": "Fehler beim Aktualisieren des Inhalts"
 	}
 }
-
-

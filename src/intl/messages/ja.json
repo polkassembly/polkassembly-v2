@@ -577,10 +577,17 @@
 		"network": "ネットワーク",
 		"searchNetworks": "ネットワークを検索..."
 	},
+	"Leaderboard": {
+		"username": "ユーザー名",
+		"astrals": "アストラル",
+		"userSince": "ユーザーが存在する日",
+		"actions": "アクション",
+		"leaderboard": "リーダーボード",
+		"findYourRank": "生態系でのランクを見つける",
+		"searchUsername": "ユーザー名を検索"
+	},
 	"BlockEditor": {
 		"placeholder": "/ を入力して開始",
 		"errorUpdatingContent": "コンテンツの更新中にエラーが発生しました"
 	}
 }
-
-
