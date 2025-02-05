@@ -67,7 +67,8 @@ enum EApiRoute {
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
 	LINK_ADDRESS = 'LINK_ADDRESS',
 	EDIT_USER_PROFILE = 'EDIT_USER_PROFILE',
-	DELETE_ACCOUNT = 'DELETE_ACCOUNT'
+	DELETE_ACCOUNT = 'DELETE_ACCOUNT',
+	FETCH_LEADERBOARD = 'FETCH_LEADERBOARD'
 }
 
 export class NextApiClientService {
@@ -136,6 +137,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.FETCH_LEADERBOARD:
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
 			case EApiRoute.ADD_COMMENT:
@@ -454,5 +456,15 @@ export class NextApiClientService {
 	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
+	}
+
+	static async fetchLeaderboardApi({ page }: { page: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams, routeSegments: ['users'] });
+		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 }
