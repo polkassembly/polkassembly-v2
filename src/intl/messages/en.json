@@ -539,6 +539,7 @@
 		"darkMode": "Dark Mode",
 		"language": "Language",
 		"node": "Node",
-		"network": "Network"
+		"network": "Network",
+		"searchNetworks": "Search networks..."
 	}
 }

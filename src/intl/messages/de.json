@@ -539,6 +539,7 @@
 		"darkMode": "Dunkelmodus",
 		"language": "Sprache",
 		"node": "Knoten",
-		"network": "Netzwerk"
+		"network": "Netzwerk",
+		"searchNetworks": "Netzwerke suchen..."
 	}
 }

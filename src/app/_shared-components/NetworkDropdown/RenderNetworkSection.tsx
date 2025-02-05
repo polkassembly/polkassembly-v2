@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { SelectItem } from '@ui/Select/Select';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 
@@ -20,17 +19,14 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 
 	return (
 		<div className='mb-4 overflow-y-auto'>
-			<h3 className='bg-background_secondary px-4 py-2 text-sm font-medium text-btn_secondary_text'>{title}</h3>
+			<h3 className='bg-background_secondary px-2 py-2 text-sm font-medium text-btn_secondary_text'>{title}</h3>
 			<div className='grid grid-cols-2 gap-2 px-2'>
 				{filteredNetworks.map(([key, logo]) => (
-					<SelectItem
-						key={key}
-						value={key.toLowerCase()}
-						className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-					>
+					<div className='cursor-pointer rounded-md py-1 text-btn_secondary_text hover:text-text_pink'>
 						<Link
 							href={`https://${key.toLowerCase()}.polkassembly.io/`}
 							className='flex items-center gap-2'
+							passHref
 						>
 							<div className='h-6 w-6 flex-shrink-0 overflow-hidden rounded-full'>
 								<Image
@@ -41,9 +37,9 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 									className='object-cover'
 								/>
 							</div>
-							<span className='text-sm text-btn_secondary_text'>{key}</span>
+							<span className='text-sm'>{key}</span>
 						</Link>
-					</SelectItem>
+					</div>
 				))}
 			</div>
 		</div>

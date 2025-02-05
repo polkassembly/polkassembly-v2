@@ -539,6 +539,7 @@
 		"darkMode": "Modo oscuro",
 		"language": "Idioma",
 		"node": "Nodo",
-		"network": "Red"
+		"network": "Red",
+		"searchNetworks": "Buscar redes..."
 	}
 }

@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ChangeEvent, memo, RefObject } from 'react';
+import { useTranslations } from 'next-intl';
 import { Input } from '../Input';
 import styles from './NetworkDropdown.module.scss';
 
@@ -16,12 +17,13 @@ const NetworkInput = memo(
 		searchTerm: string;
 		handleSearchChange: (e: ChangeEvent<HTMLInputElement>) => void;
 	}) => {
+		const t = useTranslations('Header');
 		return (
 			<div className={styles.fixedInputContainer}>
 				<Input
 					ref={searchInputRef}
 					type='text'
-					placeholder='Search networks...'
+					placeholder={t('searchNetworks')}
 					value={searchTerm}
 					onChange={handleSearchChange}
 					className='mb-2'

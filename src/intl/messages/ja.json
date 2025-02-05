@@ -539,6 +539,7 @@
 		"darkMode": "ダークモード",
 		"language": "言語",
 		"node": "ノード",
-		"network": "ネットワーク"
+		"network": "ネットワーク",
+		"searchNetworks": "ネットワークを検索..."
 	}
 }
