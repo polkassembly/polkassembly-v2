@@ -18,6 +18,7 @@ import { IoPersonAdd } from 'react-icons/io5';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import styles from './Leaderboard.module.scss';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
 // import { Input } from '../Input';
@@ -26,9 +27,9 @@ import RankCard from './RankCard';
 
 function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
-	const page = searchParams.get('page') || 1;
+	const page = parseInt(searchParams.get('page') || '1', 10) || 1;
 	const router = useRouter();
-	const displayedItems = page === '1' ? data.items.slice(3, 10) : data.items;
+	const displayedItems = page === 1 ? data.items.slice(3, 10) : data.items;
 	const t = useTranslations();
 	return (
 		<div className='bg-page_background'>
@@ -89,7 +90,10 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 									<TableRow key={item.id}>
 										<TableCell className={styles.tableCell_1}>{item.rank}</TableCell>
 										<TableCell className={styles.tableCell_2}>
-											<span className='flex items-center gap-x-2'>
+											<Link
+												href={`/user/${item?.id}`}
+												className='flex items-center gap-x-2'
+											>
 												<Image
 													src={UserIcon}
 													alt='User Icon'
@@ -98,7 +102,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 													height={20}
 												/>
 												<span className='text-sm font-medium'>{item?.username}</span>
-											</span>
+											</Link>
 										</TableCell>
 										<TableCell className='p-4'>
 											<span className='flex w-20 items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
@@ -108,7 +112,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 													width={16}
 													height={16}
 												/>
-												<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
+												<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
 											</span>
 										</TableCell>
 										<TableCell className={styles.tableCell}>

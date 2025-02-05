@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useTheme } from 'next-themes';
 import React from 'react';
 import Image from 'next/image';
 import rankStar from '@assets/profile/rank-star.svg';
@@ -16,6 +15,7 @@ import ThirdPlaceDark from '@assets/leaderboard/ThirdPlaceDark.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { IoPersonAdd } from 'react-icons/io5';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
+import Link from 'next/link';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { useTranslations } from 'next-intl';
@@ -23,21 +23,18 @@ import { useSidebar } from '../Sidebar/Sidebar';
 import styles from './Leaderboard.module.scss';
 
 function RankCard({ place, className, item }: { place: number; className?: string; item: IPublicUser }) {
-	const { resolvedTheme: theme } = useTheme();
 	const { state } = useSidebar();
 	const t = useTranslations();
-	const placeImageMap: Record<number, string> =
-		theme === 'dark'
-			? {
-					1: FirstPlaceDark,
-					2: SecondPlaceDark,
-					3: ThirdPlaceDark
-				}
-			: {
-					1: FirstPlace,
-					2: SecondPlace,
-					3: ThirdPlace
-				};
+	const placeImageMap: Record<number, string> = {
+		1: FirstPlace,
+		2: SecondPlace,
+		3: ThirdPlace
+	};
+	const placeImageMapDark: Record<number, string> = {
+		1: FirstPlaceDark,
+		2: SecondPlaceDark,
+		3: ThirdPlaceDark
+	};
 
 	const positionClasses = place === 1 ? 'xl:order-2 xl:z-10 ' : place === 2 ? 'xl:order-1 xl:translate-y-4' : 'xl:order-3 xl:translate-y-4';
 	const imageWidth = place === 1 ? 'xl:w-[456px] xl:h-[217px] w-[380px] h-[180px]' : 'xl:w-[400px] xl:h-[197px] w-[380px] h-[180px]';
@@ -49,7 +46,14 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 				alt={`Rank ${place}`}
 				width={200}
 				height={100}
-				className={`relative bg-cover bg-center bg-no-repeat ${imageWidth}`}
+				className={`relative bg-cover bg-center bg-no-repeat ${imageWidth} dark:hidden`}
+			/>
+			<Image
+				src={placeImageMapDark[place as keyof typeof placeImageMapDark]}
+				alt={`Rank ${place}`}
+				width={200}
+				height={100}
+				className={`relative bg-cover bg-center bg-no-repeat ${imageWidth} hidden dark:block`}
 			/>
 			<div className='absolute left-0 top-0 h-full w-full'>
 				<div className={`flex flex-col items-center pt-1 ${state === 'expanded' ? 'xl:pt-3' : ''}`}>
@@ -63,12 +67,15 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 							width={16}
 							height={16}
 						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
+						<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
 					</span>
 				</div>
 				<div className='flex flex-col gap-3 px-10'>
 					<span className='flex w-full items-center justify-between pt-4 xl:pt-10'>
-						<div className='flex items-center gap-x-2'>
+						<Link
+							href={`/user/${item?.id}`}
+							className='flex items-center gap-x-2'
+						>
 							<Image
 								src={UserIcon}
 								alt='User Icon'
@@ -77,7 +84,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 								height={20}
 							/>
 							<span className='text-sm font-medium'>{item?.username}</span>
-						</div>
+						</Link>
 						<div className='flex items-center gap-x-2'>
 							<IoPersonAdd className='text-lg text-text_primary' />
 							<HiMiniCurrencyDollar className='text-2xl text-text_primary' />

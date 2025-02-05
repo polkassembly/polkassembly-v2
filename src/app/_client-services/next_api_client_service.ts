@@ -151,6 +151,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_LEADERBOARD:
+				path = '/users';
+				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
@@ -552,7 +554,7 @@ export class NextApiClientService {
 			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
 
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams, routeSegments: ['users'] });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 }
