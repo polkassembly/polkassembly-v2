@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, RefObject, useRef, useState } from 'react';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import AstarLogo from '@assets/parachain-logos/astar-logo.png';
 import AcalaLogo from '@assets/parachain-logos/acala-logo.jpg';
@@ -63,9 +63,9 @@ import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
 import { cn } from '@/lib/utils';
 import Image, { StaticImageData } from 'next/image';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
-import { Input } from '../Input';
 import RenderNetworkSection from './RenderNetworkSection';
 import styles from './NetworkDropdown.module.scss';
+import NetworkInput from './NetworkInput';
 
 interface NetworkDataType {
 	[key: string]: {
@@ -73,127 +73,115 @@ interface NetworkDataType {
 	};
 }
 
+const networkData: NetworkDataType = {
+	polkadot: {
+		Polkadot: PolkadotLogo,
+		Astar: AstarLogo,
+		Acala: AcalaLogo,
+		Centrifuge: CentrifugeLogo,
+		Collectives: CollectivesLogo,
+		Composable: ComposableLogo,
+		Equilibrium: EquillibriumLogo,
+		Frequency: FrequencyLogo,
+		Hashed: HashedLogo,
+		HydraDX: HydradxLogo,
+		Kilt: KiltLogo,
+		Kylin: KylinLogo,
+		Moonbeam: MoonbeamLogo,
+		Parallel: ParallelLogo,
+		Pendulum: PendulumLogo,
+		Polimec: PolimecLogo,
+		Zeitgeist: ZeitgeistLogo,
+		Mythos: MythosLogo
+	},
+	kusama: {
+		Kusama: KusamaLogo,
+		Altair: AltairLogo,
+		Amplitude: AmplitudeLogo,
+		Basilisk: BasiliskLogo,
+		Calamari: CalamariLogo,
+		Crustshadow: CrustLogo,
+		Heiko: HeikoLogo,
+		Integritee: IntegriteeLogo,
+		Karura: KaruraLogo,
+		Khala: KhalaLogo,
+		Moonriver: MoonriverLogo,
+		Robonomics: RobonomicsLogo,
+		Snow: SnowLogo,
+		Shiden: ShidenLogo,
+		Picasso: PicassoLogo,
+		Turing: TuringLogo,
+		Curio: CurioLogo
+	},
+	soloChains: {
+		Acuity: AcuityLogo,
+		Automata: AutomataLogo,
+		Crust: CrustLogo,
+		Cere: CereLogo,
+		Gear: GearLogo,
+		Manta: MantaLogo,
+		Myriad: MyriadLogo,
+		Pioneer: PioneerLogo,
+		Polkadex: PolkadexLogo,
+		Phyken: PhykenLogo,
+		Polymesh: PolymeshLogo,
+		XX: XXLogo,
+		Mandala: MandalaLogo
+	},
+	testChains: {
+		Paseo: WestendLogo,
+		Genshiro: GenshiroLogo,
+		Gmordie: GmordieLogo,
+		Moonbase: MoonbaseLogo,
+		Rolimec: PolimecLogo,
+		Shibuya: ShidenLogo,
+		Tidechain: TidechainLogo,
+		Pichiu: PichiuLogo,
+		'Pichiu-Rococo': KylinLogo,
+		'Polymesh-Test': PolimecLogo,
+		Rococo: WestendLogo,
+		Vara: VaraLogo,
+		Westend: WestendLogo,
+		'Westend-Collectives': WestendLogo,
+		Laossigma: LaossigmaLogo
+	}
+};
+
+const getNetworkDisplayName = (networkKey: string): string => {
+	const lowerNetworkKey = networkKey.toLowerCase();
+	return (
+		Object.values(networkData)
+			.flatMap((category) => Object.keys(category))
+			.find((key) => key.toLowerCase() === lowerNetworkKey) || networkKey
+	);
+};
+
+const defaultLogo = WestendLogo;
+
+const getNetworkLogo = (networkKey: string): StaticImageData => {
+	const lowerNetworkKey = networkKey.toLowerCase();
+	return (
+		Object.values(networkData)
+			.flatMap((category) => Object.entries(category))
+			.find(([key]) => key.toLowerCase() === lowerNetworkKey)?.[1] || defaultLogo
+	);
+};
+
 function NetworkDropdown({ className }: { className?: string }) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedNetwork, setSelectedNetwork] = useState<string>('westend');
 	const [isOpen, setIsOpen] = useState(false);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	const NetworkData: NetworkDataType = {
-		polkadot: {
-			Polkadot: PolkadotLogo,
-			Astar: AstarLogo,
-			Acala: AcalaLogo,
-			Centrifuge: CentrifugeLogo,
-			Collectives: CollectivesLogo,
-			Composable: ComposableLogo,
-			Equilibrium: EquillibriumLogo,
-			Frequency: FrequencyLogo,
-			Hashed: HashedLogo,
-			HydraDX: HydradxLogo,
-			Kilt: KiltLogo,
-			Kylin: KylinLogo,
-			Moonbeam: MoonbeamLogo,
-			Parallel: ParallelLogo,
-			Pendulum: PendulumLogo,
-			Polimec: PolimecLogo,
-			Zeitgeist: ZeitgeistLogo,
-			Mythos: MythosLogo
-		},
-		kusama: {
-			Kusama: KusamaLogo,
-			Altair: AltairLogo,
-			Amplitude: AmplitudeLogo,
-			Basilisk: BasiliskLogo,
-			Calamari: CalamariLogo,
-			Crustshadow: CrustLogo,
-			Heiko: HeikoLogo,
-			Integritee: IntegriteeLogo,
-			Karura: KaruraLogo,
-			Khala: KhalaLogo,
-			Moonriver: MoonriverLogo,
-			Robonomics: RobonomicsLogo,
-			Snow: SnowLogo,
-			Shiden: ShidenLogo,
-			Picasso: PicassoLogo,
-			Turing: TuringLogo,
-			Curio: CurioLogo
-		},
-		soloChains: {
-			Acuity: AcuityLogo,
-			Automata: AutomataLogo,
-			Crust: CrustLogo,
-			Cere: CereLogo,
-			Gear: GearLogo,
-			Manta: MantaLogo,
-			Myriad: MyriadLogo,
-			Pioneer: PioneerLogo,
-			Polkadex: PolkadexLogo,
-			Phyken: PhykenLogo,
-			Polymesh: PolymeshLogo,
-			XX: XXLogo,
-			Mandala: MandalaLogo
-		},
-		testChains: {
-			Paseo: WestendLogo,
-			Genshiro: GenshiroLogo,
-			Gmordie: GmordieLogo,
-			Moonbase: MoonbaseLogo,
-			Rolimec: PolimecLogo,
-			Shibuya: ShidenLogo,
-			Tidechain: TidechainLogo,
-			Pichiu: PichiuLogo,
-			'Pichiu-Rococo': KylinLogo,
-			'Polymesh-Test': PolimecLogo,
-			Rococo: WestendLogo,
-			Vara: VaraLogo,
-			Westend: WestendLogo,
-			'Westend-Collectives': WestendLogo,
-			Laossigma: LaossigmaLogo
-		}
-	};
-	const getNetworkDisplayName = (networkKey: string): string => {
-		const lowerNetworkKey = networkKey.toLowerCase();
-		return (
-			Object.values(NetworkData)
-				.flatMap((category) => Object.keys(category))
-				.find((key) => key.toLowerCase() === lowerNetworkKey) || networkKey
-		);
-	};
-	const getNetworkLogo = (networkKey: string): StaticImageData | undefined => {
-		const lowerNetworkKey = networkKey.toLowerCase();
-		return Object.values(NetworkData)
-			.flatMap((category) => Object.entries(category))
-			.find(([key]) => key.toLowerCase() === lowerNetworkKey)?.[1];
-	};
-
 	const handleNetworkChange = (network: string) => {
 		setSelectedNetwork(network.toLowerCase());
 		window.location.href = `https://${network.toLowerCase()}.polkassembly.io/`;
 		setSearchTerm('');
 	};
+
 	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-		e.stopPropagation();
 		setSearchTerm(e.target.value);
-		if (searchInputRef.current) {
-			searchInputRef.current.value = e.target.value;
-			searchInputRef.current.focus();
-		}
 	};
-
-	const handleBlur = () => {
-		setTimeout(() => {
-			if (searchInputRef.current && !searchInputRef.current.contains(document.activeElement)) {
-				searchInputRef.current.focus();
-			}
-		}, 10);
-	};
-
-	useEffect(() => {
-		if (isOpen && searchInputRef.current) {
-			searchInputRef.current.focus();
-		}
-	}, [isOpen]);
 
 	return (
 		<Select
@@ -223,46 +211,21 @@ function NetworkDropdown({ className }: { className?: string }) {
 					</div>
 				</SelectValue>
 			</SelectTrigger>
-			<SelectContent
-				className={styles.selectContentContainer}
-				onPointerDown={(e) => e.stopPropagation()}
-				onCloseAutoFocus={(e) => e.preventDefault()}
-			>
-				<div className={styles.selectContent}>
-					<Input
-						ref={searchInputRef}
-						type='text'
-						placeholder='Search networks...'
-						value={searchTerm}
-						onChange={handleSearchChange}
-						className='mb-2'
-						onKeyDown={(e) => {
-							e.stopPropagation();
-						}}
-						onBlur={handleBlur}
-					/>
-				</div>
-				<div className='p-2'>
-					<RenderNetworkSection
-						title='Polkadot & Parachains'
-						networks={NetworkData.polkadot}
-						searchTerm={searchTerm}
-					/>
-					<RenderNetworkSection
-						title='Kusama & Parachains'
-						networks={NetworkData.kusama}
-						searchTerm={searchTerm}
-					/>
-					<RenderNetworkSection
-						title='Solo Chains'
-						networks={NetworkData.soloChains}
-						searchTerm={searchTerm}
-					/>
-					<RenderNetworkSection
-						title='Test Chains'
-						networks={NetworkData.testChains}
-						searchTerm={searchTerm}
-					/>
+			<SelectContent className={styles.selectContentContainer}>
+				<NetworkInput
+					searchInputRef={searchInputRef as RefObject<HTMLInputElement>}
+					searchTerm={searchTerm}
+					handleSearchChange={handleSearchChange}
+				/>
+				<div className='overflow-y-auto p-2'>
+					{Object.entries(networkData).map(([category, networks]) => (
+						<RenderNetworkSection
+							key={category}
+							title={getNetworkDisplayName(category)}
+							networks={networks}
+							searchTerm={searchTerm}
+						/>
+					))}
 				</div>
 			</SelectContent>
 		</Select>
