@@ -13,9 +13,9 @@ import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import { MessageCircleWarning } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useRouter } from 'next/navigation';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
 import { OutputData } from '@editorjs/editorjs';
+import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import { Button } from '../../Button';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
@@ -35,7 +35,6 @@ interface IWritePostFormFields {
 
 function WritePost() {
 	const t = useTranslations();
-	const router = useRouter();
 	const formData = useForm<IWritePostFormFields>();
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -78,7 +77,7 @@ function WritePost() {
 		formData.reset();
 		setLoading(false);
 		// redirect to the discussion page
-		router.replace(`/post/${data.data.index}`);
+		redirectFromServer(`/post/${data.data.index}`);
 	};
 
 	return (

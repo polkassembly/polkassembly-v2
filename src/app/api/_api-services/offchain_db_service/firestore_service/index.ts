@@ -1039,20 +1039,28 @@ export class FirestoreService extends FirestoreRefs {
 	static async GetAllTags(network: ENetwork): Promise<IGenericListingResponse<ITag>> {
 		const tags = await FirestoreRefs.tagsCollectionRef().where('network', '==', network).get();
 		return {
-			items: tags.docs.map((doc) => ({
-				lastUsedAt: doc.data().lastUsedAt?.toDate ? doc.data().lastUsedAt.toDate() : doc.data().lastUsedAt,
-				value: doc.data().value || '',
-				network: doc.data().network
-			})),
+			items: tags.docs
+				.filter((doc) => doc.data().value)
+				.map((doc) => {
+					const data = doc.data();
+					return {
+						lastUsedAt: data.lastUsedAt?.toDate?.() || new Date(),
+						value: data.value,
+						network: data.network
+					} as ITag;
+				}),
 			totalCount: tags.size
 		};
 	}
 
 	static async CreateTags(tags: ITag[]) {
 		const batch = this.firestoreDb.batch();
+
 		tags?.forEach((tag) => {
-			batch.set(FirestoreRefs.tagsCollectionRef().doc(tag.value), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
+			const docId = `${tag.value}_${tag.network}`;
+			batch.set(FirestoreRefs.tagsCollectionRef().doc(docId), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
 		});
+
 		await batch.commit();
 	}
 }
