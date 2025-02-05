@@ -88,10 +88,10 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 		>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
-				<div className='flex items-center space-x-2 text-wallet_btn_text'>
+				<div className='flex items-center text-wallet_btn_text'>
 					<span className='text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
-							<div className={`${styles.beneficiaryContainer} text-xl font-semibold text-wallet_btn_text`}>
+							<div className={`${styles.beneficiaryContainer} mr-2 text-xl font-semibold text-wallet_btn_text`}>
 								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network))
 									.map(([assetId, amount]) =>
 										formatBnBalance(

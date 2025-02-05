@@ -12,7 +12,6 @@ import rankStar from '@assets/profile/rank-star.svg';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
-import Address from '../../Profile/Address/Address';
 
 function ActivityFeedRankCard() {
 	const t = useTranslations();
@@ -46,7 +45,7 @@ function ActivityFeedRankCard() {
 					<p className='text-base font-semibold text-rank_card_text'>
 						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
 					</p>
-					<div className='flex items-center justify-between gap-4 pt-8'>
+					<div className='flex items-center gap-2 pt-8'>
 						<div className='flex items-center'>
 							<Image
 								src={profileAvatar}
@@ -55,9 +54,7 @@ function ActivityFeedRankCard() {
 								width={32}
 								height={32}
 							/>
-							<p className='text-base font-semibold text-btn_secondary_text'>
-								<Address address={user.username} />
-							</p>
+							<p className='w-36 truncate font-semibold text-btn_secondary_text'>{user.username}</p>
 						</div>
 
 						<div>
