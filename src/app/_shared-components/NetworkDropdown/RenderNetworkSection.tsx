@@ -5,6 +5,7 @@
 import React from 'react';
 import { SelectItem } from '@ui/Select/Select';
 import Image, { StaticImageData } from 'next/image';
+import Link from 'next/link';
 
 interface RenderNetworkSectionProps {
 	title: string;
@@ -27,7 +28,10 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 						value={key.toLowerCase()}
 						className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
 					>
-						<div className='flex items-center gap-2'>
+						<Link
+							href={`https://${key.toLowerCase()}.polkassembly.io/`}
+							className='flex items-center gap-2'
+						>
 							<div className='h-6 w-6 flex-shrink-0 overflow-hidden rounded-full'>
 								<Image
 									src={logo}
@@ -38,7 +42,7 @@ function RenderNetworkSection({ title, networks, searchTerm }: RenderNetworkSect
 								/>
 							</div>
 							<span className='text-sm text-btn_secondary_text'>{key}</span>
-						</div>
+						</Link>
 					</SelectItem>
 				))}
 			</div>

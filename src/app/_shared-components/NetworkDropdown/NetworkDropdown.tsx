@@ -61,6 +61,7 @@ import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
 import { cn } from '@/lib/utils';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image, { StaticImageData } from 'next/image';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 import RenderNetworkSection from './RenderNetworkSection';
@@ -176,15 +177,9 @@ const getNetworkLogo = (networkKey: string): StaticImageData => {
 
 function NetworkDropdown({ className }: { className?: string }) {
 	const [searchTerm, setSearchTerm] = useState('');
-	const [selectedNetwork, setSelectedNetwork] = useState<string>('westend');
 	const [isOpen, setIsOpen] = useState(false);
+	const network = getCurrentNetwork();
 	const searchInputRef = useRef<HTMLInputElement>(null);
-
-	const handleNetworkChange = (network: string) => {
-		setSelectedNetwork(network.toLowerCase());
-		window.location.href = `https://${network.toLowerCase()}.polkassembly.io/`;
-		setSearchTerm('');
-	};
 
 	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
@@ -192,8 +187,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 
 	return (
 		<Select
-			value={selectedNetwork}
-			onValueChange={handleNetworkChange}
+			value={network}
 			open={isOpen}
 			onOpenChange={setIsOpen}
 		>
@@ -207,14 +201,14 @@ function NetworkDropdown({ className }: { className?: string }) {
 					<div className={styles.selectValueContainer}>
 						<div className={styles.selectValue}>
 							<Image
-								src={getNetworkLogo(selectedNetwork) || WestendLogo}
-								alt={getNetworkDisplayName(selectedNetwork)}
+								src={getNetworkLogo(network) || WestendLogo}
+								alt={getNetworkDisplayName(network)}
 								width={24}
 								height={24}
 								className='object-cover'
 							/>
 						</div>
-						{getNetworkDisplayName(selectedNetwork)}
+						{getNetworkDisplayName(network)}
 					</div>
 				</SelectValue>
 			</SelectTrigger>
