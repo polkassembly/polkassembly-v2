@@ -163,7 +163,9 @@
 			"linked_address": "链接地址",
 			"linked_multiple_addresses": "链接多个地址",
 			"unlinked_address": "取消链接地址",
-			"unlinked_multiple_addresses": "取消链接多个地址"
+			"unlinked_multiple_addresses": "取消链接多个地址",
+			"followed_user": "关注用户",
+			"unfollowed_user": "取消关注用户"
 		},
 		"overview": "概览",
 		"onchainIdentity": "链上身份",

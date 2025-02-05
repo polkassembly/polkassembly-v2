@@ -163,7 +163,9 @@
 			"linked_address": "Adresse verknüpft",
 			"linked_multiple_addresses": "Mehrere Adressen verknüpft",
 			"unlinked_address": "Adresse getrennt",
-			"unlinked_multiple_addresses": "Mehrere Adressen getrennt"
+			"unlinked_multiple_addresses": "Mehrere Adressen getrennt",
+			"followed_user": "Benutzer folgen",
+			"unfollowed_user": "Benutzer entfolgen"
 		},
 		"overview": "Übersicht",
 		"onchainIdentity": "Onchain-Identität",

@@ -163,7 +163,9 @@
 			"linked_address": "アドレスをリンク",
 			"linked_multiple_addresses": "複数のアドレスをリンク",
 			"unlinked_address": "アドレスのリンクを解除",
-			"unlinked_multiple_addresses": "複数のアドレスのリンクを解除"
+			"unlinked_multiple_addresses": "複数のアドレスのリンクを解除",
+			"followed_user": "ユーザーをフォロー",
+			"unfollowed_user": "ユーザーをフォロー解除"
 		},
 		"overview": "概要",
 		"onchainIdentity": "オンチェーンID",
