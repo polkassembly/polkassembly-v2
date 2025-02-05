@@ -61,8 +61,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 				})}
 			</div>
 			<div className='rounded-lg bg-bg_modal p-6'>
-				<div className='flex items-center justify-between'>
-					<p className='text-xl font-semibold text-text_primary'>{t('Leaderboard.top50Ranks')}</p>
+				<div className='flex items-center justify-end'>
 					{/* <div className='flex items-center gap-2'>
 						<div className='relative'>
 							<Input
