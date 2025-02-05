@@ -19,7 +19,8 @@ import {
 	IOffChainPost,
 	IOnChainPostListing,
 	IPostListing,
-	IPublicUser
+	IPublicUser,
+	ITag
 } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -190,7 +191,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		title: z.string().min(1, 'Title is required'),
 		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
-		tags: z.array(z.string().min(1)).optional(),
+		tags: z.array(z.custom<ITag>()).optional(),
 		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
 	});
 

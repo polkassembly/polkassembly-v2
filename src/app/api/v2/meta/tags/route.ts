@@ -9,6 +9,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
+import { ITag } from '@/_shared/types';
 import { OffChainDbService } from '../../../_api-services/offchain_db_service';
 import { withErrorHandling } from '../../../_api-utils/withErrorHandling';
 
@@ -19,12 +20,12 @@ export const GET = withErrorHandling(async () => {
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const zodQuerySchema = z.object({
-		tags: z.array(z.string().min(1))
+		tags: z.array(z.custom<ITag>())
 	});
 
 	const { tags } = zodQuerySchema.parse(await getReqBody(req));
 
-	if (!tags.length || tags.some((tag) => !ValidatorService.isValidTag(tag))) {
+	if (!tags.length || tags.some((tag) => !ValidatorService.isValidTag(tag.value))) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
 	}
 

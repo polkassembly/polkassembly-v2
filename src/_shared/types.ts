@@ -327,6 +327,12 @@ export enum EOffChainPostTopic {
 	FELLOWSHIP = 'fellowship'
 }
 
+export interface ITag {
+	value: string;
+	lastUsedAt: Date;
+	network: ENetwork;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -338,7 +344,7 @@ export interface IOffChainPost {
 	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
-	tags?: string[];
+	tags?: ITag[];
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
@@ -770,18 +776,6 @@ export interface IQRSessionPayload {
 	sessionId: string;
 	timestamp: number;
 	expiresIn: number;
-}
-export interface IWritePostFormFields {
-	title: string;
-	description: OutputData;
-	tags: { value: string; label: string }[];
-	topic: EOffChainPostTopic;
-	allowedCommentor: EAllowedCommentor;
-}
-
-export interface ITag {
-	lastUsedAt: Date;
-	name: string;
 }
 
 export enum EAppEnv {

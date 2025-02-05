@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EOffChainPostTopic, EProposalType, IWritePostFormFields } from '@/_shared/types';
+import { EAllowedCommentor, EOffChainPostTopic, EProposalType, ITag } from '@/_shared/types';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { Input } from '@ui/Input';
@@ -16,6 +16,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useRouter } from 'next/navigation';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
+import { OutputData } from '@editorjs/editorjs';
 import { Button } from '../../Button';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
@@ -24,6 +25,14 @@ import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
 import classes from './WritePost.module.scss';
 import LoadingLayover from '../../LoadingLayover';
+
+interface IWritePostFormFields {
+	title: string;
+	description: OutputData;
+	tags: ITag[];
+	topic: EOffChainPostTopic;
+	allowedCommentor: EAllowedCommentor;
+}
 
 function WritePost() {
 	const t = useTranslations();
@@ -56,7 +65,7 @@ function WritePost() {
 			content: description,
 			title,
 			allowedCommentor,
-			tags: tags?.map((tag) => tag?.value) || [],
+			tags,
 			topic: topic || EOffChainPostTopic.GENERAL
 		});
 

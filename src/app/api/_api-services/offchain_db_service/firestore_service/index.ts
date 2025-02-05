@@ -24,7 +24,8 @@ import {
 	IUserNotificationSettings,
 	IFollowEntry,
 	IGenericListingResponse,
-	EOffChainPostTopic
+	EOffChainPostTopic,
+	ITag
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -930,7 +931,7 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash?: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
-		tags?: string[];
+		tags?: ITag[];
 		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
@@ -953,7 +954,7 @@ export class FirestoreService extends FirestoreRefs {
 			allowedCommentor,
 			isDeleted: false
 		};
-		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag))) newPost.tags = tags;
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
 		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
 
 		if (proposalType === EProposalType.TIP) {
@@ -1040,10 +1041,10 @@ export class FirestoreService extends FirestoreRefs {
 		return tags.docs.map((doc) => ({ lastUsedAt: doc.data().lastUsedAt?.toDate ? doc.data().lastUsedAt.toDate() : doc.data().lastUsedAt, name: doc.data().name || '' }));
 	}
 
-	static async CreateTags(tags: string[]) {
+	static async CreateTags(tags: ITag[]) {
 		const batch = this.firestoreDb.batch();
 		tags?.forEach((tag) => {
-			batch.set(FirestoreRefs.tagsCollectionRef().doc(tag), { name: tag, lastUsedAt: new Date() }, { merge: true });
+			batch.set(FirestoreRefs.tagsCollectionRef().doc(tag.value), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
 		});
 		await batch.commit();
 	}

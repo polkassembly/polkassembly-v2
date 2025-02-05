@@ -12,27 +12,25 @@ import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
 import { useRef, useState } from 'react';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
+import { ITag } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './AddTags.module.scss';
 import { Input } from '../../Input';
 
-interface Option {
-	value: string;
-	label: string;
-}
-
-export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) => void; disabled: boolean }) {
+export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) => void; disabled: boolean }) {
 	const t = useTranslations();
 	const [open, setOpen] = useState(false);
-	const [selectedValues, setSelectedValues] = useState<Option[]>([]);
+	const [selectedValues, setSelectedValues] = useState<ITag[]>([]);
 	const [pressedAddTag, setPressedAddTag] = useState(false);
 	const addTagInputRef = useRef<HTMLInputElement>(null);
+	const network = getCurrentNetwork();
 
 	const fetchAllTags = async () => {
 		const { data, error } = await NextApiClientService.fetchAllTagsApi();
 		if (error) {
 			throw new ClientError(error.message || 'Failed to fetch data');
 		}
-		return data?.map((tag) => ({ value: tag.name, label: tag.name })) || [];
+		return data;
 	};
 
 	const { data: allTags = [], isFetching } = useQuery({
@@ -42,14 +40,14 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 		staleTime: FIVE_MIN_IN_MILLI
 	});
 
-	const handleSelect = (option: Option) => {
+	const handleSelect = (option: ITag) => {
 		if (selectedValues?.length >= MAX_POST_TAGS) return;
 		const newTags = selectedValues?.find((item) => item.value === option.value) ? selectedValues : [...selectedValues, option];
 		setSelectedValues(newTags);
 		onChange(newTags);
 	};
 
-	const handleRemove = (optionToRemove: Option) => {
+	const handleRemove = (optionToRemove: ITag) => {
 		const newTags = selectedValues.filter((item) => item.value !== optionToRemove.value);
 		setSelectedValues(newTags);
 		onChange(newTags);
@@ -67,7 +65,7 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 						placeholder={t('Create.addTags')}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
-								handleSelect({ value: e.currentTarget.value, label: e.currentTarget.value });
+								handleSelect({ value: e.currentTarget.value, lastUsedAt: new Date(), network });
 								setPressedAddTag(false);
 							}
 						}}
@@ -114,7 +112,7 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 										key={option.value}
 										className={classes.tagLabel}
 									>
-										{option.label}
+										{option.value}
 										<Button
 											type='button'
 											variant='ghost'
@@ -149,9 +147,9 @@ export function AddTags({ onChange, disabled }: { onChange: (options: Option[]) 
 						allTags.map((tag) => (
 							<button
 								type='button'
-								onClick={() => handleSelect(tag)}
+								onClick={() => handleSelect({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })}
 							>
-								{tag.label}
+								{tag.value}
 							</button>
 						))
 					) : (

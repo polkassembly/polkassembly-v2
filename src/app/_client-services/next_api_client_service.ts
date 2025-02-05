@@ -535,7 +535,7 @@ export class NextApiClientService {
 		content: OutputData;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
-		tags?: string[];
+		tags?: ITag[];
 		topic?: EOffChainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
