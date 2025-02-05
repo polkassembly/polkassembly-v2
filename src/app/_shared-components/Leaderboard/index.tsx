@@ -63,7 +63,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 			<div className='rounded-lg bg-bg_modal p-6'>
 				<div className='flex items-center justify-between'>
 					<p className='text-xl font-semibold text-text_primary'>{t('Leaderboard.top50Ranks')}</p>
-					<div className='flex items-center gap-2'>
+					{/* <div className='flex items-center gap-2'>
 						<div className='relative'>
 							<Input
 								className={styles.input_container}
@@ -71,7 +71,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 							/>
 							<MdOutlineSearch className={styles.input_search} />
 						</div>
-					</div>
+					</div> */}
 				</div>
 				<div className='pt-5'>
 					<Table>
