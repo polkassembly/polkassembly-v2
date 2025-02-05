@@ -44,8 +44,8 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 						/>
 					</div>
 					<div className='flex flex-col items-center gap-1 text-center md:items-start md:text-left'>
-						<p className='text-4xl font-semibold text-white'>Leaderboard</p>
-						<p className='text-white'>Find your rank in the ecosystem</p>
+						<p className='text-4xl font-semibold text-white'>{t('Leaderboard.leaderboard')}</p>
+						<p className='text-white'>{t('Leaderboard.findYourRank')}</p>
 					</div>
 				</div>
 			</div>
@@ -62,12 +62,12 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 			</div>
 			<div className='rounded-lg bg-bg_modal p-6'>
 				<div className='flex items-center justify-between'>
-					<p className='text-xl font-semibold text-text_primary'>Top 50 Ranks</p>
+					<p className='text-xl font-semibold text-text_primary'>{t('Leaderboard.top50Ranks')}</p>
 					<div className='flex items-center gap-2'>
 						<div className='relative'>
 							<Input
 								className={styles.input_container}
-								placeholder='Enter username to search'
+								placeholder={t('Leaderboard.searchUsername')}
 							/>
 							<MdOutlineSearch className={styles.input_search} />
 						</div>
@@ -78,10 +78,10 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 						<TableHeader>
 							<TableRow className={styles.tableRow}>
 								<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
-								<TableHead className={styles.tableCell_2}>{t('Profile.username')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('Profile.astrals')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('Profile.userSince')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('Profile.actions')}</TableHead>
+								<TableHead className={styles.tableCell_2}>{t('Leaderboard.username')}</TableHead>
+								<TableHead className={styles.tableCell}>{t('Leaderboard.astrals')}</TableHead>
+								<TableHead className={styles.tableCell}>{t('Leaderboard.userSince')}</TableHead>
+								<TableHead className={styles.tableCell_last}>{t('Leaderboard.actions')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>

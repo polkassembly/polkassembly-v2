@@ -573,7 +573,15 @@
 		"node": "Nodo",
 		"network": "Red",
 		"searchNetworks": "Buscar redes..."
+	},
+	"Leaderboard": {
+		"username": "Nombre de usuario",
+		"astrals": "Astrals",
+		"userSince": "Usuario desde",
+		"actions": "Acciones",
+		"top50Ranks": "Top 50 Rangos",
+		"leaderboard": "Tabla de Clasificación",
+		"findYourRank": "Encuentra tu rango en el ecosistema",
+		"searchUsername": "Buscar nombre de usuario"
 	}
 }
-
-

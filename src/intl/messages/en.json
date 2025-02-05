@@ -593,5 +593,15 @@
 		"node": "Node",
 		"network": "Network",
 		"searchNetworks": "Search networks..."
+	},
+	"Leaderboard": {
+		"username": "Username",
+		"astrals": "Astrals",
+		"userSince": "User Since",
+		"actions": "Actions",
+		"top50Ranks": "Top 50 Ranks",
+		"leaderboard": "Leaderboard",
+		"findYourRank": "Find your rank in the ecosystem",
+		"searchUsername": "Enter username to search"
 	}
 }

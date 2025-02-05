@@ -573,5 +573,15 @@
 		"node": "节点",
 		"network": "网络",
 		"searchNetworks": "搜索网络..."
+	},
+	"Leaderboard": {
+		"username": "用户名",
+		"astrals": "波卡点",
+		"userSince": "用户自",
+		"actions": "操作",
+		"top50Ranks": "前50名",
+		"leaderboard": "排行榜",
+		"findYourRank": "在生态系统中找到你的排名",
+		"searchUsername": "搜索用户名"
 	}
 }

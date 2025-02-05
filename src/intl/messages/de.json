@@ -511,7 +511,7 @@
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
-	
+
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
 		"title": "Titel",
@@ -574,7 +574,15 @@
 		"node": "Knoten",
 		"network": "Netzwerk",
 		"searchNetworks": "Netzwerke suchen..."
+	},
+	"Leaderboard": {
+		"username": "Benutzername",
+		"astrals": "Astrals",
+		"userSince": "Benutzer seit",
+		"actions": "Aktionen",
+		"top50Ranks": "Top 50 Ränge",
+		"leaderboard": "Bestenliste",
+		"findYourRank": "Finde deinen Rang in der Ökosystem",
+		"searchUsername": "Benutzername suchen"
 	}
 }
-
-
