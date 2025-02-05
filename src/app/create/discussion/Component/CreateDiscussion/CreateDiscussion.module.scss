@@ -2,7 +2,7 @@
     @apply flex h-full w-full items-start justify-center p-8 sm:p-20
 }
 .createDiscussionComp {
-    @apply w-[350px] sm:w-[600px] rounded-lg shadow-lg bg-bg_modal
+    @apply shadow-lg bg-bg_modal
 }
 .header {
     @apply border-b border-border_grey p-4

@@ -539,7 +539,10 @@
 			"stakingadmin": "Administrador de apuestas",
 			"treasury": "Tesorería",
 			"fellowship": "Compañerismo"
-		}
+		},
+		"titleTooShort": "Por favor, proporcione un título válido.",
+		"titlePlaceholder": "Ingrese título",
+		"descriptionRequired": "Por favor, proporcione una descripción válida."
 	},
 	"ProposalType": {
 		"discussion": "Discusión",
@@ -573,6 +576,10 @@
 		"node": "Nodo",
 		"network": "Red",
 		"searchNetworks": "Buscar redes..."
+	},
+	"BlockEditor": {
+		"placeholder": "Escribe / para comenzar",
+		"errorUpdatingContent": "Error al actualizar el contenido"
 	}
 }
 

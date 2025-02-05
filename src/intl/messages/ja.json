@@ -539,7 +539,10 @@
 			"stakingadmin": "ステーキング管理者",
 			"treasury": "財務",
 			"fellowship": "フェローシップ"
-		}
+		},
+		"titleTooShort": "有効なタイトルを入力してください。",
+		"titlePlaceholder": "タイトルを入力",
+		"descriptionRequired": "有効な説明を入力してください。"
 	},
 	"ProposalType": {
 		"discussion": "ディスカッション",
@@ -573,6 +576,10 @@
 		"node": "ノード",
 		"network": "ネットワーク",
 		"searchNetworks": "ネットワークを検索..."
+	},
+	"BlockEditor": {
+		"placeholder": "/ を入力して開始",
+		"errorUpdatingContent": "コンテンツの更新中にエラーが発生しました"
 	}
 }
 
