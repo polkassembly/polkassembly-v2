@@ -67,7 +67,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 							width={16}
 							height={16}
 						/>
-						<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
+						<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
 					</span>
 				</div>
 				<div className='flex flex-col gap-3 px-10'>
