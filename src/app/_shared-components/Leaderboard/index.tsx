@@ -27,9 +27,9 @@ import RankCard from './RankCard';
 
 function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
-	const page = parseInt(searchParams.get('page') || '1', 10) || 1;
+	const page = parseInt(searchParams.get('page') || '1', DEFAULT_LISTING_LIMIT) || 1;
 	const router = useRouter();
-	const displayedItems = page === 1 ? data.items.slice(3, 10) : data.items;
+	const displayedItems = page === 1 ? data.items.slice(3, DEFAULT_LISTING_LIMIT) : data.items;
 	const t = useTranslations();
 	return (
 		<div className='bg-page_background'>
