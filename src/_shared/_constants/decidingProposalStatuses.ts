@@ -4,4 +4,4 @@
 
 import { EProposalStatus } from '@shared/types';
 
-export const VOTING_PROPOSAL_STATUSES = [EProposalStatus.DecisionDepositPlaced, EProposalStatus.Deciding, EProposalStatus.ConfirmStarted, EProposalStatus.ConfirmAborted];
+export const DECIDING_PROPOSAL_STATUSES = [EProposalStatus.DecisionDepositPlaced, EProposalStatus.Deciding, EProposalStatus.ConfirmStarted, EProposalStatus.ConfirmAborted];
