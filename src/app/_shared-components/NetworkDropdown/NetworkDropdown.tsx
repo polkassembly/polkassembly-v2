@@ -147,6 +147,13 @@ const networkData: NetworkDataType = {
 	}
 };
 
+const categoryDisplayNames: { [key: string]: string } = {
+	polkadot: 'Polkadot & Parachains',
+	kusama: 'Kusama & Parachains',
+	soloChains: 'Solo Chains',
+	testChains: 'Test Chains'
+};
+
 const getNetworkDisplayName = (networkKey: string): string => {
 	const lowerNetworkKey = networkKey.toLowerCase();
 	return (
