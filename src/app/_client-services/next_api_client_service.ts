@@ -26,7 +26,8 @@ import {
 	IUserActivity,
 	IPreimage,
 	IQRSessionPayload,
-	ESocial
+	ESocial,
+	IFollowEntry
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -68,7 +69,11 @@ enum EApiRoute {
 	LINK_ADDRESS = 'LINK_ADDRESS',
 	EDIT_USER_PROFILE = 'EDIT_USER_PROFILE',
 	DELETE_ACCOUNT = 'DELETE_ACCOUNT',
-	FETCH_LEADERBOARD = 'FETCH_LEADERBOARD'
+	FETCH_LEADERBOARD = 'FETCH_LEADERBOARD',
+	FOLLOW_USER = 'FOLLOW_USER',
+	UNFOLLOW_USER = 'UNFOLLOW_USER',
+	GET_FOLLOWING = 'GET_FOLLOWING',
+	GET_FOLLOWERS = 'GET_FOLLOWERS'
 }
 
 export class NextApiClientService {
@@ -159,8 +164,19 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.DELETE_ACCOUNT:
+			case EApiRoute.UNFOLLOW_USER:
 				path = '/users/id';
 				method = 'DELETE';
+				break;
+			case EApiRoute.FOLLOW_USER:
+				path = '/users/id';
+				method = 'POST';
+				break;
+			case EApiRoute.GET_FOLLOWING:
+				path = '/users/id';
+				break;
+			case EApiRoute.GET_FOLLOWERS:
+				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 				path = '/users/address';
@@ -436,6 +452,26 @@ export class NextApiClientService {
 	protected static async deleteAccountApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_ACCOUNT, routeSegments: [userId.toString()] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async followUserApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FOLLOW_USER, routeSegments: [userId.toString(), 'followers'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async unfollowUserApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UNFOLLOW_USER, routeSegments: [userId.toString(), 'followers'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async getFollowingApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_FOLLOWING, routeSegments: [userId.toString(), 'following'] });
+		return this.nextApiClientFetch<{ following: IFollowEntry[] }>({ url, method });
+	}
+
+	protected static async getFollowersApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_FOLLOWERS, routeSegments: [userId.toString(), 'followers'] });
+		return this.nextApiClientFetch<{ followers: IFollowEntry[] }>({ url, method });
 	}
 
 	static async fetchPreimagesApi({ page }: { page: number }) {
