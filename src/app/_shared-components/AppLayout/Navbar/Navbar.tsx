@@ -16,7 +16,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ChevronDown } from 'lucide-react';
 import { FaBars } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -44,19 +44,18 @@ function Navbar() {
 		setUserPreferences({ ...userPreferences, locale });
 	};
 
-	useEffect(() => {
-		if (isModalOpen) {
-			document.body.style.overflow = 'hidden';
-		} else {
-			document.body.style.overflow = 'auto';
-		}
-		return () => {
-			document.body.style.overflow = 'auto';
-		};
-	}, [isModalOpen]);
+	const handleModalOpen = () => {
+		document.body.classList.add('no-scroll');
+	};
 
-	const closeModal = () => setModalOpen(false);
+	const handleModalClose = () => {
+		document.body.classList.remove('no-scroll');
+	};
 
+	const closeModal = () => {
+		setModalOpen(false);
+		handleModalClose();
+	};
 	return (
 		<nav className={classes.navbar}>
 			<div className='flex items-center pl-8 md:pl-0'>
@@ -70,7 +69,14 @@ function Navbar() {
 			<div
 				aria-hidden
 				className='block rounded-md border border-border_grey bg-network_dropdown_bg p-2 md:hidden'
-				onClick={() => setModalOpen(!isModalOpen)}
+				onClick={() => {
+					setModalOpen(!isModalOpen);
+					if (!isModalOpen) {
+						handleModalOpen();
+					} else {
+						handleModalClose();
+					}
+				}}
 			>
 				{isModalOpen ? <IoMdClose className='text-text_primary' /> : <FaBars className='text-text_primary' />}
 			</div>
