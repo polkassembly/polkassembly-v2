@@ -77,7 +77,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 				<DropdownMenuTrigger className={classes.dropdownTrigger}>
 					<Address
 						address={userPreferences?.address?.address || ''}
-						walletAddressName={userPreferences?.address?.name}
+						walletAddressName={userPreferences?.address?.name || ''}
 						iconSize={25}
 					/>
 				</DropdownMenuTrigger>

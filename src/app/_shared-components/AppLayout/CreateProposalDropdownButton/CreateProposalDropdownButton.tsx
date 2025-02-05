@@ -16,14 +16,16 @@ import { ETheme } from '@/_shared/types';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/hooks/useUser';
 import style from './CreateProposalDropdownButton.module.scss';
 
 function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
+	const { user } = useUser();
 	const menuItems = [
 		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
 		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: '#' }
+		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: user?.id ? '/create/discussion' : '/login?nextUrl=create/discussion' }
 	];
 
 	const { resolvedTheme: theme } = useTheme();

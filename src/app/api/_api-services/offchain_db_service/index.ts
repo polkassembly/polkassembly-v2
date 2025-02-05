@@ -25,7 +25,9 @@ import {
 	IProfileDetails,
 	IUserNotificationSettings,
 	IFollowEntry,
-	IGenericListingResponse
+	IGenericListingResponse,
+	EOffChainPostTopic,
+	ITag
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -495,7 +497,9 @@ export class OffChainDbService {
 		userId,
 		content,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -503,6 +507,8 @@ export class OffChainDbService {
 		content: OutputData;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: ITag[];
+		topic?: EOffChainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -510,7 +516,12 @@ export class OffChainDbService {
 
 		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, tags: tags || [], topic, indexOrHash: index.toString() });
+
+		// Create tags
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) {
+			await this.CreateTags(tags);
+		}
 
 		// create content summary
 		// await AIService.createPostSummary({ network, proposalType, indexOrHash: post.indexOrHash });
@@ -629,5 +640,13 @@ export class OffChainDbService {
 			name: EActivityName.UNFOLLOWED_USER,
 			metadata: { userId: userIdToUnfollow }
 		});
+	}
+
+	static async GetAllTags(network: ENetwork) {
+		return FirestoreService.GetAllTags(network);
+	}
+
+	static async CreateTags(tags: ITag[]) {
+		return FirestoreService.CreateTags(tags);
 	}
 }

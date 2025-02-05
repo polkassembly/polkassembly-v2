@@ -511,6 +511,36 @@
 		"searchByHash": "按哈希搜索",
 		"preimageNotFound": "预映像未找到"
 	},
+	"Create": {
+		"createDiscussionTitle": "创建讨论",
+		"title": "标题",
+		"description": "描述",
+		"create": "创建",
+		"createTag": "创建标签",
+		"addTags": "添加标签",
+		"searchTags": "搜索标签",
+		"noTagsFound": "未找到标签。",
+		"selectTags": "选择标签",
+		"selectTopic": "选择主题",
+		"tagsLeftText": "剩余标签",
+		"AllowedCommentors": {
+			"title": "谁可以评论？",
+			"all": "所有",
+			"onchainVerified": "链上验证",
+			"none": "无",
+			"tooltip": "选择谁可以评论和回复此帖子"
+		},
+		"Topic": {
+			"general": "一般",
+			"auctionadmin": "拍卖管理员",
+			"generaladmin": "一般管理员",
+			"governance": "治理",
+			"root": "根",
+			"stakingadmin": "质押管理员",
+			"treasury": "国库",
+			"fellowship": "奖学金"
+		}
+	},
 	"ProposalType": {
 		"discussion": "讨论",
 		"referendum": "公投",
@@ -520,14 +550,14 @@
 		"treasuryproposal": "国库提案",
 		"bounty": "赏金",
 		"childbounty": "子赏金",
-		"tip": "小费",
-		"fellowshipreferendum": "研究员公投",
+		"tip": "提示",
+		"fellowshipreferendum": "奖学金公投",
 		"alliancemotion": "联盟动议",
 		"announcement": "公告",
 		"democracyproposal": "民主提案",
 		"upgradecommittee": "升级委员会",
 		"advisorycommittee": "咨询委员会",
-		"grant": "资助",
+		"grant": "拨款",
 		"community": "社区",
 		"technicalcommittee": "技术委员会"
 	},

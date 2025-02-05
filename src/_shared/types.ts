@@ -316,6 +316,23 @@ export interface IContentSummary {
 	updatedAt: Date;
 }
 
+export enum EOffChainPostTopic {
+	GENERAL = 'general',
+	AUCTION_ADMIN = 'auctionAdmin',
+	GENERAL_ADMIN = 'generalAdmin',
+	GOVERNANCE = 'governance',
+	ROOT = 'root',
+	STAKING_ADMIN = 'stakingAdmin',
+	TREASURY = 'treasury',
+	FELLOWSHIP = 'fellowship'
+}
+
+export interface ITag {
+	value: string;
+	lastUsedAt: Date;
+	network: ENetwork;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -327,7 +344,7 @@ export interface IOffChainPost {
 	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
-	tags?: string[];
+	tags?: ITag[];
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
@@ -338,6 +355,7 @@ export interface IOffChainPost {
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
+	topic?: EOffChainPostTopic;
 }
 
 export enum EProposalStatus {

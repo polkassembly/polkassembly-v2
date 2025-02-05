@@ -9,7 +9,7 @@ import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, HTMLAttributes } from 'react';
-import styles from './Dialog.module.scss';
+import classes from './Dialog.module.scss';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -22,10 +22,7 @@ const DialogClose = DialogPrimitive.Close;
 const DialogOverlay = forwardRef<ElementRef<typeof DialogPrimitive.Overlay>, ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>>(({ className, ...props }, ref) => (
 	<DialogPrimitive.Overlay
 		ref={ref}
-		className={cn(
-			'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-			className
-		)}
+		className={cn(classes.dialogOverlay, className)}
 		{...props}
 	/>
 ));
@@ -39,12 +36,12 @@ const DialogContent = forwardRef<ElementRef<typeof DialogPrimitive.Content>, Com
 			className={cn(
 				'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
 				className,
-				styles.dialogContent
+				classes.dialogContent
 			)}
 			{...props}
 		>
 			{children}
-			<DialogPrimitive.Close className={`${styles.dialogClose} data-[state=open]:bg-accent data-[state=open]:text-muted-foreground`}>
+			<DialogPrimitive.Close className={cn(classes.dialogClose, 'data-[state=open]:bg-accent data-[state=open]:text-muted-foreground')}>
 				<X className='h-4 w-4' />
 				<span className='sr-only'>Close</span>
 			</DialogPrimitive.Close>
@@ -56,7 +53,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 function DialogHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn(styles.dialogHeader, className)}
+			className={cn(classes.dialogHeader, className)}
 			{...props}
 		/>
 	);
@@ -66,7 +63,7 @@ DialogHeader.displayName = 'DialogHeader';
 function DialogFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn(styles.dialogFooter, className)}
+			className={cn(classes.dialogFooter, className)}
 			{...props}
 		/>
 	);
@@ -76,7 +73,7 @@ DialogFooter.displayName = 'DialogFooter';
 const DialogTitle = forwardRef<ElementRef<typeof DialogPrimitive.Title>, ComponentPropsWithoutRef<typeof DialogPrimitive.Title>>(({ className, ...props }, ref) => (
 	<DialogPrimitive.Title
 		ref={ref}
-		className={cn('text-lg font-semibold leading-none tracking-tight', className)}
+		className={cn(classes.dialogTitle, 'text-lg font-semibold leading-none tracking-tight', className)}
 		{...props}
 	/>
 ));
@@ -86,7 +83,7 @@ const DialogDescription = forwardRef<ElementRef<typeof DialogPrimitive.Descripti
 	({ className, ...props }, ref) => (
 		<DialogPrimitive.Description
 			ref={ref}
-			className={cn('text-sm text-muted-foreground', className)}
+			className={cn(classes.dialogDescription, className)}
 			{...props}
 		/>
 	)

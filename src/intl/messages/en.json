@@ -531,6 +531,56 @@
 		"searchByHash": "Search by hash",
 		"preimageNotFound": "Preimage not found"
 	},
+	"Create": {
+		"createDiscussionTitle": "Create Discussion",
+		"title": "Title",
+		"description": "Description",
+		"create": "Create",
+		"createTag": "Create Tag",
+		"addTags": "Add Tags",
+		"searchTags": "Search tags",
+		"noTagsFound": "No tags found.",
+		"selectTags": "Select tags",
+		"selectTopic": "Select Topic",
+		"tagsLeftText": "Tags left",
+		"AllowedCommentors": {
+			"title": "Who can comment ?",
+			"all": "All",
+			"onchainVerified": "Onchain Verified",
+			"none": "None",
+			"tooltip": "Choose who can comment and reply to this post"
+		},
+		"Topic": {
+			"general": "General",
+			"auctionadmin": "Auction Admin",
+			"generaladmin": "General Admin",
+			"governance": "Governance",
+			"root": "Root",
+			"stakingadmin": "Staking Admin",
+			"treasury": "Treasury",
+			"fellowship": "Fellowship"
+		}
+	},
+	"ProposalType": {
+		"discussion": "Discussion",
+		"referendum": "Referendum",
+		"referendumv2": "Referendum",
+		"councilmotion": "Council Motion",
+		"techcommitteeproposal": "Tech Committee Proposal",
+		"treasuryproposal": "Treasury Proposal",
+		"bounty": "Bounty",
+		"childbounty": "Child Bounty",
+		"tip": "Tip",
+		"fellowshipreferendum": "Fellowship Referendum",
+		"alliancemotion": "Alliance Motion",
+		"announcement": "Announcement",
+		"democracyproposal": "Democracy Proposal",
+		"upgradecommittee": "Upgrade Committee",
+		"advisorycommittee": "Advisory Committee",
+		"grant": "Grant",
+		"community": "Community",
+		"technicalcommittee": "Technical Committee"
+	},
 	"Header": {
 		"polkadot": "Polkadot & Parachains",
 		"kusama": "Kusama & Parachains",

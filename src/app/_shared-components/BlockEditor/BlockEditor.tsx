@@ -139,7 +139,7 @@ function BlockEditor({
 							// TODO: show notification
 						}
 					},
-					placeholder: readOnly ? '' : 'Type your comment here'
+					placeholder: readOnly ? '' : 'Type / to start'
 				});
 				blockEditorRef.current = editor;
 			}

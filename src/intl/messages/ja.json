@@ -511,20 +511,50 @@
 		"searchByHash": "ハッシュで検索",
 		"preimageNotFound": "プレイメージが見つかりません"
 	},
+	"Create": {
+		"createDiscussionTitle": "ディスカッションを作成",
+		"title": "タイトル",
+		"description": "説明",
+		"create": "作成",
+		"createTag": "タグを作成",
+		"addTags": "タグを追加",
+		"searchTags": "タグを検索",
+		"noTagsFound": "タグが見つかりません。",
+		"selectTags": "タグを選択",
+		"selectTopic": "トピックを選択",
+		"tagsLeftText": "残りのタグ",
+		"AllowedCommentors": {
+			"title": "誰がコメントできますか？",
+			"all": "すべて",
+			"onchainVerified": "オンチェーンで確認済み",
+			"none": "なし",
+			"tooltip": "この投稿にコメントおよび返信できる人を選択"
+		},
+		"Topic": {
+			"general": "一般",
+			"auctionadmin": "オークション管理者",
+			"generaladmin": "一般管理者",
+			"governance": "ガバナンス",
+			"root": "ルート",
+			"stakingadmin": "ステーキング管理者",
+			"treasury": "財務",
+			"fellowship": "フェローシップ"
+		}
+	},
 	"ProposalType": {
 		"discussion": "ディスカッション",
-		"referendum": "レファレンダム",
-		"referendumv2": "レファレンダム",
-		"councilmotion": "評議会モーション",
-		"techcommitteeproposal": "技術委員会提案",
+		"referendum": "国民投票",
+		"referendumv2": "国民投票",
+		"councilmotion": "評議会の動議",
+		"techcommitteeproposal": "技術委員会の提案",
 		"treasuryproposal": "財務提案",
 		"bounty": "報奨金",
-		"childbounty": "子報奨金",
+		"childbounty": "子供の報奨金",
 		"tip": "チップ",
-		"fellowshipreferendum": "フェローシップレファレンダム",
-		"alliancemotion": "アライアンスモーション",
+		"fellowshipreferendum": "フェローシップ国民投票",
+		"alliancemotion": "同盟の動議",
 		"announcement": "発表",
-		"democracyproposal": "民主主義提案",
+		"democracyproposal": "民主主義の提案",
 		"upgradecommittee": "アップグレード委員会",
 		"advisorycommittee": "諮問委員会",
 		"grant": "助成金",
@@ -545,3 +575,5 @@
 		"searchNetworks": "ネットワークを検索..."
 	}
 }
+
+
