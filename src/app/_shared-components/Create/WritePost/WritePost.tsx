@@ -15,7 +15,7 @@ import { MessageCircleWarning } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
 import { OutputData } from '@editorjs/editorjs';
-import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
+import { useRouter } from 'next/navigation';
 import { Button } from '../../Button';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
@@ -38,6 +38,7 @@ function WritePost() {
 	const formData = useForm<IWritePostFormFields>();
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const router = useRouter();
 
 	const allowedCommentorsOptions = [
 		{
@@ -77,7 +78,7 @@ function WritePost() {
 		formData.reset();
 		setLoading(false);
 		// redirect to the discussion page
-		redirectFromServer(`/post/${data.data.index}`);
+		router.push(`/post/${data.data.index}`);
 	};
 
 	return (
