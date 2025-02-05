@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { dayjs } from '@shared/_utils/dayjsInit';
 import React from 'react';
 import Cup from '@assets/leaderboard/cup.svg';
 import Image from 'next/image';
@@ -29,13 +29,11 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 			</div>
 
 			{data.items.map((item) => {
-				// eslint-disable-next-line
-				const createdAtSeconds = item.createdAt?._seconds;
 				return (
 					<div key={item.id}>
 						<h1>{item.username}</h1>
 						<h1>{item.rank}</h1>
-						<h1>{createdAtSeconds ? dayjs(new Date(createdAtSeconds * 1000)).format("Do MMM 'YY") : ''}</h1>
+						{dayjs(item.createdAt).format("Do MMM 'YY")}
 					</div>
 				);
 			})}
