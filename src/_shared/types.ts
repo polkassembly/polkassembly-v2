@@ -316,6 +316,23 @@ export interface IContentSummary {
 	updatedAt: Date;
 }
 
+export enum EOffChainPostTopic {
+	GENERAL = 'general',
+	AUCTION_ADMIN = 'auctionAdmin',
+	GENERAL_ADMIN = 'generalAdmin',
+	GOVERNANCE = 'governance',
+	ROOT = 'root',
+	STAKING_ADMIN = 'stakingAdmin',
+	TREASURY = 'treasury',
+	FELLOWSHIP = 'fellowship'
+}
+
+export interface ITag {
+	value: string;
+	lastUsedAt: Date;
+	network: ENetwork;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -327,7 +344,7 @@ export interface IOffChainPost {
 	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
-	tags?: string[];
+	tags?: ITag[];
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
@@ -338,6 +355,7 @@ export interface IOffChainPost {
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
+	topic?: EOffChainPostTopic;
 }
 
 export enum EProposalStatus {
@@ -657,7 +675,9 @@ export enum EActivityName {
 	LINKED_ADDRESS = 'linked_address',
 	LINKED_MULTIPLE_ADDRESSES = 'linked_multiple_addresses',
 	UNLINKED_ADDRESS = 'unlinked_address',
-	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses'
+	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses',
+	FOLLOWED_USER = 'followed_user',
+	UNFOLLOWED_USER = 'unfollowed_user'
 }
 
 export enum EActivityCategory {
@@ -700,6 +720,9 @@ export interface IActivityMetadata {
 
 	// for identity and link address
 	address?: string;
+
+	// for follow/unfollow
+	userId?: number;
 }
 
 export interface IUserActivity {
@@ -771,4 +794,9 @@ export interface IFollowEntry {
 	followerUserId: number;
 	followedUserId: number;
 	updatedAt: Date;
+}
+
+export enum ESidebarState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed'
 }

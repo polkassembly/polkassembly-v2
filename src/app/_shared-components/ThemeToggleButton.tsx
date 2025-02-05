@@ -8,13 +8,15 @@ import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 
 interface ToggleButtonProps {
 	className?: string;
 }
 
-function ToggleButton({ className }: ToggleButtonProps) {
+function ThemeToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
+	const t = useTranslations('Header');
 
 	const isDark = resolvedTheme === ETheme.DARK;
 
@@ -32,25 +34,33 @@ function ToggleButton({ className }: ToggleButtonProps) {
 				'border-border_grey',
 				className
 			)}
-			aria-label={`Switch to ${isDark ? ETheme.LIGHT : ETheme.DARK} theme`}
+			aria-label={`${t('switchTo')} ${isDark ? t('lightMode') : t('darkMode')}`}
 		>
 			{isDark ? (
-				<FiMoon
-					className='h-4 w-4 text-[#90A0B7] transition-transform duration-200 hover:scale-110'
-					strokeWidth={2}
-					aria-hidden='true'
-				/>
+				<div className='flex items-center gap-2'>
+					<FiMoon
+						className='h-4 w-4 text-[#90A0B7] transition-transform duration-200 hover:scale-110'
+						strokeWidth={2}
+						aria-hidden='true'
+					/>
+					<p className='block text-xs text-text_primary md:hidden'>
+						{t('switchTo')} <span className='font-semibold'>{t('lightMode')}</span>
+					</p>
+				</div>
 			) : (
-				<IoSunnyOutline
-					className='h-5 w-5 text-[#888888] transition-transform duration-200 hover:scale-110'
-					strokeWidth={2}
-					aria-hidden='true'
-				/>
+				<div className='flex items-center gap-2'>
+					<IoSunnyOutline
+						className='h-5 w-5 text-[#888888] transition-transform duration-200 hover:scale-110'
+						strokeWidth={2}
+						aria-hidden='true'
+					/>
+					<p className='block text-xs text-text_primary md:hidden'>
+						{t('switchTo')} <span className='font-semibold'>{t('darkMode')}</span>
+					</p>
+				</div>
 			)}
 		</button>
 	);
 }
 
-ToggleButton.displayName = 'ToggleButton';
-
-export default ToggleButton;
+export default ThemeToggleButton;

@@ -163,7 +163,9 @@
 			"linked_address": "Adresse verknüpft",
 			"linked_multiple_addresses": "Mehrere Adressen verknüpft",
 			"unlinked_address": "Adresse getrennt",
-			"unlinked_multiple_addresses": "Mehrere Adressen getrennt"
+			"unlinked_multiple_addresses": "Mehrere Adressen getrennt",
+			"followed_user": "Benutzer folgen",
+			"unfollowed_user": "Benutzer entfolgen"
 		},
 		"overview": "Übersicht",
 		"onchainIdentity": "Onchain-Identität",
@@ -509,24 +511,70 @@
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
+	
+	"Create": {
+		"createDiscussionTitle": "Diskussion erstellen",
+		"title": "Titel",
+		"description": "Beschreibung",
+		"create": "Erstellen",
+		"createTag": "Tag erstellen",
+		"addTags": "Tags hinzufügen",
+		"searchTags": "Tags suchen",
+		"noTagsFound": "Keine Tags gefunden.",
+		"selectTags": "Tags auswählen",
+		"selectTopic": "Thema auswählen",
+		"tagsLeftText": "Verbleibende Tags",
+		"AllowedCommentors": {
+			"title": "Wer kann kommentieren?",
+			"all": "Alle",
+			"onchainVerified": "Onchain verifiziert",
+			"none": "Keine",
+			"tooltip": "Wählen Sie, wer kommentieren und auf diesen Beitrag antworten kann"
+		},
+		"Topic": {
+			"general": "Allgemein",
+			"auctionadmin": "Auktionsadministrator",
+			"generaladmin": "Allgemeiner Administrator",
+			"governance": "Governance",
+			"root": "Root",
+			"stakingadmin": "Staking-Administrator",
+			"treasury": "Schatzamt",
+			"fellowship": "Gemeinschaft"
+		}
+	},
 	"ProposalType": {
 		"discussion": "Diskussion",
 		"referendum": "Referendum",
 		"referendumv2": "Referendum",
-		"councilmotion": "Ratsantrag",
+		"councilmotion": "Ratsbewegung",
 		"techcommitteeproposal": "Technikkomitee-Vorschlag",
-		"treasuryproposal": "Finanzvorschlag",
+		"treasuryproposal": "Schatzamtsvorschlag",
 		"bounty": "Prämie",
-		"childbounty": "Untergeordnete Prämie",
-		"tip": "Trinkgeld",
-		"fellowshipreferendum": "Fellowship-Referendum",
-		"alliancemotion": "Allianz-Antrag",
+		"childbounty": "Kinderprämie",
+		"tip": "Tipp",
+		"fellowshipreferendum": "Gemeinschaftsreferendum",
+		"alliancemotion": "Allianzbewegung",
 		"announcement": "Ankündigung",
-		"democracyproposal": "Demokratie-Vorschlag",
+		"democracyproposal": "Demokratievorschlag",
 		"upgradecommittee": "Upgrade-Komitee",
 		"advisorycommittee": "Beratungsausschuss",
 		"grant": "Zuschuss",
 		"community": "Gemeinschaft",
 		"technicalcommittee": "Technisches Komitee"
+	},
+	"Header": {
+		"polkadot": "Polkadot & Parachains",
+		"kusama": "Kusama & Parachains",
+		"soloChains": "Solo-Ketten",
+		"testChains": "Testketten",
+		"switchTo": "Wechseln zu",
+		"lightMode": "Hellmodus",
+		"darkMode": "Dunkelmodus",
+		"language": "Sprache",
+		"node": "Knoten",
+		"network": "Netzwerk",
+		"searchNetworks": "Netzwerke suchen..."
 	}
 }
+
+

@@ -52,6 +52,8 @@ export class FirestoreRefs {
 
 	protected static followersCollectionRef = () => this.firestoreDb.collection('followers');
 
+	protected static tagsCollectionRef = () => this.firestoreDb.collection('tags');
+
 	// document reference methods
 	protected static getUserDocRefById = (userId: number) => this.usersCollectionRef().doc(userId.toString());
 

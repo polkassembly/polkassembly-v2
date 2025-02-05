@@ -23,7 +23,9 @@ import {
 	IProfileDetails,
 	IUserNotificationSettings,
 	IFollowEntry,
-	IGenericListingResponse
+	IGenericListingResponse,
+	EOffChainPostTopic,
+	ITag
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -918,7 +920,9 @@ export class FirestoreService extends FirestoreRefs {
 		content,
 		indexOrHash,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -927,9 +931,10 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash?: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: ITag[];
+		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
-
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
@@ -949,13 +954,14 @@ export class FirestoreService extends FirestoreRefs {
 			allowedCommentor,
 			isDeleted: false
 		};
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
+		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
 
 		if (proposalType === EProposalType.TIP) {
 			newPost.hash = indexOrHash;
 		} else {
 			newPost.index = Number(newIndex);
 		}
-
 		await FirestoreRefs.getPostDocRefById(newPostId).set(newPost, { merge: true });
 
 		return { id: newPostId, indexOrHash: String(newIndex) };
@@ -1022,11 +1028,39 @@ export class FirestoreService extends FirestoreRefs {
 		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
 	}
 
-	static async UnfollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
-		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1).get();
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToUnfollow).limit(1).get();
 
 		if (followEntry.docs.length) {
 			await followEntry.docs[0].ref.delete();
 		}
+	}
+
+	static async GetAllTags(network: ENetwork): Promise<IGenericListingResponse<ITag>> {
+		const tags = await FirestoreRefs.tagsCollectionRef().where('network', '==', network).get();
+		return {
+			items: tags.docs
+				.filter((doc) => doc.data().value)
+				.map((doc) => {
+					const data = doc.data();
+					return {
+						lastUsedAt: data.lastUsedAt?.toDate?.() || new Date(),
+						value: data.value,
+						network: data.network
+					} as ITag;
+				}),
+			totalCount: tags.size
+		};
+	}
+
+	static async CreateTags(tags: ITag[]) {
+		const batch = this.firestoreDb.batch();
+
+		tags?.forEach((tag) => {
+			const docId = `${tag.value}_${tag.network}`;
+			batch.set(FirestoreRefs.tagsCollectionRef().doc(docId), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
+		});
+
+		await batch.commit();
 	}
 }

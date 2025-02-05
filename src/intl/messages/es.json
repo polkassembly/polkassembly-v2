@@ -163,7 +163,9 @@
 			"linked_address": "Vinculó dirección",
 			"linked_multiple_addresses": "Vinculó múltiples direcciones",
 			"unlinked_address": "Desvinculó dirección",
-			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones"
+			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones",
+			"followed_user": "Seguido",
+			"unfollowed_user": "Dejó de seguir"
 		},
 		"overview": "Resumen",
 		"onchainIdentity": "Identidad en cadena",
@@ -509,24 +511,69 @@
 		"searchByHash": "Buscar por hash",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
+	"Create": {
+		"createDiscussionTitle": "Crear discusión",
+		"title": "Título",
+		"description": "Descripción",
+		"create": "Crear",
+		"createTag": "Crear etiqueta",
+		"addTags": "Agregar etiquetas",
+		"searchTags": "Buscar etiquetas",
+		"noTagsFound": "No se encontraron etiquetas.",
+		"selectTags": "Seleccionar etiquetas",
+		"selectTopic": "Seleccionar tema",
+		"tagsLeftText": "Etiquetas restantes",
+		"AllowedCommentors": {
+			"title": "¿Quién puede comentar?",
+			"all": "Todos",
+			"onchainVerified": "Verificado en cadena",
+			"none": "Ninguno",
+			"tooltip": "Elija quién puede comentar y responder a esta publicación"
+		},
+		"Topic": {
+			"general": "General",
+			"auctionadmin": "Administrador de subastas",
+			"generaladmin": "Administrador general",
+			"governance": "Gobernanza",
+			"root": "Raíz",
+			"stakingadmin": "Administrador de apuestas",
+			"treasury": "Tesorería",
+			"fellowship": "Compañerismo"
+		}
+	},
 	"ProposalType": {
 		"discussion": "Discusión",
-		"referendum": "Referendo",
-		"referendumv2": "Referendo",
-		"councilmotion": "Moción del Consejo",
-		"techcommitteeproposal": "Propuesta del Comité Técnico",
-		"treasuryproposal": "Propuesta de Tesorería",
+		"referendum": "Referéndum",
+		"referendumv2": "Referéndum",
+		"councilmotion": "Moción del consejo",
+		"techcommitteeproposal": "Propuesta del comité técnico",
+		"treasuryproposal": "Propuesta de tesorería",
 		"bounty": "Recompensa",
-		"childbounty": "Recompensa Secundaria",
+		"childbounty": "Recompensa infantil",
 		"tip": "Propina",
-		"fellowshipreferendum": "Referendo de Fellowship",
-		"alliancemotion": "Moción de Alianza",
+		"fellowshipreferendum": "Referéndum de compañerismo",
+		"alliancemotion": "Moción de alianza",
 		"announcement": "Anuncio",
-		"democracyproposal": "Propuesta de Democracia",
-		"upgradecommittee": "Comité de Actualización",
-		"advisorycommittee": "Comité Asesor",
+		"democracyproposal": "Propuesta de democracia",
+		"upgradecommittee": "Comité de actualización",
+		"advisorycommittee": "Comité asesor",
 		"grant": "Subvención",
 		"community": "Comunidad",
 		"technicalcommittee": "Comité Técnico"
+	},
+	"Header": {
+		"polkadot": "Polkadot y Parachains",
+		"kusama": "Kusama y Parachains",
+		"soloChains": "Cadenas en solitario",
+		"testChains": "Cadenas de prueba",
+		"switchTo": "Cambiar a",
+		"lightMode": "Modo claro",
+		"darkMode": "Modo oscuro",
+		"language": "Idioma",
+		"node": "Nodo",
+		"network": "Red",
+		"searchNetworks": "Buscar redes..."
 	}
 }
+
+

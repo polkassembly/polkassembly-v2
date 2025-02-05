@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { FaAngleRight } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@ui/Skeleton';
@@ -32,10 +31,7 @@ function ActivityFeedActiveProposal() {
 		return (
 			<div className={styles.activeProposalContainer}>
 				<div className={styles.activeProposalTitle}>
-					<span className={`${styles.activeProposalTitleText} dark:text-white`}>
-						{t('ActivityFeed.VotedProposals')} <FaAngleRight />
-					</span>
-					<span className={styles.activeProposalTitleDate}>{t('ActivityFeed.Last15Days')}</span>
+					<span className={`${styles.activeProposalTitleText} dark:text-white`}>{t('ActivityFeed.VotedProposals')}</span>
 				</div>
 				<div className='text-sm'>
 					<span className='text-xs text-wallet_btn_text'>
