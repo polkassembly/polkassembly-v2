@@ -127,7 +127,10 @@ export interface IUser {
 
 export interface IPublicUser {
 	id: number;
-	createdAt?: Date;
+	createdAt?: {
+		_seconds: number;
+		_nanoseconds: number;
+	};
 	username: string;
 	profileScore: number;
 	addresses: string[];
