@@ -23,7 +23,8 @@ import {
 	IProfileDetails,
 	IUserNotificationSettings,
 	IFollowEntry,
-	IGenericListingResponse
+	IGenericListingResponse,
+	EOffChainPostTopic
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -918,7 +919,9 @@ export class FirestoreService extends FirestoreRefs {
 		content,
 		indexOrHash,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -927,9 +930,10 @@ export class FirestoreService extends FirestoreRefs {
 		indexOrHash?: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: string[];
+		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
-
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
@@ -949,13 +953,14 @@ export class FirestoreService extends FirestoreRefs {
 			allowedCommentor,
 			isDeleted: false
 		};
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag))) newPost.tags = tags;
+		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
 
 		if (proposalType === EProposalType.TIP) {
 			newPost.hash = indexOrHash;
 		} else {
 			newPost.index = Number(newIndex);
 		}
-
 		await FirestoreRefs.getPostDocRefById(newPostId).set(newPost, { merge: true });
 
 		return { id: newPostId, indexOrHash: String(newIndex) };
@@ -1028,5 +1033,18 @@ export class FirestoreService extends FirestoreRefs {
 		if (followEntry.docs.length) {
 			await followEntry.docs[0].ref.delete();
 		}
+	}
+
+	static async GetAllTags() {
+		const tags = await FirestoreRefs.tagsCollectionRef().get();
+		return tags.docs.map((doc) => ({ lastUsedAt: doc.data().lastUsedAt?.toDate ? doc.data().lastUsedAt.toDate() : doc.data().lastUsedAt, name: doc.data().name || '' }));
+	}
+
+	static async CreateTags(tags: string[]) {
+		const batch = this.firestoreDb.batch();
+		tags?.forEach((tag) => {
+			batch.set(FirestoreRefs.tagsCollectionRef().doc(tag), { name: tag, lastUsedAt: new Date() }, { merge: true });
+		});
+		await batch.commit();
 	}
 }

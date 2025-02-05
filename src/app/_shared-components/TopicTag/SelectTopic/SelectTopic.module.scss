@@ -1,0 +1,7 @@
+.topicContainer {
+   @apply flex gap-3 text-xs capitalize flex-wrap;
+}
+
+.topicButton {
+   @apply cursor-pointer px-4 h-8 rounded-xl border border-none capitalize text-xs tracking-wide shadow-none ;
+}

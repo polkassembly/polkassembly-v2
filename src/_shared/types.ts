@@ -316,6 +316,17 @@ export interface IContentSummary {
 	updatedAt: Date;
 }
 
+export enum EOffChainPostTopic {
+	GENERAL = 'general',
+	AUCTION_ADMIN = 'auctionAdmin',
+	GENERAL_ADMIN = 'generalAdmin',
+	GOVERNANCE = 'governance',
+	ROOT = 'root',
+	STAKING_ADMIN = 'stakingAdmin',
+	TREASURY = 'treasury',
+	FELLOWSHIP = 'fellowship'
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -338,6 +349,7 @@ export interface IOffChainPost {
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
+	topic?: EOffChainPostTopic;
 }
 
 export enum EProposalStatus {
@@ -758,6 +770,18 @@ export interface IQRSessionPayload {
 	sessionId: string;
 	timestamp: number;
 	expiresIn: number;
+}
+export interface IWritePostFormFields {
+	title: string;
+	description: OutputData;
+	tags: { value: string; label: string }[];
+	topic: EOffChainPostTopic;
+	allowedCommentor: EAllowedCommentor;
+}
+
+export interface ITag {
+	lastUsedAt: Date;
+	name: string;
 }
 
 export enum EAppEnv {

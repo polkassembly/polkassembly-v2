@@ -509,6 +509,37 @@
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
+	
+	"Create": {
+		"createDiscussionTitle": "Diskussion erstellen",
+		"title": "Titel",
+		"description": "Beschreibung",
+		"create": "Erstellen",
+		"createTag": "Tag erstellen",
+		"addTags": "Tags hinzufügen",
+		"searchTags": "Tags suchen",
+		"noTagsFound": "Keine Tags gefunden.",
+		"selectTags": "Tags auswählen",
+		"selectTopic": "Thema auswählen",
+		"tagsLeftText": "Tags übrig",
+		"AllowedCommentors": {
+			"title": "Wer darf kommentieren?",
+			"all": "Alle",
+			"onchainVerified": "Onchain-Verifizierte",
+			"none": "Niemand",
+			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten darf"
+		},
+		"Topic": {
+			"general": "Allgemein",
+			"auctionadmin": "Auktions-Administrator",
+			"generaladmin": "Allgemeiner Administrator",
+			"governance": "Verwaltung",
+			"root": "Root",
+			"stakingadmin": "Staking-Administrator",
+			"treasury": "Finanzverwaltung",
+			"fellowship": "Fellowship"
+		}
+	},
 	"ProposalType": {
 		"discussion": "Diskussion",
 		"referendum": "Referendum",
@@ -527,6 +558,18 @@
 		"advisorycommittee": "Beratungsausschuss",
 		"grant": "Zuschuss",
 		"community": "Gemeinschaft",
-		"technicalcommittee": "Technisches Komitee"
+		"technicalcommittee": "Technisches Komitee",
+		"Topic": {
+			"general": "Allgemein",
+			"auction_admin": "Auktions-Administrator",
+			"general_admin": "Allgemeiner Administrator",
+			"governance": "Verwaltung",
+			"root": "Root",
+			"staking_admin": "Staking-Administrator",
+			"treasury": "Finanzverwaltung",
+			"fellowship": "Fellowship"
+		}
 	}
 }
+
+

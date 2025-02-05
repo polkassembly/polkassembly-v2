@@ -27,12 +27,17 @@ import {
 	IPreimage,
 	IQRSessionPayload,
 	ESocial,
-	IFollowEntry
+	IFollowEntry,
+	ITag,
+	EAllowedCommentor,
+	EOffChainPostTopic
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
@@ -72,7 +77,10 @@ enum EApiRoute {
 	FOLLOW_USER = 'FOLLOW_USER',
 	UNFOLLOW_USER = 'UNFOLLOW_USER',
 	GET_FOLLOWING = 'GET_FOLLOWING',
-	GET_FOLLOWERS = 'GET_FOLLOWERS'
+	GET_FOLLOWERS = 'GET_FOLLOWERS',
+	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
+	CREATE_TAGS = 'CREATE_TAGS',
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
 }
 
 export class NextApiClientService {
@@ -143,6 +151,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
+			case EApiRoute.CREATE_OFFCHAIN_POST:
+				method = 'POST';
+				break;
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.POST_REACTIONS:
 				method = 'POST';
@@ -192,6 +203,14 @@ export class NextApiClientService {
 			case EApiRoute.CLAIM_QR_SESSION:
 				path = '/auth/qr-session';
 				method = 'POST';
+				break;
+			case EApiRoute.FETCH_ALL_TAGS:
+				method = 'GET';
+				path = '/meta/tags';
+				break;
+			case EApiRoute.CREATE_TAGS:
+				method = 'POST';
+				path = '/meta/tags';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -490,5 +509,39 @@ export class NextApiClientService {
 	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
+	}
+	static async fetchAllTagsApi() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
+		return this.nextApiClientFetch<ITag[]>({ url, method });
+	}
+
+	static async createTagsApi(tags: string[]) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_TAGS });
+		if (!tags.length || tags.some((tag) => !ValidatorService.isValidTag(tag))) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
+	}
+
+	static async createOffChainPostApi({
+		proposalType,
+		allowedCommentor,
+		content,
+		title,
+		tags,
+		topic
+	}: {
+		proposalType: EProposalType;
+		content: OutputData;
+		title: string;
+		allowedCommentor: EAllowedCommentor;
+		tags?: string[];
+		topic?: EOffChainPostTopic;
+	}) {
+		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
+		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
 	}
 }

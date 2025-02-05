@@ -13,6 +13,8 @@ import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
@@ -35,6 +37,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const searchParams = useSearchParams();
 	const initialPage = parseInt(searchParams.get('page') || '1', 10);
 	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
+	const { user } = useUser();
 
 	const STATUSES = [
 		t('ListingPage_Status.Cancelled'),
@@ -117,13 +120,13 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 				</h1>
 				<p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>
 			</div>
-			<button
-				type='button'
+			<Link
+				href={!user?.id ? '/login?nextUrl=create/discussion' : '/create/discussion'}
 				className={styles.button}
 			>
 				<span className='text-xl'>+</span>
 				<span className='whitespace-nowrap text-sm'>{t(`CreateProposalDropdownButton.create${proposalType === EProposalType.DISCUSSION ? 'Post' : 'Proposal'}`)}</span>
-			</button>
+			</Link>
 		</div>
 	);
 

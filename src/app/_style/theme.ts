@@ -77,7 +77,11 @@ export const THEME_COLORS = {
 		bg_blue: '#5489FF',
 		border_blue: '#407BFF',
 		activity_comment: '#798AA2',
-		social_green: '#51D36E'
+		social_green: '#51D36E',
+		selected_topic_bg: '#ebeef2',
+		basic_text: '#485F7D',
+		allowed_commentor_text: '#485F7D',
+		input_text: '#485F7D'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -151,6 +155,10 @@ export const THEME_COLORS = {
 		bg_blue: '#5489FF',
 		border_blue: '#407BFF',
 		activity_comment: '#4a4a4a',
-		social_green: '#51D36E'
+		social_green: '#51D36E',
+		selected_topic_bg: '#1D1D1D',
+		basic_text: '#909090',
+		allowed_commentor_text: '#ffffff',
+		input_text: '#ffffff'
 	}
 };

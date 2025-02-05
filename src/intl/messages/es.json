@@ -509,12 +509,39 @@
 		"searchByHash": "Buscar por hash",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
+	"Create": {
+    "createDiscussionTitle": "Crear Discusión",
+    "title": "Título",
+    "description": "Descripción",
+    "create": "Crear",
+    "createTag": "Crear Etiqueta",
+    "addTags": "Agregar Etiquetas",
+    "searchTags": "Buscar etiquetas",
+    "noTagsFound": "No se encontraron etiquetas.",
+    "selectTags": "Seleccionar etiquetas",
+    "selectTopic": "Seleccionar Tema",
+    "tagsLeftText": "Etiquetas restantes",
+    "AllowedCommentors": {
+        "title": "¿Quién puede comentar?",
+        "all": "Todos",
+        "onchainVerified": "Verificados en Cadena",
+        "none": "Ninguno",
+        "tooltip": "Elija quién puede comentar y responder a esta publicación"
+		},
+		"Topic": {
+			"general": "General",
+			"auctionadmin": "Administrador de Subastas",
+			"generaladmin": "Administrador General",
+			"governance": "Gobernanza",
+			"root": "Root",
+			"stakingadmin": "Administrador de Staking",
+			"treasury": "Tesorería",
+			"fellowship": "Fellowship"
+		}
+	},
 	"ProposalType": {
 		"discussion": "Discusión",
 		"referendum": "Referendo",
-		"referendumv2": "Referendo",
-		"councilmotion": "Moción del Consejo",
-		"techcommitteeproposal": "Propuesta del Comité Técnico",
 		"treasuryproposal": "Propuesta de Tesorería",
 		"bounty": "Recompensa",
 		"childbounty": "Recompensa Secundaria",
@@ -530,3 +557,5 @@
 		"technicalcommittee": "Comité Técnico"
 	}
 }
+
+

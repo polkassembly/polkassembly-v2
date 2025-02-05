@@ -11,6 +11,7 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import {
 	EAllowedCommentor,
 	EDataSource,
+	EOffChainPostTopic,
 	EPostOrigin,
 	EProposalStatus,
 	EProposalType,
@@ -188,10 +189,12 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
 		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
-		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
+		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
+		tags: z.array(z.string().min(1)).optional(),
+		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
 	});
 
-	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor, topic, tags } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
@@ -205,6 +208,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content: formattedContent,
 		title,
+		tags: tags || [],
+		topic: topic || EOffChainPostTopic.GENERAL,
 		allowedCommentor
 	});
 
@@ -217,6 +222,5 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
-
 	return response;
 });
