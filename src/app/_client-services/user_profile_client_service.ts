@@ -49,4 +49,20 @@ export class UserProfileClientService extends NextApiClientService {
 	static async deleteAccount({ userId }: { userId: number }) {
 		return this.deleteAccountApi({ userId });
 	}
+
+	static async followUser({ userId }: { userId: number }) {
+		return this.followUserApi({ userId });
+	}
+
+	static async unfollowUser({ userId }: { userId: number }) {
+		return this.unfollowUserApi({ userId });
+	}
+
+	static async getFollowing({ userId }: { userId: number }) {
+		return this.getFollowingApi({ userId });
+	}
+
+	static async getFollowers({ userId }: { userId: number }) {
+		return this.getFollowersApi({ userId });
+	}
 }

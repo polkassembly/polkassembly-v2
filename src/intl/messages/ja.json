@@ -225,7 +225,10 @@
 		"telegram": "Telegram",
 		"riot": "Riot",
 		"discord": "Discord",
-		"saveChanges": "保存"
+		"saveChanges": "保存",
+		"unfollow": "フォロー解除",
+		"following": "フォロー中",
+		"followers": "フォロワー"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
