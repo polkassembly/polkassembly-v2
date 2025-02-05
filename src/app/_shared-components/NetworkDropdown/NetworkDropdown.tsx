@@ -228,7 +228,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 					{Object.entries(networkData).map(([category, networks]) => (
 						<RenderNetworkSection
 							key={category}
-							title={getNetworkDisplayName(category)}
+							title={categoryDisplayNames[category as keyof typeof categoryDisplayNames] || category}
 							networks={networks}
 							searchTerm={searchTerm}
 						/>
