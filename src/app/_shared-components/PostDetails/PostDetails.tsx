@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { canVote } from '@/_shared/_utils/canVote';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -64,8 +65,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					</div>
 					{isModalOpen && !isOffchainPost && (
 						<div className='pt-5'>
-							{' '}
-							<VoteReferendumButton index={index} />
+							{postData?.onChainInfo?.status && postData?.onChainInfo?.preparePeriodEndsAt && canVote(postData.onChainInfo.status, postData.onChainInfo.preparePeriodEndsAt) && (
+								<VoteReferendumButton index={index} />
+							)}
 						</div>
 					)}
 					{!isModalOpen && (
@@ -79,7 +81,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				</div>
 				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>
-						<VoteReferendumButton index={index} />
+						{postData?.onChainInfo?.status && postData?.onChainInfo?.preparePeriodEndsAt && canVote(postData.onChainInfo.status, postData.onChainInfo.preparePeriodEndsAt) && (
+							<VoteReferendumButton index={index} />
+						)}
 						<ProposalPeriods
 							confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
