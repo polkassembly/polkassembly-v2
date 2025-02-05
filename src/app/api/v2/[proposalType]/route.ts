@@ -126,7 +126,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 						origin: onChainPostInfo.origin || '',
 						type: proposalType,
 						hash: onChainPostInfo.hash || post.hash || '',
-						voteMetrics: onChainPostInfo.voteMetrics
+						voteMetrics: onChainPostInfo.voteMetrics,
+						preparePeriodEndsAt: onChainPostInfo.preparePeriodEndsAt
 					}
 				: undefined;
 			return {

@@ -475,6 +475,7 @@ export interface IOnChainPostListing {
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
+	preparePeriodEndsAt?: Date;
 }
 
 export interface IPostListing extends IOffChainPost {

@@ -25,6 +25,7 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
+import { canVote } from '@/_shared/_utils/canVote';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -107,13 +108,30 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 					</span>
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				<button
-					type='button'
-					onClick={(e) => e.stopPropagation()}
-				>
-					{user?.id ? (
-						<Dialog>
-							<DialogTrigger asChild>
+				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					<div>
+						{user?.id ? (
+							<Dialog>
+								<DialogTrigger asChild>
+									<span className={`${styles.castVoteButton} cursor-pointer`}>
+										<Image
+											src={VoteIcon}
+											alt=''
+											width={20}
+											height={20}
+										/>
+										<span>{t('PostDetails.castVote')}</span>
+									</span>
+								</DialogTrigger>
+								<DialogTitle>
+									<DialogContent className='max-w-xl p-6'>
+										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+										<VoteReferendum index={postData?.index?.toString() || ''} />
+									</DialogContent>
+								</DialogTitle>
+							</Dialog>
+						) : (
+							<Link href='/login'>
 								<span className={`${styles.castVoteButton} cursor-pointer`}>
 									<Image
 										src={VoteIcon}
@@ -121,30 +139,12 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 										width={20}
 										height={20}
 									/>
-									<span>{t('PostDetails.castVote')}</span>
+									<span>{t('PostDetails.loginToVote')}</span>
 								</span>
-							</DialogTrigger>
-							<DialogTitle>
-								<DialogContent className='max-w-xl p-6'>
-									<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-									<VoteReferendum index={postData?.index?.toString() || ''} />
-								</DialogContent>
-							</DialogTitle>
-						</Dialog>
-					) : (
-						<Link href='/login'>
-							<span className={`${styles.castVoteButton} cursor-pointer`}>
-								<Image
-									src={VoteIcon}
-									alt=''
-									width={20}
-									height={20}
-								/>
-								<span>{t('PostDetails.loginToVote')}</span>
-							</span>
-						</Link>
-					)}
-				</button>
+							</Link>
+						)}
+					</div>
+				)}
 			</div>
 
 			{/* Post Info Section */}
