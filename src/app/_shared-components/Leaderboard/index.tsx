@@ -61,8 +61,8 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 				})}
 			</div>
 			<div className='rounded-lg bg-bg_modal p-6'>
-				<div className='flex items-center justify-end'>
-					{/* <div className='flex items-center gap-2'>
+				{/* <div className='flex items-center justify-between'>
+					<div className='flex items-center gap-2'>
 						<div className='relative'>
 							<Input
 								className={styles.input_container}
@@ -70,9 +70,9 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 							/>
 							<MdOutlineSearch className={styles.input_search} />
 						</div>
-					</div> */}
-				</div>
-				<div className='pt-5'>
+					</div> 
+				</div>  */}
+				<div>
 					<Table>
 						<TableHeader>
 							<TableRow className={styles.tableRow}>
