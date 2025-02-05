@@ -8,7 +8,7 @@ import { EActivityFeedTab, IGenericListingResponse, IActivityFeedPostListing, ES
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import ActivityFeedToggleButton from './ToggleButton/ToggleButton';
+import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
 import { Tabs, TabsContent } from '../Tabs/Tabs';
 import styles from './ActivityFeed.module.scss';

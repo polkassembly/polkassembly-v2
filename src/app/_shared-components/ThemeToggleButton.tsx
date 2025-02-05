@@ -8,17 +8,15 @@ import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
-import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface ToggleButtonProps {
 	className?: string;
 }
 
-function ToggleButton({ className }: ToggleButtonProps) {
+function ThemeToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
 
 	const isDark = resolvedTheme === ETheme.DARK;
-	const isMobile = useIsMobile();
 
 	return (
 		<button
@@ -43,11 +41,9 @@ function ToggleButton({ className }: ToggleButtonProps) {
 						strokeWidth={2}
 						aria-hidden='true'
 					/>
-					{isMobile && (
-						<p className='text-xs text-text_primary'>
-							Switch to <span className='font-semibold'>Dark Mode</span>
-						</p>
-					)}
+					<p className='block text-xs text-text_primary md:hidden'>
+						Switch to <span className='font-semibold'>Light Mode</span>
+					</p>
 				</div>
 			) : (
 				<div className='flex items-center gap-2'>
@@ -56,17 +52,13 @@ function ToggleButton({ className }: ToggleButtonProps) {
 						strokeWidth={2}
 						aria-hidden='true'
 					/>
-					{isMobile && (
-						<p className='text-xs text-text_primary'>
-							Switch to <span className='font-semibold'>Light Mode</span>
-						</p>
-					)}
+					<p className='block text-xs text-text_primary md:hidden'>
+						Switch to <span className='font-semibold'>Dark Mode</span>
+					</p>
 				</div>
 			)}
 		</button>
 	);
 }
 
-ToggleButton.displayName = 'ToggleButton';
-
-export default ToggleButton;
+export default ThemeToggleButton;

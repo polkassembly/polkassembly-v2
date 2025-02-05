@@ -8,14 +8,14 @@ import React, { useEffect } from 'react';
 import { EActivityFeedTab } from '@/_shared/types';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import styles from './ToggleButton.module.scss';
+import styles from './ActivityFeedToggleButton.module.scss';
 
 interface IToggleButtonProps {
 	activeTab: EActivityFeedTab;
 	setActiveTab: (tab: EActivityFeedTab) => void;
 }
 
-function ToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
+function ActivityFeedToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
@@ -54,4 +54,4 @@ function ToggleButton({ activeTab, setActiveTab }: IToggleButtonProps) {
 	);
 }
 
-export default ToggleButton;
+export default ActivityFeedToggleButton;
