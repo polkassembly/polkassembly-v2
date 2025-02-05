@@ -112,7 +112,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 													width={16}
 													height={16}
 												/>
-												<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
+												<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
 											</span>
 										</TableCell>
 										<TableCell className={styles.tableCell}>
