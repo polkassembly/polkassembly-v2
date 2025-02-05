@@ -225,7 +225,10 @@
 		"telegram": "Telegram",
 		"riot": "Riot",
 		"discord": "Discord",
-		"saveChanges": "Speichern"
+		"saveChanges": "Speichern",
+		"unfollow": "Entfolgen",
+		"following": "Folgend",
+		"followers": "Follower"
 	},
 	"ListingTab": {
 		"Analytics": "Analysen",
