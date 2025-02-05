@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { RefObject, useMemo, useRef, useState } from 'react';
+import { MouseEvent, RefObject, useMemo, useRef, useState } from 'react';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
@@ -70,7 +70,7 @@ function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
-	const handleContainerClick = (e: React.MouseEvent) => {
+	const handleContainerClick = (e: MouseEvent) => {
 		if (!(e.target instanceof Element)) return;
 
 		const isExcludedSection =
