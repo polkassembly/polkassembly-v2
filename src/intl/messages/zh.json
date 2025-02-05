@@ -539,7 +539,10 @@
 			"stakingadmin": "质押管理员",
 			"treasury": "国库",
 			"fellowship": "奖学金"
-		}
+		},
+		"titleTooShort": "请提供有效的标题。",
+		"titlePlaceholder": "输入标题",
+		"descriptionRequired": "请提供有效的描述。"
 	},
 	"ProposalType": {
 		"discussion": "讨论",
@@ -573,5 +576,9 @@
 		"node": "节点",
 		"network": "网络",
 		"searchNetworks": "搜索网络..."
+	},
+	"BlockEditor": {
+		"placeholder": "输入 / 开始",
+		"errorUpdatingContent": "更新内容时出错"
 	}
 }
