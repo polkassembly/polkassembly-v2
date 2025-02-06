@@ -96,7 +96,7 @@ function WritePost() {
 							rules={{
 								required: true,
 								validate: (value) => {
-									if (value.length <= 3) return 'Please provide a valid title.';
+									if (value.length <= 3) return t('Create.titleTooShort');
 									return true;
 								}
 							}}
@@ -106,7 +106,7 @@ function WritePost() {
 									<FormControl>
 										<Input
 											disabled={loading}
-											placeholder='Enter title'
+											placeholder={t('Create.titlePlaceholder')}
 											type='text'
 											className={classes.titleInput}
 											{...field}
@@ -124,7 +124,7 @@ function WritePost() {
 							rules={{
 								required: true,
 								validate: (value) => {
-									if (!value) return 'Please provide a valid description.';
+									if (!value) return t('Create.descriptionRequired');
 									return true;
 								}
 							}}

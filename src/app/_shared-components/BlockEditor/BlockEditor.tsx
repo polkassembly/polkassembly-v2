@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { convertHtmlToEditorJs } from '@/app/_client-utils/convertHtmlToEditorJs';
+import { useTranslations } from 'next-intl';
 import classes from './BlockEditor.module.scss';
 
 function BlockEditor({
@@ -34,6 +35,7 @@ function BlockEditor({
 	renderFromHtml?: boolean;
 	ref?: React.RefObject<{ clearEditor: () => void } | null>;
 }) {
+	const t = useTranslations();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [shouldScroll, setShouldScroll] = useState(false);
 	const blockEditorRef = useRef<EditorJS | null>(null);
@@ -139,7 +141,7 @@ function BlockEditor({
 							// TODO: show notification
 						}
 					},
-					placeholder: readOnly ? '' : 'Type / to start'
+					placeholder: readOnly ? '' : t('BlockEditor.placeholder')
 				});
 				blockEditorRef.current = editor;
 			}
@@ -189,7 +191,7 @@ function BlockEditor({
 					}
 				}
 			} catch (error) {
-				console.error('Error updating content:', error);
+				console.error(t('BlockEditor.errorUpdatingContent'), error);
 			}
 		};
 

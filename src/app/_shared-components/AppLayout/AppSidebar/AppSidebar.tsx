@@ -65,7 +65,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 
 	const headerData = [
 		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
-		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard') },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard'), url: '/leaderboard' },
 		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation') },
 		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile'), url: user?.id ? `/user/${user.id}` : '/login' }
 	];

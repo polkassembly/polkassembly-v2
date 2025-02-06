@@ -543,6 +543,9 @@
 		"selectTags": "Select tags",
 		"selectTopic": "Select Topic",
 		"tagsLeftText": "Tags left",
+		"titleTooShort": "Please provide a valid title.",
+		"titlePlaceholder": "Enter title",
+		"descriptionRequired": "Please provide a valid description.",
 		"AllowedCommentors": {
 			"title": "Who can comment ?",
 			"all": "All",
@@ -593,5 +596,18 @@
 		"node": "Node",
 		"network": "Network",
 		"searchNetworks": "Search networks..."
+	},
+	"Leaderboard": {
+		"username": "Username",
+		"astrals": "Astrals",
+		"userSince": "User Since",
+		"actions": "Actions",
+		"leaderboard": "Leaderboard",
+		"findYourRank": "Find your rank in the ecosystem",
+		"searchUsername": "Enter username to search"
+	},
+	"BlockEditor": {
+		"placeholder": "Type / to start",
+		"errorUpdatingContent": "Error updating content"
 	}
 }
