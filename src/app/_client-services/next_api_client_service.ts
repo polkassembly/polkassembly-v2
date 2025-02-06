@@ -74,6 +74,7 @@ enum EApiRoute {
 	LINK_ADDRESS = 'LINK_ADDRESS',
 	EDIT_USER_PROFILE = 'EDIT_USER_PROFILE',
 	DELETE_ACCOUNT = 'DELETE_ACCOUNT',
+	FETCH_LEADERBOARD = 'FETCH_LEADERBOARD',
 	FOLLOW_USER = 'FOLLOW_USER',
 	UNFOLLOW_USER = 'UNFOLLOW_USER',
 	GET_FOLLOWING = 'GET_FOLLOWING',
@@ -149,6 +150,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.FETCH_LEADERBOARD:
+				path = '/users';
+				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
@@ -543,5 +547,14 @@ export class NextApiClientService {
 		}
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
 		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
+	}
+	static async fetchLeaderboardApi({ page }: { page: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 }

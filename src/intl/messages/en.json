@@ -597,6 +597,15 @@
 		"network": "Network",
 		"searchNetworks": "Search networks..."
 	},
+	"Leaderboard": {
+		"username": "Username",
+		"astrals": "Astrals",
+		"userSince": "User Since",
+		"actions": "Actions",
+		"leaderboard": "Leaderboard",
+		"findYourRank": "Find your rank in the ecosystem",
+		"searchUsername": "Enter username to search"
+	},
 	"BlockEditor": {
 		"placeholder": "Type / to start",
 		"errorUpdatingContent": "Error updating content"
