@@ -128,6 +128,9 @@ function Navbar() {
 								<Link href={`/user/id/${user.id}`}>{t('Profile.profile')}</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
+								<Link href='/set-identity'>{t('SetIdentity.setIdentity')}</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
 								<Button
 									variant='ghost'
 									className='p-0'

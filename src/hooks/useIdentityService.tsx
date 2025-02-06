@@ -46,7 +46,8 @@ export const useIdentityService = () => {
 
 	return useMemo(() => {
 		return {
-			getOnChainIdentity: getCachedIdentity
+			getOnChainIdentity: getCachedIdentity,
+			identityService: api
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [api, identityCache]);

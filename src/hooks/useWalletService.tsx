@@ -8,18 +8,20 @@ import { useAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
 import { walletAtom } from '@/app/_atoms/wallet/walletAtom';
 import { usePolkadotApiService } from './usePolkadotApiService';
+import { useIdentityService } from './useIdentityService';
 
 export const useWalletService = () => {
 	const [walletService, setWalletService] = useAtom(walletAtom);
 	const network = getCurrentNetwork();
 	const apiService = usePolkadotApiService();
+	const { identityService } = useIdentityService();
 
 	useEffect(() => {
 		// Todo: reload(notification) if service is null;
 
 		const initWalletService = async () => {
-			if (apiService) {
-				const service = await WalletClientService.Init(network, apiService);
+			if (apiService && identityService) {
+				const service = await WalletClientService.Init(network, apiService, identityService);
 				setWalletService(service);
 			}
 		};

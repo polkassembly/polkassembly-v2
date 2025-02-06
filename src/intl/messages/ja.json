@@ -580,6 +580,15 @@
 	"BlockEditor": {
 		"placeholder": "/ を入力して開始",
 		"errorUpdatingContent": "コンテンツの更新中にエラーが発生しました"
+	},
+	"SetIdentity": {
+		"displayName": "表示名",
+		"legalName": "法的名",
+		"email": "メール",
+		"twitter": "Twitter",
+		"matrix": "マトリックス",
+		"setIdentity": "アイデンティティを設定",
+		"onChainIdentity": "オンチェーンアイデンティティ"
 	}
 }
 
