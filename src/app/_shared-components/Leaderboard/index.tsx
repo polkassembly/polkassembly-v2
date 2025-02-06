@@ -25,7 +25,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { PaginationWithLinks } from '../PaginationWithLinks';
 import RankCard from './RankCard';
 
-function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
+function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPublicUser>; top3RankData: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
 	const page = parseInt(searchParams.get('page') || '1', DEFAULT_LISTING_LIMIT) || 1;
 	const router = useRouter();
@@ -51,7 +51,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 				</div>
 			</div>
 			<div className='my-5 flex flex-wrap items-center justify-center gap-4 xl:my-10 xl:flex-nowrap'>
-				{data.items.slice(0, 3).map((item, index) => {
+				{top3RankData.items.map((item, index) => {
 					return (
 						<RankCard
 							key={item.id}
@@ -112,7 +112,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 													width={16}
 													height={16}
 												/>
-												<span className='text-leaderboard_score text-sm font-medium'>{item?.profileScore}</span>
+												<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
 											</span>
 										</TableCell>
 										<TableCell className={styles.tableCell}>

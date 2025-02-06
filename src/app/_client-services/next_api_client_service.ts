@@ -548,10 +548,10 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
 		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
 	}
-	static async fetchLeaderboardApi({ page }: { page: number }) {
+	static async fetchLeaderboardApi({ page, limit }: { page: number; limit?: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString() || '1',
-			limit: DEFAULT_LISTING_LIMIT.toString()
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
 		});
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
