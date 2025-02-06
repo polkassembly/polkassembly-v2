@@ -13,13 +13,17 @@ async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?
 	const page = parseInt(searchParamsValue.page || '1', DEFAULT_LISTING_LIMIT);
 
 	const { data, error } = await NextApiClientService.fetchLeaderboardApi({ page });
+	const { data: top3RankData, error: top3RankError } = await NextApiClientService.fetchLeaderboardApi({ page: 1, limit: 3 });
 
-	if (error || !data) {
+	if (error || !data || top3RankError || !top3RankData) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
-			<Leaderboard data={data} />
+			<Leaderboard
+				data={data}
+				top3RankData={top3RankData}
+			/>
 		</div>
 	);
 }
