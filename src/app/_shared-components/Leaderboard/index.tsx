@@ -31,6 +31,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	const router = useRouter();
 	const displayedItems = page === 1 ? data.items.slice(3, DEFAULT_LISTING_LIMIT) : data.items;
 	const t = useTranslations();
+
 	return (
 		<div className='bg-page_background'>
 			<div className={styles.Card}>
