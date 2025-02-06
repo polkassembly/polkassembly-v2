@@ -26,6 +26,7 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+	
 	const encodedAddress = getEncodedAddress(address, network) || address;
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
