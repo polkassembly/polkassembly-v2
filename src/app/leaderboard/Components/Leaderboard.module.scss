@@ -8,7 +8,7 @@
 }
 
 .tableRow_user {
-    @apply bg-leaderboard_usercard_bg text-btn_secondary_text;
+    @apply bg-leaderboard_usercard_bg border-y border-leaderboard_usercard_border text-btn_secondary_text;
 }
 
 .tableCell_1 {

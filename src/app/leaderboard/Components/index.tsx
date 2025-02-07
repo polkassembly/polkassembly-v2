@@ -31,63 +31,83 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	const { user } = useUser();
 
 	const calculateRankRange = (currentPage: number): RankRange => {
+		if (!Number.isInteger(currentPage) || currentPage < 1) {
+			return { startRank: 0, endRank: 0 };
+		}
 		if (currentPage === 1) {
 			return { startRank: 4, endRank: 10 };
 		}
+		if (!Array.isArray(data?.items)) {
+			return { startRank: 0, endRank: 0 };
+		}
+		const allRanks = data.items
+			.map((item) => Number(item.rank) || 0)
+			.filter((rank) => rank > 10)
+			.sort((a, b) => a - b);
 
-		const uniqueRanks = [...new Set(data.items.map((item) => item.rank))].sort((a, b) => (a ?? 0) - (b ?? 0));
-		const startIndex = (currentPage - 1) * DEFAULT_LISTING_LIMIT - 3;
-		const endIndex = startIndex + DEFAULT_LISTING_LIMIT - 1;
+		const itemsPerPage = DEFAULT_LISTING_LIMIT;
+		const startIndex = (currentPage - 2) * itemsPerPage;
+		if (startIndex < 0 || startIndex >= allRanks.length) {
+			return { startRank: 0, endRank: 0 };
+		}
+		const startRank = allRanks.at(startIndex) ?? allRanks.at(0) ?? 0;
+		const endIndex = Math.min(startIndex + itemsPerPage - 1, allRanks.length - 1);
+		const endRank = allRanks.at(endIndex) ?? startRank;
 
 		return {
-			startRank: uniqueRanks[startIndex ?? 0] ?? 0,
-			endRank: uniqueRanks[endIndex ?? 0] ?? uniqueRanks[uniqueRanks.length - 1] ?? 0
+			startRank,
+			endRank
 		};
 	};
 
 	const processItems = (): IPublicUser[] => {
 		const { startRank, endRank } = calculateRankRange(page);
-		const items = page === 1 ? data.items.filter((item) => item.rank >= 4 && item.rank <= 10) : data.items.filter((item) => item.rank >= startRank && item.rank <= endRank);
-
+		let items;
+		if (page === 1) {
+			items = data.items.filter((item) => (item.rank ?? 0) >= 4 && (item.rank ?? 0) <= 10);
+		} else {
+			items = data.items
+				.filter((item) => {
+					const rank = item.rank ?? 0;
+					return rank >= startRank && rank <= endRank;
+				})
+				.slice(0, DEFAULT_LISTING_LIMIT);
+		}
 		const rankGroups = items.reduce<Record<number, IPublicUser[]>>((acc, item) => {
 			const rank = item.rank ?? 0;
-			return {
-				...acc,
-				[rank]: [...(acc[rank] || []), item]
-			};
+			if (!acc[rank]) {
+				acc[rank] = [];
+			}
+			acc[rank].push(item);
+			return acc;
 		}, {});
-
 		if (!user?.publicUser) {
 			return Object.values(rankGroups).flat();
 		}
-
 		const userRank = user.publicUser.rank ?? 0;
 		if (userRank <= 3) {
 			return Object.values(rankGroups).flat();
 		}
-
-		const sameRankUsers = data.items.filter((item) => item.rank === userRank);
 		const isUserRankInCurrentPage = page === 1 ? userRank >= 4 && userRank <= 10 : userRank >= startRank && userRank <= endRank;
-
 		if (!isUserRankInCurrentPage) {
 			return Object.values(rankGroups).flat();
 		}
-
 		const userEntry: IPublicUser = {
 			...user.publicUser,
 			username: user.username ?? 'Unknown User'
 		};
-
+		const sameRankUsers = items.filter((item) => item.rank === userRank);
 		const updatedRankGroups = {
 			...rankGroups,
 			[userRank]: [userEntry, ...sameRankUsers.filter((item) => item.id !== user.publicUser?.id)]
 		};
-
 		return Object.entries(updatedRankGroups)
 			.sort(([rankA], [rankB]) => Number(rankA) - Number(rankB))
-			.flatMap(([, users]) => users);
+			.flatMap(([, users]) => users)
+			.slice(0, DEFAULT_LISTING_LIMIT);
 	};
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const processDisplayedItems = useMemo<IPublicUser[]>(() => processItems(), [data.items, page, user]);
 
 	const shouldShowUserAtBottom = useMemo(() => {

@@ -25,7 +25,7 @@ function LeadboardRow({ user, isCurrentUser, isBottom = false }: TableRowProps) 
 	return (
 		<TableRow
 			key={`${user.id}${isBottom ? '-bottom' : ''}`}
-			className={cn(isCurrentUser && styles.tableRow_user, isCurrentUser && 'border-b border-t border-leaderboard_usercard_border')}
+			className={cn(isCurrentUser && styles.tableRow_user)}
 		>
 			<TableCell className={styles.tableCell_3}>{user.rank}</TableCell>
 			<TableCell className={styles.tableCell_2}>
