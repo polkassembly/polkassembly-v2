@@ -5,35 +5,99 @@
 'use client';
 
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
-import { dayjs } from '@shared/_utils/dayjsInit';
-import React from 'react';
+import React, { useMemo } from 'react';
 import Trophy from '@assets/leaderboard/Trophy.png';
-import rankStar from '@assets/profile/rank-star.svg';
-import CalendarIcon from '@assets/icons/calendar-icon.svg';
-import UserIcon from '@assets/profile/user-icon.svg';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { IoPersonAdd } from 'react-icons/io5';
-// import { MdOutlineSearch } from 'react-icons/md';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import styles from './Leaderboard.module.scss';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
-// import { Input } from '../Input';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '../Table';
 import { PaginationWithLinks } from '../PaginationWithLinks';
 import RankCard from './RankCard';
+import LeadboardRow from './LeadboardTable';
+
+interface RankRange {
+	startRank: number;
+	endRank: number;
+}
 
 function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPublicUser>; top3RankData: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
-	const page = parseInt(searchParams.get('page') || '1', DEFAULT_LISTING_LIMIT) || 1;
+	const page = parseInt(searchParams?.get('page') ?? '1', 10);
 	const router = useRouter();
-	const displayedItems = page === 1 ? data.items.slice(3, DEFAULT_LISTING_LIMIT) : data.items;
 	const t = useTranslations();
 	const { user } = useUser();
+
+	const calculateRankRange = (currentPage: number): RankRange => {
+		if (currentPage === 1) {
+			return { startRank: 4, endRank: 10 };
+		}
+
+		const uniqueRanks = [...new Set(data.items.map((item) => item.rank))].sort((a, b) => (a ?? 0) - (b ?? 0));
+		const startIndex = (currentPage - 1) * DEFAULT_LISTING_LIMIT - 3;
+		const endIndex = startIndex + DEFAULT_LISTING_LIMIT - 1;
+
+		return {
+			startRank: uniqueRanks[startIndex ?? 0] ?? 0,
+			endRank: uniqueRanks[endIndex ?? 0] ?? uniqueRanks[uniqueRanks.length - 1] ?? 0
+		};
+	};
+
+	const processItems = (): IPublicUser[] => {
+		const { startRank, endRank } = calculateRankRange(page);
+		const items = page === 1 ? data.items.filter((item) => item.rank >= 4 && item.rank <= 10) : data.items.filter((item) => item.rank >= startRank && item.rank <= endRank);
+
+		const rankGroups = items.reduce<Record<number, IPublicUser[]>>((acc, item) => {
+			const rank = item.rank ?? 0;
+			return {
+				...acc,
+				[rank]: [...(acc[rank] || []), item]
+			};
+		}, {});
+
+		if (!user?.publicUser) {
+			return Object.values(rankGroups).flat();
+		}
+
+		const userRank = user.publicUser.rank ?? 0;
+		if (userRank <= 3) {
+			return Object.values(rankGroups).flat();
+		}
+
+		const sameRankUsers = data.items.filter((item) => item.rank === userRank);
+		const isUserRankInCurrentPage = page === 1 ? userRank >= 4 && userRank <= 10 : userRank >= startRank && userRank <= endRank;
+
+		if (!isUserRankInCurrentPage) {
+			return Object.values(rankGroups).flat();
+		}
+
+		const userEntry: IPublicUser = {
+			...user.publicUser,
+			username: user.username ?? 'Unknown User'
+		};
+
+		const updatedRankGroups = {
+			...rankGroups,
+			[userRank]: [userEntry, ...sameRankUsers.filter((item) => item.id !== user.publicUser?.id)]
+		};
+
+		return Object.entries(updatedRankGroups)
+			.sort(([rankA], [rankB]) => Number(rankA) - Number(rankB))
+			.flatMap(([, users]) => users);
+	};
+
+	const processDisplayedItems = useMemo<IPublicUser[]>(() => processItems(), [data.items, page, user]);
+
+	const shouldShowUserAtBottom = useMemo(() => {
+		if (!user?.publicUser?.rank) return false;
+		if (user.publicUser.rank <= 3) return false;
+
+		const { startRank, endRank } = calculateRankRange(page);
+		return user.publicUser.rank < startRank || user.publicUser.rank > endRank;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user, page]);
 
 	return (
 		<div className='bg-page_background'>
@@ -54,153 +118,58 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 					</div>
 				</div>
 			</div>
+
 			<div className='my-5 flex flex-wrap items-center justify-center gap-4 xl:my-10 xl:flex-nowrap'>
-				{top3RankData.items.map((item, index) => {
-					return (
-						<RankCard
-							key={item.id}
-							item={item}
-							place={index + 1}
-						/>
-					);
-				})}
+				{top3RankData.items.map((item: IPublicUser, index: number) => (
+					<RankCard
+						key={item.id}
+						item={item}
+						place={index + 1}
+					/>
+				))}
 			</div>
+
 			<div className='rounded-lg bg-bg_modal p-6'>
-				{/* <div className='flex items-center justify-between'>
-					<div className='flex items-center gap-2'>
-						<div className='relative'>
-							<Input
-								className={styles.input_container}
-								placeholder={t('Leaderboard.searchUsername')}
+				<Table>
+					<TableHeader>
+						<TableRow className={styles.tableRow}>
+							<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
+							<TableHead className={styles.tableCell_2}>{t('Leaderboard.username')}</TableHead>
+							<TableHead className={styles.tableCell}>{t('Leaderboard.astrals')}</TableHead>
+							<TableHead className={styles.tableCell}>{t('Leaderboard.userSince')}</TableHead>
+							<TableHead className={styles.tableCell_last}>{t('Leaderboard.actions')}</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{processDisplayedItems?.map((item: IPublicUser) => (
+							<LeadboardRow
+								key={item.id}
+								user={item}
+								isCurrentUser={item.id === user?.publicUser?.id}
 							/>
-							<MdOutlineSearch className={styles.input_search} />
-						</div>
-					</div> 
-				</div>  */}
-				<div>
-					<Table>
-						<TableHeader>
-							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
-								<TableHead className={styles.tableCell_2}>{t('Leaderboard.username')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('Leaderboard.astrals')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('Leaderboard.userSince')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('Leaderboard.actions')}</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{displayedItems.map((item) => {
-								return (
-									<TableRow key={item.id}>
-										<TableCell className={styles.tableCell_1}>{item.rank}</TableCell>
-										<TableCell className={styles.tableCell_2}>
-											<Link
-												href={`/user/${item?.id}`}
-												className='flex items-center gap-x-2'
-											>
-												<Image
-													src={UserIcon}
-													alt='User Icon'
-													className='h-6 w-6'
-													width={20}
-													height={20}
-												/>
-												<span className='text-sm font-medium'>{item?.username}</span>
-											</Link>
-										</TableCell>
-										<TableCell className='p-4'>
-											<span className='flex w-20 items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
-												<Image
-													src={rankStar}
-													alt='Rank Star'
-													width={16}
-													height={16}
-												/>
-												<span className='text-sm font-medium text-leaderboard_score'>{item?.profileScore}</span>
-											</span>
-										</TableCell>
-										<TableCell className={styles.tableCell}>
-											<span className='flex items-center gap-x-2 text-xs'>
-												<Image
-													src={CalendarIcon}
-													alt='calendar'
-													width={20}
-													height={20}
-												/>
-												<span className='whitespace-nowrap'>{dayjs(item.createdAt).format("Do MMM 'YY")}</span>
-											</span>
-										</TableCell>
-										<TableCell className={styles.tableContentCell_last}>
-											<IoPersonAdd className='text-lg text-text_primary' />
-											<HiMiniCurrencyDollar className='text-2xl text-text_primary' />
-										</TableCell>
-									</TableRow>
-								);
-							})}
-							{user && (
-								<TableRow
-									key={user.publicUser?.id}
-									className={cn(styles.tableRow_user, 'border-b border-t border-leaderboard_usercard_border')}
-								>
-									<TableCell className={styles.tableCell_2}>{user.publicUser?.rank}</TableCell>
-									<TableCell className={styles.tableCell_2}>
-										<Link
-											href={`/user/${user.publicUser?.id}`}
-											className='flex items-center gap-x-2'
-										>
-											<Image
-												src={UserIcon}
-												alt='User Icon'
-												className='h-6 w-6'
-												width={20}
-												height={20}
-											/>
-											<span className='text-sm font-medium'>{user.username}</span>
-										</Link>
-									</TableCell>
-									<TableCell className='p-4'>
-										<span className='flex w-20 items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
-											<Image
-												src={rankStar}
-												alt='Rank Star'
-												width={16}
-												height={16}
-											/>
-											<span className='text-sm font-medium text-leaderboard_score'>{user.publicUser?.profileScore}</span>
-										</span>
-									</TableCell>
-									<TableCell className={styles.tableCell}>
-										<span className='flex items-center gap-x-2 text-xs'>
-											<Image
-												src={CalendarIcon}
-												alt='calendar'
-												width={20}
-												height={20}
-											/>
-											<span className='whitespace-nowrap'>{dayjs(user.publicUser?.createdAt).format("Do MMM 'YY")}</span>
-										</span>
-									</TableCell>
-									<TableCell className={styles.tableContentCell_last}>
-										<IoPersonAdd className='hidden' />
-										<HiMiniCurrencyDollar className='hidden' />
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-					{data.totalCount && data.totalCount > DEFAULT_LISTING_LIMIT && (
-						<div className='mt-5 w-full'>
-							<PaginationWithLinks
-								page={Number(page)}
-								pageSize={DEFAULT_LISTING_LIMIT}
-								totalCount={data.totalCount}
-								onClick={(pageNumber) => {
-									router.push(`/leaderboard?page=${pageNumber}`);
-								}}
+						))}
+						{shouldShowUserAtBottom && user?.publicUser && (
+							<LeadboardRow
+								user={user.publicUser}
+								isCurrentUser
+								isBottom
 							/>
-						</div>
-					)}
-				</div>
+						)}
+					</TableBody>
+				</Table>
+
+				{data.totalCount > DEFAULT_LISTING_LIMIT && (
+					<div className='mt-5 w-full'>
+						<PaginationWithLinks
+							page={page}
+							pageSize={DEFAULT_LISTING_LIMIT}
+							totalCount={data.totalCount}
+							onClick={(pageNumber) => {
+								router.push(`/leaderboard?page=${pageNumber}`);
+							}}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);
