@@ -10,7 +10,7 @@ import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import ReactJson from 'react-json-view';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useTheme } from 'next-themes';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../Table';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import { Dialog, DialogContent, DialogTitle } from '../../Dialog/Dialog';
@@ -20,7 +20,7 @@ import PreimageRow from './PreimageRow';
 function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const searchParams = useSearchParams();
 	const page = searchParams.get('page') || 1;
-	const { resolvedTheme: theme } = useTheme();
+	const { userPreferences } = useUserPreferences();
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [selectedPreimage, setSelectedPreimage] = useState<IPreimage | null>(null);
@@ -84,7 +84,7 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							{modalarg && (
 								<div className={styles.modalContent}>
 									<ReactJson
-										theme={theme === ETheme.DARK ? 'bright' : 'rjv-default'}
+										theme={userPreferences.theme === ETheme.DARK ? 'bright' : 'rjv-default'}
 										style={{ color: 'white', background: 'var(--section-dark-overlay)' }}
 										src={modalarg}
 										iconStyle='circle'

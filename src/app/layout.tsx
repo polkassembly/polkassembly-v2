@@ -57,6 +57,7 @@ export default async function RootLayout({
 					crawlSpeed={100}
 					speed={300}
 					showSpinner={false}
+					height={1}
 				/>
 				<Initializers
 					userData={user || null}

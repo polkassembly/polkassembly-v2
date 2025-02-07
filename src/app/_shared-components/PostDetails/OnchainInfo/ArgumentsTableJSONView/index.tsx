@@ -6,7 +6,7 @@ import ReactJson from 'react-json-view';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { useTheme } from 'next-themes';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import ArgumentsTable from './ArgumentsTable';
 import classes from './ArgumentsTable.module.scss';
 
@@ -21,8 +21,9 @@ enum Etabs {
 }
 
 function ArgumentsTableJSONView({ className, postArguments }: Props) {
-	const { resolvedTheme } = useTheme();
 	const t = useTranslations();
+	const { userPreferences } = useUserPreferences();
+
 	if (postArguments) {
 		return (
 			<div className={className}>
@@ -53,7 +54,7 @@ function ArgumentsTableJSONView({ className, postArguments }: Props) {
 					<TabsContent value={Etabs.JSON}>
 						<div className={classes.jsonContainer}>
 							<ReactJson
-								theme={resolvedTheme === ETheme.DARK ? 'monokai' : 'rjv-default'}
+								theme={userPreferences.theme === ETheme.DARK ? 'monokai' : 'rjv-default'}
 								src={postArguments}
 								iconStyle='circle'
 								enableClipboard={false}

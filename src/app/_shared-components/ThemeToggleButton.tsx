@@ -3,27 +3,28 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { useTheme } from 'next-themes';
 import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface ToggleButtonProps {
 	className?: string;
 }
 
 function ThemeToggleButton({ className }: ToggleButtonProps) {
-	const { resolvedTheme, setTheme } = useTheme();
 	const t = useTranslations('Header');
 
-	const isDark = resolvedTheme === ETheme.DARK;
+	const { userPreferences, setUserPreferences } = useUserPreferences();
+
+	const isDark = userPreferences.theme === ETheme.DARK;
 
 	return (
 		<button
 			type='button'
-			onClick={() => setTheme(isDark ? ETheme.LIGHT : ETheme.DARK)}
+			onClick={() => setUserPreferences({ ...userPreferences, theme: isDark ? ETheme.LIGHT : ETheme.DARK })}
 			className={cn(
 				'flex items-center justify-center',
 				'rounded-full border',

@@ -23,12 +23,12 @@ import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import USDTIcon from '@assets/icons/usdt.svg';
 import USDCIcon from '@assets/icons/usdc.svg';
 import { BN } from '@polkadot/util';
-import { useTheme } from 'next-themes';
 import DOTIcon from '@assets/icons/dot.png';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import Link from 'next/link';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -48,7 +48,7 @@ function ListingCard({
 	index: number;
 }) {
 	const network = getCurrentNetwork();
-	const { resolvedTheme: theme } = useTheme();
+	const { userPreferences } = useUserPreferences();
 
 	const formattedCreatedAt = dayjs(data.createdAt || data.onChainInfo?.createdAt || new Date()).fromNow();
 	const ayeValue = new BN(data.onChainInfo?.voteMetrics?.aye.value || '0');
@@ -122,7 +122,7 @@ function ListingCard({
 										src={CommentIcon}
 										alt='comments'
 										width={16}
-										className={theme === ETheme.DARK ? 'dark-icons' : ''}
+										className={userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}
 										height={16}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
