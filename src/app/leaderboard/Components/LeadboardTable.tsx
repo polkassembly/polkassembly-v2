@@ -30,7 +30,7 @@ function LeadboardRow({ user, isCurrentUser, isBottom = false }: TableRowProps) 
 			<TableCell className={styles.tableCell_3}>{user.rank}</TableCell>
 			<TableCell className={styles.tableCell_2}>
 				<Link
-					href={`/user/${user.id}`}
+					href={`/user/username/${user.username}`}
 					className='flex items-center gap-x-2'
 				>
 					<Image

@@ -81,7 +81,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 					<div className={`flex flex-col gap-2 sm:gap-3 ${contentPadding} pb-2 sm:pb-3`}>
 						<span className='flex w-full items-center justify-between'>
 							<Link
-								href={`/user/${item?.id}`}
+								href={`/user/username/${item?.username}`}
 								className='flex items-center gap-x-1 sm:gap-x-2'
 							>
 								<Image
