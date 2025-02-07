@@ -23,7 +23,6 @@ async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?
 			<Leaderboard
 				data={data}
 				top3RankData={top3RankData}
-				searchParamsValue={searchParamsValue}
 			/>
 		</div>
 	);
