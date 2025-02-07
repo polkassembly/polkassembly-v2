@@ -140,7 +140,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							{user && (
 								<TableRow
 									key={user.publicUser?.id}
-									className={cn(styles.tableRow_user, 'border-leaderboard_usercard_border border-b border-t')}
+									className={cn(styles.tableRow_user, 'border-b border-t border-leaderboard_usercard_border')}
 								>
 									<TableCell className={styles.tableCell_2}>{user.publicUser?.rank}</TableCell>
 									<TableCell className={styles.tableCell_2}>
