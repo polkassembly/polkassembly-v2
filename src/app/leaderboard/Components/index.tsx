@@ -108,19 +108,22 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	return (
 		<div className='bg-page_background'>
 			<div className={styles.Card}>
-				<div className='relative flex flex-row items-center justify-center md:justify-start'>
-					<div className='relative'>
-						<Image
-							src={Trophy}
-							alt='Cup'
-							className='z-10 h-auto w-40 md:w-60 lg:w-72'
-							width={50}
-							height={100}
-						/>
-					</div>
-					<div className='flex flex-col items-center text-center md:-ml-10 md:items-start md:text-left'>
-						<p className='text-4xl font-semibold text-white'>{t('Leaderboard.leaderboard')}</p>
-						<p className='text-center text-white'>{t('Leaderboard.findYourRank')}</p>
+				<div className='flex min-h-[200px] items-center justify-center'>
+					<div className='flex w-full items-center justify-center md:-ml-60'>
+						<div className='relative flex-shrink-0'>
+							<Image
+								src={Trophy}
+								alt='Cup'
+								className='h-auto w-40 md:w-52 lg:w-64'
+								width={50}
+								height={100}
+								priority
+							/>
+						</div>
+						<div className='flex flex-col items-center justify-center text-center'>
+							<p className='text-4xl font-semibold text-white'>{t('Leaderboard.leaderboard')}</p>
+							<p className='whitespace-nowrap text-white'>{t('Leaderboard.findYourRank')}</p>
+						</div>
 					</div>
 				</div>
 			</div>
