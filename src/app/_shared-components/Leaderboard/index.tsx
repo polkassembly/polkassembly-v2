@@ -25,12 +25,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { PaginationWithLinks } from '../PaginationWithLinks';
 import RankCard from './RankCard';
 
-function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
+function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPublicUser>; top3RankData: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
 	const page = parseInt(searchParams.get('page') || '1', DEFAULT_LISTING_LIMIT) || 1;
 	const router = useRouter();
 	const displayedItems = page === 1 ? data.items.slice(3, DEFAULT_LISTING_LIMIT) : data.items;
 	const t = useTranslations();
+
 	return (
 		<div className='bg-page_background'>
 			<div className={styles.Card}>
@@ -51,7 +52,7 @@ function Leaderboard({ data }: { data: IGenericListingResponse<IPublicUser> }) {
 				</div>
 			</div>
 			<div className='my-5 flex flex-wrap items-center justify-center gap-4 xl:my-10 xl:flex-nowrap'>
-				{data.items.slice(0, 3).map((item, index) => {
+				{top3RankData.items.map((item, index) => {
 					return (
 						<RankCard
 							key={item.id}
