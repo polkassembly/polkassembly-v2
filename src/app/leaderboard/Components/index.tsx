@@ -58,7 +58,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			const rank = item.rank ?? 0;
 			return {
 				...acc,
-				[rank]: [...(acc[rank] || []), item]
+				[rank]: [...(acc[rank as number] || []), item]
 			};
 		}, {});
 
@@ -93,6 +93,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			.flatMap(([, users]) => users);
 	};
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const processDisplayedItems = useMemo<IPublicUser[]>(() => processItems(), [data.items, page, user]);
 
 	const shouldShowUserAtBottom = useMemo(() => {
