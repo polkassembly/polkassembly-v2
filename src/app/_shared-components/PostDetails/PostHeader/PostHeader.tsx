@@ -99,7 +99,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 									orientation='vertical'
 									className='h-3'
 								/>
-								<PostTags tags={postData.tags as unknown as string[]} />
+								<PostTags tags={postData.tags} />
 							</>
 						)}
 					</div>
