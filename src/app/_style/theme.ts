@@ -84,7 +84,9 @@ export const THEME_COLORS = {
 		selected_topic_bg: '#ebeef2',
 		basic_text: '#485F7D',
 		allowed_commentor_text: '#485F7D',
-		input_text: '#485F7D'
+		input_text: '#485F7D',
+		leaderboard_usercard_bg: '#e2ebff',
+		leaderboard_usercard_border: '#486ddf'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -165,6 +167,8 @@ export const THEME_COLORS = {
 		selected_topic_bg: '#1D1D1D',
 		basic_text: '#909090',
 		allowed_commentor_text: '#ffffff',
-		input_text: '#ffffff'
+		input_text: '#ffffff',
+		leaderboard_usercard_bg: '#141C2D',
+		leaderboard_usercard_border: '#407BFF'
 	}
 };

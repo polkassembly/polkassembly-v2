@@ -18,7 +18,9 @@ import { IoPersonAdd } from 'react-icons/io5';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import styles from './Leaderboard.module.scss';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
 // import { Input } from '../Input';
@@ -31,6 +33,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	const router = useRouter();
 	const displayedItems = page === 1 ? data.items.slice(3, DEFAULT_LISTING_LIMIT) : data.items;
 	const t = useTranslations();
+	const { user } = useUser();
 
 	return (
 		<div className='bg-page_background'>
@@ -134,6 +137,55 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 									</TableRow>
 								);
 							})}
+							{user && (
+								<TableRow
+									key={user.publicUser?.id}
+									className={cn(styles.tableRow_user, 'border-leaderboard_usercard_border border-b border-t')}
+								>
+									<TableCell className={styles.tableCell_2}>{user.publicUser?.rank}</TableCell>
+									<TableCell className={styles.tableCell_2}>
+										<Link
+											href={`/user/${user.publicUser?.id}`}
+											className='flex items-center gap-x-2'
+										>
+											<Image
+												src={UserIcon}
+												alt='User Icon'
+												className='h-6 w-6'
+												width={20}
+												height={20}
+											/>
+											<span className='text-sm font-medium'>{user.username}</span>
+										</Link>
+									</TableCell>
+									<TableCell className='p-4'>
+										<span className='flex w-20 items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
+											<Image
+												src={rankStar}
+												alt='Rank Star'
+												width={16}
+												height={16}
+											/>
+											<span className='text-sm font-medium text-leaderboard_score'>{user.publicUser?.profileScore}</span>
+										</span>
+									</TableCell>
+									<TableCell className={styles.tableCell}>
+										<span className='flex items-center gap-x-2 text-xs'>
+											<Image
+												src={CalendarIcon}
+												alt='calendar'
+												width={20}
+												height={20}
+											/>
+											<span className='whitespace-nowrap'>{dayjs(user.publicUser?.createdAt).format("Do MMM 'YY")}</span>
+										</span>
+									</TableCell>
+									<TableCell className={styles.tableContentCell_last}>
+										<IoPersonAdd className='hidden' />
+										<HiMiniCurrencyDollar className='hidden' />
+									</TableCell>
+								</TableRow>
+							)}
 						</TableBody>
 					</Table>
 					{data.totalCount && data.totalCount > DEFAULT_LISTING_LIMIT && (
