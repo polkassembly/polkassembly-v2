@@ -99,6 +99,7 @@ export class NextApiClientService {
 		let path = '';
 		let method: Method = 'GET';
 
+		// eslint-disable-next-line sonarjs/max-switch-cases
 		switch (route) {
 			// Static routes
 			case EApiRoute.WEB2_LOGIN:
@@ -150,6 +151,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+				break;
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
