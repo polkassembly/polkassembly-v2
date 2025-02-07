@@ -18,8 +18,7 @@ export function getEncodedAddress(address: string, network: ENetwork): string | 
 		return null;
 	}
 
-	// eslint-disable-next-line
-	const ss58Format = NETWORKS_DETAILS[network]?.ss58Format;
+	const ss58Format = NETWORKS_DETAILS[network as ENetwork]?.ss58Format;
 
 	if (ss58Format === undefined) {
 		return null;

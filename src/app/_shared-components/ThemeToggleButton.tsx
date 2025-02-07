@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { FiMoon } from 'react-icons/fi';
 import { IoSunnyOutline } from 'react-icons/io5';
@@ -17,6 +17,15 @@ interface ToggleButtonProps {
 function ThemeToggleButton({ className }: ToggleButtonProps) {
 	const { resolvedTheme, setTheme } = useTheme();
 	const t = useTranslations('Header');
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	if (!isMounted) {
+		return null;
+	}
 
 	const isDark = resolvedTheme === ETheme.DARK;
 
@@ -43,7 +52,10 @@ function ThemeToggleButton({ className }: ToggleButtonProps) {
 						strokeWidth={2}
 						aria-hidden='true'
 					/>
-					<p className='block text-xs text-text_primary md:hidden'>
+					<p
+						className='block text-xs text-text_primary md:hidden'
+						suppressHydrationWarning
+					>
 						{t('switchTo')} <span className='font-semibold'>{t('lightMode')}</span>
 					</p>
 				</div>
@@ -54,7 +66,10 @@ function ThemeToggleButton({ className }: ToggleButtonProps) {
 						strokeWidth={2}
 						aria-hidden='true'
 					/>
-					<p className='block text-xs text-text_primary md:hidden'>
+					<p
+						className='block text-xs text-text_primary md:hidden'
+						suppressHydrationWarning
+					>
 						{t('switchTo')} <span className='font-semibold'>{t('darkMode')}</span>
 					</p>
 				</div>

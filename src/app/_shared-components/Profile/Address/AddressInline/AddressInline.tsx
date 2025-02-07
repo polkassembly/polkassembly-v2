@@ -7,8 +7,8 @@
 import React from 'react';
 import Identicon from '@polkadot/react-identicon';
 import { IOnChainIdentity } from '@/_shared/types';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import IdentityBadge from '../IdentityBadge';
 import styles from './AddressInline.module.scss';
 
@@ -23,6 +23,12 @@ interface Props {
 }
 
 function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName }: Props) {
+	const router = useRouter();
+
+	const handleAddressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation();
+		router.push(`/user/address/${address}`);
+	};
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
@@ -36,17 +42,17 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					theme='polkadot'
 				/>
 			)}
-			<Link
+			<div
+				aria-hidden='true'
+				onClick={handleAddressClick}
 				className={styles.container}
-				href={`/user/address/${address}`}
 			>
 				<IdentityBadge
 					onChainIdentity={onChainIdentity}
 					iconSize={iconSize}
 				/>
-
 				<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
-			</Link>
+			</div>
 		</div>
 	);
 }

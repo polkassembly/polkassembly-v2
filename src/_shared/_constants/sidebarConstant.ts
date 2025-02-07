@@ -39,8 +39,7 @@ const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuI
 		items: item.items ? ActiveItems(item.items, pathname) : undefined
 	}));
 const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string) => string, trackCounts?: Record<string, number>) => {
-	// eslint-disable-next-line
-	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
+	const tracks = NETWORKS_DETAILS[networkKey as ENetwork]?.tracks || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === trackGroup)
 		.map(([trackKey, track]) => {
@@ -54,8 +53,7 @@ const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string
 			return {
 				title: t(translationKey),
 				url: `/${track.name.toLowerCase().replace(/_/g, '-')}`,
-				// eslint-disable-next-line
-				count: trackCounts?.[trackKey] || 0,
+				count: trackCounts?.[trackKey as keyof typeof trackCounts] || 0,
 				icon: undefined
 			};
 		});
@@ -83,8 +81,7 @@ const getOriginIcon = (key: string) => {
 };
 
 const getOriginsItems = (networkKey: ENetwork, t: (key: string) => string) => {
-	// eslint-disable-next-line
-	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
+	const tracks = NETWORKS_DETAILS[networkKey as ENetwork]?.tracks || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === 'Origin')
 		.map(([key, track]) => {

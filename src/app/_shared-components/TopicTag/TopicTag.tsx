@@ -8,6 +8,6 @@ export const getSpanStyle = (trackName: string, activeProposal?: number): string
 	if (!activeProposal || activeProposal <= 0) return styles.spanStyle;
 
 	const normalizedTrackName = trackName.replace(/\s+/g, '');
-	// eslint-disable-next-line
-	return styles[normalizedTrackName] || styles.spanStyle;
+
+	return styles[normalizedTrackName as keyof typeof styles] || styles.spanStyle;
 };

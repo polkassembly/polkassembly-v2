@@ -5,12 +5,11 @@
 'use client';
 
 import * as SliderPrimitive from '@radix-ui/react-slider';
-
 import { cn } from '@/lib/utils';
 import { ComponentPropsWithoutRef, ComponentRef, forwardRef, useState } from 'react';
 
 const Slider = forwardRef<ComponentRef<typeof SliderPrimitive.Root>, ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & { withBottomIndicator?: boolean }>(
-	({ className, ...props }, ref) => {
+	({ className, withBottomIndicator, ...props }, ref) => {
 		const [value, setValue] = useState(props.defaultValue);
 		return (
 			<div>
@@ -29,7 +28,7 @@ const Slider = forwardRef<ComponentRef<typeof SliderPrimitive.Root>, ComponentPr
 					</SliderPrimitive.Track>
 					<SliderPrimitive.Thumb className='block h-6 w-4 rounded-lg bg-bg_pink shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50' />
 				</SliderPrimitive.Root>
-				{props.max && props.withBottomIndicator && (
+				{props.max && withBottomIndicator && (
 					<div className='mt-2 flex items-center justify-between'>
 						{Array.from({ length: props.max + 1 }, (_, index) => (
 							<button

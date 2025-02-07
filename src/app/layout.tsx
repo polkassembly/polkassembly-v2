@@ -50,7 +50,10 @@ export default async function RootLayout({
 			className={userPreferences.theme}
 			suppressHydrationWarning
 		>
-			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
+			<body
+				className={`${fontDmSans.variable} ${fontDmSans.className}`}
+				suppressHydrationWarning
+			>
 				<NextTopLoader
 					color={THEME_COLORS.light.navbar_border}
 					initialPosition={0.55}

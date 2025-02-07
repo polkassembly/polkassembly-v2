@@ -2,14 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import React from 'react';
 import rankCardBg from '@assets/profile/rankcard-bg.svg';
-import profileAvatar from '@assets/profile/user-icon.svg';
 import rankCardInner from '@assets/profile/rankcard-inner.svg';
 import rankStar from '@assets/profile/rank-star.svg';
 import Image from 'next/image';
+import profileAvatar from '@assets/profile/user-icon.svg';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 

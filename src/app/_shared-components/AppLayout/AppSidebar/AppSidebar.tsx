@@ -5,7 +5,7 @@
 'use client';
 
 import Image from 'next/image';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
@@ -29,7 +29,7 @@ import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
 
-function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const t = useTranslations();
 	const pathname = usePathname();
@@ -37,7 +37,6 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
 	const network = getCurrentNetwork();
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
 		return (
 			<>
