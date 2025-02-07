@@ -13,14 +13,14 @@ import { useIdentityService } from './useIdentityService';
 export const useWalletService = () => {
 	const [walletService, setWalletService] = useAtom(walletAtom);
 	const network = getCurrentNetwork();
-	const apiService = usePolkadotApiService();
+	const { apiService } = usePolkadotApiService();
 	const { identityService } = useIdentityService();
 
 	useEffect(() => {
 		// Todo: reload(notification) if service is null;
 
 		const initWalletService = async () => {
-			if (apiService && identityService) {
+			if (apiService) {
 				const service = await WalletClientService.Init(network, apiService, identityService);
 				setWalletService(service);
 			}
@@ -28,7 +28,7 @@ export const useWalletService = () => {
 
 		initWalletService();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [apiService]);
+	}, [apiService, identityService]);
 
 	return useMemo(() => {
 		return walletService;

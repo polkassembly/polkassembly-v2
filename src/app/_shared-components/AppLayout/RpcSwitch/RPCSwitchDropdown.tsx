@@ -17,7 +17,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 export default function RPCSwitchDropdown({ className }: { className?: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const network = getCurrentNetwork();
-	const api = usePolkadotApiService();
+	const { apiService } = usePolkadotApiService();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 
 	if (!(network in NETWORKS_DETAILS)) {
@@ -28,10 +28,10 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	const handleRpcSwitch = async (index: number) => {
-		if (!api || isLoading) return;
+		if (!apiService || isLoading) return;
 		setIsLoading(true);
 		try {
-			await api.switchToNewRpcEndpoint(index);
+			await apiService.switchToNewRpcEndpoint(index);
 			setUserPreferences({ ...userPreferences, rpcIndex: index });
 		} catch {
 			// TODO: show notification
