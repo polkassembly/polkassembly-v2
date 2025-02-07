@@ -18,7 +18,7 @@ import Link from 'next/link';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { useTranslations } from 'next-intl';
-import { useSidebar } from '../Sidebar/Sidebar';
+import { useSidebar } from '@ui/Sidebar/Sidebar';
 import styles from './Leaderboard.module.scss';
 
 function RankCard({ place, className, item }: { place: number; className?: string; item: IPublicUser }) {

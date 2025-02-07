@@ -12,10 +12,10 @@ import Image from 'next/image';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
-import styles from './Leaderboard.module.scss';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '../Table';
-import { PaginationWithLinks } from '../PaginationWithLinks';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@ui/Table';
+import { PaginationWithLinks } from '@ui/PaginationWithLinks';
 import RankCard from './RankCard';
+import styles from './Leaderboard.module.scss';
 import LeadboardRow from './LeadboardTable';
 
 interface RankRange {

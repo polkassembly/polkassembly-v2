@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import { IoPersonAdd } from 'react-icons/io5';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
-import { TableRow, TableCell } from '../Table';
+import { TableRow, TableCell } from '@ui/Table';
 import styles from './Leaderboard.module.scss';
 
 interface TableRowProps {
