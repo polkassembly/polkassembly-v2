@@ -1,20 +1,25 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 import React from 'react';
-import { ITag } from '@/_shared/types';
 import classes from './PostTags.module.scss';
 
-function PostTags({ tags }: { tags: ITag[] }) {
+function PostTags({ tags }: { tags: string[] }) {
+	if (!tags?.length) return null;
+
 	return (
-		<div className='flex items-center gap-x-2'>
+		<div
+			className='flex items-center gap-x-2'
+			aria-label='Post Tags'
+		>
 			{tags.map((tag) => (
-				<div
-					key={tag.value}
+				<span
+					key={tag}
 					className={classes.tag}
 				>
-					{tag.value}
-				</div>
+					{tag}
+				</span>
 			))}
 		</div>
 	);
