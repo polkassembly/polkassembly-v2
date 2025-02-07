@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 /* eslint-disable no-await-in-loop */
 
-/* eslint-disable lines-between-class-members */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
@@ -22,7 +21,9 @@ import { ENetwork, IOnChainIdentity } from '@shared/types';
 
 export class IdentityService {
 	private readonly network: ENetwork;
+
 	private peopleChainApi: ApiPromise;
+
 	private currentPeopleChainRpcEndpointIndex: number;
 
 	private constructor(network: ENetwork, api: ApiPromise) {

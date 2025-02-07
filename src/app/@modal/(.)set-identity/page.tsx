@@ -5,7 +5,6 @@
 'use client';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
-import React from 'react';
 import { useRouter } from 'next/navigation';
 import SetIdentity from '@/app/_shared-components/SetIdentity/SetIdentity';
 import { useTranslations } from 'next-intl';
