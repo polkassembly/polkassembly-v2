@@ -5,7 +5,7 @@
 'use client';
 
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import Trophy from '@assets/leaderboard/Trophy.png';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
