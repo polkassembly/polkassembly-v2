@@ -31,28 +31,18 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	const { user } = useUser();
 
 	const calculateRankRange = (currentPage: number): RankRange => {
-		if (!Number.isInteger(currentPage) || currentPage < 1) {
-			return { startRank: 0, endRank: 0 };
-		}
 		if (currentPage === 1) {
 			return { startRank: 4, endRank: 10 };
 		}
-		if (!Array.isArray(data?.items)) {
-			return { startRank: 0, endRank: 0 };
-		}
 		const allRanks = data.items
-			.map((item) => Number(item.rank) || 0)
+			.map((item) => item.rank ?? 0)
 			.filter((rank) => rank > 10)
 			.sort((a, b) => a - b);
-
 		const itemsPerPage = DEFAULT_LISTING_LIMIT;
 		const startIndex = (currentPage - 2) * itemsPerPage;
-		if (startIndex < 0 || startIndex >= allRanks.length) {
-			return { startRank: 0, endRank: 0 };
-		}
-		const startRank = allRanks.at(startIndex) ?? allRanks.at(0) ?? 0;
-		const endIndex = Math.min(startIndex + itemsPerPage - 1, allRanks.length - 1);
-		const endRank = allRanks.at(endIndex) ?? startRank;
+		const endIndex = startIndex + itemsPerPage - 1;
+		const startRank = allRanks[startIndex] ?? allRanks[0] ?? 0;
+		const endRank = allRanks[Math.min(endIndex, allRanks.length - 1)] ?? allRanks[allRanks.length - 1] ?? 0;
 
 		return {
 			startRank,
