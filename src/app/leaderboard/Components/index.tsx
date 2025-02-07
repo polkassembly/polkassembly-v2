@@ -75,10 +75,10 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 		}
 		const rankGroups = items.reduce<Record<number, IPublicUser[]>>((acc, item) => {
 			const rank = item.rank ?? 0;
-			if (!acc[rank ?? 0]) {
-				acc[rank ?? 0] = [];
+			if (!acc[rank]) {
+				acc[rank] = [];
 			}
-			acc[rank ?? 0].push(item);
+			acc[rank].push(item);
 			return acc;
 		}, {});
 		if (!user?.publicUser) {
