@@ -110,8 +110,7 @@ export const THEME_COLORS = {
 		dark_auction_text: '#CCAED4',
 		dark_community_bg: '#1C2945',
 		dark_community_text: '#96AAD6',
-		dark_council_bg: '#0B353C',
-		dark_council_text: '#93C9D1',
+		light_council_text: '#93C9D1',
 		dark_general_bg: '#380E0E',
 		dark_general_text: '#DB8383',
 		dark_technical_bg: '#302921',
@@ -169,6 +168,7 @@ export const THEME_COLORS = {
 		allowed_commentor_text: '#ffffff',
 		input_text: '#ffffff',
 		leaderboard_usercard_bg: '#141C2D',
-		leaderboard_usercard_border: '#407BFF'
+		leaderboard_usercard_border: '#407BFF',
+		light_council_bg: '#FFEDF2'
 	}
 };
