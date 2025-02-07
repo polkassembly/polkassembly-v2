@@ -108,17 +108,18 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	return (
 		<div className='bg-page_background'>
 			<div className={styles.Card}>
-				<div className='relative flex flex-row items-center justify-center'>
-					<div className='relative flex justify-center md:justify-start'>
+				<div className='relative flex flex-row items-center justify-center md:justify-start'>
+					<div className='relative'>
 						<Image
 							src={Trophy}
 							alt='Cup'
 							className='z-10 h-auto w-40 md:w-60 lg:w-72'
-							width={100}
+							width={50}
 							height={100}
 						/>
 					</div>
-					<div className='flex flex-col items-center gap-1 text-center md:items-start md:text-left'>
+					{/* Removed gap-1 and added -ml-2 to move text closer to image */}
+					<div className='flex flex-col items-center text-center md:-ml-10 md:items-start md:text-left'>
 						<p className='text-4xl font-semibold text-white'>{t('Leaderboard.leaderboard')}</p>
 						<p className='text-center text-white'>{t('Leaderboard.findYourRank')}</p>
 					</div>
