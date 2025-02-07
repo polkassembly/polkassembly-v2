@@ -118,7 +118,6 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							height={100}
 						/>
 					</div>
-					{/* Removed gap-1 and added -ml-2 to move text closer to image */}
 					<div className='flex flex-col items-center text-center md:-ml-10 md:items-start md:text-left'>
 						<p className='text-4xl font-semibold text-white'>{t('Leaderboard.leaderboard')}</p>
 						<p className='text-center text-white'>{t('Leaderboard.findYourRank')}</p>
