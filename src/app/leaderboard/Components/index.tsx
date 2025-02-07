@@ -2,18 +2,15 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
-import { useMemo } from 'react';
 import Trophy from '@assets/leaderboard/Trophy.png';
-import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { useTranslations } from 'next-intl';
-import { useUser } from '@/hooks/useUser';
+import { CookieService } from '@/_shared/_services/cookie_service';
+import { getTranslations } from 'next-intl/server';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { PaginationWithLinks } from '@ui/PaginationWithLinks';
+import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import RankCard from './RankCard';
 import styles from './Leaderboard.module.scss';
 import LeadboardRow from './LeadboardTable';
@@ -23,12 +20,21 @@ interface RankRange {
 	endRank: number;
 }
 
-function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPublicUser>; top3RankData: IGenericListingResponse<IPublicUser> }) {
-	const searchParams = useSearchParams();
-	const page = parseInt(searchParams?.get('page') ?? '1', DEFAULT_LISTING_LIMIT);
-	const router = useRouter();
-	const t = useTranslations();
-	const { user } = useUser();
+async function Leaderboard({
+	data,
+	top3RankData,
+	searchParamsValue
+}: {
+	data: IGenericListingResponse<IPublicUser>;
+	top3RankData: IGenericListingResponse<IPublicUser>;
+	searchParamsValue: { page?: string };
+}) {
+	const page = parseInt(searchParamsValue.page || '1', DEFAULT_LISTING_LIMIT);
+	const t = await getTranslations();
+	const user = await CookieService.getUserFromCookie();
+
+	const publicUserData = await UserProfileClientService.fetchPublicUserById({ userId: user?.id ?? 0 });
+	const publicUser = publicUserData?.data;
 
 	const calculateRankRange = (currentPage: number): RankRange => {
 		if (currentPage === 1) {
@@ -57,11 +63,11 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			};
 		}, {});
 
-		if (!user?.publicUser) {
+		if (!publicUser) {
 			return Object.values(rankGroups).flat();
 		}
 
-		const userRank = user.publicUser.rank ?? 0;
+		const userRank = publicUser.rank ?? 0;
 		if (userRank <= 3) {
 			return Object.values(rankGroups).flat();
 		}
@@ -74,13 +80,13 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 		}
 
 		const userEntry: IPublicUser = {
-			...user.publicUser,
-			username: user.username ?? 'Unknown User'
+			...publicUser,
+			username: publicUser.username ?? 'Unknown User'
 		};
 
 		const updatedRankGroups = {
 			...rankGroups,
-			[userRank]: [userEntry, ...sameRankUsers.filter((item) => item.id !== user.publicUser?.id)]
+			[userRank]: [userEntry, ...sameRankUsers.filter((item) => item.id !== publicUser?.id)]
 		};
 
 		return Object.entries(updatedRankGroups)
@@ -88,16 +94,15 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			.flatMap(([, users]) => users);
 	};
 
-	const processDisplayedItems = useMemo<IPublicUser[]>(() => processItems(), [data.items, page, user]);
+	const processDisplayedItems = processItems();
 
-	const shouldShowUserAtBottom = useMemo(() => {
-		if (!user?.publicUser?.rank) return false;
-		if (user.publicUser.rank <= 3) return false;
+	const shouldShowUserAtBottom = () => {
+		if (!publicUser?.rank) return false;
+		if (publicUser.rank <= 3) return false;
 
 		const { startRank, endRank } = calculateRankRange(page);
-		return user.publicUser.rank < startRank || user.publicUser.rank > endRank;
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user, page]);
+		return publicUser.rank < startRank || publicUser.rank > endRank;
+	};
 
 	return (
 		<div className='bg-page_background'>
@@ -145,12 +150,12 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							<LeadboardRow
 								key={item.id}
 								user={item}
-								isCurrentUser={item.id === user?.publicUser?.id}
+								isCurrentUser={item.id === publicUser?.id}
 							/>
 						))}
-						{shouldShowUserAtBottom && user?.publicUser && (
+						{shouldShowUserAtBottom() && publicUser && (
 							<LeadboardRow
-								user={user.publicUser}
+								user={publicUser}
 								isCurrentUser
 								isBottom
 							/>
@@ -164,9 +169,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							page={page}
 							pageSize={DEFAULT_LISTING_LIMIT}
 							totalCount={data.totalCount}
-							onClick={(pageNumber) => {
-								router.push(`/leaderboard?page=${pageNumber}`);
-							}}
+							linkPagination
 						/>
 					</div>
 				)}

@@ -60,7 +60,7 @@
 }
 
 .rankStar {
-    @apply flex w-20 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium;
+    @apply flex w-20 max-w-28 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium;
 }
 
 .rankCardText {
