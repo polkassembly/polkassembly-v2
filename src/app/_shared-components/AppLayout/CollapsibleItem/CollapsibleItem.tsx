@@ -28,7 +28,7 @@ type State = 'collapsed' | 'expanded';
 
 const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
 const NEW_BADGE_TEXT = 'Sidebar.Tag.new';
-const DARK_ICON_CLASS = 'dark:dark-icons';
+const DARK_ICON_CLASS = 'dark-icons';
 
 function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
