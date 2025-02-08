@@ -79,3 +79,7 @@
 .newBadge {
 	@apply absolute right-[-12px] top-[-5px] rounded-full bg-[var(--sidebar-ring)] px-[0.4rem] py-[0.1rem] text-xs text-[var(--sidebar-primary-foreground)];
 }
+
+.menuItemIcon {
+	@apply h-6 w-6
+}
