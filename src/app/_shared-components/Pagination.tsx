@@ -63,7 +63,7 @@ function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof
 			className={cn('m-0 flex h-8 w-8 items-center justify-center gap-x-1 p-0', className)}
 			{...props}
 		>
-			<ChevronLeft className='h-4 w-4 text-text_primary' />
+			<ChevronLeft className='h-4 w-4 text-listing_page_btn' />
 		</PaginationLink>
 	);
 }
@@ -77,7 +77,7 @@ function PaginationNext({ className, ...props }: React.ComponentProps<typeof Pag
 			className={cn('m-0 flex h-8 w-8 items-center justify-center gap-x-1 p-0', className)}
 			{...props}
 		>
-			<ChevronRight className='h-4 w-4 text-text_primary' />
+			<ChevronRight className='h-4 w-4 text-listing_page_btn' />
 		</PaginationLink>
 	);
 }

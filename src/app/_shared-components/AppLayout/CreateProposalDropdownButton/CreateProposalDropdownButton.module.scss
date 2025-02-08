@@ -29,7 +29,7 @@
 
 
 .trigger {
-	@apply flex cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
+	@apply flex cursor-pointer items-center h-9 justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
 }
 
 .triggerCollapsed {

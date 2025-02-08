@@ -15,7 +15,7 @@ export const buttonVariants = {
 		'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	secondary: 'bg-btn_secondary_background text-text_pink rounded-lg border border-navbar_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	ghost: '',
-	pagination: 'bg-btn_secondary_background text-text_primary rounded-lg border border-border_grey hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
+	pagination: 'bg-btn_secondary_background text-text_primary rounded-lg border border-pagination_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	link: 'text-primary underline-offset-4 hover:underline'
 };
 
