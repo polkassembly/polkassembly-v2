@@ -145,7 +145,6 @@ export const THEME_COLORS = {
 		progress_nay: '#fc3e5d',
 		decision_bar_bg: '#D4E0FC',
 		decision_bar_indicator: '#407AFC',
-		progress_pink_bg: '#FEF2F8',
 		info: '#1677ff',
 		activity_selected_tab: '#2E2E2E',
 		post_btn_bg: '#4B4B4B',
