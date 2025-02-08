@@ -14,7 +14,6 @@ import identity from '@assets/activityfeed/features/features4.svg';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/Carousel';
 import { useTranslations } from 'next-intl';
 import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
-import { useUser } from '@/hooks/useUser';
 import styles from './ActivityFeedFeaturesSection.module.scss';
 
 interface IFeature {
@@ -26,7 +25,6 @@ interface IFeature {
 }
 
 function ActivityFeedFeaturesSection() {
-	const { user } = useUser();
 	const [api, setApi] = useState<CarouselApi>();
 	const { state } = useSidebar();
 
@@ -87,7 +85,7 @@ function ActivityFeedFeaturesSection() {
 	}, [api]);
 
 	return (
-		<div className={`${state === 'collapsed' ? styles.featuresContainerClosed : styles.featuresContainerOpen} ${!user?.id ? styles.featuresContainerNotLogin : ''}`}>
+		<div className={`${state === 'collapsed' ? styles.featuresContainerClosed : styles.featuresContainerOpen}`}>
 			<div className='flex items-start justify-between gap-2'>
 				<div className='flex items-center gap-2'>
 					<p className={`${styles.featuresTitle} dark:text-white`}>{t('ActivityFeed.Features')}</p>

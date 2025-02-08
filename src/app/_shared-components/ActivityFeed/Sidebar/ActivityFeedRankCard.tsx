@@ -12,11 +12,11 @@ import rankStar from '@assets/profile/rank-star.svg';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 
 function ActivityFeedRankCard() {
 	const t = useTranslations();
 	const { user } = useUser();
-	if (!user?.publicUser) return null;
 
 	return (
 		<div className='relative'>
@@ -43,31 +43,47 @@ function ActivityFeedRankCard() {
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
 					<p className='text-base font-semibold text-rank_card_text'>
-						{t('ActivityFeed.Rank')} {user?.publicUser?.rank}
+						{t('ActivityFeed.Rank')} {user?.publicUser?.rank ?? '#00'}
 					</p>
-					<div className='flex items-center gap-2 pt-8'>
-						<div className='flex items-center'>
-							<Image
-								src={profileAvatar}
-								alt='User Avatar'
-								className=''
-								width={32}
-								height={32}
-							/>
-							<p className='w-36 truncate font-semibold text-btn_secondary_text'>{user.username}</p>
-						</div>
+					<div className='w-full pt-8'>
+						{user?.publicUser?.rank ? (
+							<div className='flex items-center justify-between'>
+								<div className='flex items-center gap-2'>
+									<Image
+										src={profileAvatar}
+										alt='User Avatar'
+										className=''
+										width={32}
+										height={32}
+									/>
+									<p className='max-w-28 truncate font-semibold text-btn_secondary_text'>{user.username.charAt(0).toUpperCase() + user.username.slice(1)}</p>
+								</div>
 
-						<div>
-							<div className='flex items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
-								<Image
-									src={rankStar}
-									alt='Rank Star'
-									width={16}
-									height={16}
-								/>
-								<span className='text-sm font-medium text-gray-800'>{user?.publicUser?.profileScore}</span>
+								<div>
+									<div className='flex items-center gap-1 rounded-lg bg-rank_card_bg px-1.5 py-0.5 font-medium'>
+										<Image
+											src={rankStar}
+											alt='Rank Star'
+											width={16}
+											height={16}
+										/>
+										<span className='text-sm font-medium text-gray-800'>{user?.publicUser?.profileScore}</span>
+									</div>
+								</div>
 							</div>
-						</div>
+						) : (
+							<div className='w-full text-center'>
+								<p className='font-medium text-gray-800'>
+									<Link
+										href='/login'
+										className='cursor-pointer text-text_pink underline'
+									>
+										{t('Profile.login')}
+									</Link>{' '}
+									{t('ActivityFeed.NoRank')}
+								</p>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

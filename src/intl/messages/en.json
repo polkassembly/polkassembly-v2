@@ -57,7 +57,8 @@
 			"loadMoreComments": "Load more comments",
 			"showLessComments": "Show less comments",
 			"commentingOnProposal": "Commenting on proposal"
-		}
+		},
+		"NoRank": "to see your rank"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
