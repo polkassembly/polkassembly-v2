@@ -5,8 +5,6 @@
 'use client';
 
 import { useState } from 'react';
-import { EWallet } from '@/_shared/types';
-import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@ui/Form';
@@ -29,8 +27,6 @@ interface ISetIdentityFormFields {
 function SetIdentity() {
 	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
-	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(userPreferences.wallet || null);
-	const [selectedAccount, setSelectedAccount] = useState<InjectedAccount | null>(userPreferences.address || null);
 
 	const formData = useForm<ISetIdentityFormFields>();
 
@@ -39,13 +35,13 @@ function SetIdentity() {
 	const { identityService } = useIdentityService();
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
-		if (!selectedWallet || !selectedAccount || !values.displayName || !values.email || !identityService) return;
+		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !values.email || !identityService) return;
 
 		const { displayName, legalName, email, twitter, matrix } = values;
 		setLoading(true);
 
 		await identityService.setOnChainIdentity({
-			address: selectedAccount.address,
+			address: userPreferences.address.address,
 			displayName,
 			email,
 			legalName,
@@ -64,14 +60,8 @@ function SetIdentity() {
 		<Form {...formData}>
 			<form onSubmit={formData.handleSubmit(handleSetIdentity)}>
 				<div className='flex flex-col gap-y-4'>
-					<WalletButtons
-						small
-						onWalletChange={(wallet) => setSelectedWallet(wallet)}
-					/>
-					<AddressDropdown
-						withBalance
-						onChange={(account) => setSelectedAccount(account)}
-					/>
+					<WalletButtons small />
+					<AddressDropdown withBalance />
 					<Separator />
 					<FormField
 						control={formData.control}

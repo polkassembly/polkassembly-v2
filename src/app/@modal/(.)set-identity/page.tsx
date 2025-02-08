@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import SetIdentity from '@/app/_shared-components/SetIdentity/SetIdentity';
 import { useTranslations } from 'next-intl';
 
-function Discussion() {
+function SetIdentityModal() {
 	const t = useTranslations();
 	const router = useRouter();
 
@@ -33,4 +33,4 @@ function Discussion() {
 	);
 }
 
-export default Discussion;
+export default SetIdentityModal;

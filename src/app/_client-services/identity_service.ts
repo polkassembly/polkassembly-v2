@@ -39,8 +39,6 @@ export class IdentityService {
 
 		await api.isReady;
 
-		console.log('api ready', api.tx.identity);
-
 		return new IdentityService(network, api);
 	}
 

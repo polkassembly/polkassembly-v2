@@ -9,7 +9,7 @@ import SetIdentity from '../_shared-components/SetIdentity/SetIdentity';
 import HeaderTitle from './HeaderTitle';
 import { Separator } from '../_shared-components/Separator';
 
-async function Discussion() {
+async function SetIdentityPage() {
 	const user = await CookieService.getUserFromCookie();
 	if (!user) {
 		redirect('/');
@@ -26,4 +26,4 @@ async function Discussion() {
 	);
 }
 
-export default Discussion;
+export default SetIdentityPage;

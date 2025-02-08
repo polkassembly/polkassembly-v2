@@ -17,18 +17,18 @@ export class WalletClientService {
 
 	private apiService: PolkadotApiService;
 
-	private identityService?: IdentityService | null;
+	private identityService?: IdentityService;
 
 	private readonly network: ENetwork;
 
-	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork, identityService?: IdentityService | null) {
+	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork, identityService?: IdentityService) {
 		this.network = network;
 		this.injectedWindow = injectedWindow;
 		this.apiService = apiService;
 		this.identityService = identityService;
 	}
 
-	static async Init(network: ENetwork, apiService: PolkadotApiService, identityService?: IdentityService | null) {
+	static async Init(network: ENetwork, apiService: PolkadotApiService, identityService?: IdentityService) {
 		// Todo: wait for doc ready. (async)
 		const returnWalletService = async () => {
 			const injectedWindow = window as Window & InjectedWindow;

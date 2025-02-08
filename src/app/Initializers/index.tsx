@@ -132,7 +132,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		(async () => {
 			if (!polkadotApi) return;
 
-			const service = await WalletClientService.Init(network, polkadotApi, identityApi);
+			const service = await WalletClientService.Init(network, polkadotApi, identityApi || undefined);
 			setWalletServiceAtom(service);
 		})();
 

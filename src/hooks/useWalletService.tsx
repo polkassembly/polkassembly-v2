@@ -21,7 +21,7 @@ export const useWalletService = () => {
 
 		const initWalletService = async () => {
 			if (apiService) {
-				const service = await WalletClientService.Init(network, apiService, identityService);
+				const service = await WalletClientService.Init(network, apiService, identityService || undefined);
 				setWalletService(service);
 			}
 		};
