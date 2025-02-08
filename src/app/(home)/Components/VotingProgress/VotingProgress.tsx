@@ -5,7 +5,7 @@
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { IPostListing } from '@/_shared/types';
-import { Progress } from '../../progress';
+import { Progress } from '@ui/progress';
 import styles from './VotingProgress.module.scss';
 import VotingMetrics from '../VotingMetrics/VotingMetrics';
 

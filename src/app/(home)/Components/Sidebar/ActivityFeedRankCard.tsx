@@ -73,7 +73,7 @@ function ActivityFeedRankCard() {
 							</div>
 						) : (
 							<div className='w-full text-center'>
-								<p className='font-medium text-gray-800'>
+								<p className='font-medium text-text_primary'>
 									<Link
 										href='/login'
 										className='cursor-pointer text-text_pink underline'
