@@ -1,0 +1,7 @@
+.container {
+    @apply flex items-center rounded-lg bg-sidebar_footer px-1.5 py-1 dark:bg-white dark:bg-opacity-[12%];
+}
+
+.button {
+    @apply md:text-base cursor-pointer rounded-md px-2 py-[3px] text-sm md:px-3;
+}
