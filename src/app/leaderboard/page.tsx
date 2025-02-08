@@ -6,7 +6,7 @@ import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals'
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
-import Leaderboard from '../_shared-components/Leaderboard';
+import Leaderboard from './Components/index';
 
 async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
 	const searchParamsValue = await searchParams;
