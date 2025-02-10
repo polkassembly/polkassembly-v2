@@ -86,7 +86,8 @@ export const THEME_COLORS = {
 		allowed_commentor_text: '#485F7D',
 		input_text: '#485F7D',
 		leaderboard_usercard_bg: '#e2ebff',
-		leaderboard_usercard_border: '#486ddf'
+		leaderboard_usercard_border: '#486ddf',
+		info_bg: '#F6F7F9'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -169,6 +170,7 @@ export const THEME_COLORS = {
 		input_text: '#ffffff',
 		leaderboard_usercard_bg: '#141C2D',
 		leaderboard_usercard_border: '#407BFF',
-		light_council_bg: '#4D2631'
+		light_council_bg: '#4D2631',
+		info_bg: '#2A2B2D'
 	}
 };

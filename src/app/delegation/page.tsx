@@ -3,11 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import Delegation from '@ui/Delegation/index';
+import Delegation from './Components/index';
 
 function DelegationPage() {
 	return (
-		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
+		<div className='grid grid-cols-1 gap-5 p-5 lg:p-10'>
 			<Delegation />
 		</div>
 	);

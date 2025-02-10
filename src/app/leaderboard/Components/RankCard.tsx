@@ -85,7 +85,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 								className='flex items-center gap-x-1 sm:gap-x-2'
 							>
 								<Image
-									src={UserIcon}
+									src={item.profileDetails.image !== '' ? item.profileDetails.image : UserIcon}
 									alt='User Icon'
 									className='h-5 w-5 sm:h-6 sm:w-6'
 									width={20}
