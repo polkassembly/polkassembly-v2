@@ -5,7 +5,7 @@
 'use client';
 
 import { useState } from 'react';
-import { IoMdClose } from 'react-icons/io';
+import { IoMdClose, IoMdTrendingUp } from 'react-icons/io';
 import { Button } from '@ui/Button';
 import PolkaAsset from '@assets/delegation/Track.svg';
 import PolkaBadge from '@assets/delegation/badge.svg';
@@ -25,6 +25,7 @@ import styles from './Delegation.module.scss';
 function Delegation() {
 	const { user } = useUser();
 	const [showDelegationInfo, setShowDelegationInfo] = useState(true);
+	console.log(user);
 	return (
 		<div className={styles.delegation}>
 			<h1 className={styles.delegation_title}>Delegation</h1>
@@ -189,6 +190,12 @@ function Delegation() {
 							</p>
 						</div>
 					</div>
+				</div>
+			</div>
+			<div className='mt-5 rounded-lg bg-bg_modal p-4'>
+				<div className='flex items-center gap-2'>
+					<IoMdTrendingUp className='text-xl font-bold text-bg_pink' />
+					<p className='text-xl font-semibold text-text_primary'>Trending Delegates</p>
 				</div>
 			</div>
 		</div>
