@@ -4,12 +4,13 @@
 
 'use client';
 
-import { useTheme } from 'next-themes';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { ETheme } from '@/_shared/types';
 
 function NotificationsContainer() {
-	const { theme } = useTheme();
+	const { userPreferences } = useUserPreferences();
 
 	return (
 		<ToastContainer
@@ -22,7 +23,7 @@ function NotificationsContainer() {
 			pauseOnFocusLoss
 			draggable
 			pauseOnHover
-			theme={theme === 'light' ? 'light' : 'dark'}
+			theme={userPreferences.theme === ETheme.LIGHT ? ETheme.LIGHT : ETheme.DARK}
 		/>
 	);
 }

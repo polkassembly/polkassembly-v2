@@ -111,8 +111,8 @@ export function NavMain({
 								>
 									<CollapsibleTrigger asChild>
 										<div>
-											<div className='mt-4 flex items-center border-t-2 border-dotted border-border_grey pt-4'>
-												<span className={`text-lightBlue ${state === 'collapsed' ? 'pl-2' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
+											<div className='mt-4 flex cursor-pointer items-center border-t-2 border-dotted border-border_grey pt-4'>
+												<span className={`text-text_primary ${state === 'collapsed' ? 'pl-2' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
 													{mainItem.heading}
 												</span>
 												<ChevronRight className={`${styles.chevron} group-data-[state=open]/collapsible:rotate-90`} />

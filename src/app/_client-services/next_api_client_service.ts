@@ -99,6 +99,7 @@ export class NextApiClientService {
 		let path = '';
 		let method: Method = 'GET';
 
+		// eslint-disable-next-line sonarjs/max-switch-cases
 		switch (route) {
 			// Static routes
 			case EApiRoute.WEB2_LOGIN:
@@ -144,29 +145,19 @@ export class NextApiClientService {
 				path = '/activity-feed';
 				method = 'GET';
 				break;
-			// Dynamic routes
-			case EApiRoute.POSTS_LISTING:
-			case EApiRoute.FETCH_PROPOSAL_DETAILS:
-			case EApiRoute.GET_PREIMAGE_FOR_POST:
-			case EApiRoute.GET_COMMENTS:
-			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
+				path = '/preimages';
 				break;
-			case EApiRoute.CREATE_OFFCHAIN_POST:
+			case EApiRoute.FETCH_ALL_TAGS:
+				method = 'GET';
+				path = '/meta/tags';
+				break;
+			case EApiRoute.CREATE_TAGS:
 				method = 'POST';
-				break;
-			case EApiRoute.ADD_COMMENT:
-			case EApiRoute.POST_REACTIONS:
-				method = 'POST';
-				break;
-			case EApiRoute.DELETE_REACTION:
-				method = 'DELETE';
-				break;
-			case EApiRoute.EDIT_PROPOSAL_DETAILS:
-				method = 'PATCH';
+				path = '/meta/tags';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
@@ -175,6 +166,14 @@ export class NextApiClientService {
 			case EApiRoute.EDIT_USER_PROFILE:
 				path = '/users/id';
 				method = 'PATCH';
+				break;
+			case EApiRoute.GENERATE_QR_SESSION:
+				path = '/auth/qr-session';
+				method = 'GET';
+				break;
+			case EApiRoute.CLAIM_QR_SESSION:
+				path = '/auth/qr-session';
+				method = 'POST';
 				break;
 			case EApiRoute.DELETE_ACCOUNT:
 			case EApiRoute.UNFOLLOW_USER:
@@ -197,24 +196,28 @@ export class NextApiClientService {
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
-			case EApiRoute.DELETE_COMMENT:
+			// Post-related routes (do not put any static routes below this)
+			case EApiRoute.POSTS_LISTING:
+			case EApiRoute.FETCH_PROPOSAL_DETAILS:
+			case EApiRoute.GET_PREIMAGE_FOR_POST:
+			case EApiRoute.GET_COMMENTS:
+			case EApiRoute.GET_VOTES_HISTORY:
+				break;
+			case EApiRoute.CREATE_OFFCHAIN_POST:
+				method = 'POST';
+				break;
+			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.POST_REACTIONS:
+				method = 'POST';
+				break;
+			case EApiRoute.DELETE_REACTION:
 				method = 'DELETE';
 				break;
-			case EApiRoute.GENERATE_QR_SESSION:
-				path = '/auth/qr-session';
-				method = 'GET';
+			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+				method = 'PATCH';
 				break;
-			case EApiRoute.CLAIM_QR_SESSION:
-				path = '/auth/qr-session';
-				method = 'POST';
-				break;
-			case EApiRoute.FETCH_ALL_TAGS:
-				method = 'GET';
-				path = '/meta/tags';
-				break;
-			case EApiRoute.CREATE_TAGS:
-				method = 'POST';
-				path = '/meta/tags';
+			case EApiRoute.DELETE_COMMENT:
+				method = 'DELETE';
 				break;
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
@@ -501,12 +504,12 @@ export class NextApiClientService {
 			limit: PREIMAGES_LISTING_LIMIT.toString()
 		});
 
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages'], queryParams });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 
 	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: ['preimages', hash] });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: [hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
