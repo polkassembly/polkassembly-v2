@@ -688,4 +688,20 @@ export class OffChainDbService {
 	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
 		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
 	}
+
+	static async UpdateVoteCartItem({
+		userId,
+		voteCartItemId,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		voteCartItemId: string;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		return FirestoreService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
+	}
 }

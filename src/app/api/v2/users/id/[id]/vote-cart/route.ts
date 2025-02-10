@@ -67,9 +67,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for nay decision');
 	} else if (
 		decision === EVoteDecision.ABSTAIN &&
-		(!amount.abstain || !ValidatorService.isValidVoteAmount(amount.abstain)) &&
-		(!amount.aye || !ValidatorService.isValidVoteAmount(amount.aye)) &&
-		(!amount.nay || !ValidatorService.isValidVoteAmount(amount.nay))
+		!(
+			(amount.abstain && ValidatorService.isValidVoteAmount(amount.abstain)) ||
+			(amount.aye && ValidatorService.isValidVoteAmount(amount.aye)) ||
+			(amount.nay && ValidatorService.isValidVoteAmount(amount.nay))
+		)
 	) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'At least one amount (abstain, aye, or nay) is required for abstain decision');
 	}
@@ -95,6 +97,56 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	});
 
 	const response = NextResponse.json({ voteCartItem });
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
+});
+
+// edit a vote cart item
+export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
+	const { id } = zodParamsSchema.parse(await params);
+
+	const zodBodySchema = z.object({
+		id: z.string().min(1, 'Vote cart item id is required'),
+		decision: z.nativeEnum(EVoteDecision),
+		amount: z.object({
+			abstain: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
+			aye: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
+			nay: z.string().refine(ValidatorService.isValidVoteAmount).optional()
+		}),
+		conviction: z.nativeEnum(EConvictionAmount)
+	});
+
+	const { id: voteCartItemId, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
+
+	// additional validation for amount and votes
+	if (decision === EVoteDecision.AYE && (!amount.aye || !ValidatorService.isValidVoteAmount(amount.aye))) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for aye decision');
+	} else if (decision === EVoteDecision.NAY && (!amount.nay || !ValidatorService.isValidVoteAmount(amount.nay))) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for nay decision');
+	} else if (
+		decision === EVoteDecision.ABSTAIN &&
+		!(
+			(amount.abstain && ValidatorService.isValidVoteAmount(amount.abstain)) ||
+			(amount.aye && ValidatorService.isValidVoteAmount(amount.aye)) ||
+			(amount.nay && ValidatorService.isValidVoteAmount(amount.nay))
+		)
+	) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'At least one amount (abstain, aye, or nay) is required for abstain decision');
+	}
+
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
+	if (userId !== id) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	await OffChainDbService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
+
+	const response = NextResponse.json({ message: 'Vote cart item updated' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

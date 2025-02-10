@@ -1125,4 +1125,24 @@ export class FirestoreService extends FirestoreRefs {
 			await voteCartItem.docs[0].ref.delete();
 		}
 	}
+
+	static async UpdateVoteCartItem({
+		userId,
+		voteCartItemId,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		voteCartItemId: string;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		const voteCartItem = await FirestoreRefs.voteCartItemsCollectionRef().where('userId', '==', userId).where('id', '==', voteCartItemId).limit(1).get();
+
+		if (voteCartItem.docs.length) {
+			await voteCartItem.docs[0].ref.set({ decision, amount, conviction, updatedAt: new Date() }, { merge: true });
+		}
+	}
 }
