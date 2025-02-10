@@ -57,7 +57,8 @@
 			"loadMoreComments": "Weitere Kommentare laden",
 			"showLessComments": "Weniger Kommentare anzeigen",
 			"commentingOnProposal": "Kommentieren des Vorschlags"
-		}
+		},
+		"NoRank": "um Ihren Rang zu sehen"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Bitte wählen Sie eine Brieftasche",

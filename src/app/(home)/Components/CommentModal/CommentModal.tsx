@@ -14,11 +14,11 @@ import { useTranslations } from 'next-intl';
 import Address from '@ui/Profile/Address/Address';
 import dynamic from 'next/dynamic';
 import { FaRegClock } from 'react-icons/fa';
+import { Button } from '@ui/Button';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import styles from './CommentModal.module.scss';
-import { Button } from '../../Button';
 
-const BlockEditor = dynamic(() => import('../../BlockEditor/BlockEditor'), { ssr: false });
+const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
 function CommentModal({
 	isDialogOpen,

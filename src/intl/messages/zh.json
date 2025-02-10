@@ -57,7 +57,8 @@
 			"loadMoreComments": "加载更多评论",
 			"showLessComments": "显示更少评论",
 			"commentingOnProposal": "正在评论提案"
-		}
+		},
+		"NoRank": "查看您的排名"
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",

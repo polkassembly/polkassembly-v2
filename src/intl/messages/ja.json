@@ -57,7 +57,8 @@
 			"loadMoreComments": "さらにコメントを読み込む",
 			"showLessComments": "コメントを減らす",
 			"commentingOnProposal": "提案にコメント中"
-		}
+		},
+		"NoRank": "ランクを見る"
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",

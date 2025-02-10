@@ -57,7 +57,8 @@
 			"loadMoreComments": "Cargar más comentarios",
 			"showLessComments": "Mostrar menos comentarios",
 			"commentingOnProposal": "Comentando en la propuesta"
-		}
+		},
+		"NoRank": "para ver tu rango"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione billetera",

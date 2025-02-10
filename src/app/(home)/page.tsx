@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import ActivityFeed from '../_shared-components/ActivityFeed';
+import ActivityFeed from './Components/index';
 import { ClientError } from '../_client-utils/clientError';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
 

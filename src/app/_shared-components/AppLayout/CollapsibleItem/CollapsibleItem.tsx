@@ -76,7 +76,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 												/>
 											</div>
 										)}
-										<span>{subItem.title}</span>
+										<span className='text-sidebar_title'>{subItem.title}</span>
 									</span>
 									{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 								</Link>

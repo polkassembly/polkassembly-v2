@@ -17,7 +17,7 @@ import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
-import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({

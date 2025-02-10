@@ -8,13 +8,13 @@ import { EActivityFeedTab, IGenericListingResponse, IActivityFeedPostListing, ES
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent } from '@ui/Tabs';
+import { useSidebar } from '@ui/Sidebar/Sidebar';
 import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
-import { Tabs, TabsContent } from '../Tabs/Tabs';
 import styles from './ActivityFeed.module.scss';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
-import { useSidebar } from '../Sidebar/Sidebar';
 
 function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IActivityFeedPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
