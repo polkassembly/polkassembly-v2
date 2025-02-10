@@ -592,5 +592,14 @@
 	"BlockEditor": {
 		"placeholder": "Escribe / para comenzar",
 		"errorUpdatingContent": "Error al actualizar el contenido"
+	},
+	"SetIdentity": {
+		"displayName": "Nombre para mostrar",
+		"legalName": "Nombre legal",
+		"email": "Correo electrónico",
+		"twitter": "Twitter",
+		"matrix": "Matrix",
+		"setIdentity": "Establecer identidad",
+		"onChainIdentity": "Identidad en cadena"
 	}
 }

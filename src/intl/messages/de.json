@@ -593,5 +593,14 @@
 	"BlockEditor": {
 		"placeholder": "Geben Sie / ein, um zu starten",
 		"errorUpdatingContent": "Fehler beim Aktualisieren des Inhalts"
+	},
+	"SetIdentity": {
+		"displayName": "Anzeigename",
+		"legalName": "Rechtlicher Name",
+		"email": "E-Mail",
+		"twitter": "Twitter",
+		"matrix": "Matrix",
+		"setIdentity": "Identität festlegen",
+		"onChainIdentity": "On-Chain-Identität"
 	}
 }

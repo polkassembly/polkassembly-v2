@@ -132,7 +132,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		(async () => {
 			if (!polkadotApi) return;
 
-			const service = await WalletClientService.Init(network, polkadotApi);
+			const service = await WalletClientService.Init(network, polkadotApi, identityApi || undefined);
 			setWalletServiceAtom(service);
 		})();
 
@@ -143,7 +143,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			polkadotApi?.disconnect().then(() => setPolkadotApiAtom(null));
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [network, polkadotApi]);
+	}, [network, polkadotApi, identityApi]);
 
 	// set user preferences
 	useEffect(() => {

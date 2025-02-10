@@ -31,6 +31,7 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
 	const fetchIdentity = async () => {
+		setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 		try {
 			const identityInfo = await getOnChainIdentity(encodedAddress);
 			setIdentity(identityInfo);
