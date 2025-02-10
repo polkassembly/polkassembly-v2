@@ -8,7 +8,7 @@ import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { IActivityFeedPostListing } from '@/_shared/types';
+import { IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -36,7 +36,7 @@ import ReactionHandler from '../ReactionHandler';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
-function ActivityFeedPostItem({ postData }: { postData: IActivityFeedPostListing }) {
+function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const t = useTranslations();

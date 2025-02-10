@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { EPostOrigin, IActivityFeedPostListing, IGenericListingResponse } from '@/_shared/types';
+import { EPostOrigin, IPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -19,7 +19,7 @@ import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 
-function ActivityFeedPostList({ initialData }: { initialData: IGenericListingResponse<IActivityFeedPostListing> }) {
+function ActivityFeedPostList({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
@@ -54,7 +54,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 		staleTime: SLATE_TIME
 	});
 
-	const allPosts = data?.pages?.flatMap((page) => page.items || []).filter((post): post is IActivityFeedPostListing => post !== undefined);
+	const allPosts = data?.pages?.flatMap((page) => page.items || []).filter((post): post is IPostListing => post !== undefined);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -75,7 +75,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 	const filteredPosts = useMemo(() => {
 		if (origin === 'All') return allPosts;
 
-		return allPosts?.filter((post: IActivityFeedPostListing) => {
+		return allPosts?.filter((post: IPostListing) => {
 			if (!(network in NETWORKS_DETAILS)) {
 				return false;
 			}
@@ -120,7 +120,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 					ref={observerTarget}
 					className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'
 				>
-					{filteredPosts?.map((post: IActivityFeedPostListing) => (
+					{filteredPosts?.map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}

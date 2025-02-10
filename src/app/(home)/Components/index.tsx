@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EActivityFeedTab, IGenericListingResponse, IActivityFeedPostListing, ESidebarState } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IPostListing, ESidebarState } from '@/_shared/types';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ import styles from './ActivityFeed.module.scss';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IActivityFeedPostListing> }) {
+function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
 	const { state } = useSidebar();
