@@ -13,6 +13,7 @@ import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 import { OutputData } from '@editorjs/editorjs';
+import { BN } from '@polkadot/util';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -237,5 +238,14 @@ export class ValidatorService {
 
 	static isValidOffChainPostTopic(topic: string): boolean {
 		return Object.values(EOffChainPostTopic).includes(topic as EOffChainPostTopic);
+	}
+
+	static isValidVoteAmount(amount: string): boolean {
+		try {
+			const bnAmount = new BN(amount);
+			return bnAmount.gt(new BN(0));
+		} catch {
+			return false;
+		}
 	}
 }
