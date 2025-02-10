@@ -499,9 +499,6 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
-}
-
-export interface IActivityFeedPostListing extends IPostListing {
 	userReaction?: IReaction;
 }
 

@@ -291,7 +291,7 @@ export class FirestoreService extends FirestoreRefs {
 		return {
 			...postData,
 			content: formattedContent,
-			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate(), network })) || [],
+			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate() || new Date(), network })) || [],
 			htmlContent,
 			markdownContent,
 			dataSource: EDataSource.POLKASSEMBLY,

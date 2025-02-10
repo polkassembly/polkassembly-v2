@@ -17,16 +17,15 @@ import { BN } from '@polkadot/util';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-
+import VotingProgress from '@/app/(home)/Components/VotingProgress/VotingProgress';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import Address from '@ui/Profile/Address/Address';
+import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
+import PostTags from '@ui/PostDetails/PostTags/PostTags';
+import StatusTag from '@ui/StatusTag/StatusTag';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import classes from './PostHeader.module.scss';
-import Address from '../../Profile/Address/Address';
-import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
-import PostTags from '../PostTags/PostTags';
-import StatusTag from '../../StatusTag/StatusTag';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import VotingProgress from '../../ActivityFeed/VotingProgress/VotingProgress';
 
 function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();

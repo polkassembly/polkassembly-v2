@@ -10,8 +10,8 @@ import { useUser } from '@/hooks/useUser';
 import { EPostOrigin, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Button } from '@ui/Button';
 import styles from './ActivityFeedPostList.module.scss';
-import { Button } from '../../Button';
 import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 
 function SubscribedPostList({ postData }: { postData: IGenericListingResponse<IPostListing> }) {

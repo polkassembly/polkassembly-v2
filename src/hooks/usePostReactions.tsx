@@ -2,12 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IActivityFeedPostListing } from '@/_shared/types';
+import { EProposalType, EReaction, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState } from 'react';
 import { useUser } from './useUser';
 
-export const usePostReactions = (postData: IActivityFeedPostListing) => {
+export const usePostReactions = (postData: IPostListing) => {
 	const { user } = useUser();
 	const [reactionState, setReactionState] = useState({
 		isLiked: postData?.userReaction?.userId === user?.id && postData?.userReaction?.reaction === EReaction.like,

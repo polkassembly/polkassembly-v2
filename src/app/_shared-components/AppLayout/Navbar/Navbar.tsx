@@ -63,7 +63,7 @@ function Navbar() {
 					variant='full'
 					className='md:hidden'
 				/>
-				<div className='border-l-[1px] border-bg_pink pl-3 font-semibold text-navbar_title md:border-none md:pl-0'>OpenGov</div>
+				<div className='border-l-[1px] border-bg_pink pl-3 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
 			<div

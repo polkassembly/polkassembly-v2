@@ -57,18 +57,21 @@
 			"loadMoreComments": "Load more comments",
 			"showLessComments": "Show less comments",
 			"commentingOnProposal": "Commenting on proposal"
-		}
+		},
+		"NoRank": "to see your rank"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
 		"chooseLinkedAccount": "Choose Linked Account",
-		"noAccountsFound": "No accounts found, check permission",
+		"noAccountsFound": "No Accounts Found",
 		"selectWallet": "Please Select Wallet",
 		"fetchingAddresses": "For fetching your addresses, Polkassembly needs access to your wallet extensions. Please authorize this transaction.",
 		"goBack": "Go Back",
 		"gotIt": "Got It",
 		"hidePassword": "Hide Password",
-		"showPassword": "Show Password"
+		"showPassword": "Show Password",
+		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
+		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",

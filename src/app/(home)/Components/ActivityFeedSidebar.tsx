@@ -15,12 +15,8 @@ function ActivityFeedSidebar() {
 	return (
 		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
-			{user?.id && (
-				<>
-					<ActivityFeedActiveProposal />
-					<ActivityFeedRankCard />
-				</>
-			)}
+			{user?.id && <ActivityFeedActiveProposal />}
+			<ActivityFeedRankCard />
 			<ActivityFeedFeaturesSection />
 		</div>
 	);

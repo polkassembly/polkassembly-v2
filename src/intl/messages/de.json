@@ -57,18 +57,21 @@
 			"loadMoreComments": "Weitere Kommentare laden",
 			"showLessComments": "Weniger Kommentare anzeigen",
 			"commentingOnProposal": "Kommentieren des Vorschlags"
-		}
+		},
+		"NoRank": "um Ihren Rang zu sehen"
 	},
 	"AddressDropdown": {
-		"fallbackText": "Bitte Wallet auswählen",
+		"fallbackText": "Bitte wählen Sie eine Brieftasche",
 		"chooseLinkedAccount": "Verknüpftes Konto auswählen",
-		"noAccountsFound": "Keine Konten gefunden, Berechtigung prüfen",
-		"selectWallet": "Bitte Wallet auswählen",
+		"noAccountsFound": "Keine Konten gefunden",
+		"selectWallet": "Bitte Brieftasche auswählen",
 		"fetchingAddresses": "Um Ihre Adressen abzurufen, benötigt Polkassembly Zugriff auf Ihre Wallet-Erweiterungen. Bitte autorisieren Sie diese Transaktion.",
 		"goBack": "Zurück",
 		"gotIt": "Verstanden",
 		"hidePassword": "Passwort verbergen",
-		"showPassword": "Passwort anzeigen"
+		"showPassword": "Passwort anzeigen",
+		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
+		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung."
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Finanzvorschlag",
