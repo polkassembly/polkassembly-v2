@@ -49,7 +49,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		postIndexOrHash: z.string().min(1, 'Post index or hash is required'),
 		proposalType: z.nativeEnum(EProposalType),
-		decision: z.nativeEnum(EVoteDecision),
+		decision: z.nativeEnum(EVoteDecision).refine((val) => val !== EVoteDecision.SPLIT_ABSTAIN, 'SPLIT_ABSTAIN decision is not supported'),
 		amount: z.object({
 			abstain: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
 			aye: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
@@ -61,19 +61,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const { postIndexOrHash, proposalType, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
 
 	// additional validation for amount and votes
-	if (decision === EVoteDecision.AYE && (!amount.aye || !ValidatorService.isValidVoteAmount(amount.aye))) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for aye decision');
-	} else if (decision === EVoteDecision.NAY && (!amount.nay || !ValidatorService.isValidVoteAmount(amount.nay))) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for nay decision');
-	} else if (
-		decision === EVoteDecision.ABSTAIN &&
-		!(
-			(amount.abstain && ValidatorService.isValidVoteAmount(amount.abstain)) ||
-			(amount.aye && ValidatorService.isValidVoteAmount(amount.aye)) ||
-			(amount.nay && ValidatorService.isValidVoteAmount(amount.nay))
-		)
-	) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'At least one amount (abstain, aye, or nay) is required for abstain decision');
+	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid amount(s) for decision');
 	}
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
@@ -109,7 +98,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		id: z.string().min(1, 'Vote cart item id is required'),
-		decision: z.nativeEnum(EVoteDecision),
+		decision: z.nativeEnum(EVoteDecision).refine((val) => val !== EVoteDecision.SPLIT_ABSTAIN, 'SPLIT_ABSTAIN decision is not supported'),
 		amount: z.object({
 			abstain: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
 			aye: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
@@ -121,19 +110,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const { id: voteCartItemId, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
 
 	// additional validation for amount and votes
-	if (decision === EVoteDecision.AYE && (!amount.aye || !ValidatorService.isValidVoteAmount(amount.aye))) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for aye decision');
-	} else if (decision === EVoteDecision.NAY && (!amount.nay || !ValidatorService.isValidVoteAmount(amount.nay))) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Amount is required for nay decision');
-	} else if (
-		decision === EVoteDecision.ABSTAIN &&
-		!(
-			(amount.abstain && ValidatorService.isValidVoteAmount(amount.abstain)) ||
-			(amount.aye && ValidatorService.isValidVoteAmount(amount.aye)) ||
-			(amount.nay && ValidatorService.isValidVoteAmount(amount.nay))
-		)
-	) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'At least one amount (abstain, aye, or nay) is required for abstain decision');
+	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid amount(s) for decision');
 	}
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
