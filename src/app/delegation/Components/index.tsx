@@ -18,7 +18,6 @@ import delegatees from '@assets/delegation/delegatees.svg';
 import Link from 'next/link';
 import { MdInfoOutline } from 'react-icons/md';
 import Image from 'next/image';
-import { Separator } from '@ui/Separator';
 import { useUser } from '@/hooks/useUser';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import styles from './Delegation.module.scss';
@@ -26,7 +25,6 @@ import styles from './Delegation.module.scss';
 function Delegation() {
 	const { user } = useUser();
 	const [showDelegationInfo, setShowDelegationInfo] = useState(true);
-	console.log(user);
 	return (
 		<div className={styles.delegation}>
 			<h1 className={styles.delegation_title}>Delegation</h1>
@@ -102,7 +100,7 @@ function Delegation() {
 							</div>
 						</div>
 					</div>
-					<div className='bg-info_bg mx-4 mb-2 rounded-md px-4 py-2 text-sm'>
+					<div className='mx-4 mb-2 rounded-md bg-info_bg px-4 py-2 text-sm'>
 						<p className='flex items-center gap-1 text-wallet_btn_text'>
 							<MdInfoOutline className='mr-1 inline-block text-lg' />
 							Want to learn more about delegation process before locking your tokens. Click{' '}
