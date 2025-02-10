@@ -479,6 +479,7 @@ export interface IOnChainPostInfo {
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
+	userReaction?: IReaction;
 }
 
 export interface IOnChainPostListing {
