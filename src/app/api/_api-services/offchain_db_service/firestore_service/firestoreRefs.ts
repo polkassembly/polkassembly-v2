@@ -54,7 +54,10 @@ export class FirestoreRefs {
 
 	protected static tagsCollectionRef = () => this.firestoreDb.collection('tags');
 
+	protected static voteCartItemsCollectionRef = () => this.firestoreDb.collection('vote_cart_items');
+
 	// document reference methods
+	// TODO: remove the bottom methods
 	protected static getUserDocRefById = (userId: number) => this.usersCollectionRef().doc(userId.toString());
 
 	protected static getAddressDocRefByAddress = (address: string) => {

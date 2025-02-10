@@ -25,7 +25,10 @@ import {
 	IFollowEntry,
 	IGenericListingResponse,
 	EOffChainPostTopic,
-	ITag
+	ITag,
+	IVoteCartItem,
+	EVoteDecision,
+	EConvictionAmount
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -631,6 +634,19 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
+	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
+		const voteCartQuery = FirestoreRefs.voteCartItemsCollectionRef().where('userId', '==', userId);
+		const voteCartQuerySnapshot = await voteCartQuery.get();
+		return voteCartQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IVoteCartItem;
+		});
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -1063,5 +1079,50 @@ export class FirestoreService extends FirestoreRefs {
 		});
 
 		await batch.commit();
+	}
+
+	static async AddVoteCartItem({
+		userId,
+		postIndexOrHash,
+		proposalType,
+		decision,
+		amount,
+		conviction,
+		network
+	}: {
+		userId: number;
+		postIndexOrHash: string;
+		proposalType: EProposalType;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+		network: ENetwork;
+	}): Promise<IVoteCartItem> {
+		const newVoteCartItemId = FirestoreRefs.voteCartItemsCollectionRef().doc().id;
+
+		const voteCartItem: IVoteCartItem = {
+			id: newVoteCartItemId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			userId,
+			postIndexOrHash,
+			proposalType,
+			decision,
+			amount,
+			conviction,
+			network
+		};
+
+		await FirestoreRefs.voteCartItemsCollectionRef().doc(newVoteCartItemId).set(voteCartItem);
+
+		return voteCartItem;
+	}
+
+	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
+		const voteCartItem = await FirestoreRefs.voteCartItemsCollectionRef().where('userId', '==', userId).where('id', '==', voteCartItemId).limit(1).get();
+
+		if (voteCartItem.docs.length) {
+			await voteCartItem.docs[0].ref.delete();
+		}
 	}
 }
