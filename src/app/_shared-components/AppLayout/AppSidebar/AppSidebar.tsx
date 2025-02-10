@@ -54,7 +54,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 		);
 	};
 
-	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[], gridName: string) => (
+	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[], gridName: 'header' | 'footer') => (
 		<DynamicImageGrid
 			items={data}
 			rowSize={2}
