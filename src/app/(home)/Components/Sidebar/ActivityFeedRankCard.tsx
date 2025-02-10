@@ -43,7 +43,7 @@ function ActivityFeedRankCard() {
 
 				<div className='z-20 flex flex-col justify-between px-5 pt-3 text-center'>
 					<p className='text-base font-semibold text-rank_card_text'>
-						{t('ActivityFeed.Rank')} {user?.publicUser?.rank ?? '#00'}
+						{t('ActivityFeed.Rank')} {user?.publicUser?.rank ?? '#'}
 					</p>
 					<div className='w-full pt-8'>
 						{user?.publicUser?.rank ? (
