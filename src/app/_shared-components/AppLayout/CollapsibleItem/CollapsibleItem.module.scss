@@ -7,7 +7,7 @@
 }
 
 .menuItem {
-	@apply flex w-full cursor-pointer items-center justify-between rounded-md px-1.5 py-1 text-sm transition-colors duration-200 hover:bg-sidebar_accent;
+	@apply flex w-full cursor-pointer items-center justify-between rounded-md px-1.5 py-1 h-8 text-sm transition-colors duration-200 hover:bg-sidebar_accent;
 }
 
 .subItemCount {
@@ -48,7 +48,7 @@
 }
 
 .itemTitle {
-	@apply flex-1 whitespace-nowrap;
+	@apply flex-1 whitespace-nowrap text-sidebar_title;
 }
 
 .chevron {

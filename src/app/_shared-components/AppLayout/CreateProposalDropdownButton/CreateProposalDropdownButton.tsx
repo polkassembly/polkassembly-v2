@@ -16,6 +16,7 @@ import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
+import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import style from './CreateProposalDropdownButton.module.scss';
 
@@ -65,7 +66,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 									alt='Dropdown Icon'
 									width={20}
 									height={20}
-									className={`${userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}`}
+									className={cn(`${userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}`, style.menuItemIcon)}
 								/>
 
 								<Link
