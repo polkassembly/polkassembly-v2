@@ -10,11 +10,17 @@ import { Button } from '@ui/Button';
 import PolkaAsset from '@assets/delegation/Track.svg';
 import PolkaBadge from '@assets/delegation/badge.svg';
 import Reverse from '@assets/delegation/reverse.svg';
+import DOT from '@assets/delegation/dot.svg';
+import tokens from '@assets/delegation/tokens.svg';
+import votes from '@assets/delegation/votes.svg';
+import delegates from '@assets/delegation/delegates.svg';
+import delegatees from '@assets/delegation/delegatees.svg';
 import Link from 'next/link';
 import { MdInfoOutline } from 'react-icons/md';
 import Image from 'next/image';
+import { Separator } from '@ui/Separator';
 import { useUser } from '@/hooks/useUser';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import styles from './Delegation.module.scss';
 
 function Delegation() {
@@ -112,6 +118,81 @@ function Delegation() {
 					</div>
 				</div>
 			)}
+			<div className='mt-5 flex gap-5 rounded-lg bg-bg_modal p-4'>
+				<div className='flex items-center gap-3'>
+					<Image
+						src={DOT}
+						alt='DOT'
+						className='h-10 w-10'
+					/>
+					<div className='flex flex-col'>
+						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Supply</p>
+						<p className='text-xl font-semibold'>
+							1.53B <span className='text-sm text-wallet_btn_text'>DOT</span>
+						</p>
+					</div>
+				</div>
+				<div className='border-l border-border_grey pl-5'>
+					<div className='flex items-center gap-3'>
+						<Image
+							src={tokens}
+							alt='Tokens'
+							className='h-10 w-10'
+						/>
+						<div className='flex flex-col'>
+							<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Delegated Tokens</p>
+							<p className='text-xl font-semibold'>
+								679.6K <span className='text-sm text-wallet_btn_text'>DOT</span>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div className='border-l border-border_grey pl-5'>
+					<div className='flex items-center gap-3'>
+						<Image
+							src={votes}
+							alt='Votes'
+							className='h-10 w-10'
+						/>
+						<div className='flex flex-col'>
+							<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegated Votes</p>
+							<p className='text-xl font-semibold'>
+								123.6K <span className='text-sm text-wallet_btn_text'>DOT</span>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div className='border-l border-border_grey pl-5'>
+					<div className='flex items-center gap-3'>
+						<Image
+							src={delegates}
+							alt='Delegates'
+							className='h-10 w-10'
+						/>
+						<div className='flex flex-col'>
+							<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegates</p>
+							<p className='text-xl font-semibold'>
+								108 <span className='text-sm text-wallet_btn_text'>DOT</span>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div className='border-l border-border_grey pl-5'>
+					<div className='flex items-center gap-3'>
+						<Image
+							src={delegatees}
+							alt='Delegatees'
+							className='h-10 w-10'
+						/>
+						<div className='flex flex-col'>
+							<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegatees</p>
+							<p className='text-xl font-semibold'>
+								21,203 <span className='text-sm text-wallet_btn_text'>DOT</span>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }
