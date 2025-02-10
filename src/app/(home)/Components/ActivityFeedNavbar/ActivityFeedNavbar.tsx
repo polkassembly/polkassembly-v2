@@ -154,7 +154,7 @@ function ActivityFeedNavbar({
 											alt={category}
 											width={20}
 											height={20}
-											className='h-5 w-5 dark:brightness-0 dark:invert'
+											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
 										<span className='ml-1'>{category}</span>
 										{tracks?.length > 1 && (

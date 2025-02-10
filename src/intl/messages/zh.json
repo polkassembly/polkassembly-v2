@@ -62,14 +62,16 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",
-		"chooseLinkedAccount": "选择关联账户",
-		"noAccountsFound": "未找到账户，请检查权限",
+		"chooseLinkedAccount": "选择链接的账户",
+		"noAccountsFound": "未找到账户",
 		"selectWallet": "请选择钱包",
 		"fetchingAddresses": "为了获取您的地址，Polkassembly需要访问您的钱包扩展。请授权此交易。",
 		"goBack": "返回",
-		"gotIt": "明白了",
+		"gotIt": "知道了",
 		"hidePassword": "隐藏密码",
-		"showPassword": "显示密码"
+		"showPassword": "显示密码",
+		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
+		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",

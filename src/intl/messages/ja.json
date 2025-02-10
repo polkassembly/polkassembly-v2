@@ -63,13 +63,15 @@
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",
 		"chooseLinkedAccount": "リンクされたアカウントを選択",
-		"noAccountsFound": "アカウントが見つかりません、権限を確認してください",
+		"noAccountsFound": "アカウントが見つかりません",
 		"selectWallet": "ウォレットを選択してください",
-		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能にアクセスする必要があります。このトランザクションを承認してください。",
+		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能へのアクセスを必要とします。このトランザクションを承認してください。",
 		"goBack": "戻る",
 		"gotIt": "了解",
 		"hidePassword": "パスワードを隠す",
-		"showPassword": "パスワードを表示"
+		"showPassword": "パスワードを表示",
+		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",

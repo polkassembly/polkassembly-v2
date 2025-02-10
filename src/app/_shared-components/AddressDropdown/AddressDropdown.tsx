@@ -51,8 +51,6 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 
 	if (!userPreferences.wallet) return <div className={classes.fallbackText}>{t('AddressDropdown.fallbackText')}</div>;
 
-	if (!accounts) return <div className={classes.fallbackText}>{t('AddressDropdown.noAccountsFound')}</div>;
-
 	return !accounts || accounts.length === 0 ? (
 		<Alert
 			variant='info'
@@ -60,10 +58,10 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 		>
 			<AlertCircle className='h-4 w-4' />
 			<AlertDescription className=''>
-				<h2 className='mb-2 text-base font-medium'>No Accounts Found</h2>
+				<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.noAccountsFound')}</h2>
 				<ul className='list-disc pl-4'>
-					<li>Please connect your wallet to Polkassembly.</li>
-					<li>Please check the connected wallets in extension.</li>
+					<li>{t('AddressDropdown.pleaseConnectWallet')}</li>
+					<li>{t('AddressDropdown.pleaseCheckConnectedAccounts')}</li>
 				</ul>
 			</AlertDescription>
 		</Alert>

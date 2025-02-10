@@ -62,14 +62,16 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione billetera",
-		"chooseLinkedAccount": "Elegir Cuenta Vinculada",
-		"noAccountsFound": "No se encontraron cuentas, verificar permisos",
-		"selectWallet": "Por favor Seleccione Billetera",
+		"chooseLinkedAccount": "Elegir cuenta vinculada",
+		"noAccountsFound": "No se encontraron cuentas",
+		"selectWallet": "Por favor seleccione billetera",
 		"fetchingAddresses": "Para obtener sus direcciones, Polkassembly necesita acceso a sus extensiones de billetera. Por favor autorice esta transacción.",
-		"goBack": "Volver",
+		"goBack": "Regresar",
 		"gotIt": "Entendido",
-		"hidePassword": "Ocultar Contraseña",
-		"showPassword": "Mostrar Contraseña"
+		"hidePassword": "Ocultar contraseña",
+		"showPassword": "Mostrar contraseña",
+		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",

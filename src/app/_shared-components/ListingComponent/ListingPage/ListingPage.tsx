@@ -132,7 +132,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	const renderFilterContent = () => (
 		<div className='p-4'>
-			<h3 className='text-sm font-semibold uppercase text-filter_dropdown'>{t('CreateProposalDropdownButton.status')}</h3>
+			<h3 className='text-sm font-semibold uppercase text-wallet_btn_text'>{t('CreateProposalDropdownButton.status')}</h3>
 			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
 				{STATUSES.map((status) => (
 					<span
@@ -145,12 +145,12 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 							checked={state.selectedStatuses.some((s) => t(`ListingPage_Status.${s}`) === status)}
 							onChange={() => handleStatusToggle(status)}
 						/>
-						<span className='text-sm text-filter_dropdown'>{status}</span>
+						<span className='text-sm text-wallet_btn_text'>{status}</span>
 					</span>
 				))}
 			</div>
 
-			<h3 className='mt-4 text-sm font-semibold text-filter_dropdown'>{t('CreateProposalDropdownButton.tags')}</h3>
+			<h3 className='mt-4 text-sm font-semibold text-wallet_btn_text'>{t('CreateProposalDropdownButton.tags')}</h3>
 			<div className='relative mt-2'>
 				<input
 					type='text'
@@ -159,7 +159,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 					onChange={(e) => setState((prev) => ({ ...prev, tagSearchTerm: e.target.value }))}
 					className={styles.searchbar}
 				/>
-				<MdSearch className='absolute right-3 top-1/2 -translate-y-1/2 transform text-filter_dropdown' />
+				<MdSearch className='absolute right-3 top-1/2 -translate-y-1/2 transform text-wallet_btn_text' />
 			</div>
 
 			<div className='mt-2 max-h-24 space-y-1 overflow-y-auto'>
@@ -174,7 +174,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 							checked={state.selectedTags.includes(tag)}
 							onChange={() => handleTagToggle(tag)}
 						/>
-						<span className='flex items-center gap-1 text-sm text-filter_dropdown'>
+						<span className='flex items-center gap-1 text-sm text-wallet_btn_text'>
 							<IoMdTrendingUp /> {tag}
 						</span>
 					</span>
@@ -193,7 +193,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 							<button
 								key={key}
 								type='button'
-								className={`${styles['tab-button']} ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
+								className={`${styles['tab-button']} uppercase ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
 								onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
 							>
 								{value}
@@ -209,7 +209,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 									tabIndex={0}
 								>
 									<span className={state.filterActive ? styles.selectedicon : ''}>
-										<FaFilter className='text-text_primary' />
+										<FaFilter className='text-sm text-text_primary' />
 									</span>
 									<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
 								</div>
