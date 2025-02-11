@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import Address from '@ui/Profile/Address/Address';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { IoPersonAdd } from 'react-icons/io5';
@@ -33,6 +35,27 @@ enum EDelegateSource {
 	individual = 'Individual'
 }
 
+const getPlatformStyles = (platforms: string[]) => {
+	if (platforms.length > 2) {
+		return 'border-wallet_btn_text bg-delegation_bgcard';
+	}
+
+	const platform = platforms[0];
+	switch (platform as EDelegateSource) {
+		case EDelegateSource.POLKASSEMBLY:
+		case EDelegateSource.individual:
+			return 'border-navbar_border bg-delegation_card_polkassembly';
+		case EDelegateSource.PARITY:
+			return 'border-delegation_polkadot_border bg-delegation_card_polkadot';
+		case EDelegateSource.W3F:
+			return 'border-btn_secondary_text bg-delegation_card_w3f';
+		case EDelegateSource.NOVA:
+			return 'border-delegation_nova_border bg-delegation_card_nova';
+		default:
+			return 'border-wallet_btn_text bg-delegation_bgcard';
+	}
+};
+
 const delegateData: DelegateData[] = [
 	{
 		platforms: ['Polkassembly', 'Polkadot', 'Nova Wallet'],
@@ -47,7 +70,7 @@ const delegateData: DelegateData[] = [
 	},
 	{
 		platforms: ['Polkassembly', 'Polkadot', 'Individual'],
-		address: '1FN1XvRXhVBfWN6mxHyUsWsGLjrHqFM6RvJZVRp1UvXH3H2', // Changed to a different address to ensure uniqueness
+		address: '1FN1XvRXhVBfWN6mxHyUsWsGLjrHqFM6RvJZVRp1UvXH3H2',
 		description: 'Vestibulum nec leo at dui euismod lacinia non quis risus. Vivamus lobortis felis lectus, et consequat lacus dapibus in. Noits....',
 		votingPower: {
 			amount: 1000,
@@ -63,8 +86,41 @@ const logoMap: { [key in EDelegateSource]: StaticImageData | ReactNode } = {
 	[EDelegateSource.PARITY]: ParityLogo,
 	[EDelegateSource.NOVA]: NovaLogo,
 	[EDelegateSource.W3F]: W3FLogo,
-	[EDelegateSource.individual]: <FaUser />
+	[EDelegateSource.individual]: <FaUser className='text-text_primary' />
 };
+
+function PlatformLogos({ platforms }: { platforms: string[] }) {
+	const validPlatforms = platforms.filter((platform) => logoMap[platform as EDelegateSource]);
+
+	return (
+		<div className='flex'>
+			{validPlatforms.map((platform, index) => {
+				const logo = logoMap[platform as EDelegateSource];
+				if (!logo) return null;
+
+				return (
+					<div
+						key={platform}
+						className={`flex items-center gap-2 px-4 ${validPlatforms.length > 2 && index > 0 ? 'border-delegation_card_border border-l' : ''}`}
+					>
+						{typeof logo === 'object' && 'src' in logo ? (
+							<Image
+								src={logo as StaticImageData}
+								alt={`${platform} logo`}
+								className='h-4 w-4'
+								width={10}
+								height={10}
+							/>
+						) : (
+							logo
+						)}
+						<p className='text-sm text-btn_secondary_text'>{platform}</p>
+					</div>
+				);
+			})}
+		</div>
+	);
+}
 
 function DelegationCard() {
 	return (
@@ -79,32 +135,8 @@ function DelegationCard() {
 						key={delegate.address}
 						className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'
 					>
-						<div className='flex gap-2 bg-delegation_bgcard px-4 py-1'>
-							{delegate.platforms.map((platform) => {
-								const logo = logoMap[platform as EDelegateSource];
-								if (!logo) {
-									return null;
-								}
-								return (
-									<div
-										key={platform}
-										className='flex items-center gap-2'
-									>
-										{typeof logo === 'object' && 'src' in logo ? (
-											<Image
-												src={logo as StaticImageData}
-												alt={`${platform} logo`}
-												className='h-4 w-4'
-												width={10}
-												height={10}
-											/>
-										) : (
-											logo
-										)}
-										<p className='text-sm text-text_primary'>{platform}</p>
-									</div>
-								);
-							})}
+						<div className={`flex gap-2 rounded-t py-1 ${getPlatformStyles(delegate.platforms)}`}>
+							<PlatformLogos platforms={delegate.platforms} />
 						</div>
 						<div className='p-4'>
 							<div className='flex items-center justify-between gap-2'>
@@ -135,7 +167,7 @@ function DelegationCard() {
 									<p className='text-[10px] text-delegation_card_text'>(Past 30 Days)</p>
 								</div>
 							</div>
-							<div className='border-r border-border_grey p-5 text-center'>
+							<div className='p-5 text-center'>
 								<div>
 									<p className='text-2xl font-semibold'>{delegate.receivedDelegations}</p>
 									<p className='whitespace-nowrap text-xs text-delegation_card_text'>Received Delegation</p>

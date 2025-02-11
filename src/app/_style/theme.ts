@@ -90,7 +90,14 @@ export const THEME_COLORS = {
 		info_bg: '#F6F7F9',
 		pagination_border: '#CED4DE',
 		delegation_bgcard: '#EDEFF3',
-		delegation_card_text: '#576D8B'
+		delegation_card_text: '#576D8B',
+		delegation_card_border: '#7F8FA4',
+		delegation_card_polkassembly: '#FCE5F2',
+		delegation_card_polkadot: '#e3e1f9',
+		delegation_card_w3f: '#282526',
+		delegation_card_nova: '#E2EAFB',
+		delegation_nova_border: '#3C74E1',
+		delegation_polkadot_border: '#7A67DF'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -176,6 +183,12 @@ export const THEME_COLORS = {
 		info_bg: '#2A2B2D',
 		listing_page_btn: '#9E9E9E',
 		pagination_border: '#4B4B4B',
-		delegation_bgcard: '#141C2D'
+		delegation_bgcard: '#3D3F41',
+		delegation_card_border: '#7F8FA4',
+		delegation_card_polkassembly: '#33071E',
+		delegation_card_polkadot: '#251f3d',
+		delegation_card_w3f: '#272526',
+		delegation_nova_border: '#3C74E1',
+		delegation_polkadot_border: '#7A67DF'
 	}
 };

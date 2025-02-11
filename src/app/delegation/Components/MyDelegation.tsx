@@ -9,20 +9,9 @@ import UserIcon from '@assets/profile/user-icon.svg';
 import Image from 'next/image';
 import Address from '@ui/Profile/Address/Address';
 import { useUser } from '@/hooks/useUser';
-import EmailIcon from '@assets/icons/email-icon.svg';
-import TwitterIcon from '@assets/icons/twitter-icon.svg';
-import TelegramIcon from '@assets/icons/telegram-icon.svg';
-import { ESocial } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import DelegationPopupCard from './DelegationPopupCard';
-
-const SocialIcons = {
-	[ESocial.EMAIL]: EmailIcon,
-	[ESocial.TWITTER]: TwitterIcon,
-	[ESocial.TELEGRAM]: TelegramIcon,
-	[ESocial.DISCORD]: TelegramIcon,
-	[ESocial.RIOT]: TelegramIcon
-};
+import SocialLinks from './SocialLinks';
 
 function MyDelegation() {
 	const { user } = useUser();
@@ -48,24 +37,7 @@ function MyDelegation() {
 				<div className='flex w-full justify-between'>
 					<div>
 						<Address address={user.defaultAddress} />
-						<div className='mt-4 flex items-center gap-x-4'>
-							{socialLinks.map((social) => (
-								<a
-									key={social.platform}
-									href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
-									target='_blank'
-									className='flex h-8 w-8 items-center justify-center rounded-full bg-social_green'
-									rel='noreferrer'
-								>
-									<Image
-										src={SocialIcons[social.platform]}
-										alt={`${social.platform} icon`}
-										width={16}
-										height={16}
-									/>
-								</a>
-							))}
-						</div>
+						<SocialLinks socialLinks={socialLinks} />
 					</div>
 					<div>
 						<Button>Become a Delegate</Button>
