@@ -24,10 +24,10 @@ function DelegationPopupCard() {
 	return (
 		<div>
 			{showDelegationInfo && (
-				<div className='mt-5 hidden rounded-lg bg-bg_modal py-4 sm:block'>
+				<div className='mt-5 hidden rounded-lg bg-bg_modal py-4 shadow-lg sm:block'>
 					<div className='flex items-center justify-between px-6'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>How to Delegate on Polkassembly</p>
-						<div className='flex items-center gap-5'>
+						<div className='flex items-center gap-4'>
 							<Tooltip delayDuration={0}>
 								<TooltipTrigger asChild>
 									<div>

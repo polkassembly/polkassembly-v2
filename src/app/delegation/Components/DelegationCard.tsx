@@ -5,6 +5,13 @@
 import Address from '@ui/Profile/Address/Address';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { IoPersonAdd } from 'react-icons/io5';
+import { FaUser } from 'react-icons/fa';
+import PALOGO from '@assets/delegation/pa-logo-small-delegate.svg';
+import ParityLogo from '@assets/delegation/polkadot-logo.svg';
+import NovaLogo from '@assets/delegation/nova-wallet.svg';
+import W3FLogo from '@assets/delegation/w3f.svg';
+import Image, { StaticImageData } from 'next/image';
+import { ReactNode } from 'react';
 
 interface DelegateData {
 	platforms: string[];
@@ -16,6 +23,14 @@ interface DelegateData {
 	};
 	votedProposals: number;
 	receivedDelegations: number;
+}
+
+enum EDelegateSource {
+	PARITY = 'Polkadot',
+	POLKASSEMBLY = 'Polkassembly',
+	W3F = 'W3F',
+	NOVA = 'Nova Wallet',
+	individual = 'Individual'
 }
 
 const delegateData: DelegateData[] = [
@@ -31,8 +46,8 @@ const delegateData: DelegateData[] = [
 		receivedDelegations: 12
 	},
 	{
-		platforms: ['Polkassembly', 'Polkadot', 'Nova Wallet'],
-		address: '1FN1XvRXhVBfWN6mxHyUsWsGLjrHqFM6RvJZVRp1UvXH3HU',
+		platforms: ['Polkassembly', 'Polkadot', 'Individual'],
+		address: '1FN1XvRXhVBfWN6mxHyUsWsGLjrHqFM6RvJZVRp1UvXH3H2', // Changed to a different address to ensure uniqueness
 		description: 'Vestibulum nec leo at dui euismod lacinia non quis risus. Vivamus lobortis felis lectus, et consequat lacus dapibus in. Noits....',
 		votingPower: {
 			amount: 1000,
@@ -43,20 +58,53 @@ const delegateData: DelegateData[] = [
 	}
 ];
 
+const logoMap: { [key in EDelegateSource]: StaticImageData | ReactNode } = {
+	[EDelegateSource.POLKASSEMBLY]: PALOGO,
+	[EDelegateSource.PARITY]: ParityLogo,
+	[EDelegateSource.NOVA]: NovaLogo,
+	[EDelegateSource.W3F]: W3FLogo,
+	[EDelegateSource.individual]: <FaUser />
+};
+
 function DelegationCard() {
 	return (
-		<div className='mt-5 rounded-lg bg-bg_modal p-4'>
+		<div className='mt-5 rounded-lg bg-bg_modal p-4 shadow-lg'>
 			<div className='flex items-center gap-2'>
 				<IoMdTrendingUp className='text-xl font-bold text-bg_pink' />
 				<p className='text-xl font-semibold text-text_primary'>Trending Delegates</p>
 			</div>
 			<div className='my-5 grid w-full grid-cols-2 items-center gap-5'>
 				{delegateData.map((delegate) => (
-					<div className='rounded-md border border-border_grey hover:border-bg_pink'>
-						<div className='flex gap-2 bg-delegation_bgcard px-4'>
-							{delegate.platforms.map((platform) => (
-								<p key={platform}>{platform}</p>
-							))}
+					<div
+						key={delegate.address}
+						className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'
+					>
+						<div className='flex gap-2 bg-delegation_bgcard px-4 py-1'>
+							{delegate.platforms.map((platform) => {
+								const logo = logoMap[platform as EDelegateSource];
+								if (!logo) {
+									return null;
+								}
+								return (
+									<div
+										key={platform}
+										className='flex items-center gap-2'
+									>
+										{typeof logo === 'object' && 'src' in logo ? (
+											<Image
+												src={logo as StaticImageData}
+												alt={`${platform} logo`}
+												className='h-4 w-4'
+												width={10}
+												height={10}
+											/>
+										) : (
+											logo
+										)}
+										<p className='text-sm text-text_primary'>{platform}</p>
+									</div>
+								);
+							})}
 						</div>
 						<div className='p-4'>
 							<div className='flex items-center justify-between gap-2'>
