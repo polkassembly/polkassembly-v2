@@ -101,7 +101,7 @@ function PlatformLogos({ platforms }: { platforms: string[] }) {
 				return (
 					<div
 						key={platform}
-						className={`flex items-center gap-2 px-4 ${validPlatforms.length > 2 && index > 0 ? 'border-delegation_card_border border-l' : ''}`}
+						className={`flex items-center gap-2 px-4 ${validPlatforms.length > 2 && index > 0 ? 'border-l border-delegation_card_border' : ''}`}
 					>
 						{typeof logo === 'object' && 'src' in logo ? (
 							<Image
