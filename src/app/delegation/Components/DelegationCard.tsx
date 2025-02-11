@@ -53,7 +53,7 @@ function DelegationCard() {
 			<div className='my-5 grid w-full grid-cols-2 items-center gap-5'>
 				{delegateData.map((delegate) => (
 					<div className='rounded-md border border-border_grey hover:border-bg_pink'>
-						<div className='bg-delegation_bgcard flex gap-2 px-4'>
+						<div className='flex gap-2 bg-delegation_bgcard px-4'>
 							{delegate.platforms.map((platform) => (
 								<p key={platform}>{platform}</p>
 							))}
@@ -77,20 +77,20 @@ function DelegationCard() {
 									<p className='text-sm text-text_primary'>
 										<span className='text-2xl font-semibold'>{delegate.votingPower.amount}</span> {delegate.votingPower.currency}
 									</p>
-									<p className='text-delegation_card_text text-xs'>Voting power</p>
+									<p className='text-xs text-delegation_card_text'>Voting power</p>
 								</div>
 							</div>
 							<div className='border-r border-border_grey p-5 text-center'>
 								<div>
 									<p className='text-2xl font-semibold'>{delegate.votedProposals}</p>
-									<p className='text-delegation_card_text text-xs'>Voted proposals </p>
-									<p className='text-delegation_card_text text-[10px]'>(Past 30 Days)</p>
+									<p className='text-xs text-delegation_card_text'>Voted proposals </p>
+									<p className='text-[10px] text-delegation_card_text'>(Past 30 Days)</p>
 								</div>
 							</div>
 							<div className='border-r border-border_grey p-5 text-center'>
 								<div>
 									<p className='text-2xl font-semibold'>{delegate.receivedDelegations}</p>
-									<p className='text-delegation_card_text whitespace-nowrap text-xs'>Received Delegation</p>
+									<p className='whitespace-nowrap text-xs text-delegation_card_text'>Received Delegation</p>
 								</div>
 							</div>
 						</div>
