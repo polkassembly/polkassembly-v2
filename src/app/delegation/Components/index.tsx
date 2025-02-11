@@ -36,8 +36,18 @@ function Delegation() {
 		<div className={styles.delegation}>
 			<Tabs defaultValue={EDelegationTab.MY_DELEGATION}>
 				<TabsList className='mb-4 flex w-full justify-start'>
-					<TabsTrigger value={EDelegationTab.DASHBOARD}>Dashboard</TabsTrigger>
-					<TabsTrigger value={EDelegationTab.MY_DELEGATION}>My Delegation</TabsTrigger>
+					<TabsTrigger
+						className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
+						value={EDelegationTab.DASHBOARD}
+					>
+						Dashboard
+					</TabsTrigger>
+					<TabsTrigger
+						className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
+						value={EDelegationTab.MY_DELEGATION}
+					>
+						My Delegation
+					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={EDelegationTab.DASHBOARD}>{dashboardContent}</TabsContent>
 				<TabsContent value={EDelegationTab.MY_DELEGATION}>
