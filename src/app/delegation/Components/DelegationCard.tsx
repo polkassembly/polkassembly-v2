@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import Address from '@ui/Profile/Address/Address';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { IoPersonAdd } from 'react-icons/io5';
