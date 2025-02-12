@@ -34,12 +34,12 @@ function MyDelegation() {
 					width={100}
 					height={100}
 				/>
-				<div className='flex w-full justify-between'>
+				<div className='w-full justify-between sm:flex'>
 					<div>
 						<Address address={user.defaultAddress} />
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
-					<div>
+					<div className='mt-5 sm:mt-0'>
 						<Button>Become a Delegate</Button>
 					</div>
 				</div>
