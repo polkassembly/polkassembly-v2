@@ -184,10 +184,12 @@ export const THEME_COLORS = {
 		listing_page_btn: '#9E9E9E',
 		pagination_border: '#4B4B4B',
 		delegation_bgcard: '#3D3F41',
+		delegation_card_text: '#595959',
 		delegation_card_border: '#7F8FA4',
 		delegation_card_polkassembly: '#33071E',
 		delegation_card_polkadot: '#251f3d',
 		delegation_card_w3f: '#272526',
+		delegation_card_nova: '#141C2D',
 		delegation_nova_border: '#3C74E1',
 		delegation_polkadot_border: '#7A67DF'
 	}

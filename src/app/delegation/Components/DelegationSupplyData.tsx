@@ -11,7 +11,7 @@ import delegatees from '@assets/delegation/delegatees.svg';
 
 function DelegationSupplyData() {
 	return (
-		<div className='mt-5 flex gap-5 rounded-lg bg-bg_modal p-4 shadow-lg'>
+		<div className='mt-5 flex flex-wrap gap-3 rounded-lg bg-bg_modal p-4 shadow-lg lg:gap-5'>
 			<div className='flex items-center gap-3'>
 				<Image
 					src={DOT}
