@@ -84,7 +84,7 @@ function DelegationCard() {
 									<p className='text-xs text-delegation_card_text'>Voting power</p>
 								</div>
 							</div>
-							<div className='border-r border-border_grey p-5 text-center'>
+							<div className='border-r border-border_grey p-3 text-center'>
 								<div>
 									<p className='text-2xl font-semibold'>{delegate.votedProposals}</p>
 									<p className='text-xs text-delegation_card_text'>Voted proposals </p>
