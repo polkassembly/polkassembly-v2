@@ -77,7 +77,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 				onValueChange={handleTabChange}
 				defaultValue={status}
 			>
-				<TabsList className='mb-4 flex w-full justify-start border-border_grey dark:border-b'>
+				<TabsList className='hide_scrollbar mb-4 flex w-full justify-start overflow-x-auto border-border_grey dark:border-b'>
 					{statusValues.map((statusValue) => (
 						<TabsTrigger
 							key={statusValue}
