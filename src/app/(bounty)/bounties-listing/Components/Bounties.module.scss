@@ -1,0 +1,31 @@
+.tableRow {
+    @apply overflow-hidden rounded-t-lg bg-bounty_table_bg px-6;
+}
+
+.tableCell_1 {
+    @apply p-6 first:rounded-tl-lg last:rounded-tr-lg
+}
+
+.tableCell_last {
+    @apply p-6 last:rounded-tr-lg
+}
+
+.tableCell_2 {
+    @apply w-1/6 px-6 py-5;
+}
+
+.tableCell {
+    @apply px-5 py-5;
+}
+
+.tableBodyRow {
+    @apply overflow-hidden rounded-t-lg bg-section_dark_overlay px-6;
+}
+
+.tableCellBody_1 {
+    @apply p-6 first:rounded-bl-lg last:rounded-br-lg
+}
+
+.tableCellBody_last {
+    @apply p-6 last:rounded-br-lg
+}
