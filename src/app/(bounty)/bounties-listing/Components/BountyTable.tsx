@@ -25,7 +25,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 				{filteredItems?.map((item) => (
 					<TableRow
 						className={styles.tableBodyRow}
-						key={item.id}
+						key={item?.index}
 					>
 						<TableCell className={styles.tableCellBody_1}>{item.index}</TableCell>
 						<TableCell className={styles.tableCell}>-</TableCell>
