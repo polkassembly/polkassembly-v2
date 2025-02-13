@@ -94,22 +94,24 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 						key={statusValue}
 						value={statusValue}
 					>
-						{initialData.items.length > 1 ? <BountyTable filteredItems={initialData?.items} /> : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}
+						{initialData.totalCount > 1 ? <BountyTable filteredItems={initialData?.items} /> : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}
 					</TabsContent>
 				))}
 
-				<div className='mt-4'>
-					<PaginationWithLinks
-						page={Number(page)}
-						pageSize={DEFAULT_LISTING_LIMIT}
-						totalCount={initialData?.totalCount || 0}
-						onClick={(pageNumber) => {
-							const params = new URLSearchParams(searchParams.toString());
-							params.set('page', pageNumber.toString());
-							router.push(`/bounties-listing?${params.toString()}`);
-						}}
-					/>
-				</div>
+				{initialData.totalCount > DEFAULT_LISTING_LIMIT && (
+					<div className='mt-4'>
+						<PaginationWithLinks
+							page={Number(page)}
+							pageSize={DEFAULT_LISTING_LIMIT}
+							totalCount={initialData?.totalCount || 0}
+							onClick={(pageNumber) => {
+								const params = new URLSearchParams(searchParams.toString());
+								params.set('page', pageNumber.toString());
+								router.push(`/bounties-listing?${params.toString()}`);
+							}}
+						/>
+					</div>
+				)}
 			</Tabs>
 		</div>
 	);
