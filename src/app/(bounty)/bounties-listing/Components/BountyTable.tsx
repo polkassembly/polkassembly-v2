@@ -33,7 +33,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 						<TableCell className={styles.tableCell}>{item.dataSource}</TableCell>
 						<TableCell className={styles.tableCell}>{dayjs.utc(item.onChainInfo?.createdAt).format("DD MMM 'YY")}</TableCell>
 						<TableCell className={styles.tableCell}>{item.onChainInfo?.status}</TableCell>
-						<TableCell className={styles.tableCellBody_last}>{item.tags?.join(', ')}</TableCell>
+						<TableCell className={styles.tableCellBody_last}>{item.tags && item.tags.length > 1 ? item.tags.join(', ') : 'N/A'}</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
