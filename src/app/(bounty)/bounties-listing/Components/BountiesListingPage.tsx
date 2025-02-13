@@ -84,7 +84,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
 							value={statusValue}
 						>
-							{STATUS_DISPLAY_NAMES[statusValue]}
+							{STATUS_DISPLAY_NAMES[statusValue as EBountyStatus]}
 						</TabsTrigger>
 					))}
 				</TabsList>
