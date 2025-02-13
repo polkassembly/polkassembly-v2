@@ -29,3 +29,7 @@
 .tableCellBody_last {
     @apply p-6 last:rounded-br-lg
 }
+
+.no_data {
+    @apply text-center py-2 text-btn_secondary_text;
+}

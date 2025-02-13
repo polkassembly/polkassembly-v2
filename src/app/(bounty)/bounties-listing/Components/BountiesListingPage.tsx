@@ -11,7 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-componen
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { useTranslations } from 'next-intl';
 import BountyTable from './BountyTable';
+import styles from './Bounties.module.scss';
 
 enum EBountyStatus {
 	All = 'all',
@@ -37,6 +39,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 	const pageParam = searchParams.get('page')?.split('?')[0];
 	const page = parseInt(pageParam || '1', 10);
 	const status = searchParams.get('status') || 'all';
+	const t = useTranslations();
 
 	const statusValues = Object.values(EBountyStatus);
 
@@ -91,7 +94,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 						key={statusValue}
 						value={statusValue}
 					>
-						<BountyTable filteredItems={initialData?.items} />
+						{initialData.items.length > 1 ? <BountyTable filteredItems={initialData?.items} /> : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}
 					</TabsContent>
 				))}
 
