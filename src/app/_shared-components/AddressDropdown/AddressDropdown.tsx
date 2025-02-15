@@ -68,7 +68,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 	) : (
 		<DropdownMenu>
 			<div>
-				<div className='mb-1 flex items-center justify-between'>
+				<div className='mb-1 flex items-center justify-between gap-x-12'>
 					<p className='text-sm text-wallet_btn_text'>{t('AddressDropdown.chooseLinkedAccount')}</p>
 					{withBalance && <Balance address={userPreferences?.address?.address || ''} />}
 				</div>
@@ -80,7 +80,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 					/>
 				</DropdownMenuTrigger>
 			</div>
-			<DropdownMenuContent className='max-h-[300px] min-w-[500px] overflow-y-auto border-0'>
+			<DropdownMenuContent className='max-h-[300px] overflow-y-auto border-0'>
 				{accounts.map((item) => (
 					<DropdownMenuItem key={item.address}>
 						<button

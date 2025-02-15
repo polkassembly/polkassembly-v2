@@ -601,5 +601,25 @@
 		"matrix": "マトリックス",
 		"setIdentity": "アイデンティティを設定",
 		"onChainIdentity": "オンチェーンアイデンティティ"
+	},
+	"BatchVote": {
+		"batchVoting": "一括投票",
+		"please": "お願いします",
+		"login": "ログイン",
+		"toVote": "して投票する",
+		"setDefaults": "デフォルトを設定",
+		"vote": "投票",
+		"noProposalsAvailable": "提案がありません",
+		"skip": "スキップ",
+		"aye": "賛成",
+		"nay": "反対",
+		"abstain": "棄権",
+		"chooseYourVote": "投票を選択",
+		"setConviction": "確信度を設定",
+		"noItemsInVoteCart": "投票カートにアイテムがありません",
+		"confirmBatchVoting": "一括投票を確認",
+		"save": "保存",
+		"editVote": "投票を編集",
+		"next": "次へ"
 	}
 }

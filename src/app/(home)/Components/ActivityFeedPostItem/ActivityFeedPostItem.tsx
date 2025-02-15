@@ -36,7 +36,7 @@ import ReactionHandler from '../ReactionHandler';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
-function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
+function ActivityFeedPostItem({ postData, voteButton = true, commentBox = true }: { postData: IPostListing; voteButton?: boolean; commentBox?: boolean }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const t = useTranslations();
@@ -108,7 +108,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					</span>
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
 					<div>
 						{user?.id ? (
 							<Dialog>
@@ -216,25 +216,27 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<div
-				aria-hidden='true'
-				onClick={(e) => e.stopPropagation()}
-				data-comment-input='true'
-			>
-				<ReactionHandler
-					postData={postData}
-					setIsDialogOpen={setIsDialogOpen}
-					reactionState={reactionState}
-					showLikeGif={showLikeGif}
-					showDislikeGif={showDislikeGif}
-					handleReaction={handleReaction}
-				/>
+			{commentBox && (
+				<div
+					aria-hidden='true'
+					onClick={(e) => e.stopPropagation()}
+					data-comment-input='true'
+				>
+					<ReactionHandler
+						postData={postData}
+						setIsDialogOpen={setIsDialogOpen}
+						reactionState={reactionState}
+						showLikeGif={showLikeGif}
+						showDislikeGif={showDislikeGif}
+						handleReaction={handleReaction}
+					/>
 
-				<CommentInput
-					inputRef={inputRef as RefObject<HTMLInputElement>}
-					onClick={handleCommentClick}
-				/>
-			</div>
+					<CommentInput
+						inputRef={inputRef as RefObject<HTMLInputElement>}
+						onClick={handleCommentClick}
+					/>
+				</div>
+			)}
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}

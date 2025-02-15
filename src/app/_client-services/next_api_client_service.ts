@@ -30,7 +30,9 @@ import {
 	IFollowEntry,
 	ITag,
 	EAllowedCommentor,
-	EOffChainPostTopic
+	EOffChainPostTopic,
+	IVoteCartItem,
+	EConvictionAmount
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -38,6 +40,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { getCookieHeadersServer } from '@/_shared/_utils/getCookieHeadersServer';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
@@ -81,7 +84,11 @@ enum EApiRoute {
 	GET_FOLLOWERS = 'GET_FOLLOWERS',
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
-	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
+	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
+	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
+	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART'
 }
 
 export class NextApiClientService {
@@ -101,7 +108,6 @@ export class NextApiClientService {
 
 		// eslint-disable-next-line sonarjs/max-switch-cases
 		switch (route) {
-			// Static routes
 			case EApiRoute.WEB2_LOGIN:
 				path = '/auth/web2-auth/login';
 				method = 'POST';
@@ -159,11 +165,16 @@ export class NextApiClientService {
 				method = 'POST';
 				path = '/meta/tags';
 				break;
+			// User related routes
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
+			case EApiRoute.GET_FOLLOWING:
+			case EApiRoute.GET_FOLLOWERS:
+			case EApiRoute.GET_BATCH_VOTE_CART:
 				path = '/users/id';
 				break;
 			case EApiRoute.EDIT_USER_PROFILE:
+			case EApiRoute.EDIT_BATCH_VOTE_CART_ITEM:
 				path = '/users/id';
 				method = 'PATCH';
 				break;
@@ -177,18 +188,14 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.DELETE_ACCOUNT:
 			case EApiRoute.UNFOLLOW_USER:
+			case EApiRoute.DELETE_BATCH_VOTE_CART_ITEM:
 				path = '/users/id';
 				method = 'DELETE';
 				break;
 			case EApiRoute.FOLLOW_USER:
+			case EApiRoute.ADD_TO_BATCH_VOTE_CART:
 				path = '/users/id';
 				method = 'POST';
-				break;
-			case EApiRoute.GET_FOLLOWING:
-				path = '/users/id';
-				break;
-			case EApiRoute.GET_FOLLOWERS:
-				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 				path = '/users/address';
@@ -246,6 +253,7 @@ export class NextApiClientService {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
+				...(!global.window ? await getCookieHeadersServer() : {}),
 				'Content-Type': 'application/json',
 				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				'x-network': currentNetwork
@@ -496,6 +504,52 @@ export class NextApiClientService {
 	protected static async getFollowersApi({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_FOLLOWERS, routeSegments: [userId.toString(), 'followers'] });
 		return this.nextApiClientFetch<{ followers: IFollowEntry[] }>({ url, method });
+	}
+
+	protected static async getBatchVoteCartApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_BATCH_VOTE_CART, routeSegments: [userId.toString(), 'vote-cart'] });
+		return this.nextApiClientFetch<{ voteCart: IVoteCartItem[] }>({ url, method });
+	}
+
+	protected static async addToBatchVoteCartApi({
+		userId,
+		postIndexOrHash,
+		proposalType,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		postIndexOrHash: string;
+		proposalType: EProposalType;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_TO_BATCH_VOTE_CART, routeSegments: [userId.toString(), 'vote-cart'] });
+		return this.nextApiClientFetch<{ voteCartItem: IVoteCartItem }>({ url, method, data: { postIndexOrHash, proposalType, decision, amount, conviction } });
+	}
+
+	protected static async editBatchVoteCartItemApi({
+		userId,
+		id,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		id: string;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_BATCH_VOTE_CART_ITEM, routeSegments: [userId.toString(), 'vote-cart'] });
+		return this.nextApiClientFetch<{ voteCartItem: IVoteCartItem }>({ url, method, data: { id, decision, amount, conviction } });
+	}
+
+	protected static async deleteBatchVoteCartItemApi({ userId, id }: { userId: number; id: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_BATCH_VOTE_CART_ITEM, routeSegments: [userId.toString(), 'vote-cart'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { id } });
 	}
 
 	static async fetchPreimagesApi({ page }: { page: number }) {
