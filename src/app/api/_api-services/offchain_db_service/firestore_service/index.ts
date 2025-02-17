@@ -216,7 +216,7 @@ export class FirestoreService extends FirestoreUtils {
 		return this.GetUserById(addressData.userId);
 	}
 
-	static async getAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
 		const substrAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
 
 		if (!substrAddress) {

@@ -93,6 +93,10 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+		return FirestoreService.GetAddressDataByAddress(address);
+	}
+
 	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
