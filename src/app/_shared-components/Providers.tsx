@@ -12,7 +12,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { getTimeZoneForLocale } from '@/_shared/_utils/getTimeZoneForLocale';
 import { SidebarProvider } from './Sidebar/Sidebar';
-import { Toaster } from './Toaster/toaster';
+import { PolkassemblyNotifier } from './Toaster/PolkassemblyNotifier';
 
 const queryClient = new QueryClient();
 
@@ -41,7 +41,7 @@ export function Providers({
 					enableSystem={false}
 				>
 					<SidebarProvider>{children}</SidebarProvider>
-					<Toaster />
+					<PolkassemblyNotifier />
 				</ThemeProvider>
 				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>

@@ -5,10 +5,11 @@
 'use client';
 
 import { useToast } from '@/hooks/use-toast';
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@ui/Toaster/toast';
-import { getIconForStatus, NotificationStatus } from './queueNotification';
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
+import { NotificationStatus } from '@/_shared/types';
+import { getIconForStatus } from './PolkassemblyNotificationPrimitive';
 
-export function Toaster() {
+export function PolkassemblyNotifier() {
 	const { toasts } = useToast();
 
 	return (

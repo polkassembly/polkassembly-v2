@@ -826,3 +826,10 @@ export interface IVoteCartItem {
 	conviction: EConvictionAmount;
 	title?: string;
 }
+
+export enum NotificationStatus {
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info'
+}

@@ -4,8 +4,8 @@
 
 import * as React from 'react';
 
-import type { ToastActionElement, ToastProps } from '@/app/_shared-components/Toaster/toast';
-import { NotificationStatus } from '@/app/_shared-components/Toaster/queueNotification';
+import type { ToastActionElement, ToastProps } from '@ui/Toaster/Toast';
+import { NotificationStatus } from '@/_shared/types';
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
