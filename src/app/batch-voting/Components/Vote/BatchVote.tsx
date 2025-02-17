@@ -81,12 +81,13 @@ function BatchVote({
 
 		setLoading(true);
 
-		const amount = {
-			...(voteDecision === EVoteDecision.AYE && { aye: defaultAyeNayValue.toString() }),
-			...(voteDecision === EVoteDecision.NAY && { nay: defaultAyeNayValue.toString() }),
-			...(voteDecision === EVoteDecision.ABSTAIN && { abstain: defaultAbstainValue.toString(), aye: defaultAbstainAyeValue.toString(), nay: defaultAbstainNayValue.toString() }),
-			...(voteDecision === EVoteDecision.SPLIT && { aye: defaultAbstainAyeValue.toString(), nay: defaultAbstainNayValue.toString() })
-		};
+		const amount = BatchVotingClientService.getAmountForDecision({
+			voteDecision,
+			ayeNayValue: defaultAyeNayValue,
+			abstainValue: defaultAbstainValue,
+			abstainAyeValue: defaultAbstainAyeValue,
+			abstainNayValue: defaultAbstainNayValue
+		});
 
 		const { data, error } = await BatchVotingClientService.addToBatchVoteCart({
 			userId: user.id,

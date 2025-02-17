@@ -18,8 +18,8 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 	const t = useTranslations();
 	const [voteDecision, setVoteDecision] = useState<EVoteDecision>(voteCartItem.decision);
 	const [ayeNayValue, setAyeNayValue] = useState<BN>(new BN(voteCartItem.decision === EVoteDecision.AYE ? voteCartItem.amount.aye || BN_ZERO : voteCartItem.amount.nay || BN_ZERO));
-	const [splitAyeValue, setSplitAyeValue] = useState<BN>(new BN(voteCartItem.amount.aye || BN_ZERO));
-	const [splitNayValue, setSplitNayValue] = useState<BN>(new BN(voteCartItem.amount.nay || BN_ZERO));
+	const [abstainAyeValue, setAbstainAyeValue] = useState<BN>(new BN(voteCartItem.amount.aye || BN_ZERO));
+	const [abstainNayValue, setAbstainNayValue] = useState<BN>(new BN(voteCartItem.amount.nay || BN_ZERO));
 	const [abstainValue, setAbstainValue] = useState<BN>(new BN(voteCartItem.amount.abstain || BN_ZERO));
 	const [conviction, setConviction] = useState<EConvictionAmount>(voteCartItem.conviction);
 
@@ -33,12 +33,13 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 
 		setLoading(true);
 
-		const amount = {
-			...(voteDecision === EVoteDecision.AYE && { aye: ayeNayValue.toString() }),
-			...(voteDecision === EVoteDecision.NAY && { nay: ayeNayValue.toString() }),
-			...(voteDecision === EVoteDecision.ABSTAIN && { abstain: abstainValue.toString(), aye: splitAyeValue.toString(), nay: splitNayValue.toString() }),
-			...(voteDecision === EVoteDecision.SPLIT && { aye: splitAyeValue.toString(), nay: splitNayValue.toString() })
-		};
+		const amount = BatchVotingClientService.getAmountForDecision({
+			voteDecision,
+			ayeNayValue,
+			abstainValue,
+			abstainAyeValue,
+			abstainNayValue
+		});
 
 		const { data, error } = await BatchVotingClientService.editBatchVoteCartItem({ userId: user.id, id: voteCartItem.id, decision: voteDecision, amount, conviction });
 		if (error || !data) {
@@ -79,11 +80,11 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 						)}
 						<BalanceInput
 							label={t('VoteReferendum.ayeVoteValue')}
-							onChange={setSplitAyeValue}
+							onChange={setAbstainAyeValue}
 						/>
 						<BalanceInput
 							label={t('VoteReferendum.nayVoteValue')}
-							onChange={setSplitNayValue}
+							onChange={setAbstainNayValue}
 						/>
 					</>
 				)}

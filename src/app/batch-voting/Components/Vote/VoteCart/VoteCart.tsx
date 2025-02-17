@@ -17,12 +17,11 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const confirmBatchVoting = async () => {
-		if (!userPreferences.address?.address) return;
-		console.log('confirmBatchVoting');
+		if (!userPreferences.address?.address || voteCart.length === 0) return;
 
 		setLoading(true);
 		await apiService?.batchVoteReferendum({
-			address: userPreferences.address?.address,
+			address: userPreferences.address.address,
 			voteCartItems: voteCart,
 			onSuccess: () => {
 				setLoading(false);

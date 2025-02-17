@@ -7,11 +7,13 @@
 import { EConvictionAmount, EVoteDecision, IPostListing } from '@/_shared/types';
 import { TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { Tabs } from '@/app/_shared-components/Tabs/Tabs';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import SetDefaults from './SetDefaults/SetDefaults';
 import BatchVote from './Vote/BatchVote';
 
@@ -33,12 +35,20 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 
 	const { user } = useUser();
 
-	const isInvalidAmount = useMemo(() => {
-		return (
-			([EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) && defaultAyeNayValue.lte(BN_ZERO)) ||
-			(voteDecision === EVoteDecision.ABSTAIN && defaultAbstainValue.add(defaultAyeNayValue).add(defaultAbstainNayValue).lte(BN_ZERO))
-		);
-	}, [defaultAbstainNayValue, defaultAbstainValue, defaultAyeNayValue, voteDecision]);
+	const isInvalidAmount = useMemo(
+		() =>
+			ValidatorService.isValidVoteAmountsForDecision(
+				BatchVotingClientService.getAmountForDecision({
+					voteDecision,
+					ayeNayValue: defaultAyeNayValue,
+					abstainValue: defaultAbstainValue,
+					abstainAyeValue: defaultAbstainAyeValue,
+					abstainNayValue: defaultAbstainNayValue
+				}),
+				voteDecision
+			),
+		[voteDecision, defaultAyeNayValue, defaultAbstainValue, defaultAbstainAyeValue, defaultAbstainNayValue]
+	);
 
 	return (
 		<div className='flex flex-col gap-y-4'>
