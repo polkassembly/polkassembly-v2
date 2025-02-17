@@ -50,6 +50,12 @@ export default async function RootLayout({
 			className={userPreferences.theme}
 			suppressHydrationWarning
 		>
+			<head>
+				<link
+					href='https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap'
+					rel='stylesheet'
+				/>
+			</head>
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
 				<NextTopLoader
 					color={THEME_COLORS.light.navbar_border}

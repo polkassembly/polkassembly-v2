@@ -14,6 +14,10 @@ const config: Config = {
 	plugins: [createThemes(THEME_COLORS), require('tailwindcss-animate')],
 	theme: {
 		extend: {
+			fontFamily: {
+				pixeboy: ['Pixeboy', 'sans-serif'],
+				pixelify: ['Pixelify Sans', 'sans-serif']
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
