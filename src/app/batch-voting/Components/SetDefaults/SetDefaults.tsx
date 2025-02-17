@@ -40,56 +40,46 @@ function SetDefaults({
 		<div>
 			<div className='p-4'>{t('BatchVote.setDefaults')}</div>
 			<Separator />
-			<div className='flex w-full flex-col items-center gap-y-4 p-4'>
+			<div className='flex w-full flex-col items-center gap-y-4 px-24 py-4'>
 				<WalletButtons small />
 				<AddressDropdown withBalance />
-				<div className='flex w-full items-center gap-x-4'>
-					<div className='w-full'>
-						<p className='mb-1 text-sm text-wallet_btn_text'>{t('BatchVote.chooseYourVote')}</p>
-						<ChooseVote
-							voteDecision={voteDecision}
-							onVoteDecisionChange={onVoteDecisionChange}
-							removeSplit
-						/>
-					</div>
-					<div className='w-full'>
-						<p className='mb-3 text-sm text-wallet_btn_text'>{t('BatchVote.setConviction')}</p>
-						<ConvictionSelector onConvictionChange={onConvictionChange} />
-					</div>
+				<div className='w-full'>
+					<p className='mb-1 text-sm text-wallet_btn_text'>{t('BatchVote.chooseYourVote')}</p>
+					<ChooseVote
+						voteDecision={voteDecision}
+						onVoteDecisionChange={onVoteDecisionChange}
+						removeSplit
+					/>
 				</div>
-				<div className='flex w-full flex-wrap gap-4'>
+				<div className='flex w-full flex-col gap-y-4'>
 					{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
-						<div className='w-1/2'>
-							<BalanceInput
-								name={`${voteDecision}-balance`}
-								label={t('VoteReferendum.lockBalance')}
-								onChange={onDefaultAyeNayValueChange}
-							/>
-						</div>
+						<BalanceInput
+							name={`${voteDecision}-balance`}
+							label={t('VoteReferendum.lockBalance')}
+							onChange={onDefaultAyeNayValueChange}
+						/>
 					) : (
 						<>
 							{voteDecision === EVoteDecision.ABSTAIN && (
-								<div className='flex-1'>
-									<BalanceInput
-										label={t('VoteReferendum.abstainVoteValue')}
-										onChange={onDefaultAbstainValueChange}
-									/>
-								</div>
+								<BalanceInput
+									label={t('VoteReferendum.abstainVoteValue')}
+									onChange={onDefaultAbstainValueChange}
+								/>
 							)}
-							<div className='flex-1'>
-								<BalanceInput
-									label={t('VoteReferendum.ayeVoteValue')}
-									onChange={onDefaultAbstainAyeValueChange}
-								/>
-							</div>
-							<div className='flex-1'>
-								<BalanceInput
-									label={t('VoteReferendum.nayVoteValue')}
-									onChange={onDefaultAbstainNayValueChange}
-								/>
-							</div>
+							<BalanceInput
+								label={t('VoteReferendum.ayeVoteValue')}
+								onChange={onDefaultAbstainAyeValueChange}
+							/>
+							<BalanceInput
+								label={t('VoteReferendum.nayVoteValue')}
+								onChange={onDefaultAbstainNayValueChange}
+							/>
 						</>
 					)}
+				</div>
+				<div className='w-full'>
+					<p className='mb-3 text-sm text-wallet_btn_text'>{t('BatchVote.setConviction')}</p>
+					<ConvictionSelector onConvictionChange={onConvictionChange} />
 				</div>
 				<Separator />
 				<div className='flex w-full justify-end'>

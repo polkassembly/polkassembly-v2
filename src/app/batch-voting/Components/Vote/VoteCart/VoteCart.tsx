@@ -33,7 +33,7 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	};
 	return (
 		<div className='flex h-full flex-col gap-y-4'>
-			<div className='flex max-h-[300px] flex-1 flex-col gap-y-2 overflow-y-auto'>
+			<div className='flex max-h-[400px] flex-1 flex-col gap-y-2 overflow-y-auto'>
 				{voteCart.length > 0 ? (
 					voteCart.map((item) => (
 						<CartItem

@@ -7,7 +7,7 @@
 import { EConvictionAmount, EVoteDecision, IPostListing } from '@/_shared/types';
 import { TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { Tabs } from '@/app/_shared-components/Tabs/Tabs';
-import { BN } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { useState, useMemo } from 'react';
 import { useUser } from '@/hooks/useUser';
@@ -26,16 +26,16 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 	const t = useTranslations();
 	const [voteDecision, setVoteDecision] = useState<EVoteDecision>(EVoteDecision.AYE);
 	const [defaultConviction, setDefaultConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
-	const [defaultAyeNayValue, setDefaultAyeNayValue] = useState<BN>(new BN(0));
-	const [defaultAbstainValue, setDefaultAbstainValue] = useState<BN>(new BN(0));
-	const [defaultAbstainAyeValue, setDefaultAbstainAyeValue] = useState<BN>(new BN(0));
-	const [defaultAbstainNayValue, setDefaultAbstainNayValue] = useState<BN>(new BN(0));
+	const [defaultAyeNayValue, setDefaultAyeNayValue] = useState<BN>(BN_ZERO);
+	const [defaultAbstainValue, setDefaultAbstainValue] = useState<BN>(BN_ZERO);
+	const [defaultAbstainAyeValue, setDefaultAbstainAyeValue] = useState<BN>(BN_ZERO);
+	const [defaultAbstainNayValue, setDefaultAbstainNayValue] = useState<BN>(BN_ZERO);
 
 	const [tab, setTab] = useState<EBatchVotingTab>(EBatchVotingTab.SET_DEFAULTS);
 
 	const { user } = useUser();
 
-	const isInvalidAmount = useMemo(
+	const isValidAmount = useMemo(
 		() =>
 			ValidatorService.isValidVoteAmountsForDecision(
 				BatchVotingClientService.getAmountForDecision({
@@ -75,7 +75,7 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 						<TabsList>
 							<TabsTrigger value={EBatchVotingTab.SET_DEFAULTS}>{t('BatchVote.setDefaults')}</TabsTrigger>
 							<TabsTrigger
-								disabled={isInvalidAmount}
+								disabled={!isValidAmount}
 								value={EBatchVotingTab.VOTE}
 							>
 								{t('BatchVote.vote')}
@@ -95,7 +95,7 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 							onDefaultAbstainAyeValueChange={setDefaultAbstainAyeValue}
 							onDefaultAbstainNayValueChange={setDefaultAbstainNayValue}
 							onNext={() => setTab(EBatchVotingTab.VOTE)}
-							isInvalidAmount={isInvalidAmount}
+							isInvalidAmount={!isValidAmount}
 						/>
 					</TabsContent>
 					<TabsContent value={EBatchVotingTab.VOTE}>

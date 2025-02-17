@@ -243,7 +243,7 @@ export class ValidatorService {
 	static isValidVoteAmount(amount: string): boolean {
 		try {
 			const bnAmount = new BN(amount);
-			return bnAmount.gte(new BN(0));
+			return bnAmount.gt(new BN(0));
 		} catch {
 			return false;
 		}
