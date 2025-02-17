@@ -5,7 +5,7 @@
 import * as React from 'react';
 
 import type { ToastActionElement, ToastProps } from '@/app/_shared-components/Toaster/toast';
-import { NotificationStatusType } from '@/app/_shared-components/Toaster/queueNotification';
+import { NotificationStatus } from '@/app/_shared-components/Toaster/queueNotification';
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -15,7 +15,7 @@ type ToasterToast = ToastProps & {
 	title?: React.ReactNode;
 	description?: React.ReactNode;
 	action?: ToastActionElement;
-	status?: NotificationStatusType;
+	status?: NotificationStatus;
 };
 
 type ActionType = {

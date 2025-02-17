@@ -6,7 +6,7 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@ui/Toaster/toast';
-import { getIconForStatus, NotificationStatusType } from './queueNotification';
+import { getIconForStatus, NotificationStatus } from './queueNotification';
 
 export function Toaster() {
 	const { toasts } = useToast();
@@ -21,13 +21,13 @@ export function Toaster() {
 						className='bg-white'
 					>
 						<div className='grid gap-2'>
-							{title && (
-								<ToastTitle className='flex items-center gap-2'>
-									{getIconForStatus(status as NotificationStatusType)}
-									{title}
-								</ToastTitle>
-							)}
-							{description && <ToastDescription>{description}</ToastDescription>}
+							<div className='flex items-start gap-2'>
+								<span>{status && getIconForStatus(status as NotificationStatus)}</span>
+								<div className='flex flex-col gap-1'>
+									{title && <ToastTitle>{title}</ToastTitle>}
+									{description && <ToastDescription>{description}</ToastDescription>}
+								</div>
+							</div>
 						</div>
 						{action}
 						<ToastClose />
