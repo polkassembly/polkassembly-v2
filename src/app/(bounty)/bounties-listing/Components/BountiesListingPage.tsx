@@ -7,6 +7,7 @@
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import ProposalIcon from '@assets/icons/proposal.svg';
+import { spaceGroteskFont } from '@/app/_style/fonts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
@@ -56,7 +57,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 	return (
 		<div>
 			<div className='flex items-center justify-between'>
-				<span className='text-[32px] font-bold text-btn_secondary_text'>On-chain Bounties</span>
+				<span className={`${spaceGroteskFont.className} text-[32px] font-bold text-btn_secondary_text`}>On-chain Bounties</span>
 				<div className='flex gap-2'>
 					<button
 						type='button'
@@ -76,6 +77,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 			<Tabs
 				onValueChange={handleTabChange}
 				defaultValue={status}
+				className='mt-5'
 			>
 				<TabsList className='hide_scrollbar mb-4 flex w-full justify-start overflow-x-auto border-border_grey dark:border-b'>
 					{statusValues.map((statusValue) => (
