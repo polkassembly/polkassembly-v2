@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision } from '@/_shared/types';
+import { EVoteDecision, NotificationStatus } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Ban, Split, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,7 @@ import classes from './VoteReferendum.module.scss';
 import { Slider } from '../../Slider';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
+import NotificationToaster from '../../Toaster/PolkassemblyNotificationPrimitive';
 
 function VoteReferendum({ index }: { index: string }) {
 	const { setUserPreferences, userPreferences } = useUserPreferences();
@@ -52,11 +53,19 @@ function VoteReferendum({ index }: { index: string }) {
 			await apiService.voteReferendum({
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
-					console.log('Vote successful');
+					NotificationToaster({
+						header: 'Vote successful',
+						message: 'Your vote has been cast successfully',
+						status: NotificationStatus.SUCCESS
+					});
 					setIsLoading(false);
 				},
 				onFailed: () => {
-					console.log('Vote failed');
+					NotificationToaster({
+						header: 'Vote failed',
+						message: 'Your vote has not been cast successfully',
+						status: NotificationStatus.ERROR
+					});
 					setIsLoading(false);
 				},
 				referendumId: Number(index),
