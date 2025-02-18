@@ -20,7 +20,7 @@ import classes from './VoteReferendum.module.scss';
 import { Slider } from '../../Slider';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
-import NotificationToaster from '../../Toaster/NotificationToaster';
+import { useNotificationToaster } from '../../Toaster/useNotificationToaster';
 
 function VoteReferendum({ index }: { index: string }) {
 	const { setUserPreferences, userPreferences } = useUserPreferences();
@@ -32,6 +32,7 @@ function VoteReferendum({ index }: { index: string }) {
 	const [abstainVoteValue, setAbstainVoteValue] = useState<BN>(BN_ZERO);
 	const [conviction, setConviction] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { showNotification } = useNotificationToaster();
 
 	const { apiService } = usePolkadotApiService();
 
@@ -53,7 +54,7 @@ function VoteReferendum({ index }: { index: string }) {
 			await apiService.voteReferendum({
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
-					NotificationToaster({
+					showNotification({
 						header: 'Vote successful',
 						message: 'Your vote has been cast successfully',
 						status: NotificationStatus.SUCCESS
@@ -61,7 +62,7 @@ function VoteReferendum({ index }: { index: string }) {
 					setIsLoading(false);
 				},
 				onFailed: () => {
-					NotificationToaster({
+					showNotification({
 						header: 'Vote failed',
 						message: 'Your vote has not been cast successfully',
 						status: NotificationStatus.ERROR
