@@ -4,16 +4,14 @@
 
 'use client';
 
-import { EActivityFeedTab, IGenericListingResponse, IPostListing, ESidebarState, NotificationStatus } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IPostListing, ESidebarState } from '@/_shared/types';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { useSidebar } from '@ui/Sidebar/Sidebar';
-import { useNotificationToaster } from '@/app/_shared-components/Toaster/useNotificationToaster';
 import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
 import ActivityFeedSidebar from './ActivityFeedSidebar';
-
 import styles from './ActivityFeed.module.scss';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
@@ -22,23 +20,11 @@ function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IP
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
 	const { state } = useSidebar();
-	const { showNotification } = useNotificationToaster();
 
 	return (
 		<div className={cn('min-h-screen bg-page_background pt-5', state === ESidebarState.EXPANDED ? 'px-10 lg:px-16' : 'px-10 lg:px-20')}>
 			<div className='container mx-auto grid grid-cols-12 gap-5'>
 				<div className='col-span-12'>
-					<button
-						type='button'
-						onClick={() =>
-							showNotification({
-								header: 'Action created successfully',
-								status: NotificationStatus.SUCCESS
-							})
-						}
-					>
-						Test
-					</button>
 					<div className={styles.activityFeedContainer}>
 						<div className={styles.activityFeedToggleButton}>
 							<div>
