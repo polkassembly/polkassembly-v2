@@ -5,8 +5,9 @@
 import { ReactNode } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { FaCircleCheck } from 'react-icons/fa6';
-import { IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io';
+import { IoIosCloseCircle, IoIosInformationCircle, IoIosCloseCircleOutline } from 'react-icons/io';
 import { NotificationStatus } from '@/_shared/types';
+import { MdInfoOutline } from 'react-icons/md';
 
 interface Props {
 	header: string;
@@ -18,25 +19,30 @@ interface Props {
 export const getIconForStatus = (status: NotificationStatus) => {
 	switch (status) {
 		case NotificationStatus.SUCCESS:
-			return <FaCircleCheck className='h-6 w-6 text-green-400' />;
+			return <FaCircleCheck className='h-5 w-5 text-white' />;
 		case NotificationStatus.ERROR:
-			return <IoIosCloseCircle className='h-7 w-7 text-red-400' />;
+			return <IoIosCloseCircle className='text-toast_error_text h-6 w-6' />;
 		case NotificationStatus.WARNING:
-			return <IoIosInformationCircle className='h-7 w-7 text-yellow-400' />;
+			return <IoIosInformationCircle className='text-toast_warning_text h-6 w-6' />;
 		case NotificationStatus.INFO:
-			return <IoIosInformationCircle className='h-7 w-7 text-blue-400' />;
+			return <MdInfoOutline className='text-toast_info_text h-6 w-6' />;
+		case NotificationStatus.WARNINGV2:
+			return <MdInfoOutline className='text-toast_warning_text h-6 w-6' />;
+		case NotificationStatus.ERRORV2:
+			return <IoIosCloseCircleOutline className='text-toast_error_text h-6 w-6' />;
 		default:
 			return null;
 	}
 };
 
-const PolkassemblyNotificationPrimitive = ({ header, message, durationInSeconds = 4.5, status }: Props) => {
+const NotificationToaster = ({ header, message, durationInSeconds = 4.5, status }: Props) => {
 	toast({
 		title: header,
 		description: message,
 		duration: durationInSeconds * 1000,
-		status: status as NotificationStatus
+		status: status as NotificationStatus,
+		variant: status as NotificationStatus
 	});
 };
 
-export default PolkassemblyNotificationPrimitive;
+export default NotificationToaster;

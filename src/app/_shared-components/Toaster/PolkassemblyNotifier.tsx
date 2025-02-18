@@ -19,10 +19,9 @@ export function PolkassemblyNotifier() {
 					<Toast
 						key={id}
 						{...props}
-						className='bg-white'
 					>
 						<div className='grid gap-2'>
-							<div className='flex items-start gap-2'>
+							<div className={`flex gap-2 ${description ? 'items-start' : 'items-center'}`}>
 								<span>{status && getIconForStatus(status as NotificationStatus)}</span>
 								<div className='flex flex-col gap-1'>
 									{title && <ToastTitle>{title}</ToastTitle>}

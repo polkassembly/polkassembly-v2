@@ -830,6 +830,8 @@ export interface IVoteCartItem {
 export enum NotificationStatus {
 	SUCCESS = 'success',
 	ERROR = 'error',
+	ERRORV2 = 'errorv2',
 	WARNING = 'warning',
+	WARNINGV2 = 'warningv2',
 	INFO = 'info'
 }
