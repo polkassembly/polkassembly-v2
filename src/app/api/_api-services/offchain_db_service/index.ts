@@ -20,7 +20,17 @@ import {
 	EActivityName,
 	EActivityCategory,
 	IActivityMetadata,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IContentSummary,
+	IProfileDetails,
+	IUserNotificationSettings,
+	IFollowEntry,
+	IGenericListingResponse,
+	EOffChainPostTopic,
+	ITag,
+	IVoteCartItem,
+	EConvictionAmount,
+	EVoteDecision
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -83,7 +93,7 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IPublicUser[]> {
+	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
 
@@ -105,6 +115,11 @@ export class OffChainDbService {
 
 		// 2. if not found, get post from subsquare
 		if (!post) {
+			// if is off-chain and not found in our db, throw error
+			if (ValidatorService.isValidOffChainProposalType(proposalType)) {
+				throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Post not found');
+			}
+
 			post = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		}
 
@@ -234,6 +249,34 @@ export class OffChainDbService {
 		return FirestoreService.GetUserReactionForPost({ network, indexOrHash, proposalType, userId });
 	}
 
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
+		return FirestoreService.GetContentSummary({ network, indexOrHash, proposalType });
+	}
+
+	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
+		return FirestoreService.IsUserFollowing({ userId, userIdToFollow });
+	}
+
+	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowers(userId);
+	}
+
+	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
+		return FirestoreService.GetFollowing(userId);
+	}
+
+	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
+		const voteCartItems = await FirestoreService.GetVoteCart(userId);
+
+		// fetch title for each vote cart item
+		return Promise.all(
+			voteCartItems.map(async (voteCartItem) => {
+				const post = await this.GetOffChainPostData({ network: voteCartItem.network, indexOrHash: voteCartItem.postIndexOrHash, proposalType: voteCartItem.proposalType });
+				return { ...voteCartItem, title: post.title };
+			})
+		);
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -327,6 +370,38 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
+	static async UpdateUserProfile({
+		userId,
+		newProfileDetails,
+		notificationPreferences
+	}: {
+		userId: number;
+		newProfileDetails: IProfileDetails;
+		notificationPreferences?: IUserNotificationSettings;
+	}) {
+		return FirestoreService.UpdateUserProfile({ userId, newProfileDetails, notificationPreferences });
+	}
+
+	static async DeleteUser(userId: number) {
+		return FirestoreService.DeleteUser(userId);
+	}
+
+	static async UpdateUserEmail(userId: number, email: string) {
+		if (!ValidatorService.isValidUserId(userId) || !ValidatorService.isValidEmail(email)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or email');
+		}
+
+		return FirestoreService.UpdateUserEmail(userId, email);
+	}
+
+	static async UpdateUserUsername(userId: number, username: string) {
+		if (!ValidatorService.isValidUserId(userId) || !ValidatorService.isValidUsername(username)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid user id or username');
+		}
+
+		return FirestoreService.UpdateUserUsername(userId, username);
+	}
+
 	static async AddNewComment({
 		network,
 		indexOrHash,
@@ -367,8 +442,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content }: { commentId: string; content: OutputData }) {
-		return FirestoreService.UpdateComment({ commentId, content });
+	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -437,7 +512,9 @@ export class OffChainDbService {
 		userId,
 		content,
 		title,
-		allowedCommentor
+		allowedCommentor,
+		tags,
+		topic
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -445,6 +522,8 @@ export class OffChainDbService {
 		content: OutputData;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
+		tags?: ITag[];
+		topic?: EOffChainPostTopic;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -452,7 +531,15 @@ export class OffChainDbService {
 
 		const index = (await FirestoreService.GetLatestOffChainPostIndex(network, proposalType)) + 1;
 
-		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, indexOrHash: index.toString() });
+		const post = await FirestoreService.CreatePost({ network, proposalType, userId, content, title, allowedCommentor, tags: tags || [], topic, indexOrHash: index.toString() });
+
+		// Create tags
+		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) {
+			await this.CreateTags(tags);
+		}
+
+		// create content summary
+		// await AIService.createPostSummary({ network, proposalType, indexOrHash: post.indexOrHash });
 
 		await this.saveUserActivity({
 			userId,
@@ -542,5 +629,79 @@ export class OffChainDbService {
 
 	static async UpdateUserPassword(userId: number, password: string, salt: string) {
 		return FirestoreService.UpdateUserPassword(userId, password, salt);
+	}
+
+	static async UpdateContentSummary(contentSummary: IContentSummary) {
+		return FirestoreService.UpdateContentSummary(contentSummary);
+	}
+
+	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
+		await FirestoreService.FollowUser({ userId, userIdToFollow });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.FOLLOWED_USER,
+			metadata: {
+				userId: userIdToFollow
+			}
+		});
+	}
+
+	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
+		await FirestoreService.UnfollowUser({ userId, userIdToUnfollow });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.UNFOLLOWED_USER,
+			metadata: { userId: userIdToUnfollow }
+		});
+	}
+
+	static async GetAllTags(network: ENetwork) {
+		return FirestoreService.GetAllTags(network);
+	}
+
+	static async CreateTags(tags: ITag[]) {
+		return FirestoreService.CreateTags(tags);
+	}
+
+	static async AddVoteCartItem({
+		userId,
+		postIndexOrHash,
+		proposalType,
+		decision,
+		amount,
+		conviction,
+		network
+	}: {
+		userId: number;
+		postIndexOrHash: string;
+		proposalType: EProposalType;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+		network: ENetwork;
+	}): Promise<IVoteCartItem> {
+		return FirestoreService.AddVoteCartItem({ userId, postIndexOrHash, proposalType, decision, amount, conviction, network });
+	}
+
+	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
+		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
+	}
+
+	static async UpdateVoteCartItem({
+		userId,
+		voteCartItemId,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		voteCartItemId: string;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		return FirestoreService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
 	}
 }

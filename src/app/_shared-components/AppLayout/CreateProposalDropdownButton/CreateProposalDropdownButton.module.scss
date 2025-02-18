@@ -29,7 +29,7 @@
 
 
 .trigger {
-	@apply flex cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
+	@apply flex cursor-pointer items-center h-9 justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
 }
 
 .triggerCollapsed {
@@ -78,4 +78,8 @@
 
 .newBadge {
 	@apply absolute right-[-12px] top-[-5px] rounded-full bg-[var(--sidebar-ring)] px-[0.4rem] py-[0.1rem] text-xs text-[var(--sidebar-primary-foreground)];
+}
+
+.menuItemIcon {
+	@apply h-6 w-6
 }

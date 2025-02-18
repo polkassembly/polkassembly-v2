@@ -4,6 +4,7 @@
 
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
@@ -125,7 +126,9 @@ export class PolkadotApiService {
 			.then((result) => {
 				lockedBalance = new BN(result.lockedBalance || lockedBalance);
 			})
-			.catch((e) => console.log(e));
+			.catch(() => {
+				// TODO: show notification
+			});
 
 		await this.api.query.system
 			.account(encodedAddress)
@@ -135,7 +138,9 @@ export class PolkadotApiService {
 				totalBalance = free.add(reserved);
 				freeBalance = free;
 			})
-			.catch((e) => console.error(e));
+			.catch(() => {
+				// TODO: show notification
+			});
 
 		return {
 			freeBalance,

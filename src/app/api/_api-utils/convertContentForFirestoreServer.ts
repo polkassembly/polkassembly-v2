@@ -26,7 +26,7 @@ export function convertContentForFirestoreServer(content: string | Record<string
 		'time' in content &&
 		(content as any).blocks.every(isValidEditorJsBlock)
 	) {
-		return content as unknown as OutputData;
+		return encodeEditorJsDataForFirestore(content as unknown as OutputData);
 	}
 
 	const contentStr = typeof content === 'object' ? JSON.stringify(content) : content;

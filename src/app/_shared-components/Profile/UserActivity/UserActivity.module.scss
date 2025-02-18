@@ -1,5 +1,5 @@
 .userActivityWrapper {
-    @apply flex flex-col gap-y-4
+    @apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal py-4 shadow-lg
 }
 
 .userActivityHeader {

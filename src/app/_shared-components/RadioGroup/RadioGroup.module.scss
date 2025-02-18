@@ -1,0 +1,12 @@
+.radioGroup {
+    @apply grid gap-2;
+}
+.radioGroupItem {
+    @apply aspect-square h-4 w-4 rounded-full border border-btn_primary_background text-primary shadow focus:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50;
+}
+.radioGroupIndicator {
+    @apply flex items-center justify-center;
+}
+.radioGroupIndicatorCircle {
+    @apply h-3.5 w-3.5 fill-btn_primary_background stroke-none;
+}

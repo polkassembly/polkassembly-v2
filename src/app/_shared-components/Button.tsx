@@ -10,11 +10,12 @@ import { cn } from '@/lib/utils';
 
 export const buttonVariants = {
 	default: 'bg-btn_primary_background rounded-md text-btn_primary_text text-sm shadow hover:bg-btn_primary_background/90',
-	destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
+	destructive: 'bg-failure text-white shadow-sm hover:bg-failure/90',
 	outline:
 		'bg-btn_secondary_background text-btn_secondary_text rounded-lg border border-btn_secondary_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	secondary: 'bg-btn_secondary_background text-text_pink rounded-lg border border-navbar_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	ghost: '',
+	pagination: 'bg-btn_secondary_background text-text_primary rounded-lg border border-pagination_border hover:border-navbar_border shadow-sm hover:bg-btn_secondary_background/80',
 	link: 'text-primary underline-offset-4 hover:underline'
 };
 
@@ -22,7 +23,8 @@ export const buttonSizes = {
 	default: 'h-9 px-4 py-2',
 	sm: 'h-8 rounded-md px-3 text-xs',
 	lg: 'h-10 rounded-md px-8',
-	icon: 'px-2 sm:px-4 py-1'
+	icon: 'px-2 sm:px-4 py-1',
+	pagination: 'px-2 sm:px-3 h-8 w-8 py-1'
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

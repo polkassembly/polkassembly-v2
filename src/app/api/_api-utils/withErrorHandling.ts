@@ -22,7 +22,7 @@ export const withErrorHandling = (handler: { (req: NextRequest, context?: any): 
 			storeApiKeyUsage(req);
 			return await handler(req, context);
 		} catch (error) {
-			console.log('Error in API call : ', req.nextUrl);
+			console.log('Error in API call : ', req.nextUrl.href);
 
 			try {
 				consolePretty({ error }, true);

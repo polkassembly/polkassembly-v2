@@ -32,7 +32,7 @@ function VoteReferendum({ index }: { index: string }) {
 	const [conviction, setConviction] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const polkadotApiService = usePolkadotApiService();
+	const { apiService } = usePolkadotApiService();
 
 	const isInvalidAmount = useMemo(() => {
 		return (
@@ -43,13 +43,13 @@ function VoteReferendum({ index }: { index: string }) {
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
 
 	const onVoteConfirm = async () => {
-		if (!polkadotApiService || !userPreferences.address?.address) return;
+		if (!apiService || !userPreferences.address?.address) return;
 
 		if (isInvalidAmount) return;
 
 		try {
 			setIsLoading(true);
-			await polkadotApiService.voteReferendum({
+			await apiService.voteReferendum({
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
 					console.log('Vote successful');

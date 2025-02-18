@@ -1,0 +1,68 @@
+.Card {
+    @apply py-4 md:py-6 rounded-3xl h-[122px] flex justify-center items-center;
+    background: linear-gradient(357.71deg, #262323 31.71%, #1D2182 136.54%);
+}
+
+.tableRow {
+    @apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+}
+
+.tableRow_user {
+    @apply bg-leaderboard_usercard_bg border-y border-leaderboard_usercard_border text-btn_secondary_text;
+}
+
+.tableCell_1 {
+    @apply p-4 first:rounded-tl-lg last:rounded-tr-lg
+}
+
+.tableCell_last {
+    @apply p-4 last:rounded-tr-lg
+}
+
+.tableCell_3 {
+    @apply px-6 py-5;
+}
+
+.tableCell_2 {
+    @apply w-1/4 px-6 py-5;
+}
+
+.tableCell {
+    @apply p-4;
+}
+
+.tableContentCell_last {
+    @apply p-4 flex items-center gap-3 mt-3
+}
+
+.table_content_cell {
+    @apply flex items-center gap-3 mt-3 min-w-44
+}
+
+.table_content_cell_1 {
+    @apply cursor-pointer text-base text-wallet_btn_text;
+}
+
+.table_content_cell_2 {
+    @apply flex items-center gap-3 mt-3;
+}
+
+.table_content_cell_2_content {
+    @apply rounded-lg bg-wallet_disabled_bg px-2 py-1;
+}
+
+.input_container {
+    @apply h-10 w-72 overflow-x-auto pr-12;
+}
+
+.input_search {
+    @apply -translate-y-1/2 h-8 absolute right-2 top-4 cursor-pointer border-l border-border_grey pl-1 text-2xl text-gray-500;
+}
+
+.rankStar {
+    @apply flex w-20 max-w-28 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium;
+}
+
+.rankCardText {
+    @apply m-0 flex justify-center text-base font-semibold text-rank_card_text;
+}

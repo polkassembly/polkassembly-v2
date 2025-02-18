@@ -8,6 +8,8 @@ import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/t
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { OutputData } from '@editorjs/editorjs';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { canVote } from '@/_shared/_utils/canVote';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -25,6 +27,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const onEditPostSuccess = (title: string, content: OutputData) => {
 		setPost((prev) => ({ ...prev, title, content }));
 	};
+
+	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post.proposalType);
 
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
@@ -45,7 +49,11 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							/>
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.TIMELINE}>
-							<Timeline timeline={postData?.onChainInfo?.timeline} />
+							<Timeline
+								proposalType={postData?.proposalType}
+								timeline={postData?.onChainInfo?.timeline}
+								createdAt={postData?.createdAt}
+							/>
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
 							<OnchainInfo
@@ -55,11 +63,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							/>
 						</TabsContent>
 					</div>
-					{isModalOpen && (
-						<div className='pt-5'>
-							{' '}
-							<VoteReferendumButton index={index} />
-						</div>
+					{isModalOpen && !isOffchainPost && (
+						<div className='pt-5'>{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}</div>
 					)}
 					{!isModalOpen && (
 						<div className={classes.commentsBox}>
@@ -70,9 +75,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</div>
 					)}
 				</div>
-				{!isModalOpen && (
+				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>
-						<VoteReferendumButton index={index} />
+						{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}
 						<ProposalPeriods
 							confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}

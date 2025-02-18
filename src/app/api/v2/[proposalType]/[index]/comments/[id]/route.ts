@@ -17,6 +17,7 @@ import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertCo
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { AIService } from '@/app/api/_api-services/ai_service';
 
 const zodParamsSchema = z.object({
 	id: z.string(),
@@ -36,6 +37,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	return NextResponse.json(comment);
 });
 
+// update comment
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string; proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { id, proposalType, index } = zodParamsSchema.parse(await params);
 
@@ -69,13 +71,15 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		content: formattedContent
 	});
 
-	// Invalidate caches since comment content changed
 	const network = await getNetworkFromHeaders();
 
+	await AIService.UpdatePostCommentsSummary({ network, proposalType: comment.proposalType, indexOrHash: comment.indexOrHash, newCommentId: comment.id });
+
+	// Invalidate caches since comment content changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network });
-
+	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 	const response = NextResponse.json({ message: 'Comment updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
@@ -83,6 +87,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	return response;
 });
 
+// delete comment
 export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string; proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { id, proposalType, index } = zodParamsSchema.parse(await params);
 
@@ -104,11 +109,15 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 
 	await OffChainDbService.DeleteComment(id);
 
-	// Invalidate caches since comment was deleted
 	const network = await getNetworkFromHeaders();
+
+	await AIService.UpdatePostCommentsSummary({ network, proposalType: comment.proposalType, indexOrHash: comment.indexOrHash });
+
+	// Invalidate caches since comment was deleted
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network });
+	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
 	const response = NextResponse.json({ message: 'Comment deleted successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

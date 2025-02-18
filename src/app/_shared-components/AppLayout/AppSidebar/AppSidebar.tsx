@@ -5,8 +5,6 @@
 'use client';
 
 import Image from 'next/image';
-import React from 'react';
-import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
@@ -19,56 +17,59 @@ import Foot1 from '@assets/sidebar/foot1.svg';
 import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
-import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useUser } from '@/hooks/useUser';
+import { ComponentProps } from 'react';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
 
-function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const t = useTranslations();
-	const { resolvedTheme: theme } = useTheme();
 	const pathname = usePathname();
+	const { user } = useUser();
 
 	const network = getCurrentNetwork();
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
-		if (theme === ETheme.LIGHT) {
-			return <PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />;
-		}
-		if (state === 'expanded') {
-			return (
-				<Image
-					src={PaLogoDark}
-					alt='Polkassembly Logo'
-				/>
-			);
-		}
-		return <PaLogo variant='compact' />;
+		return (
+			<>
+				<div className={state === 'expanded' ? 'dark:hidden' : ''}>
+					<PaLogo variant={state === 'collapsed' ? 'compact' : 'full'} />
+				</div>
+				<div className={`${state === 'expanded' ? 'hidden dark:block' : 'hidden'}`}>
+					<Image
+						src={PaLogoDark}
+						alt='Polkassembly Logo'
+					/>
+				</div>
+			</>
+		);
 	};
 
-	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (
+	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[], gridName: 'header' | 'footer') => (
 		<DynamicImageGrid
 			items={data}
 			rowSize={2}
 			tooltipPosition='top'
 			isExpanded={state === 'expanded'}
+			gridName={gridName}
 		/>
 	);
 	const data = getSidebarData(network, pathname, t);
 
 	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
-		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard') },
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity'), url: user?.id ? '/set-identity' : '/login?nextUrl=set-identity' },
+		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard'), url: '/leaderboard' },
 		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation') },
-		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile') }
+		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile'), url: user?.id ? `/user/${user.id}` : '/login' }
 	];
 
 	const bgColor = 'bg-sidebar_footer';
@@ -85,12 +86,17 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			{...props}
 		>
 			<SidebarHeader>
-				<div className={styles.sidebar_logo}>{getLogo()}</div>
+				<Link
+					href='/'
+					className={styles.sidebar_logo}
+				>
+					{getLogo()}
+				</Link>
 			</SidebarHeader>
 
 			<hr className='text-border_grey' />
 
-			<div className='mt-5'>{generateGridData(headerData)}</div>
+			<div className='mt-5'>{generateGridData(headerData, 'header')}</div>
 
 			<div className='px-4'>
 				<CreateProposalDropdownButton state={state} />
@@ -121,7 +127,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					</Link>
 				)}
 
-				{generateGridData(footerData)}
+				{generateGridData(footerData, 'footer')}
 			</SidebarFooter>
 		</Sidebar>
 	);

@@ -45,7 +45,7 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					iconSize={iconSize}
 				/>
 
-				<p className={cn(styles.displaytext, 'text-xs font-medium lg:text-sm', textClassName)}>{addressDisplayText}</p>
+				<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
 			</Link>
 		</div>
 	);

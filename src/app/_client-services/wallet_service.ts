@@ -10,28 +10,35 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { PolkadotApiService } from './polkadot_api_service';
+import { IdentityService } from './identity_service';
 
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
 
 	private apiService: PolkadotApiService;
 
+	private identityService?: IdentityService;
+
 	private readonly network: ENetwork;
 
-	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork) {
+	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork, identityService?: IdentityService) {
 		this.network = network;
 		this.injectedWindow = injectedWindow;
 		this.apiService = apiService;
+		this.identityService = identityService;
 	}
 
-	static async Init(network: ENetwork, apiService: PolkadotApiService) {
+	static async Init(network: ENetwork, apiService: PolkadotApiService, identityService?: IdentityService) {
 		// Todo: wait for doc ready. (async)
 		const returnWalletService = async () => {
 			const injectedWindow = window as Window & InjectedWindow;
 
 			await apiService.apiReady();
+			if (identityService) {
+				await identityService.ready();
+			}
 
-			return new WalletClientService(injectedWindow, apiService, network);
+			return new WalletClientService(injectedWindow, apiService, network, identityService);
 		};
 
 		if (document.readyState !== 'loading') {
@@ -75,9 +82,14 @@ export class WalletClientService {
 			if (this.apiService) {
 				this.apiService.setSigner(injected.signer as Signer);
 			}
+
+			if (this.identityService) {
+				this.identityService.setSigner(injected.signer as Signer);
+			}
+
 			return await injected.accounts.get();
-		} catch (err) {
-			console.log(err);
+		} catch {
+			// TODO: show notification
 			return [];
 		}
 	}
@@ -97,7 +109,7 @@ export class WalletClientService {
 
 		const signRaw = injected && injected.signer && injected.signer.signRaw;
 		if (!signRaw) {
-			console.error('Signer not available');
+			// TODO: show notification
 			return null;
 		}
 
@@ -105,7 +117,7 @@ export class WalletClientService {
 		if (!address.startsWith('0x')) {
 			substrateAddress = getSubstrateAddress(address);
 			if (!substrateAddress) {
-				console.error('Invalid address');
+				// TODO: show notification
 				return null;
 			}
 		} else {

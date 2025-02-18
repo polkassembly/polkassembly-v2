@@ -11,5 +11,5 @@ export const DEFAULT_PROFILE_DETAILS: IProfileDetails = {
 	image: '',
 	title: '',
 	coverImage: '',
-	socialLinks: []
+	publicSocialLinks: []
 };

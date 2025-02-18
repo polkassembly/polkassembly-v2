@@ -1,0 +1,32 @@
+.originStyle {
+    @apply rounded-md px-1.5 py-1 text-xs;
+}
+
+.progressBarContainer {
+    @apply flex bg-voting_bar_bg text-white p-3 w-48 rounded-md flex-col;
+}
+
+.commentContainer {
+    @apply flex items-center gap-1;
+}
+
+.timeBarContainer {
+    @apply flex bg-voting_bar_bg text-white p-3 w-60 rounded-md flex-col;
+}
+
+.requestedAmount {
+    @apply font-medium text-text_primary text-base flex items-center gap-1 whitespace-nowrap;
+}
+
+.castVoteButton {
+    @apply flex gap-1 rounded-md border-[1px] hover:bg-progress_pink_bg border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border;
+}
+
+.beneficiaryContainer {
+    @apply flex flex-wrap gap-2 items-center;
+
+}
+
+.container {
+    @apply cursor-pointer rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg
+}

@@ -1,11 +1,35 @@
 .profileHeaderWrapper {
-    @apply mb-2 flex items-start gap-x-4
+    @apply mb-4 flex items-start gap-x-6
 }
 
 .profileHeaderInner {
-    @apply flex w-full justify-between
+    @apply flex justify-between
 }
 
 .profileHeaderButtons {
     @apply flex items-center gap-x-2
+}
+
+.rankBadge {
+    @apply border-border_blue bg-bg_blue absolute -bottom-2 left-[50%] w-max -translate-x-1/2 rounded-[100px] border-2 px-3 shadow-[0px_1px_12px_0px_#201047_inset]
+}
+
+.rankBadgeText {
+    @apply text-xs font-semibold text-white
+}
+
+.profileHeaderText {
+    @apply flex flex-col gap-y-4
+}
+
+.profileHeaderTextTitle {
+    @apply text-lg font-semibold lg:text-2xl
+}
+
+.profileHeaderTextSince {
+    @apply flex items-center gap-x-1 text-sm text-wallet_btn_text
+}
+
+.profileHeaderTextFollowing {
+    @apply flex items-center gap-x-1 text-sm text-wallet_btn_text
 }

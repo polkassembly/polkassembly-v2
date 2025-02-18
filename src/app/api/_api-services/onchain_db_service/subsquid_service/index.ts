@@ -24,6 +24,7 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -114,7 +115,8 @@ export class SubsquidService extends SubsquidUtils {
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 			confirmationPeriodEndsAt: allPeriodEnds?.confirmationPeriodEnd ?? undefined,
-			timeline: proposal.statusHistory as IStatusHistoryItem[]
+			timeline: proposal.statusHistory as IStatusHistoryItem[],
+			preimageArgs: proposal.preimage?.proposedCall?.args
 		};
 	}
 
@@ -226,7 +228,8 @@ export class SubsquidService extends SubsquidUtils {
 					hash: proposal.hash || '',
 					voteMetrics: voteMetrics[Number(index)],
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
-					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined
+					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
+					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
 				});
 			}
 		);
@@ -377,5 +380,29 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return subsquidData.preimages[0] as IPreimage;
+	}
+
+	static async GetActiveVotedProposalsCount({
+		addresses,
+		network
+	}: {
+		addresses: string[];
+		network: ENetwork;
+	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ACTIVE_VOTED_PROPOSALS_COUNT;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain active voted proposals count from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain active voted proposals count from Subsquid');
+		}
+
+		return {
+			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
+			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
+		};
 	}
 }

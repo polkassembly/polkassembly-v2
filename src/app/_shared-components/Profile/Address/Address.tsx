@@ -28,22 +28,25 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
+	const [displayText, setDisplayText] = useState<string>(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
 	const fetchIdentity = async () => {
+		setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 		try {
 			const identityInfo = await getOnChainIdentity(encodedAddress);
 			setIdentity(identityInfo);
-		} catch {
-			// console.error('Error fetching identity:', error);
+			if (identityInfo?.display) {
+				setDisplayText(identityInfo?.display);
+			}
+		} catch (error) {
+			console.error('Error fetching identity:', error);
 		}
 	};
 
 	useEffect(() => {
 		fetchIdentity();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [encodedAddress, network]);
-
-	const displayText = identity?.display || walletAddressName || shortenAddress(encodedAddress, truncateCharLen);
+	}, [encodedAddress, network, getOnChainIdentity]);
 
 	return (
 		<div>

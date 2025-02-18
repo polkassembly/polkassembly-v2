@@ -1,0 +1,44 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import React from 'react';
+import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
+import Image from 'next/image';
+import { EReaction } from '@/_shared/types';
+import LikeGif from '@assets/reactions/Liked-Colored.gif';
+import { useTranslations } from 'next-intl';
+import styles from './ReactionButton.module.scss';
+
+function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction; isActive: boolean; showGif: boolean; onClick: () => void }) {
+	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
+	const t = useTranslations();
+
+	return (
+		<button
+			className='relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110'
+			onClick={onClick}
+			type='button'
+		>
+			<div className='relative mr-1 w-[24px]'>
+				{showGif ? (
+					<div className={type === EReaction.like ? styles.likeGifContainer : styles.dislikeGifContainer}>
+						<Image
+							src={LikeGif}
+							alt={`${type} Animation`}
+							width={24}
+							className='h-10 w-10'
+							height={24}
+							style={type === EReaction.dislike ? { transform: 'scaleY(-1)' } : undefined}
+						/>
+					</div>
+				) : (
+					<Icon className={`${styles.activity_icons} text-lg text-bg_pink`} />
+				)}
+			</div>
+			<span className='text-bg_pink'>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
+		</button>
+	);
+}
+
+export default ReactionButton;

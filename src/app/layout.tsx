@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 	description: 'Polkassembly but so much better'
 };
 
-export const fontDmSans = dmSans({
+const fontDmSans = dmSans({
 	adjustFontFallback: false,
 	display: 'swap',
 	style: ['italic', 'normal'],
@@ -39,8 +39,10 @@ export default async function RootLayout({
 	const user = await CookieService.getUserFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
 
-	const messages = await getMessages();
 	const locale = await getLocale();
+	const messages = await getMessages({
+		locale
+	});
 
 	return (
 		<html
@@ -49,7 +51,14 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
-				<NextTopLoader color={THEME_COLORS.light.navbar_border} />
+				<NextTopLoader
+					color={THEME_COLORS.light.navbar_border}
+					initialPosition={0.55}
+					crawlSpeed={100}
+					speed={300}
+					showSpinner={false}
+					height={1}
+				/>
 				<Initializers
 					userData={user || null}
 					userPreferences={userPreferences}
@@ -57,6 +66,7 @@ export default async function RootLayout({
 				<Providers
 					messages={messages}
 					locale={locale}
+					userPreferences={userPreferences}
 				>
 					{modal}
 					<AppLayout>{children}</AppLayout>

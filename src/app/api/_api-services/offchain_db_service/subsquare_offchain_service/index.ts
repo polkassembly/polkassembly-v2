@@ -6,11 +6,12 @@
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IContentSummary, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
 import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -45,24 +46,25 @@ export class SubsquareOffChainService {
 				return null;
 			}
 
-			if (!data) {
-				return null;
-			}
-
 			let title = data?.title || '';
 
 			if (title.includes('Untitled')) {
 				title = '';
 			}
 
-			if (title && title.includes('[Root] Referendum #')) {
-				title = title.replace(/\[Root\] Referendum #\d+: /, '');
+			if (title && title.includes('[')) {
+				title = title.replace(/\[[^\]]*\] Referendum #\d+: /, '');
 			}
 
-			const content = data?.content || getDefaultPostContent(proposalType, data?.proposer);
-			const editorJsContent = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+			let content = data?.content;
 
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(editorJsContent);
+			if (!content) {
+				content = getDefaultPostContent(proposalType, data?.proposer);
+			} else {
+				content = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+			}
+
+			const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 			if (!title && !content) {
 				return null;
@@ -73,7 +75,7 @@ export class SubsquareOffChainService {
 				index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
 				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 				title: title || DEFAULT_POST_TITLE,
-				content: editorJsContent,
+				content,
 				htmlContent: html,
 				markdownContent: markdown,
 				createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
@@ -138,9 +140,10 @@ export class SubsquareOffChainService {
 					userId: publicUser?.id ?? 0,
 					user: publicUser ?? {
 						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
-						id: 0,
+						id: -1,
 						username: '',
-						profileScore: 0
+						profileScore: 0,
+						profileDetails: DEFAULT_PROFILE_DETAILS
 					},
 					createdAt: new Date(comment.createdAt),
 					updatedAt: new Date(comment.updatedAt),
@@ -177,5 +180,33 @@ export class SubsquareOffChainService {
 			},
 			comments: await this.GetPostComments({ network, indexOrHash, proposalType }).then((comments) => comments.length)
 		};
+	}
+
+	static async GetContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
+		const mappedUrl = this.postDetailsUrlMap[proposalType as keyof typeof this.postDetailsUrlMap]?.(indexOrHash, network);
+
+		if (!mappedUrl) {
+			return null;
+		}
+
+		try {
+			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
+
+			if (!data || !data?.contentSummary?.summary) {
+				return null;
+			}
+
+			return {
+				id: '',
+				network,
+				proposalType,
+				indexOrHash,
+				postSummary: data.contentSummary.summary,
+				createdAt: data.contentSummary.postUpdatedAt ? new Date(data.contentSummary.postUpdatedAt) : new Date(),
+				updatedAt: data.contentSummary.postUpdatedAt ? new Date(data.contentSummary.postUpdatedAt) : new Date()
+			};
+		} catch {
+			return null;
+		}
 	}
 }

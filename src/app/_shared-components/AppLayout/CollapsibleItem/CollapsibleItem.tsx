@@ -8,8 +8,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { ETheme } from '@/_shared/types';
-import { useTheme } from 'next-themes';
 import { useTranslations } from 'next-intl';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
@@ -28,9 +26,9 @@ interface ISidebarMenuItem {
 
 type State = 'collapsed' | 'expanded';
 
-const DARK_THEME_CLASS = 'dark-icons';
 const SELECTED_ICON_CLASS = style.sidebar_selected_icon;
 const NEW_BADGE_TEXT = 'Sidebar.Tag.new';
+const DARK_ICON_CLASS = style.darkIcon;
 
 function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
@@ -74,10 +72,11 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 													alt={subItem.title || 'icon'}
 													width={24}
 													height={24}
+													className={DARK_ICON_CLASS}
 												/>
 											</div>
 										)}
-										<span>{subItem.title}</span>
+										<span className='text-sidebar_title'>{subItem.title}</span>
 									</span>
 									{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 								</Link>
@@ -92,7 +91,6 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 
 function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 	const [isNestedOpen, setIsNestedOpen] = useState(false);
-	const { resolvedTheme: theme } = useTheme();
 
 	return (
 		<Collapsible
@@ -135,7 +133,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 												<Image
 													src={subItem.icon}
 													alt={subItem.title || 'icon'}
-													className={`${subItem.isActive ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !subItem.isActive ? DARK_THEME_CLASS : ''}`}
+													className={`${subItem.isActive ? SELECTED_ICON_CLASS : DARK_ICON_CLASS}`}
 													width={20}
 													height={20}
 												/>
@@ -154,7 +152,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 	);
 }
 
-function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme }) {
+function CollapsedState({ item }: { item: ISidebarMenuItem }) {
 	const t = useTranslations();
 	return (
 		<SidebarMenuItem>
@@ -178,7 +176,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 										<Image
 											src={item.icon}
 											alt={item.title || 'icon'}
-											className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
+											className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : DARK_ICON_CLASS}`}
 											width={24}
 											height={24}
 										/>
@@ -209,7 +207,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 														<Image
 															src={subItem.icon}
 															alt={subItem.title || 'icon'}
-															className={`${theme === ETheme.DARK ? DARK_THEME_CLASS : ''}`}
+															className={DARK_ICON_CLASS}
 															width={24}
 															height={24}
 														/>
@@ -230,7 +228,7 @@ function CollapsedState({ item, theme }: { item: ISidebarMenuItem; theme: ETheme
 	);
 }
 
-function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMenuItem; isOpen: boolean; theme: ETheme; onClick?: () => void }) {
+function CollapsibleButton({ item, isOpen, onClick }: { item: ISidebarMenuItem; isOpen: boolean; onClick?: () => void }) {
 	const t = useTranslations();
 	return (
 		<SidebarMenuButton
@@ -244,7 +242,7 @@ function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMen
 					<Image
 						src={item.icon}
 						alt={item.title || 'icon'}
-						className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : ''} ${theme === ETheme.DARK && !item.isActive && !item.items?.some((subItem) => subItem.isActive) ? DARK_THEME_CLASS : ''}`}
+						className={`${item.isActive || item.items?.some((subItem) => subItem.isActive) ? SELECTED_ICON_CLASS : DARK_ICON_CLASS}`}
 						width={24}
 						height={24}
 					/>
@@ -263,7 +261,7 @@ function CollapsibleButton({ item, isOpen, theme, onClick }: { item: ISidebarMen
 	);
 }
 
-function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void; theme: ETheme }) {
+function ExpandedState({ item, isOpen, setIsOpen }: { item: ISidebarMenuItem; isOpen: boolean; setIsOpen: (open: boolean) => void }) {
 	const handleClick = () => {
 		if (item.items) {
 			setIsOpen(!isOpen);
@@ -282,7 +280,6 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 						<CollapsibleButton
 							item={item}
 							isOpen={isOpen}
-							theme={theme}
 							onClick={handleClick}
 						/>
 					) : (
@@ -290,7 +287,6 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 							<CollapsibleButton
 								item={item}
 								isOpen={isOpen}
-								theme={theme}
 							/>
 						</Link>
 					)}
@@ -328,20 +324,14 @@ function ExpandedState({ item, isOpen, setIsOpen, theme }: { item: ISidebarMenuI
 
 function CollapsibleItem({ item, state }: { item: ISidebarMenuItem; state: State }) {
 	const [isOpen, setIsOpen] = useState(false);
-	const { resolvedTheme } = useTheme();
-	const theme = resolvedTheme as ETheme;
 
 	return state === 'collapsed' ? (
-		<CollapsedState
-			item={item}
-			theme={theme}
-		/>
+		<CollapsedState item={item} />
 	) : (
 		<ExpandedState
 			item={item}
 			isOpen={isOpen}
 			setIsOpen={setIsOpen}
-			theme={theme}
 		/>
 	);
 }

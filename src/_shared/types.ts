@@ -31,8 +31,8 @@ export interface ITrackCounts {
 }
 
 export interface IUserSocialDetails {
-	type: ESocial;
-	link: string;
+	platform: ESocial;
+	url: string;
 }
 
 export enum EUserBadge {
@@ -48,8 +48,7 @@ export enum EUserBadge {
 
 export interface IUserBadgeDetails {
 	name: EUserBadge;
-	check: boolean;
-	unlockedAt: string;
+	unlockedAt: Date;
 }
 
 export interface IProfileDetails {
@@ -57,9 +56,9 @@ export interface IProfileDetails {
 	badges?: string[];
 	title?: string;
 	image?: string;
-	socialLinks?: IUserSocialDetails[];
+	publicSocialLinks?: IUserSocialDetails[];
 	coverImage?: string;
-	achievementBadges: IUserBadgeDetails[];
+	achievementBadges?: IUserBadgeDetails[];
 }
 
 export interface IUserTFADetails {
@@ -128,10 +127,12 @@ export interface IUser {
 
 export interface IPublicUser {
 	id: number;
+	createdAt?: Date;
 	username: string;
 	profileScore: number;
 	addresses: string[];
 	rank: number;
+	profileDetails: IProfileDetails;
 }
 
 export interface IAuthResponse {
@@ -243,7 +244,7 @@ export enum ELocales {
 	ENGLISH = 'en',
 	CHINESE = 'zh',
 	GERMAN = 'de',
-	JAPANESE = 'jp'
+	JAPANESE = 'ja'
 }
 
 export enum ECookieNames {
@@ -303,6 +304,35 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
+export interface IContentSummary {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	indexOrHash: string;
+	postSummary?: string;
+	commentsSummary?: string;
+	isSpam?: boolean;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+export enum EOffChainPostTopic {
+	GENERAL = 'general',
+	AUCTION_ADMIN = 'auctionAdmin',
+	GENERAL_ADMIN = 'generalAdmin',
+	GOVERNANCE = 'governance',
+	ROOT = 'root',
+	STAKING_ADMIN = 'stakingAdmin',
+	TREASURY = 'treasury',
+	FELLOWSHIP = 'fellowship'
+}
+
+export interface ITag {
+	value: string;
+	lastUsedAt: Date;
+	network: ENetwork;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -314,7 +344,7 @@ export interface IOffChainPost {
 	markdownContent: string;
 	createdAt?: Date;
 	updatedAt?: Date;
-	tags?: string[];
+	tags?: ITag[];
 	dataSource: EDataSource;
 	proposalType: EProposalType;
 	network: ENetwork;
@@ -324,6 +354,8 @@ export interface IOffChainPost {
 	isDeleted: boolean;
 	createdOnPolkassembly?: boolean;
 	linkedPost?: IPostLink;
+	publicUser?: IPublicUser;
+	topic?: EOffChainPostTopic;
 }
 
 export enum EProposalStatus {
@@ -366,7 +398,8 @@ export enum EProposalStatus {
 	Confirmed = 'Confirmed',
 	DecisionDepositPlaced = 'DecisionDepositPlaced',
 	TimedOut = 'TimedOut',
-	Opened = 'Opened'
+	Opened = 'Opened',
+	Created = 'Created'
 }
 
 export enum EPostOrigin {
@@ -440,10 +473,13 @@ export interface IOnChainPostInfo {
 	decisionPeriodEndsAt?: Date;
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
+	preimageArgs?: Record<string, unknown>;
 }
 
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
+	publicUser?: IPublicUser;
+	userReaction?: IReaction;
 }
 
 export interface IOnChainPostListing {
@@ -458,13 +494,12 @@ export interface IOnChainPostListing {
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
+	preparePeriodEndsAt?: Date;
 }
 
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
-}
-
-export interface IActivityFeedPostListing extends IPostListing {
+	publicUser?: IPublicUser;
 	userReaction?: IReaction;
 }
 
@@ -532,6 +567,7 @@ export interface IComment {
 	isDeleted: boolean;
 	address: string | null;
 	dataSource: EDataSource;
+	isSpam?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -637,7 +673,9 @@ export enum EActivityName {
 	LINKED_ADDRESS = 'linked_address',
 	LINKED_MULTIPLE_ADDRESSES = 'linked_multiple_addresses',
 	UNLINKED_ADDRESS = 'unlinked_address',
-	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses'
+	UNLINKED_MULTIPLE_ADDRESSES = 'unlinked_multiple_addresses',
+	FOLLOWED_USER = 'followed_user',
+	UNFOLLOWED_USER = 'unfollowed_user'
 }
 
 export enum EActivityCategory {
@@ -680,6 +718,9 @@ export interface IActivityMetadata {
 
 	// for identity and link address
 	address?: string;
+
+	// for follow/unfollow
+	userId?: number;
 }
 
 export interface IUserActivity {
@@ -709,7 +750,8 @@ export interface IVoteCurve {
 export enum EProfileTabs {
 	OVERVIEW = 'overview',
 	ACTIVITY = 'activity',
-	ACCOUNTS = 'accounts'
+	ACCOUNTS = 'accounts',
+	SETTINGS = 'settings'
 }
 
 export interface IPreimage {
@@ -737,4 +779,50 @@ export interface IQRSessionPayload {
 	sessionId: string;
 	timestamp: number;
 	expiresIn: number;
+}
+
+export enum EAppEnv {
+	PRODUCTION = 'production',
+	DEVELOPMENT = 'development'
+}
+
+export interface IFollowEntry {
+	id: string;
+	createdAt: Date;
+	followerUserId: number;
+	followedUserId: number;
+	updatedAt: Date;
+}
+
+export enum ESidebarState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed'
+}
+
+export enum EConvictionAmount {
+	ZERO = 0,
+	ONE = 1,
+	TWO = 2,
+	THREE = 3,
+	FOUR = 4,
+	FIVE = 5,
+	SIX = 6
+}
+
+export interface IVoteCartItem {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	userId: number;
+	postIndexOrHash: string;
+	proposalType: EProposalType;
+	network: ENetwork;
+	decision: EVoteDecision;
+	amount: {
+		abstain?: string;
+		aye?: string;
+		nay?: string;
+	};
+	conviction: EConvictionAmount;
+	title?: string;
 }

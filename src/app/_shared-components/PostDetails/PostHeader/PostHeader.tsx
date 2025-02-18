@@ -17,15 +17,15 @@ import { BN } from '@polkadot/util';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-
+import VotingProgress from '@/app/(home)/Components/VotingProgress/VotingProgress';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import Address from '@ui/Profile/Address/Address';
+import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
+import PostTags from '@ui/PostDetails/PostTags/PostTags';
+import StatusTag from '@ui/StatusTag/StatusTag';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import classes from './PostHeader.module.scss';
-import Address from '../../Profile/Address/Address';
-import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
-import PostTags from '../PostTags/PostTags';
-import StatusTag from '../../StatusTag/StatusTag';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import VotingProgress from '../../ActivityFeed/VotingProgress/VotingProgress';
 
 function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
@@ -47,6 +47,8 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
+
+	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	return (
 		<div>
@@ -79,17 +81,12 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 							/>
 						</div>
 					)}
-					<StatusTag status={postData?.onChainInfo?.status?.toLowerCase().replace(/\s+/g, '_')} />
+					{postData?.onChainInfo?.status && <StatusTag status={postData.onChainInfo.status.toLowerCase().replace(/\s+/g, '_')} />}
 				</div>
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
-						{postData?.onChainInfo?.proposer && (
-							<Address
-								truncateCharLen={4}
-								address={postData.onChainInfo?.proposer}
-							/>
-						)}
+						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
 						<Separator
 							orientation='vertical'
 							className='h-3'
@@ -125,10 +122,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 									key={`${beneficiary.amount}-${beneficiary.address}-${beneficiary.assetId}`}
 									className='flex items-center gap-x-1'
 								>
-									<Address
-										truncateCharLen={4}
-										address={beneficiary.address}
-									/>
+									<Address address={beneficiary.address} />
 									<span className='text-xs text-wallet_btn_text'>
 										({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 									</span>
@@ -147,10 +141,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 												key={beneficiary.amount}
 												className='flex items-center gap-x-1'
 											>
-												<Address
-													truncateCharLen={4}
-													address={beneficiary.address}
-												/>
+												<Address address={beneficiary.address} />
 												<span className='text-xs text-wallet_btn_text'>
 													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 												</span>
@@ -192,12 +183,14 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				>
 					{t('PostDetails.timeline')}
 				</TabsTrigger>
-				<TabsTrigger
-					className='uppercase'
-					value={EPostDetailsTab.ONCHAIN_INFO}
-				>
-					{t('PostDetails.onchainInfo')}
-				</TabsTrigger>
+				{!isOffchainPost && (
+					<TabsTrigger
+						className='uppercase'
+						value={EPostDetailsTab.ONCHAIN_INFO}
+					>
+						{t('PostDetails.onchainInfo')}
+					</TabsTrigger>
+				)}
 			</TabsList>
 		</div>
 	);

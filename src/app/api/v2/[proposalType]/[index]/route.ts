@@ -12,25 +12,57 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, IPost } from '@shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, IOffChainPost, IOnChainPostInfo, IPost, IPublicUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { deepParseJson } from 'deep-parse-json';
+import { AIService } from '@/app/api/_api-services/ai_service';
+
+const SET_COOKIE = 'Set-Cookie';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
 	index: z.string()
 });
 
+async function handleOffChainPost(network: string, proposalType: string, index: string, offChainPostData: IOffChainPost) {
+	if (!offChainPostData) {
+		throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
+	}
+
+	let postData = offChainPostData;
+	if (offChainPostData.userId && ValidatorService.isValidUserId(Number(offChainPostData.userId || -1))) {
+		const publicUser = await OffChainDbService.GetPublicUserById(offChainPostData.userId);
+		if (publicUser) {
+			postData = { ...offChainPostData, publicUser };
+		}
+	}
+
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(postData) });
+	return postData;
+}
+
+async function getPublicUser(onChainPostInfo: IOnChainPostInfo, offChainPostData: IOffChainPost) {
+	let publicUser: IPublicUser | null = null;
+
+	if (onChainPostInfo.proposer && ValidatorService.isValidWeb3Address(onChainPostInfo.proposer)) {
+		publicUser = await OffChainDbService.GetPublicUserByAddress(onChainPostInfo.proposer);
+	}
+
+	if (!publicUser && offChainPostData.userId && ValidatorService.isValidUserId(Number(offChainPostData.userId || -1))) {
+		publicUser = await OffChainDbService.GetPublicUserById(offChainPostData.userId);
+	}
+
+	return publicUser;
+}
+
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
-
 	const network = await getNetworkFromHeaders();
 
-	// Try to get from cache first
 	const cachedData = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 	if (cachedData) {
 		return NextResponse.json(deepParseJson(cachedData));
@@ -40,24 +72,16 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	// if is off-chain post just return the offchain post data
 	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
-		if (!offChainPostData) {
-			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
-		}
-
-		// Cache the response
-		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(offChainPostData) });
-
-		return NextResponse.json(offChainPostData);
+		return NextResponse.json(await handleOffChainPost(network, proposalType, index, offChainPostData));
 	}
 
-	// is on-chain post
+	// if is on-chain post
 	const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
-
 	if (!onChainPostInfo) {
 		throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
 	}
 
-	const post: IPost = {
+	let post: IPost = {
 		...offChainPostData,
 		dataSource: offChainPostData?.dataSource || EDataSource.POLKASSEMBLY,
 		proposalType: proposalType as EProposalType,
@@ -65,10 +89,50 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		onChainInfo: onChainPostInfo
 	};
 
+	const publicUser = await getPublicUser(onChainPostInfo, offChainPostData);
+	if (publicUser) {
+		post = { ...post, publicUser };
+	}
+
+	let accessToken: string | undefined;
+	let refreshToken: string | undefined;
+
+	// if user is authenticated, fetch user reaction for the post
+	try {
+		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		accessToken = newAccessToken;
+		refreshToken = newRefreshToken;
+		const userId = accessToken ? AuthService.GetUserIdFromAccessToken(accessToken) : undefined;
+
+		if (userId) {
+			const userReaction = await OffChainDbService.GetUserReactionForPost({
+				network,
+				proposalType,
+				indexOrHash: index,
+				userId
+			});
+
+			if (userReaction) {
+				post = { ...post, userReaction };
+			}
+		}
+	} catch {
+		// do nothing
+	}
+
 	// Cache the response
 	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
 
-	return NextResponse.json(post);
+	const response = NextResponse.json(post);
+
+	if (accessToken) {
+		response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(accessToken));
+	}
+	if (refreshToken) {
+		response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(refreshToken));
+	}
+
+	return response;
 });
 
 // update post
@@ -111,13 +175,16 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		});
 	}
 
+	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
+
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
-	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
-	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 
 	return response;
 });

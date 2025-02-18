@@ -8,11 +8,12 @@ import { OFF_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/offChainProposalTyp
 import { WEB3_AUTH_SIGN_MESSAGE } from '@shared/_constants/signMessage';
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { getSubstrateAddressPublicKey } from '@shared/_utils/getSubstrateAddressPublicKey';
-import { ELocales, ENetwork, EProposalType, ETheme, EWallet } from '@shared/types';
+import { ELocales, ENetwork, EOffChainPostTopic, EProposalType, ETheme, EVoteDecision, EWallet } from '@shared/types';
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 import { OutputData } from '@editorjs/editorjs';
+import { BN } from '@polkadot/util';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -225,5 +226,55 @@ export class ValidatorService {
 
 	static isValidNumber(number: unknown): boolean {
 		return number !== null && number !== undefined && Number.isFinite(Number(number));
+	}
+
+	static isUrl(url: string): boolean {
+		return validator.isURL(url);
+	}
+
+	static isValidTag(tag: string): boolean {
+		return tag.length > 0 && typeof tag === 'string';
+	}
+
+	static isValidOffChainPostTopic(topic: string): boolean {
+		return Object.values(EOffChainPostTopic).includes(topic as EOffChainPostTopic);
+	}
+
+	static isValidVoteAmount(amount: string): boolean {
+		try {
+			const bnAmount = new BN(amount);
+			return bnAmount.gte(new BN(0));
+		} catch {
+			return false;
+		}
+	}
+
+	static isValidVoteAmountsForDecision(amount: { abstain?: string; aye?: string; nay?: string }, decision: EVoteDecision): boolean {
+		try {
+			if (decision === EVoteDecision.AYE && !this.isValidVoteAmount(amount.aye || '-1')) {
+				throw new Error();
+			}
+
+			if (decision === EVoteDecision.NAY && !this.isValidVoteAmount(amount.nay || '-1')) {
+				throw new Error();
+			}
+
+			// abstain requires all three amounts
+			if (
+				decision === EVoteDecision.ABSTAIN &&
+				(!this.isValidVoteAmount(amount.abstain || '-1') || !this.isValidVoteAmount(amount.aye || '-1') || !this.isValidVoteAmount(amount.nay || '-1'))
+			) {
+				throw new Error();
+			}
+
+			// split requires aye or nay
+			if (decision === EVoteDecision.SPLIT && (!this.isValidVoteAmount(amount.aye || '-1') || !this.isValidVoteAmount(amount.nay || '-1'))) {
+				throw new Error();
+			}
+
+			return true;
+		} catch {
+			return false;
+		}
 	}
 }

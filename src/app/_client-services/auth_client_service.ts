@@ -5,6 +5,7 @@
 import { EWallet } from '@/_shared/types';
 import { NextApiClientService } from './next_api_client_service';
 import { CookieClientService } from './cookie_client_service';
+import { LocalStorageClientService } from './local_storage_client_service';
 
 export class AuthClientService extends NextApiClientService {
 	static async refreshAccessToken() {
@@ -66,5 +67,10 @@ export class AuthClientService extends NextApiClientService {
 		onLogout?.();
 		CookieClientService.deleteAccessToken();
 		CookieClientService.deleteRefreshToken();
+		LocalStorageClientService.logout();
+	}
+
+	static async linkAddress({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
+		return this.linkAddressApi({ address, signature, wallet });
 	}
 }

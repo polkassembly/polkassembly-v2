@@ -1,0 +1,67 @@
+.overview {
+	@apply grid grid-cols-1 lg:grid-cols-3 gap-4
+}
+
+.overviewCard {
+	@apply rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal p-4 shadow-lg
+}
+
+.overviewCardHeader {
+	@apply flex items-center justify-between
+}
+
+.overviewCardHeaderTitle {
+	@apply text-2xl font-semibold
+}
+
+.onchainIdentityCard {
+	@apply rounded-xl bg-bg_modal px-5 py-6
+}
+
+.onchainIdentityCardHeader {
+	@apply mb-4 flex items-center justify-between
+}
+
+.onchainIdentityCardHeaderTitle {
+	@apply text-base font-semibold text-text_primary
+}
+
+.modal {
+	@apply max-w-xl p-6
+}
+
+.onchainIdentityCardContent {
+	@apply flex flex-col gap-y-2
+}
+
+.overviewGrid {
+	@apply col-span-2 flex flex-col gap-y-4
+}
+
+.badgesCard {
+	@apply rounded-xl bg-bg_modal px-5 py-6
+}
+
+.badgesCardHeader {
+	@apply mb-4 flex flex-col gap-y-1 text-text_primary
+}
+
+.badgesCardHeaderTitle {
+	@apply flex items-center gap-x-2 text-text_primary
+}
+
+.badgesCardContent {
+	@apply grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4
+}
+
+.badgesCardContentItem {
+	@apply flex flex-col items-center justify-between gap-y-2 rounded-xl bg-page_background py-3
+}
+
+.badgesCardContentItemTitle {
+	@apply text-xs font-semibold capitalize text-text_primary
+}
+
+.rightGrid {
+	@apply col-span-1 flex flex-col gap-y-4
+}

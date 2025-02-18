@@ -11,13 +11,16 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import {
 	EAllowedCommentor,
 	EDataSource,
+	EOffChainPostTopic,
 	EPostOrigin,
 	EProposalStatus,
 	EProposalType,
 	IGenericListingResponse,
 	IOffChainPost,
 	IOnChainPostListing,
-	IPostListing
+	IPostListing,
+	IPublicUser,
+	ITag
 } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -30,6 +33,7 @@ import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 import { RedisService } from '../../_api-services/redis_service';
+import { AIService } from '../../_api-services/ai_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -124,7 +128,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 						origin: onChainPostInfo.origin || '',
 						type: proposalType,
 						hash: onChainPostInfo.hash || post.hash || '',
-						voteMetrics: onChainPostInfo.voteMetrics
+						voteMetrics: onChainPostInfo.voteMetrics,
+						preparePeriodEndsAt: onChainPostInfo.preparePeriodEndsAt
 					}
 				: undefined;
 			return {
@@ -144,6 +149,23 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
 	}
+
+	const publicUserPromises = posts.map((post) => {
+		if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
+			return OffChainDbService.GetPublicUserById(Number(post.userId));
+		}
+		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
+			return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
+		}
+		return null;
+	});
+
+	const publicUsers = await Promise.all(publicUserPromises);
+
+	posts = posts.map((post, index) => ({
+		...post,
+		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
+	}));
 
 	const response: IGenericListingResponse<IPostListing> = {
 		items: posts,
@@ -168,10 +190,12 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
 		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
-		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
+		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
+		tags: z.array(z.custom<ITag>()).optional(),
+		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
 	});
 
-	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor, topic, tags } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
@@ -185,8 +209,12 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content: formattedContent,
 		title,
+		tags: tags || [],
+		topic: topic || EOffChainPostTopic.GENERAL,
 		allowedCommentor
 	});
+
+	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
@@ -195,6 +223,5 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
-
 	return response;
 });

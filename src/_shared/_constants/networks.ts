@@ -129,12 +129,12 @@ export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpc
 	[ENetwork.WESTEND]: {
 		rpcEndpoints: [
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://kusama-rpc.dwellir.com'
-			},
-			{
 				name: VIA_IBP_GEODNS1,
 				url: 'wss://sys.ibp.network/people-westend'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://kusama-rpc.dwellir.com'
 			},
 			{
 				name: VIA_IBP_GEODNS2,

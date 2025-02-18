@@ -7,12 +7,10 @@
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@ui/Button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/Sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
-import { ETheme } from '@/_shared/types';
 import LeftIcon from '@assets/sidebar/lefticon.svg';
 import RightIcon from '@assets/sidebar/righticon.svg';
 import { ComponentProps, createContext, CSSProperties, ElementRef, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -251,7 +249,6 @@ Sidebar.displayName = 'Sidebar';
 
 const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
 	const { toggleSidebar, state } = useSidebar();
-	const { resolvedTheme: theme } = useTheme();
 	const isMobile = useIsMobile();
 
 	return (
@@ -270,9 +267,7 @@ const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<type
 			<Image
 				src={isMobile ? RightIcon : state === 'expanded' ? LeftIcon : RightIcon}
 				alt={state === 'expanded' ? 'Collapse sidebar' : 'Expand sidebar'}
-				className={cn('h-5 w-5', {
-					'dark-icons': theme === ETheme.DARK
-				})}
+				className={cn('h-5 w-5', styles.darkIcon)}
 				width={20}
 				height={20}
 				priority

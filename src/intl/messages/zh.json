@@ -57,18 +57,21 @@
 			"loadMoreComments": "加载更多评论",
 			"showLessComments": "显示更少评论",
 			"commentingOnProposal": "正在评论提案"
-		}
+		},
+		"NoRank": "查看您的排名"
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",
-		"chooseLinkedAccount": "选择关联账户",
-		"noAccountsFound": "未找到账户，请检查权限",
+		"chooseLinkedAccount": "选择链接的账户",
+		"noAccountsFound": "未找到账户",
 		"selectWallet": "请选择钱包",
 		"fetchingAddresses": "为了获取您的地址，Polkassembly需要访问您的钱包扩展。请授权此交易。",
 		"goBack": "返回",
-		"gotIt": "明白了",
+		"gotIt": "知道了",
 		"hidePassword": "隐藏密码",
-		"showPassword": "显示密码"
+		"showPassword": "显示密码",
+		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
+		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
@@ -163,8 +166,74 @@
 			"linked_address": "链接地址",
 			"linked_multiple_addresses": "链接多个地址",
 			"unlinked_address": "取消链接地址",
-			"unlinked_multiple_addresses": "取消链接多个地址"
-		}
+			"unlinked_multiple_addresses": "取消链接多个地址",
+			"followed_user": "关注用户",
+			"unfollowed_user": "取消关注用户"
+		},
+		"overview": "概览",
+		"onchainIdentity": "链上身份",
+		"linkAddress": "链接地址",
+		"badges": "徽章",
+		"badgesDescription": "在Polkassembly中参与时解锁、接收和赚取徽章",
+		"userSince": "用户自",
+		"rank": "等级",
+		"Settings": {
+			"settings": "设置",
+			"deleteAccount": "删除账户",
+			"profileSettings": "个人资料设置",
+			"username": "用户名",
+			"edit": "编辑",
+			"editUsername": "编辑用户名",
+			"email": "电子邮件",
+			"editEmail": "编辑电子邮件",
+			"enableTfa": "启用双因素认证",
+			"enableTfaDescription": "通过双因素认证增强账户安全性。通过额外的步骤验证您的身份以获得额外的保护。",
+			"tfaAuth": "双因素认证",
+			"accountSettings": "账户设置",
+			"linkAddress": "链接地址",
+			"linkAddressDescription": "使用您的钱包地址参与治理活动",
+			"deleteAccountDescription": "请注意，此操作不可逆，所有与您的账户相关的数据将被永久删除。",
+			"deleteMyAccount": "删除我的账户",
+			"oldUsername": "旧用户名",
+			"newUsername": "新用户名",
+			"save": "保存",
+			"oldEmail": "旧电子邮件",
+			"newEmail": "新电子邮件",
+			"type": "类型",
+			"belowToConfirm": "在下方确认",
+			"TFA": {
+				"configuringGoogleAuthenticator": "配置Google Authenticator",
+				"installGoogleAuthenticator": "1. 安装Google Authenticator（iOS/Android）。",
+				"selectAddIcon": "2. 在认证应用中选择+图标。",
+				"scanQRCode": "3. 选择扫描QR码，并使用手机摄像头扫描此QR码。",
+				"scanQRCodeDescription": "扫描QR码",
+				"orEnterTheCodeToYourApp": "或将代码输入到您的应用程序（base32编码）:",
+				"verifyCode": "验证代码",
+				"verifyCodeDescription": "请输入认证代码 :",
+				"verify": "验证"
+			}
+		},
+		"edit": "编辑",
+		"editProfile": "编辑个人资料",
+		"basicInformation": "基本信息",
+		"socials": "社交",
+		"coverImage": "封面图片",
+		"uploadCover": "上传封面",
+		"profileImage": "个人资料图片",
+		"uploadProfileImageDescription": "上传1600px或以上的文件",
+		"invalidUsername": "无效的用户名",
+		"displayName": "显示名称",
+		"jobTitle": "职位",
+		"about": "关于",
+		"email": "电子邮件",
+		"twitter": "Twitter",
+		"telegram": "Telegram",
+		"riot": "Riot",
+		"discord": "Discord",
+		"saveChanges": "保存",
+		"unfollow": "取消关注",
+		"following": "关注中",
+		"followers": "粉丝"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
@@ -387,7 +456,8 @@
 		"notpassed": "未通过",
 		"started": "已开始",
 		"passed": "已通过",
-		"proposed": "已提议"
+		"proposed": "已提议",
+		"created": "已创建"
 	},
 	"Pagination": {
 		"next": "下一页",
@@ -443,5 +513,93 @@
 		"showAll": "显示全部",
 		"searchByHash": "按哈希搜索",
 		"preimageNotFound": "预映像未找到"
+	},
+	"Create": {
+		"createDiscussionTitle": "创建讨论",
+		"title": "标题",
+		"description": "描述",
+		"create": "创建",
+		"createTag": "创建标签",
+		"addTags": "添加标签",
+		"searchTags": "搜索标签",
+		"noTagsFound": "未找到标签。",
+		"selectTags": "选择标签",
+		"selectTopic": "选择主题",
+		"tagsLeftText": "剩余标签",
+		"AllowedCommentors": {
+			"title": "谁可以评论？",
+			"all": "所有",
+			"onchainVerified": "链上验证",
+			"none": "无",
+			"tooltip": "选择谁可以评论和回复此帖子"
+		},
+		"Topic": {
+			"general": "一般",
+			"auctionadmin": "拍卖管理员",
+			"generaladmin": "一般管理员",
+			"governance": "治理",
+			"root": "根",
+			"stakingadmin": "质押管理员",
+			"treasury": "国库",
+			"fellowship": "奖学金"
+		},
+		"titleTooShort": "请提供有效的标题。",
+		"titlePlaceholder": "输入标题",
+		"descriptionRequired": "请提供有效的描述。"
+	},
+	"ProposalType": {
+		"discussion": "讨论",
+		"referendum": "公投",
+		"referendumv2": "公投",
+		"councilmotion": "理事会动议",
+		"techcommitteeproposal": "技术委员会提案",
+		"treasuryproposal": "国库提案",
+		"bounty": "赏金",
+		"childbounty": "子赏金",
+		"tip": "提示",
+		"fellowshipreferendum": "奖学金公投",
+		"alliancemotion": "联盟动议",
+		"announcement": "公告",
+		"democracyproposal": "民主提案",
+		"upgradecommittee": "升级委员会",
+		"advisorycommittee": "咨询委员会",
+		"grant": "拨款",
+		"community": "社区",
+		"technicalcommittee": "技术委员会"
+	},
+	"Header": {
+		"polkadot": "波卡点＆平行链",
+		"kusama": "库萨马＆平行链",
+		"soloChains": "独立链",
+		"testChains": "测试链",
+		"switchTo": "切换到",
+		"lightMode": "亮色模式",
+		"darkMode": "暗色模式",
+		"language": "语言",
+		"node": "节点",
+		"network": "网络",
+		"searchNetworks": "搜索网络..."
+	},
+	"Leaderboard": {
+		"username": "用户名",
+		"astrals": "波卡点",
+		"userSince": "用户自",
+		"actions": "操作",
+		"leaderboard": "排行榜",
+		"findYourRank": "在生态系统中找到你的排名",
+		"searchUsername": "搜索用户名"
+	},
+	"BlockEditor": {
+		"placeholder": "输入 / 开始",
+		"errorUpdatingContent": "更新内容时出错"
+	},
+	"SetIdentity": {
+		"displayName": "显示名称",
+		"legalName": "法定名称",
+		"email": "电子邮件",
+		"twitter": "推特",
+		"matrix": "矩阵",
+		"setIdentity": "设置身份",
+		"onChainIdentity": "链上身份"
 	}
 }
