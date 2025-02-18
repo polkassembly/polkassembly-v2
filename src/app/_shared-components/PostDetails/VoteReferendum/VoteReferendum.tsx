@@ -20,7 +20,7 @@ import classes from './VoteReferendum.module.scss';
 import { Slider } from '../../Slider';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
-import NotificationToaster from '../../Toaster/PolkassemblyNotificationPrimitive';
+import NotificationToaster from '../../Toaster/NotificationToaster';
 
 function VoteReferendum({ index }: { index: string }) {
 	const { setUserPreferences, userPreferences } = useUserPreferences();

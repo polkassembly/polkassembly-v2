@@ -2,22 +2,15 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ReactNode } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
+import { NotificationStatus } from '@/_shared/types';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { IoIosCloseCircle, IoIosInformationCircle, IoIosCloseCircleOutline } from 'react-icons/io';
-import { NotificationStatus } from '@/_shared/types';
 import { MdInfoOutline } from 'react-icons/md';
 import styles from './Toaster.module.scss';
 
-interface Props {
-	header: string;
-	message?: string | ReactNode;
-	durationInSeconds?: number;
-	status: NotificationStatus;
-}
-
-export const getIconForStatus = (status: NotificationStatus) => {
+const getIconForStatus = (status: NotificationStatus) => {
 	switch (status) {
 		case NotificationStatus.SUCCESS:
 			return <FaCircleCheck className={styles.toast_success_icon} />;
@@ -36,14 +29,30 @@ export const getIconForStatus = (status: NotificationStatus) => {
 	}
 };
 
-const NotificationToaster = ({ header, message, durationInSeconds = 4.5, status }: Props) => {
-	toast({
-		title: header,
-		description: message,
-		duration: durationInSeconds * 1000,
-		status: status as NotificationStatus,
-		variant: status as NotificationStatus
-	});
-};
+export function ToastProviderWrapper() {
+	const { toasts } = useToast();
 
-export default NotificationToaster;
+	return (
+		<ToastProvider>
+			{toasts.map(({ id, title, description, status, action, ...props }) => (
+				<Toast
+					key={id}
+					{...props}
+				>
+					<div className='grid gap-2'>
+						<div className={`flex gap-2 ${description ? 'items-start' : 'items-center'}`}>
+							<span>{status && getIconForStatus(status as NotificationStatus)}</span>
+							<div className='flex flex-col gap-1'>
+								{title && <ToastTitle>{title}</ToastTitle>}
+								{description && <ToastDescription>{description}</ToastDescription>}
+							</div>
+						</div>
+					</div>
+					{action}
+					<ToastClose />
+				</Toast>
+			))}
+			<ToastViewport className='top-0' />
+		</ToastProvider>
+	);
+}
