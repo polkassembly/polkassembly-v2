@@ -21,15 +21,15 @@ export const getIconForStatus = (status: NotificationStatus) => {
 		case NotificationStatus.SUCCESS:
 			return <FaCircleCheck className='h-5 w-5 text-white' />;
 		case NotificationStatus.ERROR:
-			return <IoIosCloseCircle className='text-toast_error_text h-6 w-6' />;
+			return <IoIosCloseCircle className='h-6 w-6 text-toast_error_text' />;
 		case NotificationStatus.WARNING:
-			return <IoIosInformationCircle className='text-toast_warning_text h-6 w-6' />;
+			return <IoIosInformationCircle className='h-6 w-6 text-toast_warning_text' />;
 		case NotificationStatus.INFO:
-			return <MdInfoOutline className='text-toast_info_text h-6 w-6' />;
+			return <MdInfoOutline className='h-6 w-6 text-toast_info_text' />;
 		case NotificationStatus.WARNINGV2:
-			return <MdInfoOutline className='text-toast_warning_text h-6 w-6' />;
+			return <MdInfoOutline className='h-6 w-6 text-toast_warning_text' />;
 		case NotificationStatus.ERRORV2:
-			return <IoIosCloseCircleOutline className='text-toast_error_text h-6 w-6' />;
+			return <IoIosCloseCircleOutline className='h-6 w-6 text-toast_error_text' />;
 		default:
 			return null;
 	}
