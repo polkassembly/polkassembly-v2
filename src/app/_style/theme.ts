@@ -88,14 +88,14 @@ export const THEME_COLORS = {
 		leaderboard_usercard_bg: '#e2ebff',
 		leaderboard_usercard_border: '#486ddf',
 		pagination_border: '#CED4DE',
-		toast_error_bg: '#452626',
+		toast_error_bg: '#FBDBD9',
 		toast_error_border: '#ED4D42',
 		toast_error_text: '#F04248',
-		toast_warning_bg: '#363125',
+		toast_warning_bg: '#FEF7D1',
 		toast_warning_border: '#F7C752',
 		toast_warning_text: '#F7C752',
-		toast_info_bg: '#27323D',
-		toast_info_border: '#3288FF',
+		toast_info_bg: '#E6F4FF',
+		toast_info_border: '#91CAFF',
 		toast_info_text: '#3288FF'
 	},
 	dark: {
@@ -185,10 +185,10 @@ export const THEME_COLORS = {
 		toast_error_border: '#ED4D42',
 		toast_error_text: '#F04248',
 		toast_warning_bg: '#363125',
-		toast_warning_border: '#F7C752',
+		toast_warning_border: '#8F6F21',
 		toast_warning_text: '#F7C752',
 		toast_info_bg: '#27323D',
-		toast_info_border: '#3288FF',
+		toast_info_border: '#1677FE',
 		toast_info_text: '#3288FF'
 	}
 };

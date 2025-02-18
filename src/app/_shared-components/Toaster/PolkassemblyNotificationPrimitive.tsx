@@ -8,6 +8,7 @@ import { FaCircleCheck } from 'react-icons/fa6';
 import { IoIosCloseCircle, IoIosInformationCircle, IoIosCloseCircleOutline } from 'react-icons/io';
 import { NotificationStatus } from '@/_shared/types';
 import { MdInfoOutline } from 'react-icons/md';
+import styles from './Toaster.module.scss';
 
 interface Props {
 	header: string;
@@ -19,17 +20,17 @@ interface Props {
 export const getIconForStatus = (status: NotificationStatus) => {
 	switch (status) {
 		case NotificationStatus.SUCCESS:
-			return <FaCircleCheck className='h-5 w-5 text-white' />;
+			return <FaCircleCheck className={styles.toast_success_icon} />;
 		case NotificationStatus.ERROR:
-			return <IoIosCloseCircle className='h-6 w-6 text-toast_error_text' />;
+			return <IoIosCloseCircle className={styles.toast_error_icon} />;
 		case NotificationStatus.WARNING:
-			return <IoIosInformationCircle className='h-6 w-6 text-toast_warning_text' />;
+			return <IoIosInformationCircle className={styles.toast_warning_icon} />;
 		case NotificationStatus.INFO:
-			return <MdInfoOutline className='h-6 w-6 text-toast_info_text' />;
+			return <MdInfoOutline className={styles.toast_info_icon} />;
 		case NotificationStatus.WARNINGV2:
-			return <MdInfoOutline className='h-6 w-6 text-toast_warning_text' />;
+			return <MdInfoOutline className={styles.toast_warning_icon} />;
 		case NotificationStatus.ERRORV2:
-			return <IoIosCloseCircleOutline className='h-6 w-6 text-toast_error_text' />;
+			return <IoIosCloseCircleOutline className={styles.toast_error_icon} />;
 		default:
 			return null;
 	}
