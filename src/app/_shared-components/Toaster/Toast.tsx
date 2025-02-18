@@ -43,17 +43,19 @@ const toastVariants = cva(
 		}
 	}
 );
-const Toast = forwardRef<ElementRef<typeof ToastPrimitives.Root>, ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants>>(
-	({ className, variant, ...props }, ref) => {
-		return (
-			<ToastPrimitives.Root
-				ref={ref}
-				className={cn(toastVariants({ variant }), className)}
-				{...props}
-			/>
-		);
-	}
-);
+const Toast = forwardRef<
+	ElementRef<typeof ToastPrimitives.Root>,
+	ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants> & { status?: NotificationStatus }
+>(({ className, variant, status, ...props }, ref) => {
+	const finalVariant = status || variant;
+	return (
+		<ToastPrimitives.Root
+			ref={ref}
+			className={cn(toastVariants({ variant: finalVariant }), className)}
+			{...props}
+		/>
+	);
+});
 Toast.displayName = ToastPrimitives.Root.displayName;
 
 const ToastAction = forwardRef<ElementRef<typeof ToastPrimitives.Action>, ComponentPropsWithoutRef<typeof ToastPrimitives.Action>>(({ className, ...props }, ref) => (

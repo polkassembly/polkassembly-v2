@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
 import { NotificationStatus } from '@/_shared/types';
 import { FaCircleCheck } from 'react-icons/fa6';
@@ -37,6 +37,8 @@ export function ToastProviderWrapper() {
 			{toasts.map(({ id, title, description, status, action, ...props }) => (
 				<Toast
 					key={id}
+					status={status}
+					variant={status}
 					{...props}
 				>
 					<div className='grid gap-2'>

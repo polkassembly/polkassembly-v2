@@ -13,7 +13,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 import AddressDropdown from '../../AddressDropdown/AddressDropdown';
 import WalletButtons from '../../WalletsUI/WalletButtons/WalletButtons';
 import { Tabs, TabsList, TabsTrigger } from '../../Tabs';

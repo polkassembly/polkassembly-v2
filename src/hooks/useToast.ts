@@ -15,6 +15,7 @@ type ToasterToast = ToastProps & {
 	description?: ReactNode;
 	action?: ToastActionElement;
 	status?: NotificationStatus;
+	variant?: NotificationStatus;
 };
 
 type ActionType = {
@@ -154,6 +155,7 @@ function toast({ duration = 4.5, status, ...props }: Toast) {
 		toast: {
 			...props,
 			duration: duration * 1000,
+			status,
 			variant: status,
 			id,
 			open: true,
