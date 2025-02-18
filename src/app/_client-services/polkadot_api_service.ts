@@ -190,7 +190,8 @@ export class PolkadotApiService {
 				address,
 				errorMessageFallback: 'Failed to vote',
 				onSuccess,
-				onFailed
+				onFailed,
+				waitTillFinalizedHash: true
 			});
 		}
 	}
@@ -220,7 +221,7 @@ export class PolkadotApiService {
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
 	}) {
-		let isSuccess = false;
+		let isFailed = false;
 		if (!this.api || !tx) return;
 
 		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
@@ -251,7 +252,7 @@ export class PolkadotApiService {
 					for (const { event } of events) {
 						if (event.method === 'ExtrinsicSuccess') {
 							setStatus?.('Transaction Success');
-							isSuccess = true;
+							isFailed = false;
 							if (!waitTillFinalizedHash) {
 								// eslint-disable-next-line no-await-in-loop
 								await onSuccess(txHash);
@@ -262,7 +263,7 @@ export class PolkadotApiService {
 							console.log('Transaction failed');
 							setStatus?.('Transaction failed');
 							const dispatchError = (event.data as any)?.dispatchError;
-							isSuccess = false;
+							isFailed = true;
 
 							if (dispatchError?.isModule) {
 								const errorModule = (event.data as any)?.dispatchError?.asModule;
@@ -283,7 +284,7 @@ export class PolkadotApiService {
 					console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
 					console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
 					setIsTxFinalized?.(txHash.toString());
-					if (isSuccess && waitTillFinalizedHash) {
+					if (!isFailed && waitTillFinalizedHash) {
 						await onSuccess(txHash);
 					}
 				}

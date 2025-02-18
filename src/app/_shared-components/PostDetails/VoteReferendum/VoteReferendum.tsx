@@ -13,6 +13,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useToast } from '@/hooks/use-toast';
 import AddressDropdown from '../../AddressDropdown/AddressDropdown';
 import WalletButtons from '../../WalletsUI/WalletButtons/WalletButtons';
 import { Tabs, TabsList, TabsTrigger } from '../../Tabs';
@@ -20,7 +21,6 @@ import classes from './VoteReferendum.module.scss';
 import { Slider } from '../../Slider';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
-import { useNotificationToaster } from '../../Toaster/useNotificationToaster';
 
 function VoteReferendum({ index }: { index: string }) {
 	const { setUserPreferences, userPreferences } = useUserPreferences();
@@ -32,7 +32,7 @@ function VoteReferendum({ index }: { index: string }) {
 	const [abstainVoteValue, setAbstainVoteValue] = useState<BN>(BN_ZERO);
 	const [conviction, setConviction] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const { showNotification } = useNotificationToaster();
+	const { toast } = useToast();
 
 	const { apiService } = usePolkadotApiService();
 
@@ -54,17 +54,17 @@ function VoteReferendum({ index }: { index: string }) {
 			await apiService.voteReferendum({
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
-					showNotification({
-						header: 'Vote successful',
-						message: 'Your vote has been cast successfully',
+					toast({
+						title: 'Vote successful',
+						description: 'Your vote has been cast successfully',
 						status: NotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
 				},
 				onFailed: () => {
-					showNotification({
-						header: 'Vote failed',
-						message: 'Your vote has not been cast successfully',
+					toast({
+						title: 'Vote failed',
+						description: 'Your vote has not been cast successfully',
 						status: NotificationStatus.ERROR
 					});
 					setIsLoading(false);

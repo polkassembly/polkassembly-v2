@@ -138,7 +138,7 @@ export const reducer = (state: State, action: Action): State => {
 
 type Toast = Omit<ToasterToast, 'id'>;
 
-function toast({ ...props }: Toast) {
+function toast({ duration = 4.5, status, ...props }: Toast) {
 	const id = genId();
 
 	const update = (toastProps: ToasterToast) =>
@@ -153,6 +153,8 @@ function toast({ ...props }: Toast) {
 		type: 'ADD_TOAST',
 		toast: {
 			...props,
+			duration: duration * 1000,
+			variant: status,
 			id,
 			open: true,
 			onOpenChange: (open) => {
