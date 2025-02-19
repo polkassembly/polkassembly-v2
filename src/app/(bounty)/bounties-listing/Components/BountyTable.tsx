@@ -5,8 +5,8 @@
 import { IPostListing } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import Address from '@ui/Profile/Address/Address';
 import styles from './Bounties.module.scss';
-import Address from '@/app/_shared-components/Profile/Address/Address';
 
 function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 	return (
