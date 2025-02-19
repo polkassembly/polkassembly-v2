@@ -194,8 +194,8 @@ export class SubsquidService extends SubsquidUtils {
 
 		const posts: IOnChainPostListing[] = [];
 
-		subsquidData.proposals.forEach(
-			(
+		const postsPromises = subsquidData.proposals.map(
+			async (
 				proposal: {
 					createdAt: Date;
 					description?: string | null;
@@ -218,9 +218,25 @@ export class SubsquidService extends SubsquidUtils {
 				index: number
 			) => {
 				const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+				let childBountiesCount = 0;
 
-				posts.push({
+				// child bounties count
+				if (proposalType === EProposalType.BOUNTY) {
+					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES;
+
+					const { data } = await gqlClient
+						.query(childBountiesCountGQL, {
+							parentBountyIndex_eq: proposal.index
+						})
+						.toPromise();
+					if (data) {
+						childBountiesCount = data?.totalChildBounties?.totalCount || 0;
+					}
+				}
+
+				return {
 					createdAt: proposal.createdAt,
+					childBountiesCount: childBountiesCount || 0,
 					curator: proposal.curator,
 					description: proposal.description || '',
 					index: proposal.index,
@@ -233,9 +249,17 @@ export class SubsquidService extends SubsquidUtils {
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
-				});
+				};
 			}
 		);
+
+		const resolvedPosts = await Promise.allSettled(postsPromises);
+
+		resolvedPosts?.forEach((result) => {
+			if (result.status === 'fulfilled' && result?.value) {
+				posts.push(result.value);
+			}
+		});
 
 		return {
 			items: posts,
