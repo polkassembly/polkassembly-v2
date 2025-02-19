@@ -486,6 +486,7 @@ export interface IPost extends IOffChainPost {
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
+	childBountiesCount?: number;
 	index: number;
 	origin: string;
 	proposer: string;
@@ -830,12 +831,10 @@ export interface IVoteCartItem {
 }
 
 export interface IChildBounty {
-	index: number;
-	reward: string;
-	createdAt: Date;
-	curator: string;
-	payee: string;
-	status: EProposalStatus;
 	title: string;
 	tags: ITag[];
+	index: number;
+	proposalType: EProposalType;
+	network: ENetwork;
+	onchainInfo?: IOnChainPostListing;
 }
