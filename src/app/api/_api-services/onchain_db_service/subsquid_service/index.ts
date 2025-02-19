@@ -104,6 +104,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			createdAt: proposal.createdAt,
+			curator: proposal.curator || '',
 			proposer: proposal.proposer || '',
 			status: proposal.status,
 			index: proposal.index,

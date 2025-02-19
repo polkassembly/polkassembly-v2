@@ -13,6 +13,7 @@ export class SubsquidQueries {
 				createdAt
 				proposer
 				status
+				curator
 				description
 				origin,
 				preimage {

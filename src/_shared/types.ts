@@ -474,6 +474,7 @@ export interface IOnChainPostInfo {
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
+	curator?: string;
 }
 
 export interface IPost extends IOffChainPost {
