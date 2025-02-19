@@ -474,6 +474,7 @@ export interface IOnChainPostInfo {
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
+	curator?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -825,4 +826,15 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+}
+
+export interface IChildBounty {
+	index: number;
+	reward: string;
+	createdAt: Date;
+	curator: string;
+	payee: string;
+	status: EProposalStatus;
+	title: string;
+	tags: ITag[];
 }
