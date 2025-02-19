@@ -826,3 +826,14 @@ export interface IVoteCartItem {
 	conviction: EConvictionAmount;
 	title?: string;
 }
+
+export interface IChildBounty {
+	index: number;
+	reward: string;
+	createdAt: Date;
+	curator: string;
+	payee: string;
+	status: EProposalStatus;
+	title: string;
+	tags: ITag[];
+}

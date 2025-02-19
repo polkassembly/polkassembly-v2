@@ -405,4 +405,21 @@ export class SubsquidService extends SubsquidUtils {
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
 		};
 	}
+
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { parentBountyIndex_eq: index }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
+		}
+		return {
+			childBounties: subsquidData.childBounties || [],
+			totalCount: subsquidData.totalChildBounties.totalCount || 0
+		};
+	}
 }

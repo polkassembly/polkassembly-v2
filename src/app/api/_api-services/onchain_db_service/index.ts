@@ -138,4 +138,8 @@ export class OnChainDbService {
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
 	}
+
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
+		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
+	}
 }

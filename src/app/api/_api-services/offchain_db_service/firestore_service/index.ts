@@ -41,6 +41,8 @@ import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFro
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreUtils } from './firestoreUtils';
 
+const CHUNK_SIZE = 30;
+
 export class FirestoreService extends FirestoreUtils {
 	// Read methods
 	static async GetTotalUsersCount(): Promise<number> {
@@ -1138,5 +1140,22 @@ export class FirestoreService extends FirestoreUtils {
 		if (voteCartItem.docs.length) {
 			await voteCartItem.docs[0].ref.set({ decision, amount, conviction, updatedAt: new Date() }, { merge: true });
 		}
+	}
+
+	static async GetChildBountiesByIndexes({ network, indexes, proposalType }: { network: ENetwork; indexes: number[]; proposalType: EProposalType }) {
+		const chunks = ValidatorService.getChunksOfArray({ array: indexes, chunkSize: CHUNK_SIZE });
+
+		const childBountiesDocsPromises = chunks.map((chunk) =>
+			this.postsCollectionRef().where('proposalType', '==', proposalType).where('index', 'in', chunk).where('network', '==', network).where('isDeleted', '==', false).get()
+		);
+
+		const childBountiesDocsSnapshots = await Promise.all(childBountiesDocsPromises);
+
+		const childBounties = childBountiesDocsSnapshots.flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()));
+		return childBounties?.map((childBounty) => ({
+			index: childBounty.index,
+			title: childBounty.title || '',
+			tags: childBounty.tags || []
+		}));
 	}
 }
