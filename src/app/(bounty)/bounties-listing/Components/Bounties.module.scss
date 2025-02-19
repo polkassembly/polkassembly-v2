@@ -3,7 +3,7 @@
 }
 
 .tableCell_1 {
-    @apply p-6 first:rounded-tl-lg last:rounded-tr-lg
+    @apply first:rounded-tl-lg last:rounded-tr-lg
 }
 
 .tableCell_last {
@@ -15,7 +15,7 @@
 }
 
 .tableCell {
-    @apply px-5 py-5;
+    @apply px-5 py-5 whitespace-nowrap;
 }
 
 .tableCell_status {
@@ -24,10 +24,6 @@
 
 .tableBodyRow {
     @apply overflow-hidden rounded-t-lg bg-section_dark_overlay px-6;
-}
-
-.tableCellBody_1 {
-    @apply p-6 first:rounded-bl-lg last:rounded-br-lg
 }
 
 .tableCellBody_last {
@@ -40,4 +36,8 @@
 
 .table {
     @apply table-auto w-full
+}
+
+.childBountyRow {
+    @apply bg-bounty_table_child_bg
 }

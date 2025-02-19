@@ -88,7 +88,8 @@ export const THEME_COLORS = {
 		leaderboard_usercard_bg: '#e2ebff',
 		leaderboard_usercard_border: '#486ddf',
 		pagination_border: '#CED4DE',
-		bounty_table_bg: '#f9fcfb'
+		bounty_table_bg: '#f9fcfb',
+		bounty_table_child_bg: '#fcebf5'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -173,6 +174,7 @@ export const THEME_COLORS = {
 		light_council_bg: '#4D2631',
 		listing_page_btn: '#9E9E9E',
 		pagination_border: '#4B4B4B',
-		bounty_table_bg: '#272727'
+		bounty_table_bg: '#272727',
+		bounty_table_child_bg: '#280b19'
 	}
 };

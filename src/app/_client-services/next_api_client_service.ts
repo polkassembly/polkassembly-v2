@@ -81,7 +81,8 @@ enum EApiRoute {
 	GET_FOLLOWERS = 'GET_FOLLOWERS',
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
-	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	FETCH_CHILD_BOUNTIES = 'FETCH_CHILD_BOUNTIES'
 }
 
 export class NextApiClientService {
@@ -195,6 +196,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.FETCH_CHILD_BOUNTIES:
+				path = '/Bounty';
 				break;
 			// Post-related routes (do not put any static routes below this)
 			case EApiRoute.POSTS_LISTING:
@@ -559,5 +563,13 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async fetchChildBountiesApi({ bountyIndex }: { bountyIndex: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_CHILD_BOUNTIES,
+			routeSegments: [bountyIndex.toString(), 'child-bounties']
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 }

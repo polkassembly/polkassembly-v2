@@ -55,7 +55,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 					lastUsedAt: new Date(),
 					network
 				})) ?? [],
-			onchainInfo: childBounty
+			onChainInfo: childBounty
 		};
 	});
 
