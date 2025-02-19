@@ -65,6 +65,7 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
+				curator,
 				hash,
 				preimage {
 					proposedCall {
@@ -93,6 +94,7 @@ export class SubsquidQueries {
 				proposer
 				status,
 				hash,
+				curator
 				preimage {
 					proposedCall {
 						args
@@ -127,6 +129,7 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					curator
 					status,
 					hash,
 					preimage {
@@ -171,6 +174,7 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					curator
 					status,
 					hash,
 					preimage {
@@ -208,6 +212,7 @@ export class SubsquidQueries {
 				proposer
 				status
 				hash,
+				curator
 				preimage {
 					proposedCall {
 						args
@@ -234,6 +239,7 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status
+				curator
 				hash,
 				preimage {
 					proposedCall {

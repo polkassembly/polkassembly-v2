@@ -494,6 +494,7 @@ export interface IOnChainPostListing {
 	hash: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	curator?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
 }

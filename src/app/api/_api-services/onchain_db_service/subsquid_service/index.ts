@@ -202,6 +202,7 @@ export class SubsquidService extends SubsquidUtils {
 					index: number;
 					origin: EPostOrigin;
 					proposer?: string;
+					curator?: string;
 					status?: EProposalStatus;
 					hash?: string;
 					preimage?: {
@@ -220,6 +221,7 @@ export class SubsquidService extends SubsquidUtils {
 
 				posts.push({
 					createdAt: proposal.createdAt,
+					curator: proposal.curator,
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
