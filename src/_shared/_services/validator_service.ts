@@ -277,12 +277,4 @@ export class ValidatorService {
 			return false;
 		}
 	}
-
-	static getChunksOfArray({ array, chunkSize }: { array: unknown[]; chunkSize: number }): unknown[][] {
-		const chunkedArray = [];
-		for (let i = 0; i < array.length; i += chunkSize) {
-			chunkedArray.push(array.slice(i, i + chunkSize));
-		}
-		return chunkedArray;
-	}
 }

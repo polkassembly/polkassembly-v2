@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalStatus, EProposalType, IChildBounty } from '@/_shared/types';
+import { EProposalStatus, EProposalType, IChildBounty, IGenericListingResponse } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
@@ -17,11 +17,6 @@ interface IOnchainChildBounty {
 	curator: string;
 	payee: string;
 	status: EProposalStatus;
-}
-
-interface IChildBountiesResponse {
-	totalCount: number;
-	childBounties: IChildBounty[];
 }
 
 const zodParamsSchema = z.object({
@@ -40,9 +35,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	});
 
 	if (!onchainChildBountiesInfo?.totalCount) {
-		return NextResponse.json<IChildBountiesResponse>({
+		return NextResponse.json<IGenericListingResponse<IChildBounty>>({
 			totalCount: 0,
-			childBounties: []
+			items: []
 		});
 	}
 
@@ -74,8 +69,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		};
 	});
 
-	return NextResponse.json<IChildBountiesResponse>({
+	return NextResponse.json<IGenericListingResponse<IChildBounty>>({
 		totalCount: onchainChildBountiesInfo.totalCount,
-		childBounties
+		items: childBounties
 	});
 });

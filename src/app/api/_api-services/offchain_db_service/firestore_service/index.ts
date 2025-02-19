@@ -39,6 +39,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { OutputData } from '@editorjs/editorjs';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { getChunksOfArray } from '@/app/api/_api-utils/getChunksOfArray';
 import { FirestoreUtils } from './firestoreUtils';
 
 const CHUNK_SIZE = 30;
@@ -1143,7 +1144,7 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async GetChildBountiesByIndexes({ network, indexes, proposalType }: { network: ENetwork; indexes: number[]; proposalType: EProposalType }) {
-		const chunks = ValidatorService.getChunksOfArray({ array: indexes, chunkSize: CHUNK_SIZE });
+		const chunks = getChunksOfArray({ array: indexes, chunkSize: CHUNK_SIZE });
 
 		const childBountiesDocsPromises = chunks.map((chunk) =>
 			this.postsCollectionRef().where('proposalType', '==', proposalType).where('index', 'in', chunk).where('network', '==', network).where('isDeleted', '==', false).get()
