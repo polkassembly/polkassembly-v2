@@ -18,6 +18,10 @@
     @apply px-5 py-5;
 }
 
+.tableCell_status {
+    @apply px-0 m-0 py-5 text-center min-w-max;
+}
+
 .tableBodyRow {
     @apply overflow-hidden rounded-t-lg bg-section_dark_overlay px-6;
 }
@@ -32,4 +36,8 @@
 
 .no_data {
     @apply text-center py-2 text-btn_secondary_text;
+}
+
+.table {
+    @apply table-auto w-full
 }

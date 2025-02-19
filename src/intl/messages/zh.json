@@ -457,7 +457,10 @@
 		"started": "已开始",
 		"passed": "已通过",
 		"proposed": "已提议",
-		"created": "已创建"
+		"created": "已创建",
+		"curatorassigned": "已分配 curator",
+		"curatorunassigned": "未分配 curator",
+		"curatorproposed": "已提议 curator"
 	},
 	"Pagination": {
 		"next": "下一页",

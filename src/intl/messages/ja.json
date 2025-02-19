@@ -457,7 +457,10 @@
 		"started": "開始",
 		"passed": "可決",
 		"proposed": "提案済み",
-		"created": "作成済み"
+		"created": "作成済み",
+		"curatorassigned": "クレジットアサイン済み",
+		"curatorunassigned": "クレジット未アサイン",
+		"curatorproposed": "クレジット提案済み"
 	},
 	"Pagination": {
 		"next": "次へ",

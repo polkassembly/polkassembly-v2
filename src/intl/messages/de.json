@@ -457,7 +457,10 @@
 		"started": "Gestartet",
 		"passed": "Bestanden",
 		"proposed": "Vorgeschlagen",
-		"created": "Erstellt"
+		"created": "Erstellt",
+		"curatorassigned": "Curator zugewiesen",
+		"curatorunassigned": "Curator nicht zugewiesen",
+		"curatorproposed": "Curator vorgeschlagen"
 	},
 	"Pagination": {
 		"next": "Weiter",

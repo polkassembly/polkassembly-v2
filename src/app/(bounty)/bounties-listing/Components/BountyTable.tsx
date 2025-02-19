@@ -6,11 +6,12 @@ import { IPostListing } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@ui/Profile/Address/Address';
+import StatusTag from '@ui/StatusTag/StatusTag';
 import styles from './Bounties.module.scss';
 
 function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 	return (
-		<Table>
+		<Table className={styles.table}>
 			<TableHeader>
 				<TableRow className={styles.tableRow}>
 					<TableHead className={styles.tableCell_1}>#</TableHead>
@@ -33,7 +34,12 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 						<TableCell className={styles.tableCell}>{item.title}</TableCell>
 						<TableCell className={styles.tableCell}>{item.dataSource}</TableCell>
 						<TableCell className={styles.tableCell}>{dayjs.utc(item.onChainInfo?.createdAt).format("DD MMM 'YY")}</TableCell>
-						<TableCell className={styles.tableCell}>{item.onChainInfo?.status}</TableCell>
+						<TableCell className={styles.tableCell_status}>
+							<StatusTag
+								className='text-center'
+								status={item.onChainInfo?.status}
+							/>
+						</TableCell>
 						<TableCell className={styles.tableCellBody_last}>{item.tags && item.tags.length > 1 ? item.tags.join(', ') : 'N/A'}</TableCell>
 					</TableRow>
 				))}
