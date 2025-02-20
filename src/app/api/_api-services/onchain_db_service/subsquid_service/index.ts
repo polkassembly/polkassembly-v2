@@ -204,6 +204,7 @@ export class SubsquidService extends SubsquidUtils {
 					proposer?: string;
 					curator?: string;
 					status?: EProposalStatus;
+					reward?: string;
 					hash?: string;
 					preimage?: {
 						proposedCall?: {
@@ -242,6 +243,7 @@ export class SubsquidService extends SubsquidUtils {
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
+					reward: proposal.reward || '',
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
