@@ -103,7 +103,7 @@ function ChildBountiesRow({
 			<TableCell className={styles.tableCell}>{childBounty.title || '-'}</TableCell>
 			<TableCell className={styles.tableCell}>
 				{childBounty.onChainInfo?.reward
-					? formatBnBalance(childBounty.onChainInfo.reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2 }, network)
+					? formatBnBalance(childBounty.onChainInfo.reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
 					: '-'}
 			</TableCell>
 			<TableCell className={styles.tableCell_createdAt}>

@@ -11,11 +11,15 @@ import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Clock } from 'lucide-react';
 import { useChildBounties } from '@/hooks/useChildBounties';
 import { useTranslations } from 'next-intl';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import styles from './Bounties.module.scss';
 import ChildBountiesRow from './ChildBountiesRow';
 
 function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 	const { expandedRows, childBounties, loading, errors, toggleRow } = useChildBounties();
+	const network = getCurrentNetwork();
+
 	const t = useTranslations();
 	return (
 		<Table className={styles.table}>
@@ -62,7 +66,11 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 							</TableCell>
 							<TableCell className={styles.tableCell}>{item.onChainInfo?.curator ? <Address address={item.onChainInfo?.curator} /> : '-'}</TableCell>
 							<TableCell className={styles.tableCell}>{item.title}</TableCell>
-							<TableCell className={styles.tableCell}>{item.dataSource}</TableCell>
+							<TableCell className={styles.tableCell}>
+								{item.onChainInfo?.reward
+									? formatBnBalance(item.onChainInfo.reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
+									: '-'}
+							</TableCell>
 							<TableCell className={styles.tableCell_createdAt}>
 								<Clock className='h-4 w-4' />
 								{dayjs.utc(item.onChainInfo?.createdAt).format("DD MMM 'YY")}
