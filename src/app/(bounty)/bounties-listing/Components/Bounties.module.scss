@@ -26,6 +26,11 @@
     @apply overflow-hidden rounded-t-lg bg-section_dark_overlay px-6;
 }
 
+
+.tableCellBody {
+    @apply first:rounded-bl-lg last:rounded-br-lg px-5 py-6
+}
+
 .tableCellBody_last {
     @apply p-6 last:rounded-br-lg
 }
@@ -40,4 +45,8 @@
 
 .childBountyRow {
     @apply bg-bounty_table_child_bg
+}
+
+.tableCell_createdAt {
+    @apply px-5 py-6 whitespace-nowrap text-wallet_btn_text flex items-center gap-1;
 }

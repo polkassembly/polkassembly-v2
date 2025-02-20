@@ -6,20 +6,17 @@ import { EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import BountiesListingPage from './Components/BountiesListingPage';
 
 async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
 	const searchParamsValue = await searchParams;
-
-	// Fix the page parameter parsing
 	const pageParam = searchParamsValue.page?.split('?')[0];
-	const page = parseInt(pageParam || '1', 10);
-	// Extract status from either the status parameter or from the page parameter (in case of malformed URL)
+	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
 	const { status: paramStatus } = searchParamsValue;
 	const [, urlStatus] = searchParamsValue.page?.includes('status=') ? searchParamsValue.page.split('status=') : [];
 	const status = paramStatus || urlStatus;
 
-	// Process statuses
 	let statuses: string[] = [];
 	if (status && status !== 'all') {
 		statuses = [status];
