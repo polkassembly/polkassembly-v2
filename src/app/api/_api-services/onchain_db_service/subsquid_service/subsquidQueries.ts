@@ -64,6 +64,7 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status,
 				curator,
 				hash,
@@ -93,6 +94,7 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
+				reward
 				hash,
 				curator
 				preimage {
@@ -129,6 +131,7 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					reward
 					curator
 					status,
 					hash,
@@ -174,6 +177,7 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					reward
 					curator
 					status,
 					hash,
@@ -210,6 +214,7 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status
 				hash,
 				curator
@@ -238,6 +243,7 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status
 				curator
 				hash,
