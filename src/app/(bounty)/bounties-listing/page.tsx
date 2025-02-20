@@ -14,7 +14,7 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 	const pageParam = searchParamsValue.page?.split('?')[0];
 	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
 	const { status: paramStatus } = searchParamsValue;
-	const [, urlStatus] = searchParamsValue.page?.includes('status=') ? searchParamsValue.page.split('status=') : [];
+	const [urlStatus] = searchParamsValue.page?.includes('status=') ? searchParamsValue.page.split('status=') : [];
 	const status = paramStatus || urlStatus;
 
 	let statuses: string[] = [];
