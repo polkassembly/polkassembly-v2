@@ -605,5 +605,23 @@
 		"matrix": "Matrix",
 		"setIdentity": "Identität festlegen",
 		"onChainIdentity": "On-Chain-Identität"
+	},
+	"Bounties": {
+		"onchainBounties": "Onchain-Prämien",
+		"createBountyProposal": "Prämie erstellen",
+		"loadingChildBounties": "Kinderprämien laden...",
+		"noChildBountiesFound": "Keine Kinderprämien gefunden",
+		"curator": "Curator",
+		"title": "Titel",
+		"amount": "Betrag",
+		"date": "Datum",
+		"status": "Status",
+		"categories": "Kategorien",
+		"all": "Alle",
+		"active": "Aktiv",
+		"proposed": "Vorgeschlagen",
+		"claimed": "Beansprucht",
+		"cancelled": "Abgebrochen",
+		"rejected": "Abgelehnt"
 	}
 }

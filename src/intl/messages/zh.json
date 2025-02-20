@@ -604,5 +604,23 @@
 		"matrix": "矩阵",
 		"setIdentity": "设置身份",
 		"onChainIdentity": "链上身份"
+	},
+	"Bounties": {
+		"onchainBounties": "链上赏金",
+		"createBountyProposal": "创建赏金提案",
+		"loadingChildBounties": "加载子赏金...",
+		"noChildBountiesFound": "未找到子赏金",
+		"curator": "赏金者",
+		"title": "标题",
+		"amount": "金额",
+		"date": "日期",
+		"status": "状态",
+		"categories": "类别",
+		"all": "全部",
+		"active": "活跃",
+		"proposed": "提议",
+		"claimed": "认领",
+		"cancelled": "取消",
+		"rejected": "拒绝"
 	}
 }

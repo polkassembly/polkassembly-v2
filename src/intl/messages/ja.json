@@ -604,5 +604,23 @@
 		"matrix": "マトリックス",
 		"setIdentity": "アイデンティティを設定",
 		"onChainIdentity": "オンチェーンアイデンティティ"
+	},
+	"Bounties": {
+		"onchainBounties": "オンチェーン報奨金",
+		"createBountyProposal": "報奨金提案を作成",
+		"loadingChildBounties": "子供の報奨金を読み込んでいます...",
+		"noChildBountiesFound": "子供の報奨金が見つかりません",
+		"curator": "クレジットアサイン者",
+		"title": "タイトル",
+		"amount": "金額",
+		"date": "日付",
+		"status": "ステータス",
+		"categories": "カテゴリ",
+		"all": "すべて",
+		"active": "アクティブ",
+		"proposed": "提案済み",
+		"claimed": "請求済み",
+		"cancelled": "キャンセル済み",
+		"rejected": "否決"
 	}
 }

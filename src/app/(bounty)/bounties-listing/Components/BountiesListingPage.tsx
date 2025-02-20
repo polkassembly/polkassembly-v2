@@ -25,22 +25,22 @@ enum EBountyStatus {
 	Rejected = 'Rejected'
 }
 
-const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
-	[EBountyStatus.All]: 'All',
-	[EBountyStatus.Active]: 'Active',
-	[EBountyStatus.Proposed]: 'Proposed',
-	[EBountyStatus.Claimed]: 'Claimed',
-	[EBountyStatus.Cancelled]: 'Cancelled',
-	[EBountyStatus.Rejected]: 'Rejected'
-};
-
 function BountiesListingPage({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pageParam = searchParams.get('page')?.split('?')[0];
-	const page = parseInt(pageParam || '1', 10);
+	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
 	const status = searchParams.get('status') || 'all';
 	const t = useTranslations();
+
+	const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
+		[EBountyStatus.All]: t('Bounties.all'),
+		[EBountyStatus.Active]: t('Bounties.active'),
+		[EBountyStatus.Proposed]: t('Bounties.proposed'),
+		[EBountyStatus.Claimed]: t('Bounties.claimed'),
+		[EBountyStatus.Cancelled]: t('Bounties.cancelled'),
+		[EBountyStatus.Rejected]: t('Bounties.rejected')
+	};
 
 	const statusValues = Object.values(EBountyStatus);
 
@@ -57,7 +57,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 	return (
 		<div>
 			<div className='flex items-center justify-between'>
-				<span className={`${spaceGroteskFont.className} text-[32px] font-bold text-btn_secondary_text`}>On-chain Bounties</span>
+				<span className={`${spaceGroteskFont.className} text-[32px] font-bold text-btn_secondary_text`}>{t('Bounties.onchainBounties')}</span>
 				<div className='flex gap-2'>
 					<button
 						type='button'
@@ -70,7 +70,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							width={15}
 							height={15}
 						/>
-						<span className='font-bold text-white'>Create Bounty Proposal</span>
+						<span className='font-bold text-white'>{t('Bounties.createBountyProposal')}</span>
 					</button>
 				</div>
 			</div>

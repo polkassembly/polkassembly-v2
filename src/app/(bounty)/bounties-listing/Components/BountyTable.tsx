@@ -10,23 +10,24 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Clock } from 'lucide-react';
 import { useChildBounties } from '@/hooks/useChildBounties';
+import { useTranslations } from 'next-intl';
 import styles from './Bounties.module.scss';
 import ChildBountiesRow from './ChildBountiesRow';
 
 function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 	const { expandedRows, childBounties, loading, errors, toggleRow } = useChildBounties();
-
+	const t = useTranslations();
 	return (
 		<Table className={styles.table}>
 			<TableHeader>
 				<TableRow className={styles.tableRow}>
 					<TableHead className={`${styles.tableCell_1} w-24 pl-10`}>#</TableHead>
-					<TableHead className={styles.tableCell_2}>Curator</TableHead>
-					<TableHead className={styles.tableCell}>Title</TableHead>
-					<TableHead className={styles.tableCell}>Amount</TableHead>
-					<TableHead className={styles.tableCell}>Date</TableHead>
-					<TableHead className={styles.tableCell}>Status</TableHead>
-					<TableHead className={styles.tableCell_last}>Categories</TableHead>
+					<TableHead className={styles.tableCell_2}>{t('Bounties.curator')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('Bounties.title')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('Bounties.amount')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('Bounties.date')}</TableHead>
+					<TableHead className={styles.tableCell}>{t('Bounties.status')}</TableHead>
+					<TableHead className={styles.tableCell_last}>{t('Bounties.categories')}</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>

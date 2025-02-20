@@ -13,6 +13,7 @@ import ChildBountiesIcon from '@assets/bounties/bountieslistingchildlevelone.svg
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '@ui/Profile/Address/Address';
+import { useTranslations } from 'next-intl';
 import ChildBountiesLevelZeroIcon from '@assets/bounties/bountieslistingchildlevelzero.svg';
 import styles from './Bounties.module.scss';
 
@@ -28,6 +29,7 @@ function ChildBountiesRow({
 	childBounties: IGenericListingResponse<IChildBounty>;
 }) {
 	const network = getCurrentNetwork();
+	const t = useTranslations();
 
 	if (loading[parentIndex as number]) {
 		return (
@@ -38,7 +40,7 @@ function ChildBountiesRow({
 				>
 					<div className='flex items-center justify-center space-x-2'>
 						<div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary' />
-						<span>Loading child bounties...</span>
+						<span>{t('Bounties.loadingChildBounties')}</span>
 					</div>
 				</TableCell>
 			</TableRow>
@@ -65,7 +67,7 @@ function ChildBountiesRow({
 					colSpan={7}
 					className='p-4 text-center'
 				>
-					No child bounties found
+					{t('Bounties.noChildBountiesFound')}
 				</TableCell>
 			</TableRow>
 		);
