@@ -625,6 +625,7 @@
 		"minimumDeposit": "Minimum Deposit",
 		"registrarFee": "Registrar Fee",
 		"totalAmountRequired": "Total Amount Required",
-		"viewAmountBreakup": "View Amount Breakup"
+		"viewAmountBreakup": "View Amount Breakup",
+		"registrarFees": "Registrar Fees"
 	}
 }

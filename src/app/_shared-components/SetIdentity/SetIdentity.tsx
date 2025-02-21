@@ -10,10 +10,11 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { getIdentityRegistrarIndex } from '@/app/_client-utils/getIdentityRegistrarIndex';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { getIdentityMinDeposit } from '@/app/_client-utils/getIdentityMinDeposit';
+import { PEOPLE_CHAIN_NETWORK_DETAILS } from '@/_shared/_constants/networks';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
@@ -44,25 +45,38 @@ function SetIdentity() {
 	const formData = useForm<ISetIdentityFormFields>();
 
 	const [loading, setLoading] = useState(false);
+	const [identityLoading, setIdentityLoading] = useState(false);
 
 	const { identityService } = useIdentityService();
 
 	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
 
-	const [txFee, setTxFee] = useState<{ bnRegisterarFee: BN; minDeposit: BN }>();
+	const [txFee, setTxFee] = useState<{ bnRegistrarFee?: BN; minDeposit: BN }>({ minDeposit: getIdentityMinDeposit(network) });
 
 	useEffect(() => {
 		const getTxFee = async () => {
-			if (!identityService || !network) return;
+			if (!identityService || !network || !userPreferences.address?.address) return;
 
-			const registerars = await identityService.getRegistrars();
-			const registerarIndex = getIdentityRegistrarIndex({ network });
-			const bnRegisterarFee = registerarIndex ? new BN(registerars?.[`${registerarIndex}`]?.fee || BN_ZERO) : BN_ZERO;
-			const minDeposit = identityService.getMinIdentityDeposit() as unknown as BN;
-			setTxFee({ bnRegisterarFee, minDeposit });
+			setIdentityLoading(true);
+			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
+
+			formData.setValue('displayName', identityInfo.display);
+			formData.setValue('legalName', identityInfo.legal);
+			formData.setValue('email', identityInfo.email);
+			formData.setValue('twitter', identityInfo.twitter);
+			formData.setValue('matrix', identityInfo.matrix);
+
+			setIdentityLoading(false);
+
+			const registrarIndex = PEOPLE_CHAIN_NETWORK_DETAILS[`${network}`].polkassemblyRegistrarIndex;
+			if (registrarIndex) {
+				const registrars = await identityService.getRegistrars();
+				const bnRegistrarFee = new BN(registrars?.[`${registrarIndex}`]?.fee);
+				setTxFee((prev) => ({ ...prev, bnRegistrarFee }));
+			}
 		};
 		getTxFee();
-	}, [identityService, network]);
+	}, [formData, identityService, network, userPreferences.address?.address]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
 		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !values.email || !identityService) return;
@@ -78,7 +92,7 @@ function SetIdentity() {
 			twitter,
 			matrix,
 			network,
-			registerarFee: txFee?.bnRegisterarFee || BN_ZERO,
+			registrarFee: txFee.bnRegistrarFee,
 			onSuccess: () => {
 				setLoading(false);
 			},
@@ -98,14 +112,16 @@ function SetIdentity() {
 			<form onSubmit={formData.handleSubmit(handleSetIdentity)}>
 				<div className='flex flex-col gap-y-4'>
 					<WalletButtons small />
-					<AddressDropdown withBalance />
+					<AddressDropdown
+						withBalance
+						disabled={identityLoading}
+					/>
 					<Separator />
 					<FormField
 						control={formData.control}
 						name='displayName'
 						key='displayName'
-						disabled={loading}
-						defaultValue=''
+						disabled={loading || identityLoading}
 						rules={{
 							required: true,
 							validate: (value) => {
@@ -131,7 +147,6 @@ function SetIdentity() {
 						name='legalName'
 						key='legalName'
 						disabled={loading}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.legalName')}</FormLabel>
@@ -157,7 +172,6 @@ function SetIdentity() {
 							},
 							required: true
 						}}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.email')}*</FormLabel>
@@ -176,7 +190,6 @@ function SetIdentity() {
 						name='twitter'
 						key='twitter'
 						disabled={loading}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.twitter')}</FormLabel>
@@ -195,7 +208,6 @@ function SetIdentity() {
 						name='matrix'
 						key='matrix'
 						disabled={loading}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.matrix')}</FormLabel>

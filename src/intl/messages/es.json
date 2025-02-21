@@ -605,6 +605,7 @@
 		"minimumDeposit": "Depósito Mínimo",
 		"registrarFee": "Tarifa del Registrador",
 		"totalAmountRequired": "Cantidad Total Requerida",
-		"viewAmountBreakup": "Ver Desglose del Monto"
+		"viewAmountBreakup": "Ver Desglose del Monto",
+		"registrarFees": "Tarifas de registro"
 	}
 }

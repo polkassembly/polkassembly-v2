@@ -605,6 +605,7 @@
 		"minimumDeposit": "最低存款",
 		"registrarFee": "注册费",
 		"totalAmountRequired": "所需总金额",
-		"viewAmountBreakup": "查看金额明细"
+		"viewAmountBreakup": "查看金额明细",
+		"registrarFees": "注册费"
 	}
 }

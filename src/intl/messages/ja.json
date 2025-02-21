@@ -605,6 +605,7 @@
 		"minimumDeposit": "最低預入額",
 		"registrarFee": "登録機関手数料",
 		"totalAmountRequired": "必要総額",
-		"viewAmountBreakup": "金額の内訳を表示"
+		"viewAmountBreakup": "金額の内訳を表示",
+		"registrarFees": "登録手数料"
 	}
 }

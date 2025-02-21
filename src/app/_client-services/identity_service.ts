@@ -9,13 +9,13 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
-import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
+import { BN, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { NETWORKS_DETAILS } from '@shared/_constants/networks';
+import { NETWORKS_DETAILS, PEOPLE_CHAIN_NETWORK_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity } from '@shared/types';
 import { deepParseJson } from 'deep-parse-json';
-import { getIdentityRegistrarIndex } from '../_client-utils/getIdentityRegistrarIndex';
+import { ISubmittableResult } from '@polkadot/types/types';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -282,7 +282,7 @@ export class IdentityService {
 		onSuccess,
 		onFailed,
 		network,
-		registerarFee
+		registrarFee
 	}: {
 		address: string;
 		displayName: string;
@@ -293,7 +293,7 @@ export class IdentityService {
 		onSuccess?: () => void;
 		onFailed?: () => void;
 		network: ENetwork;
-		registerarFee: BN;
+		registrarFee?: BN;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		const setIdentityTx = this.peopleChainApi?.tx.identity.setIdentity({
@@ -304,11 +304,17 @@ export class IdentityService {
 			matrix: { [matrix ? 'raw' : 'none']: matrix || null }
 		});
 
-		const registrarIndex = getIdentityRegistrarIndex({ network });
+		const registrarIndex = PEOPLE_CHAIN_NETWORK_DETAILS[`${network}`].polkassemblyRegistrarIndex;
 
-		const requestJudgementTx = this.peopleChainApi?.tx?.identity?.requestJudgement(registrarIndex, registerarFee.toString());
+		let tx: SubmittableExtrinsic<'promise', ISubmittableResult>;
 
-		const tx = this.peopleChainApi?.tx.utility.batchAll([setIdentityTx, requestJudgementTx]);
+		if (registrarIndex && registrarFee) {
+			const requestJudgementTx = this.peopleChainApi?.tx?.identity?.requestJudgement(registrarIndex, registrarFee.toString());
+			tx = this.peopleChainApi?.tx.utility.batchAll([setIdentityTx, requestJudgementTx]);
+		} else {
+			tx = setIdentityTx;
+		}
+
 		await this.executeTx({
 			tx,
 			address: encodedAddress,
@@ -321,10 +327,6 @@ export class IdentityService {
 				onFailed?.();
 			}
 		});
-	}
-
-	getMinIdentityDeposit() {
-		return this.peopleChainApi?.consts?.identity?.basicDeposit || BN_ZERO;
 	}
 
 	async getRegistrars() {

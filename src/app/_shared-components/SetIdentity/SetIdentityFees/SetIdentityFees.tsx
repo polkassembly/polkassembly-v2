@@ -15,7 +15,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import classes from './SetIdentityFees.module.scss';
 
-function SetIdentityFees({ txFee, onNext }: { txFee?: { bnRegisterarFee: BN; minDeposit: BN }; onNext: () => void }) {
+function SetIdentityFees({ txFee, onNext }: { txFee: { bnRegistrarFee?: BN; minDeposit: BN }; onNext: () => void }) {
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 	const network = getCurrentNetwork();
 	const t = useTranslations();
@@ -29,7 +29,7 @@ function SetIdentityFees({ txFee, onNext }: { txFee?: { bnRegisterarFee: BN; min
 				/>
 			</div>
 			<ul className={classes.description}>
-				<li>{t('SetIdentity.identityDescription')}</li>
+				<li>{t('SetIdentity.identityDescription1')}</li>
 				<li>{t('SetIdentity.identityDescription2')}</li>
 			</ul>
 			<Collapsible className={classes.collapsible}>
@@ -39,7 +39,7 @@ function SetIdentityFees({ txFee, onNext }: { txFee?: { bnRegisterarFee: BN; min
 						<div className={classes.collapsibleTriggerContentInner}>
 							<p className={classes.collapsibleTriggerContentInnerText}>
 								<span className='font-semibold'>
-									{formatter.format(Number(formatBnBalance(txFee?.bnRegisterarFee.add(txFee?.minDeposit) || BN_ZERO, { withThousandDelimitor: false }, network)))}{' '}
+									{formatter.format(Number(formatBnBalance(txFee.minDeposit.add(txFee.bnRegistrarFee || BN_ZERO), { withThousandDelimitor: false }, network)))}{' '}
 									{NETWORKS_DETAILS[`${network}`].tokenSymbol}
 								</span>
 								<span className='text-[10px] text-wallet_btn_text'>{t('SetIdentity.viewAmountBreakup')}</span>
@@ -54,16 +54,17 @@ function SetIdentityFees({ txFee, onNext }: { txFee?: { bnRegisterarFee: BN; min
 						<div className={classes.feeItem}>
 							<p className={classes.feeItemText}>{t('SetIdentity.minimumDeposit')}</p>
 							<p className={classes.feeItemValue}>
-								{formatter.format(Number(formatBnBalance(txFee?.minDeposit || BN_ZERO, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+								{formatter.format(Number(formatBnBalance(txFee.minDeposit, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 							</p>
 						</div>
-						<div className={classes.feeItem}>
-							<p className={classes.feeItemText}>{t('SetIdentity.registrarFees')}</p>
-							<p className={classes.feeItemValue}>
-								{formatter.format(Number(formatBnBalance(txFee?.bnRegisterarFee || BN_ZERO, { withThousandDelimitor: false }, network)))}{' '}
-								{NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</p>
-						</div>
+						{txFee?.bnRegistrarFee && (
+							<div className={classes.feeItem}>
+								<p className={classes.feeItemText}>{t('SetIdentity.registrarFees')}</p>
+								<p className={classes.feeItemValue}>
+									{formatter.format(Number(formatBnBalance(txFee.bnRegistrarFee, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+								</p>
+							</div>
+						)}
 					</div>
 				</CollapsibleContent>
 			</Collapsible>

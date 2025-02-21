@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { IDENTITY_JUDGEMENT_AUTH, REQUEST_JUDGEMENT_CF_URL } from '@/app/api/_api-constants/apiEnvVars';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -11,10 +12,18 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fetchPF } from '@/_shared/_utils/fetchPF';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 const zodParamsSchema = z.object({
-	userAddress: z.string(),
-	identityHash: z.string()
+	userAddress: z.string().refine((address) => {
+		try {
+			return ValidatorService.isValidSubstrateAddress(address);
+		} catch {
+			return false;
+		}
+	}, 'Invalid substrate address'),
+	identityHash: z.string().regex(/^0x[0-9a-fA-F]+$/, 'Identity hash must be a valid hex string starting with 0x')
 });
 
 export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
@@ -27,17 +36,21 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_PARAMS_ERROR);
 	}
 
-	const res = await fetch('https://us-central1-individual-node-watcher.cloudfunctions.net/judgementCall', {
+	if (!IDENTITY_JUDGEMENT_AUTH || !REQUEST_JUDGEMENT_CF_URL) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR);
+	}
+
+	const res = await fetchPF(REQUEST_JUDGEMENT_CF_URL, {
 		body: JSON.stringify({ identityHash, network, userAddress }),
 		headers: {
-			Authorization: `${process.env.IDENTITY_JUDGEMENT_AUTH}`,
+			Authorization: `${IDENTITY_JUDGEMENT_AUTH}`,
 			'Content-Type': 'application/json'
 		},
 		method: 'POST'
 	});
 
 	if (!res.ok) {
-		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR);
 	}
 
 	const response = NextResponse.json({ message: 'Judgement call made successfully' });

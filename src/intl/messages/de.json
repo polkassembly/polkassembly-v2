@@ -606,6 +606,7 @@
 		"minimumDeposit": "Mindesteinzahlung",
 		"registrarFee": "Registrierungsgebühr",
 		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
-		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen"
+		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
+		"registrarFees": "Registrierungsgebühren"
 	}
 }

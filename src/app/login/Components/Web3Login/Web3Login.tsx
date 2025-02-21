@@ -104,8 +104,8 @@ function Web3Login({
 					router.replace(`/${nextUrl}`);
 				} else {
 					router.back();
+					setLoading(false);
 				}
-				setLoading(false);
 			}
 		} catch {
 			// TODO: show notification

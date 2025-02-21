@@ -21,13 +21,12 @@ interface Props {
 	walletAddressName?: string;
 	textClassName?: string;
 	redirectToProfile?: boolean;
-	onIdentityChange?: (identity: IOnChainIdentity | null) => void;
 }
 
-function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile, onIdentityChange }: Props) {
+function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile }: Props) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
-	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+	const [identity, setIdentity] = useState<IOnChainIdentity>();
 
 	const encodedAddress = getEncodedAddress(address, network) || address;
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
@@ -36,10 +35,11 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 		setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 		try {
 			const identityInfo = await getOnChainIdentity(encodedAddress);
-			setIdentity(identityInfo);
-			onIdentityChange?.(identityInfo);
-			if (identityInfo?.display) {
-				setDisplayText(identityInfo?.display);
+			if (identityInfo) {
+				setIdentity(identityInfo);
+				if (identityInfo?.display) {
+					setDisplayText(identityInfo?.display);
+				}
 			}
 		} catch (error) {
 			console.error('Error fetching identity:', error);

@@ -89,8 +89,10 @@ export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
 	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' }
 } as const;
 
-export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpcEndpoint[] }> = {
+export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpcEndpoint[]; polkassemblyRegistrarIndex?: number; identityMinDeposit: number }> = {
 	[ENetwork.POLKADOT]: {
+		polkassemblyRegistrarIndex: 3,
+		identityMinDeposit: 2001700000,
 		rpcEndpoints: [
 			{
 				name: VIA_PARITY,
@@ -115,6 +117,8 @@ export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpc
 		]
 	},
 	[ENetwork.KUSAMA]: {
+		polkassemblyRegistrarIndex: 5,
+		identityMinDeposit: 6672333321,
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -127,6 +131,7 @@ export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpc
 		]
 	},
 	[ENetwork.WESTEND]: {
+		identityMinDeposit: 10008500000,
 		rpcEndpoints: [
 			{
 				name: VIA_IBP_GEODNS1,
