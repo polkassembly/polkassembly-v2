@@ -6,7 +6,7 @@
 
 import React from 'react';
 import Identicon from '@polkadot/react-identicon';
-import { IOnChainIdentity, IPublicUser } from '@/_shared/types';
+import { IOnChainIdentity } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import IdentityBadge from '../IdentityBadge';
@@ -15,17 +15,14 @@ import styles from './AddressInline.module.scss';
 interface Props {
 	address: string;
 	className?: string;
-	onChainIdentity: IOnChainIdentity;
-	addressDisplayText?: string;
+	onChainIdentity?: IOnChainIdentity;
+	addressDisplayText: string;
 	iconSize?: number;
 	showIdenticon?: boolean;
 	textClassName?: string;
-	userData?: IPublicUser | null;
-	followers?: number;
-	following?: number;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName, userData, followers, following }: Props) {
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName }: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}

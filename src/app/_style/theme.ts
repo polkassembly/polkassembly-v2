@@ -87,7 +87,10 @@ export const THEME_COLORS = {
 		input_text: '#485F7D',
 		leaderboard_usercard_bg: '#e2ebff',
 		leaderboard_usercard_border: '#486ddf',
-		pagination_border: '#CED4DE'
+		pagination_border: '#CED4DE',
+		address_tooltip_bg: '#FFF',
+		address_tooltip_text: '#9aa7b9',
+		social_link: '#EDEFF3'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -171,6 +174,9 @@ export const THEME_COLORS = {
 		leaderboard_usercard_border: '#407BFF',
 		light_council_bg: '#4D2631',
 		listing_page_btn: '#9E9E9E',
-		pagination_border: '#4B4B4B'
+		pagination_border: '#4B4B4B',
+		address_tooltip_bg: '#1C1D1F',
+		address_tooltip_text: '#595959',
+		social_link: '#EDEFF3'
 	}
 };
