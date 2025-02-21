@@ -74,7 +74,7 @@ const AddressTooltipContent = React.memo(
 									e.preventDefault();
 								}}
 							>
-								<div className='flex flex-col gap-1.5 px-4'>
+								<div className='flex flex-col gap-1.5 px-2'>
 									<div className={cn('flex', !address && !userData.createdAt ? 'mb-2 justify-between' : 'flex-col gap-1.5')}>
 										<div className='mt-0 flex items-center justify-start gap-2'>
 											<div

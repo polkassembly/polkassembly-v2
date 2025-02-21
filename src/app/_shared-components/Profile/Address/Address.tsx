@@ -179,7 +179,7 @@ const Address = React.memo(({ className, address, truncateCharLen = 5, iconSize 
 							/>
 						</div>
 					</TooltipTrigger>
-					<TooltipContent className={cn(classes.tooltipContent, 'bg-address_tooltip_bg')}>
+					<TooltipContent className={cn(classes.tooltipContent, 'w-[340px] bg-address_tooltip_bg')}>
 						<AddressTooltipContent
 							address={address}
 							userData={userData ?? undefined}
