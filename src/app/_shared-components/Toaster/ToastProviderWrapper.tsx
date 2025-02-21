@@ -20,9 +20,9 @@ const getIconForStatus = (status: NotificationType) => {
 			return <IoIosInformationCircle className={styles.toast_warning_icon} />;
 		case NotificationType.INFO:
 			return <MdInfoOutline className={styles.toast_info_icon} />;
-		case NotificationType.WARNINGV2:
+		case NotificationType.CAUTION:
 			return <MdInfoOutline className={styles.toast_warning_icon} />;
-		case NotificationType.ERRORV2:
+		case NotificationType.CRITICAL_ERROR:
 			return <IoIosCloseCircleOutline className={styles.toast_error_icon} />;
 		default:
 			return null;

@@ -34,8 +34,8 @@ const toastVariants = cva(
 				[NotificationType.WARNING]: 'bg-toast_warning_bg text-btn_secondary_text',
 				[NotificationType.INFO]: 'bg-toast_info_bg border border-toast_info_border text-btn_secondary_text',
 				[NotificationType.ERROR]: 'bg-toast_error_bg text-btn_secondary_text',
-				[NotificationType.ERRORV2]: 'bg-toast_error_bg text-btn_secondary_text border border-toast_error_border',
-				[NotificationType.WARNINGV2]: 'bg-toast_warning_bg text-btn_secondary_text border border-toast_warning_border'
+				[NotificationType.CAUTION]: 'bg-toast_error_bg text-btn_secondary_text border border-toast_error_border',
+				[NotificationType.CRITICAL_ERROR]: 'bg-toast_warning_bg text-btn_secondary_text border border-toast_warning_border'
 			}
 		},
 		defaultVariants: {
