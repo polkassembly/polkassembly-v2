@@ -36,7 +36,17 @@ import ReactionHandler from '../ReactionHandler';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
-function ActivityFeedPostItem({ postData, voteButton = true, commentBox = true }: { postData: IPostListing; voteButton?: boolean; commentBox?: boolean }) {
+function ActivityFeedPostItem({
+	postData,
+	voteButton = true,
+	commentBox = true,
+	preventClick
+}: {
+	postData: IPostListing;
+	voteButton?: boolean;
+	commentBox?: boolean;
+	preventClick?: boolean;
+}) {
 	const { user } = useUser();
 	const router = useRouter();
 	const t = useTranslations();
@@ -84,7 +94,7 @@ function ActivityFeedPostItem({ postData, voteButton = true, commentBox = true }
 	return (
 		<div
 			aria-hidden='true'
-			onClick={handleContainerClick}
+			onClick={preventClick ? undefined : handleContainerClick}
 			className={styles.container}
 		>
 			{/* Header Section */}
@@ -177,7 +187,7 @@ function ActivityFeedPostItem({ postData, voteButton = true, commentBox = true }
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
+				<div className='flex max-h-40 w-full overflow-hidden border-none'>
 					<BlockEditor
 						data={postData.content}
 						readOnly
