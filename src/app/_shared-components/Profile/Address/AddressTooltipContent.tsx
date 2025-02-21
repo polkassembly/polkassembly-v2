@@ -46,11 +46,11 @@ const ProfileImage = React.memo(({ imageUrl }: { imageUrl?: string }) => (
 
 const UserStats = React.memo(({ followers, following }: { followers: number; following: number }) => (
 	<div className='flex gap-1.5'>
-		<p className='text-text_primary'>
+		<p className='whitespace-nowrap text-text_primary'>
 			Followers: <span className='text-text_pink'>{followers}</span>
 		</p>
 
-		<p className='border-l border-border_grey pl-2 text-text_primary'>
+		<p className='whitespace-nowrap border-l border-border_grey pl-2 text-text_primary'>
 			Following: <span className='text-text_pink'>{following}</span>
 		</p>
 	</div>
@@ -75,62 +75,64 @@ const AddressTooltipContent = React.memo(
 								}}
 							>
 								<div className='flex flex-col gap-1.5 px-2'>
-									<div className={cn('flex', !address && !userData.createdAt ? 'mb-2 justify-between' : 'flex-col gap-1.5')}>
-										<div className='mt-0 flex items-center justify-start gap-2'>
-											<div
-												aria-hidden
-												className='text-pink_primary flex cursor-pointer'
-												onClick={() => redirectionUrl && window.open(redirectionUrl, '_blank')}
-											>
-												<AddressInline
-													address={address}
-													showIdenticon={false}
-													className='text-lg'
-													onChainIdentity={identity}
-													addressDisplayText={displayText}
-												/>
-											</div>
-										</div>
-										<div className={cn('flex gap-1.5', userData.createdAt || identity?.parentProxyTitle?.length ? 'flex-col' : 'justify-between')}>
-											<div className='flex items-center gap-1 text-xs text-text_primary'>
-												<span
-													className='flex cursor-pointer items-center gap-2'
-													onClick={() => onCopy(address)}
+									<div className={cn('mb-2 flex justify-between gap-1.5')}>
+										<div className='flex w-full flex-col gap-1.5'>
+											<div className='mt-0 flex items-center justify-start gap-2'>
+												<div
 													aria-hidden
+													className='text-pink_primary flex cursor-pointer'
+													onClick={() => redirectionUrl && window.open(redirectionUrl, '_blank')}
 												>
-													<Identicon
-														className='image identicon'
-														value={address}
-														size={20}
-														theme='polkadot'
+													<AddressInline
+														address={address}
+														showIdenticon={false}
+														className='text-lg'
+														onChainIdentity={identity}
+														addressDisplayText={displayText}
 													/>
-													<span>{address.length > 10 ? `${address.slice(0, 5)}...${address.slice(-5)}` : address}</span>
-													<CopyIcon className='-ml-[6px] scale-[70%] text-2xl' />
-												</span>
+												</div>
 											</div>
-											<div className={cn('mt-0.5 flex items-center gap-1 border-solid dark:border-none', userData.createdAt ? 'justify-between' : 'justify-start')}>
-												{userData.createdAt && (
-													<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
-														Since: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
+											<div className='flex w-full flex-col gap-1.5'>
+												<div className='flex items-center gap-1 text-xs text-text_primary'>
+													<span
+														className='flex cursor-pointer items-center gap-2'
+														onClick={() => onCopy(address)}
+														aria-hidden
+													>
+														<Identicon
+															className='image identicon'
+															value={address}
+															size={20}
+															theme='polkadot'
+														/>
+														<span>{address.length > 10 ? `${address.slice(0, 5)}...${address.slice(-5)}` : address}</span>
+														<CopyIcon className='-ml-[6px] scale-[70%] text-2xl' />
 													</span>
-												)}
-												{identity?.judgements && (
-													<article className='flex items-center justify-center gap-1 text-xs'>
-														<div className='flex items-center gap-1 font-medium text-text_primary'>
-															<span className='text-address_tooltip_text'>Judgements:</span>
-														</div>
-														<span className='text-wallet_btn_text'>
-															{identity.judgements
-																.map(([, jud]) => jud.toString())
-																.join(', ')
-																.split(',')[0] || 'None'}
+												</div>
+												<div className='mt-0.5 flex items-center justify-between gap-1 border-solid px-2 dark:border-none'>
+													{userData.createdAt && (
+														<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
+															Since: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 														</span>
-													</article>
-												)}
+													)}
+													{identity?.judgements && (
+														<article className='flex items-center justify-center gap-1 text-xs'>
+															<div className='flex items-center gap-1 font-medium text-text_primary'>
+																<span className='text-address_tooltip_text'>Judgements:</span>
+															</div>
+															<span className='text-wallet_btn_text'>
+																{identity.judgements
+																	.map(([, jud]) => jud.toString())
+																	.join(', ')
+																	.split(',')[0] || 'None'}
+															</span>
+														</article>
+													)}
+												</div>
 											</div>
 										</div>
 									</div>
-									<div className={cn(userData.id && !isNaN(userData.id) ? 'flex items-center justify-between' : 'flex items-center justify-start')}>
+									<div className={cn(userData.id && !isNaN(userData.id) ? 'flex items-center justify-between px-2' : 'flex items-center justify-start')}>
 										{userData.id && !isNaN(userData.id) && (
 											<UserStats
 												followers={followers}
