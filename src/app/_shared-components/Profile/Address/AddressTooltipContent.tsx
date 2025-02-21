@@ -110,7 +110,7 @@ const AddressTooltipContent = React.memo(
 											</div>
 											<div className={cn('mt-0.5 flex items-center gap-1 border-solid dark:border-none', userData.createdAt ? 'justify-between' : 'justify-start')}>
 												{userData.createdAt && (
-													<span className='text-address_tooltip_text flex items-center text-xs tracking-wide'>
+													<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
 														Since: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 													</span>
 												)}
