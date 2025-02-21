@@ -6,7 +6,7 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { EWallet } from '@/_shared/types';
+import { EWallet, IOnChainIdentity } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useEffect, useState } from 'react';
@@ -17,7 +17,15 @@ import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
 import Address from '../Profile/Address/Address';
 
-function AddressDropdown({ onChange, withBalance }: { onChange?: (account: InjectedAccount) => void; withBalance?: boolean }) {
+function AddressDropdown({
+	onChange,
+	withBalance,
+	onIdentityChange
+}: {
+	onChange?: (account: InjectedAccount) => void;
+	withBalance?: boolean;
+	onIdentityChange?: (identity: IOnChainIdentity | null) => void;
+}) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
 	const walletService = useWalletService();
@@ -79,6 +87,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 						address={userPreferences?.address?.address || ''}
 						walletAddressName={userPreferences?.address?.name || ''}
 						iconSize={25}
+						redirectToProfile={false}
 					/>
 				</DropdownMenuTrigger>
 			</div>
@@ -95,6 +104,8 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 								address={item.address}
 								walletAddressName={item.name}
 								iconSize={25}
+								redirectToProfile={false}
+								onIdentityChange={onIdentityChange}
 							/>
 						</button>
 					</DropdownMenuItem>

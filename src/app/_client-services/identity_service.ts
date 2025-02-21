@@ -9,11 +9,13 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
-import { hexToString, isHex } from '@polkadot/util';
+import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity } from '@shared/types';
+import { deepParseJson } from 'deep-parse-json';
+import { getIdentityRegistrarIndex } from '../_client-utils/getIdentityRegistrarIndex';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -243,7 +245,7 @@ export class IdentityService {
 		const parentProxyInfo = await this.getParentProxyInfo({ address: encodedQueryAddress });
 		const encodedAddress = parentProxyInfo?.address ? getEncodedAddress(parentProxyInfo.address, this.network) : encodedQueryAddress;
 
-		const identityInfo: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress).then((res: any) => res?.toHuman()?.[0]);
+		const identityInfo: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress).then((res: any) => res?.toHuman()?.[0] || res?.toHuman());
 
 		const { isGood, unverified } = IdentityService.processIdentityInfo(identityInfo);
 		const verifiedByPolkassembly = this.checkVerifiedByPolkassembly(identityInfo);
@@ -278,7 +280,9 @@ export class IdentityService {
 		twitter,
 		matrix,
 		onSuccess,
-		onFailed
+		onFailed,
+		network,
+		registerarFee
 	}: {
 		address: string;
 		displayName: string;
@@ -288,15 +292,23 @@ export class IdentityService {
 		matrix?: string;
 		onSuccess?: () => void;
 		onFailed?: () => void;
+		network: ENetwork;
+		registerarFee: BN;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
-		const tx = this.peopleChainApi?.tx.identity.setIdentity({
+		const setIdentityTx = this.peopleChainApi?.tx.identity.setIdentity({
 			display: { [displayName ? 'raw' : 'none']: displayName || null },
 			email: { [email ? 'raw' : 'none']: email || null },
 			legal: { [legalName ? 'raw' : 'none']: legalName || null },
 			twitter: { [twitter ? 'raw' : 'none']: twitter || null },
 			matrix: { [matrix ? 'raw' : 'none']: matrix || null }
 		});
+
+		const registrarIndex = getIdentityRegistrarIndex({ network });
+
+		const requestJudgementTx = this.peopleChainApi?.tx?.identity?.requestJudgement(registrarIndex, registerarFee.toString());
+
+		const tx = this.peopleChainApi?.tx.utility.batchAll([setIdentityTx, requestJudgementTx]);
 		await this.executeTx({
 			tx,
 			address: encodedAddress,
@@ -309,5 +321,14 @@ export class IdentityService {
 				onFailed?.();
 			}
 		});
+	}
+
+	getMinIdentityDeposit() {
+		return this.peopleChainApi?.consts?.identity?.basicDeposit || BN_ZERO;
+	}
+
+	async getRegistrars() {
+		const res = await this.peopleChainApi?.query?.identity?.registrars?.().then((e) => JSON.parse(e.toString()));
+		return deepParseJson(res.toString());
 	}
 }

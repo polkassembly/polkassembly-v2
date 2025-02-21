@@ -4,17 +4,22 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { getIdentityRegistrarIndex } from '@/app/_client-utils/getIdentityRegistrarIndex';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { Input } from '../Input';
+import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -24,15 +29,40 @@ interface ISetIdentityFormFields {
 	matrix?: string;
 }
 
+enum ESetIdentityStep {
+	GAS_FEE,
+	SET_IDENTITY_FORM,
+	SOCIAL_VERIFICATION
+}
+
 function SetIdentity() {
 	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
+
+	const network = getCurrentNetwork();
 
 	const formData = useForm<ISetIdentityFormFields>();
 
 	const [loading, setLoading] = useState(false);
 
 	const { identityService } = useIdentityService();
+
+	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
+
+	const [txFee, setTxFee] = useState<{ bnRegisterarFee: BN; minDeposit: BN }>();
+
+	useEffect(() => {
+		const getTxFee = async () => {
+			if (!identityService || !network) return;
+
+			const registerars = await identityService.getRegistrars();
+			const registerarIndex = getIdentityRegistrarIndex({ network });
+			const bnRegisterarFee = registerarIndex ? new BN(registerars?.[`${registerarIndex}`]?.fee || BN_ZERO) : BN_ZERO;
+			const minDeposit = identityService.getMinIdentityDeposit() as unknown as BN;
+			setTxFee({ bnRegisterarFee, minDeposit });
+		};
+		getTxFee();
+	}, [identityService, network]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
 		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !values.email || !identityService) return;
@@ -47,6 +77,8 @@ function SetIdentity() {
 			legalName,
 			twitter,
 			matrix,
+			network,
+			registerarFee: txFee?.bnRegisterarFee || BN_ZERO,
 			onSuccess: () => {
 				setLoading(false);
 			},
@@ -56,7 +88,12 @@ function SetIdentity() {
 		});
 	};
 
-	return (
+	return step === ESetIdentityStep.GAS_FEE ? (
+		<SetIdentityFees
+			txFee={txFee}
+			onNext={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
+		/>
+	) : (
 		<Form {...formData}>
 			<form onSubmit={formData.handleSubmit(handleSetIdentity)}>
 				<div className='flex flex-col gap-y-4'>
@@ -78,7 +115,7 @@ function SetIdentity() {
 						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{t('SetIdentity.displayName')}</FormLabel>
+								<FormLabel>{t('SetIdentity.displayName')}*</FormLabel>
 								<FormControl>
 									<Input
 										placeholder={t('SetIdentity.displayName')}
@@ -113,10 +150,17 @@ function SetIdentity() {
 						name='email'
 						key='email'
 						disabled={loading}
+						rules={{
+							validate: (value) => {
+								if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
+								return true;
+							},
+							required: true
+						}}
 						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{t('SetIdentity.email')}</FormLabel>
+								<FormLabel>{t('SetIdentity.email')}*</FormLabel>
 								<FormControl>
 									<Input
 										placeholder={t('SetIdentity.email')}

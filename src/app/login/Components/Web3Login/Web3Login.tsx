@@ -29,17 +29,19 @@ function Web3Login({
 	switchToWeb2,
 	switchToSignup,
 	onWalletChange,
-	onTfaEnabled
+	onTfaEnabled,
+	web3Screen,
+	onChangeWeb3LoginScreen
 }: {
 	switchToWeb2: () => void;
 	switchToSignup: () => void;
 	onWalletChange: () => void;
 	onTfaEnabled: (token: string) => void;
+	web3Screen: EWeb3LoginScreens;
+	onChangeWeb3LoginScreen: (screen: EWeb3LoginScreens) => void;
 }) {
 	const router = useRouter();
 	const t = useTranslations();
-
-	const [web3Screen, setWeb3Screen] = useState<EWeb3LoginScreens>(EWeb3LoginScreens.SELECT_WALLET);
 
 	const { userPreferences } = useUserPreferences();
 
@@ -52,10 +54,6 @@ function Web3Login({
 	const walletService = useWalletService();
 	const searchParams = useSearchParams();
 	const nextUrl = searchParams.get('nextUrl');
-
-	const onChangeWeb3LoginScreen = (screen: EWeb3LoginScreens) => {
-		setWeb3Screen(screen);
-	};
 
 	const handleLogin = async () => {
 		try {

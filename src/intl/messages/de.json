@@ -598,6 +598,14 @@
 		"twitter": "Twitter",
 		"matrix": "Matrix",
 		"setIdentity": "Identität festlegen",
-		"onChainIdentity": "On-Chain-Identität"
+		"onChainIdentity": "On-Chain-Identität",
+		"identityDescription1": "Polkadot bietet On-Chain-Identitäten, die die Anmeldeinformationen der Benutzer durch ernannte Registrare überprüfen und dadurch größeres Vertrauen und Unterstützung schaffen.",
+		"identityDescription2": "Nach erfolgreicher Überprüfung erhalten Benutzer ein grünes Häkchen als Symbol für ihren vertrauenswürdigen Status. Dieses Verifizierungssymbol erhöht die Vertrauenswürdigkeit bei der Beantragung von Mitteln aus der Treasury oder der Teilnahme an Diskussionen und Vorschlägen.",
+		"letBegin": "Lass uns beginnen",
+		"requestJudgement": "Urteil anfordern (Demnächst verfügbar)",
+		"minimumDeposit": "Mindesteinzahlung",
+		"registrarFee": "Registrierungsgebühr",
+		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
+		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen"
 	}
 }

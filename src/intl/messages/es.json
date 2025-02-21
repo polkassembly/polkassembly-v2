@@ -597,6 +597,14 @@
 		"twitter": "Twitter",
 		"matrix": "Matrix",
 		"setIdentity": "Establecer identidad",
-		"onChainIdentity": "Identidad en cadena"
+		"onChainIdentity": "Identidad en cadena",
+		"identityDescription1": "Polkadot ofrece identidades en cadena que verifican las credenciales de los usuarios a través de registradores designados, generando mayor confianza y apoyo.",
+		"identityDescription2": "Una vez verificados con éxito, los usuarios reciben una marca de verificación verde, simbolizando su estado de confianza. Este símbolo de estado verificado mejora la credibilidad al solicitar fondos del tesoro o participar en discusiones y propuestas.",
+		"letBegin": "Empecemos",
+		"requestJudgement": "Solicitar Evaluación (Próximamente)",
+		"minimumDeposit": "Depósito Mínimo",
+		"registrarFee": "Tarifa del Registrador",
+		"totalAmountRequired": "Cantidad Total Requerida",
+		"viewAmountBreakup": "Ver Desglose del Monto"
 	}
 }

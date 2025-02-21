@@ -45,7 +45,6 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 			size='lg'
 		>
 			<span>{label}</span>
-			{disabled && <span className={cn(classes.notInstalled)}>Not Installed</span>}
 		</Button>
 	);
 }
