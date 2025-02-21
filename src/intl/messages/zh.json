@@ -177,6 +177,8 @@
 		"badgesDescription": "在Polkassembly中参与时解锁、接收和赚取徽章",
 		"userSince": "用户自",
 		"rank": "等级",
+		"judgements": "判定",
+		"since": "于",
 		"Settings": {
 			"settings": "设置",
 			"deleteAccount": "删除账户",

@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
@@ -37,7 +37,7 @@ const getUserRedirection = (network: string, address: string, username?: string)
 };
 
 // Main Address Component
-const Address = React.memo(({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName }: AddressProps) => {
+const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName }: AddressProps) => {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 	const { user: currentUser } = useUser();

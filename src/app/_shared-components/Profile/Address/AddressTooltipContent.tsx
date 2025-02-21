@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
+import { memo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import ProfileAvatar from '@assets/profile/user-icon.svg';
@@ -31,7 +31,7 @@ interface AddressTooltipContentProps {
 	displayText: string;
 }
 
-const ProfileImage = React.memo(({ imageUrl }: { imageUrl?: string }) => (
+const ProfileImage = memo(({ imageUrl }: { imageUrl?: string }) => (
 	<div className={classes.profileImageContainer}>
 		<Image
 			src={imageUrl || ProfileAvatar}
@@ -44,19 +44,23 @@ const ProfileImage = React.memo(({ imageUrl }: { imageUrl?: string }) => (
 	</div>
 ));
 
-const UserStats = React.memo(({ followers, following }: { followers: number; following: number }) => (
-	<div className='flex gap-1.5'>
-		<p className='whitespace-nowrap text-text_primary'>
-			Followers: <span className='text-text_pink'>{followers}</span>
-		</p>
+const UserStats = memo(({ followers, following }: { followers: number; following: number }) => {
+	const t = useTranslations();
 
-		<p className='whitespace-nowrap border-l border-border_grey pl-2 text-text_primary'>
-			Following: <span className='text-text_pink'>{following}</span>
-		</p>
-	</div>
-));
+	return (
+		<div className='flex gap-1.5'>
+			<p className='whitespace-nowrap text-text_primary'>
+				{t('Profile.followers')}: <span className='text-text_pink'>{followers}</span>
+			</p>
 
-const AddressTooltipContent = React.memo(
+			<p className='whitespace-nowrap border-l border-border_grey pl-2 text-text_primary'>
+				{t('Profile.following')}: <span className='text-text_pink'>{following}</span>
+			</p>
+		</div>
+	);
+});
+
+const AddressTooltipContent = memo(
 	({ address, userData, identity, followers, following, isFollowing, redirectionUrl, onCopy, onFollow, onUnfollow, loading, displayText }: AddressTooltipContentProps) => {
 		const t = useTranslations();
 
@@ -112,13 +116,13 @@ const AddressTooltipContent = React.memo(
 												<div className='mt-0.5 flex items-center justify-between gap-1 border-solid px-2 dark:border-none'>
 													{userData.createdAt && (
 														<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
-															Since: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
+															{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 														</span>
 													)}
 													{identity?.judgements && (
 														<article className='flex items-center justify-center gap-1 text-xs'>
 															<div className='flex items-center gap-1 font-medium text-text_primary'>
-																<span className='text-address_tooltip_text'>Judgements:</span>
+																<span className='text-address_tooltip_text'>{t('Profile.judgements')}:</span>
 															</div>
 															<span className='text-wallet_btn_text'>
 																{identity.judgements
