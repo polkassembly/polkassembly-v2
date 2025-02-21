@@ -6,3 +6,7 @@
     @apply text-btn_secondary_text truncate inline-block align-middle;
 
 }
+
+.tooltipContent {
+    @apply relative rounded-md bg-bg_modal px-5 py-4 text-text_primary shadow-lg;
+}

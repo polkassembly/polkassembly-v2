@@ -6,7 +6,7 @@
 
 import React from 'react';
 import Identicon from '@polkadot/react-identicon';
-import { IOnChainIdentity } from '@/_shared/types';
+import { IOnChainIdentity, IPublicUser } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import IdentityBadge from '../IdentityBadge';
@@ -20,13 +20,18 @@ interface Props {
 	iconSize?: number;
 	showIdenticon?: boolean;
 	textClassName?: string;
+	userData?: IPublicUser | null;
+	followers?: number;
+	following?: number;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName }: Props) {
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName, userData, followers, following }: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
 			title={addressDisplayText || address}
+			data-tip
+			data-for={`tooltip-${address}`}
 		>
 			{showIdenticon && (
 				<Identicon
@@ -44,7 +49,6 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					onChainIdentity={onChainIdentity}
 					iconSize={iconSize}
 				/>
-
 				<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
 			</Link>
 		</div>
