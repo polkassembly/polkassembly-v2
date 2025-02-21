@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, NotificationStatus } from '@/_shared/types';
+import { EVoteDecision, NotificationType } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Ban, Split, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -57,7 +57,7 @@ function VoteReferendum({ index }: { index: string }) {
 					toast({
 						title: 'Vote successful',
 						description: 'Your vote has been cast successfully',
-						status: NotificationStatus.SUCCESS
+						status: NotificationType.SUCCESS
 					});
 					setIsLoading(false);
 				},
@@ -65,7 +65,7 @@ function VoteReferendum({ index }: { index: string }) {
 					toast({
 						title: 'Vote failed',
 						description: 'Your vote has not been cast successfully',
-						status: NotificationStatus.ERROR
+						status: NotificationType.ERROR
 					});
 					setIsLoading(false);
 				},

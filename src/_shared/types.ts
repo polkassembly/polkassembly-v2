@@ -827,11 +827,11 @@ export interface IVoteCartItem {
 	title?: string;
 }
 
-export enum NotificationStatus {
-	SUCCESS = 'success',
-	ERROR = 'error',
-	ERRORV2 = 'errorv2',
-	WARNING = 'warning',
-	WARNINGV2 = 'warningv2',
-	INFO = 'info'
+export enum NotificationType {
+	SUCCESS = 'success', // Positive outcome
+	ERROR = 'error', // Basic error state
+	CRITICAL_ERROR = 'critical_error', // Formerly ERRORV2 - for more severe errors
+	WARNING = 'warning', // Basic warning state
+	CAUTION = 'caution', // Formerly WARNINGV2 - for more notable warnings
+	INFO = 'info' // Neutral information
 }

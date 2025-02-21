@@ -4,25 +4,25 @@
 
 import { useToast } from '@/hooks/useToast';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
-import { NotificationStatus } from '@/_shared/types';
+import { NotificationType } from '@/_shared/types';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { IoIosCloseCircle, IoIosInformationCircle, IoIosCloseCircleOutline } from 'react-icons/io';
 import { MdInfoOutline } from 'react-icons/md';
 import styles from './Toaster.module.scss';
 
-const getIconForStatus = (status: NotificationStatus) => {
+const getIconForStatus = (status: NotificationType) => {
 	switch (status) {
-		case NotificationStatus.SUCCESS:
+		case NotificationType.SUCCESS:
 			return <FaCircleCheck className={styles.toast_success_icon} />;
-		case NotificationStatus.ERROR:
+		case NotificationType.ERROR:
 			return <IoIosCloseCircle className={styles.toast_error_icon} />;
-		case NotificationStatus.WARNING:
+		case NotificationType.WARNING:
 			return <IoIosInformationCircle className={styles.toast_warning_icon} />;
-		case NotificationStatus.INFO:
+		case NotificationType.INFO:
 			return <MdInfoOutline className={styles.toast_info_icon} />;
-		case NotificationStatus.WARNINGV2:
+		case NotificationType.WARNINGV2:
 			return <MdInfoOutline className={styles.toast_warning_icon} />;
-		case NotificationStatus.ERRORV2:
+		case NotificationType.ERRORV2:
 			return <IoIosCloseCircleOutline className={styles.toast_error_icon} />;
 		default:
 			return null;
@@ -43,7 +43,7 @@ export function ToastProviderWrapper() {
 				>
 					<div className='grid gap-2'>
 						<div className={`flex gap-2 ${description ? 'items-start' : 'items-center'}`}>
-							<span>{status && getIconForStatus(status as NotificationStatus)}</span>
+							<span>{status && getIconForStatus(status as NotificationType)}</span>
 							<div className='flex flex-col gap-1'>
 								{title && <ToastTitle>{title}</ToastTitle>}
 								{description && <ToastDescription>{description}</ToastDescription>}
