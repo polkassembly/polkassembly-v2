@@ -12,6 +12,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IFollowEntry, IOnChainIdentity, IPublicUser } from '@/_shared/types';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useUser } from '@/hooks/useUser';
+import { cn } from '@/lib/utils';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import AddressInline from './AddressInline/AddressInline';
 import classes from './AddressInline/AddressInline.module.scss';
@@ -178,7 +179,7 @@ const Address = React.memo(({ className, address, truncateCharLen = 5, iconSize 
 							/>
 						</div>
 					</TooltipTrigger>
-					<TooltipContent className={classes.tooltipContent}>
+					<TooltipContent className={cn(classes.tooltipContent, 'bg-address_tooltip_bg')}>
 						<AddressTooltipContent
 							address={address}
 							userData={userData ?? undefined}
