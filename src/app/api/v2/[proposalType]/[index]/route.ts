@@ -18,7 +18,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { deepParseJson } from 'deep-parse-json';
 import { AIService } from '@/app/api/_api-services/ai_service';
 
 const SET_COOKIE = 'Set-Cookie';
@@ -33,16 +32,17 @@ async function handleOffChainPost(network: string, proposalType: string, index: 
 		throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
 	}
 
-	let postData = offChainPostData;
+	let post: IPost = offChainPostData;
+
 	if (offChainPostData.userId && ValidatorService.isValidUserId(Number(offChainPostData.userId || -1))) {
 		const publicUser = await OffChainDbService.GetPublicUserById(offChainPostData.userId);
 		if (publicUser) {
-			postData = { ...offChainPostData, publicUser };
+			post = { ...offChainPostData, publicUser };
 		}
 	}
 
-	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(postData) });
-	return postData;
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
+	return post;
 }
 
 async function getPublicUser(onChainPostInfo: IOnChainPostInfo, offChainPostData: IOffChainPost) {
@@ -65,7 +65,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const cachedData = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 	if (cachedData) {
-		return NextResponse.json(deepParseJson(cachedData));
+		return NextResponse.json(cachedData);
 	}
 
 	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
@@ -121,7 +121,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	// Cache the response
-	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: JSON.stringify(post) });
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
 	const response = NextResponse.json(post);
 
