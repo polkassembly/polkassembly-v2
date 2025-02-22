@@ -29,7 +29,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
 		const formattedOrigin = origin === 'All' ? undefined : origin;
-		const { data, error } = await NextApiClientService.fetchActivityFeedApi({ page: pageParam, origin: formattedOrigin, limit: DEFAULT_LISTING_LIMIT });
+		const { data, error } = await NextApiClientService.fetchActivityFeed({ page: pageParam, origin: formattedOrigin, limit: DEFAULT_LISTING_LIMIT });
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}

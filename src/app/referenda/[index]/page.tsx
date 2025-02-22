@@ -8,7 +8,7 @@ import React from 'react';
 
 async function Referenda({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
-	const { data, error } = await NextApiClientService.fetchProposalDetailsApi(EProposalType.REFERENDUM_V2, index);
+	const { data, error } = await NextApiClientService.fetchProposalDetails(EProposalType.REFERENDUM_V2, index);
 
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
 

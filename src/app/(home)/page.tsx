@@ -11,7 +11,7 @@ import { ClientError } from '../_client-utils/clientError';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
 
 export default async function Home() {
-	const { data, error } = await NextApiClientService.fetchActivityFeedApi({ page: 1, limit: DEFAULT_LISTING_LIMIT });
+	const { data, error } = await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);

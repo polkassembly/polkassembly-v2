@@ -59,7 +59,7 @@ enum EApiRoute {
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
-	POST_REACTIONS = 'POST_REACTIONS',
+	ADD_POST_REACTION = 'ADD_POST_REACTION',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
 	PUBLIC_USER_DATA_BY_ADDRESS = 'PUBLIC_USER_DATA_BY_ADDRESS',
@@ -85,6 +85,14 @@ enum EApiRoute {
 }
 
 export class NextApiClientService {
+	private static isServerSide() {
+		return !global?.window;
+	}
+
+	private static async getCurrentNetwork() {
+		return this.isServerSide() ? getNetworkFromHeaders() : getCurrentNetwork();
+	}
+
 	private static async getRouteConfig({
 		route,
 		routeSegments,
@@ -101,9 +109,75 @@ export class NextApiClientService {
 
 		// eslint-disable-next-line sonarjs/max-switch-cases
 		switch (route) {
-			// Static routes
-			case EApiRoute.WEB2_LOGIN:
-				path = '/auth/web2-auth/login';
+			// TODO: remove this route, use get public user via usernameroute instead
+			case EApiRoute.USER_EXISTS:
+				path = '/auth/username-exists';
+				method = 'POST';
+				break;
+
+			// get routes
+			case EApiRoute.REFRESH_ACCESS_TOKEN:
+				path = '/auth/refresh-access-token';
+				break;
+			case EApiRoute.GENERATE_QR_SESSION:
+				path = '/auth/qr-session';
+				break;
+			case EApiRoute.GET_ACTIVITY_FEED:
+				path = '/activity-feed';
+				break;
+			case EApiRoute.FETCH_LEADERBOARD:
+				path = '/users';
+				break;
+			case EApiRoute.FETCH_PREIMAGES:
+				path = '/preimages';
+				break;
+			case EApiRoute.FETCH_ALL_TAGS:
+				path = '/meta/tags';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
+			case EApiRoute.FETCH_USER_ACTIVITY:
+				path = '/users/id';
+				break;
+			case EApiRoute.GET_FOLLOWING:
+			case EApiRoute.GET_FOLLOWERS:
+				path = '/users/id';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+				path = '/users/address';
+				break;
+			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
+				path = '/users/username';
+				break;
+			case EApiRoute.POSTS_LISTING:
+			case EApiRoute.FETCH_PROPOSAL_DETAILS:
+			case EApiRoute.GET_PREIMAGE_FOR_POST:
+			case EApiRoute.GET_COMMENTS:
+			case EApiRoute.GET_VOTES_HISTORY:
+				break;
+
+			// post routes
+			case EApiRoute.LOGOUT:
+				path = '/auth/logout';
+				method = 'POST';
+				break;
+			case EApiRoute.LINK_ADDRESS:
+				path = '/auth/link-address';
+				method = 'POST';
+				break;
+			case EApiRoute.CLAIM_QR_SESSION:
+				path = '/auth/qr-session';
+				method = 'POST';
+				break;
+			case EApiRoute.VERIFY_TFA_TOKEN:
+				path = '/auth/tfa/setup/verify';
+				method = 'POST';
+				break;
+			case EApiRoute.GEN_TFA_TOKEN:
+				path = '/auth/tfa/setup/generate';
+				method = 'POST';
+				break;
+			case EApiRoute.TFA_LOGIN:
+				path = '/auth/tfa/login';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB2_SIGNUP:
@@ -114,111 +188,44 @@ export class NextApiClientService {
 				path = '/auth/web3-auth';
 				method = 'POST';
 				break;
-			case EApiRoute.REFRESH_ACCESS_TOKEN:
-				path = '/auth/refresh-access-token';
-				break;
-			case EApiRoute.USER_EXISTS:
-				path = '/auth/username-exists';
+			case EApiRoute.WEB2_LOGIN:
+				path = '/auth/web2-auth/login';
 				method = 'POST';
-				break;
-			case EApiRoute.TFA_LOGIN:
-				path = '/auth/tfa/login';
-				method = 'POST';
-				break;
-			case EApiRoute.GEN_TFA_TOKEN:
-				path = '/auth/tfa/setup/generate';
-				method = 'POST';
-				break;
-			case EApiRoute.VERIFY_TFA_TOKEN:
-				path = '/auth/tfa/setup/verify';
-				method = 'POST';
-				break;
-			case EApiRoute.LOGOUT:
-				path = '/auth/logout';
-				method = 'POST';
-				break;
-			case EApiRoute.LINK_ADDRESS:
-				path = '/auth/link-address';
-				method = 'POST';
-				break;
-			case EApiRoute.GET_ACTIVITY_FEED:
-				path = '/activity-feed';
-				method = 'GET';
-				break;
-			case EApiRoute.FETCH_LEADERBOARD:
-				path = '/users';
-				break;
-			case EApiRoute.FETCH_PREIMAGES:
-				path = '/preimages';
-				break;
-			case EApiRoute.FETCH_ALL_TAGS:
-				method = 'GET';
-				path = '/meta/tags';
 				break;
 			case EApiRoute.CREATE_TAGS:
 				method = 'POST';
 				path = '/meta/tags';
 				break;
-			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
-			case EApiRoute.FETCH_USER_ACTIVITY:
+			case EApiRoute.FOLLOW_USER:
 				path = '/users/id';
+				method = 'POST';
 				break;
+			case EApiRoute.CREATE_OFFCHAIN_POST:
+			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.ADD_POST_REACTION:
+				method = 'POST';
+				break;
+
+			// patch routes
 			case EApiRoute.EDIT_USER_PROFILE:
 				path = '/users/id';
 				method = 'PATCH';
 				break;
-			case EApiRoute.GENERATE_QR_SESSION:
-				path = '/auth/qr-session';
-				method = 'GET';
+			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+				method = 'PATCH';
 				break;
-			case EApiRoute.CLAIM_QR_SESSION:
-				path = '/auth/qr-session';
-				method = 'POST';
-				break;
+
+			// delete routes
 			case EApiRoute.DELETE_ACCOUNT:
 			case EApiRoute.UNFOLLOW_USER:
 				path = '/users/id';
 				method = 'DELETE';
 				break;
-			case EApiRoute.FOLLOW_USER:
-				path = '/users/id';
-				method = 'POST';
-				break;
-			case EApiRoute.GET_FOLLOWING:
-				path = '/users/id';
-				break;
-			case EApiRoute.GET_FOLLOWERS:
-				path = '/users/id';
-				break;
-			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
-				path = '/users/address';
-				break;
-			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
-				path = '/users/username';
-				break;
-			// Post-related routes (do not put any static routes below this)
-			case EApiRoute.POSTS_LISTING:
-			case EApiRoute.FETCH_PROPOSAL_DETAILS:
-			case EApiRoute.GET_PREIMAGE_FOR_POST:
-			case EApiRoute.GET_COMMENTS:
-			case EApiRoute.GET_VOTES_HISTORY:
-				break;
-			case EApiRoute.CREATE_OFFCHAIN_POST:
-				method = 'POST';
-				break;
-			case EApiRoute.ADD_COMMENT:
-			case EApiRoute.POST_REACTIONS:
-				method = 'POST';
-				break;
 			case EApiRoute.DELETE_REACTION:
-				method = 'DELETE';
-				break;
-			case EApiRoute.EDIT_PROPOSAL_DETAILS:
-				method = 'PATCH';
-				break;
 			case EApiRoute.DELETE_COMMENT:
 				method = 'DELETE';
 				break;
+
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
 		}
@@ -240,7 +247,7 @@ export class NextApiClientService {
 		method: Method;
 		data?: Record<string, unknown>;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
-		const currentNetwork = global?.window ? getCurrentNetwork() : await getNetworkFromHeaders();
+		const currentNetwork = await this.getCurrentNetwork();
 
 		const response = await fetchPF(url, {
 			body: JSON.stringify(data),
@@ -312,7 +319,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, wallet } });
 	}
 
-	static async fetchListingDataApi(
+	static async fetchListingData(
 		proposalType: string,
 		page: number,
 		statuses?: string[],
@@ -341,29 +348,29 @@ export class NextApiClientService {
 	}
 
 	// Post Reactions
-	static async postReactionsApi(proposalType: EProposalType, index: string, reactionType: EReaction) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POST_REACTIONS, routeSegments: [proposalType, index, 'reactions'] });
+	static async addPostReaction(proposalType: EProposalType, index: string, reactionType: EReaction) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_REACTION, routeSegments: [proposalType, index, 'reactions'] });
 		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
 	}
 
 	// Delete Post Reaction
-	static async deletePostReactionApi(proposalType: EProposalType, index: string, reactionId: string) {
+	static async deletePostReaction(proposalType: EProposalType, index: string, reactionId: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_REACTION, routeSegments: [proposalType, index, 'reactions', reactionId] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	// details
-	static async fetchProposalDetailsApi(proposalType: EProposalType, index: string) {
+	static async fetchProposalDetails(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
-	static async editProposalDetailsApi(proposalType: EProposalType, index: string, data: { title: string; content: OutputData }) {
+	static async editProposalDetails(proposalType: EProposalType, index: string, data: { title: string; content: OutputData }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
 
-	static async getPreimageForPostApi(proposalType: EProposalType, index: string) {
+	static async getPreimageForPost(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE_FOR_POST, routeSegments: [proposalType, index, 'preimage'] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
@@ -402,7 +409,7 @@ export class NextApiClientService {
 	}
 
 	// votes
-	static async getVotesHistoryApi({ proposalType, index, page, decision }: { proposalType: EProposalType; index: string; page: number; decision: EVoteDecision }) {
+	static async getVotesHistory({ proposalType, index, page, decision }: { proposalType: EProposalType; index: string; page: number; decision: EVoteDecision }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString(),
@@ -413,7 +420,7 @@ export class NextApiClientService {
 	}
 
 	// activity feed
-	static async fetchActivityFeedApi({ page, origin, limit = DEFAULT_LISTING_LIMIT }: { page: number; origin?: EPostOrigin; limit?: number }) {
+	static async fetchActivityFeed({ page, origin, limit = DEFAULT_LISTING_LIMIT }: { page: number; origin?: EPostOrigin; limit?: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
@@ -498,7 +505,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ followers: IFollowEntry[] }>({ url, method });
 	}
 
-	static async fetchPreimagesApi({ page }: { page: number }) {
+	static async fetchPreimages({ page }: { page: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: PREIMAGES_LISTING_LIMIT.toString()
@@ -508,21 +515,21 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 
-	static async fetchPreimageByHashApi({ hash }: { hash: string }) {
+	static async fetchPreimageByHash({ hash }: { hash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: [hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
-	protected static async generateQRSessionApi() {
+	protected static async generateQRSession() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
-	static async fetchAllTagsApi() {
+	static async fetchAllTags() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
 		return this.nextApiClientFetch<IGenericListingResponse<ITag>>({ url, method });
 	}
 
-	static async createTagsApi(tags: string[]) {
+	static async createTags(tags: string[]) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_TAGS });
 		if (!tags.length || tags.some((tag) => !ValidatorService.isValidTag(tag))) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -530,7 +537,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
 	}
 
-	static async createOffChainPostApi({
+	static async createOffChainPost({
 		proposalType,
 		allowedCommentor,
 		content,
