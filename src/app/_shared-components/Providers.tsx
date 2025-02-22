@@ -6,6 +6,7 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode } from 'react';
+import { Provider as JotaiProvider } from 'jotai';
 import { ETheme, IUserPreferences } from '@/_shared/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -27,22 +28,24 @@ export function Providers({
 	userPreferences: IUserPreferences;
 }) {
 	return (
-		<NextIntlClientProvider
-			messages={messages}
-			locale={locale}
-			timeZone={getTimeZoneForLocale(locale)}
-		>
-			<QueryClientProvider client={queryClient}>
-				<ThemeProvider
-					attribute='class'
-					defaultTheme={userPreferences.theme}
-					themes={[ETheme.LIGHT, ETheme.DARK]}
-					enableSystem={false}
-				>
-					<SidebarProvider>{children}</SidebarProvider>
-				</ThemeProvider>
-				<ReactQueryDevtools initialIsOpen={false} />
-			</QueryClientProvider>
-		</NextIntlClientProvider>
+		<JotaiProvider>
+			<NextIntlClientProvider
+				messages={messages}
+				locale={locale}
+				timeZone={getTimeZoneForLocale(locale)}
+			>
+				<QueryClientProvider client={queryClient}>
+					<ThemeProvider
+						attribute='class'
+						defaultTheme={userPreferences.theme}
+						themes={[ETheme.LIGHT, ETheme.DARK]}
+						enableSystem={false}
+					>
+						<SidebarProvider>{children}</SidebarProvider>
+					</ThemeProvider>
+					<ReactQueryDevtools initialIsOpen={false} />
+				</QueryClientProvider>
+			</NextIntlClientProvider>
+		</JotaiProvider>
 	);
 }
