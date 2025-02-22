@@ -15,7 +15,7 @@ async function GeneralAdminPage({ searchParams }: { searchParams: Promise<{ page
 	const page = parseInt(searchParamsValue.page || '1', 10);
 	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
 
-	const { data, error } = await NextApiClientService.fetchListingData(EProposalType.REFERENDUM_V2, page, statuses, [origin], []);
+	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.REFERENDUM_V2, page, statuses, origins: [origin] });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);

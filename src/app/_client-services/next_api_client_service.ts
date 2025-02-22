@@ -40,6 +40,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
+import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -319,27 +320,58 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, wallet } });
 	}
 
-	static async fetchListingData(
-		proposalType: string,
-		page: number,
-		statuses?: string[],
-		origins?: string[],
-		tags: string[] = []
-	): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
+	static async fetchListingData({
+		proposalType,
+		page,
+		statuses,
+		origins = [],
+		tags = [],
+		limit = DEFAULT_LISTING_LIMIT
+	}: {
+		proposalType: string;
+		page: number;
+		statuses?: string[];
+		origins?: EPostOrigin[];
+		tags?: string[];
+		limit?: number;
+	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
+		// try redis cache first if ssr
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetPostsListing', {
+				network: currentNetwork,
+				proposalType,
+				page,
+				limit,
+				statuses,
+				origins,
+				tags
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
 
+		if (limit) {
+			queryParams.append('limit', limit.toString());
+		}
+
 		if (statuses?.length) {
 			statuses.forEach((status) => queryParams.append('status', status));
 		}
 
-		if (tags.length) {
+		if (tags?.length) {
 			tags.forEach((tag) => queryParams.append('tags', tag));
 		}
 
-		if (Array.isArray(origins) && origins.length) {
+		if (origins?.length) {
 			origins.forEach((origin) => queryParams.append('origin', origin));
 		}
 
