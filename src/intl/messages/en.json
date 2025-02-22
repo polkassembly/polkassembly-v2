@@ -640,6 +640,9 @@
 		"confirmBatchVoting": "Confirm Batch Voting",
 		"save": "Save",
 		"editVote": "Edit Vote",
-		"next": "Next"
+		"next": "Next",
+		"totalProposals": "Total Proposals",
+		"viewCart": "View Cart",
+		"proposals": "Proposals"
 	}
 }

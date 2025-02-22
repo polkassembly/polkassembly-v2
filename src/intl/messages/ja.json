@@ -620,6 +620,9 @@
 		"confirmBatchVoting": "一括投票を確認",
 		"save": "保存",
 		"editVote": "投票を編集",
-		"next": "次へ"
+		"next": "次へ",
+		"totalProposals": "提案総数",
+		"viewCart": "カートを見る",
+		"proposals": "提案"
 	}
 }

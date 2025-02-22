@@ -620,6 +620,9 @@
 		"confirmBatchVoting": "Confirmar votación por lotes",
 		"save": "Guardar",
 		"editVote": "Editar voto",
-		"next": "Siguiente"
+		"next": "Siguiente",
+		"totalProposals": "Propuestas totales",
+		"viewCart": "Ver carrito",
+		"proposals": "Propuestas"
 	}
 }

@@ -1,0 +1,186 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+import { EProposalType, EVoteDecision, IPostListing, IVoteCartItem } from '@/_shared/types';
+import ActivityFeedPostItem from '@/app/(home)/Components/ActivityFeedPostItem/ActivityFeedPostItem';
+import { Button } from '@/app/_shared-components/Button';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/app/_shared-components/Drawer';
+import LoadingLayover from '@/app/_shared-components/LoadingLayover';
+import { THEME_COLORS } from '@/app/_style/theme';
+import { Ban, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { createRef, RefObject, useMemo } from 'react';
+import TinderCard from 'react-tinder-card';
+import VoteCart from '../VoteCart/VoteCart';
+import classes from './TinderVoting.module.scss';
+
+enum ESwipeDirection {
+	RIGHT = 'right',
+	LEFT = 'left',
+	UP = 'up'
+}
+
+function TinderVoting({
+	handleNext,
+	loading,
+	filteredProposals,
+	proposals,
+	currentIndex,
+	addToVoteCart,
+	isFetching,
+	voteCart,
+	currentIndexRef
+}: {
+	handleNext: () => void;
+	loading: boolean;
+	currentIndexRef: RefObject<number>;
+	filteredProposals: IPostListing[];
+	proposals: IPostListing[];
+	isFetching: boolean;
+	voteCart: IVoteCartItem[];
+	currentIndex: number;
+	addToVoteCart: ({
+		voteDecision,
+		proposalIndexOrHash,
+		proposalType,
+		title
+	}: {
+		voteDecision: EVoteDecision;
+		proposalIndexOrHash: string;
+		proposalType: EProposalType;
+		title?: string;
+	}) => void;
+}) {
+	const t = useTranslations();
+
+	const childRefs = useMemo(
+		() =>
+			Array(proposals.length)
+				.fill(0)
+				.map(() => createRef()),
+		[proposals]
+	);
+
+	const onSwipe = (dir: ESwipeDirection) => {
+		if (currentIndex >= 0 && currentIndex < proposals.length) {
+			const proposal = proposals[`${currentIndex}`];
+			addToVoteCart({
+				proposalIndexOrHash: proposal.index?.toString() || proposal.hash || '',
+				proposalType: proposal.proposalType,
+				title: proposal.title,
+				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.ABSTAIN
+			});
+			handleNext();
+		}
+	};
+
+	const outOfFrame = (idx: number) => {
+		if (currentIndexRef.current >= idx) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(childRefs[`${idx}`].current as any).restoreCard();
+		}
+	};
+
+	return (
+		<div className={classes.tinderVoting}>
+			{isFetching && <LoadingLayover />}
+			<Button
+				variant='ghost'
+				className={classes.skipButton}
+				onClick={handleNext}
+			>
+				{t('BatchVote.skip')}
+			</Button>
+			{filteredProposals.map((proposal, index) => (
+				<div
+					className={classes.proposalCard}
+					style={{ zIndex: filteredProposals.length - index }}
+					key={`${proposal.title}-${proposal.index}`}
+				>
+					<TinderCard
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						ref={childRefs[`${index}`] as any}
+						key={`${proposal.title}-${proposal.index}`}
+						onSwipe={(dir) => onSwipe(dir as ESwipeDirection)}
+						preventSwipe={['down']}
+						onCardLeftScreen={() => outOfFrame(index)}
+					>
+						<div className='h-[350px] rounded-2xl bg-bg_modal p-4'>
+							<ActivityFeedPostItem
+								commentBox={false}
+								voteButton={false}
+								postData={proposal}
+								preventClick
+							/>
+						</div>
+					</TinderCard>
+				</div>
+			))}
+			{voteCart && voteCart.length > 0 && (
+				<div className={classes.voteCart}>
+					<span>
+						{t('BatchVote.totalProposals')}: {voteCart?.length}
+					</span>
+					<Drawer>
+						<DrawerTrigger asChild>
+							<Button size='sm'>{t('BatchVote.viewCart')}</Button>
+						</DrawerTrigger>
+						<DrawerContent className='bg-bg_modal px-4 pb-4'>
+							<DrawerHeader className='flex items-center justify-between'>
+								<DrawerTitle>{t('BatchVote.proposals')}</DrawerTitle>
+								<DrawerClose asChild>
+									<Button
+										variant='ghost'
+										size='icon'
+									>
+										<X className='h-4 w-4' />
+									</Button>
+								</DrawerClose>
+							</DrawerHeader>
+							<div className='w-full'>
+								<VoteCart voteCart={voteCart} />
+							</div>
+						</DrawerContent>
+					</Drawer>
+				</div>
+			)}
+			<div className={classes.voteButtons}>
+				<Button
+					variant='ghost'
+					className='rounded-full bg-failure p-2'
+					size='icon'
+					onClick={() => onSwipe(ESwipeDirection.LEFT)}
+					disabled={loading}
+				>
+					<ThumbsDown
+						fill={THEME_COLORS.light.btn_primary_text}
+						className='h-10 w-10'
+					/>
+				</Button>
+				<Button
+					variant='ghost'
+					size='icon'
+					className='rounded-full bg-white p-3 text-decision_bar_indicator shadow'
+					onClick={() => onSwipe(ESwipeDirection.UP)}
+					disabled={loading}
+				>
+					<Ban className='h-10 w-10' />
+				</Button>
+				<Button
+					variant='ghost'
+					size='icon'
+					className='rounded-full bg-success p-2'
+					onClick={() => onSwipe(ESwipeDirection.RIGHT)}
+					disabled={loading}
+				>
+					<ThumbsUp
+						fill={THEME_COLORS.light.btn_primary_text}
+						className='h-10 w-10'
+					/>
+				</Button>
+			</div>
+		</div>
+	);
+}
+
+export default TinderVoting;

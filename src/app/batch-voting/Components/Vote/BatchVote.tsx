@@ -5,26 +5,15 @@
 import { canVote } from '@/_shared/_utils/canVote';
 import { EConvictionAmount, EProposalType, EVoteDecision, IPostListing, IVoteCartItem } from '@/_shared/types';
 import { BN } from '@polkadot/util';
-import { useState, useMemo, useRef, createRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
-import TinderCard from 'react-tinder-card';
-import ActivityFeedPostItem from '@/app/(home)/Components/ActivityFeedPostItem/ActivityFeedPostItem';
-import { Button } from '@/app/_shared-components/Button';
-import { Ban, ThumbsDown, ThumbsUp, X } from 'lucide-react';
-import { THEME_COLORS } from '@/app/_style/theme';
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/app/_shared-components/Drawer';
 import ProposalScreen from './ProposalScreen/ProposalScreen';
 import VoteCart from './VoteCart/VoteCart';
-
-enum ESwipeDirection {
-	RIGHT = 'right',
-	LEFT = 'left',
-	UP = 'up'
-}
+import TinderVoting from './TinderVotingMobile/TinderVoting';
 
 function BatchVote({
 	proposals,
@@ -44,6 +33,7 @@ function BatchVote({
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const { user } = useUser();
 	const queryClient = useQueryClient();
+	const currentIndexRef = useRef(currentIndex);
 
 	const [loading, setLoading] = useState(false);
 
@@ -72,18 +62,8 @@ function BatchVote({
 		);
 	}, [proposals, voteCart]);
 
-	const currentIndexRef = useRef(currentIndex);
-
-	const childRefs = useMemo(
-		() =>
-			Array(filteredProposals.length)
-				.fill(0)
-				.map(() => createRef()),
-		[filteredProposals]
-	);
-
 	const handleNext = () => {
-		if (currentIndex < filteredProposals.length - 1) {
+		if (currentIndex < proposals.length) {
 			setCurrentIndex(currentIndex + 1);
 			currentIndexRef.current = currentIndex + 1;
 		}
@@ -148,26 +128,6 @@ function BatchVote({
 		setLoading(false);
 	};
 
-	const onSwipe = (dir: ESwipeDirection) => {
-		if (currentIndex >= 0 && currentIndex < filteredProposals.length) {
-			const proposal = filteredProposals[`${currentIndex}`];
-			addToVoteCart({
-				proposalIndexOrHash: proposal.index?.toString() || proposal.hash || '',
-				proposalType: proposal.proposalType,
-				title: proposal.title,
-				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.ABSTAIN
-			});
-			handleNext();
-		}
-	};
-
-	const outOfFrame = (idx: number) => {
-		if (currentIndexRef.current >= idx) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(childRefs[`${idx}`].current as any).restoreCard();
-		}
-	};
-
 	return (
 		<div>
 			<div className='hidden grid-cols-1 gap-4 sm:grid lg:grid-cols-3'>
@@ -185,90 +145,17 @@ function BatchVote({
 					<VoteCart voteCart={voteCart || []} />
 				</div>
 			</div>
-			<div className='relative flex h-[500px] flex-col-reverse sm:hidden'>
-				{isFetching && <LoadingLayover />}
-				{filteredProposals.map((proposal, index) => (
-					<TinderCard
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						ref={childRefs[`${index}`] as any}
-						className='absolute top-0'
-						key={`${proposal.title}-${proposal.index}`}
-						onSwipe={(dir) => onSwipe(dir as ESwipeDirection)}
-						preventSwipe={['down']}
-						onCardLeftScreen={() => outOfFrame(index)}
-					>
-						<div className='h-[350px] rounded-2xl bg-bg_modal p-4'>
-							<ActivityFeedPostItem
-								commentBox={false}
-								voteButton={false}
-								postData={proposal}
-								preventClick
-							/>
-						</div>
-					</TinderCard>
-				))}
-				{voteCart && voteCart.length > 0 && (
-					<div className='flex items-center justify-between gap-x-4'>
-						<span>Proposals: {voteCart?.length}</span>
-						<Drawer>
-							<DrawerTrigger asChild>
-								<Button size='sm'>View Cart</Button>
-							</DrawerTrigger>
-							<DrawerContent>
-								<DrawerHeader className='flex items-center justify-between'>
-									<DrawerTitle>Proposals</DrawerTitle>
-									<DrawerClose asChild>
-										<Button
-											variant='ghost'
-											size='icon'
-										>
-											<X className='h-4 w-4' />
-										</Button>
-									</DrawerClose>
-								</DrawerHeader>
-								<div className='w-full'>
-									<VoteCart voteCart={voteCart} />
-								</div>
-							</DrawerContent>
-						</Drawer>
-					</div>
-				)}
-				<div className='flex w-full items-center justify-center gap-x-4 p-4'>
-					<Button
-						variant='ghost'
-						className='rounded-full bg-failure p-2'
-						size='icon'
-						onClick={() => onSwipe(ESwipeDirection.LEFT)}
-						disabled={loading}
-					>
-						<ThumbsDown
-							fill={THEME_COLORS.light.btn_primary_text}
-							className='h-10 w-10'
-						/>
-					</Button>
-					<Button
-						variant='ghost'
-						size='icon'
-						className='rounded-full bg-white p-3 text-decision_bar_indicator shadow'
-						onClick={() => onSwipe(ESwipeDirection.UP)}
-						disabled={loading}
-					>
-						<Ban className='h-10 w-10' />
-					</Button>
-					<Button
-						variant='ghost'
-						size='icon'
-						className='rounded-full bg-success p-2'
-						onClick={() => onSwipe(ESwipeDirection.RIGHT)}
-						disabled={loading}
-					>
-						<ThumbsUp
-							fill={THEME_COLORS.light.btn_primary_text}
-							className='h-10 w-10'
-						/>
-					</Button>
-				</div>
-			</div>
+			<TinderVoting
+				filteredProposals={filteredProposals}
+				handleNext={handleNext}
+				loading={loading}
+				currentIndexRef={currentIndexRef}
+				addToVoteCart={addToVoteCart}
+				isFetching={isFetching}
+				voteCart={voteCart || []}
+				currentIndex={currentIndex}
+				proposals={proposals}
+			/>
 		</div>
 	);
 }

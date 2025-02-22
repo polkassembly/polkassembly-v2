@@ -621,6 +621,9 @@
 		"confirmBatchVoting": "Stapelabstimmung bestätigen",
 		"save": "Speichern",
 		"editVote": "Abstimmung bearbeiten",
-		"next": "Weiter"
+		"next": "Weiter",
+		"totalProposals": "Gesamtvorschläge",
+		"viewCart": "Warenkorb anzeigen",
+		"proposals": "Vorschläge"
 	}
 }

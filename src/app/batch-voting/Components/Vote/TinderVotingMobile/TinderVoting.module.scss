@@ -1,0 +1,19 @@
+.tinderVoting {
+  @apply relative flex h-[450px] flex-col-reverse sm:hidden;
+}
+
+.skipButton {
+  @apply absolute right-0 top-0 z-50 text-sm text-text_pink
+}
+
+.proposalCard {
+  @apply absolute top-0;
+}
+
+.voteButtons {
+  @apply flex w-full items-center justify-center gap-x-4 p-4
+}
+
+.voteCart {
+  @apply flex items-center justify-between gap-x-4
+}
