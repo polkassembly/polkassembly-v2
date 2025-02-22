@@ -466,14 +466,30 @@ export class NextApiClientService {
 	}
 
 	// activity feed
-	static async fetchActivityFeed({ page, origin, limit = DEFAULT_LISTING_LIMIT }: { page: number; origin?: EPostOrigin; limit?: number }) {
+	static async fetchActivityFeed({ page, origins, limit = DEFAULT_LISTING_LIMIT, userId }: { page: number; origins?: EPostOrigin[]; limit?: number; userId?: number }) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetActivityFeed', {
+				network: currentNetwork,
+				page,
+				limit,
+				...(origins ? { origins } : {}),
+				...(userId ? { userId } : {})
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
 		});
 
-		if (origin) {
-			queryParams.append('origin', origin.toString());
+		if (origins?.length) {
+			origins.forEach((origin) => queryParams.append('origin', origin));
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, queryParams });
