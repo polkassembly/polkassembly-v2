@@ -68,7 +68,7 @@ function SetIdentity() {
 	}, [formData, identityService, network, userPreferences.address?.address]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
-		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !identityService) return;
+		if (!userPreferences.wallet || !userPreferences.address?.address || !identityService) return;
 
 		const { displayName, legalName, email, twitter, matrix } = values;
 		setLoading(true);
@@ -112,13 +112,13 @@ function SetIdentity() {
 						rules={{
 							required: true,
 							validate: (value) => {
-								if (value.length === 0) return 'Invalid Display Name';
+								if (value?.length === 0) return 'Invalid Display Name';
 								return true;
 							}
 						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{t('SetIdentity.displayName')}*</FormLabel>
+								<FormLabel>{t('SetIdentity.displayName')}</FormLabel>
 								<FormControl>
 									<Input
 										placeholder={t('SetIdentity.displayName')}
@@ -160,7 +160,7 @@ function SetIdentity() {
 						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{t('SetIdentity.email')}*</FormLabel>
+								<FormLabel>{t('SetIdentity.email')}</FormLabel>
 								<FormControl>
 									<Input
 										placeholder={t('SetIdentity.email')}
