@@ -11,7 +11,6 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { BN } from '@polkadot/util';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
@@ -50,8 +49,6 @@ function SetIdentity() {
 
 	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
 
-	const [txFee, setTxFee] = useState<{ bnRegistrarFee?: BN; minDeposit: BN }>({ minDeposit: NETWORKS_DETAILS[`${network}`].peopleChainDetails.identityMinDeposit });
-
 	useEffect(() => {
 		const getTxFee = async () => {
 			if (!identityService || !network || !userPreferences.address?.address) return;
@@ -66,19 +63,12 @@ function SetIdentity() {
 			formData.setValue('matrix', identityInfo.matrix);
 
 			setIdentityLoading(false);
-
-			const registrarIndex = NETWORKS_DETAILS[`${network}`].peopleChainDetails.polkassemblyRegistrarIndex;
-			if (registrarIndex) {
-				const registrars = await identityService.getRegistrars();
-				const bnRegistrarFee = new BN(registrars?.[`${registrarIndex}`]?.fee);
-				setTxFee((prev) => ({ ...prev, bnRegistrarFee }));
-			}
 		};
 		getTxFee();
 	}, [formData, identityService, network, userPreferences.address?.address]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
-		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !values.email || !identityService) return;
+		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !identityService) return;
 
 		const { displayName, legalName, email, twitter, matrix } = values;
 		setLoading(true);
@@ -90,8 +80,6 @@ function SetIdentity() {
 			legalName,
 			twitter,
 			matrix,
-			network,
-			registrarFee: txFee.bnRegistrarFee,
 			onSuccess: () => {
 				setLoading(false);
 			},
@@ -103,7 +91,7 @@ function SetIdentity() {
 
 	return step === ESetIdentityStep.GAS_FEE ? (
 		<SetIdentityFees
-			txFee={txFee}
+			txFee={NETWORKS_DETAILS[`${network}`].peopleChainDetails.identityMinDeposit}
 			onNext={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
 		/>
 	) : (
@@ -124,7 +112,7 @@ function SetIdentity() {
 						rules={{
 							required: true,
 							validate: (value) => {
-								if (!value) return 'Display name is required';
+								if (value.length === 0) return 'Invalid Display Name';
 								return true;
 							}
 						}}
@@ -168,8 +156,7 @@ function SetIdentity() {
 							validate: (value) => {
 								if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
 								return true;
-							},
-							required: true
+							}
 						}}
 						render={({ field }) => (
 							<FormItem>

@@ -6,7 +6,7 @@ import SetIdentityIllustration from '@assets/illustrations/set-identity.svg';
 import Image from 'next/image';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
@@ -15,7 +15,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import classes from './SetIdentityFees.module.scss';
 
-function SetIdentityFees({ txFee, onNext }: { txFee: { bnRegistrarFee?: BN; minDeposit: BN }; onNext: () => void }) {
+function SetIdentityFees({ txFee, onNext }: { txFee: BN; onNext: () => void }) {
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 	const network = getCurrentNetwork();
 	const t = useTranslations();
@@ -39,8 +39,7 @@ function SetIdentityFees({ txFee, onNext }: { txFee: { bnRegistrarFee?: BN; minD
 						<div className={classes.collapsibleTriggerContentInner}>
 							<p className={classes.collapsibleTriggerContentInnerText}>
 								<span className='font-semibold'>
-									{formatter.format(Number(formatBnBalance(txFee.minDeposit.add(txFee.bnRegistrarFee || BN_ZERO), { withThousandDelimitor: false }, network)))}{' '}
-									{NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									{formatter.format(Number(formatBnBalance(txFee, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 								</span>
 								<span className='text-[10px] text-wallet_btn_text'>{t('SetIdentity.viewAmountBreakup')}</span>
 							</p>
@@ -54,17 +53,9 @@ function SetIdentityFees({ txFee, onNext }: { txFee: { bnRegistrarFee?: BN; minD
 						<div className={classes.feeItem}>
 							<p className={classes.feeItemText}>{t('SetIdentity.minimumDeposit')}</p>
 							<p className={classes.feeItemValue}>
-								{formatter.format(Number(formatBnBalance(txFee.minDeposit, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+								{formatter.format(Number(formatBnBalance(txFee, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 							</p>
 						</div>
-						{txFee?.bnRegistrarFee && (
-							<div className={classes.feeItem}>
-								<p className={classes.feeItemText}>{t('SetIdentity.registrarFees')}</p>
-								<p className={classes.feeItemValue}>
-									{formatter.format(Number(formatBnBalance(txFee.bnRegistrarFee, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-								</p>
-							</div>
-						)}
 					</div>
 				</CollapsibleContent>
 			</Collapsible>
