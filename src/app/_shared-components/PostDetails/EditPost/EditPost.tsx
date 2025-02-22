@@ -39,7 +39,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 		setIsLoading(true);
 
-		const { data, error } = await NextApiClientService.editProposalDetailsApi(
+		const { data, error } = await NextApiClientService.editProposalDetails(
 			postData.proposalType,
 			postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
 			{ title, content }

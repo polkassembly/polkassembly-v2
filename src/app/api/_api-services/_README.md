@@ -3,4 +3,4 @@
 ## Files in this directory -
 
 - Should only throw an `APIError`
-- Should only be imported to the server side code into `src/app/api/` and NOT into React server side components.
+- Should only be imported to the server side code into `src/app/api/` and into React server side components.

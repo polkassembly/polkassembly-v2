@@ -101,7 +101,7 @@ export class RedisService {
 		});
 	}
 
-	// static methods
+	// auth and third party methods
 	static async SetEmailVerificationToken(token: string, email: string): Promise<void> {
 		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY, true);
 	}
