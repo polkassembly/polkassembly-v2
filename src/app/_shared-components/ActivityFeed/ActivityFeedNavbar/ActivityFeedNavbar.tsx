@@ -31,7 +31,7 @@ function ActivityFeedNavbar({
 }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
-	const trackInfo = NETWORKS_DETAILS[network as ENetwork].tracks;
+	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 

@@ -130,7 +130,7 @@ export class IdentityService {
 
 		return infoCall
 			? infoCall.some(([index, judgement]: any[]) => {
-					return NETWORKS_DETAILS[this.network].identityRegistrarIndex === index && ['KnownGood', 'Reasonable'].includes(judgement);
+					return NETWORKS_DETAILS[this.network].peopleChainDetails.polkassemblyRegistrarIndex === index && ['KnownGood', 'Reasonable'].includes(judgement);
 				})
 			: false;
 	}

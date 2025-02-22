@@ -40,7 +40,7 @@ const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuI
 	}));
 const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string) => string, trackCounts?: Record<string, number>) => {
 	// eslint-disable-next-line
-	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
+	const tracks = NETWORKS_DETAILS[networkKey]?.trackDetails || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === trackGroup)
 		.map(([trackKey, track]) => {
@@ -84,7 +84,7 @@ const getOriginIcon = (key: string) => {
 
 const getOriginsItems = (networkKey: ENetwork, t: (key: string) => string) => {
 	// eslint-disable-next-line
-	const tracks = NETWORKS_DETAILS[networkKey]?.tracks || {};
+	const tracks = NETWORKS_DETAILS[networkKey]?.trackDetails || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === 'Origin')
 		.map(([key, track]) => {
