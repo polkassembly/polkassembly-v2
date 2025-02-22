@@ -7,7 +7,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
-import { ENetwork, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { ENetwork, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
@@ -149,12 +149,13 @@ export class RedisService {
 	}
 
 	// Posts caching methods
-	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<string | null> {
-		return this.Get({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
+	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<IPost | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
+		return data ? (deepParseJson(data) as IPost) : null;
 	}
 
-	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash), value: data, ttlSeconds: ONE_DAY });
+	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
 	}
 
 	static async DeletePostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<void> {

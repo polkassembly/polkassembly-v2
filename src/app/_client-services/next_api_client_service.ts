@@ -393,6 +393,20 @@ export class NextApiClientService {
 
 	// details
 	static async fetchProposalDetails(proposalType: EProposalType, index: string) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetPostData', {
+				network: currentNetwork,
+				proposalType,
+				indexOrHash: index
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
