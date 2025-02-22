@@ -479,6 +479,7 @@ export interface IOnChainPostInfo {
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
+	userReaction?: IReaction;
 }
 
 export interface IOnChainPostListing {
@@ -499,9 +500,6 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
-}
-
-export interface IActivityFeedPostListing extends IPostListing {
 	userReaction?: IReaction;
 }
 
@@ -799,4 +797,32 @@ export interface IFollowEntry {
 export enum ESidebarState {
 	EXPANDED = 'expanded',
 	COLLAPSED = 'collapsed'
+}
+
+export enum EConvictionAmount {
+	ZERO = 0,
+	ONE = 1,
+	TWO = 2,
+	THREE = 3,
+	FOUR = 4,
+	FIVE = 5,
+	SIX = 6
+}
+
+export interface IVoteCartItem {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	userId: number;
+	postIndexOrHash: string;
+	proposalType: EProposalType;
+	network: ENetwork;
+	decision: EVoteDecision;
+	amount: {
+		abstain?: string;
+		aye?: string;
+		nay?: string;
+	};
+	conviction: EConvictionAmount;
+	title?: string;
 }

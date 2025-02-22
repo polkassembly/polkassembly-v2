@@ -2,8 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECookieNames, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
-import { deleteCookie, getCookie } from 'cookies-next/client';
+import { ECookieNames, ETheme, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
+import { deleteCookie, getCookie, setCookie } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
 
 export class CookieClientService {
@@ -13,6 +13,10 @@ export class CookieClientService {
 
 	private static deleteCookieFromClient(cookieName: ECookieNames) {
 		return deleteCookie(cookieName);
+	}
+
+	private static setCookieInClient(cookieName: ECookieNames, value: string) {
+		return setCookie(cookieName, value);
 	}
 
 	private static decodeCookieToken<T>(token: string) {
@@ -41,5 +45,9 @@ export class CookieClientService {
 
 	static deleteRefreshToken() {
 		this.deleteCookieFromClient(ECookieNames.REFRESH_TOKEN);
+	}
+
+	static setThemeCookie(theme: ETheme) {
+		this.setCookieInClient(ECookieNames.THEME, theme);
 	}
 }

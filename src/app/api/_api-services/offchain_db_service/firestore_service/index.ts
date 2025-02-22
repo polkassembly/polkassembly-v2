@@ -25,7 +25,10 @@ import {
 	IFollowEntry,
 	IGenericListingResponse,
 	EOffChainPostTopic,
-	ITag
+	ITag,
+	IVoteCartItem,
+	EVoteDecision,
+	EConvictionAmount
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -36,17 +39,17 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { OutputData } from '@editorjs/editorjs';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
-import { FirestoreRefs } from './firestoreRefs';
+import { FirestoreUtils } from './firestoreUtils';
 
-export class FirestoreService extends FirestoreRefs {
+export class FirestoreService extends FirestoreUtils {
 	// Read methods
 	static async GetTotalUsersCount(): Promise<number> {
-		const userDocSnapshot = await FirestoreRefs.usersCollectionRef().get();
+		const userDocSnapshot = await this.usersCollectionRef().get();
 		return userDocSnapshot.docs.length;
 	}
 
 	static async GetUserByEmail(email: string): Promise<IUser | null> {
-		const userDocSnapshot = await FirestoreRefs.usersCollectionRef().where('email', '==', email).limit(1).get();
+		const userDocSnapshot = await this.usersCollectionRef().where('email', '==', email).limit(1).get();
 		if (userDocSnapshot.empty) {
 			return null;
 		}
@@ -60,7 +63,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetUserByUsername(username: string): Promise<IUser | null> {
-		const userDocSnapshot = await FirestoreRefs.usersCollectionRef().where('username', '==', username).limit(1).get();
+		const userDocSnapshot = await this.usersCollectionRef().where('username', '==', username).limit(1).get();
 		if (userDocSnapshot.empty) {
 			return null;
 		}
@@ -74,7 +77,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetUserById(userId: number): Promise<IUser | null> {
-		const userDocSnapshot = await FirestoreRefs.usersCollectionRef().doc(userId.toString()).get();
+		const userDocSnapshot = await this.usersCollectionRef().doc(userId.toString()).get();
 		if (!userDocSnapshot.exists) {
 			return null;
 		}
@@ -101,7 +104,7 @@ export class FirestoreService extends FirestoreRefs {
 		const addresses = await this.GetAddressesForUserId(userId);
 		const rank =
 			(
-				await FirestoreRefs.usersCollectionRef()
+				await this.usersCollectionRef()
 					.where('profileScore', '>', Number(user.profileScore || 0))
 					.count()
 					.get()
@@ -140,7 +143,7 @@ export class FirestoreService extends FirestoreRefs {
 		const addresses = await this.GetAddressesForUserId(user.id);
 		const rank =
 			(
-				await FirestoreRefs.usersCollectionRef()
+				await this.usersCollectionRef()
 					.where('profileScore', '>', Number(user.profileScore || 0))
 					.count()
 					.get()
@@ -158,14 +161,14 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
-		const usersQuery = FirestoreRefs.usersCollectionRef()
+		const usersQuery = this.usersCollectionRef()
 			.orderBy('profileScore', 'desc')
 			.limit(limit)
 			.offset((page - 1) * limit);
 
 		const usersQuerySnapshot = await usersQuery.get();
 
-		const totalUsersCount = (await FirestoreRefs.usersCollectionRef().count().get()).data().count || 0;
+		const totalUsersCount = (await this.usersCollectionRef().count().get()).data().count || 0;
 
 		return {
 			items: await Promise.all(
@@ -175,7 +178,7 @@ export class FirestoreService extends FirestoreRefs {
 					const addresses = await this.GetAddressesForUserId(data.id);
 					const rank =
 						(
-							await FirestoreRefs.usersCollectionRef()
+							await this.usersCollectionRef()
 								.where('profileScore', '>', Number(data.profileScore || 0))
 								.count()
 								.get()
@@ -203,7 +206,7 @@ export class FirestoreService extends FirestoreRefs {
 			return null;
 		}
 
-		const addressDocSnapshot = await FirestoreRefs.getAddressDocRefByAddress(substrAddress).get();
+		const addressDocSnapshot = await this.addressesCollectionRef().doc(substrAddress).get();
 		if (!addressDocSnapshot.exists) {
 			return null;
 		}
@@ -220,7 +223,7 @@ export class FirestoreService extends FirestoreRefs {
 			return null;
 		}
 
-		const addressDocSnapshot = await FirestoreRefs.getAddressDocRefByAddress(substrAddress).get();
+		const addressDocSnapshot = await this.addressesCollectionRef().doc(substrAddress).get();
 		if (!addressDocSnapshot.exists) {
 			return null;
 		}
@@ -238,7 +241,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {
-		const addressesQuery = FirestoreRefs.addressesCollectionRef().where('userId', '==', userId);
+		const addressesQuery = this.addressesCollectionRef().where('userId', '==', userId);
 		const addressesQuerySnapshot = await addressesQuery.get();
 
 		return addressesQuerySnapshot.docs.map((doc) => {
@@ -253,7 +256,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetOffChainPostData({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IOffChainPost | null> {
-		let postDocSnapshot = await FirestoreRefs.postsCollectionRef()
+		let postDocSnapshot = await this.postsCollectionRef()
 			.where('proposalType', '==', proposalType)
 			.where('index', '==', Number(indexOrHash))
 			.where('network', '==', network)
@@ -263,7 +266,7 @@ export class FirestoreService extends FirestoreRefs {
 
 		// if proposal type is tip then index is hash
 		if (proposalType === EProposalType.TIP) {
-			postDocSnapshot = await FirestoreRefs.postsCollectionRef()
+			postDocSnapshot = await this.postsCollectionRef()
 				.where('proposalType', '==', proposalType)
 				.where('hash', '==', indexOrHash)
 				.where('network', '==', network)
@@ -291,7 +294,7 @@ export class FirestoreService extends FirestoreRefs {
 		return {
 			...postData,
 			content: formattedContent,
-			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate(), network })) || [],
+			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate() || new Date(), network })) || [],
 			htmlContent,
 			markdownContent,
 			dataSource: EDataSource.POLKASSEMBLY,
@@ -314,7 +317,7 @@ export class FirestoreService extends FirestoreRefs {
 		page: number;
 		tags?: string[];
 	}): Promise<IOffChainPost[]> {
-		let postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
+		let postsQuery = this.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
 
 		if (tags?.length) {
 			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
@@ -358,7 +361,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetTotalOffChainPostsCount({ network, proposalType, tags }: { network: ENetwork; proposalType: EProposalType; tags?: string[] }): Promise<number> {
-		let postsQuery = FirestoreRefs.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
+		let postsQuery = this.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
 
 		if (tags?.length) {
 			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
@@ -380,7 +383,7 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType: EProposalType;
 	}): Promise<{ reaction: EReaction; count: number }[]> {
 		const reactionCountPromises = Object.values(EReaction).map(async (reaction) => {
-			const reactionCount = await FirestoreRefs.reactionsCollectionRef()
+			const reactionCount = await this.reactionsCollectionRef()
 				.where('network', '==', network)
 				.where('proposalType', '==', proposalType)
 				.where('indexOrHash', '==', indexOrHash)
@@ -398,7 +401,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetPostCommentsCount({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<number> {
-		const commentsCount = await FirestoreRefs.commentsCollectionRef()
+		const commentsCount = await this.commentsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
@@ -426,7 +429,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
-		const commentsQuery = FirestoreRefs.commentsCollectionRef()
+		const commentsQuery = this.commentsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
@@ -474,7 +477,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
-		const commentDocSnapshot = await FirestoreRefs.commentsCollectionRef().doc(id).get();
+		const commentDocSnapshot = await this.commentsCollectionRef().doc(id).get();
 		if (!commentDocSnapshot.exists) {
 			return null;
 		}
@@ -506,7 +509,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
-		const reactionsQuery = FirestoreRefs.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
+		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
 		return reactionsQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -519,7 +522,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetPostReactionById(id: string): Promise<IReaction | null> {
-		const reactionDocSnapshot = await FirestoreRefs.getReactionDocRefById(id).get();
+		const reactionDocSnapshot = await this.reactionsCollectionRef().doc(id).get();
 		if (!reactionDocSnapshot.exists) {
 			return null;
 		}
@@ -538,13 +541,13 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetLatestOffChainPostIndex(network: ENetwork, proposalType: EProposalType): Promise<number> {
-		const postsQuery = FirestoreRefs.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).orderBy('index', 'desc').limit(1);
+		const postsQuery = this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).orderBy('index', 'desc').limit(1);
 		const postsQuerySnapshot = await postsQuery.get();
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
 	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
-		const userActivityQuery = FirestoreRefs.userActivityCollectionRef().where('userId', '==', id);
+		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', id);
 		const userActivityQuerySnapshot = await userActivityQuery.get();
 		return userActivityQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -567,7 +570,7 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType: EProposalType;
 		userId: number;
 	}): Promise<IReaction | null> {
-		const reactionQuery = FirestoreRefs.reactionsCollectionRef()
+		const reactionQuery = this.reactionsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
@@ -580,7 +583,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
-		const contentSummaryQuery = FirestoreRefs.contentSummariesCollectionRef()
+		const contentSummaryQuery = this.contentSummariesCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
@@ -600,13 +603,13 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async IsUserFollowing({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }): Promise<boolean> {
-		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1);
+		const followingQuery = this.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToFollow).limit(1);
 		const followingQuerySnapshot = await followingQuery.get();
 		return followingQuerySnapshot.docs.length > 0;
 	}
 
 	static async GetFollowers(userId: number): Promise<IFollowEntry[]> {
-		const followersQuery = FirestoreRefs.followersCollectionRef().where('followedUserId', '==', userId);
+		const followersQuery = this.followersCollectionRef().where('followedUserId', '==', userId);
 		const followersQuerySnapshot = await followersQuery.get();
 		return followersQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -619,7 +622,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
-		const followingQuery = FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId);
+		const followingQuery = this.followersCollectionRef().where('followerUserId', '==', userId);
 		const followingQuerySnapshot = await followingQuery.get();
 		return followingQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -631,19 +634,32 @@ export class FirestoreService extends FirestoreRefs {
 		});
 	}
 
+	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
+		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId);
+		const voteCartQuerySnapshot = await voteCartQuery.get();
+		return voteCartQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IVoteCartItem;
+		});
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
 			key: apiKey,
 			usage: {
 				[apiRoute]: {
-					count: FirestoreRefs.increment(1),
+					count: this.increment(1),
 					last_used_at: new Date()
 				}
 			}
 		};
 
-		await FirestoreRefs.apiKeysCollectionRef()
+		await this.apiKeysCollectionRef()
 			.doc(apiKey)
 			.set(apiUsageUpdate, { merge: true })
 			.catch((err) => {
@@ -652,7 +668,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async AddNewUser(user: IUser) {
-		await FirestoreRefs.usersCollectionRef().doc(user.id.toString()).set(user);
+		await this.usersCollectionRef().doc(user.id.toString()).set(user);
 	}
 
 	static async AddNewAddress(addressEntry: IUserAddress) {
@@ -662,11 +678,11 @@ export class FirestoreService extends FirestoreRefs {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
 		}
 
-		await FirestoreRefs.addressesCollectionRef().doc(substrateAddress).set(addressEntry);
+		await this.addressesCollectionRef().doc(substrateAddress).set(addressEntry);
 	}
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
+		await this.usersCollectionRef().doc(userId.toString()).set({ twoFactorAuth: newTfaDetails }, { merge: true });
 	}
 
 	static async UpdateUserProfile({
@@ -697,7 +713,7 @@ export class FirestoreService extends FirestoreRefs {
 			payload = { ...payload, notificationPreferences };
 		}
 
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
+		await this.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
 	}
 
 	static async UpdateUserEmail(userId: number, email: string) {
@@ -707,7 +723,7 @@ export class FirestoreService extends FirestoreRefs {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Email already in use');
 		}
 
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ email, isEmailVerified: false }, { merge: true });
+		await this.usersCollectionRef().doc(userId.toString()).set({ email, isEmailVerified: false }, { merge: true });
 	}
 
 	static async UpdateUserUsername(userId: number, username: string) {
@@ -717,7 +733,7 @@ export class FirestoreService extends FirestoreRefs {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Username already in use');
 		}
 
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ username }, { merge: true });
+		await this.usersCollectionRef().doc(userId.toString()).set({ username }, { merge: true });
 	}
 
 	// Helper function to process documents in batches
@@ -731,13 +747,13 @@ export class FirestoreService extends FirestoreRefs {
 		batchSize?: number;
 	}) {
 		const batches: WriteBatch[] = [];
-		let currentBatch = FirestoreRefs.firestoreDb.batch();
+		let currentBatch = this.firestoreDb.batch();
 		let operationCount = 0;
 
 		querySnapshot.docs.forEach((doc) => {
 			if (operationCount === batchSize) {
 				batches.push(currentBatch);
-				currentBatch = FirestoreRefs.firestoreDb.batch();
+				currentBatch = this.firestoreDb.batch();
 				operationCount = 0;
 			}
 			batchOperation(currentBatch, doc);
@@ -754,30 +770,30 @@ export class FirestoreService extends FirestoreRefs {
 
 	static async DeleteUser(userId: number) {
 		// Delete user document
-		const userBatch = FirestoreRefs.firestoreDb.batch();
-		userBatch.delete(FirestoreRefs.usersCollectionRef().doc(userId.toString()));
+		const userBatch = this.firestoreDb.batch();
+		userBatch.delete(this.usersCollectionRef().doc(userId.toString()));
 		await userBatch.commit();
 
 		// Fetch and delete all related collections
 		const collections = [
 			{
-				query: FirestoreRefs.addressesCollectionRef().where('userId', '==', userId),
+				query: this.addressesCollectionRef().where('userId', '==', userId),
 				name: 'addresses'
 			},
 			{
-				query: FirestoreRefs.userActivityCollectionRef().where('userId', '==', userId),
+				query: this.userActivityCollectionRef().where('userId', '==', userId),
 				name: 'user activities'
 			},
 			{
-				query: FirestoreRefs.commentsCollectionRef().where('userId', '==', userId),
+				query: this.commentsCollectionRef().where('userId', '==', userId),
 				name: 'comments'
 			},
 			{
-				query: FirestoreRefs.reactionsCollectionRef().where('userId', '==', userId),
+				query: this.reactionsCollectionRef().where('userId', '==', userId),
 				name: 'reactions'
 			},
 			{
-				query: FirestoreRefs.notificationsCollectionRef().where('userId', '==', userId),
+				query: this.notificationsCollectionRef().where('userId', '==', userId),
 				name: 'notifications'
 			}
 		];
@@ -813,7 +829,7 @@ export class FirestoreService extends FirestoreRefs {
 		parentCommentId?: string;
 		address?: string;
 	}) {
-		const newCommentId = FirestoreRefs.commentsCollectionRef().doc().id;
+		const newCommentId = this.commentsCollectionRef().doc().id;
 
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
@@ -834,7 +850,7 @@ export class FirestoreService extends FirestoreRefs {
 			dataSource: EDataSource.POLKASSEMBLY
 		};
 
-		await FirestoreRefs.commentsCollectionRef().doc(newCommentId).set(newComment);
+		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
 
 		return newComment;
 	}
@@ -850,11 +866,11 @@ export class FirestoreService extends FirestoreRefs {
 			updatedAt: new Date()
 		};
 
-		await FirestoreRefs.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
+		await this.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
 	}
 
 	static async DeleteComment(commentId: string) {
-		await FirestoreRefs.commentsCollectionRef().doc(commentId).set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+		await this.commentsCollectionRef().doc(commentId).set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async AddPostReaction({
@@ -871,47 +887,46 @@ export class FirestoreService extends FirestoreRefs {
 		reaction: EReaction;
 	}): Promise<string> {
 		// if user has already reacted to this post, replace the reaction
-		const existingReaction = await FirestoreRefs.reactionsCollectionRef()
+		const existingReaction = await this.reactionsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
 			.where('userId', '==', userId)
 			.get();
 
-		let reactionId = FirestoreRefs.reactionsCollectionRef().doc().id;
+		let reactionId = this.reactionsCollectionRef().doc().id;
 
 		if (existingReaction.docs.length) {
 			reactionId = existingReaction.docs[0].id;
 		}
 
-		await FirestoreRefs.getReactionDocRefById(reactionId).set(
-			{
-				id: reactionId,
-				network,
-				indexOrHash,
-				proposalType,
-				userId,
-				reaction,
-				createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt?.toDate() : new Date(),
-				updatedAt: new Date()
-			},
-			{ merge: true }
-		);
+		await this.reactionsCollectionRef()
+			.doc(reactionId)
+			.set(
+				{
+					id: reactionId,
+					network,
+					indexOrHash,
+					proposalType,
+					userId,
+					reaction,
+					createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt?.toDate() : new Date(),
+					updatedAt: new Date()
+				},
+				{ merge: true }
+			);
 
 		return reactionId;
 	}
 
 	static async DeletePostReaction(id: string) {
-		await FirestoreRefs.getReactionDocRefById(id).delete();
+		await this.reactionsCollectionRef().doc(id).delete();
 	}
 
 	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: OutputData; title: string; allowedCommentor: EAllowedCommentor }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
-		await FirestoreRefs.getPostDocRefById(String(id)).set(
-			{ content, htmlContent: html, markdownContent: markdown, title, allowedCommentor, updatedAt: new Date() },
-			{ merge: true }
-		);
+		await this.postsCollectionRef().doc(String(id)).set({ content, htmlContent: html, markdownContent: markdown, title, allowedCommentor, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -935,7 +950,7 @@ export class FirestoreService extends FirestoreRefs {
 		tags?: ITag[];
 		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
-		const newPostId = FirestoreRefs.postsCollectionRef().doc().id;
+		const newPostId = this.postsCollectionRef().doc().id;
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
@@ -963,26 +978,26 @@ export class FirestoreService extends FirestoreRefs {
 		} else {
 			newPost.index = Number(newIndex);
 		}
-		await FirestoreRefs.getPostDocRefById(newPostId).set(newPost, { merge: true });
+		await this.postsCollectionRef().doc(newPostId).set(newPost, { merge: true });
 
 		return { id: newPostId, indexOrHash: String(newIndex) };
 	}
 
 	static async AddUserActivity(activity: IUserActivity) {
-		const newActivityId = FirestoreRefs.userActivityCollectionRef().doc().id;
-		await FirestoreRefs.userActivityCollectionRef()
+		const newActivityId = this.userActivityCollectionRef().doc().id;
+		await this.userActivityCollectionRef()
 			.doc(newActivityId)
 			.set({ ...activity, id: newActivityId });
 	}
 
 	static async IncrementUserProfileScore(userId: number, score: number) {
-		await FirestoreRefs.usersCollectionRef()
+		await this.usersCollectionRef()
 			.doc(userId.toString())
-			.set({ profileScore: FirestoreRefs.increment(score) }, { merge: true });
+			.set({ profileScore: this.increment(score) }, { merge: true });
 	}
 
 	static async UpdateUserPassword(userId: number, password: string, salt: string) {
-		await FirestoreRefs.usersCollectionRef().doc(userId.toString()).set({ password, salt }, { merge: true });
+		await this.usersCollectionRef().doc(userId.toString()).set({ password, salt }, { merge: true });
 	}
 
 	static async UpdateLastCommentAtPost({
@@ -996,12 +1011,7 @@ export class FirestoreService extends FirestoreRefs {
 		proposalType: EProposalType;
 		lastCommentAt: Date;
 	}) {
-		const post = await FirestoreRefs.postsCollectionRef()
-			.where('network', '==', network)
-			.where('proposalType', '==', proposalType)
-			.where('indexOrHash', '==', indexOrHash)
-			.limit(1)
-			.get();
+		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash).limit(1).get();
 
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ lastCommentAt }, { merge: true });
@@ -1009,14 +1019,14 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async UpdateContentSummary(contentSummary: IContentSummary) {
-		const contentSummaryId = contentSummary.id || FirestoreRefs.contentSummariesCollectionRef().doc().id;
-		await FirestoreRefs.contentSummariesCollectionRef()
+		const contentSummaryId = contentSummary.id || this.contentSummariesCollectionRef().doc().id;
+		await this.contentSummariesCollectionRef()
 			.doc(contentSummaryId)
 			.set({ ...contentSummary, id: contentSummaryId }, { merge: true });
 	}
 
 	static async FollowUser({ userId, userIdToFollow }: { userId: number; userIdToFollow: number }) {
-		const newFollowEntryId = FirestoreRefs.followersCollectionRef().doc().id;
+		const newFollowEntryId = this.followersCollectionRef().doc().id;
 
 		const followEntry: IFollowEntry = {
 			id: newFollowEntryId,
@@ -1026,11 +1036,11 @@ export class FirestoreService extends FirestoreRefs {
 			updatedAt: new Date()
 		};
 
-		await FirestoreRefs.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
+		await this.followersCollectionRef().doc(newFollowEntryId).set(followEntry);
 	}
 
 	static async UnfollowUser({ userId, userIdToUnfollow }: { userId: number; userIdToUnfollow: number }) {
-		const followEntry = await FirestoreRefs.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToUnfollow).limit(1).get();
+		const followEntry = await this.followersCollectionRef().where('followerUserId', '==', userId).where('followedUserId', '==', userIdToUnfollow).limit(1).get();
 
 		if (followEntry.docs.length) {
 			await followEntry.docs[0].ref.delete();
@@ -1038,7 +1048,7 @@ export class FirestoreService extends FirestoreRefs {
 	}
 
 	static async GetAllTags(network: ENetwork): Promise<IGenericListingResponse<ITag>> {
-		const tags = await FirestoreRefs.tagsCollectionRef().where('network', '==', network).get();
+		const tags = await this.tagsCollectionRef().where('network', '==', network).get();
 		return {
 			items: tags.docs
 				.filter((doc) => doc.data().value)
@@ -1059,9 +1069,74 @@ export class FirestoreService extends FirestoreRefs {
 
 		tags?.forEach((tag) => {
 			const docId = `${tag.value}_${tag.network}`;
-			batch.set(FirestoreRefs.tagsCollectionRef().doc(docId), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
+			batch.set(this.tagsCollectionRef().doc(docId), { value: tag.value, lastUsedAt: new Date(), network: tag.network }, { merge: true });
 		});
 
 		await batch.commit();
+	}
+
+	static async AddVoteCartItem({
+		userId,
+		postIndexOrHash,
+		proposalType,
+		decision,
+		amount,
+		conviction,
+		network
+	}: {
+		userId: number;
+		postIndexOrHash: string;
+		proposalType: EProposalType;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+		network: ENetwork;
+	}): Promise<IVoteCartItem> {
+		const newVoteCartItemId = this.voteCartItemsCollectionRef().doc().id;
+
+		const voteCartItem: IVoteCartItem = {
+			id: newVoteCartItemId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			userId,
+			postIndexOrHash,
+			proposalType,
+			decision,
+			amount,
+			conviction,
+			network
+		};
+
+		await this.voteCartItemsCollectionRef().doc(newVoteCartItemId).set(voteCartItem);
+
+		return voteCartItem;
+	}
+
+	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
+		const voteCartItem = await this.voteCartItemsCollectionRef().where('userId', '==', userId).where('id', '==', voteCartItemId).limit(1).get();
+
+		if (voteCartItem.docs.length) {
+			await voteCartItem.docs[0].ref.delete();
+		}
+	}
+
+	static async UpdateVoteCartItem({
+		userId,
+		voteCartItemId,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		voteCartItemId: string;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		const voteCartItem = await this.voteCartItemsCollectionRef().where('userId', '==', userId).where('id', '==', voteCartItemId).limit(1).get();
+
+		if (voteCartItem.docs.length) {
+			await voteCartItem.docs[0].ref.set({ decision, amount, conviction, updatedAt: new Date() }, { merge: true });
+		}
 	}
 }

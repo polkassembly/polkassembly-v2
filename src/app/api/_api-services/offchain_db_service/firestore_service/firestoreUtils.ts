@@ -3,8 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { FIREBASE_SERVICE_ACC_CONFIG } from '@/app/api/_api-constants/apiEnvVars';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import * as firebaseAdmin from 'firebase-admin';
@@ -26,7 +24,7 @@ try {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error in initialising firebase-admin.');
 }
 
-export class FirestoreRefs {
+export class FirestoreUtils {
 	protected static firestoreDb: firebaseAdmin.firestore.Firestore = firebaseAdmin.firestore();
 
 	protected static increment = firebaseAdmin.firestore.FieldValue.increment;
@@ -54,18 +52,5 @@ export class FirestoreRefs {
 
 	protected static tagsCollectionRef = () => this.firestoreDb.collection('tags');
 
-	// document reference methods
-	protected static getUserDocRefById = (userId: number) => this.usersCollectionRef().doc(userId.toString());
-
-	protected static getAddressDocRefByAddress = (address: string) => {
-		const formattedAddress = ValidatorService.isValidSubstrateAddress(address) ? address : getSubstrateAddress(address);
-		if (!formattedAddress) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Internal Error: Invalid substrate address.');
-		}
-		return this.addressesCollectionRef().doc(formattedAddress);
-	};
-
-	protected static getReactionDocRefById = (reactionId: string) => this.reactionsCollectionRef().doc(reactionId);
-
-	protected static getPostDocRefById = (id: string) => this.postsCollectionRef().doc(id);
+	protected static voteCartItemsCollectionRef = () => this.firestoreDb.collection('vote_cart_items');
 }

@@ -54,12 +54,13 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 		);
 	};
 
-	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[]) => (
+	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[], gridName: 'header' | 'footer') => (
 		<DynamicImageGrid
 			items={data}
 			rowSize={2}
 			tooltipPosition='top'
 			isExpanded={state === 'expanded'}
+			gridName={gridName}
 		/>
 	);
 	const data = getSidebarData(network, pathname, t);
@@ -95,7 +96,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 
 			<hr className='text-border_grey' />
 
-			<div className='mt-5'>{generateGridData(headerData)}</div>
+			<div className='mt-5'>{generateGridData(headerData, 'header')}</div>
 
 			<div className='px-4'>
 				<CreateProposalDropdownButton state={state} />
@@ -126,7 +127,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 					</Link>
 				)}
 
-				{generateGridData(footerData)}
+				{generateGridData(footerData, 'footer')}
 			</SidebarFooter>
 		</Sidebar>
 	);

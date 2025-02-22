@@ -27,7 +27,10 @@ import {
 	IFollowEntry,
 	IGenericListingResponse,
 	EOffChainPostTopic,
-	ITag
+	ITag,
+	IVoteCartItem,
+	EConvictionAmount,
+	EVoteDecision
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -260,6 +263,18 @@ export class OffChainDbService {
 
 	static async GetFollowing(userId: number): Promise<IFollowEntry[]> {
 		return FirestoreService.GetFollowing(userId);
+	}
+
+	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
+		const voteCartItems = await FirestoreService.GetVoteCart(userId);
+
+		// fetch title for each vote cart item
+		return Promise.all(
+			voteCartItems.map(async (voteCartItem) => {
+				const post = await this.GetOffChainPostData({ network: voteCartItem.network, indexOrHash: voteCartItem.postIndexOrHash, proposalType: voteCartItem.proposalType });
+				return { ...voteCartItem, title: post.title };
+			})
+		);
 	}
 
 	// helper methods
@@ -648,5 +663,45 @@ export class OffChainDbService {
 
 	static async CreateTags(tags: ITag[]) {
 		return FirestoreService.CreateTags(tags);
+	}
+
+	static async AddVoteCartItem({
+		userId,
+		postIndexOrHash,
+		proposalType,
+		decision,
+		amount,
+		conviction,
+		network
+	}: {
+		userId: number;
+		postIndexOrHash: string;
+		proposalType: EProposalType;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+		network: ENetwork;
+	}): Promise<IVoteCartItem> {
+		return FirestoreService.AddVoteCartItem({ userId, postIndexOrHash, proposalType, decision, amount, conviction, network });
+	}
+
+	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
+		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
+	}
+
+	static async UpdateVoteCartItem({
+		userId,
+		voteCartItemId,
+		decision,
+		amount,
+		conviction
+	}: {
+		userId: number;
+		voteCartItemId: string;
+		decision: EVoteDecision;
+		amount: { abstain?: string; aye?: string; nay?: string };
+		conviction: EConvictionAmount;
+	}) {
+		return FirestoreService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
 	}
 }

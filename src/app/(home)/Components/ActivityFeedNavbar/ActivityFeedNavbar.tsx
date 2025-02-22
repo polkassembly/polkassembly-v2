@@ -17,7 +17,7 @@ import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
-import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({
@@ -154,7 +154,7 @@ function ActivityFeedNavbar({
 											alt={category}
 											width={20}
 											height={20}
-											className='h-5 w-5 dark:brightness-0 dark:invert'
+											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
 										<span className='ml-1'>{category}</span>
 										{tracks?.length > 1 && (

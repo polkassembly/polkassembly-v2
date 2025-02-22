@@ -4,7 +4,11 @@
 }
 
 .tableRow {
-    @apply overflow-hidden rounded-t-lg bg-page_background px-6 text-wallet_btn_text;
+    @apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+}
+
+.tableRow_user {
+    @apply bg-leaderboard_usercard_bg border-y border-leaderboard_usercard_border text-btn_secondary_text;
 }
 
 .tableCell_1 {
@@ -13,6 +17,10 @@
 
 .tableCell_last {
     @apply p-4 last:rounded-tr-lg
+}
+
+.tableCell_3 {
+    @apply px-6 py-5;
 }
 
 .tableCell_2 {
@@ -24,7 +32,7 @@
 }
 
 .tableContentCell_last {
-    @apply p-4 last:rounded-tr-lg flex items-center gap-3 mt-3
+    @apply p-4 flex items-center gap-3 mt-3
 }
 
 .table_content_cell {
@@ -52,7 +60,7 @@
 }
 
 .rankStar {
-    @apply flex w-20 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium;
+    @apply flex w-20 max-w-28 items-center gap-1 rounded-lg border border-white bg-leaderboard_score_card_bg px-1.5 py-0.5 font-medium;
 }
 
 .rankCardText {

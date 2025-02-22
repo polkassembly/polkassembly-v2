@@ -63,7 +63,7 @@ function Navbar() {
 					variant='full'
 					className='md:hidden'
 				/>
-				<div className='border-l-[1px] border-bg_pink pl-3 font-semibold text-navbar_title md:border-none md:pl-0'>OpenGov</div>
+				<div className='border-l-[1px] border-bg_pink pl-3 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
 			<div
@@ -106,7 +106,7 @@ function Navbar() {
 				</span>
 				{user?.id ? (
 					<DropdownMenu>
-						<DropdownMenuTrigger>
+						<DropdownMenuTrigger asChild>
 							<Button
 								variant='ghost'
 								className='rounded-3xl border border-border_grey bg-wallet_disabled_bg text-sm text-text_primary'

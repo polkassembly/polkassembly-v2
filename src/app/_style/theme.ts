@@ -84,7 +84,10 @@ export const THEME_COLORS = {
 		selected_topic_bg: '#ebeef2',
 		basic_text: '#485F7D',
 		allowed_commentor_text: '#485F7D',
-		input_text: '#485F7D'
+		input_text: '#485F7D',
+		leaderboard_usercard_bg: '#e2ebff',
+		leaderboard_usercard_border: '#486ddf',
+		pagination_border: '#CED4DE'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -108,8 +111,7 @@ export const THEME_COLORS = {
 		dark_auction_text: '#CCAED4',
 		dark_community_bg: '#1C2945',
 		dark_community_text: '#96AAD6',
-		dark_council_bg: '#0B353C',
-		dark_council_text: '#93C9D1',
+		light_council_text: '#EB5688',
 		dark_general_bg: '#380E0E',
 		dark_general_text: '#DB8383',
 		dark_technical_bg: '#302921',
@@ -143,7 +145,6 @@ export const THEME_COLORS = {
 		progress_nay: '#fc3e5d',
 		decision_bar_bg: '#D4E0FC',
 		decision_bar_indicator: '#407AFC',
-		progress_pink_bg: '#FEF2F8',
 		info: '#1677ff',
 		activity_selected_tab: '#2E2E2E',
 		post_btn_bg: '#4B4B4B',
@@ -165,6 +166,11 @@ export const THEME_COLORS = {
 		selected_topic_bg: '#1D1D1D',
 		basic_text: '#909090',
 		allowed_commentor_text: '#ffffff',
-		input_text: '#ffffff'
+		input_text: '#ffffff',
+		leaderboard_usercard_bg: '#141C2D',
+		leaderboard_usercard_border: '#407BFF',
+		light_council_bg: '#4D2631',
+		listing_page_btn: '#9E9E9E',
+		pagination_border: '#4B4B4B'
 	}
 };
