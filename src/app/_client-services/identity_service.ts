@@ -11,7 +11,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import { BN, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { NETWORKS_DETAILS, PEOPLE_CHAIN_NETWORK_DETAILS } from '@shared/_constants/networks';
+import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity } from '@shared/types';
 import { deepParseJson } from 'deep-parse-json';
@@ -36,7 +36,7 @@ export class IdentityService {
 
 	static async Init(network: ENetwork): Promise<IdentityService> {
 		const api = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].peopleChainEndpoints[0].url)
+			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].peopleChainDetails.rpcEndpoints[0].url)
 		});
 
 		await api.isReady;
@@ -60,12 +60,12 @@ export class IdentityService {
 			}
 			this.currentPeopleChainRpcEndpointIndex = index;
 		} else {
-			this.currentPeopleChainRpcEndpointIndex = (this.currentPeopleChainRpcEndpointIndex + 1) % NETWORKS_DETAILS[this.network].peopleChainEndpoints.length;
+			this.currentPeopleChainRpcEndpointIndex = (this.currentPeopleChainRpcEndpointIndex + 1) % NETWORKS_DETAILS[this.network].peopleChainDetails.rpcEndpoints.length;
 		}
 
 		this.peopleChainApi.disconnect();
 		this.peopleChainApi = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
+			provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainDetails.rpcEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
 		});
 		await this.peopleChainApi.isReady;
 	}
@@ -84,7 +84,7 @@ export class IdentityService {
 
 		try {
 			this.peopleChainApi = await ApiPromise.create({
-				provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
+				provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainDetails.rpcEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
 			});
 
 			await this.peopleChainApi.isReady;
@@ -304,7 +304,7 @@ export class IdentityService {
 			matrix: { [matrix ? 'raw' : 'none']: matrix || null }
 		});
 
-		const registrarIndex = PEOPLE_CHAIN_NETWORK_DETAILS[`${network}`].polkassemblyRegistrarIndex;
+		const registrarIndex = NETWORKS_DETAILS[`${network}`].peopleChainDetails.polkassemblyRegistrarIndex;
 
 		let tx: SubmittableExtrinsic<'promise', ISubmittableResult>;
 

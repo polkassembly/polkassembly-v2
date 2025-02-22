@@ -13,8 +13,7 @@ import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BN } from '@polkadot/util';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { getIdentityMinDeposit } from '@/app/_client-utils/getIdentityMinDeposit';
-import { PEOPLE_CHAIN_NETWORK_DETAILS } from '@/_shared/_constants/networks';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
@@ -51,7 +50,7 @@ function SetIdentity() {
 
 	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
 
-	const [txFee, setTxFee] = useState<{ bnRegistrarFee?: BN; minDeposit: BN }>({ minDeposit: getIdentityMinDeposit(network) });
+	const [txFee, setTxFee] = useState<{ bnRegistrarFee?: BN; minDeposit: BN }>({ minDeposit: NETWORKS_DETAILS[`${network}`].peopleChainDetails.identityMinDeposit });
 
 	useEffect(() => {
 		const getTxFee = async () => {
@@ -68,7 +67,7 @@ function SetIdentity() {
 
 			setIdentityLoading(false);
 
-			const registrarIndex = PEOPLE_CHAIN_NETWORK_DETAILS[`${network}`].polkassemblyRegistrarIndex;
+			const registrarIndex = NETWORKS_DETAILS[`${network}`].peopleChainDetails.polkassemblyRegistrarIndex;
 			if (registrarIndex) {
 				const registrars = await identityService.getRegistrars();
 				const bnRegistrarFee = new BN(registrars?.[`${registrarIndex}`]?.fee);

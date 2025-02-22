@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { BN } from '@polkadot/util';
 import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
 
 const VIA_PARITY = 'via Parity';
@@ -67,6 +68,12 @@ interface ITrackInfo {
 	fellowshipOrigin?: boolean;
 }
 
+interface IPeopleChainDetails {
+	rpcEndpoints: IRpcEndpoint[];
+	polkassemblyRegistrarIndex?: number;
+	identityMinDeposit: BN;
+}
+
 interface INetworkDetails {
 	key: ENetwork;
 	name: string;
@@ -78,7 +85,7 @@ interface INetworkDetails {
 	tokenSymbol: string;
 	rpcEndpoints: IRpcEndpoint[];
 	supportedAssets: Record<string, INetworkTreasuryAssets>;
-	peopleChainEndpoints: IRpcEndpoint[];
+	peopleChainDetails: IPeopleChainDetails;
 	tracks: Partial<Record<EPostOrigin, ITrackInfo>>;
 	identityRegistrarIndex?: number;
 }
@@ -89,10 +96,10 @@ export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
 	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' }
 } as const;
 
-export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpcEndpoint[]; polkassemblyRegistrarIndex?: number; identityMinDeposit: number }> = {
+const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 	[ENetwork.POLKADOT]: {
 		polkassemblyRegistrarIndex: 3,
-		identityMinDeposit: 2001700000,
+		identityMinDeposit: new BN('2001700000'),
 		rpcEndpoints: [
 			{
 				name: VIA_PARITY,
@@ -118,7 +125,7 @@ export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpc
 	},
 	[ENetwork.KUSAMA]: {
 		polkassemblyRegistrarIndex: 5,
-		identityMinDeposit: 6672333321,
+		identityMinDeposit: new BN('6672333321'),
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -131,7 +138,7 @@ export const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, { rpcEndpoints: IRpc
 		]
 	},
 	[ENetwork.WESTEND]: {
-		identityMinDeposit: 10008500000,
+		identityMinDeposit: new BN('10008500000'),
 		rpcEndpoints: [
 			{
 				name: VIA_IBP_GEODNS1,
@@ -224,7 +231,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				index: '30'
 			}
 		},
-		peopleChainEndpoints: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT].rpcEndpoints,
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT],
 		tracks: {
 			[EPostOrigin.ROOT]: {
 				trackId: 0,
@@ -694,7 +701,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://rpc-kusama.luckyfriday.io'
 			}
 		],
-		peopleChainEndpoints: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA].rpcEndpoints,
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
 		tracks: {
 			[EPostOrigin.ROOT]: {
 				trackId: 0,
@@ -1428,7 +1435,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		],
 		supportedAssets: {},
-		peopleChainEndpoints: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.WESTEND].rpcEndpoints,
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.WESTEND],
 		tracks: {
 			[EPostOrigin.ROOT]: {
 				trackId: 0,
