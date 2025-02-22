@@ -12,7 +12,7 @@ import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, IOffChainPost, IOnChainPostInfo, IPost, IPublicUser } from '@shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, IPost, IPublicUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -27,77 +27,75 @@ const zodParamsSchema = z.object({
 	index: z.string()
 });
 
-async function handleOffChainPost(network: string, proposalType: string, index: string, offChainPostData: IOffChainPost) {
-	if (!offChainPostData) {
-		throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
-	}
-
-	let post: IPost = offChainPostData;
-
-	if (offChainPostData.userId && ValidatorService.isValidUserId(Number(offChainPostData.userId || -1))) {
-		const publicUser = await OffChainDbService.GetPublicUserById(offChainPostData.userId);
-		if (publicUser) {
-			post = { ...offChainPostData, publicUser };
-		}
-	}
-
-	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
-	return post;
-}
-
-async function getPublicUser(onChainPostInfo: IOnChainPostInfo, offChainPostData: IOffChainPost) {
+async function getPublicUser({ proposer, userId }: { proposer?: string; userId?: number }) {
 	let publicUser: IPublicUser | null = null;
 
-	if (onChainPostInfo.proposer && ValidatorService.isValidWeb3Address(onChainPostInfo.proposer)) {
-		publicUser = await OffChainDbService.GetPublicUserByAddress(onChainPostInfo.proposer);
+	if (proposer && ValidatorService.isValidWeb3Address(proposer)) {
+		publicUser = await OffChainDbService.GetPublicUserByAddress(proposer);
 	}
 
-	if (!publicUser && offChainPostData.userId && ValidatorService.isValidUserId(Number(offChainPostData.userId || -1))) {
-		publicUser = await OffChainDbService.GetPublicUserById(offChainPostData.userId);
+	if (!publicUser && userId && ValidatorService.isValidUserId(Number(userId || -1))) {
+		publicUser = await OffChainDbService.GetPublicUserById(userId);
 	}
 
 	return publicUser;
+}
+
+async function fetchPostData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: string }): Promise<IPost> {
+	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
+
+	let post: IPost;
+
+	// if is off-chain post just return the offchain post data
+	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
+		if (!offChainPostData) {
+			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
+		}
+		post = offChainPostData;
+	} else {
+		// if is on-chain post
+		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
+
+		if (!onChainPostInfo) {
+			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
+		}
+
+		post = {
+			...offChainPostData,
+			dataSource: offChainPostData?.dataSource || EDataSource.POLKASSEMBLY,
+			proposalType: proposalType as EProposalType,
+			network: network as ENetwork,
+			onChainInfo: onChainPostInfo
+		};
+	}
+
+	const publicUser = await getPublicUser({ userId: post.userId, proposer: post.onChainInfo?.proposer });
+
+	if (publicUser) {
+		post = { ...post, publicUser };
+	}
+
+	return post;
 }
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 	const network = await getNetworkFromHeaders();
 
-	const cachedData = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
-	if (cachedData) {
-		return NextResponse.json(cachedData);
-	}
+	// Get base post data from cache
+	let post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 
-	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
+	if (!post) {
+		post = await fetchPostData({ network, proposalType, index });
 
-	// if is off-chain post just return the offchain post data
-	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
-		return NextResponse.json(await handleOffChainPost(network, proposalType, index, offChainPostData));
-	}
-
-	// if is on-chain post
-	const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
-	if (!onChainPostInfo) {
-		throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
-	}
-
-	let post: IPost = {
-		...offChainPostData,
-		dataSource: offChainPostData?.dataSource || EDataSource.POLKASSEMBLY,
-		proposalType: proposalType as EProposalType,
-		network: network as ENetwork,
-		onChainInfo: onChainPostInfo
-	};
-
-	const publicUser = await getPublicUser(onChainPostInfo, offChainPostData);
-	if (publicUser) {
-		post = { ...post, publicUser };
+		// Cache the base post data without user reaction
+		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 	}
 
 	let accessToken: string | undefined;
 	let refreshToken: string | undefined;
 
-	// if user is authenticated, fetch user reaction for the post
+	// Add user-specific data if user is authenticated
 	try {
 		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 		accessToken = newAccessToken;
@@ -119,9 +117,6 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	} catch {
 		// do nothing
 	}
-
-	// Cache the response
-	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
 	const response = NextResponse.json(post);
 

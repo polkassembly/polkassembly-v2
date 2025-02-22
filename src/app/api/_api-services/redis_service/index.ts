@@ -238,8 +238,9 @@ export class RedisService {
 		limit: number;
 		userId?: number;
 		origins?: string[];
-	}): Promise<string | null> {
-		return this.Get({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins) });
+	}): Promise<IGenericListingResponse<IPostListing> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins) });
+		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 
 	static async SetActivityFeed({
@@ -253,11 +254,11 @@ export class RedisService {
 		network: string;
 		page: number;
 		limit: number;
-		data: string;
+		data: IGenericListingResponse<IPostListing>;
 		userId?: number;
 		origins?: string[];
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: data, ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
