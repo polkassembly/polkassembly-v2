@@ -82,52 +82,23 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 	const network = await getNetworkFromHeaders();
 
-	// Get base post data from cache
+	// Get post data from cache
 	let post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 
-	if (!post) {
-		post = await fetchPostData({ network, proposalType, index });
-
-		// Cache the base post data without user reaction
-		await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
+	if (post) {
+		return NextResponse.json(post);
 	}
 
-	let accessToken: string | undefined;
-	let refreshToken: string | undefined;
+	post = await fetchPostData({ network, proposalType, index });
 
-	// Add user-specific data if user is authenticated
-	try {
-		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
-		accessToken = newAccessToken;
-		refreshToken = newRefreshToken;
-		const userId = accessToken ? AuthService.GetUserIdFromAccessToken(accessToken) : undefined;
+	// fetch and add reactions to post
+	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });
+	post = { ...post, reactions };
 
-		if (userId) {
-			const userReaction = await OffChainDbService.GetUserReactionForPost({
-				network,
-				proposalType,
-				indexOrHash: index,
-				userId
-			});
+	// Cache the post data
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
-			if (userReaction) {
-				post = { ...post, userReaction };
-			}
-		}
-	} catch {
-		// do nothing
-	}
-
-	const response = NextResponse.json(post);
-
-	if (accessToken) {
-		response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(accessToken));
-	}
-	if (refreshToken) {
-		response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(refreshToken));
-	}
-
-	return response;
+	return NextResponse.json(post);
 });
 
 // update post
