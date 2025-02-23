@@ -10,7 +10,7 @@ import React from 'react';
 
 async function DiscussionPost({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
-	const { data, error } = await NextApiClientService.fetchProposalDetails(EProposalType.DISCUSSION, index);
+	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.DISCUSSION, indexOrHash: index });
 
 	if (error || !data) throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 
