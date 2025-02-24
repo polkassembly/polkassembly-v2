@@ -6,7 +6,7 @@ import Overview from './Components/Overview';
 
 function page() {
 	return (
-		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
+		<div className='grid grid-cols-1 gap-5 p-5 sm:p-8'>
 			<Overview />
 		</div>
 	);

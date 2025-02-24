@@ -1,0 +1,47 @@
+.tableRow {
+    @apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+}
+
+.tableRow_user {
+    @apply bg-leaderboard_usercard_bg border-y border-leaderboard_usercard_border text-btn_secondary_text;
+}
+
+.tableCell_1 {
+    @apply p-4 first:rounded-tl-md last:rounded-tr-md
+}
+
+.tableCell_last {
+    @apply p-4 last:rounded-tr-md
+}
+
+.tableCell_3 {
+    @apply px-6 py-5;
+}
+
+.tableCell_2 {
+    @apply w-1/4 px-6 py-5;
+}
+
+.tableCell {
+    @apply p-4;
+}
+
+.tableContentCell_last {
+    @apply p-4 flex items-center gap-3 mt-3
+}
+
+.table_content_cell {
+    @apply flex items-center gap-3 mt-3 min-w-44
+}
+
+.table_content_cell_1 {
+    @apply cursor-pointer text-base text-wallet_btn_text;
+}
+
+.table_content_cell_2 {
+    @apply flex items-center gap-3 mt-3;
+}
+
+.table_content_cell_2_content {
+    @apply rounded-md bg-wallet_disabled_bg px-2 py-1;
+}

@@ -11,6 +11,7 @@ export const THEME_COLORS = {
 		btn_primary_background: '#E5007A',
 		primary_border: '#D2D8E0',
 		tooltip_background: '#363636',
+		social_tooltip_background: '#E5007A',
 		tooltip_foreground: '#FFFFFF',
 		link: '#1B61FF',
 		btn_primary_text: '#FFF',
@@ -87,7 +88,9 @@ export const THEME_COLORS = {
 		input_text: '#485F7D',
 		leaderboard_usercard_bg: '#e2ebff',
 		leaderboard_usercard_border: '#486ddf',
-		pagination_border: '#CED4DE'
+		pagination_border: '#CED4DE',
+		info_card_bg: '#F4F5F6',
+		info_card_text: '##333843'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -97,6 +100,7 @@ export const THEME_COLORS = {
 		btn_primary_background: '#E5007A',
 		primary_border: '#333333',
 		tooltip_background: '#363636',
+		social_tooltip_background: '#333843',
 		tooltip_foreground: '#CCCCCC',
 		link: '#1B61FF',
 		btn_primary_text: '#FFF',
@@ -140,7 +144,7 @@ export const THEME_COLORS = {
 		sidebar_accent: '#FFFFFF14',
 		sidebar_foreground: '#49CFFC',
 		voting_bar_bg: '#575255',
-		progress_default: '#d3d3d3',
+		progress_default: '#1b282b',
 		progress_aye: '#27d57b',
 		progress_nay: '#fc3e5d',
 		decision_bar_bg: '#D4E0FC',
@@ -171,6 +175,8 @@ export const THEME_COLORS = {
 		leaderboard_usercard_border: '#407BFF',
 		light_council_bg: '#4D2631',
 		listing_page_btn: '#9E9E9E',
-		pagination_border: '#4B4B4B'
+		pagination_border: '#4B4B4B',
+		info_card_bg: '#333843',
+		info_card_text: '#ffffff'
 	}
 };
