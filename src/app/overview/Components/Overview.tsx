@@ -249,9 +249,9 @@ function Overview({
 					))}
 				</Tabs>
 			</div>
-			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2'>
+			<div className='mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2'>
 				{/* Upcoming Events */}
-				<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
+				<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg lg:col-span-1'>
 					<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Upcoming Events</h2>
 					<Calendar />
 					<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
