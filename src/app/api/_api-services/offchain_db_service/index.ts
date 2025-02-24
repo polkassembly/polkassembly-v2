@@ -704,8 +704,4 @@ export class OffChainDbService {
 	}) {
 		return FirestoreService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
 	}
-
-	static async GetChildBountiesByIndexes({ network, indexes, proposalType }: { network: ENetwork; indexes: number[]; proposalType: EProposalType }) {
-		return FirestoreService.GetChildBountiesByIndexes({ network, indexes, proposalType });
-	}
 }

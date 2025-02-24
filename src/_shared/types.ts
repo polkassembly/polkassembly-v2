@@ -830,12 +830,3 @@ export interface IVoteCartItem {
 	conviction: EConvictionAmount;
 	title?: string;
 }
-
-export interface IChildBounty {
-	title: string;
-	tags: ITag[];
-	index: number;
-	proposalType: EProposalType;
-	network: ENetwork;
-	onchainInfo?: IOnChainPostListing;
-}

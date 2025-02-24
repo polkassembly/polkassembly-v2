@@ -617,7 +617,7 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
-	query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!=50, $curator_eq: String, $status_eq: ProposalStatus ) {
+	query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
 	totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
     totalCount
   }  
