@@ -4,31 +4,36 @@
 
 'use client';
 
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Card, CardContent } from '@ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@ui/Tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@ui/Tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { MdInfoOutline } from 'react-icons/md';
 import Calendar from '@ui/calendar';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ENetwork, EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import Address from '@/app/_shared-components/Profile/Address/Address';
+import { useRouter } from 'next/navigation';
 import { aboutSocialLinks } from '@shared/_constants/AboutSocialLinks';
+import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 import AboutSocialLinks from './AboutSocialLinks';
 import styles from './Overview.module.scss';
 import NewsSection from './NewsSection';
 import SpendPeriod from './SpendPeriod';
 
-const MOCK_TITLE = 'Omni: Polkadot Enterprise desktop app Treasury Proposal';
-const MOCK_AUTHOR = 'Markian | Supercolony';
-const MOCK_DATE = "23rd Dec '22";
-const MOCK_STATUS = 'Proposed';
+function Overview({
+	trackDetails
+}: {
+	trackDetails: {
+		all: IGenericListingResponse<IPostListing> | null;
+		discussion: IGenericListingResponse<IPostListing> | null;
+		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
+	};
+}) {
+	const network = getCurrentNetwork() as ENetwork;
+	const router = useRouter();
 
-const mockActivityData = [
-	{ id: '1234', title: MOCK_TITLE, author: MOCK_AUTHOR, date: MOCK_DATE, status: MOCK_STATUS },
-	{ id: '1235', title: MOCK_TITLE, author: MOCK_AUTHOR, date: MOCK_DATE, status: MOCK_STATUS },
-	{ id: '1236', title: MOCK_TITLE, author: MOCK_AUTHOR, date: MOCK_DATE, status: MOCK_STATUS },
-	{ id: '1237', title: MOCK_TITLE, author: MOCK_AUTHOR, date: MOCK_DATE, status: MOCK_STATUS },
-	{ id: '1238', title: MOCK_TITLE, author: MOCK_AUTHOR, date: MOCK_DATE, status: MOCK_STATUS }
-];
-
-function Overview() {
 	return (
 		<div>
 			<h1 className='mb-4 text-2xl font-semibold text-btn_secondary_text'>Overview</h1>
@@ -64,78 +69,152 @@ function Overview() {
 			{/* Latest Activity */}
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
 				<h2 className='mb-4 text-lg font-semibold'>Latest Activity</h2>
-				<Tabs defaultValue='referenda'>
+				<Tabs defaultValue='all'>
 					<TabsList className='hide_scrollbar w-full justify-start overflow-x-auto border-b border-border_grey'>
 						<TabsTrigger
 							showBorder
 							className='px-4 py-2'
-							value='referenda'
+							value='all'
 						>
-							Referenda (23)
+							All <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
 							className='px-4 py-2'
-							value='proposals'
+							value='discussion'
 						>
-							Proposals (12)
+							Discussion <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
 						</TabsTrigger>
-						<TabsTrigger
-							showBorder
-							className='px-4 py-2'
-							value='motions'
-						>
-							Motions (34)
-						</TabsTrigger>
-						<TabsTrigger
-							showBorder
-							className='px-4 py-2'
-							value='treasury'
-						>
-							Treasury Proposals (56)
-						</TabsTrigger>
-						<TabsTrigger
-							showBorder
-							className='px-4 py-2'
-							value='bounties'
-						>
-							Bounties (2)
-						</TabsTrigger>
-						<TabsTrigger
-							showBorder
-							className='px-4 py-2'
-							value='tips'
-						>
-							Tips (3)
-						</TabsTrigger>
-					</TabsList>
-				</Tabs>
-
-				{/* Activity Table */}
-				<Table className='mt-4'>
-					<TableHeader>
-						<TableRow className={styles.tableRow}>
-							<TableHead className={styles.tableCell_1}>#</TableHead>
-							<TableHead className={styles.tableCell_2}>Title</TableHead>
-							<TableHead className={styles.tableCell}>Posted by</TableHead>
-							<TableHead className={styles.tableCell}>Created</TableHead>
-							<TableHead className={styles.tableCell}>Origin</TableHead>
-							<TableHead className={styles.tableCell_last}>Status</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{mockActivityData.map((row) => (
-							<TableRow key={row.id}>
-								<TableCell className={styles.tableCell}>#{row.id}</TableCell>
-								<TableCell className={styles.tableCell}>{row.title}</TableCell>
-								<TableCell className={styles.tableCell}>{row.author}</TableCell>
-								<TableCell className={styles.tableCell}>{row.date}</TableCell>
-								<TableCell className={styles.tableCell}>{row.status}</TableCell>
-								<TableCell className={styles.tableCell}>{row.status}</TableCell>
-							</TableRow>
+						{Object.keys(NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {}).map((key) => (
+							<TabsTrigger
+								showBorder
+								className='px-4 py-2'
+								value={key}
+								key={key}
+							>
+								{key} <span className='ml-1 text-xs'>({trackDetails?.tracks?.find((track) => track.trackName === key)?.data?.totalCount || 0})</span>
+							</TabsTrigger>
 						))}
-					</TableBody>
-				</Table>
+					</TabsList>
+					{/* "All" Tab */}
+					<TabsContent value='all'>
+						<Table className='mt-4'>
+							<TableHeader>
+								<TableRow className={styles.tableRow}>
+									<TableHead className={styles.tableCell_1}>#</TableHead>
+									<TableHead className={styles.tableCell_2}>Title</TableHead>
+									<TableHead className={styles.tableCell}>Posted by</TableHead>
+									<TableHead className={styles.tableCell}>Created</TableHead>
+									<TableHead className={styles.tableCell}>Origin</TableHead>
+									<TableHead className={styles.tableCell_last}>Status</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{trackDetails?.all?.items?.map((row) => (
+									<TableRow
+										className='cursor-pointer'
+										onClick={() => router.push(`/referenda/${row.index}`)}
+									>
+										<TableCell className={styles.tableCell}>{row.index}</TableCell>
+										<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
+										<TableCell className={styles.tableCell}>
+											<Address address={row.onChainInfo?.proposer || ''} />
+										</TableCell>
+										<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? new Date(row.onChainInfo.createdAt).toLocaleString() : 'N/A'}</TableCell>
+										<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
+										<TableCell className={styles.tableCell_status}>
+											<StatusTag
+												className='text-center'
+												status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+											/>
+										</TableCell>{' '}
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TabsContent>
+
+					{/* "Discussion" Tab */}
+					<TabsContent value='discussion'>
+						<Table className='mt-4'>
+							<TableHeader>
+								<TableRow className={styles.tableRow}>
+									<TableHead className={styles.tableCell_1}>#</TableHead>
+									<TableHead className={styles.tableCell_2}>Title</TableHead>
+									<TableHead className={styles.tableCell}>Posted by</TableHead>
+									<TableHead className={styles.tableCell}>Created</TableHead>
+									<TableHead className={styles.tableCell}>Origin</TableHead>
+									<TableHead className={styles.tableCell_last}>Status</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{trackDetails?.discussion?.items?.map((row) => (
+									<TableRow
+										className='cursor-pointer'
+										onClick={() => router.push(`/referenda/${row.index}`)}
+									>
+										<TableCell className={styles.tableCell}>{row.index}</TableCell>
+										<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
+										<TableCell className={styles.tableCell}>
+											<Address address={row.onChainInfo?.proposer || ''} />
+										</TableCell>
+										<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? dayjs.utc(row.onChainInfo?.createdAt).fromNow() : 'N/A'}</TableCell>
+										<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
+										<TableCell className={styles.tableCell_status}>
+											<StatusTag
+												className='text-center'
+												status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+											/>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TabsContent>
+
+					{/* Individual Track Tabs */}
+					{trackDetails?.tracks?.map((track) => (
+						<TabsContent
+							key={track.trackName}
+							value={track.trackName}
+						>
+							<Table className='mt-4'>
+								<TableHeader>
+									<TableRow className={styles.tableRow}>
+										<TableHead className={styles.tableCell_1}>#</TableHead>
+										<TableHead className={styles.tableCell_2}>Title</TableHead>
+										<TableHead className={styles.tableCell}>Posted by</TableHead>
+										<TableHead className={styles.tableCell}>Created</TableHead>
+										<TableHead className={styles.tableCell}>Origin</TableHead>
+										<TableHead className={styles.tableCell_status}>Status</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{track?.data?.items?.map((row) => (
+										<TableRow
+											className='cursor-pointer'
+											onClick={() => router.push(`/referenda/${row.index}`)}
+										>
+											<TableCell className={styles.tableCell}>{row.index}</TableCell>
+											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
+											<TableCell className={styles.tableCell}>
+												<Address address={row.onChainInfo?.proposer || ''} />
+											</TableCell>
+											<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? new Date(row.onChainInfo.createdAt).toLocaleString() : 'N/A'}</TableCell>
+											<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
+											<TableCell className={styles.tableCell_status}>
+												<StatusTag
+													className='text-center'
+													status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+												/>
+											</TableCell>{' '}
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						</TabsContent>
+					))}
+				</Tabs>
 			</div>
 			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2'>
 				{/* Upcoming Events */}

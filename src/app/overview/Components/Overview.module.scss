@@ -23,7 +23,15 @@
 }
 
 .tableCell {
-    @apply p-4;
+    @apply p-4 whitespace-nowrap;
+}
+
+.tableCell_status {
+    @apply w-[100px] overflow-hidden text-ellipsis;
+}
+
+.tableCell_title {
+    @apply w-[305px] py-5 whitespace-nowrap overflow-hidden text-ellipsis block max-w-[305px];
 }
 
 .tableContentCell_last {

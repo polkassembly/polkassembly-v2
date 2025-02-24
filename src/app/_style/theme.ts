@@ -90,7 +90,7 @@ export const THEME_COLORS = {
 		leaderboard_usercard_border: '#486ddf',
 		pagination_border: '#CED4DE',
 		info_card_bg: '#F4F5F6',
-		info_card_text: '##333843'
+		info_card_text: '#333843'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
