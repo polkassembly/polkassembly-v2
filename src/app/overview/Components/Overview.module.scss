@@ -7,11 +7,11 @@
 }
 
 .tableCell_1 {
-    @apply p-4 first:rounded-tl-md last:rounded-tr-md
+    @apply px-6 py-5 first:rounded-tl-md last:rounded-tr-md
 }
 
 .tableCell_last {
-    @apply p-4 last:rounded-tr-md
+    @apply px-6 py-5 last:rounded-tr-md
 }
 
 .tableCell_3 {
@@ -23,7 +23,7 @@
 }
 
 .tableCell {
-    @apply p-4 whitespace-nowrap;
+    @apply px-5 py-5 whitespace-nowrap;
 }
 
 .tableCell_status {

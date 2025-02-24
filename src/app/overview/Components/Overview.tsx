@@ -68,19 +68,19 @@ function Overview({
 
 			{/* Latest Activity */}
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
-				<h2 className='mb-4 text-lg font-semibold'>Latest Activity</h2>
+				<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Latest Activity</h2>
 				<Tabs defaultValue='all'>
 					<TabsList className='hide_scrollbar w-full justify-start overflow-x-auto border-b border-border_grey'>
 						<TabsTrigger
 							showBorder
-							className='px-4 py-2'
+							className='px-4 py-2 text-btn_secondary_text'
 							value='all'
 						>
 							All <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
-							className='px-4 py-2'
+							className='px-4 py-2 text-btn_secondary_text'
 							value='discussion'
 						>
 							Discussion <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
@@ -88,7 +88,7 @@ function Overview({
 						{Object.keys(NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {}).map((key) => (
 							<TabsTrigger
 								showBorder
-								className='px-4 py-2'
+								className='px-4 py-2 text-btn_secondary_text'
 								value={key}
 								key={key}
 							>
