@@ -48,7 +48,7 @@ function Calendar() {
 					>
 						{['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
 							<option
-								key={index}
+								key={month}
 								value={index}
 							>
 								{month}
