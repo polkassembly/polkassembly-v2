@@ -4,11 +4,11 @@
 
 import { useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { EProposalStatus, IChildBounty, IGenericListingResponse } from '@/_shared/types';
+import { EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
 
 export function useChildBounties() {
 	const [expandedRows, setExpandedRows] = useState<number[]>([]);
-	const [childBounties, setChildBounties] = useState<Record<number, IGenericListingResponse<IChildBounty>>>({});
+	const [childBounties, setChildBounties] = useState<Record<number, IGenericListingResponse<IPostListing>>>({});
 	const [loading, setLoading] = useState<Record<number, boolean>>({});
 	const [errors, setErrors] = useState<Record<number, string>>({});
 
@@ -27,13 +27,18 @@ export function useChildBounties() {
 				throw new Error('No data received from API');
 			}
 
-			const childBountiesResponse: IGenericListingResponse<IChildBounty> = {
+			const childBountiesResponse: IGenericListingResponse<IPostListing> = {
 				totalCount: response.data.totalCount ?? 0,
 				items:
 					response.data.items?.map((item) => ({
 						index: item.index ?? 0,
 						title: item.title ?? '',
 						tags: item.tags ?? [],
+						htmlContent: item.htmlContent ?? '',
+						markdownContent: item.markdownContent ?? '',
+						dataSource: item.dataSource ?? '',
+						allowedCommentor: item.allowedCommentor ?? '',
+						isDeleted: item.isDeleted ?? false,
 						proposalType: item.proposalType,
 						network: item.network,
 						onChainInfo: {
