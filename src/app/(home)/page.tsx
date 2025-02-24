@@ -6,12 +6,16 @@ import { Suspense } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { CookieService } from '@/_shared/_services/cookie_service';
 import ActivityFeed from './Components/index';
 import { ClientError } from '../_client-utils/clientError';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
 
 export default async function Home() {
-	const { data, error } = await NextApiClientService.fetchActivityFeedApi({ page: 1, limit: DEFAULT_LISTING_LIMIT });
+	const user = await CookieService.getUserFromCookie();
+	const userId = user?.id;
+
+	const { data, error } = await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);

@@ -60,7 +60,7 @@ function WritePost() {
 		if (!title || !description) return;
 
 		setLoading(true);
-		const { data, error } = await NextApiClientService.createOffChainPostApi({
+		const { data, error } = await NextApiClientService.createOffChainPost({
 			proposalType: EProposalType.DISCUSSION,
 			content: description,
 			title,

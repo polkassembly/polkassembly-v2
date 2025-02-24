@@ -47,7 +47,7 @@ export class AuthService {
 	private static async CreateAndSendEmailVerificationToken(user: IUser): Promise<void> {
 		if (user.email) {
 			const verifyToken = createCuid();
-			await RedisService.SetEmailVerificationToken(verifyToken, user.email);
+			await RedisService.SetEmailVerificationToken({ token: verifyToken, email: user.email });
 
 			// send verification email in background
 			NotificationService.SendVerificationEmail(user, verifyToken);
@@ -213,7 +213,7 @@ export class AuthService {
 		);
 
 		// save refresh token in redis
-		await RedisService.SetRefreshToken(userId, refreshToken);
+		await RedisService.SetRefreshToken({ userId, refreshToken });
 
 		return refreshToken;
 	}
@@ -248,7 +248,7 @@ export class AuthService {
 
 		if (isTFAEnabled) {
 			const tfaToken = createCuid();
-			await RedisService.SetTfaToken(tfaToken, user.id);
+			await RedisService.SetTfaToken({ tfaToken, userId: user.id });
 
 			return {
 				isTFAEnabled,
@@ -336,7 +336,7 @@ export class AuthService {
 
 			if (isTFAEnabled) {
 				const tfaToken = createCuid();
-				await RedisService.SetTfaToken(tfaToken, user.id);
+				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
 
 				return {
 					isTFAEnabled,
@@ -447,7 +447,7 @@ export class AuthService {
 
 		// send verification email
 		const verifyToken = createCuid();
-		await RedisService.SetEmailVerificationToken(verifyToken, user.email);
+		await RedisService.SetEmailVerificationToken({ token: verifyToken, email: user.email });
 		await NotificationService.SendVerificationEmail(user, verifyToken);
 
 		// regenerate access and refresh tokens
@@ -650,7 +650,7 @@ export class AuthService {
 		}
 
 		const resetToken = createCuid();
-		await RedisService.SetResetPasswordToken(resetToken, user.id);
+		await RedisService.SetResetPasswordToken({ token: resetToken, userId: user.id });
 
 		await NotificationService.SendResetPasswordEmail(user, resetToken);
 	}

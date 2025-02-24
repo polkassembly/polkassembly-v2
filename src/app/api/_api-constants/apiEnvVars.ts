@@ -16,7 +16,9 @@ export const {
 	NOTIFICATION_ENGINE_API_KEY = '',
 	SUBSCAN_API_KEY = '',
 	TOOLS_PASSPHRASE = '',
-	AI_SERVICE_URL = ''
+	AI_SERVICE_URL = '',
+	REQUEST_JUDGEMENT_CF_URL = '',
+	IDENTITY_JUDGEMENT_AUTH = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';
