@@ -20,7 +20,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const network = await getNetworkFromHeaders();
 	const parsedIndex = Number(index);
 
-	const onchainChildBountiesInfo = await OnChainDbService.GetChildBountiesByParentBountyIndex({
+	const onchainChildBountiesInfo: IGenericListingResponse<IOnChainPostInfo> = await OnChainDbService.GetChildBountiesByParentBountyIndex({
 		network,
 		index: parsedIndex
 	});
@@ -32,7 +32,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		});
 	}
 
-	const offChainDataPromises = onchainChildBountiesInfo.childBounties.map(async (onChainInfo: IOnChainPostInfo) => {
+	const offChainDataPromises = onchainChildBountiesInfo.items.map(async (onChainInfo: IOnChainPostInfo) => {
 		// get offchain child bounties;
 		const offchainPost = await OffChainDbService.GetOffChainPostData({
 			network,

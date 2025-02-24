@@ -435,7 +435,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }): Promise<IGenericListingResponse<IOnChainPostInfo>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
@@ -447,7 +447,7 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
 		}
 		return {
-			childBounties: subsquidData.childBounties || [],
+			items: subsquidData.childBounties || [],
 			totalCount: subsquidData.totalChildBounties.totalCount || 0
 		};
 	}
