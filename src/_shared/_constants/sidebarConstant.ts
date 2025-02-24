@@ -29,6 +29,7 @@ import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
 import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
 import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
 import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
+import OverviewIcon from '@assets/sidebar/overview-icon.svg';
 import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
@@ -105,6 +106,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 		initalItems: ActiveItems(
 			[
 				{ title: t('Sidebar.home'), url: '/', icon: Home },
+				{ title: t('Sidebar.overview'), url: '/overview', icon: OverviewIcon },
 				{ title: t('Sidebar.discussions'), url: '/discussions', icon: Discussion }
 			],
 			pathname
