@@ -110,8 +110,8 @@ function Overview({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{trackDetails ? (
-									trackDetails?.all?.items?.map((row) => (
+								{trackDetails?.all?.items && trackDetails.all.items.length > 0 ? (
+									trackDetails.all.items.map((row) => (
 										<TableRow
 											className='cursor-pointer'
 											onClick={() => router.push(`/referenda/${row.index}`)}
@@ -137,7 +137,7 @@ function Overview({
 											colSpan={6}
 											className='text-center'
 										>
-											No activity found
+											No activity data found
 										</TableCell>
 									</TableRow>
 								)}
@@ -159,8 +159,8 @@ function Overview({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{trackDetails ? (
-									trackDetails?.discussion?.items?.map((row) => (
+								{trackDetails?.discussion?.items && trackDetails.discussion.items.length > 0 ? (
+									trackDetails.discussion.items.map((row) => (
 										<TableRow
 											className='cursor-pointer'
 											onClick={() => router.push(`/referenda/${row.index}`)}
@@ -186,7 +186,7 @@ function Overview({
 											colSpan={6}
 											className='text-center'
 										>
-											No discussion found
+											No discussion posts found
 										</TableCell>
 									</TableRow>
 								)}
@@ -212,8 +212,8 @@ function Overview({
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{trackDetails ? (
-										track?.data?.items?.map((row) => (
+									{track?.data?.items && track.data.items.length > 0 ? (
+										track.data.items.map((row) => (
 											<TableRow
 												className='cursor-pointer'
 												onClick={() => router.push(`/referenda/${row.index}`)}
