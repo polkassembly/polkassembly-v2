@@ -10,7 +10,7 @@ interface INewsProps {
 	twitter: string;
 }
 
-function AboutNewsSection({ twitter }: INewsProps) {
+function NewsSection({ twitter }: INewsProps) {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const profile = twitter ? twitter.split('/')[3] : 'polkadot';
@@ -57,4 +57,4 @@ function AboutNewsSection({ twitter }: INewsProps) {
 	);
 }
 
-export default AboutNewsSection;
+export default NewsSection;

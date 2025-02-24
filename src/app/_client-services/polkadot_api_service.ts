@@ -109,22 +109,22 @@ export class PolkadotApiService {
 		const currentBlock = await this.api.derive.chain.bestNumberFinalized();
 		const spendPeriodConst = this.api.consts.treasury ? this.api.consts.treasury.spendPeriod : BN_ZERO;
 		if (spendPeriodConst) {
-			const spendPeriod = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
-			const totalSpendPeriod: number = blockToDays(spendPeriod, this.network, 6000);
-			const goneBlocks = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
-			const blocksLeft = spendPeriod - (goneBlocks % spendPeriod);
-			const { time } = blockToTime(blocksLeft, this.network, 6000);
-			const { d, h, m } = getDaysTimeObj(time);
+			const spendPeriodBlocks = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
+			const totalSpendPeriodDays: number = blockToDays(spendPeriodBlocks, this.network, 6000);
+			const currentBlockNumber = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
+			const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
+			const { time: remainingTime } = blockToTime(remainingBlocks, this.network, 6000);
+			const { d: days, h: hours, m: minutes } = getDaysTimeObj(remainingTime);
 
-			const percentage = (((goneBlocks % spendPeriod) / spendPeriod) * 100).toFixed(0);
+			const progressPercentage = (((currentBlockNumber % spendPeriodBlocks) / spendPeriodBlocks) * 100).toFixed(0);
 
 			return {
-				percentage: parseFloat(percentage),
+				percentage: parseFloat(progressPercentage),
 				value: {
-					days: d,
-					hours: h,
-					minutes: m,
-					total: totalSpendPeriod
+					days,
+					hours,
+					minutes,
+					total: totalSpendPeriodDays
 				}
 			};
 		}
