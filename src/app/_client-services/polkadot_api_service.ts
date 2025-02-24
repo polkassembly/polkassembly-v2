@@ -14,8 +14,8 @@ import { Signer } from '@polkadot/types/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-
 import { ENetwork, EVoteDecision } from '@shared/types';
+import { blockToDays, blockToTime, getDaysTimeObj } from '@shared/_utils/blockTimeCalculations';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -103,6 +103,32 @@ export class PolkadotApiService {
 
 	async getExistentialDeposit() {
 		return this.api.consts.balances.existentialDeposit;
+	}
+
+	async getSpendPeriod() {
+		const currentBlock = await this.api.derive.chain.bestNumberFinalized();
+		const spendPeriodConst = this.api.consts.treasury ? this.api.consts.treasury.spendPeriod : BN_ZERO;
+		if (spendPeriodConst) {
+			const spendPeriod = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
+			const totalSpendPeriod: number = blockToDays(spendPeriod, this.network, 6000);
+			const goneBlocks = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
+			const blocksLeft = spendPeriod - (goneBlocks % spendPeriod);
+			const { time } = blockToTime(blocksLeft, this.network, 6000);
+			const { d, h, m } = getDaysTimeObj(time);
+
+			const percentage = (((goneBlocks % spendPeriod) / spendPeriod) * 100).toFixed(0);
+
+			return {
+				percentage: parseFloat(percentage),
+				value: {
+					days: d,
+					hours: h,
+					minutes: m,
+					total: totalSpendPeriod
+				}
+			};
+		}
+		return null;
 	}
 
 	async getUserBalances({ address }: { address: string }) {

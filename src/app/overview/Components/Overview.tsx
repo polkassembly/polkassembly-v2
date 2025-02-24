@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { Card, CardContent } from '@ui/card';
 import { Progress } from '@ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@ui/Tabs';
@@ -12,9 +14,13 @@ import { RiDiscordFill } from 'react-icons/ri';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 import { FaTelegramPlane } from 'react-icons/fa';
 import { IoIosCube } from 'react-icons/io';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useEffect, useState } from 'react';
 import { MdInfoOutline } from 'react-icons/md';
+import Calendar from '@ui/calendar';
 import AboutSocialLinks, { AboutSocialLink } from './AboutSocialLinks';
 import styles from './Overview.module.scss';
+import AboutNewsSection from './AboutNewsSection';
 
 const socialLinks: AboutSocialLink[] = [
 	{
@@ -73,6 +79,17 @@ const mockActivityData = [
 ];
 
 function Overview() {
+	const { apiService } = usePolkadotApiService();
+
+	const [spendPeriod, setSpendPeriod] = useState<{ percentage: number; value: { days: number; hours: number; minutes: number; total: number } } | null>(null);
+
+	useEffect(() => {
+		if (!apiService) return;
+		(async () => {
+			const data = await apiService?.getSpendPeriod();
+			setSpendPeriod(data);
+		})();
+	}, [apiService]);
 	return (
 		<div className='p-6'>
 			<h1 className='mb-4 text-2xl font-semibold text-btn_secondary_text'>Overview</h1>
@@ -85,7 +102,7 @@ function Overview() {
 						<AboutSocialLinks links={socialLinks} />
 					</div>
 					<p className='mt-4 text-sm font-medium text-btn_secondary_text'>
-						Join our Community to discuss, contribute and get regular updates from us! <span className='text-bg_pink'>View Gallery</span>
+						Join our Community to discuss, contribute and get regular updates from us! <span className='cursor-pointer text-bg_pink'>View Gallery</span>
 					</p>
 				</CardContent>
 			</Card>
@@ -107,15 +124,16 @@ function Overview() {
 							Spend Period Remaining <MdInfoOutline className='inline-block text-lg' />
 						</p>
 						<p className='text-xs text-wallet_btn_text'>
-							<span className='text-lg font-medium text-btn_secondary_text'>15</span> hrs <span className='text-lg font-medium text-btn_secondary_text'>23</span> mins / 20 days
+							<span className='text-lg font-medium text-btn_secondary_text'>{spendPeriod?.value.hours}</span> hrs{' '}
+							<span className='text-lg font-medium text-btn_secondary_text'>{spendPeriod?.value.minutes}</span> mins / {spendPeriod?.value.total} days
 						</p>
 						<div className='mt-2 flex items-center gap-2'>
 							<Progress
-								value={76}
+								value={spendPeriod?.percentage}
 								className='bg-progress_default'
 								indicatorClassName='bg-text_pink'
 							/>
-							<p className='text-xs font-medium text-btn_secondary_text'>{76}%</p>
+							<p className='text-xs font-medium text-btn_secondary_text'>{spendPeriod?.percentage}%</p>
 						</div>
 						<hr className='my-3 border-border_grey' />
 						<div className='flex items-center gap-3'>
@@ -140,7 +158,7 @@ function Overview() {
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
 				<h2 className='mb-4 text-lg font-semibold'>Latest Activity</h2>
 				<Tabs defaultValue='referenda'>
-					<TabsList className='w-full justify-start border-b border-border_grey'>
+					<TabsList className='hide_scrollbar w-full justify-start overflow-x-auto border-b border-border_grey'>
 						<TabsTrigger
 							showBorder
 							className='px-4 py-2'
@@ -211,6 +229,17 @@ function Overview() {
 						))}
 					</TableBody>
 				</Table>
+			</div>
+			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2'>
+				{/* Upcoming Events */}
+				<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
+					<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Upcoming Events</h2>
+					<Calendar />
+					<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
+				</div>
+				{/* News */}
+
+				<AboutNewsSection twitter='https://x.com/polkadot' />
 			</div>
 		</div>
 	);
