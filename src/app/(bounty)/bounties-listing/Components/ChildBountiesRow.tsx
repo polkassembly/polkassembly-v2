@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IChildBounty, IGenericListingResponse } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import React from 'react';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { TableCell, TableRow } from '@/app/_shared-components/Table';
@@ -26,7 +26,7 @@ function ChildBountiesRow({
 	parentIndex: number;
 	loading: Record<number, boolean>;
 	errors: string | string[];
-	childBounties: IGenericListingResponse<IChildBounty>;
+	childBounties: IGenericListingResponse<IPostListing>;
 }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
@@ -120,7 +120,7 @@ function ChildBountiesRow({
 					'-'
 				)}
 			</TableCell>
-			<TableCell className={styles.tableCellBody_last}>{childBounty.tags?.length > 0 ? childBounty.tags.join(', ') : 'N/A'}</TableCell>
+			<TableCell className={styles.tableCellBody_last}>{childBounty.tags?.length ? childBounty.tags.join(', ') : 'N/A'}</TableCell>
 		</TableRow>
 	));
 }
