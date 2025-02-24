@@ -458,7 +458,8 @@
 		"started": "已开始",
 		"passed": "已通过",
 		"proposed": "已提议",
-		"created": "已创建"
+		"created": "已创建",
+		"undefined": "未定义"
 	},
 	"Pagination": {
 		"next": "下一页",

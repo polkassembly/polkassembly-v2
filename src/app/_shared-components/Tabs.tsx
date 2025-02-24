@@ -14,7 +14,7 @@ const Tabs = TabsPrimitive.Root;
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>>(({ className, ...props }, ref) => (
 	<TabsPrimitive.List
 		ref={ref}
-		className={cn('inline-flex items-center justify-center rounded-lg bg-muted text-muted-foreground', className)}
+		className={cn('inline-flex items-center justify-center bg-muted text-muted-foreground', className)}
 		{...props}
 	/>
 ));
@@ -25,9 +25,9 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigg
 		<TabsPrimitive.Trigger
 			ref={ref}
 			className={cn(
-				'inline-flex items-center justify-center whitespace-nowrap px-5 py-3 text-sm font-medium text-text_primary ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+				'inline-flex items-center justify-center whitespace-nowrap px-5 py-3 text-sm font-medium text-text_primary ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-text_pink',
 				showBorder && 'data-[state=active]:border-x data-[state=active]:border-t data-[state=active]:border-border_grey',
-				showBorder && 'data-[state=active]:rounded-t-lg data-[state=active]:border-b-2 data-[state=active]:border-b-text_pink',
+				'data-[state=active]:rounded-t-lg data-[state=active]:border-b-2 data-[state=active]:border-b-text_pink',
 				'data-[state=active]:font-semibold data-[state=active]:text-text_pink',
 				className
 			)}

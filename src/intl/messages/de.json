@@ -458,7 +458,8 @@
 		"started": "Gestartet",
 		"passed": "Bestanden",
 		"proposed": "Vorgeschlagen",
-		"created": "Erstellt"
+		"created": "Erstellt",
+		"undefined": "Undefiniert"
 	},
 	"Pagination": {
 		"next": "Weiter",

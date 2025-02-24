@@ -110,26 +110,37 @@ function Overview({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{trackDetails?.all?.items?.map((row) => (
-									<TableRow
-										className='cursor-pointer'
-										onClick={() => router.push(`/referenda/${row.index}`)}
-									>
-										<TableCell className={styles.tableCell}>{row.index}</TableCell>
-										<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
-										<TableCell className={styles.tableCell}>
-											<Address address={row.onChainInfo?.proposer || ''} />
+								{trackDetails ? (
+									trackDetails?.all?.items?.map((row) => (
+										<TableRow
+											className='cursor-pointer'
+											onClick={() => router.push(`/referenda/${row.index}`)}
+										>
+											<TableCell className={styles.tableCell}>{row.index}</TableCell>
+											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
+											<TableCell className={styles.tableCell}>
+												<Address address={row.onChainInfo?.proposer || ''} />
+											</TableCell>
+											<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? new Date(row.onChainInfo.createdAt).toLocaleString() : 'N/A'}</TableCell>
+											<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
+											<TableCell className={styles.tableCell_status}>
+												<StatusTag
+													className='text-center'
+													status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+												/>
+											</TableCell>
+										</TableRow>
+									))
+								) : (
+									<TableRow>
+										<TableCell
+											colSpan={6}
+											className='text-center'
+										>
+											No activity found
 										</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? new Date(row.onChainInfo.createdAt).toLocaleString() : 'N/A'}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
-										<TableCell className={styles.tableCell_status}>
-											<StatusTag
-												className='text-center'
-												status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
-											/>
-										</TableCell>{' '}
 									</TableRow>
-								))}
+								)}
 							</TableBody>
 						</Table>
 					</TabsContent>
@@ -148,26 +159,37 @@ function Overview({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{trackDetails?.discussion?.items?.map((row) => (
-									<TableRow
-										className='cursor-pointer'
-										onClick={() => router.push(`/referenda/${row.index}`)}
-									>
-										<TableCell className={styles.tableCell}>{row.index}</TableCell>
-										<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
-										<TableCell className={styles.tableCell}>
-											<Address address={row.onChainInfo?.proposer || ''} />
-										</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? dayjs.utc(row.onChainInfo?.createdAt).fromNow() : 'N/A'}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
-										<TableCell className={styles.tableCell_status}>
-											<StatusTag
-												className='text-center'
-												status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
-											/>
+								{trackDetails ? (
+									trackDetails?.discussion?.items?.map((row) => (
+										<TableRow
+											className='cursor-pointer'
+											onClick={() => router.push(`/referenda/${row.index}`)}
+										>
+											<TableCell className={styles.tableCell}>{row.index}</TableCell>
+											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
+											<TableCell className={styles.tableCell}>
+												<Address address={row.onChainInfo?.proposer || ''} />
+											</TableCell>
+											<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? dayjs.utc(row.onChainInfo?.createdAt).fromNow() : 'N/A'}</TableCell>
+											<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
+											<TableCell className={styles.tableCell_status}>
+												<StatusTag
+													className='text-center'
+													status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+												/>
+											</TableCell>
+										</TableRow>
+									))
+								) : (
+									<TableRow>
+										<TableCell
+											colSpan={6}
+											className='text-center'
+										>
+											No discussion found
 										</TableCell>
 									</TableRow>
-								))}
+								)}
 							</TableBody>
 						</Table>
 					</TabsContent>
@@ -190,26 +212,37 @@ function Overview({
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{track?.data?.items?.map((row) => (
-										<TableRow
-											className='cursor-pointer'
-											onClick={() => router.push(`/referenda/${row.index}`)}
-										>
-											<TableCell className={styles.tableCell}>{row.index}</TableCell>
-											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
-											<TableCell className={styles.tableCell}>
-												<Address address={row.onChainInfo?.proposer || ''} />
+									{trackDetails ? (
+										track?.data?.items?.map((row) => (
+											<TableRow
+												className='cursor-pointer'
+												onClick={() => router.push(`/referenda/${row.index}`)}
+											>
+												<TableCell className={styles.tableCell}>{row.index}</TableCell>
+												<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
+												<TableCell className={styles.tableCell}>
+													<Address address={row.onChainInfo?.proposer || ''} />
+												</TableCell>
+												<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? dayjs.utc(row.onChainInfo?.createdAt).fromNow() : 'N/A'}</TableCell>
+												<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
+												<TableCell className={styles.tableCell_status}>
+													<StatusTag
+														className='text-center'
+														status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+													/>
+												</TableCell>
+											</TableRow>
+										))
+									) : (
+										<TableRow>
+											<TableCell
+												colSpan={6}
+												className='text-center'
+											>
+												No {track.trackName} activity found
 											</TableCell>
-											<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? new Date(row.onChainInfo.createdAt).toLocaleString() : 'N/A'}</TableCell>
-											<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
-											<TableCell className={styles.tableCell_status}>
-												<StatusTag
-													className='text-center'
-													status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
-												/>
-											</TableCell>{' '}
 										</TableRow>
-									))}
+									)}
 								</TableBody>
 							</Table>
 						</TabsContent>

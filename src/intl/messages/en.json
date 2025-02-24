@@ -478,7 +478,8 @@
 		"started": "Started",
 		"passed": "Passed",
 		"proposed": "Proposed",
-		"created": "Created"
+		"created": "Created",
+		"undefined": "Undefined"
 	},
 	"Pagination": {
 		"next": "Next",
