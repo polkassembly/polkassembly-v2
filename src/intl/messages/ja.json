@@ -621,6 +621,16 @@
 		"proposed": "提案済み",
 		"claimed": "請求済み",
 		"cancelled": "キャンセル済み",
-		"rejected": "否決"
+		"rejected": "否決",
+		"onChainIdentity": "オンチェーンアイデンティティ",
+		"identityDescription1": "Polkadotは、任命された登録機関を通じてユーザーの資格情報を検証するオンチェーンIDを提供し、より大きな信頼とサポートを実現します。",
+		"identityDescription2": "検証が成功すると、ユーザーは信頼できるステータスを象徴する緑のチェックマークを受け取ります。この検証済みステータスシンボルは、財務部からの資金要請や討論・提案への参加時の信頼性を高めます。",
+		"letBegin": "始めましょう",
+		"requestJudgement": "判断を要請（近日公開）",
+		"minimumDeposit": "最低預入額",
+		"registrarFee": "登録機関手数料",
+		"totalAmountRequired": "必要総額",
+		"viewAmountBreakup": "金額の内訳を表示",
+		"registrarFees": "登録手数料"
 	}
 }

@@ -4,7 +4,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { deepParseJson } from 'deep-parse-json';
 import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser, IReaction } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -58,7 +57,8 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	// Try to get from cache first
 	const cachedData = await RedisService.GetActivityFeed({ network, page, limit, userId, origins });
 	if (cachedData) {
-		const response = NextResponse.json(deepParseJson(cachedData));
+		const response = NextResponse.json(cachedData);
+
 		if (accessToken) {
 			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
 		}
@@ -155,7 +155,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const responseData: IGenericListingResponse<IPostListing> = { items: posts, totalCount };
 
 	// Cache the response
-	await RedisService.SetActivityFeed({ network, page, limit, data: JSON.stringify(responseData), userId, origins });
+	await RedisService.SetActivityFeed({ network, page, limit, data: responseData, userId, origins });
 
 	const response = NextResponse.json(responseData);
 

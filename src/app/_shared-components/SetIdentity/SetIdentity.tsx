@@ -4,17 +4,21 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { Input } from '../Input';
+import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -24,18 +28,47 @@ interface ISetIdentityFormFields {
 	matrix?: string;
 }
 
+enum ESetIdentityStep {
+	GAS_FEE,
+	SET_IDENTITY_FORM,
+	SOCIAL_VERIFICATION
+}
+
 function SetIdentity() {
 	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
 
+	const network = getCurrentNetwork();
+
 	const formData = useForm<ISetIdentityFormFields>();
 
 	const [loading, setLoading] = useState(false);
+	const [identityLoading, setIdentityLoading] = useState(false);
 
 	const { identityService } = useIdentityService();
 
+	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
+
+	useEffect(() => {
+		const getTxFee = async () => {
+			if (!identityService || !network || !userPreferences.address?.address) return;
+
+			setIdentityLoading(true);
+			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
+
+			formData.setValue('displayName', identityInfo.display);
+			formData.setValue('legalName', identityInfo.legal);
+			formData.setValue('email', identityInfo.email);
+			formData.setValue('twitter', identityInfo.twitter);
+			formData.setValue('matrix', identityInfo.matrix);
+
+			setIdentityLoading(false);
+		};
+		getTxFee();
+	}, [formData, identityService, network, userPreferences.address?.address]);
+
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
-		if (!userPreferences.wallet || !userPreferences.address?.address || !values.displayName || !values.email || !identityService) return;
+		if (!userPreferences.wallet || !userPreferences.address?.address || !identityService) return;
 
 		const { displayName, legalName, email, twitter, matrix } = values;
 		setLoading(true);
@@ -56,23 +89,30 @@ function SetIdentity() {
 		});
 	};
 
-	return (
+	return step === ESetIdentityStep.GAS_FEE ? (
+		<SetIdentityFees
+			txFee={NETWORKS_DETAILS[`${network}`].peopleChainDetails.identityMinDeposit}
+			onNext={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
+		/>
+	) : (
 		<Form {...formData}>
 			<form onSubmit={formData.handleSubmit(handleSetIdentity)}>
 				<div className='flex flex-col gap-y-4'>
 					<WalletButtons small />
-					<AddressDropdown withBalance />
+					<AddressDropdown
+						withBalance
+						disabled={identityLoading}
+					/>
 					<Separator />
 					<FormField
 						control={formData.control}
 						name='displayName'
 						key='displayName'
-						disabled={loading}
-						defaultValue=''
+						disabled={loading || identityLoading}
 						rules={{
 							required: true,
 							validate: (value) => {
-								if (!value) return 'Display name is required';
+								if (value?.length === 0) return 'Invalid Display Name';
 								return true;
 							}
 						}}
@@ -94,7 +134,6 @@ function SetIdentity() {
 						name='legalName'
 						key='legalName'
 						disabled={loading}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.legalName')}</FormLabel>
@@ -113,7 +152,12 @@ function SetIdentity() {
 						name='email'
 						key='email'
 						disabled={loading}
-						defaultValue=''
+						rules={{
+							validate: (value) => {
+								if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
+								return true;
+							}
+						}}
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.email')}</FormLabel>
@@ -132,7 +176,6 @@ function SetIdentity() {
 						name='twitter'
 						key='twitter'
 						disabled={loading}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.twitter')}</FormLabel>
@@ -151,7 +194,6 @@ function SetIdentity() {
 						name='matrix'
 						key='matrix'
 						disabled={loading}
-						defaultValue=''
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.matrix')}</FormLabel>

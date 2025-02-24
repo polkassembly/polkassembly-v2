@@ -481,6 +481,7 @@ export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
 	userReaction?: IReaction;
+	reactions?: IReaction[];
 }
 
 export interface IOnChainPostListing {
@@ -829,13 +830,4 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
-}
-
-export interface IChildBounty {
-	title: string;
-	tags: ITag[];
-	index: number;
-	proposalType: EProposalType;
-	network: ENetwork;
-	onChainInfo?: IOnChainPostListing;
 }
