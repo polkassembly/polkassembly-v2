@@ -146,7 +146,7 @@ function Overview() {
 									<p className='whitespace-nowrap text-xs font-medium text-input_text'>~ $1.30M</p>
 								</div>
 							</div>
-							<div className='bg-info_card_bg rounded-md p-2'>
+							<div className='rounded-md bg-info_card_bg p-2'>
 								<p className='text-xs'>If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.</p>
 							</div>
 						</div>
