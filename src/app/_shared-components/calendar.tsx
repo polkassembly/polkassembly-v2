@@ -75,13 +75,14 @@ function Calendar() {
 			</div>
 
 			{view === 'month' ? (
-				<div className='w-full'>
+				<div className='w-full border-t border-border_grey'>
 					<DayPicker
 						mode='single'
 						selected={selectedDate}
 						onSelect={setSelectedDate}
 						showOutsideDays
 						fromYear={1900}
+						className='m-0 p-0'
 						toYear={2025}
 						month={selectedDate}
 						classNames={{

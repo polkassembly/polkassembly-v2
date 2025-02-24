@@ -26,42 +26,42 @@ const socialLinks: AboutSocialLink[] = [
 	{
 		icon: TiHome,
 		name: 'HomePage',
-		url: 'https://your-homepage-url.com'
+		url: 'https://polkadot.com/'
 	},
 	{
 		icon: FaTwitter,
 		name: 'Twitter',
-		url: 'https://twitter.com/your-handle'
+		url: 'https://x.com/Polkadot'
 	},
 	{
 		icon: RiDiscordFill,
 		name: 'Discord',
-		url: 'https://discord.gg/your-server'
+		url: 'https://discord.gg/polkadot'
 	},
 	{
 		icon: TbBrandGithubFilled,
 		name: 'Github',
-		url: 'https://github.com/your-org'
+		url: 'https://github.com/paritytech/polkadot-sdk'
 	},
 	{
 		icon: FaYoutube,
 		name: 'Youtube',
-		url: 'https://youtube.com/your-channel'
+		url: 'https://www.youtube.com/channel/UCB7PbjuZLEba_znc7mEGNgw'
 	},
 	{
 		icon: FaRedditAlien,
 		name: 'Reddit',
-		url: 'https://reddit.com/r/your-subreddit'
+		url: 'https://reddit.com/r/polkadot'
 	},
 	{
 		icon: FaTelegramPlane,
 		name: 'Telegram',
-		url: 'https://t.me/your-channel'
+		url: 'https://t.me/PolkadotOfficial'
 	},
 	{
 		icon: IoIosCube,
 		name: 'Block Explorer',
-		url: 'https://your-block-explorer.com'
+		url: 'https://polkadot.subscan.io/'
 	}
 ];
 
@@ -91,7 +91,7 @@ function Overview() {
 		})();
 	}, [apiService]);
 	return (
-		<div className='p-6'>
+		<div>
 			<h1 className='mb-4 text-2xl font-semibold text-btn_secondary_text'>Overview</h1>
 
 			{/* About Section */}
@@ -101,7 +101,7 @@ function Overview() {
 						<p className='text-xl font-semibold text-btn_secondary_text'>About</p>
 						<AboutSocialLinks links={socialLinks} />
 					</div>
-					<p className='mt-4 text-sm font-medium text-btn_secondary_text'>
+					<p className='mt-5 text-sm text-btn_secondary_text'>
 						Join our Community to discuss, contribute and get regular updates from us! <span className='cursor-pointer text-bg_pink'>View Gallery</span>
 					</p>
 				</CardContent>

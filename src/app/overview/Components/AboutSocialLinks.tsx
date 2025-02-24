@@ -18,7 +18,7 @@ interface AboutSocialLinksProps {
 
 function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 	return (
-		<div className='flex items-center gap-4 text-lg text-wallet_btn_text'>
+		<div className='flex items-center gap-6 text-lg text-wallet_btn_text'>
 			{links.map((link) => (
 				<Tooltip key={link.name}>
 					<TooltipTrigger asChild>
@@ -27,7 +27,7 @@ function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 							target='_blank'
 							rel='noopener noreferrer'
 						>
-							<link.icon className='cursor-pointer hover:text-bg_pink' />
+							<link.icon className='h-5 w-5 cursor-pointer hover:text-bg_pink' />
 						</Link>
 					</TooltipTrigger>
 					<TooltipContent className='bg-social_tooltip_background text-btn_primary_text'>
