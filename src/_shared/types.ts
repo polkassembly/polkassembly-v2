@@ -827,3 +827,13 @@ export interface IVoteCartItem {
 	conviction: EConvictionAmount;
 	title?: string;
 }
+
+export interface IPostSubscription {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	network: ENetwork;
+	indexOrHash: string;
+	proposalType: EProposalType;
+	userId: number;
+}
