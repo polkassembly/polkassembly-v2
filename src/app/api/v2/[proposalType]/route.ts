@@ -27,7 +27,6 @@ import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
-import { deepParseJson } from 'deep-parse-json';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
@@ -59,7 +58,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	// Try to get from cache first
 	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
 	if (cachedData) {
-		return NextResponse.json(deepParseJson(cachedData));
+		return NextResponse.json(cachedData);
 	}
 
 	let posts: IPostListing[] = [];
@@ -173,7 +172,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	};
 
 	// Cache the response
-	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: JSON.stringify(response), statuses, origins, tags });
+	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
 
 	// 3. return the data
 	return NextResponse.json(response);

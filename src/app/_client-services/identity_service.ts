@@ -14,6 +14,7 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity } from '@shared/types';
+import { deepParseJson } from 'deep-parse-json';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -34,7 +35,7 @@ export class IdentityService {
 
 	static async Init(network: ENetwork): Promise<IdentityService> {
 		const api = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].peopleChainEndpoints[0].url)
+			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].peopleChainDetails.rpcEndpoints[0].url)
 		});
 
 		await api.isReady;
@@ -58,12 +59,12 @@ export class IdentityService {
 			}
 			this.currentPeopleChainRpcEndpointIndex = index;
 		} else {
-			this.currentPeopleChainRpcEndpointIndex = (this.currentPeopleChainRpcEndpointIndex + 1) % NETWORKS_DETAILS[this.network].peopleChainEndpoints.length;
+			this.currentPeopleChainRpcEndpointIndex = (this.currentPeopleChainRpcEndpointIndex + 1) % NETWORKS_DETAILS[this.network].peopleChainDetails.rpcEndpoints.length;
 		}
 
 		this.peopleChainApi.disconnect();
 		this.peopleChainApi = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
+			provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainDetails.rpcEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
 		});
 		await this.peopleChainApi.isReady;
 	}
@@ -82,7 +83,7 @@ export class IdentityService {
 
 		try {
 			this.peopleChainApi = await ApiPromise.create({
-				provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
+				provider: new WsProvider(NETWORKS_DETAILS[this.network].peopleChainDetails.rpcEndpoints[this.currentPeopleChainRpcEndpointIndex].url)
 			});
 
 			await this.peopleChainApi.isReady;
@@ -128,7 +129,7 @@ export class IdentityService {
 
 		return infoCall
 			? infoCall.some(([index, judgement]: any[]) => {
-					return NETWORKS_DETAILS[this.network].identityRegistrarIndex === index && ['KnownGood', 'Reasonable'].includes(judgement);
+					return NETWORKS_DETAILS[this.network].peopleChainDetails.polkassemblyRegistrarIndex === index && ['KnownGood', 'Reasonable'].includes(judgement);
 				})
 			: false;
 	}
@@ -243,7 +244,7 @@ export class IdentityService {
 		const parentProxyInfo = await this.getParentProxyInfo({ address: encodedQueryAddress });
 		const encodedAddress = parentProxyInfo?.address ? getEncodedAddress(parentProxyInfo.address, this.network) : encodedQueryAddress;
 
-		const identityInfo: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress).then((res: any) => res?.toHuman()?.[0]);
+		const identityInfo: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress).then((res: any) => res?.toHuman()?.[0] || res?.toHuman());
 
 		const { isGood, unverified } = IdentityService.processIdentityInfo(identityInfo);
 		const verifiedByPolkassembly = this.checkVerifiedByPolkassembly(identityInfo);
@@ -290,15 +291,16 @@ export class IdentityService {
 		onFailed?: () => void;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
-		const tx = this.peopleChainApi?.tx.identity.setIdentity({
+		const setIdentityTx = this.peopleChainApi?.tx.identity.setIdentity({
 			display: { [displayName ? 'raw' : 'none']: displayName || null },
 			email: { [email ? 'raw' : 'none']: email || null },
 			legal: { [legalName ? 'raw' : 'none']: legalName || null },
 			twitter: { [twitter ? 'raw' : 'none']: twitter || null },
 			matrix: { [matrix ? 'raw' : 'none']: matrix || null }
 		});
+
 		await this.executeTx({
-			tx,
+			tx: setIdentityTx,
 			address: encodedAddress,
 			errorMessageFallback: 'Failed to set identity',
 			waitTillFinalizedHash: true,
@@ -309,5 +311,10 @@ export class IdentityService {
 				onFailed?.();
 			}
 		});
+	}
+
+	async getRegistrars() {
+		const res = await this.peopleChainApi?.query?.identity?.registrars?.().then((e) => JSON.parse(e.toString()));
+		return deepParseJson(res.toString());
 	}
 }

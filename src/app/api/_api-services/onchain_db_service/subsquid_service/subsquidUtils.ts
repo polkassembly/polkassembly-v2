@@ -116,7 +116,7 @@ export class SubsquidUtils extends SubsquidQueries {
 		try {
 			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
 			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
-			const trackData = networkDetails?.tracks[origin as keyof typeof networkDetails.tracks];
+			const trackData = networkDetails?.trackDetails[origin as keyof typeof networkDetails.trackDetails];
 
 			if (!trackData) {
 				console.error('Track data not found for network:', network);

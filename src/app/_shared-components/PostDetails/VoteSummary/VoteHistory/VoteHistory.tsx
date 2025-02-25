@@ -23,7 +23,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 	const [page, setPage] = useState(1);
 
 	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision) => {
-		const { data, error } = await NextApiClientService.getVotesHistoryApi({ proposalType, index, page: pageNumber, decision });
+		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision });
 
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
