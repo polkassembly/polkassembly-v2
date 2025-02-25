@@ -43,16 +43,21 @@ function Overview({
 				<CardContent className='p-3'>
 					<div className='flex items-center justify-between'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>About</p>
-						<AboutSocialLinks links={aboutSocialLinks} />
+						<span className='hidden lg:block'>
+							<AboutSocialLinks links={aboutSocialLinks} />
+						</span>
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
 						Join our Community to discuss, contribute and get regular updates from us! <span className='cursor-pointer text-bg_pink'>View Gallery</span>
 					</p>
+					<span className='block pt-3 lg:hidden'>
+						<AboutSocialLinks links={aboutSocialLinks} />
+					</span>
 				</CardContent>
 			</Card>
 
 			{/* Treasury and Spend Period */}
-			<div className='mt-6 grid grid-cols-2 gap-4'>
+			<div className='mt-6 grid gap-4 lg:grid-cols-2'>
 				<Card className='border-none bg-bg_modal p-4 shadow-lg'>
 					<CardContent className='p-3'>
 						<p className='text-sm text-wallet_btn_text'>
@@ -115,6 +120,7 @@ function Overview({
 										<TableRow
 											className='cursor-pointer'
 											onClick={() => router.push(`/referenda/${row.index}`)}
+											key={row.index}
 										>
 											<TableCell className={styles.tableCell}>{row.index}</TableCell>
 											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
@@ -164,6 +170,7 @@ function Overview({
 										<TableRow
 											className='cursor-pointer'
 											onClick={() => router.push(`/referenda/${row.index}`)}
+											key={row.index}
 										>
 											<TableCell className={styles.tableCell}>{row.index}</TableCell>
 											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
@@ -216,6 +223,7 @@ function Overview({
 										track.data.items.map((row) => (
 											<TableRow
 												className='cursor-pointer'
+												key={row.index}
 												onClick={() => router.push(`/referenda/${row.index}`)}
 											>
 												<TableCell className={styles.tableCell}>{row.index}</TableCell>
