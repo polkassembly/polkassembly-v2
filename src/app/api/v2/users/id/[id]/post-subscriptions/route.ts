@@ -11,8 +11,8 @@ import { AuthService } from '@/app/api/_api-services/auth_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { ENetwork } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -21,7 +21,6 @@ const zodParamsSchema = z.object({
 });
 
 const zodQuerySchema = z.object({
-	network: z.nativeEnum(ENetwork),
 	page: z.coerce.number().min(1).optional().default(1),
 	limit: z.coerce.number().min(1).optional().default(DEFAULT_LISTING_LIMIT)
 });
@@ -29,7 +28,9 @@ const zodQuerySchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	const { page, limit, network } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const network = await getNetworkFromHeaders();
+
+	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
