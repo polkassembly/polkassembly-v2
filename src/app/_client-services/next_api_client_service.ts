@@ -30,7 +30,8 @@ import {
 	IFollowEntry,
 	ITag,
 	EAllowedCommentor,
-	EOffChainPostTopic
+	EOffChainPostTopic,
+	INetworkSocials
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -82,7 +83,8 @@ enum EApiRoute {
 	GET_FOLLOWERS = 'GET_FOLLOWERS',
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
-	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	FETCH_NETWORK_SOCIALS = 'FETCH_NETWORK_SOCIALS'
 }
 
 export class NextApiClientService {
@@ -154,6 +156,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.FETCH_NETWORK_SOCIALS:
 				break;
 
 			// post routes
@@ -628,5 +631,10 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async fetchNetworkSocials() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_NETWORK_SOCIALS });
+		return this.nextApiClientFetch<INetworkSocials>({ url, method });
 	}
 }
