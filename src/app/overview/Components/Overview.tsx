@@ -23,12 +23,16 @@ import NewsSection from './NewsSection';
 import SpendPeriod from './SpendPeriod';
 
 function Overview({
-	trackDetails
+	trackDetails,
+	tokenPrice
 }: {
 	trackDetails: {
 		all: IGenericListingResponse<IPostListing> | null;
 		discussion: IGenericListingResponse<IPostListing> | null;
 		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
+	};
+	tokenPrice: {
+		price: string;
 	};
 }) {
 	const network = getCurrentNetwork() as ENetwork;
@@ -68,7 +72,7 @@ function Overview({
 						</div>
 					</CardContent>
 				</Card>
-				<SpendPeriod />
+				<SpendPeriod tokenPrice={tokenPrice} />
 			</div>
 
 			{/* Latest Activity */}

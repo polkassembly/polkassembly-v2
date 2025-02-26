@@ -30,7 +30,8 @@ import {
 	ITag,
 	IVoteCartItem,
 	EConvictionAmount,
-	EVoteDecision
+	EVoteDecision,
+	IPostSubscription
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -275,6 +276,24 @@ export class OffChainDbService {
 				return { ...voteCartItem, title: post.title };
 			})
 		);
+	}
+
+	static async GetPostSubscriptionByPostAndUserId({
+		network,
+		indexOrHash,
+		proposalType,
+		userId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+	}): Promise<IPostSubscription | null> {
+		return FirestoreService.GetPostSubscriptionByPostAndUserId({ network, indexOrHash, proposalType, userId });
+	}
+
+	static async GetPostSubscriptionsByUserId({ userId, page, limit, network }: { userId: number; page: number; limit: number; network: ENetwork }): Promise<IPostSubscription[]> {
+		return FirestoreService.GetPostSubscriptionsByUserId({ userId, page, limit, network });
 	}
 
 	// helper methods
@@ -703,5 +722,18 @@ export class OffChainDbService {
 		conviction: EConvictionAmount;
 	}) {
 		return FirestoreService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
+	}
+
+	static async AddPostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
+		const existingSubscription = await this.GetPostSubscriptionByPostAndUserId({ network, indexOrHash, proposalType, userId });
+		if (existingSubscription) {
+			throw new APIError(ERROR_CODES.ALREADY_EXISTS, StatusCodes.CONFLICT, 'Subscription already exists');
+		}
+
+		return FirestoreService.AddPostSubscription({ network, indexOrHash, proposalType, userId });
+	}
+
+	static async DeletePostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
+		return FirestoreService.DeletePostSubscription({ network, indexOrHash, proposalType, userId });
 	}
 }

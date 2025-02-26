@@ -12,22 +12,16 @@ async function page() {
 	const network = getCurrentNetwork();
 	const fetchTrackDetails = async () => {
 		const tracks = NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {};
-
-		// Fetch "All" posts
 		const { data: allData } = await NextApiClientService.fetchListingData({
 			proposalType: EProposalType.REFERENDUM_V2,
 			limit: 8,
 			page: 1
 		});
-
-		// Fetch "Discussion" posts
 		const { data: discussionData } = await NextApiClientService.fetchListingData({
 			proposalType: EProposalType.DISCUSSION,
 			limit: 8,
 			page: 1
 		});
-
-		// Fetch Track-Specific posts
 		const trackData = await Promise.all(
 			Object.entries(tracks).map(async ([trackName]) => {
 				const { data } = await NextApiClientService.fetchListingData({
@@ -40,8 +34,6 @@ async function page() {
 				return { trackName, data };
 			})
 		);
-
-		// Organize the fetched data
 		return {
 			all: allData,
 			discussion: discussionData,
@@ -50,9 +42,15 @@ async function page() {
 	};
 	const trackDetails = await fetchTrackDetails();
 
+	const symbol = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
+	const tokenPrice = await NextApiClientService?.getCurrentTokenPrice({ symbol });
+
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-8'>
-			<Overview trackDetails={trackDetails || { all: [], discussion: [], tracks: [] }} />
+			<Overview
+				trackDetails={trackDetails || { all: [], discussion: [], tracks: [] }}
+				tokenPrice={tokenPrice.data ?? { price: 'N/A' }}
+			/>
 		</div>
 	);
 }

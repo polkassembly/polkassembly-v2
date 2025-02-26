@@ -10,16 +10,21 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Balance, AccountInfo, Permill } from '@polkadot/types/interfaces';
 import { Signer } from '@polkadot/types/types';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN, BN_MILLION, BN_ZERO, u8aConcat, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { ENetwork, EVoteDecision } from '@shared/types';
 import { blockToDays, blockToTime, getDaysTimeObj } from '@shared/_utils/blockTimeCalculations';
+import { formatBnBalance } from '../_client-utils/formatBnBalance';
+import { formatUSDWithUnits } from '../_client-utils/formatUSDWithUnits';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
+
+const EMPTY_U8A_32 = new Uint8Array(32);
 
 export class PolkadotApiService {
 	private readonly network: ENetwork;
@@ -129,6 +134,69 @@ export class PolkadotApiService {
 			};
 		}
 		return null;
+	}
+
+	async getNextBurnData({ currentTokenPrice }: { currentTokenPrice: { price: string } }) {
+		const treasuryAccount = u8aConcat(
+			'modl',
+			this.api.consts.treasury && this.api.consts.treasury.palletId
+				? this.api.consts.treasury.palletId.toU8a(true)
+				: `${['polymesh', 'polymesh-test'].includes(this.network) ? 'pm' : 'pr'}/trsry`,
+			EMPTY_U8A_32
+		);
+
+		return this.api?.derive?.balances?.account(u8aToHex(treasuryAccount)).then((treasuryBalance) => {
+			return this.api.query.system
+				.account(treasuryAccount)
+				.then((res) => {
+					const freeBalance = new BN((res as AccountInfo).data.free) || BN_ZERO;
+					return { ...treasuryBalance, freeBalance: freeBalance as Balance };
+				})
+				.then((updatedTreasuryBalance) => {
+					let valueUSD = '';
+					let value = '';
+					try {
+						const burn =
+							updatedTreasuryBalance.freeBalance.gt(BN_ZERO) && !(this.api.consts.treasury.burn as Permill).isZero()
+								? (this.api.consts.treasury.burn as Permill).mul(updatedTreasuryBalance.freeBalance).div(BN_MILLION)
+								: BN_ZERO;
+
+						if (burn) {
+							const nextBurnValueUSD = parseFloat(
+								formatBnBalance(
+									burn.toString(),
+									{
+										numberAfterComma: 2,
+										withThousandDelimitor: false,
+										withUnit: false
+									},
+									this.network
+								)
+							);
+							if (nextBurnValueUSD && currentTokenPrice && currentTokenPrice.price !== 'N/A') {
+								valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(currentTokenPrice.price)).toString());
+							}
+							value = formatUSDWithUnits(
+								formatBnBalance(
+									burn.toString(),
+									{
+										numberAfterComma: 0,
+										withThousandDelimitor: false,
+										withUnit: false
+									},
+									this.network
+								)
+							);
+						}
+					} catch (error) {
+						console.log(error);
+					}
+					return {
+						value,
+						valueUSD
+					};
+				});
+		});
 	}
 
 	async getUserBalances({ address }: { address: string }) {

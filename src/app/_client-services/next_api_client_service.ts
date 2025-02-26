@@ -82,7 +82,8 @@ enum EApiRoute {
 	GET_FOLLOWERS = 'GET_FOLLOWERS',
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
-	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	GET_CURRENT_TOKEN_PRICE = 'GET_CURRENT_TOKEN_PRICE'
 }
 
 export class NextApiClientService {
@@ -154,6 +155,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_CURRENT_TOKEN_PRICE:
+				path = '/token-price';
 				break;
 
 			// post routes
@@ -628,5 +631,13 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async getCurrentTokenPrice({ symbol }: { symbol: string }) {
+		const queryParams = new URLSearchParams({
+			symbol
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CURRENT_TOKEN_PRICE, queryParams });
+		return this.nextApiClientFetch<{ price: string }>({ url, method });
 	}
 }
