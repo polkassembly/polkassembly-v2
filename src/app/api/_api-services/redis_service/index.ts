@@ -25,7 +25,8 @@ enum ERedisKeys {
 	POSTS_LISTING = 'PLT',
 	ACTIVITY_FEED = 'AFD',
 	QR_SESSION = 'QRS',
-	CONTENT_SUMMARY = 'CSM'
+	CONTENT_SUMMARY = 'CSM',
+	TOKEN_PRICE = 'TKP'
 }
 
 export class RedisService {
@@ -52,7 +53,8 @@ export class RedisService {
 			return baseKey + userPart + originsPart;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
-		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`
+		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
+		[ERedisKeys.TOKEN_PRICE]: (symbol: string): string => `${ERedisKeys.TOKEN_PRICE}-${symbol.toLowerCase()}`
 	} as const;
 
 	// helper methods
@@ -288,5 +290,14 @@ export class RedisService {
 
 	static async DeleteQRSession(sessionId: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), forceCache: true });
+	}
+
+	// Token price caching methods
+	static async GetTokenPrice(symbol: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.TOKEN_PRICE](symbol) });
+	}
+
+	static async SetTokenPrice({ symbol, data, ttlSeconds }: { symbol: string; data: string; ttlSeconds: number }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TOKEN_PRICE](symbol), value: data, ttlSeconds });
 	}
 }
