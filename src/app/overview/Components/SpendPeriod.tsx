@@ -97,7 +97,9 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 									<p className='whitespace-nowrap text-lg font-medium text-btn_secondary_text'>
 										{nextBurn?.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}</span>
 									</p>
-									<p className='whitespace-nowrap text-xs font-medium text-input_text'>~ ${nextBurn?.valueUSD}</p>
+									{nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '' && (
+										<p className='whitespace-nowrap text-xs font-medium text-input_text'>~ ${nextBurn?.valueUSD}</p>
+									)}
 								</div>
 							</div>
 						)}

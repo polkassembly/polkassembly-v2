@@ -150,13 +150,14 @@ export class NextApiClientService {
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
+			case EApiRoute.GET_CURRENT_TOKEN_PRICE:
+				path = '/token-price';
+				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
-			case EApiRoute.GET_CURRENT_TOKEN_PRICE:
-				path = '/token-price';
 				break;
 
 			// post routes
