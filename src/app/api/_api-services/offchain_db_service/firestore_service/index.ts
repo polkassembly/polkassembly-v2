@@ -29,8 +29,7 @@ import {
 	IVoteCartItem,
 	EVoteDecision,
 	EConvictionAmount,
-	IPostSubscription,
-	INetworkSocials
+	IPostSubscription
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1223,40 +1222,6 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (postSubscription.docs.length) {
 			await postSubscription.docs[0].ref.delete();
-		}
-	}
-
-	// Get network socials data from Firestore
-	public static async getNetworkSocials(network: string): Promise<{ blockchain_socials?: INetworkSocials }> {
-		try {
-			const networkDoc = await this.networksCollectionRef().doc(network).get();
-			if (!networkDoc.exists) {
-				return { blockchain_socials: {} as INetworkSocials };
-			}
-			return { blockchain_socials: networkDoc.data() as INetworkSocials };
-		} catch (error) {
-			console.error('Error fetching network socials:', error);
-			throw error;
-		}
-	}
-
-	// Create new network socials
-	public static async createNetworkSocials(network: string, data: { blockchain_socials?: INetworkSocials }): Promise<void> {
-		try {
-			await this.networksCollectionRef().doc(network).set(data);
-		} catch (error) {
-			console.error('Error creating network socials:', error);
-			throw error;
-		}
-	}
-
-	// Update existing network socials
-	public static async updateNetworkSocials(network: string, data: Partial<{ blockchain_socials?: INetworkSocials }>): Promise<void> {
-		try {
-			await this.networksCollectionRef().doc(network).set(data, { merge: true });
-		} catch (error) {
-			console.error('Error updating network socials:', error);
-			throw error;
 		}
 	}
 }
