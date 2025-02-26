@@ -837,15 +837,3 @@ export interface IPostSubscription {
 	proposalType: EProposalType;
 	userId: number;
 }
-
-export interface INetworkSocials {
-	discord?: string;
-	element?: string;
-	github?: string;
-	homepage?: string;
-	medium?: string;
-	telegram?: string;
-	twitter?: string;
-	youtube?: string;
-	[key: string]: string | undefined;
-}
