@@ -26,7 +26,7 @@ function NewsSection({ twitter }: INewsProps) {
 			)}
 
 			<div className='mt-6'>
-				<div className='overflow-hidden rounded-[10px]'>
+				<div className='overflow-hidden rounded-[10px] lg:h-[380px]'>
 					<div className='block dark:hidden'>
 						<TwitterTimelineEmbed
 							onLoad={() => setIsLoading(false)}

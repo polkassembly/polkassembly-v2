@@ -78,10 +78,10 @@ export async function POST(req: NextRequest) {
 			// Group events by proposal type
 			const eventsByProposalType: Record<string, ICalendarEvent[]> = {};
 			subsquidEvents.forEach((event: ICalendarEvent) => {
-				if (!eventsByProposalType[event.proposalType]) {
-					eventsByProposalType[event.proposalType] = [];
+				if (!eventsByProposalType[event.type as EProposalType]) {
+					eventsByProposalType[event.type as EProposalType] = [];
 				}
-				eventsByProposalType[event.proposalType].push(event);
+				eventsByProposalType[event.type as EProposalType].push(event);
 			});
 
 			const events: ICalendarEvent[] = [];
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
 										createdAt: subsquidEvent?.createdAt,
 										index: subsquidEvent?.index,
 										parentBountyIndex: subsquidEvent?.parentBountyIndex,
-										proposalType: proposalType as EProposalType,
+										proposalType: subsquidEvent?.type as EProposalType,
 										proposer: subsquidEvent?.proposer,
 										source: 'polkasembly',
 										status: subsquidEvent?.status,
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
 									}
 
 									if (!payload.title) {
-										payload.title = `${proposalType === EProposalType.REFERENDUM_V2 ? 'Open Gov' : (proposalType as EProposalType) || ''} Proposal`;
+										payload.title = `${proposalType === EProposalType.REFERENDUM_V2 ? 'ReferendumV2' : (proposalType as EProposalType) || ''} Proposal`;
 									}
 
 									events.push(payload);

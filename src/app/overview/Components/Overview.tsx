@@ -39,7 +39,7 @@ function Overview({
 	const router = useRouter();
 
 	return (
-		<div>
+		<div className='flex flex-col gap-4'>
 			<h1 className='mb-4 text-2xl font-semibold text-btn_secondary_text'>Overview</h1>
 
 			{/* About Section */}
@@ -261,11 +261,16 @@ function Overview({
 					))}
 				</Tabs>
 			</div>
-			<div className='mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2'>
+			{/* Make the calendar and news sections equal height in lg screens */}
+			<div className='mt-6 flex flex-col gap-4 lg:flex-row'>
 				{/* Upcoming Events */}
-				<CalendarEvents />
-				{/* News */}
-				<NewsSection twitter='https://x.com/polkadot' />
+				<div className='w-full lg:w-2/3'>
+					<CalendarEvents />
+				</div>
+				{/* News Section */}
+				<div className='lg:w-1/3'>
+					<NewsSection twitter='https://x.com/polkadot' />
+				</div>
 			</div>
 		</div>
 	);

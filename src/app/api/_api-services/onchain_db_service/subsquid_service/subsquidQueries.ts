@@ -611,13 +611,13 @@ export class SubsquidQueries {
 				createdAt
 				trackNumber
 				parentBountyIndex
-			type
-			proposer
-			statusHistory {
-				status
-				block
-				timestamp
-			}
+				type
+				proposer
+				statusHistory {
+					status
+					block
+					timestamp
+				}
 			}
 		}
 	`;

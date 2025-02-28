@@ -842,6 +842,7 @@ export interface ICalendarEvent {
 	createdAt: Date;
 	index: number;
 	proposalType: EProposalType;
+	type?: EProposalType;
 	parentBountyIndex?: number;
 	proposer: string;
 	source: 'polkasembly' | 'subsquare';
