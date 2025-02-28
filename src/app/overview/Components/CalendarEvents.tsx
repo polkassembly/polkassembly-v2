@@ -6,72 +6,197 @@ import Calendar from '@/app/_shared-components/calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNo } from '@/_shared/_utils/dateToBlockNo';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ICalendarEvent } from '@/_shared/types';
+import { EProposalType, ICalendarEvent } from '@/_shared/types';
+import Link from 'next/link';
+import type { Dayjs } from 'dayjs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { cn } from '@/lib/utils';
+
+const DATE_FORMAT = 'YYYY-MM-DD';
+function getSinglePostLinkFromProposalType(proposalType: EProposalType): string {
+	switch (proposalType) {
+		case EProposalType.BOUNTY:
+			return 'bounty';
+		case EProposalType.DISCUSSION:
+			return 'post';
+		case EProposalType.REFERENDUM_V2:
+			return 'referenda';
+		default:
+			return '';
+	}
+}
+
+function EventList({ events }: { events: ICalendarEvent[] }) {
+	return (
+		<div className='flex flex-col gap-2 overflow-y-auto pl-8 xl:max-h-[385px]'>
+			{events.map((eventObj, index) => (
+				// eslint-disable-next-line react/no-array-index-key
+				<div key={`${eventObj.proposer}-${eventObj.index}-${index}`}>
+					<p className='mb-0.5 text-xs text-text_primary'>{dayjs(eventObj.createdAt).format('MMM DD, YYYY HH:mm:ss')}</p>
+					<Link
+						className='capitalize text-btn_secondary_text hover:text-text_pink hover:underline'
+						href={`/${getSinglePostLinkFromProposalType(eventObj.proposalType)}/${eventObj.index}`}
+						target='_blank'
+						rel='noreferrer'
+					>
+						{eventObj.title}
+					</Link>
+					{index !== events.length - 1 && <hr className='my-1 border-border_grey' />}
+				</div>
+			))}
+		</div>
+	);
+}
 
 function CalendarEvents() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	const [calendarEvents, setCalendarEvents] = useState<ICalendarEvent[]>([]);
+	const [monthlyEvents, setMonthlyEvents] = useState<{ [key: string]: ICalendarEvent[] }>({});
+	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const [isLoading, setIsLoading] = useState(false);
+	const [currentMonth, setCurrentMonth] = useState<string>(dayjs(new Date()).format('YYYY-MM'));
 
-	const selectedDate = new Date();
-	const startDate = dayjs(selectedDate).startOf('month');
-	const endDate = dayjs(selectedDate).endOf('month');
+	const fetchMonthEvents = useCallback(
+		async (date: Date) => {
+			const monthKey = dayjs(date).format('YYYY-MM');
 
-	const [startBlockNo, setStartBlockNo] = useState<number | null>(null);
-	const [endBlockNo, setEndBlockNo] = useState<number | null>(null);
-	async function fetchCalendarEvents() {
-		if (!startBlockNo || !endBlockNo) return;
-
-		try {
-			const { data, error } = await NextApiClientService.getCalendarEvents({
-				endBlockNo,
-				startBlockNo
-			});
-
-			setCalendarEvents(data || []);
-
-			if (error) {
-				console.error('Error fetching calendar events:', error);
+			// If we already have data for this month, don't fetch again
+			if (monthlyEvents[monthKey as keyof typeof monthlyEvents] && !isLoading) {
+				return;
 			}
-		} catch (error) {
-			console.error('Error fetching calendar events:', error);
-		}
-	}
-	console.log('calendarEvents', calendarEvents);
 
-	useEffect(() => {
-		const fetchBlockNumbers = async () => {
-			const currentBlock = (await apiService?.getBlockTime()) || 0;
-			setStartBlockNo(
-				dateToBlockNo({
+			setIsLoading(true);
+			try {
+				const startDate = dayjs(date).startOf('month');
+				const endDate = dayjs(date).endOf('month');
+				const currentBlock = (await apiService?.getBlockTime()) || 0;
+
+				const newStartBlockNo = dateToBlockNo({
 					currentBlockNumber: currentBlock,
 					date: startDate.toDate(),
 					network
-				})
-			);
-			setEndBlockNo(
-				dateToBlockNo({
+				});
+
+				const newEndBlockNo = dateToBlockNo({
 					currentBlockNumber: currentBlock,
 					date: endDate.toDate(),
 					network
-				})
-			);
-		};
+				});
 
-		fetchBlockNumbers();
-	}, [apiService, startDate, endDate, network]);
+				if (!newStartBlockNo || !newEndBlockNo) return;
+
+				const { data, error } = await NextApiClientService.getCalendarEvents({
+					endBlockNo: newEndBlockNo,
+					startBlockNo: newStartBlockNo
+				});
+
+				if (error) {
+					console.error('Error fetching calendar events:', error);
+					return;
+				}
+
+				setMonthlyEvents((prev) => ({
+					...prev,
+					[monthKey]: data || []
+				}));
+			} catch (error) {
+				console.error('Error fetching calendar events:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[apiService, network, monthlyEvents]
+	);
 
 	useEffect(() => {
-		fetchCalendarEvents();
-	}, [startBlockNo, endBlockNo]);
+		fetchMonthEvents(selectedDate);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentMonth, apiService, network]);
+
+	const handleMonthChange = (date: Date) => {
+		const newMonth = dayjs(date).format('YYYY-MM');
+		setCurrentMonth(newMonth);
+		fetchMonthEvents(date);
+	};
+
+	const getDateHasEvent = (value: Dayjs): boolean => {
+		const monthKey = value.format('YYYY-MM');
+		const exactDate = value.format(DATE_FORMAT);
+
+		return monthlyEvents[monthKey as keyof typeof monthlyEvents]?.some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || false;
+	};
+
+	const getEventData = (value: Dayjs): ICalendarEvent[] => {
+		const monthKey = value.format('YYYY-MM');
+		const exactDate = value.format(DATE_FORMAT);
+
+		return monthlyEvents[monthKey as keyof typeof monthlyEvents]?.filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || [];
+	};
+
+	const dateCellRender = (value: Date | undefined) => {
+		if (!value) return null;
+		const dateValue = dayjs(value);
+		const hasEvent = getDateHasEvent(dateValue);
+		const isSelected = dayjs(selectedDate).format(DATE_FORMAT) === dateValue.format(DATE_FORMAT);
+
+		return (
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<div
+							aria-hidden='true'
+							onClick={() => setSelectedDate(value)}
+							className={cn(
+								'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-center',
+								hasEvent ? 'bg-bg_pink text-white' : '',
+								isSelected ? 'border-2 border-primary_border' : '',
+								!hasEvent && !isSelected ? 'hover:bg-primary_border' : ''
+							)}
+						>
+							{value.getDate()}
+						</div>
+					</TooltipTrigger>
+					{hasEvent && (
+						<TooltipContent className='w-[280px] bg-social_tooltip_background p-2'>
+							<EventList events={getEventData(dateValue)} />
+						</TooltipContent>
+					)}
+				</Tooltip>
+			</TooltipProvider>
+		);
+	};
+
+	const selectedDateEvents = getEventData(dayjs(selectedDate));
+
 	return (
-		<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg lg:col-span-1'>
-			<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Upcoming Events</h2>
-			<Calendar />
-			<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
+		<div>
+			<div className='flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 lg:flex-row'>
+				<div className='hidden xl:block'>
+					<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Events</h2>
+					<Calendar
+						cellRender={dateCellRender}
+						selectedDate={selectedDate}
+						setSelectedDate={setSelectedDate}
+						isLoading={isLoading}
+						onMonthChange={handleMonthChange}
+					/>
+					<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
+				</div>
+				<div className='my-5 w-full xl:mt-5 xl:h-[400px] xl:w-[50%]'>
+					{isLoading ? (
+						<div className='text-text_secondary'>Loading events...</div>
+					) : selectedDateEvents.length > 0 ? (
+						<EventList events={getEventData(dayjs(selectedDate))} />
+					) : (
+						<div className='text-text_secondary'>No events for this date</div>
+					)}
+				</div>
+			</div>
 		</div>
 	);
 }

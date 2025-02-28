@@ -261,14 +261,13 @@ function Overview({
 					))}
 				</Tabs>
 			</div>
-			{/* Make the calendar and news sections equal height in lg screens */}
-			<div className='mt-6 flex flex-col gap-4 lg:flex-row'>
+			<div className='mt-6 flex flex-col gap-4 xl:flex-row'>
 				{/* Upcoming Events */}
-				<div className='w-full lg:w-2/3'>
+				<div className='w-full xl:w-2/3'>
 					<CalendarEvents />
 				</div>
 				{/* News Section */}
-				<div className='lg:w-1/3'>
+				<div className='w-full xl:w-1/3'>
 					<NewsSection twitter='https://x.com/polkadot' />
 				</div>
 			</div>
