@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import { DayPicker, SelectSingleEventHandler } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { cn } from '@/lib/utils';
+import styles from './Calendar.module.scss';
+import LoadingLayover from '../LoadingLayover';
 
 interface CalendarProps {
 	cellRender: (date: Date | undefined) => React.ReactNode;
@@ -18,6 +20,7 @@ interface CalendarProps {
 function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMonthChange }: CalendarProps) {
 	const [view, setView] = useState<'month' | 'year'>('month');
 
+	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const newDate = new Date(selectedDate);
 		newDate.setMonth(parseInt(event.target.value, 10));
@@ -46,15 +49,7 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 		const customContent = cellRender(date);
 
 		return (
-			<div
-				className={cn(
-					'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
-					isSelected && 'border-2 border-primary_border bg-bg_pink',
-					'cursor-pointer hover:text-white'
-				)}
-			>
-				{customContent || date.getDate()}
-			</div>
+			<div className={cn(styles.calendar_day, isSelected && 'border-2 border-primary_border bg-bg_pink', 'cursor-pointer hover:text-white')}>{customContent || date.getDate()}</div>
 		);
 	};
 	const handleDateSelect = (date: Date) => {
@@ -67,10 +62,10 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 	};
 
 	return (
-		<div className='relative w-full rounded-lg border border-border_grey shadow-md xl:w-[320px]'>
-			<div className='flex w-full justify-end gap-2 px-2 py-4'>
+		<div className={styles.calendary_container}>
+			<div className={styles.calendary_header}>
 				<select
-					className='rounded-sm border border-border_grey px-1 py-0.5 text-sm focus:outline-none'
+					className={styles.calendary_header_select}
 					onChange={handleYearChange}
 					value={selectedDate.getFullYear()}
 				>
@@ -88,11 +83,11 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 				</select>
 				{view === 'month' && (
 					<select
-						className='rounded-sm border border-border_grey px-1 py-0.5 text-sm focus:outline-none'
+						className={styles.calendary_header_select}
 						onChange={handleMonthChange}
 						value={selectedDate.getMonth()}
 					>
-						{['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
+						{months.map((month, index) => (
 							<option
 								key={`month-${month}`}
 								value={index}
@@ -105,14 +100,14 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 				<div>
 					<button
 						type='button'
-						className={cn('text-text_btn_secondary_text rounded-l-sm border px-1 py-0.5 text-sm', view === 'month' ? 'border-text_pink' : 'border-border_grey')}
+						className={cn(styles.calendary_header_button, view === 'month' ? 'border-text_pink' : 'border-border_grey')}
 						onClick={() => setView('month')}
 					>
 						Month
 					</button>
 					<button
 						type='button'
-						className={cn('text-text_btn_secondary_text rounded-r-sm border px-3 py-0.5 text-sm', view === 'year' ? 'border-text_pink' : 'border-border_grey')}
+						className={cn(styles.calendary_header_button, view === 'year' ? 'border-text_pink' : 'border-border_grey')}
 						onClick={() => setView('year')}
 					>
 						Year
@@ -121,13 +116,13 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 			</div>
 
 			{isLoading && (
-				<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-					<div className='text-white'>Loading...</div>
+				<div className={styles.loading_container}>
+					<LoadingLayover />
 				</div>
 			)}
 
 			{view === 'month' ? (
-				<div className='w-full border-t border-border_grey'>
+				<div className={styles.calendary_month_container}>
 					<DayPicker
 						mode='single'
 						selected={selectedDate}
@@ -159,17 +154,14 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 					/>
 				</div>
 			) : (
-				<div className='flex w-full flex-col justify-between border-t border-border_grey px-2 py-4'>
+				<div className={styles.calendary_month_container_header}>
 					<div className='grid grid-cols-3 gap-3'>
-						{['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
+						{months.map((month, index) => (
 							<button
 								type='button'
 								key={`month-button-${month}`}
 								onClick={() => handleMonthButtonClick(index)}
-								className={cn(
-									'flex h-10 items-center justify-center rounded-full text-sm text-text_primary',
-									selectedDate.getMonth() === index ? 'bg-bg_pink text-white' : 'hover:bg-bg_pink hover:text-white'
-								)}
+								className={cn(styles.calendary_month_container_header_button, selectedDate.getMonth() === index ? 'bg-bg_pink text-white' : 'hover:bg-bg_pink hover:text-white')}
 							>
 								{month}
 							</button>

@@ -1,0 +1,35 @@
+.calendar_day {
+    @apply flex h-8 w-8 items-center justify-center rounded-full transition-colors;
+}
+
+.calendary_container {
+    @apply relative w-full rounded-lg border border-border_grey shadow-md xl:w-[320px];
+}
+
+.calendary_header {
+    @apply flex w-full justify-end gap-2 px-2 py-4;
+}
+
+.calendary_header_select {
+    @apply rounded-sm border border-border_grey px-1 py-0.5 text-sm focus:outline-none;
+}
+
+.calendary_header_button {
+    @apply text-text_btn_secondary_text rounded-l-sm border px-1 py-0.5 text-sm;
+}
+
+.loading_container {
+    @apply absolute inset-0 flex items-center justify-center bg-black bg-opacity-50;
+}
+
+.calendary_month_container {
+    @apply w-full border-t border-border_grey;
+}
+
+.calendary_month_container_header {
+    @apply flex w-full flex-col justify-between border-t border-border_grey px-2 py-4;
+}
+
+.calendary_month_container_header_button {
+    @apply flex h-10 items-center justify-center rounded-full text-sm text-text_primary;
+}

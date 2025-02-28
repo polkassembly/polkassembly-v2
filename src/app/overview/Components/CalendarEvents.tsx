@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import Calendar from '@/app/_shared-components/calendar';
+import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNo } from '@/_shared/_utils/dateToBlockNo';
