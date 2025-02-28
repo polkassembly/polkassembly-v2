@@ -653,7 +653,7 @@ export class NextApiClientService {
 			route: EApiRoute.GET_CALENDAR_EVENTS
 		});
 
-		return this.nextApiClientFetch<IGenericListingResponse<ICalendarEvent>>({
+		return this.nextApiClientFetch<ICalendarEvent[]>({
 			url,
 			method,
 			data: { startBlockNo, endBlockNo }

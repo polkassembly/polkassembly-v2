@@ -26,7 +26,8 @@ enum ERedisKeys {
 	ACTIVITY_FEED = 'AFD',
 	QR_SESSION = 'QRS',
 	CONTENT_SUMMARY = 'CSM',
-	TOKEN_PRICE = 'TKP'
+	TOKEN_PRICE = 'TKP',
+	CALENDAR_DATA = 'CLD'
 }
 
 export class RedisService {
@@ -54,7 +55,8 @@ export class RedisService {
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
 		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
-		[ERedisKeys.TOKEN_PRICE]: (symbol: string): string => `${ERedisKeys.TOKEN_PRICE}-${symbol.toLowerCase()}`
+		[ERedisKeys.TOKEN_PRICE]: (symbol: string): string => `${ERedisKeys.TOKEN_PRICE}-${symbol.toLowerCase()}`,
+		[ERedisKeys.CALENDAR_DATA]: (network: string, startBlockNo: number, endBlockNo: number): string => `${ERedisKeys.CALENDAR_DATA}-${network}-${startBlockNo}-${endBlockNo}`
 	} as const;
 
 	// helper methods
@@ -299,5 +301,18 @@ export class RedisService {
 
 	static async SetTokenPrice({ symbol, data, ttlSeconds }: { symbol: string; data: string; ttlSeconds: number }): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.TOKEN_PRICE](symbol), value: data, ttlSeconds });
+	}
+
+	// Calendar data caching methods
+	static async GetCalendarData({ network, startBlockNo, endBlockNo }: { network: string; startBlockNo: number; endBlockNo: number }): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.CALENDAR_DATA](network, startBlockNo, endBlockNo) });
+	}
+
+	static async SetCalendarData({ network, startBlockNo, endBlockNo, data }: { network: string; startBlockNo: number; endBlockNo: number; data: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CALENDAR_DATA](network, startBlockNo, endBlockNo), value: data, ttlSeconds: ONE_DAY });
+	}
+
+	static async DeleteCalendarData({ network, startBlockNo, endBlockNo }: { network: string; startBlockNo: number; endBlockNo: number }): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.CALENDAR_DATA}-${network}-${startBlockNo}-${endBlockNo}` });
 	}
 }

@@ -9,7 +9,6 @@ import { Card, CardContent } from '@ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@ui/Tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { MdInfoOutline } from 'react-icons/md';
-import Calendar from '@ui/calendar';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork, EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
@@ -21,6 +20,7 @@ import AboutSocialLinks from './AboutSocialLinks';
 import styles from './Overview.module.scss';
 import NewsSection from './NewsSection';
 import SpendPeriod from './SpendPeriod';
+import CalendarEvents from './CalendarEvents';
 
 function Overview({
 	trackDetails,
@@ -263,13 +263,8 @@ function Overview({
 			</div>
 			<div className='mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2'>
 				{/* Upcoming Events */}
-				<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg lg:col-span-1'>
-					<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Upcoming Events</h2>
-					<Calendar />
-					<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
-				</div>
+				<CalendarEvents />
 				{/* News */}
-
 				<NewsSection twitter='https://x.com/polkadot' />
 			</div>
 		</div>
