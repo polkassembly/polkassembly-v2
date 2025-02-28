@@ -389,4 +389,9 @@ export class PolkadotApiService {
 				onFailed(error?.toString?.() || errorMessageFallback);
 			});
 	}
+
+	async getBlockTime() {
+		const currentBlock = await this.api?.derive?.chain.bestNumber();
+		return currentBlock?.toNumber();
+	}
 }

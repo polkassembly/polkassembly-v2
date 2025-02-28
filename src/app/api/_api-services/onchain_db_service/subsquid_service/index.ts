@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	ICalendarEvent,
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
@@ -404,5 +405,23 @@ export class SubsquidService extends SubsquidUtils {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
 		};
+	}
+
+	static async GetCalendarEvents({ network, startBlock, endBlock }: { network: ENetwork; startBlock: number; endBlock: number }): Promise<ICalendarEvent[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+		const query = this.GET_CALENDAR_EVENTS_BY_BLOCK;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, {
+				block_gte: startBlock,
+				block_lt: endBlock
+			})
+			.toPromise();
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain calendar events from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain calendar events from Subsquid');
+		}
+
+		return subsquidData.proposals as ICalendarEvent[];
 	}
 }

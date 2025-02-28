@@ -30,7 +30,8 @@ import {
 	IFollowEntry,
 	ITag,
 	EAllowedCommentor,
-	EOffChainPostTopic
+	EOffChainPostTopic,
+	ICalendarEvent
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -83,7 +84,8 @@ enum EApiRoute {
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
-	GET_CURRENT_TOKEN_PRICE = 'GET_CURRENT_TOKEN_PRICE'
+	GET_CURRENT_TOKEN_PRICE = 'GET_CURRENT_TOKEN_PRICE',
+	GET_CALENDAR_EVENTS = 'GET_CALENDAR_EVENTS'
 }
 
 export class NextApiClientService {
@@ -208,6 +210,10 @@ export class NextApiClientService {
 			case EApiRoute.CREATE_OFFCHAIN_POST:
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_REACTION:
+				method = 'POST';
+				break;
+			case EApiRoute.GET_CALENDAR_EVENTS:
+				path = '/calendar';
 				method = 'POST';
 				break;
 
@@ -640,5 +646,17 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CURRENT_TOKEN_PRICE, queryParams });
 		return this.nextApiClientFetch<{ price: string }>({ url, method });
+	}
+
+	static async getCalendarEvents({ startBlockNo, endBlockNo }: { startBlockNo: number; endBlockNo: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_CALENDAR_EVENTS
+		});
+
+		return this.nextApiClientFetch<IGenericListingResponse<ICalendarEvent>>({
+			url,
+			method,
+			data: { startBlockNo, endBlockNo }
+		});
 	}
 }
