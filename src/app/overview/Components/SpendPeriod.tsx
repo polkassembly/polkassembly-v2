@@ -7,7 +7,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { Progress } from '@ui/progress';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
-import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
+import { LoadingSpinner } from '@ui/LoadingSpinner';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';

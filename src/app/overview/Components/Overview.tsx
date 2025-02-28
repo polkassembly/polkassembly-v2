@@ -12,10 +12,11 @@ import { MdInfoOutline } from 'react-icons/md';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork, EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
-import Address from '@/app/_shared-components/Profile/Address/Address';
+import Address from '@ui/Profile/Address/Address';
 import { useRouter } from 'next/navigation';
 import { aboutSocialLinks } from '@shared/_constants/AboutSocialLinks';
-import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
+import StatusTag from '@ui/StatusTag/StatusTag';
+import { cn } from '@/lib/utils';
 import AboutSocialLinks from './AboutSocialLinks';
 import styles from './Overview.module.scss';
 import NewsSection from './NewsSection';
@@ -83,7 +84,7 @@ function Overview({
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
 				<h2 className={styles.latest_activity_title}>Latest Activity</h2>
 				<Tabs defaultValue='all'>
-					<TabsList className={styles.tabList}>
+					<TabsList className={cn(styles.tabList, 'hide_scrollbar')}>
 						<TabsTrigger
 							showBorder
 							className={styles.tabTrigger}

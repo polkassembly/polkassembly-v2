@@ -11,6 +11,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, ICalendarEvent } from '@/_shared/types';
 import Link from 'next/link';
+import { Skeleton } from '@ui/Skeleton';
 import type { Dayjs } from 'dayjs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { cn } from '@/lib/utils';
@@ -190,7 +191,9 @@ function CalendarEvents() {
 				</div>
 				<div className='my-5 w-full xl:mt-5 xl:h-[400px] xl:w-[50%]'>
 					{isLoading ? (
-						<div className='text-text_secondary'>Loading events...</div>
+						<div className='text-text_secondary'>
+							<Skeleton className='h-[400px] w-full' />
+						</div>
 					) : selectedDateEvents.length > 0 ? (
 						<EventList events={getEventData(dayjs(selectedDate))} />
 					) : (

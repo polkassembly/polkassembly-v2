@@ -55,7 +55,7 @@
 }
 
 .tabList {
-    @apply hide_scrollbar w-full justify-start overflow-x-auto border-b border-border_grey;
+    @apply w-full justify-start overflow-x-auto border-b border-border_grey;
 }
 
 .tabTrigger {

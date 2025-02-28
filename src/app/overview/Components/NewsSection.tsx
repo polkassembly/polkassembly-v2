@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
+import { LoadingSpinner } from '@ui/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import styles from './Overview.module.scss';
