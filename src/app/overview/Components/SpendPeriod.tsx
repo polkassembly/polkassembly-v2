@@ -63,17 +63,17 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 						Spend Period Remaining <MdInfoOutline className='inline-block text-lg' />
 					</p>
 					<p className='text-xs text-wallet_btn_text'>
-						{spendPeriod?.value.days && spendPeriod?.value.days > 0 && (
+						{(spendPeriod?.value.days || spendPeriod?.value.days !== 0) && (
 							<>
-								<span className={styles.spend_period_remaining}>{spendPeriod?.value.days}</span> days
+								<span className={styles.spend_period_remaining}>{spendPeriod?.value.days}</span> days{' '}
 							</>
 						)}
-						{spendPeriod?.value.hours && spendPeriod?.value.hours > 0 && (
+						{(spendPeriod?.value.hours || spendPeriod?.value.hours !== 0) && (
 							<>
 								<span className={styles.spend_period_remaining_hr}>{spendPeriod?.value.hours}</span> hrs{' '}
 							</>
 						)}
-						{spendPeriod?.value.minutes && spendPeriod?.value.minutes > 0 && (
+						{(spendPeriod?.value.minutes || spendPeriod?.value.minutes !== 0) && (
 							<>
 								<span className={styles.spend_period_remaining}>{spendPeriod?.value.minutes}</span> mins / {spendPeriod?.value.total} days
 							</>
