@@ -181,18 +181,20 @@ function CalendarEvents() {
 	return (
 		<div>
 			<div className={styles.calendar_event_container}>
-				<div className='hidden xl:block'>
+				<div>
 					<h2 className={styles.calendar_event_title}>Events</h2>
-					<Calendar
-						cellRender={dateCellRender}
-						selectedDate={selectedDate}
-						setSelectedDate={setSelectedDate}
-						isLoading={isLoading}
-						onMonthChange={handleMonthChange}
-					/>
-					<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
+					<div className='hidden xl:block'>
+						<Calendar
+							cellRender={dateCellRender}
+							selectedDate={selectedDate}
+							setSelectedDate={setSelectedDate}
+							isLoading={isLoading}
+							onMonthChange={handleMonthChange}
+						/>
+						<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
+					</div>
 				</div>
-				<div className='my-5 w-full xl:mt-5 xl:h-[400px] xl:w-[50%] xl:pl-8'>
+				<div className='my-3 w-full xl:mt-5 xl:h-[400px] xl:w-[50%] xl:pl-8'>
 					{isLoading ? (
 						<div className='text-text_secondary'>
 							<Skeleton className='h-[400px] w-full' />

@@ -103,9 +103,9 @@
 }
 
 .calendar_event_container {
-    @apply flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 lg:flex-row;
+    @apply flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 xl:flex-row;
 }
 
 .calendar_event_title {
-    @apply mb-4 text-lg font-semibold text-btn_secondary_text;
+    @apply xl:mb-4 text-lg font-semibold text-btn_secondary_text;
 }

@@ -100,14 +100,14 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 				<div>
 					<button
 						type='button'
-						className={cn(styles.calendary_header_button, view === 'month' ? 'border-text_pink' : 'border-border_grey')}
+						className={cn(styles.calendary_header_button, 'rounded-l-sm', view === 'month' ? 'border-text_pink' : 'border-border_grey')}
 						onClick={() => setView('month')}
 					>
 						Month
 					</button>
 					<button
 						type='button'
-						className={cn(styles.calendary_header_button, view === 'year' ? 'border-text_pink' : 'border-border_grey')}
+						className={cn(styles.calendary_header_button, 'rounded-r-sm', view === 'year' ? 'border-text_pink' : 'border-border_grey')}
 						onClick={() => setView('year')}
 					>
 						Year
