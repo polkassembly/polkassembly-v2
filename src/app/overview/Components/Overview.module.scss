@@ -91,7 +91,7 @@
 }
 
 .event_list_container {
-    @apply flex flex-col gap-2 overflow-y-auto overflow-x-hidden pl-8 xl: max-h-[385px] xl:max-w-[320px];
+    @apply flex flex-col gap-2 overflow-y-auto overflow-x-hidden pl-8 xl:max-h-[385px] xl:max-w-[320px];
 }
 
 .event_list_link {
@@ -103,7 +103,7 @@
 }
 
 .calendar_event_container {
-    @apply flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg: mt-6 lg:flex-row;
+    @apply flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 lg:flex-row;
 }
 
 .calendar_event_title {
