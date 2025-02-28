@@ -31,7 +31,7 @@ function getSinglePostLinkFromProposalType(proposalType: EProposalType): string 
 	}
 }
 
-function EventList({ events }: { events: ICalendarEvent[] }) {
+function EventList({ events, color }: { events: ICalendarEvent[]; color: string }) {
 	return (
 		<div className={styles.event_list_container}>
 			{events.map((eventObj, index) => (
@@ -39,7 +39,7 @@ function EventList({ events }: { events: ICalendarEvent[] }) {
 				<div key={`${eventObj.proposer}-${eventObj.index}-${index}`}>
 					<p className='mb-0.5 text-xs text-text_primary'>{dayjs(eventObj.createdAt).format('MMM DD, YYYY HH:mm:ss')}</p>
 					<Link
-						className={styles.event_list_link}
+						className={cn(styles.event_list_link, color)}
 						href={`/${getSinglePostLinkFromProposalType(eventObj.proposalType)}/${eventObj.index}`}
 						target='_blank'
 						rel='noreferrer'
@@ -165,7 +165,10 @@ function CalendarEvents() {
 					</TooltipTrigger>
 					{hasEvent && (
 						<TooltipContent className='w-[280px] bg-social_tooltip_background p-2'>
-							<EventList events={getEventData(dateValue)} />
+							<EventList
+								events={getEventData(dateValue)}
+								color='text-btn_primary_text hover:text-text_pink'
+							/>
 						</TooltipContent>
 					)}
 				</Tooltip>
@@ -189,13 +192,16 @@ function CalendarEvents() {
 					/>
 					<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
 				</div>
-				<div className='my-5 w-full xl:mt-5 xl:h-[400px] xl:w-[50%]'>
+				<div className='my-5 w-full xl:mt-5 xl:h-[400px] xl:w-[50%] xl:pl-8'>
 					{isLoading ? (
 						<div className='text-text_secondary'>
 							<Skeleton className='h-[400px] w-full' />
 						</div>
 					) : selectedDateEvents.length > 0 ? (
-						<EventList events={getEventData(dayjs(selectedDate))} />
+						<EventList
+							events={getEventData(dayjs(selectedDate))}
+							color='text-btn_secondary_text hover:text-text_pink'
+						/>
 					) : (
 						<div className='text-text_secondary'>No events for this date</div>
 					)}

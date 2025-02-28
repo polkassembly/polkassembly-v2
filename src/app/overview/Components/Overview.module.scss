@@ -91,11 +91,11 @@
 }
 
 .event_list_container {
-    @apply flex flex-col gap-2 overflow-y-auto overflow-x-hidden pl-8 xl:max-h-[385px] xl:max-w-[320px];
+    @apply flex flex-col gap-2 overflow-y-auto overflow-x-hidden xl:max-h-[385px] xl:max-w-[320px];
 }
 
 .event_list_link {
-    @apply capitalize text-btn_primary_text hover:text-text_pink hover:underline;
+    @apply capitalize hover:underline;
 }
 
 .calendar_event_tooltip_trigger {
