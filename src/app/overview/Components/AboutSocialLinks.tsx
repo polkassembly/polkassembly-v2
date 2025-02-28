@@ -5,6 +5,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { ElementType } from 'react';
 import Link from 'next/link';
+import styles from './Overview.module.scss';
 
 export interface AboutSocialLink {
 	icon: ElementType;
@@ -18,7 +19,7 @@ interface AboutSocialLinksProps {
 
 function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 	return (
-		<div className='flex items-center gap-4 text-lg text-wallet_btn_text sm:gap-6'>
+		<div className={styles.about_social_links_container}>
 			{links.map((link) => (
 				<Tooltip key={link.name}>
 					<TooltipTrigger asChild>
@@ -27,7 +28,7 @@ function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 							target='_blank'
 							rel='noopener noreferrer'
 						>
-							<link.icon className='h-4 w-4 cursor-pointer hover:text-bg_pink sm:h-5 sm:w-5' />
+							<link.icon className={styles.about_social_links_icon} />
 						</Link>
 					</TooltipTrigger>
 					<TooltipContent className='bg-social_tooltip_background text-btn_primary_text'>

@@ -5,6 +5,7 @@
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
+import styles from './Overview.module.scss';
 
 interface INewsProps {
 	twitter: string;
@@ -16,8 +17,8 @@ function NewsSection({ twitter }: INewsProps) {
 	const profile = twitter ? twitter.split('/')[3] : 'polkadot';
 
 	return (
-		<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
-			<h2 className='text-xl font-semibold leading-8 tracking-tight text-btn_secondary_text'>News</h2>
+		<div className={styles.news_section_container}>
+			<h2 className={styles.news_section_title}>News</h2>
 
 			{isLoading && (
 				<div className='flex h-full items-center justify-center py-32'>

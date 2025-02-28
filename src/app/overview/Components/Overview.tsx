@@ -39,24 +39,28 @@ function Overview({
 	const router = useRouter();
 
 	return (
-		<div className='flex flex-col gap-4'>
-			<h1 className='mb-4 text-2xl font-semibold text-btn_secondary_text'>Overview</h1>
+		<div className={styles.overview_container}>
+			<h1 className={styles.overview_title}>Overview</h1>
 
 			{/* About Section */}
 			<Card className='border-none bg-bg_modal p-4 shadow-lg'>
 				<CardContent className='p-3'>
 					<div className='flex items-center justify-between'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>About</p>
-						<span className='hidden lg:block'>
-							<AboutSocialLinks links={aboutSocialLinks} />
-						</span>
+						{aboutSocialLinks[network as ENetwork].length > 0 && (
+							<span className='hidden lg:block'>
+								<AboutSocialLinks links={aboutSocialLinks[network as ENetwork]} />
+							</span>
+						)}
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
 						Join our Community to discuss, contribute and get regular updates from us! <span className='cursor-pointer text-bg_pink'>View Gallery</span>
 					</p>
-					<span className='block pt-3 lg:hidden'>
-						<AboutSocialLinks links={aboutSocialLinks} />
-					</span>
+					{aboutSocialLinks[network as ENetwork].length > 0 && (
+						<span className='block pt-3 lg:hidden'>
+							<AboutSocialLinks links={aboutSocialLinks[network as ENetwork]} />
+						</span>
+					)}
 				</CardContent>
 			</Card>
 
@@ -77,19 +81,19 @@ function Overview({
 
 			{/* Latest Activity */}
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
-				<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Latest Activity</h2>
+				<h2 className={styles.latest_activity_title}>Latest Activity</h2>
 				<Tabs defaultValue='all'>
-					<TabsList className='hide_scrollbar w-full justify-start overflow-x-auto border-b border-border_grey'>
+					<TabsList className={styles.tabList}>
 						<TabsTrigger
 							showBorder
-							className='px-4 py-2 text-btn_secondary_text'
+							className={styles.tabTrigger}
 							value='all'
 						>
 							All <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
-							className='px-4 py-2 text-btn_secondary_text'
+							className={styles.tabTrigger}
 							value='discussion'
 						>
 							Discussion <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
@@ -97,7 +101,7 @@ function Overview({
 						{Object.keys(NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {}).map((key) => (
 							<TabsTrigger
 								showBorder
-								className='px-4 py-2 text-btn_secondary_text'
+								className={styles.tabTrigger}
 								value={key}
 								key={key}
 							>

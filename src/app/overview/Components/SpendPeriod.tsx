@@ -11,6 +11,7 @@ import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import styles from './SpendPeriod.module.scss';
 
 function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	const { apiService } = usePolkadotApiService();
@@ -51,9 +52,9 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	}, [apiService]);
 
 	return (
-		<Card className='border-none bg-bg_modal p-4 shadow-lg'>
+		<Card className={styles.container}>
 			{loading ? (
-				<div className='flex h-full items-center justify-center py-10'>
+				<div className={styles.loading}>
 					<LoadingSpinner />
 				</div>
 			) : (
@@ -64,17 +65,17 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 					<p className='text-xs text-wallet_btn_text'>
 						{spendPeriod?.value.days && spendPeriod?.value.days > 0 && (
 							<>
-								<span className='text-lg font-medium text-btn_secondary_text'>{spendPeriod?.value.days}</span> days
+								<span className={styles.spend_period_remaining}>{spendPeriod?.value.days}</span> days
 							</>
 						)}
 						{spendPeriod?.value.hours && spendPeriod?.value.hours > 0 && (
 							<>
-								<span className='ml-1 text-lg font-medium text-btn_secondary_text'>{spendPeriod?.value.hours}</span> hrs{' '}
+								<span className={styles.spend_period_remaining_hr}>{spendPeriod?.value.hours}</span> hrs{' '}
 							</>
 						)}
 						{spendPeriod?.value.minutes && spendPeriod?.value.minutes > 0 && (
 							<>
-								<span className='text-lg font-medium text-btn_secondary_text'>{spendPeriod?.value.minutes}</span> mins / {spendPeriod?.value.total} days
+								<span className={styles.spend_period_remaining}>{spendPeriod?.value.minutes}</span> mins / {spendPeriod?.value.total} days
 							</>
 						)}
 					</p>
@@ -94,12 +95,10 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 							<div className='flex flex-col'>
 								<p className='text-xs text-wallet_btn_text'>Next Burn</p>
 								<div className='flex items-center gap-2'>
-									<p className='whitespace-nowrap text-lg font-medium text-btn_secondary_text'>
+									<p className={styles.next_burn}>
 										{nextBurn?.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}</span>
 									</p>
-									{nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '' && (
-										<p className='whitespace-nowrap text-xs font-medium text-input_text'>~ ${nextBurn?.valueUSD}</p>
-									)}
+									{nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '' && <p className={styles.next_burn_usd}>~ ${nextBurn?.valueUSD}</p>}
 								</div>
 							</div>
 						)}

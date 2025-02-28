@@ -14,6 +14,7 @@ import Link from 'next/link';
 import type { Dayjs } from 'dayjs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { cn } from '@/lib/utils';
+import styles from './Overview.module.scss';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 function getSinglePostLinkFromProposalType(proposalType: EProposalType): string {
@@ -31,13 +32,13 @@ function getSinglePostLinkFromProposalType(proposalType: EProposalType): string 
 
 function EventList({ events }: { events: ICalendarEvent[] }) {
 	return (
-		<div className='flex flex-col gap-2 overflow-y-auto overflow-x-hidden pl-8 xl:max-h-[385px] xl:max-w-[320px]'>
+		<div className={styles.event_list_container}>
 			{events.map((eventObj, index) => (
 				// eslint-disable-next-line react/no-array-index-key
 				<div key={`${eventObj.proposer}-${eventObj.index}-${index}`}>
 					<p className='mb-0.5 text-xs text-text_primary'>{dayjs(eventObj.createdAt).format('MMM DD, YYYY HH:mm:ss')}</p>
 					<Link
-						className='capitalize text-btn_primary_text hover:text-text_pink hover:underline'
+						className={styles.event_list_link}
 						href={`/${getSinglePostLinkFromProposalType(eventObj.proposalType)}/${eventObj.index}`}
 						target='_blank'
 						rel='noreferrer'
@@ -152,7 +153,7 @@ function CalendarEvents() {
 							aria-hidden='true'
 							onClick={() => setSelectedDate(value)}
 							className={cn(
-								'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-center',
+								styles.calendar_event_tooltip_trigger,
 								hasEvent ? 'bg-bg_pink text-white' : '',
 								isSelected ? 'border-2 border-primary_border' : '',
 								!hasEvent && !isSelected ? 'hover:bg-primary_border' : ''
@@ -175,9 +176,9 @@ function CalendarEvents() {
 
 	return (
 		<div>
-			<div className='flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 lg:flex-row'>
+			<div className={styles.calendar_event_container}>
 				<div className='hidden xl:block'>
-					<h2 className='mb-4 text-lg font-semibold text-btn_secondary_text'>Events</h2>
+					<h2 className={styles.calendar_event_title}>Events</h2>
 					<Calendar
 						cellRender={dateCellRender}
 						selectedDate={selectedDate}
