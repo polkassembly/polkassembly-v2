@@ -31,13 +31,13 @@ function getSinglePostLinkFromProposalType(proposalType: EProposalType): string 
 
 function EventList({ events }: { events: ICalendarEvent[] }) {
 	return (
-		<div className='flex flex-col gap-2 overflow-y-auto pl-8 xl:max-h-[385px]'>
+		<div className='flex flex-col gap-2 overflow-y-auto overflow-x-hidden pl-8 xl:max-h-[385px] xl:max-w-[320px]'>
 			{events.map((eventObj, index) => (
 				// eslint-disable-next-line react/no-array-index-key
 				<div key={`${eventObj.proposer}-${eventObj.index}-${index}`}>
 					<p className='mb-0.5 text-xs text-text_primary'>{dayjs(eventObj.createdAt).format('MMM DD, YYYY HH:mm:ss')}</p>
 					<Link
-						className='capitalize text-btn_secondary_text hover:text-text_pink hover:underline'
+						className='capitalize text-btn_primary_text hover:text-text_pink hover:underline'
 						href={`/${getSinglePostLinkFromProposalType(eventObj.proposalType)}/${eventObj.index}`}
 						target='_blank'
 						rel='noreferrer'
