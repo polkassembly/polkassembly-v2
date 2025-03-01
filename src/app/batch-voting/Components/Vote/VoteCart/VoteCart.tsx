@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/hooks/useUser';
+import { BATCH_VOTE_CART_QUERY_KEY } from '@/app/_client-constants/reactQueryKeys';
 import CartItem from './CartItem';
 
 function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
@@ -34,7 +35,7 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 			return;
 		}
 
-		queryClient.setQueryData(['batch-vote-cart', user.id], () => {
+		queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], () => {
 			return [];
 		});
 
@@ -58,7 +59,7 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	};
 	return (
 		<div className='flex h-full flex-col gap-y-4'>
-			<div className='flex max-h-[400px] flex-1 flex-col gap-y-2 overflow-y-auto'>
+			<div className='flex max-h-[300px] min-h-[200px] flex-1 flex-col gap-y-2 overflow-y-auto'>
 				{voteCart.length > 0 ? (
 					voteCart.map((item) => (
 						<CartItem
@@ -67,7 +68,7 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 						/>
 					))
 				) : (
-					<div className='flex flex-col items-center justify-center gap-y-2'>
+					<div className='mb-8 flex flex-col items-center gap-y-2'>
 						<p>{t('BatchVote.noItemsInVoteCart')}</p>
 					</div>
 				)}
@@ -75,13 +76,16 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 			<div className='flex flex-col gap-y-2'>
 				<div className='flex w-full items-center justify-between'>
 					<span>Proposals: {voteCart.length}</span>
-					<Button
-						isLoading={clearCartLoading}
-						onClick={clearCart}
-						size='sm'
-					>
-						Clear
-					</Button>
+					{voteCart.length > 0 && (
+						<Button
+							isLoading={clearCartLoading}
+							onClick={clearCart}
+							disabled={voteCart.length === 0}
+							size='sm'
+						>
+							Clear
+						</Button>
+					)}
 				</div>
 				<Button
 					isLoading={loading}

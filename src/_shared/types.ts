@@ -825,4 +825,5 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+	editDisabled?: boolean;
 }

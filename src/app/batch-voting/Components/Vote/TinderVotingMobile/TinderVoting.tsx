@@ -21,7 +21,7 @@ enum ESwipeDirection {
 }
 
 function TinderVoting({
-	loading,
+	disableButtons,
 	filteredProposals,
 	addToVoteCart,
 	isFetching,
@@ -29,7 +29,7 @@ function TinderVoting({
 	currentIndexRef,
 	onSkip
 }: {
-	loading: boolean;
+	disableButtons: boolean;
 	currentIndexRef: RefObject<number>;
 	filteredProposals: IPostListing[];
 	isFetching: boolean;
@@ -145,7 +145,7 @@ function TinderVoting({
 					className='rounded-full bg-failure p-2'
 					size='icon'
 					onClick={() => onSwipe(ESwipeDirection.LEFT)}
-					disabled={loading}
+					disabled={disableButtons}
 				>
 					<ThumbsDown
 						fill={THEME_COLORS.light.btn_primary_text}
@@ -157,7 +157,7 @@ function TinderVoting({
 					size='icon'
 					className='rounded-full bg-white p-3 text-decision_bar_indicator shadow'
 					onClick={() => onSwipe(ESwipeDirection.UP)}
-					disabled={loading}
+					disabled={disableButtons}
 				>
 					<Ban className='h-10 w-10' />
 				</Button>
@@ -166,7 +166,7 @@ function TinderVoting({
 					size='icon'
 					className='rounded-full bg-success p-2'
 					onClick={() => onSwipe(ESwipeDirection.RIGHT)}
-					disabled={loading}
+					disabled={disableButtons}
 				>
 					<ThumbsUp
 						fill={THEME_COLORS.light.btn_primary_text}

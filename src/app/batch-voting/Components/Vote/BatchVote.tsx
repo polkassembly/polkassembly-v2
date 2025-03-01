@@ -11,6 +11,7 @@ import { BatchVotingClientService } from '@/app/_client-services/batch_voting_cl
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
+import { BATCH_VOTE_CART_QUERY_KEY } from '@/app/_client-constants/reactQueryKeys';
 import ProposalScreen from './ProposalScreen/ProposalScreen';
 import VoteCart from './VoteCart/VoteCart';
 import TinderVoting from './TinderVotingMobile/TinderVoting';
@@ -46,9 +47,6 @@ function BatchVote({
 		}
 		return data.voteCart;
 	};
-
-	// eslint-disable-next-line sonarjs/no-duplicate-string
-	const BATCH_VOTE_CART_QUERY_KEY = 'batch-vote-cart';
 
 	const { data: voteCart, isFetching } = useQuery({
 		queryKey: [BATCH_VOTE_CART_QUERY_KEY, user?.id],
@@ -106,7 +104,8 @@ function BatchVote({
 			amount,
 			conviction: defaultConviction,
 			updatedAt: new Date(),
-			title
+			title,
+			editDisabled: true
 		};
 
 		// Store the previous state to enable rollback
@@ -131,13 +130,13 @@ function BatchVote({
 
 			// Update the item with server-returned id and createdAt
 			queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (old: IVoteCartItem[] = []) =>
-				old.map((item) => (item.postIndexOrHash === proposalIndexOrHash ? { ...item, id: data.voteCartItem.id, createdAt: data.voteCartItem.createdAt } : item))
+				old.map((item) =>
+					item.postIndexOrHash === proposalIndexOrHash ? { ...item, id: data.voteCartItem.id, createdAt: data.voteCartItem.createdAt, editDisabled: false } : item
+				)
 			);
-			// handleNext();
 		} catch (error) {
 			// Revert to previous state if the API call fails
 			queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], previousData);
-			// resetCurrentIndexToPrevious();
 			console.error('Failed to add to vote cart:', error);
 		} finally {
 			setLoading(false);
@@ -146,31 +145,28 @@ function BatchVote({
 
 	return (
 		<div>
-			<div className='hidden grid-cols-1 gap-4 sm:grid lg:grid-cols-3'>
-				<div className='relative col-span-2 rounded-2xl bg-bg_modal p-4'>
+			<div className='hidden grid-cols-1 place-items-start gap-4 sm:grid lg:grid-cols-3'>
+				<div className='relative col-span-2 w-full rounded-2xl bg-bg_modal p-4'>
 					{isFetching && <LoadingLayover />}
 					<ProposalScreen
 						proposals={filteredProposals}
-						// currentIndex={currentIndex}
 						addToVoteCart={addToVoteCart}
 						disableButtons={loading}
 						onSkip={onSkipProposal}
 					/>
 				</div>
-				<div className='relative col-span-1 rounded-2xl bg-bg_modal p-4'>
-					{(isFetching || loading) && <LoadingLayover />}
+				<div className='relative col-span-1 w-full rounded-2xl bg-bg_modal p-4'>
+					{isFetching && <LoadingLayover />}
 					<VoteCart voteCart={voteCart || []} />
 				</div>
 			</div>
 			<TinderVoting
+				disableButtons={loading}
 				filteredProposals={filteredProposals}
-				loading={loading}
 				currentIndexRef={currentIndexRef}
 				addToVoteCart={addToVoteCart}
 				isFetching={isFetching}
 				voteCart={voteCart || []}
-				// currentIndex={currentIndex}
-				// proposals={proposals}
 				onSkip={onSkipProposal}
 			/>
 		</div>

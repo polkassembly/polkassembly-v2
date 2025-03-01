@@ -16,6 +16,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { BATCH_VOTE_CART_QUERY_KEY } from '@/app/_client-constants/reactQueryKeys';
 import EditCartItem from './EditCartItem';
 
 function VoteDecisionUi({ voteDecision }: { voteDecision: EVoteDecision }) {
@@ -76,7 +77,7 @@ function CartItem({ voteCartItem }: { voteCartItem: IVoteCartItem }) {
 			return;
 		}
 
-		queryClient.setQueryData(['batch-vote-cart', user.id], (oldData: IVoteCartItem[]) => {
+		queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (oldData: IVoteCartItem[]) => {
 			return oldData.filter((item) => item.id !== voteCartItem.id);
 		});
 
@@ -114,6 +115,7 @@ function CartItem({ voteCartItem }: { voteCartItem: IVoteCartItem }) {
 								size='icon'
 								variant='ghost'
 								className='p-0 px-0 text-text_primary'
+								disabled={voteCartItem.editDisabled}
 							>
 								<Pencil />
 							</Button>
@@ -131,6 +133,7 @@ function CartItem({ voteCartItem }: { voteCartItem: IVoteCartItem }) {
 						variant='ghost'
 						className='p-0 px-0 text-text_primary'
 						onClick={removeFromVoteCart}
+						disabled={voteCartItem.editDisabled}
 					>
 						<Trash />
 					</Button>

@@ -34,9 +34,9 @@ function ProposalScreen({
 	const currentProposal = proposals[0];
 
 	return proposals.length > 0 ? (
-		<div>
+		<div className='h-full'>
 			{currentProposal && (
-				<div className='relative flex flex-col gap-y-4'>
+				<div className='relative flex h-full flex-col gap-y-4'>
 					<Button
 						variant='ghost'
 						className='absolute right-0 top-0 text-sm text-text_pink'
@@ -44,11 +44,13 @@ function ProposalScreen({
 					>
 						{t('BatchVote.skip')}
 					</Button>
-					<ActivityFeedPostItem
-						commentBox={false}
-						voteButton={false}
-						postData={currentProposal}
-					/>
+					<div className='w-full flex-1'>
+						<ActivityFeedPostItem
+							commentBox={false}
+							voteButton={false}
+							postData={currentProposal}
+						/>
+					</div>
 					<div className='flex w-full items-center gap-x-4'>
 						<Button
 							variant='secondary'
