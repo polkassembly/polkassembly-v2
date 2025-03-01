@@ -545,7 +545,10 @@
 		},
 		"titleTooShort": "有効なタイトルを入力してください。",
 		"titlePlaceholder": "タイトルを入力",
-		"descriptionRequired": "有効な説明を入力してください。"
+		"descriptionRequired": "有効な説明を入力してください。",
+		"please": "お願いします",
+		"login": "ログイン",
+		"toCreate": "ディスカッションを作成するには"
 	},
 	"ProposalType": {
 		"discussion": "ディスカッション",
