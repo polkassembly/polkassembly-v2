@@ -13,6 +13,7 @@ import { EProposalType, ICalendarEvent } from '@/_shared/types';
 import Link from 'next/link';
 import { Skeleton } from '@ui/Skeleton';
 import type { Dayjs } from 'dayjs';
+import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { cn } from '@/lib/utils';
 import styles from './Overview.module.scss';
@@ -177,12 +178,13 @@ function CalendarEvents() {
 	};
 
 	const selectedDateEvents = getEventData(dayjs(selectedDate));
+	const t = useTranslations('Overview');
 
 	return (
 		<div>
 			<div className={styles.calendar_event_container}>
 				<div>
-					<h2 className={styles.calendar_event_title}>Events</h2>
+					<h2 className={styles.calendar_event_title}>{t('events')}</h2>
 					<div className='hidden xl:block'>
 						<Calendar
 							cellRender={dateCellRender}
@@ -191,7 +193,7 @@ function CalendarEvents() {
 							isLoading={isLoading}
 							onMonthChange={handleMonthChange}
 						/>
-						<p className='mt-4 text-xs text-text_grey'>*DateTime in UTC</p>
+						<p className='mt-4 text-xs text-text_grey'>{t('*DateTimeinUTC')}</p>
 					</div>
 				</div>
 				<div className='my-3 w-full xl:mt-5 xl:h-[400px] xl:w-[50%] xl:pl-8'>
@@ -205,7 +207,7 @@ function CalendarEvents() {
 							color='text-btn_secondary_text hover:text-text_pink'
 						/>
 					) : (
-						<div className='text-text_secondary'>No events for this date</div>
+						<div className='text-text_secondary'>{t('noEventsForThisDate')}</div>
 					)}
 				</div>
 			</div>

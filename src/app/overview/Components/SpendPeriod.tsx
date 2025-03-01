@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@ui/LoadingSpinner';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import styles from './SpendPeriod.module.scss';
 
@@ -20,6 +21,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	const [spendPeriod, setSpendPeriod] = useState<{ percentage: number; value: { days: number; hours: number; minutes: number; total: number } } | null>(null);
 	const [nextBurn, setNextBurn] = useState<{ value: string; valueUSD: string } | null>(null);
 	const [isNextBurnLoading, setIsNextBurnLoading] = useState<boolean>(true);
+	const t = useTranslations();
 
 	useEffect(() => {
 		if (!apiService) return;
@@ -60,7 +62,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 			) : (
 				<CardContent className='p-3'>
 					<p className='text-sm text-wallet_btn_text'>
-						Spend Period Remaining <MdInfoOutline className='inline-block text-lg' />
+						{t('spendPeriodRemaining')} <MdInfoOutline className='inline-block text-lg' />
 					</p>
 					<p className='text-xs text-wallet_btn_text'>
 						{(spendPeriod?.value.days || spendPeriod?.value.days !== 0) && (
@@ -93,7 +95,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 							<LoadingSpinner />
 						) : (
 							<div className='flex flex-col'>
-								<p className='text-xs text-wallet_btn_text'>Next Burn</p>
+								<p className='text-xs text-wallet_btn_text'>{t('nextBurn')}</p>
 								<div className='flex items-center gap-2'>
 									<p className={styles.next_burn}>
 										{nextBurn?.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}</span>
@@ -103,7 +105,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 							</div>
 						)}
 						<div className='rounded-md bg-info_card_bg p-2'>
-							<p className='text-xs'>If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.</p>
+							<p className='text-xs'>{t('nextBurnInfo')}</p>
 						</div>
 					</div>
 				</CardContent>

@@ -2,15 +2,16 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { useState } from 'react';
+import { ChangeEvent, ReactNode, useState } from 'react';
 import { DayPicker, SelectSingleEventHandler } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import styles from './Calendar.module.scss';
 import LoadingLayover from '../LoadingLayover';
 
 interface CalendarProps {
-	cellRender: (date: Date | undefined) => React.ReactNode;
+	cellRender: (date: Date | undefined) => ReactNode;
 	selectedDate: Date;
 	setSelectedDate: (date: Date) => void;
 	isLoading?: boolean;
@@ -18,17 +19,18 @@ interface CalendarProps {
 }
 
 function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMonthChange }: CalendarProps) {
+	const t = useTranslations();
 	const [view, setView] = useState<'month' | 'year'>('month');
 
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-	const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+	const handleMonthChange = (event: ChangeEvent<HTMLSelectElement>) => {
 		const newDate = new Date(selectedDate);
 		newDate.setMonth(parseInt(event.target.value, 10));
 		setSelectedDate(newDate);
 		onMonthChange(newDate);
 	};
 
-	const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+	const handleYearChange = (event: ChangeEvent<HTMLSelectElement>) => {
 		const newDate = new Date(selectedDate);
 		newDate.setFullYear(parseInt(event.target.value, 10));
 		setSelectedDate(newDate);
@@ -103,14 +105,14 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 						className={cn(styles.calendary_header_button, 'rounded-l-sm', view === 'month' ? 'border-text_pink' : 'border-border_grey')}
 						onClick={() => setView('month')}
 					>
-						Month
+						{t('Overview.month')}
 					</button>
 					<button
 						type='button'
 						className={cn(styles.calendary_header_button, 'rounded-r-sm', view === 'year' ? 'border-text_pink' : 'border-border_grey')}
 						onClick={() => setView('year')}
 					>
-						Year
+						{t('Overview.year')}
 					</button>
 				</div>
 			</div>

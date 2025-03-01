@@ -16,6 +16,7 @@ import Address from '@ui/Profile/Address/Address';
 import { useRouter } from 'next/navigation';
 import { aboutSocialLinks } from '@shared/_constants/AboutSocialLinks';
 import StatusTag from '@ui/StatusTag/StatusTag';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import AboutSocialLinks from './AboutSocialLinks';
 import styles from './Overview.module.scss';
@@ -38,16 +39,17 @@ function Overview({
 }) {
 	const network = getCurrentNetwork() as ENetwork;
 	const router = useRouter();
+	const t = useTranslations('Overview');
 
 	return (
 		<div className={styles.overview_container}>
-			<h1 className={styles.overview_title}>Overview</h1>
+			<h1 className={styles.overview_title}>{t('overview')}</h1>
 
 			{/* About Section */}
 			<Card className='border-none bg-bg_modal p-4 shadow-lg'>
 				<CardContent className='p-3'>
 					<div className='flex items-center justify-between'>
-						<p className='text-xl font-semibold text-btn_secondary_text'>About</p>
+						<p className='text-xl font-semibold text-btn_secondary_text'>{t('about')}</p>
 						{aboutSocialLinks[network as ENetwork].length > 0 && (
 							<span className='hidden lg:block'>
 								<AboutSocialLinks links={aboutSocialLinks[network as ENetwork]} />
@@ -55,7 +57,7 @@ function Overview({
 						)}
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
-						Join our Community to discuss, contribute and get regular updates from us! <span className='cursor-pointer text-bg_pink'>View Gallery</span>
+						{t('joinCommunity')} <span className='cursor-pointer text-bg_pink'>{t('viewGallery')}</span>
 					</p>
 					{aboutSocialLinks[network as ENetwork].length > 0 && (
 						<span className='block pt-3 lg:hidden'>
@@ -70,10 +72,10 @@ function Overview({
 				<Card className='border-none bg-bg_modal p-4 shadow-lg'>
 					<CardContent className='p-3'>
 						<p className='text-sm text-wallet_btn_text'>
-							Treasury <MdInfoOutline className='inline-block text-lg' />
+							{t('treasury')} <MdInfoOutline className='inline-block text-lg' />
 						</p>
 						<div className='mt-4 flex items-center justify-center'>
-							<p className='text-sm text-btn_secondary_text'>Coming Soon..</p>
+							<p className='text-sm text-btn_secondary_text'>{t('comingSoon')}</p>
 						</div>
 					</CardContent>
 				</Card>
@@ -82,7 +84,7 @@ function Overview({
 
 			{/* Latest Activity */}
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
-				<h2 className={styles.latest_activity_title}>Latest Activity</h2>
+				<h2 className={styles.latest_activity_title}>{t('latestActivity')}</h2>
 				<Tabs defaultValue='all'>
 					<TabsList className={cn(styles.tabList, 'hide_scrollbar')}>
 						<TabsTrigger
@@ -90,14 +92,14 @@ function Overview({
 							className={styles.tabTrigger}
 							value='all'
 						>
-							All <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
+							{t('all')} <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
 							className={styles.tabTrigger}
 							value='discussion'
 						>
-							Discussion <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
+							{t('discussion')} <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
 						</TabsTrigger>
 						{Object.keys(NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {}).map((key) => (
 							<TabsTrigger
@@ -116,11 +118,11 @@ function Overview({
 							<TableHeader>
 								<TableRow className={styles.tableRow}>
 									<TableHead className={styles.tableCell_1}>#</TableHead>
-									<TableHead className={styles.tableCell_2}>Title</TableHead>
-									<TableHead className={styles.tableCell}>Posted by</TableHead>
-									<TableHead className={styles.tableCell}>Created</TableHead>
-									<TableHead className={styles.tableCell}>Origin</TableHead>
-									<TableHead className={styles.tableCell_last}>Status</TableHead>
+									<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('created')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('origin')}</TableHead>
+									<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -152,7 +154,7 @@ function Overview({
 											colSpan={6}
 											className='text-center'
 										>
-											No activity data found
+											{t('noactivity')}
 										</TableCell>
 									</TableRow>
 								)}
@@ -166,11 +168,11 @@ function Overview({
 							<TableHeader>
 								<TableRow className={styles.tableRow}>
 									<TableHead className={styles.tableCell_1}>#</TableHead>
-									<TableHead className={styles.tableCell_2}>Title</TableHead>
-									<TableHead className={styles.tableCell}>Posted by</TableHead>
-									<TableHead className={styles.tableCell}>Created</TableHead>
-									<TableHead className={styles.tableCell}>Origin</TableHead>
-									<TableHead className={styles.tableCell_last}>Status</TableHead>
+									<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('created')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('origin')}</TableHead>
+									<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -202,7 +204,7 @@ function Overview({
 											colSpan={6}
 											className='text-center'
 										>
-											No discussion posts found
+											{t('nodiscussionposts')}
 										</TableCell>
 									</TableRow>
 								)}
@@ -220,11 +222,11 @@ function Overview({
 								<TableHeader>
 									<TableRow className={styles.tableRow}>
 										<TableHead className={styles.tableCell_1}>#</TableHead>
-										<TableHead className={styles.tableCell_2}>Title</TableHead>
-										<TableHead className={styles.tableCell}>Posted by</TableHead>
-										<TableHead className={styles.tableCell}>Created</TableHead>
-										<TableHead className={styles.tableCell}>Origin</TableHead>
-										<TableHead className={styles.tableCell_status}>Status</TableHead>
+										<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
+										<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
+										<TableHead className={styles.tableCell}>{t('created')}</TableHead>
+										<TableHead className={styles.tableCell}>{t('origin')}</TableHead>
+										<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -256,7 +258,7 @@ function Overview({
 												colSpan={6}
 												className='text-center'
 											>
-												No {track.trackName} activity found
+												{t('no')} {track.trackName} {t('activityfound')}
 											</TableCell>
 										</TableRow>
 									)}

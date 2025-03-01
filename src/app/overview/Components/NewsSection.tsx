@@ -5,6 +5,7 @@
 import { LoadingSpinner } from '@ui/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
+import { useTranslations } from 'next-intl';
 import styles from './Overview.module.scss';
 
 interface INewsProps {
@@ -13,12 +14,13 @@ interface INewsProps {
 
 function NewsSection({ twitter }: INewsProps) {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const t = useTranslations('Overview');
 
 	const profile = twitter ? twitter.split('/')[3] : 'polkadot';
 
 	return (
 		<div className={styles.news_section_container}>
-			<h2 className={styles.news_section_title}>News</h2>
+			<h2 className={styles.news_section_title}>{t('news')}</h2>
 
 			{isLoading && (
 				<div className='flex h-full items-center justify-center py-32'>
