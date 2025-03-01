@@ -22,7 +22,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	const [spendPeriod, setSpendPeriod] = useState<{ percentage: number; value: { days: number; hours: number; minutes: number; total: number } } | null>(null);
 	const [nextBurn, setNextBurn] = useState<{ value: string; valueUSD: string } | null>(null);
 	const [isNextBurnLoading, setIsNextBurnLoading] = useState<boolean>(true);
-	const t = useTranslations();
+	const t = useTranslations('Overview');
 
 	useEffect(() => {
 		if (!apiService) return;
