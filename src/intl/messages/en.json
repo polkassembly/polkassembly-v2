@@ -565,7 +565,10 @@
 			"stakingadmin": "Staking Admin",
 			"treasury": "Treasury",
 			"fellowship": "Fellowship"
-		}
+		},
+		"please": "Please",
+		"login": "Login",
+		"toCreate": "to create a Discussion"
 	},
 	"ProposalType": {
 		"discussion": "Discussion",
