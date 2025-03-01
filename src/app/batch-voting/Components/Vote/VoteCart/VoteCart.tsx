@@ -7,6 +7,9 @@ import React, { useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslations } from 'next-intl';
+import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '@/hooks/useUser';
 import CartItem from './CartItem';
 
 function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
@@ -15,6 +18,28 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	const t = useTranslations();
 
 	const [loading, setLoading] = useState<boolean>(false);
+	const [clearCartLoading, setClearCartLoading] = useState<boolean>(false);
+
+	const { user } = useUser();
+	const queryClient = useQueryClient();
+
+	const clearCart = async () => {
+		if (!user?.id) return;
+		setClearCartLoading(true);
+
+		const { data, error } = await BatchVotingClientService.clearBatchVoteCart({ userId: user.id });
+		if (error || !data) {
+			console.error(error);
+			setClearCartLoading(false);
+			return;
+		}
+
+		queryClient.setQueryData(['batch-vote-cart', user.id], () => {
+			return [];
+		});
+
+		setClearCartLoading(false);
+	};
 
 	const confirmBatchVoting = async () => {
 		if (!userPreferences.address?.address || voteCart.length === 0) return;
@@ -37,7 +62,7 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 				{voteCart.length > 0 ? (
 					voteCart.map((item) => (
 						<CartItem
-							key={item.postIndexOrHash}
+							key={item.id}
 							voteCartItem={item}
 						/>
 					))
@@ -47,7 +72,17 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 					</div>
 				)}
 			</div>
-			<div>
+			<div className='flex flex-col gap-y-2'>
+				<div className='flex w-full items-center justify-between'>
+					<span>Proposals: {voteCart.length}</span>
+					<Button
+						isLoading={clearCartLoading}
+						onClick={clearCart}
+						size='sm'
+					>
+						Clear
+					</Button>
+				</div>
 				<Button
 					isLoading={loading}
 					disabled={voteCart.length === 0}

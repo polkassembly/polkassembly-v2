@@ -11,13 +11,13 @@ import { useTranslations } from 'next-intl';
 
 function ProposalScreen({
 	proposals,
-	handleNext,
-	currentIndex,
-	addToVoteCart
+	addToVoteCart,
+	disableButtons,
+	onSkip
 }: {
 	proposals: IPostListing[];
-	handleNext: () => void;
-	currentIndex: number;
+	disableButtons?: boolean;
+	onSkip: (proposal: IPostListing) => void;
 	addToVoteCart: ({
 		voteDecision,
 		proposalIndexOrHash,
@@ -31,7 +31,7 @@ function ProposalScreen({
 	}) => void;
 }) {
 	const t = useTranslations();
-	const currentProposal = proposals[`${currentIndex}`];
+	const currentProposal = proposals[0];
 
 	return proposals.length > 0 ? (
 		<div>
@@ -40,7 +40,7 @@ function ProposalScreen({
 					<Button
 						variant='ghost'
 						className='absolute right-0 top-0 text-sm text-text_pink'
-						onClick={handleNext}
+						onClick={() => onSkip(currentProposal)}
 					>
 						{t('BatchVote.skip')}
 					</Button>
@@ -52,6 +52,7 @@ function ProposalScreen({
 					<div className='flex w-full items-center gap-x-4'>
 						<Button
 							variant='secondary'
+							disabled={disableButtons}
 							className='w-full border-failure text-failure'
 							leftIcon={
 								<ThumbsDown
@@ -71,6 +72,7 @@ function ProposalScreen({
 							{t('BatchVote.nay')}
 						</Button>
 						<Button
+							disabled={disableButtons}
 							variant='secondary'
 							className='w-full border-decision_bar_indicator text-decision_bar_indicator'
 							leftIcon={<Ban className='h-4 w-4' />}
@@ -86,6 +88,7 @@ function ProposalScreen({
 							{t('BatchVote.abstain')}
 						</Button>
 						<Button
+							disabled={disableButtons}
 							variant='secondary'
 							className='w-full border-success text-success'
 							leftIcon={

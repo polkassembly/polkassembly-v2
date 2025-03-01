@@ -88,6 +88,7 @@ enum EApiRoute {
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
+	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART'
 }
 
@@ -189,6 +190,7 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_ACCOUNT:
 			case EApiRoute.UNFOLLOW_USER:
 			case EApiRoute.DELETE_BATCH_VOTE_CART_ITEM:
+			case EApiRoute.DELETE_BATCH_VOTE_CART:
 				path = '/users/id';
 				method = 'DELETE';
 				break;
@@ -550,6 +552,11 @@ export class NextApiClientService {
 	protected static async deleteBatchVoteCartItemApi({ userId, id }: { userId: number; id: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_BATCH_VOTE_CART_ITEM, routeSegments: [userId.toString(), 'vote-cart'] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { id } });
+	}
+
+	protected static async clearBatchVoteCartApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_BATCH_VOTE_CART, routeSegments: [userId.toString(), 'vote-cart', 'clear'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	static async fetchPreimagesApi({ page }: { page: number }) {

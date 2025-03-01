@@ -21,24 +21,19 @@ enum ESwipeDirection {
 }
 
 function TinderVoting({
-	handleNext,
 	loading,
 	filteredProposals,
-	proposals,
-	currentIndex,
 	addToVoteCart,
 	isFetching,
 	voteCart,
-	currentIndexRef
+	currentIndexRef,
+	onSkip
 }: {
-	handleNext: () => void;
 	loading: boolean;
 	currentIndexRef: RefObject<number>;
 	filteredProposals: IPostListing[];
-	proposals: IPostListing[];
 	isFetching: boolean;
 	voteCart: IVoteCartItem[];
-	currentIndex: number;
 	addToVoteCart: ({
 		voteDecision,
 		proposalIndexOrHash,
@@ -50,27 +45,27 @@ function TinderVoting({
 		proposalType: EProposalType;
 		title?: string;
 	}) => void;
+	onSkip: (proposal: IPostListing) => void;
 }) {
 	const t = useTranslations();
 
 	const childRefs = useMemo(
 		() =>
-			Array(proposals.length)
+			Array(filteredProposals.length)
 				.fill(0)
 				.map(() => createRef()),
-		[proposals]
+		[filteredProposals]
 	);
 
 	const onSwipe = (dir: ESwipeDirection) => {
-		if (currentIndex >= 0 && currentIndex < proposals.length) {
-			const proposal = proposals[`${currentIndex}`];
+		if (filteredProposals.length > 0) {
+			const proposal = filteredProposals[0];
 			addToVoteCart({
 				proposalIndexOrHash: proposal.index?.toString() || proposal.hash || '',
 				proposalType: proposal.proposalType,
 				title: proposal.title,
 				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.ABSTAIN
 			});
-			handleNext();
 		}
 	};
 
@@ -87,7 +82,7 @@ function TinderVoting({
 			<Button
 				variant='ghost'
 				className={classes.skipButton}
-				onClick={handleNext}
+				onClick={() => onSkip(filteredProposals[0])}
 			>
 				{t('BatchVote.skip')}
 			</Button>

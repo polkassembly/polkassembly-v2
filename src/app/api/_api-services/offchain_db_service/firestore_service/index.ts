@@ -1130,6 +1130,11 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		const voteCartItems = await FirestoreUtils.voteCartItemsCollectionRef().where('userId', '==', userId).get();
+		await Promise.all(voteCartItems.docs.map((doc) => doc.ref.delete()));
+	}
+
 	static async UpdateVoteCartItem({
 		userId,
 		voteCartItemId,

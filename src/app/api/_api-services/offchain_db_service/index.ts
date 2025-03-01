@@ -693,6 +693,10 @@ export class OffChainDbService {
 		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
 	}
 
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		return FirestoreService.ClearVoteCart({ userId });
+	}
+
 	static async UpdateVoteCartItem({
 		userId,
 		voteCartItemId,

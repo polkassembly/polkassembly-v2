@@ -77,4 +77,8 @@ export class BatchVotingClientService extends NextApiClientService {
 	static async deleteBatchVoteCartItem({ userId, id }: { userId: number; id: string }) {
 		return this.deleteBatchVoteCartItemApi({ userId, id });
 	}
+
+	static async clearBatchVoteCart({ userId }: { userId: number }) {
+		return this.clearBatchVoteCartApi({ userId });
+	}
 }

@@ -30,10 +30,9 @@ function BatchVote({
 	defaultAbstainNayValue: BN;
 	defaultConviction: EConvictionAmount;
 }) {
-	const [currentIndex, setCurrentIndex] = useState(0);
 	const { user } = useUser();
 	const queryClient = useQueryClient();
-	const currentIndexRef = useRef(currentIndex);
+	const currentIndexRef = useRef(0);
 
 	const [loading, setLoading] = useState(false);
 
@@ -48,25 +47,29 @@ function BatchVote({
 		return data.voteCart;
 	};
 
+	// eslint-disable-next-line sonarjs/no-duplicate-string
+	const BATCH_VOTE_CART_QUERY_KEY = 'batch-vote-cart';
+
 	const { data: voteCart, isFetching } = useQuery({
-		queryKey: ['batch-vote-cart', user?.id],
+		queryKey: [BATCH_VOTE_CART_QUERY_KEY, user?.id],
 		queryFn: fetchBatchVoteCart,
 		staleTime: FIVE_MIN_IN_MILLI
 	});
 
-	const filteredProposals = useMemo(() => {
-		return proposals.filter(
-			(proposal) =>
-				canVote(proposal.onChainInfo?.status, proposal.onChainInfo?.preparePeriodEndsAt) &&
-				(voteCart ? !voteCart.some((item) => Number(item.postIndexOrHash) === proposal.index || item.postIndexOrHash === proposal.hash) : true)
-		);
-	}, [proposals, voteCart]);
+	const [skippedProposals, setSkippedProposals] = useState<IPostListing[]>([]);
 
-	const handleNext = () => {
-		if (currentIndex < proposals.length) {
-			setCurrentIndex(currentIndex + 1);
-			currentIndexRef.current = currentIndex + 1;
-		}
+	const filteredProposals = useMemo(() => {
+		return proposals.filter((proposal) => {
+			return (
+				canVote(proposal.onChainInfo?.status, proposal.onChainInfo?.preparePeriodEndsAt) &&
+				(voteCart ? !voteCart.some((item) => Number(item.postIndexOrHash) === proposal.index || item.postIndexOrHash === proposal.hash) : true) &&
+				!skippedProposals.some((skippedProposal) => skippedProposal.index === proposal.index || (skippedProposal.hash && skippedProposal.hash === proposal.hash))
+			);
+		});
+	}, [proposals, voteCart, skippedProposals]);
+
+	const onSkipProposal = (proposal: IPostListing) => {
+		setSkippedProposals([...skippedProposals, proposal]);
 	};
 
 	const addToVoteCart = async ({
@@ -92,40 +95,53 @@ function BatchVote({
 			abstainNayValue: defaultAbstainNayValue
 		});
 
-		const { data, error } = await BatchVotingClientService.addToBatchVoteCart({
+		// Create the new vote cart item
+		const newItem = {
+			id: proposalIndexOrHash, // temporary id
+			createdAt: new Date(),
 			userId: user.id,
 			postIndexOrHash: proposalIndexOrHash,
 			proposalType,
 			decision: voteDecision,
 			amount,
-			conviction: defaultConviction
-		});
+			conviction: defaultConviction,
+			updatedAt: new Date(),
+			title
+		};
 
-		if (error || !data) {
-			console.error(error);
+		// Store the previous state to enable rollback
+		const previousData = queryClient.getQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id]) as IVoteCartItem[];
+
+		// Optimistically update the UI
+		queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (old: IVoteCartItem[] = []) => [...old, newItem]);
+
+		try {
+			const { data, error } = await BatchVotingClientService.addToBatchVoteCart({
+				userId: user.id,
+				postIndexOrHash: proposalIndexOrHash,
+				proposalType,
+				decision: voteDecision,
+				amount,
+				conviction: defaultConviction
+			});
+
+			if (error || !data) {
+				throw new Error(error?.message || 'Failed to add to vote cart');
+			}
+
+			// Update the item with server-returned id and createdAt
+			queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (old: IVoteCartItem[] = []) =>
+				old.map((item) => (item.postIndexOrHash === proposalIndexOrHash ? { ...item, id: data.voteCartItem.id, createdAt: data.voteCartItem.createdAt } : item))
+			);
+			// handleNext();
+		} catch (error) {
+			// Revert to previous state if the API call fails
+			queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], previousData);
+			// resetCurrentIndexToPrevious();
+			console.error('Failed to add to vote cart:', error);
+		} finally {
 			setLoading(false);
-			return;
 		}
-
-		queryClient.setQueryData(['batch-vote-cart', user.id], (oldData: IVoteCartItem[]) => {
-			return [
-				...(oldData || []),
-				{
-					id: data.voteCartItem.id,
-					createdAt: data.voteCartItem.createdAt,
-					userId: user.id,
-					postIndexOrHash: proposalIndexOrHash,
-					proposalType,
-					decision: voteDecision,
-					amount,
-					conviction: defaultConviction,
-					updatedAt: new Date(),
-					title
-				}
-			];
-		});
-
-		setLoading(false);
 	};
 
 	return (
@@ -135,9 +151,10 @@ function BatchVote({
 					{isFetching && <LoadingLayover />}
 					<ProposalScreen
 						proposals={filteredProposals}
-						handleNext={handleNext}
-						currentIndex={currentIndex}
+						// currentIndex={currentIndex}
 						addToVoteCart={addToVoteCart}
+						disableButtons={loading}
+						onSkip={onSkipProposal}
 					/>
 				</div>
 				<div className='relative col-span-1 rounded-2xl bg-bg_modal p-4'>
@@ -147,14 +164,14 @@ function BatchVote({
 			</div>
 			<TinderVoting
 				filteredProposals={filteredProposals}
-				handleNext={handleNext}
 				loading={loading}
 				currentIndexRef={currentIndexRef}
 				addToVoteCart={addToVoteCart}
 				isFetching={isFetching}
 				voteCart={voteCart || []}
-				currentIndex={currentIndex}
-				proposals={proposals}
+				// currentIndex={currentIndex}
+				// proposals={proposals}
+				onSkip={onSkipProposal}
 			/>
 		</div>
 	);
