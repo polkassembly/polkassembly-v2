@@ -11,6 +11,7 @@ import { LoadingSpinner } from '@ui/LoadingSpinner';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import styles from './SpendPeriod.module.scss';
 
@@ -54,7 +55,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	}, [apiService]);
 
 	return (
-		<Card className={styles.container}>
+		<Card className={cn(styles.container, 'bg-bg_modal')}>
 			{loading ? (
 				<div className={styles.loading}>
 					<LoadingSpinner />
