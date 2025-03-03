@@ -73,7 +73,7 @@ function BountyHeader() {
 				</div>
 
 				<div className='items-between relative hidden h-full flex-col justify-between md:flex'>
-					<div className='absolute -top-6 left-1/2 h-10 w-20 rotate-180 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]'></div>
+					<span className='absolute -top-6 left-1/2 h-10 w-20 rotate-180 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 					<Image
 						src={DashedLineIcon}
 						alt='bounty icon'
@@ -81,7 +81,7 @@ function BountyHeader() {
 						width={3}
 						height={209}
 					/>
-					<div className='absolute left-1/2 top-[237px] h-10 w-20 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]'></div>
+					<span className='absolute left-1/2 top-[237px] h-10 w-20 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 				</div>
 
 				<div className='hidden gap-x-10 md:flex'>
@@ -137,7 +137,7 @@ function BountyHeader() {
 							/>
 						</div>
 						<div className='items-between relative -ml-6 flex items-center justify-between'>
-							<div className='left-0 h-20 w-10 rounded-r-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]'></div>
+							<span className='left-0 h-20 w-10 rounded-r-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 							<Image
 								src={DashedLineIcon}
 								alt='bounty icon'
@@ -145,7 +145,7 @@ function BountyHeader() {
 								width={209}
 								height={3}
 							/>
-							<div className='first-letter right-0 h-20 w-10 rounded-l-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]'></div>
+							<span className='first-letter right-0 h-20 w-10 rounded-l-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 						</div>
 						<div className='-ml-4 mt-12 flex w-full flex-col items-center gap-x-4'>
 							<Image
