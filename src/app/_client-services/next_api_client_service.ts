@@ -31,7 +31,8 @@ import {
 	ITag,
 	EAllowedCommentor,
 	EOffChainPostTopic,
-	IBountyStats
+	IBountyStats,
+	IBountyUserActivity
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -85,7 +86,8 @@ enum EApiRoute {
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
 	FETCH_BOUNTIES_STATS = 'FETCH_BOUNTIES_STATS',
-	GET_TOKEN_PRICE = 'GET_TOKEN_PRICE'
+	GET_TOKEN_PRICE = 'GET_TOKEN_PRICE',
+	FETCH_BOUNTIES_USER_ACTIVITY = 'FETCH_BOUNTIES_USER_ACTIVITY'
 }
 
 export class NextApiClientService {
@@ -154,6 +156,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_BOUNTIES_STATS:
 				path = '/bounties/stats';
+				break;
+			case EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY:
+				path = '/bounties/user-activity';
 				break;
 			case EApiRoute.GET_TOKEN_PRICE:
 				path = '/token-price';
@@ -650,5 +655,10 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TOKEN_PRICE, queryParams });
 		return this.nextApiClientFetch<{ price: number }>({ url, method });
+	}
+
+	static async fetchBountiesUserActivity() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY });
+		return this.nextApiClientFetch<IBountyUserActivity[]>({ url, method });
 	}
 }

@@ -18,12 +18,12 @@ import BountyBarcodeMbWhiteIcon from '@assets/bounties/barcode-mb-white.svg';
 import DashedLineIcon from '@assets/bounties/dashed-line.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import { ENetwork, IBountyStats } from '@/_shared/types';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
+import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
@@ -33,35 +33,6 @@ function StatItem({ label, value }: { label: string; value: string }) {
 		</div>
 	);
 }
-export const formatNumberWithSuffix = (value: number): string => {
-	const cleanedValue = Number(value.toString().replace(/,/g, ''));
-	if (cleanedValue >= 1e6) {
-		return `${(cleanedValue / 1e6).toFixed(1)}m`;
-	}
-	if (cleanedValue >= 1e3) {
-		return `${(cleanedValue / 1e3).toFixed(1)}k`;
-	}
-	return cleanedValue.toFixed(1);
-};
-export const getFormattedValue = (value: string, network: string, currentTokenPrice: { isLoading: boolean; value: string }): string => {
-	const numericValue = Number(formatBnBalance(value, { numberAfterComma: 1, withThousandDelimitor: false }, network as ENetwork));
-
-	if (isNaN(Number(currentTokenPrice.value))) {
-		return formatNumberWithSuffix(numericValue);
-	}
-
-	const tokenPrice = Number(currentTokenPrice.value);
-	const dividedValue = numericValue * tokenPrice;
-
-	return formatNumberWithSuffix(dividedValue);
-};
-
-const getDisplayValue = (value: string, network: string, currentTokenPrice: { isLoading: boolean; value: string }, unit: string): string => {
-	if (currentTokenPrice.isLoading || isNaN(Number(currentTokenPrice.value))) {
-		return `${getFormattedValue(value, network, currentTokenPrice)} ${unit}`;
-	}
-	return `$${getFormattedValue(value, network, currentTokenPrice)}`;
-};
 
 function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
 	const network = getCurrentNetwork();
@@ -117,11 +88,16 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						/>
 						<StatItem
 							label='Total Rewarded'
-							value={getDisplayValue(bountiesStats.totalRewarded, network, { isLoading: false, value: tokenPrice.toString() }, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={formatTokenValue(bountiesStats.totalRewarded, network, { isLoading: false, value: tokenPrice.toString() }, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 						<StatItem
 							label='Total Bounty Pool'
-							value={getDisplayValue(bountiesStats.totalBountyPool, network, { isLoading: false, value: tokenPrice.toString() }, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={formatTokenValue(
+								bountiesStats.totalBountyPool,
+								network,
+								{ isLoading: false, value: tokenPrice.toString() },
+								NETWORKS_DETAILS[network as ENetwork].tokenSymbol
+							)}
 						/>
 					</div>
 				</div>

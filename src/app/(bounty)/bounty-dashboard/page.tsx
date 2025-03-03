@@ -20,6 +20,8 @@ async function page() {
 		statuses: [EProposalStatus.Active, EProposalStatus.Extended]
 	});
 
+	const { data: userActivities } = await NextApiClientService.fetchBountiesUserActivity();
+
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
 			<div className='flex items-center justify-between'>
@@ -41,7 +43,11 @@ async function page() {
 					}
 				}
 			/>
-			<HotBounties hotBounties={hotBounties || { items: [], totalCount: 0 }} />
+			<HotBounties
+				hotBounties={hotBounties || { items: [], totalCount: 0 }}
+				userActivities={userActivities || []}
+				tokenPrice={tokenPrice?.price || '0'}
+			/>
 		</div>
 	);
 }

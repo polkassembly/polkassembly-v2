@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing, IBountyUserActivity } from '@/_shared/types';
 import { ArrowUpRight } from 'lucide-react';
 import BountyCard from '@assets/bounties/bounty-card.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
@@ -17,8 +17,17 @@ import { Carousel, CarouselContent, CarouselItem } from '@ui/Carousel';
 import { useCallback, useEffect, useState } from 'react';
 import { type CarouselApi } from '@ui/Carousel';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import BountiesUserActivity from './BountiesUserActivity';
 
-export default function HotBounties({ hotBounties }: { hotBounties: IGenericListingResponse<IPostListing> }) {
+export default function HotBounties({
+	hotBounties,
+	userActivities,
+	tokenPrice
+}: {
+	hotBounties: IGenericListingResponse<IPostListing>;
+	userActivities: IBountyUserActivity[];
+	tokenPrice: string | number;
+}) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 
@@ -156,6 +165,10 @@ export default function HotBounties({ hotBounties }: { hotBounties: IGenericList
 					)}
 				</Carousel>
 			</div>
+			<BountiesUserActivity
+				userActivities={userActivities}
+				tokenPrice={tokenPrice as string}
+			/>
 		</div>
 	);
 }
