@@ -859,3 +859,10 @@ export interface ISubsquidBountyResponse {
 		proposals: IBountyProposal[];
 	};
 }
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: string;
+	address: string;
+	created_at: Date;
+}

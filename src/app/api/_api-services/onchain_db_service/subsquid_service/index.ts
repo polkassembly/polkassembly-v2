@@ -434,4 +434,18 @@ export class SubsquidService extends SubsquidUtils {
 			return null;
 		}
 	}
+
+	static async getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(network: ENetwork, parentBountyIndices: number[]): Promise<ISubsquidBountyResponse | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
+				.toPromise();
+
+			return response as ISubsquidBountyResponse;
+		} catch (error) {
+			console.error('Error fetching claimed child bounties payees and reward:', error);
+			return null;
+		}
+	}
 }
