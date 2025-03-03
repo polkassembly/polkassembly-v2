@@ -6,10 +6,10 @@ import { NextRequest } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { ENetwork, EProposalType, ICalendarEvent, IOffChainPost } from '@/_shared/types';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { OnChainDbService } from '../../_api-services/onchain_db_service';
 
 const CHUNK_SIZE = 30;
 
@@ -58,15 +58,15 @@ export async function POST(req: NextRequest) {
 			return Response.json(JSON.parse(cachedEvents));
 		}
 
-		// If not in cache, fetch events from Subsquid
+		// If not in cache, fetch events from onChain
 		try {
-			const subsquidEvents = await SubsquidService.GetCalendarEvents({
+			const onChainEvents = await OnChainDbService.GetCalendarEvents({
 				network: network as ENetwork,
 				startBlock: startBlockNo,
 				endBlock: endBlockNo
 			});
 
-			const eventsData = subsquidEvents || [];
+			const eventsData = onChainEvents || [];
 
 			if (!eventsData?.length) {
 				if (process.env.IS_CACHE_ENABLED === 'true') {
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
 			// Group events by proposal type
 			const eventsByProposalType: Record<string, ICalendarEvent[]> = {};
-			subsquidEvents.forEach((event: ICalendarEvent) => {
+			onChainEvents.forEach((event: ICalendarEvent) => {
 				if (!eventsByProposalType[event.type as EProposalType]) {
 					eventsByProposalType[event.type as EProposalType] = [];
 				}
@@ -106,22 +106,22 @@ export async function POST(req: NextRequest) {
 							const postsData = await Promise.all(postsPromises);
 
 							await Promise.all(
-								chunk.map(async (subsquidEvent) => {
+								chunk.map(async (onChainEvent) => {
 									const payload: ICalendarEvent = {
-										createdAt: subsquidEvent?.createdAt,
-										index: subsquidEvent?.index,
-										parentBountyIndex: subsquidEvent?.parentBountyIndex,
-										proposalType: subsquidEvent?.type as EProposalType,
-										proposer: subsquidEvent?.proposer,
+										createdAt: onChainEvent?.createdAt,
+										index: onChainEvent?.index,
+										parentBountyIndex: onChainEvent?.parentBountyIndex,
+										proposalType: onChainEvent?.type as EProposalType,
+										proposer: onChainEvent?.proposer,
 										source: 'polkasembly',
-										status: subsquidEvent?.status,
-										statusHistory: subsquidEvent?.statusHistory,
+										status: onChainEvent?.status,
+										statusHistory: onChainEvent?.statusHistory,
 										title: '',
-										trackNo: subsquidEvent?.trackNo
+										trackNo: onChainEvent?.trackNo
 									};
 
 									// Find matching post
-									const post = postsData.find((p: IOffChainPost) => p.index === subsquidEvent.index);
+									const post = postsData.find((p: IOffChainPost) => p.index === onChainEvent.index);
 
 									if (post?.title) {
 										payload.title = post.title;
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
 										// Try getting title from Subsquare
 										const subsquareData = await OffChainDbService.GetOffChainPostData({
 											network: network as ENetwork,
-											indexOrHash: subsquidEvent.index.toString(),
+											indexOrHash: onChainEvent.index.toString(),
 											proposalType: proposalType as EProposalType
 										});
 
@@ -162,9 +162,9 @@ export async function POST(req: NextRequest) {
 			});
 
 			return Response.json(eventsWithTimestamps);
-		} catch (subsquidError) {
-			console.error('Subsquid Error:', subsquidError);
-			return Response.json({ error: 'Failed to fetch calendar events', details: subsquidError }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+		} catch (onChainError) {
+			console.error('onChain Error:', onChainError);
+			return Response.json({ error: 'Failed to fetch calendar events', details: onChainError }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 		}
 	} catch (error) {
 		return Response.json({ error: error instanceof APIError ? error.message : 'Error while fetching calendar events' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
