@@ -3,9 +3,17 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ENetwork } from '@/_shared/types';
 import BountyHeader from './Components/BountyHeader';
 
-function page() {
+async function page() {
+	const network = getCurrentNetwork();
+	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
+	const { data: tokenPrice } = await NextApiClientService.getTokenPrice(NETWORKS_DETAILS[network as ENetwork].tokenSymbol);
+
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
 			<div className='flex items-center justify-between'>
@@ -15,7 +23,18 @@ function page() {
 					<CuratorDashboardButton /> */}
 				</div>
 			</div>
-			<BountyHeader />
+			<BountyHeader
+				tokenPrice={tokenPrice?.price || 0}
+				bountiesStats={
+					bountiesStats || {
+						activeBounties: '0',
+						availableBountyPool: 'N/A',
+						peopleEarned: 'N/A',
+						totalBountyPool: '0',
+						totalRewarded: 'N/A'
+					}
+				}
+			/>
 		</div>
 	);
 }

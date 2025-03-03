@@ -30,7 +30,8 @@ import {
 	IFollowEntry,
 	ITag,
 	EAllowedCommentor,
-	EOffChainPostTopic
+	EOffChainPostTopic,
+	IBountyStats
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -82,7 +83,9 @@ enum EApiRoute {
 	GET_FOLLOWERS = 'GET_FOLLOWERS',
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
-	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST'
+	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	FETCH_BOUNTIES_STATS = 'FETCH_BOUNTIES_STATS',
+	GET_TOKEN_PRICE = 'GET_TOKEN_PRICE'
 }
 
 export class NextApiClientService {
@@ -148,6 +151,12 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.FETCH_BOUNTIES_STATS:
+				path = '/bounties/stats';
+				break;
+			case EApiRoute.GET_TOKEN_PRICE:
+				path = '/token-price';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -628,5 +637,18 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async fetchBountiesStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_STATS });
+		return this.nextApiClientFetch<IBountyStats>({ url, method });
+	}
+
+	static async getTokenPrice(symbol: string) {
+		const queryParams = new URLSearchParams({
+			symbol
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TOKEN_PRICE, queryParams });
+		return this.nextApiClientFetch<{ price: number }>({ url, method });
 	}
 }

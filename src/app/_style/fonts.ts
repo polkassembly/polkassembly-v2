@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Poppins } from 'next/font/google';
+// eslint-disable-next-line
+import { Poppins, Space_Grotesk } from 'next/font/google';
 
 export const poppinsFont = Poppins({ subsets: ['latin'], weight: ['400', '500', '600'] });
+export const spaceGroteskFont = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600'] });

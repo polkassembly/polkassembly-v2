@@ -14,40 +14,82 @@ import BountyBarcodeMbIcon from '@assets/bounties/barcode-mb.svg';
 import BountyCreateMbWhiteIcon from '@assets/bounties/create-mb-white.svg';
 import BountyBarcodeMbWhiteIcon from '@assets/bounties/barcode-mb-white.svg';
 import DashedLineIcon from '@assets/bounties/dashed-line.svg';
+import { spaceGroteskFont } from '@/app/_style/fonts';
+import { ENetwork, IBountyStats } from '@/_shared/types';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+// import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
 		<div className='flex flex-col'>
-			<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>{label}</span>
+			<span className='font-pixelify text-[18px] font-semibold leading-none text-[#2D2D2D] dark:text-[#737373]'>{label}</span>
 			<span className='font-pixeboy text-[28px] font-medium'>{value}</span>
 		</div>
 	);
 }
+export const formatNumberWithSuffix = (value: number): string => {
+	const cleanedValue = Number(value.toString().replace(/,/g, ''));
+	if (cleanedValue >= 1e6) {
+		return `${(cleanedValue / 1e6).toFixed(1)}m`;
+	}
+	if (cleanedValue >= 1e3) {
+		return `${(cleanedValue / 1e3).toFixed(1)}k`;
+	}
+	return cleanedValue.toFixed(1);
+};
+export const getFormattedValue = (value: string, network: string, currentTokenPrice: { isLoading: boolean; value: string }): string => {
+	const numericValue = Number(formatBnBalance(value, { numberAfterComma: 1, withThousandDelimitor: false }, network as ENetwork));
 
-function BountyHeader() {
+	if (isNaN(Number(currentTokenPrice.value))) {
+		return formatNumberWithSuffix(numericValue);
+	}
+
+	const tokenPrice = Number(currentTokenPrice.value);
+	const dividedValue = numericValue * tokenPrice;
+
+	return formatNumberWithSuffix(dividedValue);
+};
+
+const getDisplayValue = (value: string, network: string, currentTokenPrice: { isLoading: boolean; value: string }, unit: string): string => {
+	if (currentTokenPrice.isLoading || isNaN(Number(currentTokenPrice.value))) {
+		return `${getFormattedValue(value, network, currentTokenPrice)} ${unit}`;
+	}
+	return `$${getFormattedValue(value, network, currentTokenPrice)}`;
+};
+
+function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
+	const network = getCurrentNetwork();
+
+	// const availableBounty = !isNaN(Number(tokenPrice)) && formatUSDWithUnits(String(Number(bountiesStats.availableBountyPool) * Number(tokenPrice)));
+
 	return (
-		<div className='dark:bg-section-dark-overlay mt-4 rounded-3xl bg-white p-5 md:p-6'>
+		<div className='dark:bg-section-dark-overlay mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
 			<div className='flex'>
-				<div className='hidden gap-6 md:flex'>
+				<div className='hidden gap-6 lg:flex'>
 					<div>
 						<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>Available Bounty pool</span>
-						<div className='font-pixeboy text-[46px]'>
-							<span className='ml-2 text-[22px] font-medium'>~500</span>
-							<span className='ml-1 text-[22px] font-medium'>USDT</span>
+						<div className='leading-none'>
+							<span className='font-pixeboy text-[46px] leading-none'>$ 19.83M</span>
+							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ 13,365</span>
+							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>DOT</span>
 						</div>
-						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] w-[420px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background'>
-							<div className='mb-8 ml-6 flex items-end gap-3'>
+						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] w-[360px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background xl:w-[380px] 2xl:w-[380px]'>
+							<div className='mb-8 ml-1 flex items-end gap-3'>
 								<Image
 									src={BountyIcon}
 									alt='bounty icon'
+									className='h-32 w-64 scale-90 xl:h-[103px] xl:w-[308px]'
 									width={308}
 									height={113}
 								/>
 								<Image
 									src={BountyArrowIcon}
 									alt='arrow icon'
-									width={50}
-									height={50}
+									className='w-20 pr-2'
+									width={100}
+									height={100}
 								/>
 							</div>
 						</div>
@@ -55,66 +97,66 @@ function BountyHeader() {
 					<div className='grid grid-cols-2 gap-x-24 py-7'>
 						<StatItem
 							label='Active Bounties'
-							value='10'
+							value={bountiesStats.activeBounties}
 						/>
 						<StatItem
 							label='Claimants'
-							value='10'
+							value={bountiesStats.peopleEarned}
 						/>
 						<StatItem
 							label='Total Rewarded'
-							value='10'
+							value={getDisplayValue(bountiesStats.totalRewarded, network, { isLoading: false, value: tokenPrice.toString() }, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 						<StatItem
 							label='Total Bounty Pool'
-							value='10'
+							value={getDisplayValue(bountiesStats.totalBountyPool, network, { isLoading: false, value: tokenPrice.toString() }, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 					</div>
 				</div>
 
-				<div className='items-between relative hidden h-full flex-col justify-between md:flex'>
+				<div className='items-between relative hidden h-full flex-col justify-between lg:flex'>
 					<span className='absolute -top-6 left-1/2 h-10 w-20 rotate-180 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 					<Image
 						src={DashedLineIcon}
 						alt='bounty icon'
-						className='ml-[38px] mt-6'
+						className='ml-16 mt-6'
 						width={3}
 						height={209}
 					/>
 					<span className='absolute left-1/2 top-[237px] h-10 w-20 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 				</div>
 
-				<div className='hidden gap-x-10 md:flex'>
+				<div className='hidden gap-x-10 lg:flex'>
 					<Image
 						src={BountyCreateWhiteIcon}
 						alt='bounty icon'
-						className='ml-32 mt-6 hidden h-[69px] dark:block'
+						className='ml-5 mt-6 hidden h-52 dark:block xl:ml-20'
 						width={100}
 						height={100}
 					/>
 					<Image
 						src={BountyCreateIcon}
 						alt='bounty icon'
-						className='ml-32 mt-6 block h-[69px] dark:hidden'
+						className='ml-5 mt-6 block h-52 dark:hidden xl:ml-20'
 						width={100}
 						height={100}
 					/>
 					<Image
 						src={BountyBarcodeWhiteIcon}
 						alt='bounty icon'
-						className='mt-6 hidden h-[24px] dark:block'
+						className='ml-5 mt-6 hidden h-52 w-auto dark:block'
 						width={24}
 						height={24}
 					/>
 					<Image
 						src={BountyBarcodeIcon}
 						alt='bounty icon'
-						className='mt-6 block h-[24px] dark:hidden'
+						className='ml-5 mt-6 block h-52 w-auto dark:hidden'
 						width={24}
 						height={24}
 					/>
 				</div>
-				<div className='flex flex-col gap-6 md:hidden'>
+				<div className='flex flex-col gap-6 lg:hidden'>
 					<div>
 						<span className='font-pixelify text-base text-[#2D2D2D] dark:text-[#737373]'>Available Bounty pool</span>
 						<div className='font-pixeboy text-[46px]'>~500 USDT</div>
@@ -141,24 +183,24 @@ function BountyHeader() {
 							<Image
 								src={DashedLineIcon}
 								alt='bounty icon'
-								className='h-[3px] w-[209px]'
+								className='h-56 w-auto rotate-90'
 								width={209}
 								height={3}
 							/>
 							<span className='first-letter right-0 h-20 w-10 rounded-l-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
 						</div>
-						<div className='-ml-4 mt-12 flex w-full flex-col items-center gap-x-4'>
+						<div className='-ml-4 flex w-full flex-col items-center gap-x-4'>
 							<Image
 								src={BountyCreateMbWhiteIcon}
 								alt='bounty icon'
-								className='hidden h-[24px] w-auto scale-125 dark:block'
+								className='w-49 hidden h-10 scale-125 dark:block'
 								width={100}
 								height={100}
 							/>
 							<Image
 								src={BountyCreateMbIcon}
 								alt='bounty icon'
-								className='block h-[24px] w-auto scale-125 dark:hidden'
+								className='block h-10 w-60 scale-125 dark:hidden'
 								width={100}
 								height={100}
 							/>
@@ -166,14 +208,14 @@ function BountyHeader() {
 							<Image
 								src={BountyBarcodeMbWhiteIcon}
 								alt='bounty icon'
-								className='mt-6 hidden h-[24px] scale-125 dark:block'
+								className='mt-6 hidden h-32 w-60 scale-125 dark:block'
 								width={24}
 								height={24}
 							/>
 							<Image
 								src={BountyBarcodeMbIcon}
 								alt='bounty icon'
-								className='mt-6 block h-[24px] scale-125 dark:hidden'
+								className='mt-6 block h-32 w-60 scale-125 dark:hidden'
 								width={24}
 								height={24}
 							/>
@@ -183,14 +225,14 @@ function BountyHeader() {
 								<Image
 									src={BountyIcon}
 									alt='bounty icon'
-									className='h-[113px] w-[308px] scale-90'
+									className='h-28 w-60 scale-90 sm:h-[113px] sm:w-[308px]'
 									width={308}
 									height={113}
 								/>
 								<Image
 									src={BountyArrowIcon}
 									alt='arrow icon'
-									className='pr-2'
+									className='w-20 pr-2 sm:w-24'
 									width={100}
 									height={100}
 								/>
