@@ -63,17 +63,16 @@ export default async function RootLayout({
 					crawlSpeed={100}
 					speed={300}
 					showSpinner={false}
-					height={1}
-				/>
-				<Initializers
-					userData={user || null}
-					userPreferences={userPreferences}
 				/>
 				<Providers
 					messages={messages}
 					locale={locale}
 					userPreferences={userPreferences}
 				>
+					<Initializers
+						userData={user || null}
+						userPreferences={userPreferences}
+					/>
 					{modal}
 					<AppLayout>{children}</AppLayout>
 					<NotificationsContainer />

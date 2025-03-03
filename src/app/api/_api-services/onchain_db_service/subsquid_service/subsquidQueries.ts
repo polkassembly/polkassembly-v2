@@ -602,4 +602,36 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS = `
+        query Rewards {
+            proposals(where: {type_eq: Bounty, status_not_in: [Cancelled,Rejected, Approved, Claimed, Approved]}) {
+                index
+                reward
+            }
+        }
+    `;
+
+	protected static GET_CHILD_BOUNTIES_REWARDS = `
+        query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
+            proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+                reward
+                statusHistory {
+                    status
+                }
+            }
+        }
+    `;
+
+	protected static GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES = `
+		query ClaimedChildBountiesForParentBountyIndices($parentBountyIndex_in: [Int!]) {
+			proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in, statusHistory_some: {status_eq: Claimed}}, orderBy: id_DESC, limit: 25) {
+				payee
+				reward
+				statusHistory(where: {status_eq: Claimed}) {
+					timestamp
+				}
+			}
+		}
+	`;
 }

@@ -7,7 +7,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import ReferendaDialog from '@ui/ListingComponent/ReferendaDialog';
 
 async function Referenda({ params }: { params: Promise<{ index: string }> }) {
-	const result = await NextApiClientService.fetchProposalDetailsApi(EProposalType.REFERENDUM_V2, (await params).index);
+	const result = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: (await params).index });
 
 	if (result.error) {
 		return <div className='text-center text-text_primary'>{result.error.message}</div>;

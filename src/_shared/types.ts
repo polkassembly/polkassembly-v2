@@ -480,6 +480,7 @@ export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
 	userReaction?: IReaction;
+	reactions?: IReaction[];
 }
 
 export interface IOnChainPostListing {
@@ -825,4 +826,43 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+}
+
+export interface IPostSubscription {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	network: ENetwork;
+	indexOrHash: string;
+	proposalType: EProposalType;
+	userId: number;
+}
+
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: string;
+	peopleEarned: string;
+	totalRewarded: string;
+	totalBountyPool: string;
+}
+
+interface IBountyProposal {
+	index: string;
+	reward: string;
+	statusHistory?: {
+		status: string;
+	}[];
+}
+
+export interface ISubsquidBountyResponse {
+	data: {
+		proposals: IBountyProposal[];
+	};
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: string;
+	address: string;
+	created_at: Date;
 }
