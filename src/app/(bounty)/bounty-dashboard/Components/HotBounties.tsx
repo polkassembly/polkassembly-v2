@@ -28,7 +28,9 @@ export default function HotBounties({ hotBounties }: { hotBounties: IGenericList
 	}, [api]);
 
 	useEffect(() => {
-		if (!api) return;
+		if (!api) {
+			return () => {};
+		}
 		api.on('select', onSelect);
 		return () => {
 			api.off('select', onSelect);
@@ -65,13 +67,13 @@ export default function HotBounties({ hotBounties }: { hotBounties: IGenericList
 												<h2 className='mt-4 font-pixelify text-[35px] font-normal text-navbar_border'>$1.2M</h2>
 											</div>
 											<div className='absolute bottom-0 right-[-30px] h-[30px] w-[30px] overflow-hidden bg-bg_modal'>
-												<div className='bg-bg_primary absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey'></div>
+												<span className='bg-bg_primary absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey' />
 											</div>
 										</div>
 										<div className='z-10 ml-2 mt-1'>
 											<button
 												type='button'
-												className='bg-arrow_bg_color rounded-full p-3'
+												className='rounded-full bg-arrow_bg_color p-3'
 											>
 												<ArrowUpRight
 													size={20}
@@ -108,7 +110,7 @@ export default function HotBounties({ hotBounties }: { hotBounties: IGenericList
 											/>
 										</div>
 									</div>
-									<div className='bg-child_bounties_bg flex items-center justify-between rounded-b-3xl p-4'>
+									<div className='flex items-center justify-between rounded-b-3xl bg-child_bounties_bg p-4'>
 										<div className='flex items-center gap-2'>
 											<Image
 												src={ChildBounties}
@@ -131,7 +133,7 @@ export default function HotBounties({ hotBounties }: { hotBounties: IGenericList
 					{current > 0 && (
 						<button
 							type='button'
-							className='bg-arrow_bg_color absolute -left-6 top-1/2 -translate-y-1/2 rounded-full p-4 shadow-lg'
+							className='absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
 							onClick={() => api?.scrollPrev()}
 						>
 							<SlArrowLeft
@@ -143,7 +145,7 @@ export default function HotBounties({ hotBounties }: { hotBounties: IGenericList
 					{current < hotBounties.items.length - 3 && (
 						<button
 							type='button'
-							className='bg-arrow_bg_color absolute -right-6 top-1/2 -translate-y-1/2 rounded-full p-4 shadow-lg'
+							className='absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
 							onClick={() => api?.scrollNext()}
 						>
 							<SlArrowRight
