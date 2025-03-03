@@ -546,7 +546,10 @@
 		},
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel an.",
 		"titlePlaceholder": "Titel eingeben",
-		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an."
+		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an.",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toCreate": "um eine Diskussion zu erstellen"
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",

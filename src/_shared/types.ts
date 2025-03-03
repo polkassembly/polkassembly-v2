@@ -286,6 +286,7 @@ export interface IReaction {
 	reaction: EReaction;
 	createdAt: Date;
 	updatedAt: Date;
+	commentId?: string;
 }
 
 export interface IPostOffChainMetrics {
