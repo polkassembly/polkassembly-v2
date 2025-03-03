@@ -837,3 +837,25 @@ export interface IPostSubscription {
 	proposalType: EProposalType;
 	userId: number;
 }
+
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: string;
+	peopleEarned: string;
+	totalRewarded: string;
+	totalBountyPool: string;
+}
+
+interface IBountyProposal {
+	index: string;
+	reward: string;
+	statusHistory?: {
+		status: string;
+	}[];
+}
+
+export interface ISubsquidBountyResponse {
+	data: {
+		proposals: IBountyProposal[];
+	};
+}

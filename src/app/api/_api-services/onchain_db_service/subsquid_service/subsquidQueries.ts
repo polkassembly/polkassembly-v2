@@ -602,4 +602,24 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS = `
+        query Rewards {
+            proposals(where: {type_eq: Bounty, status_not_in: [Cancelled,Rejected, Approved, Claimed, Approved]}) {
+                index
+                reward
+            }
+        }
+    `;
+
+	protected static GET_CHILD_BOUNTIES_REWARDS = `
+        query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
+            proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+                reward
+                statusHistory {
+                    status
+                }
+            }
+        }
+    `;
 }

@@ -13,6 +13,7 @@ import {
 	IOnChainPostListing,
 	IPreimage,
 	IStatusHistoryItem,
+	ISubsquidBountyResponse,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -404,5 +405,33 @@ export class SubsquidService extends SubsquidUtils {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
 		};
+	}
+
+	static async getActiveBountiesWithRewards(network: ENetwork): Promise<ISubsquidBountyResponse | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS, {}).toPromise();
+
+			return response as ISubsquidBountyResponse;
+		} catch (error) {
+			console.error('Error fetching active bounties:', error);
+			return null;
+		}
+	}
+
+	static async getChildBountiesRewards(network: ENetwork, parentBountyIndices: number[]): Promise<ISubsquidBountyResponse | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
+					parentBountyIndex_in: parentBountyIndices
+				})
+				.toPromise();
+
+			return response as ISubsquidBountyResponse;
+		} catch (error) {
+			console.error('Error fetching child bounties:', error);
+			return null;
+		}
 	}
 }
