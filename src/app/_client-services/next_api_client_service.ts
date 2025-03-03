@@ -242,7 +242,7 @@ export class NextApiClientService {
 
 		const url = new URL(`${baseURL}${path}${segments}`);
 		if (queryParams) {
-			queryParams.forEach((value, key) => url.searchParams.set(key, value));
+			queryParams.forEach((value, key) => url.searchParams.append(key, value));
 		}
 
 		return { url, method };

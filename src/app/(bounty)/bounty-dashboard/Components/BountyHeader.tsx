@@ -15,7 +15,7 @@ import BountyCreateMbWhiteIcon from '@assets/bounties/create-mb-white.svg';
 import BountyBarcodeMbWhiteIcon from '@assets/bounties/barcode-mb-white.svg';
 import DashedLineIcon from '@assets/bounties/dashed-line.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
-import { ENetwork, IBountyStats } from '@/_shared/types';
+import { ENetwork, IBountyStats, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 // import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
@@ -59,9 +59,10 @@ const getDisplayValue = (value: string, network: string, currentTokenPrice: { is
 	return `$${getFormattedValue(value, network, currentTokenPrice)}`;
 };
 
-function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
+function BountyHeader({ bountiesStats, tokenPrice, hotBounties }: { bountiesStats: IBountyStats; tokenPrice: number; hotBounties: IGenericListingResponse<IPostListing> }) {
 	const network = getCurrentNetwork();
-
+	console.log('hotBounties', hotBounties.totalCount);
+	console.log('hotBounties', hotBounties.items);
 	// const availableBounty = !isNaN(Number(tokenPrice)) && formatUSDWithUnits(String(Number(bountiesStats.availableBountyPool) * Number(tokenPrice)));
 
 	return (

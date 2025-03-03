@@ -6,13 +6,18 @@ import React from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType } from '@/_shared/types';
 import BountyHeader from './Components/BountyHeader';
 
 async function page() {
 	const network = getCurrentNetwork();
 	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
 	const { data: tokenPrice } = await NextApiClientService.getTokenPrice(NETWORKS_DETAILS[network as ENetwork].tokenSymbol);
+	const { data: hotBounties } = await NextApiClientService.fetchListingData({
+		proposalType: EProposalType.BOUNTY,
+		page: 1,
+		statuses: [EProposalStatus.Active, EProposalStatus.Extended]
+	});
 
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
@@ -25,6 +30,7 @@ async function page() {
 			</div>
 			<BountyHeader
 				tokenPrice={tokenPrice?.price || 0}
+				hotBounties={hotBounties || { items: [], totalCount: 0 }}
 				bountiesStats={
 					bountiesStats || {
 						activeBounties: '0',

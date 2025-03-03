@@ -43,10 +43,10 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
-		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
+		limit: z.preprocess((val) => (Array.isArray(val) ? Number(val[0]) : Number(val)), z.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)),
+		status: z.preprocess((val) => (typeof val === 'string' ? val.split(',') : Array.isArray(val) ? val : []), z.array(z.nativeEnum(EProposalStatus))).optional(),
 		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional(),
-		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional() // max 30 tags because of firestore query limit
+		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
