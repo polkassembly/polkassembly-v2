@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import Image from 'next/image';
 import BountyIcon from '@assets/bounties/bounty-icon.svg';
 import BountyArrowIcon from '@assets/bounties/bounty-arrow-icon.svg';
@@ -15,11 +17,13 @@ import BountyCreateMbWhiteIcon from '@assets/bounties/create-mb-white.svg';
 import BountyBarcodeMbWhiteIcon from '@assets/bounties/barcode-mb-white.svg';
 import DashedLineIcon from '@assets/bounties/dashed-line.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
-import { ENetwork, IBountyStats, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { ENetwork, IBountyStats } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-// import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useEffect, useState } from 'react';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
@@ -59,11 +63,18 @@ const getDisplayValue = (value: string, network: string, currentTokenPrice: { is
 	return `$${getFormattedValue(value, network, currentTokenPrice)}`;
 };
 
-function BountyHeader({ bountiesStats, tokenPrice, hotBounties }: { bountiesStats: IBountyStats; tokenPrice: number; hotBounties: IGenericListingResponse<IPostListing> }) {
+function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
 	const network = getCurrentNetwork();
-	console.log('hotBounties', hotBounties.totalCount);
-	console.log('hotBounties', hotBounties.items);
-	// const availableBounty = !isNaN(Number(tokenPrice)) && formatUSDWithUnits(String(Number(bountiesStats.availableBountyPool) * Number(tokenPrice)));
+	const { apiService } = usePolkadotApiService();
+	const [bountyAmount, setBountyAmount] = useState<string>('0');
+
+	useEffect(() => {
+		apiService?.getBountyAmount().then((amount) => {
+			setBountyAmount(amount);
+		});
+	}, [apiService]);
+
+	const availableBounty = !isNaN(Number(tokenPrice)) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
 
 	return (
 		<div className='dark:bg-section-dark-overlay mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
@@ -72,8 +83,8 @@ function BountyHeader({ bountiesStats, tokenPrice, hotBounties }: { bountiesStat
 					<div>
 						<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>Available Bounty pool</span>
 						<div className='leading-none'>
-							<span className='font-pixeboy text-[46px] leading-none'>$ 19.83M</span>
-							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ 13,365</span>
+							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
+							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
 							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>DOT</span>
 						</div>
 						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] w-[360px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background xl:w-[380px] 2xl:w-[380px]'>

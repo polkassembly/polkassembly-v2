@@ -8,6 +8,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork, EProposalStatus, EProposalType } from '@/_shared/types';
 import BountyHeader from './Components/BountyHeader';
+import HotBounties from './Components/HotBounties';
 
 async function page() {
 	const network = getCurrentNetwork();
@@ -30,7 +31,6 @@ async function page() {
 			</div>
 			<BountyHeader
 				tokenPrice={tokenPrice?.price || 0}
-				hotBounties={hotBounties || { items: [], totalCount: 0 }}
 				bountiesStats={
 					bountiesStats || {
 						activeBounties: '0',
@@ -41,6 +41,7 @@ async function page() {
 					}
 				}
 			/>
+			<HotBounties hotBounties={hotBounties || { items: [], totalCount: 0 }} />
 		</div>
 	);
 }

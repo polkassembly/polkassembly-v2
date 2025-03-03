@@ -295,4 +295,45 @@ export class PolkadotApiService {
 				onFailed(error?.toString?.() || errorMessageFallback);
 			});
 	}
+
+	async getBountyAmount() {
+		let activePjsBounties = await this.api?.derive.bounties?.bounties();
+		activePjsBounties = activePjsBounties.filter((item: any) => {
+			const { isFunded, isCuratorProposed, isActive } = item?.bounty?.status || {};
+			return isFunded || isCuratorProposed || isActive;
+		});
+
+		const balances = await Promise.all(
+			activePjsBounties.map(async (bounty) => {
+				const id = bounty?.index?.toJSON();
+				if (!id) return new BN(0);
+
+				try {
+					const response = await fetch(`https://polkadot.subsquare.io/api/treasury/bounties/${id}`);
+					const result = await response.json();
+					const address = result?.onchainData?.address;
+
+					if (!address) {
+						const metadataValue = result?.onchainData?.meta?.value || 0;
+						return new BN(metadataValue);
+					}
+
+					try {
+						const accountData = (await this.api.query.system.account(address)) as any;
+						return new BN(accountData.data.free.toString()).add(new BN(accountData.data.reserved.toString()));
+					} catch (accountError) {
+						console.error(`Error fetching account data for bounty ${id}: ${accountError}, address: ${address}`);
+						return new BN(0);
+					}
+				} catch (error) {
+					console.error(`Error fetching balance for bounty index ${id}: ${error}`);
+					return new BN(0);
+				}
+			})
+		);
+
+		// Convert from Planck to DOT (divide by 10^10)
+		const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), new BN(0));
+		return total.div(new BN(10).pow(new BN(10))).toString();
+	}
 }
