@@ -57,7 +57,10 @@ async function page() {
 				hotBounties={hotBounties || { items: [], totalCount: 0 }}
 				tokenPrice={tokenPrice?.price || '0'}
 			/>
-			<BountyProposal bountyProposals={bountyProposals || { items: [], totalCount: 0 }} />
+			<BountyProposal
+				bountyProposals={bountyProposals || { items: [], totalCount: 0 }}
+				tokenPrice={tokenPrice?.price || '0'}
+			/>
 			<BountiesUserActivity
 				userActivities={userActivities || []}
 				tokenPrice={tokenPrice?.price || '0'}

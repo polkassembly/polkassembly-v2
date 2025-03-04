@@ -12,13 +12,13 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import ChildBounties from '@assets/bounties/child_bounties.svg';
 import { FaAngleRight } from 'react-icons/fa6';
-import { Carousel, CarouselContent, CarouselItem } from '@ui/Carousel';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@ui/Carousel';
 import { useCallback, useEffect, useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { type CarouselApi } from '@ui/Carousel';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
 
 export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
 	const [api, setApi] = useState<CarouselApi>();
@@ -125,11 +125,16 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											width={100}
 											height={100}
 										/>
-										<h4 className='text-lg font-bold text-btn_secondary_text'>
-											<span className='text-[17px] font-medium text-wallet_btn_text'>#{bounty.index}</span> {bounty.title}
+										<h4 className={`${spaceGroteskFont.className} font-medium`}>
+											<span className='text-[17px] text-wallet_btn_text'>#{bounty.index}</span>{' '}
+											<span className='text-[18px] text-btn_secondary_text'>{bounty.title?.slice(0, 28)}</span>
 										</h4>
-										<div className='line-clamp-2 overflow-hidden text-ellipsis'>
-											<p className='text-sm text-text_primary'>{bounty.onChainInfo?.description}</p>
+										<div className='line-clamp-2 overflow-hidden text-ellipsis text-sm text-btn_secondary_text'>
+											<BlockEditor
+												data={{ blocks: bounty.content?.blocks?.slice(0, 2) || [] }}
+												readOnly
+												id={`bounty-content-${bounty.index}`}
+											/>{' '}
 										</div>
 										<div className='mb-2 mt-10 flex items-center text-sm'>
 											<Address
