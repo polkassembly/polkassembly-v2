@@ -475,6 +475,7 @@ export interface IOnChainPostInfo {
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
+	curator?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -487,6 +488,7 @@ export interface IPost extends IOffChainPost {
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
+	childBountiesCount?: number;
 	index: number;
 	origin: string;
 	proposer: string;
@@ -495,6 +497,8 @@ export interface IOnChainPostListing {
 	hash: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	curator?: string;
+	reward?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
 }

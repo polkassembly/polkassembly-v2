@@ -13,6 +13,7 @@ export class SubsquidQueries {
 				createdAt
 				proposer
 				status
+				curator
 				description
 				origin,
 				preimage {
@@ -63,7 +64,9 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status,
+				curator,
 				hash,
 				preimage {
 					proposedCall {
@@ -91,7 +94,9 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
+				reward
 				hash,
+				curator
 				preimage {
 					proposedCall {
 						args
@@ -126,6 +131,8 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					reward
+					curator
 					status,
 					hash,
 					preimage {
@@ -170,6 +177,8 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					reward
+					curator
 					status,
 					hash,
 					preimage {
@@ -205,8 +214,10 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status
 				hash,
+				curator
 				preimage {
 					proposedCall {
 						args
@@ -232,7 +243,9 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status
+				curator
 				hash,
 				preimage {
 					proposedCall {
@@ -634,4 +647,29 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
+	query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
+		totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
+			totalCount
+		}  
+		childBounties:proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
+		description
+		index
+		status
+		reward
+		createdAt
+		curator
+		payee
+		proposer
+		origin   
+		}
+	}`;
+
+	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES = `
+	query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
+		totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
+			totalCount
+		}  
+	}`;
 }

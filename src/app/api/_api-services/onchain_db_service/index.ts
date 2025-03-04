@@ -220,4 +220,8 @@ export class OnChainDbService {
 			created_at: new Date((proposal as unknown as IClaimedBountyProposal).statusHistory[0].timestamp)
 		}));
 	}
+
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
+		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
+	}
 }
