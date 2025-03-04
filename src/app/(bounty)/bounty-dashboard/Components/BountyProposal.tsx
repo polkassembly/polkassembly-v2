@@ -64,7 +64,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 												</h2>
 											</div>
 											<div className='absolute bottom-0 right-[-30px] h-[30px] w-[30px] overflow-hidden bg-bg_modal'>
-												<span className='bg-bg_primary absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey' />
+												<span className='absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey bg-page_background' />
 											</div>
 										</div>
 										<div className='z-10 ml-8 flex items-center -space-x-0.5'>
