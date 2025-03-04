@@ -31,9 +31,14 @@ function ProposalScreen({
 	}) => void;
 }) {
 	const t = useTranslations();
+
+	if (!proposals || proposals.length === 0) {
+		return <p className='text-center text-sm text-text_grey'>{t('BatchVote.noProposalsAvailable')}</p>;
+	}
+
 	const currentProposal = proposals[0];
 
-	return proposals.length > 0 ? (
+	return (
 		<div className='h-full'>
 			{currentProposal && (
 				<div className='relative flex h-full flex-col gap-y-4'>
@@ -114,8 +119,6 @@ function ProposalScreen({
 				</div>
 			)}
 		</div>
-	) : (
-		<p className='text-center text-sm text-text_grey'>{t('BatchVote.noProposalsAvailable')}</p>
 	);
 }
 
