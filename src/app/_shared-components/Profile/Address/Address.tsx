@@ -28,6 +28,7 @@ interface AddressProps {
 	showIdenticon?: boolean;
 	walletAddressName?: string;
 	textClassName?: string;
+	redirectToProfile?: boolean;
 }
 
 // Utility Functions
@@ -37,7 +38,7 @@ const getUserRedirection = (network: string, address: string, username?: string)
 };
 
 // Main Address Component
-const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName }: AddressProps) => {
+const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile }: AddressProps) => {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 	const { user: currentUser } = useUser();
@@ -46,6 +47,7 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 	const [loading, setLoading] = useState(false);
 	const encodedAddress = useMemo(() => getEncodedAddress(address, network) || address, [address, network]);
 	const redirectionUrl = useMemo(() => getUserRedirection(network, address, undefined), [network, address]);
+	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 
 	const queryOptions = useMemo(
 		() => ({
@@ -87,15 +89,15 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 		...queryOptions
 	});
 
-	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
-
 	const fetchIdentity = async () => {
 		setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 		try {
 			const identityInfo = await getOnChainIdentity(encodedAddress);
-			setIdentity(identityInfo);
-			if (identityInfo?.display) {
-				setDisplayText(identityInfo?.display);
+			if (identityInfo) {
+				setIdentity(identityInfo);
+				if (identityInfo?.display) {
+					setDisplayText(identityInfo?.display);
+				}
 			}
 		} catch (error) {
 			console.error('Error fetching identity:', error);
@@ -171,11 +173,12 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 							<AddressInline
 								className={className}
 								address={encodedAddress}
-								onChainIdentity={identity ?? undefined}
+								onChainIdentity={identity as IOnChainIdentity}
 								addressDisplayText={displayText}
 								iconSize={iconSize}
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}
+								redirectToProfile={redirectToProfile}
 							/>
 						</div>
 					</TooltipTrigger>

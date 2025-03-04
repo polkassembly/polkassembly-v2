@@ -28,7 +28,8 @@ import {
 	ITag,
 	IVoteCartItem,
 	EVoteDecision,
-	EConvictionAmount
+	EConvictionAmount,
+	IPostSubscription
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -521,7 +522,31 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetPostReactionById(id: string): Promise<IReaction | null> {
+	static async GetCommentReactions({
+		network,
+		indexOrHash,
+		proposalType,
+		id
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		id: string;
+	}): Promise<IReaction[]> {
+		const reactionsQuery = this.reactionsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('commentId', '==', id);
+
+		const reactionsQuerySnapshot = await reactionsQuery.get();
+		return reactionsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return { ...data, createdAt: data.createdAt?.toDate(), updatedAt: data.updatedAt?.toDate() } as IReaction;
+		});
+	}
+
+	static async GetReactionById(id: string): Promise<IReaction | null> {
 		const reactionDocSnapshot = await this.reactionsCollectionRef().doc(id).get();
 		if (!reactionDocSnapshot.exists) {
 			return null;
@@ -645,6 +670,64 @@ export class FirestoreService extends FirestoreUtils {
 				updatedAt: data.updatedAt?.toDate()
 			} as IVoteCartItem;
 		});
+	}
+
+	static async GetPostSubscriptionByPostAndUserId({
+		network,
+		indexOrHash,
+		proposalType,
+		userId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+	}): Promise<IPostSubscription | null> {
+		const postSubscriptionQuery = this.postSubscriptionsCollectionRef()
+			.where('network', '==', network)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('proposalType', '==', proposalType)
+			.where('userId', '==', userId)
+			.limit(1);
+
+		const postSubscriptionQuerySnapshot = await postSubscriptionQuery.get();
+
+		if (postSubscriptionQuerySnapshot.empty) {
+			return null;
+		}
+
+		const data = postSubscriptionQuerySnapshot.docs[0].data();
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IPostSubscription;
+	}
+
+	static async GetPostSubscriptionsByUserId({ userId, page, limit, network }: { userId: number; page: number; limit: number; network: ENetwork }): Promise<IPostSubscription[]> {
+		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef()
+			.where('userId', '==', userId)
+			.where('network', '==', network)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset(limit * (page - 1));
+		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
+
+		return postSubscriptionsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IPostSubscription;
+		});
+	}
+
+	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef().where('userId', '==', userId).where('network', '==', network).count();
+		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
+		return postSubscriptionsQuerySnapshot.data().count || 0;
 	}
 
 	// write methods
@@ -919,7 +1002,56 @@ export class FirestoreService extends FirestoreUtils {
 		return reactionId;
 	}
 
-	static async DeletePostReaction(id: string) {
+	static async AddCommentReaction({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		reaction,
+		commentId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		reaction: EReaction;
+		commentId: string;
+	}): Promise<string> {
+		// if user has already reacted to this comment, replace the reaction
+		const existingReaction = await this.reactionsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('userId', '==', userId)
+			.where('commentId', '==', commentId)
+			.get();
+
+		let reactionId = this.reactionsCollectionRef().doc().id;
+
+		if (existingReaction.docs.length) {
+			reactionId = existingReaction.docs[0].id;
+		}
+
+		await this.reactionsCollectionRef()
+			.doc(reactionId)
+			.set(
+				{
+					network,
+					indexOrHash,
+					proposalType,
+					userId,
+					reaction,
+					commentId,
+					createdAt: existingReaction.docs.length ? existingReaction.docs[0].data().createdAt?.toDate() : new Date(),
+					updatedAt: new Date()
+				},
+				{ merge: true }
+			);
+
+		return reactionId;
+	}
+
+	static async DeleteReactionById(id: string) {
 		await this.reactionsCollectionRef().doc(id).delete();
 	}
 
@@ -1137,6 +1269,38 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (voteCartItem.docs.length) {
 			await voteCartItem.docs[0].ref.set({ decision, amount, conviction, updatedAt: new Date() }, { merge: true });
+		}
+	}
+
+	static async AddPostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
+		const newPostSubscriptionId = this.postSubscriptionsCollectionRef().doc().id;
+
+		const postSubscription: IPostSubscription = {
+			id: newPostSubscriptionId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			network,
+			indexOrHash,
+			proposalType,
+			userId
+		};
+
+		await this.postSubscriptionsCollectionRef().doc(newPostSubscriptionId).set(postSubscription);
+
+		return postSubscription;
+	}
+
+	static async DeletePostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
+		const postSubscription = await this.postSubscriptionsCollectionRef()
+			.where('network', '==', network)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('proposalType', '==', proposalType)
+			.where('userId', '==', userId)
+			.limit(1)
+			.get();
+
+		if (postSubscription.docs.length) {
+			await postSubscription.docs[0].ref.delete();
 		}
 	}
 }

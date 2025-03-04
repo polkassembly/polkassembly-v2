@@ -20,9 +20,10 @@ interface Props {
 	iconSize?: number;
 	showIdenticon?: boolean;
 	textClassName?: string;
+	redirectToProfile?: boolean;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName }: Props) {
+function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName, redirectToProfile = true }: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
@@ -38,16 +39,28 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					theme='polkadot'
 				/>
 			)}
-			<Link
-				className={styles.container}
-				href={`/user/address/${address}`}
-			>
-				<IdentityBadge
-					onChainIdentity={onChainIdentity}
-					iconSize={iconSize}
-				/>
-				<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
-			</Link>
+			{redirectToProfile ? (
+				<Link
+					className={styles.container}
+					href={`/user/address/${address}`}
+				>
+					<IdentityBadge
+						onChainIdentity={onChainIdentity}
+						iconSize={iconSize}
+					/>
+
+					<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
+				</Link>
+			) : (
+				<div className={styles.container}>
+					<IdentityBadge
+						onChainIdentity={onChainIdentity}
+						iconSize={iconSize}
+					/>
+
+					<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
+				</div>
+			)}
 		</div>
 	);
 }

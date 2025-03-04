@@ -7,8 +7,10 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
-import { ENetwork } from '@/_shared/types';
-import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
+import { ENetwork, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
+import { deepParseJson } from 'deep-parse-json';
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+import { FIVE_MIN, ONE_DAY, ONE_HOUR_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
@@ -24,7 +26,8 @@ enum ERedisKeys {
 	POSTS_LISTING = 'PLT',
 	ACTIVITY_FEED = 'AFD',
 	QR_SESSION = 'QRS',
-	CONTENT_SUMMARY = 'CSM'
+	CONTENT_SUMMARY = 'CSM',
+	SUBSCRIPTION_FEED = 'SFD'
 }
 
 export class RedisService {
@@ -50,18 +53,21 @@ export class RedisService {
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			return baseKey + userPart + originsPart;
 		},
+		[ERedisKeys.SUBSCRIPTION_FEED]: (network: string, page: number, limit: number, userId: number): string => {
+			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
+		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
 		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`
 	} as const;
 
 	// helper methods
 
-	private static async Get(key: string, forceCache?: boolean): Promise<string | null> {
+	private static async Get({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
 		return this.client.get(key);
 	}
 
-	private static async Set(key: string, value: string, ttlSeconds?: number, forceCache?: boolean): Promise<string | null> {
+	private static async Set({ key, value, ttlSeconds, forceCache = false }: { key: string; value: string; ttlSeconds?: number; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
 
 		if (ttlSeconds) {
@@ -71,13 +77,13 @@ export class RedisService {
 		return this.client.set(key, value);
 	}
 
-	private static async Delete(key: string, forceCache?: boolean): Promise<number> {
+	private static async Delete({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
 		return this.client.del(key);
 	}
 
-	private static async DeleteKeys(pattern: string, forceCache?: boolean): Promise<void> {
+	private static async DeleteKeys({ pattern, forceCache = false }: { pattern: string; forceCache?: boolean }): Promise<void> {
 		if (!IS_CACHE_ENABLED && !forceCache) return;
 
 		const stream = this.client.scanStream({
@@ -101,63 +107,68 @@ export class RedisService {
 		});
 	}
 
-	// static methods
-	static async SetEmailVerificationToken(token: string, email: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), email, ONE_DAY, true);
+	// auth and third party methods
+	static async SetEmailVerificationToken({ token, email }: { token: string; email: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), value: email, ttlSeconds: ONE_DAY, forceCache: true });
 	}
 
-	static async SetRefreshToken(userId: number, refreshToken: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), refreshToken, REFRESH_TOKEN_LIFE_IN_SECONDS, true);
+	static async SetRefreshToken({ userId, refreshToken }: { userId: number; refreshToken: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), value: refreshToken, ttlSeconds: REFRESH_TOKEN_LIFE_IN_SECONDS, forceCache: true });
 	}
 
 	static async GetRefreshToken(userId: number): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), true);
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), forceCache: true });
 	}
 
 	static async DeleteRefreshToken(userId: number): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), true);
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), forceCache: true });
 	}
 
-	static async SetTfaToken(tfaToken: string, userId: number): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), userId.toString(), FIVE_MIN, true);
+	static async SetTfaToken({ tfaToken, userId }: { tfaToken: string; userId: number }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), value: userId.toString(), ttlSeconds: FIVE_MIN, forceCache: true });
 	}
 
 	static async GetTfaToken(tfaToken: string): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), true);
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), forceCache: true });
 	}
 
-	static async GetSubscanData(network: string, url: string): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url));
+	static async GetSubscanData({ network, url }: { network: string; url: string }): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url) });
 	}
 
-	static async SetSubscanData(network: string, url: string, data: string): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), data, TWELVE_HOURS_IN_SECONDS);
+	static async SetSubscanData({ network, url, data }: { network: string; url: string; data: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), value: data, ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
-	static async SetResetPasswordToken(token: string, userId: number): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), userId.toString(), ONE_DAY, true);
+	static async SetResetPasswordToken({ token, userId }: { token: string; userId: number }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), value: userId.toString(), ttlSeconds: ONE_DAY, forceCache: true });
 	}
 
 	static async GetUserIdFromResetPasswordToken(token: string): Promise<number | null> {
-		const userId = await this.Get(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), true);
+		const userId = await this.Get({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), forceCache: true });
 		return userId ? Number(userId) : null;
 	}
 
 	static async DeleteResetPasswordToken(token: string): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), true);
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), forceCache: true });
 	}
 
 	// Posts caching methods
-	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash));
+	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<IPost | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
+		return data ? (deepParseJson(data) as IPost) : null;
 	}
 
-	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: string }): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash), data, ONE_DAY);
+	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
+			value: JSON.stringify(data),
+			ttlSeconds: data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status) ? ONE_HOUR_IN_SECONDS : ONE_DAY
+		});
 	}
 
 	static async DeletePostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash));
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
 	}
 
 	static async GetPostsListing({
@@ -176,8 +187,9 @@ export class RedisService {
 		statuses?: string[];
 		origins?: string[];
 		tags?: string[];
-	}): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags));
+	}): Promise<IGenericListingResponse<IPostListing> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags) });
+		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 
 	static async SetPostsListing({
@@ -194,28 +206,32 @@ export class RedisService {
 		proposalType: string;
 		page: number;
 		limit: number;
-		data: string;
+		data: IGenericListingResponse<IPostListing>;
 		statuses?: string[];
 		origins?: string[];
 		tags?: string[];
 	}): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags), data, ONE_DAY);
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags),
+			value: JSON.stringify(data),
+			ttlSeconds: SIX_HOURS_IN_SECONDS
+		});
 	}
 
 	static async DeletePostsListing({ network, proposalType }: { network: string; proposalType: string }): Promise<void> {
-		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*`);
+		await this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*` });
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType));
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType) });
 	}
 
 	static async SetContentSummary({ network, indexOrHash, proposalType, data }: { network: string; indexOrHash: string; proposalType: string; data: string }): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), data, ONE_DAY);
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: data, ttlSeconds: ONE_DAY });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
-		await this.DeleteKeys(`${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`);
+		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}` });
 	}
 
 	// Activity feed caching methods
@@ -231,8 +247,9 @@ export class RedisService {
 		limit: number;
 		userId?: number;
 		origins?: string[];
-	}): Promise<string | null> {
-		return this.Get(this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins));
+	}): Promise<IGenericListingResponse<IPostListing> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins) });
+		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 
 	static async SetActivityFeed({
@@ -246,39 +263,76 @@ export class RedisService {
 		network: string;
 		page: number;
 		limit: number;
-		data: string;
+		data: IGenericListingResponse<IPostListing>;
 		userId?: number;
 		origins?: string[];
 	}): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), data, ONE_DAY);
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
-		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
+		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
+	}
+
+	// Subscription feed caching methods
+	static async GetSubscriptionFeed({
+		network,
+		page,
+		limit,
+		userId
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		userId: number;
+	}): Promise<IGenericListingResponse<IPostListing> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId) });
+		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
+	}
+
+	static async SetSubscriptionFeed({
+		network,
+		page,
+		limit,
+		data,
+		userId
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		data: IGenericListingResponse<IPostListing>;
+		userId: number;
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+	}
+
+	static async DeleteSubscriptionFeed({ network, userId }: { network: string; userId: number }): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-*` });
 	}
 
 	// toolkit methods
 
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
 		// clear everything posts related
-		await this.DeleteKeys(`${ERedisKeys.POSTS_LISTING}-${network}-*`);
-		await this.DeleteKeys(`${ERedisKeys.POST_DATA}-${network}-*`);
-		await this.DeleteKeys(`${ERedisKeys.ACTIVITY_FEED}-${network}-*`);
-		await this.DeleteKeys(`${ERedisKeys.CONTENT_SUMMARY}-${network}-*`);
+		await this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
 	}
 
 	// QR session caching methods
 
 	static async SetQRSession(sessionId: string, data: { userId: number; timestamp: number; expiresIn: number }): Promise<void> {
-		await this.Set(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), JSON.stringify(data), data.expiresIn, true);
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), value: JSON.stringify(data), ttlSeconds: data.expiresIn, forceCache: true });
 	}
 
 	static async GetQRSession(sessionId: string): Promise<{ userId: number; timestamp: number; expiresIn: number } | null> {
-		const data = await this.Get(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), true);
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), forceCache: true });
 		return data ? JSON.parse(data) : null;
 	}
 
 	static async DeleteQRSession(sessionId: string): Promise<void> {
-		await this.Delete(this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), true);
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), forceCache: true });
 	}
 }

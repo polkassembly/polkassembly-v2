@@ -286,6 +286,7 @@ export interface IReaction {
 	reaction: EReaction;
 	createdAt: Date;
 	updatedAt: Date;
+	commentId?: string;
 }
 
 export interface IPostOffChainMetrics {
@@ -465,7 +466,7 @@ export interface IOnChainPostInfo {
 	createdAt?: Date;
 	index?: number;
 	hash?: string;
-	origin?: EPostOrigin;
+	origin: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
@@ -480,17 +481,18 @@ export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
 	userReaction?: IReaction;
+	reactions?: IReaction[];
 }
 
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
-	index: number;
-	origin: string;
+	index?: number;
+	origin: EPostOrigin;
 	proposer: string;
 	status: EProposalStatus;
 	type: EProposalType;
-	hash: string;
+	hash?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
@@ -825,4 +827,14 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+}
+
+export interface IPostSubscription {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	network: ENetwork;
+	indexOrHash: string;
+	proposalType: EProposalType;
+	userId: number;
 }

@@ -23,7 +23,7 @@ const zodParamsSchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	const reaction = await OffChainDbService.GetPostReactionById(id);
+	const reaction = await OffChainDbService.GetReactionById(id);
 
 	if (!reaction) {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Reaction not found');
@@ -40,8 +40,10 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	// 1. check if user is authenticated
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
 	// 2. delete the reaction from the database
-	await OffChainDbService.DeletePostReaction(id);
+	await OffChainDbService.DeleteReactionById({ id, userId });
 
 	// Invalidate caches since reaction metrics changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
