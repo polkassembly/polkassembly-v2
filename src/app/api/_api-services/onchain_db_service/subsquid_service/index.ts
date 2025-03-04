@@ -178,6 +178,15 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain posts listing from Subsquid');
 		}
 
+		if (preimageSection?.length && subsquidData.proposals) {
+			subsquidData.proposals.map(async (proposal: { preimage?: { proposedCall?: { args?: Record<string, unknown> } }; reward?: string }) => {
+				if (proposal.preimage?.proposedCall?.args?.bountyId) {
+					const bountyProposals = await this.getActiveBountiesWithRewardsByIndex(network, Number(proposal.preimage?.proposedCall?.args.bountyId));
+					proposal.reward = bountyProposals?.data.proposals[0].reward;
+				}
+			});
+		}
+
 		if (subsquidData.proposals.length === 0) {
 			return {
 				items: [],
@@ -449,6 +458,18 @@ export class SubsquidService extends SubsquidUtils {
 			return response as { data: { proposals: IBountyProposal[] } };
 		} catch (error) {
 			console.error('Error fetching active bounties:', error);
+			return null;
+		}
+	}
+
+	static async getActiveBountiesWithRewardsByIndex(network: ENetwork, index: number): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX, { index_eq: index }).toPromise();
+
+			return response as { data: { proposals: IBountyProposal[] } };
+		} catch (error) {
+			console.error('Error fetching active bounties by index:', error);
 			return null;
 		}
 	}

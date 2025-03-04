@@ -632,6 +632,15 @@ export class SubsquidQueries {
         }
     `;
 
+	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX = `
+		query RewardsByIndex($index_eq: Int!) {
+			proposals(where: {type_eq: Bounty, status_not_in: [Cancelled,Rejected, Approved, Claimed, Approved], index_eq: $index_eq}) {
+				index
+				reward
+			}
+		}
+	`;
+
 	protected static GET_CHILD_BOUNTIES_REWARDS = `
         query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
             proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {

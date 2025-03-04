@@ -139,18 +139,19 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 							/>
 						</button>
 					)}
-					{current < bountyProposals.items.length - 3 && (
-						<button
-							type='button'
-							className='absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
-							onClick={() => api?.scrollNext()}
-						>
-							<SlArrowRight
-								size={24}
-								className='font-bold text-bg_modal'
-							/>
-						</button>
-					)}
+					{current < bountyProposals.items.length - 1 &&
+						(window.innerWidth >= 1024 ? bountyProposals.items.length > 3 : window.innerWidth >= 768 ? bountyProposals.items.length > 2 : bountyProposals.items.length > 1) && (
+							<button
+								type='button'
+								className='absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
+								onClick={() => api?.scrollNext()}
+							>
+								<SlArrowRight
+									size={24}
+									className='font-bold text-bg_modal'
+								/>
+							</button>
+						)}
 				</Carousel>
 			</div>
 		</div>
