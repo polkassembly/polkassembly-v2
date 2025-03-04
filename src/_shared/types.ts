@@ -452,6 +452,7 @@ export interface IBeneficiary {
 	address: string;
 	amount: string;
 	assetId: string | null;
+	validFromBlock?: string;
 }
 
 export interface IStatusHistoryItem {
