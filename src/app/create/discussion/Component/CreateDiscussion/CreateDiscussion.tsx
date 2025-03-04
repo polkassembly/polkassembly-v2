@@ -6,15 +6,13 @@ import WritePost from '@/app/_shared-components/Create/WritePost/WritePost';
 import classes from './CreateDiscussion.module.scss';
 import HeaderLabel from '../HeaderLabel';
 
-function CreateDiscussion({ isModal }: { isModal?: boolean }) {
+function CreateDiscussion() {
 	return (
 		<div className={classes.container}>
-			{!isModal && (
-				<div className={classes.header}>
-					<HeaderLabel />
-				</div>
-			)}
-			<div className={!isModal ? 'px-6 py-6 sm:px-12' : ''}>
+			<div className={classes.header}>
+				<HeaderLabel />
+			</div>
+			<div className='px-6 py-6 sm:px-12'>
 				<WritePost />
 			</div>
 		</div>

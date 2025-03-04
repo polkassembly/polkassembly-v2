@@ -9,7 +9,8 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import { ENetwork, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
-import { FIVE_MIN, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, TWELVE_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+import { FIVE_MIN, ONE_DAY, ONE_HOUR_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
@@ -27,7 +28,8 @@ enum ERedisKeys {
 	QR_SESSION = 'QRS',
 	CONTENT_SUMMARY = 'CSM',
 	TOKEN_PRICE = 'TKP',
-	CALENDAR_DATA = 'CLD'
+	CALENDAR_DATA = 'CLD',
+	SUBSCRIPTION_FEED = 'SFD'
 }
 
 export class RedisService {
@@ -52,6 +54,9 @@ export class RedisService {
 			const userPart = userId ? `-u:${userId}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			return baseKey + userPart + originsPart;
+		},
+		[ERedisKeys.SUBSCRIPTION_FEED]: (network: string, page: number, limit: number, userId: number): string => {
+			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
 		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
@@ -136,7 +141,7 @@ export class RedisService {
 	}
 
 	static async SetSubscanData({ network, url, data }: { network: string; url: string; data: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), value: data, ttlSeconds: TWELVE_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), value: data, ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async SetResetPasswordToken({ token, userId }: { token: string; userId: number }): Promise<void> {
@@ -159,7 +164,11 @@ export class RedisService {
 	}
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
+			value: JSON.stringify(data),
+			ttlSeconds: data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status) ? ONE_HOUR_IN_SECONDS : ONE_DAY
+		});
 	}
 
 	static async DeletePostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<void> {
@@ -209,7 +218,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags),
 			value: JSON.stringify(data),
-			ttlSeconds: ONE_DAY
+			ttlSeconds: SIX_HOURS_IN_SECONDS
 		});
 	}
 
@@ -262,11 +271,47 @@ export class RedisService {
 		userId?: number;
 		origins?: string[];
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
+	}
+
+	// Subscription feed caching methods
+	static async GetSubscriptionFeed({
+		network,
+		page,
+		limit,
+		userId
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		userId: number;
+	}): Promise<IGenericListingResponse<IPostListing> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId) });
+		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
+	}
+
+	static async SetSubscriptionFeed({
+		network,
+		page,
+		limit,
+		data,
+		userId
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		data: IGenericListingResponse<IPostListing>;
+		userId: number;
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+	}
+
+	static async DeleteSubscriptionFeed({ network, userId }: { network: string; userId: number }): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-*` });
 	}
 
 	// toolkit methods
@@ -277,6 +322,7 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
 	}
 
 	// QR session caching methods
