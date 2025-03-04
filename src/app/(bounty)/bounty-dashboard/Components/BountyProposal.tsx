@@ -57,7 +57,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 							>
 								<div className='relative mx-auto max-w-[363px] overflow-hidden xl:max-w-[420px]'>
 									<div className='flex w-full'>
-										<div className='relative flex h-[56px] w-[85%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5'>
+										<div className='relative flex h-[56px] w-[90%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5'>
 											<div className='flex items-baseline gap-x-2'>
 												<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
 													{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}
@@ -67,7 +67,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 												<span className='bg-bg_primary absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey' />
 											</div>
 										</div>
-										<div className='z-10 ml-2 mt-1'>
+										<div className='z-10 ml-8 flex items-center -space-x-0.5'>
 											<button
 												type='button'
 												className='rounded-full bg-arrow_bg_color p-3'
@@ -76,6 +76,13 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 													size={20}
 													className='text-bg_modal'
 												/>
+											</button>
+											<span className='relative h-2 w-[10px] bg-arrow_bg_color before:absolute before:bottom-[-13px] before:right-[-1px] before:h-3 before:w-3 before:rounded-full before:shadow-[0_-4px_0_0_black] after:absolute after:bottom-[8px] after:right-[-1px] after:h-3 after:w-3 after:rounded-full after:shadow-[0_4px_0_0_black] dark:before:shadow-[0_-4px_0_0_white] dark:after:shadow-[0_4px_0_0_white]' />
+											<button
+												type='button'
+												className={`${spaceGroteskFont.className} h-[36px] w-[75px] cursor-pointer rounded-3xl border-none bg-arrow_bg_color text-base font-bold text-bg_modal md:h-[44px] md:w-[100px] md:text-lg`}
+											>
+												Vote
 											</button>
 										</div>
 									</div>

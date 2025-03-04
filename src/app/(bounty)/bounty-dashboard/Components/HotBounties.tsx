@@ -117,7 +117,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											</button>
 										</div>
 									</div>
-									<div className='rounded-tr-2xl border-b border-l border-r border-t-0 border-solid border-border_grey bg-bg_modal px-3 py-1'>
+									<div className='h-[310px] rounded-tr-2xl border-b border-l border-r border-t-0 border-solid border-border_grey bg-bg_modal px-3 py-1'>
 										<Image
 											src={BountyCard}
 											alt='Bounty'
@@ -136,7 +136,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 												id={`bounty-content-${bounty.index}`}
 											/>{' '}
 										</div>
-										<div className='mb-2 mt-10 flex items-center text-sm'>
+										<div className='mb-2 mt-8 flex items-center text-sm'>
 											<Address
 												address={bounty.onChainInfo?.proposer || ''}
 												className='text-sm text-text_primary'
