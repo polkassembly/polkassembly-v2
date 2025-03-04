@@ -5,8 +5,8 @@
 'use client';
 
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
-// import Image from 'next/image';
-// import ProposalIcon from '@assets/icons/proposal.svg';
+import Image from 'next/image';
+import ProposalIcon from '@assets/icons/proposal.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -59,7 +59,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 			<div className='flex items-center justify-between'>
 				<span className={`${spaceGroteskFont.className} text-[32px] font-bold text-btn_secondary_text`}>{t('Bounties.onchainBounties')}</span>
 				<div className='flex gap-2'>
-					{/* <button
+					<button
 						type='button'
 						className='flex w-full cursor-pointer items-center justify-center gap-[6px] rounded-[14px] border-none bg-gradient-to-b from-[#FF50AD] via-[#E5007A] to-[#E5007A] px-[22px] py-[11px] md:w-auto md:justify-normal'
 					>
@@ -71,7 +71,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							height={15}
 						/>
 						<span className='font-bold text-white'>{t('Bounties.createBountyProposal')}</span>
-					</button> */}
+					</button>
 				</div>
 			</div>
 			<Tabs
