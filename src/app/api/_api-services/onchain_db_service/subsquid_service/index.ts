@@ -179,12 +179,16 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		if (preimageSection?.length && subsquidData.proposals) {
-			subsquidData.proposals.map(async (proposal: { preimage?: { proposedCall?: { args?: Record<string, unknown> } }; reward?: string }) => {
-				if (proposal.preimage?.proposedCall?.args?.bountyId) {
-					const bountyProposals = await this.getActiveBountiesWithRewardsByIndex(network, Number(proposal.preimage?.proposedCall?.args.bountyId));
-					proposal.reward = bountyProposals?.data.proposals[0].reward;
-				}
-			});
+			const updatedProposals = await Promise.all(
+				subsquidData.proposals.map(async (proposal: { preimage?: { proposedCall?: { args?: Record<string, unknown> } }; reward?: string }) => {
+					if (proposal.preimage?.proposedCall?.args?.bountyId) {
+						const bountyProposals = await this.getActiveBountiesWithRewardsByIndex(network, Number(proposal.preimage?.proposedCall?.args.bountyId));
+						return { ...proposal, reward: bountyProposals?.data.proposals[0].reward };
+					}
+					return proposal;
+				})
+			);
+			subsquidData.proposals = updatedProposals;
 		}
 
 		if (subsquidData.proposals.length === 0) {
