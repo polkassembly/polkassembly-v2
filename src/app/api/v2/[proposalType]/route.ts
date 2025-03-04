@@ -73,7 +73,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
 			return OffChainDbService.GetOffChainPostData({
 				network,
-				indexOrHash: proposalType !== EProposalType.TIP ? postInfo.index.toString() : postInfo.hash,
+				indexOrHash: proposalType !== EProposalType.TIP ? postInfo.index!.toString() : postInfo.hash!,
 				proposalType,
 				proposer: postInfo.proposer || ''
 			});

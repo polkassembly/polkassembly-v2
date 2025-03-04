@@ -27,6 +27,7 @@ enum ERedisKeys {
 	ACTIVITY_FEED = 'AFD',
 	QR_SESSION = 'QRS',
 	CONTENT_SUMMARY = 'CSM',
+	SUBSCRIPTION_FEED = 'SFD',
 	TOKEN_PRICE = 'TKP'
 }
 
@@ -62,6 +63,9 @@ export class RedisService {
 			const userPart = userId ? `-u:${userId}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			return baseKey + userPart + originsPart;
+		},
+		[ERedisKeys.SUBSCRIPTION_FEED]: (network: string, page: number, limit: number, userId: number): string => {
+			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
 		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
@@ -284,6 +288,42 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
 	}
 
+	// Subscription feed caching methods
+	static async GetSubscriptionFeed({
+		network,
+		page,
+		limit,
+		userId
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		userId: number;
+	}): Promise<IGenericListingResponse<IPostListing> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId) });
+		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
+	}
+
+	static async SetSubscriptionFeed({
+		network,
+		page,
+		limit,
+		data,
+		userId
+	}: {
+		network: string;
+		page: number;
+		limit: number;
+		data: IGenericListingResponse<IPostListing>;
+		userId: number;
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+	}
+
+	static async DeleteSubscriptionFeed({ network, userId }: { network: string; userId: number }): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-*` });
+	}
+
 	// toolkit methods
 
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
@@ -292,6 +332,7 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
 	}
 
 	// QR session caching methods

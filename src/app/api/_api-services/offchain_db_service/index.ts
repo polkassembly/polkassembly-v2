@@ -310,6 +310,10 @@ export class OffChainDbService {
 		return FirestoreService.GetPostSubscriptionsByUserId({ userId, page, limit, network });
 	}
 
+	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,

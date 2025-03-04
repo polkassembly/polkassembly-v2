@@ -724,6 +724,12 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
+	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef().where('userId', '==', userId).where('network', '==', network).count();
+		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
+		return postSubscriptionsQuerySnapshot.data().count || 0;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
