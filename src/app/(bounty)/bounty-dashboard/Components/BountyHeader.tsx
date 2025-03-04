@@ -88,16 +88,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						/>
 						<StatItem
 							label='Total Rewarded'
-							value={formatTokenValue(bountiesStats.totalRewarded, network, { isLoading: false, value: tokenPrice.toString() }, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 						<StatItem
 							label='Total Bounty Pool'
-							value={formatTokenValue(
-								bountiesStats.totalBountyPool,
-								network,
-								{ isLoading: false, value: tokenPrice.toString() },
-								NETWORKS_DETAILS[network as ENetwork].tokenSymbol
-							)}
+							value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 					</div>
 				</div>

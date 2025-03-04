@@ -16,6 +16,8 @@ import { Carousel, CarouselContent, CarouselItem } from '@ui/Carousel';
 import { useCallback, useEffect, useState } from 'react';
 import { type CarouselApi } from '@ui/Carousel';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import BountiesUserActivity from './BountiesUserActivity';
 
 export default function HotBounties({
@@ -29,6 +31,7 @@ export default function HotBounties({
 }) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
+	const network = getCurrentNetwork();
 
 	const onSelect = useCallback(() => {
 		if (!api) return;
@@ -72,7 +75,9 @@ export default function HotBounties({
 									<div className='flex w-full'>
 										<div className='relative flex h-[56px] w-[85%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5'>
 											<div className='flex items-baseline gap-x-2'>
-												<h2 className='mt-4 font-pixelify text-[35px] font-normal text-navbar_border'>$1.2M</h2>
+												<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
+													{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}
+												</h2>
 											</div>
 											<div className='absolute bottom-0 right-[-30px] h-[30px] w-[30px] overflow-hidden bg-bg_modal'>
 												<span className='bg-bg_primary absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey' />

@@ -18,7 +18,6 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_sha
 
 function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: string }) {
 	const network = getCurrentNetwork();
-	const currentTokenPrice = { isLoading: false, value: tokenPrice?.toString() };
 	const unit = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
 	const [api, setApi] = useState<CarouselApi>();
 
@@ -88,8 +87,8 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 											<div className='my-1 flex h-[50px] items-center gap-1 rounded-[14px] bg-bg_modal px-3 py-2 md:max-w-[450px]'>
 												<Address address={activity?.address} />
 												<span className='text-sm font-normal text-text_primary'>claimed</span>
-												<span className='font-pixeboy text-sm font-normal text-text_pink md:text-[20px]'>
-													{formatTokenValue(activity?.amount, network, currentTokenPrice, unit)}
+												<span className='whitespace-nowrap font-pixeboy text-sm font-normal text-text_pink md:text-[20px]'>
+													{formatTokenValue(activity?.amount, network, tokenPrice, unit)}
 												</span>
 												<span className='text-sm font-normal text-text_primary'>bounty</span>
 												<span className='mx-2 h-[5px] w-[5px] rounded-full bg-basic_text' />

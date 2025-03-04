@@ -16,22 +16,22 @@ export const formatNumberWithSuffix = (value: number): string => {
 	return cleanedValue.toFixed(1);
 };
 
-export const getFormattedValue = (value: string, network: string, currentTokenPrice: { isLoading: boolean; value: string }): string => {
+export const getFormattedValue = (value: string, network: string, currentTokenPrice: string): string => {
 	const numericValue = Number(formatBnBalance(value, { numberAfterComma: 1, withThousandDelimitor: false }, network as ENetwork));
 
-	if (isNaN(Number(currentTokenPrice.value))) {
+	if (isNaN(Number(currentTokenPrice))) {
 		return formatNumberWithSuffix(numericValue);
 	}
 
-	const tokenPrice = Number(currentTokenPrice.value);
+	const tokenPrice = Number(currentTokenPrice);
 	const dividedValue = numericValue * tokenPrice;
 
 	return formatNumberWithSuffix(dividedValue);
 };
 
-export const formatTokenValue = (value: string, network: string, currentTokenPrice: { isLoading: boolean; value: string }, unit: string): string => {
-	if (currentTokenPrice.isLoading || isNaN(Number(currentTokenPrice.value))) {
-		return `${getFormattedValue(value, network, currentTokenPrice)} ${unit}`;
+export const formatTokenValue = (value: string, network: string, tokenPrice: string, unit?: string): string => {
+	if (isNaN(Number(tokenPrice))) {
+		return `${getFormattedValue(value, network, tokenPrice)} ${unit ?? ''}`;
 	}
-	return `$${getFormattedValue(value, network, currentTokenPrice)}`;
+	return `$${getFormattedValue(value, network, tokenPrice)}`;
 };
