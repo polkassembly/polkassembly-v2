@@ -548,7 +548,10 @@
 		},
 		"titleTooShort": "Por favor, proporcione un título válido.",
 		"titlePlaceholder": "Ingrese título",
-		"descriptionRequired": "Por favor, proporcione una descripción válida."
+		"descriptionRequired": "Por favor, proporcione una descripción válida.",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toCreate": "para crear una discusión"
 	},
 	"ProposalType": {
 		"discussion": "Discusión",

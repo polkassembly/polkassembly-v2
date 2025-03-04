@@ -16,6 +16,8 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
 import { OutputData } from '@editorjs/editorjs';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 import { Button } from '../../Button';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
@@ -39,6 +41,8 @@ function WritePost() {
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const router = useRouter();
+
+	const { user } = useUser();
 
 	const allowedCommentorsOptions = [
 		{
@@ -83,187 +87,202 @@ function WritePost() {
 
 	return (
 		<div className={classes.container}>
-			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-			<Form {...formData}>
-				<form onSubmit={formData.handleSubmit(handleCreateDiscussionPost)}>
-					<div className={classes.form}>
-						<FormField
-							control={formData.control}
-							name='title'
-							key='title'
-							disabled={loading}
-							defaultValue=''
-							rules={{
-								required: true,
-								validate: (value) => {
-									if (value.length <= 3) return t('Create.titleTooShort');
-									return true;
-								}
-							}}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('Create.title')}*</FormLabel>
-									<FormControl>
-										<Input
-											disabled={loading}
-											placeholder={t('Create.titlePlaceholder')}
-											type='text'
-											className={classes.titleInput}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={formData.control}
-							name='description'
-							key='description'
-							disabled={loading}
-							rules={{
-								required: true,
-								validate: (value) => {
-									if (!value) return t('Create.descriptionRequired');
-									return true;
-								}
-							}}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('Create.description')}*</FormLabel>
-									<FormControl>
-										<BlockEditor
-											className={classes.editor}
-											id='write-post-editor'
-											onChange={(data) => {
-												field.onChange(data);
-											}}
-										/>
-									</FormControl>
+			{!user ? (
+				<p className='flex items-center gap-x-1 text-center text-sm text-text_primary'>
+					{t('Create.please')}
+					<Link
+						href='/login'
+						className='text-text_pink'
+					>
+						{t('Create.login')}
+					</Link>{' '}
+					{t('Create.toCreate')}
+				</p>
+			) : (
+				<>
+					{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+					<Form {...formData}>
+						<form onSubmit={formData.handleSubmit(handleCreateDiscussionPost)}>
+							<div className={classes.form}>
+								<FormField
+									control={formData.control}
+									name='title'
+									key='title'
+									disabled={loading}
+									defaultValue=''
+									rules={{
+										required: true,
+										validate: (value) => {
+											if (value.length <= 3) return t('Create.titleTooShort');
+											return true;
+										}
+									}}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{t('Create.title')}*</FormLabel>
+											<FormControl>
+												<Input
+													disabled={loading}
+													placeholder={t('Create.titlePlaceholder')}
+													type='text'
+													className={classes.titleInput}
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={formData.control}
+									name='description'
+									key='description'
+									disabled={loading}
+									rules={{
+										required: true,
+										validate: (value) => {
+											if (!value) return t('Create.descriptionRequired');
+											return true;
+										}
+									}}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{t('Create.description')}*</FormLabel>
+											<FormControl>
+												<BlockEditor
+													className={classes.editor}
+													id='write-post-editor'
+													onChange={(data) => {
+														field.onChange(data);
+													}}
+												/>
+											</FormControl>
 
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={formData.control}
-							name='tags'
-							key='tags'
-							defaultValue={[]}
-							disabled={loading}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className='flex items-center justify-between'>
-										<span>{t('Create.addTags')}</span>
-										<span className='text-xs text-basic_text'>
-											{MAX_POST_TAGS - (formData.getValues('tags')?.length || 0)} {t('Create.tagsLeftText')}
-										</span>
-									</FormLabel>
-									<FormControl>
-										<AddTags
-											disabled={loading}
-											onChange={(options) => {
-												field.onChange(options);
-											}}
-										/>
-									</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={formData.control}
+									name='tags'
+									key='tags'
+									defaultValue={[]}
+									disabled={loading}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='flex items-center justify-between'>
+												<span>{t('Create.addTags')}</span>
+												<span className='text-xs text-basic_text'>
+													{MAX_POST_TAGS - (formData.getValues('tags')?.length || 0)} {t('Create.tagsLeftText')}
+												</span>
+											</FormLabel>
+											<FormControl>
+												<AddTags
+													disabled={loading}
+													onChange={(options) => {
+														field.onChange(options);
+													}}
+												/>
+											</FormControl>
 
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={formData.control}
-							name='topic'
-							key='topic'
-							defaultValue={EOffChainPostTopic.GENERAL}
-							disabled={loading}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className='flex items-center justify-between'>
-										<span>{t('Create.selectTopic')}* </span>
-									</FormLabel>
-									<FormControl>
-										<SelectTopic
-											disabled={loading}
-											onChange={(topic: EOffChainPostTopic) => {
-												field.onChange(topic);
-											}}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={formData.control}
+									name='topic'
+									key='topic'
+									defaultValue={EOffChainPostTopic.GENERAL}
+									disabled={loading}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='flex items-center justify-between'>
+												<span>{t('Create.selectTopic')}* </span>
+											</FormLabel>
+											<FormControl>
+												<SelectTopic
+													disabled={loading}
+													onChange={(topic: EOffChainPostTopic) => {
+														field.onChange(topic);
+													}}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-						<FormField
-							control={formData.control}
-							name='allowedCommentor'
-							key='allowedCommentor'
-							disabled={loading}
-							defaultValue={EAllowedCommentor.ALL}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className='flex items-center gap-1'>
-										<span>{t('Create.AllowedCommentors.title')} </span>
-										<TooltipProvider>
-											<Tooltip>
-												<TooltipTrigger>
-													<MessageCircleWarning className='text-text-grey h-4 w-4' />
-												</TooltipTrigger>
-												<TooltipContent className='bg-tooltip_background p-2 text-white'>
-													<p>{t('Create.AllowedCommentors.tooltip')}</p>
-												</TooltipContent>
-											</Tooltip>
-										</TooltipProvider>
-									</FormLabel>
-									<FormControl>
-										<RadioGroup
-											disabled={loading}
-											defaultValue={EAllowedCommentor.ALL}
-											className={classes.radioGroup}
-											onValueChange={(e) => field.onChange(e)}
-										>
-											{allowedCommentorsOptions?.map((option) => {
-												return (
-													<div
-														key={option.value}
-														className='flex items-center space-x-2'
-													>
-														<RadioGroupItem
-															value={option.value}
-															id={option.value}
-														/>
-														<Label
-															htmlFor={option.value}
-															className={classes.radioGroupItem}
-														>
-															{option.label}
-														</Label>
-													</div>
-												);
-											})}
-										</RadioGroup>
-									</FormControl>
+								<FormField
+									control={formData.control}
+									name='allowedCommentor'
+									key='allowedCommentor'
+									disabled={loading}
+									defaultValue={EAllowedCommentor.ALL}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='flex items-center gap-1'>
+												<span>{t('Create.AllowedCommentors.title')} </span>
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger>
+															<MessageCircleWarning className='text-text-grey h-4 w-4' />
+														</TooltipTrigger>
+														<TooltipContent className='bg-tooltip_background p-2 text-white'>
+															<p>{t('Create.AllowedCommentors.tooltip')}</p>
+														</TooltipContent>
+													</Tooltip>
+												</TooltipProvider>
+											</FormLabel>
+											<FormControl>
+												<RadioGroup
+													disabled={loading}
+													defaultValue={EAllowedCommentor.ALL}
+													className={classes.radioGroup}
+													onValueChange={(e) => field.onChange(e)}
+												>
+													{allowedCommentorsOptions?.map((option) => {
+														return (
+															<div
+																key={option.value}
+																className='flex items-center space-x-2'
+															>
+																<RadioGroupItem
+																	value={option.value}
+																	id={option.value}
+																/>
+																<Label
+																	htmlFor={option.value}
+																	className={classes.radioGroupItem}
+																>
+																	{option.label}
+																</Label>
+															</div>
+														);
+													})}
+												</RadioGroup>
+											</FormControl>
 
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-					{/* {errorMessage && <ErrorMessage errorMessage={errorMessage} />} */}
-					<div className='mt-4 flex justify-end'>
-						<Button
-							size='lg'
-							className='px-12'
-							type='submit'
-							isLoading={loading}
-						>
-							{t('Create.create')}
-						</Button>
-					</div>
-				</form>
-			</Form>{' '}
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+							{/* {errorMessage && <ErrorMessage errorMessage={errorMessage} />} */}
+							<div className='mt-4 flex justify-end'>
+								<Button
+									size='lg'
+									className='px-12'
+									type='submit'
+									isLoading={loading}
+								>
+									{t('Create.create')}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</>
+			)}
 		</div>
 	);
 }
