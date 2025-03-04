@@ -19,7 +19,6 @@ import classes from './AddressInline/AddressInline.module.scss';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../Tooltip';
 import AddressTooltipContent from './AddressTooltipContent';
 
-// Type Definitions
 interface AddressProps {
 	className?: string;
 	address: string;
@@ -31,13 +30,11 @@ interface AddressProps {
 	redirectToProfile?: boolean;
 }
 
-// Utility Functions
 const getUserRedirection = (network: string, address: string, username?: string): string | null => {
 	if (!network) return null;
 	return username?.length ? `https://${network}.polkassembly.io/user/${username}` : address?.length ? `https://${network}.polkassembly.io/address/${address}` : null;
 };
 
-// Main Address Component
 const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile }: AddressProps) => {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
@@ -45,70 +42,81 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 	const queryClient = useQueryClient();
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || '');
 	const [loading, setLoading] = useState(false);
+	const [isUserDataFetched, setIsUserDataFetched] = useState(false);
+	const [userDataFetchInProgress, setUserDataFetchInProgress] = useState(false);
 	const encodedAddress = useMemo(() => getEncodedAddress(address, network) || address, [address, network]);
 	const redirectionUrl = useMemo(() => getUserRedirection(network, address, undefined), [network, address]);
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 
+	useEffect(() => {
+		const initializeIdentity = async () => {
+			setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
+
+			try {
+				const identityInfo = await getOnChainIdentity(encodedAddress);
+				if (identityInfo) {
+					setIdentity(identityInfo);
+					if (identityInfo?.display) {
+						setDisplayText(identityInfo?.display);
+					}
+				}
+			} catch (error) {
+				console.error('Error fetching identity:', error);
+			}
+		};
+
+		initializeIdentity();
+	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName]);
+
 	const queryOptions = useMemo(
 		() => ({
 			refetchInterval: 10000,
-			staleTime: 5 * 60 * 1000
+			staleTime: 5 * 60 * 1000,
+			enabled: false
 		}),
 		[]
 	);
 
-	const { data: userData } = useQuery<IPublicUser | null>({
+	const {
+		data: userData,
+		refetch: refetchUserData,
+		isFetching: isUserDataFetching
+	} = useQuery<IPublicUser | null>({
 		queryKey: ['userData', encodedAddress],
 		queryFn: async () => {
 			const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address: encodedAddress });
 			return data ?? null;
 		},
-		enabled: !!encodedAddress,
 		...queryOptions
 	});
 
-	const { data: followingData } = useQuery<{ following: IFollowEntry[] }>({
+	const {
+		data: followingData,
+		refetch: refetchFollowing,
+		isFetching: isFollowingFetching
+	} = useQuery<{ following: IFollowEntry[] }>({
 		queryKey: ['following', userData?.id],
 		queryFn: async () => {
 			if (!userData?.id) return { following: [] };
 			const { data } = await UserProfileClientService.getFollowing({ userId: userData.id });
 			return data ?? { following: [] };
 		},
-		enabled: !!userData?.id,
 		...queryOptions
 	});
 
-	const { data: followersData } = useQuery<{ followers: IFollowEntry[] }>({
+	const {
+		data: followersData,
+		refetch: refetchFollowers,
+		isFetching: isFollowersFetching
+	} = useQuery<{ followers: IFollowEntry[] }>({
 		queryKey: ['followers', userData?.id],
 		queryFn: async () => {
 			if (!userData?.id) return { followers: [] };
 			const { data } = await UserProfileClientService.getFollowers({ userId: userData.id });
 			return data ?? { followers: [] };
 		},
-		enabled: !!userData?.id,
 		...queryOptions
 	});
-
-	const fetchIdentity = async () => {
-		setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
-		try {
-			const identityInfo = await getOnChainIdentity(encodedAddress);
-			if (identityInfo) {
-				setIdentity(identityInfo);
-				if (identityInfo?.display) {
-					setDisplayText(identityInfo?.display);
-				}
-			}
-		} catch (error) {
-			console.error('Error fetching identity:', error);
-		}
-	};
-
-	useEffect(() => {
-		fetchIdentity();
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [encodedAddress, network, getOnChainIdentity]);
 
 	const stats = useMemo(
 		() => ({
@@ -119,11 +127,6 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 	);
 
 	const isFollowing = useMemo(() => followersData?.followers.some((item) => item.followerUserId === currentUser?.id) || false, [followersData, currentUser]);
-
-	useEffect(() => {
-		const newDisplayText = identity?.display || walletAddressName || shortenAddress(encodedAddress, truncateCharLen);
-		setDisplayText(newDisplayText);
-	}, [encodedAddress, identity, truncateCharLen, walletAddressName]);
 
 	const copyToClipboard = useCallback((text: string) => {
 		navigator.clipboard.writeText(text);
@@ -164,8 +167,31 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 		}
 	}, [currentUser, userData, queryClient]);
 
+	const handleMouseEnter = useCallback(async () => {
+		if (!isUserDataFetched && !userDataFetchInProgress) {
+			setUserDataFetchInProgress(true);
+			await refetchUserData();
+			setTimeout(async () => {
+				if (userData?.id) {
+					await Promise.all([refetchFollowing(), refetchFollowers()]);
+				}
+
+				setIsUserDataFetched(true);
+				setUserDataFetchInProgress(false);
+			}, 100);
+		}
+	}, [isUserDataFetched, userDataFetchInProgress, refetchUserData, refetchFollowing, refetchFollowers, userData?.id]);
+
+	const handleMouseLeave = useCallback(() => {}, []);
+
+	const isLoadingData = userDataFetchInProgress || isUserDataFetching || isFollowingFetching || isFollowersFetching;
+
 	return (
-		<div className={classes.tooltipWrapper}>
+		<div
+			className={classes.tooltipWrapper}
+			onMouseEnter={handleMouseEnter}
+			onMouseLeave={handleMouseLeave}
+		>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
@@ -183,20 +209,27 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 						</div>
 					</TooltipTrigger>
 					<TooltipContent className={cn(classes.tooltipContent, 'w-[340px] bg-address_tooltip_bg')}>
-						<AddressTooltipContent
-							address={address}
-							userData={userData ?? undefined}
-							identity={identity ?? undefined}
-							followers={stats.followers}
-							displayText={displayText}
-							following={stats.following}
-							isFollowing={isFollowing}
-							redirectionUrl={redirectionUrl}
-							onCopy={copyToClipboard}
-							onFollow={followUser}
-							onUnfollow={unfollowUser}
-							loading={loading}
-						/>
+						{isLoadingData ? (
+							<div className='flex w-full items-center justify-center p-4'>
+								<div className='h-6 w-6 animate-spin rounded-full border-b-2 border-text_pink' />
+								<span className='ml-2 text-sm text-text_primary'>Loading Profile...</span>
+							</div>
+						) : (
+							<AddressTooltipContent
+								address={address}
+								userData={userData ?? undefined}
+								identity={identity ?? undefined}
+								followers={stats.followers}
+								displayText={displayText}
+								following={stats.following}
+								isFollowing={isFollowing}
+								redirectionUrl={redirectionUrl}
+								onCopy={copyToClipboard}
+								onFollow={followUser}
+								onUnfollow={unfollowUser}
+								loading={loading}
+							/>
+						)}
 					</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
