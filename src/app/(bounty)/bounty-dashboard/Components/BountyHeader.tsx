@@ -140,23 +140,27 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 				<div className='flex flex-col gap-6 lg:hidden'>
 					<div>
 						<span className='font-pixelify text-base text-[#2D2D2D] dark:text-[#737373]'>Available Bounty pool</span>
-						<div className='font-pixeboy text-[46px]'>~500 USDT</div>
+						<div className='leading-none'>
+							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
+							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
+							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>DOT</span>
+						</div>{' '}
 						<div className='grid grid-cols-2 gap-y-8 py-7 pr-4'>
 							<StatItem
 								label='Active Bounties'
-								value='10'
+								value={bountiesStats.activeBounties}
 							/>
 							<StatItem
 								label='No. of People Earned'
-								value='10'
+								value={bountiesStats.peopleEarned}
 							/>
 							<StatItem
 								label='Total Rewarded'
-								value='10'
+								value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 							<StatItem
 								label='Total Bounty Pool'
-								value='10'
+								value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 						</div>
 						<div className='items-between relative -ml-6 flex items-center justify-between'>

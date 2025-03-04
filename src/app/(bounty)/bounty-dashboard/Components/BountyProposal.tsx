@@ -10,6 +10,7 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import BountyCard from '@assets/bounties/bounty-card.svg';
+import DollarIcon from '@assets/bounties/Dollar.svg';
 import { Carousel, type CarouselApi, CarouselContent, CarouselItem } from '@ui/Carousel';
 import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
@@ -36,7 +37,16 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 	}, [api, onSelect]);
 	return (
 		<div className='mt-5'>
-			<h3 className='font-pixelify text-3xl font-bold text-btn_secondary_text'>Bounty Proposal</h3>
+			<h3 className='flex items-center gap-x-2 font-pixelify text-3xl font-bold text-btn_secondary_text'>
+				<Image
+					src={DollarIcon}
+					alt='Dollar'
+					className='h-8 w-8'
+					width={24}
+					height={24}
+				/>
+				Bounty Proposal
+			</h3>
 			<div className='relative mt-5'>
 				<Carousel
 					opts={{
