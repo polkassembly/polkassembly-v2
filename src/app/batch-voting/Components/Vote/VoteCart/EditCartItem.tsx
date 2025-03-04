@@ -1,8 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EConvictionAmount, EVoteDecision, IVoteCartItem } from '@/_shared/types';
-import { BATCH_VOTE_CART_QUERY_KEY } from '@/app/_client-constants/reactQueryKeys';
+import { EConvictionAmount, EReactQueryKeys, EVoteDecision, IVoteCartItem } from '@/_shared/types';
 import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Button } from '@/app/_shared-components/Button';
@@ -49,7 +48,7 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 			return;
 		}
 
-		queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (oldData: IVoteCartItem[]) => {
+		queryClient.setQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id], (oldData: IVoteCartItem[]) => {
 			return oldData.map((item) => (item.id === voteCartItem.id ? { ...item, decision: voteDecision, amount, conviction } : item));
 		});
 

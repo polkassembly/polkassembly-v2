@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { canVote } from '@/_shared/_utils/canVote';
-import { EConvictionAmount, EProposalType, EVoteDecision, IPostListing, IVoteCartItem } from '@/_shared/types';
+import { EConvictionAmount, EProposalType, EReactQueryKeys, EVoteDecision, IPostListing, IVoteCartItem } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 import { useState, useMemo, useRef } from 'react';
 import { useUser } from '@/hooks/useUser';
@@ -11,7 +11,6 @@ import { BatchVotingClientService } from '@/app/_client-services/batch_voting_cl
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
-import { BATCH_VOTE_CART_QUERY_KEY } from '@/app/_client-constants/reactQueryKeys';
 import ProposalScreen from './ProposalScreen/ProposalScreen';
 import VoteCart from './VoteCart/VoteCart';
 import TinderVoting from './TinderVotingMobile/TinderVoting';
@@ -49,7 +48,7 @@ function BatchVote({
 	};
 
 	const { data: voteCart, isFetching } = useQuery({
-		queryKey: [BATCH_VOTE_CART_QUERY_KEY, user?.id],
+		queryKey: [EReactQueryKeys.BATCH_VOTE_CART, user?.id],
 		queryFn: fetchBatchVoteCart,
 		staleTime: FIVE_MIN_IN_MILLI
 	});
@@ -109,10 +108,10 @@ function BatchVote({
 		};
 
 		// Store the previous state to enable rollback
-		const previousData = queryClient.getQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id]) as IVoteCartItem[];
+		const previousData = queryClient.getQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id]) as IVoteCartItem[];
 
 		// Optimistically update the UI
-		queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (old: IVoteCartItem[] = []) => [...old, newItem]);
+		queryClient.setQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id], (old: IVoteCartItem[] = []) => [...old, newItem]);
 
 		try {
 			const { data, error } = await BatchVotingClientService.addToBatchVoteCart({
@@ -129,14 +128,14 @@ function BatchVote({
 			}
 
 			// Update the item with server-returned id and createdAt
-			queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (old: IVoteCartItem[] = []) =>
+			queryClient.setQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id], (old: IVoteCartItem[] = []) =>
 				old.map((item) =>
 					item.postIndexOrHash === proposalIndexOrHash ? { ...item, id: data.voteCartItem.id, createdAt: data.voteCartItem.createdAt, editDisabled: false } : item
 				)
 			);
 		} catch (error) {
 			// Revert to previous state if the API call fails
-			queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], previousData);
+			queryClient.setQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id], previousData);
 			console.error('Failed to add to vote cart:', error);
 		} finally {
 			setLoading(false);

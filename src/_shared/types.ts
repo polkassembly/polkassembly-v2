@@ -839,3 +839,7 @@ export interface IPostSubscription {
 	proposalType: EProposalType;
 	userId: number;
 }
+
+export enum EReactQueryKeys {
+	BATCH_VOTE_CART = 'batch-vote-cart'
+}

@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EConvictionAmount, EVoteDecision, IVoteCartItem } from '@/_shared/types';
+import { EConvictionAmount, EReactQueryKeys, EVoteDecision, IVoteCartItem } from '@/_shared/types';
 import { Ban, Eye, Pencil, ThumbsDown, ThumbsUp, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -16,7 +16,6 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { BATCH_VOTE_CART_QUERY_KEY } from '@/app/_client-constants/reactQueryKeys';
 import EditCartItem from './EditCartItem';
 
 function VoteDecisionUi({ voteDecision }: { voteDecision: EVoteDecision }) {
@@ -77,7 +76,7 @@ function CartItem({ voteCartItem }: { voteCartItem: IVoteCartItem }) {
 			return;
 		}
 
-		queryClient.setQueryData([BATCH_VOTE_CART_QUERY_KEY, user.id], (oldData: IVoteCartItem[]) => {
+		queryClient.setQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id], (oldData: IVoteCartItem[]) => {
 			return oldData.filter((item) => item.id !== voteCartItem.id);
 		});
 
