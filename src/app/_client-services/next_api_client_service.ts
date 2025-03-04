@@ -87,7 +87,8 @@ enum EApiRoute {
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
 	FETCH_BOUNTIES_STATS = 'FETCH_BOUNTIES_STATS',
 	GET_TOKEN_PRICE = 'GET_TOKEN_PRICE',
-	FETCH_BOUNTIES_USER_ACTIVITY = 'FETCH_BOUNTIES_USER_ACTIVITY'
+	FETCH_BOUNTIES_USER_ACTIVITY = 'FETCH_BOUNTIES_USER_ACTIVITY',
+	GET_CHILD_BOUNTIES = 'GET_CHILD_BOUNTIES'
 }
 
 export class NextApiClientService {
@@ -163,6 +164,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_TOKEN_PRICE:
 				path = '/token-price';
 				break;
+			case EApiRoute.GET_CHILD_BOUNTIES:
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
@@ -660,5 +662,10 @@ export class NextApiClientService {
 	static async fetchBountiesUserActivity() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY });
 		return this.nextApiClientFetch<IBountyUserActivity[]>({ url, method });
+	}
+
+	static async getChildBounties(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CHILD_BOUNTIES, routeSegments: [proposalType, index, 'child-bounties'] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 }

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IGenericListingResponse, IPostListing, IBountyUserActivity } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing, IBountyUserActivity, EProposalType } from '@/_shared/types';
 import { ArrowUpRight } from 'lucide-react';
 import BountyCard from '@assets/bounties/bounty-card.svg';
 import Image from 'next/image';
@@ -14,6 +14,7 @@ import ChildBounties from '@assets/bounties/child_bounties.svg';
 import { FaAngleRight } from 'react-icons/fa6';
 import { Carousel, CarouselContent, CarouselItem } from '@ui/Carousel';
 import { useCallback, useEffect, useState } from 'react';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { type CarouselApi } from '@ui/Carousel';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
@@ -32,11 +33,41 @@ export default function HotBounties({
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
+	const [childBountiesCounts, setChildBountiesCounts] = useState<Record<string, number>>({});
 
 	const onSelect = useCallback(() => {
 		if (!api) return;
 		setCurrent(api.selectedScrollSnap());
 	}, [api]);
+
+	const getChildBounties = async () => {
+		try {
+			const promises = hotBounties.items
+				.filter((bounty): bounty is IPostListing & { index: number } => bounty.index !== undefined)
+				.map((bounty) => NextApiClientService.getChildBounties(EProposalType.BOUNTY, bounty.index.toString()));
+
+			const results = await Promise.all(promises);
+			const counts = results.reduce(
+				(acc, result, index) => {
+					const bountyIndex = hotBounties.items[index as number]?.index?.toString() || '';
+					if (bountyIndex) acc[bountyIndex as string] = result.data?.length || 0;
+					return acc;
+				},
+				{} as Record<string, number>
+			);
+
+			setChildBountiesCounts(counts);
+		} catch (error) {
+			console.error('Error fetching child bounties:', error);
+		}
+	};
+
+	useEffect(() => {
+		if (hotBounties.items.length > 0) {
+			getChildBounties();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [hotBounties.items]);
 
 	useEffect(() => {
 		if (!api) {
@@ -124,7 +155,7 @@ export default function HotBounties({
 												width={16}
 												height={16}
 											/>
-											<span className='text-sm text-btn_primary_text'>Child Bounties: 0</span>
+											<span className='text-sm text-btn_primary_text'>Child Bounties: {childBountiesCounts[bounty.index?.toString() || ''] || 0}</span>
 										</div>
 										<FaAngleRight
 											className='text-btn_primary_text text-opacity-[70%]'
