@@ -466,7 +466,7 @@ export interface IOnChainPostInfo {
 	createdAt?: Date;
 	index?: number;
 	hash?: string;
-	origin?: EPostOrigin;
+	origin: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
@@ -487,12 +487,12 @@ export interface IPost extends IOffChainPost {
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
-	index: number;
-	origin: string;
+	index?: number;
+	origin: EPostOrigin;
 	proposer: string;
 	status: EProposalStatus;
 	type: EProposalType;
-	hash: string;
+	hash?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;

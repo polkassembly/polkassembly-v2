@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -62,6 +63,9 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken)
 	});
 
+	// 3. invalidate appropriate cache
+	await RedisService.DeleteSubscriptionFeed({ network, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
+
 	const response = NextResponse.json({ message: 'Subscription added successfully', id: subscription.id });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
@@ -84,6 +88,9 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 		proposalType: proposalType as EProposalType,
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken)
 	});
+
+	// 3. invalidate appropriate cache
+	await RedisService.DeleteSubscriptionFeed({ network, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
 
 	const response = NextResponse.json({ message: 'Subscription deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));

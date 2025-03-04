@@ -91,7 +91,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
 		return OffChainDbService.GetOffChainPostData({
 			network,
-			indexOrHash: postInfo.index.toString(),
+			indexOrHash: postInfo.index!.toString(),
 			proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 			proposer: postInfo.proposer || ''
 		});
@@ -107,7 +107,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 			return OffChainDbService.GetUserReactionForPost({
 				network,
 				proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
-				indexOrHash: postInfo.index.toString(),
+				indexOrHash: postInfo.index!.toString(),
 				userId
 			});
 		});
