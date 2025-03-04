@@ -8,10 +8,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork, EProposalStatus, EProposalType } from '@/_shared/types';
 import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
-import BountyHeader from './Components/BountyHeader';
-import HotBounties from './Components/HotBounties';
-import BountyProposal from './Components/BountyProposal';
-import BountiesUserActivity from './Components/BountiesUserActivity';
+import BountyDashboard from './Components';
 
 async function page() {
 	const network = getCurrentNetwork();
@@ -34,14 +31,7 @@ async function page() {
 
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
-			<div className='flex items-center justify-between'>
-				<span className='font-pixelify text-3xl font-bold text-btn_secondary_text'>Dashboard</span>
-				<div className='flex gap-2'>
-					{/* <BountyProposalActionButton className='hidden md:block' />
-					<CuratorDashboardButton /> */}
-				</div>
-			</div>
-			<BountyHeader
+			<BountyDashboard
 				tokenPrice={tokenPrice?.price || 0}
 				bountiesStats={
 					bountiesStats || {
@@ -52,18 +42,9 @@ async function page() {
 						totalRewarded: 'N/A'
 					}
 				}
-			/>
-			<HotBounties
 				hotBounties={hotBounties || { items: [], totalCount: 0 }}
-				tokenPrice={tokenPrice?.price || '0'}
-			/>
-			<BountyProposal
 				bountyProposals={bountyProposals || { items: [], totalCount: 0 }}
-				tokenPrice={tokenPrice?.price || '0'}
-			/>
-			<BountiesUserActivity
 				userActivities={userActivities || []}
-				tokenPrice={tokenPrice?.price || '0'}
 			/>
 		</div>
 	);

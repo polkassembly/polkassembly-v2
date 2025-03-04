@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import Image from 'next/image';
 import BountyIcon from '@assets/bounties/bounty-icon.svg';
 import BountyArrowIcon from '@assets/bounties/bounty-arrow-icon.svg';

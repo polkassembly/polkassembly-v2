@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
@@ -19,7 +17,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 
 function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
-	console.log(bountyProposals);
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
