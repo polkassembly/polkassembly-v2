@@ -565,7 +565,10 @@
 			"stakingadmin": "Staking Admin",
 			"treasury": "Treasury",
 			"fellowship": "Fellowship"
-		}
+		},
+		"please": "Please",
+		"login": "Login",
+		"toCreate": "to create a Discussion"
 	},
 	"ProposalType": {
 		"discussion": "Discussion",
@@ -620,7 +623,16 @@
 		"twitter": "Twitter",
 		"matrix": "Matrix",
 		"setIdentity": "Set Identity",
-		"onChainIdentity": "On-chain Identity"
+		"onChainIdentity": "On-chain Identity",
+		"identityDescription1": "Polkadot offers on-chain identities that verify users' credentials through appointed registrars, instilling greater trust and support.",
+		"identityDescription2": "Once successfully verified, users receive a green checkmark, symbolising their trusted status. This verified status symbol enhances trustworthiness when requesting funds from the treasury or participating in discussions and proposals.",
+		"letBegin": "Let's Begin",
+		"requestJudgement": "Request Judgement (Coming Soon)",
+		"minimumDeposit": "Minimum Deposit",
+		"registrarFee": "Registrar Fee",
+		"totalAmountRequired": "Total Amount Required",
+		"viewAmountBreakup": "View Amount Breakup",
+		"registrarFees": "Registrar Fees"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",

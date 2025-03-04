@@ -37,7 +37,7 @@ export const usePostReactions = (postData: IPostListing) => {
 					likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
 					dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
 				}));
-				await NextApiClientService.deletePostReactionApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', currentReactionId);
+				await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', currentReactionId);
 				setCurrentReactionId(null);
 			} else {
 				// Optimistic update: Add or switch reaction
@@ -52,7 +52,7 @@ export const usePostReactions = (postData: IPostListing) => {
 				showGifSetter(true);
 				setTimeout(() => showGifSetter(false), 1500);
 
-				const response = await NextApiClientService.postReactionsApi(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+				const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
 				setCurrentReactionId(response?.data?.reactionId || null);
 			}
 		} catch {

@@ -30,7 +30,8 @@ import {
 	ITag,
 	IVoteCartItem,
 	EConvictionAmount,
-	EVoteDecision
+	EVoteDecision,
+	IPostSubscription
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -227,8 +228,22 @@ export class OffChainDbService {
 		return FirestoreService.GetPostReactions({ network, indexOrHash, proposalType });
 	}
 
-	static async GetPostReactionById(id: string): Promise<IReaction | null> {
-		return FirestoreService.GetPostReactionById(id);
+	static async GetCommentReactions({
+		network,
+		indexOrHash,
+		proposalType,
+		id
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		id: string;
+	}): Promise<IReaction[]> {
+		return FirestoreService.GetCommentReactions({ network, indexOrHash, proposalType, id });
+	}
+
+	static async GetReactionById(id: string): Promise<IReaction | null> {
+		return FirestoreService.GetReactionById(id);
 	}
 
 	static async GetPublicUserById(id: number): Promise<IPublicUser | null> {
@@ -281,6 +296,28 @@ export class OffChainDbService {
 		);
 	}
 
+	static async GetPostSubscriptionByPostAndUserId({
+		network,
+		indexOrHash,
+		proposalType,
+		userId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+	}): Promise<IPostSubscription | null> {
+		return FirestoreService.GetPostSubscriptionByPostAndUserId({ network, indexOrHash, proposalType, userId });
+	}
+
+	static async GetPostSubscriptionsByUserId({ userId, page, limit, network }: { userId: number; page: number; limit: number; network: ENetwork }): Promise<IPostSubscription[]> {
+		return FirestoreService.GetPostSubscriptionsByUserId({ userId, page, limit, network });
+	}
+
+	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -308,7 +345,8 @@ export class OffChainDbService {
 		proposalType,
 		indexOrHash,
 		metadata,
-		subActivityName
+		subActivityName,
+		commentId
 	}: {
 		userId: number;
 		name: EActivityName;
@@ -317,6 +355,7 @@ export class OffChainDbService {
 		indexOrHash?: string;
 		metadata?: IActivityMetadata;
 		subActivityName?: EActivityName;
+		commentId?: string;
 	}): Promise<void> {
 		const activity: IUserActivity = {
 			id: '', // Firestore service class will generate this
@@ -328,6 +367,7 @@ export class OffChainDbService {
 			...(indexOrHash && { indexOrHash }),
 			...(metadata && { metadata }),
 			...(subActivityName && { subActivityName }),
+			...(commentId && { commentId }),
 			createdAt: new Date(),
 			updatedAt: new Date()
 		};
@@ -494,11 +534,43 @@ export class OffChainDbService {
 		return reactionId;
 	}
 
-	static async DeletePostReaction(id: string) {
-		const reaction = await FirestoreService.GetPostReactionById(id);
+	static async AddCommentReaction({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		reaction,
+		commentId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		reaction: EReaction;
+		commentId: string;
+	}): Promise<string> {
+		const reactionId = await FirestoreService.AddCommentReaction({ network, indexOrHash, proposalType, userId, reaction, commentId });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.REACTED_TO_COMMENT,
+			network,
+			proposalType,
+			indexOrHash,
+			metadata: { reaction },
+			commentId
+		});
+
+		return reactionId;
+	}
+
+	static async DeleteReactionById({ id, userId }: { id: string; userId: number }) {
+		const reaction = await FirestoreService.GetReactionById(id);
 		if (!reaction) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 
-		await FirestoreService.DeletePostReaction(id);
+		if (reaction.userId !== userId) throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+
+		await FirestoreService.DeleteReactionById(id);
 
 		await this.saveUserActivity({
 			userId: reaction.userId,
@@ -506,6 +578,7 @@ export class OffChainDbService {
 			network: reaction.network,
 			proposalType: reaction.proposalType,
 			indexOrHash: reaction.indexOrHash,
+			commentId: reaction.commentId,
 			metadata: { reaction: reaction.reaction }
 		});
 	}
@@ -711,5 +784,18 @@ export class OffChainDbService {
 		conviction: EConvictionAmount;
 	}) {
 		return FirestoreService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });
+	}
+
+	static async AddPostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
+		const existingSubscription = await this.GetPostSubscriptionByPostAndUserId({ network, indexOrHash, proposalType, userId });
+		if (existingSubscription) {
+			throw new APIError(ERROR_CODES.ALREADY_EXISTS, StatusCodes.CONFLICT, 'Subscription already exists');
+		}
+
+		return FirestoreService.AddPostSubscription({ network, indexOrHash, proposalType, userId });
+	}
+
+	static async DeletePostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
+		return FirestoreService.DeletePostSubscription({ network, indexOrHash, proposalType, userId });
 	}
 }

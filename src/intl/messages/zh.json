@@ -545,7 +545,10 @@
 		},
 		"titleTooShort": "请提供有效的标题。",
 		"titlePlaceholder": "输入标题",
-		"descriptionRequired": "请提供有效的描述。"
+		"descriptionRequired": "请提供有效的描述。",
+		"please": "请",
+		"login": "登录",
+		"toCreate": "以创建讨论"
 	},
 	"ProposalType": {
 		"discussion": "讨论",
@@ -600,7 +603,16 @@
 		"twitter": "推特",
 		"matrix": "矩阵",
 		"setIdentity": "设置身份",
-		"onChainIdentity": "链上身份"
+		"onChainIdentity": "链上身份",
+		"identityDescription1": "Polkadot通过指定的注册商提供链上身份验证用户凭证的功能，建立更大的信任和支持。",
+		"identityDescription2": "一旦成功验证，用户将收到一个绿色的验证标记，象征着他们的可信状态。这个已验证的状态标志在申请财政部资金或参与讨论和提案时可以提高可信度。",
+		"letBegin": "让我们开始",
+		"requestJudgement": "请求判断（即将推出）",
+		"minimumDeposit": "最低存款",
+		"registrarFee": "注册费",
+		"totalAmountRequired": "所需总金额",
+		"viewAmountBreakup": "查看金额明细",
+		"registrarFees": "注册费"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

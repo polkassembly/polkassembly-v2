@@ -13,7 +13,7 @@ async function DiscussionsPage({ searchParams }: { searchParams: Promise<{ page?
 	const page = parseInt(searchParamsValue.page || '1', 10);
 	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
 
-	const { data, error } = await NextApiClientService.fetchListingDataApi(EProposalType.DISCUSSION, page, statuses, [], []);
+	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.DISCUSSION, page, statuses });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
