@@ -851,20 +851,6 @@ export interface IBountyStats {
 	totalBountyPool: string;
 }
 
-interface IBountyProposal {
-	index: string;
-	reward: string;
-	statusHistory?: {
-		status: string;
-	}[];
-}
-
-export interface ISubsquidBountyResponse {
-	data: {
-		proposals: IBountyProposal[];
-	};
-}
-
 export interface IBountyUserActivity {
 	amount: string;
 	activity: string;
@@ -872,7 +858,7 @@ export interface IBountyUserActivity {
 	created_at: Date;
 }
 
-export interface IProposal {
+export interface IBountyProposal {
 	index: string;
 	reward: string;
 	statusHistory?: Array<{ status: string }>;

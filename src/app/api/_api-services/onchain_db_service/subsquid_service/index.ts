@@ -13,7 +13,7 @@ import {
 	IOnChainPostListing,
 	IPreimage,
 	IStatusHistoryItem,
-	ISubsquidBountyResponse,
+	IBountyProposal,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -441,19 +441,19 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getActiveBountiesWithRewards(network: ENetwork): Promise<ISubsquidBountyResponse | null> {
+	static async getActiveBountiesWithRewards(network: ENetwork): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS, {}).toPromise();
 
-			return response as ISubsquidBountyResponse;
+			return response as { data: { proposals: IBountyProposal[] } };
 		} catch (error) {
 			console.error('Error fetching active bounties:', error);
 			return null;
 		}
 	}
 
-	static async getChildBountiesRewards(network: ENetwork, parentBountyIndices: number[]): Promise<ISubsquidBountyResponse | null> {
+	static async getChildBountiesRewards(network: ENetwork, parentBountyIndices: number[]): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient
@@ -462,21 +462,24 @@ export class SubsquidService extends SubsquidUtils {
 				})
 				.toPromise();
 
-			return response as ISubsquidBountyResponse;
+			return response as { data: { proposals: IBountyProposal[] } };
 		} catch (error) {
 			console.error('Error fetching child bounties:', error);
 			return null;
 		}
 	}
 
-	static async getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(network: ENetwork, parentBountyIndices: number[]): Promise<ISubsquidBountyResponse | null> {
+	static async getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(
+		network: ENetwork,
+		parentBountyIndices: number[]
+	): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient
 				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
 				.toPromise();
 
-			return response as ISubsquidBountyResponse;
+			return response as { data: { proposals: IBountyProposal[] } };
 		} catch (error) {
 			console.error('Error fetching claimed child bounties payees and reward:', error);
 			return null;

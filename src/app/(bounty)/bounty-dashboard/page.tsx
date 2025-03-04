@@ -27,6 +27,8 @@ async function page() {
 		statuses: DECIDING_PROPOSAL_STATUSES
 	});
 
+	console.log('bountyProposals', bountyProposals);
+
 	const { data: userActivities } = await NextApiClientService.fetchBountiesUserActivity();
 
 	return (
