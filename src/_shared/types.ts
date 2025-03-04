@@ -867,3 +867,15 @@ export interface IBountyUserActivity {
 	address: string;
 	created_at: Date;
 }
+
+export interface IProposal {
+	index: string;
+	reward: string;
+	statusHistory?: Array<{ status: string }>;
+}
+
+export interface IClaimedBountyProposal {
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ timestamp: string }>;
+}

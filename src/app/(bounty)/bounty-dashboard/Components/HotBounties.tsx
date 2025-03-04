@@ -7,7 +7,6 @@
 import { IGenericListingResponse, IPostListing, IBountyUserActivity } from '@/_shared/types';
 import { ArrowUpRight } from 'lucide-react';
 import BountyCard from '@assets/bounties/bounty-card.svg';
-import UserIcon from '@assets/profile/user-icon.svg';
 import Image from 'next/image';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { spaceGroteskFont } from '@/app/_style/fonts';
@@ -105,14 +104,7 @@ export default function HotBounties({
 										<div className='line-clamp-2 overflow-hidden text-ellipsis'>
 											<p className='text-sm text-text_primary'>{bounty.onChainInfo?.description}</p>
 										</div>
-										<div className='mt-10 flex items-center text-sm'>
-											<Image
-												src={UserIcon}
-												alt='User'
-												className='mr-2 h-4 w-4'
-												width={16}
-												height={16}
-											/>
+										<div className='mb-2 mt-10 flex items-center text-sm'>
 											<Address
 												address={bounty.onChainInfo?.proposer || ''}
 												className='text-sm text-text_primary'

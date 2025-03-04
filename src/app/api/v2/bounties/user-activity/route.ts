@@ -9,7 +9,7 @@ import { NextRequest } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { BountyService } from '@/app/api/_api-services/bounty_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { ENetwork } from '@shared/types';
 
 export async function GET(req: NextRequest) {
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
 		}
 
-		const stats = await BountyService.getBountyUserActivity(network as ENetwork);
+		const stats = await OnChainDbService.getBountyUserActivity(network as ENetwork);
 		return Response.json(stats);
 	} catch (error) {
 		console.error('Bounty stats error:', error);
