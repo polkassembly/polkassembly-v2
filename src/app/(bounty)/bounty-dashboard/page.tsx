@@ -7,8 +7,11 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork, EProposalStatus, EProposalType } from '@/_shared/types';
+import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 import BountyHeader from './Components/BountyHeader';
 import HotBounties from './Components/HotBounties';
+import BountyProposal from './Components/BountyProposal';
+import BountiesUserActivity from './Components/BountiesUserActivity';
 
 async function page() {
 	const network = getCurrentNetwork();
@@ -18,6 +21,13 @@ async function page() {
 		proposalType: EProposalType.BOUNTY,
 		page: 1,
 		statuses: [EProposalStatus.Active, EProposalStatus.Extended]
+	});
+
+	const { data: bountyProposals } = await NextApiClientService.fetchListingData({
+		proposalType: EProposalType.REFERENDUM_V2,
+		page: 1,
+		preimageSection: 'Bounties',
+		statuses: DECIDING_PROPOSAL_STATUSES
 	});
 
 	const { data: userActivities } = await NextApiClientService.fetchBountiesUserActivity();
@@ -45,6 +55,10 @@ async function page() {
 			/>
 			<HotBounties
 				hotBounties={hotBounties || { items: [], totalCount: 0 }}
+				tokenPrice={tokenPrice?.price || '0'}
+			/>
+			<BountyProposal bountyProposals={bountyProposals || { items: [], totalCount: 0 }} />
+			<BountiesUserActivity
 				userActivities={userActivities || []}
 				tokenPrice={tokenPrice?.price || '0'}
 			/>

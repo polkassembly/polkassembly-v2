@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import BountyPoster from '@assets/bounties/bounty-poster.svg';
@@ -16,7 +18,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/Carousel';
 
-function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: string }) {
+function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: string | number }) {
 	const network = getCurrentNetwork();
 	const unit = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
 	const [api, setApi] = useState<CarouselApi>();
@@ -88,7 +90,7 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 												<Address address={activity?.address} />
 												<span className='text-sm font-normal text-text_primary'>claimed</span>
 												<span className='whitespace-nowrap font-pixeboy text-sm font-normal text-text_pink md:text-[20px]'>
-													{formatTokenValue(activity?.amount, network, tokenPrice, unit)}
+													{formatTokenValue(activity?.amount, network, tokenPrice as string, unit)}
 												</span>
 												<span className='text-sm font-normal text-text_primary'>bounty</span>
 												<span className='mx-2 h-[5px] w-[5px] rounded-full bg-basic_text' />

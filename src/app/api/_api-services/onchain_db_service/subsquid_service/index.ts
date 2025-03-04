@@ -129,7 +129,8 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		statuses,
 		origins,
-		notVotedByAddresses
+		notVotedByAddresses,
+		preimageSection
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -138,6 +139,7 @@ export class SubsquidService extends SubsquidUtils {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
+		preimageSection?: string;
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -166,7 +168,8 @@ export class SubsquidService extends SubsquidUtils {
 				status_in: statuses,
 				type_eq: proposalType,
 				origin_in: origins,
-				voters: notVotedByAddresses
+				voters: notVotedByAddresses,
+				section_eq: preimageSection
 			})
 			.toPromise();
 
@@ -211,6 +214,7 @@ export class SubsquidService extends SubsquidUtils {
 						proposedCall?: {
 							args?: Record<string, unknown>;
 						};
+						section?: string;
 					};
 					statusHistory?: Array<{
 						status: EProposalStatus;
@@ -251,7 +255,8 @@ export class SubsquidService extends SubsquidUtils {
 					voteMetrics: voteMetrics[Number(index)],
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
-					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
+					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
+					preimageSection: proposal.preimage?.section ?? undefined
 				};
 			}
 		);

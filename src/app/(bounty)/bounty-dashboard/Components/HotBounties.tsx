@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IGenericListingResponse, IPostListing, IBountyUserActivity, EProposalType } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing, EProposalType } from '@/_shared/types';
 import { ArrowUpRight } from 'lucide-react';
 import BountyCard from '@assets/bounties/bounty-card.svg';
 import Image from 'next/image';
@@ -19,17 +19,8 @@ import { type CarouselApi } from '@ui/Carousel';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import BountiesUserActivity from './BountiesUserActivity';
 
-export default function HotBounties({
-	hotBounties,
-	userActivities,
-	tokenPrice
-}: {
-	hotBounties: IGenericListingResponse<IPostListing>;
-	userActivities: IBountyUserActivity[];
-	tokenPrice: string | number;
-}) {
+export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
@@ -81,13 +72,13 @@ export default function HotBounties({
 
 	return (
 		<div>
-			<div className='flex items-center justify-between p-4'>
+			<div className='my-5 flex items-center justify-between'>
 				<h3 className='font-pixelify text-3xl font-bold text-btn_secondary_text'>
 					🔥 Hot Bounties <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
 				</h3>
 				<p className={`${spaceGroteskFont.className} text-2xl font-bold text-navbar_border`}>View All</p>
 			</div>
-			<div className='relative px-12'>
+			<div className='relative'>
 				<Carousel
 					opts={{
 						align: 'start',
@@ -193,10 +184,6 @@ export default function HotBounties({
 					)}
 				</Carousel>
 			</div>
-			<BountiesUserActivity
-				userActivities={userActivities}
-				tokenPrice={tokenPrice as string}
-			/>
 		</div>
 	);
 }

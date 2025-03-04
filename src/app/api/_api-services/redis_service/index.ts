@@ -40,12 +40,22 @@ export class RedisService {
 		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
 		[ERedisKeys.REFRESH_TOKEN]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN}-${userId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: string, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
+		[ERedisKeys.POSTS_LISTING]: (
+			network: string,
+			proposalType: string,
+			page: number,
+			limit: number,
+			statuses?: string[],
+			origins?: string[],
+			tags?: string[],
+			preimageSection?: string
+		): string => {
 			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
 			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
-			return baseKey + statusesPart + originsPart + tagsPart;
+			const preimageSectionPart = preimageSection ? `-p:${preimageSection}` : '';
+			return baseKey + statusesPart + originsPart + tagsPart + preimageSectionPart;
 		},
 		[ERedisKeys.ACTIVITY_FEED]: (network: string, page: number, limit: number, userId?: number, origins?: string[]): string => {
 			const baseKey = `${ERedisKeys.ACTIVITY_FEED}-${network}-${page}-${limit}`;
@@ -176,7 +186,8 @@ export class RedisService {
 		limit,
 		statuses,
 		origins,
-		tags
+		tags,
+		preimageSection
 	}: {
 		network: string;
 		proposalType: string;
@@ -185,8 +196,9 @@ export class RedisService {
 		statuses?: string[];
 		origins?: string[];
 		tags?: string[];
+		preimageSection?: string;
 	}): Promise<IGenericListingResponse<IPostListing> | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags, preimageSection) });
 		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 

@@ -86,21 +86,28 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES = `
-		query GetProposalsListingByTypeAndStatuses($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!) {
-			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in}, orderBy: index_DESC) {
+		query GetProposalsListingByTypeAndStatuses($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!, $section_eq: String) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in, preimage: {section_eq: $section_eq}}, orderBy: index_DESC) {
 				createdAt
 				description
 				index
 				origin
 				proposer
-				status,
 				reward
+				status,
 				hash,
 				curator
 				preimage {
+					method
+					proposer
 					proposedCall {
 						args
 					}
+				}
+				proposalArguments {
+					method
+					section
+					args
 				}
 				statusHistory {
 					status

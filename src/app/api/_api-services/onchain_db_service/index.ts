@@ -52,7 +52,8 @@ export class OnChainDbService {
 		page,
 		statuses,
 		origins,
-		notVotedByAddresses
+		notVotedByAddresses,
+		preimageSection
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -61,6 +62,7 @@ export class OnChainDbService {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
+		preimageSection?: string;
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
@@ -78,7 +80,8 @@ export class OnChainDbService {
 			page,
 			statuses,
 			origins,
-			notVotedByAddresses
+			notVotedByAddresses,
+			preimageSection
 		});
 
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
