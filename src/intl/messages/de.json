@@ -614,5 +614,15 @@
 		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
 		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
 		"registrarFees": "Registrierungsgebühren"
+	},
+	"Bounty": {
+		"availableBountyPool": "Verfügbare Prämie-Pool",
+		"viewAll": "Alle anzeigen",
+		"dot": "DOT",
+		"claimed": "Beansprucht",
+		"childBounties": "Kinderprämien",
+		"bountyProposal": "Prämie-Vorschlag",
+		"vote": "Abstimmen",
+		"bountyDashboard": "Prämie-Dashboard"
 	}
 }

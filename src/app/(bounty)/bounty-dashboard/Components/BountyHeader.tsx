@@ -22,6 +22,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
+import { useTranslations } from 'next-intl';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
@@ -36,6 +37,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const [bountyAmount, setBountyAmount] = useState<string>('0');
+	const t = useTranslations('Bounty');
 
 	useEffect(() => {
 		apiService?.getBountyAmount().then((amount) => {
@@ -50,11 +52,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 			<div className='flex'>
 				<div className='hidden gap-6 lg:flex'>
 					<div>
-						<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>Available Bounty pool</span>
+						<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
 							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
 							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
-							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>DOT</span>
+							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
 						</div>
 						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] w-[360px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background xl:w-[380px] 2xl:w-[380px]'>
 							<div className='mb-8 ml-1 flex items-end gap-3'>
@@ -139,11 +141,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 				</div>
 				<div className='flex flex-col gap-6 lg:hidden'>
 					<div>
-						<span className='font-pixelify text-base text-[#2D2D2D] dark:text-[#737373]'>Available Bounty pool</span>
+						<span className='font-pixelify text-base text-[#2D2D2D] dark:text-[#737373]'>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
 							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
 							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
-							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>DOT</span>
+							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
 						</div>{' '}
 						<div className='grid grid-cols-2 gap-y-8 py-7 pr-4'>
 							<StatItem

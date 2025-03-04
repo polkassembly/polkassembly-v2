@@ -16,11 +16,13 @@ import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
+import { useTranslations } from 'next-intl';
 
 export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
+	const t = useTranslations('Bounty');
 
 	const onSelect = useCallback(() => {
 		if (!api) return;
@@ -43,7 +45,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 				<h3 className='font-pixelify text-3xl font-bold text-btn_secondary_text'>
 					🔥 Hot Bounties <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
 				</h3>
-				<p className={`${spaceGroteskFont.className} text-2xl font-bold text-navbar_border`}>View All</p>
+				<p className={`${spaceGroteskFont.className} text-2xl font-bold text-navbar_border`}>{t('viewAll')}</p>
 			</div>
 			<div className='relative'>
 				<Carousel
@@ -118,7 +120,9 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 												width={16}
 												height={16}
 											/>
-											<span className='text-sm text-btn_primary_text'>Child Bounties: {bounty.onChainInfo?.childBountiesCount}</span>
+											<span className='text-sm text-btn_primary_text'>
+												{t('childBounties')}: {bounty.onChainInfo?.childBountiesCount}
+											</span>
 										</div>
 										<FaAngleRight
 											className='text-btn_primary_text text-opacity-[70%]'

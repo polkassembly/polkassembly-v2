@@ -613,5 +613,15 @@
 		"totalAmountRequired": "必要総額",
 		"viewAmountBreakup": "金額の内訳を表示",
 		"registrarFees": "登録手数料"
+	},
+	"Bounty": {
+		"availableBountyPool": "利用可能な報奨金プール",
+		"viewAll": "すべて表示",
+		"dot": "DOT",
+		"claimed": "クレーム済み",
+		"childBounties": "子供の報奨金",
+		"bountyProposal": "報奨金提案",
+		"vote": "投票",
+		"bountyDashboard": "報奨金ダッシュボード"
 	}
 }

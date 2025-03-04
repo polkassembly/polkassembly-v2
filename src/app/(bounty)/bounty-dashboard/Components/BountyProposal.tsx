@@ -16,11 +16,13 @@ import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { useTranslations } from 'next-intl';
 
 function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
+	const t = useTranslations('Bounty');
 	const onSelect = useCallback(() => {
 		if (!api) return;
 		setCurrent(api.selectedScrollSnap());
@@ -45,7 +47,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 					width={24}
 					height={24}
 				/>
-				Bounty Proposal
+				{t('bountyProposal')}
 			</h3>
 			<div className='relative mt-5'>
 				<Carousel
@@ -89,7 +91,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 												type='button'
 												className={`${spaceGroteskFont.className} h-[36px] w-[75px] cursor-pointer rounded-3xl border-none bg-arrow_bg_color text-base font-bold text-bg_modal md:h-[44px] md:w-[100px] md:text-lg`}
 											>
-												Vote
+												{t('vote')}
 											</button>
 										</div>
 									</div>
