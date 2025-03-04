@@ -94,6 +94,10 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressesForUserId(userId);
 	}
 
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+		return FirestoreService.GetAddressDataByAddress(address);
+	}
+
 	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
 		return FirestoreService.GetPublicUsers(page, limit);
 	}
@@ -760,6 +764,10 @@ export class OffChainDbService {
 
 	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
 		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
+	}
+
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		return FirestoreService.ClearVoteCart({ userId });
 	}
 
 	static async UpdateVoteCartItem({

@@ -828,6 +828,7 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+	editDisabled?: boolean;
 }
 
 export interface IPostSubscription {
@@ -838,4 +839,8 @@ export interface IPostSubscription {
 	indexOrHash: string;
 	proposalType: EProposalType;
 	userId: number;
+}
+
+export enum EReactQueryKeys {
+	BATCH_VOTE_CART = 'batch-vote-cart'
 }

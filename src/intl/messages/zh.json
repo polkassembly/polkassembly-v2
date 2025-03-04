@@ -613,5 +613,28 @@
 		"totalAmountRequired": "所需总金额",
 		"viewAmountBreakup": "查看金额明细",
 		"registrarFees": "注册费"
+	},
+	"BatchVote": {
+		"batchVoting": "批量投票",
+		"please": "请",
+		"login": "登录",
+		"toVote": "以进行投票",
+		"setDefaults": "设置默认值",
+		"vote": "投票",
+		"noProposalsAvailable": "没有可用提案",
+		"skip": "跳过",
+		"aye": "赞成",
+		"nay": "反对",
+		"abstain": "弃权",
+		"chooseYourVote": "选择您的投票",
+		"setConviction": "设置信念",
+		"noItemsInVoteCart": "投票车中没有项目",
+		"confirmBatchVoting": "确认批量投票",
+		"save": "保存",
+		"editVote": "编辑投票",
+		"next": "下一步",
+		"totalProposals": "提案总数",
+		"viewCart": "查看购物车",
+		"proposals": "提案"
 	}
 }

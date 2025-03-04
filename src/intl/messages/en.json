@@ -633,5 +633,28 @@
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
 		"registrarFees": "Registrar Fees"
+	},
+	"BatchVote": {
+		"batchVoting": "Batch Voting",
+		"please": "Please",
+		"login": "Login",
+		"toVote": "to Vote",
+		"setDefaults": "Set Defaults",
+		"vote": "Vote",
+		"noProposalsAvailable": "No proposals available",
+		"skip": "Skip",
+		"aye": "Aye",
+		"nay": "Nay",
+		"abstain": "Abstain",
+		"chooseYourVote": "Choose your Vote",
+		"setConviction": "Set Conviction",
+		"noItemsInVoteCart": "No items in the vote cart",
+		"confirmBatchVoting": "Confirm Batch Voting",
+		"save": "Save",
+		"editVote": "Edit Vote",
+		"next": "Next",
+		"totalProposals": "Total Proposals",
+		"viewCart": "View Cart",
+		"proposals": "Proposals"
 	}
 }
