@@ -26,7 +26,7 @@ export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) =>
 	const network = getCurrentNetwork();
 
 	const fetchAllTags = async () => {
-		const { data, error } = await NextApiClientService.fetchAllTagsApi();
+		const { data, error } = await NextApiClientService.fetchAllTags();
 		if (error) {
 			throw new ClientError(error.message || 'Failed to fetch data');
 		}

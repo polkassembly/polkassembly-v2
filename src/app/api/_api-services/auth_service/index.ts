@@ -47,7 +47,7 @@ export class AuthService {
 	private static async CreateAndSendEmailVerificationToken(user: IUser): Promise<void> {
 		if (user.email) {
 			const verifyToken = createCuid();
-			await RedisService.SetEmailVerificationToken(verifyToken, user.email);
+			await RedisService.SetEmailVerificationToken({ token: verifyToken, email: user.email });
 
 			// send verification email in background
 			NotificationService.SendVerificationEmail(user, verifyToken);
@@ -212,15 +212,19 @@ export class AuthService {
 			{ algorithm: 'RS256', expiresIn: `${REFRESH_TOKEN_LIFE_IN_SECONDS}s` }
 		);
 
-		// save refresh token in redis
-		await RedisService.SetRefreshToken(userId, refreshToken);
+		// save refresh token in redis with a unique token ID
+		await RedisService.SetRefreshToken({ userId, refreshToken });
 
 		return refreshToken;
 	}
 
 	static async DeleteRefreshToken(refreshToken: string) {
-		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
-		await RedisService.DeleteRefreshToken(refreshTokenPayload.id);
+		await this.DeleteRefreshTokenByValue(refreshToken);
+	}
+
+	// Method to delete all refresh tokens for a user (logout from all devices)
+	static async DeleteAllRefreshTokens(userId: number) {
+		await RedisService.DeleteAllRefreshTokens(userId);
 	}
 
 	static async Web2Login(emailOrUsername: string, password: string): Promise<IAuthResponse> {
@@ -248,7 +252,7 @@ export class AuthService {
 
 		if (isTFAEnabled) {
 			const tfaToken = createCuid();
-			await RedisService.SetTfaToken(tfaToken, user.id);
+			await RedisService.SetTfaToken({ tfaToken, userId: user.id });
 
 			return {
 				isTFAEnabled,
@@ -336,7 +340,7 @@ export class AuthService {
 
 			if (isTFAEnabled) {
 				const tfaToken = createCuid();
-				await RedisService.SetTfaToken(tfaToken, user.id);
+				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
 
 				return {
 					isTFAEnabled,
@@ -382,14 +386,20 @@ export class AuthService {
 			}
 
 			const refreshTokenPayload = this.GetRefreshTokenPayload(token);
+			const userId = refreshTokenPayload.id;
 
-			if (!ValidatorService.isValidUserId(refreshTokenPayload.id) || !refreshTokenPayload.iat || !refreshTokenPayload.exp) {
+			if (!ValidatorService.isValidUserId(userId) || !refreshTokenPayload.iat || !refreshTokenPayload.exp) {
 				return false;
 			}
 
-			const redisRefreshToken = await RedisService.GetRefreshToken(refreshTokenPayload.id);
+			// Check in the multi-device token storage
+			const tokenIds = await RedisService.GetAllRefreshTokenIds(userId);
 
-			return redisRefreshToken === token;
+			// Check each token ID
+			const tokenChecks = await Promise.all(tokenIds.map((tokenId) => RedisService.GetRefreshToken(userId, tokenId)));
+
+			// Return true if any token matches
+			return tokenChecks.some((storedToken) => storedToken === token);
 		} catch {
 			return false;
 		}
@@ -447,7 +457,7 @@ export class AuthService {
 
 		// send verification email
 		const verifyToken = createCuid();
-		await RedisService.SetEmailVerificationToken(verifyToken, user.email);
+		await RedisService.SetEmailVerificationToken({ token: verifyToken, email: user.email });
 		await NotificationService.SendVerificationEmail(user, verifyToken);
 
 		// regenerate access and refresh tokens
@@ -585,9 +595,7 @@ export class AuthService {
 	 * Validate and refresh tokens, if access token is invalid, generates a new one using refresh token and rotates the refresh token
 	 *
 	 * @static
-	 * @param {string} accessToken
-	 * @param {string} refreshToken
-	 * @return {*}  {Promise<{ newAccessTokenCookie: string; newRefreshTokenCookie: string }>}
+	 * @return {*}  {Promise<{ newAccessToken: string; newRefreshToken: string }>}
 	 * @memberof AuthService
 	 * @throws {APIError} 401 - Invalid access token or refresh token
 	 */
@@ -623,13 +631,18 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
 		}
 
+		// Generate new access token
 		const newAccessToken = await this.GetSignedAccessToken({
 			...user,
 			loginAddress: refreshTokenPayload.loginAddress,
 			loginWallet: refreshTokenPayload.loginWallet
 		});
 
-		// rotate refresh token
+		// Delete the old refresh token before creating a new one
+		// This ensures proper token rotation in the multi-device system
+		await this.DeleteRefreshToken(refreshToken);
+
+		// Create a new refresh token
 		const newRefreshToken = await this.GetRefreshToken({
 			userId: user.id,
 			loginAddress: refreshTokenPayload.loginAddress,
@@ -650,7 +663,7 @@ export class AuthService {
 		}
 
 		const resetToken = createCuid();
-		await RedisService.SetResetPasswordToken(resetToken, user.id);
+		await RedisService.SetResetPasswordToken({ token: resetToken, userId: user.id });
 
 		await NotificationService.SendResetPasswordEmail(user, resetToken);
 	}
@@ -700,9 +713,38 @@ export class AuthService {
 		}
 
 		// delete any redis keys for the user to revoke access
-		await RedisService.DeleteRefreshToken(user.id);
+		await RedisService.DeleteAllRefreshTokens(user.id);
 
 		// delete user from offchain db
 		await OffChainDbService.DeleteUser(user.id);
+	}
+
+	static async DeleteRefreshTokenByValue(refreshToken: string) {
+		try {
+			const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
+			const userId = refreshTokenPayload.id;
+
+			// Find the token
+			const tokenIds = await RedisService.GetAllRefreshTokenIds(userId);
+
+			// Check each token ID
+			const tokenChecks = await Promise.all(
+				tokenIds.map(async (tokenId) => {
+					const storedToken = await RedisService.GetRefreshToken(userId, tokenId);
+					return { tokenId, matches: storedToken === refreshToken };
+				})
+			);
+
+			// Find the matching token ID
+			const matchingToken = tokenChecks.find((check) => check.matches);
+			if (matchingToken) {
+				await RedisService.DeleteRefreshToken(userId, matchingToken.tokenId);
+				return true;
+			}
+
+			return false;
+		} catch {
+			return false;
+		}
 	}
 }

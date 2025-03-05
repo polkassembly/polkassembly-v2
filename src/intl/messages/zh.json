@@ -545,7 +545,10 @@
 		},
 		"titleTooShort": "请提供有效的标题。",
 		"titlePlaceholder": "输入标题",
-		"descriptionRequired": "请提供有效的描述。"
+		"descriptionRequired": "请提供有效的描述。",
+		"please": "请",
+		"login": "登录",
+		"toCreate": "以创建讨论"
 	},
 	"ProposalType": {
 		"discussion": "讨论",
@@ -600,6 +603,38 @@
 		"twitter": "推特",
 		"matrix": "矩阵",
 		"setIdentity": "设置身份",
-		"onChainIdentity": "链上身份"
+		"onChainIdentity": "链上身份",
+		"identityDescription1": "Polkadot通过指定的注册商提供链上身份验证用户凭证的功能，建立更大的信任和支持。",
+		"identityDescription2": "一旦成功验证，用户将收到一个绿色的验证标记，象征着他们的可信状态。这个已验证的状态标志在申请财政部资金或参与讨论和提案时可以提高可信度。",
+		"letBegin": "让我们开始",
+		"requestJudgement": "请求判断（即将推出）",
+		"minimumDeposit": "最低存款",
+		"registrarFee": "注册费",
+		"totalAmountRequired": "所需总金额",
+		"viewAmountBreakup": "查看金额明细",
+		"registrarFees": "注册费"
+	},
+	"BatchVote": {
+		"batchVoting": "批量投票",
+		"please": "请",
+		"login": "登录",
+		"toVote": "以进行投票",
+		"setDefaults": "设置默认值",
+		"vote": "投票",
+		"noProposalsAvailable": "没有可用提案",
+		"skip": "跳过",
+		"aye": "赞成",
+		"nay": "反对",
+		"abstain": "弃权",
+		"chooseYourVote": "选择您的投票",
+		"setConviction": "设置信念",
+		"noItemsInVoteCart": "投票车中没有项目",
+		"confirmBatchVoting": "确认批量投票",
+		"save": "保存",
+		"editVote": "编辑投票",
+		"next": "下一步",
+		"totalProposals": "提案总数",
+		"viewCart": "查看购物车",
+		"proposals": "提案"
 	}
 }

@@ -16,7 +16,7 @@ import classes from './OnchainInfo.module.scss';
 function OnchainInfo({ proposalType, index, onchainInfo }: { proposalType: EProposalType; index: string; onchainInfo?: IOnChainPostInfo }) {
 	const t = useTranslations();
 	const fetchPreimage = async () => {
-		const { data, error } = await NextApiClientService.getPreimageForPostApi(proposalType, index);
+		const { data, error } = await NextApiClientService.getPreimageForPost(proposalType, index);
 		if (error) {
 			throw new ClientError(error.message || 'Failed to fetch data');
 		}

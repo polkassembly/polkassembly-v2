@@ -545,7 +545,10 @@
 		},
 		"titleTooShort": "Por favor, proporcione un título válido.",
 		"titlePlaceholder": "Ingrese título",
-		"descriptionRequired": "Por favor, proporcione una descripción válida."
+		"descriptionRequired": "Por favor, proporcione una descripción válida.",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toCreate": "para crear una discusión"
 	},
 	"ProposalType": {
 		"discussion": "Discusión",
@@ -600,6 +603,38 @@
 		"twitter": "Twitter",
 		"matrix": "Matrix",
 		"setIdentity": "Establecer identidad",
-		"onChainIdentity": "Identidad en cadena"
+		"onChainIdentity": "Identidad en cadena",
+		"identityDescription1": "Polkadot ofrece identidades en cadena que verifican las credenciales de los usuarios a través de registradores designados, generando mayor confianza y apoyo.",
+		"identityDescription2": "Una vez verificados con éxito, los usuarios reciben una marca de verificación verde, simbolizando su estado de confianza. Este símbolo de estado verificado mejora la credibilidad al solicitar fondos del tesoro o participar en discusiones y propuestas.",
+		"letBegin": "Empecemos",
+		"requestJudgement": "Solicitar Evaluación (Próximamente)",
+		"minimumDeposit": "Depósito Mínimo",
+		"registrarFee": "Tarifa del Registrador",
+		"totalAmountRequired": "Cantidad Total Requerida",
+		"viewAmountBreakup": "Ver Desglose del Monto",
+		"registrarFees": "Tarifas de registro"
+	},
+	"BatchVote": {
+		"batchVoting": "Votación por lotes",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toVote": "para votar",
+		"setDefaults": "Establecer valores predeterminados",
+		"vote": "Votar",
+		"noProposalsAvailable": "No hay propuestas disponibles",
+		"skip": "Omitir",
+		"aye": "Sí",
+		"nay": "No",
+		"abstain": "Abstención",
+		"chooseYourVote": "Elige tu voto",
+		"setConviction": "Establecer convicción",
+		"noItemsInVoteCart": "No hay elementos en el carrito de votación",
+		"confirmBatchVoting": "Confirmar votación por lotes",
+		"save": "Guardar",
+		"editVote": "Editar voto",
+		"next": "Siguiente",
+		"totalProposals": "Propuestas totales",
+		"viewCart": "Ver carrito",
+		"proposals": "Propuestas"
 	}
 }

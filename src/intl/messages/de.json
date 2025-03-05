@@ -546,7 +546,10 @@
 		},
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel an.",
 		"titlePlaceholder": "Titel eingeben",
-		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an."
+		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an.",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toCreate": "um eine Diskussion zu erstellen"
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",
@@ -601,6 +604,38 @@
 		"twitter": "Twitter",
 		"matrix": "Matrix",
 		"setIdentity": "Identität festlegen",
-		"onChainIdentity": "On-Chain-Identität"
+		"onChainIdentity": "On-Chain-Identität",
+		"identityDescription1": "Polkadot bietet On-Chain-Identitäten, die die Anmeldeinformationen der Benutzer durch ernannte Registrare überprüfen und dadurch größeres Vertrauen und Unterstützung schaffen.",
+		"identityDescription2": "Nach erfolgreicher Überprüfung erhalten Benutzer ein grünes Häkchen als Symbol für ihren vertrauenswürdigen Status. Dieses Verifizierungssymbol erhöht die Vertrauenswürdigkeit bei der Beantragung von Mitteln aus der Treasury oder der Teilnahme an Diskussionen und Vorschlägen.",
+		"letBegin": "Lass uns beginnen",
+		"requestJudgement": "Urteil anfordern (Demnächst verfügbar)",
+		"minimumDeposit": "Mindesteinzahlung",
+		"registrarFee": "Registrierungsgebühr",
+		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
+		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
+		"registrarFees": "Registrierungsgebühren"
+	},
+	"BatchVote": {
+		"batchVoting": "Stapelabstimmung",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toVote": "zum Abstimmen",
+		"setDefaults": "Standards festlegen",
+		"vote": "Abstimmen",
+		"noProposalsAvailable": "Keine Vorschläge verfügbar",
+		"skip": "Überspringen",
+		"aye": "Ja",
+		"nay": "Nein",
+		"abstain": "Enthaltung",
+		"chooseYourVote": "Wählen Sie Ihre Stimme",
+		"setConviction": "Überzeugung festlegen",
+		"noItemsInVoteCart": "Keine Elemente im Abstimmungskorb",
+		"confirmBatchVoting": "Stapelabstimmung bestätigen",
+		"save": "Speichern",
+		"editVote": "Abstimmung bearbeiten",
+		"next": "Weiter",
+		"totalProposals": "Gesamtvorschläge",
+		"viewCart": "Warenkorb anzeigen",
+		"proposals": "Vorschläge"
 	}
 }

@@ -15,7 +15,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, EVoteDecision } from '@shared/types';
+import { ENetwork, EVoteDecision, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -194,6 +194,55 @@ export class PolkadotApiService {
 				waitTillFinalizedHash: true
 			});
 		}
+	}
+
+	async batchVoteReferendum({
+		address,
+		voteCartItems,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		voteCartItems: IVoteCartItem[];
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+	}) {
+		if (!this.api) return;
+
+		const voteTxList = voteCartItems.map((voteCartItem) => {
+			let voteTx: SubmittableExtrinsic<'promise'> | null = null;
+			const vote = voteCartItem.decision;
+			const ayeVoteValue = voteCartItem.amount.aye;
+			const nayVoteValue = voteCartItem.amount.nay;
+			const abstainVoteValue = voteCartItem.amount.abstain;
+			const referendumId = voteCartItem.postIndexOrHash;
+			const { conviction } = voteCartItem;
+			if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && (ayeVoteValue || nayVoteValue)) {
+				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
+					Standard: { balance: vote === EVoteDecision.AYE ? ayeVoteValue : nayVoteValue, vote: { aye: vote === EVoteDecision.AYE, conviction } }
+				});
+			} else if (vote === EVoteDecision.SPLIT) {
+				voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
+			} else if (vote === EVoteDecision.ABSTAIN && ayeVoteValue && nayVoteValue) {
+				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
+					SplitAbstain: { abstain: `${abstainVoteValue?.toString()}`, aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` }
+				});
+			}
+			if (voteTx) {
+				return voteTx;
+			}
+			return null;
+		});
+
+		const tx = this.api.tx.utility.batchAll(voteTxList);
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to batch vote',
+			waitTillFinalizedHash: true,
+			onSuccess,
+			onFailed
+		});
 	}
 
 	private async executeTx({

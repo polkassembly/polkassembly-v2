@@ -17,7 +17,7 @@ import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
 import Address from '../Profile/Address/Address';
 
-function AddressDropdown({ onChange, withBalance }: { onChange?: (account: InjectedAccount) => void; withBalance?: boolean }) {
+function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (account: InjectedAccount) => void; withBalance?: boolean; disabled?: boolean }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
 	const walletService = useWalletService();
@@ -68,19 +68,23 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 	) : (
 		<DropdownMenu>
 			<div>
-				<div className='mb-1 flex items-center justify-between'>
+				<div className='mb-1 flex items-center justify-between gap-x-12'>
 					<p className='text-sm text-wallet_btn_text'>{t('AddressDropdown.chooseLinkedAccount')}</p>
 					{withBalance && <Balance address={userPreferences?.address?.address || ''} />}
 				</div>
-				<DropdownMenuTrigger className={classes.dropdownTrigger}>
+				<DropdownMenuTrigger
+					disabled={disabled}
+					className={classes.dropdownTrigger}
+				>
 					<Address
 						address={userPreferences?.address?.address || ''}
 						walletAddressName={userPreferences?.address?.name || ''}
 						iconSize={25}
+						redirectToProfile={false}
 					/>
 				</DropdownMenuTrigger>
 			</div>
-			<DropdownMenuContent className='max-h-[300px] min-w-[500px] overflow-y-auto border-0'>
+			<DropdownMenuContent className='max-h-[300px] overflow-y-auto border-0'>
 				{accounts.map((item) => (
 					<DropdownMenuItem key={item.address}>
 						<button
@@ -93,6 +97,7 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: Injec
 								address={item.address}
 								walletAddressName={item.name}
 								iconSize={25}
+								redirectToProfile={false}
 							/>
 						</button>
 					</DropdownMenuItem>
