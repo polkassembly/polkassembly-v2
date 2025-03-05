@@ -80,23 +80,14 @@ function ActivityFeedPostItem({
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
-	const handleContainerClick = (e: React.MouseEvent) => {
-		if (!(e.target instanceof Element)) return;
-
-		const isExcludedSection =
-			e.target.closest(`.${styles.castVoteButton}`) || e.target.closest('[data-reaction-handler="true"]') || e.target.closest('[data-comment-input="true"]');
-
-		if (!isExcludedSection) {
-			router.push(`/referenda/${postData.index}`);
-		}
-	};
-
 	return (
-		<div
-			aria-hidden='true'
-			onClick={preventClick ? undefined : handleContainerClick}
-			className={styles.container}
-		>
+		<div className={styles.container}>
+			{!preventClick && (
+				<Link
+					href={`/referenda/${postData.index}`}
+					className='absolute left-0 top-0 z-20 h-full w-full rounded-xl'
+				/>
+			)}
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center text-wallet_btn_text'>
@@ -119,7 +110,7 @@ function ActivityFeedPostItem({
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
 				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
-					<div>
+					<div className='relative z-50'>
 						{user?.id ? (
 							<Dialog>
 								<DialogTrigger asChild>
@@ -141,7 +132,10 @@ function ActivityFeedPostItem({
 								</DialogTitle>
 							</Dialog>
 						) : (
-							<Link href='/login'>
+							<Link
+								href='/login'
+								className='relative z-50'
+							>
 								<span className={`${styles.castVoteButton} cursor-pointer`}>
 									<Image
 										src={VoteIcon}
@@ -196,7 +190,7 @@ function ActivityFeedPostItem({
 				</div>
 				<Link
 					href={`/referenda/${postData.index}`}
-					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
+					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
 				>
 					{t('ActivityFeed.PostItem.readMore')}
 				</Link>
@@ -231,6 +225,7 @@ function ActivityFeedPostItem({
 					aria-hidden='true'
 					onClick={(e) => e.stopPropagation()}
 					data-comment-input='true'
+					className='relative z-50'
 				>
 					<ReactionHandler
 						postData={postData}
