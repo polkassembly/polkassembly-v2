@@ -32,7 +32,8 @@ import {
 	EAllowedCommentor,
 	EOffChainPostTopic,
 	IVoteCartItem,
-	EConvictionAmount
+	EConvictionAmount,
+	IDelegationStats
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -90,7 +91,8 @@ enum EApiRoute {
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
-	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART'
+	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
+	GET_DELEGATION_STATS = 'GET_DELEGATION_STATS'
 }
 
 export class NextApiClientService {
@@ -156,6 +158,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.GET_DELEGATION_STATS:
+				path = '/delegation/stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -692,5 +697,10 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async getDelegationStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATION_STATS });
+		return this.nextApiClientFetch<IDelegationStats>({ url, method });
 	}
 }

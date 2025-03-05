@@ -8,8 +8,58 @@ import tokens from '@assets/delegation/tokens.svg';
 import votes from '@assets/delegation/votes.svg';
 import delegates from '@assets/delegation/delegates.svg';
 import delegatees from '@assets/delegation/delegatees.svg';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useEffect, useState } from 'react';
+import { BN, formatBalance } from '@polkadot/util';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ENetwork } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+
+const ZERO_BN = new BN(0);
 
 function DelegationSupplyData() {
+	const { apiService } = usePolkadotApiService();
+	const network = getCurrentNetwork();
+	const [totalSupply, setTotalSupply] = useState<BN>(ZERO_BN);
+	const [isReady, setIsReady] = useState(false);
+
+	useEffect(() => {
+		const fetchSupply = async () => {
+			if (!apiService) return;
+
+			try {
+				await apiService.apiReady();
+				setIsReady(true);
+
+				const supply = await apiService.getDelegationTotalSupply();
+				if (supply) {
+					setTotalSupply(supply);
+				}
+			} catch (err) {
+				console.error('Error fetching total supply:', err);
+			}
+		};
+
+		fetchSupply();
+	}, [apiService]);
+
+	const formattedSupply = isReady
+		? formatUSDWithUnits(
+				parseFloat(
+					formatBalance(totalSupply, {
+						decimals: NETWORKS_DETAILS[network as ENetwork]?.tokenDecimals,
+						forceUnit: NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol,
+						withAll: false,
+						withUnit: false,
+						withZero: false
+					}).replaceAll(',', '')
+				)
+					.toFixed(2)
+					.toString(),
+				2
+			)
+		: '0';
 	return (
 		<div className='mt-5 flex flex-wrap gap-3 rounded-lg bg-bg_modal p-4 shadow-lg lg:gap-5'>
 			<div className='flex items-center gap-3'>
@@ -21,7 +71,7 @@ function DelegationSupplyData() {
 				<div className='flex flex-col'>
 					<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Supply</p>
 					<p className='text-xl font-semibold'>
-						1.53B <span className='text-sm text-wallet_btn_text'>DOT</span>
+						{formattedSupply} <span className='text-sm text-wallet_btn_text'>{NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol}</span>
 					</p>
 				</div>
 			</div>

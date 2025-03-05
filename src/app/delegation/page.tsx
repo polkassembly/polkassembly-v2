@@ -4,8 +4,12 @@
 
 import React from 'react';
 import Delegation from './Components/index';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
 
-function DelegationPage() {
+async function DelegationPage() {
+	const { data: delegationStats } = await NextApiClientService.getDelegationStats();
+	console.log(delegationStats);
+
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 lg:p-10'>
 			<Delegation />
