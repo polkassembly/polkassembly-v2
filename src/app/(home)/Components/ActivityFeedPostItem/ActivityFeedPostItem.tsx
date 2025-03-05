@@ -28,12 +28,12 @@ import { usePostReactions } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
+import NProgress from 'nprogress';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
-import NProgress from 'nprogress';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
