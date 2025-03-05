@@ -55,8 +55,6 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
-	// TODO: Add sentiment to the comment via AI
-
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
 		indexOrHash: index,
@@ -69,6 +67,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
+	const updatedComment = await AIService.UpdateCommentSentiment(newComment.id);
 
 	// Invalidate caches since comment count changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
@@ -76,7 +75,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
-	const response = NextResponse.json(newComment);
+	const response = NextResponse.json(updatedComment ?? newComment);
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

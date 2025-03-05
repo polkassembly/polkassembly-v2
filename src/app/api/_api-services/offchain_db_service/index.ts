@@ -489,8 +489,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
-		return FirestoreService.UpdateComment({ commentId, content, isSpam });
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam, aiSentiment });
 	}
 
 	static async DeleteComment(commentId: string) {

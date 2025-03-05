@@ -942,7 +942,7 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newCommentData: Partial<IComment> = {
@@ -950,6 +950,7 @@ export class FirestoreService extends FirestoreUtils {
 			htmlContent: html,
 			markdownContent: markdown,
 			...(isSpam && { isSpam }),
+			...(aiSentiment && { aiSentiment }),
 			updatedAt: new Date()
 		};
 

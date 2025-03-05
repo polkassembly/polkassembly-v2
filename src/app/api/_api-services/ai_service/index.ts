@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { ENetwork, EProposalType, IBeneficiary, ICommentResponse, IContentSummary, IOnChainPostInfo } from '@/_shared/types';
+import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo } from '@/_shared/types';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -48,11 +48,11 @@ export class AIService {
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
     Analyze the sentiment and provide a breakdown in the following format:
 
-    Overall X% of users are feeling optimistic. [Summarize main positive points]
+    Users feeling optimistic say: [Summarize main positive points]
 
-    Overall Y% of users are feeling neutral. [Summarize neutral/questioning points]
+    Users feeling neutral say: [Summarize neutral/questioning points]
 
-    Overall Z% of users are feeling against it. [Summarize main concerns]
+    Users feeling against say: [Summarize main concerns]
 
     Important technical points raised:
     - [List key technical discussions]
@@ -84,7 +84,14 @@ export class AIService {
     - Consider the technical nature of governance discussions when evaluating.
     - A post being controversial or having strong opinions does not make it spam.
     - Return ONLY ONE WORD, either 'true' or 'false' without ANY additional text or explanation.
-  `
+		`,
+		COMMENT_SENTIMENT_ANALYSIS: `
+		You are a helpful assistant that analyzes the sentiment of given comment on a post on the Polkadot governance forum Polkassembly.
+		Return the sentiment as either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+
+		STRICT RULES:
+		- Return ONLY ONE WORD either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+		`
 	} as const;
 
 	private static async getAIResponse(prompt: string): Promise<string | null> {
@@ -267,6 +274,22 @@ export class AIService {
 		return response?.toLowerCase() === 'true';
 	}
 
+	private static async getCommentSentiment({ mdContent }: { mdContent: string }): Promise<ECommentSentiment | null> {
+		if (!mdContent) {
+			return null;
+		}
+
+		const fullPrompt = `${this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS}\n\nAnalyze the following comment:\n\n${mdContent}\n\n`;
+
+		const response = await this.getAIResponse(fullPrompt);
+
+		if (!response || typeof response !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(response.toLowerCase())) {
+			return null;
+		}
+
+		return response.toLowerCase() as ECommentSentiment;
+	}
+
 	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
 
@@ -368,5 +391,22 @@ export class AIService {
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
 
 		return updatedContentSummary;
+	}
+
+	static async UpdateCommentSentiment(commentId: string): Promise<IComment | null> {
+		const comment = await OffChainDbService.GetCommentById(commentId);
+
+		if (!comment) return null;
+
+		const sentiment = await this.getCommentSentiment({ mdContent: comment.markdownContent });
+
+		if (!sentiment) return null;
+
+		await OffChainDbService.UpdateComment({ commentId, content: comment.content, aiSentiment: sentiment });
+
+		return {
+			...comment,
+			aiSentiment: sentiment
+		};
 	}
 }

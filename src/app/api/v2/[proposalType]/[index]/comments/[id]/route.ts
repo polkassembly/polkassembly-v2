@@ -74,12 +74,14 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const network = await getNetworkFromHeaders();
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType: comment.proposalType, indexOrHash: comment.indexOrHash, newCommentId: comment.id });
+	await AIService.UpdateCommentSentiment(comment.id);
 
 	// Invalidate caches since comment content changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
+
 	const response = NextResponse.json({ message: 'Comment updated successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));

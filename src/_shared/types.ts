@@ -580,6 +580,7 @@ export interface IComment {
 	dataSource: EDataSource;
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
+	aiSentiment?: ECommentSentiment;
 }
 
 export interface ICommentResponse extends IComment {
