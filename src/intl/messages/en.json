@@ -656,5 +656,17 @@
 		"totalProposals": "Total Proposals",
 		"viewCart": "View Cart",
 		"proposals": "Proposals"
+	},
+	"TooltipContent": {
+		"voteSuccess": "Your vote has been cast successfully",
+		"voteFailed": "Your vote has not been cast successfully",
+		"voteAbstain": "You have abstained from voting",
+		"voteAye": "You have voted in favor of the proposal",
+		"voteNay": "You have voted against the proposal",
+		"voteSuccessTitle": "Vote Successful",
+		"voteFailedTitle": "Vote Failed",
+		"voteAbstainTitle": "Vote Abstain",
+		"voteAyeTitle": "Vote Aye",
+		"voteNayTitle": "Vote Nay"
 	}
 }

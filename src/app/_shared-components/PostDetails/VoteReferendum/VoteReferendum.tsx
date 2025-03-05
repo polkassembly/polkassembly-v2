@@ -51,16 +51,16 @@ function VoteReferendum({ index }: { index: string }) {
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
 					toast({
-						title: 'Vote successful',
-						description: 'Your vote has been cast successfully',
+						title: t('TooltipContent.voteSuccessTitle'),
+						description: t('TooltipContent.voteSuccess'),
 						status: NotificationType.SUCCESS
 					});
 					setIsLoading(false);
 				},
 				onFailed: () => {
 					toast({
-						title: 'Vote failed',
-						description: 'Your vote has not been cast successfully',
+						title: t('TooltipContent.voteFailedTitle'),
+						description: t('TooltipContent.voteFailed'),
 						status: NotificationType.ERROR
 					});
 					setIsLoading(false);

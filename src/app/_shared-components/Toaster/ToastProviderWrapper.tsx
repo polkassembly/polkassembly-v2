@@ -10,20 +10,14 @@ import { IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io';
 import { MdInfoOutline } from 'react-icons/md';
 import styles from './Toaster.module.scss';
 
-const getIconForStatus = (status: NotificationType) => {
-	switch (status) {
-		case NotificationType.SUCCESS:
-			return <FaCircleCheck className={styles.toast_success_icon} />;
-		case NotificationType.ERROR:
-			return <IoIosCloseCircle className={styles.toast_error_icon} />;
-		case NotificationType.WARNING:
-			return <IoIosInformationCircle className={styles.toast_warning_icon} />;
-		case NotificationType.INFO:
-			return <MdInfoOutline className={styles.toast_info_icon} />;
-		default:
-			return null;
-	}
-};
+const ICON_MAP = {
+	[NotificationType.SUCCESS]: <FaCircleCheck className={styles.toast_success_icon} />,
+	[NotificationType.ERROR]: <IoIosCloseCircle className={styles.toast_error_icon} />,
+	[NotificationType.WARNING]: <IoIosInformationCircle className={styles.toast_warning_icon} />,
+	[NotificationType.INFO]: <MdInfoOutline className={styles.toast_info_icon} />
+} as const;
+
+const getIconForStatus = (status: NotificationType) => ICON_MAP[status as keyof typeof ICON_MAP] ?? null;
 
 export function ToastProviderWrapper() {
 	const { toasts } = useToast();
