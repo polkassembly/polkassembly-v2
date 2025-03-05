@@ -22,22 +22,23 @@ import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 function ActivityFeedPostList({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
-
 	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
 	const observerTarget = useRef<HTMLDivElement>(null);
 
-	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
 		const formattedOrigin = origin === 'All' ? undefined : [origin];
-		const { data, error } = await NextApiClientService.fetchActivityFeed({ page: pageParam, origins: formattedOrigin, limit: DEFAULT_LISTING_LIMIT });
+		const { data, error } = await NextApiClientService.fetchActivityFeed({
+			page: pageParam,
+			origins: formattedOrigin,
+			limit: DEFAULT_LISTING_LIMIT
+		});
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
 		return { ...data, page: pageParam };
 	};
 
-	// Infinite query
-	const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
+	const { data, isLoading, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery({
 		queryKey: ['activityFeed', origin],
 		queryFn: getExploreActivityFeed,
 		initialPageParam: 1,
@@ -51,7 +52,8 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 			}
 			return undefined;
 		},
-		staleTime: SLATE_TIME
+		staleTime: SLATE_TIME,
+		enabled: !!origin
 	});
 
 	const allPosts = data?.pages?.flatMap((page) => page.items || []).filter((post): post is IPostListing => post !== undefined);
@@ -59,7 +61,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 	useEffect(() => {
 		const observer = new IntersectionObserver(
 			(entries) => {
-				if (entries[0].isIntersecting && !isLoading && hasNextPage) {
+				if (entries[0].isIntersecting && !isLoading && hasNextPage && !isFetching) {
 					fetchNextPage();
 				}
 			},
@@ -71,19 +73,18 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 		}
 
 		return () => observer.disconnect();
-	}, [isLoading, hasNextPage, fetchNextPage]);
+	}, [isLoading, hasNextPage, fetchNextPage, isFetching]);
+
 	const filteredPosts = useMemo(() => {
 		if (origin === 'All') return allPosts;
 
 		return allPosts?.filter((post: IPostListing) => {
-			if (!(network in NETWORKS_DETAILS)) {
-				return false;
-			}
+			if (!(network in NETWORKS_DETAILS)) return false;
 			const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
 			if (!networkInfo) return false;
 
-			const trackName = Object.keys(networkInfo.trackDetails).find((key) => post?.onChainInfo?.origin === key);
-			return trackName === origin;
+			const postOrigin = post?.onChainInfo?.origin;
+			return postOrigin === origin;
 		});
 	}, [allPosts, origin, network]);
 

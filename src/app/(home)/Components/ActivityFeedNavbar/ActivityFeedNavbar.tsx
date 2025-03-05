@@ -45,7 +45,6 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 			[TREASURY_CATEGORY]: TreasuryIcon,
 			[WHITELIST_CATEGORY]: WhitelistedCallerIcon
 		}),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[t]
 	);
 
@@ -90,10 +89,8 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 			}
 		});
 
-		// Remove empty categories
-		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === t('ActivityFeed.Navbar.All')));
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [trackInfo, t]);
+		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === ALL_CATEGORY));
+	}, [trackInfo, t, ALL_CATEGORY]);
 
 	const formatTrackName = (name: string) => {
 		return name.replace(/([A-Z])/g, ' $1').trim();
@@ -144,7 +141,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
 										<span className='ml-1'>{category}</span>
-										{tracks?.length > 1 && (
+										{tracks?.length > 0 && (
 											<span className='ml-0.5'>
 												<FaAngleDown />
 											</span>
