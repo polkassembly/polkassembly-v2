@@ -602,4 +602,18 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static TOTAL_DELEGATATION_STATS = `
+		query DelegationStats ($type_eq:DelegationType!=OpenGov){
+			totalDelegatedVotes: convictionDelegatedVotesConnection(orderBy: id_ASC, where: {removedAtBlock_isNull: true}) {
+				totalCount
+			}
+		votingDelegations(where: {endedAtBlock_isNull: true, type_eq:$type_eq}) {
+				from
+				to
+				balance
+				track
+			}
+		}
+	`;
 }

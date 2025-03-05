@@ -3,11 +3,13 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import {
+	EDelegationType,
 	ENetwork,
 	EPostOrigin,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
@@ -404,5 +406,20 @@ export class SubsquidService extends SubsquidUtils {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
 		};
+	}
+
+	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<IDelegationStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.TOTAL_DELEGATATION_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: type }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain total delegation stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain total delegation stats from Subsquid');
+		}
+
+		return subsquidData;
 	}
 }

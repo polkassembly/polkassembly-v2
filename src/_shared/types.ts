@@ -844,3 +844,22 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }
+
+export interface IDelegationStats {
+	votingDelegations?: {
+		balance: string;
+		to: string;
+		from: string;
+	}[];
+	totalDelegatedBalance: string;
+	totalDelegatedVotes: {
+		totalCount: number;
+	};
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export enum EDelegationType {
+	OPEN_GOV = 'OpenGov',
+	DEMOCRACY = 'Democracy'
+}
