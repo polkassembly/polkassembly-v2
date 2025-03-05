@@ -87,7 +87,8 @@ function ActivityFeedPostItem({
 			e.target.closest(`.${styles.castVoteButton}`) ||
 			e.target.closest('[data-reaction-handler="true"]') ||
 			e.target.closest('[data-comment-input="true"]') ||
-			e.target.closest('[role="dialog"]');
+			e.target.closest('[role="dialog"]') ||
+			e.target.closest('[data-comment-modal="true"]');
 
 		if (!isExcludedSection && !preventClick) {
 			router.push(`/referenda/${postData.index}`);
@@ -252,6 +253,7 @@ function ActivityFeedPostItem({
 			)}
 
 			<CommentModal
+				data-comment-modal='true'
 				isDialogOpen={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
 				postData={postData}
