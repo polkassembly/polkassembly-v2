@@ -89,7 +89,9 @@ function ActivityFeedPostItem({
 			e.target.closest('[data-reaction-handler="true"]') ||
 			e.target.closest('[data-comment-input="true"]') ||
 			e.target.closest('[role="dialog"]') ||
-			e.target.closest('[data-comment-modal="true"]');
+			e.target.closest('[data-comment-modal="true"]') ||
+			e.target.closest('[role="presentation"]') ||
+			e.target.closest('button[type="button"]');
 
 		if (!isExcludedSection && !preventClick) {
 			NProgress.start();
