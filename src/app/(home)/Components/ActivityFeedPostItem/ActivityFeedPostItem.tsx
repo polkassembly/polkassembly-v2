@@ -84,9 +84,12 @@ function ActivityFeedPostItem({
 		if (!(e.target instanceof Element)) return;
 
 		const isExcludedSection =
-			e.target.closest(`.${styles.castVoteButton}`) || e.target.closest('[data-reaction-handler="true"]') || e.target.closest('[data-comment-input="true"]');
+			e.target.closest(`.${styles.castVoteButton}`) ||
+			e.target.closest('[data-reaction-handler="true"]') ||
+			e.target.closest('[data-comment-input="true"]') ||
+			e.target.closest('[role="dialog"]');
 
-		if (!isExcludedSection) {
+		if (!isExcludedSection && !preventClick) {
 			router.push(`/referenda/${postData.index}`);
 		}
 	};
