@@ -121,7 +121,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 					[
 						...baseConfig.initalItems,
 						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
-						{ title: t('Sidebar.delegation'), url: '#', icon: Delegation },
+						{ title: t('Sidebar.delegation'), url: '/delegation', icon: Delegation },
 						{
 							title: t('Sidebar.bounty'),
 							url: '',

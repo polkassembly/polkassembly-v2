@@ -1,0 +1,7 @@
+.delegation_title {
+    @apply text-btn_secondary_text text-2xl font-semibold;
+}
+
+.tooltipContent {
+    @apply relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg;
+}

@@ -34,9 +34,9 @@ function LeadboardRow({ user, isCurrentUser, isBottom = false }: TableRowProps) 
 					className='flex items-center gap-x-2'
 				>
 					<Image
-						src={UserIcon}
+						src={user.profileDetails.image !== '' ? user.profileDetails.image : UserIcon}
 						alt='User Icon'
-						className='h-6 w-6'
+						className='h-6 w-6 rounded-full'
 						width={20}
 						height={20}
 					/>
