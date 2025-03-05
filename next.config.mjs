@@ -11,7 +11,7 @@ const nextConfig = {
 		domains: ['i.ibb.co']
 	},
 	compiler: {
-		removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false
+		removeConsole: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? { exclude: ['error'] } : false
 	}
 };
 
