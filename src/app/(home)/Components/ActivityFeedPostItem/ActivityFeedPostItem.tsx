@@ -33,6 +33,7 @@ import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionHandler from '../ReactionHandler';
+import NProgress from 'nprogress';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -91,6 +92,7 @@ function ActivityFeedPostItem({
 			e.target.closest('[data-comment-modal="true"]');
 
 		if (!isExcludedSection && !preventClick) {
+			NProgress.start();
 			router.push(`/referenda/${postData.index}`);
 		}
 	};
