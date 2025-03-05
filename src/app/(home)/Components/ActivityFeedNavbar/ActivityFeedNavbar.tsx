@@ -5,7 +5,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
@@ -24,7 +24,6 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
-	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
@@ -45,6 +44,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 			[TREASURY_CATEGORY]: TreasuryIcon,
 			[WHITELIST_CATEGORY]: WhitelistedCallerIcon
 		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[t]
 	);
 
@@ -90,19 +90,21 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		});
 
 		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === ALL_CATEGORY));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [trackInfo, t, ALL_CATEGORY]);
 
 	const formatTrackName = (name: string) => {
 		return name.replace(/([A-Z])/g, ' $1').trim();
 	};
 
-	const handleCategoryClick = (category: string) => {
+	const handleCategoryClick = (category: string, tracks: EPostOrigin[]) => {
 		if (category === ALL_CATEGORY) {
 			setCurrentTab('All');
 		} else if ([ROOT_CATEGORY, WISH_FOR_CHANGE_CATEGORY].includes(category)) {
 			setCurrentTab(category as EPostOrigin);
-		} else {
-			setExpandedCategory(expandedCategory === category ? null : category);
+		} else if (tracks.length > 0) {
+			// For categories with tracks, rely on Popover to handle dropdown
+			// No need to manually toggle expandedCategory here
 		}
 	};
 
@@ -126,31 +128,29 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 				{Object.entries(categoryStructure).map(([category, tracks]) => (
 					<Popover key={category}>
 						<PopoverTrigger asChild>
-							<div className='flex-shrink-0'>
-								<button
-									type='button'
-									className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
-									onClick={() => handleCategoryClick(category)}
-								>
-									<span className='flex items-center whitespace-nowrap'>
-										<Image
-											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
-											alt={category}
-											width={20}
-											height={20}
-											className={cn('h-5 w-5', styles.darkIcon)}
-										/>
-										<span className='ml-1'>{category}</span>
-										{tracks?.length > 0 && (
-											<span className='ml-0.5'>
-												<FaAngleDown />
-											</span>
-										)}
-									</span>
-								</button>
-							</div>
+							<button
+								type='button'
+								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
+								onClick={() => handleCategoryClick(category, tracks)}
+							>
+								<span className='flex items-center whitespace-nowrap'>
+									<Image
+										src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
+										alt={category}
+										width={20}
+										height={20}
+										className={cn('h-5 w-5', styles.darkIcon)}
+									/>
+									<span className='ml-1'>{category}</span>
+									{tracks?.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY && (
+										<span className='ml-0.5'>
+											<FaAngleDown />
+										</span>
+									)}
+								</span>
+							</button>
 						</PopoverTrigger>
-						{expandedCategory === category && tracks && tracks.length > 0 && (
+						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY && (
 							<PopoverContent
 								sideOffset={5}
 								className={styles.popoverContent}

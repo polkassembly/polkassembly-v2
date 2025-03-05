@@ -13,7 +13,7 @@
 }
 
 .popoverContent {
-    @apply w-52 border-primary_border bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
+    @apply w-52 border-primary_border animate-none bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
 }
 
 .trackName {
