@@ -90,7 +90,6 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 	return (
 		<div className='pb-10'>
 			<ActivityFeedNavbar
-				gov2LatestPosts={allPosts || []}
 				currentTab={origin}
 				setCurrentTab={setOrigin}
 			/>

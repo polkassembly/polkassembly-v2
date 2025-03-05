@@ -4,7 +4,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
+import { ENetwork, EPostOrigin } from '@/_shared/types';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
@@ -20,15 +20,7 @@ import { FaAngleDown } from 'react-icons/fa';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
-function ActivityFeedNavbar({
-	gov2LatestPosts,
-	currentTab,
-	setCurrentTab
-}: {
-	gov2LatestPosts: IPostListing[];
-	currentTab: EPostOrigin | 'All';
-	setCurrentTab: (tab: EPostOrigin | 'All') => void;
-}) {
+function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
@@ -117,11 +109,6 @@ function ActivityFeedNavbar({
 		}
 	};
 
-	const getPostCount = (origin: EPostOrigin) => {
-		const count = gov2LatestPosts?.filter((post: IPostListing) => post?.onChainInfo?.origin === origin).length || 0;
-		return count > 0 ? `(${count})` : '';
-	};
-
 	const isActiveCategory = (category: string, tracks: EPostOrigin[]) => {
 		if (currentTab === category) return true;
 		return tracks.some((track) => currentTab === track);
@@ -179,7 +166,7 @@ function ActivityFeedNavbar({
 												className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
 												onClick={() => setCurrentTab(track)}
 											>
-												{formatTrackName(track)} {getPostCount(track)}
+												{formatTrackName(track)}
 											</button>
 										</div>
 									))}
