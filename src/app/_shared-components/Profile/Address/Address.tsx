@@ -79,7 +79,7 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 							/>
 						</div>
 					</TooltipTrigger>
-					<TooltipContent className={`${classes.tooltipContent} bg-address_tooltip_bg w-[340px]`}>
+					<TooltipContent className={`${classes.tooltipContent} w-[340px] bg-address_tooltip_bg`}>
 						<AddressTooltipContent
 							address={encodedAddress}
 							redirectionUrl={redirectionUrl}
