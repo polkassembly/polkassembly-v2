@@ -83,6 +83,7 @@ function ActivityFeedPostItem({
 
 	const handleContainerClick = (e: React.MouseEvent) => {
 		if (!(e.target instanceof Element)) return;
+		const isAnyDialogOpen = document.querySelector('[role="dialog"]') !== null;
 
 		const isExcludedSection =
 			e.target.closest(`.${styles.castVoteButton}`) ||
@@ -91,7 +92,10 @@ function ActivityFeedPostItem({
 			e.target.closest('[role="dialog"]') ||
 			e.target.closest('[data-comment-modal="true"]') ||
 			e.target.closest('[role="presentation"]') ||
-			e.target.closest('button[type="button"]');
+			e.target.closest('button[type="button"]') ||
+			e.target.closest('[data-radix-popper-content-wrapper]') ||
+			isAnyDialogOpen ||
+			isDialogOpen;
 
 		if (!isExcludedSection && !preventClick) {
 			NProgress.start();
@@ -104,6 +108,7 @@ function ActivityFeedPostItem({
 			aria-hidden='true'
 			onClick={preventClick ? undefined : handleContainerClick}
 			className={styles.container}
+			data-activity-feed-item='true'
 		>
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
@@ -129,7 +134,7 @@ function ActivityFeedPostItem({
 				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
 					<div>
 						{user?.id ? (
-							<Dialog>
+							<Dialog data-dialog='vote-dialog'>
 								<DialogTrigger asChild>
 									<span className={`${styles.castVoteButton} cursor-pointer`}>
 										<Image
