@@ -31,7 +31,7 @@ const getUserRedirection = (network: string, address: string, username?: string)
 	return username?.length ? `https://${network}.polkassembly.io/user/${username}` : address?.length ? `https://${network}.polkassembly.io/address/${address}` : null;
 };
 
-const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile }: AddressProps) => {
+function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile }: AddressProps) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 
@@ -91,6 +91,6 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 			</TooltipProvider>
 		</div>
 	);
-});
+}
 
-export default Address;
+export default memo(Address);

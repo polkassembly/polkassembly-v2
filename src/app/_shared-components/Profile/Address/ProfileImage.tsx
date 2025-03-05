@@ -7,17 +7,19 @@ import { memo } from 'react';
 import ProfileAvatar from '@assets/profile/user-icon.svg';
 import classes from './AddressInline/AddressInline.module.scss';
 
-const ProfileImage = memo(({ imageUrl }: { imageUrl?: string }) => (
-	<div className={classes.profileImageContainer}>
-		<Image
-			src={imageUrl || ProfileAvatar}
-			alt='User'
-			className={classes.profileImage}
-			width={98}
-			height={98}
-			priority
-		/>
-	</div>
-));
+function ProfileImage({ imageUrl }: { imageUrl?: string }) {
+	return (
+		<div className={classes.profileImageContainer}>
+			<Image
+				src={imageUrl || ProfileAvatar}
+				alt='User'
+				className={classes.profileImage}
+				width={98}
+				height={98}
+				priority
+			/>
+		</div>
+	);
+}
 
-export default ProfileImage;
+export default memo(ProfileImage);

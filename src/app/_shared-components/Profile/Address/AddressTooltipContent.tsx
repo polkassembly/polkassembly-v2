@@ -33,7 +33,7 @@ const LoadingState = memo(() => (
 	</div>
 ));
 
-const AddressTooltipContent = memo(({ address, redirectionUrl, displayText, identity }: AddressTooltipContentProps) => {
+function AddressTooltipContent({ address, redirectionUrl, displayText, identity }: AddressTooltipContentProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const { user: currentUser } = useUser();
@@ -198,6 +198,6 @@ const AddressTooltipContent = memo(({ address, redirectionUrl, displayText, iden
 	};
 
 	return <div>{renderContent()}</div>;
-});
+}
 
-export default AddressTooltipContent;
+export default memo(AddressTooltipContent);

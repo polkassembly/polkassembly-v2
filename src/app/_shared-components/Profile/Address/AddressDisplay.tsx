@@ -8,20 +8,20 @@ import { memo } from 'react';
 import { IOnChainIdentity } from '@/_shared/types';
 import AddressInline from './AddressInline/AddressInline';
 
-const AddressDisplay = memo(
-	({
-		address,
-		displayText,
-		redirectionUrl,
-		onCopy,
-		identity
-	}: {
-		address: string;
-		displayText: string;
-		redirectionUrl: string | null;
-		onCopy: (text: string) => void;
-		identity?: IOnChainIdentity;
-	}) => (
+function AddressDisplay({
+	address,
+	displayText,
+	redirectionUrl,
+	onCopy,
+	identity
+}: {
+	address: string;
+	displayText: string;
+	redirectionUrl: string | null;
+	onCopy: (text: string) => void;
+	identity?: IOnChainIdentity;
+}) {
+	return (
 		<div className='flex w-full flex-col gap-1.5'>
 			<div className='mt-0 flex items-center justify-start gap-2'>
 				<div
@@ -57,7 +57,7 @@ const AddressDisplay = memo(
 				</div>
 			</div>
 		</div>
-	)
-);
+	);
+}
 
-export default AddressDisplay;
+export default memo(AddressDisplay);

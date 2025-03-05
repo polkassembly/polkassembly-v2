@@ -5,7 +5,7 @@
 import { useTranslations } from 'next-intl';
 import { memo } from 'react';
 
-const UserStats = memo(({ followers, following }: { followers?: number; following?: number }) => {
+function UserStats({ followers, following }: { followers?: number; following?: number }) {
 	const t = useTranslations();
 
 	return (
@@ -19,6 +19,6 @@ const UserStats = memo(({ followers, following }: { followers?: number; followin
 			</p>
 		</div>
 	);
-});
+}
 
-export default UserStats;
+export default memo(UserStats);
