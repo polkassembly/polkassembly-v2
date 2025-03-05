@@ -635,5 +635,28 @@
 		"totalAmountRequired": "必要総額",
 		"viewAmountBreakup": "金額の内訳を表示",
 		"registrarFees": "登録手数料"
+	},
+	"BatchVote": {
+		"batchVoting": "一括投票",
+		"please": "お願いします",
+		"login": "ログイン",
+		"toVote": "して投票する",
+		"setDefaults": "デフォルトを設定",
+		"vote": "投票",
+		"noProposalsAvailable": "提案がありません",
+		"skip": "スキップ",
+		"aye": "賛成",
+		"nay": "反対",
+		"abstain": "棄権",
+		"chooseYourVote": "投票を選択",
+		"setConviction": "確信度を設定",
+		"noItemsInVoteCart": "投票カートにアイテムがありません",
+		"confirmBatchVoting": "一括投票を確認",
+		"save": "保存",
+		"editVote": "投票を編集",
+		"next": "次へ",
+		"totalProposals": "提案総数",
+		"viewCart": "カートを見る",
+		"proposals": "提案"
 	}
 }

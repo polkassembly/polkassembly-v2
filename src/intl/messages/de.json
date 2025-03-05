@@ -636,5 +636,28 @@
 		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
 		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
 		"registrarFees": "Registrierungsgebühren"
+	},
+	"BatchVote": {
+		"batchVoting": "Stapelabstimmung",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toVote": "zum Abstimmen",
+		"setDefaults": "Standards festlegen",
+		"vote": "Abstimmen",
+		"noProposalsAvailable": "Keine Vorschläge verfügbar",
+		"skip": "Überspringen",
+		"aye": "Ja",
+		"nay": "Nein",
+		"abstain": "Enthaltung",
+		"chooseYourVote": "Wählen Sie Ihre Stimme",
+		"setConviction": "Überzeugung festlegen",
+		"noItemsInVoteCart": "Keine Elemente im Abstimmungskorb",
+		"confirmBatchVoting": "Stapelabstimmung bestätigen",
+		"save": "Speichern",
+		"editVote": "Abstimmung bearbeiten",
+		"next": "Weiter",
+		"totalProposals": "Gesamtvorschläge",
+		"viewCart": "Warenkorb anzeigen",
+		"proposals": "Vorschläge"
 	}
 }

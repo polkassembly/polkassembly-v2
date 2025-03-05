@@ -452,6 +452,7 @@ export interface IBeneficiary {
 	address: string;
 	amount: string;
 	assetId: string | null;
+	validFromBlock?: string;
 }
 
 export interface IStatusHistoryItem {
@@ -831,6 +832,7 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+	editDisabled?: boolean;
 }
 
 export interface IPostSubscription {
@@ -841,4 +843,8 @@ export interface IPostSubscription {
 	indexOrHash: string;
 	proposalType: EProposalType;
 	userId: number;
+}
+
+export enum EReactQueryKeys {
+	BATCH_VOTE_CART = 'batch-vote-cart'
 }
