@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EProposalType } from '@/_shared/types';
+import { ECommentSentiment, EProposalType } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -47,12 +47,15 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		address: z
 			.string()
 			.refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
-			.optional()
+			.optional(),
+		sentiment: z.nativeEnum(ECommentSentiment).optional()
 	});
 
-	const { content, parentCommentId, address } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, address, sentiment } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
+
+	// TODO: Add sentiment to the comment via AI
 
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
@@ -61,7 +64,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content: formattedContent,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });

@@ -31,7 +31,8 @@ import {
 	IVoteCartItem,
 	EConvictionAmount,
 	EVoteDecision,
-	IPostSubscription
+	IPostSubscription,
+	ECommentSentiment
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -453,7 +454,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -462,6 +464,7 @@ export class OffChainDbService {
 		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
+		sentiment?: ECommentSentiment;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -470,7 +473,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address, sentiment });
 
 		await this.saveUserActivity({
 			userId,
