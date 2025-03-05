@@ -14,6 +14,7 @@ import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { APIError } from '../../_api-utils/apiError';
+import { fetchPostData } from '../../_api-utils/fetchPostData';
 
 if (!IS_AI_ENABLED) {
 	console.log('\n ℹ️ Info: AI service is not enabled, AI content will not be generated and/or included in the api data\n');
@@ -194,13 +195,32 @@ export class AIService {
 		return summaryResponse;
 	}
 
-	private static async getCommentsSummary({ comments }: { comments: ICommentResponse[] }): Promise<string | null> {
+	private static async getCommentsSummary({
+		network,
+		proposalType,
+		postIndexOrHash,
+		comments
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		postIndexOrHash: string;
+		comments: ICommentResponse[];
+	}): Promise<string | null> {
 		if (!comments?.length) {
 			return null;
 		}
 
-		// Construct the prompt with all comments
-		let fullPrompt = `${this.BASE_PROMPTS.COMMENTS_SUMMARY}\n\nAnalyze the following comments:\n\n`;
+		// Construct the prompt
+		let fullPrompt = `${this.BASE_PROMPTS.COMMENTS_SUMMARY}\n\n`;
+
+		// fetch post content
+		const post = await fetchPostData({ network, proposalType, indexOrHash: postIndexOrHash });
+
+		if (post.markdownContent) {
+			fullPrompt += `For a post with the following content:\n${post.markdownContent}\n\n`;
+		}
+
+		fullPrompt += 'Analyze the following comments:\n';
 
 		comments.forEach((comment, index) => {
 			// Use markdown content if available, otherwise convert from content
@@ -329,7 +349,7 @@ export class AIService {
 			}
 		}
 
-		const commentsSummary = await this.getCommentsSummary({ comments: flattenedComments });
+		const commentsSummary = await this.getCommentsSummary({ network, proposalType, postIndexOrHash: indexOrHash, comments: flattenedComments });
 
 		if (!commentsSummary?.trim()) return null;
 
