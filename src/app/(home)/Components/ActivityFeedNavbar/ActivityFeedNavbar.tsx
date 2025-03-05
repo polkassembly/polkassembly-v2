@@ -97,14 +97,11 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		return name.replace(/([A-Z])/g, ' $1').trim();
 	};
 
-	const handleCategoryClick = (category: string, tracks: EPostOrigin[]) => {
+	const handleCategoryClick = (category: string) => {
 		if (category === ALL_CATEGORY) {
 			setCurrentTab('All');
 		} else if ([ROOT_CATEGORY, WISH_FOR_CHANGE_CATEGORY].includes(category)) {
 			setCurrentTab(category as EPostOrigin);
-		} else if (tracks.length > 0) {
-			// For categories with tracks, rely on Popover to handle dropdown
-			// No need to manually toggle expandedCategory here
 		}
 	};
 
@@ -131,7 +128,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 							<button
 								type='button'
 								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
-								onClick={() => handleCategoryClick(category, tracks)}
+								onClick={() => handleCategoryClick(category)}
 							>
 								<span className='flex items-center whitespace-nowrap'>
 									<Image
