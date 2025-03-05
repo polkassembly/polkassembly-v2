@@ -16,7 +16,7 @@ interface Props {
 	address: string;
 	className?: string;
 	onChainIdentity?: IOnChainIdentity;
-	addressDisplayText: string;
+	addressDisplayText?: string;
 	iconSize?: number;
 	showIdenticon?: boolean;
 	textClassName?: string;
