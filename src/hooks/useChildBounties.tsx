@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EProposalStatus, IGenericListingResponse, IPostListing, EPostOrigin } from '@/_shared/types';
 
 export function useChildBounties() {
 	const [expandedRows, setExpandedRows] = useState<number[]>([]);
@@ -48,7 +48,7 @@ export function useChildBounties() {
 							curator: item.onChainInfo?.curator,
 							description: item.onChainInfo?.description ?? '',
 							index: item.onChainInfo?.index ?? 0,
-							origin: item.onChainInfo?.origin ?? '',
+							origin: item.onChainInfo?.origin ?? EPostOrigin.ROOT,
 							proposer: item.onChainInfo?.proposer ?? '',
 							type: item.onChainInfo?.type ?? item.proposalType,
 							hash: item.onChainInfo?.hash ?? ''
