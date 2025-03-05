@@ -16,7 +16,7 @@ const SocialIcons = {
 	[ESocial.RIOT]: SiElement
 };
 
-function SocialLinks({ socialLinks, identity }: { socialLinks: IUserSocialDetails[]; identity: IOnChainIdentity | undefined }) {
+function SocialLinks({ socialLinks = [], identity }: { socialLinks?: IUserSocialDetails[]; identity?: IOnChainIdentity }) {
 	return (
 		<div className='flex items-center gap-x-4'>
 			{socialLinks.map((social) => {
@@ -26,7 +26,7 @@ function SocialLinks({ socialLinks, identity }: { socialLinks: IUserSocialDetail
 						key={social.platform}
 						href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
 						target='_blank'
-						className={`flex h-8 w-8 items-center justify-center rounded-full ${identity?.isGood}) ? 'bg-social_green' : 'bg-social_link'}`}
+						className={`flex h-8 w-8 items-center justify-center rounded-full ${identity?.isGood ? 'bg-social_green' : 'bg-social_link'}`}
 						rel='noreferrer'
 					>
 						<IconComponent className='text-white' />

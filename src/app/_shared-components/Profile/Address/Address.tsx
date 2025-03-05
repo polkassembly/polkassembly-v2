@@ -120,8 +120,8 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 
 	const stats = useMemo(
 		() => ({
-			following: followingData?.following.length || 0,
-			followers: followersData?.followers.length || 0
+			following: followingData?.following.length,
+			followers: followersData?.followers.length
 		}),
 		[followingData, followersData]
 	);
@@ -130,41 +130,48 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 
 	const copyToClipboard = useCallback((text: string) => {
 		navigator.clipboard.writeText(text);
+		// TODO: Add toast notification
 	}, []);
 
 	const followUser = useCallback(async () => {
 		if (!currentUser?.id || currentUser.id === userData?.id || !userData) return;
 		setLoading(true);
-		const { data, error } = await UserProfileClientService.followUser({ userId: userData.id });
-		setLoading(false);
 
-		if (data && !error) {
-			queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
-				followers: [
-					...(oldData?.followers || []),
-					{
-						id: String(userData.id),
-						createdAt: userData.createdAt ?? new Date(),
-						followerUserId: currentUser.id,
-						followedUserId: userData.id,
-						updatedAt: new Date()
-					}
-				]
-			}));
+		const { data, error } = await UserProfileClientService.followUser({ userId: userData.id });
+		if (!data || error) {
+			setLoading(false);
+			return;
 		}
+
+		queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
+			followers: [
+				...(oldData?.followers || []),
+				{
+					id: String(userData.id),
+					createdAt: new Date(),
+					followerUserId: currentUser.id,
+					followedUserId: userData.id,
+					updatedAt: new Date()
+				}
+			]
+		}));
+		setLoading(false);
 	}, [currentUser, userData, queryClient]);
 
 	const unfollowUser = useCallback(async () => {
 		if (!currentUser?.id || currentUser.id === userData?.id || !userData) return;
 		setLoading(true);
-		const { data, error } = await UserProfileClientService.unfollowUser({ userId: userData.id });
-		setLoading(false);
 
-		if (data && !error) {
-			queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
-				followers: oldData?.followers.filter((item) => item.followerUserId !== currentUser.id) || []
-			}));
+		const { data, error } = await UserProfileClientService.unfollowUser({ userId: userData.id });
+		if (!data || error) {
+			setLoading(false);
+			return;
 		}
+
+		queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
+			followers: oldData?.followers.filter((item) => item.followerUserId !== currentUser.id) || []
+		}));
+		setLoading(false);
 	}, [currentUser, userData, queryClient]);
 
 	const handleMouseEnter = useCallback(async () => {
@@ -208,7 +215,7 @@ const Address = memo(({ className, address, truncateCharLen = 5, iconSize = 20, 
 							/>
 						</div>
 					</TooltipTrigger>
-					<TooltipContent className={cn(classes.tooltipContent, 'w-[340px] bg-address_tooltip_bg')}>
+					<TooltipContent className={cn(classes.tooltipContent, 'bg-address_tooltip_bg w-[340px]')}>
 						{isLoadingData ? (
 							<div className='flex w-full items-center justify-center p-4'>
 								<div className='h-6 w-6 animate-spin rounded-full border-b-2 border-text_pink' />

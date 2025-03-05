@@ -20,8 +20,8 @@ interface AddressTooltipContentProps {
 	address: string;
 	userData?: IPublicUser;
 	identity?: IOnChainIdentity;
-	followers: number;
-	following: number;
+	followers?: number;
+	following?: number;
 	isFollowing: boolean;
 	redirectionUrl: string | null;
 	onCopy: (address: string) => void;
@@ -44,7 +44,7 @@ const ProfileImage = memo(({ imageUrl }: { imageUrl?: string }) => (
 	</div>
 ));
 
-const UserStats = memo(({ followers, following }: { followers: number; following: number }) => {
+const UserStats = memo(({ followers, following }: { followers?: number; following?: number }) => {
 	const t = useTranslations();
 
 	return (
@@ -115,7 +115,7 @@ const AddressTooltipContent = memo(
 												</div>
 												<div className='mt-0.5 flex items-center justify-between gap-1 border-solid px-2 dark:border-none'>
 													{userData.createdAt && (
-														<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
+														<span className='text-address_tooltip_text flex items-center text-xs tracking-wide'>
 															{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 														</span>
 													)}
@@ -144,7 +144,7 @@ const AddressTooltipContent = memo(
 											/>
 										)}
 										<SocialLinks
-											identity={identity ?? undefined}
+											identity={identity}
 											socialLinks={userData.profileDetails?.publicSocialLinks || []}
 										/>
 									</div>
