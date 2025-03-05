@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ECommentSentiment, EProposalType } from '@/_shared/types';
+import { ECommentSentiment, EProposalType, IComment } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -67,7 +67,12 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
-	const updatedComment = await AIService.UpdateCommentSentiment(newComment.id);
+
+	// if sentiment is not provided, update the sentiment using AI
+	let updatedComment: IComment | null = null;
+	if (!sentiment) {
+		updatedComment = await AIService.UpdateCommentSentiment(newComment.id);
+	}
 
 	// Invalidate caches since comment count changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });

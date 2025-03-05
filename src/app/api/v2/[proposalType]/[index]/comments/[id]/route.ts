@@ -74,7 +74,9 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	const network = await getNetworkFromHeaders();
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType: comment.proposalType, indexOrHash: comment.indexOrHash, newCommentId: comment.id });
-	await AIService.UpdateCommentSentiment(comment.id);
+	if (!comment.sentiment) {
+		await AIService.UpdateCommentSentiment(comment.id);
+	}
 
 	// Invalidate caches since comment content changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
