@@ -217,7 +217,7 @@ export class FirestoreService extends FirestoreUtils {
 		return this.GetUserById(addressData.userId);
 	}
 
-	static async getAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
 		const substrAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
 
 		if (!substrAddress) {
@@ -1250,6 +1250,11 @@ export class FirestoreService extends FirestoreUtils {
 		if (voteCartItem.docs.length) {
 			await voteCartItem.docs[0].ref.delete();
 		}
+	}
+
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		const voteCartItems = await FirestoreUtils.voteCartItemsCollectionRef().where('userId', '==', userId).get();
+		await Promise.all(voteCartItems.docs.map((doc) => doc.ref.delete()));
 	}
 
 	static async UpdateVoteCartItem({
