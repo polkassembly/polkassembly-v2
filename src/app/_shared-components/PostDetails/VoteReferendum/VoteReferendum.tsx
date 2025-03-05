@@ -51,16 +51,16 @@ function VoteReferendum({ index }: { index: string }) {
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
 					toast({
-						title: t('TooltipContent.voteSuccessTitle'),
-						description: t('TooltipContent.voteSuccess'),
+						title: t('VoteReferendum.voteSuccessTitle'),
+						description: t('VoteReferendum.voteSuccess'),
 						status: NotificationType.SUCCESS
 					});
 					setIsLoading(false);
 				},
 				onFailed: () => {
 					toast({
-						title: t('TooltipContent.voteFailedTitle'),
-						description: t('TooltipContent.voteFailed'),
+						title: t('VoteReferendum.voteFailedTitle'),
+						description: t('VoteReferendum.voteFailed'),
 						status: NotificationType.ERROR
 					});
 					setIsLoading(false);
