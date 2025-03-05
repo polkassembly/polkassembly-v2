@@ -555,6 +555,14 @@ export enum EListingTab {
 	POLKASSEMBLY = 'POLKASSEMBLY'
 }
 
+export enum ECommentSentiment {
+	AGAINST = 'against',
+	SLIGHTLY_AGAINST = 'slightly_against',
+	NEUTRAL = 'neutral',
+	SLIGHTLY_FOR = 'slightly_for',
+	FOR = 'for'
+}
+
 export interface IComment {
 	id: string;
 	createdAt: Date;
@@ -571,6 +579,8 @@ export interface IComment {
 	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
+	sentiment?: ECommentSentiment;
+	aiSentiment?: ECommentSentiment;
 }
 
 export interface ICommentResponse extends IComment {
