@@ -344,4 +344,10 @@ export class PolkadotApiService {
 				onFailed(error?.toString?.() || errorMessageFallback);
 			});
 	}
+
+	async getDelegationTotalSupply() {
+		const totalIssuance = (await this.api?.query?.balances?.totalIssuance()) as unknown as BN;
+		const inactiveIssuance = (await this.api?.query?.balances?.inactiveIssuance()) as unknown as BN;
+		return totalIssuance.sub(inactiveIssuance);
+	}
 }
