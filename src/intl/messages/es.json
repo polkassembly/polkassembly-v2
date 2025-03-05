@@ -644,5 +644,28 @@
 		"spendPeriodRemaining": "Período de Gasto Restante",
 		"nextBurn": "Próxima Quema",
 		"nextBurnInfo": "Si la Tesorería termina un período de gasto sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos."
+	},
+	"BatchVote": {
+		"batchVoting": "Votación por lotes",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toVote": "para votar",
+		"setDefaults": "Establecer valores predeterminados",
+		"vote": "Votar",
+		"noProposalsAvailable": "No hay propuestas disponibles",
+		"skip": "Omitir",
+		"aye": "Sí",
+		"nay": "No",
+		"abstain": "Abstención",
+		"chooseYourVote": "Elige tu voto",
+		"setConviction": "Establecer convicción",
+		"noItemsInVoteCart": "No hay elementos en el carrito de votación",
+		"confirmBatchVoting": "Confirmar votación por lotes",
+		"save": "Guardar",
+		"editVote": "Editar voto",
+		"next": "Siguiente",
+		"totalProposals": "Propuestas totales",
+		"viewCart": "Ver carrito",
+		"proposals": "Propuestas"
 	}
 }

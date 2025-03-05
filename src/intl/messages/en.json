@@ -664,5 +664,28 @@
 		"spendPeriodRemaining": "Spend Period Remaining",
 		"nextBurn": "Next Burn",
 		"nextBurnInfo": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds."
+	},
+	"BatchVote": {
+		"batchVoting": "Batch Voting",
+		"please": "Please",
+		"login": "Login",
+		"toVote": "to Vote",
+		"setDefaults": "Set Defaults",
+		"vote": "Vote",
+		"noProposalsAvailable": "No proposals available",
+		"skip": "Skip",
+		"aye": "Aye",
+		"nay": "Nay",
+		"abstain": "Abstain",
+		"chooseYourVote": "Choose your Vote",
+		"setConviction": "Set Conviction",
+		"noItemsInVoteCart": "No items in the vote cart",
+		"confirmBatchVoting": "Confirm Batch Voting",
+		"save": "Save",
+		"editVote": "Edit Vote",
+		"next": "Next",
+		"totalProposals": "Total Proposals",
+		"viewCart": "View Cart",
+		"proposals": "Proposals"
 	}
 }

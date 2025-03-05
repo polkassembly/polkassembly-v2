@@ -15,7 +15,7 @@ import { Signer } from '@polkadot/types/types';
 import { BN, BN_MILLION, BN_ZERO, u8aConcat, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { ENetwork, EVoteDecision } from '@shared/types';
+import { ENetwork, EVoteDecision, IVoteCartItem } from '@shared/types';
 import { blockToDays, blockToTime, getDaysTimeObj } from '@shared/_utils/blockTimeCalculations';
 import { formatBnBalance } from '../_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '../_client-utils/formatUSDWithUnits';
@@ -289,6 +289,55 @@ export class PolkadotApiService {
 		}
 	}
 
+	async batchVoteReferendum({
+		address,
+		voteCartItems,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		voteCartItems: IVoteCartItem[];
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+	}) {
+		if (!this.api) return;
+
+		const voteTxList = voteCartItems.map((voteCartItem) => {
+			let voteTx: SubmittableExtrinsic<'promise'> | null = null;
+			const vote = voteCartItem.decision;
+			const ayeVoteValue = voteCartItem.amount.aye;
+			const nayVoteValue = voteCartItem.amount.nay;
+			const abstainVoteValue = voteCartItem.amount.abstain;
+			const referendumId = voteCartItem.postIndexOrHash;
+			const { conviction } = voteCartItem;
+			if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && (ayeVoteValue || nayVoteValue)) {
+				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
+					Standard: { balance: vote === EVoteDecision.AYE ? ayeVoteValue : nayVoteValue, vote: { aye: vote === EVoteDecision.AYE, conviction } }
+				});
+			} else if (vote === EVoteDecision.SPLIT) {
+				voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
+			} else if (vote === EVoteDecision.ABSTAIN && ayeVoteValue && nayVoteValue) {
+				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
+					SplitAbstain: { abstain: `${abstainVoteValue?.toString()}`, aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` }
+				});
+			}
+			if (voteTx) {
+				return voteTx;
+			}
+			return null;
+		});
+
+		const tx = this.api.tx.utility.batchAll(voteTxList);
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to batch vote',
+			waitTillFinalizedHash: true,
+			onSuccess,
+			onFailed
+		});
+	}
+
 	private async executeTx({
 		tx,
 		address,
@@ -314,7 +363,7 @@ export class PolkadotApiService {
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
 	}) {
-		let isSuccess = false;
+		let isFailed = false;
 		if (!this.api || !tx) return;
 
 		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
@@ -345,7 +394,7 @@ export class PolkadotApiService {
 					for (const { event } of events) {
 						if (event.method === 'ExtrinsicSuccess') {
 							setStatus?.('Transaction Success');
-							isSuccess = true;
+							isFailed = false;
 							if (!waitTillFinalizedHash) {
 								// eslint-disable-next-line no-await-in-loop
 								await onSuccess(txHash);
@@ -356,7 +405,7 @@ export class PolkadotApiService {
 							console.log('Transaction failed');
 							setStatus?.('Transaction failed');
 							const dispatchError = (event.data as any)?.dispatchError;
-							isSuccess = false;
+							isFailed = true;
 
 							if (dispatchError?.isModule) {
 								const errorModule = (event.data as any)?.dispatchError?.asModule;
@@ -377,7 +426,7 @@ export class PolkadotApiService {
 					console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
 					console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
 					setIsTxFinalized?.(txHash.toString());
-					if (isSuccess && waitTillFinalizedHash) {
+					if (!isFailed && waitTillFinalizedHash) {
 						await onSuccess(txHash);
 					}
 				}

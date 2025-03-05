@@ -36,7 +36,17 @@ import ReactionHandler from '../ReactionHandler';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
-function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
+function ActivityFeedPostItem({
+	postData,
+	voteButton = true,
+	commentBox = true,
+	preventClick
+}: {
+	postData: IPostListing;
+	voteButton?: boolean;
+	commentBox?: boolean;
+	preventClick?: boolean;
+}) {
 	const { user } = useUser();
 	const router = useRouter();
 	const t = useTranslations();
@@ -84,7 +94,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 	return (
 		<div
 			aria-hidden='true'
-			onClick={handleContainerClick}
+			onClick={preventClick ? undefined : handleContainerClick}
 			className={styles.container}
 		>
 			{/* Header Section */}
@@ -108,7 +118,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					</span>
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
 					<div>
 						{user?.id ? (
 							<Dialog>
@@ -177,7 +187,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
+				<div className='flex max-h-40 w-full overflow-hidden border-none'>
 					<BlockEditor
 						data={postData.content}
 						readOnly
@@ -216,25 +226,27 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<div
-				aria-hidden='true'
-				onClick={(e) => e.stopPropagation()}
-				data-comment-input='true'
-			>
-				<ReactionHandler
-					postData={postData}
-					setIsDialogOpen={setIsDialogOpen}
-					reactionState={reactionState}
-					showLikeGif={showLikeGif}
-					showDislikeGif={showDislikeGif}
-					handleReaction={handleReaction}
-				/>
+			{commentBox && (
+				<div
+					aria-hidden='true'
+					onClick={(e) => e.stopPropagation()}
+					data-comment-input='true'
+				>
+					<ReactionHandler
+						postData={postData}
+						setIsDialogOpen={setIsDialogOpen}
+						reactionState={reactionState}
+						showLikeGif={showLikeGif}
+						showDislikeGif={showDislikeGif}
+						handleReaction={handleReaction}
+					/>
 
-				<CommentInput
-					inputRef={inputRef as RefObject<HTMLInputElement>}
-					onClick={handleCommentClick}
-				/>
-			</div>
+					<CommentInput
+						inputRef={inputRef as RefObject<HTMLInputElement>}
+						onClick={handleCommentClick}
+					/>
+				</div>
+			)}
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}
