@@ -137,7 +137,7 @@ function toast({ duration = 4.5, status, ...props }: Toast) {
 			variant: status,
 			id,
 			open: true,
-			onOpenChange: (open) => {
+			onOpenChange: (open: boolean) => {
 				if (!open) dismiss();
 			}
 		}

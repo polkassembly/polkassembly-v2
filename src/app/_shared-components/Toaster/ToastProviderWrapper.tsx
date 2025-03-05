@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/useToast';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
 import { NotificationType } from '@/_shared/types';
 import { FaCircleCheck } from 'react-icons/fa6';
-import { IoIosCloseCircle, IoIosInformationCircle, IoIosCloseCircleOutline } from 'react-icons/io';
+import { IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io';
 import { MdInfoOutline } from 'react-icons/md';
 import styles from './Toaster.module.scss';
 
@@ -20,10 +20,6 @@ const getIconForStatus = (status: NotificationType) => {
 			return <IoIosInformationCircle className={styles.toast_warning_icon} />;
 		case NotificationType.INFO:
 			return <MdInfoOutline className={styles.toast_info_icon} />;
-		case NotificationType.CAUTION:
-			return <MdInfoOutline className={styles.toast_warning_icon} />;
-		case NotificationType.CRITICAL_ERROR:
-			return <IoIosCloseCircleOutline className={styles.toast_error_icon} />;
 		default:
 			return null;
 	}

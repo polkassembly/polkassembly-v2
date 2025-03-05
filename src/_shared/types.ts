@@ -828,10 +828,8 @@ export interface IVoteCartItem {
 }
 
 export enum NotificationType {
-	SUCCESS = 'success', // Positive outcome
-	ERROR = 'error', // Basic error state
-	CRITICAL_ERROR = 'critical_error', // Formerly ERRORV2 - for more severe errors
-	WARNING = 'warning', // Basic warning state
-	CAUTION = 'caution', // Formerly WARNINGV2 - for more notable warnings
-	INFO = 'info' // Neutral information
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info'
 }
