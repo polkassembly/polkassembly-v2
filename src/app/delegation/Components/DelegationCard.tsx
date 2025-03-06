@@ -5,6 +5,7 @@
 import Address from '@ui/Profile/Address/Address';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { IoPersonAdd } from 'react-icons/io5';
+import { IDelegate } from '@/_shared/types';
 import PlatformLogos, { getPlatformStyles } from './PlatformLogos';
 
 interface DelegateData {
@@ -44,7 +45,8 @@ const delegateData: DelegateData[] = [
 	}
 ];
 
-function DelegationCard() {
+function DelegationCard({ delegates }: { delegates: IDelegate[] }) {
+	console.log(delegates);
 	return (
 		<div className='mt-5 rounded-lg bg-bg_modal p-4 shadow-lg'>
 			<div className='flex items-center gap-2'>

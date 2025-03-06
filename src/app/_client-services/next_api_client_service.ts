@@ -33,7 +33,8 @@ import {
 	EOffChainPostTopic,
 	IVoteCartItem,
 	EConvictionAmount,
-	IDelegationStats
+	IDelegationStats,
+	IDelegate
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -92,7 +93,8 @@ enum EApiRoute {
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
-	GET_DELEGATION_STATS = 'GET_DELEGATION_STATS'
+	GET_DELEGATION_STATS = 'GET_DELEGATION_STATS',
+	GET_DELEGATES = 'GET_DELEGATES'
 }
 
 export class NextApiClientService {
@@ -161,6 +163,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_DELEGATION_STATS:
 				path = '/delegation/stats';
+				break;
+			case EApiRoute.GET_DELEGATES:
+				path = '/delegation';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -702,5 +707,10 @@ export class NextApiClientService {
 	static async getDelegationStats() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATION_STATS });
 		return this.nextApiClientFetch<IDelegationStats>({ url, method });
+	}
+
+	static async getDelegates() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATES });
+		return this.nextApiClientFetch<IDelegate[]>({ url, method });
 	}
 }

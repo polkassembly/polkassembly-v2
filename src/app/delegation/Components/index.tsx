@@ -6,6 +6,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
 import { useUser } from '@/hooks/useUser';
+import { IDelegate, IDelegationStats } from '@/_shared/types';
 import styles from './Delegation.module.scss';
 import DelegationSupplyData from './DelegationSupplyData';
 import DelegationCard from './DelegationCard';
@@ -17,14 +18,14 @@ enum EDelegationTab {
 	MY_DELEGATION = 'My Delegation'
 }
 
-function Delegation() {
+function Delegation({ delegationStats, delegates }: { delegationStats: IDelegationStats; delegates: IDelegate[] }) {
 	const { user } = useUser();
 	const dashboardContent = (
 		<div>
 			<h1 className={styles.delegation_title}>Delegation</h1>
 			<DelegationPopupCard />
-			<DelegationSupplyData />
-			<DelegationCard />
+			<DelegationSupplyData delegationStats={delegationStats} />
+			<DelegationCard delegates={delegates} />
 		</div>
 	);
 

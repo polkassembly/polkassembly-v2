@@ -13,16 +13,15 @@ import { useEffect, useState } from 'react';
 import { BN, formatBalance } from '@polkadot/util';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork } from '@/_shared/types';
+import { ENetwork, IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 const ZERO_BN = new BN(0);
 
-function DelegationSupplyData() {
+function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegationStats }) {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [totalSupply, setTotalSupply] = useState<BN>(ZERO_BN);
-	const [isReady, setIsReady] = useState(false);
 
 	useEffect(() => {
 		const fetchSupply = async () => {
@@ -30,7 +29,6 @@ function DelegationSupplyData() {
 
 			try {
 				await apiService.apiReady();
-				setIsReady(true);
 
 				const supply = await apiService.getDelegationTotalSupply();
 				if (supply) {
@@ -44,24 +42,29 @@ function DelegationSupplyData() {
 		fetchSupply();
 	}, [apiService]);
 
-	const formattedSupply = isReady
-		? formatUSDWithUnits(
-				parseFloat(
-					formatBalance(totalSupply, {
-						decimals: NETWORKS_DETAILS[network as ENetwork]?.tokenDecimals,
-						forceUnit: NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol,
-						withAll: false,
-						withUnit: false,
-						withZero: false
-					}).replaceAll(',', '')
-				)
-					.toFixed(2)
-					.toString(),
-				2
+	const parseBalance = (balance: string, decimals: number, withUnit: boolean, network: ENetwork) => {
+		let readableBalance = formatUSDWithUnits(
+			parseFloat(
+				formatBalance(balance, {
+					decimals: NETWORKS_DETAILS[network as ENetwork]?.tokenDecimals,
+					forceUnit: NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol,
+					withAll: false,
+					withUnit: false,
+					withZero: false
+				}).replaceAll(',', '')
 			)
-		: '0';
+				.toFixed(2)
+				.toString(),
+			decimals
+		);
+		if (withUnit) {
+			readableBalance = `${readableBalance} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol}`;
+		}
+		return readableBalance;
+	};
+
 	return (
-		<div className='mt-5 flex flex-wrap gap-3 rounded-lg bg-bg_modal p-4 shadow-lg lg:gap-5'>
+		<div className='mt-5 flex flex-wrap justify-between gap-3 rounded-lg bg-bg_modal p-6 shadow-lg lg:gap-5'>
 			<div className='flex items-center gap-3'>
 				<Image
 					src={DOT}
@@ -70,9 +73,7 @@ function DelegationSupplyData() {
 				/>
 				<div className='flex flex-col'>
 					<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Supply</p>
-					<p className='text-xl font-semibold'>
-						{formattedSupply} <span className='text-sm text-wallet_btn_text'>{NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol}</span>
-					</p>
+					<p className='text-xl font-semibold'>{parseBalance(totalSupply.toString(), 2, true, network)}</p>
 				</div>
 			</div>
 			<div className='border-l border-border_grey pl-5'>
@@ -84,9 +85,7 @@ function DelegationSupplyData() {
 					/>
 					<div className='flex flex-col'>
 						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Delegated Tokens</p>
-						<p className='text-xl font-semibold'>
-							679.6K <span className='text-sm text-wallet_btn_text'>DOT</span>
-						</p>
+						<p className='text-xl font-semibold'>{parseBalance(delegationStats.totalDelegatedBalance, 2, true, network)}</p>
 					</div>
 				</div>
 			</div>
@@ -99,9 +98,7 @@ function DelegationSupplyData() {
 					/>
 					<div className='flex flex-col'>
 						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegated Votes</p>
-						<p className='text-xl font-semibold'>
-							123.6K <span className='text-sm text-wallet_btn_text'>DOT</span>
-						</p>
+						<p className='text-xl font-semibold'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes.totalCount.toString()))}</p>
 					</div>
 				</div>
 			</div>
@@ -114,9 +111,7 @@ function DelegationSupplyData() {
 					/>
 					<div className='flex flex-col'>
 						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegates</p>
-						<p className='text-xl font-semibold'>
-							108 <span className='text-sm text-wallet_btn_text'>DOT</span>
-						</p>
+						<p className='text-xl font-semibold'>{delegationStats?.totalDelegates}</p>
 					</div>
 				</div>
 			</div>
@@ -129,9 +124,7 @@ function DelegationSupplyData() {
 					/>
 					<div className='flex flex-col'>
 						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegatees</p>
-						<p className='text-xl font-semibold'>
-							21,203 <span className='text-sm text-wallet_btn_text'>DOT</span>
-						</p>
+						<p className='text-xl font-semibold'>{delegationStats?.totalDelegators}</p>
 					</div>
 				</div>
 			</div>
