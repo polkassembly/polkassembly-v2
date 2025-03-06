@@ -25,7 +25,7 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 	const { user } = useUser();
 	const menuItems = [
 		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
+		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: user?.id ? '/create/proposal' : '/login?nextUrl=create/proposal' },
 		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: user?.id ? '/create/discussion' : '/login?nextUrl=create/discussion' }
 	];
 

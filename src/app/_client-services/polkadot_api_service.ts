@@ -10,12 +10,13 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { Signer } from '@polkadot/types/types';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { getTypeDef } from '@polkadot/types';
+import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
+import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, EVoteDecision, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EVoteDecision, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -189,6 +190,7 @@ export class PolkadotApiService {
 				tx: voteTx,
 				address,
 				errorMessageFallback: 'Failed to vote',
+				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed
 			});
@@ -343,5 +345,195 @@ export class PolkadotApiService {
 				console.error('ERROR:', error);
 				onFailed(error?.toString?.() || errorMessageFallback);
 			});
+	}
+
+	getApiSectionOptions() {
+		if (!this.api) {
+			return [];
+		}
+
+		return Object.keys(this.api.tx)
+			.filter((s) => !s.startsWith('$'))
+			.sort()
+			.filter((name) => Object.keys(this.api.tx[`${name}`]).length)
+			.map((name) => ({
+				label: name,
+				text: name,
+				value: name
+			}));
+	}
+
+	getApiMethodOptions(sectionName: string) {
+		if (!this.api) {
+			return [];
+		}
+
+		const section = this.api.tx[`${sectionName}`];
+
+		if (!section || Object.keys(section)?.length === 0) {
+			return [];
+		}
+
+		return Object.keys(section)
+			.filter((s) => !s.startsWith('$'))
+			.sort()
+			.map((value) => {
+				const method = section[`${value}`];
+				const inputs = method.meta.args.map((arg: any) => arg.name.toString()).join(', ');
+				return {
+					label: `${value} (${inputs})`,
+					text: value,
+					value
+				};
+			});
+	}
+
+	getParams(sectionName: string, methodName: string) {
+		if (!this.api) {
+			return [];
+		}
+
+		const submittable = this.api.tx[`${sectionName}`][`${methodName}`];
+
+		if (!submittable) {
+			return [];
+		}
+
+		const params = submittable.meta.args.map(
+			({ name, type, typeName }): IParamDef => ({
+				name: name.toString(),
+				type: {
+					...getTypeDef(type.toString()),
+					...(typeName.isSome ? { typeName: typeName.unwrap().toString() } : {})
+				}
+			})
+		);
+
+		console.log('params', params);
+
+		return params;
+	}
+
+	getExtrinsic(sectionName: string, methodName: string) {
+		if (!this.api) {
+			return null;
+		}
+		return this.api.tx[`${sectionName}`][`${methodName}`];
+	}
+
+	getExtrinsicFn(sectionName: string, methodName: string, paramsValues: unknown[]) {
+		if (!this.api) {
+			return null;
+		}
+		return this.api.tx[`${sectionName}`][`${methodName}`](...paramsValues);
+	}
+
+	getExtrinsicHash(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>) {
+		if (!this.api) {
+			return null;
+		}
+
+		const u8a = extrinsicFn.method.toU8a();
+		const inspect = extrinsicFn.method.inspect();
+
+		const encodedTx = extrinsicFn.method.toHex();
+
+		const preimageLength = Math.ceil((encodedTx.length - 2) / 2);
+
+		return {
+			preimageHash: extrinsicFn.registry.hash(u8a).toHex(),
+			inspect,
+			preimage: u8aToHex(u8a),
+			preimageLength
+		};
+	}
+
+	getTreasurySpendLocalExtrinsic(amount: BN, beneficiary: string) {
+		if (!this.api) {
+			return null;
+		}
+		return this.api.tx.treasury.spendLocal(amount.toString(), beneficiary);
+	}
+
+	async notePreimage(address: string, extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>, onSuccess?: () => void, onFailed?: () => void) {
+		if (!this.api) {
+			return;
+		}
+
+		const encodedTx = extrinsicFn.method.toHex();
+		const notePreimageTx = this.api.tx.preimage.notePreimage(encodedTx);
+		await this.executeTx({
+			tx: notePreimageTx,
+			address,
+			errorMessageFallback: 'Failed to note preimage',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: () => {
+				onFailed?.();
+			}
+		});
+	}
+
+	async createTreasuryProposal(
+		address: string,
+		track: string,
+		preimageHash: string,
+		preimageLength: number,
+		enactment: EEnactment,
+		enactmentValue: BN,
+		onSuccess?: (postId: number) => void,
+		onFailed?: () => void
+	) {
+		if (!this.api) {
+			return;
+		}
+		const tx = this.api.tx.referenda.submit(
+			{ Origins: track },
+			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
+			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
+		);
+
+		const postId = Number(await this.api.query.referenda.referendumCount());
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to create treasury proposal',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.(postId);
+			},
+			onFailed: () => {
+				onFailed?.();
+			}
+		});
+	}
+
+	getApiRegistry() {
+		return this.api?.registry;
+	}
+
+	getParamsFromTypeDef(type: TypeDef) {
+		const registry = this.getApiRegistry();
+		const typeDef = getTypeDef(registry.createType(type.type as 'u32').toRawType()) || type;
+
+		console.log('typeDef', typeDef.sub);
+
+		return typeDef.sub
+			? (Array.isArray(typeDef.sub) ? typeDef.sub : [typeDef.sub]).map(
+					(td): IParamDef => ({
+						name: td.name || '',
+						type: td as TypeDef
+					})
+				)
+			: [];
+	}
+
+	async getCurrentBlockNumber() {
+		if (!this.api) {
+			return null;
+		}
+		return this.api.derive.chain.bestNumber();
 	}
 }
