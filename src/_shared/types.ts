@@ -885,11 +885,16 @@ export enum EDelegateSource {
 }
 
 export interface IDelegate {
-	network: ENetwork;
 	address: string;
-	source: EDelegateSource;
-	stats: IDelegateStats;
-	description?: string;
-	name?: string;
-	avatar?: string;
+	dataSource: EDelegateSource[];
+	username?: string;
+	image?: string;
+	bio: string;
+	delegatedBalance: string;
+	receivedDelegationsCount: number;
+	votedProposalCount: {
+		convictionVotesConnection: {
+			totalCount: number;
+		};
+	};
 }

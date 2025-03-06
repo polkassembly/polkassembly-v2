@@ -13,8 +13,15 @@ async function DelegationPage() {
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 lg:p-10'>
 			<Delegation
-				delegationStats={delegationStats ?? {}}
-				delegates={delegates ?? []}
+				delegationStats={
+					delegationStats ?? {
+						totalDelegatedBalance: '0',
+						totalDelegatedVotes: { totalCount: 0 },
+						totalDelegates: 0,
+						totalDelegators: 0
+					}
+				}
+				delegates={delegates?.delegates ?? []}
 			/>
 		</div>
 	);

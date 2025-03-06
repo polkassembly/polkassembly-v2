@@ -711,6 +711,6 @@ export class NextApiClientService {
 
 	static async getDelegates() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATES });
-		return this.nextApiClientFetch<IDelegate[]>({ url, method });
+		return this.nextApiClientFetch<{ delegates: IDelegate[] }>({ url, method });
 	}
 }

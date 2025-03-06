@@ -122,9 +122,9 @@ const getPolkassemblyDelegates = async (network: ENetwork): Promise<IDelegateSou
 	return createDelegateTransformer(DELEGATE_SOURCES.polkassembly)(
 		data.map((delegate: IDelegate) => ({
 			address: delegate.address,
-			[DELEGATE_SOURCES.polkassembly.bioKey]: delegate.description || '',
-			[DELEGATE_SOURCES.polkassembly.usernameKey]: delegate.name || '',
-			[DELEGATE_SOURCES.polkassembly.imageKey!]: delegate.avatar || ''
+			[DELEGATE_SOURCES.polkassembly.bioKey]: delegate.bio || '',
+			[DELEGATE_SOURCES.polkassembly.usernameKey]: delegate.username || '',
+			[DELEGATE_SOURCES.polkassembly.imageKey!]: delegate.image || ''
 		}))
 	);
 };

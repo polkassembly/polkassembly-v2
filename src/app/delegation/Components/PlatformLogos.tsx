@@ -9,56 +9,70 @@ import NovaLogo from '@assets/delegation/nova-wallet.svg';
 import W3FLogo from '@assets/delegation/w3f.svg';
 import Image, { StaticImageData } from 'next/image';
 import { ReactNode } from 'react';
+import { EDelegateSource } from '@/_shared/types';
 
-enum EDelegateSource {
-	PARITY = 'Polkadot',
-	POLKASSEMBLY = 'Polkassembly',
-	W3F = 'W3F',
-	NOVA = 'Nova Wallet',
-	individual = 'Individual'
-}
+const DEFAULT_PLATFORM_STYLE = 'border-navbar_border bg-delegation_card_polkassembly';
 
-export const getPlatformStyles = (platforms: string[]) => {
+export const getPlatformStyles = (platforms: EDelegateSource[]) => {
+	if (!Array.isArray(platforms) || platforms.length === 0) {
+		return DEFAULT_PLATFORM_STYLE;
+	}
+
 	if (platforms.length > 2) {
 		return 'border-wallet_btn_text bg-delegation_bgcard';
 	}
 
-	const platform = platforms[0];
-	switch (platform as EDelegateSource) {
-		case EDelegateSource.POLKASSEMBLY:
-		case EDelegateSource.individual:
-			return 'border-navbar_border bg-delegation_card_polkassembly';
-		case EDelegateSource.PARITY:
+	const platform = String(platforms[0]).toLowerCase();
+	switch (platform) {
+		case 'polkassembly':
+			return DEFAULT_PLATFORM_STYLE;
+		case 'parity':
 			return 'border-delegation_polkadot_border bg-delegation_card_polkadot';
-		case EDelegateSource.W3F:
+		case 'w3f':
 			return 'border-btn_secondary_text bg-delegation_card_w3f';
-		case EDelegateSource.NOVA:
+		case 'nova':
 			return 'border-delegation_nova_border bg-delegation_card_nova';
+		case 'individual':
+		case 'na':
+			return DEFAULT_PLATFORM_STYLE;
 		default:
 			return 'border-wallet_btn_text bg-delegation_bgcard';
 	}
 };
 
-const logoMap: { [key in EDelegateSource]: StaticImageData | ReactNode } = {
-	[EDelegateSource.POLKASSEMBLY]: PALOGO,
-	[EDelegateSource.PARITY]: ParityLogo,
-	[EDelegateSource.NOVA]: NovaLogo,
-	[EDelegateSource.W3F]: W3FLogo,
-	[EDelegateSource.individual]: <FaUser className='text-text_primary' />
+const logoMap: { [key: string]: StaticImageData | ReactNode } = {
+	nova: NovaLogo,
+	parity: ParityLogo,
+	polkassembly: PALOGO,
+	w3f: W3FLogo,
+	individual: <FaUser className='text-text_primary' />,
+	na: <FaUser className='text-text_primary' />
 };
-function PlatformLogos({ platforms }: { platforms: string[] }) {
-	const validPlatforms = platforms.filter((platform) => logoMap[platform as EDelegateSource]);
+
+function PlatformLogos({ platforms }: { platforms: EDelegateSource[] }) {
+	if (!Array.isArray(platforms) || platforms.length === 0) {
+		return (
+			<div className='flex'>
+				<div className='flex items-center gap-1 px-2 lg:gap-2 lg:px-4'>
+					<FaUser className='h-4 w-4 text-text_primary' />
+					<p className='text-sm text-btn_secondary_text'>Individual</p>
+				</div>
+			</div>
+		);
+	}
+
+	const validPlatforms = platforms.map((p) => String(p).toLowerCase()).filter((platform) => logoMap[platform as keyof typeof logoMap]);
 
 	return (
 		<div className='flex'>
 			{validPlatforms.map((platform, index) => {
-				const logo = logoMap[platform as EDelegateSource];
+				const logo = logoMap[platform as keyof typeof logoMap];
 				if (!logo) return null;
 
 				return (
 					<div
 						key={platform}
-						className={`flex items-center gap-1 px-2 lg:gap-2 lg:px-4 ${validPlatforms.length > 2 && index > 0 ? 'border-l border-delegation_card_border' : ''}`}
+						className={`flex items-center gap-1 px-2 lg:gap-2 lg:px-4 ${validPlatforms.length > 1 && index > 0 ? 'border-l border-delegation_card_border' : ''}`}
 					>
 						{typeof logo === 'object' && 'src' in logo ? (
 							<Image
@@ -71,7 +85,7 @@ function PlatformLogos({ platforms }: { platforms: string[] }) {
 						) : (
 							logo
 						)}
-						<p className='text-sm text-btn_secondary_text'>{platform}</p>
+						<p className='text-sm text-btn_secondary_text'>{platform === 'na' ? 'Individual' : platform.charAt(0).toUpperCase() + platform.slice(1)}</p>
 					</div>
 				);
 			})}
