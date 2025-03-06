@@ -93,7 +93,7 @@ export class AIService {
 		STRICT RULES:
 		- Return ONLY ONE WORD either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
 		`,
-		POST_CONTENT_EXTRACTOR: `
+		POST_CONTENT_EXTRACTION: `
 		You are a helpful assistant that extracts the content of a given post on the Polkadot governance forum Polkassembly.
 		Return the following in a JSON format:
 		{
@@ -311,9 +311,9 @@ export class AIService {
 			return null;
 		}
 
-		let fullPrompt = `${this.BASE_PROMPTS.POST_CONTENT_EXTRACTOR}\n\nAnalyze the following content:\n\n`;
+		let fullPrompt = `${this.BASE_PROMPTS.POST_CONTENT_EXTRACTION}\n\n`;
 
-		fullPrompt += `\n\n### Main Content:\n${mdContent}\n\n`;
+		fullPrompt += `\n\nExtract from the following content:\n${mdContent}\n\n`;
 
 		const response = await this.getAIResponse(fullPrompt);
 
@@ -337,6 +337,7 @@ export class AIService {
 				proposerAddress = proposer.startsWith('0x') ? proposer : getSubstrateAddress(proposer) || '';
 			}
 		} catch {
+			// if response is not a valid JSON or the fields returned by the LLM are not valid, discard the response
 			return null;
 		}
 
