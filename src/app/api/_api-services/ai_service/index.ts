@@ -323,6 +323,8 @@ export class AIService {
 
 		if (!postSummary?.trim() && !isSpam) return null;
 
+		// TODO: send appropriate notifications if content is spam
+
 		// check if content summary already exists
 		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
 
