@@ -863,3 +863,33 @@ export enum EDelegationType {
 	OPEN_GOV = 'OpenGov',
 	DEMOCRACY = 'Democracy'
 }
+
+export interface IDelegateData {
+	address: string;
+	[key: string]: string | undefined;
+}
+
+export interface IDelegateStats {
+	address: string;
+	delegatedBalance: string;
+	receivedDelegationsCount: number;
+	votedProposalCount: number;
+}
+
+export enum EDelegateSource {
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly',
+	W3F = 'w3f',
+	NOVA = 'nova',
+	NA = 'individual'
+}
+
+export interface IDelegate {
+	network: ENetwork;
+	address: string;
+	source: EDelegateSource;
+	stats: IDelegateStats;
+	description?: string;
+	name?: string;
+	avatar?: string;
+}

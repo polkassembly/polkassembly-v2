@@ -422,4 +422,34 @@ export class SubsquidService extends SubsquidUtils {
 
 		return subsquidData;
 	}
+
+	static async GetVotesCountForTimespan({ network, address, createdAtGte }: { network: ENetwork; address: string; createdAtGte: Date }): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_VOTES_COUNT_FOR_TIMESPAN;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address, createdAt_gte: createdAtGte }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain votes count for timespan from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes count for timespan from Subsquid');
+		}
+
+		return subsquidData;
+	}
+
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain all track level analytics delegation data from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain all track level analytics delegation data from Subsquid');
+		}
+
+		return subsquidData;
+	}
 }

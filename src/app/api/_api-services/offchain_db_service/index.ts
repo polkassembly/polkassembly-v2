@@ -798,4 +798,8 @@ export class OffChainDbService {
 	static async DeletePostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
 		return FirestoreService.DeletePostSubscription({ network, indexOrHash, proposalType, userId });
 	}
+
+	static async GetAllDelegates(network: ENetwork) {
+		return FirestoreService.GetAllDelegates(network);
+	}
 }

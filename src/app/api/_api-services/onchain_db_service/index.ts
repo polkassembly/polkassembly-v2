@@ -154,4 +154,12 @@ export class OnChainDbService {
 	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<IDelegationStats> {
 		return SubsquidService.GetTotalDelegationStats({ network, type });
 	}
+
+	static async GetVotesCountForTimespan({ network, address, createdAtGte }: { network: ENetwork; address: string; createdAtGte: Date }): Promise<number> {
+		return SubsquidService.GetVotesCountForTimespan({ network, address, createdAtGte });
+	}
+
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+		return SubsquidService.GetAllTrackLevelAnalyticsDelegationData({ network, address });
+	}
 }
