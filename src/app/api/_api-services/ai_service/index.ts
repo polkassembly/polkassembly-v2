@@ -25,6 +25,8 @@ if (IS_AI_ENABLED && !AI_SERVICE_URL.trim()) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'AI_SERVICE_URL is not set');
 }
 
+// TODO: add a retry mechanism for every AI call
+
 export class AIService {
 	private static AI_SERVICE_URL = AI_SERVICE_URL;
 
