@@ -329,7 +329,15 @@ export class AIService {
 
 		// check if response is a valid JSON
 		try {
-			const { beneficiaries, proposer } = JSON.parse(response);
+			// extract js object via regex in case there is noise in the response
+			const jsonRegex = /{[\s\S]*?}/;
+			const jsonResponse = response.match(jsonRegex)?.[0];
+
+			if (!jsonResponse) {
+				return null;
+			}
+
+			const { beneficiaries, proposer } = JSON.parse(jsonResponse);
 
 			if (beneficiaries && Array.isArray(beneficiaries) && beneficiaries.every((address) => ValidatorService.isValidWeb3Address(address))) {
 				beneficiaryAddresses = beneficiaries.map((address) => (address.startsWith('0x') ? address : getSubstrateAddress(address))).filter((address) => address !== null);
