@@ -3,11 +3,13 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import {
+	EDelegationType,
 	ENetwork,
 	EPostOrigin,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
@@ -404,5 +406,79 @@ export class SubsquidService extends SubsquidUtils {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
 		};
+	}
+
+	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<IDelegationStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.TOTAL_DELEGATATION_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: type }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain total delegation stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain total delegation stats from Subsquid');
+		}
+
+		return subsquidData;
+	}
+
+	static async GetVotesCountForTimespan({ network, address, createdAtGte }: { network: ENetwork; address: string; createdAtGte: Date }): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_VOTES_COUNT_FOR_TIMESPAN;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address, createdAt_gte: createdAtGte }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain votes count for timespan from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes count for timespan from Subsquid');
+		}
+
+		return subsquidData;
+	}
+
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address?: string }): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA;
+
+		let subsquidData;
+		let subsquidErr;
+		if (address) {
+			const { data, error } = await gqlClient.query(query, { address }).toPromise();
+			subsquidData = data;
+			subsquidErr = error;
+		} else {
+			const { data, error } = await gqlClient.query(query, {}).toPromise();
+			subsquidData = data;
+			subsquidErr = error;
+		}
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain all track level analytics delegation data from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain all track level analytics delegation data from Subsquid');
+		}
+
+		return subsquidData;
+	}
+
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.ACTIVE_DELEGATIONS_TO_OR_FROM_ADDRESS_FOR_TRACK;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address, track_eq: track }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain active delegations to or from address for track from Subsquid: ${subsquidErr}`);
+			throw new APIError(
+				ERROR_CODES.INTERNAL_SERVER_ERROR,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+				'Error fetching on-chain active delegations to or from address for track from Subsquid'
+			);
+		}
+
+		return subsquidData;
 	}
 }

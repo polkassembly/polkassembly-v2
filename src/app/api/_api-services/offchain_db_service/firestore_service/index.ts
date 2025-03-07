@@ -30,7 +30,8 @@ import {
 	EVoteDecision,
 	EConvictionAmount,
 	IPostSubscription,
-	ECommentSentiment
+	ECommentSentiment,
+	IDelegate
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1311,6 +1312,16 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (postSubscription.docs.length) {
 			await postSubscription.docs[0].ref.delete();
+		}
+	}
+
+	static async GetAllDelegates(network: ENetwork): Promise<IDelegate[]> {
+		try {
+			const delegatesSnapshot = await this.firestoreDb.collection('delegates').doc(network).collection('addresses').get();
+			return delegatesSnapshot.docs.map((doc) => doc.data() as IDelegate);
+		} catch (error) {
+			console.error('Error fetching delegates:', error);
+			return [];
 		}
 	}
 }

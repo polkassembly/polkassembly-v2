@@ -861,3 +861,92 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }
+
+export interface IDelegationStats {
+	votingDelegations?: {
+		balance: string;
+		to: string;
+		from: string;
+	}[];
+	totalDelegatedBalance: string;
+	totalDelegatedVotes: {
+		totalCount: number;
+	};
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export enum EDelegationType {
+	OPEN_GOV = 'OpenGov',
+	DEMOCRACY = 'Democracy'
+}
+
+export interface IDelegateData {
+	address: string;
+	[key: string]: string | undefined;
+}
+
+export interface IDelegateStats {
+	address: string;
+	delegatedBalance: string;
+	receivedDelegationsCount: number;
+	votedProposalCount: number;
+}
+
+export enum EDelegateSource {
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly',
+	W3F = 'w3f',
+	NOVA = 'nova',
+	NA = 'individual'
+}
+
+export interface IDelegate {
+	address: string;
+	dataSource: EDelegateSource[];
+	username?: string;
+	image?: string;
+	bio: string;
+	delegatedBalance: string;
+	receivedDelegationsCount: number;
+	votedProposalCount: {
+		convictionVotesConnection: {
+			totalCount: number;
+		};
+	};
+}
+
+export interface IDelegationData {
+	votingDelegations: Array<{
+		from: string;
+		to: string;
+		balance: string;
+		lockPeriod: number;
+		track: number;
+		__typename: string;
+	}>;
+}
+
+export interface IDelegation {
+	track: number;
+	to: string;
+	from: string;
+	lockPeriod: number;
+	balance: string;
+	createdAt: Date;
+}
+
+export enum ETrackDelegationStatus {
+	ALL = 'all',
+	DELEGATED = 'delegated',
+	RECEIVED_DELEGATION = 'received_delegation',
+	UNDELEGATED = 'undelegated'
+}
+
+export interface ITrackDelegation {
+	track: number;
+	active_proposals_count: number;
+	status: ETrackDelegationStatus[];
+	recieved_delegation_count: number;
+	delegations: IDelegation[];
+}

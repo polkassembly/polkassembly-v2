@@ -55,4 +55,6 @@ export class FirestoreUtils {
 	protected static voteCartItemsCollectionRef = () => this.firestoreDb.collection('vote_cart_items');
 
 	protected static postSubscriptionsCollectionRef = () => this.firestoreDb.collection('post_subscriptions');
+
+	protected static delegatesCollectionRef = () => this.firestoreDb.collection('delegates');
 }

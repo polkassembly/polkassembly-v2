@@ -2,7 +2,19 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostListing, IGenericListingResponse, IVoteCurve, IPreimage } from '@shared/types';
+import {
+	ENetwork,
+	EPostOrigin,
+	EProposalStatus,
+	EProposalType,
+	EVoteDecision,
+	IOnChainPostListing,
+	IGenericListingResponse,
+	IVoteCurve,
+	IPreimage,
+	IDelegationStats,
+	EDelegationType
+} from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
@@ -137,5 +149,21 @@ export class OnChainDbService {
 		network: ENetwork;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
+	}
+
+	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<IDelegationStats> {
+		return SubsquidService.GetTotalDelegationStats({ network, type });
+	}
+
+	static async GetVotesCountForTimespan({ network, address, createdAtGte }: { network: ENetwork; address: string; createdAtGte: Date }): Promise<number> {
+		return SubsquidService.GetVotesCountForTimespan({ network, address, createdAtGte });
+	}
+
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+		return SubsquidService.GetAllTrackLevelAnalyticsDelegationData({ network, address });
+	}
+
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<number> {
+		return SubsquidService.GetActiveDelegationsToOrFromAddressForTrack({ network, address, track });
 	}
 }
