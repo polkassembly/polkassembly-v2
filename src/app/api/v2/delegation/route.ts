@@ -13,12 +13,14 @@ import { OnChainDbService } from '../../_api-services/onchain_db_service';
 import { OffChainDbService } from '../../_api-services/offchain_db_service';
 import { w3fDelegatesKusama, w3fDelegatesPolkadot } from '../../_api-constants/delegateData';
 
-// Types
 export interface IDelegationData {
 	votingDelegations: Array<{
-		balance: string;
-		lockPeriod?: string;
 		from: string;
+		to: string;
+		balance: string;
+		lockPeriod: number;
+		track: number;
+		__typename: string;
 	}>;
 }
 
@@ -38,7 +40,6 @@ export interface IDelegateSourceConfig {
 	url?: (network: ENetwork) => string;
 }
 
-// Constants
 const DELEGATE_SOURCES = {
 	nova: {
 		bioKey: 'shortDescription',
@@ -95,6 +96,7 @@ const mergeDelegates = (sources: IDelegateSource[]): IDelegateSource[] => {
 			delegatesMap.set(delegate.address, delegate);
 		}
 	});
+
 	return Array.from(delegatesMap.values());
 };
 
@@ -129,25 +131,22 @@ const getPolkassemblyDelegates = async (network: ENetwork): Promise<IDelegateSou
 	);
 };
 
-const fetchAllDelegateSources = async (network: ENetwork): Promise<IDelegateSource[]> => {
-	const [nova, parity, w3f, polkassembly] = await Promise.all([
-		fetchDelegatesFromUrl(network, DELEGATE_SOURCES.nova),
-		fetchDelegatesFromUrl(network, DELEGATE_SOURCES.parity),
-		Promise.resolve(getW3FDelegates(network)),
-		getPolkassemblyDelegates(network)
-	]);
-	return mergeDelegates([...nova, ...parity, ...w3f, ...polkassembly]);
+const verifyDelegateSource = (address: string, knownSources: Map<string, EDelegateSource[]>): EDelegateSource[] => {
+	return knownSources.get(address) || [EDelegateSource.NA];
 };
 
-// Analytics
-const calculateDelegateStats = (address: string, delegationData: IDelegationData, votesCount: number): IDelegateStats => {
+const calculateDelegateStats = (
+	address: string,
+	delegationData: IDelegationData,
+	votesCount: number,
+	knownSources: Map<string, EDelegateSource[]>
+): IDelegateStats & { sources: EDelegateSource[] } => {
 	const delegations = delegationData?.votingDelegations || [];
 	let totalBalance = new BN(0);
 	const uniqueDelegators = new Set<string>();
 
 	delegations.forEach((delegation) => {
 		try {
-			// Safely handle balance calculations
 			const balanceValue = new BN(delegation.balance);
 			let adjustedBalance;
 
@@ -168,12 +167,19 @@ const calculateDelegateStats = (address: string, delegationData: IDelegationData
 		address,
 		delegatedBalance: totalBalance.toString(),
 		receivedDelegationsCount: uniqueDelegators.size,
+		sources: verifyDelegateSource(address, knownSources),
 		votedProposalCount: votesCount
 	};
 };
 
-const fetchDelegateAnalytics = async (network: ENetwork, addresses: string[]): Promise<IDelegateStats[]> => {
+const fetchDelegateAnalytics = async (
+	network: ENetwork,
+	addresses: string[],
+	knownSources?: Map<string, EDelegateSource[]>
+): Promise<(IDelegateStats & { sources: EDelegateSource[] })[]> => {
 	const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+	const sourcesMap = knownSources || new Map();
+
 	return Promise.all(
 		addresses.map(async (address) => {
 			try {
@@ -181,161 +187,91 @@ const fetchDelegateAnalytics = async (network: ENetwork, addresses: string[]): P
 					OnChainDbService.GetAllTrackLevelAnalyticsDelegationData({ network, address }) as unknown as Promise<IDelegationData>,
 					OnChainDbService.GetVotesCountForTimespan({ address, createdAtGte: thirtyDaysAgo, network })
 				]);
-				return calculateDelegateStats(address, delegationData, votesCount);
+				return calculateDelegateStats(address, delegationData, votesCount, sourcesMap);
 			} catch (error) {
 				console.error(`Error fetching analytics for address ${address}:`, error);
-				return { address, delegatedBalance: '0', receivedDelegationsCount: 0, votedProposalCount: 0 };
+				return {
+					address,
+					delegatedBalance: '0',
+					receivedDelegationsCount: 0,
+					sources: [EDelegateSource.NA],
+					votedProposalCount: 0
+				};
 			}
 		})
 	);
 };
-
-// Filtering and Sorting
-const filterAndSortDelegates = (delegates: (IDelegateSource & IDelegateStats)[], params: URLSearchParams) => {
-	// Parse filter parameters safely
-	let minVotingPower = null;
-	let minVotedProposals = null;
-	let minDelegations = null;
-	const dataSource = params.get('dataSource')?.toLowerCase(); // Add dataSource parameter
-
-	try {
-		const minVotingPowerStr = params.get('minVotingPower');
-		if (minVotingPowerStr && minVotingPowerStr !== 'null' && minVotingPowerStr !== 'undefined') {
-			minVotingPower = new BN(minVotingPowerStr);
-		}
-	} catch (error) {
-		console.error('Invalid minVotingPower parameter:', error);
-	}
-
-	try {
-		const minVotedProposalsStr = params.get('minVotedProposals');
-		if (minVotedProposalsStr && minVotedProposalsStr !== 'null' && minVotedProposalsStr !== 'undefined') {
-			minVotedProposals = parseInt(minVotedProposalsStr, 10);
-		}
-	} catch (error) {
-		console.error('Invalid minVotedProposals parameter:', error);
-	}
-
-	try {
-		const minDelegationsStr = params.get('minDelegations');
-		if (minDelegationsStr && minDelegationsStr !== 'null' && minDelegationsStr !== 'undefined') {
-			minDelegations = parseInt(minDelegationsStr, 10);
-		}
-	} catch (error) {
-		console.error('Invalid minDelegations parameter:', error);
-	}
-
-	// Get sort parameter
-	const sortBy = params.get('sortBy') || 'votedProposalCount';
-
-	// Filter the delegates
-	let filtered = [...delegates]; // Create a copy to avoid mutation issues
-
-	// Add data source filtering
-	if (dataSource) {
-		filtered = filtered.filter((delegate) => {
-			const delegateDataSources = delegate.dataSource.map((source) => source.toLowerCase());
-			return delegateDataSources.includes(dataSource);
-		});
-	}
-
-	if (minVotingPower) {
-		filtered = filtered.filter((delegate) => {
-			try {
-				const balance = new BN(delegate.delegatedBalance);
-				return balance.gte(minVotingPower);
-			} catch (error) {
-				console.error(`Error comparing delegate balance for ${delegate.address}:`, error);
-				return false;
-			}
-		});
-	}
-
-	if (minVotedProposals !== null) {
-		filtered = filtered.filter((delegate) => delegate.votedProposalCount >= minVotedProposals);
-	}
-
-	if (minDelegations !== null) {
-		filtered = filtered.filter((delegate) => delegate.receivedDelegationsCount >= minDelegations);
-	}
-
-	// Sort the filtered delegates
-	return filtered.sort((a, b) => {
-		switch (sortBy) {
-			case 'votingPower': {
-				try {
-					const balanceA = new BN(a.delegatedBalance || '0');
-					const balanceB = new BN(b.delegatedBalance || '0');
-					return balanceB.cmp(balanceA);
-				} catch (error) {
-					console.error('Error sorting by votingPower:', error);
-					return 0;
-				}
-			}
-
-			case 'votedProposalCount': {
-				const countA = Number(a.votedProposalCount || 0);
-				const countB = Number(b.votedProposalCount || 0);
-				return countB - countA;
-			}
-
-			case 'receivedDelegations': {
-				const countA = Number(a.receivedDelegationsCount || 0);
-				const countB = Number(b.receivedDelegationsCount || 0);
-				return countB - countA;
-			}
-
-			case 'dataSource': {
-				if (a.dataSource.length !== b.dataSource.length) {
-					return b.dataSource.length - a.dataSource.length;
-				}
-				const sortedA = [...a.dataSource].sort().join(',');
-				const sortedB = [...b.dataSource].sort().join(',');
-				return sortedA.localeCompare(sortedB);
-			}
-
-			case 'address':
-				return a.address.localeCompare(b.address);
-
-			case 'username': {
-				const usernameA = a.username || '';
-				const usernameB = b.username || '';
-				return usernameA.localeCompare(usernameB);
-			}
-
-			default: {
-				const defaultCountA = Number(a.votedProposalCount || 0);
-				const defaultCountB = Number(b.votedProposalCount || 0);
-				return defaultCountB - defaultCountA;
-			}
-		}
-	});
+const fetchAllDelegateAnalytics = async (network: ENetwork): Promise<IDelegationData> => {
+	return (await OnChainDbService.GetAllTrackLevelAnalyticsDelegationData({ network, address: '' })) as unknown as IDelegationData;
 };
-// API Handler
+const fetchAllDelegateSources = async (network: ENetwork): Promise<IDelegateSource[]> => {
+	const [nova, parity, w3f, polkassembly] = await Promise.all([
+		fetchDelegatesFromUrl(network, DELEGATE_SOURCES.nova),
+		fetchDelegatesFromUrl(network, DELEGATE_SOURCES.parity),
+		Promise.resolve(getW3FDelegates(network)),
+		getPolkassemblyDelegates(network)
+	]);
+
+	const knownDelegatesMap = new Map<string, EDelegateSource[]>();
+	const addToKnownDelegates = (delegate: IDelegateSource, source: EDelegateSource) => {
+		const existing = knownDelegatesMap.get(delegate.address) || [];
+		knownDelegatesMap.set(delegate.address, [...new Set([...existing, source])]);
+	};
+
+	nova.forEach((delegate) => addToKnownDelegates(delegate, EDelegateSource.NOVA));
+	parity.forEach((delegate) => addToKnownDelegates(delegate, EDelegateSource.PARITY));
+	w3f.forEach((delegate) => addToKnownDelegates(delegate, EDelegateSource.W3F));
+	polkassembly.forEach((delegate) => addToKnownDelegates(delegate, EDelegateSource.POLKASSEMBLY));
+	const allDelegateData = await fetchAllDelegateAnalytics(network);
+	const activeDelegateAddresses = new Set<string>();
+	allDelegateData.votingDelegations.forEach((delegation) => {
+		activeDelegateAddresses.add(delegation.to);
+		activeDelegateAddresses.add(delegation.from);
+	});
+
+	const naDelegates: IDelegateSource[] = Array.from(activeDelegateAddresses)
+		.filter((address) => !knownDelegatesMap.has(address))
+		.map((address) => ({
+			address,
+			bio: '',
+			dataSource: [EDelegateSource.NA],
+			image: '',
+			username: ''
+		}));
+
+	const analytics = await fetchDelegateAnalytics(network, Array.from(activeDelegateAddresses));
+	const allDelegates = [...nova, ...parity, ...w3f, ...polkassembly, ...naDelegates].map((delegate) => {
+		const stats = analytics.find((stat) => stat.address === delegate.address);
+		return {
+			...delegate,
+			delegatedBalance: stats?.delegatedBalance || '0',
+			receivedDelegationsCount: stats?.receivedDelegationsCount || 0,
+			votedProposalCount: stats?.votedProposalCount || 0
+		};
+	});
+
+	return mergeDelegates(allDelegates);
+};
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
 	try {
 		const network = await getNetworkFromHeaders();
 		const { searchParams } = req.nextUrl;
 		const address = searchParams.get('address');
 
-		// Validate address if provided
 		if (address) {
 			const encodedAddress = getEncodedAddress(address, network);
 			if (!encodedAddress && !isAddress(address)) {
 				return NextResponse.json({ error: 'Invalid address provided' }, { status: 400 });
 			}
 		}
-
-		// Fetch data
 		const delegateSources = await fetchAllDelegateSources(network);
 		if (!delegateSources.length) {
 			return NextResponse.json({ error: 'No delegates found' }, { status: 404 });
 		}
-
 		const targetAddresses = address ? [address] : delegateSources.map((d) => d.address);
 		const analytics = await fetchDelegateAnalytics(network, targetAddresses);
 
-		// Combine data
 		const combinedDelegates = delegateSources
 			.map((delegate) => {
 				const stats = analytics.find((a) => a.address === delegate.address);
@@ -348,12 +284,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			})
 			.filter((d) => d.votedProposalCount > 0 || d.receivedDelegationsCount > 0);
 
-		// Apply filters and sorting
-		const filteredAndSorted = filterAndSortDelegates(combinedDelegates, searchParams);
-
 		return NextResponse.json({
-			delegates: filteredAndSorted,
-			totalDelegates: filteredAndSorted.length
+			delegates: combinedDelegates,
+			totalDelegates: combinedDelegates.length
 		});
 	} catch (error) {
 		console.error('Delegate API Error:', error);

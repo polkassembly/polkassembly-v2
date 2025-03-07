@@ -438,12 +438,22 @@ export class SubsquidService extends SubsquidUtils {
 		return subsquidData;
 	}
 
-	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address?: string }): Promise<number> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address }).toPromise();
+		let subsquidData;
+		let subsquidErr;
+		if (address) {
+			const { data, error } = await gqlClient.query(query, { address }).toPromise();
+			subsquidData = data;
+			subsquidErr = error;
+		} else {
+			const { data, error } = await gqlClient.query(query, {}).toPromise();
+			subsquidData = data;
+			subsquidErr = error;
+		}
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain all track level analytics delegation data from Subsquid: ${subsquidErr}`);

@@ -5,3 +5,11 @@
 .tooltipContent {
     @apply relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg;
 }
+
+.selectTrigger {
+    @apply m-0 w-5 border-border_grey p-0;
+}
+
+.selectContent {
+    @apply border-border_grey px-3 py-2;
+}

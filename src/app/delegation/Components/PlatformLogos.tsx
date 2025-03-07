@@ -34,7 +34,7 @@ export const getPlatformStyles = (platforms: EDelegateSource[]) => {
 			return 'border-delegation_nova_border bg-delegation_card_nova';
 		case 'individual':
 		case 'na':
-			return DEFAULT_PLATFORM_STYLE;
+			return 'border-btn_secondary_text bg-delegation_card_polkassembly';
 		default:
 			return 'border-wallet_btn_text bg-delegation_bgcard';
 	}

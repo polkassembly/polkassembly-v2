@@ -10,11 +10,11 @@ import delegates from '@assets/delegation/delegates.svg';
 import delegatees from '@assets/delegation/delegatees.svg';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
-import { BN, formatBalance } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork, IDelegationStats } from '@/_shared/types';
+import { IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { parseBalance } from '@/app/_client-utils/parseBalance';
 
 const ZERO_BN = new BN(0);
 
@@ -41,27 +41,6 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 
 		fetchSupply();
 	}, [apiService]);
-
-	const parseBalance = (balance: string, decimals: number, withUnit: boolean, network: ENetwork) => {
-		let readableBalance = formatUSDWithUnits(
-			parseFloat(
-				formatBalance(balance, {
-					decimals: NETWORKS_DETAILS[network as ENetwork]?.tokenDecimals,
-					forceUnit: NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol,
-					withAll: false,
-					withUnit: false,
-					withZero: false
-				}).replaceAll(',', '')
-			)
-				.toFixed(2)
-				.toString(),
-			decimals
-		);
-		if (withUnit) {
-			readableBalance = `${readableBalance} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol}`;
-		}
-		return readableBalance;
-	};
 
 	return (
 		<div className='mt-5 flex flex-wrap justify-between gap-3 rounded-lg bg-bg_modal p-6 shadow-lg lg:gap-5'>

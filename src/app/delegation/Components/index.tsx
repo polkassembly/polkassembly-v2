@@ -30,7 +30,7 @@ function Delegation({ delegationStats, delegates }: { delegationStats: IDelegati
 	);
 
 	if (!user) {
-		return <div className={styles.delegation}>{dashboardContent}</div>;
+		return <div className='w-full'>{dashboardContent}</div>;
 	}
 
 	return (
