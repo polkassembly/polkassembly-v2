@@ -22,6 +22,8 @@ import EnumComp from './Enum';
 import Struct from './Struct';
 import VectorFixed from './VectorFixed';
 import NullComp from './Null';
+import AccountId20 from './AccountId20';
+import AccountId32 from './AccountId32';
 
 export interface ComponentProps {
 	className?: string;
@@ -146,19 +148,17 @@ function getTypeFromDef({ displayName, info, lookupName, sub, type }: TypeDef) {
 	}
 }
 
-function getComponent({ def, registry }: { def: TypeDef; registry?: Registry }): ComponentType<ComponentProps> | null {
-	// Explicit/special handling for Account20/32 types where they don't match
-	// the actual chain we are connected to
-	// if (['AccountId20', 'AccountId32'].includes(def.type)) {
-	// const defType = `AccountId${registry.createType('AccountId').length}`;
+function getComponent({ def, registry }: { def: TypeDef; registry: Registry }): ComponentType<ComponentProps> | null {
+	if (['AccountId20', 'AccountId32'].includes(def.type)) {
+		const defType = `AccountId${(registry.createType('AccountId') as unknown as { length: number }).length}`;
 
-	// if (def.type !== defType) {
-	// if (def.type === 'AccountId20') {
-	// return AccountId20;
-	// }
-	// return AccountId32;
-	// }
-	// }
+		if (def.type !== defType) {
+			if (def.type === 'AccountId20') {
+				return AccountId20 as ComponentType<ComponentProps>;
+			}
+			return AccountId32 as ComponentType<ComponentProps>;
+		}
+	}
 
 	const findOne = (type?: string): ComponentType<ComponentProps> | null => (type ? components[`${type}`] : null);
 
@@ -204,8 +204,10 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 
 	const registry = useMemo(() => apiService?.getApiRegistry(), [apiService]);
 
+	if (!registry) return null;
+
 	const Component = getComponent({ registry, def: param.type });
-	if (!Component || !registry) return null;
+	if (!Component) return null;
 
 	const paramComponent = createElement(Component, {
 		onChange: (value: unknown) => onChange(value),
