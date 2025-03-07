@@ -10,9 +10,9 @@ import { useUser } from '@/hooks/useUser';
 import { RadioGroup, RadioGroupItem } from '@/app/_shared-components/RadioGroup/RadioGroup';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import styles from './Delegation.module.scss';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
+import styles from './Delegation.module.scss';
 
 const FILTER_OPTIONS = [
 	{ value: ETrackDelegationStatus.ALL, label: 'All' },
