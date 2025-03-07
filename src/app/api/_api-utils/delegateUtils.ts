@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EDelegateSource, ENetwork, IDelegate, IDelegateData, IDelegateStats, IDelegationData } from '@/_shared/types';
+import { EDelegateSource, ENetwork, IDelegate, IDelegateStats } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 import { w3fDelegatesKusama, w3fDelegatesPolkadot } from '../_api-constants/delegateData';
 import { OffChainDbService } from '../_api-services/offchain_db_service';
@@ -16,12 +16,28 @@ interface IDelegateSource {
 	username?: string;
 }
 
+interface IDelegationData {
+	votingDelegations: Array<{
+		from: string;
+		to: string;
+		balance: string;
+		lockPeriod: number;
+		track: number;
+		__typename: string;
+	}>;
+}
+
 interface IDelegateSourceConfig {
 	bioKey: string;
 	source: EDelegateSource;
 	usernameKey: string;
 	imageKey?: string;
 	url?: (network: ENetwork) => string;
+}
+
+interface IDelegateData {
+	address: string;
+	[key: string]: string | undefined;
 }
 
 const DELEGATE_SOURCES = {
