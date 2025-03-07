@@ -1318,7 +1318,7 @@ export class FirestoreService extends FirestoreUtils {
 
 	static async GetAllDelegates(network: ENetwork): Promise<IDelegate[]> {
 		try {
-			const delegatesSnapshot = await this.firestoreDb.collection('delegates').doc(network).collection('addresses').get();
+			const delegatesSnapshot = await this.delegatesCollectionRef().doc(network).collection('addresses').get();
 			return delegatesSnapshot.docs.map((doc) => doc.data() as IDelegate);
 		} catch (error) {
 			console.error('Error fetching delegates:', error);
