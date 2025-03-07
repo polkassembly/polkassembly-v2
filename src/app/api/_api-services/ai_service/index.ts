@@ -337,9 +337,21 @@ export class AIService {
 				return null;
 			}
 
-			const { beneficiaries, proposer } = JSON.parse(jsonResponse);
+			const { beneficiaries = null, proposer = null } = JSON.parse(jsonResponse);
 
-			if (beneficiaries && Array.isArray(beneficiaries) && beneficiaries.every((address) => ValidatorService.isValidWeb3Address(address))) {
+			if (
+				!beneficiaries ||
+				!Array.isArray(beneficiaries) ||
+				!proposer ||
+				typeof proposer !== 'string' ||
+				!ValidatorService.isValidWeb3Address(proposer) ||
+				!beneficiaries.every((address) => ValidatorService.isValidWeb3Address(address))
+			) {
+				// invalid response from LLM
+				return null;
+			}
+
+			if (beneficiaries && Array.isArray(beneficiaries)) {
 				beneficiaryAddresses = beneficiaries.map((address) => (address.startsWith('0x') ? address : getSubstrateAddress(address))).filter((address) => address !== null);
 			}
 
