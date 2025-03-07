@@ -344,4 +344,22 @@ export class PolkadotApiService {
 				onFailed(error?.toString?.() || errorMessageFallback);
 			});
 	}
+
+	async getDelegationTotalSupply(): Promise<BN> {
+		if (!this.api) return new BN(0);
+		try {
+			const totalIssuance = await this.api.query.balances.totalIssuance();
+			const inactiveIssuance = await this.api.query.balances.inactiveIssuance();
+
+			if (!totalIssuance || !inactiveIssuance) {
+				console.error('Failed to fetch issuance values');
+				return new BN(0);
+			}
+
+			return new BN(totalIssuance.toString()).sub(new BN(inactiveIssuance.toString()));
+		} catch (error) {
+			console.error('Error in getDelegationTotalSupply:', error);
+			return new BN(0);
+		}
+	}
 }
