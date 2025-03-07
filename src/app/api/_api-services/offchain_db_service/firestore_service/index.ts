@@ -934,7 +934,7 @@ export class FirestoreService extends FirestoreUtils {
 			parentCommentId: parentCommentId || null,
 			address: address || null,
 			dataSource: EDataSource.POLKASSEMBLY,
-			sentiment
+			...(sentiment && { sentiment })
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
