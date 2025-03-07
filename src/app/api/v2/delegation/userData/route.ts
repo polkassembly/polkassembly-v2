@@ -7,22 +7,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork, IDelegation } from '@/_shared/types';
-
-export enum ETrackDelegationStatus {
-	ALL = 'all',
-	DELEGATED = 'delegated',
-	RECEIVED_DELEGATION = 'received_delegation',
-	UNDELEGATED = 'undelegated'
-}
-
-interface ITrackDelegation {
-	track: number;
-	active_proposals_count: number;
-	status: ETrackDelegationStatus[];
-	recieved_delegation_count: number;
-	delegations: IDelegation[];
-}
+import { ENetwork, ETrackDelegationStatus, IDelegation, ITrackDelegation } from '@/_shared/types';
 
 type TrackDelegationData = PromiseSettledResult<{
 	votingDelegations: IDelegation[];

@@ -8,7 +8,7 @@ import { NextApiClientService } from '../_client-services/next_api_client_servic
 
 async function DelegationPage() {
 	const { data: delegationStats } = await NextApiClientService.getDelegationStats();
-	const { data: delegates } = await NextApiClientService.getDelegates();
+	// const { data: delegates } = await NextApiClientService.getDelegates();
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 lg:p-10'>
@@ -21,7 +21,7 @@ async function DelegationPage() {
 						totalDelegators: 0
 					}
 				}
-				delegates={delegates?.delegates ?? []}
+				delegates={[]}
 			/>
 		</div>
 	);

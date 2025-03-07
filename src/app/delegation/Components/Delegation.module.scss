@@ -13,3 +13,69 @@
 .selectContent {
     @apply border-border_grey px-3 py-2;
 }
+
+.tableRow {
+    @apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+}
+
+.tableCell_1 {
+    @apply p-4 first:rounded-tl-lg last:rounded-tr-lg
+}
+
+.tableCell_last {
+    @apply p-4 last:rounded-tr-lg
+}
+
+.tableCell_3 {
+    @apply px-6 py-5;
+}
+
+.tableCell_2 {
+    @apply w-1/4 px-6 py-5;
+}
+
+.tableCell {
+    @apply p-4 whitespace-nowrap;
+}
+
+.activeTab {
+    @apply bg-sidebar_menu_active;
+}
+
+.activeTabText {
+    @apply rounded-full px-4 py-2 text-btn_secondary_text text-sm;
+}
+
+.radioButton {
+    @apply w-5 h-5 rounded-full border-2 border-border_grey inline-flex items-center justify-center cursor-pointer;
+
+    &[data-state='checked'] {
+        &::after {
+            @apply content-[''] block w-2 h-2 rounded-full bg-btn_primary_text;
+        }
+    }
+}
+
+.radioLabel {
+    @apply text-btn_secondary_text text-sm cursor-pointer;
+}
+
+.radioGroup {
+    @apply flex flex-wrap gap-4;
+}
+
+.radioWrapper {
+    @apply flex items-center rounded-full border border-border_grey px-4 py-2 transition-all duration-200;
+
+    &[data-state='checked'] {
+        @apply bg-btn_primary_text;
+    }
+}
+
+.selectTrigger {
+    @apply flex h-10 w-full items-center justify-between rounded-full border border-border_grey px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.selectContent {
+    @apply border-border_grey px-3 py-2;
+}

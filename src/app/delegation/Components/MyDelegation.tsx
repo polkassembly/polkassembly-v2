@@ -12,6 +12,7 @@ import { useUser } from '@/hooks/useUser';
 import { Button } from '@ui/Button';
 import DelegationPopupCard from './DelegationPopupCard';
 import SocialLinks from './SocialLinks';
+import MyDelegateTracks from './MyDelegateTracks';
 
 function MyDelegation() {
 	const { user } = useUser();
@@ -26,7 +27,7 @@ function MyDelegation() {
 	return (
 		<div>
 			<DelegationPopupCard />
-			<div className='mt-5 flex w-full gap-x-5 rounded-lg bg-bg_modal p-6 shadow-lg'>
+			<div className='mt-5 flex flex-col items-center justify-center rounded-lg bg-bg_modal p-6 shadow-lg md:flex-row md:gap-x-5'>
 				<Image
 					src={profileImage}
 					alt='user icon'
@@ -34,16 +35,17 @@ function MyDelegation() {
 					width={100}
 					height={100}
 				/>
-				<div className='w-full justify-between sm:flex'>
+				<div className='mt-2 flex w-full flex-col items-center justify-center gap-y-5 sm:flex-row sm:gap-x-5 md:mt-0 md:justify-between'>
 					<div>
 						<Address address={user.defaultAddress} />
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
-					<div className='mt-5 sm:mt-0'>
-						<Button>Become a Delegate</Button>
+					<div className='mt-5 hidden sm:mt-0 md:block'>
+						<Button variant='secondary'>Become a Delegate</Button>
 					</div>
 				</div>
 			</div>
+			<MyDelegateTracks />
 		</div>
 	);
 }

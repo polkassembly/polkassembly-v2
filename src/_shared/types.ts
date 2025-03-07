@@ -918,3 +918,18 @@ export interface IDelegation {
 	balance: string;
 	createdAt: Date;
 }
+
+export enum ETrackDelegationStatus {
+	ALL = 'all',
+	DELEGATED = 'delegated',
+	RECEIVED_DELEGATION = 'received_delegation',
+	UNDELEGATED = 'undelegated'
+}
+
+export interface ITrackDelegation {
+	track: number;
+	active_proposals_count: number;
+	status: ETrackDelegationStatus[];
+	recieved_delegation_count: number;
+	delegations: IDelegation[];
+}
