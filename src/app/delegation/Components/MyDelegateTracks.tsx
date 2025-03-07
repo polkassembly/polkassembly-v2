@@ -10,6 +10,7 @@ import { useUser } from '@/hooks/useUser';
 import { RadioGroup, RadioGroupItem } from '@/app/_shared-components/RadioGroup/RadioGroup';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import styles from './Delegation.module.scss';
@@ -25,8 +26,7 @@ function MyDelegateTracks() {
 	const { user } = useUser();
 	const network = getCurrentNetwork();
 	const [activeFilter, setActiveFilter] = useState(ETrackDelegationStatus.ALL);
-
-	const { data } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: ['address'],
 		queryFn: () => fetch(`/api/v2/delegation/userData?address=${user?.defaultAddress}`).then((res) => res.json()),
 		enabled: !!user?.defaultAddress
@@ -121,7 +121,11 @@ function MyDelegateTracks() {
 				</div>
 			</div>
 			<hr className='my-4 border-border_grey' />
-			{filteredTracks.length > 0 ? (
+			{isLoading ? (
+				<div className='flex h-full items-center justify-center'>
+					<LoadingSpinner />
+				</div>
+			) : filteredTracks.length > 0 ? (
 				<Table>
 					<TableHeader>
 						<TableRow className={styles.tableRow}>
