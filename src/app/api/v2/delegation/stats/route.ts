@@ -3,48 +3,86 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextResponse } from 'next/server';
+import { BN } from '@polkadot/util';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { EDelegationType, IDelegationStats } from '@/_shared/types';
-import { BN } from '@polkadot/util';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
 
-export async function GET() {
+interface DelegationCounts {
+	delegates: Record<string, number>;
+	delegators: Record<string, number>;
+	totalBalance: BN;
+}
+
+interface SimplifiedVotingDelegation {
+	balance: string;
+	to: string;
+	from: string;
+}
+
+const calculateDelegationStats = (votingDelegations: SimplifiedVotingDelegation[]): DelegationCounts => {
+	return votingDelegations.reduce(
+		(acc: DelegationCounts, item) => {
+			const balance = new BN(item.balance);
+			acc.totalBalance = acc.totalBalance.add(balance);
+
+			if (!acc.delegates[item.to]) acc.delegates[item.to] = 1;
+			if (!acc.delegators[item.from]) acc.delegators[item.from] = 1;
+
+			return acc;
+		},
+		{ delegates: {}, delegators: {}, totalBalance: new BN(0) }
+	);
+};
+const formatDelegationStats = (counts: DelegationCounts, totalDelegatedVotes: number): IDelegationStats => ({
+	totalDelegatedBalance: counts.totalBalance.toString(),
+	totalDelegatedVotes: {
+		totalCount: totalDelegatedVotes
+	},
+	totalDelegates: Object.keys(counts.delegates).length,
+	totalDelegators: Object.keys(counts.delegators).length
+});
+
+export async function GET(): Promise<NextResponse> {
 	try {
 		const network = await getNetworkFromHeaders();
-		const data = await OnChainDbService.GetTotalDelegationStats({ network, type: EDelegationType.OPEN_GOV });
-
-		let totalDelegatedBalance = new BN(0);
-		const totalDelegatorsObj: Record<string, number> = {};
-		const totalDelegatesObj: Record<string, number> = {};
-
-		if (Array.isArray(data?.votingDelegations)) {
-			data.votingDelegations.forEach((item: { balance: string; to: string; from: string }) => {
-				const bnBalance = new BN(item.balance);
-				totalDelegatedBalance = totalDelegatedBalance.add(bnBalance);
-
-				if (totalDelegatesObj[item.to] === undefined) {
-					totalDelegatesObj[item.to] = 1;
-				}
-				if (totalDelegatorsObj[item.from] === undefined) {
-					totalDelegatorsObj[item.from] = 1;
-				}
-			});
-		} else {
-			console.error('votingDelegations is not an array or is undefined:', data?.votingDelegations);
+		if (!network) {
+			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
 
-		const delegationStats: IDelegationStats = {
-			totalDelegatedBalance: totalDelegatedBalance.toString(),
-			totalDelegatedVotes: {
-				totalCount: data?.totalDelegatedVotes?.totalCount || 0
-			},
-			totalDelegates: Object.keys(totalDelegatesObj).length,
-			totalDelegators: Object.keys(totalDelegatorsObj).length
-		};
+		const data = await OnChainDbService.GetTotalDelegationStats({
+			network,
+			type: EDelegationType.OPEN_GOV
+		});
 
-		return NextResponse.json(delegationStats);
+		if (!data || !Array.isArray(data.votingDelegations)) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid delegation data structure');
+		}
+		const counts = calculateDelegationStats(data.votingDelegations);
+		const stats = formatDelegationStats(counts, data?.totalDelegatedVotes?.totalCount || 0);
+
+		return NextResponse.json(stats);
 	} catch (error) {
-		console.error('Error in delegation stats route:', error);
-		return NextResponse.json({ error: 'Failed to fetch delegation statistics' }, { status: 500 });
+		console.error('Delegation Stats Error:', error);
+
+		if (error instanceof APIError) {
+			return NextResponse.json({ error: error.message }, { status: error.status });
+		}
+		console.error('Detailed error:', {
+			error,
+			message: error instanceof Error ? error.message : 'Unknown error',
+			stack: error instanceof Error ? error.stack : undefined
+		});
+
+		return NextResponse.json(
+			{
+				error: 'Failed to fetch delegation statistics',
+				status: StatusCodes.INTERNAL_SERVER_ERROR
+			},
+			{ status: StatusCodes.INTERNAL_SERVER_ERROR }
+		);
 	}
 }

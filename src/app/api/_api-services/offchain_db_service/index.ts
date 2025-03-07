@@ -805,4 +805,24 @@ export class OffChainDbService {
 	static async GetAllDelegates(network: ENetwork) {
 		return FirestoreService.GetAllDelegates(network);
 	}
+
+	static async CreateDelegate({
+		network,
+		address,
+		bio,
+		createAt,
+		isNovaWalletDelegate,
+		name,
+		userId
+	}: {
+		network: ENetwork;
+		address: string;
+		bio: string;
+		createAt: Date;
+		isNovaWalletDelegate: boolean;
+		name: string;
+		userId: number;
+	}) {
+		return FirestoreService.CreateDelegate({ network, address, bio, createAt, isNovaWalletDelegate, name, userId });
+	}
 }

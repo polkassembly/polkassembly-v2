@@ -3,90 +3,136 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork, ETrackDelegationStatus, IDelegation, ITrackDelegation } from '@/_shared/types';
+import { ENetwork, ETrackDelegationStatus } from '@/_shared/types';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
 
-type TrackDelegationData = PromiseSettledResult<{
+interface IDelegation {
+	track: number;
+	to: string;
+	from: string;
+	lockPeriod: number;
+	balance: string;
+	createdAt: Date;
+}
+
+interface ITrackDelegation {
+	track: number;
+	active_proposals_count: number;
+	status: ETrackDelegationStatus[];
+	recieved_delegation_count: number;
+	delegations: IDelegation[];
+}
+
+const QuerySchema = z.object({
+	address: z.string().min(1, 'Address is required')
+});
+
+interface TrackDelegationData {
 	votingDelegations: IDelegation[];
 	proposalsConnection?: { totalCount: number };
-}>;
+}
 
-function processTrackDelegation(trackDelegationData: TrackDelegationData, track: number, address: string, encodedAddress: string): ITrackDelegation | null {
-	if (!trackDelegationData || trackDelegationData.status !== 'fulfilled' || !trackDelegationData.value) return null;
+function processTrackDelegation(data: PromiseSettledResult<TrackDelegationData>, track: number, address: string, encodedAddress: string): ITrackDelegation | null {
+	if (!data || data.status !== 'fulfilled' || !data.value) {
+		return null;
+	}
 
-	const votingDelegationsArr = trackDelegationData.value.votingDelegations || [];
+	const { votingDelegations = [], proposalsConnection } = data.value;
 
 	const trackDelegation: ITrackDelegation = {
-		active_proposals_count: trackDelegationData.value.proposalsConnection?.totalCount || 0,
-		delegations: votingDelegationsArr,
+		active_proposals_count: proposalsConnection?.totalCount || 0,
+		delegations: votingDelegations,
 		recieved_delegation_count: 0,
 		status: [],
 		track
 	};
 
-	if (!votingDelegationsArr.length) {
+	if (votingDelegations.length === 0) {
 		trackDelegation.status.push(ETrackDelegationStatus.UNDELEGATED);
 		return trackDelegation;
 	}
 
-	votingDelegationsArr.reduce((_, votingDelegation) => {
-		if (trackDelegation.status.length >= 2) return _;
+	const addresses = [encodedAddress, address];
+	votingDelegations.forEach((delegation) => {
+		if (trackDelegation.status.length >= 2) return;
 
-		if ([encodedAddress, address].includes(votingDelegation.from)) {
+		if (addresses.includes(delegation.from)) {
 			if (!trackDelegation.status.includes(ETrackDelegationStatus.DELEGATED)) {
 				trackDelegation.status.push(ETrackDelegationStatus.DELEGATED);
 			}
 		} else if (!trackDelegation.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION)) {
 			trackDelegation.status.push(ETrackDelegationStatus.RECEIVED_DELEGATION);
 		}
-		return _;
-	}, null);
+	});
 
 	if (trackDelegation.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION)) {
-		trackDelegation.recieved_delegation_count = votingDelegationsArr.filter((delegation) => ![encodedAddress, address].includes(delegation.from)).length;
+		trackDelegation.recieved_delegation_count = votingDelegations.filter((delegation) => !addresses.includes(delegation.from)).length;
 	}
 
 	return trackDelegation;
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-	const { searchParams } = req.nextUrl;
-	const address = searchParams.get('address');
-
-	const substrateAddress = getSubstrateAddress(address || '');
-	const network = await getNetworkFromHeaders();
-
-	if (!substrateAddress) {
-		return NextResponse.json({ error: 'Invalid address provided' }, { status: 400 });
-	}
-
-	const subsquidFetches = new Map<number, Promise<unknown>>();
-
-	Object.values(NETWORKS_DETAILS[network as ENetwork].trackDetails).forEach((trackInfo) => {
-		if (trackInfo.fellowshipOrigin) return;
-
-		subsquidFetches.set(
-			trackInfo.trackId,
-			OnChainDbService.GetActiveDelegationsToOrFromAddressForTrack({
-				address: substrateAddress,
-				network,
-				track: trackInfo.trackId
-			})
-		);
-	});
-
-	const subsquidResults = await Promise.allSettled([...subsquidFetches.values()]);
-	const result: ITrackDelegation[] = [];
-
-	[...subsquidFetches.keys()].forEach((trackId, index) => {
-		const trackDelegation = processTrackDelegation(subsquidResults[index as number] as TrackDelegationData, trackId, address || '', substrateAddress);
-		if (trackDelegation) {
-			result.push(trackDelegation);
+	try {
+		const { searchParams } = req.nextUrl;
+		const { address } = QuerySchema.parse({
+			address: searchParams.get('address')
+		});
+		const network = await getNetworkFromHeaders();
+		if (!network) {
+			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
-	});
+		const substrateAddress = getSubstrateAddress(address);
+		if (!substrateAddress) {
+			throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.BAD_REQUEST);
+		}
+		const trackFetches = new Map<number, Promise<TrackDelegationData>>();
+		Object.values(NETWORKS_DETAILS[network as ENetwork].trackDetails)
+			.filter((track) => !track.fellowshipOrigin)
+			.forEach((track) => {
+				trackFetches.set(
+					track.trackId,
+					OnChainDbService.GetActiveDelegationsToOrFromAddressForTrack({
+						address: substrateAddress,
+						network,
+						track: track.trackId
+					}) as unknown as Promise<TrackDelegationData>
+				);
+			});
 
-	return NextResponse.json(result);
+		if (trackFetches.size === 0) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+		}
+
+		const trackResults = await Promise.allSettled([...trackFetches.values()]);
+
+		const delegations: ITrackDelegation[] = [...trackFetches.keys()]
+			.map((trackId, index) => processTrackDelegation(trackResults[index as number], trackId, address, substrateAddress))
+			.filter((delegation): delegation is ITrackDelegation => delegation !== null);
+
+		if (delegations.length === 0) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+		}
+
+		return NextResponse.json(delegations);
+	} catch (error) {
+		console.error('User Delegation Data Error:', error);
+
+		if (error instanceof z.ZodError) {
+			return NextResponse.json({ error: 'Invalid request parameters' }, { status: StatusCodes.BAD_REQUEST });
+		}
+
+		if (error instanceof APIError) {
+			return NextResponse.json({ error: error.message }, { status: error.status });
+		}
+
+		return NextResponse.json({ error: 'Failed to fetch user delegation data' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+	}
 }
