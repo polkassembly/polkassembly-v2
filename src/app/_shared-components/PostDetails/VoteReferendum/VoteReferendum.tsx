@@ -33,7 +33,7 @@ function VoteReferendum({ index }: { index: string }) {
 	const isInvalidAmount = useMemo(() => {
 		return (
 			([EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) && balance.lte(BN_ZERO)) ||
-			(voteDecision === EVoteDecision.ABSTAIN && abstainVoteValue.add(ayeVoteValue).add(nayVoteValue).lte(BN_ZERO)) ||
+			(voteDecision === EVoteDecision.SPLIT_ABSTAIN && abstainVoteValue.add(ayeVoteValue).add(nayVoteValue).lte(BN_ZERO)) ||
 			(voteDecision === EVoteDecision.SPLIT && ayeVoteValue.add(nayVoteValue).lte(BN_ZERO))
 		);
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
@@ -101,7 +101,7 @@ function VoteReferendum({ index }: { index: string }) {
 							</>
 						) : (
 							<>
-								{voteDecision === EVoteDecision.ABSTAIN && (
+								{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 									<BalanceInput
 										label={t('VoteReferendum.abstainVoteValue')}
 										onChange={setAbstainVoteValue}

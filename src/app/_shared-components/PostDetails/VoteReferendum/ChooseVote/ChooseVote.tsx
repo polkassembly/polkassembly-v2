@@ -59,7 +59,7 @@ function ChooseVote({
 				)}
 				<TabsTrigger
 					className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
-					value={EVoteDecision.ABSTAIN}
+					value={EVoteDecision.SPLIT_ABSTAIN}
 				>
 					<Ban className='h-4 w-4' />
 					{t('PostDetails.abstain')}

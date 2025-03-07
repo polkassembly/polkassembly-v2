@@ -178,7 +178,7 @@ export class PolkadotApiService {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Standard: { balance: lockedBalance, vote: { aye: vote === EVoteDecision.AYE, conviction } } });
 		} else if (vote === EVoteDecision.SPLIT) {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
-		} else if (vote === EVoteDecision.ABSTAIN && ayeVoteValue && nayVoteValue) {
+		} else if (vote === EVoteDecision.SPLIT_ABSTAIN && ayeVoteValue && nayVoteValue) {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, {
 				SplitAbstain: { abstain: `${abstainVoteValue?.toString()}`, aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` }
 			});
@@ -222,7 +222,7 @@ export class PolkadotApiService {
 				});
 			} else if (vote === EVoteDecision.SPLIT) {
 				voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
-			} else if (vote === EVoteDecision.ABSTAIN && ayeVoteValue && nayVoteValue) {
+			} else if (vote === EVoteDecision.SPLIT_ABSTAIN && ayeVoteValue && nayVoteValue) {
 				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
 					SplitAbstain: { abstain: `${abstainVoteValue?.toString()}`, aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` }
 				});

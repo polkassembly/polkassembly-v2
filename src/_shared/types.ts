@@ -443,7 +443,6 @@ export enum EPostOrigin {
 export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
-	ABSTAIN = 'abstain',
 	SPLIT = 'split',
 	SPLIT_ABSTAIN = 'splitAbstain'
 }
