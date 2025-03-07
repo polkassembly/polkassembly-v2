@@ -2,13 +2,16 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { IParamDef } from '@/_shared/types';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TypeDef } from '@polkadot/types/types';
+import { Switch } from '@/app/_shared-components/Switch';
 // eslint-disable-next-line import/no-cycle
 import Param from './Param';
 
 function Option({ param, onChange }: { param: IParamDef; onChange: (value: unknown) => void }) {
 	const { sub } = param.type;
+
+	const [isActive, setIsActive] = useState(true);
 
 	const onParamChange = useCallback(
 		(value: unknown) => {
@@ -17,10 +20,23 @@ function Option({ param, onChange }: { param: IParamDef; onChange: (value: unkno
 		[onChange]
 	);
 
+	useEffect((): void => {
+		if (!isActive) {
+			onParamChange(null);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isActive]);
+
 	return (
 		<div>
-			{param.name}
-			{sub && (
+			<div className='flex items-center justify-end gap-x-1'>
+				<span className='text-sm text-text_primary'>include option</span>
+				<Switch
+					checked={isActive}
+					onCheckedChange={setIsActive}
+				/>
+			</div>
+			{sub && isActive && (
 				<Param
 					param={{
 						name: param.name,

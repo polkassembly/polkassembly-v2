@@ -5,7 +5,7 @@
 import { InputHTMLAttributes, useCallback, useState } from 'react';
 import { IParamDef } from '@/_shared/types';
 import { compactAddLength } from '@polkadot/util';
-import { Button } from '../../../Button';
+import { Switch } from '@/app/_shared-components/Switch';
 import InputText from './InputText';
 import InputFile from './InputFile';
 
@@ -26,14 +26,12 @@ function BytesInput({ onChange, ...props }: BytesInputProps) {
 
 	return (
 		<div>
-			<div className='flex w-full justify-end'>
-				<Button
-					variant='outline'
-					size='icon'
-					onClick={() => setIsFileDrop(!isFileDrop)}
-				>
-					file
-				</Button>
+			<div className='mb-1 flex w-full justify-end'>
+				<span className='text-sm text-text_primary'>Upload File</span>
+				<Switch
+					checked={isFileDrop}
+					onCheckedChange={setIsFileDrop}
+				/>
 			</div>
 			{isFileDrop ? (
 				<div className='flex flex-col gap-y-1'>
