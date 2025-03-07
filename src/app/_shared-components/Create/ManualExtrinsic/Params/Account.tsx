@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { IParamDef } from '@/_shared/types';
 import React, { useCallback } from 'react';
+import { Registry } from '@polkadot/types/types';
 // eslint-disable-next-line import/no-cycle
 import Enum from './Enum';
 import AddressInput from '../../../AddressInput/AddressInput';
 
-function Account({ param, onChange }: { param: IParamDef; onChange: (value: unknown) => void }) {
+function Account({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: unknown; registry: Registry }) {
 	const onAddressChange = useCallback((value: unknown) => onChange(value), [onChange]);
 
 	if (param.type.type === 'MultiAddress') {
@@ -16,6 +17,8 @@ function Account({ param, onChange }: { param: IParamDef; onChange: (value: unkn
 			<Enum
 				param={param}
 				onChange={onChange}
+				defaultValue={defaultValue}
+				registry={registry}
 			/>
 		);
 		// }

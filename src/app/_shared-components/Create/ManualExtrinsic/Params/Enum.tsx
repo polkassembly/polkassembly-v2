@@ -2,12 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { IParamDef } from '@/_shared/types';
-import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { getTypeDef } from '@polkadot/types';
+import { Enum, getTypeDef } from '@polkadot/types';
 import { Registry, TypeDef } from '@polkadot/types/types';
 import React, { useCallback, useMemo, useState } from 'react';
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from '../../../DropdownMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../DropdownMenu';
 // eslint-disable-next-line import/no-cycle
 import Params from '.';
 
@@ -51,19 +49,16 @@ function getInitial(options: Option[]): Initial {
 	};
 }
 
-function getCurrent(subTypes: TypeDef[]): IParamDef[] {
-	return [{ name: subTypes[0].name || '', type: subTypes[0] }];
+function getCurrent(registry: Registry, type: TypeDef, defaultValue: unknown, subTypes: TypeDef[]): IParamDef[] | null {
+	const subs = getSubTypes(registry, type);
+
+	return defaultValue instanceof Enum ? [{ name: defaultValue.type, type: subs[defaultValue.index] }] : [{ name: subTypes[0].name || '', type: subTypes[0] }];
 }
 
-function EnumComp({ param, onChange }: { param: IParamDef; onChange: (value: unknown) => void }) {
-	const { apiService } = usePolkadotApiService();
+function EnumComp({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: unknown; registry: Registry }) {
+	const { options, subTypes } = useMemo(() => getOptions(registry, param.type), [registry, param.type]);
 
-	const { options, subTypes } = useMemo(
-		() => (apiService?.getApiRegistry ? getOptions(apiService?.getApiRegistry(), param.type) : { options: [], subTypes: [] }),
-		[apiService, param.type]
-	);
-
-	const [current, setCurrent] = useState<IParamDef[] | null>(() => getCurrent(subTypes));
+	const [current, setCurrent] = useState<IParamDef[] | null>(() => getCurrent(registry, param.type, defaultValue, subTypes));
 	const [{ initialParams }, setInitial] = useState<Initial>(() => getInitial(options));
 
 	const onEnumChange = useCallback(
@@ -91,19 +86,15 @@ function EnumComp({ param, onChange }: { param: IParamDef; onChange: (value: unk
 	);
 
 	return (
-		<div>
+		<div className='flex flex-col gap-y-2'>
 			<DropdownMenu>
-				<DropdownMenuTrigger
-					asChild
-					className='w-full rounded border border-border_grey px-4 py-2'
-				>
-					{current?.[0]?.name || ''}
-				</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='flex w-full items-center rounded border border-border_grey px-4 py-2'>{current?.[0]?.name || ''}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{options.map((option) => (
 						<DropdownMenuItem
 							onClick={() => onEnumChange(option.value || '')}
 							key={option.value}
+							className='cursor-pointer'
 						>
 							{option.text}
 						</DropdownMenuItem>

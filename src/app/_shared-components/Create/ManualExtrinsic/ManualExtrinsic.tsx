@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Copy } from 'lucide-react';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
 
@@ -29,6 +30,27 @@ function ManualExtrinsic() {
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<Extrinsic onChange={setExtrinsicFn} />
+			{extrinsicHash && (
+				<div className='flex flex-col gap-y-2 rounded-lg bg-grey_bg p-2 text-text_primary'>
+					<div className='flex items-start justify-between gap-x-6'>
+						<p className='whitespace-nowrap'>Preimage Hash</p>
+						<div className='flex flex-wrap items-center justify-end break-all text-right'>
+							{extrinsicHash.preimageHash}
+							<Button
+								variant='ghost'
+								size='icon'
+								onClick={() => navigator.clipboard.writeText(`${extrinsicHash.preimageHash}`)}
+							>
+								<Copy size={16} />
+							</Button>
+						</div>
+					</div>
+					<div className='flex items-center justify-between'>
+						<p>Length</p>
+						<p>{extrinsicHash.preimageLength}</p>
+					</div>
+				</div>
+			)}
 			<div className='flex justify-end'>
 				<Button
 					disabled={!extrinsicHash}

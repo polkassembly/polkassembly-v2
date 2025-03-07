@@ -399,7 +399,7 @@ export class PolkadotApiService {
 			return [];
 		}
 
-		const params = submittable.meta.args.map(
+		return submittable.meta.args.map(
 			({ name, type, typeName }): IParamDef => ({
 				name: name.toString(),
 				type: {
@@ -408,10 +408,6 @@ export class PolkadotApiService {
 				}
 			})
 		);
-
-		console.log('params', params);
-
-		return params;
 	}
 
 	getExtrinsic(sectionName: string, methodName: string) {
@@ -518,13 +514,12 @@ export class PolkadotApiService {
 		const registry = this.getApiRegistry();
 		const typeDef = getTypeDef(registry.createType(type.type as 'u32').toRawType()) || type;
 
-		console.log('typeDef', typeDef.sub);
-
 		return typeDef.sub
 			? (Array.isArray(typeDef.sub) ? typeDef.sub : [typeDef.sub]).map(
 					(td): IParamDef => ({
 						name: td.name || '',
-						type: td as TypeDef
+						type: td as TypeDef,
+						length: typeDef.length
 					})
 				)
 			: [];

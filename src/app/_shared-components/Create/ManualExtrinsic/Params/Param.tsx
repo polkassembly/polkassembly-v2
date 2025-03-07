@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 /* eslint-disable import/no-cycle */
-import { ComponentType, createElement, ReactNode } from 'react';
+import { ComponentType, createElement, ReactNode, useMemo } from 'react';
 import { IParamDef } from '@/_shared/types';
 import { Registry, TypeDef, TypeDefInfo } from '@polkadot/types/types';
 import { getTypeDef } from '@polkadot/types';
@@ -19,6 +19,9 @@ import BytesInput from './Bytes';
 import Account from './Account';
 import Bool from './Bool';
 import EnumComp from './Enum';
+import Struct from './Struct';
+import VectorFixed from './VectorFixed';
+import NullComp from './Null';
 
 export interface ComponentProps {
 	className?: string;
@@ -39,6 +42,7 @@ export interface ComponentProps {
 	title?: ReactNode;
 	withLabel?: boolean;
 	withLength?: boolean;
+	registry: Registry;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,15 +78,15 @@ const componentDef: TypeToComponent[] = [
 	// { c: KeyValue, t: ['KeyValue'] },
 	// { c: KeyValueArray, t: ['Vec<KeyValue>'] },
 	// { c: Moment, t: ['Moment', 'MomentOf'] },
-	// { c: Null, t: ['Null'] },
+	{ c: NullComp, t: ['Null'] },
 	// { c: OpaqueCall, t: ['OpaqueCall'] },
 	{ c: Option, t: ['Option'] },
 	{ c: InputText, t: ['String', 'Text'] },
-	// { c: Struct, t: ['Struct'] },
+	{ c: Struct, t: ['Struct'] },
 	{ c: Tuple, t: ['Tuple'] },
 	// { c: BTreeMap, t: ['BTreeMap'] },
 	// { c: Vector, t: ['Vec', 'BTreeSet'] },
-	// { c: VectorFixed, t: ['VecFixed'] },
+	{ c: VectorFixed, t: ['VecFixed'] },
 	// { c: Vote, t: ['Vote'] },
 	// { c: VoteThreshold, t: ['VoteThreshold'] },
 	{ c: InputText, t: ['Unknown'] }
@@ -192,18 +196,21 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 	const { apiService } = usePolkadotApiService();
 
 	const title = (
-		<span className='overflow-hidden whitespace-nowrap text-sm font-medium text-text_primary'>
+		<span className='flex items-center gap-x-1 overflow-hidden whitespace-nowrap text-sm font-medium text-text_primary'>
 			{param.name && `${param.name}:`} {param.type.type}
 			{param.type.typeName && ` (${param.type.typeName})`}
 		</span>
 	);
 
-	const Component = getComponent({ registry: apiService?.getApiRegistry(), def: param.type });
-	if (!Component) return null;
+	const registry = useMemo(() => apiService?.getApiRegistry(), [apiService]);
+
+	const Component = getComponent({ registry, def: param.type });
+	if (!Component || !registry) return null;
 
 	const paramComponent = createElement(Component, {
 		onChange: (value: unknown) => onChange(value),
 		defaultValue: paramValue,
+		registry,
 		param
 	});
 

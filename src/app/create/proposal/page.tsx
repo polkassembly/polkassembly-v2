@@ -8,7 +8,7 @@ import CreateProposalComponent from './Components/CreateProposal';
 function CreateProposal() {
 	return (
 		<div className='flex h-full w-full items-start justify-center p-8 sm:p-20'>
-			<div className='w-full rounded-lg bg-bg_modal p-6 shadow-lg'>
+			<div className='mx-auto w-full max-w-screen-lg rounded-lg bg-bg_modal p-6 shadow-lg'>
 				<div className='mb-4 text-lg font-semibold text-text_primary'>New Proposal</div>
 				<Separator className='my-4' />
 				<CreateProposalComponent />

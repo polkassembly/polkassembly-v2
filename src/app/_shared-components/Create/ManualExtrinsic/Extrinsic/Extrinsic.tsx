@@ -49,7 +49,6 @@ export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtr
 	const setParamValues = useCallback((values: unknown[]) => setExtrinsicValues((prev) => ({ ...prev, paramValues: values })), []);
 
 	useEffect(() => {
-		console.log('paramValues', paramValues, extrinsic);
 		if (paramValues.length === extrinsic.params.length) {
 			try {
 				const method = extrinsic.extrinsicFn?.(...paramValues);

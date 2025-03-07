@@ -849,6 +849,7 @@ export enum EReactQueryKeys {
 
 export interface IParamDef {
 	name: string;
+	length?: number;
 	type: TypeDef;
 }
 
