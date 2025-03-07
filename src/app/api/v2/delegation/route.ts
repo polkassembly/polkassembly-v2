@@ -14,9 +14,13 @@ import { OffChainDbService } from '../../_api-services/offchain_db_service';
 import { AuthService } from '../../_api-services/auth_service';
 import { fetchAllDelegateSources, fetchDelegateAnalytics } from '../../_api-utils/delegateUtils';
 
-const GetDelegatesQuerySchema = z.object({
-	address: z.string().optional()
-});
+const GetDelegatesQuerySchema = z
+	.object({
+		address: z.string().nullish()
+	})
+	.transform((data) => ({
+		address: data.address || undefined
+	}));
 
 const CreateDelegateSchema = z.object({
 	address: z.string().min(1, 'Address is required'),
@@ -31,9 +35,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
 
-		const { searchParams } = req.nextUrl;
 		const { address } = GetDelegatesQuerySchema.parse({
-			address: searchParams.get('address')
+			address: req.nextUrl.searchParams.get('address')
 		});
 
 		if (address) {
@@ -65,8 +68,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			data: {
 				delegates: combinedDelegates,
 				totalDelegates: combinedDelegates.length
-			},
-			status: StatusCodes.OK
+			}
 		});
 	} catch (error) {
 		console.error('Delegate API Error:', error);
@@ -113,10 +115,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			userId
 		});
 
-		return NextResponse.json({
-			data: delegate,
-			status: StatusCodes.CREATED
-		});
+		return NextResponse.json(delegate);
 	} catch (error) {
 		console.error('Create Delegate Error:', error);
 

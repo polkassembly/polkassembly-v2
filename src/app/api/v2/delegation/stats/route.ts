@@ -48,40 +48,29 @@ const formatDelegationStats = (counts: DelegationCounts, totalDelegatedVotes: nu
 
 export async function GET(): Promise<NextResponse> {
 	try {
-		// Validate network
 		const network = await getNetworkFromHeaders();
 		if (!network) {
 			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
 
-		// Fetch delegation data
 		const data = await OnChainDbService.GetTotalDelegationStats({
 			network,
 			type: EDelegationType.OPEN_GOV
 		});
 
-		// Validate data structure
 		if (!data || !Array.isArray(data.votingDelegations)) {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid delegation data structure');
 		}
-
-		// Calculate statistics
 		const counts = calculateDelegationStats(data.votingDelegations);
 		const stats = formatDelegationStats(counts, data?.totalDelegatedVotes?.totalCount || 0);
 
-		// Return success response
-		return NextResponse.json({
-			data: stats,
-			status: StatusCodes.OK
-		});
+		return NextResponse.json(stats);
 	} catch (error) {
 		console.error('Delegation Stats Error:', error);
 
 		if (error instanceof APIError) {
 			return NextResponse.json({ error: error.message }, { status: error.status });
 		}
-
-		// Log detailed error for debugging
 		console.error('Detailed error:', {
 			error,
 			message: error instanceof Error ? error.message : 'Unknown error',
