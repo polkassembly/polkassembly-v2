@@ -462,4 +462,23 @@ export class SubsquidService extends SubsquidUtils {
 
 		return subsquidData;
 	}
+
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.ACTIVE_DELEGATIONS_TO_OR_FROM_ADDRESS_FOR_TRACK;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address, track_eq: track }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain active delegations to or from address for track from Subsquid: ${subsquidErr}`);
+			throw new APIError(
+				ERROR_CODES.INTERNAL_SERVER_ERROR,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+				'Error fetching on-chain active delegations to or from address for track from Subsquid'
+			);
+		}
+
+		return subsquidData;
+	}
 }

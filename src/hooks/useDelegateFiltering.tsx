@@ -2,9 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { SORT_OPTIONS } from '@/_shared/_constants/delegateConstant';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { EDelegateSource, IDelegate } from '@/_shared/types';
-import { SORT_OPTIONS } from '@/app/delegation/Components/DelegationCard';
 import { useCallback, useMemo, useState } from 'react';
 
 const useDelegateFiltering = (delegates: IDelegate[]) => {

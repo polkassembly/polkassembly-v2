@@ -14,6 +14,7 @@ import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLink
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { Label } from '@/app/_shared-components/Label';
 import { Checkbox } from '@/app/_shared-components/checkbox';
+import { SOURCE_OPTIONS } from '@/_shared/_constants/delegateConstant';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { Button } from '@/app/_shared-components/Button';
 import { parseBalance } from '@/app/_client-utils/parseBalance';
@@ -29,20 +30,6 @@ interface DelegateCardProps {
 	delegate: IDelegate;
 	network: ENetwork;
 }
-
-export const SOURCE_OPTIONS = [
-	{ label: 'Polkassembly', value: EDelegateSource.POLKASSEMBLY },
-	{ label: 'Parity', value: EDelegateSource.PARITY },
-	{ label: 'Nova', value: EDelegateSource.NOVA },
-	{ label: 'W3F', value: EDelegateSource.W3F },
-	{ label: 'Individual', value: EDelegateSource.NA }
-] as const;
-
-export const SORT_OPTIONS = {
-	votingPower: 'Voting Power',
-	votedProposals: 'Voted Proposals',
-	receivedDelegations: 'Received Delegations'
-} as const;
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => (
 	<Popover>
@@ -206,7 +193,7 @@ function DelegationCard({ delegates }: { delegates: IDelegate[] }) {
 				/>
 				<div className='flex items-center gap-2'>
 					<Select
-						value={sortBy}
+						value={sortBy as string}
 						onValueChange={(value: typeof sortBy) => setSortBy(value)}
 					>
 						<SelectTrigger

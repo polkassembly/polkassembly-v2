@@ -5,24 +5,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BN } from '@polkadot/util';
 import { isAddress } from '@polkadot/util-crypto';
-import { EDelegateSource, ENetwork, IDelegate, IDelegateData, IDelegateStats } from '@/_shared/types';
+import { EDelegateSource, ENetwork, IDelegate, IDelegateData, IDelegateStats, IDelegationData } from '@/_shared/types';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { getNetworkFromHeaders } from '../../_api-utils/getNetworkFromHeaders';
 import { APIError } from '../../_api-utils/apiError';
 import { OnChainDbService } from '../../_api-services/onchain_db_service';
 import { OffChainDbService } from '../../_api-services/offchain_db_service';
 import { w3fDelegatesKusama, w3fDelegatesPolkadot } from '../../_api-constants/delegateData';
-
-export interface IDelegationData {
-	votingDelegations: Array<{
-		from: string;
-		to: string;
-		balance: string;
-		lockPeriod: number;
-		track: number;
-		__typename: string;
-	}>;
-}
 
 export interface IDelegateSource {
 	address: string;

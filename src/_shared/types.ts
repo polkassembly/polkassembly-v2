@@ -898,3 +898,23 @@ export interface IDelegate {
 		};
 	};
 }
+
+export interface IDelegationData {
+	votingDelegations: Array<{
+		from: string;
+		to: string;
+		balance: string;
+		lockPeriod: number;
+		track: number;
+		__typename: string;
+	}>;
+}
+
+export interface IDelegation {
+	track: number;
+	to: string;
+	from: string;
+	lockPeriod: number;
+	balance: string;
+	createdAt: Date;
+}

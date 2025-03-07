@@ -162,4 +162,8 @@ export class OnChainDbService {
 	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<number> {
 		return SubsquidService.GetAllTrackLevelAnalyticsDelegationData({ network, address });
 	}
+
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<number> {
+		return SubsquidService.GetActiveDelegationsToOrFromAddressForTrack({ network, address, track });
+	}
 }
