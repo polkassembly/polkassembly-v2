@@ -24,7 +24,7 @@ function Proposal() {
 		>
 			<DialogContent className='max-w-screen-md p-6'>
 				<DialogHeader>
-					<DialogTitle>Create Proposal</DialogTitle>
+					<DialogTitle>New Proposal</DialogTitle>
 				</DialogHeader>
 				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
 					<CreateProposal />
