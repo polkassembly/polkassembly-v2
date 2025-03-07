@@ -31,7 +31,8 @@ import {
 	EConvictionAmount,
 	IPostSubscription,
 	ECommentSentiment,
-	IDelegate
+	IDelegate,
+	EDelegateSource
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1323,5 +1324,42 @@ export class FirestoreService extends FirestoreUtils {
 			console.error('Error fetching delegates:', error);
 			return [];
 		}
+	}
+
+	static async CreateDelegate({
+		network,
+		address,
+		bio,
+		createAt,
+		isNovaWalletDelegate,
+		name,
+		userId
+	}: {
+		network: ENetwork;
+		address: string;
+		bio: string;
+		createAt: Date;
+		isNovaWalletDelegate: boolean;
+		name: string;
+		userId: number;
+	}) {
+		const delegate = await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).get();
+		if (delegate.exists) {
+			return delegate.data() as IDelegate;
+		}
+
+		const newDelegate = {
+			address,
+			bio,
+			dataSource: EDelegateSource.POLKASSEMBLY,
+			created_at: createAt,
+			isNovaWalletDelegate,
+			name,
+			user_id: userId
+		};
+
+		await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).set(newDelegate);
+
+		return newDelegate;
 	}
 }
