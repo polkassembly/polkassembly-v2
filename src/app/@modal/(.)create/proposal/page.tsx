@@ -22,11 +22,11 @@ function Proposal() {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className='max-w-xl overflow-y-auto p-6'>
+			<DialogContent className='max-w-screen-md p-6'>
 				<DialogHeader>
 					<DialogTitle>Create Proposal</DialogTitle>
 				</DialogHeader>
-				<div className='px-4'>
+				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
 					<CreateProposal />
 				</div>
 			</DialogContent>

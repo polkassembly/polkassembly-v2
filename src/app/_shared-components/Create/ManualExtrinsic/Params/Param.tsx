@@ -196,10 +196,10 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 	const { apiService } = usePolkadotApiService();
 
 	const title = (
-		<span className='flex items-center gap-x-1 overflow-hidden whitespace-nowrap text-sm font-medium text-text_primary'>
+		<p className='flex w-full items-center gap-x-1 truncate text-sm font-medium text-text_primary'>
 			{param.name && `${param.name}:`} {param.type.type}
 			{param.type.typeName && ` (${param.type.typeName})`}
-		</span>
+		</p>
 	);
 
 	const registry = useMemo(() => apiService?.getApiRegistry(), [apiService]);
@@ -215,7 +215,7 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 	});
 
 	return (
-		<div className='flex flex-col gap-y-1'>
+		<div className='flex w-full flex-col gap-y-1'>
 			{title}
 			{paramComponent}
 		</div>

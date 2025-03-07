@@ -59,6 +59,7 @@ export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtr
 				console.error(error);
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [extrinsic, paramValues]);
 
 	return (

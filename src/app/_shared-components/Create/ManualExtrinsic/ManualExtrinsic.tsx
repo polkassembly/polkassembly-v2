@@ -28,8 +28,10 @@ function ManualExtrinsic() {
 	}, [apiService, extrinsicFn, userPreferences.address?.address]);
 
 	return (
-		<div className='flex flex-col gap-y-4'>
-			<Extrinsic onChange={setExtrinsicFn} />
+		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>
+			<div className='flex-1 overflow-y-auto'>
+				<Extrinsic onChange={setExtrinsicFn} />
+			</div>
 			{extrinsicHash && (
 				<div className='flex flex-col gap-y-2 rounded-lg bg-grey_bg p-2 text-text_primary'>
 					<div className='flex items-start justify-between gap-x-6'>
