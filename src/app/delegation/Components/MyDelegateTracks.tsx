@@ -60,9 +60,10 @@ function MyDelegateTracks() {
 
 	return (
 		<div className='mt-6 rounded-lg bg-bg_modal p-6 shadow-lg'>
-			<div className='mb-4 flex flex-row items-center justify-between'>
-				<h2 className='mb-4 text-2xl font-semibold text-btn_secondary_text'>Tracks</h2>
-				<div className='md:hidden'>
+			<div className='mb-4 flex flex-row items-center justify-between md:gap-20'>
+				<h2 className='text-2xl font-semibold text-btn_secondary_text'>Tracks</h2>
+
+				<div className='mt-4 md:hidden'>
 					<Select
 						value={activeFilter}
 						onValueChange={(value: ETrackDelegationStatus) => {
@@ -84,34 +85,38 @@ function MyDelegateTracks() {
 						</SelectContent>
 					</Select>
 				</div>
+
+				{/* Desktop Radio Group */}
 				<div className='hidden md:block'>
 					<RadioGroup
 						defaultValue={ETrackDelegationStatus.ALL}
 						value={activeFilter}
 						name='track-filter'
-						className='flex flex-row items-center gap-4'
+						className='flex flex-row space-x-2 lg:space-x-4'
 						onValueChange={(value: ETrackDelegationStatus) => {
 							setActiveFilter(value);
 						}}
 					>
-						{FILTER_OPTIONS.map((option) => (
-							<div
-								key={option.value}
-								className={`flex items-center rounded-full px-4 py-2 ${activeFilter === option.value ? 'bg-sidebar_menu_active' : ''}`}
-							>
-								<RadioGroupItem
-									value={option.value}
-									id={option.value}
-									className={styles.radioButton}
-								/>
-								<Label
-									htmlFor={option.value}
-									className='ml-2 cursor-pointer whitespace-nowrap text-sm text-btn_secondary_text'
+						<div className='flex flex-row flex-wrap items-end space-x-4'>
+							{FILTER_OPTIONS.map((option) => (
+								<div
+									key={option.value}
+									className={`flex items-center rounded-full px-4 py-2 transition-all duration-200 ${activeFilter === option.value ? 'bg-sidebar_menu_active' : ''}`}
 								>
-									{option.label} ({tabCounts[option.value.toLowerCase() as keyof typeof tabCounts]})
-								</Label>
-							</div>
-						))}
+									<RadioGroupItem
+										value={option.value}
+										id={option.value}
+										className={styles.radioButton}
+									/>
+									<Label
+										htmlFor={option.value}
+										className='ml-2 cursor-pointer whitespace-nowrap text-sm text-btn_secondary_text'
+									>
+										{option.label} ({tabCounts[option.value.toLowerCase() as keyof typeof tabCounts]})
+									</Label>
+								</div>
+							))}
+						</div>
 					</RadioGroup>
 				</div>
 			</div>
