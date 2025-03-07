@@ -30,7 +30,8 @@ import {
 	EVoteDecision,
 	EConvictionAmount,
 	IPostSubscription,
-	IDelegate
+	IDelegate,
+	ECommentSentiment
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -903,7 +904,8 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -912,6 +914,7 @@ export class FirestoreService extends FirestoreUtils {
 		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
+		sentiment?: ECommentSentiment;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
 
@@ -931,7 +934,8 @@ export class FirestoreService extends FirestoreUtils {
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
 			address: address || null,
-			dataSource: EDataSource.POLKASSEMBLY
+			dataSource: EDataSource.POLKASSEMBLY,
+			sentiment
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -939,7 +943,7 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newCommentData: Partial<IComment> = {
@@ -947,6 +951,7 @@ export class FirestoreService extends FirestoreUtils {
 			htmlContent: html,
 			markdownContent: markdown,
 			...(isSpam && { isSpam }),
+			...(aiSentiment && { aiSentiment }),
 			updatedAt: new Date()
 		};
 
