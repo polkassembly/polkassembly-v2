@@ -66,7 +66,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 									<div className='flex w-full'>
 										<div className='relative flex h-[56px] w-[85%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5'>
 											<div className='flex items-baseline gap-x-2'>
-												<h2 className='font-pixeboy mt-4 text-[35px] font-normal text-navbar_border'>
+												<h2 className='m t-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
 													{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}
 												</h2>
 											</div>
@@ -77,7 +77,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 										<div className='z-10 ml-2 mt-1'>
 											<button
 												type='button'
-												className='bg-arrow_bg_color rounded-full p-3'
+												className='rounded-full bg-arrow_bg_color p-3'
 											>
 												<ArrowUpRight
 													size={20}
@@ -112,7 +112,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											/>
 										</div>
 									</div>
-									<div className='bg-child_bounties_bg flex items-center justify-between rounded-b-3xl p-4'>
+									<div className='flex items-center justify-between rounded-b-3xl bg-child_bounties_bg p-4'>
 										<div className='flex items-center gap-2'>
 											<Image
 												src={ChildBounties}
@@ -137,7 +137,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{current > 0 && (
 						<button
 							type='button'
-							className='bg-arrow_bg_color absolute -left-6 top-1/2 -translate-y-1/2 rounded-full p-4 shadow-lg'
+							className='absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
 							onClick={() => carouselApi?.scrollPrev()}
 						>
 							<SlArrowLeft
@@ -149,7 +149,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{current < hotBounties.items.length - 3 && (
 						<button
 							type='button'
-							className='bg-arrow_bg_color absolute -right-6 top-1/2 -translate-y-1/2 rounded-full p-4 shadow-lg'
+							className='absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
 							onClick={() => carouselApi?.scrollNext()}
 						>
 							<SlArrowRight

@@ -20,9 +20,9 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { useEffect, useState } from 'react';
-import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
@@ -36,14 +36,13 @@ function StatItem({ label, value }: { label: string; value: string }) {
 function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
-	const [bountyAmount, setBountyAmount] = useState<string>('0');
 	const t = useTranslations('Bounty');
 
-	useEffect(() => {
-		apiService?.getBountyAmount().then((amount) => {
-			setBountyAmount(amount);
-		});
-	}, [apiService]);
+	const { data: bountyAmount = '0' } = useQuery({
+		queryKey: ['bountyAmount'],
+		queryFn: () => apiService?.getBountyAmount() ?? '0',
+		enabled: !!apiService
+	});
 
 	const availableBounty = !isNaN(Number(tokenPrice)) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
 
