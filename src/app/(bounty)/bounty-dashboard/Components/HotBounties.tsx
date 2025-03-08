@@ -19,25 +19,25 @@ import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
 import { useTranslations } from 'next-intl';
 
 export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
-	const [api, setApi] = useState<CarouselApi>();
+	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
 	const t = useTranslations('Bounty');
 
 	const onSelect = useCallback(() => {
-		if (!api) return;
-		setCurrent(api.selectedScrollSnap());
-	}, [api]);
+		if (!carouselApi) return;
+		setCurrent(carouselApi.selectedScrollSnap());
+	}, [carouselApi]);
 
 	useEffect(() => {
-		if (!api) {
+		if (!carouselApi) {
 			return () => {};
 		}
-		api.on('select', onSelect);
+		carouselApi.on('select', onSelect);
 		return () => {
-			api.off('select', onSelect);
+			carouselApi.off('select', onSelect);
 		};
-	}, [api, onSelect]);
+	}, [carouselApi, onSelect]);
 
 	return (
 		<div>
@@ -54,7 +54,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 						loop: false
 					}}
 					className='w-full'
-					setApi={setApi}
+					setApi={setCarouselApi}
 				>
 					<CarouselContent className='-ml-6'>
 						{hotBounties.items.map((bounty) => (
@@ -66,7 +66,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 									<div className='flex w-full'>
 										<div className='relative flex h-[56px] w-[85%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5'>
 											<div className='flex items-baseline gap-x-2'>
-												<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
+												<h2 className='font-pixeboy mt-4 text-[35px] font-normal text-navbar_border'>
 													{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}
 												</h2>
 											</div>
@@ -77,7 +77,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 										<div className='z-10 ml-2 mt-1'>
 											<button
 												type='button'
-												className='rounded-full bg-arrow_bg_color p-3'
+												className='bg-arrow_bg_color rounded-full p-3'
 											>
 												<ArrowUpRight
 													size={20}
@@ -112,7 +112,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											/>
 										</div>
 									</div>
-									<div className='flex items-center justify-between rounded-b-3xl bg-child_bounties_bg p-4'>
+									<div className='bg-child_bounties_bg flex items-center justify-between rounded-b-3xl p-4'>
 										<div className='flex items-center gap-2'>
 											<Image
 												src={ChildBounties}
@@ -137,8 +137,8 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{current > 0 && (
 						<button
 							type='button'
-							className='absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
-							onClick={() => api?.scrollPrev()}
+							className='bg-arrow_bg_color absolute -left-6 top-1/2 -translate-y-1/2 rounded-full p-4 shadow-lg'
+							onClick={() => carouselApi?.scrollPrev()}
 						>
 							<SlArrowLeft
 								size={24}
@@ -149,8 +149,8 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{current < hotBounties.items.length - 3 && (
 						<button
 							type='button'
-							className='absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
-							onClick={() => api?.scrollNext()}
+							className='bg-arrow_bg_color absolute -right-6 top-1/2 -translate-y-1/2 rounded-full p-4 shadow-lg'
+							onClick={() => carouselApi?.scrollNext()}
 						>
 							<SlArrowRight
 								size={24}
