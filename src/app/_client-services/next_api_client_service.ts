@@ -34,7 +34,8 @@ import {
 	IBountyStats,
 	IBountyUserActivity,
 	IVoteCartItem,
-	EConvictionAmount
+	EConvictionAmount,
+	ENetwork
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -43,6 +44,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { getCookieHeadersServer } from '@/_shared/_utils/getCookieHeadersServer';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
@@ -722,9 +724,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IBountyStats>({ url, method });
 	}
 
-	static async getTokenPrice(symbol: string) {
+	static async getTokenPrice() {
+		const currentNetwork = await this.getCurrentNetwork();
+		const { tokenSymbol } = NETWORKS_DETAILS[currentNetwork as ENetwork];
 		const queryParams = new URLSearchParams({
-			symbol
+			symbol: tokenSymbol
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TOKEN_PRICE, queryParams });
 		return this.nextApiClientFetch<{ price: number }>({ url, method });
