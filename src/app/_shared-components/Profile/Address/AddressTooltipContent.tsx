@@ -26,7 +26,7 @@ interface AddressTooltipContentProps {
 	identity?: IOnChainIdentity;
 }
 
-const LoadingState = memo(() => (
+const LoadingSpinner = memo(() => (
 	<div className='flex w-full items-center justify-center p-4'>
 		<div className='h-6 w-6 animate-spin rounded-full border-b-2 border-text_pink' />
 		<span className='ml-2 text-sm text-text_primary'>Loading Profile...</span>
@@ -90,7 +90,6 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 
 	const copyToClipboard = useCallback((text: string) => {
 		navigator.clipboard.writeText(text);
-		// TODO: Add toast notification
 	}, []);
 
 	const followUser = useCallback(async () => {
@@ -141,63 +140,61 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 	}, [currentUser, isFollowing, router, followUser, unfollowUser]);
 
 	const isLoadingData = isUserDataFetching || isFollowingFetching || isFollowersFetching;
+	const hasUserData = !!userData;
 
-	const renderContent = () => {
-		if (isLoadingData) return <LoadingState />;
+	if (isLoadingData) {
+		return <LoadingSpinner />;
+	}
 
-		const hasUserData = !!userData;
-		return (
-			<>
-				<ProfileImage imageUrl={userData?.profileDetails?.image} />
-				<div className={classes.tooltipContentWrapper}>
-					<div
-						aria-hidden='true'
-						className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'
-						onClick={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-						}}
-					>
-						<div className={`flex flex-col gap-1.5 ${hasUserData ? 'px-2' : 'px-4'}`}>
-							<AddressDisplay
-								address={address}
-								identity={identity}
-								displayText={displayText}
-								redirectionUrl={redirectionUrl}
-								onCopy={copyToClipboard}
+	return (
+		<div>
+			<ProfileImage imageUrl={userData?.profileDetails?.image} />
+			<div className={classes.tooltipContentWrapper}>
+				<div
+					aria-hidden='true'
+					className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'
+					onClick={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
+				>
+					<div className={`flex flex-col gap-1.5 ${hasUserData ? 'px-2' : 'px-4'}`}>
+						<AddressDisplay
+							address={address}
+							identity={identity}
+							displayText={displayText}
+							redirectionUrl={redirectionUrl}
+							onCopy={copyToClipboard}
+						/>
+						{hasUserData && userData.createdAt && (
+							<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
+								{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
+							</span>
+						)}
+						<div className={cn(hasUserData && userData.id && !isNaN(userData.id) ? 'flex items-center justify-between px-2' : 'flex items-center justify-start')}>
+							<UserStats
+								followers={stats.followers}
+								following={stats.following}
 							/>
-							{hasUserData && userData.createdAt && (
-								<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
-									{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
-								</span>
-							)}
-							<div className={cn(hasUserData && userData.id && !isNaN(userData.id) ? 'flex items-center justify-between px-2' : 'flex items-center justify-start')}>
-								<UserStats
-									followers={stats.followers}
-									following={stats.following}
-								/>
-								{hasUserData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
-							</div>
-							{hasUserData && (
-								<Button
-									size='lg'
-									className='mt-2 rounded-3xl'
-									leftIcon={<ShieldPlus />}
-									isLoading={loading}
-									onClick={handleButtonClick}
-									disabled={!userData.id}
-								>
-									{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
-								</Button>
-							)}
+							{hasUserData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
 						</div>
+						{hasUserData && (
+							<Button
+								size='lg'
+								className='mt-2 rounded-3xl'
+								leftIcon={<ShieldPlus />}
+								isLoading={loading}
+								onClick={handleButtonClick}
+								disabled={!userData.id}
+							>
+								{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
+							</Button>
+						)}
 					</div>
 				</div>
-			</>
-		);
-	};
-
-	return <div>{renderContent()}</div>;
+			</div>
+		</div>
+	);
 }
 
 export default memo(AddressTooltipContent);

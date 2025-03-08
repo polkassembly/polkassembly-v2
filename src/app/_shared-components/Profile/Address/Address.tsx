@@ -24,6 +24,7 @@ interface AddressProps {
 	walletAddressName?: string;
 	textClassName?: string;
 	redirectToProfile?: boolean;
+	disableTooltip?: boolean;
 }
 
 const getUserRedirection = (network: string, address: string, username?: string): string | null => {
@@ -31,7 +32,17 @@ const getUserRedirection = (network: string, address: string, username?: string)
 	return username?.length ? `https://${network}.polkassembly.io/user/${username}` : address?.length ? `https://${network}.polkassembly.io/address/${address}` : null;
 };
 
-function Address({ className, address, truncateCharLen = 5, iconSize = 20, showIdenticon = true, walletAddressName, textClassName, redirectToProfile }: AddressProps) {
+function Address({
+	className,
+	address,
+	truncateCharLen = 5,
+	iconSize = 20,
+	showIdenticon = true,
+	walletAddressName,
+	textClassName,
+	redirectToProfile,
+	disableTooltip = false
+}: AddressProps) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 
@@ -61,9 +72,24 @@ function Address({ className, address, truncateCharLen = 5, iconSize = 20, showI
 		initializeIdentity();
 	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName]);
 
+	if (disableTooltip) {
+		return (
+			<AddressInline
+				className={className}
+				address={encodedAddress}
+				onChainIdentity={identity as IOnChainIdentity}
+				addressDisplayText={displayText}
+				iconSize={iconSize}
+				showIdenticon={showIdenticon}
+				textClassName={textClassName}
+				redirectToProfile={redirectToProfile}
+			/>
+		);
+	}
+
 	return (
 		<div className={classes.tooltipWrapper}>
-			<TooltipProvider>
+			<TooltipProvider delayDuration={0}>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div className='relative cursor-pointer'>
