@@ -190,7 +190,8 @@ export class PolkadotApiService {
 				address,
 				errorMessageFallback: 'Failed to vote',
 				onSuccess,
-				onFailed
+				onFailed,
+				waitTillFinalizedHash: true
 			});
 		}
 	}

@@ -860,3 +860,10 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }
+
+export enum NotificationType {
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info'
+}

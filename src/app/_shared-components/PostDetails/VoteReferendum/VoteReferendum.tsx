@@ -4,12 +4,13 @@
 
 'use client';
 
-import { EVoteDecision } from '@/_shared/types';
+import { EVoteDecision, NotificationType } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useToast } from '@/hooks/useToast';
 import AddressDropdown from '../../AddressDropdown/AddressDropdown';
 import WalletButtons from '../../WalletsUI/WalletButtons/WalletButtons';
 import { Button } from '../../Button';
@@ -27,6 +28,7 @@ function VoteReferendum({ index }: { index: string }) {
 	const [abstainVoteValue, setAbstainVoteValue] = useState<BN>(BN_ZERO);
 	const [conviction, setConviction] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { toast } = useToast();
 
 	const { apiService } = usePolkadotApiService();
 
@@ -48,11 +50,19 @@ function VoteReferendum({ index }: { index: string }) {
 			await apiService.voteReferendum({
 				address: userPreferences.address?.address ?? '',
 				onSuccess: () => {
-					console.log('Vote successful');
+					toast({
+						title: t('VoteReferendum.voteSuccessTitle'),
+						description: t('VoteReferendum.voteSuccess'),
+						status: NotificationType.SUCCESS
+					});
 					setIsLoading(false);
 				},
 				onFailed: () => {
-					console.log('Vote failed');
+					toast({
+						title: t('VoteReferendum.voteFailedTitle'),
+						description: t('VoteReferendum.voteFailed'),
+						status: NotificationType.ERROR
+					});
 					setIsLoading(false);
 				},
 				referendumId: Number(index),
