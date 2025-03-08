@@ -65,10 +65,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			.filter((d) => d.votedProposalCount > 0 || d.receivedDelegationsCount > 0);
 
 		return NextResponse.json({
-			data: {
-				delegates: combinedDelegates,
-				totalDelegates: combinedDelegates.length
-			}
+			delegates: combinedDelegates,
+			totalDelegates: combinedDelegates.length
 		});
 	} catch (error) {
 		console.error('Delegate API Error:', error);
