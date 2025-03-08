@@ -88,7 +88,7 @@ function ProposalScreen({
 									proposalIndexOrHash: currentProposal.index?.toString() || currentProposal.hash || '',
 									proposalType: currentProposal.proposalType,
 									title: currentProposal.title,
-									voteDecision: EVoteDecision.ABSTAIN
+									voteDecision: EVoteDecision.SPLIT_ABSTAIN
 								})
 							}
 						>

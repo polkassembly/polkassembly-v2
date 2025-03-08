@@ -5,7 +5,7 @@
 import { encodeAddress } from '@polkadot/util-crypto';
 
 /**
- * Return an address encoded in the sbstrate format
+ * Return an address encoded in the substrate format
  * Returns null if invalid address (e.g. Ethereum address)
  *
  * @param address An address string

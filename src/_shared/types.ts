@@ -307,6 +307,12 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
+// stores the reason for invalidity or "Valid" if valid
+export interface ICrossValidationResult {
+	beneficiaries: string | 'Valid';
+	proposer: string | 'Valid';
+}
+
 export interface IContentSummary {
 	id: string;
 	network: ENetwork;
@@ -317,6 +323,7 @@ export interface IContentSummary {
 	isSpam?: boolean;
 	createdAt: Date;
 	updatedAt: Date;
+	crossValidationResult?: ICrossValidationResult;
 }
 
 export enum EOffChainPostTopic {
@@ -438,7 +445,6 @@ export enum EPostOrigin {
 export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
-	ABSTAIN = 'abstain',
 	SPLIT = 'split',
 	SPLIT_ABSTAIN = 'splitAbstain'
 }
@@ -557,6 +563,14 @@ export enum EListingTab {
 	POLKASSEMBLY = 'POLKASSEMBLY'
 }
 
+export enum ECommentSentiment {
+	AGAINST = 'against',
+	SLIGHTLY_AGAINST = 'slightly_against',
+	NEUTRAL = 'neutral',
+	SLIGHTLY_FOR = 'slightly_for',
+	FOR = 'for'
+}
+
 export interface IComment {
 	id: string;
 	createdAt: Date;
@@ -573,6 +587,8 @@ export interface IComment {
 	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
+	sentiment?: ECommentSentiment;
+	aiSentiment?: ECommentSentiment;
 }
 
 export interface ICommentResponse extends IComment {
@@ -872,4 +888,11 @@ export interface IWritePostFormFields {
 	tags: ITag[];
 	topic: EOffChainPostTopic;
 	allowedCommentor: EAllowedCommentor;
+}
+
+export enum NotificationType {
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info'
 }

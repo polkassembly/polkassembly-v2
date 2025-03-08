@@ -3,17 +3,19 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { fetchPF } from '@/_shared/_utils/fetchPF';
-import { ENetwork, EProposalType, IBeneficiary, ICommentResponse, IContentSummary, IOnChainPostInfo } from '@/_shared/types';
+import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo, ICrossValidationResult } from '@/_shared/types';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { APIError } from '../../_api-utils/apiError';
+import { fetchPostData } from '../../_api-utils/fetchPostData';
 
 if (!IS_AI_ENABLED) {
 	console.log('\n ℹ️ Info: AI service is not enabled, AI content will not be generated and/or included in the api data\n');
@@ -22,6 +24,8 @@ if (!IS_AI_ENABLED) {
 if (IS_AI_ENABLED && !AI_SERVICE_URL.trim()) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'AI_SERVICE_URL is not set');
 }
+
+// TODO: add a retry mechanism for every AI call
 
 export class AIService {
 	private static AI_SERVICE_URL = AI_SERVICE_URL;
@@ -47,11 +51,11 @@ export class AIService {
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
     Analyze the sentiment and provide a breakdown in the following format:
 
-    Overall X% of users are feeling optimistic. [Summarize main positive points]
+    Users feeling optimistic say: [Summarize main positive points]
 
-    Overall Y% of users are feeling neutral. [Summarize neutral/questioning points]
+    Users feeling neutral say: [Summarize neutral/questioning points]
 
-    Overall Z% of users are feeling against it. [Summarize main concerns]
+    Users feeling against say: [Summarize main concerns]
 
     Important technical points raised:
     - [List key technical discussions]
@@ -83,7 +87,25 @@ export class AIService {
     - Consider the technical nature of governance discussions when evaluating.
     - A post being controversial or having strong opinions does not make it spam.
     - Return ONLY ONE WORD, either 'true' or 'false' without ANY additional text or explanation.
-  `
+		`,
+		COMMENT_SENTIMENT_ANALYSIS: `
+		You are a helpful assistant that analyzes the sentiment of given comment on a post on the Polkadot governance forum Polkassembly.
+		Return the sentiment as either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+
+		STRICT RULES:
+		- Return ONLY ONE WORD either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+		`,
+		POST_CONTENT_EXTRACTION: `
+		You are a helpful assistant that extracts the content of a given post on the Polkadot governance forum Polkassembly.
+		Return the following in a JSON format:
+		{
+			"beneficiaries": [address1, address2, ...],
+			"proposer": "proposer address",
+		}
+
+		STRICT RULES:
+		- Return ONLY the JSON format.
+		`
 	} as const;
 
 	private static async getAIResponse(prompt: string): Promise<string | null> {
@@ -194,13 +216,32 @@ export class AIService {
 		return summaryResponse;
 	}
 
-	private static async getCommentsSummary({ comments }: { comments: ICommentResponse[] }): Promise<string | null> {
+	private static async getCommentsSummary({
+		network,
+		proposalType,
+		postIndexOrHash,
+		comments
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		postIndexOrHash: string;
+		comments: ICommentResponse[];
+	}): Promise<string | null> {
 		if (!comments?.length) {
 			return null;
 		}
 
-		// Construct the prompt with all comments
-		let fullPrompt = `${this.BASE_PROMPTS.COMMENTS_SUMMARY}\n\nAnalyze the following comments:\n\n`;
+		// Construct the prompt
+		let fullPrompt = `${this.BASE_PROMPTS.COMMENTS_SUMMARY}\n\n`;
+
+		// fetch post content
+		const post = await fetchPostData({ network, proposalType, indexOrHash: postIndexOrHash });
+
+		if (post.markdownContent) {
+			fullPrompt += `For a post with the following content:\n${post.markdownContent}\n\n`;
+		}
+
+		fullPrompt += 'Analyze the following comments:\n';
 
 		comments.forEach((comment, index) => {
 			// Use markdown content if available, otherwise convert from content
@@ -247,6 +288,105 @@ export class AIService {
 		return response?.toLowerCase() === 'true';
 	}
 
+	private static async getCommentSentiment({ mdContent }: { mdContent: string }): Promise<ECommentSentiment | null> {
+		if (!mdContent) {
+			return null;
+		}
+
+		const fullPrompt = `${this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS}\n\nAnalyze the following comment:\n\n${mdContent}\n\n`;
+
+		const response = await this.getAIResponse(fullPrompt);
+
+		if (!response || typeof response !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(response.toLowerCase())) {
+			return null;
+		}
+
+		return response.toLowerCase() as ECommentSentiment;
+	}
+
+	/**
+	 * Validates the content of a post against the on-chain post info.
+	 * Returns the validation result or null if validation process fails
+	 */
+	private static async validatePostContent({ mdContent, onChainPostInfo }: { mdContent?: string; onChainPostInfo?: IOnChainPostInfo }): Promise<ICrossValidationResult | null> {
+		if (!mdContent || !onChainPostInfo) {
+			return null;
+		}
+
+		let fullPrompt = `${this.BASE_PROMPTS.POST_CONTENT_EXTRACTION}\n\n`;
+
+		fullPrompt += `\n\nExtract from the following content:\n${mdContent}\n\n`;
+
+		const response = await this.getAIResponse(fullPrompt);
+
+		if (!response) {
+			return null;
+		}
+
+		// TODO: validate more fields, amount, assetId, etc.
+		let beneficiaryAddresses: string[] = [];
+		let proposerAddress: string = '';
+
+		// check if response is a valid JSON
+		try {
+			// extract js object via regex in case there is noise in the response
+			const jsonRegex = /{[\s\S]*?}/;
+			const jsonResponse = response.match(jsonRegex)?.[0];
+
+			if (!jsonResponse) {
+				return null;
+			}
+
+			const { beneficiaries = null, proposer = null } = JSON.parse(jsonResponse);
+
+			if (
+				!beneficiaries ||
+				!Array.isArray(beneficiaries) ||
+				!proposer ||
+				typeof proposer !== 'string' ||
+				!ValidatorService.isValidWeb3Address(proposer) ||
+				!beneficiaries.every((address) => ValidatorService.isValidWeb3Address(address))
+			) {
+				// invalid response from LLM
+				return null;
+			}
+
+			if (beneficiaries && Array.isArray(beneficiaries)) {
+				beneficiaryAddresses = beneficiaries.map((address) => (address.startsWith('0x') ? address : getSubstrateAddress(address))).filter((address) => address !== null);
+			}
+
+			if (proposer && typeof proposer === 'string' && ValidatorService.isValidWeb3Address(proposer)) {
+				proposerAddress = proposer.startsWith('0x') ? proposer : getSubstrateAddress(proposer) || '';
+			}
+		} catch {
+			// if response is not a valid JSON or the fields returned by the LLM are not valid, discard the response
+			return null;
+		}
+
+		const validationResult: ICrossValidationResult = {
+			beneficiaries: '',
+			proposer: ''
+		};
+
+		if (beneficiaryAddresses.length !== (onChainPostInfo.beneficiaries?.length || 0)) {
+			validationResult.beneficiaries += `Beneficiary addresses count mismatch. Found ${beneficiaryAddresses.length} in content but ${onChainPostInfo.beneficiaries?.length || 0} on-chain.`;
+		}
+
+		if (beneficiaryAddresses.some((address) => !onChainPostInfo.beneficiaries?.some((beneficiary) => beneficiary.address === address))) {
+			const mismatchedAddresses = beneficiaryAddresses.filter((address) => !onChainPostInfo.beneficiaries?.some((beneficiary) => beneficiary.address === address));
+			validationResult.beneficiaries += `Beneficiary addresses mismatch: ${mismatchedAddresses.join(', ')} not found in on-chain data.`;
+		}
+
+		if (proposerAddress !== onChainPostInfo.proposer) {
+			validationResult.proposer += `Proposer address mismatch: found "${proposerAddress}" in content but "${onChainPostInfo.proposer}" on-chain.`;
+		}
+
+		return {
+			beneficiaries: validationResult.beneficiaries || 'Valid',
+			proposer: validationResult.proposer || 'Valid'
+		};
+	}
+
 	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
 
@@ -278,7 +418,17 @@ export class AIService {
 			title: offChainPostData.title
 		});
 
-		if (!postSummary?.trim() && !isSpam) return null;
+		const crossValidationResult = onChainPostInfo
+			? await this.validatePostContent({
+					mdContent,
+					onChainPostInfo
+				})
+			: null;
+
+		// if neither of AI generated stuff is usable, don't update anything
+		if (!postSummary?.trim() && !isSpam && !crossValidationResult) return null;
+
+		// TODO: send appropriate notifications if content is spam or cross validation fails
 
 		// check if content summary already exists
 		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
@@ -292,7 +442,8 @@ export class AIService {
 			...(isSpam && { isSpam }),
 			...(existingContentSummary?.commentsSummary && { commentsSummary: existingContentSummary.commentsSummary }),
 			createdAt: existingContentSummary?.createdAt || new Date(),
-			updatedAt: new Date()
+			updatedAt: new Date(),
+			...(crossValidationResult && { crossValidationResult })
 		};
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
@@ -329,7 +480,7 @@ export class AIService {
 			}
 		}
 
-		const commentsSummary = await this.getCommentsSummary({ comments: flattenedComments });
+		const commentsSummary = await this.getCommentsSummary({ network, proposalType, postIndexOrHash: indexOrHash, comments: flattenedComments });
 
 		if (!commentsSummary?.trim()) return null;
 
@@ -348,5 +499,22 @@ export class AIService {
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
 
 		return updatedContentSummary;
+	}
+
+	static async UpdateCommentSentiment(commentId: string): Promise<IComment | null> {
+		const comment = await OffChainDbService.GetCommentById(commentId);
+
+		if (!comment) return null;
+
+		const sentiment = await this.getCommentSentiment({ mdContent: comment.markdownContent });
+
+		if (!sentiment) return null;
+
+		await OffChainDbService.UpdateComment({ commentId, content: comment.content, aiSentiment: sentiment });
+
+		return {
+			...comment,
+			aiSentiment: sentiment
+		};
 	}
 }

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EProposalType } from '@/_shared/types';
+import { ECommentSentiment, EProposalType, IComment } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -47,10 +47,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		address: z
 			.string()
 			.refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
-			.optional()
+			.optional(),
+		sentiment: z.nativeEnum(ECommentSentiment).optional()
 	});
 
-	const { content, parentCommentId, address } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, address, sentiment } = zodBodySchema.parse(await getReqBody(req));
 
 	const formattedContent = convertContentForFirestoreServer(content);
 
@@ -61,10 +62,17 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content: formattedContent,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
+
+	// if sentiment is not provided, update the sentiment using AI
+	let updatedComment: IComment | null = null;
+	if (!sentiment) {
+		updatedComment = await AIService.UpdateCommentSentiment(newComment.id);
+	}
 
 	// Invalidate caches since comment count changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
@@ -72,7 +80,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
-	const response = NextResponse.json(newComment);
+	const response = NextResponse.json(updatedComment ?? newComment);
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

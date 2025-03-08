@@ -72,7 +72,7 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 					/>
 				) : (
 					<>
-						{voteDecision === EVoteDecision.ABSTAIN && (
+						{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 							<BalanceInput
 								label={t('VoteReferendum.abstainVoteValue')}
 								onChange={setAbstainValue}
