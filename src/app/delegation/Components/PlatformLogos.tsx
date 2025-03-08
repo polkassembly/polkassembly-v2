@@ -10,6 +10,7 @@ import W3FLogo from '@assets/delegation/w3f.svg';
 import Image, { StaticImageData } from 'next/image';
 import { ReactNode } from 'react';
 import { EDelegateSource } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 
 const DEFAULT_PLATFORM_STYLE = 'border-navbar_border bg-delegation_card_polkassembly';
 
@@ -50,12 +51,13 @@ const logoMap: { [key: string]: StaticImageData | ReactNode } = {
 };
 
 function PlatformLogos({ platforms }: { platforms: EDelegateSource[] }) {
+	const t = useTranslations('Delegation');
 	if (!Array.isArray(platforms) || platforms.length === 0) {
 		return (
 			<div className='flex'>
 				<div className='flex items-center gap-1 px-2 lg:gap-2 lg:px-4'>
 					<FaUser className='h-4 w-4 text-text_primary' />
-					<p className='text-sm text-btn_secondary_text'>Individual</p>
+					<p className='text-sm text-btn_secondary_text'>{t('individual')}</p>
 				</div>
 			</div>
 		);

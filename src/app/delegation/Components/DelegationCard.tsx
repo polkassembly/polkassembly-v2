@@ -21,6 +21,7 @@ import { parseBalance } from '@/app/_client-utils/parseBalance';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/app/_shared-components/Select/Select';
 import { FaFilter } from 'react-icons/fa';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
+import { useTranslations } from 'next-intl';
 import { MdSort } from 'react-icons/md';
 import PlatformLogos, { getPlatformStyles } from './PlatformLogos';
 import DelegateSearchInput from './DelegateSearchInput';
@@ -31,131 +32,138 @@ interface DelegateCardProps {
 	network: ENetwork;
 }
 
-const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => (
-	<Popover>
-		<PopoverTrigger asChild>
-			<Button variant='outline'>
-				<FaFilter className='text-text_pink' />
-			</Button>
-		</PopoverTrigger>
-		<PopoverContent className='w-[200px] border-border_grey p-4'>
-			<div className='flex items-center justify-end'>
-				<button
-					onClick={() => setSelectedSources([])}
-					className='cursor-pointer text-sm font-medium text-text_pink'
-					type='button'
-				>
-					Clear All
-				</button>
-			</div>
-			<hr className='my-2 border-text_pink' />
-			<div className='mt-2 space-y-4'>
-				{SOURCE_OPTIONS.map((source) => (
-					<div
-						key={source.value}
-						className='flex items-center space-x-2'
+const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
+	const t = useTranslations('Delegation');
+	return (
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button variant='outline'>
+					<FaFilter className='text-text_pink' />
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className='w-[200px] border-border_grey p-4'>
+				<div className='flex items-center justify-end'>
+					<button
+						onClick={() => setSelectedSources([])}
+						className='cursor-pointer text-sm font-medium text-text_pink'
+						type='button'
 					>
-						<Checkbox
-							checked={selectedSources.includes(source.value)}
-							onCheckedChange={(checked) => {
-								setSelectedSources(checked ? [...selectedSources, source.value] : selectedSources.filter((s) => s !== source.value));
-							}}
-						/>
-						<Label className='text-sm text-text_primary'>{source.label}</Label>
-					</div>
-				))}
-			</div>
-		</PopoverContent>
-	</Popover>
-));
-
-const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => (
-	<div className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'>
-		<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles(delegate.dataSource)}`}>
-			<PlatformLogos platforms={delegate.dataSource} />
-		</div>
-		<div className='p-4'>
-			<div className='flex items-center justify-between gap-2'>
-				<Address address={delegate.address} />
-				<div className='flex items-center gap-1 text-text_pink'>
-					<IoPersonAdd />
-					<span>Delegate</span>
+						{t('clearAll')}
+					</button>
 				</div>
+				<hr className='my-2 border-text_pink' />
+				<div className='mt-2 space-y-4'>
+					{SOURCE_OPTIONS.map((source) => (
+						<div
+							key={source.value}
+							className='flex items-center space-x-2'
+						>
+							<Checkbox
+								checked={selectedSources.includes(source.value)}
+								onCheckedChange={(checked) => {
+									setSelectedSources(checked ? [...selectedSources, source.value] : selectedSources.filter((s) => s !== source.value));
+								}}
+							/>
+							<Label className='text-sm text-text_primary'>{source.label}</Label>
+						</div>
+					))}
+				</div>
+			</PopoverContent>
+		</Popover>
+	);
+});
+
+const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
+	const t = useTranslations('Delegation');
+	return (
+		<div className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'>
+			<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles(delegate.dataSource)}`}>
+				<PlatformLogos platforms={delegate.dataSource} />
 			</div>
-			<div className='h-24 px-5'>
-				<div className='text-sm text-text_primary'>
-					{delegate.bio.length > 0 ? (
-						delegate.bio.includes('<') ? (
-							<div className='bio-content'>
-								<BlockEditor
-									data={delegate.bio}
-									readOnly
-									id={`delegate-bio-${delegate.address}`}
-									className='text-sm text-text_primary'
-								/>
-								{delegate.bio.length > 100 && (
-									<button
-										className='cursor-pointer text-xs font-medium text-blue-600'
-										type='button'
-									>
-										Read more
-									</button>
-								)}
-							</div>
-						) : (
-							<div className='bio-content'>
-								<span>{delegate.bio.slice(0, 100)}</span>
-								{delegate.bio.length > 100 && (
-									<>
-										<span>... </span>
+			<div className='p-4'>
+				<div className='flex items-center justify-between gap-2'>
+					<Address address={delegate.address} />
+					<div className='flex items-center gap-1 text-text_pink'>
+						<IoPersonAdd />
+						<span>{t('delegate')}</span>
+					</div>
+				</div>
+				<div className='h-24 px-5'>
+					<div className='text-sm text-text_primary'>
+						{delegate.bio.length > 0 ? (
+							delegate.bio.includes('<') ? (
+								<div className='bio-content'>
+									<BlockEditor
+										data={delegate.bio}
+										readOnly
+										id={`delegate-bio-${delegate.address}`}
+										className='text-sm text-text_primary'
+									/>
+									{delegate.bio.length > 100 && (
 										<button
 											className='cursor-pointer text-xs font-medium text-blue-600'
 											type='button'
 										>
-											Read more
+											{t('readMore')}
 										</button>
-									</>
-								)}
-							</div>
-						)
-					) : (
-						<span>No Bio</span>
-					)}
-				</div>
-			</div>
-		</div>
-		<div className='grid grid-cols-3 items-center border-t border-border_grey'>
-			<div className='border-r border-border_grey p-5 text-center'>
-				<div>
-					<div className='text-sm text-btn_secondary_text'>
-						<span className='text-2xl font-semibold'> {parseBalance(delegate?.delegatedBalance.toString(), 1, false, network)}</span>{' '}
-						{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}
+									)}
+								</div>
+							) : (
+								<div className='bio-content'>
+									<span>{delegate.bio.slice(0, 100)}</span>
+									{delegate.bio.length > 100 && (
+										<>
+											<span>... </span>
+											<button
+												className='cursor-pointer text-xs font-medium text-blue-600'
+												type='button'
+											>
+												{t('readMore')}
+											</button>
+										</>
+									)}
+								</div>
+							)
+						) : (
+							<span>{t('noBio')}</span>
+						)}
 					</div>
-					<span className='text-xs text-delegation_card_text'>Voting power</span>
 				</div>
 			</div>
-			<div className='border-r border-border_grey p-3 text-center'>
-				<div>
-					<div className='text-2xl font-semibold'>{delegate?.votedProposalCount?.convictionVotesConnection?.totalCount}</div>
-					<span className='text-xs text-delegation_card_text'>Voted proposals </span>
-					<span className='block text-[10px] text-delegation_card_text'>(Past 30 Days)</span>
+			<div className='grid grid-cols-3 items-center border-t border-border_grey'>
+				<div className='border-r border-border_grey p-5 text-center'>
+					<div>
+						<div className='text-sm text-btn_secondary_text'>
+							<span className='text-2xl font-semibold'> {parseBalance(delegate?.delegatedBalance.toString(), 1, false, network)}</span>{' '}
+							{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}
+						</div>
+						<span className='text-xs text-delegation_card_text'>{t('votingPower')}</span>
+					</div>
 				</div>
-			</div>
-			<div className='p-5 text-center'>
-				<div>
-					<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
-					<span className='text-xs text-delegation_card_text lg:whitespace-nowrap'>Received Delegation</span>
+				<div className='border-r border-border_grey p-3 text-center'>
+					<div>
+						<div className='text-2xl font-semibold'>{delegate?.votedProposalCount?.convictionVotesConnection?.totalCount}</div>
+						<span className='text-xs text-delegation_card_text'>{t('votedProposals')}</span>
+						<span className='block text-[10px] text-delegation_card_text'>({t('past30Days')})</span>
+					</div>
+				</div>
+				<div className='p-5 text-center'>
+					<div>
+						<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
+						<span className='text-xs text-delegation_card_text lg:whitespace-nowrap'>{t('receivedDelegations')}</span>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-));
+	);
+});
 
 function DelegationCard({ delegates }: { delegates: IDelegate[] }) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
+	const t = useTranslations('Delegation');
 
 	const { filteredAndSortedDelegates, searchQuery, handleSearchChange, selectedSources, setSelectedSources, sortBy, setSortBy } = useDelegateFiltering(delegates);
 
@@ -178,7 +186,7 @@ function DelegationCard({ delegates }: { delegates: IDelegate[] }) {
 			<div className='mb-4 flex items-center justify-between'>
 				<div className='flex items-center gap-2'>
 					<IoMdTrendingUp className='text-xl font-bold text-bg_pink' />
-					<p className='text-xl font-semibold text-btn_secondary_text'>Trending Delegates</p>
+					<p className='text-xl font-semibold text-btn_secondary_text'>{t('trendingDelegates')}</p>
 				</div>
 			</div>
 			<div className='flex items-center gap-4'>
@@ -203,9 +211,9 @@ function DelegationCard({ delegates }: { delegates: IDelegate[] }) {
 							<MdSort className='text-3xl text-text_pink' />
 						</SelectTrigger>
 						<SelectContent className={styles.selectContent}>
-							<SelectItem value='votingPower'>Voting Power</SelectItem>
-							<SelectItem value='votedProposals'>Voted Proposals</SelectItem>
-							<SelectItem value='receivedDelegations'>Received Delegations</SelectItem>
+							<SelectItem value='votingPower'>{t('votingPower')}</SelectItem>
+							<SelectItem value='votedProposals'>{t('votedProposals')}</SelectItem>
+							<SelectItem value='receivedDelegations'>{t('receivedDelegations')}</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>

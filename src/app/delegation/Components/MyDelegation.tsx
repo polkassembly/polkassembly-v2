@@ -10,12 +10,14 @@ import Image from 'next/image';
 import Address from '@ui/Profile/Address/Address';
 import { useUser } from '@/hooks/useUser';
 import { Button } from '@ui/Button';
+import { useTranslations } from 'next-intl';
 import DelegationPopupCard from './DelegationPopupCard';
 import SocialLinks from './SocialLinks';
 import MyDelegateTracks from './MyDelegateTracks';
 
 function MyDelegation() {
 	const { user } = useUser();
+	const t = useTranslations('Delegation');
 
 	if (!user) {
 		return null;
@@ -41,7 +43,7 @@ function MyDelegation() {
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
 					<div className='mt-5 hidden sm:mt-0 md:block'>
-						<Button variant='secondary'>Become a Delegate</Button>
+						<Button variant='secondary'>{t('becomeDelegate')}</Button>
 					</div>
 				</div>
 			</div>

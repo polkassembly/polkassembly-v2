@@ -7,6 +7,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
 import { useUser } from '@/hooks/useUser';
 import { IDelegate, IDelegationStats } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import styles from './Delegation.module.scss';
 import DelegationSupplyData from './DelegationSupplyData';
 import DelegationCard from './DelegationCard';
@@ -20,9 +21,10 @@ enum EDelegationTab {
 
 function Delegation({ delegationStats, delegates }: { delegationStats: IDelegationStats; delegates: IDelegate[] }) {
 	const { user } = useUser();
+	const t = useTranslations('Delegation');
 	const dashboardContent = (
 		<div>
-			<h1 className={styles.delegation_title}>Delegation</h1>
+			<h1 className={styles.delegation_title}>{t('delegation')}</h1>
 			<DelegationPopupCard />
 			<DelegationSupplyData delegationStats={delegationStats} />
 			<DelegationCard delegates={delegates} />
@@ -41,13 +43,13 @@ function Delegation({ delegationStats, delegates }: { delegationStats: IDelegati
 						className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
 						value={EDelegationTab.DASHBOARD}
 					>
-						Dashboard
+						{t('dashboard')}
 					</TabsTrigger>
 					<TabsTrigger
 						className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
 						value={EDelegationTab.MY_DELEGATION}
 					>
-						My Delegation
+						{t('myDelegation')}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={EDelegationTab.DASHBOARD}>{dashboardContent}</TabsContent>

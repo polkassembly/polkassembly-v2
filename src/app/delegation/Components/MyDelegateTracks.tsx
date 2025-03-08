@@ -11,26 +11,28 @@ import { RadioGroup, RadioGroupItem } from '@/app/_shared-components/RadioGroup/
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
+import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import styles from './Delegation.module.scss';
 
-const FILTER_OPTIONS = [
-	{ value: ETrackDelegationStatus.ALL, label: 'All' },
-	{ value: ETrackDelegationStatus.DELEGATED, label: 'Delegated' },
-	{ value: ETrackDelegationStatus.RECEIVED_DELEGATION, label: 'Received delegation' },
-	{ value: ETrackDelegationStatus.UNDELEGATED, label: 'Undelegated' }
-] as const;
-
 function MyDelegateTracks() {
 	const { user } = useUser();
 	const network = getCurrentNetwork();
+	const t = useTranslations('Delegation');
 	const [activeFilter, setActiveFilter] = useState(ETrackDelegationStatus.ALL);
 	const { data, isLoading } = useQuery({
 		queryKey: ['address'],
 		queryFn: () => fetch(`/api/v2/delegation/userData?address=${user?.defaultAddress}`).then((res) => res.json()),
 		enabled: !!user?.defaultAddress
 	});
+
+	const FILTER_OPTIONS = [
+		{ value: ETrackDelegationStatus.ALL, label: t('all') },
+		{ value: ETrackDelegationStatus.DELEGATED, label: t('delegated') },
+		{ value: ETrackDelegationStatus.RECEIVED_DELEGATION, label: t('receivedDelegation') },
+		{ value: ETrackDelegationStatus.UNDELEGATED, label: t('undelegated') }
+	] as const;
 
 	const tabCounts = useMemo(() => {
 		if (!data) return { all: 0, delegated: 0, received_delegation: 0, undelegated: 0 };
@@ -61,7 +63,7 @@ function MyDelegateTracks() {
 	return (
 		<div className='mt-6 rounded-lg bg-bg_modal p-6 shadow-lg'>
 			<div className='mb-4 flex flex-row items-center justify-between md:gap-20'>
-				<h2 className='text-2xl font-semibold text-btn_secondary_text'>Tracks</h2>
+				<h2 className='text-2xl font-semibold text-btn_secondary_text'>{t('tracks')}</h2>
 
 				<div className='mt-4 md:hidden'>
 					<Select
@@ -71,7 +73,7 @@ function MyDelegateTracks() {
 						}}
 					>
 						<SelectTrigger className={styles.selectTrigger}>
-							<SelectValue placeholder='Select filter' />
+							<SelectValue placeholder={t('selectFilter')} />
 						</SelectTrigger>
 						<SelectContent className={styles.selectContent}>
 							{FILTER_OPTIONS.map((option) => (
@@ -130,10 +132,10 @@ function MyDelegateTracks() {
 					<TableHeader>
 						<TableRow className={styles.tableRow}>
 							<TableHead className={styles.tableCell_1}>#</TableHead>
-							<TableHead className={styles.tableCell_2}>Tracks</TableHead>
-							<TableHead className={styles.tableCell}>Description</TableHead>
-							<TableHead className={styles.tableCell}>Active proposals</TableHead>
-							<TableHead className={styles.tableCell_last}>Status</TableHead>
+							<TableHead className={styles.tableCell_2}>{t('tracks')}</TableHead>
+							<TableHead className={styles.tableCell}>{t('description')}</TableHead>
+							<TableHead className={styles.tableCell}>{t('activeProposals')}</TableHead>
+							<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -154,7 +156,7 @@ function MyDelegateTracks() {
 				</Table>
 			) : (
 				<div className='flex h-full items-center justify-center'>
-					<p className='text-btn_secondary_text'>No tracks found</p>
+					<p className='text-btn_secondary_text'>{t('noTracksFound')}</p>
 				</div>
 			)}
 		</div>

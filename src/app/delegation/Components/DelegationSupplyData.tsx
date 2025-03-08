@@ -15,12 +15,14 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { parseBalance } from '@/app/_client-utils/parseBalance';
+import { useTranslations } from 'next-intl';
 
 const ZERO_BN = new BN(0);
 
 function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegationStats }) {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
+	const t = useTranslations('Delegation');
 	const [totalSupply, setTotalSupply] = useState<BN>(ZERO_BN);
 
 	useEffect(() => {
@@ -51,7 +53,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					className='h-10 w-10'
 				/>
 				<div className='flex flex-col'>
-					<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Supply</p>
+					<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalSupply')}</p>
 					<p className='text-xl font-semibold'>{parseBalance(totalSupply.toString(), 2, true, network)}</p>
 				</div>
 			</div>
@@ -63,7 +65,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Delegated Tokens</p>
+						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('delegatedTokens')}</p>
 						<p className='text-xl font-semibold'>{parseBalance(delegationStats.totalDelegatedBalance, 2, true, network)}</p>
 					</div>
 				</div>
@@ -76,7 +78,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegated Votes</p>
+						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalDelegatedVotes')}</p>
 						<p className='text-xl font-semibold'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes.totalCount.toString()))}</p>
 					</div>
 				</div>
@@ -89,7 +91,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegates</p>
+						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalDelegates')}</p>
 						<p className='text-xl font-semibold'>{delegationStats?.totalDelegates}</p>
 					</div>
 				</div>
@@ -102,7 +104,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>Total Delegatees</p>
+						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalDelegatees')}</p>
 						<p className='text-xl font-semibold'>{delegationStats?.totalDelegators}</p>
 					</div>
 				</div>

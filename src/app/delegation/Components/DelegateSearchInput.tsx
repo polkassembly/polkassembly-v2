@@ -5,6 +5,7 @@
 import { Input } from '@/app/_shared-components/Input';
 import { Search } from 'lucide-react';
 import { memo, useState, useEffect, ChangeEvent, KeyboardEvent, RefObject } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface SearchInputProps {
 	searchInputRef: RefObject<HTMLInputElement>;
@@ -15,6 +16,7 @@ interface SearchInputProps {
 function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }: SearchInputProps) {
 	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
+	const t = useTranslations('Delegation');
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target;
 		setLocalSearchTerm(value);
@@ -33,7 +35,7 @@ function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }:
 			<Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500' />
 			<Input
 				ref={searchInputRef}
-				placeholder='Enter username or address to Delegate vote'
+				placeholder={t('enterUsernameOrAddressToDelegateVote')}
 				value={localSearchTerm}
 				onChange={handleInputChange}
 				className='pl-10'

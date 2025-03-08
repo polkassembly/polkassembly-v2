@@ -8,27 +8,10 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork, ETrackDelegationStatus } from '@/_shared/types';
+import { ENetwork, ETrackDelegationStatus, IDelegation, ITrackDelegation } from '@/_shared/types';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-
-interface IDelegation {
-	track: number;
-	to: string;
-	from: string;
-	lockPeriod: number;
-	balance: string;
-	createdAt: Date;
-}
-
-interface ITrackDelegation {
-	track: number;
-	active_proposals_count: number;
-	status: ETrackDelegationStatus[];
-	recieved_delegation_count: number;
-	delegations: IDelegation[];
-}
 
 const QuerySchema = z.object({
 	address: z.string().min(1, 'Address is required')

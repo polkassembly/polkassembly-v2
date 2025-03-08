@@ -13,6 +13,7 @@ import PolkaAsset from '@assets/delegation/Track.svg';
 import PolkaBadge from '@assets/delegation/badge.svg';
 import Reverse from '@assets/delegation/reverse.svg';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { MdInfoOutline } from 'react-icons/md';
 import Image from 'next/image';
 import styles from './Delegation.module.scss';
@@ -20,13 +21,13 @@ import styles from './Delegation.module.scss';
 function DelegationPopupCard() {
 	const { user } = useUser();
 	const [showDelegationInfo, setShowDelegationInfo] = useState(true);
-
+	const t = useTranslations('Delegation');
 	return (
 		<div>
 			{showDelegationInfo && (
 				<div className='mt-5 hidden rounded-lg bg-bg_modal py-4 shadow-lg sm:block'>
 					<div className='flex items-center justify-between px-6'>
-						<p className='text-xl font-semibold text-btn_secondary_text'>How to Delegate on Polkassembly</p>
+						<p className='text-xl font-semibold text-btn_secondary_text'>{t('howToDelegateOnPolkassembly')}</p>
 						<div className='flex items-center gap-4'>
 							<Tooltip delayDuration={0}>
 								<TooltipTrigger asChild>
@@ -35,7 +36,7 @@ function DelegationPopupCard() {
 											disabled={!user}
 											className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
 										>
-											Become a Delegate
+											{t('becomeDelegate')}
 										</Button>
 									</div>
 								</TooltipTrigger>
@@ -45,7 +46,7 @@ function DelegationPopupCard() {
 										side='top'
 										sideOffset={5}
 									>
-										<p className='text-sm'>Please Login to continue</p>
+										<p className='text-sm'>{t('pleaseLoginToContinue')}</p>
 									</TooltipContent>
 								)}
 							</Tooltip>
@@ -64,10 +65,10 @@ function DelegationPopupCard() {
 								className='-mt-5 h-36 w-36'
 							/>
 							<div className='grid max-w-sm grid-cols-[auto_1fr] gap-4 text-sm text-text_primary'>
-								<p className='whitespace-nowrap font-semibold'>STEP 1</p>
+								<p className='whitespace-nowrap font-semibold'>{t('step1')}</p>
 								<div>
-									<p className='font-semibold'>Select Track for Delegation</p>
-									<p>OpenGov allows for track level agile delegation. Choose a track to proceed.</p>
+									<p className='font-semibold'>{t('selectTrackForDelegation')}</p>
+									<p>{t('openGovAllowsForTrackLevelAgileDelegationChooseATrackToProceed')}</p>
 								</div>
 							</div>
 						</div>
@@ -86,10 +87,10 @@ function DelegationPopupCard() {
 							</div>
 							<div className='grid max-w-lg grid-cols-[auto_1fr] gap-3'>
 								<div className='grid grid-cols-[auto_1fr] items-start gap-4 text-sm text-text_primary'>
-									<p className='whitespace-nowrap font-semibold'>STEP 2</p>
+									<p className='whitespace-nowrap font-semibold'>{t('step2')}</p>
 									<div>
-										<p className='font-semibold'>Select Delegate</p>
-										<p>Choose a delegate based on the stats to complete your delegation process.</p>
+										<p className='font-semibold'>{t('selectDelegate')}</p>
+										<p>{t('chooseADelegateBasedOnTheStatsToCompleteYourDelegationProcess')}</p>
 									</div>
 								</div>
 							</div>
@@ -98,14 +99,14 @@ function DelegationPopupCard() {
 					<div className='mx-4 mb-2 rounded-md bg-info_bg px-4 py-2 text-sm'>
 						<p className='flex items-center gap-1 text-wallet_btn_text'>
 							<MdInfoOutline className='mr-1 inline-block text-lg' />
-							Want to learn more about delegation process before locking your tokens. Click{' '}
+							{t('wantToLearnMoreAboutDelegationProcessBeforeLockingYourTokensClick')}
 							<Link
 								className='text-border_blue underline'
 								target='_blank'
 								href='https://docs.polkassembly.io/opengov/learn-about-referenda/voting-on-a-referendum/delegating-voting-power'
 							>
 								{' '}
-								here
+								{t('here')}
 							</Link>
 						</p>
 					</div>
