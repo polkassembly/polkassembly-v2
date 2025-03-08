@@ -24,6 +24,13 @@ import VectorFixed from './VectorFixed';
 import NullComp from './Null';
 import AccountId20 from './AccountId20';
 import AccountId32 from './AccountId32';
+import Cid from './Cid';
+import KeyValue from './KeyValue';
+import KeyValueArray from './KeyValueArray';
+import BTreeMapComp from './BTreeMap';
+import VectorComp from './Vector';
+import PreimageVoteComp from './PreimageVote';
+import PreimageVoteThresholdComp from './PreimageVoteThreshold';
 
 export interface ComponentProps {
 	className?: string;
@@ -68,8 +75,8 @@ const componentDef: TypeToComponent[] = [
 	{ c: Bool, t: ['bool'] },
 	{ c: BytesInput, t: ['Bytes', 'Vec<u8>'] },
 	{ c: Extrinsic, t: ['Call', 'Proposal', 'RuntimeCall'] },
-	{ c: InputText, t: ['PalletAllianceCid'] },
-	// { c: Code, t: ['Code'] },
+	{ c: Cid, t: ['PalletAllianceCid'] },
+	{ c: BytesInput, t: ['Code'] },
 	// { c: DispatchError, t: DISPATCH_ERROR },
 	// { c: DispatchResult, t: ['DispatchResult', 'Result<Null, SpRuntimeDispatchError>'] },
 	{ c: InputText, t: ['Raw', 'RuntimeSessionKeys', 'Keys'] },
@@ -77,20 +84,20 @@ const componentDef: TypeToComponent[] = [
 	{ c: InputText, t: ['Hash', 'H256'] },
 	{ c: InputText, t: ['H160'] },
 	{ c: InputText, t: ['H512'] },
-	// { c: KeyValue, t: ['KeyValue'] },
-	// { c: KeyValueArray, t: ['Vec<KeyValue>'] },
-	// { c: Moment, t: ['Moment', 'MomentOf'] },
+	{ c: KeyValue, t: ['KeyValue'] },
+	{ c: KeyValueArray, t: ['Vec<KeyValue>'] },
+	{ c: InputNumber, t: ['Moment', 'MomentOf'] },
 	{ c: NullComp, t: ['Null'] },
-	// { c: OpaqueCall, t: ['OpaqueCall'] },
+	{ c: Extrinsic, t: ['OpaqueCall'] },
 	{ c: Option, t: ['Option'] },
 	{ c: InputText, t: ['String', 'Text'] },
 	{ c: Struct, t: ['Struct'] },
 	{ c: Tuple, t: ['Tuple'] },
-	// { c: BTreeMap, t: ['BTreeMap'] },
-	// { c: Vector, t: ['Vec', 'BTreeSet'] },
+	{ c: BTreeMapComp, t: ['BTreeMap'] },
+	{ c: VectorComp, t: ['Vec', 'BTreeSet'] },
 	{ c: VectorFixed, t: ['VecFixed'] },
-	// { c: Vote, t: ['Vote'] },
-	// { c: VoteThreshold, t: ['VoteThreshold'] },
+	{ c: PreimageVoteComp, t: ['Vote'] },
+	{ c: PreimageVoteThresholdComp, t: ['VoteThreshold'] },
 	{ c: InputText, t: ['Unknown'] }
 ];
 
@@ -195,7 +202,7 @@ function getComponent({ def, registry }: { def: TypeDef; registry: Registry }): 
 function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?: unknown; onChange: (value: unknown) => void }) {
 	const { apiService } = usePolkadotApiService();
 
-	const title = (
+	const title = param.type.type !== 'Null' && (
 		<p className='flex w-full items-center gap-x-1 truncate text-sm font-medium text-text_primary'>
 			{param.name && `${param.name}:`} {param.type.type}
 			{param.type.typeName && ` (${param.type.typeName})`}

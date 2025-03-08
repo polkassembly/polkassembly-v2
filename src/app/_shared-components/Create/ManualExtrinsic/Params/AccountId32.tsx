@@ -1,14 +1,25 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
+import { useCallback } from 'react';
 import { IParamDef } from '@/_shared/types';
+import { toAddress } from '@/app/_client-utils/toAddress';
 import InputText from './InputText';
 
-function AccountId32({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: string) => void; defaultValue: string }) {
-	const onParamChange = (value: string) => {
-		onChange(value);
-	};
+function AccountId32({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: string | null) => void; defaultValue: string }) {
+	const onParamChange = useCallback(
+		(value: string): void => {
+			const address =
+				toAddress({
+					value,
+					bytesLength: 32
+				}) || null;
+			const output = address || null;
+
+			onChange(output);
+		},
+		[onChange]
+	);
 
 	return (
 		<InputText

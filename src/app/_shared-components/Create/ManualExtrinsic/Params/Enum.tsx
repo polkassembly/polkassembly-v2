@@ -4,7 +4,7 @@
 import { IParamDef } from '@/_shared/types';
 import { Enum, getTypeDef } from '@polkadot/types';
 import { Registry, TypeDef } from '@polkadot/types/types';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../DropdownMenu';
 // eslint-disable-next-line import/no-cycle
 import Params from '.';
