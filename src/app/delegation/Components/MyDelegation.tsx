@@ -39,7 +39,10 @@ function MyDelegation() {
 				/>
 				<div className='mt-2 flex w-full flex-col items-center justify-center gap-y-5 sm:flex-row sm:gap-x-5 md:mt-0 md:justify-between'>
 					<div>
-						<Address address={user.defaultAddress} />
+						<Address
+							address={user.defaultAddress}
+							walletAddressName={user?.username}
+						/>
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
 					<div className='mt-5 hidden sm:mt-0 md:block'>

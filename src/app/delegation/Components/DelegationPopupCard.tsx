@@ -103,7 +103,7 @@ function DelegationPopupCard() {
 							<Link
 								className='text-border_blue underline'
 								target='_blank'
-								href='https://docs.polkassembly.io/opengov/learn-about-referenda/voting-on-a-referendum/delegating-voting-power'
+								href='https://docs.polkassembly.io/jekyll/2022-06-30-opengov.html#delegating-voting-power-on-polkassembly'
 							>
 								{' '}
 								{t('here')}
