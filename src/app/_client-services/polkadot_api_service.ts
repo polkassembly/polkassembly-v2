@@ -192,8 +192,7 @@ export class PolkadotApiService {
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
-				onFailed,
-				waitTillFinalizedHash: true
+				onFailed
 			});
 		}
 	}
