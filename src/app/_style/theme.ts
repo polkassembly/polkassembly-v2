@@ -97,7 +97,10 @@ export const THEME_COLORS = {
 		delegation_card_w3f: '#282526',
 		delegation_card_nova: '#E2EAFB',
 		delegation_nova_border: '#3C74E1',
-		delegation_polkadot_border: '#7A67DF'
+		delegation_polkadot_border: '#7A67DF',
+		received_delegation_bg: '#E7DCFF',
+		delegated_delegation_bg: '#FFFBD8',
+		undelegated_delegation_bg: '#FFDAD8'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -191,6 +194,9 @@ export const THEME_COLORS = {
 		delegation_card_w3f: '#272526',
 		delegation_card_nova: '#141C2D',
 		delegation_nova_border: '#3C74E1',
-		delegation_polkadot_border: '#7A67DF'
+		delegation_polkadot_border: '#7A67DF',
+		received_delegation_bg: '#6C2CF8',
+		delegated_delegation_bg: '#69600B',
+		undelegated_delegation_bg: '#EF6158'
 	}
 };

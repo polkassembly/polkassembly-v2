@@ -24,7 +24,6 @@ function Delegation({ delegationStats, delegates }: { delegationStats: IDelegati
 	const t = useTranslations('Delegation');
 	const dashboardContent = (
 		<div>
-			<h1 className={styles.delegation_title}>{t('delegation')}</h1>
 			<DelegationPopupCard />
 			<DelegationSupplyData delegationStats={delegationStats} />
 			<DelegationCard delegates={delegates} />

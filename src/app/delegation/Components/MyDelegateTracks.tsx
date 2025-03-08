@@ -7,6 +7,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, ETrackDelegationStatus, ITrackDelegation } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
+import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/app/_shared-components/RadioGroup/RadioGroup';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -148,7 +149,22 @@ function MyDelegateTracks() {
 									<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
 									<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
 									<TableCell className={styles.tableCell_3}>{track.active_proposals_count}</TableCell>
-									<TableCell className={styles.tableCell_3}>{track.status.join(', ')}</TableCell>
+									<TableCell className={styles.tableCell_3}>
+										{track.status.length > 0 ? (
+											<span
+												className={cn(
+													'rounded-[26px] px-3 py-1.5 text-center text-sm',
+													track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION) && 'bg-received_delegation_bg',
+													track.status.includes(ETrackDelegationStatus.DELEGATED) && 'bg-delegated_delegation_bg',
+													track.status.includes(ETrackDelegationStatus.UNDELEGATED) && 'bg-undelegated_delegation_bg'
+												)}
+											>
+												{track.status.map((status) => status.split('_').join(' ').charAt(0).toUpperCase() + status.split('_').join(' ').slice(1)).join(', ')}
+											</span>
+										) : (
+											<span className='px-3 py-1.5 text-center text-sm'>-</span>
+										)}
+									</TableCell>
 								</TableRow>
 							);
 						})}
