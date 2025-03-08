@@ -473,7 +473,11 @@
 		"abstainVoteValue": "棄権票の値",
 		"ayeVoteValue": "賛成票の値",
 		"nayVoteValue": "反対票の値",
-		"confirm": "確認"
+		"confirm": "確認",
+		"voteSuccess": "投票が成功しました",
+		"voteFailed": "投票が失敗しました",
+		"voteSuccessTitle": "投票成功",
+		"voteFailedTitle": "投票失敗"
 	},
 	"Balance": {
 		"voteBalance": "投票残高"

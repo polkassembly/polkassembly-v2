@@ -10,6 +10,7 @@ import Redis from 'ioredis';
 import { ENetwork, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+import { createId as createCuid } from '@paralleldrive/cuid2';
 import { FIVE_MIN, ONE_DAY, ONE_HOUR_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -21,7 +22,8 @@ enum ERedisKeys {
 	EMAIL_VERIFICATION_TOKEN = 'EVT',
 	TWO_FACTOR_AUTH_TOKEN = 'TFA',
 	SUBSCAN_DATA = 'SDT',
-	REFRESH_TOKEN = 'RFT',
+	REFRESH_TOKEN_SET = 'RFTS',
+	REFRESH_TOKEN_ITEM = 'RFTI',
 	POST_DATA = 'PDT',
 	POSTS_LISTING = 'PLT',
 	ACTIVITY_FEED = 'AFD',
@@ -39,7 +41,8 @@ export class RedisService {
 		[ERedisKeys.EMAIL_VERIFICATION_TOKEN]: (token: string): string => `${ERedisKeys.EMAIL_VERIFICATION_TOKEN}-${token}`,
 		[ERedisKeys.TWO_FACTOR_AUTH_TOKEN]: (tfaToken: string): string => `${ERedisKeys.TWO_FACTOR_AUTH_TOKEN}-${tfaToken}`,
 		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
-		[ERedisKeys.REFRESH_TOKEN]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN}-${userId}`,
+		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
+		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
 		[ERedisKeys.POSTS_LISTING]: (
 			network: string,
@@ -119,21 +122,94 @@ export class RedisService {
 		});
 	}
 
+	private static async AddToSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
+		if (!IS_CACHE_ENABLED && !forceCache) return 0;
+
+		return this.client.sadd(key, value);
+	}
+
+	private static async RemoveFromSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
+		if (!IS_CACHE_ENABLED && !forceCache) return 0;
+
+		return this.client.srem(key, value);
+	}
+
+	private static async GetSetMembers({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string[]> {
+		if (!IS_CACHE_ENABLED && !forceCache) return [];
+
+		return this.client.smembers(key);
+	}
+
 	// auth and third party methods
 	static async SetEmailVerificationToken({ token, email }: { token: string; email: string }): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), value: email, ttlSeconds: ONE_DAY, forceCache: true });
 	}
 
 	static async SetRefreshToken({ userId, refreshToken }: { userId: number; refreshToken: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), value: refreshToken, ttlSeconds: REFRESH_TOKEN_LIFE_IN_SECONDS, forceCache: true });
+		const tokenId = createCuid();
+
+		// Store the token with its unique ID
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_ITEM](userId, tokenId),
+			value: refreshToken,
+			ttlSeconds: REFRESH_TOKEN_LIFE_IN_SECONDS,
+			forceCache: true
+		});
+
+		// Add the token ID to the user's set of tokens
+		await this.AddToSet({
+			key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_SET](userId),
+			value: tokenId,
+			forceCache: true
+		});
 	}
 
-	static async GetRefreshToken(userId: number): Promise<string | null> {
-		return this.Get({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), forceCache: true });
+	static async GetRefreshToken(userId: number, tokenId: string): Promise<string | null> {
+		// Get a specific token by ID
+		return this.Get({
+			key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_ITEM](userId, tokenId),
+			forceCache: true
+		});
 	}
 
-	static async DeleteRefreshToken(userId: number): Promise<void> {
-		await this.Delete({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN](userId), forceCache: true });
+	static async GetAllRefreshTokenIds(userId: number): Promise<string[]> {
+		return this.GetSetMembers({
+			key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_SET](userId),
+			forceCache: true
+		});
+	}
+
+	static async DeleteRefreshToken(userId: number, tokenId: string): Promise<void> {
+		// Delete the specific token
+		await this.Delete({
+			key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_ITEM](userId, tokenId),
+			forceCache: true
+		});
+
+		// Remove the token ID from the user's set
+		await this.RemoveFromSet({
+			key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_SET](userId),
+			value: tokenId,
+			forceCache: true
+		});
+	}
+
+	static async DeleteAllRefreshTokens(userId: number): Promise<void> {
+		// Get all token IDs for this user
+		const tokenIds = await this.GetAllRefreshTokenIds(userId);
+
+		// Delete each token
+		await Promise.all(
+			tokenIds.map((tokenId) =>
+				this.Delete({
+					key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_ITEM](userId, tokenId),
+					forceCache: true
+				})
+			)
+		);
+
+		// Delete the set itself
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.REFRESH_TOKEN_SET](userId), forceCache: true });
 	}
 
 	static async SetTfaToken({ tfaToken, userId }: { tfaToken: string; userId: number }): Promise<void> {

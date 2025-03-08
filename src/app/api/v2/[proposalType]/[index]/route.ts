@@ -6,19 +6,16 @@ import { AuthService } from '@/app/api/_api-services/auth_service';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
-import { OnChainDbService } from '@api/_api-services/onchain_db_service';
-import { APIError } from '@api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, IPost, IPublicUser } from '@shared/types';
-import { StatusCodes } from 'http-status-codes';
+import { EAllowedCommentor, EProposalType } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
+import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -26,57 +23,6 @@ const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
 	index: z.string()
 });
-
-async function getPublicUser({ proposer, userId }: { proposer?: string; userId?: number }) {
-	let publicUser: IPublicUser | null = null;
-
-	if (proposer && ValidatorService.isValidWeb3Address(proposer)) {
-		publicUser = await OffChainDbService.GetPublicUserByAddress(proposer);
-	}
-
-	if (!publicUser && userId && ValidatorService.isValidUserId(Number(userId || -1))) {
-		publicUser = await OffChainDbService.GetPublicUserById(userId);
-	}
-
-	return publicUser;
-}
-
-async function fetchPostData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: string }): Promise<IPost> {
-	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
-
-	let post: IPost;
-
-	// if is off-chain post just return the offchain post data
-	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
-		if (!offChainPostData) {
-			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
-		}
-		post = offChainPostData;
-	} else {
-		// if is on-chain post
-		const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
-
-		if (!onChainPostInfo) {
-			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
-		}
-
-		post = {
-			...offChainPostData,
-			dataSource: offChainPostData?.dataSource || EDataSource.POLKASSEMBLY,
-			proposalType: proposalType as EProposalType,
-			network: network as ENetwork,
-			onChainInfo: onChainPostInfo
-		};
-	}
-
-	const publicUser = await getPublicUser({ userId: post.userId, proposer: post.onChainInfo?.proposer });
-
-	if (publicUser) {
-		post = { ...post, publicUser };
-	}
-
-	return post;
-}
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
@@ -89,7 +35,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		return NextResponse.json(post);
 	}
 
-	post = await fetchPostData({ network, proposalType, index });
+	post = await fetchPostData({ network, proposalType, indexOrHash: index });
 
 	// fetch and add reactions to post
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });
