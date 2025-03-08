@@ -10,6 +10,7 @@ import { EDelegationType, IDelegationStats } from '@/_shared/types';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 interface DelegationCounts {
 	delegates: Record<string, number>;
@@ -53,6 +54,11 @@ export async function GET(): Promise<NextResponse> {
 			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
 
+		const cachedStats = await RedisService.GetDelegationStats(network);
+		if (cachedStats) {
+			return NextResponse.json(cachedStats);
+		}
+
 		const data = await OnChainDbService.GetTotalDelegationStats({
 			network,
 			type: EDelegationType.OPEN_GOV
@@ -63,6 +69,8 @@ export async function GET(): Promise<NextResponse> {
 		}
 		const counts = calculateDelegationStats(data.votingDelegations);
 		const stats = formatDelegationStats(counts, data?.totalDelegatedVotes?.totalCount || 0);
+
+		await RedisService.SetDelegationStats(network, stats);
 
 		return NextResponse.json(stats);
 	} catch (error) {

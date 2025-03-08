@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAddress } from '@polkadot/util-crypto';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { z } from 'zod';
+import { IDelegate } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getNetworkFromHeaders } from '../../_api-utils/getNetworkFromHeaders';
@@ -13,6 +14,7 @@ import { APIError } from '../../_api-utils/apiError';
 import { OffChainDbService } from '../../_api-services/offchain_db_service';
 import { AuthService } from '../../_api-services/auth_service';
 import { fetchAllDelegateSources, fetchDelegateAnalytics } from '../../_api-utils/delegateUtils';
+import { RedisService } from '../../_api-services/redis_service';
 
 const GetDelegatesQuerySchema = z
 	.object({
@@ -33,6 +35,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const network = await getNetworkFromHeaders();
 		if (!network) {
 			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
+		}
+
+		const cachedDelegates = await RedisService.GetDelegates(network);
+
+		if (cachedDelegates) {
+			return NextResponse.json({ delegates: cachedDelegates });
 		}
 
 		const { address } = GetDelegatesQuerySchema.parse({
@@ -63,6 +71,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				})
 			}))
 			.filter((d) => d.votedProposalCount > 0 || d.receivedDelegationsCount > 0);
+
+		await RedisService.SetDelegates(network, combinedDelegates as unknown as IDelegate[]);
 
 		return NextResponse.json({
 			delegates: combinedDelegates,
