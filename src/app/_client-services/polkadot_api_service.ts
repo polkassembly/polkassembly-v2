@@ -353,7 +353,6 @@ export class PolkadotApiService {
 		}
 
 		return Object.keys(this.api.tx)
-			.filter((s) => !s.startsWith('$'))
 			.sort()
 			.filter((name) => Object.keys(this.api.tx[`${name}`]).length)
 			.map((name) => ({
