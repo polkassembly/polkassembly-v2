@@ -31,7 +31,8 @@ import {
 	IVoteCartItem,
 	EConvictionAmount,
 	EVoteDecision,
-	IPostSubscription
+	IPostSubscription,
+	ECommentSentiment
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -92,6 +93,10 @@ export class OffChainDbService {
 
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {
 		return FirestoreService.GetAddressesForUserId(userId);
+	}
+
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+		return FirestoreService.GetAddressDataByAddress(address);
 	}
 
 	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
@@ -449,7 +454,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -458,6 +464,7 @@ export class OffChainDbService {
 		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
+		sentiment?: ECommentSentiment;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -466,7 +473,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address, sentiment });
 
 		await this.saveUserActivity({
 			userId,
@@ -482,8 +489,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
-		return FirestoreService.UpdateComment({ commentId, content, isSpam });
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam, aiSentiment });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -760,6 +767,10 @@ export class OffChainDbService {
 
 	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
 		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
+	}
+
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		return FirestoreService.ClearVoteCart({ userId });
 	}
 
 	static async UpdateVoteCartItem({

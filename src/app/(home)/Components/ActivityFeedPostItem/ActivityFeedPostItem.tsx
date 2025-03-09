@@ -36,7 +36,17 @@ import ReactionHandler from '../ReactionHandler';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
-function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
+function ActivityFeedPostItem({
+	postData,
+	voteButton = true,
+	commentBox = true,
+	preventClick
+}: {
+	postData: IPostListing;
+	voteButton?: boolean;
+	commentBox?: boolean;
+	preventClick?: boolean;
+}) {
 	const { user } = useUser();
 	const router = useRouter();
 	const t = useTranslations();
@@ -70,23 +80,14 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
-	const handleContainerClick = (e: React.MouseEvent) => {
-		if (!(e.target instanceof Element)) return;
-
-		const isExcludedSection =
-			e.target.closest(`.${styles.castVoteButton}`) || e.target.closest('[data-reaction-handler="true"]') || e.target.closest('[data-comment-input="true"]');
-
-		if (!isExcludedSection) {
-			router.push(`/referenda/${postData.index}`);
-		}
-	};
-
 	return (
-		<div
-			aria-hidden='true'
-			onClick={handleContainerClick}
-			className={styles.container}
-		>
+		<div className={styles.container}>
+			{!preventClick && (
+				<Link
+					href={`/referenda/${postData.index}`}
+					className='absolute left-0 top-0 z-20 h-full w-full rounded-xl'
+				/>
+			)}
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center text-wallet_btn_text'>
@@ -108,8 +109,8 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					</span>
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
-					<div>
+				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					<div className='relative z-50'>
 						{user?.id ? (
 							<Dialog>
 								<DialogTrigger asChild>
@@ -131,7 +132,10 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 								</DialogTitle>
 							</Dialog>
 						) : (
-							<Link href='/login'>
+							<Link
+								href='/login'
+								className='relative z-50'
+							>
 								<span className={`${styles.castVoteButton} cursor-pointer`}>
 									<Image
 										src={VoteIcon}
@@ -177,7 +181,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
+				<div className='flex max-h-40 w-full overflow-hidden border-none'>
 					<BlockEditor
 						data={postData.content}
 						readOnly
@@ -186,7 +190,7 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				</div>
 				<Link
 					href={`/referenda/${postData.index}`}
-					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
+					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
 				>
 					{t('ActivityFeed.PostItem.readMore')}
 				</Link>
@@ -216,25 +220,28 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<div
-				aria-hidden='true'
-				onClick={(e) => e.stopPropagation()}
-				data-comment-input='true'
-			>
-				<ReactionHandler
-					postData={postData}
-					setIsDialogOpen={setIsDialogOpen}
-					reactionState={reactionState}
-					showLikeGif={showLikeGif}
-					showDislikeGif={showDislikeGif}
-					handleReaction={handleReaction}
-				/>
+			{commentBox && (
+				<div
+					aria-hidden='true'
+					onClick={(e) => e.stopPropagation()}
+					data-comment-input='true'
+					className='relative z-50'
+				>
+					<ReactionHandler
+						postData={postData}
+						setIsDialogOpen={setIsDialogOpen}
+						reactionState={reactionState}
+						showLikeGif={showLikeGif}
+						showDislikeGif={showDislikeGif}
+						handleReaction={handleReaction}
+					/>
 
-				<CommentInput
-					inputRef={inputRef as RefObject<HTMLInputElement>}
-					onClick={handleCommentClick}
-				/>
-			</div>
+					<CommentInput
+						inputRef={inputRef as RefObject<HTMLInputElement>}
+						onClick={handleCommentClick}
+					/>
+				</div>
+			)}
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}

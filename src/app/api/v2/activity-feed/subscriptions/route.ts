@@ -22,19 +22,18 @@ import { COOKIE_HEADER_ACTION_NAME } from '@/_shared/_constants/cookieHeaderActi
 // 5. sort by comments as well
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
+	// Parse and validate query parameters
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
-
 	const { page, limit } = zodQuerySchema.parse(searchParamsObject);
 
+	// Authenticate user and get network
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
-
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
-
 	const network = await getNetworkFromHeaders();
 
 	// Try to get from cache first
@@ -46,26 +45,40 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		return response;
 	}
 
-	const totalCount = await OffChainDbService.GetPostSubscriptionCountByUserId({ userId, network });
+	// Fetch subscriptions and count in parallel
+	const [totalCount, userPostSubscriptions] = await Promise.all([
+		OffChainDbService.GetPostSubscriptionCountByUserId({ userId, network }),
+		OffChainDbService.GetPostSubscriptionsByUserId({ userId, page, limit, network })
+	]);
 
-	const userPostSubscriptions = await OffChainDbService.GetPostSubscriptionsByUserId({ userId, page, limit, network });
+	if (userPostSubscriptions.length === 0) {
+		const emptyResponse: IGenericListingResponse<IPostListing> = { items: [], totalCount };
 
-	// Fetch post data for each post subscription
+		// Cache the empty response
+		await RedisService.SetSubscriptionFeed({ network, page, limit, data: emptyResponse, userId });
+
+		const response = NextResponse.json(emptyResponse);
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(newAccessToken));
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+		return response;
+	}
+
+	// Batch fetch post data for all subscriptions in parallel
 	const postDataPromises = userPostSubscriptions.map(async (postSubscription) => {
-		let postListingItem: IPostListing;
-
+		// Fetch off-chain data for all posts in parallel
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({
 			network,
 			indexOrHash: postSubscription.indexOrHash,
 			proposalType: postSubscription.proposalType
 		});
 
-		postListingItem = {
+		let postListingItem: IPostListing = {
 			...offChainPostData,
 			network,
 			proposalType: postSubscription.proposalType
 		};
 
+		// Only fetch on-chain data if it's a valid on-chain proposal type
 		if (ValidatorService.isValidOnChainProposalType(postSubscription.proposalType)) {
 			const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({
 				network,
@@ -90,47 +103,45 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		return postListingItem;
 	});
 
+	// Wait for all post data to be fetched
 	let posts = await Promise.all(postDataPromises);
 
-	// fetch reactions for each post
-	const reactionsPromises = posts.map((post) => {
-		return OffChainDbService.GetPostReactions({
-			network,
-			proposalType: post.proposalType,
-			indexOrHash: post.index?.toString?.() || post.hash || ''
-		});
-	});
+	// Batch fetch reactions and public users in parallel
+	const [reactions, publicUsers] = await Promise.all([
+		// Fetch reactions for all posts in parallel
+		Promise.all(
+			posts.map((post) =>
+				OffChainDbService.GetPostReactions({
+					network,
+					proposalType: post.proposalType,
+					indexOrHash: post.index?.toString?.() || post.hash || ''
+				})
+			)
+		),
 
-	const reactions = await Promise.all(reactionsPromises);
+		// Fetch public user data for all posts in parallel
+		Promise.all(
+			posts.map((post) => {
+				if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
+					return OffChainDbService.GetPublicUserById(Number(post.userId));
+				}
+				if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
+					return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
+				}
+				return null;
+			})
+		)
+	]);
+
+	// Combine all data
 	posts = posts.map((post, index) => ({
 		...post,
-		reactions: reactions[Number(index)] || []
+		reactions: reactions[Number(index)] || [],
+		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
 	}));
 
 	// Sort posts by comment count in descending order
-	posts.sort((a, b) => {
-		const commentsA = a.metrics?.comments || 0;
-		const commentsB = b.metrics?.comments || 0;
-		return commentsB - commentsA;
-	});
-
-	// fetch public user for each post
-	const publicUserPromises = posts.map((post) => {
-		if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
-			return OffChainDbService.GetPublicUserById(Number(post.userId));
-		}
-		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
-			return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
-		}
-		return null;
-	});
-
-	const publicUsers = await Promise.all(publicUserPromises);
-
-	posts = posts.map((post, index) => ({
-		...post,
-		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
-	}));
+	posts.sort((a, b) => (b.metrics?.comments || 0) - (a.metrics?.comments || 0));
 
 	const responseData: IGenericListingResponse<IPostListing> = { items: posts, totalCount };
 

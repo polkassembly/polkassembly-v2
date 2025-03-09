@@ -29,7 +29,8 @@ import {
 	IVoteCartItem,
 	EVoteDecision,
 	EConvictionAmount,
-	IPostSubscription
+	IPostSubscription,
+	ECommentSentiment
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -217,7 +218,7 @@ export class FirestoreService extends FirestoreUtils {
 		return this.GetUserById(addressData.userId);
 	}
 
-	static async getAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
 		const substrAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
 
 		if (!substrAddress) {
@@ -902,7 +903,8 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -911,6 +913,7 @@ export class FirestoreService extends FirestoreUtils {
 		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
+		sentiment?: ECommentSentiment;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
 
@@ -930,7 +933,8 @@ export class FirestoreService extends FirestoreUtils {
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
 			address: address || null,
-			dataSource: EDataSource.POLKASSEMBLY
+			dataSource: EDataSource.POLKASSEMBLY,
+			...(sentiment && { sentiment })
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -938,7 +942,7 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newCommentData: Partial<IComment> = {
@@ -946,6 +950,7 @@ export class FirestoreService extends FirestoreUtils {
 			htmlContent: html,
 			markdownContent: markdown,
 			...(isSpam && { isSpam }),
+			...(aiSentiment && { aiSentiment }),
 			updatedAt: new Date()
 		};
 
@@ -1250,6 +1255,11 @@ export class FirestoreService extends FirestoreUtils {
 		if (voteCartItem.docs.length) {
 			await voteCartItem.docs[0].ref.delete();
 		}
+	}
+
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		const voteCartItems = await FirestoreUtils.voteCartItemsCollectionRef().where('userId', '==', userId).get();
+		await Promise.all(voteCartItems.docs.map((doc) => doc.ref.delete()));
 	}
 
 	static async UpdateVoteCartItem({

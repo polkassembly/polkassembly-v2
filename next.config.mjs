@@ -9,6 +9,9 @@ const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 const nextConfig = {
 	images: {
 		domains: ['i.ibb.co']
+	},
+	compiler: {
+		removeConsole: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? { exclude: ['error'] } : false
 	}
 };
 

@@ -80,7 +80,8 @@ export class SubsquidUtils extends SubsquidQueries {
 				result.push({
 					address,
 					amount: args.amount.toString(),
-					assetId
+					assetId,
+					...(args.validFrom && { validFromBlock: String(args.validFrom) })
 				});
 			}
 		}
@@ -89,7 +90,7 @@ export class SubsquidUtils extends SubsquidQueries {
 			args.calls.forEach((call: any) => {
 				if (!call.value) return;
 
-				const { amount, beneficiary, assetKind } = call.value;
+				const { amount, beneficiary, assetKind, validFrom } = call.value;
 				const assetId = this.extractAssetId(assetKind);
 				const address = this.extractBeneficiaryAddress(beneficiary);
 
@@ -97,7 +98,8 @@ export class SubsquidUtils extends SubsquidQueries {
 					result.push({
 						address,
 						amount: amount.toString(),
-						assetId
+						assetId,
+						...(validFrom && { validFromBlock: String(validFrom) })
 					});
 				}
 			});
