@@ -5,19 +5,19 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
-import React, { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
 import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
 import GovernanceIcon from '@assets/sidebar/admin-icon.svg';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { cn } from '@/lib/utils';
 import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -123,8 +123,40 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 				ref={containerRef}
 			>
 				{Object.entries(categoryStructure).map(([category, tracks]) => (
-					<Popover key={category}>
-						<PopoverTrigger asChild>
+					<div key={category}>
+						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
+							<DropdownMenu>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}>
+									<span className='flex items-center whitespace-nowrap'>
+										<Image
+											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
+											alt={category}
+											width={20}
+											height={20}
+											className={cn('h-5 w-5', styles.darkIcon)}
+										/>
+										<span className='ml-1'>{category}</span>
+										<span className='ml-0.5'>
+											<FaAngleDown />
+										</span>
+									</span>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align='start'
+									className={styles.popoverContent}
+								>
+									{tracks.map((track) => (
+										<DropdownMenuItem
+											key={track}
+											className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
+											onSelect={() => setCurrentTab(track)}
+										>
+											{formatTrackName(track)}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						) : (
 							<button
 								type='button'
 								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
@@ -139,35 +171,10 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 										className={cn('h-5 w-5', styles.darkIcon)}
 									/>
 									<span className='ml-1'>{category}</span>
-									{tracks?.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY && (
-										<span className='ml-0.5'>
-											<FaAngleDown />
-										</span>
-									)}
 								</span>
 							</button>
-						</PopoverTrigger>
-						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY && (
-							<PopoverContent
-								sideOffset={5}
-								className={styles.popoverContent}
-							>
-								<div className='w-full'>
-									{tracks.map((track) => (
-										<div key={track}>
-											<button
-												type='button'
-												className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
-												onClick={() => setCurrentTab(track)}
-											>
-												{formatTrackName(track)}
-											</button>
-										</div>
-									))}
-								</div>
-							</PopoverContent>
 						)}
-					</Popover>
+					</div>
 				))}
 			</div>
 		</div>

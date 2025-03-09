@@ -17,7 +17,7 @@
 }
 
 .trackName {
-    @apply w-full rounded-lg px-1 py-2 text-start text-sm font-medium text-wallet_btn_text hover:bg-activity_selected_tab;
+    @apply w-full rounded-lg px-1 py-2 text-start text-sm font-medium text-wallet_btn_text hover:bg-activity_selected_tab cursor-pointer;
 }
 
 @media (max-width: 768px) {
