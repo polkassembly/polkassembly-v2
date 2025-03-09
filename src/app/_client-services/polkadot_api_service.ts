@@ -374,7 +374,6 @@ export class PolkadotApiService {
 		}
 
 		return Object.keys(section)
-			.filter((s) => !s.startsWith('$'))
 			.sort()
 			.map((value) => {
 				const method = section[`${value}`];
