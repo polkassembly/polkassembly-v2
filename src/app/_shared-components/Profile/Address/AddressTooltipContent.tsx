@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -38,18 +38,16 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 	const t = useTranslations();
 	const { user: currentUser } = useUser();
 	const queryClient = useQueryClient();
-	const [loading, setLoading] = useState(false);
 
 	const queryOptions = useMemo(
 		() => ({
-			refetchInterval: 10000,
 			staleTime: 5 * 60 * 1000,
 			enabled: true
 		}),
 		[]
 	);
 
-	const { data: userData, isFetching: isUserDataFetching } = useQuery<IPublicUser | null>({
+	const { data: userData, isLoading: isUserDataLoading } = useQuery<IPublicUser | null>({
 		queryKey: ['userData', address],
 		queryFn: async () => {
 			const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
@@ -58,7 +56,7 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 		...queryOptions
 	});
 
-	const { data: followingData, isFetching: isFollowingFetching } = useQuery<{ following: IFollowEntry[] }>({
+	const { data: followingData, isLoading: isFollowingLoading } = useQuery<{ following: IFollowEntry[] }>({
 		queryKey: ['following', userData?.id],
 		queryFn: async () => {
 			if (!userData?.id) return { following: [] };
@@ -68,7 +66,7 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 		...queryOptions
 	});
 
-	const { data: followersData, isFetching: isFollowersFetching } = useQuery<{ followers: IFollowEntry[] }>({
+	const { data: followersData, isLoading: isFollowersLoading } = useQuery<{ followers: IFollowEntry[] }>({
 		queryKey: ['followers', userData?.id],
 		queryFn: async () => {
 			if (!userData?.id) return { followers: [] };
@@ -94,10 +92,8 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 
 	const followUser = useCallback(async () => {
 		if (!currentUser?.id || currentUser.id === userData?.id || !userData) return;
-		setLoading(true);
 		const { data, error } = await UserProfileClientService.followUser({ userId: userData.id });
 		if (!data || error) {
-			setLoading(false);
 			return;
 		}
 		queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
@@ -112,21 +108,17 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 				}
 			]
 		}));
-		setLoading(false);
 	}, [currentUser, userData, queryClient]);
 
 	const unfollowUser = useCallback(async () => {
 		if (!currentUser?.id || currentUser.id === userData?.id || !userData) return;
-		setLoading(true);
 		const { data, error } = await UserProfileClientService.unfollowUser({ userId: userData.id });
 		if (!data || error) {
-			setLoading(false);
 			return;
 		}
 		queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
 			followers: oldData?.followers.filter((item) => item.followerUserId !== currentUser.id) || []
 		}));
-		setLoading(false);
 	}, [currentUser, userData, queryClient]);
 
 	const handleButtonClick = useCallback(() => {
@@ -139,10 +131,10 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 		}
 	}, [currentUser, isFollowing, router, followUser, unfollowUser]);
 
-	const isLoadingData = isUserDataFetching || isFollowingFetching || isFollowersFetching;
+	const isInitialLoading = isUserDataLoading || isFollowingLoading || isFollowersLoading;
 	const hasUserData = !!userData;
 
-	if (isLoadingData) {
+	if (isInitialLoading) {
 		return <LoadingSpinner />;
 	}
 
@@ -183,7 +175,7 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 								size='lg'
 								className='mt-2 rounded-3xl'
 								leftIcon={<ShieldPlus />}
-								isLoading={loading}
+								isLoading={isFollowingLoading || isFollowersLoading || isUserDataLoading}
 								onClick={handleButtonClick}
 								disabled={!userData.id}
 							>
