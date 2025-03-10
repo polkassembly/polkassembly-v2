@@ -45,6 +45,107 @@ export class PolkadotApiService {
 		return new PolkadotApiService(network, api);
 	}
 
+	private async executeTx({
+		tx,
+		address,
+		proxyAddress,
+		params = {},
+		errorMessageFallback,
+		onSuccess,
+		onFailed,
+		onBroadcast,
+		setStatus,
+		setIsTxFinalized,
+		waitTillFinalizedHash = false
+	}: {
+		tx: SubmittableExtrinsic<'promise'>;
+		address: string;
+		proxyAddress?: string;
+		params?: Record<string, unknown>;
+		errorMessageFallback: string;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+		onBroadcast?: () => void;
+		setStatus?: (pre: string) => void;
+		setIsTxFinalized?: (pre: string) => void;
+		waitTillFinalizedHash?: boolean;
+	}) {
+		let isFailed = false;
+		if (!this.api || !tx) return;
+
+		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
+
+		const signerOptions = {
+			...params,
+			withSignedTransaction: true
+		};
+
+		extrinsic
+			// eslint-disable-next-line sonarjs/cognitive-complexity
+			.signAndSend(proxyAddress || address, signerOptions, async ({ status, events, txHash }) => {
+				if (status.isInvalid) {
+					console.log('Transaction invalid');
+					setStatus?.('Transaction invalid');
+				} else if (status.isReady) {
+					console.log('Transaction is ready');
+					setStatus?.('Transaction is ready');
+				} else if (status.isBroadcast) {
+					console.log('Transaction has been broadcasted');
+					setStatus?.('Transaction has been broadcasted');
+					onBroadcast?.();
+				} else if (status.isInBlock) {
+					console.log('Transaction is in block');
+					setStatus?.('Transaction is in block');
+
+					// eslint-disable-next-line no-restricted-syntax
+					for (const { event } of events) {
+						if (event.method === 'ExtrinsicSuccess') {
+							setStatus?.('Transaction Success');
+							isFailed = false;
+							if (!waitTillFinalizedHash) {
+								// eslint-disable-next-line no-await-in-loop
+								await onSuccess(txHash);
+							}
+						} else if (event.method === 'ExtrinsicFailed') {
+							// eslint-disable-next-line sonarjs/no-duplicate-string
+							setStatus?.('Transaction failed');
+							console.log('Transaction failed');
+							setStatus?.('Transaction failed');
+							const dispatchError = (event.data as any)?.dispatchError;
+							isFailed = true;
+
+							if (dispatchError?.isModule) {
+								const errorModule = (event.data as any)?.dispatchError?.asModule;
+								const { method, section, docs } = this.api.registry.findMetaError(errorModule);
+								// eslint-disable-next-line no-param-reassign
+								errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
+								console.log(errorMessageFallback, 'error module');
+								await onFailed(errorMessageFallback);
+							} else if (dispatchError?.isToken) {
+								console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
+								await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
+							} else {
+								await onFailed(`${dispatchError.type}` || errorMessageFallback);
+							}
+						}
+					}
+				} else if (status.isFinalized) {
+					console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
+					console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
+					setIsTxFinalized?.(txHash.toString());
+					if (!isFailed && waitTillFinalizedHash) {
+						await onSuccess(txHash);
+					}
+				}
+			})
+			.catch((error: unknown) => {
+				console.log(':( transaction failed');
+				setStatus?.(':( transaction failed');
+				console.error('ERROR:', error);
+				onFailed(error?.toString?.() || errorMessageFallback);
+			});
+	}
+
 	async disconnect(): Promise<void> {
 		await this.api.disconnect();
 	}
@@ -246,107 +347,6 @@ export class PolkadotApiService {
 		});
 	}
 
-	private async executeTx({
-		tx,
-		address,
-		proxyAddress,
-		params = {},
-		errorMessageFallback,
-		onSuccess,
-		onFailed,
-		onBroadcast,
-		setStatus,
-		setIsTxFinalized,
-		waitTillFinalizedHash = false
-	}: {
-		tx: SubmittableExtrinsic<'promise'>;
-		address: string;
-		proxyAddress?: string;
-		params?: Record<string, unknown>;
-		errorMessageFallback: string;
-		onSuccess: (pre?: unknown) => Promise<void> | void;
-		onFailed: (errorMessageFallback: string) => Promise<void> | void;
-		onBroadcast?: () => void;
-		setStatus?: (pre: string) => void;
-		setIsTxFinalized?: (pre: string) => void;
-		waitTillFinalizedHash?: boolean;
-	}) {
-		let isFailed = false;
-		if (!this.api || !tx) return;
-
-		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
-
-		const signerOptions = {
-			...params,
-			withSignedTransaction: true
-		};
-
-		extrinsic
-			// eslint-disable-next-line sonarjs/cognitive-complexity
-			.signAndSend(proxyAddress || address, signerOptions, async ({ status, events, txHash }) => {
-				if (status.isInvalid) {
-					console.log('Transaction invalid');
-					setStatus?.('Transaction invalid');
-				} else if (status.isReady) {
-					console.log('Transaction is ready');
-					setStatus?.('Transaction is ready');
-				} else if (status.isBroadcast) {
-					console.log('Transaction has been broadcasted');
-					setStatus?.('Transaction has been broadcasted');
-					onBroadcast?.();
-				} else if (status.isInBlock) {
-					console.log('Transaction is in block');
-					setStatus?.('Transaction is in block');
-
-					// eslint-disable-next-line no-restricted-syntax
-					for (const { event } of events) {
-						if (event.method === 'ExtrinsicSuccess') {
-							setStatus?.('Transaction Success');
-							isFailed = false;
-							if (!waitTillFinalizedHash) {
-								// eslint-disable-next-line no-await-in-loop
-								await onSuccess(txHash);
-							}
-						} else if (event.method === 'ExtrinsicFailed') {
-							// eslint-disable-next-line sonarjs/no-duplicate-string
-							setStatus?.('Transaction failed');
-							console.log('Transaction failed');
-							setStatus?.('Transaction failed');
-							const dispatchError = (event.data as any)?.dispatchError;
-							isFailed = true;
-
-							if (dispatchError?.isModule) {
-								const errorModule = (event.data as any)?.dispatchError?.asModule;
-								const { method, section, docs } = this.api.registry.findMetaError(errorModule);
-								// eslint-disable-next-line no-param-reassign
-								errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
-								console.log(errorMessageFallback, 'error module');
-								await onFailed(errorMessageFallback);
-							} else if (dispatchError?.isToken) {
-								console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
-								await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
-							} else {
-								await onFailed(`${dispatchError.type}` || errorMessageFallback);
-							}
-						}
-					}
-				} else if (status.isFinalized) {
-					console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
-					console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
-					setIsTxFinalized?.(txHash.toString());
-					if (!isFailed && waitTillFinalizedHash) {
-						await onSuccess(txHash);
-					}
-				}
-			})
-			.catch((error: unknown) => {
-				console.log(':( transaction failed');
-				setStatus?.(':( transaction failed');
-				console.error('ERROR:', error);
-				onFailed(error?.toString?.() || errorMessageFallback);
-			});
-	}
-
 	getApiSectionOptions() {
 		if (!this.api) {
 			return [];
@@ -408,6 +408,21 @@ export class PolkadotApiService {
 		);
 	}
 
+	getParamsFromTypeDef(type: TypeDef) {
+		const registry = this.getApiRegistry();
+		const typeDef = getTypeDef(registry.createType(type.type as 'u32').toRawType()) || type;
+
+		return typeDef.sub
+			? (Array.isArray(typeDef.sub) ? typeDef.sub : [typeDef.sub]).map(
+					(td): IParamDef => ({
+						name: td.name || '',
+						type: td as TypeDef,
+						length: typeDef.length
+					})
+				)
+			: [];
+	}
+
 	getExtrinsic(sectionName: string, methodName: string) {
 		if (!this.api) {
 			return null;
@@ -442,13 +457,6 @@ export class PolkadotApiService {
 		};
 	}
 
-	getTreasurySpendLocalExtrinsic(amount: BN, beneficiary: string) {
-		if (!this.api) {
-			return null;
-		}
-		return this.api.tx.treasury.spendLocal(amount.toString(), beneficiary);
-	}
-
 	async notePreimage(address: string, extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>, onSuccess?: () => void, onFailed?: () => void) {
 		if (!this.api) {
 			return;
@@ -468,6 +476,13 @@ export class PolkadotApiService {
 				onFailed?.();
 			}
 		});
+	}
+
+	getTreasurySpendLocalExtrinsic(amount: BN, beneficiary: string) {
+		if (!this.api) {
+			return null;
+		}
+		return this.api.tx.treasury.spendLocal(amount.toString(), beneficiary);
 	}
 
 	async createTreasuryProposal(
@@ -506,21 +521,6 @@ export class PolkadotApiService {
 
 	getApiRegistry() {
 		return this.api?.registry;
-	}
-
-	getParamsFromTypeDef(type: TypeDef) {
-		const registry = this.getApiRegistry();
-		const typeDef = getTypeDef(registry.createType(type.type as 'u32').toRawType()) || type;
-
-		return typeDef.sub
-			? (Array.isArray(typeDef.sub) ? typeDef.sub : [typeDef.sub]).map(
-					(td): IParamDef => ({
-						name: td.name || '',
-						type: td as TypeDef,
-						length: typeDef.length
-					})
-				)
-			: [];
 	}
 
 	async getCurrentBlockNumber() {
