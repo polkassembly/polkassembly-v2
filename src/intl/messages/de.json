@@ -476,7 +476,11 @@
 		"abstainVoteValue": "Enthaltungsstimmwert",
 		"ayeVoteValue": "Ja-Stimmwert",
 		"nayVoteValue": "Nein-Stimmwert",
-		"confirm": "Bestätigen"
+		"confirm": "Bestätigen",
+		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
+		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
+		"voteSuccessTitle": "Abstimmung erfolgreich",
+		"voteFailedTitle": "Abstimmung fehlgeschlagen"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben"

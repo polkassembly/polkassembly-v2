@@ -64,7 +64,7 @@ function TinderVoting({
 				proposalIndexOrHash: proposal.index?.toString() || proposal.hash || '',
 				proposalType: proposal.proposalType,
 				title: proposal.title,
-				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.ABSTAIN
+				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.SPLIT_ABSTAIN
 			});
 		}
 	};

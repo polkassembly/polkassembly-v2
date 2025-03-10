@@ -31,7 +31,8 @@ import {
 	IVoteCartItem,
 	EConvictionAmount,
 	EVoteDecision,
-	IPostSubscription
+	IPostSubscription,
+	ECommentSentiment
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -199,15 +200,25 @@ export class OffChainDbService {
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
-		const firestoreComments = await FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
-		const subsquareComments = await SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType });
+		const [firestoreComments, subsquareComments] = await Promise.all([
+			FirestoreService.GetPostComments({ network, indexOrHash, proposalType }),
+			SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType })
+		]);
 
 		// Combine all comments from both sources
 		const allComments = [...firestoreComments, ...subsquareComments];
 
+		// get reactions for each comment
+		const allCommentsWithReactions: ICommentResponse[] = await Promise.all(
+			allComments.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({ network, indexOrHash, proposalType, id: comment.id });
+				return { ...comment, reactions };
+			})
+		);
+
 		// Helper function to build comment tree
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
-			return allComments
+			return allCommentsWithReactions
 				.filter((comment) => comment.parentCommentId === parentId)
 				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
@@ -453,7 +464,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -462,6 +474,7 @@ export class OffChainDbService {
 		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
+		sentiment?: ECommentSentiment;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -470,7 +483,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address, sentiment });
 
 		await this.saveUserActivity({
 			userId,
@@ -486,8 +499,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
-		return FirestoreService.UpdateComment({ commentId, content, isSpam });
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam, aiSentiment });
 	}
 
 	static async DeleteComment(commentId: string) {

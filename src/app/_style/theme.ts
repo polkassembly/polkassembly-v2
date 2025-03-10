@@ -89,7 +89,16 @@ export const THEME_COLORS = {
 		leaderboard_usercard_border: '#486ddf',
 		pagination_border: '#CED4DE',
 		bounty_table_bg: '#f9fcfb',
-		bounty_table_child_bg: '#fcebf5'
+		bounty_table_child_bg: '#fcebf5',
+		toast_error_bg: '#FBDBD9',
+		toast_error_border: '#ED4D42',
+		toast_error_text: '#F04248',
+		toast_warning_bg: '#FEF7D1',
+		toast_warning_border: '#F7C752',
+		toast_warning_text: '#F7C752',
+		toast_info_bg: '#E6F4FF',
+		toast_info_border: '#91CAFF',
+		toast_info_text: '#3288FF'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -175,6 +184,15 @@ export const THEME_COLORS = {
 		listing_page_btn: '#9E9E9E',
 		pagination_border: '#4B4B4B',
 		bounty_table_bg: '#272727',
-		bounty_table_child_bg: '#280b19'
+		bounty_table_child_bg: '#280b19',
+		toast_error_bg: '#452626',
+		toast_error_border: '#ED4D42',
+		toast_error_text: '#F04248',
+		toast_warning_bg: '#363125',
+		toast_warning_border: '#8F6F21',
+		toast_warning_text: '#F7C752',
+		toast_info_bg: '#27323D',
+		toast_info_border: '#1677FE',
+		toast_info_text: '#3288FF'
 	}
 };

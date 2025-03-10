@@ -41,7 +41,7 @@ function VoteDecisionUi({ voteDecision }: { voteDecision: EVoteDecision }) {
 					{t('BatchVote.nay')}
 				</div>
 			);
-		case EVoteDecision.ABSTAIN:
+		case EVoteDecision.SPLIT_ABSTAIN:
 			return (
 				<div className='itemscenter flex gap-x-1 text-xs text-decision_bar_indicator'>
 					<Ban

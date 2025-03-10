@@ -24,7 +24,7 @@ export class BatchVotingClientService extends NextApiClientService {
 		return {
 			...(voteDecision === EVoteDecision.AYE && { aye: ayeNayValue.toString() }),
 			...(voteDecision === EVoteDecision.NAY && { nay: ayeNayValue.toString() }),
-			...(voteDecision === EVoteDecision.ABSTAIN && { abstain: abstainValue.toString(), aye: abstainAyeValue.toString(), nay: abstainNayValue.toString() })
+			...(voteDecision === EVoteDecision.SPLIT_ABSTAIN && { abstain: abstainValue.toString(), aye: abstainAyeValue.toString(), nay: abstainNayValue.toString() })
 		};
 	}
 

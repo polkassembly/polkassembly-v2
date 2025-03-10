@@ -261,7 +261,7 @@ export class ValidatorService {
 
 			// abstain requires all three amounts
 			if (
-				decision === EVoteDecision.ABSTAIN &&
+				decision === EVoteDecision.SPLIT_ABSTAIN &&
 				(!this.isValidVoteAmount(amount.abstain || '-1') || !this.isValidVoteAmount(amount.aye || '-1') || !this.isValidVoteAmount(amount.nay || '-1'))
 			) {
 				throw new Error();

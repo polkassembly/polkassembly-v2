@@ -60,7 +60,7 @@ function SetDefaults({
 						/>
 					) : (
 						<>
-							{voteDecision === EVoteDecision.ABSTAIN && (
+							{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 								<BalanceInput
 									label={t('VoteReferendum.abstainVoteValue')}
 									onChange={onDefaultAbstainValueChange}

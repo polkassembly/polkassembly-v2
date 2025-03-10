@@ -15,6 +15,7 @@ export const POST = withErrorHandling(async () => {
 	const isValidRefreshToken = await AuthService.IsValidRefreshToken(refreshToken || '');
 
 	if (isValidRefreshToken && refreshToken) {
+		// Delete only the current session's refresh token
 		await AuthService.DeleteRefreshToken(refreshToken);
 	}
 

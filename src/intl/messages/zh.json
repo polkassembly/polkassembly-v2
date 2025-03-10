@@ -476,7 +476,11 @@
 		"abstainVoteValue": "弃权票值",
 		"ayeVoteValue": "赞成票值",
 		"nayVoteValue": "反对票值",
-		"confirm": "确认"
+		"confirm": "确认",
+		"voteSuccess": "您的投票已成功投出",
+		"voteFailed": "您的投票未成功投出",
+		"voteSuccessTitle": "投票成功",
+		"voteFailedTitle": "投票失败"
 	},
 	"Balance": {
 		"voteBalance": "投票余额"
