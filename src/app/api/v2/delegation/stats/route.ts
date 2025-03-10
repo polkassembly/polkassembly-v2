@@ -11,6 +11,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 interface DelegationCounts {
 	delegates: Record<string, number>;
@@ -47,9 +48,10 @@ const formatDelegationStats = (counts: DelegationCounts, totalDelegatedVotes: nu
 	totalDelegators: Object.keys(counts.delegators).length
 });
 
-export async function GET(): Promise<NextResponse> {
+export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	try {
 		const network = await getNetworkFromHeaders();
+
 		if (!network) {
 			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
@@ -93,4 +95,4 @@ export async function GET(): Promise<NextResponse> {
 			{ status: StatusCodes.INTERNAL_SERVER_ERROR }
 		);
 	}
-}
+});

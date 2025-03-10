@@ -12,6 +12,7 @@ import { ENetwork, ETrackDelegationStatus } from '@/_shared/types';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 interface IDelegation {
 	track: number;
@@ -78,17 +79,21 @@ function processTrackDelegation(data: PromiseSettledResult<TrackDelegationData>,
 	return trackDelegation;
 }
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
+export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	try {
+		const network = await getNetworkFromHeaders();
+
+		if (!network) {
+			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
+		}
+
 		const { searchParams } = req.nextUrl;
 		const { address } = QuerySchema.parse({
 			address: searchParams.get('address')
 		});
-		const network = await getNetworkFromHeaders();
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-		}
+
 		const substrateAddress = getSubstrateAddress(address);
+
 		if (!substrateAddress) {
 			throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.BAD_REQUEST);
 		}
@@ -134,4 +139,4 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 		return NextResponse.json({ error: 'Failed to fetch user delegation data' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 	}
-}
+});

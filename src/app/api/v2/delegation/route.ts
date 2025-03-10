@@ -15,6 +15,7 @@ import { OffChainDbService } from '../../_api-services/offchain_db_service';
 import { AuthService } from '../../_api-services/auth_service';
 import { fetchAllDelegateSources, fetchDelegateAnalytics } from '../../_api-utils/delegateUtils';
 import { RedisService } from '../../_api-services/redis_service';
+import { withErrorHandling } from '../../_api-utils/withErrorHandling';
 
 const GetDelegatesQuerySchema = z
 	.object({
@@ -30,7 +31,7 @@ const CreateDelegateSchema = z.object({
 	name: z.string().min(1, 'Name is required')
 });
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
+export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	try {
 		const network = await getNetworkFromHeaders();
 		if (!network) {
@@ -91,26 +92,26 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 	}
-}
+});
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	try {
-		const body = await req.json();
-		const { address, bio, name } = CreateDelegateSchema.parse(body);
+		const network = await getNetworkFromHeaders();
+		if (!network) {
+			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
+		}
 
 		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
 		if (!newAccessToken) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 		}
 
+		const body = await req.json();
+		const { address, bio, name } = CreateDelegateSchema.parse(body);
+
 		const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 		if (!userId) {
 			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
-		}
-
-		const network = await getNetworkFromHeaders();
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
 
 		const delegate = await OffChainDbService.CreateDelegate({
@@ -137,4 +138,4 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 	}
-}
+});
