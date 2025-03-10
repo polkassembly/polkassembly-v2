@@ -133,8 +133,8 @@ function ReactionHandler({
 							className='cursor-pointer'
 							onClick={handleShare}
 						>
-							<IoShareSocialOutline className='mr-2' />
-							<span>Share</span>
+							<IoShareSocialOutline className='mr-2 text-basic_text' />
+							<span className='text-basic_text'>Share</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
