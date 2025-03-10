@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
@@ -10,6 +10,8 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { ENetwork, EProposalType, ICalendarEvent, IOffChainPost } from '@/_shared/types';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { OnChainDbService } from '../../_api-services/onchain_db_service';
+import { withErrorHandling } from '../../_api-utils/withErrorHandling';
+import { getNetworkFromHeaders } from '../../_api-utils/getNetworkFromHeaders';
 
 const CHUNK_SIZE = 30;
 
@@ -37,11 +39,11 @@ const updateEventsWithTimeStamps = (events: ICalendarEvent[], blockNo: number) =
 		.sort((a, b) => a.blockNo - b.blockNo);
 };
 
-export async function POST(req: NextRequest) {
+export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	try {
-		const network = req.headers.get('x-network');
+		const network = await getNetworkFromHeaders();
 		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Network is required');
+			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 		}
 
 		const body = await req.json();
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
 		const cachedEvents = await RedisService.GetCalendarData({ network, startBlockNo, endBlockNo });
 
 		if (cachedEvents) {
-			return Response.json(JSON.parse(cachedEvents));
+			return NextResponse.json(JSON.parse(cachedEvents));
 		}
 
 		try {
@@ -70,7 +72,7 @@ export async function POST(req: NextRequest) {
 				if (process.env.IS_CACHE_ENABLED === 'true') {
 					await RedisService.SetCalendarData({ network, startBlockNo, endBlockNo, data: JSON.stringify([]) });
 				}
-				return Response.json([]);
+				return NextResponse.json([]);
 			}
 
 			const eventsByProposalType: Record<string, ICalendarEvent[]> = {};
@@ -150,12 +152,12 @@ export async function POST(req: NextRequest) {
 				data: JSON.stringify(eventsWithTimestamps)
 			});
 
-			return Response.json(eventsWithTimestamps);
+			return NextResponse.json(eventsWithTimestamps);
 		} catch (onChainError) {
 			console.error('onChain Error:', onChainError);
-			return Response.json({ error: 'Failed to fetch calendar events', details: onChainError }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+			return NextResponse.json({ error: 'Failed to fetch calendar events', details: onChainError }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 		}
 	} catch (error) {
-		return Response.json({ error: error instanceof APIError ? error.message : 'Error while fetching calendar events' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+		return NextResponse.json({ error: error instanceof APIError ? error.message : 'Error while fetching calendar events' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 	}
-}
+});
