@@ -99,7 +99,10 @@ enum EApiRoute {
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
-	GET_BOUNTY_AMOUNT = 'GET_BOUNTY_AMOUNT'
+	GET_BOUNTY_AMOUNT = 'GET_BOUNTY_AMOUNT',
+	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
+	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
+	GET_POST_SUBSCRIPTIONS = 'GET_POST_SUBSCRIPTIONS'
 }
 
 export class NextApiClientService {
@@ -184,6 +187,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_POST_SUBSCRIPTIONS:
 				break;
 
 			// post routes
@@ -237,6 +241,9 @@ export class NextApiClientService {
 			case EApiRoute.ADD_POST_REACTION:
 				method = 'POST';
 				break;
+			case EApiRoute.ADD_POST_SUBSCRIPTION:
+				method = 'POST';
+				break;
 
 			// patch routes
 			case EApiRoute.EDIT_USER_PROFILE:
@@ -258,6 +265,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.DELETE_REACTION:
 			case EApiRoute.DELETE_COMMENT:
+				method = 'DELETE';
+				break;
+			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 				method = 'DELETE';
 				break;
 
@@ -751,5 +761,20 @@ export class NextApiClientService {
 	static async getBountyAmount() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_BOUNTY_AMOUNT });
 		return this.nextApiClientFetch<{ bountyAmount: string }>({ url, method });
+	}
+
+	static async addPostSubscription(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscribe'] });
+		return this.nextApiClientFetch<{ message: string; id: number }>({ url, method });
+	}
+
+	static async deletePostSubscription(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscribe'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getPostSubscriptions(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_SUBSCRIPTIONS, routeSegments: [proposalType, index, 'subscribe'] });
+		return this.nextApiClientFetch<{ message: string; id: number }>({ url, method });
 	}
 }
