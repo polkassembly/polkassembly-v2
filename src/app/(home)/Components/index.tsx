@@ -16,7 +16,7 @@ import styles from './ActivityFeed.module.scss';
 import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
+function ActivityFeed({ initialData, subscribedData }: { initialData: IGenericListingResponse<IPostListing>; subscribedData?: IGenericListingResponse<IPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
 	const { state } = useSidebar();
@@ -48,8 +48,7 @@ function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IP
 							<ActivityFeedPostList initialData={initialData} />
 						</TabsContent>
 						<TabsContent value={EActivityFeedTab.FOLLOWING}>
-							{/* TODO: add subscribed post list */}
-							<SubscribedPostList postData={initialData} />
+							<SubscribedPostList initialData={subscribedData || { items: [], totalCount: 0 }} />
 						</TabsContent>
 					</Tabs>
 				</div>

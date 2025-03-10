@@ -66,6 +66,7 @@ enum EApiRoute {
 	GET_COMMENTS = 'GET_COMMENTS',
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
+	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
 	ADD_POST_REACTION = 'ADD_POST_REACTION',
 	DELETE_REACTION = 'DELETE_REACTION',
@@ -145,6 +146,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ACTIVITY_FEED:
 				path = '/activity-feed';
+				break;
+			case EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED:
+				path = '/activity-feed/subscriptions';
 				break;
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
@@ -545,6 +549,32 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
+	}
+
+	// subscribed activity feed
+	static async getSubscribedActivityFeed({ page, limit = DEFAULT_LISTING_LIMIT, userId }: { page: number; limit?: number; userId: number }) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetSubscriptionFeed', {
+				network: currentNetwork,
+				page,
+				limit,
+				userId
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
