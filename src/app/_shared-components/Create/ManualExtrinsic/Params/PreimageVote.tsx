@@ -4,15 +4,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../DropdownMenu';
 
-interface VoteParts {
+interface IVote {
 	aye: boolean;
 	conviction: number;
 }
 
 // const AYE_MASK = 0b10000000;
-const EMPTY_VOTE: VoteParts = { aye: true, conviction: 0 };
+const EMPTY_VOTE: IVote = { aye: true, conviction: 0 };
 
-function PreimageVoteComp({ onChange }: { onChange: (value: unknown) => void }) {
+function PreimageVoteComp({ onChange }: { onChange: (value: IVote) => void }) {
 	const [vote, setVote] = useState(EMPTY_VOTE);
 
 	useEffect((): void => {

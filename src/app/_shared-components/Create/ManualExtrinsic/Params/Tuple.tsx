@@ -11,7 +11,7 @@ function Tuple({ param, onChange }: { param: IParamDef; onChange: (value: unknow
 	const { apiService } = usePolkadotApiService();
 
 	const params = useMemo(() => {
-		return apiService?.getParamsFromTypeDef(param.type) || [];
+		return apiService?.getPreimageParamsFromTypeDef({ type: param.type }) || [];
 	}, [apiService, param.type]);
 
 	const onParamsChange = useCallback(

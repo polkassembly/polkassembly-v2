@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useEffect } from 'react';
 
-function NullComp({ onChange }: { onChange: (value: unknown) => void }) {
+function NullComp({ onChange }: { onChange: (value: null) => void }) {
 	useEffect(() => {
 		onChange(null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

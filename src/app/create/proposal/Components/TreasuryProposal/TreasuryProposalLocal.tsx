@@ -20,8 +20,10 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_THOUSAND, BN_ZERO } from '@polkadot/util';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 function TreasuryProposalLocal() {
+	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
 	const [amount, setAmount] = useState<BN>(BN_ZERO);
@@ -68,31 +70,31 @@ function TreasuryProposalLocal() {
 			return;
 		}
 
-		apiService.createTreasuryProposal(
-			userPreferences.address.address,
-			selectedTrack,
+		apiService.createTreasuryProposal({
+			address: userPreferences.address.address,
+			track: selectedTrack,
 			preimageHash,
 			preimageLength,
-			selectedEnactment,
-			advancedDetails[`${selectedEnactment}`],
-			(postId) => {
+			enactment: selectedEnactment,
+			enactmentValue: advancedDetails[`${selectedEnactment}`],
+			onSuccess: (postId) => {
 				redirectFromServer(`/referenda/${postId}`);
 			},
-			() => {
+			onFailed: () => {
 				setLoading(false);
 			}
-		);
+		});
 	};
 
 	const createPreimage = async () => {
 		if (!apiService || !amount.toString() || !beneficiary || !userPreferences.address?.address) return;
 
-		const tx = apiService.getTreasurySpendLocalExtrinsic(amount, beneficiary);
+		const tx = apiService.getTreasurySpendLocalExtrinsic({ amount, beneficiary });
 		if (!tx) return;
 
 		setLoading(true);
 
-		const preImage = apiService.getExtrinsicHash(tx);
+		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
 
 		if (!preImage) {
 			setLoading(false);
@@ -101,16 +103,16 @@ function TreasuryProposalLocal() {
 
 		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
 
-		await apiService.notePreimage(
-			userPreferences.address.address,
-			tx,
-			() => {
+		await apiService.notePreimage({
+			address: userPreferences.address.address,
+			extrinsicFn: tx,
+			onSuccess: () => {
 				createProposal(preImage.preimageHash, preImage.preimageLength);
 			},
-			() => {
+			onFailed: () => {
 				setLoading(false);
 			}
-		);
+		});
 	};
 
 	return (
@@ -123,15 +125,15 @@ function TreasuryProposalLocal() {
 				<AddressDropdown withBalance />
 
 				<div className='flex flex-col gap-y-1'>
-					<p>Beneficiary</p>
+					<p>{t('CreateTreasuryProposal.beneficiary')}</p>
 					<AddressInput onChange={(value) => setBeneficiary(value)} />
 				</div>
 				<BalanceInput
-					label='Amount'
+					label={t('CreateTreasuryProposal.amount')}
 					onChange={(value) => setAmount(value)}
 				/>
 				<div className='flex flex-col gap-y-1'>
-					<p>Track</p>
+					<p>{t('CreateTreasuryProposal.track')}</p>
 					<DropdownMenu>
 						<DropdownMenuTrigger className='flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2'>{selectedTrack || 'Select Track'}</DropdownMenuTrigger>
 						<DropdownMenuContent>
@@ -178,7 +180,7 @@ function TreasuryProposalLocal() {
 						isLoading={loading}
 						disabled={!amount.toString() || !beneficiary || !userPreferences.address?.address || !selectedTrack || !selectedEnactment}
 					>
-						Create
+						{t('CreateTreasuryProposal.createProposal')}
 					</Button>
 				</div>
 			</form>

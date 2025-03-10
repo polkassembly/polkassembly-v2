@@ -21,7 +21,7 @@ function StructComp({ param, onChange, defaultValue }: { param: IParamDef; onCha
 	const [paramValues] = useState(() => extractValues(defaultValue));
 
 	const params = useMemo(() => {
-		return apiService?.getParamsFromTypeDef(param.type) || [];
+		return apiService?.getPreimageParamsFromTypeDef({ type: param.type }) || [];
 	}, [apiService, param.type]);
 
 	const onParamsChange = useCallback(

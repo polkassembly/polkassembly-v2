@@ -25,7 +25,7 @@ export function fromIpfsCid(cid: string): ExpandedCid | null {
 	try {
 		const {
 			code: codec,
-			multihash: { code, digest },
+			multihash: { code, digest: _digest },
 			version
 		} = CID.parse(cid);
 
@@ -33,7 +33,7 @@ export function fromIpfsCid(cid: string): ExpandedCid | null {
 			codec,
 			hash: {
 				code,
-				digest: u8aToHex(digest)
+				digest: u8aToHex(_digest)
 			},
 			version
 		};
@@ -72,7 +72,7 @@ export function toIpfsCid(cid: any): string | null {
 	}
 }
 
-function Cid({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: string }) {
+function Cid({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value?: ExpandedCid) => void; defaultValue: string }) {
 	const ipfsCid = useMemo(() => (defaultValue && isCodec(defaultValue) ? toIpfsCid(defaultValue) : null), [defaultValue]);
 
 	const isStruct = useMemo(() => !defaultValue || isCodec(defaultValue), [defaultValue]);
@@ -80,7 +80,7 @@ function Cid({ param, onChange, defaultValue }: { param: IParamDef; onChange: (v
 	const onParamChange = (v: unknown): void => {
 		const value = fromIpfsCid(v as string);
 
-		onChange(value);
+		onChange(value ?? undefined);
 	};
 
 	if (ipfsCid) {

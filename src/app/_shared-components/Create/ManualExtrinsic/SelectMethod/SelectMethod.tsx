@@ -22,11 +22,11 @@ function SelectMethod({
 		if (!selectedSection) {
 			return;
 		}
-		const methodOptions = apiService?.getApiMethodOptions(selectedSection);
+		const methodOptions = apiService?.getApiMethodOptions({ sectionName: selectedSection });
 		if (!methodOptions) {
 			return;
 		}
-		const initialExtFn = apiService?.getExtrinsic(selectedSection, methodOptions[0].value);
+		const initialExtFn = apiService?.getPreimageTx({ sectionName: selectedSection, methodName: methodOptions[0].value });
 		setMethods(methodOptions || []);
 		if (initialExtFn) {
 			onChange(initialExtFn);
@@ -51,8 +51,7 @@ function SelectMethod({
 								if (!selectedSection) {
 									return;
 								}
-								const extFn = apiService?.getExtrinsic(selectedSection, method.value);
-								console.log('from select method', extFn?.section, extFn?.method);
+								const extFn = apiService?.getPreimageTx({ sectionName: selectedSection, methodName: method.value });
 								if (extFn) {
 									onChange(extFn);
 								}

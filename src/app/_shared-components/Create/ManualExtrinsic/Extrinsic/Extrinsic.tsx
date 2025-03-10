@@ -26,7 +26,7 @@ export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtr
 
 	const getCallState = useCallback(
 		(fn: SubmittableExtrinsicFunction<'promise'>, values: unknown[] = []): ICallState => {
-			const params = apiService?.getParams(fn.section, fn.method) ?? [];
+			const params = apiService?.getPreimageParams({ sectionName: fn.section, methodName: fn.method }) ?? [];
 			return {
 				extrinsic: {
 					extrinsicFn: fn,

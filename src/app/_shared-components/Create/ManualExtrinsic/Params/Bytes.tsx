@@ -6,6 +6,7 @@ import { InputHTMLAttributes, useCallback, useState } from 'react';
 import { IParamDef } from '@/_shared/types';
 import { compactAddLength } from '@polkadot/util';
 import { Switch } from '@/app/_shared-components/Switch';
+import { useTranslations } from 'next-intl';
 import InputText from './InputText';
 import InputFile from './InputFile';
 
@@ -15,6 +16,7 @@ type BytesInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> &
 };
 
 function BytesInput({ onChange, ...props }: BytesInputProps) {
+	const t = useTranslations();
 	const [isFileDrop, setIsFileDrop] = useState(false);
 
 	const onFileChange = useCallback(
@@ -27,7 +29,7 @@ function BytesInput({ onChange, ...props }: BytesInputProps) {
 	return (
 		<div>
 			<div className='mb-1 flex w-full justify-end'>
-				<span className='text-sm text-text_primary'>Upload File</span>
+				<span className='text-sm text-text_primary'>{t('CreatePreimage.uploadFile')}</span>
 				<Switch
 					checked={isFileDrop}
 					onCheckedChange={setIsFileDrop}

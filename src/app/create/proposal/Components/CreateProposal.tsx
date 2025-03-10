@@ -51,7 +51,7 @@ function CreateProposal() {
 						className='flex w-full items-center justify-start p-2'
 						onClick={() => setStep(EProposalStep.CREATE_PREIMAGE)}
 					>
-						Create Preimage
+						{t('CreateProposal.createPreimage')}
 					</Button>
 					<Button
 						variant='outline'
@@ -59,7 +59,7 @@ function CreateProposal() {
 						className='flex w-full items-center justify-start p-2'
 						onClick={() => setStep(EProposalStep.CREATE_PROPOSAL)}
 					>
-						Create Treasury Proposal
+						{t('CreateProposal.createTreasuryProposal')}
 					</Button>
 				</div>
 			)}

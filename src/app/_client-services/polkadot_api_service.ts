@@ -16,7 +16,7 @@ import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EVoteDecision, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -362,7 +362,7 @@ export class PolkadotApiService {
 			}));
 	}
 
-	getApiMethodOptions(sectionName: string) {
+	getApiMethodOptions({ sectionName }: { sectionName: string }) {
 		if (!this.api) {
 			return [];
 		}
@@ -386,7 +386,7 @@ export class PolkadotApiService {
 			});
 	}
 
-	getParams(sectionName: string, methodName: string) {
+	getPreimageParams({ sectionName, methodName }: { sectionName: string; methodName: string }) {
 		if (!this.api) {
 			return [];
 		}
@@ -408,7 +408,7 @@ export class PolkadotApiService {
 		);
 	}
 
-	getParamsFromTypeDef(type: TypeDef) {
+	getPreimageParamsFromTypeDef({ type }: { type: TypeDef }) {
 		const registry = this.getApiRegistry();
 		const typeDef = getTypeDef(registry.createType(type.type as 'u32').toRawType()) || type;
 
@@ -423,21 +423,21 @@ export class PolkadotApiService {
 			: [];
 	}
 
-	getExtrinsic(sectionName: string, methodName: string) {
+	getPreimageTx({ sectionName, methodName }: { sectionName: string; methodName: string }) {
 		if (!this.api) {
 			return null;
 		}
 		return this.api.tx[`${sectionName}`][`${methodName}`];
 	}
 
-	getExtrinsicFn(sectionName: string, methodName: string, paramsValues: unknown[]) {
+	getPreimageCallableTx({ sectionName, methodName, paramsValues }: { sectionName: string; methodName: string; paramsValues: unknown[] }) {
 		if (!this.api) {
 			return null;
 		}
 		return this.api.tx[`${sectionName}`][`${methodName}`](...paramsValues);
 	}
 
-	getExtrinsicHash(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>) {
+	getPreimageTxDetails({ extrinsicFn }: { extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult> }) {
 		if (!this.api) {
 			return null;
 		}
@@ -457,7 +457,17 @@ export class PolkadotApiService {
 		};
 	}
 
-	async notePreimage(address: string, extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>, onSuccess?: () => void, onFailed?: () => void) {
+	async notePreimage({
+		address,
+		extrinsicFn,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
+		onSuccess?: () => void;
+		onFailed?: () => void;
+	}) {
 		if (!this.api) {
 			return;
 		}
@@ -478,26 +488,44 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic(amount: BN, beneficiary: string) {
+	getTreasurySpendLocalExtrinsic({ amount, beneficiary }: { amount: BN; beneficiary: string }) {
 		if (!this.api) {
 			return null;
 		}
 		return this.api.tx.treasury.spendLocal(amount.toString(), beneficiary);
 	}
 
-	async createTreasuryProposal(
-		address: string,
-		track: string,
-		preimageHash: string,
-		preimageLength: number,
-		enactment: EEnactment,
-		enactmentValue: BN,
-		onSuccess?: (postId: number) => void,
-		onFailed?: () => void
-	) {
-		if (!this.api) {
+	async createTreasuryProposal({
+		address,
+		track,
+		preimageHash,
+		preimageLength,
+		enactment,
+		enactmentValue,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		track: string;
+		preimageHash: string;
+		preimageLength: number;
+		enactment: EEnactment;
+		enactmentValue: BN;
+		onSuccess?: (postId: number) => void;
+		onFailed?: () => void;
+	}) {
+		const tracks = Object.values(EPostOrigin);
+		if (!tracks.includes(track as EPostOrigin)) {
+			console.log('Invalid track', track);
+			onFailed?.();
 			return;
 		}
+
+		if (!preimageHash || !preimageLength || !address) {
+			onFailed?.();
+			return;
+		}
+
 		const tx = this.api.tx.referenda.submit(
 			{ Origins: track },
 			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },

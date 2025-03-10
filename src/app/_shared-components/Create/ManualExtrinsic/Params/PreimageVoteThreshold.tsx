@@ -22,7 +22,7 @@ export const textMap = options.reduce(
 	{} as unknown as TextMap
 );
 
-function PreimageVoteThresholdComp({ onChange }: { onChange: (value: unknown) => void }) {
+function PreimageVoteThresholdComp({ onChange }: { onChange: (value: number) => void }) {
 	const [voteThreshold, setVoteThreshold] = useState(0);
 
 	useEffect(() => {

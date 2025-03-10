@@ -8,6 +8,7 @@ import { Registry } from '@polkadot/types/types';
 import { getInitValue } from '@/app/_client-utils/initValue';
 import { Button } from '@/app/_shared-components/Button';
 import { Minus, Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 // eslint-disable-next-line import/no-cycle
 import Params from '.';
 
@@ -43,9 +44,10 @@ export function getValues(value: unknown): unknown[] {
 
 function VectorComp({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue?: unknown; registry: Registry }) {
 	const { apiService } = usePolkadotApiService();
+	const t = useTranslations();
 
 	const inputParams = useMemo(() => {
-		return apiService?.getParamsFromTypeDef(param.type) || [];
+		return apiService?.getPreimageParamsFromTypeDef({ type: param.type }) || [];
 	}, [apiService, param.type]);
 
 	const [values, setValues] = useState<unknown[]>(() => getValues(defaultValue));
@@ -93,7 +95,7 @@ function VectorComp({ param, onChange, defaultValue, registry }: { param: IParam
 					size='sm'
 					leftIcon={<Plus />}
 				>
-					Add Item
+					{t('CreatePreimage.addItem')}
 				</Button>
 				<Button
 					onClick={removeRow}
@@ -102,7 +104,7 @@ function VectorComp({ param, onChange, defaultValue, registry }: { param: IParam
 					leftIcon={<Minus />}
 					disabled={values.length === 0}
 				>
-					Remove Item
+					{t('CreatePreimage.removeItem')}
 				</Button>
 			</div>
 			<Params

@@ -9,6 +9,7 @@ import { Registry } from '@polkadot/types/types';
 import { getInitValue } from '@/app/_client-utils/initValue';
 import { Button } from '@/app/_shared-components/Button';
 import { Minus, Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 // eslint-disable-next-line import/no-cycle
 import Params from '.';
 
@@ -54,11 +55,22 @@ export function getValues(value: unknown): unknown[] {
 		: [];
 }
 
-function BTreeMapComp({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue?: unknown; registry: Registry }) {
+function BTreeMapComp({
+	param,
+	onChange,
+	defaultValue,
+	registry
+}: {
+	param: IParamDef;
+	onChange: (value: Map<unknown, unknown>) => void;
+	defaultValue?: unknown;
+	registry: Registry;
+}) {
+	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
 	const keyValueParam = getParamType(
 		useMemo(() => {
-			return apiService?.getParamsFromTypeDef(param.type) || [];
+			return apiService?.getPreimageParamsFromTypeDef({ type: param.type }) || [];
 		}, [apiService, param.type])
 	);
 
@@ -119,7 +131,7 @@ function BTreeMapComp({ param, onChange, defaultValue, registry }: { param: IPar
 					size='sm'
 					leftIcon={<Plus />}
 				>
-					Add Item
+					{t('CreatePreimage.addItem')}
 				</Button>
 				<Button
 					onClick={removeRow}
@@ -128,7 +140,7 @@ function BTreeMapComp({ param, onChange, defaultValue, registry }: { param: IPar
 					leftIcon={<Minus />}
 					disabled={values.length === 0}
 				>
-					Remove Item
+					{t('CreatePreimage.removeItem')}
 				</Button>
 			</div>
 			<Params

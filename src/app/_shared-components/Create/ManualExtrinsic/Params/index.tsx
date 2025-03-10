@@ -19,6 +19,7 @@ function Params({ params, values, onChange }: { params: IParamDef[]; values?: un
 
 	useEffect(() => {
 		onChange(paramValues);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [paramValues]);
 
 	return (

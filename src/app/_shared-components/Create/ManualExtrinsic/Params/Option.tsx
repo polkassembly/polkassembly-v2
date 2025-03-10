@@ -5,10 +5,12 @@ import { IParamDef } from '@/_shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { TypeDef } from '@polkadot/types/types';
 import { Switch } from '@/app/_shared-components/Switch';
+import { useTranslations } from 'next-intl';
 // eslint-disable-next-line import/no-cycle
 import Param from './Param';
 
 function Option({ param, onChange }: { param: IParamDef; onChange: (value: unknown) => void }) {
+	const t = useTranslations();
 	const { sub } = param.type;
 
 	const [isActive, setIsActive] = useState(true);
@@ -30,7 +32,7 @@ function Option({ param, onChange }: { param: IParamDef; onChange: (value: unkno
 	return (
 		<div>
 			<div className='flex items-center justify-end gap-x-1'>
-				<span className='text-sm text-text_primary'>include option</span>
+				<span className='text-sm text-text_primary'>{t('CreatePreimage.includeOption')}</span>
 				<Switch
 					checked={isActive}
 					onCheckedChange={setIsActive}

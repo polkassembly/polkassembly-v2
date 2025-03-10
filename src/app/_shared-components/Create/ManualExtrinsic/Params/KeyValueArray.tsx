@@ -9,7 +9,7 @@ function parseFile(raw: Uint8Array): [Uint8Array, Uint8Array][] {
 	const json = JSON.parse(u8aToString(raw)) as Record<string, string>;
 	const keys = Object.keys(json);
 	return keys.map((key): [Uint8Array, Uint8Array] => {
-		const value = json[key];
+		const value = json[`${key}`];
 
 		assert(isHex(key) && isHex(value), `Non-hex key/value pair found in ${key.toString()} => ${value.toString()}`);
 
@@ -20,7 +20,7 @@ function parseFile(raw: Uint8Array): [Uint8Array, Uint8Array][] {
 	});
 }
 
-function KeyValueArray({ onChange }: { onChange: (value: unknown) => void }) {
+function KeyValueArray({ onChange }: { onChange: (value: [Uint8Array, Uint8Array][]) => void }) {
 	const onParamChange = (raw: Uint8Array): void => {
 		let encoded: [Uint8Array, Uint8Array][] = [];
 

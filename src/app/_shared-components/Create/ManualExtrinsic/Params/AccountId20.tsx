@@ -6,15 +6,14 @@ import { IParamDef } from '@/_shared/types';
 import { toAddress } from '@/app/_client-utils/toAddress';
 import InputText from './InputText';
 
-function AccountId20({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: string | null) => void; defaultValue: string }) {
+function AccountId20({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value?: string) => void; defaultValue: string }) {
 	const onParamChange = useCallback(
 		(value: string): void => {
-			const address =
-				toAddress({
-					value,
-					bytesLength: 20
-				}) || null;
-			const output = address ? value : null;
+			const address = toAddress({
+				value,
+				bytesLength: 20
+			});
+			const output = address ? value : undefined;
 
 			onChange(output);
 		},

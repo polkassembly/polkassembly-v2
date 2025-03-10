@@ -142,7 +142,7 @@ function getTypeFromDef({ displayName, info, lookupName, sub, type }: TypeDef) {
 			return 'BTreeSet';
 
 		case TypeDefInfo.Tuple:
-			return components[type] === AddressInput ? type : 'Tuple';
+			return components[`${type}`] === AddressInput ? type : 'Tuple';
 
 		case TypeDefInfo.Vec:
 			return type === 'Vec<u8>' ? 'Bytes' : ['Vec<KeyValue>'].includes(type) ? 'Vec<KeyValue>' : 'Vec';

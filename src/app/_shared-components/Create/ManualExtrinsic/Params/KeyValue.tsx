@@ -19,7 +19,7 @@ export function createParam(hex: string | string): Uint8Array {
 	return compactAddLength(u8a);
 }
 
-function KeyValue({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: string }) {
+function KeyValue({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: Uint8Array) => void; defaultValue: string }) {
 	const [key, setKey] = useState<Uint8Array>(() => new Uint8Array([]));
 	const [value, setValue] = useState<Uint8Array>(() => new Uint8Array([]));
 

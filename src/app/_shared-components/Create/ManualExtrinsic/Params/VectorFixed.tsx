@@ -45,7 +45,7 @@ function getInitialValues(defaultValue: unknown): unknown[] {
 function VectorFixed({ param, onChange, defaultValue }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue?: unknown }) {
 	const { apiService } = usePolkadotApiService();
 	const inputParams = useMemo(() => {
-		return apiService?.getParamsFromTypeDef(param.type) || [];
+		return apiService?.getPreimageParamsFromTypeDef({ type: param.type }) || [];
 	}, [apiService, param.type]);
 
 	const [params] = useState<IParamDef[]>(() => getParams(inputParams, [], inputParams[0].length || 1));
