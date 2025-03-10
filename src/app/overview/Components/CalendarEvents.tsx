@@ -163,7 +163,7 @@ function CalendarEvents() {
 						</div>
 					</TooltipTrigger>
 					{hasEvent && (
-						<TooltipContent className='bg-social_tooltip_background w-[280px] p-2'>
+						<TooltipContent className='w-[280px] bg-social_tooltip_background p-2'>
 							<EventList
 								events={getEventData(dateValue)}
 								color='text-btn_primary_text hover:text-text_pink'
