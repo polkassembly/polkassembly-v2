@@ -227,4 +227,8 @@ export class OnChainDbService {
 	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
 		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
 	}
+
+	static async GetBountyAmount(network: ENetwork, bountyId: string) {
+		return SubsquareOnChainService.GetBountyAmount(network, bountyId);
+	}
 }

@@ -98,7 +98,8 @@ enum EApiRoute {
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
-	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART'
+	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
+	GET_BOUNTY_AMOUNT = 'GET_BOUNTY_AMOUNT'
 }
 
 export class NextApiClientService {
@@ -167,6 +168,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_BOUNTIES_STATS:
 				path = '/bounties/stats';
+				break;
+			case EApiRoute.GET_BOUNTY_AMOUNT:
+				path = '/bounties/stats/amount';
 				break;
 			case EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY:
 				path = '/bounties/user-activity';
@@ -742,5 +746,10 @@ export class NextApiClientService {
 	static async getChildBounties(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CHILD_BOUNTIES, routeSegments: [proposalType, index, 'child-bounties'] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	static async getBountyAmount() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_BOUNTY_AMOUNT });
+		return this.nextApiClientFetch<{ bountyAmount: string }>({ url, method });
 	}
 }

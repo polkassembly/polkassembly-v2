@@ -19,10 +19,11 @@ import { ENetwork, IBountyStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
@@ -35,15 +36,15 @@ function StatItem({ label, value }: { label: string; value: string }) {
 
 function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
 	const network = getCurrentNetwork();
-	const { apiService } = usePolkadotApiService();
 	const t = useTranslations('Bounty');
-
-	const { data: bountyAmount = '0' } = useQuery({
+	const { data: bountyAmount = '0', isLoading } = useQuery({
 		queryKey: ['bountyAmount'],
-		queryFn: () => apiService?.getBountyAmount() ?? '0',
-		enabled: !!apiService
+		queryFn: async () => {
+			const response = await NextApiClientService.getBountyAmount();
+			return response?.data?.bountyAmount ?? '0';
+		},
+		enabled: !!network
 	});
-
 	const availableBounty = !isNaN(Number(tokenPrice)) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
 
 	return (
@@ -54,7 +55,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
 							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
-							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
+							{isLoading ? (
+								<Skeleton className='h-[22px] w-[100px]' />
+							) : (
+								<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
+							)}
 							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
 						</div>
 						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] w-[360px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background xl:w-[380px] 2xl:w-[380px]'>

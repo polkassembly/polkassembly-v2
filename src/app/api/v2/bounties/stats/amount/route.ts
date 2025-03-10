@@ -1,0 +1,69 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { NextRequest } from 'next/server';
+import { BN } from '@polkadot/util';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
+import { ENetwork } from '@shared/types';
+import { PolkadotApiService } from '@/app/_client-services/polkadot_api_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+
+interface Bounty {
+	index: { toJSON: () => number };
+	bounty: {
+		status: {
+			isFunded: boolean;
+			isCuratorProposed: boolean;
+			isActive: boolean;
+		};
+	};
+}
+
+export async function GET(req: NextRequest) {
+	const network = req.headers.get('x-network');
+	if (!network || !Object.values(ENetwork).includes(network as ENetwork)) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
+	}
+
+	try {
+		const api = await PolkadotApiService.Init(network as ENetwork);
+		const activePjsBounties = await api.getBountyAmount();
+
+		const balances = await Promise.all(
+			activePjsBounties.map(async (bounty: Bounty) => {
+				const id = bounty?.index?.toJSON();
+				if (!id) return new BN(0);
+				try {
+					const bountyData = await OnChainDbService.GetBountyAmount(network as ENetwork, id.toString());
+					const address = bountyData?.address;
+					if (!address) {
+						const metadataValue = bountyData?.meta?.value || 0;
+						return new BN(metadataValue);
+					}
+					try {
+						return await api.getAccountData(address);
+					} catch (accountError) {
+						await api.disconnect();
+						console.error(`Error fetching account data for bounty ${id}: ${accountError}`);
+						return new BN(0);
+					}
+				} catch (error) {
+					console.error(`Error processing bounty ${id}: ${error}`);
+					await api.disconnect();
+					return new BN(0);
+				}
+			})
+		);
+		await api.disconnect();
+		const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), new BN(0));
+		const bountyAmount = total.div(new BN(10).pow(new BN(10))).toString();
+
+		return Response.json({ bountyAmount: bountyAmount.toString() });
+	} catch (error) {
+		console.error('Error processing bounty amount:', error);
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to fetch bounty amount');
+	}
+}
