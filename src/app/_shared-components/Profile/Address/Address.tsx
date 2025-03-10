@@ -4,6 +4,7 @@
 
 'use client';
 
+import Link from 'next/link';
 import { useMemo, memo, useEffect, useState } from 'react';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
@@ -27,9 +28,23 @@ interface AddressProps {
 	disableTooltip?: boolean;
 }
 
-const getUserRedirection = (network: string, address: string, username?: string): string | null => {
-	if (!network) return null;
-	return username?.length ? `https://${network}.polkassembly.io/user/${username}` : address?.length ? `https://${network}.polkassembly.io/address/${address}` : null;
+interface LinkWrapperProps {
+	href: string | null;
+	children: React.ReactNode;
+	redirectToProfile?: boolean;
+}
+
+const LinkWrapper = ({ href, children, redirectToProfile }: LinkWrapperProps) => {
+	if (!href || !redirectToProfile) return <>{children}</>;
+
+	return (
+		<Link
+			href={href}
+			passHref
+		>
+			{children}
+		</Link>
+	);
 };
 
 function Address({
@@ -47,10 +62,14 @@ function Address({
 	const { getOnChainIdentity } = useIdentityService();
 
 	const encodedAddress = useMemo(() => getEncodedAddress(address, network) || address, [address, network]);
-	const redirectionUrl = useMemo(() => getUserRedirection(network, address), [network, address]);
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || '');
-
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+
+	const linkHref = useMemo(() => {
+		if (!network) return null;
+		const username = identity?.display;
+		return username ? `/${network}/user/${username}` : address ? `/${network}/address/${address}` : null;
+	}, [network, address, identity]);
 
 	useEffect(() => {
 		const initializeIdentity = async () => {
@@ -72,18 +91,27 @@ function Address({
 		initializeIdentity();
 	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName]);
 
+	const addressInlineComponent = (
+		<AddressInline
+			className={className}
+			address={encodedAddress}
+			onChainIdentity={identity as IOnChainIdentity}
+			addressDisplayText={displayText}
+			iconSize={iconSize}
+			showIdenticon={showIdenticon}
+			textClassName={textClassName}
+			redirectToProfile={redirectToProfile}
+		/>
+	);
+
 	if (disableTooltip) {
 		return (
-			<AddressInline
-				className={className}
-				address={encodedAddress}
-				onChainIdentity={identity as IOnChainIdentity}
-				addressDisplayText={displayText}
-				iconSize={iconSize}
-				showIdenticon={showIdenticon}
-				textClassName={textClassName}
+			<LinkWrapper
+				href={linkHref}
 				redirectToProfile={redirectToProfile}
-			/>
+			>
+				{addressInlineComponent}
+			</LinkWrapper>
 		);
 	}
 
@@ -93,22 +121,18 @@ function Address({
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div className='relative cursor-pointer'>
-							<AddressInline
-								className={className}
-								address={encodedAddress}
-								onChainIdentity={identity as IOnChainIdentity}
-								addressDisplayText={displayText}
-								iconSize={iconSize}
-								showIdenticon={showIdenticon}
-								textClassName={textClassName}
+							<LinkWrapper
+								href={linkHref}
 								redirectToProfile={redirectToProfile}
-							/>
+							>
+								{addressInlineComponent}
+							</LinkWrapper>
 						</div>
 					</TooltipTrigger>
-					<TooltipContent className={`${classes.tooltipContent} w-[340px] bg-address_tooltip_bg`}>
+					<TooltipContent className={`${classes.tooltipContent} bg-address_tooltip_bg w-[340px]`}>
 						<AddressTooltipContent
 							address={encodedAddress}
-							redirectionUrl={redirectionUrl}
+							userProfileUrl={linkHref || ''}
 							displayText={displayText}
 							identity={identity as IOnChainIdentity}
 						/>

@@ -21,7 +21,7 @@ import AddressDisplay from './AddressDisplay';
 
 interface AddressTooltipContentProps {
 	address: string;
-	redirectionUrl: string | null;
+	userProfileUrl?: string;
 	displayText: string;
 	identity?: IOnChainIdentity;
 }
@@ -33,7 +33,7 @@ const LoadingSpinner = memo(() => (
 	</div>
 ));
 
-function AddressTooltipContent({ address, redirectionUrl, displayText, identity }: AddressTooltipContentProps) {
+function AddressTooltipContent({ address, userProfileUrl, displayText, identity }: AddressTooltipContentProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const { user: currentUser } = useUser();
@@ -155,11 +155,11 @@ function AddressTooltipContent({ address, redirectionUrl, displayText, identity 
 							address={address}
 							identity={identity}
 							displayText={displayText}
-							redirectionUrl={redirectionUrl}
+							userProfileUrl={userProfileUrl}
 							onCopy={copyToClipboard}
 						/>
 						{hasUserData && userData.createdAt && (
-							<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
+							<span className='text-address_tooltip_text flex items-center text-xs tracking-wide'>
 								{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 							</span>
 						)}

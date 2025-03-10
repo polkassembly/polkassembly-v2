@@ -7,27 +7,28 @@ import { CopyIcon } from 'lucide-react';
 import { memo } from 'react';
 import { IOnChainIdentity } from '@/_shared/types';
 import AddressInline from './AddressInline/AddressInline';
+import Link from 'next/link';
 
 function AddressDisplay({
 	address,
 	displayText,
-	redirectionUrl,
+	userProfileUrl,
 	onCopy,
 	identity
 }: {
 	address: string;
 	displayText: string;
-	redirectionUrl: string | null;
+	userProfileUrl?: string;
 	onCopy: (text: string) => void;
 	identity?: IOnChainIdentity;
 }) {
 	return (
 		<div className='flex w-full flex-col gap-1.5'>
 			<div className='mt-0 flex items-center justify-start gap-2'>
-				<div
-					aria-hidden
+				<Link
+					href={userProfileUrl || ''}
+					target='_blank'
 					className='text-pink_primary flex cursor-pointer'
-					onClick={() => redirectionUrl && window.open(redirectionUrl, '_blank')}
 				>
 					<AddressInline
 						address={address}
@@ -36,7 +37,7 @@ function AddressDisplay({
 						onChainIdentity={identity}
 						addressDisplayText={displayText}
 					/>
-				</div>
+				</Link>
 			</div>
 			<div className='flex w-full flex-col gap-1.5'>
 				<div className='flex items-center gap-1 text-xs text-text_primary'>
