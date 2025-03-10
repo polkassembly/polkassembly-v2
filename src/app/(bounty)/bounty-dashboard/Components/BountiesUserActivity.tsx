@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import BountyPoster from '@assets/bounties/bounty-poster.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import { ArrowUpRight } from 'lucide-react';
