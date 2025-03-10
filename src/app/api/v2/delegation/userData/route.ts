@@ -75,7 +75,6 @@ function processTrackDelegation(data: PromiseSettledResult<TrackDelegationData>,
 	if (trackDelegation.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION)) {
 		trackDelegation.recieved_delegation_count = votingDelegations.filter((delegation) => !addresses.includes(delegation.from)).length;
 	}
-
 	return trackDelegation;
 }
 
