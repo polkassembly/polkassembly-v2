@@ -9,6 +9,7 @@ import { Share2 } from 'lucide-react';
 import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
 import { useMemo, useCallback } from 'react';
 import styles from './PostActions.module.scss';
@@ -16,6 +17,7 @@ import styles from './PostActions.module.scss';
 function PostActions({ postData }: { postData: IPost }) {
 	const { user } = useUser();
 	const router = useRouter();
+	const t = useTranslations();
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions(postData);
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {
@@ -35,7 +37,7 @@ function PostActions({ postData }: { postData: IPost }) {
 		[isSubscribed, isSubscribing]
 	);
 
-	const buttonText = useMemo(() => (isSubscribing ? 'Loading...' : isSubscribed ? 'Subscribed' : 'Subscribe'), [isSubscribing, isSubscribed]);
+	const buttonText = useMemo(() => (isSubscribing ? t('loading') : isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribing, isSubscribed]);
 
 	const handleShare = () => {
 		const titlePart = postData?.title ? ` for ${postData.title}` : '';
@@ -100,7 +102,7 @@ function PostActions({ postData }: { postData: IPost }) {
 						className={styles.post_actions_container}
 					>
 						<Share2 className='h-4 w-4' />
-						<span className='text-xs font-medium'>Share</span>
+						<span className='text-xs font-medium'>{t('share')}</span>
 					</button>
 				</div>
 			</div>

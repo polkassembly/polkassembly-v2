@@ -25,6 +25,10 @@
 		"Live": "实时",
 		"CommentPlaceholder": "在此输入您的评论",
 		"Post": "发布",
+		"share": "分享",
+		"loading": "加载中...",
+		"subscribe": "订阅",
+		"unsubscribe": "取消订阅",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",

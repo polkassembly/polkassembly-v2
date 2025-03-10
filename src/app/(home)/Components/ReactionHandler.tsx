@@ -126,7 +126,7 @@ function ReactionHandler({
 								onClick={() => handleAuthenticatedAction(handleSubscribe)}
 							>
 								{isSubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
-								<span className={`${isSubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>{isSubscribed ? 'Unsubscribe' : 'Subscribe'}</span>
+								<span className={`${isSubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>{isSubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
 							</DropdownMenuItem>
 						)}
 						<DropdownMenuItem
@@ -134,7 +134,7 @@ function ReactionHandler({
 							onClick={handleShare}
 						>
 							<IoShareSocialOutline className='mr-2 text-basic_text' />
-							<span className='text-basic_text'>Share</span>
+							<span className='text-basic_text'>{t('ActivityFeed.share')}</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
