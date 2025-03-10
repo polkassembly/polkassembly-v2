@@ -29,7 +29,7 @@ import styles from './Bounty.module.scss';
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
 		<div className='flex flex-col'>
-			<span className='text-bounty_pool_text font-pixelify text-[18px] font-semibold leading-none'>{label}</span>
+			<span className={styles.bounty_stats_label}>{label}</span>
 			<span className='font-pixeboy text-[28px] font-medium'>{value}</span>
 		</div>
 	);
@@ -146,7 +146,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 				</div>
 				<div className='flex flex-col gap-6 lg:hidden'>
 					<div>
-						<span className='text-bounty_pool_text font-pixelify text-base'>{t('availableBountyPool')}</span>
+						<span className='font-pixelify text-base text-bounty_pool_text'>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
 							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
 							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>

@@ -138,3 +138,7 @@
 .bounty_proposal_wrapper_img_text {
     @apply line-clamp-2 overflow-hidden text-ellipsis text-sm text-btn_secondary_text;
 }
+
+.bounty_stats_label {
+    @apply text-bounty_pool_text font-pixelify text-[18px] font-semibold;
+}
