@@ -9,6 +9,8 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Copy } from 'lucide-react';
+import { useToast } from '@/hooks/useToast';
+import { NotificationType } from '@/_shared/types';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
 
@@ -17,6 +19,10 @@ function ManualExtrinsic() {
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
 
+	const { toast } = useToast();
+
+	const [isLoading, setIsLoading] = useState(false);
+
 	const extrinsicDetails = useMemo(() => extrinsicFn && apiService?.getPreimageTxDetails({ extrinsicFn }), [apiService, extrinsicFn]);
 
 	const notePreimage = useCallback(async () => {
@@ -24,11 +30,29 @@ function ManualExtrinsic() {
 			return;
 		}
 
+		setIsLoading(true);
+
 		await apiService?.notePreimage({
 			address: userPreferences.address.address,
-			extrinsicFn
+			extrinsicFn,
+			onSuccess: () => {
+				setIsLoading(false);
+				toast({
+					status: NotificationType.SUCCESS,
+					title: 'Preimage noted successfully',
+					description: 'The preimage has been noted successfully'
+				});
+			},
+			onFailed: () => {
+				setIsLoading(false);
+				toast({
+					status: NotificationType.ERROR,
+					title: 'Failed to note preimage',
+					description: 'There was an error while noting the preimage'
+				});
+			}
 		});
-	}, [apiService, extrinsicFn, userPreferences.address?.address]);
+	}, [apiService, extrinsicFn, toast, userPreferences.address?.address]);
 
 	return (
 		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>
@@ -60,6 +84,7 @@ function ManualExtrinsic() {
 				<Button
 					disabled={!extrinsicDetails?.preimageHash}
 					onClick={notePreimage}
+					isLoading={isLoading}
 				>
 					Submit
 				</Button>
