@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EReaction, IPostListing } from '@/_shared/types';
+import { EReaction, IPost } from '@/_shared/types';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { useUser } from '@/hooks/useUser';
 import { Share2 } from 'lucide-react';
@@ -12,10 +12,9 @@ import { useRouter } from 'next/navigation';
 import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import styles from './PostActions.module.scss';
 
-const SELECTED_TEXT_COLOR = 'text-bg_pink';
-
-function PostActions({ postData }: { postData: IPostListing }) {
+function PostActions({ postData }: { postData: IPost }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif } = usePostReactions(postData);
@@ -33,7 +32,7 @@ function PostActions({ postData }: { postData: IPostListing }) {
 		[user?.id, router]
 	);
 
-	const { isLiked, isDisliked } = reactionState;
+	const { likesCount, dislikesCount, isLiked, isDisliked } = reactionState;
 
 	const subscriptionParams = useMemo(
 		() => ({
@@ -77,10 +76,7 @@ function PostActions({ postData }: { postData: IPostListing }) {
 		[handleAuthenticatedAction, isSubscribed, subscriptionParams]
 	);
 
-	const subscribeButtonClasses = useMemo(
-		() => cn('flex cursor-pointer items-center gap-1 rounded-md bg-grey_bg p-1.5', isSubscribed && SELECTED_TEXT_COLOR, isLoading && 'opacity-50'),
-		[isSubscribed, isLoading]
-	);
+	const subscribeButtonClasses = useMemo(() => cn(styles.post_actions_container, isSubscribed && styles.selected_text, isLoading && styles.loading), [isSubscribed, isLoading]);
 
 	const buttonText = useMemo(() => (isLoading ? 'Loading...' : isSubscribed ? 'Subscribed' : 'Subscribe'), [isLoading, isSubscribed]);
 
@@ -107,29 +103,31 @@ function PostActions({ postData }: { postData: IPostListing }) {
 						role='button'
 						aria-hidden
 						onClick={handleLike}
-						className='flex cursor-pointer items-center gap-1 rounded-md bg-grey_bg p-1.5'
+						className={cn(isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}
 					>
 						<ReactionButton
 							type={EReaction.like}
-							isActive={isLiked}
+							isActive={isLiked || false}
 							showGif={showLikeGif}
 							showText={false}
-							className={cn(isLiked ? SELECTED_TEXT_COLOR : 'text-basic_text', 'text-sm')}
+							className='text-sm'
 						/>
+						<span className='text-xs font-medium'>{likesCount}</span>
 					</div>
 					<div
 						role='button'
 						aria-hidden
 						onClick={handleDislike}
-						className='flex cursor-pointer items-center gap-1 rounded-md bg-grey_bg p-1.5'
+						className={cn(isDisliked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}
 					>
 						<ReactionButton
 							type={EReaction.dislike}
-							isActive={isDisliked}
+							isActive={isDisliked || false}
 							showGif={showDislikeGif}
 							showText={false}
-							className={cn(isDisliked ? SELECTED_TEXT_COLOR : 'text-basic_text', 'text-sm')}
+							className='text-sm'
 						/>
+						<span className='text-xs font-medium'>{dislikesCount}</span>
 					</div>
 				</div>
 
@@ -146,7 +144,7 @@ function PostActions({ postData }: { postData: IPostListing }) {
 					<button
 						type='button'
 						onClick={handleShare}
-						className='flex cursor-pointer items-center gap-1 rounded-md bg-grey_bg p-1.5'
+						className={styles.post_actions_container}
 					>
 						<Share2 className='h-4 w-4' />
 						<span className='text-xs font-medium'>Share</span>
