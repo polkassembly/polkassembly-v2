@@ -5,7 +5,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, memo, useEffect, useState } from 'react';
+import { useMemo, memo, useEffect, useState, ReactNode } from 'react';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -30,12 +30,12 @@ interface AddressProps {
 
 interface LinkWrapperProps {
 	href: string | null;
-	children: React.ReactNode;
+	children: ReactNode;
 	redirectToProfile?: boolean;
 }
 
-const LinkWrapper = ({ href, children, redirectToProfile }: LinkWrapperProps) => {
-	if (!href || !redirectToProfile) return <>{children}</>;
+function LinkWrapper({ href, children, redirectToProfile }: LinkWrapperProps) {
+	if (!href || !redirectToProfile) return children;
 
 	return (
 		<Link
@@ -45,7 +45,7 @@ const LinkWrapper = ({ href, children, redirectToProfile }: LinkWrapperProps) =>
 			{children}
 		</Link>
 	);
-};
+}
 
 function Address({
 	className,
@@ -129,7 +129,7 @@ function Address({
 							</LinkWrapper>
 						</div>
 					</TooltipTrigger>
-					<TooltipContent className={`${classes.tooltipContent} bg-address_tooltip_bg w-[340px]`}>
+					<TooltipContent className={`${classes.tooltipContent} w-[340px] bg-address_tooltip_bg`}>
 						<AddressTooltipContent
 							address={encodedAddress}
 							userProfileUrl={linkHref || ''}

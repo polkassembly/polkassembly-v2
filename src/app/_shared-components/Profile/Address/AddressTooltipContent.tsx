@@ -159,7 +159,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity 
 							onCopy={copyToClipboard}
 						/>
 						{hasUserData && userData.createdAt && (
-							<span className='text-address_tooltip_text flex items-center text-xs tracking-wide'>
+							<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
 								{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 							</span>
 						)}

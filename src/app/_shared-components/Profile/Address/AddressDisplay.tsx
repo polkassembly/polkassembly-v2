@@ -5,9 +5,9 @@
 import Identicon from '@polkadot/react-identicon';
 import { CopyIcon } from 'lucide-react';
 import { memo } from 'react';
+import Link from 'next/link';
 import { IOnChainIdentity } from '@/_shared/types';
 import AddressInline from './AddressInline/AddressInline';
-import Link from 'next/link';
 
 function AddressDisplay({
 	address,
