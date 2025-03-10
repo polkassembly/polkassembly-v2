@@ -51,14 +51,12 @@ export async function POST(req: NextRequest) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Start and end block numbers are required');
 		}
 
-		// Check Redis cache first
 		const cachedEvents = await RedisService.GetCalendarData({ network, startBlockNo, endBlockNo });
 
 		if (cachedEvents) {
 			return Response.json(JSON.parse(cachedEvents));
 		}
 
-		// If not in cache, fetch events from onChain
 		try {
 			const onChainEvents = await OnChainDbService.GetCalendarEvents({
 				network: network as ENetwork,
@@ -75,7 +73,6 @@ export async function POST(req: NextRequest) {
 				return Response.json([]);
 			}
 
-			// Group events by proposal type
 			const eventsByProposalType: Record<string, ICalendarEvent[]> = {};
 			onChainEvents.forEach((event: ICalendarEvent) => {
 				if (!eventsByProposalType[event.type as EProposalType]) {
@@ -86,7 +83,6 @@ export async function POST(req: NextRequest) {
 
 			const events: ICalendarEvent[] = [];
 
-			// Process each proposal type
 			await Promise.all(
 				Object.entries(eventsByProposalType).map(async ([proposalType, proposalEvents]) => {
 					const chunks = chunkArray(proposalEvents, CHUNK_SIZE);
@@ -94,8 +90,6 @@ export async function POST(req: NextRequest) {
 					await Promise.all(
 						chunks.map(async (chunk) => {
 							const indexes = chunk.map((item) => item?.index);
-
-							// Get posts from offchain database
 							const postsPromises = indexes.map((index) =>
 								OffChainDbService.GetOffChainPostData({
 									network: network as ENetwork,
@@ -119,14 +113,11 @@ export async function POST(req: NextRequest) {
 										title: '',
 										trackNo: onChainEvent?.trackNo
 									};
-
-									// Find matching post
 									const post = postsData.find((p: IOffChainPost) => p.index === onChainEvent.index);
 
 									if (post?.title) {
 										payload.title = post.title;
 									} else {
-										// Try getting title from Subsquare
 										const subsquareData = await OffChainDbService.GetOffChainPostData({
 											network: network as ENetwork,
 											indexOrHash: onChainEvent.index.toString(),
@@ -152,8 +143,6 @@ export async function POST(req: NextRequest) {
 			);
 
 			const eventsWithTimestamps = updateEventsWithTimeStamps(events, startBlockNo);
-
-			// Cache the results
 			await RedisService.SetCalendarData({
 				network,
 				startBlockNo,

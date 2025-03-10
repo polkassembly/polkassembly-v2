@@ -65,8 +65,6 @@ function CalendarEvents() {
 	const fetchMonthEvents = useCallback(
 		async (date: Date) => {
 			const monthKey = dayjs(date).format('YYYY-MM');
-
-			// If we already have data for this month, don't fetch again
 			if (monthlyEvents[monthKey as keyof typeof monthlyEvents] && !isLoading) {
 				return;
 			}
@@ -165,7 +163,7 @@ function CalendarEvents() {
 						</div>
 					</TooltipTrigger>
 					{hasEvent && (
-						<TooltipContent className='w-[280px] bg-social_tooltip_background p-2'>
+						<TooltipContent className='bg-social_tooltip_background w-[280px] p-2'>
 							<EventList
 								events={getEventData(dateValue)}
 								color='text-btn_primary_text hover:text-text_pink'
