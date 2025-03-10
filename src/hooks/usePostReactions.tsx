@@ -9,19 +9,29 @@ import { useUser } from './useUser';
 
 export const usePostReactions = (postData: IPost) => {
 	const { user } = useUser();
+	const [isSubscribed, setIsSubscribed] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
-		const userReactions = postData.reactions?.filter((reaction) => reaction.userId === user?.id) || [];
-		const allReactions = postData.reactions || [];
+		const reactionsArray = Array.isArray(postData?.reactions) ? postData?.reactions : postData?.reactions ? [postData.reactions] : [];
+
+		const userReactions = reactionsArray.filter((reaction) => reaction.userId === user?.id);
 
 		return {
 			isLiked: userReactions.some((reaction) => reaction.reaction === EReaction.like),
 			isDisliked: userReactions.some((reaction) => reaction.reaction === EReaction.dislike),
-			likesCount: allReactions.filter((reaction) => reaction.reaction === EReaction.like).length,
-			dislikesCount: allReactions.filter((reaction) => reaction.reaction === EReaction.dislike).length
+			likesCount: reactionsArray.filter((reaction) => reaction.reaction === EReaction.like).length,
+			dislikesCount: reactionsArray.filter((reaction) => reaction.reaction === EReaction.dislike).length
 		};
-	}, [postData.reactions, user?.id]);
+	}, [postData?.reactions, user?.id]);
 
+	const subscriptionParams = useMemo(
+		() => ({
+			proposalType: postData.proposalType,
+			postIndex: String(postData.index)
+		}),
+		[postData.proposalType, postData.index]
+	);
 	const [reactionState, setReactionState] = useState({ isLiked, isDisliked, likesCount, dislikesCount });
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
@@ -80,10 +90,43 @@ export const usePostReactions = (postData: IPost) => {
 		[currentReactionId, reactionState, postData.proposalType, postData.index]
 	);
 
+	const fetchSubscriptionStatus = useCallback(async () => {
+		if (!user?.id) return;
+		try {
+			const status = await NextApiClientService.getPostSubscriptions(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			setIsSubscribed(status.data?.message === 'Subscription found');
+		} catch (error) {
+			console.error('Failed to fetch subscription status:', error);
+		}
+	}, [user?.id, subscriptionParams]);
+
+	useEffect(() => {
+		fetchSubscriptionStatus();
+	}, [fetchSubscriptionStatus]);
+
+	const handleSubscribe = useCallback(async () => {
+		try {
+			setIsLoading(true);
+			if (isSubscribed) {
+				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			} else {
+				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			}
+			setIsSubscribed(!isSubscribed);
+		} catch (error) {
+			console.error('Failed to update subscription:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [isSubscribed, subscriptionParams]);
+
 	return {
 		reactionState,
 		showLikeGif,
 		showDislikeGif,
-		handleReaction
+		handleReaction,
+		isSubscribed,
+		isSubscribing: isLoading,
+		handleSubscribe
 	};
 };

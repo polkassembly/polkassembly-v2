@@ -51,7 +51,9 @@ function ReactionButton({
 					<Icon className={cn(`${styles.activity_icons} ${className}`)} />
 				)}
 			</div>
-			{showText && <span className={`${isActive ? 'font-bold text-bg_pink' : ''}`}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>}
+			{showText && (
+				<span className={`${isActive ? 'ml-1 font-bold text-bg_pink' : ''}`}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
+			)}
 		</button>
 	);
 }

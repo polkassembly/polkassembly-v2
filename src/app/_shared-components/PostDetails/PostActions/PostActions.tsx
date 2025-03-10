@@ -10,17 +10,13 @@ import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import styles from './PostActions.module.scss';
 
 function PostActions({ postData }: { postData: IPost }) {
 	const { user } = useUser();
 	const router = useRouter();
-	const { handleReaction, reactionState, showLikeGif, showDislikeGif } = usePostReactions(postData);
-	const [isSubscribed, setIsSubscribed] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
-
+	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions(postData);
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {
 			if (!user?.id) {
@@ -34,55 +30,12 @@ function PostActions({ postData }: { postData: IPost }) {
 
 	const { likesCount, dislikesCount, isLiked, isDisliked } = reactionState;
 
-	const subscriptionParams = useMemo(
-		() => ({
-			proposalType: postData.proposalType,
-			postIndex: String(postData.index)
-		}),
-		[postData.proposalType, postData.index]
+	const subscribeButtonClasses = useMemo(
+		() => cn(styles.post_actions_container, isSubscribed && styles.selected_text, isSubscribing && styles.loading),
+		[isSubscribed, isSubscribing]
 	);
 
-	const fetchSubscriptionStatus = useMemo(
-		() => async () => {
-			if (!user?.id) return;
-			try {
-				const status = await NextApiClientService.getPostSubscriptions(subscriptionParams.proposalType, subscriptionParams.postIndex);
-				setIsSubscribed(status.data?.message === 'Subscription found');
-			} catch (error) {
-				console.error('Failed to fetch subscription status:', error);
-			}
-		},
-		[user?.id, subscriptionParams]
-	);
-
-	const handleSubscribe = useMemo(
-		() => async () => {
-			handleAuthenticatedAction(async () => {
-				try {
-					setIsLoading(true);
-					if (isSubscribed) {
-						await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
-					} else {
-						await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
-					}
-					setIsSubscribed(!isSubscribed);
-				} catch (error) {
-					console.error('Failed to update subscription:', error);
-				} finally {
-					setIsLoading(false);
-				}
-			});
-		},
-		[handleAuthenticatedAction, isSubscribed, subscriptionParams]
-	);
-
-	const subscribeButtonClasses = useMemo(() => cn(styles.post_actions_container, isSubscribed && styles.selected_text, isLoading && styles.loading), [isSubscribed, isLoading]);
-
-	const buttonText = useMemo(() => (isLoading ? 'Loading...' : isSubscribed ? 'Subscribed' : 'Subscribe'), [isLoading, isSubscribed]);
-
-	useEffect(() => {
-		fetchSubscriptionStatus();
-	}, [fetchSubscriptionStatus]);
+	const buttonText = useMemo(() => (isSubscribing ? 'Loading...' : isSubscribed ? 'Subscribed' : 'Subscribe'), [isSubscribing, isSubscribed]);
 
 	const handleShare = () => {
 		const titlePart = postData?.title ? ` for ${postData.title}` : '';
@@ -134,8 +87,8 @@ function PostActions({ postData }: { postData: IPost }) {
 				<div className='flex items-center gap-4 text-basic_text'>
 					<button
 						type='button'
-						onClick={handleSubscribe}
-						disabled={isLoading}
+						onClick={() => handleAuthenticatedAction(() => handleSubscribe())}
+						disabled={isSubscribing}
 						className={subscribeButtonClasses}
 					>
 						{isSubscribed ? <RiBookmarkFill className='h-4 w-4' /> : <RiBookmarkLine className='h-4 w-4' />}
