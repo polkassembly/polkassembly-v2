@@ -17,6 +17,7 @@ import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
 import { useTranslations } from 'next-intl';
+import styles from './Bounty.module.scss';
 
 export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
 	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -64,14 +65,12 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 							>
 								<div className='relative mx-auto max-w-[363px] overflow-hidden xl:max-w-[420px]'>
 									<div className='flex w-full'>
-										<div className='relative flex h-[56px] w-[85%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5'>
+										<div className={styles.hotbounties_wrapper}>
 											<div className='flex items-baseline gap-x-2'>
-												<h2 className='m t-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
-													{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}
-												</h2>
+												<h2 className={styles.hotbounties_wrapper_text}>{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}</h2>
 											</div>
-											<div className='absolute bottom-0 right-[-30px] h-[30px] w-[30px] overflow-hidden bg-bg_modal'>
-												<span className='absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey bg-page_background' />
+											<div className={styles.hotbounties_div}>
+												<span className={styles.bounty_proposal_div_span} />
 											</div>
 										</div>
 										<div className='z-10 ml-2 mt-1'>
@@ -86,7 +85,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											</button>
 										</div>
 									</div>
-									<div className='h-[310px] rounded-tr-2xl border-b border-l border-r border-t-0 border-solid border-border_grey bg-bg_modal px-3 py-1'>
+									<div className={styles.hotbounties_wrapper_img}>
 										<Image
 											src={BountyCard}
 											alt='Bounty'
@@ -98,7 +97,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											<span className='text-[17px] text-wallet_btn_text'>#{bounty.index}</span>{' '}
 											<span className='text-[18px] text-btn_secondary_text'>{bounty.title?.slice(0, 28)}</span>
 										</h4>
-										<div className='line-clamp-2 overflow-hidden text-ellipsis text-sm text-btn_secondary_text'>
+										<div className={styles.hotbounties_wrapper_editor_text}>
 											<BlockEditor
 												data={{ blocks: bounty.content?.blocks?.slice(0, 2) || [] }}
 												readOnly
@@ -112,7 +111,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											/>
 										</div>
 									</div>
-									<div className='flex items-center justify-between rounded-b-3xl bg-child_bounties_bg p-4'>
+									<div className={styles.hotbounties_wrapper_img_text}>
 										<div className='flex items-center gap-2'>
 											<Image
 												src={ChildBounties}
@@ -137,7 +136,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{current > 0 && (
 						<button
 							type='button'
-							className='absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
+							className={styles.carouselLeftArrow}
 							onClick={() => carouselApi?.scrollPrev()}
 						>
 							<SlArrowLeft
@@ -149,7 +148,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{current < hotBounties.items.length - 3 && (
 						<button
 							type='button'
-							className='absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg'
+							className={styles.carouselRightArrow}
 							onClick={() => carouselApi?.scrollNext()}
 						>
 							<SlArrowRight

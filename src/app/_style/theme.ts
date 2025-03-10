@@ -98,7 +98,9 @@ export const THEME_COLORS = {
 		toast_warning_text: '#F7C752',
 		toast_info_bg: '#E6F4FF',
 		toast_info_border: '#91CAFF',
-		toast_info_text: '#3288FF'
+		toast_info_text: '#3288FF',
+		bounty_pool_text: '#2D2D2D',
+		bounty_dash_bg: '#f5f6f8'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -193,6 +195,8 @@ export const THEME_COLORS = {
 		toast_warning_text: '#F7C752',
 		toast_info_bg: '#27323D',
 		toast_info_border: '#1677FE',
-		toast_info_text: '#3288FF'
+		toast_info_text: '#3288FF',
+		bounty_pool_text: '#737373',
+		bounty_dash_bg: '#1c1d1f'
 	}
 };

@@ -15,6 +15,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_shared-components/Carousel';
 import { useTranslations } from 'next-intl';
+import styles from './Bounty.module.scss';
 
 function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: string | number }) {
 	const network = getCurrentNetwork();
@@ -34,8 +35,8 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 	}, [api]);
 
 	return (
-		<div className=''>
-			<div className='mt-10 flex flex-col-reverse items-center gap-8 overflow-hidden md:flex-row'>
+		<div>
+			<div className={styles.bounty_User_Activity_Container}>
 				<div className='relative'>
 					<Image
 						src={BountyPoster}
@@ -43,7 +44,7 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 						className='w-[100%]'
 					/>
 					<div
-						className={`${spaceGroteskFont.className} absolute right-0 top-0 z-50 flex h-6 w-[86px] items-center justify-center gap-x-1 rounded-[50px] px-2 text-[10px] font-bold text-btn_primary_text sm:h-10 sm:w-[150px] sm:px-6 sm:text-base xl:h-[48px] xl:w-[180px] xl:px-[36px] xl:text-xl`}
+						className={`${spaceGroteskFont.className} ${styles.bounty_User_Activity_Container_Skeleton_Wrapper}`}
 						style={{
 							background: 'linear-gradient(266deg, #301DA7 15.23%, #57F 75.34%)'
 						}}
@@ -83,15 +84,13 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 												padding: '0'
 											}}
 										>
-											<div className='my-1 flex h-[50px] items-center gap-1 rounded-[14px] bg-bg_modal px-3 py-2 md:max-w-[450px]'>
+											<div className={styles.bounty_User_Activity_Carousel}>
 												<Address address={activity?.address} />
-												<span className='text-sm font-normal text-text_primary'>{t('claimed')}</span>
-												<span className='whitespace-nowrap font-pixeboy text-sm font-normal text-text_pink md:text-[20px]'>
-													{formatTokenValue(activity?.amount, network, tokenPrice as string, unit)}
-												</span>
-												<span className='text-sm font-normal text-text_primary'>{t('bounty')}</span>
-												<span className='mx-2 h-[5px] w-[5px] rounded-full bg-basic_text' />
-												<span className='rounded-full text-xs text-wallet_btn_text'>{dayjs(activity?.created_at).format("DD[th] MMM 'YY")}</span>
+												<span className={styles.bounty_User_Activity_Carousel_Content}>{t('claimed')}</span>
+												<span className={styles.bounty_User_Activity_Carousel_Token_Amount}>{formatTokenValue(activity?.amount, network, tokenPrice as string, unit)}</span>
+												<span className={styles.bounty_User_Activity_Carousel_Content}>{t('bounty')}</span>
+												<span className={styles.bounty_User_Activity_Carousel_Span} />
+												<span className={styles.bounty_User_Activity_Carousel_Date}>{dayjs(activity?.created_at).format("DD[th] MMM 'YY")}</span>
 											</div>
 										</CarouselItem>
 									))}

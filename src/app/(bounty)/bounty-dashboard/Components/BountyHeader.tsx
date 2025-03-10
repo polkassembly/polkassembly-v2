@@ -24,11 +24,12 @@ import { useTranslations } from 'next-intl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import styles from './Bounty.module.scss';
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
 		<div className='flex flex-col'>
-			<span className='font-pixelify text-[18px] font-semibold leading-none text-[#2D2D2D] dark:text-[#737373]'>{label}</span>
+			<span className='text-bounty_pool_text font-pixelify text-[18px] font-semibold leading-none'>{label}</span>
 			<span className='font-pixeboy text-[28px] font-medium'>{value}</span>
 		</div>
 	);
@@ -48,11 +49,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 	const availableBounty = !isNaN(Number(tokenPrice)) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
 
 	return (
-		<div className='dark:bg-section-dark-overlay mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
+		<div className='mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
 			<div className='flex'>
 				<div className='hidden gap-6 lg:flex'>
 					<div>
-						<span className='font-pixelify text-[18px] font-semibold text-[#2D2D2D] dark:text-[#737373]'>{t('availableBountyPool')}</span>
+						<span className={styles.bounty_dash_available_bounty_pool}>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
 							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
 							{isLoading ? (
@@ -62,7 +63,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 							)}
 							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
 						</div>
-						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] w-[360px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background xl:w-[380px] 2xl:w-[380px]'>
+						<div className={styles.bounty_dash_available_bounty_pool_left_bg}>
 							<div className='mb-8 ml-1 flex items-end gap-3'>
 								<Image
 									src={BountyIcon}
@@ -101,8 +102,8 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 					</div>
 				</div>
 
-				<div className='items-between relative hidden h-full flex-col justify-between lg:flex'>
-					<span className='absolute -top-6 left-1/2 h-10 w-20 rotate-180 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
+				<div className={styles.bounty_dash_available_bounty_pool_right_bg}>
+					<span className={styles.bounty_dash_available_bounty_pool_right_bg_line} />
 					<Image
 						src={DashedLineIcon}
 						alt='bounty icon'
@@ -110,7 +111,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						width={3}
 						height={209}
 					/>
-					<span className='absolute left-1/2 top-[237px] h-10 w-20 rounded-t-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
+					<span className={styles.bounty_dash_available_bounty_pool_right_bg_line_2} />
 				</div>
 
 				<div className='hidden gap-x-10 lg:flex'>
@@ -145,7 +146,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 				</div>
 				<div className='flex flex-col gap-6 lg:hidden'>
 					<div>
-						<span className='font-pixelify text-base text-[#2D2D2D] dark:text-[#737373]'>{t('availableBountyPool')}</span>
+						<span className='text-bounty_pool_text font-pixelify text-base'>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
 							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
 							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
@@ -169,8 +170,8 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 								value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 						</div>
-						<div className='items-between relative -ml-6 flex items-center justify-between'>
-							<span className='left-0 h-20 w-10 rounded-r-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
+						<div className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line}>
+							<span className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line_line} />
 							<Image
 								src={DashedLineIcon}
 								alt='bounty icon'
@@ -178,7 +179,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 								width={209}
 								height={3}
 							/>
-							<span className='first-letter right-0 h-20 w-10 rounded-l-full bg-[#f5f6f8] shadow-none dark:bg-[#1c1d1f]' />
+							<span className={styles.mobileImagesWrapper} />
 						</div>
 						<div className='-ml-4 flex w-full flex-col items-center gap-x-4'>
 							<Image
@@ -211,7 +212,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 								height={24}
 							/>
 						</div>
-						<div className='-mb-6 -ml-6 mt-4 flex h-[185px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background'>
+						<div className={styles.bounty_dash_available_bounty_pool_right_bg_line_3}>
 							<div className='mb-8 flex items-end gap-3'>
 								<Image
 									src={BountyIcon}
