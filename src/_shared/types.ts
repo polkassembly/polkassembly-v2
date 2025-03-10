@@ -592,6 +592,7 @@ export interface IComment {
 export interface ICommentResponse extends IComment {
 	user: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
+	reactions?: IReaction[];
 }
 
 export interface IOnChainIdentity {
