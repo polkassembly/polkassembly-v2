@@ -443,7 +443,6 @@ export enum EPostOrigin {
 export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
-	ABSTAIN = 'abstain',
 	SPLIT = 'split',
 	SPLIT_ABSTAIN = 'splitAbstain'
 }
@@ -593,6 +592,7 @@ export interface IComment {
 export interface ICommentResponse extends IComment {
 	user: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
+	reactions?: IReaction[];
 }
 
 export interface IOnChainIdentity {
@@ -860,6 +860,13 @@ export interface IPostSubscription {
 
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
+}
+
+export enum NotificationType {
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info'
 }
 
 export interface IDelegationStats {

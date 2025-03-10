@@ -200,15 +200,25 @@ export class OffChainDbService {
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
-		const firestoreComments = await FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
-		const subsquareComments = await SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType });
+		const [firestoreComments, subsquareComments] = await Promise.all([
+			FirestoreService.GetPostComments({ network, indexOrHash, proposalType }),
+			SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType })
+		]);
 
 		// Combine all comments from both sources
 		const allComments = [...firestoreComments, ...subsquareComments];
 
+		// get reactions for each comment
+		const allCommentsWithReactions: ICommentResponse[] = await Promise.all(
+			allComments.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({ network, indexOrHash, proposalType, id: comment.id });
+				return { ...comment, reactions };
+			})
+		);
+
 		// Helper function to build comment tree
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
-			return allComments
+			return allCommentsWithReactions
 				.filter((comment) => comment.parentCommentId === parentId)
 				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
