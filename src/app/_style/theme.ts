@@ -90,7 +90,16 @@ export const THEME_COLORS = {
 		leaderboard_usercard_border: '#486ddf',
 		pagination_border: '#CED4DE',
 		info_card_bg: '#F4F5F6',
-		info_card_text: '#333843'
+		info_card_text: '#333843',
+		toast_error_bg: '#FBDBD9',
+		toast_error_border: '#ED4D42',
+		toast_error_text: '#F04248',
+		toast_warning_bg: '#FEF7D1',
+		toast_warning_border: '#F7C752',
+		toast_warning_text: '#F7C752',
+		toast_info_bg: '#E6F4FF',
+		toast_info_border: '#91CAFF',
+		toast_info_text: '#3288FF'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -177,6 +186,15 @@ export const THEME_COLORS = {
 		listing_page_btn: '#9E9E9E',
 		pagination_border: '#4B4B4B',
 		info_card_bg: '#333843',
-		info_card_text: '#ffffff'
+		info_card_text: '#ffffff',
+		toast_error_bg: '#452626',
+		toast_error_border: '#ED4D42',
+		toast_error_text: '#F04248',
+		toast_warning_bg: '#363125',
+		toast_warning_border: '#8F6F21',
+		toast_warning_text: '#F7C752',
+		toast_info_bg: '#27323D',
+		toast_info_border: '#1677FE',
+		toast_info_text: '#3288FF'
 	}
 };

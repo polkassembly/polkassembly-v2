@@ -475,7 +475,11 @@
 		"abstainVoteValue": "Valor de Voto de Abstención",
 		"ayeVoteValue": "Valor de Voto Sí",
 		"nayVoteValue": "Valor de Voto No",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"voteSuccess": "Su voto ha sido emitido correctamente",
+		"voteFailed": "Su voto no ha sido emitido correctamente",
+		"voteSuccessTitle": "Voto exitoso",
+		"voteFailedTitle": "Voto fallido"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de Votación"
