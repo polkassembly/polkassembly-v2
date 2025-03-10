@@ -97,6 +97,7 @@
     "react-minimal-pie-chart": "^9.1.0",
     "react-qr-code": "^2.0.15",
     "react-tinder-card": "^1.6.4",
+    "react-twitter-embed": "^4.0.4",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "turndown": "^7.2.0",
