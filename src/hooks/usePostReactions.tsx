@@ -2,71 +2,131 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IPostListing } from '@/_shared/types';
+import { EProposalType, EReaction, IPost } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useUser } from './useUser';
 
-export const usePostReactions = (postData: IPostListing) => {
+export const usePostReactions = (postData: IPost) => {
 	const { user } = useUser();
-	const [reactionState, setReactionState] = useState({
-		isLiked: postData?.userReaction?.userId === user?.id && postData?.userReaction?.reaction === EReaction.like,
-		isDisliked: postData?.userReaction?.userId === user?.id && postData?.userReaction?.reaction === EReaction.dislike,
-		likesCount: postData?.metrics?.reactions?.like || 0,
-		dislikesCount: postData?.metrics?.reactions?.dislike || 0
-	});
+	const [isSubscribed, setIsSubscribed] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
-	const [currentReactionId, setCurrentReactionId] = useState<string | null>(postData?.userReaction?.userId === user?.id ? postData?.userReaction?.id || null : null);
+	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
+		const reactionsArray = Array.isArray(postData?.reactions) ? postData?.reactions : postData?.reactions ? [postData.reactions] : [];
+
+		const userReactions = reactionsArray.filter((reaction) => reaction.userId === user?.id);
+
+		return {
+			isLiked: userReactions.some((reaction) => reaction.reaction === EReaction.like),
+			isDisliked: userReactions.some((reaction) => reaction.reaction === EReaction.dislike),
+			likesCount: reactionsArray.filter((reaction) => reaction.reaction === EReaction.like).length,
+			dislikesCount: reactionsArray.filter((reaction) => reaction.reaction === EReaction.dislike).length
+		};
+	}, [postData?.reactions, user?.id]);
+
+	const subscriptionParams = useMemo(
+		() => ({
+			proposalType: postData.proposalType,
+			postIndex: String(postData.index)
+		}),
+		[postData.proposalType, postData.index]
+	);
+	const [reactionState, setReactionState] = useState({ isLiked, isDisliked, likesCount, dislikesCount });
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
+	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
+		useMemo(() => (postData?.userReaction?.userId === user?.id ? postData?.userReaction?.id || null : null), [postData?.userReaction, user?.id])
+	);
 
-	const handleReaction = async (type: EReaction) => {
-		const isLikeAction = type === EReaction.like;
-		const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
+	// Update reaction state when reactions change
+	useEffect(() => {
+		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount });
+	}, [isLiked, isDisliked, likesCount, dislikesCount]);
 
-		try {
-			// Determine if the action is to delete the reaction
-			const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
+	const handleReaction = useCallback(
+		async (type: EReaction) => {
+			const isLikeAction = type === EReaction.like;
+			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 
-			if (isDeleteAction) {
-				// Optimistic update: Remove reaction
+			try {
+				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
+
+				if (isDeleteAction) {
+					setReactionState((prev) => ({
+						...prev,
+						isLiked: false,
+						isDisliked: false,
+						likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
+						dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
+					}));
+					await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', currentReactionId);
+					setCurrentReactionId(null);
+				} else {
+					setReactionState((prev) => ({
+						...prev,
+						isLiked: isLikeAction,
+						isDisliked: !isLikeAction,
+						likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? 0 : 1) : prev.isLiked ? -1 : 0),
+						dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? 0 : 1) : prev.isDisliked ? -1 : 0)
+					}));
+
+					showGifSetter(true);
+					setTimeout(() => showGifSetter(false), 1500);
+
+					const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+					setCurrentReactionId(response?.data?.reactionId || null);
+				}
+			} catch {
 				setReactionState((prev) => ({
 					...prev,
-					isLiked: false,
-					isDisliked: false,
-					likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
-					dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
+					isLiked: isLikeAction ? !prev.isLiked : prev.isLiked,
+					isDisliked: !isLikeAction ? !prev.isDisliked : prev.isDisliked,
+					likesCount: prev.likesCount - (isLikeAction ? 1 : 0),
+					dislikesCount: prev.dislikesCount - (!isLikeAction ? 1 : 0)
 				}));
-				await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', currentReactionId);
-				setCurrentReactionId(null);
-			} else {
-				// Optimistic update: Add or switch reaction
-				setReactionState((prev) => ({
-					...prev,
-					isLiked: isLikeAction,
-					isDisliked: !isLikeAction,
-					likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? 0 : 1) : prev.isLiked ? -1 : 0),
-					dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? 0 : 1) : prev.isDisliked ? -1 : 0)
-				}));
-
-				showGifSetter(true);
-				setTimeout(() => showGifSetter(false), 1500);
-
-				const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
-				setCurrentReactionId(response?.data?.reactionId || null);
 			}
-		} catch {
-			// TODO: show notification
-			// Revert on error
-			setReactionState((prev) => ({
-				...prev,
-				isLiked: isLikeAction ? !prev.isLiked : prev.isLiked,
-				isDisliked: !isLikeAction ? !prev.isDisliked : prev.isDisliked,
-				likesCount: prev.likesCount - (isLikeAction ? 1 : 0),
-				dislikesCount: prev.dislikesCount - (!isLikeAction ? 1 : 0)
-			}));
-		}
-	};
+		},
+		[currentReactionId, reactionState, postData.proposalType, postData.index]
+	);
 
-	return { reactionState, showLikeGif, showDislikeGif, handleReaction };
+	const fetchSubscriptionStatus = useCallback(async () => {
+		if (!user?.id) return;
+		try {
+			const status = await NextApiClientService.getPostSubscriptions(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			setIsSubscribed(status.data?.message === 'Subscription found');
+		} catch (error) {
+			console.error('Failed to fetch subscription status:', error);
+		}
+	}, [user?.id, subscriptionParams]);
+
+	useEffect(() => {
+		fetchSubscriptionStatus();
+	}, [fetchSubscriptionStatus]);
+
+	const handleSubscribe = useCallback(async () => {
+		try {
+			setIsLoading(true);
+			if (isSubscribed) {
+				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			} else {
+				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			}
+			setIsSubscribed(!isSubscribed);
+		} catch (error) {
+			console.error('Failed to update subscription:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [isSubscribed, subscriptionParams]);
+
+	return {
+		reactionState,
+		showLikeGif,
+		showDislikeGif,
+		handleReaction,
+		isSubscribed,
+		isSubscribing: isLoading,
+		handleSubscribe
+	};
 };

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { RefObject, useRef, useState } from 'react';
+import { RefObject, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
@@ -54,7 +54,7 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction } = usePostReactions(postData);
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions(postData);
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -197,7 +197,7 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{(reactionState.likesCount > 0 || reactionState.dislikesCount > 0 || commentCount > 0) && (
+			{(reactionState.isLiked || reactionState.isDisliked || commentCount > 0) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
@@ -234,6 +234,8 @@ function ActivityFeedPostItem({
 						showLikeGif={showLikeGif}
 						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}
+						isSubscribed={isSubscribed}
+						handleSubscribe={handleSubscribe}
 					/>
 
 					<CommentInput

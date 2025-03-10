@@ -122,7 +122,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		network,
 		proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 		onChainInfo: postInfo,
-		userReaction: userReactions[Number(index)] || undefined
+		reactions: userReactions[Number(index)] || undefined
 	}));
 
 	// Sort posts by comment count in descending order

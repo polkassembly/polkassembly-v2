@@ -2,9 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { EPostOrigin, IPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';

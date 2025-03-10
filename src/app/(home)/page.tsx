@@ -20,10 +20,27 @@ export default async function Home() {
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
+	if (userId) {
+		const { data: subscribedData, error: subscribedError } = await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId });
+		if (subscribedError || !subscribedData) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, subscribedError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+		return (
+			<Suspense fallback={<LoadingSpinner />}>
+				<ActivityFeed
+					initialData={data}
+					subscribedData={subscribedData}
+				/>
+			</Suspense>
+		);
+	}
 
 	return (
 		<Suspense fallback={<LoadingSpinner />}>
-			<ActivityFeed initialData={data} />
+			<ActivityFeed
+				initialData={data}
+				subscribedData={{ items: [], totalCount: 0 }}
+			/>
 		</Suspense>
 	);
 }
