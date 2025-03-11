@@ -6,8 +6,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -496,8 +496,9 @@ export class PolkadotApiService {
 		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
 
 		beneficiaries.forEach((beneficiary) => {
-			if (new BN(beneficiary.amount).isZero() || !getSubstrateAddress(beneficiary.address)) return;
-			tx.push(this.api.tx.treasury.spendLocal(beneficiary.amount.toString(), beneficiary.address));
+			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
+				tx.push(this.api.tx.treasury.spendLocal(beneficiary.amount.toString(), beneficiary.address));
+			}
 		});
 
 		if (tx.length === 0) return null;

@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import MultipleBeneficiaryForm from './MultipleBeneficiaryForm';
 
 function TreasuryProposalLocal() {
@@ -107,7 +107,7 @@ function TreasuryProposalLocal() {
 			!apiService ||
 			totalAmount.isZero() ||
 			!beneficiaries.length ||
-			beneficiaries.some((b) => !getSubstrateAddress(b.address) || new BN(b.amount).isZero()) ||
+			beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
 			!userPreferences.address?.address
 		)
 			return;
@@ -218,7 +218,7 @@ function TreasuryProposalLocal() {
 						disabled={
 							totalAmount.isZero() ||
 							!beneficiaries.length ||
-							beneficiaries.some((b) => !getSubstrateAddress(b.address) || new BN(b.amount).isZero()) ||
+							beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
 							!userPreferences.address?.address ||
 							!selectedTrack ||
 							!selectedEnactment
