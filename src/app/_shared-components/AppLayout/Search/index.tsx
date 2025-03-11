@@ -17,7 +17,7 @@ function Search() {
 			</DialogTrigger>
 			<DialogContent className='w-full max-w-4xl rounded-lg px-6 pt-4'>
 				<DialogHeader>
-					<DialogTitle className='text-3xl font-bold text-btn_secondary_text'>Search</DialogTitle>
+					<DialogTitle className='text-xl font-bold text-btn_secondary_text'>Search</DialogTitle>
 				</DialogHeader>
 				<div>
 					<div className='relative'>
