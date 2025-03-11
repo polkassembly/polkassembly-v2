@@ -659,5 +659,10 @@
 		"no": "否",
 		"uploadFile": "上传文件",
 		"includeOption": "包含选项"
+	},
+	"AddressInput": {
+		"invalidAddress": "无效地址",
+		"noResultsFound": "未找到结果",
+		"placeholder": "请输入地址"
 	}
 }

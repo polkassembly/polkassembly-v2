@@ -660,5 +660,10 @@
 		"no": "Nein",
 		"uploadFile": "Datei hochladen",
 		"includeOption": "Option einschließen"
+	},
+	"AddressInput": {
+		"invalidAddress": "Ungültige Adresse",
+		"noResultsFound": "Keine Ergebnisse gefunden",
+		"placeholder": "Adresse eingeben"
 	}
 }

@@ -7,12 +7,28 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
+import { bnToInput } from '@/app/_client-utils/bnToInput';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 
-function BalanceInput({ label, placeholder, onChange, name }: { label: string; placeholder?: string; onChange: (value: BN) => void; name?: string }) {
+function BalanceInput({
+	label,
+	placeholder,
+	onChange,
+	name,
+	disabled,
+	defaultValue
+}: {
+	label: string;
+	placeholder?: string;
+	onChange?: (value: BN) => void;
+	name?: string;
+	disabled?: boolean;
+	defaultValue?: BN;
+}) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
+	const [error, setError] = useState('');
 
 	const [valueString, setValueString] = useState('');
 
@@ -20,19 +36,23 @@ function BalanceInput({ label, placeholder, onChange, name }: { label: string; p
 		const { bnValue, isValid } = inputToBn(value || '', network, false);
 
 		if (isValid) {
-			onChange(bnValue);
+			setError('');
+			onChange?.(bnValue);
 		} else {
-			onChange(BN_ZERO);
+			setError('Invalid Amount');
+			onChange?.(BN_ZERO);
 		}
 	};
 
 	useEffect(() => {
-		onBalanceChange(valueString);
+		if (!defaultValue) return;
+
+		setValueString(bnToInput(defaultValue, network));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [defaultValue]);
 
 	return (
-		<div>
+		<div className='min-w-[200px]'>
 			<p className={classes.label}>{label}</p>
 			<div className='relative'>
 				<Input
@@ -45,8 +65,10 @@ function BalanceInput({ label, placeholder, onChange, name }: { label: string; p
 					name={name || 'balance'}
 					id={name || 'balance'}
 					value={valueString}
+					disabled={disabled}
 				/>
 				<div className={classes.tokenSymbol}>{NETWORKS_DETAILS[`${network}`].tokenSymbol}</div>
+				{error && !disabled && <p className='absolute left-0 my-1 text-sm text-failure'>{error}</p>}
 			</div>
 		</div>
 	);

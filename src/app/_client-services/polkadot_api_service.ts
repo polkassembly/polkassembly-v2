@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -16,7 +17,7 @@ import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiary, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -488,11 +489,23 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic({ amount, beneficiary }: { amount: BN; beneficiary: string }) {
+	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 		if (!this.api) {
 			return null;
 		}
-		return this.api.tx.treasury.spendLocal(amount.toString(), beneficiary);
+		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+
+		beneficiaries.forEach((beneficiary) => {
+			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
+				tx.push(this.api.tx.treasury.spendLocal(beneficiary.amount.toString(), beneficiary.address));
+			}
+		});
+
+		if (tx.length === 0) return null;
+
+		if (tx.length === 1) return tx[0];
+
+		return this.api.tx.utility.batchAll(tx);
 	}
 
 	async createTreasuryProposal({

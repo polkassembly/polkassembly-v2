@@ -659,5 +659,10 @@
 		"no": "いいえ",
 		"uploadFile": "ファイルをアップロード",
 		"includeOption": "オプションを含める"
+	},
+	"AddressInput": {
+		"invalidAddress": "無効なアドレス",
+		"noResultsFound": "結果が見つかりません",
+		"placeholder": "アドレスを入力"
 	}
 }
