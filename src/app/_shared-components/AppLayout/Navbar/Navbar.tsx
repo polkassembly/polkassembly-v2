@@ -24,6 +24,7 @@ import NetworkDropdown from '../../NetworkDropdown/NetworkDropdown';
 import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
 import PaLogo from '../PaLogo';
 import ThemeToggleButton from '../../ThemeToggleButton';
+import Search from '../Search';
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -82,6 +83,7 @@ function Navbar() {
 			</div>
 
 			<div className='hidden items-center gap-x-4 md:flex'>
+				<Search />
 				<Select
 					value={userPreferences.locale}
 					onValueChange={handleLocaleChange}
