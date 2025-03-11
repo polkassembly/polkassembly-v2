@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import classes from './SelectTopic.module.scss';
 import { Button } from '../../Button';
 
-function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffChainPostTopic) => void; disabled: boolean }) {
+function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffChainPostTopic) => void; disabled?: boolean }) {
 	const t = useTranslations('Create');
 	const [selectedTopic, setSelectedTopic] = useState<EOffChainPostTopic>(EOffChainPostTopic.GENERAL);
 

@@ -121,7 +121,11 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 				<p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>
 			</div>
 			<Link
-				href={!user?.id ? '/login?nextUrl=create/discussion' : '/create/discussion'}
+				href={
+					!user?.id
+						? `/login?nextUrl=create/${proposalType === EProposalType.DISCUSSION ? 'discussion' : 'proposal'}`
+						: `/create/${proposalType === EProposalType.DISCUSSION ? 'discussion' : 'proposal'}`
+				}
 				className={styles.button}
 			>
 				<span className='text-xl'>+</span>

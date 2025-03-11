@@ -672,5 +672,24 @@
 		"totalProposals": "Gesamtvorschläge",
 		"viewCart": "Warenkorb anzeigen",
 		"proposals": "Vorschläge"
+	},
+	"CreateProposal": {
+		"createPreimage": "Preimage erstellen",
+		"createTreasuryProposal": "Treasury-Vorschlag erstellen"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Begünstigter",
+		"amount": "Betrag",
+		"track": "Track",
+		"createProposal": "Vorschlag erstellen",
+		"create": "Erstellen"
+	},
+	"CreatePreimage": {
+		"addItem": "Element hinzufügen",
+		"removeItem": "Element entfernen",
+		"yes": "Ja",
+		"no": "Nein",
+		"uploadFile": "Datei hochladen",
+		"includeOption": "Option einschließen"
 	}
 }
