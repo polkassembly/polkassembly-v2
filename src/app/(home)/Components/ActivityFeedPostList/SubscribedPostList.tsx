@@ -46,13 +46,13 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 			pageParams: [1]
 		},
 		getNextPageParam: (lastPage) => {
-			if (lastPage.items?.length === DEFAULT_LISTING_LIMIT) {
+			if (lastPage?.items?.length === DEFAULT_LISTING_LIMIT) {
 				return lastPage.page + 1;
 			}
 			return undefined;
 		},
 		staleTime: SLATE_TIME,
-		enabled: !!userId && initialData.items.length < 10
+		enabled: !!userId && initialData?.items?.length < 10
 	});
 
 	const allPosts = data?.pages?.flatMap((page) => page.items || []).filter((post): post is IPostListing => post !== undefined);
