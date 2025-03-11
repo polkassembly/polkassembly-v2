@@ -17,7 +17,7 @@ import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryAmount, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiary, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -489,14 +489,14 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryAmount[] }) {
+	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 		if (!this.api) {
 			return null;
 		}
 		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
 
 		beneficiaries.forEach((beneficiary) => {
-			if (beneficiary.amount.isZero() || !getSubstrateAddress(beneficiary.address)) return;
+			if (new BN(beneficiary.amount).isZero() || !getSubstrateAddress(beneficiary.address)) return;
 			tx.push(this.api.tx.treasury.spendLocal(beneficiary.amount.toString(), beneficiary.address));
 		});
 

@@ -898,8 +898,3 @@ export enum NotificationType {
 	WARNING = 'warning',
 	INFO = 'info'
 }
-
-export interface IBeneficiaryAmount {
-	address: string;
-	amount: BN;
-}

@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl';
 import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
 import { Button } from '@/app/_shared-components/Button';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
-import { IBeneficiaryAmount } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
+import { IBeneficiary } from '@/_shared/types';
 
-function MultipleBeneficiaryForm({ onChange, beneficiaries }: { onChange: (beneficiary: IBeneficiaryAmount[]) => void; beneficiaries: IBeneficiaryAmount[] }) {
+function MultipleBeneficiaryForm({ onChange, beneficiaries }: { onChange: (beneficiary: IBeneficiary[]) => void; beneficiaries: IBeneficiary[] }) {
 	const t = useTranslations();
 
 	const handleBeneficiaryChange = (beneficiary: string, index: number) => {
@@ -20,12 +20,12 @@ function MultipleBeneficiaryForm({ onChange, beneficiaries }: { onChange: (benef
 
 	const handleAmountChange = (amount: BN, index: number) => {
 		const newArray = [...beneficiaries];
-		newArray[`${index}`].amount = amount;
+		newArray[`${index}`].amount = amount.toString();
 		onChange(newArray);
 	};
 
 	const addBeneficiary = () => {
-		onChange([...beneficiaries, { address: '', amount: BN_ZERO }]);
+		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null }]);
 	};
 
 	const removeBeneficiary = (index: number) => {

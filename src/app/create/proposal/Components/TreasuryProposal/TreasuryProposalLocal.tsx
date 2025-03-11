@@ -4,7 +4,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EEnactment, IBeneficiaryAmount, IWritePostFormFields, NotificationType } from '@/_shared/types';
+import { EEnactment, IBeneficiary, IWritePostFormFields, NotificationType } from '@/_shared/types';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
@@ -29,7 +29,7 @@ function TreasuryProposalLocal() {
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
 	const [totalAmount, setTotalAmount] = useState<BN>(BN_ZERO);
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryAmount[]>([{ address: '', amount: BN_ZERO }]);
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiary[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
 	const [selectedTrack, setSelectedTrack] = useState<string>('');
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
@@ -56,7 +56,7 @@ function TreasuryProposalLocal() {
 	}
 
 	useEffect(() => {
-		setTotalAmount(beneficiaries.reduce((acc, curr) => acc.add(curr.amount), BN_ZERO));
+		setTotalAmount(beneficiaries.reduce((acc, curr) => acc.add(new BN(curr.amount)), BN_ZERO));
 	}, [beneficiaries]);
 
 	useEffect(() => {
@@ -107,7 +107,7 @@ function TreasuryProposalLocal() {
 			!apiService ||
 			totalAmount.isZero() ||
 			!beneficiaries.length ||
-			beneficiaries.some((b) => !getSubstrateAddress(b.address) || b.amount.isZero()) ||
+			beneficiaries.some((b) => !getSubstrateAddress(b.address) || new BN(b.amount).isZero()) ||
 			!userPreferences.address?.address
 		)
 			return;
@@ -218,7 +218,7 @@ function TreasuryProposalLocal() {
 						disabled={
 							totalAmount.isZero() ||
 							!beneficiaries.length ||
-							beneficiaries.some((b) => !getSubstrateAddress(b.address) || b.amount.isZero()) ||
+							beneficiaries.some((b) => !getSubstrateAddress(b.address) || new BN(b.amount).isZero()) ||
 							!userPreferences.address?.address ||
 							!selectedTrack ||
 							!selectedEnactment
