@@ -640,5 +640,24 @@
 		"totalProposals": "提案总数",
 		"viewCart": "查看购物车",
 		"proposals": "提案"
+	},
+	"CreateProposal": {
+		"createPreimage": "创建预映像",
+		"createTreasuryProposal": "创建国库提案"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "受益人",
+		"amount": "金额",
+		"track": "轨道",
+		"createProposal": "创建提案",
+		"create": "创建"
+	},
+	"CreatePreimage": {
+		"addItem": "添加项目",
+		"removeItem": "删除项目",
+		"yes": "是",
+		"no": "否",
+		"uploadFile": "上传文件",
+		"includeOption": "包含选项"
 	}
 }
