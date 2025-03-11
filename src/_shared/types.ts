@@ -7,7 +7,6 @@ import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { TypeDef } from '@polkadot/types/types';
-import { BN } from '@polkadot/util';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
