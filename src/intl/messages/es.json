@@ -650,5 +650,24 @@
 		"totalProposals": "Propuestas totales",
 		"viewCart": "Ver carrito",
 		"proposals": "Propuestas"
+	},
+	"CreateProposal": {
+		"createPreimage": "Crear Preimagen",
+		"createTreasuryProposal": "Crear Propuesta de Tesorería"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiario",
+		"amount": "Cantidad",
+		"track": "Pista",
+		"createProposal": "Crear Propuesta",
+		"create": "Crear"
+	},
+	"CreatePreimage": {
+		"addItem": "Agregar Elemento",
+		"removeItem": "Eliminar Elemento",
+		"yes": "Sí",
+		"no": "No",
+		"uploadFile": "Subir Archivo",
+		"includeOption": "Incluir Opción"
 	}
 }

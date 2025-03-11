@@ -650,5 +650,24 @@
 		"totalProposals": "提案総数",
 		"viewCart": "カートを見る",
 		"proposals": "提案"
+	},
+	"CreateProposal": {
+		"createPreimage": "プレイメージを作成",
+		"createTreasuryProposal": "財務提案を作成"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "受益者",
+		"amount": "金額",
+		"track": "トラック",
+		"createProposal": "提案を作成",
+		"create": "作成"
+	},
+	"CreatePreimage": {
+		"addItem": "項目を追加",
+		"removeItem": "項目を削除",
+		"yes": "はい",
+		"no": "いいえ",
+		"uploadFile": "ファイルをアップロード",
+		"includeOption": "オプションを含める"
 	}
 }

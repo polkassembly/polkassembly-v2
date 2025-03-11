@@ -670,5 +670,24 @@
 		"totalProposals": "Total Proposals",
 		"viewCart": "View Cart",
 		"proposals": "Proposals"
+	},
+	"CreateProposal": {
+		"createPreimage": "Create Preimage",
+		"createTreasuryProposal": "Create Treasury Proposal"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiary",
+		"amount": "Amount",
+		"track": "Track",
+		"createProposal": "Create Proposal",
+		"create": "Create"
+	},
+	"CreatePreimage": {
+		"addItem": "Add Item",
+		"removeItem": "Remove Item",
+		"yes": "Yes",
+		"no": "No",
+		"uploadFile": "Upload File",
+		"includeOption": "Include Option"
 	}
 }

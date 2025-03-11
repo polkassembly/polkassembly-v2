@@ -453,7 +453,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
-	static async editProposalDetails(proposalType: EProposalType, index: string, data: { title: string; content: OutputData }) {
+	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: OutputData } }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
