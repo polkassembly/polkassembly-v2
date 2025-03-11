@@ -473,7 +473,11 @@
 		"abstainVoteValue": "Valor de Voto de Abstención",
 		"ayeVoteValue": "Valor de Voto Sí",
 		"nayVoteValue": "Valor de Voto No",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"voteSuccess": "Su voto ha sido emitido correctamente",
+		"voteFailed": "Su voto no ha sido emitido correctamente",
+		"voteSuccessTitle": "Voto exitoso",
+		"voteFailedTitle": "Voto fallido"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de Votación"
@@ -545,7 +549,10 @@
 		},
 		"titleTooShort": "Por favor, proporcione un título válido.",
 		"titlePlaceholder": "Ingrese título",
-		"descriptionRequired": "Por favor, proporcione una descripción válida."
+		"descriptionRequired": "Por favor, proporcione una descripción válida.",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toCreate": "para crear una discusión"
 	},
 	"ProposalType": {
 		"discussion": "Discusión",
@@ -610,5 +617,47 @@
 		"totalAmountRequired": "Cantidad Total Requerida",
 		"viewAmountBreakup": "Ver Desglose del Monto",
 		"registrarFees": "Tarifas de registro"
+	},
+	"BatchVote": {
+		"batchVoting": "Votación por lotes",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toVote": "para votar",
+		"setDefaults": "Establecer valores predeterminados",
+		"vote": "Votar",
+		"noProposalsAvailable": "No hay propuestas disponibles",
+		"skip": "Omitir",
+		"aye": "Sí",
+		"nay": "No",
+		"abstain": "Abstención",
+		"chooseYourVote": "Elige tu voto",
+		"setConviction": "Establecer convicción",
+		"noItemsInVoteCart": "No hay elementos en el carrito de votación",
+		"confirmBatchVoting": "Confirmar votación por lotes",
+		"save": "Guardar",
+		"editVote": "Editar voto",
+		"next": "Siguiente",
+		"totalProposals": "Propuestas totales",
+		"viewCart": "Ver carrito",
+		"proposals": "Propuestas"
+	},
+	"CreateProposal": {
+		"createPreimage": "Crear Preimagen",
+		"createTreasuryProposal": "Crear Propuesta de Tesorería"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiario",
+		"amount": "Cantidad",
+		"track": "Pista",
+		"createProposal": "Crear Propuesta",
+		"create": "Crear"
+	},
+	"CreatePreimage": {
+		"addItem": "Agregar Elemento",
+		"removeItem": "Eliminar Elemento",
+		"yes": "Sí",
+		"no": "No",
+		"uploadFile": "Subir Archivo",
+		"includeOption": "Incluir Opción"
 	}
 }

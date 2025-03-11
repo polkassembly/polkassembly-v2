@@ -5,7 +5,7 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { EWallet } from '@/_shared/types';
-import { FirestoreService } from '@/app/api/_api-services/offchain_db_service/firestore_service';
+import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { AuthService } from '@api/_api-services/auth_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -35,7 +35,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	const formattedAddress = ValidatorService.isValidEVMAddress(address) ? address : getSubstrateAddress(address);
 	if (!formattedAddress) throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid address');
 
-	const addressData = await FirestoreService.getAddressDataByAddress(address);
+	const addressData = await OffChainDbService.GetAddressDataByAddress(address);
 
 	if (addressData) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Address already linked');

@@ -7,11 +7,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import HeaderLabel from '@/app/create/discussion/Component/HeaderLabel';
-import CreateDiscussion from '@/app/create/discussion/Component/CreateDiscussion/CreateDiscussion';
-import classes from './discussion.module.scss';
+import CreateProposal from '@/app/create/proposal/Components/CreateProposal';
 
-function Discussion() {
+function Proposal() {
 	const router = useRouter();
 
 	const handleOpenChange = () => {
@@ -24,18 +22,16 @@ function Discussion() {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className={classes.content}>
+			<DialogContent className='max-w-screen-md p-6'>
 				<DialogHeader>
-					<DialogTitle>
-						<HeaderLabel />
-					</DialogTitle>
+					<DialogTitle>New Proposal</DialogTitle>
 				</DialogHeader>
-				<div className='px-4'>
-					<CreateDiscussion isModal />
+				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
+					<CreateProposal />
 				</div>
 			</DialogContent>
 		</Dialog>
 	);
 }
 
-export default Discussion;
+export default Proposal;

@@ -9,7 +9,6 @@ import { DM_Sans as dmSans } from 'next/font/google';
 import { getLocale, getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { Providers } from './_shared-components/Providers';
-import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
 import { CookieService } from '../_shared/_services/cookie_service';
@@ -69,7 +68,6 @@ export default async function RootLayout({
 					/>
 					{modal}
 					<AppLayout>{children}</AppLayout>
-					<NotificationsContainer />
 				</Providers>
 			</body>
 		</html>

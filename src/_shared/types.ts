@@ -3,8 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { OutputData } from '@editorjs/editorjs';
+import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
+import { TypeDef } from '@polkadot/types/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -286,6 +288,7 @@ export interface IReaction {
 	reaction: EReaction;
 	createdAt: Date;
 	updatedAt: Date;
+	commentId?: string;
 }
 
 export interface IPostOffChainMetrics {
@@ -304,6 +307,12 @@ export interface IPostLink {
 	proposalType: EProposalType;
 }
 
+// stores the reason for invalidity or "Valid" if valid
+export interface ICrossValidationResult {
+	beneficiaries: string | 'Valid';
+	proposer: string | 'Valid';
+}
+
 export interface IContentSummary {
 	id: string;
 	network: ENetwork;
@@ -314,6 +323,7 @@ export interface IContentSummary {
 	isSpam?: boolean;
 	createdAt: Date;
 	updatedAt: Date;
+	crossValidationResult?: ICrossValidationResult;
 }
 
 export enum EOffChainPostTopic {
@@ -435,7 +445,6 @@ export enum EPostOrigin {
 export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
-	ABSTAIN = 'abstain',
 	SPLIT = 'split',
 	SPLIT_ABSTAIN = 'splitAbstain'
 }
@@ -451,6 +460,7 @@ export interface IBeneficiary {
 	address: string;
 	amount: string;
 	assetId: string | null;
+	validFromBlock?: string;
 }
 
 export interface IStatusHistoryItem {
@@ -465,7 +475,7 @@ export interface IOnChainPostInfo {
 	createdAt?: Date;
 	index?: number;
 	hash?: string;
-	origin?: EPostOrigin;
+	origin: EPostOrigin;
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
@@ -486,12 +496,12 @@ export interface IPost extends IOffChainPost {
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
-	index: number;
-	origin: string;
+	index?: number;
+	origin: EPostOrigin;
 	proposer: string;
 	status: EProposalStatus;
 	type: EProposalType;
-	hash: string;
+	hash?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
 	decisionPeriodEndsAt?: Date;
@@ -553,6 +563,14 @@ export enum EListingTab {
 	POLKASSEMBLY = 'POLKASSEMBLY'
 }
 
+export enum ECommentSentiment {
+	AGAINST = 'against',
+	SLIGHTLY_AGAINST = 'slightly_against',
+	NEUTRAL = 'neutral',
+	SLIGHTLY_FOR = 'slightly_for',
+	FOR = 'for'
+}
+
 export interface IComment {
 	id: string;
 	createdAt: Date;
@@ -569,11 +587,14 @@ export interface IComment {
 	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
+	sentiment?: ECommentSentiment;
+	aiSentiment?: ECommentSentiment;
 }
 
 export interface ICommentResponse extends IComment {
 	user: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
+	reactions?: IReaction[];
 }
 
 export interface IOnChainIdentity {
@@ -826,4 +847,53 @@ export interface IVoteCartItem {
 	};
 	conviction: EConvictionAmount;
 	title?: string;
+	editDisabled?: boolean;
+}
+
+export interface IPostSubscription {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	network: ENetwork;
+	indexOrHash: string;
+	proposalType: EProposalType;
+	userId: number;
+}
+
+export enum EReactQueryKeys {
+	BATCH_VOTE_CART = 'batch-vote-cart'
+}
+
+export interface IParamDef {
+	name: string;
+	length?: number;
+	type: TypeDef;
+}
+
+export interface ICallState {
+	extrinsic: {
+		extrinsicFn: SubmittableExtrinsicFunction<'promise'> | null;
+		params: IParamDef[];
+	};
+	paramValues: unknown[];
+}
+
+export enum EEnactment {
+	At_Block_No = 'at_block_number',
+	After_No_Of_Blocks = 'after_no_of_Blocks'
+}
+
+export interface IWritePostFormFields {
+	title: string;
+	description: OutputData;
+	tags: ITag[];
+	topic: EOffChainPostTopic;
+	allowedCommentor: EAllowedCommentor;
+}
+
+export enum NotificationType {
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info'
 }

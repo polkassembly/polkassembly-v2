@@ -243,7 +243,7 @@ export class ValidatorService {
 	static isValidVoteAmount(amount: string): boolean {
 		try {
 			const bnAmount = new BN(amount);
-			return bnAmount.gte(new BN(0));
+			return bnAmount.gt(new BN(0));
 		} catch {
 			return false;
 		}
@@ -261,7 +261,7 @@ export class ValidatorService {
 
 			// abstain requires all three amounts
 			if (
-				decision === EVoteDecision.ABSTAIN &&
+				decision === EVoteDecision.SPLIT_ABSTAIN &&
 				(!this.isValidVoteAmount(amount.abstain || '-1') || !this.isValidVoteAmount(amount.aye || '-1') || !this.isValidVoteAmount(amount.nay || '-1'))
 			) {
 				throw new Error();
