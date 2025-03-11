@@ -275,7 +275,7 @@ function Overview({
 				</div>
 				{/* News Section */}
 				<div className='w-full xl:w-1/3'>
-					<NewsSection twitter='https://x.com/polkadot' />
+					<NewsSection />
 				</div>
 			</div>
 		</div>

@@ -75,7 +75,7 @@
 }
 
 .news_section_container {
-    @apply mt-6 rounded-xl bg-bg_modal p-6 shadow-lg;
+    @apply mt-6 rounded-xl bg-bg_modal max-h-[480px] p-6 shadow-lg;
 }
 
 .news_section_title {

@@ -5,18 +5,17 @@
 import { LoadingSpinner } from '@ui/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
+import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import styles from './Overview.module.scss';
 
-interface INewsProps {
-	twitter: string;
-}
-
-function NewsSection({ twitter }: INewsProps) {
+function NewsSection() {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const t = useTranslations('Overview');
+	const network = getCurrentNetwork();
 
-	const profile = twitter ? twitter.split('/')[3] : 'polkadot';
+	const profile = network === ENetwork.POLKADOT ? 'Polkadot' : 'Kusama';
 
 	return (
 		<div className={styles.news_section_container}>
