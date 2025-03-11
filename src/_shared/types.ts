@@ -865,5 +865,6 @@ export enum NotificationType {
 	SUCCESS = 'success',
 	ERROR = 'error',
 	WARNING = 'warning',
-	INFO = 'info'
+	INFO = 'info',
+	COPY_ADDRESS = 'copy_address'
 }

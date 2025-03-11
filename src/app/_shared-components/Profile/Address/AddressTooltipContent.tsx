@@ -6,11 +6,12 @@ import { memo, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { IPublicUser, IFollowEntry, IOnChainIdentity } from '@/_shared/types';
+import { IPublicUser, IFollowEntry, IOnChainIdentity, NotificationType } from '@/_shared/types';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import { useToast } from '@/hooks/useToast';
 import { ShieldPlus } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import UserStats from './UserStats';
@@ -24,6 +25,8 @@ interface AddressTooltipContentProps {
 	userProfileUrl?: string;
 	displayText: string;
 	identity?: IOnChainIdentity;
+	userData?: IPublicUser;
+	isUserDataLoading?: boolean;
 }
 
 const LoadingSpinner = memo(() => (
@@ -33,11 +36,12 @@ const LoadingSpinner = memo(() => (
 	</div>
 ));
 
-function AddressTooltipContent({ address, userProfileUrl, displayText, identity }: AddressTooltipContentProps) {
+function AddressTooltipContent({ address, userProfileUrl, displayText, identity, userData, isUserDataLoading }: AddressTooltipContentProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const { user: currentUser } = useUser();
 	const queryClient = useQueryClient();
+	const { toast } = useToast();
 
 	const queryOptions = useMemo(
 		() => ({
@@ -46,15 +50,6 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity 
 		}),
 		[]
 	);
-
-	const { data: userData, isLoading: isUserDataLoading } = useQuery<IPublicUser | null>({
-		queryKey: ['userData', address],
-		queryFn: async () => {
-			const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
-			return data ?? null;
-		},
-		...queryOptions
-	});
 
 	const { data: followingData, isLoading: isFollowingLoading } = useQuery<{ following: IFollowEntry[] }>({
 		queryKey: ['following', userData?.id],
@@ -88,6 +83,10 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity 
 
 	const copyToClipboard = useCallback((text: string) => {
 		navigator.clipboard.writeText(text);
+		toast({
+			title: 'Address copied to clipboard',
+			status: NotificationType.COPY_ADDRESS
+		});
 	}, []);
 
 	const followUser = useCallback(async () => {

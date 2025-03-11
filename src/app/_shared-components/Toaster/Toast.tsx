@@ -33,7 +33,8 @@ const toastVariants = cva(
 				[NotificationType.SUCCESS]: 'bg-green-500 text-white',
 				[NotificationType.WARNING]: 'bg-toast_warning_bg text-btn_secondary_text',
 				[NotificationType.INFO]: 'bg-toast_info_bg border border-toast_info_border text-btn_secondary_text',
-				[NotificationType.ERROR]: 'bg-toast_error_bg text-btn_secondary_text'
+				[NotificationType.ERROR]: 'bg-toast_error_bg text-btn_secondary_text',
+				[NotificationType.COPY_ADDRESS]: 'bg-btn_primary_text text-black'
 			}
 		},
 		defaultVariants: {

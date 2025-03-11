@@ -22,22 +22,30 @@ function AddressDisplay({
 	onCopy: (text: string) => void;
 	identity?: IOnChainIdentity;
 }) {
+	const addressInlineContent = (
+		<AddressInline
+			address={address}
+			showIdenticon={false}
+			className='text-lg'
+			onChainIdentity={identity}
+			addressDisplayText={displayText}
+		/>
+	);
+
 	return (
 		<div className='flex w-full flex-col gap-1.5'>
 			<div className='mt-0 flex items-center justify-start gap-2'>
-				<Link
-					href={userProfileUrl || ''}
-					target='_blank'
-					className='text-pink_primary flex cursor-pointer'
-				>
-					<AddressInline
-						address={address}
-						showIdenticon={false}
-						className='text-lg'
-						onChainIdentity={identity}
-						addressDisplayText={displayText}
-					/>
-				</Link>
+				{userProfileUrl ? (
+					<Link
+						href={userProfileUrl}
+						target='_blank'
+						className='text-pink_primary flex cursor-pointer'
+					>
+						{addressInlineContent}
+					</Link>
+				) : (
+					<div className='text-pink_primary flex'>{addressInlineContent}</div>
+				)}
 			</div>
 			<div className='flex w-full flex-col gap-1.5'>
 				<div className='flex items-center gap-1 text-xs text-text_primary'>
