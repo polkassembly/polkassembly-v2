@@ -679,5 +679,10 @@
 		"no": "No",
 		"uploadFile": "Upload File",
 		"includeOption": "Include Option"
+	},
+	"AddressInput": {
+		"invalidAddress": "Invalid Address",
+		"noResultsFound": "No results found",
+		"placeholder": "Enter Address"
 	}
 }
