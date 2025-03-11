@@ -85,16 +85,16 @@ function TreasuryProposalLocal() {
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
 				toast({
-					title: 'Proposal created successfully',
-					description: 'The proposal has been created successfully',
+					title: t('CreateTreasuryProposal.proposalCreatedSuccessfully'),
+					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
 				redirectFromServer(`/referenda/${postId}`);
 			},
 			onFailed: () => {
 				toast({
-					title: 'Failed to create proposal',
-					description: 'There was an error while creating the proposal',
+					title: t('CreateTreasuryProposal.proposalCreationFailed'),
+					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
 					status: NotificationType.ERROR
 				});
 				setLoading(false);
@@ -131,16 +131,16 @@ function TreasuryProposalLocal() {
 			extrinsicFn: tx,
 			onSuccess: () => {
 				toast({
-					title: 'Preimage noted successfully',
-					description: 'The preimage has been noted successfully',
+					title: t('CreateTreasuryProposal.preimageNotedSuccessfully'),
+					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
 				createProposal(preImage.preimageHash, preImage.preimageLength);
 			},
 			onFailed: () => {
 				toast({
-					title: 'Failed to note preimage',
-					description: 'There was an error while noting the preimage',
+					title: t('CreateTreasuryProposal.preimageNoteFailed'),
+					description: t('CreateTreasuryProposal.preimageNoteFailedDescription'),
 					status: NotificationType.ERROR
 				});
 				setLoading(false);

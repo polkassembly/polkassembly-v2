@@ -651,7 +651,15 @@
 		"amount": "Betrag",
 		"track": "Track",
 		"createProposal": "Vorschlag erstellen",
-		"create": "Erstellen"
+		"create": "Erstellen",
+		"proposalCreatedSuccessfully": "Vorschlag erfolgreich erstellt",
+		"proposalCreatedSuccessfullyDescription": "Der Vorschlag wurde erfolgreich erstellt",
+		"proposalCreationFailed": "Erstellung des Vorschlags fehlgeschlagen",
+		"proposalCreationFailedDescription": "Bei der Erstellung des Vorschlags ist ein Fehler aufgetreten",
+		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
+		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
+		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten"
 	},
 	"CreatePreimage": {
 		"addItem": "Element hinzufügen",
@@ -659,7 +667,11 @@
 		"yes": "Ja",
 		"no": "Nein",
 		"uploadFile": "Datei hochladen",
-		"includeOption": "Option einschließen"
+		"includeOption": "Option einschließen",
+		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
+		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
+		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",

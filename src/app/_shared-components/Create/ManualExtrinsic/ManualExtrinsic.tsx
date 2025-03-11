@@ -11,10 +11,12 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Copy } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { NotificationType } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
 
 function ManualExtrinsic() {
+	const t = useTranslations();
 	const [extrinsicFn, setExtrinsicFn] = useState<SubmittableExtrinsic<'promise'> | null>();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
@@ -39,20 +41,21 @@ function ManualExtrinsic() {
 				setIsLoading(false);
 				toast({
 					status: NotificationType.SUCCESS,
-					title: 'Preimage noted successfully',
-					description: 'The preimage has been noted successfully'
+					title: t('CreatePreimage.preimageNotedSuccessfully'),
+					description: t('CreatePreimage.preimageNotedSuccessfullyDescription')
 				});
 			},
 			onFailed: () => {
 				setIsLoading(false);
 				toast({
 					status: NotificationType.ERROR,
-					title: 'Failed to note preimage',
-					description: 'There was an error while noting the preimage'
+					title: t('CreatePreimage.preimageNoteFailed'),
+					description: t('CreatePreimage.preimageNoteFailedDescription')
 				});
 			}
 		});
-	}, [apiService, extrinsicFn, toast, userPreferences.address?.address]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [apiService, extrinsicFn, userPreferences.address?.address]);
 
 	return (
 		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>
