@@ -650,7 +650,15 @@
 		"amount": "Cantidad",
 		"track": "Pista",
 		"createProposal": "Crear Propuesta",
-		"create": "Crear"
+		"create": "Crear",
+		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
+		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
+		"proposalCreationFailed": "Error al crear la propuesta",
+		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen"
 	},
 	"CreatePreimage": {
 		"addItem": "Agregar Elemento",
@@ -658,7 +666,11 @@
 		"yes": "Sí",
 		"no": "No",
 		"uploadFile": "Subir Archivo",
-		"includeOption": "Incluir Opción"
+		"includeOption": "Incluir Opción",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente"
 	},
 	"AddressInput": {
 		"invalidAddress": "Dirección Inválida",

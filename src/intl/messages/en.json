@@ -670,7 +670,15 @@
 		"amount": "Amount",
 		"track": "Track",
 		"createProposal": "Create Proposal",
-		"create": "Create"
+		"create": "Create",
+		"proposalCreatedSuccessfully": "Proposal created successfully",
+		"proposalCreatedSuccessfullyDescription": "The proposal has been created successfully",
+		"proposalCreationFailed": "Failed to create proposal",
+		"proposalCreationFailedDescription": "There was an error while creating the proposal",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Item",
@@ -678,7 +686,11 @@
 		"yes": "Yes",
 		"no": "No",
 		"uploadFile": "Upload File",
-		"includeOption": "Include Option"
+		"includeOption": "Include Option",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully"
 	},
 	"AddressInput": {
 		"invalidAddress": "Invalid Address",

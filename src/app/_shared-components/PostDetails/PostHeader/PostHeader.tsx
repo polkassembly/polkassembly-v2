@@ -132,7 +132,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 								<Tooltip>
 									<TooltipTrigger>
 										<span className='text-xs text-wallet_btn_text'>
-											+ {postData?.onChainInfo?.beneficiaries?.length ?? 0 - 2} {t('PostDetails.more')}{' '}
+											+ {postData.onChainInfo.beneficiaries.length - 2} {t('PostDetails.more')}{' '}
 										</span>
 									</TooltipTrigger>
 									<TooltipContent className={classes.beneficiaryTooltipContent}>
