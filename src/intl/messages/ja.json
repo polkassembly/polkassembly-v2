@@ -114,6 +114,8 @@
 		"balance": "残高",
 		"locked": "ロック済み",
 		"on": "日時",
+		"judgements": "判定",
+		"since": "日時",
 		"Activity": {
 			"voted_on_proposal": "投票済み",
 			"created_proposal": "提案を作成",

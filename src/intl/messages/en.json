@@ -198,6 +198,8 @@
 		"riot": "Riot",
 		"discord": "Discord",
 		"saveChanges": "Save",
+		"judgements": "Judgements",
+		"since": "Since",
 		"Settings": {
 			"settings": "Settings",
 			"deleteAccount": "Delete Account",
