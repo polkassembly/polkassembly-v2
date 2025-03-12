@@ -334,7 +334,10 @@ export enum EOffChainPostTopic {
 	ROOT = 'root',
 	STAKING_ADMIN = 'stakingAdmin',
 	TREASURY = 'treasury',
-	FELLOWSHIP = 'fellowship'
+	FELLOWSHIP = 'fellowship',
+	COUNCIL = 'council',
+	DEMOCRACY = 'democracy',
+	WHITELIST = 'whitelist'
 }
 
 export interface ITag {
