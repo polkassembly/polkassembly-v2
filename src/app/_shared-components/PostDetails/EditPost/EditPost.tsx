@@ -39,11 +39,11 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 		setIsLoading(true);
 
-		const { data, error } = await NextApiClientService.editProposalDetails(
-			postData.proposalType,
-			postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
-			{ title, content }
-		);
+		const { data, error } = await NextApiClientService.editProposalDetails({
+			proposalType: postData.proposalType,
+			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
+			data: { title, content }
+		});
 
 		if (!error && data) {
 			onEditPostSuccess?.(title, content);

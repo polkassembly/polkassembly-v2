@@ -177,6 +177,8 @@
 		"badgesDescription": "Schalte Abzeichen frei, erhalte und verdiene sie, während du dich in Polkassembly engagierst",
 		"userSince": "Benutzer seit",
 		"rank": "Rang",
+		"judgements": "Beurteilungen",
+		"since": "Seit",
 		"Settings": {
 			"settings": "Einstellungen",
 			"deleteAccount": "Konto löschen",
@@ -641,5 +643,41 @@
 		"totalProposals": "Gesamtvorschläge",
 		"viewCart": "Warenkorb anzeigen",
 		"proposals": "Vorschläge"
+	},
+	"CreateProposal": {
+		"createPreimage": "Preimage erstellen",
+		"createTreasuryProposal": "Treasury-Vorschlag erstellen"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Begünstigter",
+		"amount": "Betrag",
+		"track": "Track",
+		"createProposal": "Vorschlag erstellen",
+		"create": "Erstellen",
+		"proposalCreatedSuccessfully": "Vorschlag erfolgreich erstellt",
+		"proposalCreatedSuccessfullyDescription": "Der Vorschlag wurde erfolgreich erstellt",
+		"proposalCreationFailed": "Erstellung des Vorschlags fehlgeschlagen",
+		"proposalCreationFailedDescription": "Bei der Erstellung des Vorschlags ist ein Fehler aufgetreten",
+		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
+		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
+		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten"
+	},
+	"CreatePreimage": {
+		"addItem": "Element hinzufügen",
+		"removeItem": "Element entfernen",
+		"yes": "Ja",
+		"no": "Nein",
+		"uploadFile": "Datei hochladen",
+		"includeOption": "Option einschließen",
+		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
+		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
+		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert"
+	},
+	"AddressInput": {
+		"invalidAddress": "Ungültige Adresse",
+		"noResultsFound": "Keine Ergebnisse gefunden",
+		"placeholder": "Adresse eingeben"
 	}
 }

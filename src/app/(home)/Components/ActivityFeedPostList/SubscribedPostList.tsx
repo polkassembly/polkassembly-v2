@@ -7,14 +7,14 @@ import { useTranslations } from 'next-intl';
 import JoinPA from '@assets/activityfeed/gifs/joinpa.gif';
 import NoActivity from '@assets/activityfeed/gifs/noactivity.gif';
 import { useUser } from '@/hooks/useUser';
-import { EPostOrigin, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EPostOrigin } from '@/_shared/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@ui/Button';
 import styles from './ActivityFeedPostList.module.scss';
 import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 
-function SubscribedPostList({ postData }: { postData: IGenericListingResponse<IPostListing> }) {
+function SubscribedPostList() {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [currentTab, setCurrentTab] = useState<string>('All');
@@ -23,7 +23,6 @@ function SubscribedPostList({ postData }: { postData: IGenericListingResponse<IP
 		<div>
 			{user?.id && (
 				<ActivityFeedNavbar
-					gov2LatestPosts={postData?.items}
 					currentTab={currentTab as EPostOrigin | 'All'}
 					setCurrentTab={setCurrentTab}
 				/>

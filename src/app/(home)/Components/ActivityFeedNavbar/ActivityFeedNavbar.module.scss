@@ -13,11 +13,11 @@
 }
 
 .popoverContent {
-    @apply w-52 border-primary_border bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
+    @apply w-52 border-primary_border animate-none bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
 }
 
 .trackName {
-    @apply w-full rounded-lg px-1 py-2 text-start text-sm font-medium text-wallet_btn_text hover:bg-activity_selected_tab;
+    @apply w-full rounded-lg px-1 py-2 text-start text-sm font-medium text-wallet_btn_text hover:bg-activity_selected_tab cursor-pointer;
 }
 
 @media (max-width: 768px) {

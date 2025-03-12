@@ -198,6 +198,8 @@
 		"riot": "Riot",
 		"discord": "Discord",
 		"saveChanges": "Save",
+		"judgements": "Judgements",
+		"since": "Since",
 		"Settings": {
 			"settings": "Settings",
 			"deleteAccount": "Delete Account",
@@ -660,5 +662,41 @@
 		"totalProposals": "Total Proposals",
 		"viewCart": "View Cart",
 		"proposals": "Proposals"
+	},
+	"CreateProposal": {
+		"createPreimage": "Create Preimage",
+		"createTreasuryProposal": "Create Treasury Proposal"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiary",
+		"amount": "Amount",
+		"track": "Track",
+		"createProposal": "Create Proposal",
+		"create": "Create",
+		"proposalCreatedSuccessfully": "Proposal created successfully",
+		"proposalCreatedSuccessfullyDescription": "The proposal has been created successfully",
+		"proposalCreationFailed": "Failed to create proposal",
+		"proposalCreationFailedDescription": "There was an error while creating the proposal",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage"
+	},
+	"CreatePreimage": {
+		"addItem": "Add Item",
+		"removeItem": "Remove Item",
+		"yes": "Yes",
+		"no": "No",
+		"uploadFile": "Upload File",
+		"includeOption": "Include Option",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully"
+	},
+	"AddressInput": {
+		"invalidAddress": "Invalid Address",
+		"noResultsFound": "No results found",
+		"placeholder": "Enter Address"
 	}
 }

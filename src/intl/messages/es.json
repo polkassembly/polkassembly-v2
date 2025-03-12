@@ -177,6 +177,8 @@
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
 		"userSince": "Usuario desde",
 		"rank": "Rango",
+		"judgements": "Juicios",
+		"since": "Desde",
 		"Settings": {
 			"settings": "Configuraciones",
 			"deleteAccount": "Eliminar cuenta",
@@ -640,5 +642,41 @@
 		"totalProposals": "Propuestas totales",
 		"viewCart": "Ver carrito",
 		"proposals": "Propuestas"
+	},
+	"CreateProposal": {
+		"createPreimage": "Crear Preimagen",
+		"createTreasuryProposal": "Crear Propuesta de Tesorería"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiario",
+		"amount": "Cantidad",
+		"track": "Pista",
+		"createProposal": "Crear Propuesta",
+		"create": "Crear",
+		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
+		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
+		"proposalCreationFailed": "Error al crear la propuesta",
+		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen"
+	},
+	"CreatePreimage": {
+		"addItem": "Agregar Elemento",
+		"removeItem": "Eliminar Elemento",
+		"yes": "Sí",
+		"no": "No",
+		"uploadFile": "Subir Archivo",
+		"includeOption": "Incluir Opción",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente"
+	},
+	"AddressInput": {
+		"invalidAddress": "Dirección Inválida",
+		"noResultsFound": "No se encontraron resultados",
+		"placeholder": "Ingrese la Dirección"
 	}
 }
