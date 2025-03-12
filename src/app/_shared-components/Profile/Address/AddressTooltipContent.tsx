@@ -143,6 +143,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 
 	const isInitialLoading = isUserDataLoading || isFollowingLoading || isFollowersLoading;
 	const hasUserData = !!userData;
+	const hasValidStats = userData?.id && (stats.followers !== undefined || stats.following !== undefined);
 
 	if (isInitialLoading) {
 		return <LoadingSpinner />;
@@ -167,10 +168,12 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 							</span>
 						)}
 						<div className='flex items-center justify-between'>
-							<UserStats
-								followers={stats.followers}
-								following={stats.following}
-							/>
+							{hasValidStats && (
+								<UserStats
+									followers={stats.followers}
+									following={stats.following}
+								/>
+							)}
 							{hasUserData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
 						</div>
 						{hasUserData && (

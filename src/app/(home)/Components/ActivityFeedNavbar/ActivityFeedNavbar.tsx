@@ -148,7 +148,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 									{tracks.map((track) => (
 										<DropdownMenuItem
 											key={track}
-											className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
+											className={cn(styles.trackName, 'cursor-pointer hover:bg-activity_selected_tab', currentTab === track && 'bg-activity_selected_tab')}
 											onSelect={() => setCurrentTab(track)}
 										>
 											{formatTrackName(track)}
