@@ -56,23 +56,23 @@ function SetDefaults({
 						<BalanceInput
 							name={`${voteDecision}-balance`}
 							label={t('VoteReferendum.lockBalance')}
-							onChange={onDefaultAyeNayValueChange}
+							onChange={({ value }) => onDefaultAyeNayValueChange(value)}
 						/>
 					) : (
 						<>
 							{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 								<BalanceInput
 									label={t('VoteReferendum.abstainVoteValue')}
-									onChange={onDefaultAbstainValueChange}
+									onChange={({ value }) => onDefaultAbstainValueChange(value)}
 								/>
 							)}
 							<BalanceInput
 								label={t('VoteReferendum.ayeVoteValue')}
-								onChange={onDefaultAbstainAyeValueChange}
+								onChange={({ value }) => onDefaultAbstainAyeValueChange(value)}
 							/>
 							<BalanceInput
 								label={t('VoteReferendum.nayVoteValue')}
-								onChange={onDefaultAbstainNayValueChange}
+								onChange={({ value }) => onDefaultAbstainNayValueChange(value)}
 							/>
 						</>
 					)}

@@ -14,7 +14,7 @@ import { ENetwork } from '../types';
  */
 
 export function getEncodedAddress(address: string, network: ENetwork): string | null {
-	if (!network || !(network in NETWORKS_DETAILS)) {
+	if (!network || !(network in NETWORKS_DETAILS) || !address) {
 		return null;
 	}
 

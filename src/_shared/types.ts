@@ -3,8 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { OutputData } from '@editorjs/editorjs';
+import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
+import { TypeDef } from '@polkadot/types/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -332,7 +334,10 @@ export enum EOffChainPostTopic {
 	ROOT = 'root',
 	STAKING_ADMIN = 'stakingAdmin',
 	TREASURY = 'treasury',
-	FELLOWSHIP = 'fellowship'
+	FELLOWSHIP = 'fellowship',
+	COUNCIL = 'council',
+	DEMOCRACY = 'democracy',
+	WHITELIST = 'whitelist'
 }
 
 export interface ITag {
@@ -860,6 +865,33 @@ export interface IPostSubscription {
 
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
+}
+
+export interface IParamDef {
+	name: string;
+	length?: number;
+	type: TypeDef;
+}
+
+export interface ICallState {
+	extrinsic: {
+		extrinsicFn: SubmittableExtrinsicFunction<'promise'> | null;
+		params: IParamDef[];
+	};
+	paramValues: unknown[];
+}
+
+export enum EEnactment {
+	At_Block_No = 'at_block_number',
+	After_No_Of_Blocks = 'after_no_of_Blocks'
+}
+
+export interface IWritePostFormFields {
+	title: string;
+	description: OutputData;
+	tags: ITag[];
+	topic: EOffChainPostTopic;
+	allowedCommentor: EAllowedCommentor;
 }
 
 export enum NotificationType {
