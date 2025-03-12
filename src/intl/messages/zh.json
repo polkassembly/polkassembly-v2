@@ -645,7 +645,8 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "创建预映像",
-		"createTreasuryProposal": "创建国库提案"
+		"createTreasuryProposal": "创建国库提案（原生）",
+		"usdxProposal": "创建USDx国库提案（资产中心）"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",

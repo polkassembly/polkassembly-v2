@@ -14,6 +14,7 @@ import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 import { OutputData } from '@editorjs/editorjs';
 import { BN } from '@polkadot/util';
+import { NETWORKS_DETAILS } from '../_constants/networks';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -247,6 +248,10 @@ export class ValidatorService {
 		} catch {
 			return false;
 		}
+	}
+
+	static isValidAssetId(assetId: string, network: ENetwork): boolean {
+		return Object.keys(NETWORKS_DETAILS[`${network}`].supportedAssets).includes(assetId);
 	}
 
 	static isValidVoteAmountsForDecision(amount: { abstain?: string; aye?: string; nay?: string }, decision: EVoteDecision): boolean {

@@ -646,7 +646,8 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Preimage erstellen",
-		"createTreasuryProposal": "Treasury-Vorschlag erstellen"
+		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Nativ)",
+		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",

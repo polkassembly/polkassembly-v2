@@ -665,7 +665,8 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Create Preimage",
-		"createTreasuryProposal": "Create Treasury Proposal"
+		"createTreasuryProposal": "Create Treasury Proposal (Native)",
+		"usdxProposal": "Create USDx Treasury Proposal (Assethub)"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",

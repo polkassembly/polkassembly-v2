@@ -8,8 +8,10 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { bnToInput } from '@/app/_client-utils/bnToInput';
+import { ChevronDown } from 'lucide-react';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
 
 function BalanceInput({
 	label,
@@ -17,30 +19,42 @@ function BalanceInput({
 	onChange,
 	name,
 	disabled,
-	defaultValue
+	defaultValue,
+	disabledMultiAsset
 }: {
 	label: string;
 	placeholder?: string;
-	onChange?: (value: BN) => void;
+	onChange?: (value: BN, assetId: string | null) => void;
 	name?: string;
 	disabled?: boolean;
 	defaultValue?: BN;
+	disabledMultiAsset?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const [error, setError] = useState('');
 
+	const networkDetails = NETWORKS_DETAILS[`${network}`];
+	const { supportedAssets } = networkDetails;
+
+	const [assetId, setAssetId] = useState<string | null>(null);
+
+	const assetOptions = Object.values(supportedAssets).map((asset) => ({
+		label: asset.symbol,
+		value: asset.index
+	}));
+
 	const [valueString, setValueString] = useState('');
 
 	const onBalanceChange = (value: string | null): void => {
-		const { bnValue, isValid } = inputToBn(value || '', network, false);
+		const { bnValue, isValid } = inputToBn(value || '', network, false, assetId);
 
 		if (isValid) {
 			setError('');
-			onChange?.(bnValue);
+			onChange?.(bnValue, assetId);
 		} else {
 			setError('Invalid Amount');
-			onChange?.(BN_ZERO);
+			onChange?.(BN_ZERO, assetId);
 		}
 	};
 
@@ -67,7 +81,31 @@ function BalanceInput({
 					value={valueString}
 					disabled={disabled}
 				/>
-				<div className={classes.tokenSymbol}>{NETWORKS_DETAILS[`${network}`].tokenSymbol}</div>
+				{assetOptions.length === 0 || disabledMultiAsset ? (
+					<div className={classes.tokenSymbol}>{NETWORKS_DETAILS[`${network}`].tokenSymbol}</div>
+				) : (
+					<div className={classes.tokenSymbol}>
+						<DropdownMenu>
+							<DropdownMenuTrigger
+								disabled={disabled}
+								className='flex w-full items-center gap-x-2'
+							>
+								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
+								<ChevronDown className='text-xs text-white' />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								{[{ label: networkDetails.tokenSymbol, value: null }, ...assetOptions].map((option) => (
+									<DropdownMenuItem
+										key={option.value}
+										onClick={() => setAssetId(option.value)}
+									>
+										{option.label}
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				)}
 				{error && !disabled && <p className='absolute left-0 my-1 text-sm text-failure'>{error}</p>}
 			</div>
 		</div>

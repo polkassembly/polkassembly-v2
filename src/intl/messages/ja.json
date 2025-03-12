@@ -645,7 +645,8 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "プレイメージを作成",
-		"createTreasuryProposal": "財務提案を作成"
+		"createTreasuryProposal": "トレジャリー提案を作成 (ネイティブ)",
+		"usdxProposal": "USDxトレジャリー提案を作成 (アセットハブ)"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
