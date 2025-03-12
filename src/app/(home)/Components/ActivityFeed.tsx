@@ -5,8 +5,13 @@
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import ActivityFeedComp from './ActivityFeedComp/ActivityFeedComp';
 
-function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
-	return <ActivityFeedComp initialData={initialData} />;
+function ActivityFeed({ initialData, subscribedData }: { initialData: IGenericListingResponse<IPostListing>; subscribedData: IGenericListingResponse<IPostListing> }) {
+	return (
+		<ActivityFeedComp
+			initialData={initialData}
+			subscribedData={subscribedData}
+		/>
+	);
 }
 
 export default ActivityFeed;
