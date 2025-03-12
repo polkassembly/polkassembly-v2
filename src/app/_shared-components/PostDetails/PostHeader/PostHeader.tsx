@@ -87,11 +87,15 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
 						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
-						<Separator
-							orientation='vertical'
-							className='h-3'
-						/>
-						{postData?.createdAt && <CreatedAtTime createdAt={postData.createdAt} />}
+						{postData?.createdAt && (
+							<>
+								<Separator
+									orientation='vertical'
+									className='h-3'
+								/>
+								<CreatedAtTime createdAt={postData.createdAt} />
+							</>
+						)}
 						{postData.tags && postData.tags.length > 0 && (
 							<>
 								<Separator
