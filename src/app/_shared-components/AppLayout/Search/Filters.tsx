@@ -5,10 +5,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { RefinementList, useInstantSearch, Configure } from 'react-instantsearch';
+import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { IoIosArrowDown } from 'react-icons/io';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { POST_TOPIC_MAP } from './SearchResults';
 
 interface FiltersProps {
 	activeIndex: 'posts' | 'users' | 'discussions' | null;

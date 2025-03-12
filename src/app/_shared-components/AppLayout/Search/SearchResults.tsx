@@ -10,6 +10,7 @@ import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination }
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
 import CommentIcon from '@assets/icons/Comment.svg';
+import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { FaMagic } from 'react-icons/fa';
 import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
 import PaLogo from '../PaLogo';
@@ -19,25 +20,6 @@ import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
 import { Button } from '../../Button';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
-import { allowedNetwork } from './Filters';
-
-export const POST_TOPIC_MAP = {
-	AUCTION_ADMIN: 8,
-	COMMUNITY_PIPS: 14,
-	COUNCIL: 2,
-	DEMOCRACY: 1,
-	FELLOWSHIP: 10,
-	GENERAL: 5,
-	GENERAL_ADMIN: 15,
-	GOVERNANCE: 9,
-	ROOT: 6,
-	STAKING_ADMIN: 7,
-	TECHNICAL_COMMITTEE: 3,
-	TECHNICAL_PIPS: 12,
-	TREASURY: 4,
-	UPGRADE_PIPS: 13,
-	WHITELIST: 11
-};
 
 interface Post {
 	id: string;
