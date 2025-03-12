@@ -7,7 +7,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { CookieService } from '@/_shared/_services/cookie_service';
-import ActivityFeedComponent from './Components';
+import ActivityFeed from './Components/ActivityFeed';
 import { ClientError } from '../_client-utils/clientError';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
 
@@ -23,7 +23,7 @@ export default async function Home() {
 
 	return (
 		<Suspense fallback={<LoadingSpinner />}>
-			<ActivityFeedComponent initialData={data} />
+			<ActivityFeed initialData={data} />
 		</Suspense>
 	);
 }

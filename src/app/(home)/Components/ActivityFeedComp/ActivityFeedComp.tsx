@@ -12,7 +12,7 @@ import { Tabs, TabsContent } from '@ui/Tabs';
 import { useSidebar } from '@ui/Sidebar/Sidebar';
 import ActivityFeedToggleButton from '../ActivityFeedToggleButton/ActivityFeedToggleButton';
 import ActivityFeedSidebar from '../ActivityFeedSidebar';
-import styles from './ActivityFeed.module.scss';
+import styles from './ActivityFeedComp.module.scss';
 import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
-import ActivityFeedComp from './ActivityFeed/ActivityFeed';
+import ActivityFeedComp from './ActivityFeedComp/ActivityFeedComp';
 
 function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	return <ActivityFeedComp initialData={initialData} />;
