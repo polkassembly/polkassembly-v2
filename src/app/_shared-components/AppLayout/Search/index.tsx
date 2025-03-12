@@ -35,7 +35,7 @@ export default function Search() {
 				<DialogHeader>
 					<DialogTitle className='flex items-baseline gap-2 text-xl font-bold text-btn_secondary_text'>
 						Search
-						{searchContext && <span>Results for: "{searchContext.slice(0, 30)}..."</span>}
+						{searchContext && <span>Results for: &quot;{searchContext.slice(0, 30)}&quot;</span>}
 					</DialogTitle>
 				</DialogHeader>
 
@@ -47,6 +47,7 @@ export default function Search() {
 					<Configure
 						hitsPerPage={10}
 						distinct
+						filters={activeIndex === 'posts' ? 'NOT post_type:discussions AND NOT post_type:grants' : undefined}
 					/>
 
 					<div className='mb-6'>
