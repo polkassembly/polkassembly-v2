@@ -7,78 +7,118 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@ui/Input';
 import Image from 'next/image';
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
-import { Highlight, Hits, InstantSearch, RefinementList, SearchBox } from 'react-instantsearch';
+import { Configure, Highlight, Hits, InstantSearch, RefinementList, SearchBox, Pagination, Index, useInstantSearch, useSearchBox } from 'react-instantsearch';
 import searchGif from '@assets/search/search.gif';
 import PaLogo from '../PaLogo';
+import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const ALGOLIA_APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
 const ALGOLIA_SEARCH_API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY;
-const algoliaClient = algoliasearch(ALGOLIA_APP_ID || '', ALGOLIA_SEARCH_API_KEY || '');
-// const allowedNetwork = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
-// const AUTOCOMPLETE_INDEX_LIMIT = 5;
+const searchClient = algoliasearch(ALGOLIA_APP_ID || '', ALGOLIA_SEARCH_API_KEY || '');
 
-// interface IAutocompleteResults {
-// 	posts: { [index: string]: any }[];
-// 	users: { [index: string]: any }[];
-// }
+interface Post {
+	objectID: string;
+	title: string;
+	content: string;
+	post_type: 'on-chain-posts' | 'off-chain-posts';
+	created_at: number;
+	track?: number;
+	tags?: string[];
+	network?: string;
+}
 
-// const initAutocompleteResults: IAutocompleteResults = {
-// 	posts: [],
-// 	users: []
-// };
+interface User {
+	objectID: string;
+	username: string;
+	profile?: {
+		bio?: string;
+		title?: string;
+	};
+}
 
-// interface Props {
-// 	className?: string;
-// 	openModal: boolean;
-// 	setOpenModal: (pre: boolean) => void;
-// 	isSuperSearch: boolean;
-// 	setIsSuperSearch: (pre: boolean) => void;
-// 	theme?: string;
-// }
-
-function Hit({ hit }: { hit: any }) {
-	console.log('hit', hit);
+function PostHit({ hit }: { hit: Post }) {
 	return (
-		<article>
-			<h1>
+		<article className='cursor-pointer rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800'>
+			<h2 className='text-lg font-medium'>
 				<Highlight
-					attribute='name'
+					attribute='title'
 					hit={hit}
 				/>
-			</h1>
-			<p>${hit.price}</p>
+			</h2>
+			<p className='mt-2 text-sm text-gray-600 dark:text-gray-300'>
+				<Highlight
+					attribute='content'
+					hit={hit}
+				/>
+			</p>
+			<div className='mt-2 flex flex-wrap gap-2'>
+				{hit.post_type && <span className='rounded bg-pink-100 px-2 py-1 text-xs text-pink-800'>{hit.post_type === 'on-chain-posts' ? 'On-chain' : 'Off-chain'}</span>}
+				{hit.network && <span className='rounded bg-blue-100 px-2 py-1 text-xs text-blue-800'>{hit.network}</span>}
+				{hit.tags?.map((tag) => (
+					<span
+						key={tag}
+						className='rounded bg-gray-100 px-2 py-1 text-xs text-gray-800'
+					>
+						{tag}
+					</span>
+				))}
+			</div>
+		</article>
+	);
+}
+function UserHit({ hit }: { hit: User }) {
+	return (
+		<article className='cursor-pointer rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800'>
+			<h2 className='text-lg font-medium'>
+				<Highlight
+					attribute='username'
+					hit={hit as any}
+				/>
+			</h2>
+			{hit.profile?.bio && (
+				<p className='mt-2 text-sm text-gray-600 dark:text-gray-300'>
+					<Highlight
+						attribute='profile.bio'
+						hit={hit as any}
+					/>
+				</p>
+			)}
 		</article>
 	);
 }
 
-export enum EFilterBy {
-	Referenda = 'on-chain-posts',
-	People = 'people',
-	Discussions = 'off-chain-posts'
+function SearchResults({ activeIndex }: { activeIndex: 'posts' | 'users' }) {
+	return (
+		<div className='flex h-[600px] flex-col'>
+			<div className='flex-1 overflow-auto'>
+				{activeIndex === 'posts' ? (
+					<Index indexName='polkassembly_posts'>
+						<div className='space-y-4'>
+							<Hits hitComponent={PostHit} />
+						</div>
+						<div className='sticky bottom-0 mt-4 border-t bg-white p-4 dark:bg-gray-900'>
+							<Pagination />
+						</div>
+					</Index>
+				) : (
+					<Index indexName='polkassembly_users'>
+						<div className='space-y-4'>
+							<Hits hitComponent={UserHit} />
+						</div>
+						<div className='sticky bottom-0 mt-4 border-t bg-white p-4 dark:bg-gray-900'>
+							<Pagination />
+						</div>
+					</Index>
+				)}
+			</div>
+		</div>
+	);
 }
 
-export enum EMultipleCheckFilters {
-	Tracks = 'track',
-	Tags = 'tags',
-	Topic = 'topic',
-	Chain = 'chains'
-}
+export default function Search() {
+	const [activeIndex, setActiveIndex] = useState<'posts' | 'users'>('posts');
 
-export enum EDateFilter {
-	Today = 'today',
-	Last_7_days = 'last_7_days',
-	Last_30_days = 'last_30_days',
-	Last_3_months = 'last_3_months'
-}
-
-const gov1Tracks = ['tips', 'council_motions', 'bounties', 'child_bounties', 'treasury_proposals', 'democracy_proposals', 'tech_committee_proposals', 'referendums'];
-
-function Search() {
-	// const userIndex = algoliaClient.initIndex('polkassembly_users');
-	// const postIndex = algoliaClient.initIndex('polkassembly_posts');
-	// const addressIndex = algoliaClient?.initIndex('polkassembly_addresses');
-
-	// console.log(userIndex, postIndex, addressIndex);
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -88,44 +128,101 @@ function Search() {
 				<DialogHeader>
 					<DialogTitle className='text-xl font-bold text-btn_secondary_text'>Search</DialogTitle>
 				</DialogHeader>
-				<div>
-					<div className='relative'>
-						<Input
-							className='border-bg_pink pr-10 placeholder:text-text_primary'
-							placeholder='Type here to search for something'
+
+				<InstantSearch
+					searchClient={searchClient}
+					indexName={activeIndex === 'posts' ? 'polkassembly_posts' : 'polkassembly_users'}
+					insights
+				>
+					<Configure
+						hitsPerPage={10}
+						distinct
+					/>
+
+					<div className='mb-6'>
+						<SearchBox
+							placeholder='Type at least 3 characters to search...'
+							classNames={{
+								root: 'w-full',
+								form: 'relative',
+								input: 'w-full rounded-md border-pink-500 p-2 pr-10',
+								submit: 'absolute right-2 top-1/2 -translate-y-1/2',
+								submitIcon: 'text-xl text-pink-500',
+								loadingIndicator: 'absolute right-10 top-1/2 -translate-y-1/2'
+							}}
 						/>
-						<div className='absolute right-0 top-1/2 h-10 -translate-y-1/2 rounded-r-md bg-bg_pink p-2'>
-							<IoIosSearch className='text-xl text-white' />
-						</div>
 					</div>
-					<InstantSearch
-						searchClient={algoliaClient}
-						indexName='polkassembly_users'
-						insights
-					>
-						<SearchBox />
-						<RefinementList attribute='brand' />
-						<Hits hitComponent={Hit} />
-					</InstantSearch>
-					<div className='mt-8 flex h-[360px] flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
-						<Image
-							src={searchGif}
-							alt='search-icon'
-							width={274}
-							height={274}
-							className='-my-[40px]'
-							priority
-						/>
-						<span className='mt-8 text-center tracking-[0.01em]'>Welcome to the all new & supercharged search!</span>
-						<div className='mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em]'>
-							powered by
-							<PaLogo className='h-[30px] w-[99px]' />
+
+					<div className='grid grid-cols-[200px_1fr] gap-6'>
+						<div className='space-y-6'>
+							<div>
+								<h3 className='mb-2 font-medium'>Search In</h3>
+								<div className='flex flex-col gap-2'>
+									<button
+										type='button'
+										className={`rounded-md px-3 py-2 text-left text-sm ${activeIndex === 'posts' ? 'bg-pink-100 text-pink-800' : 'text-gray-600 hover:bg-gray-100'}`}
+										onClick={() => setActiveIndex('posts')}
+									>
+										Posts
+									</button>
+									<button
+										type='button'
+										className={`rounded-md px-3 py-2 text-left text-sm ${activeIndex === 'users' ? 'bg-pink-100 text-pink-800' : 'text-gray-600 hover:bg-gray-100'}`}
+										onClick={() => setActiveIndex('users')}
+									>
+										Users
+									</button>
+								</div>
+							</div>
+
+							{activeIndex === 'posts' && (
+								<>
+									<div>
+										<h3 className='mb-2 font-medium'>Post Type</h3>
+										<RefinementList
+											attribute='post_type'
+											classNames={{
+												list: 'space-y-2',
+												label: 'flex items-center gap-2',
+												checkbox: 'rounded border-gray-300',
+												count: 'ml-auto text-sm text-gray-500'
+											}}
+										/>
+									</div>
+
+									<div>
+										<h3 className='mb-2 font-medium'>Networks</h3>
+										<RefinementList
+											attribute='network'
+											classNames={{
+												list: 'space-y-2',
+												label: 'flex items-center gap-2',
+												checkbox: 'rounded border-gray-300',
+												count: 'ml-auto text-sm text-gray-500'
+											}}
+										/>
+									</div>
+
+									<div>
+										<h3 className='mb-2 font-medium'>Tags</h3>
+										<RefinementList
+											attribute='tags'
+											classNames={{
+												list: 'space-y-2',
+												label: 'flex items-center gap-2',
+												checkbox: 'rounded border-gray-300',
+												count: 'ml-auto text-sm text-gray-500'
+											}}
+										/>
+									</div>
+								</>
+							)}
 						</div>
+
+						<SearchResults activeIndex={activeIndex} />
 					</div>
-				</div>
+				</InstantSearch>
 			</DialogContent>
 		</Dialog>
 	);
 }
-
-export default Search;
