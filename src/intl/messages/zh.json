@@ -661,7 +661,8 @@
 		"preimageNotedSuccessfully": "预映像记录成功",
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageNoteFailed": "预映像记录失败",
-		"preimageNoteFailedDescription": "记录预映像时发生错误"
+		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"selectTrack": "选择轨道"
 	},
 	"CreatePreimage": {
 		"addItem": "添加项目",
@@ -673,7 +674,9 @@
 		"preimageNoteFailed": "预映像记录失败",
 		"preimageNoteFailedDescription": "记录预映像时发生错误",
 		"preimageNotedSuccessfully": "预映像记录成功",
-		"preimageNotedSuccessfullyDescription": "预映像已成功记录"
+		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
+		"preimageHash": "预映像哈希",
+		"length": "长度"
 	},
 	"AddressInput": {
 		"invalidAddress": "无效地址",

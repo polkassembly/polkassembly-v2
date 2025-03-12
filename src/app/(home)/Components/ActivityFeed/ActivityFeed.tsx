@@ -16,7 +16,7 @@ import styles from './ActivityFeed.module.scss';
 import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
+function ActivityFeedComp({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
 	const { state } = useSidebar();
@@ -62,4 +62,4 @@ function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IP
 	);
 }
 
-export default ActivityFeed;
+export default ActivityFeedComp;

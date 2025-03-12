@@ -24,7 +24,7 @@ function BalanceInput({
 }: {
 	label: string;
 	placeholder?: string;
-	onChange?: (value: BN, assetId: string | null) => void;
+	onChange?: ({ value, assetId }: { value: BN; assetId: string | null }) => void;
 	name?: string;
 	disabled?: boolean;
 	defaultValue?: BN;
@@ -51,10 +51,10 @@ function BalanceInput({
 
 		if (isValid) {
 			setError('');
-			onChange?.(bnValue, assetId);
+			onChange?.({ value: bnValue, assetId });
 		} else {
 			setError('Invalid Amount');
-			onChange?.(BN_ZERO, assetId);
+			onChange?.({ value: BN_ZERO, assetId });
 		}
 	};
 

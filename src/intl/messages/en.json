@@ -681,7 +681,8 @@
 		"preimageNotedSuccessfully": "Preimage noted successfully",
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageNoteFailed": "Failed to note preimage",
-		"preimageNoteFailedDescription": "There was an error while noting the preimage"
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"selectTrack": "Select Track"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Item",
@@ -693,7 +694,9 @@
 		"preimageNoteFailed": "Failed to note preimage",
 		"preimageNoteFailedDescription": "There was an error while noting the preimage",
 		"preimageNotedSuccessfully": "Preimage noted successfully",
-		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully"
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageHash": "Preimage Hash",
+		"length": "Length"
 	},
 	"AddressInput": {
 		"invalidAddress": "Invalid Address",

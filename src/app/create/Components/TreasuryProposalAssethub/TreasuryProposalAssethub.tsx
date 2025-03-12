@@ -11,7 +11,7 @@ import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/Wall
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
@@ -19,6 +19,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import MultipleBeneficiaryForm from '@/app/_shared-components/Create/MultipleBeneficiaryForm/MultipleBeneficiaryForm';
 import SelectTrack from '@/app/_shared-components/Create/SelectTrack/SelectTrack';
 import EnactmentForm from '@/app/_shared-components/Create/EnactmentForm/EnactmentForm';
+import PreimageDetailsView from '@/app/_shared-components/Create/PreimageDetailsView/PreimageDetailsView';
 
 function TreasuryProposalAssethub() {
 	const t = useTranslations();
@@ -29,7 +30,6 @@ function TreasuryProposalAssethub() {
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const [preimageDetails, setPreimageDetails] = useState<{ preimageHash: string; preimageLength: number }>({
 		preimageHash: '',
 		preimageLength: 0
@@ -39,7 +39,19 @@ function TreasuryProposalAssethub() {
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
-	const createProposal = async (preimageHash: string, preimageLength: number) => {
+	useEffect(() => {
+		if (!apiService) return;
+
+		const tx = apiService.getTreasurySpendLocalExtrinsic({ beneficiaries });
+		if (!tx) return;
+
+		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
+		if (!preImage) return;
+
+		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
+	}, [apiService, beneficiaries]);
+
+	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
 		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength) {
 			setLoading(false);
 			return;
@@ -103,7 +115,7 @@ function TreasuryProposalAssethub() {
 					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				createProposal(preImage.preimageHash, preImage.preimageLength);
+				createProposal({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
 			},
 			onFailed: () => {
 				toast({
@@ -143,6 +155,12 @@ function TreasuryProposalAssethub() {
 					/>
 				</div>
 
+				{preimageDetails.preimageHash && (
+					<PreimageDetailsView
+						preimageHash={preimageDetails.preimageHash}
+						preimageLength={preimageDetails.preimageLength}
+					/>
+				)}
 				<div className='flex justify-end'>
 					<Button
 						type='submit'

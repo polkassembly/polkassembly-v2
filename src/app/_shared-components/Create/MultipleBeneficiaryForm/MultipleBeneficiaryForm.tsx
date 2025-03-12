@@ -20,13 +20,13 @@ function MultipleBeneficiaryForm({
 }) {
 	const t = useTranslations();
 
-	const handleBeneficiaryChange = (beneficiary: string, index: number) => {
+	const handleBeneficiaryChange = ({ beneficiary, index }: { beneficiary: string; index: number }) => {
 		const newArray = [...beneficiaries];
 		newArray[`${index}`].address = beneficiary;
 		onChange(newArray);
 	};
 
-	const handleAmountChange = (amount: BN, index: number, assetId: string | null) => {
+	const handleAmountChange = ({ amount, assetId, index }: { amount: BN; assetId: string | null; index: number }) => {
 		const newArray = [...beneficiaries];
 		newArray[`${index}`].amount = amount.toString();
 		newArray[`${index}`].assetId = assetId;
@@ -55,13 +55,13 @@ function MultipleBeneficiaryForm({
 								<p className='mb-1 text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.beneficiary')}</p>
 								<AddressInput
 									className='flex-1'
-									onChange={(value) => handleBeneficiaryChange(value, index)}
+									onChange={(value) => handleBeneficiaryChange({ beneficiary: value, index })}
 								/>
 							</div>
 							<BalanceInput
 								disabledMultiAsset={disabledMultiAsset}
 								label={t('CreateTreasuryProposal.amount')}
-								onChange={(value, assetId) => handleAmountChange(value, index, assetId)}
+								onChange={({ value, assetId }) => handleAmountChange({ amount: value, assetId, index })}
 							/>
 						</div>
 						{index > 0 && (

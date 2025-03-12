@@ -23,7 +23,9 @@ function SelectTrack({ selectedTrack, onChange }: { selectedTrack?: string; onCh
 		<div className='flex flex-col gap-y-1'>
 			<p>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2'>{selectedTrack || 'Select Track'}</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2'>
+					{selectedTrack || t('CreateTreasuryProposal.selectTrack')}
+				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{trackArr.map((track) => (
 						<DropdownMenuItem

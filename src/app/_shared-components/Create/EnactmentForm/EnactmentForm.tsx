@@ -51,7 +51,7 @@ function EnactmentForm({
 						<div className='capitalize'>{option.split('_').join(' ')}</div>
 						<InputNumber
 							onChange={(value) => onEnactmentValueChange({ ...advancedDetails, [option]: new BN(value) })}
-							defaultValue={advancedDetails[`${option}`].toString()}
+							value={advancedDetails[`${option}`].toString()}
 							className='w-fit'
 						/>
 					</div>

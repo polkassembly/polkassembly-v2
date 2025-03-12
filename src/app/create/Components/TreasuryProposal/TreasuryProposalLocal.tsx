@@ -20,6 +20,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import MultipleBeneficiaryForm from '@/app/_shared-components/Create/MultipleBeneficiaryForm/MultipleBeneficiaryForm';
 import SelectTrack from '@/app/_shared-components/Create/SelectTrack/SelectTrack';
 import EnactmentForm from '@/app/_shared-components/Create/EnactmentForm/EnactmentForm';
+import PreimageDetailsView from '@/app/_shared-components/Create/PreimageDetailsView/PreimageDetailsView';
 
 function TreasuryProposalLocal() {
 	const t = useTranslations();
@@ -31,7 +32,6 @@ function TreasuryProposalLocal() {
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const [preimageDetails, setPreimageDetails] = useState<{ preimageHash: string; preimageLength: number }>({
 		preimageHash: '',
 		preimageLength: 0
@@ -43,9 +43,19 @@ function TreasuryProposalLocal() {
 
 	useEffect(() => {
 		setTotalAmount(beneficiaries.reduce((acc, curr) => acc.add(new BN(curr.amount)), BN_ZERO));
-	}, [beneficiaries]);
 
-	const createProposal = async (preimageHash: string, preimageLength: number) => {
+		if (!apiService) return;
+
+		const tx = apiService.getTreasurySpendLocalExtrinsic({ beneficiaries });
+		if (!tx) return;
+
+		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
+		if (!preImage) return;
+
+		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
+	}, [apiService, beneficiaries]);
+
+	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
 		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength) {
 			setLoading(false);
 			return;
@@ -110,7 +120,7 @@ function TreasuryProposalLocal() {
 					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				createProposal(preImage.preimageHash, preImage.preimageLength);
+				createProposal({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
 			},
 			onFailed: () => {
 				toast({
@@ -156,6 +166,13 @@ function TreasuryProposalLocal() {
 						onEnactmentValueChange={setAdvancedDetails}
 					/>
 				</div>
+
+				{preimageDetails.preimageHash && (
+					<PreimageDetailsView
+						preimageHash={preimageDetails.preimageHash}
+						preimageLength={preimageDetails.preimageLength}
+					/>
+				)}
 
 				<div className='flex justify-end'>
 					<Button

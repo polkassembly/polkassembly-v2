@@ -3,10 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
-import ActivityFeed from './ActivityFeed/ActivityFeed';
+import ActivityFeedComp from './ActivityFeed/ActivityFeed';
 
-function ActivityFeedComponent({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
-	return <ActivityFeed initialData={initialData} />;
+function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
+	return <ActivityFeedComp initialData={initialData} />;
 }
 
-export default ActivityFeedComponent;
+export default ActivityFeed;

@@ -661,7 +661,8 @@
 		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
 		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
 		"preimageNoteFailed": "Error al anotar la preimagen",
-		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen"
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"selectTrack": "Seleccionar Pista"
 	},
 	"CreatePreimage": {
 		"addItem": "Agregar Elemento",
@@ -673,7 +674,9 @@
 		"preimageNoteFailed": "Error al anotar la preimagen",
 		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
 		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
-		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente"
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageHash": "Hash de Preimagen",
+		"length": "Longitud"
 	},
 	"AddressInput": {
 		"invalidAddress": "Dirección Inválida",

@@ -661,7 +661,8 @@
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
 		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
-		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました"
+		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
+		"selectTrack": "トラックを選択"
 	},
 	"CreatePreimage": {
 		"addItem": "項目を追加",
@@ -673,7 +674,9 @@
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
 		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
-		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました"
+		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
+		"preimageHash": "プレイメージハッシュ",
+		"length": "長さ"
 	},
 	"AddressInput": {
 		"invalidAddress": "無効なアドレス",
