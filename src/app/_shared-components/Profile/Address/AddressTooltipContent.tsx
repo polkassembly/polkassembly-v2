@@ -141,14 +141,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 		<div>
 			<ProfileImage imageUrl={userData?.profileDetails?.image} />
 			<div className={classes.tooltipContentWrapper}>
-				<div
-					aria-hidden='true'
-					className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'
-					onClick={(e) => {
-						e.stopPropagation();
-						e.preventDefault();
-					}}
-				>
+				<div className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'>
 					<div className={`flex flex-col gap-1.5 ${hasUserData ? 'px-2' : 'px-4'}`}>
 						<AddressDisplay
 							address={address}
