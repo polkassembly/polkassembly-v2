@@ -85,7 +85,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 		navigator.clipboard.writeText(text);
 		toast({
 			title: 'Address copied to clipboard',
-			status: NotificationType.COPY_ADDRESS
+			status: NotificationType.INFO
 		});
 	}, []);
 

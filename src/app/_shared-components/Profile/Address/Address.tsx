@@ -62,7 +62,7 @@ function Address({
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || '');
 	const [identity, setIdentity] = useState<IOnChainIdentity | undefined>();
 
-	const linkHref = useMemo(() => {
+	const userProfileUrl = useMemo(() => {
 		if (!network || isUserDataLoading) return undefined;
 		const username = userData?.username;
 		return username && username.length > 0 ? `/user/username/${username}` : address.length > 0 ? `/user/address/${address}` : undefined;
@@ -96,7 +96,7 @@ function Address({
 				address={encodedAddress}
 				onChainIdentity={identity}
 				addressDisplayText={displayText}
-				userProfileUrl={linkHref}
+				userProfileUrl={userProfileUrl}
 				iconSize={iconSize}
 				showIdenticon={showIdenticon}
 				textClassName={textClassName}
@@ -115,7 +115,7 @@ function Address({
 								className={className}
 								address={encodedAddress}
 								onChainIdentity={identity}
-								userProfileUrl={linkHref}
+								userProfileUrl={userProfileUrl}
 								addressDisplayText={displayText}
 								iconSize={iconSize}
 								showIdenticon={showIdenticon}
@@ -127,7 +127,7 @@ function Address({
 					<TooltipContent className={`${classes.tooltipContent} w-[340px] bg-address_tooltip_bg`}>
 						<AddressTooltipContent
 							address={encodedAddress}
-							userProfileUrl={linkHref}
+							userProfileUrl={userProfileUrl}
 							displayText={displayText}
 							identity={identity}
 							userData={userData ?? undefined}

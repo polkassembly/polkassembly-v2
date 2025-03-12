@@ -14,8 +14,7 @@ const ICON_MAP = {
 	[NotificationType.SUCCESS]: <FaCircleCheck className={styles.toast_success_icon} />,
 	[NotificationType.ERROR]: <IoIosCloseCircle className={styles.toast_error_icon} />,
 	[NotificationType.WARNING]: <IoIosInformationCircle className={styles.toast_warning_icon} />,
-	[NotificationType.INFO]: <MdInfoOutline className={styles.toast_info_icon} />,
-	[NotificationType.COPY_ADDRESS]: <FaCircleCheck className={styles.toast_copy_icon} />
+	[NotificationType.INFO]: <MdInfoOutline className={styles.toast_info_icon} />
 } as const;
 
 const getIconForStatus = (status: NotificationType) => ICON_MAP[status as keyof typeof ICON_MAP] ?? null;
