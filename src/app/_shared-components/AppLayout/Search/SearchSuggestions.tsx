@@ -2,26 +2,36 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Highlight, useInstantSearch } from 'react-instantsearch';
+import { useInstantSearch } from 'react-instantsearch';
 
-function SearchSuggestions({ query }: { query: string }) {
+interface SearchHit {
+	objectID: string;
+	title?: string;
+	username?: string;
+}
+
+function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSuggestionClick: (value: string) => void }) {
 	const { results } = useInstantSearch();
 
 	if (query.length < 3 || !results.hits.length) return null;
 
+	const handleClick = (hit: SearchHit) => {
+		const value = hit.title || hit.username || '';
+		onSuggestionClick(value);
+	};
+
 	return (
 		<div className='absolute top-full z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800'>
-			<div className='max-h-60 overflow-auto p-2'>
-				{results.hits.slice(0, 5).map((hit: any) => (
-					<div
+			<div className='max-h-60 w-full overflow-auto p-2'>
+				{results.hits.slice(0, 5).map((hit: SearchHit) => (
+					<button
+						type='button'
 						key={hit.objectID}
-						className='cursor-pointer rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+						className='w-full cursor-pointer rounded-md p-2 text-start hover:bg-gray-100 dark:hover:bg-gray-700'
+						onClick={() => handleClick(hit)}
 					>
-						<Highlight
-							attribute={hit.title ? 'title' : 'username'}
-							hit={hit}
-						/>
-					</div>
+						<p>{hit.title || hit.username}</p>
+					</button>
 				))}
 			</div>
 		</div>

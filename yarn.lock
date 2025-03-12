@@ -144,31 +144,10 @@
     "@csstools/css-tokenizer" "^3.0.3"
     lru-cache "^10.4.3"
 
-<<<<<<< HEAD
-"@babel/runtime@^7.1.2":
-  version "7.26.10"
-  resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.26.10.tgz"
-  integrity sha512-2WJMeRQPHKSPemqk/awGrAiuFfzBmOIPXKizAsVhWH9YJqLZ0H+HS4c8loHGgW6utJ3E/ejXQUsiGaQy2NZ9Fw==
-  dependencies:
-    regenerator-runtime "^0.14.0"
-
-"@babel/runtime@^7.10.2":
-  version "7.26.7"
-  resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.26.7.tgz"
-  integrity sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==
-  dependencies:
-    regenerator-runtime "^0.14.0"
-
-"@babel/runtime@^7.20.13":
-  version "7.26.7"
-  resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.26.7.tgz"
-  integrity sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==
-=======
 "@babel/runtime@^7.10.2", "@babel/runtime@^7.20.13":
   version "7.26.9"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.26.9.tgz#aa4c6facc65b9cb3f87d75125ffd47781b475433"
   integrity sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     regenerator-runtime "^0.14.0"
 
@@ -498,9 +477,6 @@
     "@formatjs/ecma402-abstract" "2.3.3"
     tslib "2"
 
-<<<<<<< HEAD
-"@formatjs/intl-localematcher@^0.5.4", "@formatjs/intl-localematcher@0.5.10":
-=======
 "@formatjs/intl-localematcher@0.6.0":
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.6.0.tgz#33cf0d33279572c990e02ab75a93122569878082"
@@ -509,7 +485,6 @@
     tslib "2"
 
 "@formatjs/intl-localematcher@^0.5.4":
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   version "0.5.10"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.5.10.tgz#1e0bd3fc1332c1fe4540cfa28f07e9227b659a58"
   integrity sha512-af3qATX+m4Rnd9+wHcjJ4w2ijq+rAVP3CCinJQvFv1kgSu1W6jypUmvleJxcewdxmutM8dmIRZFxO/IQBZmP2Q==
@@ -736,8 +711,6 @@
   resolved "https://registry.yarnpkg.com/@next/swc-darwin-arm64/-/swc-darwin-arm64-15.1.6.tgz#92f99badab6cb41f4c5c11a3feffa574bd6a9276"
   integrity sha512-u7lg4Mpl9qWpKgy6NzEkz/w0/keEHtOybmIl0ykgItBxEM5mYotS5PmqTpo+Rhg8FiOiWgwr8USxmKQkqLBCrw==
 
-<<<<<<< HEAD
-=======
 "@next/swc-darwin-x64@15.1.6":
   version "15.1.6"
   resolved "https://registry.yarnpkg.com/@next/swc-darwin-x64/-/swc-darwin-x64-15.1.6.tgz#f56f4f8d5f6cb5d3915912ac95590d387f897da5"
@@ -780,7 +753,6 @@
   dependencies:
     "@noble/hashes" "1.4.0"
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 "@noble/curves@^1.3.0":
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.8.1.tgz#19bc3970e205c99e4bdb1c64a4785706bce497ff"
@@ -815,14 +787,11 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.6.1.tgz#df6e5943edcea504bac61395926d6fd67869a0d5"
   integrity sha512-pq5D8h10hHBjyqX+cfBm0i8JUXJ0UhczFc4r74zbuT9XgewFo2E3J1cOaGtdZynILNmQ685YWGzGE1Zv6io50w==
 
-<<<<<<< HEAD
-=======
 "@noble/hashes@1.7.1", "@noble/hashes@^1.1.5", "@noble/hashes@^1.3.1", "@noble/hashes@^1.3.3":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.7.1.tgz#5738f6d765710921e7a751e00c20ae091ed8db0f"
   integrity sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -1058,40 +1027,10 @@
     rxjs "^7.8.1"
     tslib "^2.7.0"
 
-<<<<<<< HEAD
-"@polkadot/api@^15.0.1":
-  version "15.5.2"
-  resolved "https://registry.npmjs.org/@polkadot/api/-/api-15.5.2.tgz"
-  integrity sha512-TZPJlnoYr5kAfINooSmbvUcUCQnKDmTdLKNJmMh7CvCOYqQSJjFnMyfxhjM1bBTIcqnP9nFIGkldy19ErZHtcQ==
-  dependencies:
-    "@polkadot/api-augment" "15.5.2"
-    "@polkadot/api-base" "15.5.2"
-    "@polkadot/api-derive" "15.5.2"
-    "@polkadot/keyring" "^13.3.1"
-    "@polkadot/rpc-augment" "15.5.2"
-    "@polkadot/rpc-core" "15.5.2"
-    "@polkadot/rpc-provider" "15.5.2"
-    "@polkadot/types" "15.5.2"
-    "@polkadot/types-augment" "15.5.2"
-    "@polkadot/types-codec" "15.5.2"
-    "@polkadot/types-create" "15.5.2"
-    "@polkadot/types-known" "15.5.2"
-    "@polkadot/util" "^13.3.1"
-    "@polkadot/util-crypto" "^13.3.1"
-    eventemitter3 "^5.0.1"
-    rxjs "^7.8.1"
-    tslib "^2.8.1"
-
-"@polkadot/api@15.5.2":
-  version "15.5.2"
-  resolved "https://registry.npmjs.org/@polkadot/api/-/api-15.5.2.tgz"
-  integrity sha512-TZPJlnoYr5kAfINooSmbvUcUCQnKDmTdLKNJmMh7CvCOYqQSJjFnMyfxhjM1bBTIcqnP9nFIGkldy19ErZHtcQ==
-=======
 "@polkadot/api@15.7.2", "@polkadot/api@^15.0.1":
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-15.7.2.tgz#45dd78d7f5a6f265fc66bb96e991238383a510ef"
   integrity sha512-B11cjOuxrs0BNFEXeq95NGD4DfFz0PC6PIjjk7JkhYMvm9LI22MOXdMkxVKf48mxF+ecEz15F2iuRthnnjqK1g==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     "@polkadot/api-augment" "15.7.2"
     "@polkadot/api-base" "15.7.2"
@@ -1143,17 +1082,10 @@
     "@polkadot/util-crypto" "13.4.3"
     tslib "^2.8.0"
 
-<<<<<<< HEAD
-"@polkadot/networks@^13.1.1", "@polkadot/networks@^13.3.1", "@polkadot/networks@13.3.1":
-  version "13.3.1"
-  resolved "https://registry.npmjs.org/@polkadot/networks/-/networks-13.3.1.tgz"
-  integrity sha512-g/0OmCMUrbbW4RQ/xajTYd2SMJvFKY4kmMvpxtNN57hWQpY7c5oDXSz57jGH2uwvcBWeDfaNokcS+9hJL1RBcA==
-=======
 "@polkadot/networks@13.4.3", "@polkadot/networks@^13.1.1", "@polkadot/networks@^13.4.3":
   version "13.4.3"
   resolved "https://registry.yarnpkg.com/@polkadot/networks/-/networks-13.4.3.tgz#383a696fdc76ec4e70bf6a7360a87970ff7f7d06"
   integrity sha512-Z+YZkltBt//CtkVH8ZYJ1z66qYxdI0yPamzkzZAqw6gj3gjgSxKtxB4baA/rcAw05QTvN2R3dLkkmKr2mnHovQ==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     "@polkadot/util" "13.4.3"
     "@substrate/ss58-registry" "^1.51.0"
@@ -1261,8 +1193,6 @@
   optionalDependencies:
     "@substrate/connect" "0.8.11"
 
-<<<<<<< HEAD
-=======
 "@polkadot/rpc-provider@15.7.2", "@polkadot/rpc-provider@^15.0.1":
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/@polkadot/rpc-provider/-/rpc-provider-15.7.2.tgz#5e8d1a6b3145a3a57ef953d49742195bb5d09a3a"
@@ -1283,7 +1213,6 @@
   optionalDependencies:
     "@substrate/connect" "0.8.11"
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 "@polkadot/types-augment@13.2.1":
   version "13.2.1"
   resolved "https://registry.yarnpkg.com/@polkadot/types-augment/-/types-augment-13.2.1.tgz#15217286d3c5c243107d63fd0ab741aa2b06c4cf"
@@ -1394,17 +1323,10 @@
     rxjs "^7.8.1"
     tslib "^2.7.0"
 
-<<<<<<< HEAD
-"@polkadot/types@^15.0.1", "@polkadot/types@15.5.2":
-  version "15.5.2"
-  resolved "https://registry.npmjs.org/@polkadot/types/-/types-15.5.2.tgz"
-  integrity sha512-TANrhfovLgbG00ldFvZbOuwyzqibOOMAU9egGqnoFwz4x4vTNTBgNJRvQGF5w4+FhjcEepdxlLU/3yqFM98yzA==
-=======
 "@polkadot/types@15.7.2", "@polkadot/types@^15.0.1":
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/@polkadot/types/-/types-15.7.2.tgz#27bd3dbd569ca6b4e25f932bb1b8bdbf867e7522"
   integrity sha512-D4XUW0CwfzeSsGtZf6c/qSSWBVEylABbqgMsmyq6YclF1ZTCTFbd7rMCJ1XTIwt1BTRuvdWiGule2bnisundFA==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     "@polkadot/keyring" "^13.4.3"
     "@polkadot/types-augment" "15.7.2"
@@ -1434,17 +1356,10 @@
     colord "^2.9.3"
     tslib "^2.8.1"
 
-<<<<<<< HEAD
-"@polkadot/util-crypto@^13.0.2", "@polkadot/util-crypto@^13.1.1", "@polkadot/util-crypto@^13.2.3", "@polkadot/util-crypto@^13.3.1", "@polkadot/util-crypto@13.3.1":
-  version "13.3.1"
-  resolved "https://registry.npmjs.org/@polkadot/util-crypto/-/util-crypto-13.3.1.tgz"
-  integrity sha512-FU6yf3IY++DKlf0eqO9/obe2y1zuZ5rbqRs75fyOME/5VXio1fA3GIpW7aFphyneFRd78G8QLh8kn0oIwBGMNg==
-=======
 "@polkadot/util-crypto@13.4.3", "@polkadot/util-crypto@^13.0.2", "@polkadot/util-crypto@^13.1.1", "@polkadot/util-crypto@^13.2.3", "@polkadot/util-crypto@^13.4.3":
   version "13.4.3"
   resolved "https://registry.yarnpkg.com/@polkadot/util-crypto/-/util-crypto-13.4.3.tgz#6dbf3814949d6dc6f5f905bac26c057e9a5d18fc"
   integrity sha512-Ml0mjhKVetMrRCIosmVNMa6lbFPa3fSAeOggf34NsDIIQOKt9FL644iGz1ZSMOnBwN9qk2qHYmcFMTDXX2yKVQ==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     "@noble/curves" "^1.3.0"
     "@noble/hashes" "^1.3.3"
@@ -1457,17 +1372,10 @@
     "@scure/base" "^1.1.7"
     tslib "^2.8.0"
 
-<<<<<<< HEAD
-"@polkadot/util@^13.0.2", "@polkadot/util@^13.1.1", "@polkadot/util@^13.2.3", "@polkadot/util@^13.3.1", "@polkadot/util@13.3.1":
-  version "13.3.1"
-  resolved "https://registry.npmjs.org/@polkadot/util/-/util-13.3.1.tgz"
-  integrity sha512-5crLP/rUZOJzuo/W8t73J8PxpibJ5vrxY57rR6V+mIpCZd1ORiw0wxeHcV5F9Adpn7yJyuGBwxPbueNR5Rr1Zw==
-=======
 "@polkadot/util@13.4.3", "@polkadot/util@^13.0.2", "@polkadot/util@^13.1.1", "@polkadot/util@^13.2.3", "@polkadot/util@^13.4.3":
   version "13.4.3"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-13.4.3.tgz#b17449e89455b1f63aeedd5e73b7634b2d47f5a9"
   integrity sha512-6v2zvg8l7W22XvjYf7qv9tPQdYl2E6aXY94M4TZKsXZxmlS5BoG+A9Aq0+Gw8zBUjupjEmUkA6Y//msO8Zisug==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     "@polkadot/x-bigint" "13.4.3"
     "@polkadot/x-global" "13.4.3"
@@ -1530,17 +1438,10 @@
   dependencies:
     tslib "^2.7.0"
 
-<<<<<<< HEAD
-"@polkadot/x-bigint@^13.1.1", "@polkadot/x-bigint@^13.3.1", "@polkadot/x-bigint@13.3.1":
-  version "13.3.1"
-  resolved "https://registry.npmjs.org/@polkadot/x-bigint/-/x-bigint-13.3.1.tgz"
-  integrity sha512-ewc708a7LUdrT92v9DsSAIbcJQBn3aR9/LavF/iyMOq5lZJyPXDSjAnskfMs818R3RLCrKVKfs+aKkxt2eqo8g==
-=======
 "@polkadot/x-bigint@13.4.3", "@polkadot/x-bigint@^13.1.1", "@polkadot/x-bigint@^13.4.3":
   version "13.4.3"
   resolved "https://registry.yarnpkg.com/@polkadot/x-bigint/-/x-bigint-13.4.3.tgz#96223a7d540e828e82a37a3f470521dcccbb9f00"
   integrity sha512-8NbjF5Q+5lflhvDFve58wULjCVcvXa932LKFtI5zL2gx5VDhMgyfkNcYRjHB18Ecl21963JuGzvGVTZNkh/i6g==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     "@polkadot/x-global" "13.4.3"
     tslib "^2.8.0"
@@ -1554,17 +1455,10 @@
     node-fetch "^3.3.2"
     tslib "^2.8.0"
 
-<<<<<<< HEAD
-"@polkadot/x-global@^13.1.1", "@polkadot/x-global@^13.2.3", "@polkadot/x-global@^13.3.1", "@polkadot/x-global@13.3.1":
-  version "13.3.1"
-  resolved "https://registry.npmjs.org/@polkadot/x-global/-/x-global-13.3.1.tgz"
-  integrity sha512-861TeIw49a3JvkwlUWrddfG+JaUqtFZDsemYxxZIjjcRJLrKOsoKNqHbiHi2OPrwlX8PwAA/wc5I9Q4XRQ7KEg==
-=======
 "@polkadot/x-global@13.4.3", "@polkadot/x-global@^13.1.1", "@polkadot/x-global@^13.2.3", "@polkadot/x-global@^13.4.3":
   version "13.4.3"
   resolved "https://registry.yarnpkg.com/@polkadot/x-global/-/x-global-13.4.3.tgz#0f1d4606f16810061044e32a6e5af89651d31b59"
   integrity sha512-6c98kxZdoGRct3ua9Dz6/qz8wb3XFRUkaY+4+RzIgehKMPhu19pGWTrzmbJSyY9FtIpThuWKuDaBEvd5KgSxjA==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     tslib "^2.8.0"
 
@@ -2012,21 +1906,6 @@
     "@radix-ui/react-use-previous" "1.1.0"
     "@radix-ui/react-use-size" "1.1.0"
 
-<<<<<<< HEAD
-"@radix-ui/react-slot@^1.1.1", "@radix-ui/react-slot@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.1.1.tgz"
-  integrity sha512-RApLLOcINYJA+dMVbOju7MYv1Mb2EBp2nH4HdDzXTSyaR5optlm6Otrz1euW3HbdOR8UmmFK06TD+A9frYWv+g==
-  dependencies:
-    "@radix-ui/react-compose-refs" "1.1.1"
-
-"@radix-ui/react-slot@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.1.2.tgz"
-  integrity sha512-YAKxaiGsSQJ38VzKH86/BPRC4rh+b1Jpa+JneA5LRE7skmLPNAyeG8kPJj/oo4STLvlrs8vkf/iYyc3A5stYCQ==
-  dependencies:
-    "@radix-ui/react-compose-refs" "1.1.1"
-=======
 "@radix-ui/react-slot@1.1.2", "@radix-ui/react-slot@^1.1.1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-slot/-/react-slot-1.1.2.tgz#daffff7b2bfe99ade63b5168407680b93c00e1c6"
@@ -2046,7 +1925,6 @@
     "@radix-ui/react-use-controllable-state" "1.1.0"
     "@radix-ui/react-use-previous" "1.1.0"
     "@radix-ui/react-use-size" "1.1.0"
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 
 "@radix-ui/react-tabs@^1.1.2":
   version "1.1.3"
@@ -2486,17 +2364,10 @@
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-2.1.0.tgz#052aa67a48eccc4309d7f0191b7e41434b90bb78"
   integrity sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==
 
-<<<<<<< HEAD
-"@types/node@*":
-  version "22.13.1"
-  resolved "https://registry.npmjs.org/@types/node/-/node-22.13.1.tgz"
-  integrity sha512-jK8uzQlrvXqEU91UxiK5J7pKHyzgnI1Qnl0QDHIgVGuolJhRb9EEl28Cj9b3rGR8B2lhFCtvIm5os8lFnO/1Ew==
-=======
 "@types/node@*", "@types/node@>=13.7.0", "@types/node@^22.0.1":
   version "22.13.10"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.10.tgz#df9ea358c5ed991266becc3109dc2dc9125d77e4"
   integrity sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   dependencies:
     undici-types "~6.20.0"
 
@@ -2748,14 +2619,11 @@ agent-base@6:
   dependencies:
     debug "4"
 
-<<<<<<< HEAD
-=======
 agent-base@^7.1.0, agent-base@^7.1.2:
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-7.1.3.tgz#29435eb821bc4194633a5b89e5bc4703bafc25a1"
   integrity sha512-jRR5wdylq8CkOe6hei19GGZnxM6rBGwFl3Bg0YItGDimvjGtAvdZk4Pu6Cl4u4Igsws4a1fd1Vq3ezrhn4KmFw==
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 ajv@^6.12.4:
   version "6.12.6"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
@@ -3512,8 +3380,6 @@ dayjs@^1.11.13:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.13.tgz#92430b0139055c3ebb60150aa13e860a4b5a366c"
   integrity sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==
 
-<<<<<<< HEAD
-=======
 debug@4, debug@^4.1.0, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.3.7, debug@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.4.0.tgz#2b3f2aea2ffeb776477460267377dc8710faba8a"
@@ -3521,7 +3387,6 @@ debug@4, debug@^4.1.0, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.3.7, d
   dependencies:
     ms "^2.1.3"
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 debug@^3.2.7:
   version "3.2.7"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.7.tgz#72580b7e9145fb39b6676f9c5e5fb100b934179a"
@@ -4279,8 +4144,6 @@ fast-diff@^1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.3.0.tgz#ece407fa550a64d638536cd727e129c61616e0f0"
   integrity sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==
 
-<<<<<<< HEAD
-=======
 fast-glob@3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.1.tgz#784b4e897340f3dbbef17413b3f11acf03c874c4"
@@ -4292,7 +4155,6 @@ fast-glob@3.3.1:
     merge2 "^1.3.0"
     micromatch "^4.0.4"
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 fast-glob@^3.3.2:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.3.tgz#d06d585ce8dba90a16b0505c543c3ccfb3aeb818"
@@ -5629,14 +5491,11 @@ lru-cache@6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-<<<<<<< HEAD
-=======
 lru-cache@^10.2.0, lru-cache@^10.4.3:
   version "10.4.3"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.4.3.tgz#410fc8a17b70e598013df257c2446b7f3383f119"
   integrity sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 lru-memoizer@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/lru-memoizer/-/lru-memoizer-2.3.0.tgz#ef0fbc021bceb666794b145eefac6be49dc47f31"
@@ -6277,12 +6136,6 @@ postcss@8.4.49:
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 
-<<<<<<< HEAD
-preact@^10.10.0:
-  version "10.26.4"
-  resolved "https://registry.npmjs.org/preact/-/preact-10.26.4.tgz"
-  integrity sha512-KJhO7LBFTjP71d83trW+Ilnjbo+ySsaAgCfXOXUlmGzJ4ygYPWmysm77yg4emwfmoz3b22yvH5IsVFHbhUaH5w==
-=======
 postcss@^8, postcss@^8.4.47:
   version "8.5.3"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.3.tgz#1463b6f1c7fb16fe258736cba29a2de35237eafb"
@@ -6291,7 +6144,6 @@ postcss@^8, postcss@^8.4.47:
     nanoid "^3.3.8"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 
 prelude-ls@^1.2.1:
   version "1.2.1"
@@ -6537,11 +6389,7 @@ react-textarea-autosize@^8.3.2:
 
 react-tinder-card@^1.6.4:
   version "1.6.4"
-<<<<<<< HEAD
-  resolved "https://registry.npmjs.org/react-tinder-card/-/react-tinder-card-1.6.4.tgz"
-=======
   resolved "https://registry.yarnpkg.com/react-tinder-card/-/react-tinder-card-1.6.4.tgz#af24e8325f5e5e1e45dc85ac70f01aa8bafe248e"
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   integrity sha512-IC6YXoBZ+51jm7XsT8i+8G/ov8rvAob+kBRdp9unQyjsLc7jmuYb1cNfu95Q3mdFDgwE0AzTIyl1o2Klm61+aQ==
   dependencies:
     p-sleep "^1.1.0"
@@ -7010,11 +6858,7 @@ smoldot@2.0.26:
   dependencies:
     ws "^8.8.1"
 
-<<<<<<< HEAD
-source-map-js@^1.0.2, source-map-js@^1.2.0, source-map-js@^1.2.1, "source-map-js@>=0.6.2 <2.0.0":
-=======
 "source-map-js@>=0.6.2 <2.0.0", source-map-js@^1.0.2, source-map-js@^1.2.1:
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
@@ -7167,8 +7011,6 @@ string.prototype.trimstart@^1.0.8:
     define-properties "^1.2.1"
     es-object-atoms "^1.0.0"
 
-<<<<<<< HEAD
-=======
 string_decoder@^1.1.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.3.0.tgz#42f114594a46cf1a8e30b0a84f56c78c3edac21e"
@@ -7176,7 +7018,6 @@ string_decoder@^1.1.1:
   dependencies:
     safe-buffer "~5.2.0"
 
->>>>>>> cc5f0072ba88cbc89689c0691a4cb9470212dd1a
 "strip-ansi-cjs@npm:strip-ansi@^6.0.1":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
