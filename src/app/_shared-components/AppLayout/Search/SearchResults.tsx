@@ -6,16 +6,20 @@ import Image from 'next/image';
 import searchGif from '@assets/search/search.gif';
 import searchLoader from '@assets/search/search-loader.gif';
 import userIcon from '@assets/profile/user-icon.svg';
-import { Hits, Index, useInstantSearch, useSearchBox, Configure } from 'react-instantsearch';
+import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
 import CommentIcon from '@assets/icons/Comment.svg';
+import { FaMagic } from 'react-icons/fa';
 import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
+import { Button } from '../../Button';
+import { PaginationWithLinks } from '../../PaginationWithLinks';
+import { allowedNetwork } from './Filters';
 
 export const POST_TOPIC_MAP = {
 	AUCTION_ADMIN: 8,
@@ -69,7 +73,6 @@ interface User {
 
 function PostHit({ hit }: { hit: Post }) {
 	const topic = hit.topic_id ? Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === hit.topic_id) : null;
-	console.log('hit', hit);
 	return (
 		<Link
 			href={hit.post_type !== 'discussions' ? `/referenda/${hit.id}` : `/post/${hit.id}`}
@@ -145,7 +148,12 @@ function PostHit({ hit }: { hit: Post }) {
 				)}
 				{topic && (
 					<div className='flex items-center gap-2'>
-						<span className='rounded bg-gray-100 px-2 py-1 text-xs text-gray-800'>{topic.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</span>{' '}
+						<span className='rounded bg-gray-100 px-2 py-1 text-xs text-gray-800'>
+							{topic
+								.replace(/_/g, ' ')
+								.toLowerCase()
+								.replace(/^\w/, (c) => c.toUpperCase())}
+						</span>{' '}
 						<Separator
 							orientation='vertical'
 							className='h-4'
@@ -183,63 +191,145 @@ function UserHit({ hit }: { hit: User }) {
 	);
 }
 
-function SearchResults({ activeIndex }: { activeIndex: 'posts' | 'users' | 'discussions' | null }) {
-	const { status } = useInstantSearch();
+function SearchResults({
+	activeIndex,
+	onSuperSearch,
+	isSuperSearch
+}: {
+	activeIndex: 'posts' | 'users' | 'discussions' | null;
+	onSuperSearch: () => void;
+	isSuperSearch: boolean;
+}) {
+	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
+	const { currentRefinement, refine } = usePagination();
+
 	const isLoading = status === 'loading';
+	const hasNoResults = results?.nbHits === 0 && query.length > 3;
 
 	return (
-		<div className='flex h-[400px] flex-col'>
-			{isLoading ? (
-				<div className='mt-8 flex h-[360px] flex-col items-center justify-center'>
-					<Image
-						src={searchLoader}
-						alt='search-loader'
-						width={274}
-						height={274}
-						className='-my-[40px]'
-						priority
-					/>
-				</div>
-			) : query.length > 3 ? (
-				<div className='flex-1 overflow-auto'>
-					{activeIndex === 'posts' ? (
-						<Index indexName='polkassembly_posts'>
-							<Configure filters='NOT post_type:discussions AND NOT post_type:grants' />
-							<div className='space-y-4'>
-								<Hits hitComponent={PostHit} />
-							</div>
-						</Index>
-					) : activeIndex === 'discussions' ? (
-						<Index indexName='polkassembly_posts'>
-							<Configure filters="post_type:'discussions' OR post_type:'grants'" />
-							<div className='space-y-4'>
-								<Hits hitComponent={PostHit} />
-							</div>
-						</Index>
-					) : (
-						<Index indexName='polkassembly_users'>
-							<div className='space-y-4'>
-								<Hits hitComponent={UserHit} />
-							</div>
-						</Index>
-					)}
-				</div>
-			) : (
-				<div className='mt-8 flex h-[360px] flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
-					<Image
-						src={searchGif}
-						alt='search-icon'
-						width={274}
-						height={274}
-						className='-my-[40px]'
-						priority
-					/>
-					<span className='mt-8 text-center tracking-[0.01em]'>Welcome to the all new & supercharged search!</span>
-					<div className='mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em]'>
-						powered by
-						<PaLogo className='h-[30px] w-[99px]' />
+		<div>
+			<div className='h-[350px] overflow-hidden'>
+				{isLoading ? (
+					<div className='flex h-full items-center justify-center'>
+						<Image
+							src={searchLoader}
+							alt='search-loader'
+							width={274}
+							height={274}
+							className='-my-[40px]'
+							priority
+						/>
 					</div>
+				) : query.length > 3 ? (
+					<div className='h-full'>
+						{hasNoResults ? (
+							<div className='flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
+								<Image
+									src={searchGif}
+									alt='search-icon'
+									width={274}
+									height={274}
+									className='-my-[40px]'
+									priority
+								/>
+								<p className='mb-2 text-sm text-text_primary'>No search results found. You may want to try using different keywords.</p>
+								<Button
+									className='mt-4 flex items-center gap-2'
+									onClick={onSuperSearch}
+								>
+									<FaMagic /> Use Super Search
+								</Button>
+								<div className='mt-4 flex items-center gap-2'>
+									<span className='text-text_secondary text-sm'>OR</span>
+								</div>
+								<div className='mb-10 mt-4'>
+									<span className='flex items-center gap-2 text-sm text-text_primary'>
+										See
+										<Link
+											href='https://polkadot.polkassembly.io/opengov'
+											className='text-text_pink underline'
+										>
+											Latest Activity
+										</Link>
+										<span>on Polkassembly.</span>
+									</span>
+								</div>
+							</div>
+						) : (
+							<div className='h-full overflow-y-auto pr-2'>
+								{activeIndex === 'posts' ? (
+									<Index indexName='polkassembly_posts'>
+										<Configure
+											filters={allowedNetwork
+												.map((network) => `network:${network}`)
+												.join(' OR ')
+												.concat(' AND (NOT post_type:discussions AND NOT post_type:grants)')}
+										/>
+										<div className='space-y-4'>
+											<Hits hitComponent={PostHit} />
+										</div>
+									</Index>
+								) : activeIndex === 'discussions' ? (
+									<Index indexName='polkassembly_posts'>
+										<Configure
+											filters={allowedNetwork
+												.map((network) => `network:${network}`)
+												.join(' OR ')
+												.concat(' AND (post_type:discussions OR post_type:grants)')}
+										/>
+										<div className='space-y-4'>
+											<Hits hitComponent={PostHit} />
+										</div>
+									</Index>
+								) : (
+									<Index indexName='polkassembly_users'>
+										<Configure filters={allowedNetwork.map((network) => `network:${network}`).join(' OR ')} />
+										<div className='space-y-4'>
+											<Hits hitComponent={UserHit} />
+										</div>
+									</Index>
+								)}
+							</div>
+						)}
+					</div>
+				) : (
+					<div className='flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
+						<Image
+							src={searchGif}
+							alt='search-icon'
+							width={274}
+							height={274}
+							className='-my-[40px]'
+							priority
+						/>
+						<span className='mt-8 text-center tracking-[0.01em]'>Welcome to the all new & supercharged search!</span>
+						<div className='mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em]'>
+							powered by
+							<PaLogo className='h-[30px] w-[99px]' />
+						</div>
+					</div>
+				)}
+			</div>
+			{query.length > 3 && results?.nbHits > 10 && (
+				<div className='my-5 flex flex-col items-center justify-center gap-4'>
+					<PaginationWithLinks
+						page={currentRefinement + 1}
+						pageSize={10}
+						totalCount={results?.nbHits || 0}
+						onClick={(newPage) => refine(newPage - 1)}
+					/>
+					{!isSuperSearch && (
+						<>
+							<p className='text-text_secondary text-sm'>Didn&apos;t find what you were looking for?</p>
+							<Button
+								className='mt-4 flex items-center gap-2'
+								onClick={onSuperSearch}
+							>
+								<FaMagic /> Use Super Search
+							</Button>
+						</>
+					)}
 				</div>
 			)}
 		</div>

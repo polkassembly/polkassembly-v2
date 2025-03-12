@@ -19,11 +19,13 @@ export default function Search() {
 	const [activeIndex, setActiveIndex] = useState<'posts' | 'users' | 'discussions' | null>(null);
 	const [searchContext, setSearchContext] = useState<string | null>(null);
 	const [selectedIndex, setSelectedIndex] = useState<'posts' | 'users' | 'discussions' | null>(null);
+	const [isSuperSearch, setIsSuperSearch] = useState(false);
 
 	useEffect(() => {
 		if (selectedIndex !== activeIndex) {
 			setActiveIndex(selectedIndex);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedIndex]);
 
 	return (
@@ -34,7 +36,7 @@ export default function Search() {
 			<DialogContent className='w-full max-w-4xl rounded-lg px-6 pt-4'>
 				<DialogHeader>
 					<DialogTitle className='flex items-baseline gap-2 text-xl font-bold text-btn_secondary_text'>
-						Search
+						{isSuperSearch ? 'Super Search' : 'Search'}
 						{searchContext && <span>Results for: &quot;{searchContext.slice(0, 30)}&quot;</span>}
 					</DialogTitle>
 				</DialogHeader>
@@ -55,11 +57,16 @@ export default function Search() {
 						<Filters
 							activeIndex={activeIndex}
 							onChange={setSelectedIndex}
+							isSuperSearch={isSuperSearch}
 						/>
 					</div>
 
 					<div className='w-full'>
-						<SearchResults activeIndex={activeIndex} />
+						<SearchResults
+							activeIndex={activeIndex}
+							onSuperSearch={() => setIsSuperSearch(true)}
+							isSuperSearch={isSuperSearch}
+						/>
 					</div>
 				</InstantSearch>
 			</DialogContent>
