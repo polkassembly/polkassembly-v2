@@ -49,7 +49,7 @@ function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IP
 						</TabsContent>
 						<TabsContent value={EActivityFeedTab.FOLLOWING}>
 							{/* TODO: add subscribed post list */}
-							<SubscribedPostList postData={initialData} />
+							<SubscribedPostList />
 						</TabsContent>
 					</Tabs>
 				</div>

@@ -14,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
@@ -22,44 +23,61 @@ import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
 function ActivityFeedPostList({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
-
 	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
 	const observerTarget = useRef<HTMLDivElement>(null);
 
-	// Fetch activity feed API
 	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
-		const formattedOrigin = origin === 'All' ? undefined : [origin];
-		const { data, error } = await NextApiClientService.fetchActivityFeed({ page: pageParam, origins: formattedOrigin, limit: DEFAULT_LISTING_LIMIT });
+		const formattedOrigin = origin === 'All' ? undefined : [origin.replace(/\s+/g, '')];
+
+		const { data, error } = await NextApiClientService.fetchActivityFeed({
+			page: pageParam,
+			origins: formattedOrigin as EPostOrigin[],
+			limit: DEFAULT_LISTING_LIMIT
+		});
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
 		return { ...data, page: pageParam };
 	};
 
-	// Infinite query
-	const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
+	const { data, isLoading, fetchNextPage, hasNextPage, isFetching, refetch } = useInfiniteQuery({
 		queryKey: ['activityFeed', origin],
 		queryFn: getExploreActivityFeed,
 		initialPageParam: 1,
-		initialData: {
-			pages: [{ ...initialData, page: 1 }],
-			pageParams: [1]
-		},
+		initialData:
+			origin === 'All'
+				? {
+						pages: [{ ...initialData, page: 1 }],
+						pageParams: [1]
+					}
+				: undefined,
 		getNextPageParam: (lastPage) => {
 			if (lastPage.items?.length === DEFAULT_LISTING_LIMIT) {
 				return lastPage.page + 1;
 			}
 			return undefined;
 		},
-		staleTime: SLATE_TIME
+		staleTime: SLATE_TIME,
+		enabled: origin !== 'All'
 	});
 
-	const allPosts = data?.pages?.flatMap((page) => page.items || []).filter((post): post is IPostListing => post !== undefined);
+	const allPosts = useMemo(() => {
+		if (origin === 'All') {
+			return initialData.items.filter((post): post is IPostListing => post !== undefined);
+		}
+		return data?.pages?.flatMap((page) => page.items || []).filter((post): post is IPostListing => post !== undefined);
+	}, [data, origin, initialData]);
+
+	useEffect(() => {
+		if (origin !== 'All') {
+			refetch();
+		}
+	}, [origin, refetch]);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
 			(entries) => {
-				if (entries[0].isIntersecting && !isLoading && hasNextPage) {
+				if (entries[0].isIntersecting && !isLoading && hasNextPage && !isFetching) {
 					fetchNextPage();
 				}
 			},
@@ -71,32 +89,33 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 		}
 
 		return () => observer.disconnect();
-	}, [isLoading, hasNextPage, fetchNextPage]);
+	}, [isLoading, hasNextPage, fetchNextPage, isFetching]);
+
 	const filteredPosts = useMemo(() => {
 		if (origin === 'All') return allPosts;
 
 		return allPosts?.filter((post: IPostListing) => {
-			if (!(network in NETWORKS_DETAILS)) {
-				return false;
-			}
+			if (!(network in NETWORKS_DETAILS)) return false;
 			const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
 			if (!networkInfo) return false;
 
-			const trackName = Object.keys(networkInfo.trackDetails).find((key) => post?.onChainInfo?.origin === key);
-			return trackName === origin;
+			const postOrigin = post?.onChainInfo?.origin;
+			return postOrigin?.replace(/\s+/g, '') === origin.replace(/\s+/g, '');
 		});
 	}, [allPosts, origin, network]);
 
 	return (
 		<div className='pb-10'>
 			<ActivityFeedNavbar
-				gov2LatestPosts={allPosts || []}
 				currentTab={origin}
 				setCurrentTab={setOrigin}
 			/>
-			{isLoading ? (
-				<div className='flex h-full items-center justify-center'>
-					<LoadingSpinner />
+			{origin !== 'All' && isLoading ? (
+				<div className='flex h-full items-center justify-center bg-bg_modal'>
+					<div className='flex flex-col items-center gap-4'>
+						<LoadingSpinner className='mt-10 h-10 w-auto md:mt-32' />
+						<Skeleton className='h-48 w-auto' />
+					</div>
 				</div>
 			) : filteredPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
