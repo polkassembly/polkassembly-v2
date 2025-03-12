@@ -6,34 +6,49 @@ import { IoIosSearch } from 'react-icons/io';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { Input } from '@ui/Input';
 import Image from 'next/image';
-import { algoliasearch } from 'algoliasearch';
+import { liteClient as algoliasearch } from 'algoliasearch/lite';
+import { Highlight, Hits, InstantSearch, RefinementList, SearchBox } from 'react-instantsearch';
 import searchGif from '@assets/search/search.gif';
 import PaLogo from '../PaLogo';
 
 const ALGOLIA_APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
 const ALGOLIA_SEARCH_API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY;
-// eslint-disable-next-line
-export const algolia_client = algoliasearch(ALGOLIA_APP_ID || '', ALGOLIA_SEARCH_API_KEY || '');
-export const allowedNetwork = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
-const AUTOCOMPLETE_INDEX_LIMIT = 5;
+const algoliaClient = algoliasearch(ALGOLIA_APP_ID || '', ALGOLIA_SEARCH_API_KEY || '');
+// const allowedNetwork = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
+// const AUTOCOMPLETE_INDEX_LIMIT = 5;
 
-interface IAutocompleteResults {
-	posts: { [index: string]: any }[];
-	users: { [index: string]: any }[];
-}
+// interface IAutocompleteResults {
+// 	posts: { [index: string]: any }[];
+// 	users: { [index: string]: any }[];
+// }
 
-const initAutocompleteResults: IAutocompleteResults = {
-	posts: [],
-	users: []
-};
+// const initAutocompleteResults: IAutocompleteResults = {
+// 	posts: [],
+// 	users: []
+// };
 
-interface Props {
-	className?: string;
-	openModal: boolean;
-	setOpenModal: (pre: boolean) => void;
-	isSuperSearch: boolean;
-	setIsSuperSearch: (pre: boolean) => void;
-	theme?: string;
+// interface Props {
+// 	className?: string;
+// 	openModal: boolean;
+// 	setOpenModal: (pre: boolean) => void;
+// 	isSuperSearch: boolean;
+// 	setIsSuperSearch: (pre: boolean) => void;
+// 	theme?: string;
+// }
+
+function Hit({ hit }: { hit: any }) {
+	console.log('hit', hit);
+	return (
+		<article>
+			<h1>
+				<Highlight
+					attribute='name'
+					hit={hit}
+				/>
+			</h1>
+			<p>${hit.price}</p>
+		</article>
+	);
 }
 
 export enum EFilterBy {
@@ -59,6 +74,11 @@ export enum EDateFilter {
 const gov1Tracks = ['tips', 'council_motions', 'bounties', 'child_bounties', 'treasury_proposals', 'democracy_proposals', 'tech_committee_proposals', 'referendums'];
 
 function Search() {
+	// const userIndex = algoliaClient.initIndex('polkassembly_users');
+	// const postIndex = algoliaClient.initIndex('polkassembly_posts');
+	// const addressIndex = algoliaClient?.initIndex('polkassembly_addresses');
+
+	// console.log(userIndex, postIndex, addressIndex);
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -78,7 +98,15 @@ function Search() {
 							<IoIosSearch className='text-xl text-white' />
 						</div>
 					</div>
-
+					<InstantSearch
+						searchClient={algoliaClient}
+						indexName='polkassembly_users'
+						insights
+					>
+						<SearchBox />
+						<RefinementList attribute='brand' />
+						<Hits hitComponent={Hit} />
+					</InstantSearch>
 					<div className='mt-8 flex h-[360px] flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
 						<Image
 							src={searchGif}
