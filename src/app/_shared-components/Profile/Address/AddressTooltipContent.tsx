@@ -2,14 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { IPublicUser, IFollowEntry, IOnChainIdentity, NotificationType } from '@/_shared/types';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useUser } from '@/hooks/useUser';
-import { cn } from '@/lib/utils';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { useToast } from '@/hooks/useToast';
 import { ShieldPlus } from 'lucide-react';
@@ -89,35 +88,47 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 		});
 	}, []);
 
+	const [isActionLoading, setIsActionLoading] = useState(false);
+
 	const followUser = useCallback(async () => {
 		if (!currentUser?.id || currentUser.id === userData?.id || !userData) return;
-		const { data, error } = await UserProfileClientService.followUser({ userId: userData.id });
-		if (!data || error) {
-			return;
+		try {
+			setIsActionLoading(true);
+			const { data, error } = await UserProfileClientService.followUser({ userId: userData.id });
+			if (!data || error) {
+				return;
+			}
+			queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
+				followers: [
+					...(oldData?.followers || []),
+					{
+						id: String(userData.id),
+						createdAt: new Date(),
+						followerUserId: currentUser.id,
+						followedUserId: userData.id,
+						updatedAt: new Date()
+					}
+				]
+			}));
+		} finally {
+			setIsActionLoading(false);
 		}
-		queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
-			followers: [
-				...(oldData?.followers || []),
-				{
-					id: String(userData.id),
-					createdAt: new Date(),
-					followerUserId: currentUser.id,
-					followedUserId: userData.id,
-					updatedAt: new Date()
-				}
-			]
-		}));
 	}, [currentUser, userData, queryClient]);
 
 	const unfollowUser = useCallback(async () => {
 		if (!currentUser?.id || currentUser.id === userData?.id || !userData) return;
-		const { data, error } = await UserProfileClientService.unfollowUser({ userId: userData.id });
-		if (!data || error) {
-			return;
+		try {
+			setIsActionLoading(true);
+			const { data, error } = await UserProfileClientService.unfollowUser({ userId: userData.id });
+			if (!data || error) {
+				return;
+			}
+			queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
+				followers: oldData?.followers.filter((item) => item.followerUserId !== currentUser.id) || []
+			}));
+		} finally {
+			setIsActionLoading(false);
 		}
-		queryClient.setQueryData<{ followers: IFollowEntry[] }>(['followers', userData.id], (oldData) => ({
-			followers: oldData?.followers.filter((item) => item.followerUserId !== currentUser.id) || []
-		}));
 	}, [currentUser, userData, queryClient]);
 
 	const handleButtonClick = useCallback(() => {
@@ -142,7 +153,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 			<ProfileImage imageUrl={userData?.profileDetails?.image} />
 			<div className={classes.tooltipContentWrapper}>
 				<div className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'>
-					<div className={`flex flex-col gap-1.5 ${hasUserData ? 'px-2' : 'px-4'}`}>
+					<div className='flex flex-col gap-1.5 px-4'>
 						<AddressDisplay
 							address={address}
 							identity={identity}
@@ -155,7 +166,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 								{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
 							</span>
 						)}
-						<div className={cn(hasUserData && userData.id && !isNaN(userData.id) ? 'flex items-center justify-between px-2' : 'flex items-center justify-start')}>
+						<div className='flex items-center justify-between'>
 							<UserStats
 								followers={stats.followers}
 								following={stats.following}
@@ -167,9 +178,9 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 								size='lg'
 								className='mt-2 rounded-3xl'
 								leftIcon={<ShieldPlus />}
-								isLoading={isFollowingLoading || isFollowersLoading || isUserDataLoading}
+								isLoading={isActionLoading}
 								onClick={handleButtonClick}
-								disabled={!userData.id}
+								disabled={!userData.id || isActionLoading}
 							>
 								{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
 							</Button>
