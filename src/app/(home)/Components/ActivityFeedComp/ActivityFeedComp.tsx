@@ -10,13 +10,13 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { useSidebar } from '@ui/Sidebar/Sidebar';
-import ActivityFeedToggleButton from './ActivityFeedToggleButton/ActivityFeedToggleButton';
-import ActivityFeedSidebar from './ActivityFeedSidebar';
-import styles from './ActivityFeed.module.scss';
-import ActivityFeedPostList from './ActivityFeedPostList/ActivityFeedPostList';
-import SubscribedPostList from './ActivityFeedPostList/SubscribedPostList';
+import ActivityFeedToggleButton from '../ActivityFeedToggleButton/ActivityFeedToggleButton';
+import ActivityFeedSidebar from '../ActivityFeedSidebar';
+import styles from './ActivityFeedComp.module.scss';
+import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
+import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
+function ActivityFeedComp({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
 	const t = useTranslations();
 	const { state } = useSidebar();
@@ -62,4 +62,4 @@ function ActivityFeed({ initialData }: { initialData: IGenericListingResponse<IP
 	);
 }
 
-export default ActivityFeed;
+export default ActivityFeedComp;

@@ -7,9 +7,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import CreateProposal from '@/app/create/proposal/Components/CreateProposal';
+import CreateComponent from '@/app/create/Components/Create';
 
-function Proposal() {
+function CreateModal() {
 	const router = useRouter();
 
 	const handleOpenChange = () => {
@@ -27,11 +27,11 @@ function Proposal() {
 					<DialogTitle>New Proposal</DialogTitle>
 				</DialogHeader>
 				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
-					<CreateProposal />
+					<CreateComponent />
 				</div>
 			</DialogContent>
 		</Dialog>
 	);
 }
 
-export default Proposal;
+export default CreateModal;

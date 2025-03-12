@@ -11,17 +11,25 @@ import { Button } from '@/app/_shared-components/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import TreasuryProposalLocal from './TreasuryProposal/TreasuryProposalLocal';
+import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 
 enum EProposalStep {
 	CREATE_PREIMAGE = 'CREATE_PREIMAGE',
-	CREATE_PROPOSAL = 'CREATE_PROPOSAL'
+	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
+	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL'
 }
 
-function CreateProposal() {
+function Create() {
 	const [step, setStep] = useState<EProposalStep>();
 	const { user } = useUser();
 	const t = useTranslations();
+
+	const network = getCurrentNetwork();
+
+	const isAssetHubEnabled = Object.keys(NETWORKS_DETAILS[`${network}`]?.supportedAssets).length > 0;
 
 	return (
 		<div className='flex h-full flex-1 flex-col gap-y-4'>
@@ -41,8 +49,10 @@ function CreateProposal() {
 					<AddressDropdown withBalance />
 					<ManualExtrinsic />
 				</>
-			) : step === EProposalStep.CREATE_PROPOSAL ? (
+			) : step === EProposalStep.CREATE_TREASURY_PROPOSAL ? (
 				<TreasuryProposalLocal />
+			) : step === EProposalStep.CREATE_USDX_PROPOSAL ? (
+				<TreasuryProposalAssethub />
 			) : (
 				<div className='flex flex-col gap-y-4'>
 					<Button
@@ -57,14 +67,24 @@ function CreateProposal() {
 						variant='outline'
 						size='lg'
 						className='flex w-full items-center justify-start p-2'
-						onClick={() => setStep(EProposalStep.CREATE_PROPOSAL)}
+						onClick={() => setStep(EProposalStep.CREATE_TREASURY_PROPOSAL)}
 					>
 						{t('CreateProposal.createTreasuryProposal')}
 					</Button>
+					{isAssetHubEnabled && (
+						<Button
+							variant='outline'
+							size='lg'
+							className='flex w-full items-center justify-start p-2'
+							onClick={() => setStep(EProposalStep.CREATE_USDX_PROPOSAL)}
+						>
+							{t('CreateProposal.usdxProposal')}
+						</Button>
+					)}
 				</div>
 			)}
 		</div>
 	);
 }
 
-export default CreateProposal;
+export default Create;

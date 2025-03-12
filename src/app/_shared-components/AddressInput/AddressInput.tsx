@@ -121,7 +121,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 			)}
 			{error && <p className='absolute left-0 my-1 text-sm text-failure'>{error}</p>}
 			{isOpen && (
-				<div className='absolute z-10 mt-1 flex max-h-[300px] w-full flex-col gap-y-2 overflow-y-auto rounded-md border border-border_grey bg-white p-2 shadow-lg'>
+				<div className='absolute z-20 mt-1 flex max-h-[300px] w-full flex-col gap-y-2 overflow-y-auto rounded-md border border-border_grey bg-white p-2 shadow-lg'>
 					{filteredOptions.length > 0 ? (
 						filteredOptions.map((account) => (
 							<button
