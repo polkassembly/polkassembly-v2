@@ -7,12 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
 import { useMemo, useState } from 'react';
+import { allowedNetwork } from '@/_shared/_constants/searchConstants';
 import { ESearchType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import CustomSearchBox from './CustomSearchBox';
 import Filters from './Filters';
 import SearchResults from './SearchResults';
-import { allowedNetwork } from '@/_shared/_constants/searchConstants';
 
 const ALGOLIA_APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
 const ALGOLIA_SEARCH_API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY;
@@ -30,7 +30,7 @@ export default function Search() {
 		}
 
 		if (isSuperSearch) {
-			return allowedNetwork.map((network) => `network:${network}`).join(' OR ');
+			return allowedNetwork.map((Network) => `network:${Network}`).join(' OR ');
 		}
 		return `network:${network}`;
 	}, [isSuperSearch, network, activeIndex]);

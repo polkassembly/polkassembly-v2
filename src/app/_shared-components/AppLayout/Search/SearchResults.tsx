@@ -57,7 +57,6 @@ interface User {
 }
 
 function PostHit({ hit }: { hit: Post }) {
-	console.log('hit', hit);
 	// eslint-disable-next-line
 	const position = hit.__position;
 	const topic = hit.topic_id ? Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === hit.topic_id) : null;
@@ -127,7 +126,7 @@ function PostHit({ hit }: { hit: Post }) {
 					)}
 					{topic && (
 						<div className='flex items-center gap-2'>
-							<span className='bg-topic_tag_bg text-topic_tag_text rounded px-2 py-1 text-xs'>
+							<span className='rounded bg-topic_tag_bg px-2 py-1 text-xs text-topic_tag_text'>
 								{topic
 									.replace(/_/g, ' ')
 									.toLowerCase()
