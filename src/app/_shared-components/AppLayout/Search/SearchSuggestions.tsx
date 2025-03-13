@@ -4,6 +4,7 @@
 
 import { ESearchDiscussionType, ESearchType } from '@/_shared/types';
 import { useInstantSearch } from 'react-instantsearch';
+import styles from './Search.module.scss';
 
 interface SearchHit {
 	objectID: string;
@@ -35,13 +36,13 @@ function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSugg
 	};
 
 	return (
-		<div className='absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg'>
-			<div className='max-h-60 w-full overflow-auto p-2'>
+		<div className={styles.search_suggestions_wrapper}>
+			<div className={styles.search_suggestions_list}>
 				{results.hits.slice(0, 5).map((hit: SearchHit) => (
 					<button
 						type='button'
 						key={hit.objectID}
-						className='w-full cursor-pointer rounded-md p-2 text-start'
+						className={styles.search_suggestions_item}
 						onClick={() => handleClick(hit)}
 						onMouseDown={(e) => e.preventDefault()}
 					>

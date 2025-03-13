@@ -13,3 +13,23 @@
 .search_dialog_title {
     @apply flex items-baseline gap-2 text-xl font-bold text-btn_secondary_text;
 }
+
+.tags_wrapper {
+    @apply flex flex-wrap gap-1 text-xs text-btn_secondary_text;
+}
+
+.tag {
+    @apply rounded-full border border-border_grey px-2 py-0.5;
+}
+
+.search_suggestions_wrapper1 {
+    @apply absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg;
+}
+
+.search_suggestions_list {
+    @apply max-h-60 w-full overflow-auto p-2;
+}
+
+.search_suggestions_item {
+    @apply w-full cursor-pointer rounded-md p-2 text-start;
+}
