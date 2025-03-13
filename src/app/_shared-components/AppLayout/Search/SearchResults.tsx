@@ -306,14 +306,14 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 			{query.length > 2 && results?.nbHits > 10 && (
 				<div className='my-5 flex flex-col items-center justify-center gap-4'>
 					<Pagination
-						showFirst={false}
-						showLast={false}
 						classNames={{
 							list: 'flex items-center space-x-2',
 							pageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
 							selectedItem: `${buttonVariants.secondary} px-2 py-1 rounded-md`,
 							previousPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
-							nextPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`
+							nextPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
+							firstPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
+							lastPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`
 						}}
 					/>
 					{!isSuperSearch && (
