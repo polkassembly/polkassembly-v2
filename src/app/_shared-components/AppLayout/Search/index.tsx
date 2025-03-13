@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
 import { useState } from 'react';
+import { ESearchType } from '@/_shared/types';
 import CustomSearchBox from './CustomSearchBox';
 import Filters from './Filters';
 import SearchResults from './SearchResults';
@@ -16,7 +17,7 @@ const ALGOLIA_SEARCH_API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY;
 const searchClient = algoliasearch(ALGOLIA_APP_ID || '', ALGOLIA_SEARCH_API_KEY || '');
 
 export default function Search() {
-	const [activeIndex, setActiveIndex] = useState<'posts' | 'users' | 'discussions' | null>(null);
+	const [activeIndex, setActiveIndex] = useState<ESearchType | null>(null);
 	const [searchContext, setSearchContext] = useState<string | null>(null);
 	const [isSuperSearch, setIsSuperSearch] = useState(false);
 
@@ -35,16 +36,16 @@ export default function Search() {
 
 				<InstantSearch
 					searchClient={searchClient}
-					indexName={activeIndex === 'users' ? 'polkassembly_users' : 'polkassembly_posts'}
+					indexName={activeIndex === ESearchType.USERS ? 'polkassembly_users' : 'polkassembly_posts'}
 					insights
 				>
 					<Configure
 						hitsPerPage={10}
 						distinct
 						filters={
-							activeIndex === 'posts'
+							activeIndex === ESearchType.POSTS
 								? 'NOT post_type:discussions OR NOT post_type:grants'
-								: activeIndex === 'discussions'
+								: activeIndex === ESearchType.DISCUSSIONS
 									? 'post_type:discussions OR post_type:grants'
 									: undefined
 						}
@@ -53,11 +54,11 @@ export default function Search() {
 					<div className='mb-2'>
 						<CustomSearchBox
 							onSearch={setSearchContext}
-							onTypeChange={setActiveIndex}
+							onTypeChange={(type: ESearchType | null) => setActiveIndex(type)}
 						/>
 						<Filters
 							activeIndex={activeIndex}
-							onChange={setActiveIndex}
+							onChange={(type: ESearchType | null) => setActiveIndex(type)}
 							isSuperSearch={isSuperSearch}
 						/>
 					</div>

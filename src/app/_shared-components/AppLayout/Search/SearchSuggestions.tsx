@@ -2,29 +2,34 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ESearchType } from '@/_shared/types';
 import { useInstantSearch } from 'react-instantsearch';
 
+enum ESearchDiscussionType {
+	DISCUSSIONS = 'discussions',
+	GRANTS = 'grants'
+}
 interface SearchHit {
 	objectID: string;
 	title?: string;
 	username?: string;
-	post_type?: 'discussions' | 'grants';
+	post_type?: ESearchDiscussionType;
 }
 
-function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSuggestionClick: (value: string, type: 'posts' | 'users' | 'discussions') => void }) {
+function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSuggestionClick: (value: string, type: ESearchType) => void }) {
 	const { results } = useInstantSearch();
 
 	if (query.length < 3 || !results.hits.length) return null;
 	const handleClick = (hit: SearchHit) => {
 		const value = hit.title || hit.username || '';
-		let type: 'posts' | 'users' | 'discussions';
+		let type: ESearchType;
 
 		if (hit.username) {
-			type = 'users';
-		} else if (hit.post_type === 'discussions' || hit.post_type === 'grants') {
-			type = 'discussions';
+			type = ESearchType.USERS;
+		} else if (hit.post_type === ESearchDiscussionType.DISCUSSIONS || hit.post_type === ESearchDiscussionType.GRANTS) {
+			type = ESearchType.DISCUSSIONS;
 		} else {
-			type = 'posts';
+			type = ESearchType.POSTS;
 		}
 
 		onSuggestionClick(value, type);

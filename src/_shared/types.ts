@@ -897,3 +897,9 @@ export enum NotificationType {
 	WARNING = 'warning',
 	INFO = 'info'
 }
+
+export enum ESearchType {
+	POSTS = 'posts',
+	DISCUSSIONS = 'discussions',
+	USERS = 'users'
+}

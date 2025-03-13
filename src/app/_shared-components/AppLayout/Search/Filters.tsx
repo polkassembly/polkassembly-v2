@@ -9,10 +9,11 @@ import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConst
 import { IoIosArrowDown } from 'react-icons/io';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { ESearchType } from '@/_shared/types';
 
 interface FiltersProps {
-	activeIndex: 'posts' | 'users' | 'discussions' | null;
-	onChange: (index: 'posts' | 'users' | 'discussions' | null) => void;
+	activeIndex: ESearchType | null;
+	onChange: (index: ESearchType | null) => void;
 	isSuperSearch?: boolean;
 }
 
@@ -24,9 +25,9 @@ interface RefinementItem {
 }
 
 const options = [
-	{ value: 'posts', label: 'Referenda' },
-	{ value: 'users', label: 'Users' },
-	{ value: 'discussions', label: 'Discussions' }
+	{ value: ESearchType.POSTS, label: 'Referenda' },
+	{ value: ESearchType.USERS, label: 'Users' },
+	{ value: ESearchType.DISCUSSIONS, label: 'Discussions' }
 ];
 
 type DropdownType = 'networks' | 'date' | 'topics' | 'tags' | null;
@@ -38,7 +39,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 
 	useMemo(() => {
 		if (results.query.length > 3 && activeIndex === null) {
-			onChange('posts');
+			onChange(ESearchType.POSTS);
 		}
 		if (results.query.length === 0 && activeIndex !== null) {
 			onChange(null);
@@ -125,8 +126,8 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		<div className='mt-3 flex justify-between gap-6'>
 			<div>
 				<RadioGroup
-					value={activeIndex || (results.query.length > 3 ? 'posts' : undefined)}
-					onValueChange={(e) => onChange(e as 'posts' | 'users' | 'discussions' | null)}
+					value={activeIndex || (results.query.length > 3 ? ESearchType.POSTS : undefined)}
+					onValueChange={(e) => onChange(e as ESearchType | null)}
 					className='flex flex-row gap-3'
 					disabled={results.query.length < 3}
 				>
@@ -149,7 +150,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 				</RadioGroup>
 			</div>
 			<div>
-				{(activeIndex === 'posts' || activeIndex === 'discussions') && (
+				{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && (
 					<div className='flex gap-4'>
 						{isSuperSearch && (
 							<DropdownMenu

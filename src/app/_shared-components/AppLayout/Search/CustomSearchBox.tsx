@@ -7,11 +7,12 @@ import { IoIosSearch } from 'react-icons/io';
 import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch';
 import { KeyboardEvent, useRef, useState, useCallback, useEffect, FocusEvent } from 'react';
 import debounce from 'lodash/debounce';
+import { ESearchType } from '@/_shared/types';
 import SearchSuggestions from './SearchSuggestions';
 
 interface CustomSearchBoxProps extends UseSearchBoxProps {
 	onSearch: (query: string) => void;
-	onTypeChange: (type: 'posts' | 'users' | 'discussions') => void;
+	onTypeChange: (type: ESearchType | null) => void;
 }
 
 export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: CustomSearchBoxProps) {
@@ -32,7 +33,6 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 		[refine]
 	);
 
-	// Cleanup debounce on unmount
 	useEffect(() => {
 		debouncedRefine(inputValue);
 	}, [debouncedRefine, inputValue]);
@@ -63,7 +63,7 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 	);
 
 	const handleSuggestionClick = useCallback(
-		(value: string, type: 'posts' | 'users' | 'discussions') => {
+		(value: string, type: ESearchType) => {
 			setInputValue(value);
 			setShowSuggestions(false);
 			refine(value);
