@@ -647,7 +647,10 @@
 	"CreateProposal": {
 		"createPreimage": "Preimage erstellen",
 		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Nativ)",
-		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)"
+		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)",
+		"cancelReferendum": "Referendum abbrechen",
+		"killReferendum": "Referendum beenden",
+		"goBack": "Zurück"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -683,5 +686,10 @@
 		"invalidAddress": "Ungültige Adresse",
 		"noResultsFound": "Keine Ergebnisse gefunden",
 		"placeholder": "Adresse eingeben"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Referendum-ID",
+		"referendumIdDescription": "Geben Sie die Referendum-ID zum Abbrechen ein",
+		"thisReferendumIsNotOngoing": "Dieses Referendum läuft nicht"
 	}
 }

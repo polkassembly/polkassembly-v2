@@ -646,7 +646,10 @@
 	"CreateProposal": {
 		"createPreimage": "创建预映像",
 		"createTreasuryProposal": "创建国库提案（原生）",
-		"usdxProposal": "创建USDx国库提案（资产中心）"
+		"usdxProposal": "创建USDx国库提案（资产中心）",
+		"cancelReferendum": "取消公投",
+		"killReferendum": "终止公投",
+		"goBack": "返回"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -682,5 +685,10 @@
 		"invalidAddress": "无效地址",
 		"noResultsFound": "未找到结果",
 		"placeholder": "请输入地址"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "公投ID",
+		"referendumIdDescription": "请输入要取消的公投ID",
+		"thisReferendumIsNotOngoing": "此公投未在进行中"
 	}
 }

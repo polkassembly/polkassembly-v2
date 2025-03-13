@@ -13,13 +13,18 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ChevronLeft } from 'lucide-react';
 import TreasuryProposalLocal from './TreasuryProposal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
+import CancelReferendum from './CancelReferendum/CancelReferendum';
+import KillReferendum from './KillReferendum/KillReferendum';
 
 enum EProposalStep {
 	CREATE_PREIMAGE = 'CREATE_PREIMAGE',
 	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
-	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL'
+	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
+	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
 }
 
 function Create() {
@@ -33,6 +38,18 @@ function Create() {
 
 	return (
 		<div className='flex h-full flex-1 flex-col gap-y-4'>
+			{step && (
+				<div className='flex'>
+					<Button
+						variant='ghost'
+						className='text-sm text-text_primary'
+						onClick={() => setStep(undefined)}
+						leftIcon={<ChevronLeft />}
+					>
+						{t('CreateProposal.goBack')}
+					</Button>
+				</div>
+			)}
 			{!user ? (
 				<p className='flex items-center gap-x-1 text-center text-sm text-text_primary'>
 					{t('Create.please')}
@@ -53,6 +70,10 @@ function Create() {
 				<TreasuryProposalLocal />
 			) : step === EProposalStep.CREATE_USDX_PROPOSAL ? (
 				<TreasuryProposalAssethub />
+			) : step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL ? (
+				<CancelReferendum />
+			) : step === EProposalStep.CREATE_KILL_REF_PROPOSAL ? (
+				<KillReferendum />
 			) : (
 				<div className='flex flex-col gap-y-4'>
 					<Button
@@ -81,6 +102,22 @@ function Create() {
 							{t('CreateProposal.usdxProposal')}
 						</Button>
 					)}
+					<Button
+						variant='outline'
+						size='lg'
+						className='flex w-full items-center justify-start p-2'
+						onClick={() => setStep(EProposalStep.CREATE_CANCEL_REF_PROPOSAL)}
+					>
+						{t('CreateProposal.cancelReferendum')}
+					</Button>
+					<Button
+						variant='outline'
+						size='lg'
+						className='flex w-full items-center justify-start p-2'
+						onClick={() => setStep(EProposalStep.CREATE_KILL_REF_PROPOSAL)}
+					>
+						{t('CreateProposal.killReferendum')}
+					</Button>
 				</div>
 			)}
 		</div>
