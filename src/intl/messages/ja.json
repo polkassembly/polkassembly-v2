@@ -710,6 +710,7 @@
 		"useSuperSearch": "スーパーサーチを使用",
 		"didntFindWhatYouWereLookingFor": "見つかりませんでしたか？",
 		"useSuperSearchButton": "スーパーサーチを使用",
-		"poweredByPolkassembly": "Powered by Polkassembly."
+		"poweredByPolkassembly": "Powered by Polkassembly.",
+		"enableSearchAndSuperSearch": "検索とスーパーサーチを有効にするには、hello@polkassembly.ioにお問い合わせください。"
 	}
 }

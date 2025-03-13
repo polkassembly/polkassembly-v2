@@ -710,6 +710,7 @@
 		"useSuperSearch": "使用超级搜索",
 		"didntFindWhatYouWereLookingFor": "没有找到您要找的内容？",
 		"useSuperSearchButton": "使用超级搜索",
-		"poweredByPolkassembly": "Powered by Polkassembly."
+		"poweredByPolkassembly": "Powered by Polkassembly.",
+		"enableSearchAndSuperSearch": "如果您想为您的链启用搜索和超级搜索，请通过"
 	}
 }

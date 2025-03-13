@@ -7,6 +7,7 @@ import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
 import { useState, memo } from 'react';
 import { ESearchType } from '@/_shared/types';
+import { allowedNetwork } from '@/_shared/_constants/searchConstants';
 import { useSearchConfig } from '@/hooks/useSearchConfig';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
@@ -37,7 +38,7 @@ function Search() {
 			<DialogTrigger asChild>
 				<IoIosSearch className='cursor-pointer text-2xl text-text_primary' />
 			</DialogTrigger>
-			<DialogContent className='w-full max-w-4xl rounded-lg px-6 pt-4'>
+			<DialogContent className={`${allowedNetwork.includes(network) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
 					<DialogTitle className={styles.search_dialog_title}>
 						{isSuperSearch ? t('superSearch') : t('search')}
@@ -49,37 +50,49 @@ function Search() {
 					</DialogTitle>
 				</DialogHeader>
 
-				<InstantSearch
-					searchClient={searchClient}
-					indexName={indexName}
-					insights
-				>
-					<Configure
-						hitsPerPage={10}
-						distinct
-						filters={`${networkFilter}${getPostTypeFilter}`.trim()}
-					/>
+				{allowedNetwork.includes(network) ? (
+					<InstantSearch
+						searchClient={searchClient}
+						indexName={indexName}
+						insights
+					>
+						<Configure
+							hitsPerPage={10}
+							distinct
+							filters={`${networkFilter}${getPostTypeFilter}`.trim()}
+						/>
 
-					<div>
-						<CustomSearchBox
-							onSearch={setSearchContext}
-							onTypeChange={handleTypeChange}
-						/>
-						<Filters
-							activeIndex={activeIndex}
-							onChange={handleTypeChange}
-							isSuperSearch={isSuperSearch}
-						/>
-					</div>
+						<div>
+							<CustomSearchBox
+								onSearch={setSearchContext}
+								onTypeChange={handleTypeChange}
+							/>
+							<Filters
+								activeIndex={activeIndex}
+								onChange={handleTypeChange}
+								isSuperSearch={isSuperSearch}
+							/>
+						</div>
 
-					<div className='w-full'>
-						<SearchResults
-							activeIndex={activeIndex}
-							onSuperSearch={handleSuperSearch}
-							isSuperSearch={isSuperSearch}
-						/>
-					</div>
-				</InstantSearch>
+						<div className='w-full'>
+							<SearchResults
+								activeIndex={activeIndex}
+								onSuperSearch={handleSuperSearch}
+								isSuperSearch={isSuperSearch}
+							/>
+						</div>
+					</InstantSearch>
+				) : (
+					<p className='pb-5 text-center text-sm font-medium text-btn_secondary_text'>
+						{t('enableSearchAndSuperSearch')}
+						<a
+							href='mailto:hello@polkassembly.io'
+							className='text-bg_pink'
+						>
+							hello@polkassembly.io
+						</a>
+					</p>
+				)}
 			</DialogContent>
 		</Dialog>
 	);

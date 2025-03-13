@@ -730,6 +730,7 @@
 		"useSuperSearch": "Use Super Search",
 		"didntFindWhatYouWereLookingFor": "Didn't find what you were looking for?",
 		"useSuperSearchButton": "Use Super Search",
-		"poweredByPolkassembly": "Powered by Polkassembly."
+		"poweredByPolkassembly": "Powered by Polkassembly.",
+		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on"
 	}
 }
