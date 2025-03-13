@@ -698,5 +698,11 @@
 		"invalidAddress": "Invalid Address",
 		"noResultsFound": "No results found",
 		"placeholder": "Enter Address"
+	},
+	"Search": {
+		"placeholder": "Type here to search for something",
+		"superSearch": "Super Search",
+		"search": "Search",
+		"resultsFor": "Results for"
 	}
 }

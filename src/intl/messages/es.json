@@ -678,5 +678,11 @@
 		"invalidAddress": "Dirección Inválida",
 		"noResultsFound": "No se encontraron resultados",
 		"placeholder": "Ingrese la Dirección"
+	},
+	"Search": {
+		"placeholder": "Ingrese para buscar algo",
+		"superSearch": "Búsqueda Super",
+		"search": "Buscar",
+		"resultsFor": "Resultados para"
 	}
 }

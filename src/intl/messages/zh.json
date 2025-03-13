@@ -678,5 +678,11 @@
 		"invalidAddress": "无效地址",
 		"noResultsFound": "未找到结果",
 		"placeholder": "请输入地址"
+	},
+	"Search": {
+		"placeholder": "请输入要搜索的内容",
+		"superSearch": "超级搜索",
+		"search": "搜索",
+		"resultsFor": "结果"
 	}
 }

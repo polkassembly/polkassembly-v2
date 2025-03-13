@@ -160,6 +160,7 @@ function UserHit({ hit }: { hit: User }) {
 		<Link
 			href={hit.username && `/user/username/${hit.username}`}
 			className='flex cursor-pointer gap-2 rounded-lg p-4'
+			target='_blank'
 		>
 			<Image
 				src={userIcon}

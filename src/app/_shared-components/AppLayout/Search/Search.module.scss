@@ -1,0 +1,15 @@
+.search_input {
+    @apply border-bg_pink pr-10 placeholder:text-text_primary;
+}
+
+.search_button {
+    @apply absolute right-0 top-1/2 h-10 -translate-y-1/2 cursor-pointer rounded-r-md bg-bg_pink p-2 transition-colors hover:bg-bg_pink/90;
+}
+
+.search_suggestions_wrapper {
+    @apply absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg;
+}
+
+.search_dialog_title {
+    @apply flex items-baseline gap-2 text-xl font-bold text-btn_secondary_text;
+}

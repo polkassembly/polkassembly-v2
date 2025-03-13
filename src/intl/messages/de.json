@@ -679,5 +679,11 @@
 		"invalidAddress": "Ungültige Adresse",
 		"noResultsFound": "Keine Ergebnisse gefunden",
 		"placeholder": "Adresse eingeben"
+	},
+	"Search": {
+		"placeholder": "Hier etwas eingeben, um etwas zu suchen",
+		"superSearch": "Super Suche",
+		"search": "Suchen",
+		"resultsFor": "Ergebnisse für"
 	}
 }

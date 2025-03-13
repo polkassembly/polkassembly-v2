@@ -678,5 +678,11 @@
 		"invalidAddress": "無効なアドレス",
 		"noResultsFound": "結果が見つかりません",
 		"placeholder": "アドレスを入力"
+	},
+	"Search": {
+		"placeholder": "ここに何かを検索",
+		"superSearch": "スーパーサーチ",
+		"search": "検索",
+		"resultsFor": "結果"
 	}
 }

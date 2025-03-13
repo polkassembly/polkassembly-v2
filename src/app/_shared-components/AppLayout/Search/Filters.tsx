@@ -351,9 +351,9 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 					<button
 						type='button'
 						onClick={clearDateFilter}
-						className='rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text'
+						className='flex items-center gap-1 rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text'
 					>
-						<RxCross2 className='text-xs' /> Date Filter
+						<RxCross2 className='text-xs' /> <span>Date Filter</span>
 					</button>
 				)}
 			</div>

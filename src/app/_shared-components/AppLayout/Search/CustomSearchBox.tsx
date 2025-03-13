@@ -1,57 +1,67 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-
 import { Input } from '@ui/Input';
 import { IoIosSearch } from 'react-icons/io';
 import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch';
-import { KeyboardEvent, useRef, useState, useCallback, useEffect, FocusEvent, useMemo } from 'react';
+import { KeyboardEvent, useRef, useState, useCallback, FocusEvent, useMemo, memo, ChangeEvent } from 'react';
 import debounce from 'lodash/debounce';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { ESearchType } from '@/_shared/types';
 import SearchSuggestions from './SearchSuggestions';
+import styles from './Search.module.scss';
 
 interface CustomSearchBoxProps extends UseSearchBoxProps {
 	onSearch: (query: string) => void;
 	onTypeChange: (type: ESearchType | null) => void;
 }
 
-export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: CustomSearchBoxProps) {
+interface SearchState {
+	inputValue: string;
+	showSuggestions: boolean;
+}
+
+function CustomSearchBox({ onSearch, onTypeChange, ...props }: CustomSearchBoxProps) {
 	const { query, refine } = useSearchBox(props);
-	const [inputValue, setInputValue] = useState(query);
-	const [showSuggestions, setShowSuggestions] = useState(false);
+	const t = useTranslations('Search');
+	const [searchState, setSearchState] = useState<SearchState>({
+		inputValue: query,
+		showSuggestions: false
+	});
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { inputValue, showSuggestions } = searchState;
 
-	const debouncedRefine = useMemo(
-		() =>
-			debounce((value: string) => {
-				refine(value);
-			}, 300),
-		[refine]
-	);
+	const debouncedSearch = useMemo(() => {
+		const search = debounce((value: string) => {
+			refine(value);
+		}, 300);
 
-	useEffect(() => {
-		return () => {
-			debouncedRefine.cancel();
+		return (value: string) => {
+			setSearchState((prev) => ({
+				...prev,
+				inputValue: value,
+				showSuggestions: value.length >= 3
+			}));
+			if (value.length >= 3) {
+				search(value);
+			}
 		};
-	}, [debouncedRefine]);
+	}, [refine]);
 
 	const handleInputChange = useCallback(
-		(value: string) => {
-			setInputValue(value);
-			if (value.length >= 3) {
-				setShowSuggestions(true);
-				debouncedRefine(value);
-			} else {
-				setShowSuggestions(false);
-			}
+		(e: ChangeEvent<HTMLInputElement>) => {
+			debouncedSearch(e.target.value);
 		},
-		[debouncedRefine]
+		[debouncedSearch]
 	);
 
 	const handleSearch = useCallback(() => {
-		setShowSuggestions(false);
-		refine(inputValue);
-		onSearch(inputValue);
+		if (inputValue.length >= 3) {
+			setSearchState((prev) => ({ ...prev, showSuggestions: false }));
+			refine(inputValue);
+			onSearch(inputValue);
+		}
 	}, [inputValue, refine, onSearch]);
 
 	const handleKeyDown = useCallback(
@@ -66,8 +76,10 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 
 	const handleSuggestionClick = useCallback(
 		(value: string, type: ESearchType) => {
-			setInputValue(value);
-			setShowSuggestions(false);
+			setSearchState({
+				inputValue: value,
+				showSuggestions: false
+			});
 			refine(value);
 			onSearch(value);
 			onTypeChange(type);
@@ -77,41 +89,60 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 	);
 
 	const handleFocus = useCallback(() => {
-		if (inputValue.length >= 3) {
-			setShowSuggestions(true);
-		}
-	}, [inputValue.length]);
+		setSearchState((prev) => ({
+			...prev,
+			showSuggestions: prev.inputValue.length >= 3
+		}));
+	}, []);
 
 	const handleBlur = useCallback((e: FocusEvent<HTMLInputElement>) => {
 		if (!e.relatedTarget?.closest('.search-area')) {
-			setTimeout(() => {
-				setShowSuggestions(false);
-			}, 200);
+			requestAnimationFrame(() => {
+				setSearchState((prev) => ({
+					...prev,
+					showSuggestions: false
+				}));
+			});
 		}
 	}, []);
+
+	const inputProps = useMemo(
+		() => ({
+			value: inputValue,
+			onChange: handleInputChange,
+			onKeyDown: handleKeyDown,
+			className: styles.search_input,
+			placeholder: t('placeholder'),
+			onFocus: handleFocus,
+			onBlur: handleBlur,
+			autoComplete: 'off' as const
+		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[inputValue, handleInputChange, handleKeyDown, handleFocus, handleBlur]
+	);
+
+	const searchButtonProps = useMemo(
+		() => ({
+			className: styles.search_button,
+			onClick: handleSearch
+		}),
+		[handleSearch]
+	);
 
 	return (
 		<div className='search-area relative'>
 			<Input
-				value={inputValue}
-				onChange={(e) => handleInputChange(e.target.value)}
-				onKeyDown={handleKeyDown}
-				className='border-bg_pink pr-10 placeholder:text-text_primary'
-				placeholder='Type here to search for something'
+				{...inputProps}
 				ref={inputRef}
-				onFocus={handleFocus}
-				onBlur={handleBlur}
-				autoComplete='off'
 			/>
 			<button
 				type='button'
-				className='absolute right-0 top-1/2 h-10 -translate-y-1/2 cursor-pointer rounded-r-md bg-bg_pink p-2'
-				onClick={handleSearch}
+				{...searchButtonProps}
 			>
 				<IoIosSearch className='text-xl text-btn_primary_text' />
 			</button>
 			{showSuggestions && (
-				<div className='search-suggestions search-area'>
+				<div className={cn(styles.search_suggestions_wrapper, 'search-suggestions search-area')}>
 					<SearchSuggestions
 						query={inputValue}
 						onSuggestionClick={handleSuggestionClick}
@@ -121,3 +152,5 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 		</div>
 	);
 }
+
+export default memo(CustomSearchBox);
