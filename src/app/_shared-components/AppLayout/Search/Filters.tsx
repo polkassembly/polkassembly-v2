@@ -34,7 +34,7 @@ type DropdownType = 'networks' | 'date' | 'topics' | 'tags' | null;
 
 const LABELSTYLE = 'flex items-center gap-1 text-xs text-text_primary';
 export default function Filters({ activeIndex, onChange, isSuperSearch = false }: FiltersProps) {
-	const { results } = useInstantSearch();
+	const { results, refresh } = useInstantSearch();
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 
 	useMemo(() => {
@@ -70,197 +70,266 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		}));
 	}, []);
 
-	const transformDateItems = useCallback((items: RefinementItem[]) => {
-		const now = dayjs.utc();
+	interface DateRange {
+		label: string;
+		start: number;
+		end: number;
+	}
+	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
 
-		const timeRanges = [
-			{
-				label: 'Today',
-				value: now.subtract(1, 'day').unix(),
-				operator: '>='
-			},
-			{
-				label: 'Last 7 days',
-				value: now.subtract(7, 'days').unix(),
-				operator: '>='
-			},
-			{
-				label: 'Last 30 days',
-				value: now.subtract(30, 'days').unix(),
-				operator: '>='
-			},
-			{
-				label: 'Last 3 months',
-				value: now.subtract(3, 'months').unix(),
-				operator: '>='
-			},
-			{
-				label: 'All time',
-				value: 0,
-				operator: '>='
+	// Separate clear filter function
+	const clearDateFilter = useCallback(() => {
+		setSelectedDateRange(null);
+		refresh(); // Refresh to update results
+	}, [refresh]);
+
+	// Modified dropdown open/close handler
+	const handleDropdownOpen = useCallback(
+		(dropdown: DropdownType) => {
+			// If we're closing the date dropdown and there's no selection, clear the filter
+			if (openDropdown === 'date' && dropdown === null && !selectedDateRange) {
+				clearDateFilter();
 			}
-		];
+			setOpenDropdown(dropdown);
+		},
+		[openDropdown, selectedDateRange, clearDateFilter]
+	);
 
-		return timeRanges.map((range) => {
-			const itemsInRange = items.filter((item) => {
-				const itemDate = dayjs.utc(Number(item.value) * 1000);
-				return itemDate.isAfter(dayjs.utc(range.value * 1000));
-			});
+	const handleDateSelection = useCallback(
+		(range: DateRange | null) => {
+			setSelectedDateRange(range);
+			refresh();
+		},
+		[refresh]
+	);
 
-			const count = itemsInRange.reduce((sum, item) => sum + item.count, 0);
+	const handleDateClick = useCallback(
+		(label: string) => {
+			const now = dayjs.utc();
+			let range: DateRange | null = null;
 
-			return {
-				value: range.value.toString(),
-				label: range.label,
-				count,
-				isRefined: false
-			};
-		});
-	}, []);
+			switch (label) {
+				case 'Today':
+					range = {
+						label,
+						start: now.startOf('day').unix(),
+						end: now.endOf('day').unix()
+					};
+					break;
+				case 'Last 7 days':
+					range = {
+						label,
+						// Use startOf('day') for both start and end to get exact day boundaries
+						start: now.subtract(7, 'days').startOf('day').unix(),
+						end: now.endOf('day').unix()
+					};
+					break;
+				case 'Last 30 days':
+					range = {
+						label,
+						start: now.subtract(30, 'days').startOf('day').unix(),
+						end: now.endOf('day').unix()
+					};
+					break;
+				case 'Last 3 months':
+					range = {
+						label,
+						start: now.subtract(3, 'months').startOf('day').unix(),
+						end: now.endOf('day').unix()
+					};
+					break;
+				case 'All time':
+					range = {
+						label,
+						// Don't use 0 as start time, use a reasonable past date
+						start: dayjs.utc('2020-01-01').startOf('day').unix(),
+						end: now.endOf('day').unix()
+					};
+					break;
+				default:
+					range = null;
+			}
 
-	const handleDropdownOpen = (dropdown: DropdownType) => {
-		setOpenDropdown(dropdown);
-	};
+			// Add debug logging
+			if (range) {
+				console.log('Date range selected:', {
+					label: range.label,
+					start: dayjs.unix(range.start).format('YYYY-MM-DD HH:mm:ss'),
+					end: dayjs.unix(range.end).format('YYYY-MM-DD HH:mm:ss')
+				});
+			}
+
+			handleDateSelection(range);
+		},
+		[handleDateSelection]
+	);
 
 	return (
-		<div className='mt-3 flex justify-between gap-6'>
-			<div>
-				<RadioGroup
-					value={activeIndex || (results.query.length > 2 ? ESearchType.POSTS : undefined)}
-					onValueChange={(e) => onChange(e as ESearchType | null)}
-					className='flex flex-row gap-3'
-					disabled={results.query.length < 3}
-				>
-					{options.map((option) => {
-						return (
-							<label
-								key={option.value}
-								htmlFor={option.value}
-								className={`flex cursor-pointer flex-row items-center gap-1 ${activeIndex === option.value ? 'rounded-full bg-progress_pink_bg p-2' : ''}`}
-							>
-								<RadioGroupItem
-									value={option.value}
-									id={option.value}
-									className='h-4 w-4'
-								/>
-								<span className='text-xs text-text_primary'>{option.label}</span>
-							</label>
-						);
-					})}
-				</RadioGroup>
-			</div>
-			<div>
-				{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && (
-					<div className='flex gap-4'>
-						{isSuperSearch && (
+		<div>
+			<div className='mt-3 flex justify-between gap-6'>
+				<div>
+					<RadioGroup
+						value={activeIndex || (results.query.length > 2 ? ESearchType.POSTS : undefined)}
+						onValueChange={(e) => onChange(e as ESearchType | null)}
+						className='flex flex-row gap-3'
+						disabled={results.query.length < 3}
+					>
+						{options.map((option) => {
+							return (
+								<label
+									key={option.value}
+									htmlFor={option.value}
+									className={`flex cursor-pointer flex-row items-center gap-1 ${activeIndex === option.value ? 'rounded-full bg-progress_pink_bg p-2' : ''}`}
+								>
+									<RadioGroupItem
+										value={option.value}
+										id={option.value}
+										className='h-4 w-4'
+									/>
+									<span className='text-xs text-text_primary'>{option.label}</span>
+								</label>
+							);
+						})}
+					</RadioGroup>
+				</div>
+				<div>
+					{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && (
+						<div className='flex gap-4'>
+							{isSuperSearch && (
+								<DropdownMenu
+									open={openDropdown === 'networks'}
+									onOpenChange={(open) => handleDropdownOpen(open ? 'networks' : null)}
+								>
+									<DropdownMenuTrigger asChild>
+										<button
+											type='button'
+											className='flex items-center gap-1 text-xs text-text_primary'
+										>
+											Networks <IoIosArrowDown />
+										</button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+										<Configure filters={allowedNetwork.map((network) => `network:${network}`).join(' OR ')} />
+										<RefinementList
+											attribute='network'
+											classNames={{
+												list: 'space-y-2',
+												label: LABELSTYLE,
+												labelText: LABELSTYLE,
+												count: 'hidden'
+											}}
+										/>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
 							<DropdownMenu
-								open={openDropdown === 'networks'}
-								onOpenChange={(open) => handleDropdownOpen(open ? 'networks' : null)}
+								open={openDropdown === 'date'}
+								onOpenChange={(open) => {
+									handleDropdownOpen(open ? 'date' : null);
+								}}
 							>
 								<DropdownMenuTrigger asChild>
 									<button
 										type='button'
 										className='flex items-center gap-1 text-xs text-text_primary'
 									>
-										Networks <IoIosArrowDown />
+										{/* Show selected date range in the trigger button */}
+										{selectedDateRange ? selectedDateRange.label : 'Date'} <IoIosArrowDown />
+									</button>
+								</DropdownMenuTrigger>
+
+								<DropdownMenuContent className='max-h-[250px] w-48 overflow-auto p-3'>
+									<div className='mb-2 flex items-center justify-between'>
+										<span className='text-xs font-medium'>Filter by date</span>
+									</div>
+									{selectedDateRange && (
+										<Configure
+											filters={`created_at >= ${selectedDateRange.start} AND created_at <= ${selectedDateRange.end}`}
+											numericFilters={[`created_at >= ${selectedDateRange.start}`, `created_at <= ${selectedDateRange.end}`]}
+										/>
+									)}
+									<div className='space-y-2'>
+										{['Today', 'Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((label) => (
+											<button
+												key={label}
+												type='button'
+												className={`w-full rounded px-2 py-1 text-left text-xs ${selectedDateRange?.label === label ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'}`}
+												onClick={() => handleDateClick(label)}
+											>
+												{label}
+											</button>
+										))}
+									</div>
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							<DropdownMenu
+								open={openDropdown === 'topics'}
+								onOpenChange={(open) => handleDropdownOpen(open ? 'topics' : null)}
+							>
+								<DropdownMenuTrigger asChild>
+									<button
+										type='button'
+										className='flex items-center gap-1 text-xs text-text_primary'
+									>
+										Topics <IoIosArrowDown />
 									</button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
-									<Configure filters={allowedNetwork.map((network) => `network:${network}`).join(' OR ')} />
 									<RefinementList
-										attribute='network'
+										attribute='topic_id'
 										classNames={{
 											list: 'space-y-2',
 											label: LABELSTYLE,
 											labelText: LABELSTYLE,
 											count: 'hidden'
 										}}
+										transformItems={transformTopicItems}
+										limit={15}
+										showMore={false}
 									/>
 								</DropdownMenuContent>
 							</DropdownMenu>
-						)}
 
-						<DropdownMenu
-							open={openDropdown === 'date'}
-							onOpenChange={(open) => handleDropdownOpen(open ? 'date' : null)}
-						>
-							<DropdownMenuTrigger asChild>
-								<button
-									type='button'
-									className='flex items-center gap-1 text-xs text-text_primary'
-								>
-									Date <IoIosArrowDown />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
-								<RefinementList
-									attribute='created_at'
-									classNames={{
-										list: 'space-y-2',
-										label: LABELSTYLE,
-										labelText: LABELSTYLE,
-										count: 'hidden'
-									}}
-									transformItems={transformDateItems}
-									sortBy={['count:desc']}
-								/>
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						<DropdownMenu
-							open={openDropdown === 'topics'}
-							onOpenChange={(open) => handleDropdownOpen(open ? 'topics' : null)}
-						>
-							<DropdownMenuTrigger asChild>
-								<button
-									type='button'
-									className='flex items-center gap-1 text-xs text-text_primary'
-								>
-									Topics <IoIosArrowDown />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
-								<RefinementList
-									attribute='topic_id'
-									classNames={{
-										list: 'space-y-2',
-										label: LABELSTYLE,
-										labelText: LABELSTYLE,
-										count: 'hidden'
-									}}
-									transformItems={transformTopicItems}
-									limit={15}
-									showMore={false}
-								/>
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						<DropdownMenu
-							open={openDropdown === 'tags'}
-							onOpenChange={(open) => handleDropdownOpen(open ? 'tags' : null)}
-						>
-							<DropdownMenuTrigger asChild>
-								<button
-									type='button'
-									className='flex items-center gap-1 text-xs text-text_primary'
-								>
-									Tags <IoIosArrowDown />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
-								<RefinementList
-									attribute='tags'
-									classNames={{
-										list: 'space-y-2',
-										label: LABELSTYLE,
-										labelText: LABELSTYLE,
-										count: 'hidden'
-									}}
-									transformItems={transformTagItems}
-								/>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+							<DropdownMenu
+								open={openDropdown === 'tags'}
+								onOpenChange={(open) => handleDropdownOpen(open ? 'tags' : null)}
+							>
+								<DropdownMenuTrigger asChild>
+									<button
+										type='button'
+										className='flex items-center gap-1 text-xs text-text_primary'
+									>
+										Tags <IoIosArrowDown />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+									<RefinementList
+										attribute='tags'
+										classNames={{
+											list: 'space-y-2',
+											label: LABELSTYLE,
+											labelText: LABELSTYLE,
+											count: 'hidden'
+										}}
+										transformItems={transformTagItems}
+									/>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					)}
+				</div>
+			</div>
+			<div className='mt-3 flex justify-start'>
+				{' '}
+				{selectedDateRange && (
+					<button
+						type='button'
+						onClick={clearDateFilter}
+						className='text-xs text-blue-500 hover:text-blue-700'
+					>
+						Clear Date Filter
+					</button>
 				)}
 			</div>
 		</div>

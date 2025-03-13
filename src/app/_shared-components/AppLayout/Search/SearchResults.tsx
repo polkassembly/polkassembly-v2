@@ -6,7 +6,7 @@ import Image from 'next/image';
 import searchGif from '@assets/search/search.gif';
 import searchLoader from '@assets/search/search-loader.gif';
 import userIcon from '@assets/profile/user-icon.svg';
-import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
+import { Hits, Index, useInstantSearch, useSearchBox, Configure, Pagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
 import { ESearchDiscussionType, ESearchType } from '@/_shared/types';
@@ -19,8 +19,7 @@ import { Separator } from '../../Separator';
 import BlockEditor from '../../BlockEditor/BlockEditor';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
-import { Button } from '../../Button';
-import { PaginationWithLinks } from '../../PaginationWithLinks';
+import { Button, buttonVariants } from '../../Button';
 
 interface Post {
 	id: string;
@@ -177,7 +176,6 @@ function UserHit({ hit }: { hit: User }) {
 function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIndex: ESearchType | null; onSuperSearch: () => void; isSuperSearch: boolean }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
-	const { currentRefinement, refine } = usePagination();
 
 	const isLoading = status === 'loading';
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
@@ -307,11 +305,16 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 			</div>
 			{query.length > 2 && results?.nbHits > 10 && (
 				<div className='my-5 flex flex-col items-center justify-center gap-4'>
-					<PaginationWithLinks
-						page={currentRefinement + 1}
-						pageSize={10}
-						totalCount={results?.nbHits || 0}
-						onClick={(newPage) => refine(newPage - 1)}
+					<Pagination
+						showFirst={false}
+						showLast={false}
+						classNames={{
+							list: 'flex items-center space-x-2',
+							pageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
+							selectedItem: `${buttonVariants.secondary} px-2 py-1 rounded-md`,
+							previousPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
+							nextPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`
+						}}
 					/>
 					{!isSuperSearch && (
 						<>
