@@ -646,7 +646,10 @@
 	"CreateProposal": {
 		"createPreimage": "プレイメージを作成",
 		"createTreasuryProposal": "トレジャリー提案を作成 (ネイティブ)",
-		"usdxProposal": "USDxトレジャリー提案を作成 (アセットハブ)"
+		"usdxProposal": "USDxトレジャリー提案を作成 (アセットハブ)",
+		"cancelReferendum": "レファレンダムをキャンセル",
+		"killReferendum": "レファレンダムを強制終了",
+		"goBack": "戻る"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -682,5 +685,10 @@
 		"invalidAddress": "無効なアドレス",
 		"noResultsFound": "結果が見つかりません",
 		"placeholder": "アドレスを入力"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "レファレンダムID",
+		"referendumIdDescription": "キャンセルするレファレンダムIDを入力してください",
+		"thisReferendumIsNotOngoing": "このレファレンダムは進行中ではありません"
 	}
 }

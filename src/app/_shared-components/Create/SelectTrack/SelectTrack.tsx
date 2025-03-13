@@ -6,7 +6,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
-function SelectTrack({ selectedTrack, onChange }: { selectedTrack?: string; onChange: (track: string) => void }) {
+function SelectTrack({ selectedTrack, onChange, trackGroup }: { selectedTrack?: string; onChange: (track: string) => void; trackGroup?: string[] }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
@@ -14,14 +14,18 @@ function SelectTrack({ selectedTrack, onChange }: { selectedTrack?: string; onCh
 
 	if (network) {
 		Object.entries(NETWORKS_DETAILS?.[`${network}`].trackDetails).forEach(([key, value]) => {
-			if (value.group === 'Treasury') {
+			if (trackGroup) {
+				if (trackGroup.includes(value.group || 'Treasury')) {
+					trackArr.push(key);
+				}
+			} else {
 				trackArr.push(key);
 			}
 		});
 	}
 	return (
 		<div className='flex flex-col gap-y-1'>
-			<p>{t('CreateTreasuryProposal.track')}</p>
+			<p className='text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
 				<DropdownMenuTrigger className='flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2'>
 					{selectedTrack || t('CreateTreasuryProposal.selectTrack')}
