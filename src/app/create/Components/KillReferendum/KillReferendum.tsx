@@ -157,7 +157,7 @@ function KillReferendum() {
 						<InputNumber
 							onChange={setReferendumId}
 							disabled={isFetching}
-							placeholder={t('KillCancelReferendum.referendumIdPlaceholder')}
+							placeholder={t('KillCancelReferendum.referendumIdDescription')}
 						/>
 						{isFetching && <Skeleton className='h-4 w-full' />}
 						{data &&

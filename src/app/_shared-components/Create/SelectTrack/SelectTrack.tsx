@@ -4,9 +4,10 @@
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { BN_ZERO } from '@polkadot/util';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
-function SelectTrack({ selectedTrack, onChange, trackGroup }: { selectedTrack?: string; onChange: (track: string) => void; trackGroup?: string[] }) {
+function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: string; onChange: (track: string) => void; isTreasury?: boolean }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
@@ -14,8 +15,8 @@ function SelectTrack({ selectedTrack, onChange, trackGroup }: { selectedTrack?: 
 
 	if (network) {
 		Object.entries(NETWORKS_DETAILS?.[`${network}`].trackDetails).forEach(([key, value]) => {
-			if (trackGroup) {
-				if (trackGroup.includes(value.group || 'Treasury')) {
+			if (isTreasury) {
+				if (value.maxSpend && value.maxSpend.gt(BN_ZERO)) {
 					trackArr.push(key);
 				}
 			} else {

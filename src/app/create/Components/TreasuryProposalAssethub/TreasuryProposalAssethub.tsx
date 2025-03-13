@@ -146,7 +146,7 @@ function TreasuryProposalAssethub() {
 					<SelectTrack
 						selectedTrack={selectedTrack}
 						onChange={setSelectedTrack}
-						trackGroup={['Treasury']}
+						isTreasury
 					/>
 					<EnactmentForm
 						selectedEnactment={selectedEnactment}

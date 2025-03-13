@@ -64,7 +64,7 @@ function MultipleBeneficiaryForm({
 								onChange={({ value, assetId }) => handleAmountChange({ amount: value, assetId, index })}
 							/>
 						</div>
-						{index > 0 && (
+						{beneficiaries.length > 1 && (
 							<div className='flex w-full justify-end text-text_pink'>
 								<Button
 									onClick={() => removeBeneficiary(index)}

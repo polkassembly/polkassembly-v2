@@ -157,7 +157,7 @@ function TreasuryProposalLocal() {
 					<SelectTrack
 						selectedTrack={selectedTrack}
 						onChange={(track) => setSelectedTrack(track)}
-						trackGroup={['Treasury']}
+						isTreasury
 					/>
 
 					<EnactmentForm
