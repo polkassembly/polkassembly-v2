@@ -5,7 +5,7 @@
 import { Input } from '@ui/Input';
 import { IoIosSearch } from 'react-icons/io';
 import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch';
-import { KeyboardEvent, useRef, useState, useCallback, useEffect, FocusEvent } from 'react';
+import { KeyboardEvent, useRef, useState, useCallback, useEffect, FocusEvent, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import { ESearchType } from '@/_shared/types';
 import SearchSuggestions from './SearchSuggestions';
@@ -20,28 +20,31 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 	const [inputValue, setInputValue] = useState(query);
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [isFocused, setIsFocused] = useState(false);
 
-	const debouncedRefine = useCallback(
-		(value: string) => {
-			const debouncedFn = debounce((val: string) => {
-				refine(val);
-			}, 300);
-			debouncedFn(value);
-			return () => debouncedFn.cancel();
-		},
+	const debouncedRefine = useMemo(
+		() =>
+			debounce((value: string) => {
+				refine(value);
+			}, 300),
 		[refine]
 	);
 
+	// Cleanup debounce on unmount
 	useEffect(() => {
-		debouncedRefine(inputValue);
-	}, [debouncedRefine, inputValue]);
+		return () => {
+			debouncedRefine.cancel();
+		};
+	}, [debouncedRefine]);
 
 	const handleInputChange = useCallback(
 		(value: string) => {
 			setInputValue(value);
-			setShowSuggestions(true);
-			debouncedRefine(value);
+			if (value.length >= 3) {
+				setShowSuggestions(true);
+				debouncedRefine(value);
+			} else {
+				setShowSuggestions(false);
+			}
 		},
 		[debouncedRefine]
 	);
@@ -75,26 +78,21 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 	);
 
 	const handleFocus = useCallback(() => {
-		setIsFocused(true);
-		setShowSuggestions(true);
+		if (inputValue.length >= 3) {
+			setShowSuggestions(true);
+		}
+	}, [inputValue.length]);
+
+	const handleBlur = useCallback((e: FocusEvent<HTMLInputElement>) => {
+		if (!e.relatedTarget?.closest('.search-area')) {
+			setTimeout(() => {
+				setShowSuggestions(false);
+			}, 200);
+		}
 	}, []);
 
-	const handleBlur = useCallback(
-		(e: FocusEvent<HTMLInputElement>) => {
-			if (!e.relatedTarget?.closest('.search-suggestions')) {
-				setIsFocused(false);
-				setTimeout(() => {
-					if (!isFocused) {
-						setShowSuggestions(false);
-					}
-				}, 200);
-			}
-		},
-		[isFocused]
-	);
-
 	return (
-		<div className='relative'>
+		<div className='search-area relative'>
 			<Input
 				value={inputValue}
 				onChange={(e) => handleInputChange(e.target.value)}
@@ -114,7 +112,7 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 				<IoIosSearch className='text-xl text-white' />
 			</button>
 			{showSuggestions && (
-				<div className='search-suggestions'>
+				<div className='search-suggestions search-area'>
 					<SearchSuggestions
 						query={inputValue}
 						onSuggestionClick={handleSuggestionClick}

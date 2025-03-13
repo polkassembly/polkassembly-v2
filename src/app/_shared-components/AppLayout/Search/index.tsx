@@ -51,7 +51,7 @@ export default function Search() {
 						}
 					/>
 
-					<div className='mb-2'>
+					<div>
 						<CustomSearchBox
 							onSearch={setSearchContext}
 							onTypeChange={(type: ESearchType | null) => setActiveIndex(type)}

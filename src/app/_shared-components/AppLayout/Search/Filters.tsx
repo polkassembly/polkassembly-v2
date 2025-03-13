@@ -10,6 +10,8 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ESearchType } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
 interface FiltersProps {
 	activeIndex: ESearchType | null;
@@ -30,7 +32,7 @@ const options = [
 	{ value: ESearchType.DISCUSSIONS, label: 'Discussions' }
 ];
 
-type DropdownType = 'networks' | 'date' | 'topics' | 'tags' | null;
+type DropdownType = 'networks' | 'date' | 'tracks' | 'topics' | 'tags' | null;
 
 const LABELSTYLE = 'flex items-center gap-1 text-xs text-text_primary';
 export default function Filters({ activeIndex, onChange, isSuperSearch = false }: FiltersProps) {
@@ -76,24 +78,14 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		end: number;
 	}
 	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
-
-	// Separate clear filter function
 	const clearDateFilter = useCallback(() => {
 		setSelectedDateRange(null);
-		refresh(); // Refresh to update results
+		refresh();
 	}, [refresh]);
 
-	// Modified dropdown open/close handler
-	const handleDropdownOpen = useCallback(
-		(dropdown: DropdownType) => {
-			// If we're closing the date dropdown and there's no selection, clear the filter
-			if (openDropdown === 'date' && dropdown === null && !selectedDateRange) {
-				clearDateFilter();
-			}
-			setOpenDropdown(dropdown);
-		},
-		[openDropdown, selectedDateRange, clearDateFilter]
-	);
+	const handleDropdownOpen = useCallback((dropdown: DropdownType) => {
+		setOpenDropdown(dropdown);
+	}, []);
 
 	const handleDateSelection = useCallback(
 		(range: DateRange | null) => {
@@ -119,7 +111,6 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 				case 'Last 7 days':
 					range = {
 						label,
-						// Use startOf('day') for both start and end to get exact day boundaries
 						start: now.subtract(7, 'days').startOf('day').unix(),
 						end: now.endOf('day').unix()
 					};
@@ -141,7 +132,6 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 				case 'All time':
 					range = {
 						label,
-						// Don't use 0 as start time, use a reasonable past date
 						start: dayjs.utc('2020-01-01').startOf('day').unix(),
 						end: now.endOf('day').unix()
 					};
@@ -150,18 +140,29 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 					range = null;
 			}
 
-			// Add debug logging
-			if (range) {
-				console.log('Date range selected:', {
-					label: range.label,
-					start: dayjs.unix(range.start).format('YYYY-MM-DD HH:mm:ss'),
-					end: dayjs.unix(range.end).format('YYYY-MM-DD HH:mm:ss')
-				});
-			}
-
 			handleDateSelection(range);
 		},
 		[handleDateSelection]
+	);
+	const network = getCurrentNetwork();
+	const transformTrackItems = useCallback(
+		(items: RefinementItem[]) => {
+			return items.map((item: RefinementItem) => {
+				const trackDetails = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.trackDetails;
+				const trackInfo = Object.values(trackDetails || {}).find((track) => track.trackId?.toString() === item.value);
+				const trackName = trackInfo?.name || item.label;
+				const formattedTrackName = trackName
+					.replace(/_/g, ' ')
+					.toLowerCase()
+					.replace(/^\w/, (c) => c.toUpperCase());
+
+				return {
+					...item,
+					label: `${formattedTrackName} (${item.count})`
+				};
+			});
+		},
+		[network]
 	);
 
 	return (
@@ -209,7 +210,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 										</button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
-										<Configure filters={allowedNetwork.map((network) => `network:${network}`).join(' OR ')} />
+										<Configure filters={allowedNetwork.map((Networks) => `network:${Networks}`).join(' OR ')} />
 										<RefinementList
 											attribute='network'
 											classNames={{
@@ -224,24 +225,17 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 							)}
 							<DropdownMenu
 								open={openDropdown === 'date'}
-								onOpenChange={(open) => {
-									handleDropdownOpen(open ? 'date' : null);
-								}}
+								onOpenChange={(open) => handleDropdownOpen(open ? 'date' : null)}
 							>
 								<DropdownMenuTrigger asChild>
 									<button
 										type='button'
 										className='flex items-center gap-1 text-xs text-text_primary'
 									>
-										{/* Show selected date range in the trigger button */}
 										{selectedDateRange ? selectedDateRange.label : 'Date'} <IoIosArrowDown />
 									</button>
 								</DropdownMenuTrigger>
-
 								<DropdownMenuContent className='max-h-[250px] w-48 overflow-auto p-3'>
-									<div className='mb-2 flex items-center justify-between'>
-										<span className='text-xs font-medium'>Filter by date</span>
-									</div>
 									{selectedDateRange && (
 										<Configure
 											filters={`created_at >= ${selectedDateRange.start} AND created_at <= ${selectedDateRange.end}`}
@@ -262,7 +256,35 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 									</div>
 								</DropdownMenuContent>
 							</DropdownMenu>
-
+							{activeIndex === ESearchType.POSTS && (
+								<DropdownMenu
+									open={openDropdown === 'tracks'}
+									onOpenChange={(open) => handleDropdownOpen(open ? 'tracks' : null)}
+								>
+									<DropdownMenuTrigger asChild>
+										<button
+											type='button'
+											className='flex items-center gap-1 text-xs text-text_primary'
+										>
+											Tracks <IoIosArrowDown />
+										</button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+										<RefinementList
+											attribute='track_number'
+											classNames={{
+												list: 'space-y-2',
+												label: LABELSTYLE,
+												labelText: LABELSTYLE,
+												count: 'hidden'
+											}}
+											transformItems={transformTrackItems}
+											limit={15}
+											showMore={false}
+										/>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
 							<DropdownMenu
 								open={openDropdown === 'topics'}
 								onOpenChange={(open) => handleDropdownOpen(open ? 'topics' : null)}
@@ -277,7 +299,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
 									<RefinementList
-										attribute='topic_id'
+										attribute='topic'
 										classNames={{
 											list: 'space-y-2',
 											label: LABELSTYLE,

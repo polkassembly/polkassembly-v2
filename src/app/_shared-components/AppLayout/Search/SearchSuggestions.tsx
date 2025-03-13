@@ -35,13 +35,13 @@ function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSugg
 	};
 
 	return (
-		<div className='absolute top-full z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800'>
+		<div className='absolute top-full z-50 mt-1 w-full rounded-md border bg-bg_modal shadow-lg'>
 			<div className='max-h-60 w-full overflow-auto p-2'>
 				{results.hits.slice(0, 5).map((hit: SearchHit) => (
 					<button
 						type='button'
 						key={hit.objectID}
-						className='w-full cursor-pointer rounded-md p-2 text-start hover:bg-gray-100 dark:hover:bg-gray-700'
+						className='w-full cursor-pointer rounded-md p-2 text-start'
 						onClick={() => handleClick(hit)}
 						onMouseDown={(e) => e.preventDefault()}
 					>

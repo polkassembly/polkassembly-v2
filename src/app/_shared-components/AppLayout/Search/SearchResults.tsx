@@ -6,7 +6,7 @@ import Image from 'next/image';
 import searchGif from '@assets/search/search.gif';
 import searchLoader from '@assets/search/search-loader.gif';
 import userIcon from '@assets/profile/user-icon.svg';
-import { Hits, Index, useInstantSearch, useSearchBox, Configure, Pagination } from 'react-instantsearch';
+import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
 import { ESearchDiscussionType, ESearchType } from '@/_shared/types';
@@ -16,10 +16,11 @@ import { FaMagic } from 'react-icons/fa';
 import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
-import BlockEditor from '../../BlockEditor/BlockEditor';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
-import { Button, buttonVariants } from '../../Button';
+import { Button } from '../../Button';
+import { PaginationWithLinks } from '../../PaginationWithLinks';
+import Tags from './Tags';
 
 interface Post {
 	id: string;
@@ -74,13 +75,9 @@ function PostHit({ hit }: { hit: Post }) {
 					#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
 				</p>
 			</h2>
-			<div className='mb-5 flex max-h-40 w-full overflow-hidden border-none'>
-				<BlockEditor
-					data={typeof hit.content === 'string' ? { blocks: [{ type: 'paragraph', data: { text: `${hit.content.slice(0, 350)}...` } }] } : hit.content}
-					readOnly
-					id={`post-content-${hit.objectID}`}
-				/>
-			</div>{' '}
+			<div className='my-3 flex max-h-40 w-full overflow-hidden border-none'>
+				<p className='text-sm text-text_primary'>{hit.parsed_content?.slice(0, 350)}...</p>
+			</div>
 			<div className='mt-2 flex flex-wrap gap-2 text-sm'>
 				<div className='flex items-center gap-2'>
 					<div className='flex items-center gap-1'>
@@ -105,14 +102,7 @@ function PostHit({ hit }: { hit: Post }) {
 				/>{' '}
 				{hit.tags && hit.tags.length > 0 && (
 					<div className='flex items-center gap-2'>
-						{hit.tags?.map((tag) => (
-							<span
-								key={tag}
-								className='rounded bg-gray-100 px-2 py-1 text-xs text-gray-800'
-							>
-								{tag}
-							</span>
-						))}
+						<Tags tags={hit.tags} />
 						<Separator
 							orientation='vertical'
 							className='h-4'
@@ -176,6 +166,7 @@ function UserHit({ hit }: { hit: User }) {
 function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIndex: ESearchType | null; onSuperSearch: () => void; isSuperSearch: boolean }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
+	const { currentRefinement, refine } = usePagination();
 
 	const isLoading = status === 'loading';
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
@@ -305,16 +296,11 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 			</div>
 			{query.length > 2 && results?.nbHits > 10 && (
 				<div className='my-5 flex flex-col items-center justify-center gap-4'>
-					<Pagination
-						classNames={{
-							list: 'flex items-center space-x-2',
-							pageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
-							selectedItem: `${buttonVariants.secondary} px-2 py-1 rounded-md`,
-							previousPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
-							nextPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
-							firstPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`,
-							lastPageItem: `${buttonVariants.pagination} px-2 py-1 rounded-md`
-						}}
+					<PaginationWithLinks
+						page={currentRefinement + 1}
+						pageSize={10}
+						totalCount={results?.nbHits || 0}
+						onClick={(newPage) => refine(newPage - 1)}
 					/>
 					{!isSuperSearch && (
 						<>
