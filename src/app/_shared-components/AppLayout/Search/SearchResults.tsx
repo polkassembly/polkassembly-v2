@@ -33,8 +33,10 @@ interface Post {
 	track?: number;
 	tags?: string[];
 	parsed_content?: string;
+	__position?: number;
 	network?: string;
 	topic_id?: number;
+	typeOfReferendum?: string;
 	metrics?: {
 		reactions?: {
 			like: number;
@@ -55,89 +57,101 @@ interface User {
 }
 
 function PostHit({ hit }: { hit: Post }) {
+	console.log('hit', hit);
+	// eslint-disable-next-line
+	const position = hit.__position;
 	const topic = hit.topic_id ? Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === hit.topic_id) : null;
+	const backgroundColor = position ? (position % 2 === 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay') : '';
+
 	return (
 		<Link
 			href={hit.post_type !== ESearchDiscussionType.DISCUSSIONS ? `/referenda/${hit.id}` : `/post/${hit.id}`}
 			target='_blank'
-			className='cursor-pointer p-4 text-btn_secondary_text hover:border-y-bg_pink'
 		>
-			<div className='flex'>
-				{hit.proposer_address && (
-					<Address
-						address={hit.proposer_address}
-						className='text-lg font-medium'
-					/>
-				)}
-			</div>
-			<h2 className='text-lg font-medium'>
-				<p className='text-sm font-medium'>
-					#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
-				</p>
-			</h2>
-			<div className='my-3 flex max-h-40 w-full overflow-hidden border-none'>
-				<p className='text-sm text-text_primary'>{hit.parsed_content?.slice(0, 350)}...</p>
-			</div>
-			<div className='mt-2 flex flex-wrap gap-2 text-sm'>
-				<div className='flex items-center gap-2'>
-					<div className='flex items-center gap-1'>
-						<AiOutlineLike className='text-sm' /> {hit.metrics?.reactions?.like || 0}
-					</div>
-					<div className='flex items-center gap-1'>
-						<AiOutlineDislike className='text-sm' /> {hit.metrics?.reactions?.dislike || 0}
-					</div>
-					<div className='flex items-center gap-1'>
-						<Image
-							src={CommentIcon}
-							alt='comment'
-							width={14}
-							height={14}
-						/>{' '}
-						{hit.metrics?.comments || 0}
-					</div>
+			<div className={`p-4 text-btn_secondary_text hover:border-y hover:border-bg_pink ${backgroundColor}`}>
+				<div className='flex'>
+					{hit.proposer_address && (
+						<Address
+							address={hit.proposer_address}
+							className='text-lg font-medium'
+						/>
+					)}
 				</div>
-				<Separator
-					orientation='vertical'
-					className='h-4'
-				/>{' '}
-				{hit.tags && hit.tags.length > 0 && (
+				<h2 className='text-lg font-medium'>
+					<p className='text-sm font-medium'>
+						#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
+					</p>
+				</h2>
+				<div className='my-3 flex max-h-40 w-full overflow-hidden border-none'>
+					<p className='text-sm text-text_primary'>{hit.parsed_content?.slice(0, 350)}...</p>
+				</div>
+				<div className='mt-2 flex flex-wrap gap-2 text-sm'>
 					<div className='flex items-center gap-2'>
-						<Tags tags={hit.tags} />
+						<div className='flex items-center gap-1'>
+							<AiOutlineLike className='text-sm' /> {hit.metrics?.reactions?.like || 0}
+						</div>
+						<div className='flex items-center gap-1'>
+							<AiOutlineDislike className='text-sm' /> {hit.metrics?.reactions?.dislike || 0}
+						</div>
+						<div className='flex items-center gap-1'>
+							<Image
+								src={CommentIcon}
+								alt='comment'
+								width={14}
+								height={14}
+							/>{' '}
+							{hit.metrics?.comments || 0}
+						</div>
 						<Separator
 							orientation='vertical'
 							className='h-4'
-						/>{' '}
+						/>
 					</div>
-				)}
-				{hit.created_at && (
-					<div className='flex items-center gap-2'>
-						<CreatedAtTime createdAt={dayjs.utc(hit.created_at * 1000).toDate()} />
-						<Separator
-							orientation='vertical'
-							className='h-4'
-						/>{' '}
-					</div>
-				)}
-				{topic && (
-					<div className='flex items-center gap-2'>
-						<span className='rounded bg-gray-100 px-2 py-1 text-xs text-gray-800'>
-							{topic
-								.replace(/_/g, ' ')
-								.toLowerCase()
-								.replace(/^\w/, (c) => c.toUpperCase())}
-						</span>{' '}
-						<Separator
-							orientation='vertical'
-							className='h-4'
-						/>{' '}
-					</div>
-				)}
-				{hit.post_type && (
-					<div className='flex items-center gap-2'>
-						<p>in</p>
-						<span className='rounded bg-pink-100 px-2 py-1 text-xs text-pink-800'>{hit.post_type.charAt(0).toUpperCase() + hit.post_type.slice(1).replace('_', ' ')}</span>
-					</div>
-				)}
+					{hit.tags && hit.tags.length > 0 && (
+						<div className='flex items-center gap-2'>
+							<Tags tags={hit.tags} />
+							<Separator
+								orientation='vertical'
+								className='h-4'
+							/>{' '}
+						</div>
+					)}
+					{hit.created_at && (
+						<div className='flex items-center gap-2'>
+							<CreatedAtTime createdAt={dayjs.utc(hit.created_at * 1000).toDate()} />
+							<Separator
+								orientation='vertical'
+								className='h-4'
+							/>{' '}
+						</div>
+					)}
+					{topic && (
+						<div className='flex items-center gap-2'>
+							<span className='bg-topic_tag_bg text-topic_tag_text rounded px-2 py-1 text-xs'>
+								{topic
+									.replace(/_/g, ' ')
+									.toLowerCase()
+									.replace(/^\w/, (c) => c.toUpperCase())}
+							</span>
+							<Separator
+								orientation='vertical'
+								className='h-4'
+							/>{' '}
+						</div>
+					)}
+					{hit.post_type && (
+						<div className='flex items-center gap-2'>
+							<p>in</p>
+							{hit.post_type === ESearchDiscussionType.REFERENDUMS_V2 ? (
+								<span className='text-xs text-text_pink'>Opengov Referenda</span>
+							) : (
+								<span className='rounded bg-progress_pink_bg px-2 py-1 text-xs text-text_pink'>
+									{hit.post_type.charAt(0).toUpperCase() + hit.post_type.slice(1).replace('_', ' ')}
+								</span>
+							)}
+						</div>
+					)}
+				</div>
 			</div>
 		</Link>
 	);
@@ -146,7 +160,7 @@ function UserHit({ hit }: { hit: User }) {
 	return (
 		<Link
 			href={hit.username && `/user/username/${hit.username}`}
-			className='flex cursor-pointer gap-2 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800'
+			className='flex cursor-pointer gap-2 rounded-lg p-4'
 		>
 			<Image
 				src={userIcon}
@@ -156,8 +170,8 @@ function UserHit({ hit }: { hit: User }) {
 				className='rounded-full'
 			/>
 			<div>
-				<h2 className='text-lg font-medium'>{hit.username}</h2>
-				<p className='mt-2 text-sm text-gray-600 dark:text-gray-300'>{hit.profile?.bio || 'No bio'}</p>
+				<h2 className='text-lg font-medium text-btn_secondary_text'>{hit.username}</h2>
+				<p className='mt-2 text-sm text-text_primary'>{hit.profile?.bio || 'No bio'}</p>
 			</div>
 		</Link>
 	);

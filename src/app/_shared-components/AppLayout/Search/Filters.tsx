@@ -32,21 +32,20 @@ const options = [
 	{ value: ESearchType.DISCUSSIONS, label: 'Discussions' }
 ];
 
+interface DateRange {
+	label: string;
+	start: number;
+	end: number;
+}
+
 type DropdownType = 'networks' | 'date' | 'tracks' | 'topics' | 'tags' | null;
 
 const LABELSTYLE = 'flex items-center gap-1 text-xs text-text_primary';
 export default function Filters({ activeIndex, onChange, isSuperSearch = false }: FiltersProps) {
 	const { results, refresh } = useInstantSearch();
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
-
-	useMemo(() => {
-		if (results.query.length > 2 && activeIndex === null) {
-			onChange(ESearchType.POSTS);
-		}
-		if (results.query.length === 0 && activeIndex !== null) {
-			onChange(null);
-		}
-	}, [results.query.length, activeIndex, onChange]);
+	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
+	const network = getCurrentNetwork();
 
 	const transformTopicItems = useCallback((items: RefinementItem[]) => {
 		return items.map((item: RefinementItem) => {
@@ -72,12 +71,6 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		}));
 	}, []);
 
-	interface DateRange {
-		label: string;
-		start: number;
-		end: number;
-	}
-	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
 	const clearDateFilter = useCallback(() => {
 		setSelectedDateRange(null);
 		refresh();
@@ -144,7 +137,16 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		},
 		[handleDateSelection]
 	);
-	const network = getCurrentNetwork();
+
+	useMemo(() => {
+		if (results.query.length > 2 && activeIndex === null) {
+			onChange(ESearchType.POSTS);
+		}
+		if (results.query.length === 0 && activeIndex !== null) {
+			onChange(null);
+		}
+	}, [results.query.length, activeIndex, onChange]);
+
 	const transformTrackItems = useCallback(
 		(items: RefinementItem[]) => {
 			return items.map((item: RefinementItem) => {
@@ -210,7 +212,6 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 										</button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
-										<Configure filters={allowedNetwork.map((Networks) => `network:${Networks}`).join(' OR ')} />
 										<RefinementList
 											attribute='network'
 											classNames={{
@@ -219,6 +220,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 												labelText: LABELSTYLE,
 												count: 'hidden'
 											}}
+											transformItems={(items: RefinementItem[]) => items.filter((item) => allowedNetwork.includes(item.value))}
 										/>
 									</DropdownMenuContent>
 								</DropdownMenu>
@@ -348,9 +350,9 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 					<button
 						type='button'
 						onClick={clearDateFilter}
-						className='text-xs text-blue-500 hover:text-blue-700'
+						className='rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text'
 					>
-						Clear Date Filter
+						X Date Filter
 					</button>
 				)}
 			</div>

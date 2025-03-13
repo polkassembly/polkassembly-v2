@@ -6,11 +6,13 @@ import { IoIosSearch } from 'react-icons/io';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ESearchType } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import CustomSearchBox from './CustomSearchBox';
 import Filters from './Filters';
 import SearchResults from './SearchResults';
+import { allowedNetwork } from '@/_shared/_constants/searchConstants';
 
 const ALGOLIA_APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
 const ALGOLIA_SEARCH_API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY;
@@ -20,6 +22,18 @@ export default function Search() {
 	const [activeIndex, setActiveIndex] = useState<ESearchType | null>(null);
 	const [searchContext, setSearchContext] = useState<string | null>(null);
 	const [isSuperSearch, setIsSuperSearch] = useState(false);
+	const network = getCurrentNetwork();
+
+	const networkFilter = useMemo(() => {
+		if (activeIndex === ESearchType.USERS) {
+			return '';
+		}
+
+		if (isSuperSearch) {
+			return allowedNetwork.map((network) => `network:${network}`).join(' OR ');
+		}
+		return `network:${network}`;
+	}, [isSuperSearch, network, activeIndex]);
 
 	return (
 		<Dialog>
@@ -42,13 +56,17 @@ export default function Search() {
 					<Configure
 						hitsPerPage={10}
 						distinct
-						filters={
+						filters={`${networkFilter}${
 							activeIndex === ESearchType.POSTS
-								? 'NOT post_type:discussions OR NOT post_type:grants'
+								? networkFilter
+									? ' AND (NOT post_type:discussions AND NOT post_type:grants)'
+									: 'NOT post_type:discussions AND NOT post_type:grants'
 								: activeIndex === ESearchType.DISCUSSIONS
-									? 'post_type:discussions OR post_type:grants'
-									: undefined
-						}
+									? networkFilter
+										? ' AND (post_type:discussions OR post_type:grants)'
+										: 'post_type:discussions OR post_type:grants'
+									: ''
+						}`.trim()}
 					/>
 
 					<div>

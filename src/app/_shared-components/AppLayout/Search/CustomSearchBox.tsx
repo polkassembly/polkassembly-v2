@@ -29,7 +29,6 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 		[refine]
 	);
 
-	// Cleanup debounce on unmount
 	useEffect(() => {
 		return () => {
 			debouncedRefine.cancel();
@@ -109,7 +108,7 @@ export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: Cu
 				className='absolute right-0 top-1/2 h-10 -translate-y-1/2 cursor-pointer rounded-r-md bg-bg_pink p-2'
 				onClick={handleSearch}
 			>
-				<IoIosSearch className='text-xl text-white' />
+				<IoIosSearch className='text-xl text-btn_primary_text' />
 			</button>
 			{showSuggestions && (
 				<div className='search-suggestions search-area'>

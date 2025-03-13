@@ -35,7 +35,7 @@ function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSugg
 	};
 
 	return (
-		<div className='absolute top-full z-50 mt-1 w-full rounded-md border bg-bg_modal shadow-lg'>
+		<div className='absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg'>
 			<div className='max-h-60 w-full overflow-auto p-2'>
 				{results.hits.slice(0, 5).map((hit: SearchHit) => (
 					<button

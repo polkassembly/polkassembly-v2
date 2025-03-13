@@ -906,5 +906,6 @@ export enum ESearchType {
 
 export enum ESearchDiscussionType {
 	DISCUSSIONS = 'discussions',
-	GRANTS = 'grants'
+	GRANTS = 'grants',
+	REFERENDUMS_V2 = 'referendums_v2'
 }

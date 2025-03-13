@@ -5,28 +5,22 @@
 function Tags({ tags }: { tags: string[] }) {
 	return (
 		<div className='flex flex-wrap gap-2'>
-			{tags.length > 2 ? (
+			{tags[0]?.length > 6 ? (
+				<div className='flex items-center gap-1'>
+					<span className='rounded-full border border-border_grey px-2 py-0.5 text-xs text-btn_secondary_text'>{tags[0]}</span>
+					{tags.length > 1 && <span className='text-xs text-btn_secondary_text'>+{tags.length - 1}</span>}
+				</div>
+			) : (
 				<div className='flex items-center gap-1'>
 					{tags.slice(0, 2).map((tag) => (
 						<span
-							className='rounded-full border border-border_grey px-2 py-0.5 text-xs text-btn_secondary_text'
 							key={tag}
+							className='rounded-full border border-border_grey px-2 py-0.5 text-xs text-btn_secondary_text'
 						>
 							{tag}
 						</span>
 					))}
-					<span className='text-xs text-btn_secondary_text'>+{tags.length - 2}</span>
-				</div>
-			) : (
-				<div>
-					{tags.map((tag) => (
-						<div
-							className='rounded-full border border-border_grey px-2 py-0.5 text-xs text-btn_secondary_text'
-							key={tag}
-						>
-							{tag}
-						</div>
-					))}
+					{tags.length > 2 && <span className='text-xs text-btn_secondary_text'>+{tags.length - 2}</span>}
 				</div>
 			)}
 		</div>
