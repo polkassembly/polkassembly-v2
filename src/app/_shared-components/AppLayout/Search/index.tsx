@@ -30,15 +30,13 @@ function Search() {
 
 	const handleTypeChange = (type: ESearchType | null) => setActiveIndex(type);
 	const handleSuperSearch = () => setIsSuperSearch(true);
-
 	const t = useTranslations('Search');
-
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
 				<IoIosSearch className='cursor-pointer text-2xl text-text_primary' />
 			</DialogTrigger>
-			<DialogContent className={`${allowedNetwork.includes(network) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
+			<DialogContent className={`${allowedNetwork.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
 					<DialogTitle className={styles.search_dialog_title}>
 						{isSuperSearch ? t('superSearch') : t('search')}
@@ -50,7 +48,7 @@ function Search() {
 					</DialogTitle>
 				</DialogHeader>
 
-				{allowedNetwork.includes(network) ? (
+				{allowedNetwork.includes(network.toUpperCase()) ? (
 					<InstantSearch
 						searchClient={searchClient}
 						indexName={indexName}
