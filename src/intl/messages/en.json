@@ -716,6 +716,20 @@
 		"networks": "Networks",
 		"tracks": "Tracks",
 		"topics": "Topics",
-		"tags": "Tags"
+		"tags": "Tags",
+		"in": "in",
+		"noBio": "No bio",
+		"pleaseEnterAtLeast3Characters": "Please enter at least 3 characters to proceed.",
+		"or": "OR",
+		"see": "See",
+		"poweredBy": "Powered by",
+		"welcomeToTheAllNewSuperchargedSearch": "Welcome to the all new & supercharged search!",
+		"latestActivity": "Latest Activity",
+		"onPolkassembly": "on Polkassembly.",
+		"noSearchResultsFound": "No search results found. You may want to try using different keywords.",
+		"useSuperSearch": "Use Super Search",
+		"didntFindWhatYouWereLookingFor": "Didn't find what you were looking for?",
+		"useSuperSearchButton": "Use Super Search",
+		"poweredByPolkassembly": "Powered by Polkassembly."
 	}
 }

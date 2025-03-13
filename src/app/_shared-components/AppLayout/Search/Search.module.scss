@@ -58,3 +58,39 @@
 .date_filter_label {
     @apply w-full rounded px-2 py-1 text-left text-xs
 }
+
+.search_results_wrapper {
+    @apply p-4 text-btn_secondary_text hover:border-y hover:border-bg_pink;
+}
+
+.post_content {
+    @apply my-3 flex max-h-40 w-full overflow-hidden border-none
+}
+
+.topic_tag {
+    @apply rounded bg-topic_tag_bg px-2 py-1 text-xs text-topic_tag_text;
+}
+
+.post_type {
+    @apply rounded bg-progress_pink_bg px-2 py-1 text-xs text-text_pink
+}
+
+.user_name {
+    @apply text-lg font-medium text-btn_secondary_text;
+}
+
+.post_context {
+    @apply flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text;
+}
+
+.pagination {
+    @apply my-5 flex flex-col items-center justify-center gap-4
+}
+
+.pa_logo {
+    @apply mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em]
+}
+
+.search {
+    @apply flex items-center gap-2 text-sm text-text_primary
+}

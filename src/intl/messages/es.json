@@ -696,6 +696,20 @@
 		"networks": "Redes",
 		"tracks": "Pistas",
 		"topics": "Temas",
-		"tags": "Etiquetas"
+		"tags": "Etiquetas",
+		"in": "en",
+		"noBio": "Sin bio",
+		"pleaseEnterAtLeast3Characters": "Por favor, ingrese al menos 3 caracteres para continuar.",
+		"or": "O",
+		"see": "Ver",
+		"poweredBy": "Powered by",
+		"welcomeToTheAllNewSuperchargedSearch": "Bienvenido a la nueva búsqueda supercharged!",
+		"latestActivity": "Última actividad",
+		"onPolkassembly": "en Polkassembly.",
+		"noSearchResultsFound": "No se encontraron resultados de búsqueda. Es posible que desee intentar usar diferentes palabras clave.",
+		"useSuperSearch": "Usar búsqueda super",
+		"didntFindWhatYouWereLookingFor": "No encontraste lo que buscabas?",
+		"useSuperSearchButton": "Usar búsqueda super",
+		"poweredByPolkassembly": "Powered by Polkassembly."
 	}
 }

@@ -696,6 +696,20 @@
 		"networks": "网络",
 		"tracks": "轨道",
 		"topics": "主题",
-		"tags": "标签"
+		"tags": "标签",
+		"in": "in",
+		"noBio": "没有生物",
+		"pleaseEnterAtLeast3Characters": "请输入至少3个字符",
+		"or": "或",
+		"see": "查看",
+		"poweredBy": "Powered by",
+		"welcomeToTheAllNewSuperchargedSearch": "欢迎使用全新的&超级充电搜索！",
+		"latestActivity": "最新活动",
+		"onPolkassembly": "在Polkassembly上。",
+		"noSearchResultsFound": "未找到搜索结果。您可能想尝试使用不同的关键词。",
+		"useSuperSearch": "使用超级搜索",
+		"didntFindWhatYouWereLookingFor": "没有找到您要找的内容？",
+		"useSuperSearchButton": "使用超级搜索",
+		"poweredByPolkassembly": "Powered by Polkassembly."
 	}
 }

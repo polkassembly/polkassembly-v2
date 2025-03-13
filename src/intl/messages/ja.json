@@ -696,6 +696,20 @@
 		"networks": "ネットワーク",
 		"tracks": "トラック",
 		"topics": "トピック",
-		"tags": "タグ"
+		"tags": "タグ",
+		"in": "in",
+		"noBio": "ノービオ",
+		"pleaseEnterAtLeast3Characters": "少なくとも3文字を入力してください。",
+		"or": "OR",
+		"see": "見る",
+		"poweredBy": "Powered by",
+		"welcomeToTheAllNewSuperchargedSearch": "すべての新しい&スーパーチャージャードサーチへようこそ！",
+		"latestActivity": "最新のアクティビティ",
+		"onPolkassembly": "on Polkassembly.",
+		"noSearchResultsFound": "検索結果が見つかりません。異なるキーワードを使用してみてください。",
+		"useSuperSearch": "スーパーサーチを使用",
+		"didntFindWhatYouWereLookingFor": "見つかりませんでしたか？",
+		"useSuperSearchButton": "スーパーサーチを使用",
+		"poweredByPolkassembly": "Powered by Polkassembly."
 	}
 }

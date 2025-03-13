@@ -12,6 +12,8 @@ import { ESearchDiscussionType, ESearchType } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { FaMagic } from 'react-icons/fa';
+import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
@@ -20,6 +22,7 @@ import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
 import { Button } from '../../Button';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import Tags from './Tags';
+import styles from './Search.module.scss';
 
 interface Post {
 	id: string;
@@ -56,6 +59,7 @@ interface User {
 }
 
 function PostHit({ hit }: { hit: Post }) {
+	const t = useTranslations();
 	// eslint-disable-next-line
 	const position = hit.__position;
 	const topic = hit.topic_id ? Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === hit.topic_id) : null;
@@ -66,7 +70,7 @@ function PostHit({ hit }: { hit: Post }) {
 			href={hit.post_type !== ESearchDiscussionType.DISCUSSIONS ? `/referenda/${hit.id}` : `/post/${hit.id}`}
 			target='_blank'
 		>
-			<div className={`p-4 text-btn_secondary_text hover:border-y hover:border-bg_pink ${backgroundColor}`}>
+			<div className={`${styles.search_results_wrapper} ${backgroundColor}`}>
 				<div className='flex'>
 					{hit.proposer_address && (
 						<Address
@@ -80,7 +84,7 @@ function PostHit({ hit }: { hit: Post }) {
 						#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
 					</p>
 				</h2>
-				<div className='my-3 flex max-h-40 w-full overflow-hidden border-none'>
+				<div className={styles.post_content}>
 					<p className='text-sm text-text_primary'>{hit.parsed_content?.slice(0, 350)}...</p>
 				</div>
 				<div className='mt-2 flex flex-wrap gap-2 text-sm'>
@@ -125,7 +129,7 @@ function PostHit({ hit }: { hit: Post }) {
 					)}
 					{topic && (
 						<div className='flex items-center gap-2'>
-							<span className='rounded bg-topic_tag_bg px-2 py-1 text-xs text-topic_tag_text'>
+							<span className={styles.topic_tag}>
 								{topic
 									.replace(/_/g, ' ')
 									.toLowerCase()
@@ -139,13 +143,11 @@ function PostHit({ hit }: { hit: Post }) {
 					)}
 					{hit.post_type && (
 						<div className='flex items-center gap-2'>
-							<p>in</p>
+							<p className='text-text_secondary text-xs'>{t('Search.in')}</p>
 							{hit.post_type === ESearchDiscussionType.REFERENDUMS_V2 ? (
-								<span className='text-xs text-text_pink'>Opengov Referenda</span>
+								<span className='text-xs text-text_pink'>{t('Search.referenda')}</span>
 							) : (
-								<span className='rounded bg-progress_pink_bg px-2 py-1 text-xs text-text_pink'>
-									{hit.post_type.charAt(0).toUpperCase() + hit.post_type.slice(1).replace('_', ' ')}
-								</span>
+								<span className={styles.post_type}>{hit.post_type.charAt(0).toUpperCase() + hit.post_type.slice(1).replace('_', ' ')}</span>
 							)}
 						</div>
 					)}
@@ -155,6 +157,7 @@ function PostHit({ hit }: { hit: Post }) {
 	);
 }
 function UserHit({ hit }: { hit: User }) {
+	const t = useTranslations();
 	return (
 		<Link
 			href={hit.username && `/user/username/${hit.username}`}
@@ -169,8 +172,8 @@ function UserHit({ hit }: { hit: User }) {
 				className='rounded-full'
 			/>
 			<div>
-				<h2 className='text-lg font-medium text-btn_secondary_text'>{hit.username}</h2>
-				<p className='mt-2 text-sm text-text_primary'>{hit.profile?.bio || 'No bio'}</p>
+				<h2 className={styles.user_name}>{hit.username}</h2>
+				<p className='mt-2 text-sm text-text_primary'>{hit.profile?.bio || t('Search.noBio')}</p>
 			</div>
 		</Link>
 	);
@@ -180,7 +183,7 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
-
+	const t = useTranslations();
 	const isLoading = status === 'loading';
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
 
@@ -199,7 +202,7 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 						/>
 					</div>
 				) : query.length > 0 && query.length < 3 ? (
-					<div className='flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
+					<div className={styles.post_context}>
 						<Image
 							src={searchGif}
 							alt='search-icon'
@@ -208,27 +211,27 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 							className='-my-[40px]'
 							priority
 						/>
-						<p className='text-sm text-text_primary'>Please enter at least 3 characters to proceed.</p>
+						<p className='text-sm text-text_primary'>{t('Search.pleaseEnterAtLeast3Characters')}</p>
 						<div className='mt-4 flex items-center gap-2'>
-							<span className='text-text_secondary text-sm'>OR</span>
+							<span className='text-text_secondary text-sm'>{t('Search.or')}</span>
 						</div>
 						<div className='mb-10 mt-4'>
-							<span className='flex items-center gap-2 text-sm text-text_primary'>
-								See
+							<span className={styles.search}>
+								{t('Search.see')}
 								<Link
 									href='https://polkadot.polkassembly.io/opengov'
 									className='text-text_pink underline'
 								>
-									Latest Activity
+									{t('Search.latestActivity')}
 								</Link>
-								<span>on Polkassembly.</span>
+								<span>{t('Search.onPolkassembly')}</span>
 							</span>
 						</div>
 					</div>
 				) : query.length > 2 ? (
 					<div className='h-full'>
 						{hasNoResults ? (
-							<div className='flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
+							<div className={styles.post_context}>
 								<Image
 									src={searchGif}
 									alt='search-icon'
@@ -237,28 +240,28 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 									className='-my-[40px]'
 									priority
 								/>
-								<p className='mb-2 text-sm text-text_primary'>No search results found. You may want to try using different keywords.</p>
+								<p className='mb-2 text-sm text-text_primary'>{t('Search.noSearchResultsFound')}</p>
 								{!isSuperSearch && (
 									<Button
 										className='mt-4 flex items-center gap-2'
 										onClick={onSuperSearch}
 									>
-										<FaMagic /> Use Super Search
+										<FaMagic /> {t('Search.useSuperSearch')}
 									</Button>
 								)}
 								<div className='mt-4 flex items-center gap-2'>
-									<span className='text-text_secondary text-sm'>OR</span>
+									<span className='text-text_secondary text-sm'>{t('Search.or')}</span>
 								</div>
 								<div className='mb-10 mt-4'>
-									<span className='flex items-center gap-2 text-sm text-text_primary'>
-										See
+									<span className={styles.search}>
+										{t('Search.see')}
 										<Link
 											href='https://polkadot.polkassembly.io/opengov'
 											className='text-text_pink underline'
 										>
-											Latest Activity
+											{t('Search.latestActivity')}
 										</Link>
-										<span>on Polkassembly.</span>
+										<span>{t('Search.onPolkassembly')}</span>
 									</span>
 								</div>
 							</div>
@@ -290,7 +293,7 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 						)}
 					</div>
 				) : (
-					<div className='mb-10 flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text'>
+					<div className={cn(styles.post_context, 'mb-10')}>
 						<Image
 							src={searchGif}
 							alt='search-icon'
@@ -299,16 +302,16 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 							className='-my-[40px]'
 							priority
 						/>
-						<span className='mt-8 text-center tracking-[0.01em]'>Welcome to the all new & supercharged search!</span>
-						<div className='mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em]'>
-							powered by
+						<span className='mt-8 text-center tracking-[0.01em]'>{t('Search.welcomeToTheAllNewSuperchargedSearch')}</span>
+						<div className={styles.pa_logo}>
+							{t('Search.poweredByPolkassembly')}
 							<PaLogo className='h-[30px] w-[99px]' />
 						</div>
 					</div>
 				)}
 			</div>
 			{query.length > 2 && results?.nbHits > 10 && (
-				<div className='my-5 flex flex-col items-center justify-center gap-4'>
+				<div className={styles.pagination}>
 					<PaginationWithLinks
 						page={currentRefinement + 1}
 						pageSize={10}
@@ -317,12 +320,12 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 					/>
 					{!isSuperSearch && (
 						<>
-							<p className='text-text_secondary text-sm'>Didn&apos;t find what you were looking for?</p>
+							<p className='text-text_secondary text-sm'>{t('Search.didntFindWhatYouWereLookingFor')}</p>
 							<Button
 								className='mt-4 flex items-center gap-2'
 								onClick={onSuperSearch}
 							>
-								<FaMagic /> Use Super Search
+								<FaMagic /> {t('Search.useSuperSearch')}
 							</Button>
 						</>
 					)}

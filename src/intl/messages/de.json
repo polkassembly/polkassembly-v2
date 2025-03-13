@@ -697,6 +697,20 @@
 		"networks": "Netzwerke",
 		"tracks": "Tracks",
 		"topics": "Themen",
-		"tags": "Tags"
+		"tags": "Tags",
+		"in": "in",
+		"noBio": "Keine Bio",
+		"pleaseEnterAtLeast3Characters": "Bitte geben Sie mindestens 3 Zeichen ein, um fortzufahren.",
+		"or": "ODER",
+		"see": "Sehen",
+		"poweredBy": "Powered by",
+		"welcomeToTheAllNewSuperchargedSearch": "Willkommen bei der neuen & supercharged Suche!",
+		"latestActivity": "Letzte Aktivität",
+		"onPolkassembly": "auf Polkassembly.",
+		"noSearchResultsFound": "Keine Suchergebnisse gefunden. Möglicherweise möchten Sie versuchen, mit anderen Schlüsselwörtern zu suchen.",
+		"useSuperSearch": "Super Suche verwenden",
+		"didntFindWhatYouWereLookingFor": "Nichts gefunden, wonach Sie suchen?",
+		"useSuperSearchButton": "Super Suche verwenden",
+		"poweredByPolkassembly": "Powered by Polkassembly."
 	}
 }
