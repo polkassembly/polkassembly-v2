@@ -8,16 +8,26 @@ interface SearchHit {
 	objectID: string;
 	title?: string;
 	username?: string;
+	post_type?: 'discussions' | 'grants';
 }
 
-function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSuggestionClick: (value: string) => void }) {
+function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSuggestionClick: (value: string, type: 'posts' | 'users' | 'discussions') => void }) {
 	const { results } = useInstantSearch();
 
 	if (query.length < 3 || !results.hits.length) return null;
-
 	const handleClick = (hit: SearchHit) => {
 		const value = hit.title || hit.username || '';
-		onSuggestionClick(value);
+		let type: 'posts' | 'users' | 'discussions';
+
+		if (hit.username) {
+			type = 'users';
+		} else if (hit.post_type === 'discussions' || hit.post_type === 'grants') {
+			type = 'discussions';
+		} else {
+			type = 'posts';
+		}
+
+		onSuggestionClick(value, type);
 	};
 
 	return (
@@ -29,6 +39,7 @@ function SearchSuggestions({ query, onSuggestionClick }: { query: string; onSugg
 						key={hit.objectID}
 						className='w-full cursor-pointer rounded-md p-2 text-start hover:bg-gray-100 dark:hover:bg-gray-700'
 						onClick={() => handleClick(hit)}
+						onMouseDown={(e) => e.preventDefault()}
 					>
 						<p>{hit.title || hit.username}</p>
 					</button>

@@ -5,62 +5,106 @@
 import { Input } from '@ui/Input';
 import { IoIosSearch } from 'react-icons/io';
 import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch';
-import { KeyboardEvent, RefObject, useRef, useState } from 'react';
+import { KeyboardEvent, useRef, useState, useCallback, useEffect, FocusEvent } from 'react';
+import debounce from 'lodash/debounce';
 import SearchSuggestions from './SearchSuggestions';
 
 interface CustomSearchBoxProps extends UseSearchBoxProps {
 	onSearch: (query: string) => void;
+	onTypeChange: (type: 'posts' | 'users' | 'discussions') => void;
 }
 
-export default function CustomSearchBox({ onSearch, ...props }: CustomSearchBoxProps) {
+export default function CustomSearchBox({ onSearch, onTypeChange, ...props }: CustomSearchBoxProps) {
 	const { query, refine } = useSearchBox(props);
 	const [inputValue, setInputValue] = useState(query);
-	const [showSuggestions, setShowSuggestions] = useState(true);
+	const [showSuggestions, setShowSuggestions] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const [isFocused, setIsFocused] = useState(false);
 
-	function setQuery(newQuery: string) {
-		setInputValue(newQuery);
-		refine(newQuery);
-	}
+	const debouncedRefine = useCallback(
+		(value: string) => {
+			const debouncedFn = debounce((val: string) => {
+				refine(val);
+			}, 300);
+			debouncedFn(value);
+			return () => debouncedFn.cancel();
+		},
+		[refine]
+	);
 
-	const handleSearch = () => {
+	// Cleanup debounce on unmount
+	useEffect(() => {
+		debouncedRefine(inputValue);
+	}, [debouncedRefine, inputValue]);
+
+	const handleInputChange = useCallback(
+		(value: string) => {
+			setInputValue(value);
+			setShowSuggestions(true);
+			debouncedRefine(value);
+		},
+		[debouncedRefine]
+	);
+
+	const handleSearch = useCallback(() => {
 		setShowSuggestions(false);
 		refine(inputValue);
 		onSearch(inputValue);
-	};
+	}, [inputValue, refine, onSearch]);
 
-	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-		e.stopPropagation();
-		if (e.key === 'Enter') {
-			handleSearch();
-		}
-	};
+	const handleKeyDown = useCallback(
+		(e: KeyboardEvent<HTMLInputElement>) => {
+			e.stopPropagation();
+			if (e.key === 'Enter') {
+				handleSearch();
+			}
+		},
+		[handleSearch]
+	);
 
-	const handleSuggestionClick = (value: string) => {
-		setQuery(value);
-		setShowSuggestions(false);
-		refine(value);
-		onSearch(value);
-	};
+	const handleSuggestionClick = useCallback(
+		(value: string, type: 'posts' | 'users' | 'discussions') => {
+			setInputValue(value);
+			setShowSuggestions(false);
+			refine(value);
+			onSearch(value);
+			onTypeChange(type);
+			inputRef.current?.focus();
+		},
+		[refine, onSearch, onTypeChange]
+	);
+
+	const handleFocus = useCallback(() => {
+		setIsFocused(true);
+		setShowSuggestions(true);
+	}, []);
+
+	const handleBlur = useCallback(
+		(e: FocusEvent<HTMLInputElement>) => {
+			if (!e.relatedTarget?.closest('.search-suggestions')) {
+				setIsFocused(false);
+				setTimeout(() => {
+					if (!isFocused) {
+						setShowSuggestions(false);
+					}
+				}, 200);
+			}
+		},
+		[isFocused]
+	);
 
 	return (
 		<div className='relative'>
 			<Input
 				value={inputValue}
-				onChange={(e) => {
-					setQuery(e.target.value);
-					setShowSuggestions(true);
-				}}
+				onChange={(e) => handleInputChange(e.target.value)}
 				onKeyDown={handleKeyDown}
 				className='border-bg_pink pr-10 placeholder:text-text_primary'
 				placeholder='Type here to search for something'
-				ref={inputRef as RefObject<HTMLInputElement>}
-				onFocus={() => {
-					inputRef.current?.focus();
-				}}
-				onBlur={() => {
-					inputRef.current?.focus();
-				}}
+				ref={inputRef}
+				onFocus={handleFocus}
+				onBlur={handleBlur}
+				autoComplete='off'
 			/>
 			<button
 				type='button'
@@ -70,10 +114,12 @@ export default function CustomSearchBox({ onSearch, ...props }: CustomSearchBoxP
 				<IoIosSearch className='text-xl text-white' />
 			</button>
 			{showSuggestions && (
-				<SearchSuggestions
-					query={inputValue}
-					onSuggestionClick={handleSuggestionClick}
-				/>
+				<div className='search-suggestions'>
+					<SearchSuggestions
+						query={inputValue}
+						onSuggestionClick={handleSuggestionClick}
+					/>
+				</div>
 			)}
 		</div>
 	);

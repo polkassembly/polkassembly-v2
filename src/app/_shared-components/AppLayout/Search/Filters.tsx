@@ -2,10 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { RefinementList, useInstantSearch, Configure } from 'react-instantsearch';
-import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
+import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { IoIosArrowDown } from 'react-icons/io';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
@@ -16,7 +16,6 @@ interface FiltersProps {
 	isSuperSearch?: boolean;
 }
 
-export const allowedNetwork = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
 interface RefinementItem {
 	value: string;
 	label: string;
@@ -37,7 +36,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 	const { results } = useInstantSearch();
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 
-	useEffect(() => {
+	useMemo(() => {
 		if (results.query.length > 3 && activeIndex === null) {
 			onChange('posts');
 		}
@@ -121,6 +120,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 	const handleDropdownOpen = (dropdown: DropdownType) => {
 		setOpenDropdown(dropdown);
 	};
+
 	return (
 		<div className='mt-3 flex justify-between gap-6'>
 			<div>

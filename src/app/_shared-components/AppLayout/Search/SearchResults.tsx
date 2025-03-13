@@ -10,7 +10,7 @@ import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination }
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
 import CommentIcon from '@assets/icons/Comment.svg';
-import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
+import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { FaMagic } from 'react-icons/fa';
 import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
 import PaLogo from '../PaLogo';
@@ -27,7 +27,7 @@ interface Post {
 	title: string;
 	content: string;
 	proposer_address: string;
-	post_type: 'on-chain-posts' | 'off-chain-posts' | 'discussions' | 'grants';
+	post_type: 'discussions' | 'grants';
 	created_at: number;
 	track?: number;
 	tags?: string[];
@@ -242,31 +242,21 @@ function SearchResults({
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === 'posts' ? (
 									<Index indexName='polkassembly_posts'>
-										<Configure
-											filters={allowedNetwork
-												.map((network) => `network:${network}`)
-												.join(' OR ')
-												.concat(' AND (NOT post_type:discussions AND NOT post_type:grants)')}
-										/>
+										<Configure filters='NOT post_type:discussions AND NOT post_type:grants' />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === 'discussions' ? (
 									<Index indexName='polkassembly_posts'>
-										<Configure
-											filters={allowedNetwork
-												.map((network) => `network:${network}`)
-												.join(' OR ')
-												.concat(' AND (post_type:discussions OR post_type:grants)')}
-										/>
+										<Configure filters='post_type:discussions OR post_type:grants' />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : (
 									<Index indexName='polkassembly_users'>
-										<Configure filters={allowedNetwork.map((network) => `network:${network}`).join(' OR ')} />
+										<Configure />
 										<div className='space-y-4'>
 											<Hits hitComponent={UserHit} />
 										</div>
