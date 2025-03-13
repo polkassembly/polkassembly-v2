@@ -903,3 +903,8 @@ export enum ESearchType {
 	DISCUSSIONS = 'discussions',
 	USERS = 'users'
 }
+
+export enum ESearchDiscussionType {
+	DISCUSSIONS = 'discussions',
+	GRANTS = 'grants'
+}

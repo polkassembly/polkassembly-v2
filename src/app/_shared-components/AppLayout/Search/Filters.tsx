@@ -38,7 +38,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 
 	useMemo(() => {
-		if (results.query.length > 3 && activeIndex === null) {
+		if (results.query.length > 2 && activeIndex === null) {
 			onChange(ESearchType.POSTS);
 		}
 		if (results.query.length === 0 && activeIndex !== null) {
@@ -126,7 +126,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		<div className='mt-3 flex justify-between gap-6'>
 			<div>
 				<RadioGroup
-					value={activeIndex || (results.query.length > 3 ? ESearchType.POSTS : undefined)}
+					value={activeIndex || (results.query.length > 2 ? ESearchType.POSTS : undefined)}
 					onValueChange={(e) => onChange(e as ESearchType | null)}
 					className='flex flex-row gap-3'
 					disabled={results.query.length < 3}
