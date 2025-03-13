@@ -683,6 +683,19 @@
 		"placeholder": "ここに何かを検索",
 		"superSearch": "スーパーサーチ",
 		"search": "検索",
-		"resultsFor": "結果"
+		"resultsFor": "結果",
+		"referenda": "国民投票",
+		"users": "ユーザー",
+		"discussions": "ディスカッション",
+		"today": "今日",
+		"last_7_days": "過去7日間",
+		"last_30_days": "過去30日間",
+		"last_3_months": "過去3ヶ月",
+		"all_time": "すべての時間",
+		"date_filter": "日付フィルター",
+		"networks": "ネットワーク",
+		"tracks": "トラック",
+		"topics": "トピック",
+		"tags": "タグ"
 	}
 }

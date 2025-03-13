@@ -683,6 +683,19 @@
 		"placeholder": "Ingrese para buscar algo",
 		"superSearch": "Búsqueda Super",
 		"search": "Buscar",
-		"resultsFor": "Resultados para"
+		"resultsFor": "Resultados para",
+		"referenda": "Referéndum",
+		"users": "Usuarios",
+		"discussions": "Discusiones",
+		"today": "Hoy",
+		"last_7_days": "Últimos 7 días",
+		"last_30_days": "Últimos 30 días",
+		"last_3_months": "Últimos 3 meses",
+		"all_time": "Todo el tiempo",
+		"date_filter": "Filtro de fecha",
+		"networks": "Redes",
+		"tracks": "Pistas",
+		"topics": "Temas",
+		"tags": "Etiquetas"
 	}
 }

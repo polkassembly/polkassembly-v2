@@ -684,6 +684,19 @@
 		"placeholder": "Hier etwas eingeben, um etwas zu suchen",
 		"superSearch": "Super Suche",
 		"search": "Suchen",
-		"resultsFor": "Ergebnisse für"
+		"resultsFor": "Ergebnisse für",
+		"referenda": "Referenda",
+		"users": "Benutzer",
+		"discussions": "Diskussionen",
+		"today": "Heute",
+		"last_7_days": "Letzte 7 Tage",
+		"last_30_days": "Letzte 30 Tage",
+		"last_3_months": "Letzte 3 Monate",
+		"all_time": "Alle Zeiten",
+		"date_filter": "Datum Filter",
+		"networks": "Netzwerke",
+		"tracks": "Tracks",
+		"topics": "Themen",
+		"tags": "Tags"
 	}
 }

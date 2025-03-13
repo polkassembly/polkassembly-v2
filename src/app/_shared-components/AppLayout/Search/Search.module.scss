@@ -33,3 +33,28 @@
 .search_suggestions_item {
     @apply w-full cursor-pointer rounded-md p-2 text-start;
 }
+
+.search_filter_label {
+    @apply flex items-center gap-1 text-xs text-text_primary;
+}
+
+.clear_date_filter {
+    @apply flex items-center gap-1 rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text;
+}
+
+.dropdown_menu_content {
+    @apply max-h-[250px] w-40 overflow-auto p-3;
+}
+
+.radio_label {
+    @apply flex cursor-pointer flex-row items-center gap-1;
+}
+
+.radio_label_active {
+    @apply rounded-full bg-progress_pink_bg p-2;
+}
+
+
+.date_filter_label {
+    @apply w-full rounded px-2 py-1 text-left text-xs
+}

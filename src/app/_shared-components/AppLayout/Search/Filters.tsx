@@ -8,10 +8,13 @@ import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConst
 import { IoIosArrowDown } from 'react-icons/io';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { cn } from '@/lib/utils';
 import { RxCross2 } from 'react-icons/rx';
+import { useTranslations } from 'next-intl';
 import { ESearchType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import styles from './Search.module.scss';
 
 interface FiltersProps {
 	activeIndex: ESearchType | null;
@@ -26,12 +29,6 @@ interface RefinementItem {
 	isRefined: boolean;
 }
 
-const options = [
-	{ value: ESearchType.POSTS, label: 'Referenda' },
-	{ value: ESearchType.USERS, label: 'Users' },
-	{ value: ESearchType.DISCUSSIONS, label: 'Discussions' }
-];
-
 interface DateRange {
 	label: string;
 	start: number;
@@ -40,12 +37,18 @@ interface DateRange {
 
 type DropdownType = 'networks' | 'date' | 'tracks' | 'topics' | 'tags' | null;
 
-const LABELSTYLE = 'flex items-center gap-1 text-xs text-text_primary';
 export default function Filters({ activeIndex, onChange, isSuperSearch = false }: FiltersProps) {
+	const t = useTranslations('Search');
 	const { results, refresh } = useInstantSearch();
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
 	const network = getCurrentNetwork();
+
+	const options = [
+		{ value: ESearchType.POSTS, label: t('referenda') },
+		{ value: ESearchType.USERS, label: t('users') },
+		{ value: ESearchType.DISCUSSIONS, label: t('discussions') }
+	];
 
 	const transformTopicItems = useCallback((items: RefinementItem[]) => {
 		return items.map((item: RefinementItem) => {
@@ -94,35 +97,35 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 			let range: DateRange | null = null;
 
 			switch (label) {
-				case 'Today':
+				case t('today'):
 					range = {
 						label,
 						start: now.startOf('day').unix(),
 						end: now.endOf('day').unix()
 					};
 					break;
-				case 'Last 7 days':
+				case t('last_7_days'):
 					range = {
 						label,
 						start: now.subtract(7, 'days').startOf('day').unix(),
 						end: now.endOf('day').unix()
 					};
 					break;
-				case 'Last 30 days':
+				case t('last_30_days'):
 					range = {
 						label,
 						start: now.subtract(30, 'days').startOf('day').unix(),
 						end: now.endOf('day').unix()
 					};
 					break;
-				case 'Last 3 months':
+				case t('last_3_months'):
 					range = {
 						label,
 						start: now.subtract(3, 'months').startOf('day').unix(),
 						end: now.endOf('day').unix()
 					};
 					break;
-				case 'All time':
+				case t('all_time'):
 					range = {
 						label,
 						start: dayjs.utc('2020-01-01').startOf('day').unix(),
@@ -135,6 +138,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 
 			handleDateSelection(range);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[handleDateSelection]
 	);
 
@@ -182,7 +186,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 								<label
 									key={option.value}
 									htmlFor={option.value}
-									className={`flex cursor-pointer flex-row items-center gap-1 ${activeIndex === option.value ? 'rounded-full bg-progress_pink_bg p-2' : ''}`}
+									className={`${styles.radio_label} ${activeIndex === option.value ? styles.radio_label_active : ''}`}
 								>
 									<RadioGroupItem
 										value={option.value}
@@ -206,18 +210,18 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 									<DropdownMenuTrigger asChild>
 										<button
 											type='button'
-											className='flex items-center gap-1 text-xs text-text_primary'
+											className={styles.search_filter_label}
 										>
-											Networks <IoIosArrowDown />
+											{t('networks')} <IoIosArrowDown />
 										</button>
 									</DropdownMenuTrigger>
-									<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+									<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
 										<RefinementList
 											attribute='network'
 											classNames={{
 												list: 'space-y-2',
-												label: LABELSTYLE,
-												labelText: LABELSTYLE,
+												label: styles.search_filter_label,
+												labelText: styles.search_filter_label,
 												count: 'hidden'
 											}}
 											transformItems={(items: RefinementItem[]) => items.filter((item) => allowedNetwork.includes(item.value))}
@@ -232,12 +236,12 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 								<DropdownMenuTrigger asChild>
 									<button
 										type='button'
-										className='flex items-center gap-1 text-xs text-text_primary'
+										className={styles.search_filter_label}
 									>
 										{selectedDateRange ? selectedDateRange.label : 'Date'} <IoIosArrowDown />
 									</button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent className='max-h-[250px] w-48 overflow-auto p-3'>
+								<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
 									{selectedDateRange && (
 										<Configure
 											filters={`created_at >= ${selectedDateRange.start} AND created_at <= ${selectedDateRange.end}`}
@@ -245,11 +249,11 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 										/>
 									)}
 									<div className='space-y-2'>
-										{['Today', 'Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((label) => (
+										{[t('today'), t('last_7_days'), t('last_30_days'), t('last_3_months'), t('all_time')].map((label) => (
 											<button
 												key={label}
 												type='button'
-												className={`w-full rounded px-2 py-1 text-left text-xs ${selectedDateRange?.label === label ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'}`}
+												className={`${styles.date_filter_label} ${selectedDateRange?.label === label ? styles.radio_label_active : 'hover:bg-topic_tag_bg'}`}
 												onClick={() => handleDateClick(label)}
 											>
 												{label}
@@ -266,18 +270,18 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 									<DropdownMenuTrigger asChild>
 										<button
 											type='button'
-											className='flex items-center gap-1 text-xs text-text_primary'
+											className={styles.search_filter_label}
 										>
-											Tracks <IoIosArrowDown />
+											{t('tracks')} <IoIosArrowDown />
 										</button>
 									</DropdownMenuTrigger>
-									<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+									<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
 										<RefinementList
 											attribute='track_number'
 											classNames={{
 												list: 'space-y-2',
-												label: LABELSTYLE,
-												labelText: LABELSTYLE,
+												label: styles.search_filter_label,
+												labelText: styles.search_filter_label,
 												count: 'hidden'
 											}}
 											transformItems={transformTrackItems}
@@ -294,18 +298,18 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 								<DropdownMenuTrigger asChild>
 									<button
 										type='button'
-										className='flex items-center gap-1 text-xs text-text_primary'
+										className={styles.search_filter_label}
 									>
-										Topics <IoIosArrowDown />
+										{t('topics')} <IoIosArrowDown />
 									</button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+								<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
 									<RefinementList
 										attribute='topic'
 										classNames={{
 											list: 'space-y-2',
-											label: LABELSTYLE,
-											labelText: LABELSTYLE,
+											label: styles.search_filter_label,
+											labelText: styles.search_filter_label,
 											count: 'hidden'
 										}}
 										transformItems={transformTopicItems}
@@ -322,18 +326,18 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 								<DropdownMenuTrigger asChild>
 									<button
 										type='button'
-										className='flex items-center gap-1 text-xs text-text_primary'
+										className={styles.search_filter_label}
 									>
-										Tags <IoIosArrowDown />
+										{t('tags')} <IoIosArrowDown />
 									</button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent className='max-h-[250px] w-full overflow-auto p-3'>
+								<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
 									<RefinementList
 										attribute='tags'
 										classNames={{
 											list: 'space-y-2',
-											label: LABELSTYLE,
-											labelText: LABELSTYLE,
+											label: styles.search_filter_label,
+											labelText: styles.search_filter_label,
 											count: 'hidden'
 										}}
 										transformItems={transformTagItems}
@@ -350,9 +354,9 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 					<button
 						type='button'
 						onClick={clearDateFilter}
-						className='flex items-center gap-1 rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text'
+						className={styles.clear_date_filter}
 					>
-						<RxCross2 className='text-xs' /> <span>Date Filter</span>
+						<RxCross2 className='text-xs' /> <span>{t('date_filter')}</span>
 					</button>
 				)}
 			</div>

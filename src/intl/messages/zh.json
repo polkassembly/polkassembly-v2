@@ -683,6 +683,19 @@
 		"placeholder": "请输入要搜索的内容",
 		"superSearch": "超级搜索",
 		"search": "搜索",
-		"resultsFor": "结果"
+		"resultsFor": "结果",
+		"referenda": "公投",
+		"users": "用户",
+		"discussions": "讨论",
+		"today": "今天",
+		"last_7_days": "过去7天",
+		"last_30_days": "过去30天",
+		"last_3_months": "过去3个月",
+		"all_time": "所有时间",
+		"date_filter": "日期过滤器",
+		"networks": "网络",
+		"tracks": "轨道",
+		"topics": "主题",
+		"tags": "标签"
 	}
 }
