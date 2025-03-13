@@ -7,7 +7,7 @@ import { IParamDef } from '@/_shared/types';
 import { Input } from '../../../Input';
 
 type InputNumberProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
-	onChange: (value: string) => void;
+	onChange: (value: number) => void;
 	param?: IParamDef;
 };
 
@@ -16,7 +16,7 @@ function InputNumber({ onChange, ...props }: InputNumberProps) {
 		<Input
 			type='number'
 			onChange={(e) => {
-				onChange(e.target.value);
+				onChange(Number(e.target.value));
 			}}
 			{...props}
 		/>

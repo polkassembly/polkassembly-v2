@@ -597,12 +597,12 @@ export class PolkadotApiService {
 		return this.api.tx.utility.batchAll(tx);
 	}
 
-	getCancelReferendumExtrinsic({ referendumId }: { referendumId: string }) {
+	getCancelReferendumExtrinsic({ referendumId }: { referendumId: number }) {
 		if (!this.api) return null;
 		return this.api.tx.referenda.cancel(referendumId);
 	}
 
-	getKillReferendumExtrinsic({ referendumId }: { referendumId: string }) {
+	getKillReferendumExtrinsic({ referendumId }: { referendumId: number }) {
 		if (!this.api) return null;
 		return this.api.tx.referenda.kill(referendumId);
 	}

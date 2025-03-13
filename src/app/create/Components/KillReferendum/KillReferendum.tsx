@@ -23,6 +23,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { canVote } from '@/_shared/_utils/canVote';
+import { useDebounce } from '@/hooks/useDebounce';
 
 function KillReferendum() {
 	const t = useTranslations();
@@ -31,7 +32,7 @@ function KillReferendum() {
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
-	const [referendumId, setReferendumId] = useState<string>();
+	const { debouncedValue: debouncedReferendumId, setValue: setReferendumId, value: referendumId } = useDebounce<number | undefined>(undefined, 500);
 
 	const [preimageDetails, setPreimageDetails] = useState<{ preimageHash: string; preimageLength: number }>({
 		preimageHash: '',
@@ -42,10 +43,10 @@ function KillReferendum() {
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
-	const fetchProposalDetails = async (refId?: string) => {
+	const fetchProposalDetails = async (refId?: number) => {
 		if (!refId) return null;
 
-		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: refId });
+		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: refId.toString() });
 
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
@@ -53,16 +54,20 @@ function KillReferendum() {
 		return data;
 	};
 	const { data, isFetching, error } = useQuery({
-		queryKey: ['referendum', referendumId],
-		queryFn: ({ queryKey }) => fetchProposalDetails(queryKey[1]),
+		queryKey: ['referendum', debouncedReferendumId],
+		queryFn: ({ queryKey }) => fetchProposalDetails(Number(queryKey[1])),
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!debouncedReferendumId,
+		retry: false,
+		retryOnMount: false,
+		refetchOnWindowFocus: false
 	});
 
 	useEffect(() => {
 		if (!apiService || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)) return;
 
-		const tx = apiService.getKillReferendumExtrinsic({ referendumId: data.index.toString() });
+		const tx = apiService.getKillReferendumExtrinsic({ referendumId: data.index });
 		if (!tx) return;
 
 		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
@@ -106,7 +111,7 @@ function KillReferendum() {
 	const createPreimage = async () => {
 		if (!apiService || !userPreferences.address?.address || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)) return;
 
-		const tx = apiService.getCancelReferendumExtrinsic({ referendumId: data.index.toString() });
+		const tx = apiService.getKillReferendumExtrinsic({ referendumId: data.index });
 		if (!tx) return;
 
 		setLoading(true);
@@ -156,16 +161,19 @@ function KillReferendum() {
 						<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
 						<InputNumber
 							onChange={setReferendumId}
-							disabled={isFetching}
 							placeholder={t('KillCancelReferendum.referendumIdDescription')}
+							value={referendumId}
 						/>
-						{isFetching && <Skeleton className='h-4 w-full' />}
-						{data &&
+						{isFetching ? (
+							<Skeleton className='h-4 w-full' />
+						) : (
+							data &&
 							(canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ? (
 								<div className='rounded bg-grey_bg p-2 text-sm text-text_primary'>{data.title}</div>
 							) : (
 								<div className='rounded bg-grey_bg p-2 text-sm text-text_primary'>{t('KillCancelReferendum.thisReferendumIsNotOngoing')}</div>
-							))}
+							))
+						)}
 						{error && <div className='rounded bg-grey_bg p-2 text-sm text-text_primary'>{error.message}</div>}
 					</div>
 

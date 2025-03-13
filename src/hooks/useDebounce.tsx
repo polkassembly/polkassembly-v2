@@ -51,5 +51,3 @@ export function useDebounce<T>(initialValue: T, delay = 500) {
 		setValue: onChange
 	};
 }
-
-export default useDebounce;

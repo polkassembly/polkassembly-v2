@@ -4,7 +4,6 @@
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { BN_ZERO } from '@polkadot/util';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: string; onChange: (track: string) => void; isTreasury?: boolean }) {
@@ -16,7 +15,7 @@ function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: 
 	if (network) {
 		Object.entries(NETWORKS_DETAILS?.[`${network}`].trackDetails).forEach(([key, value]) => {
 			if (isTreasury) {
-				if (value.maxSpend && value.maxSpend.gt(BN_ZERO)) {
+				if ('maxSpend' in value) {
 					trackArr.push(key);
 				}
 			} else {
