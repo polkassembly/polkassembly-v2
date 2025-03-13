@@ -9,6 +9,7 @@ import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConst
 import { IoIosArrowDown } from 'react-icons/io';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { RxCross2 } from 'react-icons/rx';
 import { ESearchType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -346,13 +347,13 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 			</div>
 			<div className='mt-3 flex justify-start'>
 				{' '}
-				{selectedDateRange && (
+				{selectedDateRange && results.query.length > 2 && (
 					<button
 						type='button'
 						onClick={clearDateFilter}
 						className='rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text'
 					>
-						X Date Filter
+						<RxCross2 className='text-xs' /> Date Filter
 					</button>
 				)}
 			</div>
