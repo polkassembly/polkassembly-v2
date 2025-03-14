@@ -21,7 +21,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
-		index: postData?.index,
+		indexOrHash: postData?.index?.toString() || postData?.hash,
 		userSubscriptionId: postData?.userSubscriptionId
 	});
 	const handleAuthenticatedAction = useCallback(

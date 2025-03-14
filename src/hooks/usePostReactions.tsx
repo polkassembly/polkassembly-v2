@@ -10,7 +10,7 @@ import { useUser } from './useUser';
 interface IPostData {
 	reactions?: IReaction[];
 	proposalType: EProposalType;
-	index?: number;
+	indexOrHash?: string;
 	userSubscriptionId?: string | null;
 }
 
@@ -35,9 +35,9 @@ export const usePostReactions = (postData: IPostData) => {
 	const subscriptionParams = useMemo(
 		() => ({
 			proposalType: postData.proposalType,
-			postIndex: String(postData.index)
+			postIndex: String(postData.indexOrHash)
 		}),
-		[postData.proposalType, postData.index]
+		[postData.proposalType, postData.indexOrHash]
 	);
 	const [reactionState, setReactionState] = useState({ isLiked, isDisliked, likesCount, dislikesCount });
 	const [showLikeGif, setShowLikeGif] = useState(false);
@@ -68,7 +68,7 @@ export const usePostReactions = (postData: IPostData) => {
 						likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
 						dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
 					}));
-					await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', currentReactionId);
+					await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.indexOrHash || '', currentReactionId);
 					setCurrentReactionId(null);
 				} else {
 					setReactionState((prev) => ({
@@ -82,7 +82,7 @@ export const usePostReactions = (postData: IPostData) => {
 					showGifSetter(true);
 					setTimeout(() => showGifSetter(false), 1500);
 
-					const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.index?.toString() || '', type);
+					const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.indexOrHash || '', type);
 					setCurrentReactionId(response?.data?.reactionId || null);
 				}
 			} catch {
@@ -95,7 +95,7 @@ export const usePostReactions = (postData: IPostData) => {
 				}));
 			}
 		},
-		[currentReactionId, reactionState, postData.proposalType, postData.index]
+		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
 	);
 
 	const fetchSubscriptionStatus = useCallback(async () => {

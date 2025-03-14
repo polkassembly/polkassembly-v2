@@ -57,7 +57,7 @@ function ActivityFeedPostItem({
 	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
-		index: postData?.index,
+		indexOrHash: postData?.index?.toString() || postData?.hash,
 		userSubscriptionId: postData?.userSubscriptionId
 	});
 
