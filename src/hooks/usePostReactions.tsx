@@ -98,20 +98,6 @@ export const usePostReactions = (postData: IPostData) => {
 		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
 	);
 
-	const fetchSubscriptionStatus = useCallback(async () => {
-		if (!user?.id) return;
-		try {
-			const status = await NextApiClientService.getPostSubscriptions(subscriptionParams.proposalType, subscriptionParams.postIndex);
-			setIsSubscribed(status.data?.message === 'Subscription found');
-		} catch (error) {
-			console.error('Failed to fetch subscription status:', error);
-		}
-	}, [user?.id, subscriptionParams]);
-
-	useEffect(() => {
-		fetchSubscriptionStatus();
-	}, [fetchSubscriptionStatus]);
-
 	const handleSubscribe = useCallback(async () => {
 		try {
 			setIsLoading(true);
