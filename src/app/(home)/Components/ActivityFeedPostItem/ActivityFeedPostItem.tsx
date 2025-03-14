@@ -54,7 +54,7 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
+	const { likesCount, dislikesCount, isLiked, isDisliked, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
@@ -80,8 +80,8 @@ function ActivityFeedPostItem({
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-	const likeCount = reactionState !== null ? reactionState.likesCount : 0;
-	const dislikeCount = reactionState !== null ? reactionState.dislikesCount : 0;
+	const likeCount = likesCount;
+	const dislikeCount = dislikesCount;
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
@@ -236,7 +236,8 @@ function ActivityFeedPostItem({
 					<ReactionBar
 						postData={postData}
 						setIsDialogOpen={setIsDialogOpen}
-						reactionState={reactionState}
+						isLiked={isLiked}
+						isDisliked={isDisliked}
 						showLikeGif={showLikeGif}
 						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}

@@ -19,12 +19,13 @@ function PostActions({ postData }: { postData: IPost }) {
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations('ActivityFeed');
-	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
+	const { handleReaction, likesCount, dislikesCount, isLiked, isDisliked, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
 		userSubscriptionId: postData?.userSubscriptionId
 	});
+
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {
 			if (!user?.id) {
@@ -36,8 +37,6 @@ function PostActions({ postData }: { postData: IPost }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[user?.id]
 	);
-
-	const { likesCount, dislikesCount, isLiked, isDisliked } = reactionState;
 
 	const subscribeButtonClasses = useMemo(
 		() => cn(styles.post_actions_container, isSubscribed && styles.selected_text, isSubscribing && styles.loading),

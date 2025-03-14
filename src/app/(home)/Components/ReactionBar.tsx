@@ -31,7 +31,8 @@ function ActionButton({ icon: Icon, text, onClick, className }: { icon: React.Re
 function ReactionBar({
 	postData,
 	setIsDialogOpen,
-	reactionState,
+	isLiked,
+	isDisliked,
 	showLikeGif,
 	showDislikeGif,
 	handleReaction,
@@ -40,12 +41,9 @@ function ReactionBar({
 }: {
 	postData: IPostListing;
 	setIsDialogOpen: (value: boolean) => void;
-	reactionState: {
-		isLiked: boolean;
-		isDisliked: boolean;
-		likesCount: number;
-		dislikesCount: number;
-	};
+
+	isLiked: boolean;
+	isDisliked: boolean;
 	showLikeGif: boolean;
 	showDislikeGif: boolean;
 	handleReaction: (reaction: EReaction) => void;
@@ -87,13 +85,13 @@ function ReactionBar({
 			<div className='flex space-x-5'>
 				<ReactionButton
 					type={EReaction.like}
-					isActive={reactionState.isLiked}
+					isActive={isLiked}
 					showGif={showLikeGif}
 					onClick={handleLike}
 				/>
 				<ReactionButton
 					type={EReaction.dislike}
-					isActive={reactionState.isDisliked}
+					isActive={isDisliked}
 					showGif={showDislikeGif}
 					onClick={handleDislike}
 				/>
