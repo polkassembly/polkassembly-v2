@@ -80,7 +80,8 @@ function ActivityFeedPostItem({
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-
+	const likeCount = reactionState.isLiked ? reactionState.likesCount : postData.metrics?.reactions.like;
+	const dislikeCount = reactionState.isDisliked ? reactionState.dislikesCount : postData.metrics?.reactions.dislike;
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
@@ -202,16 +203,16 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{(postData.metrics?.reactions.like || postData.metrics?.reactions.dislike || commentCount > 0) && (
+			{((likeCount && likeCount > 0) || (dislikeCount && dislikeCount > 0) || commentCount > 0) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
-							{postData.metrics?.reactions.like} {t('ActivityFeed.PostItem.likes')}
+							{likeCount} {t('ActivityFeed.PostItem.likes')}
 						</span>
 						<span>|</span>
 
 						<span>
-							{postData.metrics?.reactions.dislike} {t('ActivityFeed.PostItem.dislikes')}
+							{dislikeCount} {t('ActivityFeed.PostItem.dislikes')}
 						</span>
 						<span>|</span>
 
