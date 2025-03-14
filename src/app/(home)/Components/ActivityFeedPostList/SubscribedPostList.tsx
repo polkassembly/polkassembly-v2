@@ -26,7 +26,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	const observerTarget = useRef<HTMLDivElement>(null);
 
-	const getExploreActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
+	const getSubscribedActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
 		if (!userId) {
 			throw new Error('User not found');
 		}
@@ -39,7 +39,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
 		queryKey: ['subscribedActivityFeed', userId],
-		queryFn: getExploreActivityFeed,
+		queryFn: getSubscribedActivityFeed,
 		initialPageParam: 1,
 		initialData: {
 			pages: [{ ...initialData, page: 1 }],
