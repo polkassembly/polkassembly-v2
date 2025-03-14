@@ -28,7 +28,7 @@ export const usePostReactions = (postData: IPostData) => {
 
 	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId || isInSubscriptionTab);
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
-		const reactionsArray = Array.isArray(postData?.reactions) ? postData.reactions : postData.reactions ? [postData.reactions] : [];
+		const reactionsArray = postData?.reactions || [];
 
 		const userReactions = reactionsArray.filter((reaction) => reaction.userId === user?.id);
 
