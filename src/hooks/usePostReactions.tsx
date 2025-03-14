@@ -2,11 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IReaction } from '@/_shared/types';
+import { EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback } from 'react';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { useUser } from './useUser';
+import { useToast as useToastLib } from './useToast';
 
 interface IPostData {
 	reactions?: IReaction[];
@@ -17,6 +18,7 @@ interface IPostData {
 
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
+	const { toast } = useToastLib();
 	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -57,29 +59,26 @@ export const usePostReactions = (postData: IPostData) => {
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 			try {
 				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
+				showGifSetter(true);
+				setTimeout(() => showGifSetter(false), 1500);
+				setReactionState((prev) => ({
+					...prev,
+					isLiked: isLikeAction ? !prev.isLiked : false,
+					isDisliked: !isLikeAction ? !prev.isDisliked : false,
+					likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? -1 : 1) : prev.isLiked ? -1 : 0),
+					dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? -1 : 1) : prev.isDisliked ? -1 : 0)
+				}));
 
 				if (isDeleteAction) {
-					setReactionState((prev) => ({
-						...prev,
-						isLiked: false,
-						isDisliked: false,
-						likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
-						dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
-					}));
-					await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.indexOrHash, currentReactionId);
-					setCurrentReactionId(null);
+					if (currentReactionId) {
+						await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.indexOrHash, currentReactionId);
+						setCurrentReactionId(null);
+					}
 				} else {
-					setReactionState((prev) => ({
-						...prev,
-						isLiked: isLikeAction,
-						isDisliked: !isLikeAction,
-						likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? 0 : 1) : prev.isLiked ? -1 : 0),
-						dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? 0 : 1) : prev.isDisliked ? -1 : 0)
-					}));
-
-					showGifSetter(true);
-					setTimeout(() => showGifSetter(false), 1500);
-
+					if (currentReactionId) {
+						await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.indexOrHash, currentReactionId);
+						setCurrentReactionId(null);
+					}
 					const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.indexOrHash, type);
 					setCurrentReactionId(response?.data?.reactionId || null);
 				}
@@ -95,14 +94,21 @@ export const usePostReactions = (postData: IPostData) => {
 		},
 		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
 	);
-
 	const handleSubscribe = useCallback(async () => {
 		try {
 			setIsLoading(true);
 			if (isSubscribed) {
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+				toast({
+					title: 'Unsubscribed from the post',
+					status: NotificationType.INFO
+				});
 			} else {
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+				toast({
+					title: 'Subscribed to the post',
+					status: NotificationType.SUCCESS
+				});
 			}
 			setIsSubscribed(!isSubscribed);
 		} catch (error) {
@@ -110,6 +116,7 @@ export const usePostReactions = (postData: IPostData) => {
 		} finally {
 			setIsLoading(false);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isSubscribed, subscriptionParams]);
 
 	return {

@@ -80,8 +80,8 @@ function ActivityFeedPostItem({
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-	const likeCount = reactionState.likesCount;
-	const dislikeCount = reactionState.dislikesCount;
+	const likeCount = reactionState !== null ? reactionState.likesCount : 0;
+	const dislikeCount = reactionState !== null ? reactionState.dislikesCount : 0;
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
@@ -203,7 +203,7 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{(likeCount || dislikeCount || commentCount) && (
+			{(likeCount || dislikeCount || commentCount !== null) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
