@@ -30,8 +30,8 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	const getSubscribedActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
 		const { data, error } = await NextApiClientService.getSubscribedActivityFeed({ page: pageParam, limit: DEFAULT_LISTING_LIMIT, userId });
-		if (error) {
-			throw new Error(error.message || 'Failed to fetch data');
+		if (!data || error) {
+			throw new Error(error?.message || 'Failed to fetch data');
 		}
 		return { ...data, page: pageParam };
 	};
