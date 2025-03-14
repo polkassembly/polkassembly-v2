@@ -5,11 +5,11 @@
 import { EActivityFeedTab, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import ActivityFeedComp from './ActivityFeedComp/ActivityFeedComp';
 
-function ActivityFeed({ initialData, activeTab }: { initialData: IGenericListingResponse<IPostListing>; activeTab?: EActivityFeedTab | EActivityFeedTab.EXPLORE }) {
+function ActivityFeed({ initialData, activeTab = EActivityFeedTab.EXPLORE }: { initialData: IGenericListingResponse<IPostListing>; activeTab?: EActivityFeedTab }) {
 	return (
 		<ActivityFeedComp
 			initialData={initialData}
-			activeTab={activeTab ?? EActivityFeedTab.EXPLORE}
+			activeTab={activeTab}
 		/>
 	);
 }

@@ -28,7 +28,7 @@ function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericLis
 							<div>
 								<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
 							</div>
-							<ActivityFeedToggleButton activeTab={activeTab ?? EActivityFeedTab.EXPLORE} />
+							<ActivityFeedToggleButton activeTab={activeTab} />
 						</div>
 					</div>
 				</div>
