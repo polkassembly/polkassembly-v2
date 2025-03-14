@@ -56,7 +56,7 @@ function ReactionButton({
 			{showText && (
 				<span className={`${isActive ? 'ml-1 font-bold text-bg_pink' : ''}`}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
 			)}
-			{count && count > 0 && <span className='text-xs font-medium'>{count}</span>}
+			{count !== undefined && count > 0 && <span className='text-xs font-medium'>{count}</span>}
 		</button>
 	);
 }
