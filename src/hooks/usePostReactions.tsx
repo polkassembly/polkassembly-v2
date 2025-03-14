@@ -109,30 +109,37 @@ export const usePostReactions = (postData: IPostData) => {
 		},
 		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
 	);
+
 	const handleSubscribe = useCallback(async () => {
+		if (!postData?.indexOrHash) {
+			throw new ClientError('Index or hash is required');
+		}
+
+		setIsSubscribed(!isSubscribed);
+		toast({
+			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
+			status: !isSubscribed ? NotificationType.SUCCESS : NotificationType.INFO
+		});
+
 		try {
 			setIsLoading(true);
 			if (isSubscribed) {
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
-				toast({
-					title: 'Unsubscribed from the post',
-					status: NotificationType.INFO
-				});
 			} else {
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
-				toast({
-					title: 'Subscribed to the post',
-					status: NotificationType.SUCCESS
-				});
 			}
-			setIsSubscribed(!isSubscribed);
 		} catch (error) {
+			setIsSubscribed(isSubscribed);
+			toast({
+				title: 'Failed to update subscription',
+				status: NotificationType.ERROR
+			});
 			console.error('Failed to update subscription:', error);
 		} finally {
 			setIsLoading(false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isSubscribed, subscriptionParams]);
+	}, [isSubscribed, subscriptionParams, postData?.indexOrHash]);
 
 	return {
 		reactionState,
