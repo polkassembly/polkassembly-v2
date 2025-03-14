@@ -15,18 +15,32 @@ import styles from './AddressInline.module.scss';
 interface Props {
 	address: string;
 	className?: string;
-	onChainIdentity: IOnChainIdentity;
+	onChainIdentity?: IOnChainIdentity;
 	addressDisplayText?: string;
 	iconSize?: number;
 	showIdenticon?: boolean;
 	textClassName?: string;
+	redirectToProfile?: boolean;
+	userProfileUrl?: string;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName }: Props) {
+function AddressInline({
+	address,
+	onChainIdentity,
+	addressDisplayText,
+	className,
+	iconSize = 20,
+	showIdenticon = true,
+	textClassName,
+	redirectToProfile = true,
+	userProfileUrl
+}: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
 			title={addressDisplayText || address}
+			data-tip
+			data-for={`tooltip-${address}`}
 		>
 			{showIdenticon && (
 				<Identicon
@@ -36,17 +50,28 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					theme='polkadot'
 				/>
 			)}
-			<Link
-				className={styles.container}
-				href={`/user/address/${address}`}
-			>
-				<IdentityBadge
-					onChainIdentity={onChainIdentity}
-					iconSize={iconSize}
-				/>
+			{redirectToProfile && userProfileUrl ? (
+				<Link
+					className={styles.container}
+					href={userProfileUrl}
+				>
+					<IdentityBadge
+						onChainIdentity={onChainIdentity}
+						iconSize={iconSize}
+					/>
 
-				<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
-			</Link>
+					<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
+				</Link>
+			) : (
+				<div className={styles.container}>
+					<IdentityBadge
+						onChainIdentity={onChainIdentity}
+						iconSize={iconSize}
+					/>
+
+					<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
+				</div>
+			)}
 		</div>
 	);
 }

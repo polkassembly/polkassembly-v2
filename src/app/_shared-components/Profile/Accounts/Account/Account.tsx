@@ -15,7 +15,7 @@ import classes from './Account.module.scss';
 
 function Account({ address }: { address: string }) {
 	const t = useTranslations();
-	const apiService = usePolkadotApiService();
+	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 
 	const [balance, setBalance] = useState<string>('0');

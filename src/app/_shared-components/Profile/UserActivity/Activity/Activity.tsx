@@ -431,6 +431,22 @@ const activityText: Record<EActivityName, { icon: ReactNode; iconClassName?: str
 				className='text-text_pink'
 			/>
 		)
+	},
+	[EActivityName.UNFOLLOWED_USER]: {
+		icon: (
+			<MessageCircleMore
+				size={16}
+				className='text-text_pink'
+			/>
+		)
+	},
+	[EActivityName.FOLLOWED_USER]: {
+		icon: (
+			<MessageCircleMore
+				size={16}
+				className='text-text_pink'
+			/>
+		)
 	}
 };
 

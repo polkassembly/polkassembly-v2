@@ -13,3 +13,15 @@
 .dialogFooter {
     @apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2;
 }
+
+.dialogOverlay {
+    @apply fixed inset-0 z-50 bg-black/80;
+}
+
+.dialogTitle {
+    @apply text-lg font-semibold leading-none tracking-tight;
+}
+
+.dialogDescription {
+    @apply text-sm text-muted-foreground;
+}

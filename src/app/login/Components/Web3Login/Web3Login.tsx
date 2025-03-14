@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '@/app/_shared-components/Button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
@@ -29,17 +29,19 @@ function Web3Login({
 	switchToWeb2,
 	switchToSignup,
 	onWalletChange,
-	onTfaEnabled
+	onTfaEnabled,
+	web3Screen,
+	onChangeWeb3LoginScreen
 }: {
 	switchToWeb2: () => void;
 	switchToSignup: () => void;
 	onWalletChange: () => void;
 	onTfaEnabled: (token: string) => void;
+	web3Screen: EWeb3LoginScreens;
+	onChangeWeb3LoginScreen: (screen: EWeb3LoginScreens) => void;
 }) {
 	const router = useRouter();
 	const t = useTranslations();
-
-	const [web3Screen, setWeb3Screen] = useState<EWeb3LoginScreens>(EWeb3LoginScreens.SELECT_WALLET);
 
 	const { userPreferences } = useUserPreferences();
 
@@ -50,10 +52,8 @@ function Web3Login({
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const walletService = useWalletService();
-
-	const onChangeWeb3LoginScreen = (screen: EWeb3LoginScreens) => {
-		setWeb3Screen(screen);
-	};
+	const searchParams = useSearchParams();
+	const nextUrl = searchParams.get('nextUrl');
 
 	const handleLogin = async () => {
 		try {
@@ -99,12 +99,16 @@ function Web3Login({
 				}
 
 				setUser(accessTokenPayload);
-				router.back();
+
+				if (nextUrl) {
+					router.replace(`/${nextUrl}`);
+				} else {
+					router.back();
+					setLoading(false);
+				}
 			}
-			setLoading(false);
 		} catch {
 			// TODO: show notification
-			setLoading(false);
 		}
 	};
 

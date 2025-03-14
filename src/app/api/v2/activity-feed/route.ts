@@ -4,8 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { deepParseJson } from 'deep-parse-json';
-import { EDataSource, EPostOrigin, EProposalType, IActivityFeedPostListing, IGenericListingResponse, IPublicUser, IReaction } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser, IReaction } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -58,7 +57,8 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	// Try to get from cache first
 	const cachedData = await RedisService.GetActivityFeed({ network, page, limit, userId, origins });
 	if (cachedData) {
-		const response = NextResponse.json(deepParseJson(cachedData));
+		const response = NextResponse.json(cachedData);
+
 		if (accessToken) {
 			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
 		}
@@ -74,7 +74,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		userAddresses = (await OffChainDbService.GetAddressesForUserId(userId)).map((a) => a.address);
 	}
 
-	let posts: IActivityFeedPostListing[] = [];
+	let posts: IPostListing[] = [];
 	let totalCount = 0;
 
 	const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({
@@ -91,7 +91,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
 		return OffChainDbService.GetOffChainPostData({
 			network,
-			indexOrHash: postInfo.index.toString(),
+			indexOrHash: postInfo.index!.toString(),
 			proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 			proposer: postInfo.proposer || ''
 		});
@@ -107,7 +107,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 			return OffChainDbService.GetUserReactionForPost({
 				network,
 				proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
-				indexOrHash: postInfo.index.toString(),
+				indexOrHash: postInfo.index!.toString(),
 				userId
 			});
 		});
@@ -152,10 +152,10 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	totalCount = onChainPostsListingResponse.totalCount;
 
-	const responseData: IGenericListingResponse<IActivityFeedPostListing> = { items: posts, totalCount };
+	const responseData: IGenericListingResponse<IPostListing> = { items: posts, totalCount };
 
 	// Cache the response
-	await RedisService.SetActivityFeed({ network, page, limit, data: JSON.stringify(responseData), userId, origins });
+	await RedisService.SetActivityFeed({ network, page, limit, data: responseData, userId, origins });
 
 	const response = NextResponse.json(responseData);
 

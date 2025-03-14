@@ -7,6 +7,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import style from './DynamicImageGrid.module.scss';
 
@@ -24,14 +25,17 @@ interface DynamicImageGridProps {
 	rowSize: number;
 	tooltipPosition?: 'top' | 'bottom' | 'left' | 'right';
 	isExpanded: boolean;
+	gridName: string;
 }
 
-const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageGrid({ items, rowSize, tooltipPosition = 'top', isExpanded }) {
+const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageGrid({ items, rowSize, tooltipPosition = 'top', isExpanded, gridName }) {
 	const handleClick = (item: ImageGridItem) => {
 		if (item.onClick) {
 			item.onClick();
 		}
 	};
+
+	// footer, header grid
 
 	return (
 		<TooltipProvider>
@@ -47,7 +51,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 							<TooltipTrigger asChild>
 								{item.url ? (
 									<Link href={item.url}>
-										<div className={`${style.iconWrapper} ${item.bgColor}`}>
+										<div className={cn(style.iconWrapper, item.bgColor, gridName === 'footer' ? 'hover:bg-gray-200' : style.activeborderhover)}>
 											<Image
 												src={item.src}
 												alt={item.alt}
@@ -59,7 +63,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 									</Link>
 								) : (
 									<div
-										className={`${style.iconWrapper} ${item.bgColor}`}
+										className={cn(style.iconWrapper, item.bgColor, gridName === 'footer' ? 'hover:bg-gray-200' : style.activeborderhover)}
 										onClick={() => handleClick(item)}
 										role='button'
 										tabIndex={0}
@@ -79,7 +83,7 @@ const DynamicImageGrid: React.FC<DynamicImageGridProps> = function DynamicImageG
 							</TooltipTrigger>
 							<TooltipContent
 								side={isExpanded ? tooltipPosition : 'right'}
-								className={style.tooltipContent}
+								className='relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg'
 							>
 								<span className={style.tooltipText}>{item.tooltip}</span>
 								<div

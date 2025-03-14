@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { ButtonProps, buttonVariants, buttonSizes } from '@ui/Button';
-import { useTranslations } from 'next-intl';
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
 	return (
@@ -23,7 +22,7 @@ Pagination.displayName = 'Pagination';
 const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(({ className, ...props }, ref) => (
 	<ul
 		ref={ref}
-		className={cn('flex flex-row items-center gap-1', className)}
+		className={cn('flex flex-row items-center gap-2', className)}
 		{...props}
 	/>
 ));
@@ -43,11 +42,11 @@ type PaginationLinkProps = {
 } & Pick<ButtonProps, 'size'> &
 	React.ComponentProps<'a'>;
 
-function PaginationLink({ className, children, isActive, size = 'icon', ...props }: PaginationLinkProps) {
+function PaginationLink({ className, children, isActive, size = 'pagination', ...props }: PaginationLinkProps) {
 	return (
 		<a
 			aria-current={isActive ? 'page' : undefined}
-			className={cn(isActive ? buttonVariants.secondary : buttonVariants.ghost, buttonSizes[`${size}`], 'cursor-pointer', className)}
+			className={cn(isActive ? buttonVariants.secondary : buttonVariants.pagination, buttonSizes[`${size}`], 'cursor-pointer', className)}
 			{...props}
 		>
 			{children}
@@ -57,32 +56,28 @@ function PaginationLink({ className, children, isActive, size = 'icon', ...props
 PaginationLink.displayName = 'PaginationLink';
 
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
-	const t = useTranslations();
 	return (
 		<PaginationLink
 			aria-label='Go to previous page'
 			size='default'
-			className={cn('flex items-center gap-x-1 pl-2.5', className)}
+			className={cn('m-0 flex h-8 w-8 items-center justify-center gap-x-1 p-0', className)}
 			{...props}
 		>
-			<ChevronLeft className='h-4 w-4' />
-			<span>{t('Pagination.previous')}</span>
+			<ChevronLeft className='h-4 w-4 text-listing_page_btn' />
 		</PaginationLink>
 	);
 }
 PaginationPrevious.displayName = 'PaginationPrevious';
 
 function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
-	const t = useTranslations();
 	return (
 		<PaginationLink
 			aria-label='Go to next page'
 			size='default'
-			className={cn('flex items-center gap-x-1 pr-2.5', className)}
+			className={cn('m-0 flex h-8 w-8 items-center justify-center gap-x-1 p-0', className)}
 			{...props}
 		>
-			<span>{t('Pagination.next')}</span>
-			<ChevronRight className='h-4 w-4' />
+			<ChevronRight className='h-4 w-4 text-listing_page_btn' />
 		</PaginationLink>
 	);
 }

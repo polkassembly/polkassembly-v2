@@ -1,0 +1,162 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { X, ChevronsUpDown, PlusIcon } from 'lucide-react';
+import { Button } from '@/app/_shared-components/Button';
+import { useTranslations } from 'next-intl';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { useQuery } from '@tanstack/react-query';
+import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
+import { useRef, useState } from 'react';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
+import { ITag } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import classes from './AddTags.module.scss';
+import { Input } from '../../Input';
+
+export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) => void; disabled?: boolean }) {
+	const t = useTranslations();
+	const [open, setOpen] = useState(false);
+	const [selectedValues, setSelectedValues] = useState<ITag[]>([]);
+	const [pressedAddTag, setPressedAddTag] = useState(false);
+	const addTagInputRef = useRef<HTMLInputElement>(null);
+	const network = getCurrentNetwork();
+
+	const fetchAllTags = async () => {
+		const { data, error } = await NextApiClientService.fetchAllTags();
+		if (error) {
+			throw new ClientError(error.message || 'Failed to fetch data');
+		}
+		return data?.items;
+	};
+
+	const { data: allTags = [], isFetching } = useQuery({
+		queryKey: ['tags'],
+		queryFn: fetchAllTags,
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI
+	});
+
+	const handleSelect = (option: ITag) => {
+		if (selectedValues?.length >= MAX_POST_TAGS) return;
+		const newTags = selectedValues?.find((item) => item.value === option.value) ? selectedValues : [...selectedValues, option];
+		setSelectedValues(newTags);
+		onChange(newTags);
+	};
+
+	const handleRemove = (optionToRemove: ITag) => {
+		const newTags = selectedValues.filter((item) => item.value !== optionToRemove.value);
+		setSelectedValues(newTags);
+		onChange(newTags);
+	};
+
+	return (
+		<div className={classes.container}>
+			<div>
+				{pressedAddTag ? (
+					<Input
+						disabled={disabled}
+						ref={addTagInputRef}
+						className={classes.addTagInput}
+						autoFocus
+						placeholder={t('Create.addTags')}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSelect({ value: e.currentTarget.value, lastUsedAt: new Date(), network });
+								setPressedAddTag(false);
+							}
+						}}
+					/>
+				) : (
+					<Button
+						className={classes.addTagButton}
+						disabled={disabled}
+						onClick={() => {
+							setPressedAddTag(true);
+							addTagInputRef.current?.focus();
+						}}
+					>
+						<PlusIcon className='h-4 w-4' />
+						{t('Create.createTag')}
+					</Button>
+				)}
+			</div>
+
+			<Popover onOpenChange={setOpen}>
+				<PopoverTrigger
+					className='w-full'
+					asChild
+					disabled={disabled}
+					onClick={(e) => {
+						if ((e.target as HTMLElement).closest('button')?.classList.contains('p-0')) {
+							return;
+						}
+						e.stopPropagation();
+						e.preventDefault();
+						setOpen(!open);
+					}}
+				>
+					<div
+						role='combobox'
+						aria-controls='tags-listbox'
+						aria-expanded={open}
+						className={classes.popoverTrigger}
+					>
+						<div className='flex flex-wrap'>
+							{selectedValues?.length ? (
+								selectedValues?.map((option) => (
+									<div
+										key={option.value}
+										className={classes.tagLabel}
+									>
+										{option.value}
+										<Button
+											type='button'
+											variant='ghost'
+											size='sm'
+											className='p-0'
+											disabled={disabled}
+											onClick={(e) => {
+												e.stopPropagation();
+												e.preventDefault();
+												handleRemove(option);
+												setOpen(false);
+											}}
+										>
+											<X />
+										</Button>
+									</div>
+								))
+							) : (
+								<span className={classes.selectTagsText}>{t('Create.selectTags')}</span>
+							)}
+						</div>
+						<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+					</div>
+				</PopoverTrigger>
+				<PopoverContent
+					align='start'
+					className='min-w-[300px]'
+				>
+					{isFetching ? (
+						<div className={classes.noTagFoundText}>Loading....</div>
+					) : allTags && allTags.length > 0 ? (
+						allTags.map((tag) => (
+							<button
+								type='button'
+								onClick={() => handleSelect({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })}
+							>
+								{tag.value}
+							</button>
+						))
+					) : (
+						<div className={classes.noTagFoundText}>{t('Create.noTagsFound')}.</div>
+					)}
+				</PopoverContent>
+			</Popover>
+		</div>
+	);
+}

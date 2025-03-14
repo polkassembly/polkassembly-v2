@@ -4,27 +4,26 @@
 
 'use client';
 
-import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import { ELocales, ENetwork } from '@/_shared/types';
+import { ELocales } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
-import dynamic from 'next/dynamic';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Input } from '@/app/_shared-components/Input';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ChevronDown } from 'lucide-react';
+import { FaBars } from 'react-icons/fa';
+import { IoMdClose } from 'react-icons/io';
+import { useState } from 'react';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
-
-const RPCSwitchDropdown = dynamic(() => import('../RpcSwitch/RPCSwitchDropdown'), { ssr: false });
-const ToggleButton = dynamic(() => import('../../ToggleButton'), { ssr: false });
+import NetworkDropdown from '../../NetworkDropdown/NetworkDropdown';
+import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
+import PaLogo from '../PaLogo';
+import ThemeToggleButton from '../../ThemeToggleButton';
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -38,113 +37,76 @@ function Navbar() {
 	const { user, setUser } = useUser();
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
-	const [searchTerm, setSearchTerm] = useState('');
-	const [selectedNetwork, setSelectedNetwork] = useState<ENetwork>(getCurrentNetwork());
-	const [isOpen, setIsOpen] = useState(false);
-	const searchInputRef = useRef<HTMLInputElement>(null);
+	const [isModalOpen, setModalOpen] = useState(false);
 
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
 		setUserPreferences({ ...userPreferences, locale });
 	};
 
-	const handleNetworkChange = (network: ENetwork) => {
-		setSelectedNetwork(network);
-		window.location.href = `https://${network}.polkassembly.io/`;
-		setSearchTerm('');
+	const handleModalOpen = () => {
+		document.body.classList.add('no-scroll');
 	};
 
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		e.stopPropagation();
-		setSearchTerm(e.target.value);
+	const handleModalClose = () => {
+		document.body.classList.remove('no-scroll');
 	};
 
-	const filteredNetworks = Object.entries(NETWORKS_DETAILS).filter(([, details]) => details.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
+	const closeModal = () => {
+		setModalOpen(false);
+		handleModalClose();
+	};
 	return (
 		<nav className={classes.navbar}>
-			<p className='pl-8 font-semibold text-navbar_title md:pl-0'>OpenGov</p>
+			<div className='flex items-center pl-8 md:pl-0'>
+				<PaLogo
+					variant='full'
+					className='md:hidden'
+				/>
+				<div className='border-l-[1px] border-bg_pink pl-3 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
+			</div>
 
-			<div className='flex items-center gap-x-4'>
+			<div
+				aria-hidden
+				className='block rounded-md border border-border_grey bg-network_dropdown_bg p-2 md:hidden'
+				onClick={() => {
+					setModalOpen(!isModalOpen);
+					if (!isModalOpen) {
+						handleModalOpen();
+					} else {
+						handleModalClose();
+					}
+				}}
+			>
+				{isModalOpen ? <IoMdClose className='text-text_primary' /> : <FaBars className='text-text_primary' />}
+			</div>
+
+			<div className='hidden items-center gap-x-4 md:flex'>
 				<Select
 					value={userPreferences.locale}
-					onValueChange={(value: ELocales) => handleLocaleChange(value)}
+					onValueChange={handleLocaleChange}
 				>
-					<SelectTrigger className='w-[180px] border-border_grey'>
+					<SelectTrigger className='w-[180px] border-border_grey bg-network_dropdown_bg'>
 						<SelectValue placeholder='Select Language' />
 					</SelectTrigger>
 					<SelectContent className='border-border_grey'>
-						<div>
-							{Object.entries(LANGUAGES).map(([locale, label]) => (
-								<SelectItem
-									key={locale}
-									value={locale}
-									className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-								>
-									{label}
-								</SelectItem>
-							))}
-						</div>
+						{Object.entries(LANGUAGES).map(([locale, label]) => (
+							<SelectItem
+								key={locale}
+								value={locale}
+								className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+							>
+								{label}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
-
-				<div className='relative'>
-					<Select
-						value={selectedNetwork}
-						onValueChange={handleNetworkChange}
-						open={isOpen}
-						onOpenChange={setIsOpen}
-					>
-						<SelectTrigger
-							className='w-[180px] border-border_grey'
-							onClick={() => {
-								setIsOpen(true);
-								setTimeout(() => {
-									searchInputRef.current?.focus();
-								}, 0);
-							}}
-						>
-							<SelectValue>
-								<div className='flex items-center gap-2'>{NETWORKS_DETAILS[selectedNetwork as ENetwork]?.name}</div>
-							</SelectValue>
-						</SelectTrigger>
-						<SelectContent
-							className='max-h-[300px] border-border_grey'
-							onCloseAutoFocus={(e) => {
-								e.preventDefault();
-							}}
-						>
-							<div className='p-2'>
-								<Input
-									ref={searchInputRef}
-									type='text'
-									placeholder='Search networks...'
-									value={searchTerm}
-									onChange={handleSearchChange}
-									className='mb-2'
-									onKeyDown={(e) => {
-										e.stopPropagation();
-									}}
-								/>
-								<div className='max-h-[200px] overflow-y-auto'>
-									{filteredNetworks.map(([network, details]) => (
-										<SelectItem
-											key={network}
-											value={network}
-											className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
-										>
-											<div className='flex items-center gap-2'>{details.name}</div>
-										</SelectItem>
-									))}
-								</div>
-							</div>
-						</SelectContent>
-					</Select>
-				</div>
-
+				<span>
+					<NetworkDropdown />
+				</span>
 				{user?.id ? (
 					<DropdownMenu>
-						<DropdownMenuTrigger>
+						<DropdownMenuTrigger asChild>
 							<Button
 								variant='ghost'
 								className='rounded-3xl border border-border_grey bg-wallet_disabled_bg text-sm text-text_primary'
@@ -155,6 +117,7 @@ function Navbar() {
 									<Address
 										address={user.addresses[0]}
 										walletAddressName={user.username}
+										disableTooltip
 									/>
 								) : (
 									<p>{user.username}</p>
@@ -164,6 +127,9 @@ function Navbar() {
 						<DropdownMenuContent className='min-w-[100px]'>
 							<DropdownMenuItem>
 								<Link href={`/user/id/${user.id}`}>{t('Profile.profile')}</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Link href='/set-identity'>{t('SetIdentity.setIdentity')}</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
 								<Button
@@ -181,10 +147,68 @@ function Navbar() {
 						<Button>{t('Profile.login')}</Button>
 					</Link>
 				)}
-
-				<RPCSwitchDropdown className='hidden lg:flex' />
-				<ToggleButton className='hidden lg:flex' />
+				<RPCSwitchDropdown />
+				<span>
+					<ThemeToggleButton />
+				</span>
 			</div>
+
+			{isModalOpen && (
+				<div
+					className='fixed inset-0 top-20 bg-black bg-opacity-40 md:hidden'
+					onClick={closeModal}
+					role='button'
+					tabIndex={0}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							closeModal();
+						}
+					}}
+				/>
+			)}
+
+			{isModalOpen && (
+				<div className='absolute left-0 top-full z-50 w-full border-t-[3px] border-navbar_border bg-bg_modal p-4 pb-10 shadow-md md:hidden'>
+					<div className='flex flex-col gap-5 pt-10'>
+						<div>
+							<p className='pb-1 text-sm text-text_primary'>{t('Header.network')}</p>
+							<NetworkDropdown className='w-full' />
+						</div>
+						<div>
+							<p className='pb-1 text-sm text-text_primary'>{t('Header.node')}</p>
+							<RPCSwitchDropdown className='w-full' />
+						</div>
+						<div className='w-full'>
+							<p className='pb-1 text-sm text-text_primary'>{t('Header.language')}</p>
+							<Select
+								value={userPreferences.locale}
+								onValueChange={handleLocaleChange}
+							>
+								<SelectTrigger className='w-full border-border_grey bg-network_dropdown_bg md:w-[180px]'>
+									<SelectValue placeholder='Select Language' />
+								</SelectTrigger>
+								<SelectContent className='border-border_grey'>
+									{Object.entries(LANGUAGES).map(([locale, label]) => (
+										<SelectItem
+											key={locale}
+											value={locale}
+											className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+										>
+											{label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+						<ThemeToggleButton className='w-full' />
+						<div>
+							<Link href='/login'>
+								<Button className='w-full'>{t('Profile.login')}</Button>
+							</Link>
+						</div>
+					</div>
+				</div>
+			)}
 		</nav>
 	);
 }

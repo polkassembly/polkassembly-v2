@@ -9,7 +9,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { cn } from '@/lib/utils';
 import classes from './WalletButton.module.scss';
 
-function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWallet; onClick: (wallet: EWallet) => void; disabled?: boolean; label: string; small?: boolean }) {
+function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWallet; onClick?: (wallet: EWallet) => void; disabled?: boolean; label: string; small?: boolean }) {
 	const walletName = wallet === EWallet.NOVAWALLET ? EWallet.POLKADOT : wallet;
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 
@@ -18,7 +18,7 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 			...userPreferences,
 			wallet: selectedWallet
 		});
-		onClick(selectedWallet);
+		onClick?.(selectedWallet);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +45,6 @@ function WalletButton({ wallet, onClick, disabled, label, small }: { wallet: EWa
 			size='lg'
 		>
 			<span>{label}</span>
-			{disabled && <span className={cn(classes.notInstalled)}>Not Installed</span>}
 		</Button>
 	);
 }

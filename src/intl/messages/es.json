@@ -57,18 +57,21 @@
 			"loadMoreComments": "Cargar más comentarios",
 			"showLessComments": "Mostrar menos comentarios",
 			"commentingOnProposal": "Comentando en la propuesta"
-		}
+		},
+		"NoRank": "para ver tu rango"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione billetera",
-		"chooseLinkedAccount": "Elegir Cuenta Vinculada",
-		"noAccountsFound": "No se encontraron cuentas, verificar permisos",
-		"selectWallet": "Por favor Seleccione Billetera",
+		"chooseLinkedAccount": "Elegir cuenta vinculada",
+		"noAccountsFound": "No se encontraron cuentas",
+		"selectWallet": "Por favor seleccione billetera",
 		"fetchingAddresses": "Para obtener sus direcciones, Polkassembly necesita acceso a sus extensiones de billetera. Por favor autorice esta transacción.",
-		"goBack": "Volver",
+		"goBack": "Regresar",
 		"gotIt": "Entendido",
-		"hidePassword": "Ocultar Contraseña",
-		"showPassword": "Mostrar Contraseña"
+		"hidePassword": "Ocultar contraseña",
+		"showPassword": "Mostrar contraseña",
+		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
@@ -163,7 +166,9 @@
 			"linked_address": "Vinculó dirección",
 			"linked_multiple_addresses": "Vinculó múltiples direcciones",
 			"unlinked_address": "Desvinculó dirección",
-			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones"
+			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones",
+			"followed_user": "Seguido",
+			"unfollowed_user": "Dejó de seguir"
 		},
 		"overview": "Resumen",
 		"onchainIdentity": "Identidad en cadena",
@@ -172,6 +177,8 @@
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
 		"userSince": "Usuario desde",
 		"rank": "Rango",
+		"judgements": "Juicios",
+		"since": "Desde",
 		"Settings": {
 			"settings": "Configuraciones",
 			"deleteAccount": "Eliminar cuenta",
@@ -468,7 +475,11 @@
 		"abstainVoteValue": "Valor de Voto de Abstención",
 		"ayeVoteValue": "Valor de Voto Sí",
 		"nayVoteValue": "Valor de Voto No",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"voteSuccess": "Su voto ha sido emitido correctamente",
+		"voteFailed": "Su voto no ha sido emitido correctamente",
+		"voteSuccessTitle": "Voto exitoso",
+		"voteFailedTitle": "Voto fallido"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de Votación"
@@ -509,24 +520,175 @@
 		"searchByHash": "Buscar por hash",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
+	"Create": {
+		"createDiscussionTitle": "Crear discusión",
+		"title": "Título",
+		"description": "Descripción",
+		"create": "Crear",
+		"createTag": "Crear etiqueta",
+		"addTags": "Agregar etiquetas",
+		"searchTags": "Buscar etiquetas",
+		"noTagsFound": "No se encontraron etiquetas.",
+		"selectTags": "Seleccionar etiquetas",
+		"selectTopic": "Seleccionar tema",
+		"tagsLeftText": "Etiquetas restantes",
+		"AllowedCommentors": {
+			"title": "¿Quién puede comentar?",
+			"all": "Todos",
+			"onchainVerified": "Verificado en cadena",
+			"none": "Ninguno",
+			"tooltip": "Elija quién puede comentar y responder a esta publicación"
+		},
+		"Topic": {
+			"general": "General",
+			"auctionadmin": "Administrador de subastas",
+			"generaladmin": "Administrador general",
+			"governance": "Gobernanza",
+			"root": "Raíz",
+			"stakingadmin": "Administrador de apuestas",
+			"treasury": "Tesorería",
+			"fellowship": "Compañerismo"
+		},
+		"titleTooShort": "Por favor, proporcione un título válido.",
+		"titlePlaceholder": "Ingrese título",
+		"descriptionRequired": "Por favor, proporcione una descripción válida.",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toCreate": "para crear una discusión"
+	},
 	"ProposalType": {
 		"discussion": "Discusión",
-		"referendum": "Referendo",
-		"referendumv2": "Referendo",
-		"councilmotion": "Moción del Consejo",
-		"techcommitteeproposal": "Propuesta del Comité Técnico",
-		"treasuryproposal": "Propuesta de Tesorería",
+		"referendum": "Referéndum",
+		"referendumv2": "Referéndum",
+		"councilmotion": "Moción del consejo",
+		"techcommitteeproposal": "Propuesta del comité técnico",
+		"treasuryproposal": "Propuesta de tesorería",
 		"bounty": "Recompensa",
-		"childbounty": "Recompensa Secundaria",
+		"childbounty": "Recompensa infantil",
 		"tip": "Propina",
-		"fellowshipreferendum": "Referendo de Fellowship",
-		"alliancemotion": "Moción de Alianza",
+		"fellowshipreferendum": "Referéndum de compañerismo",
+		"alliancemotion": "Moción de alianza",
 		"announcement": "Anuncio",
-		"democracyproposal": "Propuesta de Democracia",
-		"upgradecommittee": "Comité de Actualización",
-		"advisorycommittee": "Comité Asesor",
+		"democracyproposal": "Propuesta de democracia",
+		"upgradecommittee": "Comité de actualización",
+		"advisorycommittee": "Comité asesor",
 		"grant": "Subvención",
 		"community": "Comunidad",
 		"technicalcommittee": "Comité Técnico"
+	},
+	"Header": {
+		"polkadot": "Polkadot y Parachains",
+		"kusama": "Kusama y Parachains",
+		"soloChains": "Cadenas en solitario",
+		"testChains": "Cadenas de prueba",
+		"switchTo": "Cambiar a",
+		"lightMode": "Modo claro",
+		"darkMode": "Modo oscuro",
+		"language": "Idioma",
+		"node": "Nodo",
+		"network": "Red",
+		"searchNetworks": "Buscar redes..."
+	},
+	"Leaderboard": {
+		"username": "Nombre de usuario",
+		"astrals": "Astrals",
+		"userSince": "Usuario desde",
+		"actions": "Acciones",
+		"leaderboard": "Tabla de Clasificación",
+		"findYourRank": "Encuentra tu rango en el ecosistema",
+		"searchUsername": "Buscar nombre de usuario"
+	},
+	"BlockEditor": {
+		"placeholder": "Escribe / para comenzar",
+		"errorUpdatingContent": "Error al actualizar el contenido"
+	},
+	"SetIdentity": {
+		"displayName": "Nombre para mostrar",
+		"legalName": "Nombre legal",
+		"email": "Correo electrónico",
+		"twitter": "Twitter",
+		"matrix": "Matrix",
+		"setIdentity": "Establecer identidad",
+		"onChainIdentity": "Identidad en cadena",
+		"identityDescription1": "Polkadot ofrece identidades en cadena que verifican las credenciales de los usuarios a través de registradores designados, generando mayor confianza y apoyo.",
+		"identityDescription2": "Una vez verificados con éxito, los usuarios reciben una marca de verificación verde, simbolizando su estado de confianza. Este símbolo de estado verificado mejora la credibilidad al solicitar fondos del tesoro o participar en discusiones y propuestas.",
+		"letBegin": "Empecemos",
+		"requestJudgement": "Solicitar Evaluación (Próximamente)",
+		"minimumDeposit": "Depósito Mínimo",
+		"registrarFee": "Tarifa del Registrador",
+		"totalAmountRequired": "Cantidad Total Requerida",
+		"viewAmountBreakup": "Ver Desglose del Monto",
+		"registrarFees": "Tarifas de registro"
+	},
+	"BatchVote": {
+		"batchVoting": "Votación por lotes",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toVote": "para votar",
+		"setDefaults": "Establecer valores predeterminados",
+		"vote": "Votar",
+		"noProposalsAvailable": "No hay propuestas disponibles",
+		"skip": "Omitir",
+		"aye": "Sí",
+		"nay": "No",
+		"abstain": "Abstención",
+		"chooseYourVote": "Elige tu voto",
+		"setConviction": "Establecer convicción",
+		"noItemsInVoteCart": "No hay elementos en el carrito de votación",
+		"confirmBatchVoting": "Confirmar votación por lotes",
+		"save": "Guardar",
+		"editVote": "Editar voto",
+		"next": "Siguiente",
+		"totalProposals": "Propuestas totales",
+		"viewCart": "Ver carrito",
+		"proposals": "Propuestas"
+	},
+	"CreateProposal": {
+		"createPreimage": "Crear Preimagen",
+		"createTreasuryProposal": "Crear Propuesta de Tesorería (Nativa)",
+		"usdxProposal": "Crear Propuesta de Tesorería USDx (Assethub)",
+		"cancelReferendum": "Cancelar un Referéndum",
+		"killReferendum": "Terminar un Referéndum",
+		"goBack": "Volver"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiario",
+		"amount": "Cantidad",
+		"track": "Pista",
+		"createProposal": "Crear Propuesta",
+		"create": "Crear",
+		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
+		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
+		"proposalCreationFailed": "Error al crear la propuesta",
+		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"selectTrack": "Seleccionar Pista"
+	},
+	"CreatePreimage": {
+		"addItem": "Agregar Elemento",
+		"removeItem": "Eliminar Elemento",
+		"yes": "Sí",
+		"no": "No",
+		"uploadFile": "Subir Archivo",
+		"includeOption": "Incluir Opción",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageHash": "Hash de Preimagen",
+		"length": "Longitud"
+	},
+	"AddressInput": {
+		"invalidAddress": "Dirección Inválida",
+		"noResultsFound": "No se encontraron resultados",
+		"placeholder": "Ingrese la Dirección"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "ID del Referéndum",
+		"referendumIdDescription": "Ingrese el ID del referéndum para cancelar",
+		"thisReferendumIsNotOngoing": "Este Referéndum no está en curso"
 	}
 }

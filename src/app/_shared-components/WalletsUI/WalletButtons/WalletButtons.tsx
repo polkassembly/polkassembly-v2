@@ -8,7 +8,7 @@ import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { useWalletService } from '@/hooks/useWalletService';
 import classes from './WalletButtons.module.scss';
 
-function WalletButtons({ onWalletChange, small }: { onWalletChange: (wallet: EWallet | null) => void; small?: boolean }) {
+function WalletButtons({ onWalletChange, small }: { onWalletChange?: (wallet: EWallet | null) => void; small?: boolean }) {
 	const walletService = useWalletService();
 	const availableWallets = walletService?.getInjectedWallets();
 

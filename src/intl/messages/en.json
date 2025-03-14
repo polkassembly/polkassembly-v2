@@ -57,18 +57,21 @@
 			"loadMoreComments": "Load more comments",
 			"showLessComments": "Show less comments",
 			"commentingOnProposal": "Commenting on proposal"
-		}
+		},
+		"NoRank": "to see your rank"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
 		"chooseLinkedAccount": "Choose Linked Account",
-		"noAccountsFound": "No accounts found, check permission",
+		"noAccountsFound": "No Accounts Found",
 		"selectWallet": "Please Select Wallet",
 		"fetchingAddresses": "For fetching your addresses, Polkassembly needs access to your wallet extensions. Please authorize this transaction.",
 		"goBack": "Go Back",
 		"gotIt": "Got It",
 		"hidePassword": "Hide Password",
-		"showPassword": "Show Password"
+		"showPassword": "Show Password",
+		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
+		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",
@@ -117,7 +120,7 @@
 		"Activity": {
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
-			"created_tip": "Created Tip", 
+			"created_tip": "Created Tip",
 			"gave_tip": "Gave Tip",
 			"created_bounty": "Created Bounty",
 			"created_child_bounty": "Created Child Bounty",
@@ -166,7 +169,9 @@
 			"linked_address": "Linked Address",
 			"linked_multiple_addresses": "Linked Multiple Addresses",
 			"unlinked_address": "Unlinked Address",
-			"unlinked_multiple_addresses": "Unlinked Multiple Addresses"
+			"unlinked_multiple_addresses": "Unlinked Multiple Addresses",
+			"followed_user": "Followed User",
+			"unfollowed_user": "Unfollowed User"
 		},
 		"overview": "Overview",
 		"onchainIdentity": "Onchain Identity",
@@ -193,6 +198,8 @@
 		"riot": "Riot",
 		"discord": "Discord",
 		"saveChanges": "Save",
+		"judgements": "Judgements",
+		"since": "Since",
 		"Settings": {
 			"settings": "Settings",
 			"deleteAccount": "Delete Account",
@@ -488,7 +495,11 @@
 		"abstainVoteValue": "Abstain vote value",
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"voteSuccess": "Your vote has been cast successfully",
+		"voteFailed": "Your vote has not been cast successfully",
+		"voteSuccessTitle": "Vote Successful",
+		"voteFailedTitle": "Vote Failed"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance"
@@ -528,5 +539,176 @@
 		"showAll": "Show All",
 		"searchByHash": "Search by hash",
 		"preimageNotFound": "Preimage not found"
+	},
+	"Create": {
+		"createDiscussionTitle": "Create Discussion",
+		"title": "Title",
+		"description": "Description",
+		"create": "Create",
+		"createTag": "Create Tag",
+		"addTags": "Add Tags",
+		"searchTags": "Search tags",
+		"noTagsFound": "No tags found.",
+		"selectTags": "Select tags",
+		"selectTopic": "Select Topic",
+		"tagsLeftText": "Tags left",
+		"titleTooShort": "Please provide a valid title.",
+		"titlePlaceholder": "Enter title",
+		"descriptionRequired": "Please provide a valid description.",
+		"AllowedCommentors": {
+			"title": "Who can comment ?",
+			"all": "All",
+			"onchainVerified": "Onchain Verified",
+			"none": "None",
+			"tooltip": "Choose who can comment and reply to this post"
+		},
+		"Topic": {
+			"general": "General",
+			"auctionadmin": "Auction Admin",
+			"generaladmin": "General Admin",
+			"governance": "Governance",
+			"root": "Root",
+			"stakingadmin": "Staking Admin",
+			"treasury": "Treasury",
+			"fellowship": "Fellowship"
+		},
+		"please": "Please",
+		"login": "Login",
+		"toCreate": "to create a Discussion"
+	},
+	"ProposalType": {
+		"discussion": "Discussion",
+		"referendum": "Referendum",
+		"referendumv2": "Referendum",
+		"councilmotion": "Council Motion",
+		"techcommitteeproposal": "Tech Committee Proposal",
+		"treasuryproposal": "Treasury Proposal",
+		"bounty": "Bounty",
+		"childbounty": "Child Bounty",
+		"tip": "Tip",
+		"fellowshipreferendum": "Fellowship Referendum",
+		"alliancemotion": "Alliance Motion",
+		"announcement": "Announcement",
+		"democracyproposal": "Democracy Proposal",
+		"upgradecommittee": "Upgrade Committee",
+		"advisorycommittee": "Advisory Committee",
+		"grant": "Grant",
+		"community": "Community",
+		"technicalcommittee": "Technical Committee"
+	},
+	"Header": {
+		"polkadot": "Polkadot & Parachains",
+		"kusama": "Kusama & Parachains",
+		"soloChains": "Solo Chains",
+		"testChains": "Test Chains",
+		"switchTo": "Switch to",
+		"lightMode": "Light Mode",
+		"darkMode": "Dark Mode",
+		"language": "Language",
+		"node": "Node",
+		"network": "Network",
+		"searchNetworks": "Search networks..."
+	},
+	"Leaderboard": {
+		"username": "Username",
+		"astrals": "Astrals",
+		"userSince": "User Since",
+		"actions": "Actions",
+		"leaderboard": "Leaderboard",
+		"findYourRank": "Find your rank in the ecosystem",
+		"searchUsername": "Enter username to search"
+	},
+	"BlockEditor": {
+		"placeholder": "Type / to start",
+		"errorUpdatingContent": "Error updating content"
+	},
+	"SetIdentity": {
+		"displayName": "Display Name",
+		"legalName": "Legal Name",
+		"email": "Email",
+		"twitter": "Twitter",
+		"matrix": "Matrix",
+		"setIdentity": "Set Identity",
+		"onChainIdentity": "On-chain Identity",
+		"identityDescription1": "Polkadot offers on-chain identities that verify users' credentials through appointed registrars, instilling greater trust and support.",
+		"identityDescription2": "Once successfully verified, users receive a green checkmark, symbolising their trusted status. This verified status symbol enhances trustworthiness when requesting funds from the treasury or participating in discussions and proposals.",
+		"letBegin": "Let's Begin",
+		"requestJudgement": "Request Judgement (Coming Soon)",
+		"minimumDeposit": "Minimum Deposit",
+		"registrarFee": "Registrar Fee",
+		"totalAmountRequired": "Total Amount Required",
+		"viewAmountBreakup": "View Amount Breakup",
+		"registrarFees": "Registrar Fees"
+	},
+	"BatchVote": {
+		"batchVoting": "Batch Voting",
+		"please": "Please",
+		"login": "Login",
+		"toVote": "to Vote",
+		"setDefaults": "Set Defaults",
+		"vote": "Vote",
+		"noProposalsAvailable": "No proposals available",
+		"skip": "Skip",
+		"aye": "Aye",
+		"nay": "Nay",
+		"abstain": "Abstain",
+		"chooseYourVote": "Choose your Vote",
+		"setConviction": "Set Conviction",
+		"noItemsInVoteCart": "No items in the vote cart",
+		"confirmBatchVoting": "Confirm Batch Voting",
+		"save": "Save",
+		"editVote": "Edit Vote",
+		"next": "Next",
+		"totalProposals": "Total Proposals",
+		"viewCart": "View Cart",
+		"proposals": "Proposals"
+	},
+	"CreateProposal": {
+		"createPreimage": "Create Preimage",
+		"createTreasuryProposal": "Create Treasury Proposal (Native)",
+		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
+		"cancelReferendum": "Cancel a Referendum",
+		"killReferendum": "Kill a Referendum",
+		"goBack": "Go Back"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiary",
+		"amount": "Amount",
+		"track": "Track",
+		"createProposal": "Create Proposal",
+		"create": "Create",
+		"proposalCreatedSuccessfully": "Proposal created successfully",
+		"proposalCreatedSuccessfullyDescription": "The proposal has been created successfully",
+		"proposalCreationFailed": "Failed to create proposal",
+		"proposalCreationFailedDescription": "There was an error while creating the proposal",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"selectTrack": "Select Track"
+	},
+	"CreatePreimage": {
+		"addItem": "Add Item",
+		"removeItem": "Remove Item",
+		"yes": "Yes",
+		"no": "No",
+		"uploadFile": "Upload File",
+		"includeOption": "Include Option",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageHash": "Preimage Hash",
+		"length": "Length"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Referendum ID",
+		"referendumIdDescription": "Enter the referendum ID to cancel",
+		"thisReferendumIsNotOngoing": "This Referendum is not ongoing"
+	},
+	"AddressInput": {
+		"invalidAddress": "Invalid Address",
+		"noResultsFound": "No results found",
+		"placeholder": "Enter Address"
 	}
 }

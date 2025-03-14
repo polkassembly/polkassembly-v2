@@ -23,7 +23,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 	const [page, setPage] = useState(1);
 
 	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision) => {
-		const { data, error } = await NextApiClientService.getVotesHistoryApi({ proposalType, index, page: pageNumber, decision });
+		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision });
 
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
@@ -69,7 +69,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
-						value={EVoteDecision.ABSTAIN}
+						value={EVoteDecision.SPLIT_ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
 						{t('PostDetails.abstain')}
@@ -87,7 +87,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 						loading={isFetching}
 					/>
 				</TabsContent>
-				<TabsContent value={EVoteDecision.ABSTAIN}>
+				<TabsContent value={EVoteDecision.SPLIT_ABSTAIN}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
 						loading={isFetching}

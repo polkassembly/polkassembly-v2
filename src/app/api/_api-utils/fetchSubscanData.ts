@@ -19,7 +19,7 @@ const SUBSCAN_API_HEADERS = {
 
 export const fetchSubscanData = async (url: string | URL, network: string, body?: Record<string, unknown>, method?: 'POST' | 'GET') => {
 	try {
-		const redisData = await RedisService.GetSubscanData(network, url.toString());
+		const redisData = await RedisService.GetSubscanData({ network, url: url.toString() });
 
 		if (redisData) {
 			return deepParseJson(redisData);
@@ -34,7 +34,7 @@ export const fetchSubscanData = async (url: string | URL, network: string, body?
 		).json();
 
 		if (data?.message === 'Success') {
-			await RedisService.SetSubscanData(network, url.toString(), JSON.stringify(data));
+			await RedisService.SetSubscanData({ network, url: url.toString(), data: JSON.stringify(data) });
 		}
 
 		return data;

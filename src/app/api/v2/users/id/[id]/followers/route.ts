@@ -82,7 +82,7 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'User not found');
 	}
 
-	await OffChainDbService.UnfollowUser({ userId, userIdToFollow: id });
+	await OffChainDbService.UnfollowUser({ userId, userIdToUnfollow: id });
 
 	const response = NextResponse.json({ message: 'User unfollowed successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));

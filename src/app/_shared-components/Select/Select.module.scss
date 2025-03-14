@@ -31,8 +31,6 @@
 }
 
 .viewport {
-    @apply p-1;
-
     &[data-position='popper'] {
         @apply h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] bg-[var(--sidebar-primary-foreground)];
     }
