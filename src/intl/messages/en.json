@@ -670,7 +670,10 @@
 	"CreateProposal": {
 		"createPreimage": "Create Preimage",
 		"createTreasuryProposal": "Create Treasury Proposal (Native)",
-		"usdxProposal": "Create USDx Treasury Proposal (Assethub)"
+		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
+		"cancelReferendum": "Cancel a Referendum",
+		"killReferendum": "Kill a Referendum",
+		"goBack": "Go Back"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -701,6 +704,11 @@
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageHash": "Preimage Hash",
 		"length": "Length"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Referendum ID",
+		"referendumIdDescription": "Enter the referendum ID to cancel",
+		"thisReferendumIsNotOngoing": "This Referendum is not ongoing"
 	},
 	"AddressInput": {
 		"invalidAddress": "Invalid Address",

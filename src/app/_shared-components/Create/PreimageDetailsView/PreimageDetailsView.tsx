@@ -16,6 +16,7 @@ function PreimageDetailsView({ preimageHash, preimageLength }: { preimageHash: s
 				<div className='flex flex-wrap items-center justify-end break-all text-right'>
 					{preimageHash}
 					<Button
+						type='button'
 						variant='ghost'
 						size='icon'
 						onClick={() => navigator.clipboard.writeText(`${preimageHash}`)}

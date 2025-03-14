@@ -2,35 +2,38 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, IBeneficiary, NotificationType } from '@/_shared/types';
+import { BN, BN_HUNDRED, BN_ONE } from '@polkadot/util';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { EEnactment, EPostOrigin, EProposalType, NotificationType } from '@/_shared/types';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
-import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Button } from '@/app/_shared-components/Button';
 import { Form } from '@/app/_shared-components/Form';
 import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import MultipleBeneficiaryForm from '@/app/_shared-components/Create/MultipleBeneficiaryForm/MultipleBeneficiaryForm';
-import SelectTrack from '@/app/_shared-components/Create/SelectTrack/SelectTrack';
 import EnactmentForm from '@/app/_shared-components/Create/EnactmentForm/EnactmentForm';
 import PreimageDetailsView from '@/app/_shared-components/Create/PreimageDetailsView/PreimageDetailsView';
+import InputNumber from '@/app/_shared-components/Create/ManualExtrinsic/Params/InputNumber';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { canVote } from '@/_shared/_utils/canVote';
+import { useDebounce } from '@/hooks/useDebounce';
 
-function TreasuryProposalLocal() {
+function CancelReferendum() {
 	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
-	const [totalAmount, setTotalAmount] = useState<BN>(BN_ZERO);
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiary[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
-	const [selectedTrack, setSelectedTrack] = useState<string>('');
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
+
+	// Use the enhanced useDebounce hook
+	const { debouncedValue: debouncedReferendumId, setValue: setReferendumId, value: referendumId } = useDebounce<number | undefined>(undefined, 500);
 
 	const [preimageDetails, setPreimageDetails] = useState<{ preimageHash: string; preimageLength: number }>({
 		preimageHash: '',
@@ -41,19 +44,39 @@ function TreasuryProposalLocal() {
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
+	const fetchProposalDetails = async (refId?: number) => {
+		if (!refId) return null;
+
+		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: refId.toString() });
+
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
+		}
+
+		return data;
+	};
+	const { data, isFetching, error } = useQuery({
+		queryKey: ['referendum', debouncedReferendumId],
+		queryFn: ({ queryKey }) => fetchProposalDetails(Number(queryKey[1])),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!debouncedReferendumId,
+		retry: false,
+		retryOnMount: false,
+		refetchOnWindowFocus: false
+	});
+
 	useEffect(() => {
-		setTotalAmount(beneficiaries.reduce((acc, curr) => acc.add(new BN(curr.amount)), BN_ZERO));
+		if (!apiService || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)) return;
 
-		if (!apiService) return;
-
-		const tx = apiService.getTreasurySpendLocalExtrinsic({ beneficiaries });
+		const tx = apiService.getCancelReferendumExtrinsic({ referendumId: data.index });
 		if (!tx) return;
 
 		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
 		if (!preImage) return;
 
 		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
-	}, [apiService, beneficiaries]);
+	}, [apiService, data]);
 
 	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
 		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength) {
@@ -63,7 +86,7 @@ function TreasuryProposalLocal() {
 
 		apiService.createTreasuryProposal({
 			address: userPreferences.address.address,
-			track: selectedTrack,
+			track: EPostOrigin.REFERENDUM_CANCELLER,
 			preimageHash,
 			preimageLength,
 			enactment: selectedEnactment,
@@ -88,16 +111,9 @@ function TreasuryProposalLocal() {
 	};
 
 	const createPreimage = async () => {
-		if (
-			!apiService ||
-			totalAmount.isZero() ||
-			!beneficiaries.length ||
-			beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
-			!userPreferences.address?.address
-		)
-			return;
+		if (!apiService || !userPreferences.address?.address || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)) return;
 
-		const tx = apiService.getTreasurySpendLocalExtrinsic({ beneficiaries });
+		const tx = apiService.getCancelReferendumExtrinsic({ referendumId: data.index });
 		if (!tx) return;
 
 		setLoading(true);
@@ -143,22 +159,25 @@ function TreasuryProposalLocal() {
 					<WalletButtons small />
 					<AddressDropdown withBalance />
 
-					<MultipleBeneficiaryForm
-						beneficiaries={beneficiaries}
-						onChange={(value) => setBeneficiaries(value)}
-						disabledMultiAsset
-					/>
-					<BalanceInput
-						label={t('CreateTreasuryProposal.amount')}
-						defaultValue={totalAmount}
-						disabled
-					/>
-
-					<SelectTrack
-						selectedTrack={selectedTrack}
-						onChange={(track) => setSelectedTrack(track)}
-						isTreasury
-					/>
+					<div className='flex flex-col gap-y-2'>
+						<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
+						<InputNumber
+							onChange={setReferendumId}
+							placeholder={t('KillCancelReferendum.referendumIdDescription')}
+							value={referendumId}
+						/>
+						{isFetching ? (
+							<Skeleton className='h-4 w-full' />
+						) : (
+							data &&
+							(canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ? (
+								<div className='rounded bg-grey_bg p-2 text-sm text-text_primary'>{data.title}</div>
+							) : (
+								<div className='rounded bg-grey_bg p-2 text-sm text-text_primary'>{t('KillCancelReferendum.thisReferendumIsNotOngoing')}</div>
+							))
+						)}
+						{error && <div className='rounded bg-grey_bg p-2 text-sm text-text_primary'>{error.message}</div>}
+					</div>
 
 					<EnactmentForm
 						selectedEnactment={selectedEnactment}
@@ -180,12 +199,7 @@ function TreasuryProposalLocal() {
 						type='submit'
 						isLoading={loading}
 						disabled={
-							totalAmount.isZero() ||
-							!beneficiaries.length ||
-							beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
-							!userPreferences.address?.address ||
-							!selectedTrack ||
-							!selectedEnactment
+							!userPreferences.address?.address || !selectedEnactment || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)
 						}
 					>
 						{t('CreateTreasuryProposal.createProposal')}
@@ -196,4 +210,4 @@ function TreasuryProposalLocal() {
 	);
 }
 
-export default TreasuryProposalLocal;
+export default CancelReferendum;
