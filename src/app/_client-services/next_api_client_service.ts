@@ -220,10 +220,8 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
 			case EApiRoute.ADD_COMMENT:
-			case EApiRoute.ADD_POST_REACTION:
-				method = 'POST';
-				break;
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
+			case EApiRoute.ADD_POST_REACTION:
 				method = 'POST';
 				break;
 
