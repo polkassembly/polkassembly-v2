@@ -514,7 +514,12 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
+	/**
+	 * @deprecated Use reactions array instead for better performance and flexibility
+	 */
 	userReaction?: IReaction;
+	reactions?: IReaction[];
+	userSubscriptionId?: string;
 }
 
 export interface IGenericListingResponse<T> {
