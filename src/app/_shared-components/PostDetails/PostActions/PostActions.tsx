@@ -28,7 +28,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {
 			if (!user?.id) {
-				router.push(`/login?redirectUrl=${pathname}`);
+				router.push(`/login?nextUrl=${pathname}`);
 				return;
 			}
 			action();
