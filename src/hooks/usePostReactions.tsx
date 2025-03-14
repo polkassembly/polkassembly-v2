@@ -11,15 +11,16 @@ interface IPostData {
 	reactions: IReaction[];
 	proposalType: EProposalType;
 	index: number;
+	userSubscriptionId: string | null;
 }
 
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
-	const [isSubscribed, setIsSubscribed] = useState(false);
+	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
-		const reactionsArray = Array.isArray(postData?.reactions) ? postData?.reactions : postData?.reactions ? [postData.reactions] : [];
+		const reactionsArray = Array.isArray(postData?.reactions) ? postData.reactions : postData.reactions ? [postData.reactions] : [];
 
 		const userReactions = reactionsArray.filter((reaction) => reaction.userId === user?.id);
 

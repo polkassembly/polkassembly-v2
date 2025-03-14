@@ -54,7 +54,12 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions(postData);
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
+		reactions: postData?.reactions || [],
+		proposalType: postData?.proposalType || '',
+		index: postData?.index || 0,
+		userSubscriptionId: postData?.userSubscriptionId || null
+	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
