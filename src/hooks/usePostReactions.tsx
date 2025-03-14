@@ -5,6 +5,7 @@
 import { EProposalType, EReaction, IReaction } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback } from 'react';
+import { ClientError } from '@/app/_client-utils/clientError';
 import { useUser } from './useUser';
 
 interface IPostData {
@@ -49,9 +50,11 @@ export const usePostReactions = (postData: IPostData) => {
 
 	const handleReaction = useCallback(
 		async (type: EReaction) => {
+			if (!postData?.indexOrHash) {
+				throw new ClientError('Index or hash is required');
+			}
 			const isLikeAction = type === EReaction.like;
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
-
 			try {
 				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
 
@@ -63,7 +66,7 @@ export const usePostReactions = (postData: IPostData) => {
 						likesCount: isLikeAction ? prev.likesCount - 1 : prev.likesCount,
 						dislikesCount: !isLikeAction ? prev.dislikesCount - 1 : prev.dislikesCount
 					}));
-					await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.indexOrHash || '', currentReactionId);
+					await NextApiClientService.deletePostReaction(postData.proposalType as EProposalType, postData?.indexOrHash, currentReactionId);
 					setCurrentReactionId(null);
 				} else {
 					setReactionState((prev) => ({
@@ -77,7 +80,7 @@ export const usePostReactions = (postData: IPostData) => {
 					showGifSetter(true);
 					setTimeout(() => showGifSetter(false), 1500);
 
-					const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.indexOrHash || '', type);
+					const response = await NextApiClientService.addPostReaction(postData.proposalType as EProposalType, postData?.indexOrHash, type);
 					setCurrentReactionId(response?.data?.reactionId || null);
 				}
 			} catch {
