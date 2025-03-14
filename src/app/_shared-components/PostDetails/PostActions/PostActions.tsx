@@ -64,7 +64,7 @@ function PostActions({ postData }: { postData: IPost }) {
 				<div className={cn(isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
 						type={EReaction.like}
-						isActive={isLiked || false}
+						isActive={isLiked}
 						showGif={showLikeGif}
 						showText={false}
 						className='text-sm'
@@ -75,7 +75,7 @@ function PostActions({ postData }: { postData: IPost }) {
 				<div className={cn(isDisliked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
 						type={EReaction.dislike}
-						isActive={isDisliked || false}
+						isActive={isDisliked}
 						showGif={showDislikeGif}
 						showText={false}
 						className='text-sm'
