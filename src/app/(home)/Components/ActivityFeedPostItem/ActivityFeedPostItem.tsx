@@ -202,16 +202,16 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{(reactionState.isLiked || reactionState.isDisliked || commentCount > 0) && (
+			{(postData.metrics?.reactions.like || postData.metrics?.reactions.dislike || commentCount > 0) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
-							{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+							{postData.metrics?.reactions.like} {t('ActivityFeed.PostItem.likes')}
 						</span>
 						<span>|</span>
 
 						<span>
-							{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+							{postData.metrics?.reactions.dislike} {t('ActivityFeed.PostItem.dislikes')}
 						</span>
 						<span>|</span>
 
