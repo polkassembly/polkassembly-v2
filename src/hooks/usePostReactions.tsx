@@ -4,8 +4,9 @@
 
 import { EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { usePathname } from 'next/navigation';
 import { useUser } from './useUser';
 import { useToast as useToastLib } from './useToast';
 
@@ -19,7 +20,13 @@ interface IPostData {
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
-	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId);
+	const pathname = usePathname();
+
+	const isInSubscriptionTab = useMemo(() => {
+		return pathname?.includes('/?tab=subscribed');
+	}, [pathname]);
+
+	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId || isInSubscriptionTab);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
@@ -49,6 +56,10 @@ export const usePostReactions = (postData: IPostData) => {
 	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
+
+	useEffect(() => {
+		setIsSubscribed(!!postData?.userSubscriptionId || isInSubscriptionTab);
+	}, [postData?.userSubscriptionId, isInSubscriptionTab]);
 
 	const handleReaction = useCallback(
 		async (type: EReaction) => {
