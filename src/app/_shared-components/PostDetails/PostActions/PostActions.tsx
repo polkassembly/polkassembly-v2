@@ -19,10 +19,10 @@ function PostActions({ postData }: { postData: IPost }) {
 	const router = useRouter();
 	const t = useTranslations();
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
-		reactions: postData?.reactions || [],
-		proposalType: postData?.proposalType || '',
-		index: postData?.index || 0,
-		userSubscriptionId: postData?.userSubscriptionId || null
+		reactions: postData?.reactions,
+		proposalType: postData?.proposalType,
+		index: postData?.index,
+		userSubscriptionId: postData?.userSubscriptionId
 	});
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {

@@ -8,10 +8,10 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useUser } from './useUser';
 
 interface IPostData {
-	reactions: IReaction[];
+	reactions?: IReaction[];
 	proposalType: EProposalType;
-	index: number;
-	userSubscriptionId: string | null;
+	index?: number;
+	userSubscriptionId?: string | null;
 }
 
 export const usePostReactions = (postData: IPostData) => {

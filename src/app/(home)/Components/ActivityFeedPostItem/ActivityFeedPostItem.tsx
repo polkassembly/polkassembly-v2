@@ -55,10 +55,10 @@ function ActivityFeedPostItem({
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
 
 	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
-		reactions: postData?.reactions || [],
-		proposalType: postData?.proposalType || '',
-		index: postData?.index || 0,
-		userSubscriptionId: postData?.userSubscriptionId || null
+		reactions: postData?.reactions,
+		proposalType: postData?.proposalType,
+		index: postData?.index,
+		userSubscriptionId: postData?.userSubscriptionId
 	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
