@@ -4,7 +4,7 @@
 
 import { EProposalType, EReaction, IReaction } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useUser } from './useUser';
 
 interface IPostData {
@@ -46,11 +46,6 @@ export const usePostReactions = (postData: IPostData) => {
 	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
-
-	// Update reaction state when reactions change
-	useEffect(() => {
-		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount });
-	}, [isLiked, isDisliked, likesCount, dislikesCount]);
 
 	const handleReaction = useCallback(
 		async (type: EReaction) => {
