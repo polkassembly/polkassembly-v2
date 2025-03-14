@@ -139,9 +139,22 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const publicUsers = await Promise.all(publicUserPromises);
 
+	// for each post, fetch user subscription
+	let userSubscriptionIds: (string | null)[] = [];
+
+	if (isUserAuthenticated && userId) {
+		const userSubscriptions = await Promise.all(
+			posts.map((post) => {
+				return OffChainDbService.GetPostSubscriptionByPostAndUserId({ network, proposalType: ACTIVITY_FEED_PROPOSAL_TYPE, indexOrHash: post.index!.toString(), userId });
+			})
+		);
+		userSubscriptionIds = userSubscriptions.map((subscription) => subscription?.id || null);
+	}
+
 	posts = posts.map((post, index) => ({
 		...post,
-		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
+		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {}),
+		...(userSubscriptionIds[Number(index)] ? { userSubscriptionId: userSubscriptionIds[Number(index)]! } : {})
 	}));
 
 	totalCount = onChainPostsListingResponse.totalCount;

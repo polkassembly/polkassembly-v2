@@ -494,6 +494,7 @@ export interface IPost extends IOffChainPost {
 	publicUser?: IPublicUser;
 	userReaction?: IReaction;
 	reactions?: IReaction[];
+	userSubscriptionId?: string;
 }
 
 export interface IOnChainPostListing {
