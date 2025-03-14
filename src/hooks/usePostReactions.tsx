@@ -2,11 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EActivityFeedTab, EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
+import { EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ClientError } from '@/app/_client-utils/clientError';
-import { useSearchParams } from 'next/navigation';
 import { useUser } from './useUser';
 import { useToast as useToastLib } from './useToast';
 
@@ -14,19 +13,14 @@ interface IPostData {
 	reactions?: IReaction[];
 	proposalType: EProposalType;
 	indexOrHash?: string;
-	userSubscriptionId?: string;
+	isSubscribed?: boolean;
 }
 
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
-	const searchParams = useSearchParams();
 
-	const isInSubscriptionTab = useMemo(() => {
-		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
-	}, [searchParams]);
-
-	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId || isInSubscriptionTab);
+	const [isSubscribed, setIsSubscribed] = useState(postData?.isSubscribed || false);
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
 		const reactionsArray = postData?.reactions || [];
 
@@ -56,8 +50,8 @@ export const usePostReactions = (postData: IPostData) => {
 	);
 
 	useEffect(() => {
-		setIsSubscribed(!!postData?.userSubscriptionId || isInSubscriptionTab);
-	}, [postData?.userSubscriptionId, isInSubscriptionTab]);
+		setIsSubscribed(postData?.isSubscribed || false);
+	}, [postData?.isSubscribed]);
 
 	useEffect(() => {
 		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount });

@@ -2,13 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { RefObject, useRef, useState } from 'react';
+import { RefObject, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { IPostListing } from '@/_shared/types';
+import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -23,7 +23,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
@@ -49,16 +49,21 @@ function ActivityFeedPostItem({
 }) {
 	const { user } = useUser();
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const isInSubscriptionTab = useMemo(() => {
+		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
+	}, [searchParams]);
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
+	const isSubscribed = !!postData?.userSubscriptionId || isInSubscriptionTab;
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
-		userSubscriptionId: postData?.userSubscriptionId
+		isSubscribed
 	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
