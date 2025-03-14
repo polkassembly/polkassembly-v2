@@ -11,7 +11,7 @@ interface IPostData {
 	reactions?: IReaction[];
 	proposalType: EProposalType;
 	indexOrHash?: string;
-	userSubscriptionId?: string | null;
+	userSubscriptionId?: string;
 }
 
 export const usePostReactions = (postData: IPostData) => {
