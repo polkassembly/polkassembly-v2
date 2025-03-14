@@ -139,7 +139,7 @@ export class NextApiClientService {
 				path = '/activity-feed';
 				break;
 			case EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED:
-				path = '/activity-feed/subscriptions';
+				path = '/activity-feed/subscription';
 				break;
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
