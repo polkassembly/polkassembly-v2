@@ -19,7 +19,8 @@ function PostActions({ postData }: { postData: IPost }) {
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations('ActivityFeed');
-	const { handleReaction, likesCount, dislikesCount, isLiked, isDisliked, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
+	// usememo
+	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
@@ -60,25 +61,25 @@ function PostActions({ postData }: { postData: IPost }) {
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex items-center gap-4'>
-				<div className={cn(isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
+				<div className={cn(reactionState.isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
 						type={EReaction.like}
-						isActive={isLiked}
+						isActive={reactionState.isLiked}
 						showGif={showLikeGif}
 						showText={false}
 						className='text-sm'
-						count={likesCount}
+						count={reactionState.likesCount}
 						onClick={handleLike}
 					/>
 				</div>
-				<div className={cn(isDisliked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
+				<div className={cn(reactionState.isDisliked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
 						type={EReaction.dislike}
-						isActive={isDisliked}
+						isActive={reactionState.isDisliked}
 						showGif={showDislikeGif}
 						showText={false}
 						className='text-sm'
-						count={dislikesCount}
+						count={reactionState.dislikesCount}
 						onClick={handleDislike}
 					/>
 				</div>
