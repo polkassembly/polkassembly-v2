@@ -80,8 +80,8 @@ function ActivityFeedPostItem({
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-	const likeCount = reactionState.isLiked ? reactionState.likesCount : postData.metrics?.reactions.like;
-	const dislikeCount = reactionState.isDisliked ? reactionState.dislikesCount : postData.metrics?.reactions.dislike;
+	const likeCount = reactionState.likesCount;
+	const dislikeCount = reactionState.dislikesCount;
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
