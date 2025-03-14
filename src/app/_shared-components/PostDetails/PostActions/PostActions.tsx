@@ -18,7 +18,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const pathname = usePathname();
-	const t = useTranslations();
+	const t = useTranslations('ActivityFeed');
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
