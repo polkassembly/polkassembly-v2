@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser, IReaction } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -99,21 +99,15 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const offChainData = await Promise.all(offChainDataPromises);
 
-	let userReactions: (IReaction | null)[] = [];
-
-	if (isUserAuthenticated && accessToken && userId) {
-		// fetch user reaction for each post
-		const userReactionPromises = onChainPostsListingResponse.items.map((postInfo) => {
-			return OffChainDbService.GetUserReactionForPost({
+	const reactions = await Promise.all(
+		offChainData.map((postInfo) => {
+			return OffChainDbService.GetPostReactions({
 				network,
 				proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
-				indexOrHash: postInfo.index!.toString(),
-				userId
+				indexOrHash: postInfo.index!.toString()
 			});
-		});
-
-		userReactions = await Promise.all(userReactionPromises);
-	}
+		})
+	);
 
 	// Merge on-chain and off-chain data
 	posts = onChainPostsListingResponse.items.map((postInfo, index) => ({
@@ -122,7 +116,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		network,
 		proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 		onChainInfo: postInfo,
-		userReaction: userReactions[Number(index)] || undefined
+		reactions: reactions[Number(index)]
 	}));
 
 	// Sort posts by comment count in descending order
