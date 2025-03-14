@@ -44,6 +44,7 @@ function PostActions({ postData }: { postData: IPost }) {
 		[isSubscribed, isSubscribing]
 	);
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const buttonText = useMemo(() => (isSubscribing ? t('loading') : isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribing, isSubscribed]);
 
 	const handleShare = () => {
