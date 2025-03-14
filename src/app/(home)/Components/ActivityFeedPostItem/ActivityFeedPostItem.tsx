@@ -52,7 +52,7 @@ function ActivityFeedPostItem({
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
-	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
+	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
 	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe, isSubscribed } = usePostReactions({
 		reactions: postData?.reactions,
@@ -203,7 +203,7 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{((likeCount && likeCount > 0) || (dislikeCount && dislikeCount > 0) || commentCount > 0) && (
+			{(likeCount || dislikeCount || commentCount) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
@@ -255,7 +255,7 @@ function ActivityFeedPostItem({
 				isDialogOpen={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
 				postData={postData}
-				onCommentAdded={() => setCommentCount((prev) => prev + 1)}
+				onCommentAdded={() => setCommentCount((prev) => (prev ? prev + 1 : 1))}
 			/>
 		</div>
 	);
