@@ -19,13 +19,13 @@ function ActivityFeedToggleButton({ activeTab }: IToggleButtonProps) {
 	return (
 		<div className={styles.container}>
 			<Link
-				href={`${pathname}?activeTab=${EActivityFeedTab.EXPLORE}`}
+				href='/'
 				className={`${styles.button} ${activeTab === EActivityFeedTab.EXPLORE ? 'bg-section_dark_overlay font-semibold text-navbar_border' : 'font-medium text-sidebar_text'}`}
 			>
 				{t('ActivityFeed.ExploreTab')}
 			</Link>
 			<Link
-				href={`${pathname}?activeTab=${EActivityFeedTab.SUBSCRIBED}`}
+				href={`${pathname}?tab=${EActivityFeedTab.SUBSCRIBED}`}
 				className={`${styles.button} ${activeTab === EActivityFeedTab.SUBSCRIBED ? 'bg-section_dark_overlay font-semibold text-navbar_border' : 'font-medium text-sidebar_text'}`}
 			>
 				{t('ActivityFeed.SubscribedTab')}
