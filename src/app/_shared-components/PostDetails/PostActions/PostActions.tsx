@@ -20,7 +20,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const pathname = usePathname();
 	const t = useTranslations('ActivityFeed');
 	// usememo
-	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
+	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
@@ -39,13 +39,10 @@ function PostActions({ postData }: { postData: IPost }) {
 		[user?.id]
 	);
 
-	const subscribeButtonClasses = useMemo(
-		() => cn(styles.post_actions_container, isSubscribed && styles.selected_text, isSubscribing && styles.loading),
-		[isSubscribed, isSubscribing]
-	);
+	const subscribeButtonClasses = useMemo(() => cn(styles.post_actions_container, isSubscribed && styles.selected_text), [isSubscribed]);
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const buttonText = useMemo(() => (isSubscribing ? t('loading') : isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribing, isSubscribed]);
+	const buttonText = useMemo(() => (isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribed]);
 
 	const handleShare = () => {
 		const titlePart = postData?.title ? ` for ${postData.title}` : '';
@@ -89,7 +86,6 @@ function PostActions({ postData }: { postData: IPost }) {
 				<button
 					type='button'
 					onClick={() => handleAuthenticatedAction(() => handleSubscribe())}
-					disabled={isSubscribing}
 					className={subscribeButtonClasses}
 				>
 					{isSubscribed ? <RiBookmarkFill className='h-4 w-4' /> : <RiBookmarkLine className='h-4 w-4' />}

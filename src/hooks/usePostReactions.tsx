@@ -27,8 +27,6 @@ export const usePostReactions = (postData: IPostData) => {
 	}, [searchParams]);
 
 	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId || isInSubscriptionTab);
-	const [isLoading, setIsLoading] = useState(false);
-
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
 		const reactionsArray = Array.isArray(postData?.reactions) ? postData.reactions : postData.reactions ? [postData.reactions] : [];
 
@@ -122,7 +120,6 @@ export const usePostReactions = (postData: IPostData) => {
 		});
 
 		try {
-			setIsLoading(true);
 			if (isSubscribed) {
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			} else {
@@ -135,8 +132,6 @@ export const usePostReactions = (postData: IPostData) => {
 				status: NotificationType.ERROR
 			});
 			console.error('Failed to update subscription:', error);
-		} finally {
-			setIsLoading(false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isSubscribed, subscriptionParams, postData?.indexOrHash]);
@@ -147,7 +142,6 @@ export const usePostReactions = (postData: IPostData) => {
 		showDislikeGif,
 		handleReaction,
 		isSubscribed,
-		isSubscribing: isLoading,
 		handleSubscribe
 	};
 };
