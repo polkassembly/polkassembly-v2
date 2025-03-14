@@ -246,10 +246,8 @@ export class NextApiClientService {
 				method = 'DELETE';
 				break;
 			case EApiRoute.DELETE_REACTION:
-			case EApiRoute.DELETE_COMMENT:
-				method = 'DELETE';
-				break;
 			case EApiRoute.DELETE_POST_SUBSCRIPTION:
+			case EApiRoute.DELETE_COMMENT:
 				method = 'DELETE';
 				break;
 
@@ -734,17 +732,17 @@ export class NextApiClientService {
 	}
 
 	static async addPostSubscription(proposalType: EProposalType, index: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscribe'] });
-		return this.nextApiClientFetch<{ message: string; id: number }>({ url, method });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
 	}
 
 	static async deletePostSubscription(proposalType: EProposalType, index: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscribe'] });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	static async getPostSubscriptions(proposalType: EProposalType, index: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_SUBSCRIPTIONS, routeSegments: [proposalType, index, 'subscribe'] });
-		return this.nextApiClientFetch<{ message: string; id: number }>({ url, method });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_SUBSCRIPTIONS, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
 	}
 }

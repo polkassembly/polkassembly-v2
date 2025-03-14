@@ -2,14 +2,14 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import ActivityFeedComp from './ActivityFeedComp/ActivityFeedComp';
 
-function ActivityFeed({ initialData, subscribedData }: { initialData: IGenericListingResponse<IPostListing>; subscribedData: IGenericListingResponse<IPostListing> }) {
+function ActivityFeed({ initialData, activeTab }: { initialData: IGenericListingResponse<IPostListing>; activeTab?: EActivityFeedTab | EActivityFeedTab.EXPLORE }) {
 	return (
 		<ActivityFeedComp
 			initialData={initialData}
-			subscribedData={subscribedData}
+			activeTab={activeTab ?? EActivityFeedTab.EXPLORE}
 		/>
 	);
 }

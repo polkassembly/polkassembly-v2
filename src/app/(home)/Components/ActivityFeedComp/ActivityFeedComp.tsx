@@ -5,7 +5,6 @@
 'use client';
 
 import { EActivityFeedTab, IGenericListingResponse, IPostListing, ESidebarState } from '@/_shared/types';
-import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent } from '@ui/Tabs';
@@ -16,8 +15,7 @@ import styles from './ActivityFeedComp.module.scss';
 import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeedComp({ initialData, subscribedData }: { initialData: IGenericListingResponse<IPostListing>; subscribedData: IGenericListingResponse<IPostListing> }) {
-	const [activeTab, setActiveTab] = useState<EActivityFeedTab>(EActivityFeedTab.EXPLORE as EActivityFeedTab);
+function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericListingResponse<IPostListing>; activeTab: EActivityFeedTab }) {
 	const t = useTranslations();
 	const { state } = useSidebar();
 
@@ -30,10 +28,7 @@ function ActivityFeedComp({ initialData, subscribedData }: { initialData: IGener
 							<div>
 								<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
 							</div>
-							<ActivityFeedToggleButton
-								activeTab={activeTab}
-								setActiveTab={setActiveTab}
-							/>
+							<ActivityFeedToggleButton activeTab={activeTab ?? EActivityFeedTab.EXPLORE} />
 						</div>
 					</div>
 				</div>
@@ -44,12 +39,16 @@ function ActivityFeedComp({ initialData, subscribedData }: { initialData: IGener
 						value={activeTab}
 						defaultValue={activeTab}
 					>
-						<TabsContent value={EActivityFeedTab.EXPLORE}>
-							<ActivityFeedPostList initialData={initialData} />
-						</TabsContent>
-						<TabsContent value={EActivityFeedTab.FOLLOWING}>
-							<SubscribedPostList initialData={subscribedData} />
-						</TabsContent>
+						{activeTab === EActivityFeedTab.EXPLORE && (
+							<TabsContent value={EActivityFeedTab.EXPLORE}>
+								<ActivityFeedPostList initialData={initialData} />
+							</TabsContent>
+						)}
+						{activeTab === EActivityFeedTab.SUBSCRIBED && (
+							<TabsContent value={EActivityFeedTab.SUBSCRIBED}>
+								<SubscribedPostList initialData={initialData} />
+							</TabsContent>
+						)}
 					</Tabs>
 				</div>
 

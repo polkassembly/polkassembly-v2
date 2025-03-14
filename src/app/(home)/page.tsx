@@ -6,12 +6,15 @@ import { Suspense } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { EActivityFeedTab } from '@/_shared/types';
 import { CookieService } from '@/_shared/_services/cookie_service';
 import ActivityFeed from './Components/ActivityFeed';
 import { ClientError } from '../_client-utils/clientError';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
 
-export default async function Home() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ activeTab?: string }> }) {
+	const searchParamsValue = await searchParams;
+	const { activeTab } = searchParamsValue;
 	const user = await CookieService.getUserFromCookie();
 	const userId = user?.id;
 
@@ -20,7 +23,8 @@ export default async function Home() {
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
-	if (userId) {
+
+	if (userId && activeTab === EActivityFeedTab.SUBSCRIBED) {
 		const { data: subscribedData, error: subscribedError } = await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId });
 		if (subscribedError || !subscribedData) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, subscribedError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -28,8 +32,8 @@ export default async function Home() {
 		return (
 			<Suspense fallback={<LoadingSpinner />}>
 				<ActivityFeed
-					initialData={data}
-					subscribedData={subscribedData}
+					initialData={subscribedData}
+					activeTab={activeTab}
 				/>
 			</Suspense>
 		);
@@ -39,7 +43,7 @@ export default async function Home() {
 		<Suspense fallback={<LoadingSpinner />}>
 			<ActivityFeed
 				initialData={data}
-				subscribedData={{ items: [], totalCount: 0 }}
+				activeTab={activeTab as EActivityFeedTab}
 			/>
 		</Suspense>
 	);

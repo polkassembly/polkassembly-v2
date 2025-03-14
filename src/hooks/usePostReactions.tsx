@@ -2,12 +2,18 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IPost } from '@/_shared/types';
+import { EProposalType, EReaction, IReaction } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useUser } from './useUser';
 
-export const usePostReactions = (postData: IPost) => {
+interface IPostData {
+	reactions: IReaction[];
+	proposalType: EProposalType;
+	index: number;
+}
+
+export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const [isSubscribed, setIsSubscribed] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -35,8 +41,9 @@ export const usePostReactions = (postData: IPost) => {
 	const [reactionState, setReactionState] = useState({ isLiked, isDisliked, likesCount, dislikesCount });
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
+
 	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
-		useMemo(() => (postData?.userReaction?.userId === user?.id ? postData?.userReaction?.id || null : null), [postData?.userReaction, user?.id])
+		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
 
 	// Update reaction state when reactions change
