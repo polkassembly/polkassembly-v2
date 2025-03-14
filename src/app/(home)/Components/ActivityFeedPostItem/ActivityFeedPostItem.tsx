@@ -32,7 +32,7 @@ import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
-import ReactionHandler from '../ReactionHandler';
+import ReactionBar from '../ReactionBar';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -233,7 +233,7 @@ function ActivityFeedPostItem({
 					data-comment-input='true'
 					className='relative z-50'
 				>
-					<ReactionHandler
+					<ReactionBar
 						postData={postData}
 						setIsDialogOpen={setIsDialogOpen}
 						reactionState={reactionState}

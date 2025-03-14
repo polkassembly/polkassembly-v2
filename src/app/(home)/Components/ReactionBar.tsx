@@ -28,7 +28,7 @@ function ActionButton({ icon: Icon, text, onClick, className }: { icon: React.Re
 	);
 }
 
-function ReactionHandler({
+function ReactionBar({
 	postData,
 	setIsDialogOpen,
 	reactionState,
@@ -143,4 +143,4 @@ function ReactionHandler({
 	);
 }
 
-export default ReactionHandler;
+export default ReactionBar;
