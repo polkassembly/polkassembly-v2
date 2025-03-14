@@ -16,6 +16,7 @@ function ReactionButton({
 	isActive,
 	showGif,
 	onClick,
+	count,
 	showText = true,
 	className = 'text-bg_pink text-lg'
 }: {
@@ -24,6 +25,7 @@ function ReactionButton({
 	showGif: boolean;
 	onClick?: () => void;
 	showText?: boolean;
+	count?: number;
 	className?: string;
 }) {
 	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
@@ -54,6 +56,7 @@ function ReactionButton({
 			{showText && (
 				<span className={`${isActive ? 'ml-1 font-bold text-bg_pink' : ''}`}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
 			)}
+			{count && <span className='text-xs font-medium'>{count}</span>}
 		</button>
 	);
 }

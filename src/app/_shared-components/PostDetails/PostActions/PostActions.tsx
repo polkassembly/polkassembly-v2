@@ -61,35 +61,27 @@ function PostActions({ postData }: { postData: IPost }) {
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex items-center gap-4'>
-				<div
-					role='button'
-					aria-hidden
-					onClick={handleLike}
-					className={cn(isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}
-				>
+				<div className={cn(isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
 						type={EReaction.like}
 						isActive={isLiked || false}
 						showGif={showLikeGif}
 						showText={false}
 						className='text-sm'
+						count={likesCount}
+						onClick={handleLike}
 					/>
-					<span className='text-xs font-medium'>{likesCount}</span>
 				</div>
-				<div
-					role='button'
-					aria-hidden
-					onClick={handleDislike}
-					className={cn(isDisliked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}
-				>
+				<div className={cn(isDisliked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
 						type={EReaction.dislike}
 						isActive={isDisliked || false}
 						showGif={showDislikeGif}
 						showText={false}
 						className='text-sm'
+						count={dislikesCount}
+						onClick={handleDislike}
 					/>
-					<span className='text-xs font-medium'>{dislikesCount}</span>
 				</div>
 			</div>
 
