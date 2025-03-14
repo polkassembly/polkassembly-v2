@@ -2,11 +2,11 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
+import { EActivityFeedTab, EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ClientError } from '@/app/_client-utils/clientError';
-import { usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useUser } from './useUser';
 import { useToast as useToastLib } from './useToast';
 
@@ -20,11 +20,11 @@ interface IPostData {
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
-	const pathname = usePathname();
+	const searchParams = useSearchParams();
 
 	const isInSubscriptionTab = useMemo(() => {
-		return pathname?.includes('/?tab=subscribed');
-	}, [pathname]);
+		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
+	}, [searchParams]);
 
 	const [isSubscribed, setIsSubscribed] = useState(!!postData?.userSubscriptionId || isInSubscriptionTab);
 	const [isLoading, setIsLoading] = useState(false);
