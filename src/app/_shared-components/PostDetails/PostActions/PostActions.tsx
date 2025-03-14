@@ -8,7 +8,7 @@ import { useUser } from '@/hooks/useUser';
 import { Share2 } from 'lucide-react';
 import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
 import { useMemo, useCallback } from 'react';
@@ -17,6 +17,7 @@ import styles from './PostActions.module.scss';
 function PostActions({ postData }: { postData: IPost }) {
 	const { user } = useUser();
 	const router = useRouter();
+	const pathname = usePathname();
 	const t = useTranslations();
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, isSubscribing, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
@@ -27,12 +28,13 @@ function PostActions({ postData }: { postData: IPost }) {
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {
 			if (!user?.id) {
-				router.push('/login');
+				router.push(`/login?redirectUrl=${pathname}`);
 				return;
 			}
 			action();
 		},
-		[user?.id, router]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[user?.id]
 	);
 
 	const { likesCount, dislikesCount, isLiked, isDisliked } = reactionState;
