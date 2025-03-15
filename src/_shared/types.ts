@@ -334,7 +334,10 @@ export enum EOffChainPostTopic {
 	ROOT = 'root',
 	STAKING_ADMIN = 'stakingAdmin',
 	TREASURY = 'treasury',
-	FELLOWSHIP = 'fellowship'
+	FELLOWSHIP = 'fellowship',
+	COUNCIL = 'council',
+	DEMOCRACY = 'democracy',
+	WHITELIST = 'whitelist'
 }
 
 export interface ITag {
@@ -491,6 +494,7 @@ export interface IPost extends IOffChainPost {
 	publicUser?: IPublicUser;
 	userReaction?: IReaction;
 	reactions?: IReaction[];
+	userSubscriptionId?: string;
 }
 
 export interface IOnChainPostListing {
@@ -511,7 +515,12 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
+	/**
+	 * @deprecated Use reactions array instead for better performance and flexibility
+	 */
 	userReaction?: IReaction;
+	reactions?: IReaction[];
+	userSubscriptionId?: string;
 }
 
 export interface IGenericListingResponse<T> {
@@ -552,8 +561,8 @@ export enum EWeb3LoginScreens {
 }
 
 export enum EActivityFeedTab {
-	EXPLORE = 'EXPLORE',
-	FOLLOWING = 'FOLLOWING'
+	EXPLORE = 'explore',
+	SUBSCRIBED = 'subscribed'
 }
 
 export enum EListingTab {

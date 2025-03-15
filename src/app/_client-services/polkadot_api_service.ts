@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -13,10 +14,11 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { getTypeDef } from '@polkadot/types';
 import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiary, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -488,11 +490,121 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic({ amount, beneficiary }: { amount: BN; beneficiary: string }) {
+	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 		if (!this.api) {
 			return null;
 		}
-		return this.api.tx.treasury.spendLocal(amount.toString(), beneficiary);
+		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+
+		beneficiaries.forEach((beneficiary) => {
+			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
+				tx.push(this.api.tx?.treasury?.spendLocal(beneficiary.amount.toString(), beneficiary.address));
+			}
+		});
+
+		if (tx.length === 0) return null;
+
+		if (tx.length === 1) return tx[0];
+
+		return this.api.tx.utility.batchAll(tx);
+	}
+
+	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+		if (!this.api) {
+			return null;
+		}
+		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+
+		beneficiaries.forEach((beneficiary) => {
+			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
+				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
+					tx.push(
+						this.api.tx?.treasury?.spend(
+							{
+								V3: {
+									assetId: {
+										Concrete: {
+											interior: {
+												X2: [
+													{
+														PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+													},
+													{
+														GeneralIndex: beneficiary.assetId
+													}
+												]
+											}
+										}
+									},
+									location: {
+										interior: {
+											X1: { Parachain: NETWORKS_DETAILS[this.network]?.parachain }
+										}
+									}
+								}
+							},
+							beneficiary.amount.toString(),
+							{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							null
+						)
+					);
+				} else {
+					tx.push(
+						this.api.tx?.treasury?.spend(
+							{
+								V4: {
+									location: {
+										interior: {
+											X1: [
+												{
+													Parachain: NETWORKS_DETAILS[this.network]?.parachain
+												}
+											]
+										}
+									},
+									assetId: {
+										parents: 1,
+										interior: 'here'
+									}
+								}
+							},
+							beneficiary.amount.toString(),
+							{
+								V4: {
+									interior: {
+										X1: [
+											{
+												AccountId32: {
+													id: decodeAddress(beneficiary.address),
+													network: null
+												}
+											}
+										]
+									}
+								}
+							},
+							null
+						)
+					);
+				}
+			}
+		});
+
+		if (tx.length === 0) return null;
+
+		if (tx.length === 1) return tx[0];
+
+		return this.api.tx.utility.batchAll(tx);
+	}
+
+	getCancelReferendumExtrinsic({ referendumId }: { referendumId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.referenda.cancel(referendumId);
+	}
+
+	getKillReferendumExtrinsic({ referendumId }: { referendumId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.referenda.kill(referendumId);
 	}
 
 	async createTreasuryProposal({

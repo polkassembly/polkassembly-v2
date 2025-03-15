@@ -25,6 +25,10 @@
 		"Live": "ライブ",
 		"CommentPlaceholder": "ここにコメントを入力",
 		"Post": "投稿",
+		"share": "共有",
+		"loading": "読み込み中...",
+		"subscribe": "購読",
+		"unsubscribe": "購読解除",
 		"Navbar": {
 			"All": "すべて",
 			"Root": "ルート",
@@ -114,6 +118,8 @@
 		"balance": "残高",
 		"locked": "ロック済み",
 		"on": "日時",
+		"judgements": "判定",
+		"since": "日時",
 		"Activity": {
 			"voted_on_proposal": "投票済み",
 			"created_proposal": "提案を作成",
@@ -643,14 +649,27 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "プレイメージを作成",
-		"createTreasuryProposal": "財務提案を作成"
+		"createTreasuryProposal": "トレジャリー提案を作成 (ネイティブ)",
+		"usdxProposal": "USDxトレジャリー提案を作成 (アセットハブ)",
+		"cancelReferendum": "レファレンダムをキャンセル",
+		"killReferendum": "レファレンダムを強制終了",
+		"goBack": "戻る"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
 		"amount": "金額",
 		"track": "トラック",
 		"createProposal": "提案を作成",
-		"create": "作成"
+		"create": "作成",
+		"proposalCreatedSuccessfully": "提案が正常に作成されました",
+		"proposalCreatedSuccessfullyDescription": "提案が正常に作成されました",
+		"proposalCreationFailed": "提案の作成に失敗しました",
+		"proposalCreationFailedDescription": "提案の作成中にエラーが発生しました",
+		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
+		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
+		"preimageNoteFailed": "プレイメージの記録に失敗しました",
+		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
+		"selectTrack": "トラックを選択"
 	},
 	"CreatePreimage": {
 		"addItem": "項目を追加",
@@ -658,6 +677,22 @@
 		"yes": "はい",
 		"no": "いいえ",
 		"uploadFile": "ファイルをアップロード",
-		"includeOption": "オプションを含める"
+		"includeOption": "オプションを含める",
+		"preimageNoteFailed": "プレイメージの記録に失敗しました",
+		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
+		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
+		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
+		"preimageHash": "プレイメージハッシュ",
+		"length": "長さ"
+	},
+	"AddressInput": {
+		"invalidAddress": "無効なアドレス",
+		"noResultsFound": "結果が見つかりません",
+		"placeholder": "アドレスを入力"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "レファレンダムID",
+		"referendumIdDescription": "キャンセルするレファレンダムIDを入力してください",
+		"thisReferendumIsNotOngoing": "このレファレンダムは進行中ではありません"
 	}
 }

@@ -25,6 +25,10 @@
 		"Live": "实时",
 		"CommentPlaceholder": "在此输入您的评论",
 		"Post": "发布",
+		"share": "分享",
+		"loading": "加载中...",
+		"subscribe": "订阅",
+		"unsubscribe": "取消订阅",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",
@@ -177,6 +181,8 @@
 		"badgesDescription": "在Polkassembly中参与时解锁、接收和赚取徽章",
 		"userSince": "用户自",
 		"rank": "等级",
+		"judgements": "判定",
+		"since": "于",
 		"Settings": {
 			"settings": "设置",
 			"deleteAccount": "删除账户",
@@ -643,14 +649,27 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "创建预映像",
-		"createTreasuryProposal": "创建国库提案"
+		"createTreasuryProposal": "创建国库提案（原生）",
+		"usdxProposal": "创建USDx国库提案（资产中心）",
+		"cancelReferendum": "取消公投",
+		"killReferendum": "终止公投",
+		"goBack": "返回"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
 		"amount": "金额",
 		"track": "轨道",
 		"createProposal": "创建提案",
-		"create": "创建"
+		"create": "创建",
+		"proposalCreatedSuccessfully": "提案创建成功",
+		"proposalCreatedSuccessfullyDescription": "提案已成功创建",
+		"proposalCreationFailed": "提案创建失败",
+		"proposalCreationFailedDescription": "创建提案时发生错误",
+		"preimageNotedSuccessfully": "预映像记录成功",
+		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
+		"preimageNoteFailed": "预映像记录失败",
+		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"selectTrack": "选择轨道"
 	},
 	"CreatePreimage": {
 		"addItem": "添加项目",
@@ -658,6 +677,22 @@
 		"yes": "是",
 		"no": "否",
 		"uploadFile": "上传文件",
-		"includeOption": "包含选项"
+		"includeOption": "包含选项",
+		"preimageNoteFailed": "预映像记录失败",
+		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"preimageNotedSuccessfully": "预映像记录成功",
+		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
+		"preimageHash": "预映像哈希",
+		"length": "长度"
+	},
+	"AddressInput": {
+		"invalidAddress": "无效地址",
+		"noResultsFound": "未找到结果",
+		"placeholder": "请输入地址"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "公投ID",
+		"referendumIdDescription": "请输入要取消的公投ID",
+		"thisReferendumIsNotOngoing": "此公投未在进行中"
 	}
 }

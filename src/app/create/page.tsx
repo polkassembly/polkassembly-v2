@@ -3,18 +3,18 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Separator } from '@/app/_shared-components/Separator';
-import CreateProposalComponent from './Components/CreateProposal';
+import CreateComponent from './Components/Create';
 
-function CreateProposal() {
+function Create() {
 	return (
 		<div className='flex h-full w-full items-start justify-center p-8 sm:p-20'>
 			<div className='mx-auto w-full max-w-screen-lg rounded-lg bg-bg_modal p-6 shadow-lg'>
 				<div className='mb-4 text-lg font-semibold text-text_primary'>New Proposal</div>
 				<Separator className='my-4' />
-				<CreateProposalComponent />
+				<CreateComponent />
 			</div>
 		</div>
 	);
 }
 
-export default CreateProposal;
+export default Create;

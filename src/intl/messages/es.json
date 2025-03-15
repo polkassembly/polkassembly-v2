@@ -25,6 +25,10 @@
 		"Live": "EN VIVO",
 		"CommentPlaceholder": "Escriba su comentario aquí",
 		"Post": "Publicar",
+		"share": "Compartir",
+		"loading": "Cargando...",
+		"subscribe": "Suscribirse",
+		"unsubscribe": "Desuscribirse",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",
@@ -177,6 +181,8 @@
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
 		"userSince": "Usuario desde",
 		"rank": "Rango",
+		"judgements": "Juicios",
+		"since": "Desde",
 		"Settings": {
 			"settings": "Configuraciones",
 			"deleteAccount": "Eliminar cuenta",
@@ -643,14 +649,27 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Crear Preimagen",
-		"createTreasuryProposal": "Crear Propuesta de Tesorería"
+		"createTreasuryProposal": "Crear Propuesta de Tesorería (Nativa)",
+		"usdxProposal": "Crear Propuesta de Tesorería USDx (Assethub)",
+		"cancelReferendum": "Cancelar un Referéndum",
+		"killReferendum": "Terminar un Referéndum",
+		"goBack": "Volver"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
 		"amount": "Cantidad",
 		"track": "Pista",
 		"createProposal": "Crear Propuesta",
-		"create": "Crear"
+		"create": "Crear",
+		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
+		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
+		"proposalCreationFailed": "Error al crear la propuesta",
+		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"selectTrack": "Seleccionar Pista"
 	},
 	"CreatePreimage": {
 		"addItem": "Agregar Elemento",
@@ -658,6 +677,22 @@
 		"yes": "Sí",
 		"no": "No",
 		"uploadFile": "Subir Archivo",
-		"includeOption": "Incluir Opción"
+		"includeOption": "Incluir Opción",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageHash": "Hash de Preimagen",
+		"length": "Longitud"
+	},
+	"AddressInput": {
+		"invalidAddress": "Dirección Inválida",
+		"noResultsFound": "No se encontraron resultados",
+		"placeholder": "Ingrese la Dirección"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "ID del Referéndum",
+		"referendumIdDescription": "Ingrese el ID del referéndum para cancelar",
+		"thisReferendumIsNotOngoing": "Este Referéndum no está en curso"
 	}
 }
