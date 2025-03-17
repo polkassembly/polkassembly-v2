@@ -502,8 +502,8 @@ export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
 	childBountiesCount?: number;
-	index: number;
-	origin: string;
+	index?: number;
+	origin: EPostOrigin;
 	proposer: string;
 	status: EProposalStatus;
 	type: EProposalType;
