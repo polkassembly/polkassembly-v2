@@ -18,7 +18,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiary, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -490,7 +490,7 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}
@@ -509,7 +509,7 @@ export class PolkadotApiService {
 		return this.api.tx.utility.batchAll(tx);
 	}
 
-	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}

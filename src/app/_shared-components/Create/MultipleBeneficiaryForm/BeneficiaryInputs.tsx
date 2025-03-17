@@ -6,7 +6,7 @@ import { Minus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN } from '@polkadot/util';
 import { useEffect, useState } from 'react';
-import { IBeneficiary } from '@/_shared/types';
+import { IBeneficiaryInput } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { getBlocksPerDay } from '@/app/_client-utils/getBlocksPerDay';
@@ -26,7 +26,7 @@ function BeneficiaryInputs({
 	multiAsset,
 	stagedPayment
 }: {
-	beneficiaries: IBeneficiary[];
+	beneficiaries: IBeneficiaryInput[];
 	onBeneficiaryChange: ({ beneficiary }: { beneficiary: string }) => void;
 	onAmountChange: ({ amount, assetId }: { amount: BN; assetId: string | null }) => void;
 	onValidFromChange: ({ validFrom, isInvalid }: { validFrom?: BN; isInvalid?: boolean }) => void;

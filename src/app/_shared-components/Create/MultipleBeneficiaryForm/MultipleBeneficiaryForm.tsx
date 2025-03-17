@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { Button } from '@/app/_shared-components/Button';
-import { IBeneficiary } from '@/_shared/types';
+import { IBeneficiaryInput } from '@/_shared/types';
 import BeneficiaryInputs from './BeneficiaryInputs';
 
 function MultipleBeneficiaryForm({
@@ -14,8 +14,8 @@ function MultipleBeneficiaryForm({
 	multiAsset,
 	stagedPayment
 }: {
-	onChange: (beneficiary: IBeneficiary[]) => void;
-	beneficiaries: IBeneficiary[];
+	onChange: (beneficiary: IBeneficiaryInput[]) => void;
+	beneficiaries: IBeneficiaryInput[];
 	multiAsset?: boolean;
 	stagedPayment?: boolean;
 }) {

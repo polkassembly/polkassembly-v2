@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, IBeneficiary, NotificationType } from '@/_shared/types';
+import { EEnactment, IBeneficiaryInput, NotificationType } from '@/_shared/types';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Button } from '@/app/_shared-components/Button';
@@ -25,7 +25,7 @@ function TreasuryProposalAssethub() {
 	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiary[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
 	const [selectedTrack, setSelectedTrack] = useState<string>('');
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });

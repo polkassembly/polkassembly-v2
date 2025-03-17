@@ -464,6 +464,9 @@ export interface IBeneficiary {
 	amount: string;
 	assetId: string | null;
 	validFromBlock?: string;
+}
+
+export interface IBeneficiaryInput extends IBeneficiary {
 	isInvalid?: boolean;
 }
 
