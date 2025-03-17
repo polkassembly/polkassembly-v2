@@ -2,14 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { EPostOrigin, IPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DEFAULT_LISTING_LIMIT, SLATE_TIME } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -57,7 +55,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 			}
 			return undefined;
 		},
-		staleTime: SLATE_TIME,
+		staleTime: STALE_TIME,
 		enabled: origin !== 'All'
 	});
 

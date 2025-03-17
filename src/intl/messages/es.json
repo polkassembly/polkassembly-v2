@@ -25,6 +25,10 @@
 		"Live": "EN VIVO",
 		"CommentPlaceholder": "Escriba su comentario aquí",
 		"Post": "Publicar",
+		"share": "Compartir",
+		"loading": "Cargando...",
+		"subscribe": "Suscribirse",
+		"unsubscribe": "Desuscribirse",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",

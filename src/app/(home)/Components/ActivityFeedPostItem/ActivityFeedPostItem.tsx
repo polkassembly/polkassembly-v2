@@ -2,13 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { RefObject, useRef, useState } from 'react';
+import { RefObject, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { IPostListing } from '@/_shared/types';
+import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -23,7 +23,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
@@ -32,7 +32,7 @@ import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
-import ReactionHandler from '../ReactionHandler';
+import ReactionBar from '../ReactionBar';
 
 const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
@@ -49,12 +49,22 @@ function ActivityFeedPostItem({
 }) {
 	const { user } = useUser();
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const isInSubscriptionTab = useMemo(() => {
+		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
+	}, [searchParams]);
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
-	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
+	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction } = usePostReactions(postData);
+	const isSubscribed = !!postData?.userSubscriptionId || isInSubscriptionTab;
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe } = usePostReactions({
+		reactions: postData?.reactions,
+		proposalType: postData?.proposalType,
+		indexOrHash: postData?.index?.toString() || postData?.hash,
+		isSubscribed
+	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -75,7 +85,8 @@ function ActivityFeedPostItem({
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-
+	const likeCount = reactionState.isLiked !== undefined || null ? reactionState.likesCount : 0;
+	const dislikeCount = reactionState.isDisliked !== undefined || null ? reactionState.dislikesCount : 0;
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
@@ -197,16 +208,16 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{(reactionState.likesCount > 0 || reactionState.dislikesCount > 0 || commentCount > 0) && (
+			{(likeCount || dislikeCount || commentCount !== null) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
-							{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+							{likeCount} {t('ActivityFeed.PostItem.likes')}
 						</span>
 						<span>|</span>
 
 						<span>
-							{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+							{dislikeCount} {t('ActivityFeed.PostItem.dislikes')}
 						</span>
 						<span>|</span>
 
@@ -227,13 +238,16 @@ function ActivityFeedPostItem({
 					data-comment-input='true'
 					className='relative z-50'
 				>
-					<ReactionHandler
+					<ReactionBar
 						postData={postData}
 						setIsDialogOpen={setIsDialogOpen}
-						reactionState={reactionState}
+						isLiked={reactionState.isLiked}
+						isDisliked={reactionState.isDisliked}
 						showLikeGif={showLikeGif}
 						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}
+						isSubscribed={isSubscribed}
+						handleSubscribe={handleSubscribe}
 					/>
 
 					<CommentInput
@@ -247,7 +261,7 @@ function ActivityFeedPostItem({
 				isDialogOpen={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
 				postData={postData}
-				onCommentAdded={() => setCommentCount((prev) => prev + 1)}
+				onCommentAdded={() => setCommentCount((prev) => (prev ? prev + 1 : 1))}
 			/>
 		</div>
 	);

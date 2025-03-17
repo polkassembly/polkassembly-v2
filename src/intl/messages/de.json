@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Schreiben Sie hier Ihren Kommentar",
 		"Post": "Beitrag",
+		"share": "Teilen",
+		"loading": "Wird geladen...",
+		"subscribe": "Abonnieren",
+		"unsubscribe": "Entfernen",
 		"Navbar": {
 			"All": "Alle",
 			"Root": "Root",

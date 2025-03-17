@@ -117,7 +117,7 @@ addToRemoveQueue = (toastId: string): void => {
 
 type Toast = Omit<ToasterToast, 'id'>;
 
-function toast({ duration = 4.5, status, ...props }: Toast) {
+function toast({ duration = 3, status, ...props }: Toast) {
 	const id = genId();
 
 	const update = (toastProps: ToasterToast) =>

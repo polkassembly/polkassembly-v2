@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Type your comment here",
 		"Post": "Post",
+		"share": "Share",
+		"loading": "Loading...",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
 		"Navbar": {
 			"All": "All",
 			"Root": "Root",

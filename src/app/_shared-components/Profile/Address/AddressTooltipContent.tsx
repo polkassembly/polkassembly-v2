@@ -18,6 +18,7 @@ import SocialLinks from './SocialLinks';
 import classes from './AddressInline/AddressInline.module.scss';
 import { Button } from '../../Button';
 import AddressDisplay from './AddressDisplay';
+import { Skeleton } from '../../Skeleton';
 
 interface AddressTooltipContentProps {
 	address: string;
@@ -27,13 +28,6 @@ interface AddressTooltipContentProps {
 	userData?: IPublicUser;
 	isUserDataLoading?: boolean;
 }
-
-const LoadingSpinner = memo(() => (
-	<div className='flex w-full items-center justify-center p-4'>
-		<div className='h-6 w-6 animate-spin rounded-full border-b-2 border-text_pink' />
-		<span className='ml-2 text-sm text-text_primary'>Loading Profile...</span>
-	</div>
-));
 
 function AddressTooltipContent({ address, userProfileUrl, displayText, identity, userData, isUserDataLoading }: AddressTooltipContentProps) {
 	const router = useRouter();
@@ -86,6 +80,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 			title: 'Address copied to clipboard',
 			status: NotificationType.INFO
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const [isActionLoading, setIsActionLoading] = useState(false);
@@ -143,9 +138,10 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 
 	const isInitialLoading = isUserDataLoading || isFollowingLoading || isFollowersLoading;
 	const hasUserData = !!userData;
+	const hasValidStats = userData?.id && (stats.followers !== undefined || stats.following !== undefined);
 
 	if (isInitialLoading) {
-		return <LoadingSpinner />;
+		return <Skeleton className='h-48 w-auto' />;
 	}
 
 	return (
@@ -167,10 +163,12 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 							</span>
 						)}
 						<div className='flex items-center justify-between'>
-							<UserStats
-								followers={stats.followers}
-								following={stats.following}
-							/>
+							{hasValidStats && (
+								<UserStats
+									followers={stats.followers}
+									following={stats.following}
+								/>
+							)}
 							{hasUserData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
 						</div>
 						{hasUserData && (
