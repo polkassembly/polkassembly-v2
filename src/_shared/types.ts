@@ -461,6 +461,7 @@ export interface IBeneficiary {
 	amount: string;
 	assetId: string | null;
 	validFromBlock?: string;
+	isInvalid?: boolean;
 }
 
 export interface IStatusHistoryItem {

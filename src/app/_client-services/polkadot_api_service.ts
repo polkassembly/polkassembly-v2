@@ -524,6 +524,7 @@ export class PolkadotApiService {
 								V3: {
 									assetId: {
 										Concrete: {
+											parents: 0,
 											interior: {
 												X2: [
 													{
@@ -537,6 +538,7 @@ export class PolkadotApiService {
 										}
 									},
 									location: {
+										parents: 0,
 										interior: {
 											X1: { Parachain: NETWORKS_DETAILS[this.network]?.parachain }
 										}
@@ -544,8 +546,8 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
-							null
+							{ V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							beneficiary.validFromBlock || null
 						)
 					);
 				} else {
@@ -554,6 +556,7 @@ export class PolkadotApiService {
 							{
 								V4: {
 									location: {
+										parents: 0,
 										interior: {
 											X1: [
 												{
@@ -571,6 +574,7 @@ export class PolkadotApiService {
 							beneficiary.amount.toString(),
 							{
 								V4: {
+									parents: 0,
 									interior: {
 										X1: [
 											{
@@ -583,7 +587,7 @@ export class PolkadotApiService {
 									}
 								}
 							},
-							null
+							beneficiary.validFromBlock || null
 						)
 					);
 				}
@@ -663,7 +667,7 @@ export class PolkadotApiService {
 		return this.api?.registry;
 	}
 
-	async getCurrentBlockNumber() {
+	async getCurrentBlockHeight() {
 		if (!this.api) {
 			return null;
 		}

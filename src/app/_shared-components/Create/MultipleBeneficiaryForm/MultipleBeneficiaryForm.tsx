@@ -1,22 +1,23 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { Minus, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
-import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
 import { Button } from '@/app/_shared-components/Button';
-import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { IBeneficiary } from '@/_shared/types';
+import BeneficiaryInputs from './BeneficiaryInputs';
 
 function MultipleBeneficiaryForm({
 	onChange,
 	beneficiaries,
-	disabledMultiAsset
+	multiAsset,
+	stagedPayment
 }: {
 	onChange: (beneficiary: IBeneficiary[]) => void;
 	beneficiaries: IBeneficiary[];
-	disabledMultiAsset?: boolean;
+	multiAsset?: boolean;
+	stagedPayment?: boolean;
 }) {
 	const t = useTranslations();
 
@@ -33,6 +34,13 @@ function MultipleBeneficiaryForm({
 		onChange(newArray);
 	};
 
+	const handleValidFromChange = ({ validFrom, isInvalid, index }: { validFrom?: BN; isInvalid?: boolean; index: number }) => {
+		const newArray = [...beneficiaries];
+		newArray[`${index}`].validFromBlock = validFrom ? validFrom.toString() : undefined;
+		newArray[`${index}`].isInvalid = isInvalid;
+		onChange(newArray);
+	};
+
 	const addBeneficiary = () => {
 		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null }]);
 	};
@@ -45,38 +53,17 @@ function MultipleBeneficiaryForm({
 		<div className='flex flex-col gap-y-4'>
 			<div className='flex flex-col gap-y-6'>
 				{beneficiaries.map((_, index) => (
-					<div
+					<BeneficiaryInputs
 						// eslint-disable-next-line react/no-array-index-key
 						key={index}
-						className='flex w-full flex-col gap-y-2'
-					>
-						<div className='flex items-end gap-x-2'>
-							<div className='flex-1'>
-								<p className='mb-1 text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.beneficiary')}</p>
-								<AddressInput
-									className='flex-1'
-									onChange={(value) => handleBeneficiaryChange({ beneficiary: value, index })}
-								/>
-							</div>
-							<BalanceInput
-								disabledMultiAsset={disabledMultiAsset}
-								label={t('CreateTreasuryProposal.amount')}
-								onChange={({ value, assetId }) => handleAmountChange({ amount: value, assetId, index })}
-							/>
-						</div>
-						{beneficiaries.length > 1 && (
-							<div className='flex w-full justify-end text-text_pink'>
-								<Button
-									onClick={() => removeBeneficiary(index)}
-									variant='ghost'
-									size='sm'
-									leftIcon={<Minus />}
-								>
-									{t('CreatePreimage.removeItem')}
-								</Button>
-							</div>
-						)}
-					</div>
+						beneficiaries={beneficiaries}
+						onBeneficiaryChange={({ beneficiary }) => handleBeneficiaryChange({ beneficiary, index })}
+						onAmountChange={({ amount, assetId }) => handleAmountChange({ amount, assetId, index })}
+						onValidFromChange={({ validFrom, isInvalid }) => handleValidFromChange({ validFrom, isInvalid, index })}
+						onRemoveBeneficiary={() => removeBeneficiary(index)}
+						multiAsset={multiAsset}
+						stagedPayment={stagedPayment}
+					/>
 				))}
 			</div>
 			<div className='flex justify-end text-text_pink'>

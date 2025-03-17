@@ -146,7 +146,6 @@ function TreasuryProposalLocal() {
 					<MultipleBeneficiaryForm
 						beneficiaries={beneficiaries}
 						onChange={(value) => setBeneficiaries(value)}
-						disabledMultiAsset
 					/>
 					<BalanceInput
 						label={t('CreateTreasuryProposal.amount')}

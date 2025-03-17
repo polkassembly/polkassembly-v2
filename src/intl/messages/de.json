@@ -666,7 +666,11 @@
 		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
 		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
 		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
-		"selectTrack": "Track auswählen"
+		"selectTrack": "Track auswählen",
+		"validFrom": "Gültig ab",
+		"addValidFrom": "Gültig ab hinzufügen",
+		"invalidBlockHeight": "Bitte geben Sie eine gültige Blockhöhe ein",
+		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
 	},
 	"CreatePreimage": {
 		"addItem": "Element hinzufügen",
@@ -691,5 +695,8 @@
 		"referendumId": "Referendum-ID",
 		"referendumIdDescription": "Geben Sie die Referendum-ID zum Abbrechen ein",
 		"thisReferendumIsNotOngoing": "Dieses Referendum läuft nicht"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Der Wert ist zu groß"
 	}
 }
