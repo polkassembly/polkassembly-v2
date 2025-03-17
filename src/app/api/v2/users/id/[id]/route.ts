@@ -107,11 +107,17 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
+	const loggedInUserId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
+	if (loggedInUserId !== id) {
+		throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN);
+	}
+
 	const { bio, badges, title, image, coverImage, publicSocialLinks, email, username, notificationPreferences } = zodEditSchema.parse(await getReqBody(req));
 
 	// Update profile details
 	await OffChainDbService.UpdateUserProfile({
-		userId: id,
+		userId: loggedInUserId,
 		newProfileDetails: {
 			bio,
 			badges,

@@ -1,0 +1,39 @@
+.toast_viewport {
+    @apply fixed z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:right-0 sm:top-0 sm:flex-col md:max-w-[420px]
+}
+
+.toast_success_icon {
+    @apply h-5 w-5 text-white;
+}
+
+.toast_error_icon {
+    @apply h-6 w-6 text-toast_error_text;
+}
+
+.toast_warning_icon {
+    @apply h-6 w-6 text-toast_warning_text;
+}
+
+.toast_info_icon {
+    @apply h-6 w-6 text-toast_info_text;
+}
+
+.toast_variants {
+    @apply pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-lg py-4 px-6 pr-8 shadow-lg transition-all;
+}
+
+.toast_description {
+    @apply text-sm leading-normal opacity-90;
+}
+
+.toast_title {
+    @apply text-sm font-medium;
+}
+
+.toast_close {
+    @apply absolute right-2 top-3 rounded-md p-1 text-foreground/50 hover:text-foreground focus:outline-none focus:ring-2 group-hover:opacity-100;
+}
+
+.toast_action {
+    @apply inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
+}

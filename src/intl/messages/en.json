@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Type your comment here",
 		"Post": "Post",
+		"share": "Share",
+		"loading": "Loading...",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
 		"Navbar": {
 			"All": "All",
 			"Root": "Root",
@@ -198,6 +202,8 @@
 		"riot": "Riot",
 		"discord": "Discord",
 		"saveChanges": "Save",
+		"judgements": "Judgements",
+		"since": "Since",
 		"Settings": {
 			"settings": "Settings",
 			"deleteAccount": "Delete Account",
@@ -493,7 +499,11 @@
 		"abstainVoteValue": "Abstain vote value",
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"voteSuccess": "Your vote has been cast successfully",
+		"voteFailed": "Your vote has not been cast successfully",
+		"voteSuccessTitle": "Vote Successful",
+		"voteFailedTitle": "Vote Failed"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance"
@@ -565,7 +575,10 @@
 			"stakingadmin": "Staking Admin",
 			"treasury": "Treasury",
 			"fellowship": "Fellowship"
-		}
+		},
+		"please": "Please",
+		"login": "Login",
+		"toCreate": "to create a Discussion"
 	},
 	"ProposalType": {
 		"discussion": "Discussion",
@@ -630,5 +643,76 @@
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
 		"registrarFees": "Registrar Fees"
+	},
+	"BatchVote": {
+		"batchVoting": "Batch Voting",
+		"please": "Please",
+		"login": "Login",
+		"toVote": "to Vote",
+		"setDefaults": "Set Defaults",
+		"vote": "Vote",
+		"noProposalsAvailable": "No proposals available",
+		"skip": "Skip",
+		"aye": "Aye",
+		"nay": "Nay",
+		"abstain": "Abstain",
+		"chooseYourVote": "Choose your Vote",
+		"setConviction": "Set Conviction",
+		"noItemsInVoteCart": "No items in the vote cart",
+		"confirmBatchVoting": "Confirm Batch Voting",
+		"save": "Save",
+		"editVote": "Edit Vote",
+		"next": "Next",
+		"totalProposals": "Total Proposals",
+		"viewCart": "View Cart",
+		"proposals": "Proposals"
+	},
+	"CreateProposal": {
+		"createPreimage": "Create Preimage",
+		"createTreasuryProposal": "Create Treasury Proposal (Native)",
+		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
+		"cancelReferendum": "Cancel a Referendum",
+		"killReferendum": "Kill a Referendum",
+		"goBack": "Go Back"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiary",
+		"amount": "Amount",
+		"track": "Track",
+		"createProposal": "Create Proposal",
+		"create": "Create",
+		"proposalCreatedSuccessfully": "Proposal created successfully",
+		"proposalCreatedSuccessfullyDescription": "The proposal has been created successfully",
+		"proposalCreationFailed": "Failed to create proposal",
+		"proposalCreationFailedDescription": "There was an error while creating the proposal",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"selectTrack": "Select Track"
+	},
+	"CreatePreimage": {
+		"addItem": "Add Item",
+		"removeItem": "Remove Item",
+		"yes": "Yes",
+		"no": "No",
+		"uploadFile": "Upload File",
+		"includeOption": "Include Option",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageHash": "Preimage Hash",
+		"length": "Length"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Referendum ID",
+		"referendumIdDescription": "Enter the referendum ID to cancel",
+		"thisReferendumIsNotOngoing": "This Referendum is not ongoing"
+	},
+	"AddressInput": {
+		"invalidAddress": "Invalid Address",
+		"noResultsFound": "No results found",
+		"placeholder": "Enter Address"
 	}
 }
