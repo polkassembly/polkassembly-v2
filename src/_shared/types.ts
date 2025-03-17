@@ -466,6 +466,10 @@ export interface IBeneficiary {
 	validFromBlock?: string;
 }
 
+export interface IBeneficiaryInput extends IBeneficiary {
+	isInvalid?: boolean;
+}
+
 export interface IStatusHistoryItem {
 	status: EProposalStatus;
 	timestamp: Date;

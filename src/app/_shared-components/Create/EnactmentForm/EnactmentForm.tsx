@@ -23,9 +23,9 @@ function EnactmentForm({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const blockNumber = await apiService?.getCurrentBlockNumber();
-			if (blockNumber) {
-				onEnactmentValueChange({ ...advancedDetails, [EEnactment.At_Block_No]: blockNumber.add(BN_THOUSAND) });
+			const blockHeight = await apiService?.getCurrentBlockHeight();
+			if (blockHeight) {
+				onEnactmentValueChange({ ...advancedDetails, [EEnactment.At_Block_No]: new BN(blockHeight).add(BN_THOUSAND) });
 			}
 		};
 		getCurrentBlockNumber();
@@ -51,7 +51,7 @@ function EnactmentForm({
 						<div className='capitalize'>{option.split('_').join(' ')}</div>
 						<InputNumber
 							onChange={(value) => onEnactmentValueChange({ ...advancedDetails, [option]: new BN(value) })}
-							value={advancedDetails[`${option}`].toString()}
+							defaultValue={advancedDetails[`${option}`].toString()}
 							className='w-fit'
 						/>
 					</div>

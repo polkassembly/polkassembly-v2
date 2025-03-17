@@ -669,7 +669,11 @@
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageNoteFailed": "预映像记录失败",
 		"preimageNoteFailedDescription": "记录预映像时发生错误",
-		"selectTrack": "选择轨道"
+		"selectTrack": "选择轨道",
+		"validFrom": "生效时间",
+		"addValidFrom": "添加生效时间",
+		"invalidBlockHeight": "请输入有效的区块高度",
+		"enterFutureBlockHeight": "请输入未来的区块高度"
 	},
 	"CreatePreimage": {
 		"addItem": "添加项目",
@@ -694,5 +698,8 @@
 		"referendumId": "公投ID",
 		"referendumIdDescription": "请输入要取消的公投ID",
 		"thisReferendumIsNotOngoing": "此公投未在进行中"
+	},
+	"errorMessages": {
+		"valueTooLarge": "数值过大"
 	}
 }

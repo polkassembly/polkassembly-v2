@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, IBeneficiary, NotificationType } from '@/_shared/types';
+import { EEnactment, IBeneficiaryInput, NotificationType } from '@/_shared/types';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Button } from '@/app/_shared-components/Button';
@@ -25,7 +25,7 @@ function TreasuryProposalAssethub() {
 	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiary[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
 	const [selectedTrack, setSelectedTrack] = useState<string>('');
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
@@ -42,11 +42,14 @@ function TreasuryProposalAssethub() {
 	useEffect(() => {
 		if (!apiService) return;
 
-		const tx = apiService.getTreasurySpendLocalExtrinsic({ beneficiaries });
+		const tx = apiService.getTreasurySpendExtrinsic({ beneficiaries });
 		if (!tx) return;
 
 		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
-		if (!preImage) return;
+		if (!preImage) {
+			setPreimageDetails({ preimageHash: '', preimageLength: 0 });
+			return;
+		}
 
 		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
 	}, [apiService, beneficiaries]);
@@ -87,7 +90,7 @@ function TreasuryProposalAssethub() {
 		if (
 			!apiService ||
 			!beneficiaries.length ||
-			beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
+			beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount) || b.isInvalid) ||
 			!userPreferences.address?.address
 		)
 			return;
@@ -141,6 +144,8 @@ function TreasuryProposalAssethub() {
 					<MultipleBeneficiaryForm
 						beneficiaries={beneficiaries}
 						onChange={(value) => setBeneficiaries(value)}
+						multiAsset
+						stagedPayment
 					/>
 
 					<SelectTrack
@@ -168,7 +173,7 @@ function TreasuryProposalAssethub() {
 						isLoading={loading}
 						disabled={
 							!beneficiaries.length ||
-							beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
+							beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount) || b.isInvalid) ||
 							!userPreferences.address?.address ||
 							!selectedTrack ||
 							!selectedEnactment
