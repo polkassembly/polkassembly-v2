@@ -31,7 +31,8 @@ import {
 	IVoteCartItem,
 	EConvictionAmount,
 	EVoteDecision,
-	IPostSubscription
+	IPostSubscription,
+	ECommentSentiment
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -92,6 +93,10 @@ export class OffChainDbService {
 
 	static async GetAddressesForUserId(userId: number): Promise<IUserAddress[]> {
 		return FirestoreService.GetAddressesForUserId(userId);
+	}
+
+	static async GetAddressDataByAddress(address: string): Promise<IUserAddress | null> {
+		return FirestoreService.GetAddressDataByAddress(address);
 	}
 
 	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
@@ -195,15 +200,25 @@ export class OffChainDbService {
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
-		const firestoreComments = await FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
-		const subsquareComments = await SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType });
+		const [firestoreComments, subsquareComments] = await Promise.all([
+			FirestoreService.GetPostComments({ network, indexOrHash, proposalType }),
+			SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType })
+		]);
 
 		// Combine all comments from both sources
 		const allComments = [...firestoreComments, ...subsquareComments];
 
+		// get reactions for each comment
+		const allCommentsWithReactions: ICommentResponse[] = await Promise.all(
+			allComments.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({ network, indexOrHash, proposalType, id: comment.id });
+				return { ...comment, reactions };
+			})
+		);
+
 		// Helper function to build comment tree
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
-			return allComments
+			return allCommentsWithReactions
 				.filter((comment) => comment.parentCommentId === parentId)
 				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
@@ -224,8 +239,22 @@ export class OffChainDbService {
 		return FirestoreService.GetPostReactions({ network, indexOrHash, proposalType });
 	}
 
-	static async GetPostReactionById(id: string): Promise<IReaction | null> {
-		return FirestoreService.GetPostReactionById(id);
+	static async GetCommentReactions({
+		network,
+		indexOrHash,
+		proposalType,
+		id
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		id: string;
+	}): Promise<IReaction[]> {
+		return FirestoreService.GetCommentReactions({ network, indexOrHash, proposalType, id });
+	}
+
+	static async GetReactionById(id: string): Promise<IReaction | null> {
+		return FirestoreService.GetReactionById(id);
 	}
 
 	static async GetPublicUserById(id: number): Promise<IPublicUser | null> {
@@ -296,6 +325,10 @@ export class OffChainDbService {
 		return FirestoreService.GetPostSubscriptionsByUserId({ userId, page, limit, network });
 	}
 
+	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -323,7 +356,8 @@ export class OffChainDbService {
 		proposalType,
 		indexOrHash,
 		metadata,
-		subActivityName
+		subActivityName,
+		commentId
 	}: {
 		userId: number;
 		name: EActivityName;
@@ -332,6 +366,7 @@ export class OffChainDbService {
 		indexOrHash?: string;
 		metadata?: IActivityMetadata;
 		subActivityName?: EActivityName;
+		commentId?: string;
 	}): Promise<void> {
 		const activity: IUserActivity = {
 			id: '', // Firestore service class will generate this
@@ -343,6 +378,7 @@ export class OffChainDbService {
 			...(indexOrHash && { indexOrHash }),
 			...(metadata && { metadata }),
 			...(subActivityName && { subActivityName }),
+			...(commentId && { commentId }),
 			createdAt: new Date(),
 			updatedAt: new Date()
 		};
@@ -428,7 +464,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		address
+		address,
+		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -437,6 +474,7 @@ export class OffChainDbService {
 		content: OutputData;
 		parentCommentId?: string;
 		address?: string;
+		sentiment?: ECommentSentiment;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -445,7 +483,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address, sentiment });
 
 		await this.saveUserActivity({
 			userId,
@@ -461,8 +499,8 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam }: { commentId: string; content: OutputData; isSpam?: boolean }) {
-		return FirestoreService.UpdateComment({ commentId, content, isSpam });
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+		return FirestoreService.UpdateComment({ commentId, content, isSpam, aiSentiment });
 	}
 
 	static async DeleteComment(commentId: string) {
@@ -509,11 +547,43 @@ export class OffChainDbService {
 		return reactionId;
 	}
 
-	static async DeletePostReaction(id: string) {
-		const reaction = await FirestoreService.GetPostReactionById(id);
+	static async AddCommentReaction({
+		network,
+		indexOrHash,
+		proposalType,
+		userId,
+		reaction,
+		commentId
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		userId: number;
+		reaction: EReaction;
+		commentId: string;
+	}): Promise<string> {
+		const reactionId = await FirestoreService.AddCommentReaction({ network, indexOrHash, proposalType, userId, reaction, commentId });
+
+		await this.saveUserActivity({
+			userId,
+			name: EActivityName.REACTED_TO_COMMENT,
+			network,
+			proposalType,
+			indexOrHash,
+			metadata: { reaction },
+			commentId
+		});
+
+		return reactionId;
+	}
+
+	static async DeleteReactionById({ id, userId }: { id: string; userId: number }) {
+		const reaction = await FirestoreService.GetReactionById(id);
 		if (!reaction) throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 
-		await FirestoreService.DeletePostReaction(id);
+		if (reaction.userId !== userId) throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+
+		await FirestoreService.DeleteReactionById(id);
 
 		await this.saveUserActivity({
 			userId: reaction.userId,
@@ -521,6 +591,7 @@ export class OffChainDbService {
 			network: reaction.network,
 			proposalType: reaction.proposalType,
 			indexOrHash: reaction.indexOrHash,
+			commentId: reaction.commentId,
 			metadata: { reaction: reaction.reaction }
 		});
 	}
@@ -706,6 +777,10 @@ export class OffChainDbService {
 
 	static async DeleteVoteCartItem({ userId, voteCartItemId }: { userId: number; voteCartItemId: string }) {
 		return FirestoreService.DeleteVoteCartItem({ userId, voteCartItemId });
+	}
+
+	static async ClearVoteCart({ userId }: { userId: number }) {
+		return FirestoreService.ClearVoteCart({ userId });
 	}
 
 	static async UpdateVoteCartItem({

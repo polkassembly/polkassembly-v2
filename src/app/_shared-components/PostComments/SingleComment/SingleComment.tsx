@@ -20,6 +20,7 @@ import { Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
+import UserIcon from '@assets/profile/user-icon.svg';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -111,19 +112,41 @@ function SingleComment({
 				</DialogContent>
 			</Dialog>
 			<div>
-				<Identicon
-					size={30}
-					value={comment.user.addresses[0]}
-					theme='polkadot'
-				/>
+				{comment.user.addresses[0] ? (
+					<Identicon
+						size={30}
+						value={comment.user.addresses[0]}
+						theme='polkadot'
+					/>
+				) : comment.user.profileDetails?.image ? (
+					<Image
+						src={comment.user.profileDetails.image}
+						alt='profile'
+						className='rounded-full'
+						width={30}
+						height={30}
+					/>
+				) : (
+					<div className='w-[30px]'>
+						<Image
+							src={UserIcon}
+							alt='profile'
+							className='rounded-full'
+						/>
+					</div>
+				)}
 			</div>
 			<div className={classes.innerWrapper}>
 				<div className='flex items-center gap-x-2'>
 					<span className={classes.username}>
-						<Address
-							address={comment.user.addresses[0]}
-							showIdenticon={false}
-						/>
+						{comment.user.addresses[0] ? (
+							<Address
+								address={comment.user.addresses[0]}
+								showIdenticon={false}
+							/>
+						) : (
+							<span className='text-text_primary'>{comment.user.username}</span>
+						)}
 					</span>
 					<Separator
 						orientation='vertical'

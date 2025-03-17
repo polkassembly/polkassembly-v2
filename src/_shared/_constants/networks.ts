@@ -87,6 +87,8 @@ interface INetworkDetails {
 	supportedAssets: Record<string, INetworkTreasuryAssets>;
 	peopleChainDetails: IPeopleChainDetails;
 	trackDetails: Partial<Record<EPostOrigin, ITrackInfo>>;
+	palletInstance?: string;
+	parachain?: string;
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -1688,6 +1690,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		key: ENetwork.POLKADOT,
 		name: 'Polkadot',
 		govtype: EGovType.OPENGOV,
+		parachain: '1000',
+		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
 		subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
@@ -1747,6 +1751,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
 		govtype: EGovType.OPENGOV,
+		parachain: '1000',
+		palletInstance: '50',
 		name: 'Kusama',
 		blockTime: 6000,
 		ss58Format: 2,

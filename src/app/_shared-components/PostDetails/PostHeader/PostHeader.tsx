@@ -87,11 +87,15 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
 						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
-						<Separator
-							orientation='vertical'
-							className='h-3'
-						/>
-						{postData?.createdAt && <CreatedAtTime createdAt={postData.createdAt} />}
+						{postData?.createdAt && (
+							<>
+								<Separator
+									orientation='vertical'
+									className='h-3'
+								/>
+								<CreatedAtTime createdAt={postData.createdAt} />
+							</>
+						)}
 						{postData.tags && postData.tags.length > 0 && (
 							<>
 								<Separator
@@ -132,7 +136,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 								<Tooltip>
 									<TooltipTrigger>
 										<span className='text-xs text-wallet_btn_text'>
-											+ {postData?.onChainInfo?.beneficiaries?.length ?? 0 - 2} {t('PostDetails.more')}{' '}
+											+ {postData.onChainInfo.beneficiaries.length - 2} {t('PostDetails.more')}{' '}
 										</span>
 									</TooltipTrigger>
 									<TooltipContent className={classes.beneficiaryTooltipContent}>

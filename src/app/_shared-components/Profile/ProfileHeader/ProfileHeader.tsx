@@ -87,7 +87,6 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 
 		if (data && !error) {
 			queryClient.setQueryData(['followers', userProfileData.id, user?.id], (oldData: { followers: IFollowEntry[] }) => {
-				console.log('oldData', oldData);
 				return {
 					followers: [
 						...(oldData?.followers || []),
