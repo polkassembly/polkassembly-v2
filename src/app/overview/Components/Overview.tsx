@@ -38,7 +38,7 @@ function Overview({
 		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
 	};
 	tokenPrice: {
-		price: string;
+		price: string | undefined;
 	};
 }) {
 	const network = getCurrentNetwork();

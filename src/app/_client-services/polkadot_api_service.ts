@@ -217,30 +217,30 @@ export class PolkadotApiService {
 	async getSpendPeriod() {
 		const currentBlock = await this.api.derive.chain.bestNumberFinalized();
 		const spendPeriodConst = this.api.consts.treasury ? this.api.consts.treasury.spendPeriod : BN_ZERO;
-		if (spendPeriodConst) {
-			const spendPeriodBlocks = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
-			const totalSpendPeriodDays: number = blockToDays({ blocks: spendPeriodBlocks, network: this.network });
-			const currentBlockNumber = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
-			const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
-			const { time: remainingTime } = blockToTime({ blocks: remainingBlocks, network: this.network });
-			const { d: days, h: hours, m: minutes } = convertMillisecondsToDaysHoursMinutes(remainingTime);
-
-			const progressPercentage = (((currentBlockNumber % spendPeriodBlocks) / spendPeriodBlocks) * 100).toFixed(0);
-
-			return {
-				percentage: parseFloat(progressPercentage),
-				value: {
-					days,
-					hours,
-					minutes,
-					total: totalSpendPeriodDays
-				}
-			};
+		if (!spendPeriodConst) {
+			return null;
 		}
-		return null;
+		const spendPeriodBlocks = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
+		const totalSpendPeriodDays: number = blockToDays({ blocks: spendPeriodBlocks, network: this.network });
+		const currentBlockNumber = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
+		const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
+		const { time: remainingTime } = blockToTime({ blocks: remainingBlocks, network: this.network });
+		const { d: days, h: hours, m: minutes } = convertMillisecondsToDaysHoursMinutes(remainingTime);
+
+		const progressPercentage = (((currentBlockNumber % spendPeriodBlocks) / spendPeriodBlocks) * 100).toFixed(0);
+
+		return {
+			percentage: parseFloat(progressPercentage),
+			value: {
+				days,
+				hours,
+				minutes,
+				total: totalSpendPeriodDays
+			}
+		};
 	}
 
-	async getNextBurnData({ currentTokenPrice }: { currentTokenPrice: { price: string } }) {
+	async getNextBurnData({ currentTokenPrice }: { currentTokenPrice: { price: string | undefined } }) {
 		const treasuryAccount = u8aConcat(
 			'modl',
 			this.api.consts.treasury && this.api.consts.treasury.palletId

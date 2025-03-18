@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import styles from './SpendPeriod.module.scss';
 
-function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
+function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined } }) {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -26,9 +26,9 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	useEffect(() => {
 		if (!apiService) return;
 		(async () => {
-			if (tokenPrice) {
+			try {
 				const burnResult = await apiService.getNextBurnData({
-					currentTokenPrice: tokenPrice ?? { price: '0' }
+					currentTokenPrice: tokenPrice
 				});
 
 				if (burnResult?.value) {
@@ -39,19 +39,37 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 				} else {
 					setNextBurn(null);
 				}
+			} catch (error) {
+				console.error('Error fetching burn data:', error);
+				setNextBurn(null);
+			} finally {
+				setIsNextBurnLoading(false);
 			}
-			setIsNextBurnLoading(false);
 		})();
 	}, [apiService, tokenPrice]);
 
 	useEffect(() => {
 		if (!apiService) return;
 		(async () => {
-			const data = await apiService?.getSpendPeriod();
-			setSpendPeriod(data);
-			setLoading(false);
+			try {
+				const data = await apiService?.getSpendPeriod();
+				setSpendPeriod(data);
+			} catch (error) {
+				console.error('Error fetching spend period:', error);
+				setSpendPeriod(null);
+			} finally {
+				setLoading(false);
+			}
 		})();
 	}, [apiService]);
+
+	const showDays = spendPeriod?.value?.days !== undefined;
+	const showHours = spendPeriod?.value?.hours !== undefined;
+	const showMinutes = spendPeriod?.value?.minutes !== undefined;
+	const showValueUSD = nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '';
+
+	const progressPercentage = spendPeriod?.percentage || 0;
+	const hasSpendPeriodData = spendPeriod && (showDays || showHours || showMinutes);
 
 	return (
 		<div className={cn(styles.container, 'bg-bg_modal')}>
@@ -64,44 +82,57 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 					<p className='text-sm text-wallet_btn_text'>
 						{t('spendPeriodRemaining')} <MdInfoOutline className='inline-block text-lg' />
 					</p>
-					<p className='text-xs text-wallet_btn_text'>
-						{(spendPeriod?.value.days || spendPeriod?.value.days !== 0) && (
-							<>
-								<span className={styles.spend_period_remaining}>{spendPeriod?.value.days}</span> days{' '}
-							</>
-						)}
-						{(spendPeriod?.value.hours || spendPeriod?.value.hours !== 0) && (
-							<>
-								<span className={styles.spend_period_remaining_hr}>{spendPeriod?.value.hours}</span> hrs{' '}
-							</>
-						)}
-						{(spendPeriod?.value.minutes || spendPeriod?.value.minutes !== 0) && (
-							<>
-								<span className={styles.spend_period_remaining}>{spendPeriod?.value.minutes}</span> mins / {spendPeriod?.value.total} days
-							</>
-						)}
-					</p>
-					<div className='mt-2 flex items-center gap-2'>
-						<Progress
-							value={spendPeriod?.percentage}
-							className='bg-progress_default'
-							indicatorClassName='bg-text_pink'
-						/>
-						<p className='text-xs font-medium text-btn_secondary_text'>{spendPeriod?.percentage}%</p>
-					</div>
+
+					{hasSpendPeriodData ? (
+						<>
+							<p className='text-xs text-wallet_btn_text'>
+								{showDays && (
+									<>
+										<span className={styles.spend_period_remaining}>{spendPeriod.value.days}</span> days{' '}
+									</>
+								)}
+								{showHours && (
+									<>
+										<span className={styles.spend_period_remaining_hr}>{spendPeriod.value.hours}</span> hrs{' '}
+									</>
+								)}
+								{showMinutes && (
+									<>
+										<span className={styles.spend_period_remaining}>{spendPeriod.value.minutes}</span> mins / {spendPeriod.value.total} days
+									</>
+								)}
+							</p>
+							<div className='mt-2 flex items-center gap-2'>
+								<Progress
+									value={progressPercentage}
+									className='bg-progress_default'
+									indicatorClassName='bg-text_pink'
+								/>
+								<p className='text-xs font-medium text-btn_secondary_text'>{progressPercentage}%</p>
+							</div>
+						</>
+					) : (
+						<p className='text-xs text-wallet_btn_text'>{t('unavailable')}</p>
+					)}
+
 					<hr className='my-3 border-border_grey' />
 					<div className='flex items-center gap-3'>
 						{isNextBurnLoading ? (
 							<LoadingSpinner />
-						) : (
+						) : nextBurn ? (
 							<div className='flex flex-col'>
 								<p className='text-xs text-wallet_btn_text'>{t('nextBurn')}</p>
 								<div className='flex items-center gap-2'>
 									<p className={styles.next_burn}>
-										{nextBurn?.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}</span>
+										{nextBurn.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}</span>
 									</p>
-									{nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '' && <p className={styles.next_burn_usd}>~ ${nextBurn?.valueUSD}</p>}
+									{showValueUSD && <p className={styles.next_burn_usd}>~ ${nextBurn.valueUSD}</p>}
 								</div>
+							</div>
+						) : (
+							<div className='flex flex-col'>
+								<p className='text-xs text-wallet_btn_text'>{t('nextBurn')}</p>
+								<p className='text-xs text-wallet_btn_text'>{t('unavailable')}</p>
 							</div>
 						)}
 						<div className='rounded-md bg-info_card_bg p-2'>

@@ -880,7 +880,7 @@ export interface ICalendarEvent {
 	type?: EProposalType;
 	parentBountyIndex?: number;
 	proposer: string;
-	source: 'polkasembly' | 'subsquare';
+	source: EDataSource;
 	status: string;
 	statusHistory: { status: string; timestamp: Date; block: number }[];
 	title: string;

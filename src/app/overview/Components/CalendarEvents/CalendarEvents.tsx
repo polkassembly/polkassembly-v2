@@ -5,7 +5,7 @@
 import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { dateToBlockNo } from '@/_shared/_utils/dateToBlockNo';
+import { dateToBlockNum } from '@/_shared/_utils/dateToBlockNum';
 import { useState, useEffect, useCallback } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -75,13 +75,13 @@ function CalendarEvents() {
 				const endDate = dayjs(date).endOf('month');
 				const currentBlock = (await apiService?.getBlockTime()) || 0;
 
-				const newStartBlockNo = dateToBlockNo({
+				const newStartBlockNo = dateToBlockNum({
 					currentBlockNumber: currentBlock,
 					date: startDate.toDate(),
 					network
 				});
 
-				const newEndBlockNo = dateToBlockNo({
+				const newEndBlockNo = dateToBlockNum({
 					currentBlockNumber: currentBlock,
 					date: endDate.toDate(),
 					network
