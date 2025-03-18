@@ -31,7 +31,7 @@ interface ITrackDelegation {
 	delegations: IDelegation[];
 }
 
-const QuerySchema = z.object({
+const querySchema = z.object({
 	address: z.string().min(1, 'Address is required')
 });
 
@@ -83,14 +83,7 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	try {
 		const network = await getNetworkFromHeaders();
 
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-		}
-
-		const { searchParams } = req.nextUrl;
-		const { address } = QuerySchema.parse({
-			address: searchParams.get('address')
-		});
+		const { address } = querySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 		const substrateAddress = getSubstrateAddress(address);
 
