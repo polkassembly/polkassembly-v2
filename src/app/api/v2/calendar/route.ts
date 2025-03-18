@@ -7,7 +7,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
-import { ENetwork, EProposalType, ICalendarEvent, IOffChainPost } from '@/_shared/types';
+import { EDataSource, ENetwork, EProposalType, ICalendarEvent, IOffChainPost } from '@/_shared/types';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { OnChainDbService } from '../../_api-services/onchain_db_service';
 import { withErrorHandling } from '../../_api-utils/withErrorHandling';
@@ -109,7 +109,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 										parentBountyIndex: onChainEvent?.parentBountyIndex,
 										proposalType: onChainEvent?.type as EProposalType,
 										proposer: onChainEvent?.proposer,
-										source: 'polkasembly',
+										source: EDataSource.POLKASSEMBLY,
 										status: onChainEvent?.status,
 										statusHistory: onChainEvent?.statusHistory,
 										title: '',
@@ -128,7 +128,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 
 										if (subsquareData?.title) {
 											payload.title = subsquareData.title;
-											payload.source = 'subsquare';
+											payload.source = EDataSource.SUBSQUARE;
 										}
 									}
 
