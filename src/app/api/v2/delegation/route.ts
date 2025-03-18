@@ -32,109 +32,81 @@ const CreateDelegateSchema = z.object({
 });
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
-	try {
-		const network = await getNetworkFromHeaders();
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-		}
-
-		const cachedDelegates = await RedisService.GetDelegates(network);
-
-		if (cachedDelegates) {
-			return NextResponse.json({ delegates: cachedDelegates });
-		}
-
-		const { address } = GetDelegatesQuerySchema.parse({
-			address: req.nextUrl.searchParams.get('address')
-		});
-
-		if (address) {
-			const encodedAddress = getEncodedAddress(address, network);
-			if (!encodedAddress && !isAddress(address)) {
-				throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.BAD_REQUEST);
-			}
-		}
-		const delegateSources = await fetchAllDelegateSources(network);
-		if (!delegateSources.length) {
-			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
-		}
-
-		const targetAddresses = address ? [address] : delegateSources.map((d) => d.address);
-		const analytics = await fetchDelegateAnalytics(network, targetAddresses);
-
-		const combinedDelegates = delegateSources
-			.map((delegate) => ({
-				...delegate,
-				...(analytics.find((a) => a.address === delegate.address) || {
-					delegatedBalance: '0',
-					receivedDelegationsCount: 0,
-					votedProposalCount: 0
-				})
-			}))
-			.filter((d) => d.votedProposalCount > 0 || d.receivedDelegationsCount > 0);
-
-		await RedisService.SetDelegates(network, combinedDelegates as unknown as IDelegate[]);
-
-		return NextResponse.json({
-			delegates: combinedDelegates,
-			totalDelegates: combinedDelegates.length
-		});
-	} catch (error) {
-		console.error('Delegate API Error:', error);
-
-		if (error instanceof z.ZodError) {
-			return NextResponse.json({ error: 'Invalid request parameters' }, { status: StatusCodes.BAD_REQUEST });
-		}
-
-		if (error instanceof APIError) {
-			return NextResponse.json({ error: error.message }, { status: error.status });
-		}
-
-		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+	const network = await getNetworkFromHeaders();
+	if (!network) {
+		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 	}
+
+	const cachedDelegates = await RedisService.GetDelegates(network);
+
+	if (cachedDelegates) {
+		return NextResponse.json({ delegates: cachedDelegates });
+	}
+
+	const { address } = GetDelegatesQuerySchema.parse({
+		address: req.nextUrl.searchParams.get('address')
+	});
+
+	if (address) {
+		const encodedAddress = getEncodedAddress(address, network);
+		if (!encodedAddress && !isAddress(address)) {
+			throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.BAD_REQUEST);
+		}
+	}
+	const delegateSources = await fetchAllDelegateSources(network);
+	if (!delegateSources.length) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+	}
+
+	const targetAddresses = address ? [address] : delegateSources.map((d) => d.address);
+	const analytics = await fetchDelegateAnalytics(network, targetAddresses);
+
+	const combinedDelegates = delegateSources
+		.map((delegate) => ({
+			...delegate,
+			...(analytics.find((a) => a.address === delegate.address) || {
+				delegatedBalance: '0',
+				receivedDelegationsCount: 0,
+				votedProposalCount: 0
+			})
+		}))
+		.filter((d) => d.votedProposalCount > 0 || d.receivedDelegationsCount > 0);
+
+	await RedisService.SetDelegates(network, combinedDelegates as unknown as IDelegate[]);
+
+	return NextResponse.json({
+		delegates: combinedDelegates,
+		totalDelegates: combinedDelegates.length
+	});
 });
 
 export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
-	try {
-		const network = await getNetworkFromHeaders();
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-		}
-
-		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
-		if (!newAccessToken) {
-			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
-		}
-
-		const body = await req.json();
-		const { address, bio, name } = CreateDelegateSchema.parse(body);
-
-		const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
-		if (!userId) {
-			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
-		}
-
-		const delegate = await OffChainDbService.CreateDelegate({
-			network,
-			address,
-			bio,
-			createdAt: new Date(),
-			name,
-			userId
-		});
-
-		return NextResponse.json(delegate);
-	} catch (error) {
-		console.error('Create Delegate Error:', error);
-
-		if (error instanceof z.ZodError) {
-			return NextResponse.json({ error: 'Invalid request body' }, { status: StatusCodes.BAD_REQUEST });
-		}
-
-		if (error instanceof APIError) {
-			return NextResponse.json({ error: error.message }, { status: error.status });
-		}
-
-		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+	const network = await getNetworkFromHeaders();
+	if (!network) {
+		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
 	}
+
+	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+	if (!newAccessToken) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	const body = await req.json();
+	const { address, bio, name } = CreateDelegateSchema.parse(body);
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+	if (!userId) {
+		throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
+	}
+
+	const delegate = await OffChainDbService.CreateDelegate({
+		network,
+		address,
+		bio,
+		createdAt: new Date(),
+		name,
+		userId
+	});
+
+	return NextResponse.json(delegate);
 });

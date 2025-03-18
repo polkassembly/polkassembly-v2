@@ -13,7 +13,8 @@ import {
 	IVoteCurve,
 	IPreimage,
 	EDelegationType,
-	IDelegate
+	IDelegate,
+	ITrackDelegationData
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -167,10 +168,7 @@ export class OnChainDbService {
 		return SubsquidService.GetAllTrackLevelAnalyticsDelegationData({ network, address });
 	}
 
-	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<{
-		votingDelegations: IDelegate[];
-		proposalsConnection: { totalCount: number };
-	}> {
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<ITrackDelegationData> {
 		return SubsquidService.GetActiveDelegationsToOrFromAddressForTrack({ network, address, track });
 	}
 }

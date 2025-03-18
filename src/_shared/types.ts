@@ -951,3 +951,25 @@ export enum ETrackDelegationStatus {
 	RECEIVED_DELEGATION = 'received_delegation',
 	UNDELEGATED = 'undelegated'
 }
+
+export interface IDelegation {
+	track: number;
+	to: string;
+	from: string;
+	lockPeriod: number;
+	balance: string;
+	createdAt: Date;
+}
+
+export interface ITrackDelegation {
+	track: number;
+	active_proposals_count: number;
+	status: ETrackDelegationStatus[];
+	recieved_delegation_count: number;
+	delegations: IDelegation[];
+}
+
+export interface ITrackDelegationData {
+	votingDelegations: IDelegation[];
+	proposalsConnection?: number;
+}

@@ -15,6 +15,7 @@ import {
 	IOnChainPostListing,
 	IPreimage,
 	IStatusHistoryItem,
+	ITrackDelegationData,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -471,10 +472,7 @@ export class SubsquidService extends SubsquidUtils {
 		return subsquidData.votingDelegations;
 	}
 
-	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<{
-		votingDelegations: IDelegate[];
-		proposalsConnection: { totalCount: number };
-	}> {
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<ITrackDelegationData> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.ACTIVE_DELEGATIONS_TO_OR_FROM_ADDRESS_FOR_TRACK;
