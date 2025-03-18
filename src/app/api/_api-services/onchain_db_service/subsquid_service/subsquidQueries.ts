@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { DECIDING_REFERENDUM_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
-
 export class SubsquidQueries {
 	// single proposal queries
 
@@ -605,11 +603,11 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static TOTAL_DELEGATATION_STATS = ` query DelegationStats($type: DelegationType!) {
+	protected static TOTAL_DELEGATATION_STATS = `query DelegationStats($type_eq: DelegationType!) {
 			totalDelegatedVotes: convictionDelegatedVotesConnection(orderBy: id_ASC, where: {removedAtBlock_isNull: true}) {
 				totalCount
 			}
-			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: $type}) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq}) {
 				from
 				to
 				balance
@@ -645,7 +643,7 @@ export class SubsquidQueries {
 				balance
 				createdAt
 			}
-			proposalsConnection(orderBy: id_ASC, where: {type_eq: ReferendumV2, status_in: ${JSON.stringify(DECIDING_REFERENDUM_STATUSES)}, trackNumber_eq: $track_eq}) {
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: ReferendumV2, status_in: [DecisionDepositPlaced, Submitted, Deciding, ConfirmStarted, ConfirmAborted], trackNumber_eq: $track_eq}) {
 				totalCount
 			}
 		}

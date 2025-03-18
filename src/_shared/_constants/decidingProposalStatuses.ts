@@ -5,11 +5,3 @@
 import { EProposalStatus } from '@shared/types';
 
 export const DECIDING_PROPOSAL_STATUSES = [EProposalStatus.DecisionDepositPlaced, EProposalStatus.Deciding, EProposalStatus.ConfirmStarted, EProposalStatus.ConfirmAborted];
-
-export const DECIDING_REFERENDUM_STATUSES = [
-	EProposalStatus.DecisionDepositPlaced,
-	EProposalStatus.Submitted,
-	EProposalStatus.Deciding,
-	EProposalStatus.ConfirmStarted,
-	EProposalStatus.ConfirmAborted
-] as const;
