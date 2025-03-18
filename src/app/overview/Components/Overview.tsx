@@ -17,11 +17,16 @@ import { aboutSocialLinks } from '@shared/_constants/AboutSocialLinks';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import AboutSocialLinks from './AboutSocialLinks';
+import AboutSocialLinks from './AboutSocialLinks/AboutSocialLinks';
 import styles from './Overview.module.scss';
-import NewsSection from './NewsSection';
-import SpendPeriod from './SpendPeriod';
-import CalendarEvents from './CalendarEvents';
+import NewsSection from './NewsSection/NewsSection';
+import SpendPeriod from '../SpendPeriod/SpendPeriod';
+import CalendarEvents from './CalendarEvents/CalendarEvents';
+
+enum EOverviewTabs {
+	All = 'all',
+	Discussion = 'discussion'
+}
 
 function Overview({
 	trackDetails,
@@ -36,7 +41,7 @@ function Overview({
 		price: string;
 	};
 }) {
-	const network = getCurrentNetwork() as ENetwork;
+	const network = getCurrentNetwork();
 	const router = useRouter();
 	const t = useTranslations('Overview');
 
@@ -84,19 +89,19 @@ function Overview({
 			{/* Latest Activity */}
 			<div className='mt-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
 				<h2 className={styles.latest_activity_title}>{t('latestActivity')}</h2>
-				<Tabs defaultValue='all'>
+				<Tabs defaultValue={EOverviewTabs.All}>
 					<TabsList className={cn(styles.tabList, 'hide_scrollbar')}>
 						<TabsTrigger
 							showBorder
 							className={styles.tabTrigger}
-							value='all'
+							value={EOverviewTabs.All}
 						>
 							{t('all')} <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
 							className={styles.tabTrigger}
-							value='discussion'
+							value={EOverviewTabs.Discussion}
 						>
 							{t('discussion')} <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
 						</TabsTrigger>
@@ -112,7 +117,7 @@ function Overview({
 						))}
 					</TabsList>
 					{/* "All" Tab */}
-					<TabsContent value='all'>
+					<TabsContent value={EOverviewTabs.All}>
 						<Table className='mt-4'>
 							<TableHeader>
 								<TableRow className={styles.tableRow}>
@@ -162,7 +167,7 @@ function Overview({
 					</TabsContent>
 
 					{/* "Discussion" Tab */}
-					<TabsContent value='discussion'>
+					<TabsContent value={EOverviewTabs.Discussion}>
 						<Table className='mt-4'>
 							<TableHeader>
 								<TableRow className={styles.tableRow}>
@@ -170,7 +175,6 @@ function Overview({
 									<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
 									<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
 									<TableHead className={styles.tableCell}>{t('created')}</TableHead>
-									<TableHead className={styles.tableCell}>{t('origin')}</TableHead>
 									<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
 								</TableRow>
 							</TableHeader>
@@ -224,7 +228,6 @@ function Overview({
 										<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
 										<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
 										<TableHead className={styles.tableCell}>{t('created')}</TableHead>
-										<TableHead className={styles.tableCell}>{t('origin')}</TableHead>
 										<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
 									</TableRow>
 								</TableHeader>

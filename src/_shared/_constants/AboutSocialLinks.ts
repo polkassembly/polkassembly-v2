@@ -7,7 +7,7 @@ import { RiDiscordFill } from 'react-icons/ri';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 import { FaTelegramPlane } from 'react-icons/fa';
 import { IoIosCube } from 'react-icons/io';
-import { AboutSocialLink } from '@app/overview/Components/AboutSocialLinks';
+import { AboutSocialLink } from '@/app/overview/Components/AboutSocialLinks/AboutSocialLinks';
 import { ENetwork } from '../types';
 
 type NetworkSocialLinks = {

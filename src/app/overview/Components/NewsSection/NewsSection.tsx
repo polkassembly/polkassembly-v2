@@ -8,7 +8,7 @@ import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import styles from './Overview.module.scss';
+import styles from '../Overview.module.scss';
 
 function NewsSection() {
 	const [isLoading, setIsLoading] = useState<boolean>(true);

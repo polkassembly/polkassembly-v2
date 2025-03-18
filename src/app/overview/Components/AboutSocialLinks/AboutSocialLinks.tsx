@@ -5,7 +5,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { ElementType } from 'react';
 import Link from 'next/link';
-import styles from './Overview.module.scss';
+import styles from '../Overview.module.scss';
 
 export interface AboutSocialLink {
 	icon: ElementType;

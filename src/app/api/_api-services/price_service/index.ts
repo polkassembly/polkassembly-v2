@@ -8,9 +8,17 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { RedisService } from '../redis_service';
 import { APIError } from '../../_api-utils/apiError';
 
+enum EPriceSource {
+	COIN_GECKO = 'coingecko',
+	BINANCE = 'binance',
+	KRAKEN = 'kraken',
+	HUOBI = 'huobi',
+	KUCOIN = 'kucoin'
+}
+
 interface IPriceResponse {
 	price: number;
-	source: string;
+	source: EPriceSource;
 	timestamp: number;
 }
 
@@ -47,7 +55,7 @@ export class PriceService {
 			if (data?.data?.[symbol.toLowerCase()]?.usd) {
 				return {
 					price: parseFloat(data.data[symbol.toLowerCase()].usd),
-					source: 'coingecko',
+					source: EPriceSource.COIN_GECKO,
 					timestamp: Date.now()
 				};
 			}
@@ -64,7 +72,7 @@ export class PriceService {
 			if (data?.price) {
 				return {
 					price: parseFloat(data.price),
-					source: 'binance',
+					source: EPriceSource.BINANCE,
 					timestamp: Date.now()
 				};
 			}
@@ -82,7 +90,7 @@ export class PriceService {
 			if (data?.result?.[pair as string]?.c?.[0]) {
 				return {
 					price: parseFloat(data.result[pair as string].c[0]),
-					source: 'kraken',
+					source: EPriceSource.KRAKEN,
 					timestamp: Date.now()
 				};
 			}
@@ -99,7 +107,7 @@ export class PriceService {
 			if (data?.tick?.close) {
 				return {
 					price: parseFloat(data.tick.close),
-					source: 'huobi',
+					source: EPriceSource.HUOBI,
 					timestamp: Date.now()
 				};
 			}
@@ -116,7 +124,7 @@ export class PriceService {
 			if (data?.data?.price) {
 				return {
 					price: parseFloat(data.data.price),
-					source: 'kucoin',
+					source: EPriceSource.KUCOIN,
 					timestamp: Date.now()
 				};
 			}

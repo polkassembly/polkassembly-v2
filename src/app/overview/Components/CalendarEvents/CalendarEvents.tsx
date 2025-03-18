@@ -16,7 +16,7 @@ import type { Dayjs } from 'dayjs';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { cn } from '@/lib/utils';
-import styles from './Overview.module.scss';
+import styles from '../Overview.module.scss';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 function getSinglePostLinkFromProposalType(proposalType: EProposalType): string {
@@ -163,7 +163,7 @@ function CalendarEvents() {
 						</div>
 					</TooltipTrigger>
 					{hasEvent && (
-						<TooltipContent className='w-[280px] bg-social_tooltip_background p-2'>
+						<TooltipContent className='bg-social_tooltip_background w-[280px] p-2'>
 							<EventList
 								events={getEventData(dateValue)}
 								color='text-btn_primary_text hover:text-text_pink'
