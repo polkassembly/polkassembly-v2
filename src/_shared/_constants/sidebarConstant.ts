@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Home from '@assets/sidebar/homeicon.svg';
+import All from '@assets/activityfeed/All.svg';
 import Discussion from '@assets/sidebar/discussion-icon.svg';
 import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
@@ -148,6 +149,11 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							url: '',
 							items: ActiveItems(
 								[
+									{
+										title: t('ActivityFeed.Navbar.All'),
+										url: '/All',
+										icon: All
+									},
 									{
 										title: t('Sidebar.treasury'),
 										url: '',
