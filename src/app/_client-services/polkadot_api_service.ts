@@ -222,7 +222,12 @@ export class PolkadotApiService {
 		}
 		const spendPeriodBlocks = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
 		const totalSpendPeriodDays: number = blockToDays({ blocks: spendPeriodBlocks, network: this.network });
-		const currentBlockNumber = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
+
+		if (!(currentBlock instanceof BN)) {
+			return null;
+		}
+
+		const currentBlockNumber = currentBlock.toNumber();
 		const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
 		const { time: remainingTime } = blockToTime({ blocks: remainingBlocks, network: this.network });
 		const { d: days, h: hours, m: minutes } = convertMillisecondsToDaysHoursMinutes(remainingTime);
@@ -265,33 +270,33 @@ export class PolkadotApiService {
 								? (this.api.consts.treasury.burn as Permill).mul(updatedTreasuryBalance.freeBalance).div(BN_MILLION)
 								: BN_ZERO;
 
-						if (burn) {
-							const nextBurnValueUSD = parseFloat(
-								formatBnBalance(
-									burn.toString(),
-									{
-										numberAfterComma: 2,
-										withThousandDelimitor: false,
-										withUnit: false
-									},
-									this.network
-								)
-							);
-							if (nextBurnValueUSD && currentTokenPrice && currentTokenPrice.price !== 'N/A') {
-								valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(currentTokenPrice.price)).toString());
-							}
-							value = formatUSDWithUnits(
-								formatBnBalance(
-									burn.toString(),
-									{
-										numberAfterComma: 0,
-										withThousandDelimitor: false,
-										withUnit: false
-									},
-									this.network
-								)
-							);
+						if (!burn) return null;
+
+						const nextBurnValueUSD = parseFloat(
+							formatBnBalance(
+								burn.toString(),
+								{
+									numberAfterComma: 2,
+									withThousandDelimitor: false,
+									withUnit: false
+								},
+								this.network
+							)
+						);
+						if (nextBurnValueUSD && currentTokenPrice && currentTokenPrice.price !== 'N/A') {
+							valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(currentTokenPrice.price)).toString());
 						}
+						value = formatUSDWithUnits(
+							formatBnBalance(
+								burn.toString(),
+								{
+									numberAfterComma: 0,
+									withThousandDelimitor: false,
+									withUnit: false
+								},
+								this.network
+							)
+						);
 					} catch (error) {
 						console.log(error);
 					}

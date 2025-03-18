@@ -112,7 +112,10 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined }
 							</div>
 						</>
 					) : (
-						<p className='text-xs text-wallet_btn_text'>{t('unavailable')}</p>
+						<div className='mt-2'>
+							<p className='text-xs text-wallet_btn_text'>{t('unavailable')}</p>
+							<p className='text-error_red text-xs'>{t('blockDataUnavailable')}</p>
+						</div>
 					)}
 
 					<hr className='my-3 border-border_grey' />

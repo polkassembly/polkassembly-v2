@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@ui/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import { ENetwork } from '@/_shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import styles from '../Overview.module.scss';
@@ -15,7 +16,11 @@ function NewsSection() {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 
-	const profile = network === ENetwork.POLKADOT ? 'Polkadot' : 'Kusama';
+	const profile = NETWORKS_DETAILS[network as ENetwork].socialLinks?.find((link) => link.id === 'twitter')?.href;
+
+	if (!profile) {
+		return null;
+	}
 
 	return (
 		<div className={styles.news_section_container}>
@@ -33,7 +38,7 @@ function NewsSection() {
 						<TwitterTimelineEmbed
 							onLoad={() => setIsLoading(false)}
 							sourceType='profile'
-							screenName={profile}
+							screenName={profile || ''}
 							options={{ height: 450 }}
 							noHeader
 							noFooter

@@ -1769,6 +1769,12 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			icon: SocialIcons.Home,
 			href: 'https://kusama.network/',
 			label: 'Kusama Homepage'
+		},
+		{
+			id: 'twitter',
+			icon: SocialIcons.Twitter,
+			href: 'https://twitter.com/kusamanetwork',
+			label: 'Twitter'
 		}
 	],
 	[ENetwork.WESTEND]: []
