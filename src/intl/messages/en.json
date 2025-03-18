@@ -673,7 +673,9 @@
 		"nodiscussionposts": "No discussion posts found",
 		"spendPeriodRemaining": "Spend Period Remaining",
 		"nextBurn": "Next Burn",
-		"nextBurnInfo": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds."
+		"nextBurnInfo": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.",
+		"unavailable": "Unavailable",
+		"blockDataUnavailable": "Block data unavailable"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",

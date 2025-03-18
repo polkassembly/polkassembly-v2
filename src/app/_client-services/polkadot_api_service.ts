@@ -11,7 +11,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { Balance, AccountInfo, Permill } from '@polkadot/types/interfaces';
+import type { Permill } from '@polkadot/types/interfaces';
 import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_MILLION, BN_ZERO, u8aConcat, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
@@ -246,66 +246,70 @@ export class PolkadotApiService {
 	}
 
 	async getNextBurnData({ currentTokenPrice }: { currentTokenPrice: { price: string | undefined } }) {
-		const treasuryAccount = u8aConcat(
-			'modl',
-			this.api.consts.treasury && this.api.consts.treasury.palletId
-				? this.api.consts.treasury.palletId.toU8a(true)
-				: `${['polymesh', 'polymesh-test'].includes(this.network) ? 'pm' : 'pr'}/trsry`,
-			EMPTY_U8A_32
-		);
+		try {
+			if (!this.api.consts.treasury) {
+				return null;
+			}
+			const treasuryAccount = u8aConcat(
+				'modl',
+				this.api.consts.treasury.palletId ? this.api.consts.treasury.palletId.toU8a(true) : `${['polymesh', 'polymesh-test'].includes(this.network) ? 'pm' : 'pr'}/trsry`,
+				EMPTY_U8A_32
+			);
+			if (!this.api.query.system?.account) {
+				return null;
+			}
+			const accountInfo = await this.api.query.system.account(treasuryAccount);
+			let freeBalance = BN_ZERO;
+			try {
+				freeBalance = new BN((accountInfo as any).data.free) || BN_ZERO;
+			} catch (error) {
+				console.error('Error accessing treasury balance:', error);
+				return null;
+			}
+			if (!this.api.consts.treasury.burn) {
+				return null;
+			}
+			const burnPercent = this.api.consts.treasury.burn as Permill;
+			if (freeBalance.lte(BN_ZERO) || burnPercent.isZero()) {
+				return null;
+			}
 
-		return this.api?.derive?.balances?.account(u8aToHex(treasuryAccount)).then((treasuryBalance) => {
-			return this.api.query.system
-				.account(treasuryAccount)
-				.then((res) => {
-					const freeBalance = new BN((res as AccountInfo).data.free) || BN_ZERO;
-					return { ...treasuryBalance, freeBalance: freeBalance as Balance };
-				})
-				.then((updatedTreasuryBalance) => {
-					let valueUSD = '';
-					let value = '';
-					try {
-						const burn =
-							updatedTreasuryBalance.freeBalance.gt(BN_ZERO) && !(this.api.consts.treasury.burn as Permill).isZero()
-								? (this.api.consts.treasury.burn as Permill).mul(updatedTreasuryBalance.freeBalance).div(BN_MILLION)
-								: BN_ZERO;
+			const burn = burnPercent.mul(freeBalance).div(BN_MILLION);
+			const value = formatUSDWithUnits(
+				formatBnBalance(
+					burn.toString(),
+					{
+						numberAfterComma: 0,
+						withThousandDelimitor: false,
+						withUnit: false
+					},
+					this.network
+				)
+			);
+			let valueUSD = '';
+			if (currentTokenPrice?.price && currentTokenPrice.price !== 'N/A') {
+				const nextBurnValueUSD = parseFloat(
+					formatBnBalance(
+						burn.toString(),
+						{
+							numberAfterComma: 2,
+							withThousandDelimitor: false,
+							withUnit: false
+						},
+						this.network
+					)
+				);
+				valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(currentTokenPrice.price)).toString());
+			}
 
-						if (!burn) return null;
-
-						const nextBurnValueUSD = parseFloat(
-							formatBnBalance(
-								burn.toString(),
-								{
-									numberAfterComma: 2,
-									withThousandDelimitor: false,
-									withUnit: false
-								},
-								this.network
-							)
-						);
-						if (nextBurnValueUSD && currentTokenPrice && currentTokenPrice.price !== 'N/A') {
-							valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(currentTokenPrice.price)).toString());
-						}
-						value = formatUSDWithUnits(
-							formatBnBalance(
-								burn.toString(),
-								{
-									numberAfterComma: 0,
-									withThousandDelimitor: false,
-									withUnit: false
-								},
-								this.network
-							)
-						);
-					} catch (error) {
-						console.log(error);
-					}
-					return {
-						value,
-						valueUSD
-					};
-				});
-		});
+			return {
+				value,
+				valueUSD
+			};
+		} catch (error) {
+			console.error('Error getting next burn data:', error);
+			return null;
+		}
 	}
 
 	async getUserBalances({ address }: { address: string }) {

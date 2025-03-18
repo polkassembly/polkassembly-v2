@@ -653,7 +653,9 @@
 		"nodiscussionposts": "未找到讨论帖子",
 		"spendPeriodRemaining": "剩余支出期",
 		"nextBurn": "下次销毁",
-		"nextBurnInfo": "如果金库在支出期结束时未花费所有资金，将会销毁一定比例的资金。"
+		"nextBurnInfo": "如果金库在支出期结束时未花费所有资金，将会销毁一定比例的资金。",
+		"unavailable": "不可用",
+		"blockDataUnavailable": "区块数据不可用"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

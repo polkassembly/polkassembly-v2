@@ -653,7 +653,9 @@
 		"nodiscussionposts": "No se encontraron publicaciones de discusión",
 		"spendPeriodRemaining": "Período de Gasto Restante",
 		"nextBurn": "Próxima Quema",
-		"nextBurnInfo": "Si la Tesorería termina un período de gasto sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos."
+		"nextBurnInfo": "Si la Tesorería termina un período de gasto sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos.",
+		"unavailable": "No disponible",
+		"blockDataUnavailable": "Datos de bloque no disponibles"
 	},
 	"BatchVote": {
 		"batchVoting": "Votación por lotes",

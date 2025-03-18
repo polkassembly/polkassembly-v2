@@ -65,7 +65,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined }
 
 	const showDays = spendPeriod?.value?.days !== undefined;
 	const showHours = spendPeriod?.value?.hours !== undefined;
-	const showMinutes = spendPeriod?.value?.minutes !== undefined;
+	const showMinutes = spendPeriod?.value?.minutes !== undefined && spendPeriod?.value?.days === 0;
 	const showValueUSD = nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '';
 
 	const progressPercentage = spendPeriod?.percentage || 0;
@@ -98,9 +98,10 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined }
 								)}
 								{showMinutes && (
 									<>
-										<span className={styles.spend_period_remaining}>{spendPeriod.value.minutes}</span> mins / {spendPeriod.value.total} days
+										<span className={styles.spend_period_remaining}>{spendPeriod.value.minutes}</span> mins
 									</>
 								)}
+								/ {spendPeriod.value.total} days
 							</p>
 							<div className='mt-2 flex items-center gap-2'>
 								<Progress

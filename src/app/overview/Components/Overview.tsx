@@ -192,7 +192,6 @@ function Overview({
 												<Address address={row.onChainInfo?.proposer || ''} />
 											</TableCell>
 											<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? dayjs.utc(row.onChainInfo?.createdAt).fromNow() : 'N/A'}</TableCell>
-											<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
 											<TableCell className={styles.tableCell_status}>
 												<StatusTag
 													className='text-center'
@@ -245,7 +244,6 @@ function Overview({
 													<Address address={row.onChainInfo?.proposer || ''} />
 												</TableCell>
 												<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt ? dayjs.utc(row.onChainInfo?.createdAt).fromNow() : 'N/A'}</TableCell>
-												<TableCell className={styles.tableCell}>{row.onChainInfo?.origin || 'N/A'}</TableCell>
 												<TableCell className={styles.tableCell_status}>
 													<StatusTag
 														className='text-center'

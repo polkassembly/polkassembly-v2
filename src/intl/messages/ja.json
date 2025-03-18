@@ -653,7 +653,9 @@
 		"nodiscussionposts": "ディスカッション投稿が見つかりません",
 		"spendPeriodRemaining": "残り支出期間",
 		"nextBurn": "次のバーン",
-		"nextBurnInfo": "財務が支出期間中にすべての資金を使用しなかった場合、資金の一定割合がバーンされます。"
+		"nextBurnInfo": "財務が支出期間中にすべての資金を使用しなかった場合、資金の一定割合がバーンされます。",
+		"unavailable": "利用不可",
+		"blockDataUnavailable": "ブロックデータが利用不可"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",

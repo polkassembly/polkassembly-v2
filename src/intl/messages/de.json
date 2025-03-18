@@ -654,7 +654,9 @@
 		"nodiscussionposts": "Keine Diskussionsbeiträge gefunden",
 		"spendPeriodRemaining": "Verbleibende Ausgabeperiode",
 		"nextBurn": "Nächste Verbrennung",
-		"nextBurnInfo": "Wenn die Schatzkammer eine Ausgabeperiode beendet, ohne alle ihre Mittel auszugeben, erleidet sie eine Verbrennung eines Prozentsatzes ihrer Mittel."
+		"nextBurnInfo": "Wenn die Schatzkammer eine Ausgabeperiode beendet, ohne alle ihre Mittel auszugeben, erleidet sie eine Verbrennung eines Prozentsatzes ihrer Mittel.",
+		"unavailable": "Nicht verfügbar",
+		"blockDataUnavailable": "Blockdaten nicht verfügbar"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",
