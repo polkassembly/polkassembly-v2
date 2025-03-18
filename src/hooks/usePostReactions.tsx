@@ -49,6 +49,7 @@ export const usePostReactions = (postData: IPostData) => {
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
 
+	// TODO: Remove this useEffect and make Optimistic update
 	useEffect(() => {
 		setIsSubscribed(!!postData?.isSubscribed);
 	}, [postData?.isSubscribed]);
