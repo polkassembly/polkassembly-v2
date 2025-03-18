@@ -7,8 +7,8 @@ import { IParamDef } from '@/_shared/types';
 import { Input } from '../../../Input';
 
 type InputTextProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
-	onChange: (value: string) => void;
-	param: IParamDef;
+	onChange?: (value: string) => void;
+	param?: IParamDef;
 };
 
 function InputText({ onChange, ...props }: InputTextProps) {
@@ -16,7 +16,7 @@ function InputText({ onChange, ...props }: InputTextProps) {
 		<Input
 			type='text'
 			onChange={(e) => {
-				onChange(e.target.value);
+				onChange?.(e.target.value);
 			}}
 			{...props}
 		/>

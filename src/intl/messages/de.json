@@ -650,11 +650,15 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Preimage erstellen",
-		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Nativ)",
+		"existingPreimage": "Bereits ein Preimage vorhanden",
+		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Native)",
 		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
-		"goBack": "Zurück"
+		"goBack": "Zurück",
+		"preimageHash": "Preimage-Hash",
+		"preimageLength": "Preimage-Länge",
+		"preimageHashDescription": "Geben Sie den Preimage-Hash ein, um einen Vorschlag zu erstellen"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
