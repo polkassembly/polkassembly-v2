@@ -934,17 +934,16 @@ export enum EDelegateSource {
 
 export interface IDelegate {
 	address: string;
+	network: ENetwork;
+	createdAt: Date;
+	updatedAt: Date;
 	dataSource: EDelegateSource[];
 	username?: string;
 	image?: string;
 	bio: string;
 	delegatedBalance: string;
 	receivedDelegationsCount: number;
-	votedProposalCount: {
-		convictionVotesConnection: {
-			totalCount: number;
-		};
-	};
+	votedProposalCount: number;
 }
 
 export enum ETrackDelegationStatus {
