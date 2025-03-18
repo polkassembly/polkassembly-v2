@@ -906,3 +906,30 @@ export enum NotificationType {
 	WARNING = 'warning',
 	INFO = 'info'
 }
+
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: string;
+	peopleEarned: string;
+	totalRewarded: string;
+	totalBountyPool: string;
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: string;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: string;
+	reward: string;
+	statusHistory?: Array<{ status: string }>;
+}
+
+export interface IClaimedBountyProposal {
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ timestamp: string }>;
+}

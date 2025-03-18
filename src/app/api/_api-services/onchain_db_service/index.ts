@@ -2,9 +2,24 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostListing, IGenericListingResponse, IVoteCurve, IPreimage } from '@shared/types';
+import {
+	ENetwork,
+	EPostOrigin,
+	EProposalStatus,
+	EProposalType,
+	EVoteDecision,
+	IOnChainPostListing,
+	IGenericListingResponse,
+	IVoteCurve,
+	IPreimage,
+	IBountyStats,
+	IBountyProposal,
+	IBountyUserActivity,
+	IClaimedBountyProposal
+} from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
+import { BN } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { SubsquidService } from './subsquid_service';
@@ -137,5 +152,80 @@ export class OnChainDbService {
 		network: ENetwork;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
+	}
+
+	static async getBountyStats(network: ENetwork): Promise<IBountyStats> {
+		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
+		const defaultStats: IBountyStats = {
+			activeBounties: '0',
+			availableBountyPool: 'N/A',
+			peopleEarned: 'N/A',
+			totalBountyPool: '0',
+			totalRewarded: 'N/A'
+		};
+
+		if (!activeBountiesResponse?.data?.proposals?.length) {
+			return defaultStats;
+		}
+
+		const activeBounties = String(activeBountiesResponse.data.proposals.length);
+		let totalBountyPool = activeBountiesResponse.data.proposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), new BN(0));
+
+		const activeBountyIndices = activeBountiesResponse.data.proposals.map(({ index }: IBountyProposal) => parseInt(index, 10));
+
+		const childBountiesResponse = await SubsquidService.getChildBountiesRewards(network, activeBountyIndices);
+
+		if (!childBountiesResponse?.data?.proposals?.length) {
+			return {
+				...defaultStats,
+				activeBounties,
+				totalBountyPool: totalBountyPool.toString()
+			};
+		}
+
+		totalBountyPool = childBountiesResponse.data.proposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), new BN(0));
+
+		const awardedChildBounties = childBountiesResponse.data.proposals.filter((bounty: IBountyProposal) => bounty.statusHistory?.some((item) => item?.status === 'Awarded'));
+
+		const totalRewarded = awardedChildBounties.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), new BN(0));
+
+		return {
+			activeBounties,
+			availableBountyPool: totalBountyPool.toString(),
+			peopleEarned: String(childBountiesResponse.data.proposals.length),
+			totalBountyPool: totalBountyPool.toString(),
+			totalRewarded: totalRewarded.toString()
+		};
+	}
+
+	static async getBountyUserActivity(network: ENetwork): Promise<IBountyUserActivity[]> {
+		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
+
+		if (!activeBountiesResponse?.data?.proposals?.length) {
+			return [];
+		}
+
+		const activeBountyIndices = activeBountiesResponse.data.proposals.map(({ index }: IBountyProposal) => parseInt(index, 10));
+
+		const claimedChildBounties = await SubsquidService.getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(network, activeBountyIndices);
+
+		if (!claimedChildBounties?.data?.proposals?.length) {
+			return [];
+		}
+
+		return claimedChildBounties.data.proposals.map((proposal) => ({
+			activity: 'claimed',
+			address: (proposal as unknown as IClaimedBountyProposal).payee,
+			amount: (proposal as unknown as IClaimedBountyProposal).reward,
+			created_at: new Date((proposal as unknown as IClaimedBountyProposal).statusHistory[0].timestamp)
+		}));
+	}
+
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
+		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
+	}
+
+	static async GetBountyAmount(network: ENetwork, bountyId: string) {
+		return SubsquareOnChainService.GetBountyAmount(network, bountyId);
 	}
 }

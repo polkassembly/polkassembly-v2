@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IBountyProposal,
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
@@ -403,6 +404,80 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
+		};
+	}
+
+	static async getActiveBountiesWithRewards(network: ENetwork): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS, {}).toPromise();
+
+			return response as { data: { proposals: IBountyProposal[] } };
+		} catch (error) {
+			console.error('Error fetching active bounties:', error);
+			return null;
+		}
+	}
+
+	static async getActiveBountiesWithRewardsByIndex(network: ENetwork, index: number): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX, { index_eq: index }).toPromise();
+
+			return response as { data: { proposals: IBountyProposal[] } };
+		} catch (error) {
+			console.error('Error fetching active bounties by index:', error);
+			return null;
+		}
+	}
+
+	static async getChildBountiesRewards(network: ENetwork, parentBountyIndices: number[]): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
+					parentBountyIndex_in: parentBountyIndices
+				})
+				.toPromise();
+
+			return response as { data: { proposals: IBountyProposal[] } };
+		} catch (error) {
+			console.error('Error fetching child bounties:', error);
+			return null;
+		}
+	}
+
+	static async getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(
+		network: ENetwork,
+		parentBountyIndices: number[]
+	): Promise<{ data: { proposals: IBountyProposal[] } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
+				.toPromise();
+
+			return response as { data: { proposals: IBountyProposal[] } };
+		} catch (error) {
+			console.error('Error fetching claimed child bounties payees and reward:', error);
+			return null;
+		}
+	}
+
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }): Promise<IGenericListingResponse<IOnChainPostInfo>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { parentBountyIndex_eq: index }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
+		}
+		return {
+			items: subsquidData.childBounties || [],
+			totalCount: subsquidData.totalChildBounties.totalCount || 0
 		};
 	}
 }
