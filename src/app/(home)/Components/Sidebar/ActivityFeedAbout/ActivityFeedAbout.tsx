@@ -8,13 +8,13 @@ import Link from 'next/link';
 import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { MdOpenInNew } from 'react-icons/md';
-import { networkSocialLinks } from '@/_shared/_constants/socialNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import styles from './ActivityFeedAbout.module.scss';
 
 function ActivityFeedAbout() {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const socialLinks = networkSocialLinks[network as ENetwork];
+	const { socialLinks } = NETWORKS_DETAILS[network as ENetwork];
 
 	return (
 		<div className={styles.aboutContainer}>
@@ -31,7 +31,7 @@ function ActivityFeedAbout() {
 				</span>
 			</div>
 			<div className={styles.aboutSocialContainer}>
-				{socialLinks.map((link) => (
+				{socialLinks?.map((link) => (
 					<Link
 						key={link.id}
 						href={link.href}
