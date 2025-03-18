@@ -102,7 +102,7 @@ function VoteReferendum({ index }: { index: string }) {
 								<BalanceInput
 									name={`${voteDecision}-balance`}
 									label={t('VoteReferendum.lockBalance')}
-									onChange={setBalance}
+									onChange={({ value }) => setBalance(value)}
 								/>
 								<div>
 									<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
@@ -114,16 +114,16 @@ function VoteReferendum({ index }: { index: string }) {
 								{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 									<BalanceInput
 										label={t('VoteReferendum.abstainVoteValue')}
-										onChange={setAbstainVoteValue}
+										onChange={({ value }) => setAbstainVoteValue(value)}
 									/>
 								)}
 								<BalanceInput
 									label={t('VoteReferendum.ayeVoteValue')}
-									onChange={setAyeVoteValue}
+									onChange={({ value }) => setAyeVoteValue(value)}
 								/>
 								<BalanceInput
 									label={t('VoteReferendum.nayVoteValue')}
-									onChange={setNayVoteValue}
+									onChange={({ value }) => setNayVoteValue(value)}
 								/>
 							</>
 						)}

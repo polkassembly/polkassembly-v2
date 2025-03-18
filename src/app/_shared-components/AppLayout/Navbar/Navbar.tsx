@@ -117,6 +117,7 @@ function Navbar() {
 									<Address
 										address={user.addresses[0]}
 										walletAddressName={user.username}
+										disableTooltip
 									/>
 								) : (
 									<p>{user.username}</p>
