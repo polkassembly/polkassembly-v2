@@ -17,14 +17,12 @@ interface IDelegateSource {
 }
 
 interface IDelegationData {
-	votingDelegations: Array<{
-		from: string;
-		to: string;
-		balance: string;
-		lockPeriod: number;
-		track: number;
-		__typename: string;
-	}>;
+	from: string;
+	to: string;
+	balance: string;
+	lockPeriod: number;
+	track: number;
+	__typename: string;
 }
 
 interface IDelegateSourceConfig {
@@ -136,11 +134,11 @@ const verifyDelegateSource = (address: string, knownSources: Map<string, EDelega
 
 const calculateDelegateStats = (
 	address: string,
-	delegationData: IDelegationData,
+	delegationData: IDelegationData[],
 	votesCount: number,
 	knownSources: Map<string, EDelegateSource[]>
 ): IDelegateStats & { sources: EDelegateSource[] } => {
-	const delegations = delegationData?.votingDelegations || [];
+	const delegations = delegationData || [];
 	let totalBalance = new BN(0);
 	const uniqueDelegators = new Set<string>();
 
@@ -183,7 +181,7 @@ export const fetchDelegateAnalytics = async (
 		addresses.map(async (address) => {
 			try {
 				const [delegationData, votesCount] = await Promise.all([
-					OnChainDbService.GetAllTrackLevelAnalyticsDelegationData({ network, address }) as unknown as Promise<IDelegationData>,
+					OnChainDbService.GetAllTrackLevelAnalyticsDelegationData({ network, address }) as unknown as Promise<IDelegationData[]>,
 					OnChainDbService.GetVotesCountForTimespan({ address, createdAtGte: thirtyDaysAgo, network })
 				]);
 				return calculateDelegateStats(address, delegationData, votesCount, sourcesMap);
@@ -200,8 +198,8 @@ export const fetchDelegateAnalytics = async (
 		})
 	);
 };
-const fetchAllDelegateAnalytics = async (network: ENetwork): Promise<IDelegationData> => {
-	return (await OnChainDbService.GetAllTrackLevelAnalyticsDelegationData({ network, address: '' })) as unknown as IDelegationData;
+const fetchAllDelegateAnalytics = async (network: ENetwork): Promise<IDelegationData[]> => {
+	return (await OnChainDbService.GetAllTrackLevelAnalyticsDelegationData({ network, address: '' })) as unknown as IDelegationData[];
 };
 export const fetchAllDelegateSources = async (network: ENetwork): Promise<IDelegateSource[]> => {
 	const [nova, parity, w3f, polkassembly] = await Promise.all([
@@ -223,7 +221,7 @@ export const fetchAllDelegateSources = async (network: ENetwork): Promise<IDeleg
 	polkassembly.forEach((delegate) => addToKnownDelegates(delegate, EDelegateSource.POLKASSEMBLY));
 	const allDelegateData = await fetchAllDelegateAnalytics(network);
 	const activeDelegateAddresses = new Set<string>();
-	allDelegateData.votingDelegations.forEach((delegation) => {
+	allDelegateData.forEach((delegation) => {
 		activeDelegateAddresses.add(delegation.to);
 		activeDelegateAddresses.add(delegation.from);
 	});

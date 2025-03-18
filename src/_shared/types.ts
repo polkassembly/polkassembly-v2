@@ -905,9 +905,7 @@ export interface IDelegationStats {
 		from: string;
 	}[];
 	totalDelegatedBalance: string;
-	totalDelegatedVotes: {
-		totalCount: number;
-	};
+	totalDelegatedVotes: number;
 	totalDelegates: number;
 	totalDelegators: number;
 }

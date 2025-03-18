@@ -41,9 +41,7 @@ const calculateDelegationStats = (votingDelegations: SimplifiedVotingDelegation[
 };
 const formatDelegationStats = (counts: DelegationCounts, totalDelegatedVotes: number): IDelegationStats => ({
 	totalDelegatedBalance: counts.totalBalance.toString(),
-	totalDelegatedVotes: {
-		totalCount: totalDelegatedVotes
-	},
+	totalDelegatedVotes,
 	totalDelegates: Object.keys(counts.delegates).length,
 	totalDelegators: Object.keys(counts.delegators).length
 });
@@ -61,16 +59,21 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 			return NextResponse.json(cachedStats);
 		}
 
-		const data = await OnChainDbService.GetTotalDelegationStats({
+		const data = (await OnChainDbService.GetTotalDelegationStats({
 			network,
 			type: EDelegationType.OPEN_GOV
-		});
+		})) as unknown as {
+			totalDelegatedVotes: number;
+			votingDelegations: SimplifiedVotingDelegation[];
+			totalDelegates: number;
+		};
 
 		if (!data || !Array.isArray(data.votingDelegations)) {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid delegation data structure');
 		}
 		const counts = calculateDelegationStats(data.votingDelegations);
-		const stats = formatDelegationStats(counts, data?.totalDelegatedVotes?.totalCount || 0);
+		console.log('totalDelegatedVotes', data?.totalDelegatedVotes);
+		const stats = formatDelegationStats(counts, data?.totalDelegatedVotes || 0);
 
 		await RedisService.SetDelegationStats(network, stats);
 

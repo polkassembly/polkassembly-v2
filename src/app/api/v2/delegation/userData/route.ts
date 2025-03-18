@@ -37,7 +37,7 @@ const QuerySchema = z.object({
 
 interface TrackDelegationData {
 	votingDelegations: IDelegation[];
-	proposalsConnection?: { totalCount: number };
+	proposalsConnection?: number;
 }
 
 function processTrackDelegation(data: PromiseSettledResult<TrackDelegationData>, track: number, address: string, encodedAddress: string): ITrackDelegation | null {
@@ -48,7 +48,7 @@ function processTrackDelegation(data: PromiseSettledResult<TrackDelegationData>,
 	const { votingDelegations = [], proposalsConnection } = data.value;
 
 	const trackDelegation: ITrackDelegation = {
-		active_proposals_count: proposalsConnection?.totalCount || 0,
+		active_proposals_count: proposalsConnection || 0,
 		delegations: votingDelegations,
 		recieved_delegation_count: 0,
 		status: [],
@@ -118,7 +118,7 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 		const trackResults = await Promise.allSettled([...trackFetches.values()]);
 
 		const delegations: ITrackDelegation[] = [...trackFetches.keys()]
-			.map((trackId, index) => processTrackDelegation(trackResults[index as number], trackId, address, substrateAddress))
+			.map((trackId, index) => processTrackDelegation(trackResults[Number(index)], trackId, address, substrateAddress))
 			.filter((delegation): delegation is ITrackDelegation => delegation !== null);
 
 		if (delegations.length === 0) {

@@ -9,7 +9,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
-	IDelegationStats,
+	IDelegate,
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
@@ -408,7 +408,11 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<IDelegationStats> {
+	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<{
+		totalDelegatedVotes: number;
+		votingDelegations: IDelegate[];
+		totalDelegates: number;
+	}> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.TOTAL_DELEGATATION_STATS;
@@ -420,7 +424,11 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain total delegation stats from Subsquid');
 		}
 
-		return subsquidData;
+		return {
+			totalDelegatedVotes: subsquidData.totalDelegatedVotes.totalCount,
+			votingDelegations: subsquidData.votingDelegations,
+			totalDelegates: subsquidData.totalDelegate
+		};
 	}
 
 	static async GetVotesCountForTimespan({ network, address, createdAtGte }: { network: ENetwork; address: string; createdAtGte: Date }): Promise<number> {
@@ -435,10 +443,10 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes count for timespan from Subsquid');
 		}
 
-		return subsquidData;
+		return subsquidData.convictionVotesConnection.totalCount;
 	}
 
-	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address?: string }): Promise<number> {
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address?: string }): Promise<IDelegate[]> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA;
@@ -460,10 +468,13 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain all track level analytics delegation data from Subsquid');
 		}
 
-		return subsquidData;
+		return subsquidData.votingDelegations;
 	}
 
-	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<number> {
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<{
+		votingDelegations: IDelegate[];
+		proposalsConnection: { totalCount: number };
+	}> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.ACTIVE_DELEGATIONS_TO_OR_FROM_ADDRESS_FOR_TRACK;
@@ -478,7 +489,10 @@ export class SubsquidService extends SubsquidUtils {
 				'Error fetching on-chain active delegations to or from address for track from Subsquid'
 			);
 		}
-
-		return subsquidData;
+		console.log('subsquidData', subsquidData);
+		return {
+			votingDelegations: subsquidData.votingDelegations,
+			proposalsConnection: subsquidData.proposalsConnection.totalCount
+		};
 	}
 }
