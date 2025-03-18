@@ -1318,13 +1318,21 @@ export class FirestoreService extends FirestoreUtils {
 
 	static async GetAllDelegates(network: ENetwork): Promise<IDelegate[]> {
 		try {
-			const delegatesSnapshot = await this.delegatesCollectionRef().where('network', '==', network).get();
-			return delegatesSnapshot.docs.map((doc) => {
-				const data = doc.data() as IDelegate;
+			const delegateDoc = await this.delegatesCollectionRef().doc(network).get();
+
+			if (!delegateDoc.exists) {
+				return [];
+			}
+			const delegatesData = delegateDoc.data();
+			if (!delegatesData) {
+				return [];
+			}
+			return Object.entries(delegatesData).map(([userId, data]) => {
+				const delegateData = data as Omit<IDelegate, 'delegateId'>;
+
 				return {
-					...data,
-					createdAt: data.createdAt,
-					updatedAt: data.updatedAt
+					...delegateData,
+					userId: Number(userId)
 				};
 			});
 		} catch (error) {
