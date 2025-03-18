@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { DECIDING_REFERENDUM_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
+
 export class SubsquidQueries {
 	// single proposal queries
 
@@ -603,19 +605,18 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static TOTAL_DELEGATATION_STATS = `
-		query DelegationStats ($type_eq:DelegationType!=OpenGov){
+	protected static TOTAL_DELEGATATION_STATS = ` query DelegationStats($type: DelegationType!) {
 			totalDelegatedVotes: convictionDelegatedVotesConnection(orderBy: id_ASC, where: {removedAtBlock_isNull: true}) {
 				totalCount
 			}
-		votingDelegations(where: {endedAtBlock_isNull: true, type_eq:$type_eq}) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: $type}) {
 				from
 				to
 				balance
 				track
 			}
 		}
-	`;
+		`;
 
 	protected static GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA = `query DelegationStats($address: String){
  		votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address}) {
@@ -628,23 +629,25 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_VOTES_COUNT_FOR_TIMESPAN = `query ReceivedDelgationsAndVotesCountForAddress($address: String = "", $createdAt_gte: DateTime) {
-  			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
-    		totalCount
-  		}
-	}`;
+	protected static GET_VOTES_COUNT_FOR_TIMESPAN = `query ReceivedDelegationsAndVotesCountForAddress($address: String, $createdAt_gte: DateTime!) {
+			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
 
-	protected static ACTIVE_DELEGATIONS_TO_OR_FROM_ADDRESS_FOR_TRACK = `query ActiveDelegationsToOrFromAddressForTrack($track_eq: Int = 0, $address: String) {
-		votingDelegations(orderBy: createdAt_DESC, where: {track_eq: $track_eq, endedAtBlock_isNull: true, AND: {from_eq: $address, OR: {to_eq: $address}}}) {
-			track
-			to
-			from
-			lockPeriod
-			balance
-			createdAt
+	protected static ACTIVE_DELEGATIONS_TO_OR_FROM_ADDRESS_FOR_TRACK = `query ActiveDelegationsToOrFromAddressForTrack($track_eq: Int!, $address: String!) {
+			votingDelegations(orderBy: createdAt_DESC, where: {track_eq: $track_eq, endedAtBlock_isNull: true, AND: {from_eq: $address, OR: {to_eq: $address}}}) {
+				track
+				to
+				from
+				lockPeriod
+				balance
+				createdAt
+			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: ReferendumV2, status_in: ${JSON.stringify(DECIDING_REFERENDUM_STATUSES)}, trackNumber_eq: $track_eq}) {
+				totalCount
+			}
 		}
-		proposalsConnection(orderBy: id_ASC, where: {type_eq: ReferendumV2, status_in: [DecisionDepositPlaced, Submitted, Deciding, ConfirmStarted, ConfirmAborted], trackNumber_eq: $track_eq}) {
-			totalCount
-		}
-	}`;
+		`;
 }
