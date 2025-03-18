@@ -19,7 +19,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
-import { blockToDays, blockToTime, getDaysTimeObj } from '@shared/_utils/blockTimeCalculations';
+import { blockToDays, blockToTime, convertMillisecondsToDaysHoursMinutes } from '@shared/_utils/blockTimeCalculations';
 import { formatBnBalance } from '../_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '../_client-utils/formatUSDWithUnits';
 
@@ -219,11 +219,11 @@ export class PolkadotApiService {
 		const spendPeriodConst = this.api.consts.treasury ? this.api.consts.treasury.spendPeriod : BN_ZERO;
 		if (spendPeriodConst) {
 			const spendPeriodBlocks = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
-			const totalSpendPeriodDays: number = blockToDays(spendPeriodBlocks, this.network, 6000);
+			const totalSpendPeriodDays: number = blockToDays({ blocks: spendPeriodBlocks, network: this.network });
 			const currentBlockNumber = currentBlock instanceof BN ? currentBlock.toNumber() : 0;
 			const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
-			const { time: remainingTime } = blockToTime(remainingBlocks, this.network, 6000);
-			const { d: days, h: hours, m: minutes } = getDaysTimeObj(remainingTime);
+			const { time: remainingTime } = blockToTime({ blocks: remainingBlocks, network: this.network });
+			const { d: days, h: hours, m: minutes } = convertMillisecondsToDaysHoursMinutes(remainingTime);
 
 			const progressPercentage = (((currentBlockNumber % spendPeriodBlocks) / spendPeriodBlocks) * 100).toFixed(0);
 

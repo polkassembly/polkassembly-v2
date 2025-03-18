@@ -3,18 +3,31 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ENetwork } from '@shared/types';
+import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-export const blockToDays = (blocks: number, network: ENetwork, blockTime = 6000): number => {
+interface BlockToDaysParams {
+	blocks: number;
+	network: ENetwork;
+}
+
+interface BlockToTimeParams {
+	blocks: number;
+	network: ENetwork;
+}
+
+export const blockToDays = ({ blocks, network }: BlockToDaysParams): number => {
+	const { blockTime } = NETWORKS_DETAILS[network as ENetwork];
 	const timeInMs = blocks * blockTime;
 	return Math.ceil(timeInMs / (1000 * 60 * 60 * 24));
 };
 
-export const blockToTime = (blocks: number, network: ENetwork, blockTime = 6000) => {
+export const blockToTime = ({ blocks, network }: BlockToTimeParams) => {
+	const { blockTime } = NETWORKS_DETAILS[network as ENetwork];
 	const timeInMs = blocks * blockTime;
 	return { time: timeInMs };
 };
 
-export const getDaysTimeObj = (timeInMs: number) => {
+export const convertMillisecondsToDaysHoursMinutes = (timeInMs: number) => {
 	const days = Math.floor(timeInMs / (24 * 60 * 60 * 1000));
 	const hours = Math.floor((timeInMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
 	const minutes = Math.floor((timeInMs % (60 * 60 * 1000)) / (60 * 1000));
