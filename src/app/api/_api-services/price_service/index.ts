@@ -145,7 +145,6 @@ export class PriceService {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, `Unable to fetch price for ${symbol}`);
 		}
 
-		// Cache the successful result
 		await this.saveToCache(symbol, price);
 
 		return price;
