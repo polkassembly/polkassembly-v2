@@ -138,4 +138,11 @@ export class OnChainDbService {
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
 	}
+
+	static async GetCalendarEvents({ network, startBlock, endBlock }: { network: ENetwork; startBlock: number; endBlock: number }) {
+		const calendarEvents = await SubsquidService.GetCalendarEvents({ network, startBlock, endBlock });
+		if (calendarEvents) return calendarEvents;
+
+		return [];
+	}
 }

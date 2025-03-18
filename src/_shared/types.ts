@@ -910,3 +910,18 @@ export enum NotificationType {
 	WARNING = 'warning',
 	INFO = 'info'
 }
+
+export interface ICalendarEvent {
+	createdAt: Date;
+	index: number;
+	proposalType: EProposalType;
+	type?: EProposalType;
+	parentBountyIndex?: number;
+	proposer: string;
+	source: 'polkasembly' | 'subsquare';
+	status: string;
+	statusHistory: { status: string; timestamp: Date; block: number }[];
+	title: string;
+	trackNo?: number;
+	blockNo?: number;
+}
