@@ -104,7 +104,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 								</div>
 							</div>
 						)}
-						<div className='bg-info_card_bg rounded-md p-2'>
+						<div className='rounded-md bg-info_card_bg p-2'>
 							<p className='text-xs'>{t('nextBurnInfo')}</p>
 						</div>
 					</div>
