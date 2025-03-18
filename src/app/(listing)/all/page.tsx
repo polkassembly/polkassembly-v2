@@ -2,13 +2,11 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EPostOrigin, EProposalType } from '@/_shared/types';
+import { EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
-
-const origin = EPostOrigin.AUCTION_ADMIN;
 
 async function AllProposalsPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
 	const searchParamsValue = await searchParams;
@@ -24,7 +22,6 @@ async function AllProposalsPage({ searchParams }: { searchParams: Promise<{ page
 	return (
 		<div>
 			<ListingPage
-				origin={origin}
 				proposalType={EProposalType.REFERENDUM_V2}
 				initialData={data || { items: [], totalCount: 0 }}
 			/>

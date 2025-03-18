@@ -247,6 +247,7 @@
 		"Referenda": "レファレンダム"
 	},
 	"ListingPage": {
+		"AllProposals": "すべてのレファレンダム",
 		"AuctionAdmin": "オークション管理者",
 		"AuctionAdminDescription": "オークションを開始するための起点。",
 		"BigSpender": "大口支出者",
