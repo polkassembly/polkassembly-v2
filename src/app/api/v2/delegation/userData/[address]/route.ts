@@ -89,10 +89,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 	}
 
-	const trackResults = await Promise.allSettled([...trackFetches.values()]);
+	const trackResults = await Promise.all([...trackFetches.values()]);
 
 	const delegations: ITrackDelegation[] = [...trackFetches.keys()]
-		.map((trackId, index) => processTrackDelegation(trackResults[Number(index)], trackId, address, substrateAddress))
+		.map((trackId, index) => {
+			const result = trackResults[Number(index)];
+			return processTrackDelegation({ status: 'fulfilled', value: result }, trackId, address, substrateAddress);
+		})
 		.filter((delegation): delegation is ITrackDelegation => delegation !== null);
 
 	if (delegations.length === 0) {
