@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Card, CardContent } from '@ui/card';
 import { MdInfoOutline } from 'react-icons/md';
 import { Progress } from '@ui/progress';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -28,7 +27,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 		if (!apiService) return;
 		(async () => {
 			if (tokenPrice) {
-				const burnResult = await apiService?.getNextBurnData({
+				const burnResult = await apiService.getNextBurnData({
 					currentTokenPrice: tokenPrice ?? { price: '0' }
 				});
 
@@ -55,13 +54,13 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 	}, [apiService]);
 
 	return (
-		<Card className={cn(styles.container, 'bg-bg_modal')}>
+		<div className={cn(styles.container, 'bg-bg_modal')}>
 			{loading ? (
 				<div className={styles.loading}>
 					<LoadingSpinner />
 				</div>
 			) : (
-				<CardContent className='p-3'>
+				<div className='p-3'>
 					<p className='text-sm text-wallet_btn_text'>
 						{t('spendPeriodRemaining')} <MdInfoOutline className='inline-block text-lg' />
 					</p>
@@ -105,13 +104,13 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string } }) {
 								</div>
 							</div>
 						)}
-						<div className='rounded-md bg-info_card_bg p-2'>
+						<div className='bg-info_card_bg rounded-md p-2'>
 							<p className='text-xs'>{t('nextBurnInfo')}</p>
 						</div>
 					</div>
-				</CardContent>
+				</div>
 			)}
-		</Card>
+		</div>
 	);
 }
 

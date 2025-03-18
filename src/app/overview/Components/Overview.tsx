@@ -5,7 +5,6 @@
 'use client';
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { Card, CardContent } from '@ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@ui/Tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { MdInfoOutline } from 'react-icons/md';
@@ -46,8 +45,8 @@ function Overview({
 			<h1 className={styles.overview_title}>{t('overview')}</h1>
 
 			{/* About Section */}
-			<Card className='border-none bg-bg_modal p-4 shadow-lg'>
-				<CardContent className='p-3'>
+			<div className='border-none bg-bg_modal p-4 shadow-lg'>
+				<div className='p-3'>
 					<div className='flex items-center justify-between'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>{t('about')}</p>
 						{aboutSocialLinks[network as ENetwork].length > 0 && (
@@ -64,21 +63,21 @@ function Overview({
 							<AboutSocialLinks links={aboutSocialLinks[network as ENetwork]} />
 						</span>
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Treasury and Spend Period */}
 			<div className='mt-6 grid gap-4 lg:grid-cols-2'>
-				<Card className='border-none bg-bg_modal p-4 shadow-lg'>
-					<CardContent className='p-3'>
+				<div className='border-none bg-bg_modal p-4 shadow-lg'>
+					<div className='p-3'>
 						<p className='text-sm text-wallet_btn_text'>
 							{t('treasury')} <MdInfoOutline className='inline-block text-lg' />
 						</p>
 						<div className='mt-4 flex items-center justify-center'>
 							<p className='text-sm text-btn_secondary_text'>{t('comingSoon')}</p>
 						</div>
-					</CardContent>
-				</Card>
+					</div>
+				</div>
 				<SpendPeriod tokenPrice={tokenPrice} />
 			</div>
 
