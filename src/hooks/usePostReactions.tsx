@@ -49,7 +49,6 @@ export const usePostReactions = (postData: IPostData) => {
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
 
-	// TODO: Remove this useEffect and make Optimistic update
 	useEffect(() => {
 		setIsSubscribed(!!postData?.isSubscribed);
 	}, [postData?.isSubscribed]);
@@ -108,22 +107,21 @@ export const usePostReactions = (postData: IPostData) => {
 			throw new ClientError('Index or hash is required');
 		}
 
-		const newSubscribedState = !isSubscribed;
-		setIsSubscribed(newSubscribedState);
+		setIsSubscribed((prevIsSubscribed) => !prevIsSubscribed);
 
 		toast({
-			title: newSubscribedState ? 'Subscribed to the post' : 'Unsubscribed from the post',
-			status: newSubscribedState ? NotificationType.SUCCESS : NotificationType.INFO
+			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
+			status: !isSubscribed ? NotificationType.SUCCESS : NotificationType.INFO
 		});
 
 		try {
-			if (!newSubscribedState) {
-				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
-			} else {
+			if (!isSubscribed) {
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			} else {
+				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			}
 		} catch (error) {
-			setIsSubscribed(!newSubscribedState);
+			setIsSubscribed((prevIsSubscribed) => !prevIsSubscribed);
 			toast({
 				title: 'Failed to update subscription',
 				status: NotificationType.ERROR
