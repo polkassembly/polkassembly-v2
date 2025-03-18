@@ -118,8 +118,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 			network,
 			address,
 			bio,
-			createAt: new Date(),
-			isNovaWalletDelegate: false,
+			createdAt: new Date(),
 			name,
 			userId
 		});
