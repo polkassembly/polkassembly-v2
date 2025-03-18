@@ -489,7 +489,6 @@ export class SubsquidService extends SubsquidUtils {
 				'Error fetching on-chain active delegations to or from address for track from Subsquid'
 			);
 		}
-		console.log('subsquidData', subsquidData);
 		return {
 			votingDelegations: subsquidData.votingDelegations,
 			proposalsConnection: subsquidData.proposalsConnection.totalCount
