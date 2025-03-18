@@ -1353,14 +1353,14 @@ export class FirestoreService extends FirestoreUtils {
 			throw new Error('Delegate already exists');
 		}
 
-		const newDelegate = {
+		const newDelegate: IDelegate = {
 			address,
 			bio,
-			dataSource: EDelegateSource.POLKASSEMBLY,
-			created_at: createdAt,
-			name,
-			user_id: userId,
-			updated_at: new Date()
+			dataSource: [EDelegateSource.POLKASSEMBLY],
+			createdAt,
+			username: name,
+			userId,
+			updatedAt: new Date()
 		};
 
 		await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).set(newDelegate);
