@@ -3,14 +3,15 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import { ElementType } from 'react';
+import { ReactElement } from 'react';
 import Link from 'next/link';
 import styles from '../Overview.module.scss';
 
 export interface AboutSocialLink {
-	icon: ElementType;
-	name: string;
+	id?: string;
+	icon: ReactElement;
 	url: string;
+	name: string;
 }
 
 interface AboutSocialLinksProps {
@@ -28,7 +29,7 @@ function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 							target='_blank'
 							rel='noopener noreferrer'
 						>
-							<link.icon className={styles.about_social_links_icon} />
+							{link.icon}
 						</Link>
 					</TooltipTrigger>
 					<TooltipContent className='bg-social_tooltip_background text-btn_primary_text'>

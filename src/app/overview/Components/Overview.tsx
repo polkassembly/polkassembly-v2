@@ -13,7 +13,6 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork, EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Address from '@ui/Profile/Address/Address';
 import { useRouter } from 'next/navigation';
-import { aboutSocialLinks } from '@shared/_constants/AboutSocialLinks';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -45,6 +44,11 @@ function Overview({
 	const router = useRouter();
 	const t = useTranslations('Overview');
 
+	const socialLinks = NETWORKS_DETAILS[network as ENetwork]?.socialLinks?.map((link) => ({
+		icon: link.icon,
+		name: link.label,
+		url: link.href
+	}));
 	return (
 		<div className={styles.overview_container}>
 			<h1 className={styles.overview_title}>{t('overview')}</h1>
@@ -54,18 +58,18 @@ function Overview({
 				<div className='p-3'>
 					<div className='flex items-center justify-between'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>{t('about')}</p>
-						{aboutSocialLinks[network as ENetwork].length > 0 && (
+						{socialLinks && socialLinks.length > 0 && (
 							<span className='hidden lg:block'>
-								<AboutSocialLinks links={aboutSocialLinks[network as ENetwork]} />
+								<AboutSocialLinks links={socialLinks} />
 							</span>
 						)}
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
 						{t('joinCommunity')} <span className='cursor-pointer text-bg_pink'>{t('viewGallery')}</span>
 					</p>
-					{aboutSocialLinks[network as ENetwork].length > 0 && (
+					{socialLinks && socialLinks.length > 0 && (
 						<span className='block pt-3 lg:hidden'>
-							<AboutSocialLinks links={aboutSocialLinks[network as ENetwork]} />
+							<AboutSocialLinks links={socialLinks} />
 						</span>
 					)}
 				</div>
