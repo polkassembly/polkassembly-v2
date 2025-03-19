@@ -51,7 +51,7 @@ export const usePostReactions = (postData: IPostData) => {
 
 	// TODO: Remove this useEffect and make Optimistic update
 	useEffect(() => {
-		setIsSubscribed(!!postData?.isSubscribed);
+		setIsSubscribed(postData?.isSubscribed || false);
 	}, [postData?.isSubscribed]);
 
 	useEffect(() => {
@@ -109,14 +109,13 @@ export const usePostReactions = (postData: IPostData) => {
 		}
 
 		setIsSubscribed(!isSubscribed);
-
 		toast({
 			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
 			status: !isSubscribed ? NotificationType.SUCCESS : NotificationType.INFO
 		});
 
 		try {
-			if (!isSubscribed) {
+			if (isSubscribed) {
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			} else {
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);

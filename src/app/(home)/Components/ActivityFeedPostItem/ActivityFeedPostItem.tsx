@@ -63,7 +63,7 @@ function ActivityFeedPostItem({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
-		isSubscribed: isSubscribed
+		isSubscribed
 	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
