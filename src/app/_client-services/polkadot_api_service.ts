@@ -459,6 +459,19 @@ export class PolkadotApiService {
 		};
 	}
 
+	async getPreimageLengthFromPreimageHash({ preimageHash }: { preimageHash: string }) {
+		if (!this.api || !preimageHash || !ValidatorService.isValidPreimageHash(preimageHash)) {
+			return null;
+		}
+		const statusFor = (await this.api.query.preimage.statusFor?.(preimageHash)) as any;
+		const requestStatusFor = (await this.api.query.preimage.requestStatusFor?.(preimageHash)) as any;
+
+		const status = statusFor?.isSome ? statusFor.unwrapOr(null) : requestStatusFor.unwrapOr(null);
+
+		if (!status) return null;
+		return Number(status.value?.len);
+	}
+
 	async notePreimage({
 		address,
 		extrinsicFn,

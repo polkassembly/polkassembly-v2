@@ -13,7 +13,7 @@ import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 import { OutputData } from '@editorjs/editorjs';
-import { BN } from '@polkadot/util';
+import { BN, isHex } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '../_constants/networks';
 
 export class ValidatorService {
@@ -281,5 +281,10 @@ export class ValidatorService {
 		} catch {
 			return false;
 		}
+	}
+
+	static isValidPreimageHash(preimageHash: string): boolean {
+		const bitLength = 256;
+		return isHex(preimageHash, bitLength);
 	}
 }

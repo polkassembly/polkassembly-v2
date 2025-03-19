@@ -669,11 +669,15 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Create Preimage",
+		"existingPreimage": "Already have a Preimage",
 		"createTreasuryProposal": "Create Treasury Proposal (Native)",
 		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
-		"goBack": "Go Back"
+		"goBack": "Go Back",
+		"preimageHash": "Preimage Hash",
+		"preimageLength": "Preimage Length",
+		"preimageHashDescription": "Enter the preimage hash to create a proposal"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
