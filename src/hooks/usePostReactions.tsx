@@ -20,7 +20,7 @@ export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
 
-	const [isSubscribed, setIsSubscribed] = useState(!!postData?.isSubscribed);
+	const [isSubscribed, setIsSubscribed] = useState(postData?.isSubscribed || false);
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
 		const reactionsArray = postData?.reactions || [];
 
@@ -108,29 +108,29 @@ export const usePostReactions = (postData: IPostData) => {
 			throw new ClientError('Index or hash is required');
 		}
 
-		const newSubscribedState = !isSubscribed;
-		setIsSubscribed(newSubscribedState);
+		setIsSubscribed(!isSubscribed);
 
 		toast({
-			title: newSubscribedState ? 'Subscribed to the post' : 'Unsubscribed from the post',
-			status: newSubscribedState ? NotificationType.SUCCESS : NotificationType.INFO
+			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
+			status: !isSubscribed ? NotificationType.SUCCESS : NotificationType.INFO
 		});
 
 		try {
-			if (!newSubscribedState) {
+			if (!isSubscribed) {
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			} else {
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			}
 		} catch (error) {
-			setIsSubscribed(!newSubscribedState);
+			setIsSubscribed(isSubscribed);
 			toast({
 				title: 'Failed to update subscription',
 				status: NotificationType.ERROR
 			});
 			console.error('Failed to update subscription:', error);
 		}
-	}, [isSubscribed, subscriptionParams, postData?.indexOrHash, toast]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isSubscribed, subscriptionParams, postData?.indexOrHash]);
 
 	return {
 		reactionState,
