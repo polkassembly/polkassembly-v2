@@ -8,7 +8,7 @@ import { EWallet } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { Input } from '@ui/Input';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
@@ -37,6 +37,9 @@ function Web2Login({
 }) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const t = useTranslations();
+
+	const searchParams = useSearchParams();
+	const nextUrl = searchParams.get('nextUrl');
 
 	const { setUser } = useUser();
 
@@ -81,7 +84,12 @@ function Web2Login({
 				setErrorMessage('');
 				setUser(accessTokenPayload);
 
-				router.back();
+				if (nextUrl) {
+					const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
+					router.replace(`/${url}`);
+				} else {
+					router.back();
+				}
 			}
 			setLoading(false);
 		}
