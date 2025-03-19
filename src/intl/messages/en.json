@@ -689,7 +689,11 @@
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageNoteFailed": "Failed to note preimage",
 		"preimageNoteFailedDescription": "There was an error while noting the preimage",
-		"selectTrack": "Select Track"
+		"selectTrack": "Select Track",
+		"validFrom": "Valid From",
+		"addValidFrom": "Add Valid From",
+		"invalidBlockHeight": "Please enter a valid block height",
+		"enterFutureBlockHeight": "Please enter a future block height"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Item",
@@ -714,5 +718,8 @@
 		"invalidAddress": "Invalid Address",
 		"noResultsFound": "No results found",
 		"placeholder": "Enter Address"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Value is too large"
 	}
 }
