@@ -99,6 +99,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 								walletAddressName={item.name}
 								iconSize={25}
 								redirectToProfile={false}
+								disableTooltip
 							/>
 						</button>
 					</DropdownMenuItem>
