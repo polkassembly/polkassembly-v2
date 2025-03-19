@@ -45,8 +45,8 @@ function PostActions({ postData }: { postData: IPost }) {
 	const buttonText = useMemo(() => (isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribed]);
 
 	const handleShare = () => {
-		const titlePart = postData?.title ? ` for ${postData.title}` : '';
-		const message = `The referendum "${titlePart}" is now live for @Polkassembly.\nCast your vote here: ${global?.window?.location?.href}`;
+		const titlePart = postData?.title ? `for "${postData.title}"` : '';
+		const message = `The referendum ${titlePart} is now live for @Polkassembly.\nCast your vote here: ${global?.window?.location?.href}`;
 		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
 		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
 		global?.window?.open(url);
