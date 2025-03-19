@@ -57,6 +57,7 @@ function ActivityFeedPostItem({
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
+	console.log('userSubscriptionId', postData?.userSubscriptionId);
 
 	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
