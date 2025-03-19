@@ -80,6 +80,7 @@ function ReactionBar({
 			setIsDialogOpen(true);
 		}
 	};
+	const isCurrentlySubscribed = postData?.userSubscriptionId || isSubscribed;
 	return (
 		<div className='mb-4 flex items-center justify-between text-xs text-navbar_border'>
 			<div className='flex space-x-5'>
@@ -123,8 +124,10 @@ function ReactionBar({
 								className='cursor-pointer'
 								onClick={() => handleAuthenticatedAction(handleSubscribe)}
 							>
-								{isSubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
-								<span className={`${isSubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>{isSubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
+								{isCurrentlySubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
+								<span className={`${isCurrentlySubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>
+									{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}
+								</span>
 							</DropdownMenuItem>
 						)}
 						<DropdownMenuItem
