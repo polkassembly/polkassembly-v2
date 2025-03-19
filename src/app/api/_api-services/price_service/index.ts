@@ -135,13 +135,10 @@ export class PriceService {
 	}
 
 	static async GetTokenPrice(symbol: string): Promise<IPriceResponse> {
-		// Check cache first
 		const cachedPrice = await this.getFromCache(symbol);
 		if (cachedPrice) {
 			return cachedPrice;
 		}
-
-		// Try all exchanges in sequence until we get a price
 		const price =
 			(await this.getBinancePrice(symbol)) ||
 			(await this.getKrakenPrice(symbol)) ||
@@ -152,8 +149,6 @@ export class PriceService {
 		if (!price) {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, `Unable to fetch price for ${symbol}`);
 		}
-
-		// Cache the successful result
 		await this.saveToCache(symbol, price);
 
 		return price;

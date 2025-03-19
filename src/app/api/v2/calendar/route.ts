@@ -40,124 +40,111 @@ const updateEventsWithTimeStamps = (events: ICalendarEvent[], blockNo: number) =
 };
 
 export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
-	try {
-		const network = await getNetworkFromHeaders();
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
+	const network = await getNetworkFromHeaders();
+	const body = await req.json();
+	const { startBlockNo, endBlockNo } = body;
+
+	if (!startBlockNo || !endBlockNo) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Start and end block numbers are required');
+	}
+
+	const cachedEvents = await RedisService.GetCalendarData({ network, startBlockNo, endBlockNo });
+
+	if (cachedEvents) {
+		return NextResponse.json(JSON.parse(cachedEvents));
+	}
+
+	const onChainEvents = await OnChainDbService.GetCalendarEvents({
+		network: network as ENetwork,
+		startBlock: startBlockNo,
+		endBlock: endBlockNo
+	});
+
+	const eventsData = onChainEvents || [];
+
+	if (!eventsData?.length) {
+		if (process.env.IS_CACHE_ENABLED === 'true') {
+			await RedisService.SetCalendarData({ network, startBlockNo, endBlockNo, data: JSON.stringify([]) });
 		}
+		return NextResponse.json([]);
+	}
 
-		const body = await req.json();
-		const { startBlockNo, endBlockNo } = body;
-
-		if (!startBlockNo || !endBlockNo) {
-			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Start and end block numbers are required');
+	const eventsByProposalType: Record<string, ICalendarEvent[]> = {};
+	onChainEvents.forEach((event: ICalendarEvent) => {
+		if (!eventsByProposalType[event.type as EProposalType]) {
+			eventsByProposalType[event.type as EProposalType] = [];
 		}
+		eventsByProposalType[event.type as EProposalType].push(event);
+	});
 
-		const cachedEvents = await RedisService.GetCalendarData({ network, startBlockNo, endBlockNo });
+	const events: ICalendarEvent[] = [];
 
-		if (cachedEvents) {
-			return NextResponse.json(JSON.parse(cachedEvents));
-		}
-
-		try {
-			const onChainEvents = await OnChainDbService.GetCalendarEvents({
-				network: network as ENetwork,
-				startBlock: startBlockNo,
-				endBlock: endBlockNo
-			});
-
-			const eventsData = onChainEvents || [];
-
-			if (!eventsData?.length) {
-				if (process.env.IS_CACHE_ENABLED === 'true') {
-					await RedisService.SetCalendarData({ network, startBlockNo, endBlockNo, data: JSON.stringify([]) });
-				}
-				return NextResponse.json([]);
-			}
-
-			const eventsByProposalType: Record<string, ICalendarEvent[]> = {};
-			onChainEvents.forEach((event: ICalendarEvent) => {
-				if (!eventsByProposalType[event.type as EProposalType]) {
-					eventsByProposalType[event.type as EProposalType] = [];
-				}
-				eventsByProposalType[event.type as EProposalType].push(event);
-			});
-
-			const events: ICalendarEvent[] = [];
+	await Promise.all(
+		Object.entries(eventsByProposalType).map(async ([proposalType, proposalEvents]) => {
+			const chunks = chunkArray(proposalEvents, CHUNK_SIZE);
 
 			await Promise.all(
-				Object.entries(eventsByProposalType).map(async ([proposalType, proposalEvents]) => {
-					const chunks = chunkArray(proposalEvents, CHUNK_SIZE);
+				chunks.map(async (chunk) => {
+					const indexes = chunk.map((item) => item?.index);
+					const postsPromises = indexes.map((index) =>
+						OffChainDbService.GetOffChainPostData({
+							network: network as ENetwork,
+							indexOrHash: index.toString(),
+							proposalType: proposalType as EProposalType
+						})
+					);
+					const postsData = await Promise.all(postsPromises);
 
 					await Promise.all(
-						chunks.map(async (chunk) => {
-							const indexes = chunk.map((item) => item?.index);
-							const postsPromises = indexes.map((index) =>
-								OffChainDbService.GetOffChainPostData({
+						chunk.map(async (onChainEvent) => {
+							const payload: ICalendarEvent = {
+								createdAt: onChainEvent?.createdAt,
+								index: onChainEvent?.index,
+								parentBountyIndex: onChainEvent?.parentBountyIndex,
+								proposalType: onChainEvent?.type as EProposalType,
+								proposer: onChainEvent?.proposer,
+								source: EDataSource.POLKASSEMBLY,
+								status: onChainEvent?.status,
+								statusHistory: onChainEvent?.statusHistory,
+								title: '',
+								trackNo: onChainEvent?.trackNo
+							};
+							const post = postsData.find((p: IOffChainPost) => p.index === onChainEvent.index);
+
+							if (post?.title) {
+								payload.title = post.title;
+							} else {
+								const subsquareData = await OffChainDbService.GetOffChainPostData({
 									network: network as ENetwork,
-									indexOrHash: index.toString(),
+									indexOrHash: onChainEvent.index.toString(),
 									proposalType: proposalType as EProposalType
-								})
-							);
-							const postsData = await Promise.all(postsPromises);
+								});
 
-							await Promise.all(
-								chunk.map(async (onChainEvent) => {
-									const payload: ICalendarEvent = {
-										createdAt: onChainEvent?.createdAt,
-										index: onChainEvent?.index,
-										parentBountyIndex: onChainEvent?.parentBountyIndex,
-										proposalType: onChainEvent?.type as EProposalType,
-										proposer: onChainEvent?.proposer,
-										source: EDataSource.POLKASSEMBLY,
-										status: onChainEvent?.status,
-										statusHistory: onChainEvent?.statusHistory,
-										title: '',
-										trackNo: onChainEvent?.trackNo
-									};
-									const post = postsData.find((p: IOffChainPost) => p.index === onChainEvent.index);
+								if (subsquareData?.title) {
+									payload.title = subsquareData.title;
+									payload.source = EDataSource.SUBSQUARE;
+								}
+							}
 
-									if (post?.title) {
-										payload.title = post.title;
-									} else {
-										const subsquareData = await OffChainDbService.GetOffChainPostData({
-											network: network as ENetwork,
-											indexOrHash: onChainEvent.index.toString(),
-											proposalType: proposalType as EProposalType
-										});
+							if (!payload.title) {
+								payload.title = `${proposalType === EProposalType.REFERENDUM_V2 ? 'ReferendumV2' : (proposalType as EProposalType) || ''} Proposal`;
+							}
 
-										if (subsquareData?.title) {
-											payload.title = subsquareData.title;
-											payload.source = EDataSource.SUBSQUARE;
-										}
-									}
-
-									if (!payload.title) {
-										payload.title = `${proposalType === EProposalType.REFERENDUM_V2 ? 'ReferendumV2' : (proposalType as EProposalType) || ''} Proposal`;
-									}
-
-									events.push(payload);
-								})
-							);
+							events.push(payload);
 						})
 					);
 				})
 			);
+		})
+	);
 
-			const eventsWithTimestamps = updateEventsWithTimeStamps(events, startBlockNo);
-			await RedisService.SetCalendarData({
-				network,
-				startBlockNo,
-				endBlockNo,
-				data: JSON.stringify(eventsWithTimestamps)
-			});
+	const eventsWithTimestamps = updateEventsWithTimeStamps(events, startBlockNo);
+	await RedisService.SetCalendarData({
+		network,
+		startBlockNo,
+		endBlockNo,
+		data: JSON.stringify(eventsWithTimestamps)
+	});
 
-			return NextResponse.json(eventsWithTimestamps);
-		} catch (onChainError) {
-			console.error('onChain Error:', onChainError);
-			return NextResponse.json({ error: 'Failed to fetch calendar events', details: onChainError }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
-		}
-	} catch (error) {
-		return NextResponse.json({ error: error instanceof APIError ? error.message : 'Error while fetching calendar events' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
-	}
+	return NextResponse.json(eventsWithTimestamps);
 });
