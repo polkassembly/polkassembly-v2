@@ -151,7 +151,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 								[
 									{
 										title: t('ActivityFeed.Navbar.All'),
-										url: '/All',
+										url: '/all',
 										icon: All
 									},
 									{
