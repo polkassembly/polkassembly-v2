@@ -26,7 +26,7 @@ export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
 
-	const [isSubscribed, setIsSubscribed] = useState(postData?.isSubscribed || false);
+	const [isSubscribed, setIsSubscribed] = useState(!!postData?.isSubscribed);
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
 		const reactionsArray = postData?.reactions || [];
 
@@ -57,7 +57,7 @@ export const usePostReactions = (postData: IPostData) => {
 
 	// TODO: Remove this useEffect and make Optimistic update
 	useEffect(() => {
-		setIsSubscribed(postData?.isSubscribed || false);
+		setIsSubscribed(!!postData?.isSubscribed);
 	}, [postData?.isSubscribed]);
 
 	useEffect(() => {
