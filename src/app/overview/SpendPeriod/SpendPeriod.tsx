@@ -16,7 +16,7 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import styles from './SpendPeriod.module.scss';
 
-function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined } }) {
+function SpendPeriod({ tokenPrice }: { tokenPrice?: string }) {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -46,7 +46,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined }
 					)
 				);
 				let valueUSD = '';
-				if (tokenPrice?.price && tokenPrice.price !== 'N/A') {
+				if (tokenPrice) {
 					const nextBurnValueUSD = parseFloat(
 						formatBnBalance(
 							burnResult,
@@ -58,7 +58,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined }
 							network
 						)
 					);
-					valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(tokenPrice.price)).toString());
+					valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(tokenPrice)).toString());
 				}
 
 				setNextBurn({

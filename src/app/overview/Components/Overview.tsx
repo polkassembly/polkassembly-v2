@@ -36,19 +36,12 @@ function Overview({
 		discussion: IGenericListingResponse<IPostListing> | null;
 		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
 	};
-	tokenPrice: {
-		price: string | undefined;
-	};
+	tokenPrice?: string;
 }) {
 	const network = getCurrentNetwork();
 	const router = useRouter();
 	const t = useTranslations('Overview');
 
-	const socialLinks = NETWORKS_DETAILS[network as ENetwork]?.socialLinks?.map((link) => ({
-		icon: link.icon,
-		name: link.label,
-		url: link.href
-	}));
 	return (
 		<div className={styles.overview_container}>
 			<h1 className={styles.overview_title}>{t('overview')}</h1>
@@ -58,20 +51,16 @@ function Overview({
 				<div className='p-3'>
 					<div className='flex items-center justify-between'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>{t('about')}</p>
-						{socialLinks && socialLinks.length > 0 && (
-							<span className='hidden lg:block'>
-								<AboutSocialLinks links={socialLinks} />
-							</span>
-						)}
+						<span className='hidden lg:block'>
+							<AboutSocialLinks />
+						</span>
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
 						{t('joinCommunity')} <span className='cursor-pointer text-bg_pink'>{t('viewGallery')}</span>
 					</p>
-					{socialLinks && socialLinks.length > 0 && (
-						<span className='block pt-3 lg:hidden'>
-							<AboutSocialLinks links={socialLinks} />
-						</span>
-					)}
+					<span className='block pt-3 lg:hidden'>
+						<AboutSocialLinks />
+					</span>
 				</div>
 			</div>
 
@@ -87,7 +76,7 @@ function Overview({
 						</div>
 					</div>
 				</div>
-				<SpendPeriod tokenPrice={tokenPrice} />
+				{tokenPrice && <SpendPeriod tokenPrice={tokenPrice} />}
 			</div>
 
 			{/* Latest Activity */}

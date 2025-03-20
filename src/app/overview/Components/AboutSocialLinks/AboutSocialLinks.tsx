@@ -3,29 +3,22 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import { ReactElement } from 'react';
 import Link from 'next/link';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import styles from '../Overview.module.scss';
 
-export interface AboutSocialLink {
-	id?: string;
-	icon: ReactElement;
-	url: string;
-	name: string;
-}
+function AboutSocialLinks() {
+	const network = getCurrentNetwork();
+	const { socialLinks } = NETWORKS_DETAILS[network];
 
-interface AboutSocialLinksProps {
-	links: AboutSocialLink[];
-}
-
-function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 	return (
 		<div className={styles.about_social_links_container}>
-			{links.map((link) => (
-				<Tooltip key={link.name}>
+			{socialLinks?.map((link) => (
+				<Tooltip key={link.id}>
 					<TooltipTrigger asChild>
 						<Link
-							href={link.url}
+							href={link.href}
 							target='_blank'
 							rel='noopener noreferrer'
 						>
@@ -33,7 +26,7 @@ function AboutSocialLinks({ links }: AboutSocialLinksProps) {
 						</Link>
 					</TooltipTrigger>
 					<TooltipContent className='bg-social_tooltip_background text-btn_primary_text'>
-						<p>{link.name}</p>
+						<p>{link.label}</p>
 					</TooltipContent>
 				</Tooltip>
 			))}

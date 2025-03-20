@@ -10,6 +10,11 @@ import { useTranslations } from 'next-intl';
 import styles from './Calendar.module.scss';
 import LoadingLayover from '../LoadingLayover';
 
+enum ECalendarView {
+	Month = 'month',
+	Year = 'year'
+}
+
 interface CalendarProps {
 	cellRender: (date: Date | undefined) => ReactNode;
 	selectedDate: Date;
@@ -20,7 +25,7 @@ interface CalendarProps {
 
 function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMonthChange }: CalendarProps) {
 	const t = useTranslations();
-	const [view, setView] = useState<'month' | 'year'>('month');
+	const [view, setView] = useState<ECalendarView>(ECalendarView.Month);
 
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	const handleMonthChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -41,7 +46,7 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 		const newDate = new Date(selectedDate);
 		newDate.setMonth(index);
 		setSelectedDate(newDate);
-		setView('month');
+		setView(ECalendarView.Month);
 		onMonthChange(newDate);
 	};
 
@@ -102,15 +107,15 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 				<div>
 					<button
 						type='button'
-						className={cn(styles.calendary_header_button, 'rounded-l-sm', view === 'month' ? 'border-text_pink' : 'border-border_grey')}
-						onClick={() => setView('month')}
+						className={cn(styles.calendary_header_button, 'rounded-l-sm', view === ECalendarView.Month ? 'border-text_pink' : 'border-border_grey')}
+						onClick={() => setView(ECalendarView.Month)}
 					>
 						{t('Overview.month')}
 					</button>
 					<button
 						type='button'
-						className={cn(styles.calendary_header_button, 'rounded-r-sm', view === 'year' ? 'border-text_pink' : 'border-border_grey')}
-						onClick={() => setView('year')}
+						className={cn(styles.calendary_header_button, 'rounded-r-sm', view === ECalendarView.Year ? 'border-text_pink' : 'border-border_grey')}
+						onClick={() => setView(ECalendarView.Year)}
 					>
 						{t('Overview.year')}
 					</button>

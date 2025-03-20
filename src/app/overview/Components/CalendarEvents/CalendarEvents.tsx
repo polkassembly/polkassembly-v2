@@ -11,7 +11,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, ICalendarEvent } from '@/_shared/types';
 import Link from 'next/link';
-import { Skeleton } from '@ui/Skeleton';
+import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import type { Dayjs } from 'dayjs';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
@@ -54,80 +54,75 @@ function EventList({ events, color }: { events: ICalendarEvent[]; color: string 
 	);
 }
 
-function CalendarEvents() {
+export default function CalendarEvents() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [monthlyEvents, setMonthlyEvents] = useState<{ [key: string]: ICalendarEvent[] }>({});
-	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const [selectedDate, setSelectedDate] = useState(new Date());
 	const [isLoading, setIsLoading] = useState(false);
-	const [currentMonth, setCurrentMonth] = useState<string>(dayjs(new Date()).format('YYYY-MM'));
 
-	const fetchMonthEvents = useCallback(
-		async (date: Date) => {
-			const monthKey = dayjs(date).format('YYYY-MM');
-			if (monthlyEvents[monthKey as keyof typeof monthlyEvents] && !isLoading) {
+	const fetchMonthEvents = useCallback(async () => {
+		const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+		const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+		const monthKey = dayjs(startOfMonth).format('YYYY-MM');
+
+		if (monthlyEvents[monthKey as keyof typeof monthlyEvents] && !isLoading) {
+			return;
+		}
+
+		setIsLoading(true);
+		try {
+			const startDate = dayjs(startOfMonth).startOf('month');
+			const endDate = dayjs(endOfMonth).endOf('month');
+			const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
+
+			if (!currentBlock) {
+				setIsLoading(false);
 				return;
 			}
 
-			setIsLoading(true);
-			try {
-				const startDate = dayjs(date).startOf('month');
-				const endDate = dayjs(date).endOf('month');
-				const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
+			const newStartBlockNo = dateToBlockNum({
+				currentBlockNumber: currentBlock.toNumber(),
+				date: startDate.toDate(),
+				network
+			});
 
-				if (!currentBlock) {
-					setIsLoading(false);
-					return;
-				}
+			const newEndBlockNo = dateToBlockNum({
+				currentBlockNumber: currentBlock.toNumber(),
+				date: endDate.toDate(),
+				network
+			});
 
-				const newStartBlockNo = dateToBlockNum({
-					currentBlockNumber: currentBlock.toNumber(),
-					date: startDate.toDate(),
-					network
-				});
+			if (!newStartBlockNo || !newEndBlockNo) return;
 
-				const newEndBlockNo = dateToBlockNum({
-					currentBlockNumber: currentBlock.toNumber(),
-					date: endDate.toDate(),
-					network
-				});
+			const { data, error } = await NextApiClientService.getCalendarEvents({
+				endBlockNo: newEndBlockNo,
+				startBlockNo: newStartBlockNo
+			});
 
-				if (!newStartBlockNo || !newEndBlockNo) return;
-
-				const { data, error } = await NextApiClientService.getCalendarEvents({
-					endBlockNo: newEndBlockNo,
-					startBlockNo: newStartBlockNo
-				});
-
-				if (error) {
-					console.error('Error fetching calendar events:', error);
-					return;
-				}
-
-				setMonthlyEvents((prev) => ({
-					...prev,
-					[monthKey]: data || []
-				}));
-			} catch (error) {
+			if (error) {
 				console.error('Error fetching calendar events:', error);
-			} finally {
-				setIsLoading(false);
+				return;
 			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[apiService, network, monthlyEvents]
-	);
+
+			setMonthlyEvents((prev) => ({
+				...prev,
+				[monthKey]: data || []
+			}));
+		} catch (error) {
+			console.error('Error fetching calendar events:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [selectedDate, apiService, network, monthlyEvents, isLoading]);
 
 	useEffect(() => {
-		fetchMonthEvents(selectedDate);
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentMonth, apiService, network]);
+		fetchMonthEvents();
+	}, []);
 
 	const handleMonthChange = (date: Date) => {
-		const newMonth = dayjs(date).format('YYYY-MM');
-		setCurrentMonth(newMonth);
-		fetchMonthEvents(date);
+		setSelectedDate(date);
+		fetchMonthEvents();
 	};
 
 	const getDateHasEvent = (value: Dayjs): boolean => {
@@ -201,8 +196,8 @@ function CalendarEvents() {
 				</div>
 				<div className='my-3 w-full xl:mt-5 xl:h-[400px] xl:w-[50%] xl:pl-8'>
 					{isLoading ? (
-						<div className='text-text_secondary'>
-							<Skeleton className='h-[400px] w-full' />
+						<div className='relative'>
+							<LoadingLayover />
 						</div>
 					) : selectedDateEvents.length > 0 ? (
 						<EventList
@@ -217,5 +212,3 @@ function CalendarEvents() {
 		</div>
 	);
 }
-
-export default CalendarEvents;

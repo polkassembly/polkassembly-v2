@@ -5,7 +5,7 @@
 import { LoadingSpinner } from '@ui/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
-import { ENetwork } from '@/_shared/types';
+import { ENetwork, ESocial } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -16,7 +16,7 @@ function NewsSection() {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 
-	const profile = NETWORKS_DETAILS[network as ENetwork].socialLinks?.find((link) => link.id === 'twitter')?.href;
+	const profile = NETWORKS_DETAILS[network as ENetwork].socialLinks?.find((link) => link.id === ESocial.TWITTER)?.href;
 
 	if (!profile) {
 		return null;

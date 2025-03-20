@@ -79,7 +79,7 @@ async function OverviewPage() {
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-8'>
 			<Overview
 				trackDetails={trackDetails || { all: null, discussion: null, tracks: [] }}
-				tokenPrice={tokenPrice.data ?? { price: undefined }}
+				tokenPrice={tokenPrice.data ? tokenPrice.data.price : undefined}
 			/>
 		</div>
 	);
