@@ -39,7 +39,7 @@ function ActivityFeedAbout() {
 						className={styles.aboutSocialLink}
 						title={link.label}
 					>
-						{link.icon}
+						<link.icon />
 					</Link>
 				))}
 			</div>

@@ -8,7 +8,6 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@ui/LoadingSpinner';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
