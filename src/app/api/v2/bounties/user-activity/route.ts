@@ -12,23 +12,11 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
-	try {
-		const network = await getNetworkFromHeaders();
-		if (!network || !Object.values(ENetwork).includes(network as ENetwork)) {
-			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
-		}
-
-		const stats = await OnChainDbService.getBountyUserActivity(network as ENetwork);
-		return NextResponse.json(stats);
-	} catch (error) {
-		console.error('Bounty stats error:', error);
-		return NextResponse.json(
-			{
-				error: error instanceof APIError ? error.message : 'Error while fetching bounty stats'
-			},
-			{
-				status: StatusCodes.INTERNAL_SERVER_ERROR
-			}
-		);
+	const network = await getNetworkFromHeaders();
+	if (!network || !Object.values(ENetwork).includes(network as ENetwork)) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
 	}
+
+	const stats = await OnChainDbService.getBountyUserActivity(network as ENetwork);
+	return NextResponse.json(stats);
 });

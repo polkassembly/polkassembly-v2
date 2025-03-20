@@ -30,42 +30,34 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
 	}
 
-	try {
-		const api = await PolkadotApiService.Init(network as ENetwork);
-		const activePjsBounties = await api.getBountyAmount();
+	const api = await PolkadotApiService.Init(network as ENetwork);
+	const activePjsBounties = await api.getBountyAmount();
 
-		const balances = await Promise.all(
-			activePjsBounties.map(async (bounty: Bounty) => {
-				const id = bounty?.index?.toJSON();
-				if (!id) return new BN(0);
-				try {
-					const bountyData = await OnChainDbService.GetBountyAmount(network as ENetwork, id.toString());
-					const address = bountyData?.address;
-					if (!address) {
-						const metadataValue = bountyData?.meta?.value || 0;
-						return new BN(metadataValue);
-					}
-					try {
-						return await api.getAccountData(address);
-					} catch (accountError) {
-						await api.disconnect();
-						console.error(`Error fetching account data for bounty ${id}: ${accountError}`);
-						return new BN(0);
-					}
-				} catch (error) {
-					console.error(`Error processing bounty ${id}: ${error}`);
-					await api.disconnect();
-					return new BN(0);
-				}
-			})
-		);
-		await api.disconnect();
-		const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), new BN(0));
-		const bountyAmount = total.div(new BN(10).pow(new BN(10))).toString();
+	const balances = await Promise.all(
+		activePjsBounties.map(async (bounty: Bounty) => {
+			const id = bounty?.index?.toJSON();
+			if (!id) return new BN(0);
 
-		return NextResponse.json({ bountyAmount: bountyAmount.toString() });
-	} catch (error) {
-		console.error('Error processing bounty amount:', error);
-		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to fetch bounty amount');
-	}
+			const bountyData = await OnChainDbService.GetBountyAmount(network as ENetwork, id.toString());
+			const address = bountyData?.address;
+
+			if (!address) {
+				const metadataValue = bountyData?.meta?.value || 0;
+				return new BN(metadataValue);
+			}
+
+			try {
+				return await api.getAccountData(address);
+			} catch (accountError) {
+				console.error(`Error fetching account data for bounty ${id}: ${accountError}`);
+				return new BN(0);
+			}
+		})
+	);
+
+	await api.disconnect();
+	const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), new BN(0));
+	const bountyAmount = total.div(new BN(10).pow(new BN(10))).toString();
+
+	return NextResponse.json({ bountyAmount: bountyAmount.toString() });
 });
