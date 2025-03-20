@@ -20,8 +20,6 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
 import { blockToDays, blockToTime, convertMillisecondsToDaysHoursMinutes } from '@shared/_utils/blockTimeCalculations';
-import { formatBnBalance } from '../_client-utils/formatBnBalance';
-import { formatUSDWithUnits } from '../_client-utils/formatUSDWithUnits';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -245,7 +243,7 @@ export class PolkadotApiService {
 		};
 	}
 
-	async getNextBurnData({ currentTokenPrice }: { currentTokenPrice: { price: string | undefined } }) {
+	async getNextBurnData() {
 		try {
 			if (!this.api.consts.treasury) {
 				return null;
@@ -275,37 +273,7 @@ export class PolkadotApiService {
 			}
 
 			const burn = burnPercent.mul(freeBalance).div(BN_MILLION);
-			const value = formatUSDWithUnits(
-				formatBnBalance(
-					burn.toString(),
-					{
-						numberAfterComma: 0,
-						withThousandDelimitor: false,
-						withUnit: false
-					},
-					this.network
-				)
-			);
-			let valueUSD = '';
-			if (currentTokenPrice?.price && currentTokenPrice.price !== 'N/A') {
-				const nextBurnValueUSD = parseFloat(
-					formatBnBalance(
-						burn.toString(),
-						{
-							numberAfterComma: 2,
-							withThousandDelimitor: false,
-							withUnit: false
-						},
-						this.network
-					)
-				);
-				valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(currentTokenPrice.price)).toString());
-			}
-
-			return {
-				value,
-				valueUSD
-			};
+			return burn.toString();
 		} catch (error) {
 			console.error('Error getting next burn data:', error);
 			return null;
@@ -489,11 +457,6 @@ export class PolkadotApiService {
 					value
 				};
 			});
-	}
-
-	async getBlockTime() {
-		const currentBlock = await this.api?.derive?.chain.bestNumber();
-		return currentBlock?.toNumber();
 	}
 
 	getPreimageParams({ sectionName, methodName }: { sectionName: string; methodName: string }) {

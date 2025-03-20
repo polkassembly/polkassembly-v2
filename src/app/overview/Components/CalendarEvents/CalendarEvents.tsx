@@ -73,16 +73,21 @@ function CalendarEvents() {
 			try {
 				const startDate = dayjs(date).startOf('month');
 				const endDate = dayjs(date).endOf('month');
-				const currentBlock = (await apiService?.getBlockTime()) || 0;
+				const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
+
+				if (!currentBlock) {
+					setIsLoading(false);
+					return;
+				}
 
 				const newStartBlockNo = dateToBlockNum({
-					currentBlockNumber: currentBlock,
+					currentBlockNumber: currentBlock.toNumber(),
 					date: startDate.toDate(),
 					network
 				});
 
 				const newEndBlockNo = dateToBlockNum({
-					currentBlockNumber: currentBlock,
+					currentBlockNumber: currentBlock.toNumber(),
 					date: endDate.toDate(),
 					network
 				});

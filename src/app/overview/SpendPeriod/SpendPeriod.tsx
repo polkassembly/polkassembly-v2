@@ -12,6 +12,8 @@ import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import styles from './SpendPeriod.module.scss';
 
 function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined } }) {
@@ -27,18 +29,42 @@ function SpendPeriod({ tokenPrice }: { tokenPrice: { price: string | undefined }
 		if (!apiService) return;
 		(async () => {
 			try {
-				const burnResult = await apiService.getNextBurnData({
-					currentTokenPrice: tokenPrice
-				});
-
-				if (burnResult?.value) {
-					setNextBurn({
-						value: burnResult.value,
-						valueUSD: burnResult.valueUSD || ''
-					});
-				} else {
+				const burnResult = await apiService.getNextBurnData();
+				if (!burnResult) {
 					setNextBurn(null);
+					return;
 				}
+				const value = formatUSDWithUnits(
+					formatBnBalance(
+						burnResult,
+						{
+							numberAfterComma: 0,
+							withThousandDelimitor: false,
+							withUnit: false
+						},
+						network
+					)
+				);
+				let valueUSD = '';
+				if (tokenPrice?.price && tokenPrice.price !== 'N/A') {
+					const nextBurnValueUSD = parseFloat(
+						formatBnBalance(
+							burnResult,
+							{
+								numberAfterComma: 2,
+								withThousandDelimitor: false,
+								withUnit: false
+							},
+							network
+						)
+					);
+					valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(tokenPrice.price)).toString());
+				}
+
+				setNextBurn({
+					value,
+					valueUSD
+				});
 			} catch (error) {
 				console.error('Error fetching burn data:', error);
 				setNextBurn(null);
