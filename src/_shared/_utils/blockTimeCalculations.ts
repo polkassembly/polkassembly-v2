@@ -26,10 +26,3 @@ export const blockToTime = ({ blocks, network }: BlockToTimeParams) => {
 	const timeInMs = blocks * blockTime;
 	return { time: timeInMs };
 };
-
-export const convertMillisecondsToDaysHoursMinutes = (timeInMs: number) => {
-	const days = Math.floor(timeInMs / (24 * 60 * 60 * 1000));
-	const hours = Math.floor((timeInMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-	const minutes = Math.floor((timeInMs % (60 * 60 * 1000)) / (60 * 1000));
-	return { d: days, h: hours, m: minutes };
-};

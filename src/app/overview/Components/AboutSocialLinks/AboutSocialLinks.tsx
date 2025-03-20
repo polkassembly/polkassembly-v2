@@ -22,7 +22,7 @@ function AboutSocialLinks() {
 							target='_blank'
 							rel='noopener noreferrer'
 						>
-							{link.icon}
+							<link.icon />
 						</Link>
 					</TooltipTrigger>
 					<TooltipContent className='bg-social_tooltip_background text-btn_primary_text'>

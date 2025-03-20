@@ -4,16 +4,16 @@
 
 import { BN } from '@polkadot/util';
 import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
-import { TiHome } from 'react-icons/ti';
-import { FaTwitter, FaTelegramPlane, FaYoutube, FaDiscord } from 'react-icons/fa';
-import { PiRedditLogoFill } from 'react-icons/pi';
+import { FaDiscord, FaTelegramPlane, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { TbBrandGithubFilled } from 'react-icons/tb';
+import { TiHome } from 'react-icons/ti';
+import { PiRedditLogoFill } from 'react-icons/pi';
 import { RiBox3Line } from 'react-icons/ri';
-import { ReactElement } from 'react';
+import { IconType } from 'react-icons/lib';
 
 interface ISocialLink {
 	id: string;
-	icon: ReactElement;
+	icon: IconType;
 	href: string;
 	label: string;
 }
@@ -103,6 +103,17 @@ interface INetworkDetails {
 	socialLinks?: ISocialLink[];
 	palletInstance?: string;
 	parachain?: string;
+}
+
+enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -1699,65 +1710,63 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 	}
 } as const;
 
-const HOVER_SCALE_CLASS = 'transition-transform hover:scale-110';
-
 const SocialIcons = {
-	Discord: <FaDiscord className={HOVER_SCALE_CLASS} />,
-	Github: <TbBrandGithubFilled className={HOVER_SCALE_CLASS} />,
-	Home: <TiHome className={HOVER_SCALE_CLASS} />,
-	Reddit: <PiRedditLogoFill className={HOVER_SCALE_CLASS} />,
-	Telegram: <FaTelegramPlane className={HOVER_SCALE_CLASS} />,
-	Twitter: <FaTwitter className={HOVER_SCALE_CLASS} />,
-	Youtube: <FaYoutube className={HOVER_SCALE_CLASS} />,
-	Subscan: <RiBox3Line className={HOVER_SCALE_CLASS} />
+	Discord: FaDiscord,
+	Github: TbBrandGithubFilled,
+	Home: TiHome,
+	Reddit: PiRedditLogoFill,
+	Telegram: FaTelegramPlane,
+	Twitter: FaTwitter,
+	Youtube: FaYoutube,
+	Subscan: RiBox3Line
 } as const;
 
 const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	[ENetwork.POLKADOT]: [
 		{
-			id: 'home',
+			id: ENetworkSocial.HOME,
 			icon: SocialIcons.Home,
 			href: 'https://polkadot.network/',
 			label: 'Polkadot Homepage'
 		},
 		{
-			id: 'twitter',
+			id: ENetworkSocial.TWITTER,
 			icon: SocialIcons.Twitter,
 			href: 'https://twitter.com/Polkadot',
 			label: 'Twitter'
 		},
 		{
-			id: 'discord',
+			id: ENetworkSocial.DISCORD,
 			icon: SocialIcons.Discord,
 			href: 'https://discord.gg/polkadot',
 			label: 'Discord'
 		},
 		{
-			id: 'github',
+			id: ENetworkSocial.GITHUB,
 			icon: SocialIcons.Github,
 			href: 'https://github.com/polkadot-js',
 			label: 'GitHub'
 		},
 		{
-			id: 'youtube',
+			id: ENetworkSocial.YOUTUBE,
 			icon: SocialIcons.Youtube,
 			href: 'https://www.youtube.com/channel/UCB7PbjuZLEba_znc7mEGNgw',
 			label: 'YouTube'
 		},
 		{
-			id: 'reddit',
+			id: ENetworkSocial.REDDIT,
 			icon: SocialIcons.Reddit,
 			href: 'https://www.reddit.com/r/polkadot',
 			label: 'Reddit'
 		},
 		{
-			id: 'telegram',
+			id: ENetworkSocial.TELEGRAM,
 			icon: SocialIcons.Telegram,
 			href: 'https://t.me/PolkadotOfficial',
 			label: 'Telegram'
 		},
 		{
-			id: 'subscan',
+			id: ENetworkSocial.SUBSCAN,
 			icon: SocialIcons.Subscan,
 			href: 'https://polkadot.subscan.io/',
 			label: 'Subscan'
@@ -1765,13 +1774,13 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	],
 	[ENetwork.KUSAMA]: [
 		{
-			id: 'home',
+			id: ENetworkSocial.HOME,
 			icon: SocialIcons.Home,
 			href: 'https://kusama.network/',
 			label: 'Kusama Homepage'
 		},
 		{
-			id: 'twitter',
+			id: ENetworkSocial.TWITTER,
 			icon: SocialIcons.Twitter,
 			href: 'https://twitter.com/kusamanetwork',
 			label: 'Twitter'
