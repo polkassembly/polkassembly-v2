@@ -16,9 +16,9 @@ function NewsSection() {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 
-	const profile = NETWORKS_DETAILS[network as ENetwork].socialLinks?.find((link) => link.id === ESocial.TWITTER)?.href;
+	const socialHandle = NETWORKS_DETAILS[network as ENetwork].socialLinks?.find((link) => link.id === ESocial.TWITTER)?.href;
 
-	if (!profile) {
+	if (!socialHandle) {
 		return null;
 	}
 
@@ -38,7 +38,7 @@ function NewsSection() {
 						<TwitterTimelineEmbed
 							onLoad={() => setIsLoading(false)}
 							sourceType='profile'
-							screenName={profile || ''}
+							screenName={socialHandle}
 							options={{ height: 450 }}
 							noHeader
 							noFooter
@@ -50,7 +50,7 @@ function NewsSection() {
 						<TwitterTimelineEmbed
 							onLoad={() => setIsLoading(false)}
 							sourceType='profile'
-							screenName={profile}
+							screenName={socialHandle}
 							options={{ height: 450 }}
 							noHeader
 							noFooter
