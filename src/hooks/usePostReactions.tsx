@@ -67,8 +67,11 @@ export const usePostReactions = (postData: IPostData) => {
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 			try {
 				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
-				showGifSetter(true);
-				setTimeout(() => showGifSetter(false), 1500);
+				if (!isDeleteAction) {
+					showGifSetter(true);
+					setTimeout(() => showGifSetter(false), 1500);
+				}
+
 				setReactionState((prev) => ({
 					...prev,
 					isLiked: isLikeAction ? !prev.isLiked : false,
