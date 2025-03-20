@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo, ICrossValidationResult } from '@/_shared/types';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -114,7 +113,7 @@ export class AIService {
 		}
 
 		try {
-			const response = await fetchPF(this.AI_SERVICE_URL, {
+			const response = await fetch(this.AI_SERVICE_URL, {
 				method: 'POST',
 				body: JSON.stringify({ text: prompt }),
 				headers: {

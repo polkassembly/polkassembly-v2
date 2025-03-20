@@ -247,6 +247,7 @@
 		"Referenda": "公投"
 	},
 	"ListingPage": {
+		"AllProposals": "所有公投",
 		"AuctionAdmin": "拍卖管理员",
 		"AuctionAdminDescription": "启动拍卖的来源。",
 		"BigSpender": "大额支出者",
@@ -681,12 +682,16 @@
 		"proposals": "提案"
 	},
 	"CreateProposal": {
-		"createPreimage": "创建预映像",
+		"createPreimage": "创建原像",
+		"existingPreimage": "已有原像",
 		"createTreasuryProposal": "创建国库提案（原生）",
-		"usdxProposal": "创建USDx国库提案（资产中心）",
+		"usdxProposal": "创建USDx国库提案（Assethub）",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
-		"goBack": "返回"
+		"goBack": "返回",
+		"preimageHash": "原像哈希",
+		"preimageLength": "原像长度",
+		"preimageHashDescription": "输入原像哈希以创建提案"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",

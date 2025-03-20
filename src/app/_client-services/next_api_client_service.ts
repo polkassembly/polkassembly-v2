@@ -5,7 +5,6 @@
 /* eslint-disable lines-between-class-members */
 
 import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EPostOrigin,
@@ -280,7 +279,7 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
-		const response = await fetchPF(url, {
+		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {

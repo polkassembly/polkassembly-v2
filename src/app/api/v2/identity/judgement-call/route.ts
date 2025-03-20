@@ -12,7 +12,6 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 
 const zodParamsSchema = z.object({
@@ -40,7 +39,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR);
 	}
 
-	const res = await fetchPF(REQUEST_JUDGEMENT_CF_URL, {
+	const res = await fetch(REQUEST_JUDGEMENT_CF_URL, {
 		body: JSON.stringify({ identityHash, network, userAddress }),
 		headers: {
 			Authorization: `${IDENTITY_JUDGEMENT_AUTH}`,
