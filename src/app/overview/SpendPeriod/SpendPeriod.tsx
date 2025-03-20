@@ -88,7 +88,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice?: string }) {
 		})();
 	}, [apiService]);
 
-	const showDays = spendPeriod?.value?.days !== undefined;
+	const showDays = spendPeriod?.value?.days !== undefined && spendPeriod?.value?.days !== 0;
 	const showHours = spendPeriod?.value?.hours !== undefined;
 	const showMinutes = spendPeriod?.value?.minutes !== undefined && spendPeriod?.value?.days === 0;
 	const showValueUSD = nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '';

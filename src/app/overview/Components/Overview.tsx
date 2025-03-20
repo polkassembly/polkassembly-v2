@@ -47,7 +47,7 @@ function Overview({
 			<h1 className={styles.overview_title}>{t('overview')}</h1>
 
 			{/* About Section */}
-			<div className='border-none bg-bg_modal p-4 shadow-lg'>
+			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 				<div className='p-3'>
 					<div className='flex items-center justify-between'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>{t('about')}</p>
@@ -66,7 +66,7 @@ function Overview({
 
 			{/* Treasury and Spend Period */}
 			<div className='mt-6 grid gap-4 lg:grid-cols-2'>
-				<div className='border-none bg-bg_modal p-4 shadow-lg'>
+				<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 					<div className='p-3'>
 						<p className='text-sm text-wallet_btn_text'>
 							{t('treasury')} <MdInfoOutline className='inline-block text-lg' />
@@ -76,7 +76,7 @@ function Overview({
 						</div>
 					</div>
 				</div>
-				{tokenPrice && <SpendPeriod tokenPrice={tokenPrice} />}
+				<SpendPeriod tokenPrice={tokenPrice} />
 			</div>
 
 			{/* Latest Activity */}
