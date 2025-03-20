@@ -650,11 +650,15 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "プレイメージを作成",
-		"createTreasuryProposal": "トレジャリー提案を作成 (ネイティブ)",
-		"usdxProposal": "USDxトレジャリー提案を作成 (アセットハブ)",
+		"existingPreimage": "既存のプレイメージがある",
+		"createTreasuryProposal": "トレジャリー提案を作成（ネイティブ）",
+		"usdxProposal": "USDxトレジャリー提案を作成（Assethub）",
 		"cancelReferendum": "レファレンダムをキャンセル",
-		"killReferendum": "レファレンダムを強制終了",
-		"goBack": "戻る"
+		"killReferendum": "レファレンダムを終了",
+		"goBack": "戻る",
+		"preimageHash": "プレイメージハッシュ",
+		"preimageLength": "プレイメージ長",
+		"preimageHashDescription": "提案を作成するためのプレイメージハッシュを入力してください"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",

@@ -649,12 +649,16 @@
 		"proposals": "Propuestas"
 	},
 	"CreateProposal": {
-		"createPreimage": "Crear Preimagen",
+		"createPreimage": "Crear Preimage",
+		"existingPreimage": "Ya tiene un Preimage",
 		"createTreasuryProposal": "Crear Propuesta de Tesorería (Nativa)",
 		"usdxProposal": "Crear Propuesta de Tesorería USDx (Assethub)",
 		"cancelReferendum": "Cancelar un Referéndum",
 		"killReferendum": "Terminar un Referéndum",
-		"goBack": "Volver"
+		"goBack": "Volver",
+		"preimageHash": "Hash del Preimage",
+		"preimageLength": "Longitud del Preimage",
+		"preimageHashDescription": "Ingrese el hash del preimage para crear una propuesta"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",

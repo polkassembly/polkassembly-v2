@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWeb3LoginScreens } from '@/_shared/types';
+import { EWeb3LoginScreens, NotificationType } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -22,6 +22,7 @@ import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { WalletIcon } from '@/app/_shared-components/WalletsUI/WalletsIcon';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
+import { useToast } from '@/hooks/useToast';
 import classes from './Web3Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -42,6 +43,8 @@ function Web3Login({
 }) {
 	const router = useRouter();
 	const t = useTranslations();
+
+	const { toast } = useToast();
 
 	const { userPreferences } = useUserPreferences();
 
@@ -101,14 +104,20 @@ function Web3Login({
 				setUser(accessTokenPayload);
 
 				if (nextUrl) {
-					router.replace(`/${nextUrl}`);
+					const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
+					router.replace(`/${url}`);
 				} else {
 					router.back();
-					setLoading(false);
 				}
 			}
 		} catch {
-			// TODO: show notification
+			// TODO: add to language files
+			toast({
+				status: NotificationType.ERROR,
+				title: t('Login.loginFailed')
+			});
+		} finally {
+			setLoading(false);
 		}
 	};
 
