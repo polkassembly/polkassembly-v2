@@ -16,13 +16,13 @@ interface BlockToTimeParams {
 }
 
 export const blockToDays = ({ blocks, network }: BlockToDaysParams): number => {
-	const { blockTime } = NETWORKS_DETAILS[network as ENetwork];
+	const { blockTime } = NETWORKS_DETAILS[network];
 	const timeInMs = blocks * blockTime;
 	return Math.ceil(timeInMs / (1000 * 60 * 60 * 24));
 };
 
 export const blockToTime = ({ blocks, network }: BlockToTimeParams) => {
-	const { blockTime } = NETWORKS_DETAILS[network as ENetwork];
+	const { blockTime } = NETWORKS_DETAILS[network];
 	const timeInMs = blocks * blockTime;
 	return { time: timeInMs };
 };

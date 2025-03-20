@@ -118,7 +118,7 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 			</div>
 
 			{isLoading && (
-				<div className={styles.loading_container}>
+				<div className='relative'>
 					<LoadingLayover />
 				</div>
 			)}
@@ -174,5 +174,4 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 		</div>
 	);
 }
-
 export default Calendar;
