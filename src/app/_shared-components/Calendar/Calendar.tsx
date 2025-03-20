@@ -50,7 +50,6 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 		onMonthChange(newDate);
 	};
 
-	// Custom day content renderer that integrates with cellRender
 	const renderDay = (date: Date) => {
 		const isSelected = date.toDateString() === selectedDate.toDateString();
 		const customContent = cellRender(date);

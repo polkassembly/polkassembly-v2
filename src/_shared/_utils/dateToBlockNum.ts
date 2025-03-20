@@ -4,7 +4,6 @@
 
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { NETWORKS_DETAILS } from '../_constants/networks';
-import { ENetwork } from '../types';
 
 interface Args {
 	network: string;
@@ -14,7 +13,7 @@ interface Args {
 
 const dateToBlockNum = ({ network, currentBlockNumber, date }: Args) => {
 	if (!currentBlockNumber || !date || !network) return null;
-	const blockTime = NETWORKS_DETAILS?.[network as ENetwork]?.blockTime;
+	const blockTime = NETWORKS_DETAILS?.[network as keyof typeof NETWORKS_DETAILS]?.blockTime;
 	const blockTimeSeconds: number = blockTime / 1000;
 
 	if (isNaN(blockTimeSeconds)) return null;
