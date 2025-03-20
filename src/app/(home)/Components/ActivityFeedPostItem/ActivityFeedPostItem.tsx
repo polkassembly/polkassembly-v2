@@ -24,7 +24,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { usePostReactions } from '@/hooks/usePostReactions';
+import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
@@ -40,12 +40,14 @@ function ActivityFeedPostItem({
 	postData,
 	voteButton = true,
 	commentBox = true,
-	preventClick
+	preventClick,
+	onUnsubscribe
 }: {
 	postData: IPostListing;
 	voteButton?: boolean;
 	commentBox?: boolean;
 	preventClick?: boolean;
+	onUnsubscribe?: (postId: string | number) => void;
 }) {
 	const { user } = useUser();
 	const router = useRouter();
@@ -58,12 +60,11 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const isSubscribed = !!postData?.userSubscriptionId || isInSubscriptionTab;
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe } = usePostReactions({
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
-		isSubscribed
+		isSubscribed: !!postData?.userSubscriptionId || isInSubscriptionTab
 	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -73,6 +74,18 @@ function ActivityFeedPostItem({
 			router.push('/login');
 		} else {
 			setIsDialogOpen(true);
+		}
+	};
+
+	const handleSubscribeClick = async () => {
+		try {
+			const result = (await handleSubscribe()) as SubscriptionResult;
+
+			if (isInSubscriptionTab && result.wasUnsubscribed && !result.error) {
+				onUnsubscribe?.(postData?.index || postData?.hash || '');
+			}
+		} catch (error) {
+			console.error('Error handling subscription:', error);
 		}
 	};
 
@@ -247,7 +260,7 @@ function ActivityFeedPostItem({
 						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}
 						isSubscribed={isSubscribed}
-						handleSubscribe={handleSubscribe}
+						handleSubscribe={handleSubscribeClick}
 					/>
 
 					<CommentInput

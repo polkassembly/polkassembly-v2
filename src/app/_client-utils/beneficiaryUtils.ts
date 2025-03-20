@@ -3,15 +3,15 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { IBeneficiary, ENetwork } from '@/_shared/types';
+import { IBeneficiaryInput, ENetwork } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 
-export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiary[] | undefined | null, network: ENetwork): Record<string, BN> => {
+export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiaryInput[] | undefined | null, network: ENetwork): Record<string, BN> => {
 	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network as ENetwork]) {
 		return {};
 	}
 
-	return beneficiaries.reduce((acc: Record<string, BN>, curr: IBeneficiary) => {
+	return beneficiaries.reduce((acc: Record<string, BN>, curr: IBeneficiaryInput) => {
 		if (!curr) return acc;
 
 		const assetId = curr.assetId || NETWORKS_DETAILS[network as ENetwork].tokenSymbol;

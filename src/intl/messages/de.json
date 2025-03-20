@@ -650,11 +650,15 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Preimage erstellen",
-		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Nativ)",
+		"existingPreimage": "Bereits ein Preimage vorhanden",
+		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Native)",
 		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
-		"goBack": "Zurück"
+		"goBack": "Zurück",
+		"preimageHash": "Preimage-Hash",
+		"preimageLength": "Preimage-Länge",
+		"preimageHashDescription": "Geben Sie den Preimage-Hash ein, um einen Vorschlag zu erstellen"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -670,7 +674,11 @@
 		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
 		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
 		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
-		"selectTrack": "Track auswählen"
+		"selectTrack": "Track auswählen",
+		"validFrom": "Gültig ab",
+		"addValidFrom": "Gültig ab hinzufügen",
+		"invalidBlockHeight": "Bitte geben Sie eine gültige Blockhöhe ein",
+		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
 	},
 	"CreatePreimage": {
 		"addItem": "Element hinzufügen",
@@ -695,5 +703,8 @@
 		"referendumId": "Referendum-ID",
 		"referendumIdDescription": "Geben Sie die Referendum-ID zum Abbrechen ein",
 		"thisReferendumIsNotOngoing": "Dieses Referendum läuft nicht"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Der Wert ist zu groß"
 	}
 }
