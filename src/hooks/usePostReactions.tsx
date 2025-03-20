@@ -16,6 +16,12 @@ interface IPostData {
 	isSubscribed?: boolean;
 }
 
+export interface SubscriptionResult {
+	isSubscribed: boolean;
+	wasUnsubscribed: boolean;
+	error?: boolean;
+}
+
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
@@ -106,7 +112,7 @@ export const usePostReactions = (postData: IPostData) => {
 		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
 	);
 
-	const handleSubscribe = useCallback(async () => {
+	const handleSubscribe = async (): Promise<SubscriptionResult> => {
 		if (!postData?.indexOrHash) {
 			throw new ClientError('Index or hash is required');
 		}
@@ -124,15 +130,24 @@ export const usePostReactions = (postData: IPostData) => {
 			} else {
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			}
+			return {
+				isSubscribed: !isSubscribed,
+				wasUnsubscribed: isSubscribed
+			};
 		} catch (error) {
-			setIsSubscribed((prevIsSubscribed) => !prevIsSubscribed);
+			setIsSubscribed(isSubscribed);
 			toast({
 				title: 'Failed to update subscription',
 				status: NotificationType.ERROR
 			});
 			console.error('Failed to update subscription:', error);
+			return {
+				isSubscribed,
+				wasUnsubscribed: false,
+				error: true
+			};
 		}
-	}, [isSubscribed, subscriptionParams, postData?.indexOrHash, toast]);
+	};
 
 	return {
 		reactionState,

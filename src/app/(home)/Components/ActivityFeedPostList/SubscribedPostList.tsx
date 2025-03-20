@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_LISTING_LIMIT, STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { useTranslations } from 'next-intl';
@@ -16,10 +16,21 @@ import { useUser } from '@/hooks/useUser';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 
+interface QueryData {
+	pages: {
+		items: IPostListing[];
+		totalCount: number;
+		page: number;
+	}[];
+	pageParams: number[];
+}
+
 function SubscribedPostList({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const t = useTranslations();
 	const observerTarget = useRef<HTMLDivElement>(null);
 	const [reachedEnd, setReachedEnd] = useState(false);
+	const [localPosts, setLocalPosts] = useState<IPostListing[]>([]);
+	const queryClient = useQueryClient();
 
 	const { user } = useUser();
 
@@ -28,6 +39,28 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	if (!userId) {
 		throw new ClientError('User not found');
 	}
+
+	const handleUnsubscribe = (postId: string | number) => {
+		setLocalPosts((prevPosts) =>
+			prevPosts.filter((post) => {
+				const postIdentifier = post.index || post.hash || '';
+				return postIdentifier.toString() !== postId.toString();
+			})
+		);
+		queryClient.setQueryData<QueryData>(['subscribedActivityFeed', userId], (oldData) => {
+			if (!oldData) return oldData;
+			return {
+				...oldData,
+				pages: oldData.pages.map((page) => ({
+					...page,
+					items: page.items.filter((post) => {
+						const postIdentifier = post.index || post.hash || '';
+						return postIdentifier.toString() !== postId.toString();
+					})
+				}))
+			};
+		});
+	};
 
 	const getSubscribedActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
 		const { data, error } = await NextApiClientService.getSubscribedActivityFeed({ page: pageParam, limit: DEFAULT_LISTING_LIMIT, userId });
@@ -70,7 +103,10 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		enabled: !!userId
 	});
 
-	const allPosts = data?.pages?.flatMap((page) => page?.items || []).filter((post): post is IPostListing => post !== undefined);
+	useEffect(() => {
+		const posts = data?.pages?.flatMap((page) => page?.items || []).filter((post): post is IPostListing => post !== undefined) || [];
+		setLocalPosts(posts);
+	}, [data]);
 
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};
@@ -103,7 +139,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	return (
 		<div className='pb-10'>
-			{allPosts?.length === 0 ? (
+			{localPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={NoActivity}
@@ -122,10 +158,11 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 				</div>
 			) : (
 				<div className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
-					{allPosts?.map((post: IPostListing) => (
+					{localPosts?.map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}
+							onUnsubscribe={handleUnsubscribe}
 						/>
 					))}
 					{isFetching && !reachedEnd && (
