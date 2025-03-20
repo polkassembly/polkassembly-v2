@@ -247,6 +247,7 @@
 		"Referenda": "Referenda"
 	},
 	"ListingPage": {
+		"AllProposals": "All Referenda",
 		"AuctionAdmin": "Auction Admin",
 		"AuctionAdminDescription": "Origin for starting auctions.",
 		"BigSpender": "Big Spender",

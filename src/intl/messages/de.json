@@ -247,6 +247,7 @@
 		"Referenda": "Referenden"
 	},
 	"ListingPage": {
+		"AllProposals": "Alle Referenden",
 		"AuctionAdmin": "Auktions-Administrator",
 		"AuctionAdminDescription": "Ursprung für das Starten von Auktionen.",
 		"BigSpender": "Großausgeber",
