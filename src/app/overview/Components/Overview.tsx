@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { MdInfoOutline } from 'react-icons/md';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork, EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Address from '@ui/Profile/Address/Address';
 import { useRouter } from 'next/navigation';
 import StatusTag from '@ui/StatusTag/StatusTag';
@@ -98,7 +98,7 @@ function Overview({
 						>
 							{t('discussion')} <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
 						</TabsTrigger>
-						{Object.keys(NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {}).map((key) => (
+						{Object.keys(NETWORKS_DETAILS[network]?.trackDetails || {}).map((key) => (
 							<TabsTrigger
 								showBorder
 								className={styles.tabTrigger}

@@ -154,7 +154,7 @@ function SpendPeriod({ tokenPrice }: { tokenPrice?: string }) {
 								<p className='text-xs text-wallet_btn_text'>{t('nextBurn')}</p>
 								<div className='flex items-center gap-2'>
 									<p className={styles.next_burn}>
-										{nextBurn.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}</span>
+										{nextBurn.value} <span className='text-base text-input_text'>{NETWORKS_DETAILS[network].tokenSymbol}</span>
 									</p>
 									{showValueUSD && <p className={styles.next_burn_usd}>~ ${nextBurn.valueUSD}</p>}
 								</div>
