@@ -93,6 +93,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 						walletAddressName=''
 						redirectToProfile={false}
 						iconSize={20}
+						disableTooltip
 					/>
 					<Button
 						onClick={() => {
@@ -137,6 +138,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 									address={account.address}
 									walletAddressName={account.name}
 									redirectToProfile={false}
+									disableTooltip
 								/>
 							</button>
 						))

@@ -136,52 +136,67 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 		}
 	}, [currentUser, isFollowing, router, followUser, unfollowUser]);
 
-	const isInitialLoading = isUserDataLoading || isFollowingLoading || isFollowersLoading;
-	const hasUserData = !!userData;
-	const hasValidStats = userData?.id && (stats.followers !== undefined || stats.following !== undefined);
-
-	if (isInitialLoading) {
-		return <Skeleton className='h-48 w-auto' />;
-	}
+	const isStatsLoading = isFollowingLoading || isFollowersLoading;
 
 	return (
 		<div>
-			<ProfileImage imageUrl={userData?.profileDetails?.image} />
+			{isUserDataLoading ? <Skeleton className='mx-auto h-12 w-12 rounded-full' /> : <ProfileImage imageUrl={userData?.profileDetails?.image} />}
 			<div className={classes.tooltipContentWrapper}>
 				<div className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'>
 					<div className='flex flex-col gap-1.5 px-4'>
-						<AddressDisplay
-							address={address}
-							identity={identity}
-							displayText={displayText}
-							userProfileUrl={userProfileUrl}
-							onCopy={copyToClipboard}
-						/>
-						{hasUserData && userData.createdAt && (
-							<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
-								{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
-							</span>
+						{isUserDataLoading ? (
+							<Skeleton className='mb-1 h-6 w-40' />
+						) : (
+							<AddressDisplay
+								address={address}
+								identity={identity}
+								displayText={displayText}
+								userProfileUrl={userProfileUrl}
+								onCopy={copyToClipboard}
+							/>
 						)}
+
+						{isUserDataLoading ? (
+							<Skeleton className='h-4 w-32' />
+						) : (
+							userData?.createdAt && (
+								<span className='flex items-center text-xs tracking-wide text-address_tooltip_text'>
+									{t('Profile.since')}: <span className='ml-0.5 text-text_primary'>{dayjs(userData.createdAt).format('MMM DD, YYYY')}</span>
+								</span>
+							)
+						)}
+
 						<div className='flex items-center justify-between'>
-							{hasValidStats && (
-								<UserStats
-									followers={stats.followers}
-									following={stats.following}
-								/>
+							{isStatsLoading ? (
+								<Skeleton className='h-4 w-24' />
+							) : (
+								userData?.id &&
+								(stats.followers !== undefined || stats.following !== undefined) && (
+									<UserStats
+										followers={stats.followers}
+										following={stats.following}
+									/>
+								)
 							)}
-							{hasUserData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
+
+							{isUserDataLoading ? <Skeleton className='h-5 w-16' /> : userData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
 						</div>
-						{hasUserData && (
-							<Button
-								size='lg'
-								className='mt-2 rounded-3xl'
-								leftIcon={<ShieldPlus />}
-								isLoading={isActionLoading}
-								onClick={handleButtonClick}
-								disabled={!userData.id || isActionLoading}
-							>
-								{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
-							</Button>
+
+						{isUserDataLoading ? (
+							<Skeleton className='mt-2 h-10 w-full rounded-3xl' />
+						) : (
+							userData && (
+								<Button
+									size='lg'
+									className='mt-2 rounded-3xl'
+									leftIcon={<ShieldPlus />}
+									isLoading={isActionLoading}
+									onClick={handleButtonClick}
+									disabled={!userData.id || isActionLoading}
+								>
+									{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
+								</Button>
+							)
 						)}
 					</div>
 				</div>
