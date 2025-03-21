@@ -6,7 +6,7 @@ import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNum } from '@/_shared/_utils/dateToBlockNum';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, ICalendarEvent } from '@/_shared/types';
@@ -16,6 +16,7 @@ import type { Dayjs } from 'dayjs';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { cn } from '@/lib/utils';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useQuery } from '@tanstack/react-query';
 import styles from '../Overview.module.scss';
 
@@ -59,9 +60,16 @@ export default function CalendarEvents() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [selectedDate, setSelectedDate] = useState(new Date());
+	const [eventsData, setEventsData] = useState<Record<string, ICalendarEvent[]>>({});
 	const t = useTranslations('Overview');
 
-	// Function to calculate block numbers for a given date range
+	const currentYear = selectedDate.getFullYear();
+	const currentMonth = selectedDate.getMonth();
+
+	const monthKey = useMemo(() => {
+		return dayjs(new Date(currentYear, currentMonth, 1)).format('YYYY-MM');
+	}, [currentYear, currentMonth]);
+
 	const getBlockNumbers = useCallback(
 		async (startDate: Date, endDate: Date) => {
 			const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
@@ -88,47 +96,57 @@ export default function CalendarEvents() {
 		},
 		[apiService, network]
 	);
-	const { data: monthlyEvents = {}, isLoading } = useQuery({
-		queryKey: ['calendarEvents', selectedDate.getFullYear(), selectedDate.getMonth()],
-		queryFn: async () => {
-			const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-			const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
 
-			const { startBlockNo, endBlockNo } = await getBlockNumbers(startOfMonth, endOfMonth);
+	const fetchCalendarEvents = useCallback(async () => {
+		const startOfMonth = new Date(currentYear, currentMonth, 1);
+		const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+		const { startBlockNo, endBlockNo } = await getBlockNumbers(startOfMonth, endOfMonth);
+		if (!startBlockNo || !endBlockNo) return null;
 
-			if (!startBlockNo || !endBlockNo) return {};
-			const { data, error } = await NextApiClientService.getCalendarEvents({
-				endBlockNo,
-				startBlockNo
-			});
+		const response = await NextApiClientService.getCalendarEvents({
+			endBlockNo,
+			startBlockNo
+		});
+		if (response.error) return null;
+		return Array.isArray(response.data) ? response.data : [];
+	}, [currentYear, currentMonth, getBlockNumbers]);
 
-			if (error) {
-				console.error('Error fetching calendar events:', error);
-				return {};
-			}
-			const monthKey = dayjs(startOfMonth).format('YYYY-MM');
-			return { [monthKey]: data || [] };
-		},
-		staleTime: 1000 * 60 * 5,
-		enabled: true
+	const { data: fetchedEvents, isFetching } = useQuery({
+		queryKey: ['calendarEvents', currentYear, currentMonth],
+		queryFn: fetchCalendarEvents,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!apiService
 	});
+
+	useEffect(() => {
+		if (fetchedEvents) {
+			setEventsData((prevData) => ({
+				...prevData,
+				[monthKey]: fetchedEvents
+			}));
+		}
+	}, [fetchedEvents, monthKey]);
 
 	const handleMonthChange = (date: Date) => {
 		setSelectedDate(date);
 	};
 
 	const getDateHasEvent = (value: Dayjs): boolean => {
-		const monthKey = value.format('YYYY-MM');
+		const dateMonthKey = value.format('YYYY-MM');
 		const exactDate = value.format(DATE_FORMAT);
-
-		return monthlyEvents[monthKey]?.some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || false;
+		if (!eventsData[dateMonthKey]) {
+			return false;
+		}
+		return eventsData[dateMonthKey].some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate);
 	};
 
 	const getEventData = (value: Dayjs): ICalendarEvent[] => {
-		const monthKey = value.format('YYYY-MM');
+		const dateMonthKey = value.format('YYYY-MM');
 		const exactDate = value.format(DATE_FORMAT);
-
-		return monthlyEvents[monthKey]?.filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || [];
+		if (!eventsData[dateMonthKey]) {
+			return [];
+		}
+		return eventsData[dateMonthKey].filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate);
 	};
 
 	const dateCellRender = (value: Date | undefined) => {
@@ -179,14 +197,14 @@ export default function CalendarEvents() {
 							cellRender={dateCellRender}
 							selectedDate={selectedDate}
 							setSelectedDate={setSelectedDate}
-							isLoading={isLoading}
+							isLoading={isFetching}
 							onMonthChange={handleMonthChange}
 						/>
 						<p className='mt-4 text-xs text-text_grey'>{t('*DateTimeinUTC')}</p>
 					</div>
 				</div>
 				<div className='my-3 w-full xl:mt-5 xl:h-[400px] xl:w-[50%] xl:pl-8'>
-					{isLoading ? (
+					{isFetching ? (
 						<div className='relative'>
 							<LoadingLayover />
 						</div>
