@@ -12,12 +12,12 @@ import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import { MessageCircleWarning } from 'lucide-react';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
-import BlockEditor from '../../BlockEditor/BlockEditor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
 import classes from './WritePost.module.scss';
+import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostFormFields>; disabled?: boolean }) {
 	const t = useTranslations();
@@ -84,9 +84,9 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					<FormItem>
 						<FormLabel>{t('Create.description')}*</FormLabel>
 						<FormControl>
-							<BlockEditor
+							<MarkdownEditor
+								markdown={field.value}
 								className={classes.editor}
-								id='write-post-editor'
 								onChange={(data) => {
 									field.onChange(data);
 								}}

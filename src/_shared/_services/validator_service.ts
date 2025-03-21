@@ -12,7 +12,6 @@ import { ELocales, ENetwork, EOffChainPostTopic, EProposalType, ETheme, EVoteDec
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
-import { OutputData } from '@editorjs/editorjs';
 import { BN, isHex } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '../_constants/networks';
 
@@ -218,11 +217,6 @@ export class ValidatorService {
 		if (mightBePlainText && indicators < 2) return false;
 
 		return indicators >= options.minIndicators;
-	}
-
-	// TODO: Add more checks for the content
-	static isValidBlockContent(content: OutputData): boolean {
-		return content.blocks.length > 0;
 	}
 
 	static isValidNumber(number: unknown): boolean {
