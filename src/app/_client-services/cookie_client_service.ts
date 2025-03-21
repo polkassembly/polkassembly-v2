@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECookieNames, ETheme, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
+import { ECookieNames, ELocales, ETheme, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
 
@@ -49,5 +49,17 @@ export class CookieClientService {
 
 	static setThemeCookie(theme: ETheme) {
 		this.setCookieInClient(ECookieNames.THEME, theme);
+	}
+
+	static getThemeCookie() {
+		return this.getCookieInClient(ECookieNames.THEME);
+	}
+
+	static setLocaleCookie(locale: ELocales) {
+		this.setCookieInClient(ECookieNames.LOCALE, locale);
+	}
+
+	static getLocaleCookie() {
+		return this.getCookieInClient(ECookieNames.LOCALE);
 	}
 }

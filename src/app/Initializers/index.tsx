@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
+import { ELocales, ETheme, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -149,8 +149,8 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	useEffect(() => {
 		setUserPreferences({
 			...userPreferences,
-			locale: userPreferences.locale,
-			theme: userPreferences.theme,
+			locale: (CookieClientService.getLocaleCookie() as ELocales) || userPreferences.locale,
+			theme: (CookieClientService.getThemeCookie() as ETheme) || userPreferences.theme,
 			...(user?.loginAddress
 				? {
 						address: {
@@ -161,9 +161,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			wallet: user?.loginWallet
 		});
 
-		dayjs.locale(userPreferences.locale);
+		dayjs.locale((CookieClientService.getLocaleCookie() as ELocales) || userPreferences.locale);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
+	}, [user?.loginWallet]);
 
 	// set user
 	useEffect(() => {

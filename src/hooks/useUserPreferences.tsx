@@ -20,6 +20,7 @@ export const useUserPreferences = () => {
 			setTheme(preferences.theme);
 			setUserPreferences(preferences);
 			CookieClientService.setThemeCookie(preferences.theme);
+			CookieClientService.setLocaleCookie(preferences.locale);
 		},
 		[setUserPreferences, setTheme]
 	);
