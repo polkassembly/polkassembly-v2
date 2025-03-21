@@ -25,8 +25,6 @@ const zodParamsSchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
-	console.log('getting vote cart', id);
-
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
