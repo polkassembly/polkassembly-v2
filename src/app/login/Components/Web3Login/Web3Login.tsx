@@ -4,7 +4,6 @@
 
 'use client';
 
-import { EWeb3LoginScreens } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -16,30 +15,12 @@ import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useWalletService } from '@/hooks/useWalletService';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
-import FetchAccountsConfirmation from '@/app/_shared-components/FetchAccountsConfirmation/FetchAccountsConfirmation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { WalletIcon } from '@/app/_shared-components/WalletsUI/WalletsIcon';
-import { WalletClientService } from '@/app/_client-services/wallet_service';
 import classes from './Web3Login.module.scss';
-import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
-function Web3Login({
-	switchToWeb2,
-	switchToSignup,
-	onWalletChange,
-	onTfaEnabled,
-	web3Screen,
-	onChangeWeb3LoginScreen
-}: {
-	switchToWeb2: () => void;
-	switchToSignup: () => void;
-	onWalletChange: () => void;
-	onTfaEnabled: (token: string) => void;
-	web3Screen: EWeb3LoginScreens;
-	onChangeWeb3LoginScreen: (screen: EWeb3LoginScreens) => void;
-}) {
+function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {
 	const router = useRouter();
 	const t = useTranslations();
 
@@ -114,64 +95,34 @@ function Web3Login({
 
 	return (
 		<div className='w-full'>
-			{web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && userPreferences.wallet ? (
-				<div>
-					<p className={classes.addressHeader}>
-						<WalletIcon wallet={userPreferences.wallet} />
-						<span className={classes.walletName}>{WalletClientService.getWalletNameLabel(userPreferences.wallet)}</span>
-					</p>
-					<AddressDropdown />
-				</div>
-			) : web3Screen === EWeb3LoginScreens.FETCH_CONFIRMATION && userPreferences.wallet ? (
-				<FetchAccountsConfirmation
-					goBack={() => onChangeWeb3LoginScreen(EWeb3LoginScreens.SELECT_WALLET)}
-					switchToSignup={switchToSignup}
-					onConfirm={() => onChangeWeb3LoginScreen(EWeb3LoginScreens.SELECT_ADDRESS)}
-				/>
-			) : (
-				<WalletButtons
-					onWalletChange={() => {
-						onWalletChange();
-						onChangeWeb3LoginScreen(EWeb3LoginScreens.FETCH_CONFIRMATION);
-					}}
-				/>
-			)}
+			<div className='flex flex-col gap-y-4'>
+				<WalletButtons small />
+				<AddressDropdown />
+			</div>
 
 			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 			<div>
-				{userPreferences?.address?.address && web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && (
-					<div className={classes.footer}>
-						<Button
-							isLoading={loading}
-							onClick={handleLogin}
-							size='lg'
-							className={classes.loginButton}
-						>
-							{t('Profile.login')}
-						</Button>
-					</div>
-				)}
-				{web3Screen === EWeb3LoginScreens.SELECT_WALLET && (
-					<div className={classes.switchToWeb2}>
-						Or
-						<Button
-							variant='ghost'
-							className='px-0 text-text_pink'
-							onClick={switchToWeb2}
-						>
-							{t('Profile.loginwithusername')}
-						</Button>
-					</div>
-				)}
-				{web3Screen === EWeb3LoginScreens.SELECT_ADDRESS && (
-					<SwitchToWeb2Signup
-						className='mt-4 justify-center'
-						switchToSignup={() => {
-							switchToWeb2();
-							switchToSignup();
-						}}
-					/>
-				)}
+				<div className={classes.footer}>
+					<Button
+						isLoading={loading}
+						onClick={handleLogin}
+						size='lg'
+						disabled={!userPreferences?.address?.address || !userPreferences.wallet}
+						className={classes.loginButton}
+					>
+						{t('Profile.login')}
+					</Button>
+				</div>
+				<div className={classes.switchToWeb2}>
+					Or
+					<Button
+						variant='ghost'
+						className='px-0 text-text_pink'
+						onClick={switchToWeb2}
+					>
+						{t('Profile.loginwithusername')}
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

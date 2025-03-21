@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { EWeb3LoginScreens } from '@/_shared/types';
 import Web2Signup from './Web2Signup/Web2Signup';
 import Web2Login from './Web2Login/Web2Login';
 import Web3Login from './Web3Login/Web3Login';
@@ -29,7 +28,6 @@ function Login({ isModal }: { isModal?: boolean }) {
 	}, [router]);
 
 	const [isWeb3Login, setIsWeb3Login] = useState<boolean>(true);
-	const [web3Screen, setWeb3Screen] = useState<EWeb3LoginScreens>(EWeb3LoginScreens.SELECT_WALLET);
 
 	const [isWeb2Signup, setIsWeb2Signup] = useState<boolean>(false);
 
@@ -58,10 +56,6 @@ function Login({ isModal }: { isModal?: boolean }) {
 		setTfaToken(token);
 	};
 
-	const onChangeWeb3LoginScreen = (screen: EWeb3LoginScreens) => {
-		setWeb3Screen(screen);
-	};
-
 	return (
 		<>
 			{!isModal && (
@@ -84,24 +78,18 @@ function Login({ isModal }: { isModal?: boolean }) {
 					<Web2Signup
 						onWalletChange={() => {
 							switchToWeb3Login();
-							setWeb3Screen(EWeb3LoginScreens.FETCH_CONFIRMATION);
 						}}
 						switchToLogin={switchToWeb2Login}
 					/>
 				) : isWeb3Login ? (
 					<Web3Login
-						onWalletChange={switchToWeb3Login}
 						switchToWeb2={switchToWeb2Login}
-						switchToSignup={switchToWeb2Signup}
 						onTfaEnabled={onTfaEnabled}
-						web3Screen={web3Screen}
-						onChangeWeb3LoginScreen={onChangeWeb3LoginScreen}
 					/>
 				) : (
 					<Web2Login
 						onWalletChange={() => {
 							switchToWeb3Login();
-							setWeb3Screen(EWeb3LoginScreens.FETCH_CONFIRMATION);
 						}}
 						switchToSignup={switchToWeb2Signup}
 						onTfaEnabled={onTfaEnabled}
