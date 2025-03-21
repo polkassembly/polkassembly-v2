@@ -9,16 +9,14 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { EProposalType, IPostListing } from '@/_shared/types';
-import { OutputData } from '@editorjs/editorjs';
 import { useTranslations } from 'next-intl';
 import Address from '@ui/Profile/Address/Address';
-import dynamic from 'next/dynamic';
 import { FaRegClock } from 'react-icons/fa';
 import { Button } from '@ui/Button';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
+import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { MDXEditorMethods } from '@mdxeditor/editor';
 import styles from './CommentModal.module.scss';
-
-const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
 function CommentModal({
 	isDialogOpen,
@@ -34,12 +32,13 @@ function CommentModal({
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
-	const blockEditorActionsRef = useRef<{ clearEditor: () => void } | null>(null);
-	const [content, setContent] = useState<OutputData | null>(null);
+	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
+	const [content, setContent] = useState<string | null>(null);
 	const t = useTranslations();
 
 	const handleCommentClick = async () => {
-		if (!content || !content.blocks || (content as unknown as OutputData).blocks.length === 0) return;
+		if (!content?.trim()) return;
+
 		try {
 			const { data, error } = await CommentClientService.addCommentToPost({
 				proposalType: postData.proposalType as EProposalType,
@@ -56,7 +55,7 @@ function CommentModal({
 			if (data) {
 				setContent(null);
 				setIsDialogOpen(false);
-				blockEditorActionsRef.current?.clearEditor?.();
+				markdownEditorRef.current?.setMarkdown('');
 				onCommentAdded();
 			}
 		} catch {
@@ -111,12 +110,12 @@ function CommentModal({
 									</span>
 									<span className='text-xs text-text_pink'>{t('ActivityFeed.PostItem.commentingOnProposal')}</span>
 									<div className='w-full pt-5'>
-										<BlockEditor
+										<MarkdownEditor
+											markdown={content || ''}
 											onChange={(data) => {
 												setContent(data);
 											}}
-											id='new-comment'
-											ref={blockEditorActionsRef}
+											ref={markdownEditorRef}
 										/>
 									</div>
 								</div>

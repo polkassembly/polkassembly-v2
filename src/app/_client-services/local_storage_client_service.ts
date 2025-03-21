@@ -2,10 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import { OutputData } from '@editorjs/editorjs';
-import { deepParseJson } from 'deep-parse-json';
-
 enum ELocalStorageKeys {
 	DISCUSSION_POST_DATA = 'DPD',
 	COMMENT_DATA = 'CDT',
@@ -37,17 +33,12 @@ export class LocalStorageClientService {
 	}
 
 	// Discussion Post Data
-	static setDiscussionPostData({ data }: { data: OutputData }) {
-		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA](), JSON.stringify(data));
+	static setDiscussionPostData({ data }: { data: string }) {
+		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA](), data);
 	}
 
 	static getDiscussionPostData() {
-		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA]());
-		const parsedData = data ? deepParseJson(data) : null;
-		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
-			return parsedData as OutputData;
-		}
-		return null;
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA]()) || '';
 	}
 
 	static deleteDiscussionPostData() {
@@ -55,17 +46,12 @@ export class LocalStorageClientService {
 	}
 
 	// Comment Data
-	static setCommentData({ postId, parentCommentId, data }: { postId: string; parentCommentId?: string; data: OutputData }) {
-		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId), JSON.stringify(data));
+	static setCommentData({ postId, parentCommentId, data }: { postId: string; parentCommentId?: string; data: string }) {
+		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId), data);
 	}
 
 	static getCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
-		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId));
-		const parsedData = data ? deepParseJson(data) : null;
-		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
-			return parsedData as OutputData;
-		}
-		return null;
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId)) || '';
 	}
 
 	static deleteCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
@@ -73,17 +59,12 @@ export class LocalStorageClientService {
 	}
 
 	// Edit Post Data
-	static setEditPostData({ postId, data }: { postId: string; data: OutputData }) {
-		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId), JSON.stringify(data));
+	static setEditPostData({ postId, data }: { postId: string; data: string }) {
+		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId), data);
 	}
 
 	static getEditPostData({ postId }: { postId: string }) {
-		const data = this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId));
-		const parsedData = data ? deepParseJson(data) : null;
-		if (parsedData && ValidatorService.isValidBlockContent(parsedData)) {
-			return parsedData as OutputData;
-		}
-		return null;
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId)) || '';
 	}
 
 	static deleteEditPostData({ postId }: { postId: string }) {

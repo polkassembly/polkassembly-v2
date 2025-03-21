@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { OutputData } from '@editorjs/editorjs';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
@@ -352,9 +351,7 @@ export interface IOffChainPost {
 	hash?: string;
 	userId?: number;
 	title?: string;
-	content?: OutputData;
-	htmlContent: string;
-	markdownContent: string;
+	content: string;
 	createdAt?: Date;
 	updatedAt?: Date;
 	tags?: ITag[];
@@ -589,9 +586,7 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: OutputData;
-	htmlContent: string;
-	markdownContent: string;
+	content: string;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;
@@ -898,7 +893,7 @@ export enum EEnactment {
 
 export interface IWritePostFormFields {
 	title: string;
-	description: OutputData;
+	description: string;
 	tags: ITag[];
 	topic: EOffChainPostTopic;
 	allowedCommentor: EAllowedCommentor;

@@ -3,21 +3,19 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useState } from 'react';
 import { EProposalType, IPostListing } from '@/_shared/types';
-import { OutputData } from '@editorjs/editorjs';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
-import BlockEditor from '../../BlockEditor/BlockEditor';
+import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
-function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: OutputData) => void; onClose?: () => void }) {
+function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: string) => void; onClose?: () => void }) {
 	const t = useTranslations();
 	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
-	const [content, setContent] = useState<OutputData | null>(savedContent || postData?.content || null);
+	const [content, setContent] = useState<string | null>(savedContent || postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -27,7 +25,6 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 		if (
 			!title.trim() ||
 			!content ||
-			!ValidatorService.isValidBlockContent(content) ||
 			!postData?.index ||
 			!postData?.proposalType ||
 			!user ||
@@ -67,9 +64,8 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 			<div>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.content')}</p>
-				<BlockEditor
-					data={postData?.content}
-					id='post-content-edit'
+				<MarkdownEditor
+					markdown={postData?.content}
 					onChange={(data) => {
 						setContent(data);
 						if (postData.index) {
@@ -80,12 +76,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 			</div>
 			<div className='flex justify-end'>
 				<Button
-					disabled={
-						!title.trim() ||
-						!content ||
-						!ValidatorService.isValidBlockContent(content) ||
-						(title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content))
-					}
+					disabled={!title.trim() || !content?.trim() || (title === postData?.title && content?.trim() === postData?.content?.trim())}
 					onClick={editPost}
 					isLoading={isLoading}
 				>

@@ -4,7 +4,6 @@
 
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
-import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
@@ -12,7 +11,6 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import { EAllowedCommentor, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
@@ -103,13 +101,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		content: z.string().min(1, 'Content is required'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
 	});
 
 	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
-
-	const formattedContent = convertContentForFirestoreServer(content);
 
 	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 		await OffChainDbService.UpdateOffChainPost({
@@ -117,7 +113,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			indexOrHash: index,
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content: formattedContent,
+			content,
 			title,
 			allowedCommentor
 		});
@@ -127,7 +123,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			indexOrHash: index,
 			proposalType: proposalType as EProposalType,
 			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content: formattedContent,
+			content,
 			title,
 			allowedCommentor
 		});

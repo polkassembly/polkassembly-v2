@@ -603,10 +603,6 @@
 		"findYourRank": "在生态系统中找到你的排名",
 		"searchUsername": "搜索用户名"
 	},
-	"BlockEditor": {
-		"placeholder": "输入 / 开始",
-		"errorUpdatingContent": "更新内容时出错"
-	},
 	"SetIdentity": {
 		"displayName": "显示名称",
 		"legalName": "法定名称",
