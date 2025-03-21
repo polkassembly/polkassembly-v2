@@ -94,8 +94,11 @@
 	"Profile": {
 		"settings": "設定",
 		"login": "ログイン",
+		"loginFailed": "ログインに失敗しました",
+		"signupFailed": "登録に失敗しました",
+		"noAccessTokenFound": "アクセストークンが見つかりません。",
 		"logout": "ログアウト",
-		"signUp": "登録",
+		"signUp": "新規登録",
 		"dontHaveAnAccount": "アカウントをお持ちでないですか？",
 		"twoFactorAuth": "二要素認証",
 		"twoFactorAuthDescription": "二段階認証アプリまたは拡張機能を開き、Polkassemblyアカウントの認証コードを入力してください。",

@@ -9,7 +9,7 @@ import { useWalletService } from '@/hooks/useWalletService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './WalletButtons.module.scss';
 
-function WalletButtons({ onWalletChange, small }: { onWalletChange?: (wallet: EWallet | null) => void; small?: boolean }) {
+function WalletButtons({ onWalletChange, small, noPreference }: { onWalletChange?: (wallet: EWallet | null) => void; small?: boolean; noPreference?: boolean }) {
 	const walletService = useWalletService();
 	const availableWallets = walletService?.getInjectedWallets();
 
@@ -38,6 +38,7 @@ function WalletButtons({ onWalletChange, small }: { onWalletChange?: (wallet: EW
 						onClick={onWalletChange}
 						label={WalletClientService.getWalletNameLabel(wallet)}
 						small={small}
+						noPreference={noPreference}
 					/>
 				);
 			})}

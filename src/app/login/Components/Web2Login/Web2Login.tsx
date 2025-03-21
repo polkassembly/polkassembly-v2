@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWallet } from '@/_shared/types';
+import { EWallet, NotificationType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { Input } from '@ui/Input';
@@ -18,6 +18,7 @@ import ErrorMessage from '@ui/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
+import { useToast } from '@/hooks/useToast';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -49,10 +50,16 @@ function Web2Login({
 
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
+	const { toast } = useToast();
+
 	const handleLogin = async (values: IFormFields) => {
 		const { emailOrUsername, password } = values;
 
-		if (emailOrUsername && password) {
+		if (!emailOrUsername || !password) {
+			return;
+		}
+
+		try {
 			setLoading(true);
 
 			const { data, error } = await AuthClientService.web2Login({
@@ -76,7 +83,7 @@ function Web2Login({
 				const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
 				if (!accessTokenPayload) {
-					setErrorMessage('No Access token found.');
+					setErrorMessage(t('Profile.noAccessTokenFound'));
 					setLoading(false);
 					return;
 				}
@@ -91,6 +98,12 @@ function Web2Login({
 					router.back();
 				}
 			}
+		} catch {
+			toast({
+				status: NotificationType.ERROR,
+				title: t('Profile.loginFailed')
+			});
+		} finally {
 			setLoading(false);
 		}
 	};
@@ -162,10 +175,11 @@ function Web2Login({
 				</Form>
 			</div>
 			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-			<div className='my-4 flex justify-center text-xs text-border_grey'>{t('Profile.orLoginWith')}</div>
+			<div className='my-4 flex justify-center text-xs text-text_grey'>{t('Profile.orLoginWith')}</div>
 			<WalletButtons
 				small
 				onWalletChange={onWalletChange}
+				noPreference
 			/>
 			<SwitchToWeb2Signup
 				className='mt-4 justify-center'

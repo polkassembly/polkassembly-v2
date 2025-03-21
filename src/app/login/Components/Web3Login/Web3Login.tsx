@@ -64,39 +64,38 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				wallet: userPreferences.wallet
 			});
 
-			if (error) {
-				setErrorMessage(error.message);
+			if (error || !data) {
+				setErrorMessage(error?.message || t('Profile.loginFailed'));
 				setLoading(false);
 				return;
 			}
 
-			if (data) {
-				if (data.isTFAEnabled && data.tfaToken) {
-					onTfaEnabled(data.tfaToken);
-					return;
-				}
+			if (data.isTFAEnabled && data.tfaToken) {
+				onTfaEnabled(data.tfaToken);
+				return;
+			}
 
-				const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+			const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
-				if (!accessTokenPayload) {
-					setLoading(false);
-					return;
-				}
+			if (!accessTokenPayload) {
+				setLoading(false);
+				setErrorMessage(t('Profile.noAccessTokenFound'));
+				return;
+			}
 
-				setUser(accessTokenPayload);
+			setUser(accessTokenPayload);
 
-				if (nextUrl) {
-					const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
-					router.replace(`/${url}`);
-				} else {
-					router.back();
-				}
+			if (nextUrl) {
+				const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
+				router.replace(`/${url}`);
+			} else {
+				router.back();
 			}
 		} catch {
 			// TODO: add to language files
 			toast({
 				status: NotificationType.ERROR,
-				title: t('Login.loginFailed')
+				title: t('Profile.loginFailed')
 			});
 		} finally {
 			setLoading(false);

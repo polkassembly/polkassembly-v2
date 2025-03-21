@@ -4,8 +4,8 @@
 import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
-import { ESignupSteps, EWallet } from '@/_shared/types';
-import { useRouter } from 'next/navigation';
+import { ESignupSteps, EWallet, NotificationType } from '@/_shared/types';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
@@ -16,6 +16,7 @@ import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
+import { useToast } from '@/hooks/useToast';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
@@ -32,6 +33,8 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 
 	const { setUser } = useUser();
 
+	const { toast } = useToast();
+
 	const router = useRouter();
 
 	const [loading, setLoading] = useState<boolean>(false);
@@ -40,52 +43,55 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 
 	const formData = useForm<IFormFields>();
 
+	const searchParams = useSearchParams();
+	const nextUrl = searchParams.get('nextUrl');
+
 	const handleSignup = async (values: IFormFields) => {
-		const { email, password, username, finalPassword } = values;
+		try {
+			const { email, password, username, finalPassword } = values;
 
-		if (step === ESignupSteps.USERNAME && email && username) {
-			setLoading(true);
-			const { data, error } = await AuthClientService.checkForUsernameAndEmail({
-				username,
-				email
-			});
+			if (step === ESignupSteps.USERNAME && email && username) {
+				setLoading(true);
+				const { data, error } = await AuthClientService.checkForUsernameAndEmail({
+					username,
+					email
+				});
 
-			if (error) {
-				setErrorMessage(error.message);
+				if (error) {
+					setErrorMessage(error.message);
+					setLoading(false);
+					return;
+				}
+
+				if (data && !data.usernameExists && !data.emailExists) {
+					setErrorMessage('');
+					setStep(ESignupSteps.PASSWORD);
+					setLoading(false);
+					return;
+				}
 				setLoading(false);
 				return;
 			}
 
-			if (data && !data.usernameExists && !data.emailExists) {
-				setErrorMessage('');
-				setStep(ESignupSteps.PASSWORD);
-				setLoading(false);
-				return;
-			}
-			setLoading(false);
-			return;
-		}
+			if (email && username && password && password === finalPassword) {
+				setLoading(true);
 
-		if (email && username && password && password === finalPassword) {
-			setLoading(true);
+				const { data, error } = await AuthClientService.web2Signup({
+					email,
+					username,
+					password: finalPassword
+				});
 
-			const { data, error } = await AuthClientService.web2Signup({
-				email,
-				username,
-				password: finalPassword
-			});
+				if (error || !data) {
+					setErrorMessage(error?.message || t('Profile.signupFailed'));
+					setLoading(false);
+					return;
+				}
 
-			if (error) {
-				setErrorMessage(error.message || '');
-				setLoading(false);
-				return;
-			}
-
-			if (data) {
 				const accessTokenPayload = CookieClientService.getAccessTokenPayload();
 
 				if (!accessTokenPayload) {
-					setErrorMessage('No Access token found.');
+					setErrorMessage(t('Profile.noAccessTokenFound'));
 					setLoading(false);
 					return;
 				}
@@ -93,8 +99,19 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 				setUser(accessTokenPayload);
 				setErrorMessage('');
 
-				router.back();
+				if (nextUrl) {
+					const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
+					router.replace(`/${url}`);
+				} else {
+					router.back();
+				}
 			}
+		} catch {
+			toast({
+				status: NotificationType.ERROR,
+				title: t('Profile.signupFailed')
+			});
+		} finally {
 			setLoading(false);
 		}
 	};
@@ -227,10 +244,11 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 					</div>
 				)}
 				{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-				<div className='my-4 flex justify-center text-xs text-border_grey'>{t('Profile.orLoginWith')}</div>
+				<div className='my-4 flex justify-center text-xs text-text_grey'>{t('Profile.orLoginWith')}</div>
 				<WalletButtons
 					small
 					onWalletChange={onWalletChange}
+					noPreference
 				/>
 				<p className={classes.switchToLogin}>
 					{t('Profile.alreadyHaveAnAccount')}

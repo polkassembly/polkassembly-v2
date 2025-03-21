@@ -94,6 +94,9 @@
 	"Profile": {
 		"settings": "Settings",
 		"login": "Login",
+		"loginFailed": "Failed to login",
+		"signupFailed": "Failed to signup",
+		"noAccessTokenFound": "No Access token found.",
 		"logout": "Logout",
 		"signUp": "Sign Up",
 		"dontHaveAnAccount": "Don't have an account?",
