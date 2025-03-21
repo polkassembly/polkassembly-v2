@@ -57,7 +57,7 @@ function Login({ isModal }: { isModal?: boolean }) {
 	};
 
 	return (
-		<>
+		<div className='login-container'>
 			{!isModal && (
 				<div className={classes.header}>
 					<HeaderLabel />
@@ -96,7 +96,7 @@ function Login({ isModal }: { isModal?: boolean }) {
 					/>
 				)}
 			</div>
-		</>
+		</div>
 	);
 }
 
