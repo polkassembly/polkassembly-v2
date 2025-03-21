@@ -5,12 +5,29 @@
 import React from 'react';
 import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 import { EReaction } from '@/_shared/types';
 import LikeGif from '@assets/reactions/Liked-Colored.gif';
 import { useTranslations } from 'next-intl';
 import styles from './ReactionButton.module.scss';
 
-function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction; isActive: boolean; showGif: boolean; onClick: () => void }) {
+function ReactionButton({
+	type,
+	isActive,
+	showGif,
+	onClick,
+	count,
+	showText = true,
+	className = 'text-bg_pink text-lg'
+}: {
+	type: EReaction;
+	isActive: boolean;
+	showGif: boolean;
+	onClick?: () => void;
+	showText?: boolean;
+	count?: number;
+	className?: string;
+}) {
 	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
 	const t = useTranslations();
 
@@ -20,7 +37,7 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction;
 			onClick={onClick}
 			type='button'
 		>
-			<div className='relative mr-1 w-[24px]'>
+			<div className='relative w-[24px]'>
 				{showGif ? (
 					<div className={type === EReaction.like ? styles.likeGifContainer : styles.dislikeGifContainer}>
 						<Image
@@ -33,10 +50,13 @@ function ReactionButton({ type, isActive, showGif, onClick }: { type: EReaction;
 						/>
 					</div>
 				) : (
-					<Icon className={`${styles.activity_icons} text-lg text-bg_pink`} />
+					<Icon className={cn(`${styles.activity_icons} ${className}`)} />
 				)}
 			</div>
-			<span className='text-bg_pink'>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
+			{showText && (
+				<span className={`${isActive ? 'ml-1 font-bold text-bg_pink' : ''}`}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>
+			)}
+			{count !== undefined && count > 0 && <span className='text-xs font-medium'>{count}</span>}
 		</button>
 	);
 }

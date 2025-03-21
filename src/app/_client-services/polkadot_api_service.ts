@@ -18,7 +18,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiary, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -459,6 +459,19 @@ export class PolkadotApiService {
 		};
 	}
 
+	async getPreimageLengthFromPreimageHash({ preimageHash }: { preimageHash: string }) {
+		if (!this.api || !preimageHash || !ValidatorService.isValidPreimageHash(preimageHash)) {
+			return null;
+		}
+		const statusFor = (await this.api.query.preimage.statusFor?.(preimageHash)) as any;
+		const requestStatusFor = (await this.api.query.preimage.requestStatusFor?.(preimageHash)) as any;
+
+		const status = statusFor?.isSome ? statusFor.unwrapOr(null) : requestStatusFor.unwrapOr(null);
+
+		if (!status) return null;
+		return Number(status.value?.len);
+	}
+
 	async notePreimage({
 		address,
 		extrinsicFn,
@@ -490,7 +503,7 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}
@@ -509,7 +522,7 @@ export class PolkadotApiService {
 		return this.api.tx.utility.batchAll(tx);
 	}
 
-	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}
@@ -524,6 +537,7 @@ export class PolkadotApiService {
 								V3: {
 									assetId: {
 										Concrete: {
+											parents: 0,
 											interior: {
 												X2: [
 													{
@@ -537,6 +551,7 @@ export class PolkadotApiService {
 										}
 									},
 									location: {
+										parents: 0,
 										interior: {
 											X1: { Parachain: NETWORKS_DETAILS[this.network]?.parachain }
 										}
@@ -544,8 +559,8 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
-							null
+							{ V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							beneficiary.validFromBlock || null
 						)
 					);
 				} else {
@@ -554,6 +569,7 @@ export class PolkadotApiService {
 							{
 								V4: {
 									location: {
+										parents: 0,
 										interior: {
 											X1: [
 												{
@@ -571,6 +587,7 @@ export class PolkadotApiService {
 							beneficiary.amount.toString(),
 							{
 								V4: {
+									parents: 0,
 									interior: {
 										X1: [
 											{
@@ -583,7 +600,7 @@ export class PolkadotApiService {
 									}
 								}
 							},
-							null
+							beneficiary.validFromBlock || null
 						)
 					);
 				}
@@ -663,7 +680,7 @@ export class PolkadotApiService {
 		return this.api?.registry;
 	}
 
-	async getCurrentBlockNumber() {
+	async getCurrentBlockHeight() {
 		if (!this.api) {
 			return null;
 		}

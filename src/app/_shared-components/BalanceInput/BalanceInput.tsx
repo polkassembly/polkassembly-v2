@@ -20,7 +20,7 @@ function BalanceInput({
 	name,
 	disabled,
 	defaultValue,
-	disabledMultiAsset
+	multiAsset
 }: {
 	label: string;
 	placeholder?: string;
@@ -28,7 +28,7 @@ function BalanceInput({
 	name?: string;
 	disabled?: boolean;
 	defaultValue?: BN;
-	disabledMultiAsset?: boolean;
+	multiAsset?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
@@ -81,7 +81,7 @@ function BalanceInput({
 					value={valueString}
 					disabled={disabled}
 				/>
-				{assetOptions.length === 0 || disabledMultiAsset ? (
+				{assetOptions.length === 0 || !multiAsset ? (
 					<div className={classes.tokenSymbol}>{NETWORKS_DETAILS[`${network}`].tokenSymbol}</div>
 				) : (
 					<div className={classes.tokenSymbol}>
@@ -97,7 +97,11 @@ function BalanceInput({
 								{[{ label: networkDetails.tokenSymbol, value: null }, ...assetOptions].map((option) => (
 									<DropdownMenuItem
 										key={option.value}
-										onClick={() => setAssetId(option.value)}
+										onClick={() => {
+											setAssetId(option.value);
+											onBalanceChange(null);
+											setValueString('');
+										}}
 									>
 										{option.label}
 									</DropdownMenuItem>

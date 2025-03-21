@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Type your comment here",
 		"Post": "Post",
+		"share": "Share",
+		"loading": "Loading...",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
 		"Navbar": {
 			"All": "All",
 			"Root": "Root",
@@ -90,8 +94,12 @@
 	"Profile": {
 		"settings": "Settings",
 		"login": "Login",
+		"loginFailed": "Failed to login",
+		"signupFailed": "Failed to signup",
+		"noAccessTokenFound": "No Access token found.",
 		"logout": "Logout",
 		"signUp": "Sign Up",
+		"enterCredentials": "Please enter your credentials",
 		"dontHaveAnAccount": "Don't have an account?",
 		"twoFactorAuth": "Two Factor Authentication",
 		"twoFactorAuthDescription": "Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.",
@@ -243,6 +251,7 @@
 		"Referenda": "Referenda"
 	},
 	"ListingPage": {
+		"AllProposals": "All Referenda",
 		"AuctionAdmin": "Auction Admin",
 		"AuctionAdminDescription": "Origin for starting auctions.",
 		"BigSpender": "Big Spender",
@@ -665,11 +674,15 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Create Preimage",
+		"existingPreimage": "Already have a Preimage",
 		"createTreasuryProposal": "Create Treasury Proposal (Native)",
 		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
-		"goBack": "Go Back"
+		"goBack": "Go Back",
+		"preimageHash": "Preimage Hash",
+		"preimageLength": "Preimage Length",
+		"preimageHashDescription": "Enter the preimage hash to create a proposal"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -685,7 +698,11 @@
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageNoteFailed": "Failed to note preimage",
 		"preimageNoteFailedDescription": "There was an error while noting the preimage",
-		"selectTrack": "Select Track"
+		"selectTrack": "Select Track",
+		"validFrom": "Valid From",
+		"addValidFrom": "Add Valid From",
+		"invalidBlockHeight": "Please enter a valid block height",
+		"enterFutureBlockHeight": "Please enter a future block height"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Item",
@@ -710,5 +727,8 @@
 		"invalidAddress": "Invalid Address",
 		"noResultsFound": "No results found",
 		"placeholder": "Enter Address"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Value is too large"
 	}
 }
