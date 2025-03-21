@@ -3,23 +3,30 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import termsAndConditionsContent from './terms-and-conditions';
 import { Metadata } from 'next';
+import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
+import { termsAndConditionsContent } from './terms-and-conditions';
+import BlockEditor from '../_shared-components/BlockEditor/BlockEditor';
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions - Polkassembly',
-  description: 'Terms and Conditions for Polkassembly'
+	title: 'Terms and Conditions - Polkassembly',
+	description: 'Terms and Conditions for Polkassembly'
 };
 
+const tncContent = convertMarkdownToHtml(termsAndConditionsContent);
+
 export default function TermsAndConditionsPage() {
-  return (
-    <div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
-      <div className='bg-white rounded-md shadow p-8'>
-        <h1 className='text-2xl font-semibold mb-6'>Terms and Conditions</h1>
-        <div className='markdown-content whitespace-pre-line'>
-          {termsAndConditionsContent}
-        </div>
-      </div>
-    </div>
-  );
-} 
+	return (
+		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
+			<div className='rounded-md bg-white p-8 shadow'>
+				<h1 className='mb-6 text-2xl font-semibold'>Terms and Conditions</h1>
+				<BlockEditor
+					data={tncContent}
+					readOnly
+					renderFromHtml
+					className='max-h-screen w-full'
+				/>
+			</div>
+		</div>
+	);
+}
