@@ -183,11 +183,15 @@ function ActivityFeedPostItem({
 					</span>
 					<span>in</span>
 					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
-					<span>|</span>
-					<span className='flex items-center gap-2'>
-						<FaRegClock className='text-sm' />
-						{dayjs.utc(postData.onChainInfo?.createdAt).fromNow()}
-					</span>
+					{postData.onChainInfo?.createdAt && (
+						<>
+							<span>|</span>
+							<span className='flex items-center gap-2'>
+								<FaRegClock className='text-sm' />
+								{dayjs(postData.onChainInfo?.createdAt).fromNow()}
+							</span>
+						</>
+					)}
 				</div>
 				<VotingProgress
 					timeRemaining={timeRemaining}

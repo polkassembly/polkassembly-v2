@@ -29,6 +29,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 		const injectedAccounts = await walletService?.getAddressesFromWallet(chosenWallet);
 
 		if (injectedAccounts.length === 0) {
+			setAccounts([]);
 			return;
 		}
 

@@ -94,6 +94,9 @@
 	"Profile": {
 		"settings": "Einstellungen",
 		"login": "Anmelden",
+		"loginFailed": "Anmeldung fehlgeschlagen",
+		"signupFailed": "Registrierung fehlgeschlagen",
+		"noAccessTokenFound": "Kein Zugriffstoken gefunden.",
 		"logout": "Abmelden",
 		"signUp": "Registrieren",
 		"dontHaveAnAccount": "Noch kein Konto?",
@@ -239,7 +242,8 @@
 		"saveChanges": "Speichern",
 		"unfollow": "Entfolgen",
 		"following": "Folgend",
-		"followers": "Follower"
+		"followers": "Follower",
+		"enterCredentials": "Bitte geben Sie Ihre Anmeldedaten ein"
 	},
 	"ListingTab": {
 		"Analytics": "Analysen",
