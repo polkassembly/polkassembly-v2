@@ -6,7 +6,7 @@ import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNum } from '@/_shared/_utils/dateToBlockNum';
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, ICalendarEvent } from '@/_shared/types';
@@ -108,24 +108,19 @@ export default function CalendarEvents() {
 			startBlockNo
 		});
 		if (response.error) return null;
+		setEventsData((prevData) => ({
+			...prevData,
+			[monthKey]: response.data || []
+		}));
 		return Array.isArray(response.data) ? response.data : [];
-	}, [currentYear, currentMonth, getBlockNumbers]);
+	}, [currentYear, currentMonth, getBlockNumbers, monthKey]);
 
-	const { data: fetchedEvents, isFetching } = useQuery({
+	const { isFetching } = useQuery({
 		queryKey: ['calendarEvents', currentYear, currentMonth],
 		queryFn: fetchCalendarEvents,
 		staleTime: FIVE_MIN_IN_MILLI,
 		enabled: !!apiService
 	});
-
-	useEffect(() => {
-		if (fetchedEvents) {
-			setEventsData((prevData) => ({
-				...prevData,
-				[monthKey]: fetchedEvents
-			}));
-		}
-	}, [fetchedEvents, monthKey]);
 
 	const handleMonthChange = (date: Date) => {
 		setSelectedDate(date);
