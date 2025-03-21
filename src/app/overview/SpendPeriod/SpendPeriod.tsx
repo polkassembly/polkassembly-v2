@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@ui/LoadingSpinner';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { dayjs } from '@shared/_utils/dayjsInit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -78,7 +79,23 @@ function SpendPeriod({ tokenPrice }: { tokenPrice?: string }) {
 		(async () => {
 			try {
 				const data = await apiService?.getSpendPeriod();
-				setSpendPeriod(data);
+				if (!data) {
+					setSpendPeriod(null);
+					return;
+				}
+				const duration = dayjs.duration(data.value.remainingTime);
+				const days = duration.days();
+				const hours = duration.hours();
+				const minutes = duration.minutes();
+				setSpendPeriod({
+					percentage: data.percentage,
+					value: {
+						days,
+						hours,
+						minutes,
+						total: data.value.totalSpendPeriodDays
+					}
+				});
 			} catch (error) {
 				console.error('Error fetching spend period:', error);
 				setSpendPeriod(null);

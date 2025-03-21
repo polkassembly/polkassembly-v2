@@ -5,7 +5,7 @@
 import { LoadingSpinner } from '@ui/LoadingSpinner';
 import React, { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
-import { ENetwork, ESocial } from '@/_shared/types';
+import { ESocial } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -16,7 +16,7 @@ function NewsSection() {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 
-	const socialHandle = NETWORKS_DETAILS[network as ENetwork].socialLinks?.find((link) => link.id === ESocial.TWITTER)?.href;
+	const socialHandle = NETWORKS_DETAILS[network].socialLinks?.find((link) => link.id === ESocial.TWITTER)?.href;
 
 	if (!socialHandle) {
 		return null;
@@ -36,7 +36,9 @@ function NewsSection() {
 				<div className='overflow-hidden rounded-[10px] lg:h-[380px]'>
 					<div className='block dark:hidden'>
 						<TwitterTimelineEmbed
-							onLoad={() => setIsLoading(false)}
+							onLoad={() => {
+								setIsLoading(false);
+							}}
 							sourceType='profile'
 							screenName={socialHandle}
 							options={{ height: 450 }}
@@ -48,7 +50,9 @@ function NewsSection() {
 					</div>
 					<div className='hidden dark:block'>
 						<TwitterTimelineEmbed
-							onLoad={() => setIsLoading(false)}
+							onLoad={() => {
+								setIsLoading(false);
+							}}
 							sourceType='profile'
 							screenName={socialHandle}
 							options={{ height: 450 }}

@@ -13,7 +13,7 @@ async function OverviewPage() {
 	const network = getCurrentNetwork();
 	const fetchTrackDetails = async () => {
 		try {
-			const tracks = NETWORKS_DETAILS[network as ENetwork]?.trackDetails || {};
+			const tracks = NETWORKS_DETAILS[network]?.trackDetails || {};
 			const { data: allData, error: allError } = await NextApiClientService.fetchListingData({
 				proposalType: EProposalType.REFERENDUM_V2,
 				limit: DEFAULT_LISTING_LIMIT,

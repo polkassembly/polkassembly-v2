@@ -20,7 +20,6 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
 import { blockToDays, blockToTime } from '@shared/_utils/blockTimeCalculations';
-import { dayjs } from '@shared/_utils/dayjsInit';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -229,19 +228,13 @@ export class PolkadotApiService {
 		const currentBlockNumber = currentBlock.toNumber();
 		const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
 		const { time: remainingTime } = blockToTime({ blocks: remainingBlocks, network: this.network });
-		const duration = dayjs.duration(remainingTime);
-		const days = duration.days();
-		const hours = duration.hours();
-		const minutes = duration.minutes();
 		const progressPercentage = (((currentBlockNumber % spendPeriodBlocks) / spendPeriodBlocks) * 100).toFixed(0);
 
 		return {
 			percentage: parseFloat(progressPercentage),
 			value: {
-				days,
-				hours,
-				minutes,
-				total: totalSpendPeriodDays
+				remainingTime,
+				totalSpendPeriodDays
 			}
 		};
 	}

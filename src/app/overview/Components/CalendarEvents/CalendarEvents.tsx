@@ -6,7 +6,7 @@ import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNum } from '@/_shared/_utils/dateToBlockNum';
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, ICalendarEvent } from '@/_shared/types';
@@ -16,6 +16,7 @@ import type { Dayjs } from 'dayjs';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import styles from '../Overview.module.scss';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -57,72 +58,69 @@ function EventList({ events, color }: { events: ICalendarEvent[]; color: string 
 export default function CalendarEvents() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
+	const [selectedDate, setSelectedDate] = useState(dayjs());
 	const [monthlyEvents, setMonthlyEvents] = useState<{ [key: string]: ICalendarEvent[] }>({});
-	const [selectedDate, setSelectedDate] = useState(new Date());
-	const [isLoading, setIsLoading] = useState(false);
 
-	const fetchMonthEvents = useCallback(async () => {
-		const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-		const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+	const fetchMonthEvents = async (startOfMonth: Date, endOfMonth: Date) => {
 		const monthKey = dayjs(startOfMonth).format('YYYY-MM');
 
-		if (monthlyEvents[monthKey as keyof typeof monthlyEvents] && !isLoading) {
-			return;
+		if (monthlyEvents[monthKey as keyof typeof monthlyEvents]) {
+			return monthlyEvents[monthKey as keyof typeof monthlyEvents];
 		}
 
-		setIsLoading(true);
-		try {
-			const startDate = dayjs(startOfMonth).startOf('month');
-			const endDate = dayjs(endOfMonth).endOf('month');
-			const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
+		const startDate = dayjs(startOfMonth).startOf('month');
+		const endDate = dayjs(endOfMonth).endOf('month');
+		const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
 
-			if (!currentBlock) {
-				setIsLoading(false);
-				return;
-			}
+		if (!currentBlock) {
+			return [];
+		}
 
-			const newStartBlockNo = dateToBlockNum({
-				currentBlockNumber: currentBlock.toNumber(),
-				date: startDate.toDate(),
-				network
-			});
+		const newStartBlockNo = dateToBlockNum({
+			currentBlockNumber: currentBlock.toNumber(),
+			date: startDate.toDate(),
+			network
+		});
 
-			const newEndBlockNo = dateToBlockNum({
-				currentBlockNumber: currentBlock.toNumber(),
-				date: endDate.toDate(),
-				network
-			});
+		const newEndBlockNo = dateToBlockNum({
+			currentBlockNumber: currentBlock.toNumber(),
+			date: endDate.toDate(),
+			network
+		});
 
-			if (!newStartBlockNo || !newEndBlockNo) return;
+		if (!newStartBlockNo || !newEndBlockNo) return [];
 
-			const { data, error } = await NextApiClientService.getCalendarEvents({
-				endBlockNo: newEndBlockNo,
-				startBlockNo: newStartBlockNo
-			});
+		const { data, error } = await NextApiClientService.getCalendarEvents({
+			endBlockNo: newEndBlockNo,
+			startBlockNo: newStartBlockNo
+		});
 
-			if (error) {
-				console.error('Error fetching calendar events:', error);
-				return;
-			}
-
-			setMonthlyEvents((prev) => ({
-				...prev,
-				[monthKey]: data || []
-			}));
-		} catch (error) {
+		if (error) {
 			console.error('Error fetching calendar events:', error);
-		} finally {
-			setIsLoading(false);
+			return [];
 		}
-	}, [selectedDate, apiService, network, monthlyEvents, isLoading]);
 
-	useEffect(() => {
-		fetchMonthEvents();
-	}, []);
+		setMonthlyEvents((prev) => ({
+			...prev,
+			[monthKey]: data || []
+		}));
+
+		return data || [];
+	};
+
+	const { isLoading } = useQuery({
+		queryKey: ['fetchMonthEvents', selectedDate],
+		queryFn: () => {
+			const startOfMonth = new Date(selectedDate.year(), selectedDate.month(), 1);
+			const endOfMonth = new Date(selectedDate.year(), selectedDate.month() + 1, 0);
+			return fetchMonthEvents(startOfMonth, endOfMonth);
+		},
+		staleTime: 1000 * 60 * 5,
+		enabled: true
+	});
 
 	const handleMonthChange = (date: Date) => {
-		setSelectedDate(date);
-		fetchMonthEvents();
+		setSelectedDate(dayjs(date));
 	};
 
 	const getDateHasEvent = (value: Dayjs): boolean => {
@@ -151,7 +149,7 @@ export default function CalendarEvents() {
 					<TooltipTrigger asChild>
 						<div
 							aria-hidden='true'
-							onClick={() => setSelectedDate(value)}
+							onClick={() => setSelectedDate(dayjs(value))}
 							className={cn(
 								styles.calendar_event_tooltip_trigger,
 								hasEvent ? 'bg-bg_pink text-white' : '',
@@ -186,8 +184,8 @@ export default function CalendarEvents() {
 					<div className='hidden xl:block'>
 						<Calendar
 							cellRender={dateCellRender}
-							selectedDate={selectedDate}
-							setSelectedDate={setSelectedDate}
+							selectedDate={selectedDate.toDate()}
+							setSelectedDate={(date) => setSelectedDate(dayjs(date))}
 							isLoading={isLoading}
 							onMonthChange={handleMonthChange}
 						/>
