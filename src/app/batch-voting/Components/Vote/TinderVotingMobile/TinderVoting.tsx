@@ -24,15 +24,15 @@ function TinderVoting({
 	disableButtons,
 	filteredProposals,
 	addToVoteCart,
-	isFetching,
+	isLoading,
 	voteCart,
 	currentIndexRef,
 	onSkip
 }: {
-	disableButtons: boolean;
+	disableButtons?: boolean;
 	currentIndexRef: RefObject<number>;
 	filteredProposals: IPostListing[];
-	isFetching: boolean;
+	isLoading: boolean;
 	voteCart: IVoteCartItem[];
 	addToVoteCart: ({
 		voteDecision,
@@ -78,7 +78,7 @@ function TinderVoting({
 
 	return (
 		<div className={classes.tinderVoting}>
-			{isFetching && <LoadingLayover />}
+			{isLoading && <LoadingLayover />}
 			<Button
 				variant='ghost'
 				className={classes.skipButton}
