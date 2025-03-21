@@ -6,7 +6,7 @@ import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNum } from '@/_shared/_utils/dateToBlockNum';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, ICalendarEvent } from '@/_shared/types';
@@ -58,83 +58,77 @@ function EventList({ events, color }: { events: ICalendarEvent[]; color: string 
 export default function CalendarEvents() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	const [selectedDate, setSelectedDate] = useState(dayjs());
-	const [monthlyEvents, setMonthlyEvents] = useState<{ [key: string]: ICalendarEvent[] }>({});
+	const [selectedDate, setSelectedDate] = useState(new Date());
+	const t = useTranslations('Overview');
 
-	const fetchMonthEvents = async (startOfMonth: Date, endOfMonth: Date) => {
-		const monthKey = dayjs(startOfMonth).format('YYYY-MM');
+	// Function to calculate block numbers for a given date range
+	const getBlockNumbers = useCallback(
+		async (startDate: Date, endDate: Date) => {
+			const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
+			if (!currentBlock) {
+				return { startBlockNo: null, endBlockNo: null };
+			}
 
-		if (monthlyEvents[monthKey as keyof typeof monthlyEvents]) {
-			return monthlyEvents[monthKey as keyof typeof monthlyEvents];
-		}
+			const start = dayjs(startDate).startOf('month');
+			const end = dayjs(endDate).endOf('month');
 
-		const startDate = dayjs(startOfMonth).startOf('month');
-		const endDate = dayjs(endOfMonth).endOf('month');
-		const currentBlock = (await apiService?.getCurrentBlockHeight()) || 0;
+			const newStartBlockNo = dateToBlockNum({
+				currentBlockNumber: currentBlock.toNumber(),
+				date: start.toDate(),
+				network
+			});
 
-		if (!currentBlock) {
-			return [];
-		}
+			const newEndBlockNo = dateToBlockNum({
+				currentBlockNumber: currentBlock.toNumber(),
+				date: end.toDate(),
+				network
+			});
 
-		const newStartBlockNo = dateToBlockNum({
-			currentBlockNumber: currentBlock.toNumber(),
-			date: startDate.toDate(),
-			network
-		});
+			return { startBlockNo: newStartBlockNo, endBlockNo: newEndBlockNo };
+		},
+		[apiService, network]
+	);
+	const { data: monthlyEvents = {}, isLoading } = useQuery({
+		queryKey: ['calendarEvents', selectedDate.getFullYear(), selectedDate.getMonth()],
+		queryFn: async () => {
+			const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+			const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
 
-		const newEndBlockNo = dateToBlockNum({
-			currentBlockNumber: currentBlock.toNumber(),
-			date: endDate.toDate(),
-			network
-		});
+			const { startBlockNo, endBlockNo } = await getBlockNumbers(startOfMonth, endOfMonth);
 
-		if (!newStartBlockNo || !newEndBlockNo) return [];
+			if (!startBlockNo || !endBlockNo) return {};
+			const { data, error } = await NextApiClientService.getCalendarEvents({
+				endBlockNo,
+				startBlockNo
+			});
 
-		const { data, error } = await NextApiClientService.getCalendarEvents({
-			endBlockNo: newEndBlockNo,
-			startBlockNo: newStartBlockNo
-		});
-
-		if (error) {
-			console.error('Error fetching calendar events:', error);
-			return [];
-		}
-
-		setMonthlyEvents((prev) => ({
-			...prev,
-			[monthKey]: data || []
-		}));
-
-		return data || [];
-	};
-
-	const { isLoading } = useQuery({
-		queryKey: ['fetchMonthEvents', selectedDate],
-		queryFn: () => {
-			const startOfMonth = new Date(selectedDate.year(), selectedDate.month(), 1);
-			const endOfMonth = new Date(selectedDate.year(), selectedDate.month() + 1, 0);
-			return fetchMonthEvents(startOfMonth, endOfMonth);
+			if (error) {
+				console.error('Error fetching calendar events:', error);
+				return {};
+			}
+			const monthKey = dayjs(startOfMonth).format('YYYY-MM');
+			return { [monthKey]: data || [] };
 		},
 		staleTime: 1000 * 60 * 5,
 		enabled: true
 	});
 
 	const handleMonthChange = (date: Date) => {
-		setSelectedDate(dayjs(date));
+		setSelectedDate(date);
 	};
 
 	const getDateHasEvent = (value: Dayjs): boolean => {
 		const monthKey = value.format('YYYY-MM');
 		const exactDate = value.format(DATE_FORMAT);
 
-		return monthlyEvents[monthKey as keyof typeof monthlyEvents]?.some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || false;
+		return monthlyEvents[monthKey]?.some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || false;
 	};
 
 	const getEventData = (value: Dayjs): ICalendarEvent[] => {
 		const monthKey = value.format('YYYY-MM');
 		const exactDate = value.format(DATE_FORMAT);
 
-		return monthlyEvents[monthKey as keyof typeof monthlyEvents]?.filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || [];
+		return monthlyEvents[monthKey]?.filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate) || [];
 	};
 
 	const dateCellRender = (value: Date | undefined) => {
@@ -149,7 +143,7 @@ export default function CalendarEvents() {
 					<TooltipTrigger asChild>
 						<div
 							aria-hidden='true'
-							onClick={() => setSelectedDate(dayjs(value))}
+							onClick={() => setSelectedDate(value)}
 							className={cn(
 								styles.calendar_event_tooltip_trigger,
 								hasEvent ? 'bg-bg_pink text-white' : '',
@@ -174,7 +168,6 @@ export default function CalendarEvents() {
 	};
 
 	const selectedDateEvents = getEventData(dayjs(selectedDate));
-	const t = useTranslations('Overview');
 
 	return (
 		<div>
@@ -184,8 +177,8 @@ export default function CalendarEvents() {
 					<div className='hidden xl:block'>
 						<Calendar
 							cellRender={dateCellRender}
-							selectedDate={selectedDate.toDate()}
-							setSelectedDate={(date) => setSelectedDate(dayjs(date))}
+							selectedDate={selectedDate}
+							setSelectedDate={setSelectedDate}
 							isLoading={isLoading}
 							onMonthChange={handleMonthChange}
 						/>
@@ -199,7 +192,7 @@ export default function CalendarEvents() {
 						</div>
 					) : selectedDateEvents.length > 0 ? (
 						<EventList
-							events={getEventData(dayjs(selectedDate))}
+							events={selectedDateEvents}
 							color='text-btn_secondary_text hover:text-text_pink'
 						/>
 					) : (
