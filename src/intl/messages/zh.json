@@ -247,6 +247,7 @@
 		"Referenda": "公投"
 	},
 	"ListingPage": {
+		"AllProposals": "所有公投",
 		"AuctionAdmin": "拍卖管理员",
 		"AuctionAdminDescription": "启动拍卖的来源。",
 		"BigSpender": "大额支出者",

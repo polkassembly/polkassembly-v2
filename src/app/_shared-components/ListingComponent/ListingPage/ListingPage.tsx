@@ -116,9 +116,9 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 		<div className={styles.header}>
 			<div>
 				<h1 className={styles.title}>
-					{t(`ListingPage.${origin || proposalType}`)} ({initialData?.totalCount || 0})
+					{proposalType === EProposalType.REFERENDUM_V2 && !origin ? t('ListingPage.AllProposals') : t(`ListingPage.${origin || proposalType}`)} ({initialData?.totalCount || 0})
 				</h1>
-				<p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>
+				{proposalType !== EProposalType.REFERENDUM_V2 && !origin && <p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>}
 			</div>
 			<Link
 				href={

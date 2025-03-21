@@ -4,6 +4,7 @@
 
 'use client';
 
+import { NotificationType } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -18,11 +19,14 @@ import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDro
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
+import { useToast } from '@/hooks/useToast';
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {
 	const router = useRouter();
 	const t = useTranslations();
+
+	const { toast } = useToast();
 
 	const { userPreferences } = useUserPreferences();
 
@@ -82,14 +86,20 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				setUser(accessTokenPayload);
 
 				if (nextUrl) {
-					router.replace(`/${nextUrl}`);
+					const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
+					router.replace(`/${url}`);
 				} else {
 					router.back();
-					setLoading(false);
 				}
 			}
 		} catch {
-			// TODO: show notification
+			// TODO: add to language files
+			toast({
+				status: NotificationType.ERROR,
+				title: t('Login.loginFailed')
+			});
+		} finally {
+			setLoading(false);
 		}
 	};
 

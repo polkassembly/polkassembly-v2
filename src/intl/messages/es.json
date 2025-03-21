@@ -247,6 +247,7 @@
 		"Referenda": "Referendos"
 	},
 	"ListingPage": {
+		"AllProposals": "Todas las Referendos",
 		"AuctionAdmin": "Administrador de Subastas",
 		"AuctionAdminDescription": "Origen para iniciar subastas.",
 		"BigSpender": "Gran Gastador",
