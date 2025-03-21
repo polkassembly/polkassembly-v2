@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-export default `Terms of Website Use
+export const termsOfWebsiteContent = `Terms of Website Use
 ====================
 
 Please read these terms and conditions carefully before using this site
@@ -113,7 +113,7 @@ We do not oversee, monitor or moderate any User Generated Content which is uploa
 
 -   uses the material or content or infringes the rights or privacy of anyone else;
 
--   contains someone else’s personal details or confidential information relating to other people;
+-   contains someone else's personal details or confidential information relating to other people;
 
 -   promotes discrimination, whether based on race, sex, religion, nationality, disability, sexual orientation or age;
 

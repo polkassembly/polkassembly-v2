@@ -5,7 +5,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
-import termsOfWebsiteContent from './terms-of-website';
+import { termsOfWebsiteContent } from './terms-of-website';
 import BlockEditor from '../_shared-components/BlockEditor/BlockEditor';
 
 export const metadata: Metadata = {

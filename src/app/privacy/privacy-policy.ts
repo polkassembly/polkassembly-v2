@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-export default `Polkassembly privacy notice
+export const privacyPolicyContent = `Polkassembly privacy notice
 ====================
 
 Premiurly OÜ (&quot; **Premiurly**&quot;, &quot; **we**&quot;, &quot; **us**&quot;) collects, uses, and handles your personal information when you use Polkassembly.

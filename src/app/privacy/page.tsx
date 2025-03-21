@@ -5,7 +5,8 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
-import privacyPolicyContent from './privacy-policy';
+import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
+import { privacyPolicyContent } from './privacy-policy';
 import BlockEditor from '../_shared-components/BlockEditor/BlockEditor';
 
 export const metadata: Metadata = {
@@ -34,6 +35,8 @@ export default async function PrivacyPolicyPage() {
 	if (network) {
 		policyContent = policyContent.replace(/https:\/\/polkassembly\.io/g, `https://${network}.polkassembly.io`);
 	}
+
+	policyContent = convertMarkdownToHtml(privacyPolicyContent);
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
