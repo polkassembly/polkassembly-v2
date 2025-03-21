@@ -4,10 +4,10 @@
 
 import { useAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { IUserPreferences } from '@/_shared/types';
 import { useTheme } from 'next-themes';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { userPreferencesAtom } from '../app/_atoms/user/userPreferencesAtom';
 
 export const useUserPreferences = () => {
@@ -20,7 +20,6 @@ export const useUserPreferences = () => {
 			setTheme(preferences.theme);
 			setUserPreferences(preferences);
 			CookieClientService.setThemeCookie(preferences.theme);
-			CookieClientService.setLocaleCookie(preferences.locale);
 		},
 		[setUserPreferences, setTheme]
 	);

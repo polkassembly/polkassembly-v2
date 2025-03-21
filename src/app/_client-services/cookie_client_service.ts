@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ECookieNames, ELocales, ETheme, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
@@ -51,15 +52,23 @@ export class CookieClientService {
 		this.setCookieInClient(ECookieNames.THEME, theme);
 	}
 
-	static getThemeCookie() {
-		return this.getCookieInClient(ECookieNames.THEME);
+	static getThemeCookie(): ETheme {
+		const theme = this.getCookieInClient(ECookieNames.THEME);
+		if (theme && ValidatorService.isValidTheme(theme)) {
+			return theme as ETheme;
+		}
+		return ETheme.LIGHT;
 	}
 
 	static setLocaleCookie(locale: ELocales) {
 		this.setCookieInClient(ECookieNames.LOCALE, locale);
 	}
 
-	static getLocaleCookie() {
-		return this.getCookieInClient(ECookieNames.LOCALE);
+	static getLocaleCookie(): ELocales {
+		const locale = this.getCookieInClient(ECookieNames.LOCALE);
+		if (locale && ValidatorService.isValidLocale(locale)) {
+			return locale as ELocales;
+		}
+		return ELocales.ENGLISH;
 	}
 }

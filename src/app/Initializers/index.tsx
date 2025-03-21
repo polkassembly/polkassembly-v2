@@ -4,12 +4,11 @@
 
 'use client';
 
-import { ELocales, ETheme, IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
@@ -147,23 +146,26 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user preferences
 	useEffect(() => {
+		const locale = CookieClientService.getLocaleCookie();
+		const theme = CookieClientService.getThemeCookie();
+		const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+
 		setUserPreferences({
 			...userPreferences,
-			locale: (CookieClientService.getLocaleCookie() as ELocales) || userPreferences.locale,
-			theme: (CookieClientService.getThemeCookie() as ETheme) || userPreferences.theme,
-			...(user?.loginAddress
+			locale: locale || userPreferences.locale,
+			theme: theme || userPreferences.theme,
+			...(accessTokenPayload?.loginAddress
 				? {
 						address: {
-							address: user?.loginAddress
+							address: accessTokenPayload.loginAddress
 						}
 					}
 				: {}),
-			wallet: user?.loginWallet
+			wallet: accessTokenPayload?.loginWallet
 		});
 
-		dayjs.locale((CookieClientService.getLocaleCookie() as ELocales) || userPreferences.locale);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user?.loginWallet]);
+	}, []);
 
 	// set user
 	useEffect(() => {

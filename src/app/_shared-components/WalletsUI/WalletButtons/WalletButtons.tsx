@@ -18,9 +18,12 @@ function WalletButtons({ onWalletChange, small, hidePreference }: { onWalletChan
 	useEffect(() => {
 		if (userPreferences.wallet || !availableWallets || Object.keys(availableWallets).length === 0) return;
 
+		const walletKeys = Object.keys(availableWallets);
+		const preferredWallet = walletKeys.includes(EWallet.POLKADOT) ? EWallet.POLKADOT : (walletKeys[0] as EWallet);
+
 		setUserPreferences({
 			...userPreferences,
-			wallet: Object.keys(availableWallets)[0] as EWallet
+			wallet: preferredWallet
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [availableWallets]);
