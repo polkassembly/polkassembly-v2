@@ -56,6 +56,10 @@ function Web2Login({
 		const { emailOrUsername, password } = values;
 
 		if (!emailOrUsername || !password) {
+			toast({
+				status: NotificationType.ERROR,
+				title: t('Profile.enterCredentials')
+			});
 			return;
 		}
 
@@ -179,7 +183,7 @@ function Web2Login({
 			<WalletButtons
 				small
 				onWalletChange={onWalletChange}
-				noPreference
+				hidePreference
 			/>
 			<SwitchToWeb2Signup
 				className='mt-4 justify-center'

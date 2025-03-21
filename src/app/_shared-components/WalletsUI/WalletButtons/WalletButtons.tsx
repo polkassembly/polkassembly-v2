@@ -9,18 +9,18 @@ import { useWalletService } from '@/hooks/useWalletService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './WalletButtons.module.scss';
 
-function WalletButtons({ onWalletChange, small, noPreference }: { onWalletChange?: (wallet: EWallet | null) => void; small?: boolean; noPreference?: boolean }) {
+function WalletButtons({ onWalletChange, small, hidePreference }: { onWalletChange?: (wallet: EWallet | null) => void; small?: boolean; hidePreference?: boolean }) {
 	const walletService = useWalletService();
 	const availableWallets = walletService?.getInjectedWallets();
 
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 
 	useEffect(() => {
-		if (userPreferences.wallet || !availableWallets?.[EWallet.POLKADOT]) return;
+		if (userPreferences.wallet || !availableWallets || Object.keys(availableWallets).length === 0) return;
 
 		setUserPreferences({
 			...userPreferences,
-			wallet: EWallet.POLKADOT
+			wallet: Object.keys(availableWallets)[0] as EWallet
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [availableWallets]);
@@ -38,7 +38,7 @@ function WalletButtons({ onWalletChange, small, noPreference }: { onWalletChange
 						onClick={onWalletChange}
 						label={WalletClientService.getWalletNameLabel(wallet)}
 						small={small}
-						noPreference={noPreference}
+						hidePreference={hidePreference}
 					/>
 				);
 			})}

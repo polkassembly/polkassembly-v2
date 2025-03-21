@@ -248,7 +248,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 				<WalletButtons
 					small
 					onWalletChange={onWalletChange}
-					noPreference
+					hidePreference
 				/>
 				<p className={classes.switchToLogin}>
 					{t('Profile.alreadyHaveAnAccount')}

@@ -242,7 +242,8 @@
 		"saveChanges": "Guardar",
 		"unfollow": "Dejar de seguir",
 		"following": "Siguiendo",
-		"followers": "Seguidores"
+		"followers": "Seguidores",
+		"enterCredentials": "Por favor, ingrese sus credenciales"
 	},
 	"ListingTab": {
 		"Analytics": "Analíticas",

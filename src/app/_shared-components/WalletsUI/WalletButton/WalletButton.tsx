@@ -15,14 +15,14 @@ function WalletButton({
 	disabled,
 	label,
 	small,
-	noPreference
+	hidePreference
 }: {
 	wallet: EWallet;
 	onClick?: (wallet: EWallet) => void;
 	disabled?: boolean;
 	label: string;
 	small?: boolean;
-	noPreference?: boolean;
+	hidePreference?: boolean;
 }) {
 	const walletName = wallet === EWallet.NOVAWALLET ? EWallet.POLKADOT : wallet;
 	const { userPreferences, setUserPreferences } = useUserPreferences();
@@ -45,7 +45,7 @@ function WalletButton({
 			disabled={disabled}
 			variant='outline'
 			// if it is disabled, we change the bg color to bg-page_bg
-			className={cn(wallet === userPreferences.wallet && !noPreference && 'border border-navbar_border', disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal')}
+			className={cn(wallet === userPreferences.wallet && !hidePreference && 'border border-navbar_border', disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal')}
 		>
 			<WalletIcon wallet={wallet} />
 		</Button>
@@ -53,7 +53,11 @@ function WalletButton({
 		<Button
 			onClick={() => onWalletSelect(walletName)}
 			variant='outline'
-			className={cn(classes.walletButton, wallet === userPreferences.wallet && !noPreference && 'border border-navbar_border', disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal')}
+			className={cn(
+				classes.walletButton,
+				wallet === userPreferences.wallet && !hidePreference && 'border border-navbar_border',
+				disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal'
+			)}
 			leftIcon={<WalletIcon wallet={wallet} />}
 			disabled={disabled}
 			size='lg'

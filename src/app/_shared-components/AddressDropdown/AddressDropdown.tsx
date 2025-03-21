@@ -30,10 +30,6 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 
 		if (injectedAccounts.length === 0) {
 			setAccounts([]);
-			setUserPreferences({
-				...userPreferences,
-				address: undefined
-			});
 			return;
 		}
 

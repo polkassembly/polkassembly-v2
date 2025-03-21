@@ -242,7 +242,8 @@
 		"saveChanges": "保存",
 		"unfollow": "フォロー解除",
 		"following": "フォロー中",
-		"followers": "フォロワー"
+		"followers": "フォロワー",
+		"enterCredentials": "認証情報を入力してください"
 	},
 	"ListingTab": {
 		"Analytics": "分析",

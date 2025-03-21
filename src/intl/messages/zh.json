@@ -242,7 +242,8 @@
 		"saveChanges": "保存",
 		"unfollow": "取消关注",
 		"following": "关注中",
-		"followers": "粉丝"
+		"followers": "粉丝",
+		"enterCredentials": "请输入您的登录凭据"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
