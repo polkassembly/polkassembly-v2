@@ -38,7 +38,7 @@ export class LocalStorageClientService {
 	}
 
 	static getDiscussionPostData() {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA]()) || '';
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.DISCUSSION_POST_DATA]()) || null;
 	}
 
 	static deleteDiscussionPostData() {
@@ -51,7 +51,7 @@ export class LocalStorageClientService {
 	}
 
 	static getCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId)) || '';
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId)) || null;
 	}
 
 	static deleteCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
@@ -64,7 +64,7 @@ export class LocalStorageClientService {
 	}
 
 	static getEditPostData({ postId }: { postId: string }) {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId)) || '';
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.EDIT_POST_DATA](postId)) || null;
 	}
 
 	static deleteEditPostData({ postId }: { postId: string }) {
