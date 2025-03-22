@@ -93,15 +93,6 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 									/>
 								</div>
 							)}
-							<div>
-								<button
-									type='button'
-									onClick={() => setOpen(false)}
-									className={styles.closeButton}
-								>
-									{t('close')}
-								</button>
-							</div>
 						</DialogContent>
 					</Dialog>
 				</>

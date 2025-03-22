@@ -93,8 +93,11 @@
 	},
 	"Profile": {
 		"settings": "Configuración",
-		"login": "Iniciar Sesión",
-		"logout": "Cerrar Sesión",
+		"login": "Iniciar sesión",
+		"loginFailed": "Error al iniciar sesión",
+		"signupFailed": "Error al registrarse",
+		"noAccessTokenFound": "No se encontró el token de acceso.",
+		"logout": "Cerrar sesión",
 		"signUp": "Registrarse",
 		"dontHaveAnAccount": "¿No tienes una cuenta?",
 		"twoFactorAuth": "Autenticación de Dos Factores",
@@ -239,7 +242,8 @@
 		"saveChanges": "Guardar",
 		"unfollow": "Dejar de seguir",
 		"following": "Siguiendo",
-		"followers": "Seguidores"
+		"followers": "Seguidores",
+		"enterCredentials": "Por favor, ingrese sus credenciales"
 	},
 	"ListingTab": {
 		"Analytics": "Analíticas",
@@ -247,6 +251,7 @@
 		"Referenda": "Referendos"
 	},
 	"ListingPage": {
+		"AllProposals": "Todas las Referendos",
 		"AuctionAdmin": "Administrador de Subastas",
 		"AuctionAdminDescription": "Origen para iniciar subastas.",
 		"BigSpender": "Gran Gastador",
@@ -648,12 +653,16 @@
 		"proposals": "Propuestas"
 	},
 	"CreateProposal": {
-		"createPreimage": "Crear Preimagen",
+		"createPreimage": "Crear Preimage",
+		"existingPreimage": "Ya tiene un Preimage",
 		"createTreasuryProposal": "Crear Propuesta de Tesorería (Nativa)",
 		"usdxProposal": "Crear Propuesta de Tesorería USDx (Assethub)",
 		"cancelReferendum": "Cancelar un Referéndum",
 		"killReferendum": "Terminar un Referéndum",
-		"goBack": "Volver"
+		"goBack": "Volver",
+		"preimageHash": "Hash del Preimage",
+		"preimageLength": "Longitud del Preimage",
+		"preimageHashDescription": "Ingrese el hash del preimage para crear una propuesta"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
