@@ -759,6 +759,10 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
+	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
+		await this.treasuryStatsCollectionRef().add(treasuryStats);
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {

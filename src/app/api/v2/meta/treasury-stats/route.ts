@@ -7,7 +7,13 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { z } from 'zod';
-import { ITreasuryStats } from '@/_shared/types';
+import { IMessageResponse, ITreasuryStats } from '@/_shared/types';
+import { fetchLatestTreasuryStats } from '@/app/api/_api-utils/fetchLatestTreasuryStats';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { StatusCodes } from 'http-status-codes';
+import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
+import { headers } from 'next/headers';
 
 const zodQuerySchema = z.object({
 	from: z.date().optional(),
@@ -19,4 +25,25 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const { from, to } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 	const treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to });
 	return NextResponse.json(treasuryStats);
+});
+
+export const POST = withErrorHandling(async (): Promise<NextResponse<IMessageResponse>> => {
+	const readonlyHeaders = await headers();
+	const passphrase = readonlyHeaders.get('x-tools-passphrase');
+
+	if (!passphrase?.trim() || passphrase !== TOOLS_PASSPHRASE) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
+	}
+
+	const network = await getNetworkFromHeaders();
+
+	const treasuryStats = await fetchLatestTreasuryStats(network);
+
+	if (!treasuryStats) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error in fetching treasury stats.');
+	}
+
+	await OffChainDbService.SaveTreasuryStats({ treasuryStats });
+
+	return NextResponse.json({ message: 'Treasury stats fetched successfully' });
 });
