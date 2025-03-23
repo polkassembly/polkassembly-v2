@@ -552,9 +552,12 @@ export interface ISidebarMenuItem {
 	heading?: string;
 }
 
-export interface IErrorResponse {
-	status: StatusCodes;
+export interface IMessageResponse {
 	message: string;
+}
+
+export interface IErrorResponse extends IMessageResponse {
+	status: StatusCodes;
 	name: string;
 }
 
