@@ -15,6 +15,8 @@ import { StatusCodes } from 'http-status-codes';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { headers } from 'next/headers';
 
+export const maxDuration = 300;
+
 const zodQuerySchema = z.object({
 	from: z.date().optional(),
 	to: z.date().optional()
