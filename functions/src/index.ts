@@ -11,7 +11,7 @@ import { ENetwork } from './types';
 // Load environment variables
 dotenv.config();
 
-const TREASURY_STATS_NETWORKS = [ENetwork.POLKADOT, ENetwork.KUSAMA];
+const TREASURY_STATS_NETWORKS = [ENetwork.POLKADOT];
 
 // Fetch treasury stats every 6 hours
 export const scheduledTreasuryStatsFetch = onSchedule(
