@@ -11,5 +11,6 @@
 		"target": "es2017"
 	},
 	"compileOnSave": true,
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["node_modules", "lib"]
 }
