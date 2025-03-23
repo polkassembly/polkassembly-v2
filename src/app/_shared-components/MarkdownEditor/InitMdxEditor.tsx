@@ -4,6 +4,8 @@
 
 'use client';
 
+import '@mdxeditor/editor/style.css';
+
 import type { ForwardedRef } from 'react';
 import {
 	tablePlugin,
@@ -15,58 +17,79 @@ import {
 	MDXEditor,
 	type MDXEditorMethods,
 	type MDXEditorProps,
-	UndoRedo,
-	BoldItalicUnderlineToggles,
 	toolbarPlugin,
+	linkPlugin,
+	linkDialogPlugin,
+	frontmatterPlugin,
+	codeBlockPlugin,
+	codeMirrorPlugin,
+	UndoRedo,
 	ListsToggle,
-	BlockTypeSelect,
 	CodeToggle,
+	BoldItalicUnderlineToggles,
+	BlockTypeSelect,
 	CreateLink,
-	// InsertImage,
 	InsertTable,
-	linkPlugin
+	diffSourcePlugin,
+	DiffSourceToggleWrapper
 } from '@mdxeditor/editor';
 
-import '@mdxeditor/editor/style.css';
-import { cn } from '@/lib/utils';
+import classes from './MardownEditor.module.scss';
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
 	const toolbarContents = () => {
-		if (props.readOnly) return null;
-
 		return (
 			<>
-				<UndoRedo />
 				<BoldItalicUnderlineToggles />
 				<ListsToggle />
-				<BlockTypeSelect />
 				<CodeToggle />
+				<BlockTypeSelect />
 				<CreateLink />
-				{/* <InsertImage /> */}
 				<InsertTable />
+				<DiffSourceToggleWrapper>
+					<UndoRedo />
+				</DiffSourceToggleWrapper>
 			</>
 		);
 	};
 
+	const plugins = [
+		headingsPlugin(),
+		markdownShortcutPlugin(),
+		listsPlugin(),
+		quotePlugin(),
+		linkPlugin(),
+		linkDialogPlugin(),
+		tablePlugin(),
+		thematicBreakPlugin(),
+		frontmatterPlugin(),
+		diffSourcePlugin({
+			viewMode: 'rich-text'
+		}),
+		codeBlockPlugin({ defaultCodeBlockLanguage: '' }),
+		codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'Plain Text', tsx: 'TypeScript', '': 'Unspecified' } })
+	];
+
+	if (!props.readOnly) {
+		plugins.push(
+			toolbarPlugin({
+				toolbarClassName: 'toolbar',
+				toolbarContents
+			})
+		);
+	}
+
 	return (
-		<MDXEditor
-			plugins={[
-				// Example Plugin Usage
-				headingsPlugin(),
-				linkPlugin(),
-				listsPlugin(),
-				tablePlugin(),
-				quotePlugin(),
-				thematicBreakPlugin(),
-				markdownShortcutPlugin(),
-				toolbarPlugin({
-					toolbarClassName: cn(props.readOnly && 'p-0'),
-					toolbarContents
-				})
-			]}
-			{...props}
-			ref={editorRef}
-		/>
+		<div className={classes.mdxEditorWrapper}>
+			<MDXEditor
+				plugins={plugins}
+				{...props}
+				ref={editorRef}
+				onError={(error) => {
+					console.error(error);
+				}}
+			/>
+		</div>
 	);
 }

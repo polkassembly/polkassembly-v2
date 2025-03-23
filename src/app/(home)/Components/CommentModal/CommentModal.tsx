@@ -70,7 +70,7 @@ function CommentModal({
 				onOpenChange={setIsDialogOpen}
 			>
 				<DialogTitle>
-					<DialogContent className='max-w-lg pb-4 pt-3 lg:max-w-xl'>
+					<DialogContent className='max-w-xl pb-4 pt-3 lg:max-w-2xl'>
 						<DialogHeader className='px-4'>
 							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
 								<div className='flex w-10 flex-col gap-5'>

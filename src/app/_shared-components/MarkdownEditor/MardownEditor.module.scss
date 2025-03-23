@@ -1,0 +1,76 @@
+.mdxEditorWrapper {
+  /* Fix headings styling */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold mt-1 mb-1;
+  }
+  
+  h1 {
+    @apply text-2xl font-bold;
+  }
+  
+  h2 {
+    @apply text-xl font-bold;
+  }
+  
+  h3 {
+    @apply text-lg font-bold;
+  }
+
+  h4 {
+    @apply text-base font-bold;
+  }
+
+  h5 {
+    @apply text-sm font-bold;
+  }
+
+  h6 {
+    @apply text-xs font-bold;
+  }
+
+  a {
+    @apply text-text_pink no-underline;
+  }
+  
+  /* Fix blockquote styling */
+  blockquote {
+    @apply border-l-4 border-text_pink pl-4 text-text_grey italic;
+  }
+
+  /* List styling */
+  ul, ol {
+    @apply mt-2 mb-2 pl-2;
+  }
+
+  ul {
+    @apply list-disc;
+  }
+
+  ol {
+    @apply list-decimal;
+  }
+
+  /* Nested list styling */
+  ul ul, ol ul {
+    @apply list-[circle] mt-1 mb-1;
+  }
+
+  ul ul ul, ol ul ul, ol ol ul, ul ol ul {
+    @apply list-[square];
+  }
+
+  /* List items spacing */
+  li {
+    @apply mb-1;
+  }
+
+  /* Task lists */
+  li[data-checked="true"] {
+    @apply line-through text-text_grey;
+  }
+
+  /* Ensure proper indentation for multi-line list items */
+  li p {
+    @apply mb-0;
+  }
+}

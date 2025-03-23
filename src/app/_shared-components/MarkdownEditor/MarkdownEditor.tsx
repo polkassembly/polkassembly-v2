@@ -20,7 +20,7 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MDXEditorProps>((prop
 	<Editor
 		{...props}
 		editorRef={ref}
-		className={cn('relative z-10', !props.readOnly && 'z-20 min-h-[150px] rounded-md border border-border_grey px-4 py-2', props.className)}
+		className={cn(!props.readOnly && '', props.className)}
 	/>
 ));
 
