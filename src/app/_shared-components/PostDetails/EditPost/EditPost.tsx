@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { EProposalType, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
@@ -9,6 +9,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { MDXEditorMethods } from '@mdxeditor/editor';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
@@ -18,7 +19,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 	const [content, setContent] = useState<string | null>(savedContent || postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
 	const [isLoading, setIsLoading] = useState(false);
-
+	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const { user } = useUser();
 
 	const editPost = async () => {
@@ -72,6 +73,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 							LocalStorageClientService.setEditPostData({ postId: postData.index.toString(), data });
 						}
 					}}
+					ref={markdownEditorRef}
 				/>
 			</div>
 			<div className='flex justify-end'>

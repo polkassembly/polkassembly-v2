@@ -34,23 +34,41 @@ import {
 	DiffSourceToggleWrapper
 } from '@mdxeditor/editor';
 
+import { Ellipsis } from 'lucide-react';
 import classes from './MardownEditor.module.scss';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover/Popover';
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
 	const toolbarContents = () => {
 		return (
-			<>
+			<div className='flex items-center gap-x-1 md:gap-x-2'>
+				<UndoRedo />
 				<BoldItalicUnderlineToggles />
-				<ListsToggle />
-				<CodeToggle />
+				<div className='hidden items-center gap-x-2 lg:flex'>
+					<ListsToggle />
+					<CodeToggle />
+				</div>
 				<BlockTypeSelect />
-				<CreateLink />
-				<InsertTable />
-				<DiffSourceToggleWrapper>
-					<UndoRedo />
-				</DiffSourceToggleWrapper>
-			</>
+				<div className='flex-1' />
+				<Popover>
+					<PopoverTrigger>
+						<Ellipsis />
+					</PopoverTrigger>
+					<PopoverContent className='flex items-center justify-center border-none'>
+						<div className='flex items-center gap-x-2'>
+							<DiffSourceToggleWrapper>
+								<CreateLink />
+								<InsertTable />
+								<div className='flex items-center gap-x-2 lg:hidden'>
+									<ListsToggle />
+									<CodeToggle />
+								</div>
+							</DiffSourceToggleWrapper>
+						</div>
+					</PopoverContent>
+				</Popover>
+			</div>
 		);
 	};
 
@@ -74,7 +92,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 	if (!props.readOnly) {
 		plugins.push(
 			toolbarPlugin({
-				toolbarClassName: 'toolbar',
+				toolbarClassName: 'toolbar [&_svg]:w-4 [&_svg]:h-4 md:[&_svg]:h-6 md:[&_svg]:w-6',
 				toolbarContents
 			})
 		);

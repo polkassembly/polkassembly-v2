@@ -19,8 +19,9 @@ const Editor = dynamic(() => import('./InitMdxEditor'), {
 export const MarkdownEditor = forwardRef<MDXEditorMethods, MDXEditorProps>((props, ref) => (
 	<Editor
 		{...props}
+		markdown={props.markdown || ''}
 		editorRef={ref}
-		className={cn(!props.readOnly && '', props.className)}
+		className={cn(!props.readOnly && 'w-full rounded-md border border-border_grey', props.className)}
 	/>
 ));
 

@@ -12,6 +12,8 @@ import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import { MessageCircleWarning } from 'lucide-react';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
+import { useRef } from 'react';
+import { MDXEditorMethods } from '@mdxeditor/editor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
@@ -21,6 +23,7 @@ import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostFormFields>; disabled?: boolean }) {
 	const t = useTranslations();
+	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
 	const allowedCommentorsOptions = [
 		{
@@ -85,11 +88,11 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 						<FormLabel>{t('Create.description')}*</FormLabel>
 						<FormControl>
 							<MarkdownEditor
-								markdown={field.value}
-								className={classes.editor}
+								markdown={field.value || ''}
 								onChange={(data) => {
 									field.onChange(data);
 								}}
+								ref={markdownEditorRef}
 							/>
 						</FormControl>
 
