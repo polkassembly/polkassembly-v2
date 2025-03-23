@@ -13,158 +13,33 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const { BN } = await import('@polkadot/util');
 		const { TREASURY_NETWORK_CONFIG } = await import('@/_shared/_constants/treasury');
 
-		// Define the Treasury Stats structure
-		const treasuryStats: ITreasuryStats = {
-			network,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			relayChain: {
-				dot: '',
-				myth: ''
-			},
-			ambassador: {
-				usdt: ''
-			},
-			assetHub: {
-				dot: '',
-				usdc: '',
-				usdt: ''
-			},
-			hydration: {
-				dot: '',
-				usdc: '',
-				usdt: ''
-			},
-			bounties: {
-				dot: ''
-			},
-			fellowship: {
-				dot: '',
-				usdt: ''
-			},
-			total: {
-				totalDot: '',
-				totalUsdc: '',
-				totalUsdt: '',
-				totalMyth: ''
-			},
-			loans: {
-				dot: '',
-				usdc: ''
-			}
-		};
-
 		const config = TREASURY_NETWORK_CONFIG[network as ENetwork];
 		if (!config) {
 			throw new APIError(ERROR_CODES.NETWORK_NOT_SUPPORTED, StatusCodes.BAD_REQUEST);
 		}
 
-		treasuryStats.loans = {
-			dot: config.loanAmounts.dot,
-			usdc: config.loanAmounts.usdc
-		};
-
-		// 1. get relay chain stats
-		const api = new ApiPromise({
-			provider: new WsProvider(config.relayChainRpc)
-		});
-		await api.isReady;
-
-		// Using type assertion with unknown as intermediate step for better safety
-		const treasuryAccountInfo = await api.query.system.account(config.treasuryAccount);
-		const treasuryBalance = (treasuryAccountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
-		treasuryStats.relayChain = {
-			dot: treasuryBalance,
-			myth: ''
-		};
-
-		// Function to filter bounties
-		const filterBountiesData = (items: unknown[]) => {
-			return items.filter((item) => {
-				const { isFunded, isCuratorProposed, isActive } =
-					(item as { bounty?: { status: { isFunded?: boolean; isCuratorProposed?: boolean; isActive?: boolean } } })?.bounty?.status || {};
-				return isFunded || isCuratorProposed || isActive;
-			});
-		};
-
-		// Cast to unknown first to avoid direct DeriveBounties type assignment
-		const deriveBounties = await api?.derive.bounties?.bounties();
-		const activePjsBounties = filterBountiesData(deriveBounties as unknown as unknown[]);
-
-		const balances = await Promise.all(
-			activePjsBounties.map(async (bounty) => {
-				const bountyData = bounty as { index?: { toJSON: () => string } };
-				const id = bountyData?.index?.toJSON();
-				if (!id) return new BN(0);
-
-				try {
-					// fetch bounty data from subsquare
-					const response = await fetch(`https://polkadot.subsquare.io/api/treasury/bounties/${id}`);
-					if (!response.ok) {
-						throw new Error(`Failed to fetch data for bounty ${id}: ${response.statusText}`);
-					}
-					const result = await response.json();
-					const address = result?.onchainData?.address;
-
-					if (!address) {
-						const metadataValue = result?.onchainData?.meta?.value || 0;
-						return new BN(metadataValue);
-					}
-
-					try {
-						const accountData = await api.query.system.account(address);
-						const accountInfo = accountData as unknown as { data: { free: { toString: () => string }; reserved: { toString: () => string } } };
-						return new BN(accountInfo.data.free.toString()).add(new BN(accountInfo.data.reserved.toString()));
-					} catch (accountError) {
-						console.error(`Error fetching account data for bounty ${id}: ${accountError}, address: ${address}`);
-						return new BN(0);
-					}
-				} catch (error) {
-					console.error(`Error fetching balance for bounty index ${id}: ${error}`);
-					return new BN(0);
-				}
-			})
-		);
-
-		const bountiesTotal = balances.reduce((acc, curr) => acc.add(curr), new BN(0)).toString();
-		treasuryStats.bounties = {
-			dot: bountiesTotal
-		};
-		await api.disconnect();
-
-		// 2. get asset hub stats
-		const assetHubApi = new ApiPromise({
-			provider: new WsProvider(config.assetHubRpc)
-		});
-		await assetHubApi.isReady;
-
-		// relay chain assethub dot balance
-		const treasuryAddressInfo = await assetHubApi.query.system.account(config.assetHubTreasuryAddress);
-		const relayChainAssethubDotBalance = (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
-		treasuryStats.assetHub = {
-			dot: relayChainAssethubDotBalance,
-			usdc: '',
-			usdt: ''
-		};
-
-		// fellowship assethub dot balance
-		const fellowshipAddressInfo = await assetHubApi.query.system.account(config.assetHubFellowshipAddress);
-		const fellowshipAssethubDotBalance = (fellowshipAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
-		treasuryStats.fellowship = {
-			dot: fellowshipAssethubDotBalance,
-			usdt: ''
-		};
-
-		// relay chain assethub usdt balance
-		const relayChainAssethubUsdtBalance = await assetHubApi.query.assets.account(config.usdtIndex, config.assetHubTreasuryAddress);
-
-		// Type safe checks with generic structure
-		const getBalanceIfExists = (result: unknown): string => {
-			if (!result || typeof result !== 'object') {
-				return '';
+		// Initialize treasury stats structure
+		const treasuryStats: ITreasuryStats = {
+			network,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			relayChain: { dot: '', myth: '' },
+			ambassador: { usdt: '' },
+			assetHub: { dot: '', usdc: '', usdt: '' },
+			hydration: { dot: '', usdc: '', usdt: '' },
+			bounties: { dot: '' },
+			fellowship: { dot: '', usdt: '' },
+			total: { totalDot: '', totalUsdc: '', totalUsdt: '', totalMyth: '' },
+			loans: {
+				dot: config.loanAmounts.dot,
+				usdc: config.loanAmounts.usdc
 			}
+		};
 
-			// Cast to unknown first and check properties
+		// Helper function to safely extract balance from results
+		const getBalanceIfExists = (result: unknown): string => {
+			if (!result || typeof result !== 'object') return '';
+
 			const resultObj = result as unknown;
 			if (
 				resultObj &&
@@ -172,10 +47,8 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				'isSome' in resultObj &&
 				(resultObj as { isSome: boolean }).isSome === true &&
 				'unwrap' in resultObj &&
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-				typeof (resultObj as { unwrap: Function }).unwrap === 'function'
+				typeof (resultObj as { unwrap: () => unknown }).unwrap === 'function'
 			) {
-				// Now safely unwrap
 				const unwrapped = (resultObj as { unwrap: () => unknown }).unwrap();
 
 				if (
@@ -191,101 +64,181 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			return '';
 		};
 
-		treasuryStats.assetHub.usdt = getBalanceIfExists(relayChainAssethubUsdtBalance);
-
-		// fellowship assethub usdt balance
-		const fellowshipAssethubUsdtBalance = await assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress);
-		treasuryStats.fellowship.usdt = getBalanceIfExists(fellowshipAssethubUsdtBalance);
-
-		// ambassador usdt balance
-		const ambassadorUsdtBalance = await assetHubApi.query.assets.account(config.usdtIndex, config.assetHubAmbassadorAddress);
-		treasuryStats.ambassador = {
-			usdt: getBalanceIfExists(ambassadorUsdtBalance)
+		// Initialize all API connections
+		const apiProviders = {
+			relayChain: new WsProvider(config.relayChainRpc),
+			assetHub: new WsProvider(config.assetHubRpc),
+			hydration: new WsProvider(config.hydrationRpc)
 		};
 
-		// relay chain assethub usdc balance
-		const relayChainAssethubUsdcBalance = await assetHubApi.query.assets.account(config.usdcIndex, config.assetHubTreasuryAddress);
-		treasuryStats.assetHub.usdc = getBalanceIfExists(relayChainAssethubUsdcBalance);
+		const [relayChainApi, assetHubApi, hydrationApi] = await Promise.all([
+			ApiPromise.create({ provider: apiProviders.relayChain }),
+			ApiPromise.create({ provider: apiProviders.assetHub }),
+			ApiPromise.create({ provider: apiProviders.hydration })
+		]);
 
-		// relay chain myth assethub dot balance
-		const relayChainAssethubMythDotBalance = await assetHubApi.query.foreignAssets.account(
-			{
-				parents: 1,
-				interior: {
-					X1: [
-						{
-							Parachain: config.mythosParachainId
-						}
-					]
+		// Fetch relay chain data
+		const relayChainTasks = [
+			// Treasury balance
+			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
+				treasuryStats.relayChain.dot = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+			}),
+
+			// Bounties data
+			(async () => {
+				try {
+					const deriveBounties = await relayChainApi.derive.bounties?.bounties();
+					const activeBounties = (deriveBounties as unknown as unknown[]).filter((item) => {
+						const { isFunded, isCuratorProposed, isActive } =
+							(item as { bounty?: { status: { isFunded?: boolean; isCuratorProposed?: boolean; isActive?: boolean } } })?.bounty?.status || {};
+						return isFunded || isCuratorProposed || isActive;
+					});
+
+					// Process active bounties
+					const balances = await Promise.all(
+						activeBounties.map(async (bounty) => {
+							const bountyData = bounty as { index?: { toJSON: () => string } };
+							const id = bountyData?.index?.toJSON();
+							if (!id) return new BN(0);
+
+							try {
+								const response = await fetch(`https://polkadot.subsquare.io/api/treasury/bounties/${id}`);
+								if (!response.ok) return new BN(0);
+
+								const result = await response.json();
+								const address = result?.onchainData?.address;
+
+								if (!address) {
+									const metadataValue = result?.onchainData?.meta?.value || 0;
+									return new BN(metadataValue);
+								}
+
+								try {
+									const accountData = await relayChainApi.query.system.account(address);
+									const accountInfo = accountData as unknown as {
+										data: { free: { toString: () => string }; reserved: { toString: () => string } };
+									};
+									return new BN(accountInfo.data.free.toString()).add(new BN(accountInfo.data.reserved.toString()));
+								} catch {
+									return new BN(0);
+								}
+							} catch {
+								return new BN(0);
+							}
+						})
+					);
+
+					treasuryStats.bounties.dot = balances.reduce((acc, curr) => acc.add(curr), new BN(0)).toString();
+				} catch (error) {
+					console.error(`Error processing bounties: ${error}`);
+					treasuryStats.bounties.dot = '';
 				}
-			},
-			config.assetHubMythAddress
-		);
-		treasuryStats.relayChain.myth = getBalanceIfExists(relayChainAssethubMythDotBalance);
+			})()
+		];
 
-		await assetHubApi.disconnect();
+		// Fetch asset hub data
+		const assetHubTasks = [
+			// Relay chain assethub DOT balance
+			assetHubApi.query.system.account(config.assetHubTreasuryAddress).then((treasuryAddressInfo) => {
+				treasuryStats.assetHub.dot = (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+			}),
 
-		// 3. get hydration stats
-		const hydrationApi = new ApiPromise({
-			provider: new WsProvider(config.hydrationRpc)
-		});
-		await hydrationApi.isReady;
+			// Fellowship assethub DOT balance
+			assetHubApi.query.system.account(config.assetHubFellowshipAddress).then((fellowshipAddressInfo) => {
+				treasuryStats.fellowship.dot = (fellowshipAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+			}),
 
-		const ZERO_BN = new BN(0);
-		let hydrationDotBalance = ZERO_BN;
-		let hydrationUsdcBalance = ZERO_BN;
-		let hydrationUsdtBalance = ZERO_BN;
+			// Asset Hub USDT balance
+			assetHubApi.query.assets.account(config.usdtIndex, config.assetHubTreasuryAddress).then((balance) => {
+				treasuryStats.assetHub.usdt = getBalanceIfExists(balance);
+			}),
 
-		// Use Promise.all instead of a for loop to avoid linter warnings about awaits in loops
-		await Promise.all(
-			config.hydrationAddresses.map(async (address) => {
-				// Helper function to safely get token balance
-				const getTokenBalance = async (assetId: number) => {
-					try {
-						const tokenBalance = await hydrationApi?.query?.tokens?.accounts(address, assetId);
-						if (tokenBalance && typeof tokenBalance === 'object') {
-							const tokenData = tokenBalance as { free?: { toString?: () => string }; reserved?: { toString?: () => string } };
-							const free = tokenData.free?.toString?.() || '0';
-							const reserved = tokenData.reserved?.toString?.() || '0';
-							return {
-								free: new BN(free),
-								reserved: new BN(reserved)
-							};
+			// Fellowship USDT balance
+			assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress).then((balance) => {
+				treasuryStats.fellowship.usdt = getBalanceIfExists(balance);
+			}),
+
+			// Ambassador USDT balance
+			assetHubApi.query.assets.account(config.usdtIndex, config.assetHubAmbassadorAddress).then((balance) => {
+				treasuryStats.ambassador.usdt = getBalanceIfExists(balance);
+			}),
+
+			// Asset Hub USDC balance
+			assetHubApi.query.assets.account(config.usdcIndex, config.assetHubTreasuryAddress).then((balance) => {
+				treasuryStats.assetHub.usdc = getBalanceIfExists(balance);
+			}),
+
+			// Mythos assets
+			assetHubApi.query.foreignAssets
+				.account(
+					{
+						parents: 1,
+						interior: {
+							X1: [{ Parachain: config.mythosParachainId }]
 						}
-					} catch (error) {
-						console.error(`Error fetching token balance for address ${address}, asset ${assetId}: ${error}`);
-					}
-					return { free: ZERO_BN, reserved: ZERO_BN };
-				};
+					},
+					config.assetHubMythAddress
+				)
+				.then((balance) => {
+					treasuryStats.relayChain.myth = getBalanceIfExists(balance);
+				})
+		];
 
-				// get dot balance
-				const { free: freeDOTBalance, reserved: reservedDOTBalance } = await getTokenBalance(config.hydrationDotAssetId);
-				hydrationDotBalance = hydrationDotBalance.add(freeDOTBalance).add(reservedDOTBalance);
+		// Fetch hydration data
+		const fetchHydrationBalances = async () => {
+			const ZERO_BN = new BN(0);
+			let hydrationDotBalance = ZERO_BN;
+			let hydrationUsdcBalance = ZERO_BN;
+			let hydrationUsdtBalance = ZERO_BN;
 
-				// get usdc balance
-				const { free: freeUSDCBalance, reserved: reservedUSDCBalance } = await getTokenBalance(config.hydrationUsdcAssetId);
-				hydrationUsdcBalance = hydrationUsdcBalance.add(freeUSDCBalance).add(reservedUSDCBalance);
+			// Process all hydration addresses
+			await Promise.all(
+				config.hydrationAddresses.map(async (address) => {
+					// Helper function to safely get token balance
+					const getTokenBalance = async (assetId: number) => {
+						try {
+							const tokenBalance = await hydrationApi?.query?.tokens?.accounts(address, assetId);
+							if (tokenBalance && typeof tokenBalance === 'object') {
+								const tokenData = tokenBalance as { free?: { toString?: () => string }; reserved?: { toString?: () => string } };
+								const free = tokenData.free?.toString?.() || '0';
+								const reserved = tokenData.reserved?.toString?.() || '0';
+								return {
+									free: new BN(free),
+									reserved: new BN(reserved)
+								};
+							}
+						} catch {
+							// Silent error handling
+						}
+						return { free: ZERO_BN, reserved: ZERO_BN };
+					};
 
-				// get usdt balance
-				const { free: freeUSDTBalance, reserved: reservedUSDTBalance } = await getTokenBalance(config.hydrationUsdtAssetId);
-				hydrationUsdtBalance = hydrationUsdtBalance.add(freeUSDTBalance).add(reservedUSDTBalance);
-			})
-		);
+					// Get all token balances for each address
+					const [dotBalance, usdcBalance, usdtBalance] = await Promise.all([
+						getTokenBalance(config.hydrationDotAssetId),
+						getTokenBalance(config.hydrationUsdcAssetId),
+						getTokenBalance(config.hydrationUsdtAssetId)
+					]);
 
-		treasuryStats.hydration = {
-			dot: hydrationDotBalance.isZero() ? '' : hydrationDotBalance.toString(),
-			usdc: hydrationUsdcBalance.isZero() ? '' : hydrationUsdcBalance.toString(),
-			usdt: hydrationUsdtBalance.isZero() ? '' : hydrationUsdtBalance.toString()
+					hydrationDotBalance = hydrationDotBalance.add(dotBalance.free).add(dotBalance.reserved);
+					hydrationUsdcBalance = hydrationUsdcBalance.add(usdcBalance.free).add(usdcBalance.reserved);
+					hydrationUsdtBalance = hydrationUsdtBalance.add(usdtBalance.free).add(usdtBalance.reserved);
+				})
+			);
+
+			treasuryStats.hydration = {
+				dot: hydrationDotBalance.isZero() ? '' : hydrationDotBalance.toString(),
+				usdc: hydrationUsdcBalance.isZero() ? '' : hydrationUsdcBalance.toString(),
+				usdt: hydrationUsdtBalance.isZero() ? '' : hydrationUsdtBalance.toString()
+			};
 		};
 
-		await hydrationApi.disconnect();
+		// Execute all tasks
+		await Promise.all([...relayChainTasks, ...assetHubTasks, fetchHydrationBalances()]);
 
-		// 5. add for total treasury stats
-		const zeroBN = new BN(0);
-
-		// Calculate totals
+		// Calculate totals after all data is fetched
 		const calculateTotal = (propertyName: 'dot' | 'usdc' | 'usdt' | 'myth'): string => {
-			let total = zeroBN;
+			let total = new BN(0);
 
 			Object.values(treasuryStats).forEach((section) => {
 				if (section && typeof section === 'object' && propertyName in section) {
@@ -305,6 +258,9 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			totalUsdt: calculateTotal('usdt'),
 			totalMyth: calculateTotal('myth')
 		};
+
+		// Disconnect all APIs
+		await Promise.all([relayChainApi.disconnect(), assetHubApi.disconnect(), hydrationApi.disconnect()]);
 
 		return treasuryStats;
 	} catch (error) {
