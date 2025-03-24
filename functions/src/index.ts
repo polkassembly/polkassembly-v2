@@ -15,7 +15,7 @@ dotenv.config();
 // Fetch treasury stats every 6 hours
 export const scheduledTreasuryStatsFetch = onSchedule(
 	{
-		schedule: 'every 12 hours',
+		schedule: 'every 6 hours',
 		timeZone: 'UTC',
 		retryCount: 3,
 		timeoutSeconds: 300 // 5 minutes
