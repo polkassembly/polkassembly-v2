@@ -9,10 +9,14 @@ import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { MdInfoOutline } from 'react-icons/md';
-import { FaArrowUp } from 'react-icons/fa';
+import DotIcon from '@assets/icons/dot.png';
+import UsdcIcon from '@assets/icons/usdc.svg';
+import UsdtIcon from '@assets/icons/usdt.svg';
+import MythIcon from '@assets/icons/myth.svg';
 import { FiChevronRight } from 'react-icons/fi';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ITreasuryStats } from '@/_shared/types';
+import Image from 'next/image';
 
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
@@ -40,6 +44,7 @@ export default function TreasuryStats() {
 	});
 
 	const chartData = useMemo(() => {
+		//  make this dynamic based on the current month
 		const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
 		const values = [26, 25, 24, 24, 23, 22, 23, 24, 25, 26];
 
@@ -84,7 +89,6 @@ export default function TreasuryStats() {
 				usdtFormatted: (totalUsdt / 1_000_000).toFixed(2),
 				mythFormatted: (totalMyth / 1_000_000).toFixed(2),
 				dotPrice: tokenPrice.toFixed(2),
-				dotPriceChange: 8.48,
 				totalValueUsd: totalUsdValue
 			};
 		} catch (error) {
@@ -134,9 +138,6 @@ export default function TreasuryStats() {
 					<div className='flex items-center gap-2'>
 						<p className='text-sm text-wallet_btn_text'>DOT Price</p>
 						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice}</span>
-						<span className='flex items-center text-green-500'>
-							{stats.dotPriceChange}% <FaArrowUp className='ml-1' />
-						</span>
 					</div>
 				</div>
 				<div className='mt-1'>
@@ -149,19 +150,39 @@ export default function TreasuryStats() {
 
 					<div className='mt-1 flex gap-3'>
 						<div className='flex items-center gap-1'>
-							<span className='text-lg text-pink-500'>●</span>
+							<Image
+								src={DotIcon}
+								alt='DOT'
+								width={16}
+								height={16}
+							/>
 							<span className='text-xs text-btn_secondary_text'>{stats.dotFormatted}M DOT</span>
 						</div>
 						<div className='flex items-center gap-1'>
-							<span className='text-lg text-blue-500'>●</span>
+							<Image
+								src={UsdcIcon}
+								alt='USDC'
+								width={16}
+								height={16}
+							/>
 							<span className='text-xs text-btn_secondary_text'>{stats.usdcFormatted}M USDC</span>
 						</div>
 						<div className='flex items-center gap-1'>
-							<span className='text-lg text-teal-500'>●</span>
+							<Image
+								src={UsdtIcon}
+								alt='USDt'
+								width={16}
+								height={16}
+							/>
 							<span className='text-xs text-btn_secondary_text'>{stats.usdtFormatted}M USDt</span>
 						</div>
 						<div className='flex items-center gap-1'>
-							<span className='text-lg text-red-400'>●</span>
+							<Image
+								src={MythIcon}
+								alt='MYTH'
+								width={16}
+								height={16}
+							/>
 							<span className='text-xs text-btn_secondary_text'>{stats.mythFormatted}M MYTH</span>
 						</div>
 					</div>
