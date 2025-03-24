@@ -14,14 +14,6 @@ import { FiChevronRight } from 'react-icons/fi';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ITreasuryStats } from '@/_shared/types';
 
-const plancksToDot = (plancks: string) => {
-	return Number(plancks) / 10000000000;
-};
-
-const formatMillion = (value: number) => {
-	return (value / 1000000).toFixed(2) + 'M';
-};
-
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
 
@@ -67,19 +59,38 @@ export default function TreasuryStats() {
 	const stats = useMemo(() => {
 		if (!treasuryStats || !treasuryStats[0]) return null;
 
-		const data = treasuryStats[0];
-		const totalDot = plancksToDot(data.total.totalDot);
+		try {
+			const data = treasuryStats[0];
 
-		return {
-			dot: totalDot,
-			dotFormatted: formatMillion(totalDot),
-			usdcFormatted: formatMillion(Number(data.total.totalUsdc) / 1000000),
-			usdtFormatted: formatMillion(Number(data.total.totalUsdt) / 1000000),
-			mythFormatted: formatMillion(Number(data.total.totalMyth) / 1000000000000000000),
-			dotPrice: 4.76,
-			dotPriceChange: 8.48,
-			totalValueUsd: 154.5 // Fixed value from image
-		};
+			// Calculate DOT with proper precision
+			// DOT has 10 decimal places (planks)
+			const totalDot = Number(data?.total?.totalDot || 0) / 10000000000;
+			const tokenPrice = Number(data.nativeTokenUsdPrice) || 0;
+
+			// USDC and USDT have 6 decimal places
+			const totalUsdc = Number(data?.total?.totalUsdc || 0) / 1_000_000;
+			const totalUsdt = Number(data?.total?.totalUsdt || 0) / 1_000_000;
+
+			// MYTH has 18 decimal places
+			const totalMyth = Number(data?.total?.totalMyth || 0) / 1e18;
+
+			// Calculate total USD value with higher precision
+			const totalUsdValue = Number((totalDot * tokenPrice + totalUsdc + totalUsdt).toFixed(2));
+
+			return {
+				dot: totalDot,
+				dotFormatted: (totalDot / 1_000_000).toFixed(2),
+				usdcFormatted: (totalUsdc / 1_000_000).toFixed(2),
+				usdtFormatted: (totalUsdt / 1_000_000).toFixed(2),
+				mythFormatted: (totalMyth / 1_000_000).toFixed(2),
+				dotPrice: tokenPrice.toFixed(2),
+				dotPriceChange: 8.48,
+				totalValueUsd: totalUsdValue
+			};
+		} catch (error) {
+			console.error('Error calculating treasury stats:', error);
+			return null;
+		}
 	}, [treasuryStats]);
 
 	if (isLoading) {
@@ -122,7 +133,7 @@ export default function TreasuryStats() {
 					</div>
 					<div className='flex items-center gap-2'>
 						<p className='text-sm text-wallet_btn_text'>DOT Price</p>
-						<span className='font-semibold text-btn_secondary_text'>${stats.dotPrice.toFixed(2)}</span>
+						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice}</span>
 						<span className='flex items-center text-green-500'>
 							{stats.dotPriceChange}% <FaArrowUp className='ml-1' />
 						</span>
@@ -130,7 +141,7 @@ export default function TreasuryStats() {
 				</div>
 				<div className='mt-1'>
 					<div className='flex items-center gap-2'>
-						<span className='text-xl font-bold text-btn_secondary_text'>~${stats.totalValueUsd}M</span>
+						<span className='text-xl font-bold text-btn_secondary_text'>~${(stats.totalValueUsd / 1_000_000).toFixed(2)}M</span>{' '}
 						<span className='flex items-center text-xs text-pink-500'>
 							Details <FiChevronRight className='ml-1' />
 						</span>
@@ -139,19 +150,19 @@ export default function TreasuryStats() {
 					<div className='mt-1 flex gap-3'>
 						<div className='flex items-center gap-1'>
 							<span className='text-lg text-pink-500'>●</span>
-							<span className='text-xs text-btn_secondary_text'>{stats.dotFormatted} DOT</span>
+							<span className='text-xs text-btn_secondary_text'>{stats.dotFormatted}M DOT</span>
 						</div>
 						<div className='flex items-center gap-1'>
 							<span className='text-lg text-blue-500'>●</span>
-							<span className='text-xs text-btn_secondary_text'>{stats.usdcFormatted} USDC</span>
+							<span className='text-xs text-btn_secondary_text'>{stats.usdcFormatted}M USDC</span>
 						</div>
 						<div className='flex items-center gap-1'>
 							<span className='text-lg text-teal-500'>●</span>
-							<span className='text-xs text-btn_secondary_text'>{stats.usdtFormatted} USDt</span>
+							<span className='text-xs text-btn_secondary_text'>{stats.usdtFormatted}M USDt</span>
 						</div>
 						<div className='flex items-center gap-1'>
 							<span className='text-lg text-red-400'>●</span>
-							<span className='text-xs text-btn_secondary_text'>{stats.mythFormatted} MYTH</span>
+							<span className='text-xs text-btn_secondary_text'>{stats.mythFormatted}M MYTH</span>
 						</div>
 					</div>
 				</div>
