@@ -216,6 +216,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			description: WISH_FOR_CHANGE_DESCRIPTION,
 			group: 'Origin',
 			name: 'wish_for_change',
+			maxDeciding: 10,
 			decisionDeposit: new BN('200000000000000'),
 			preparePeriod: 1200,
 			decisionPeriod: 403200,
