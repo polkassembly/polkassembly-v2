@@ -962,5 +962,6 @@ export interface ITreasuryStats {
 		[key: string]: string | undefined;
 	};
 	nativeTokenUsdPrice?: string;
+	nativeTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
