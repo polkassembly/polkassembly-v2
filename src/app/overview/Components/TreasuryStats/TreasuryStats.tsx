@@ -17,6 +17,7 @@ import { FiChevronRight } from 'react-icons/fi';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ITreasuryStats } from '@/_shared/types';
 import Image from 'next/image';
+import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
@@ -86,8 +87,7 @@ export default function TreasuryStats() {
 			// DOT has 10 decimal places (planks)
 			const totalDot = Number(data?.total?.totalDot || 0) / 10000000000;
 			const tokenPrice = Number(data.nativeTokenUsdPrice) || 0;
-
-			// USDC and USDT have 6 decimal places
+			const dot24hChange = Number(data?.nativeTokenUsdPrice24hChange) || 0;
 			const totalUsdc = Number(data?.total?.totalUsdc || 0) / 1_000_000;
 			const totalUsdt = Number(data?.total?.totalUsdt || 0) / 1_000_000;
 
@@ -104,7 +104,8 @@ export default function TreasuryStats() {
 				usdtFormatted: (totalUsdt / 1_000_000).toFixed(2),
 				mythFormatted: (totalMyth / 1_000_000).toFixed(2),
 				dotPrice: tokenPrice.toFixed(2),
-				totalValueUsd: totalUsdValue
+				totalValueUsd: totalUsdValue,
+				dot24hChange: dot24hChange
 			};
 		} catch (error) {
 			console.error('Error calculating treasury stats:', error);
@@ -152,7 +153,18 @@ export default function TreasuryStats() {
 					</div>
 					<div className='flex items-center gap-2'>
 						<p className='text-sm text-wallet_btn_text'>DOT Price</p>
-						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice}</span>
+						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice} </span>
+						<span className='text-xs'>
+							{stats?.dot24hChange > 0 ? (
+								<span className='flex items-center gap-1 text-success'>
+									{stats?.dot24hChange?.toFixed(2)}% <FaCaretUp />
+								</span>
+							) : (
+								<span className='flex items-center gap-1 text-failure'>
+									{stats?.dot24hChange?.toFixed(2)}% <FaCaretDown />
+								</span>
+							)}
+						</span>
 					</div>
 				</div>
 				<div className='mt-1'>
