@@ -133,7 +133,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 							if (!id) return new BN(0);
 
 							try {
-								const response = await fetch(`https://polkadot.subsquare.io/api/treasury/bounties/${id}`);
+								const response = await fetch(`https://${network}.subsquare.io/api/treasury/bounties/${id}`);
 								if (!response.ok) return new BN(0);
 
 								const result = await response.json();
