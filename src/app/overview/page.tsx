@@ -5,7 +5,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EPostOrigin, EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import Overview from './Components/Overview';
 
@@ -71,8 +71,6 @@ async function OverviewPage() {
 		}
 	};
 	const trackDetails = await fetchTrackDetails();
-
-	const symbol = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-8'>
