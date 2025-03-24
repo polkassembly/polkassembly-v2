@@ -34,10 +34,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			bounties: { dot: '' },
 			fellowship: { dot: '', usdt: '' },
 			total: { totalDot: '', totalUsdc: '', totalUsdt: '', totalMyth: '' },
-			loans: {
-				dot: config.loanAmounts.dot,
-				usdc: config.loanAmounts.usdc
-			}
+			loans: config.loanAmounts
 		};
 
 		// Helper function to safely extract balance from results
@@ -319,6 +316,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		// Execute all tasks
 		await Promise.all([...relayChainTasks, ...assetHubTasks, fetchHydrationBalances(), fetchNativeTokenPriceInUsd()]);
 
+		// TODO: add cross network handling
 		// Calculate totals after all data is fetched
 		const calculateTotal = (propertyName: 'dot' | 'usdc' | 'usdt' | 'myth'): string => {
 			let total = new BN(0);
@@ -344,6 +342,30 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				totalMyth: calculateTotal('myth')
 			}
 		};
+
+		// calculate all above values' addition in usd
+
+		// get myth price from coingecko
+		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
+		const mythPriceInUsd = mythPrice[String(network)]?.usd;
+
+		if (mythPriceInUsd) {
+			const totalDotInUsd = new BN(treasuryStats.nativeTokenUsdPrice || '0').mul(new BN(treasuryStats.total?.totalDot || '0'));
+			const totalMythInUsd = new BN(mythPriceInUsd).mul(new BN(treasuryStats.total?.totalMyth || '0'));
+
+			const totalInUsd = totalDotInUsd
+				.add(totalMythInUsd)
+				.add(new BN(treasuryStats.total?.totalUsdc || '0'))
+				.add(new BN(treasuryStats.total?.totalUsdt || '0'));
+
+			treasuryStats = {
+				...treasuryStats,
+				total: {
+					...treasuryStats.total,
+					totalInUsd: totalInUsd.toString()
+				}
+			};
+		}
 
 		// Disconnect all APIs
 		await Promise.all([relayChainApi.disconnect(), assetHubApi.disconnect(), hydrationApi.disconnect()]);
