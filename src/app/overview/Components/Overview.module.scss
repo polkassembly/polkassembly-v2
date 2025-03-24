@@ -1,0 +1,111 @@
+.tableRow {
+    @apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+}
+
+.tableRow_user {
+    @apply bg-leaderboard_usercard_bg border-y border-leaderboard_usercard_border text-btn_secondary_text;
+}
+
+.tableCell_1 {
+    @apply px-6 py-5 first:rounded-tl-md last:rounded-tr-md
+}
+
+.tableCell_last {
+    @apply px-6 py-5 last:rounded-tr-md
+}
+
+.tableCell_3 {
+    @apply px-6 py-5;
+}
+
+.tableCell_2 {
+    @apply w-1/4 px-6 py-5;
+}
+
+.tableCell {
+    @apply px-5 py-5 whitespace-nowrap;
+}
+
+.tableCell_status {
+    @apply w-[100px] overflow-hidden text-ellipsis;
+}
+
+.tableCell_title {
+    @apply w-[305px] py-5 whitespace-nowrap overflow-hidden text-ellipsis block max-w-[305px];
+}
+
+.tableContentCell_last {
+    @apply p-4 flex items-center gap-3 mt-3
+}
+
+.table_content_cell {
+    @apply flex items-center gap-3 mt-3 min-w-44
+}
+
+.table_content_cell_1 {
+    @apply cursor-pointer text-base text-wallet_btn_text;
+}
+
+.table_content_cell_2 {
+    @apply flex items-center gap-3 mt-3;
+}
+
+.table_content_cell_2_content {
+    @apply rounded-md bg-wallet_disabled_bg px-2 py-1;
+}
+
+.tabList {
+    @apply w-full justify-start overflow-x-auto border-b border-border_grey;
+}
+
+.tabTrigger {
+    @apply px-4 py-2 text-btn_secondary_text;
+}
+
+.latest_activity_title {
+    @apply mb-4 text-lg font-semibold text-btn_secondary_text;
+}
+
+.overview_container {
+    @apply flex flex-col gap-4;
+}
+
+.overview_title {
+    @apply mb-4 text-2xl font-semibold text-btn_secondary_text;
+}
+
+.news_section_container {
+    @apply mt-6 rounded-xl bg-bg_modal max-h-[480px] p-6 shadow-lg;
+}
+
+.news_section_title {
+    @apply text-xl font-semibold leading-8 tracking-tight text-btn_secondary_text;
+}
+
+.about_social_links_container {
+    @apply flex items-center gap-4 text-lg text-wallet_btn_text sm:gap-6;
+}
+
+.about_social_links_icon {
+    @apply h-4 w-4 cursor-pointer hover:text-bg_pink sm:h-5 sm:w-5;
+}
+
+.event_list_container {
+    @apply flex flex-col gap-2 overflow-y-auto overflow-x-hidden xl:max-h-[385px] xl:max-w-[320px];
+}
+
+.event_list_link {
+    @apply capitalize hover:underline;
+}
+
+.calendar_event_tooltip_trigger {
+    @apply flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-center;
+}
+
+.calendar_event_container {
+    @apply flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 xl:flex-row;
+}
+
+.calendar_event_title {
+    @apply xl:mb-4 text-lg font-semibold text-btn_secondary_text;
+}

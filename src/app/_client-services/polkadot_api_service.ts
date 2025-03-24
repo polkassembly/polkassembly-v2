@@ -11,18 +11,21 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Permill } from '@polkadot/types/interfaces';
+import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
+import { BN, BN_HUNDRED, BN_MILLION, BN_ZERO, u8aConcat, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
-import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
-import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-
 import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
+import { blockToDays, blockToTime } from '@shared/_utils/blockTimeCalculations';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
+
+const EMPTY_U8A_32 = new Uint8Array(32);
 
 export class PolkadotApiService {
 	private readonly network: ENetwork;
@@ -207,6 +210,70 @@ export class PolkadotApiService {
 
 	async getExistentialDeposit() {
 		return this.api.consts.balances.existentialDeposit;
+	}
+
+	async getSpendPeriod() {
+		const currentBlock = await this.api.derive.chain.bestNumberFinalized();
+		const spendPeriodConst = this.api.consts.treasury ? this.api.consts.treasury.spendPeriod : BN_ZERO;
+		if (!spendPeriodConst) {
+			return null;
+		}
+		const spendPeriodBlocks = spendPeriodConst instanceof BN ? spendPeriodConst.toNumber() : BN_ZERO.toNumber();
+		const totalSpendPeriodDays: number = blockToDays({ blocks: spendPeriodBlocks, network: this.network });
+
+		if (!(currentBlock instanceof BN)) {
+			return null;
+		}
+
+		const currentBlockNumber = currentBlock.toNumber();
+		const remainingBlocks = spendPeriodBlocks - (currentBlockNumber % spendPeriodBlocks);
+		const { time: remainingTime } = blockToTime({ blocks: remainingBlocks, network: this.network });
+		const progressPercentage = (((currentBlockNumber % spendPeriodBlocks) / spendPeriodBlocks) * 100).toFixed(0);
+
+		return {
+			percentage: parseFloat(progressPercentage),
+			value: {
+				remainingTime,
+				totalSpendPeriodDays
+			}
+		};
+	}
+
+	async getNextBurnData() {
+		try {
+			if (!this.api.consts.treasury) {
+				return null;
+			}
+			const treasuryAccount = u8aConcat(
+				'modl',
+				this.api.consts.treasury.palletId ? this.api.consts.treasury.palletId.toU8a(true) : `${['polymesh', 'polymesh-test'].includes(this.network) ? 'pm' : 'pr'}/trsry`,
+				EMPTY_U8A_32
+			);
+			if (!this.api.query.system?.account) {
+				return null;
+			}
+			const accountInfo = await this.api.query.system.account(treasuryAccount);
+			let freeBalance = BN_ZERO;
+			try {
+				freeBalance = new BN((accountInfo as any).data.free) || BN_ZERO;
+			} catch (error) {
+				console.error('Error accessing treasury balance:', error);
+				return null;
+			}
+			if (!this.api.consts.treasury.burn) {
+				return null;
+			}
+			const burnPercent = this.api.consts.treasury.burn as Permill;
+			if (freeBalance.lte(BN_ZERO) || burnPercent.isZero()) {
+				return null;
+			}
+
+			const burn = burnPercent.mul(freeBalance).div(BN_MILLION);
+			return burn.toString();
+		} catch (error) {
+			console.error('Error getting next burn data:', error);
+			return null;
+		}
 	}
 
 	async getUserBalances({ address }: { address: string }) {

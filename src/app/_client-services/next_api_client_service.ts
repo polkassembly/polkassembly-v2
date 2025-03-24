@@ -30,6 +30,7 @@ import {
 	ITag,
 	EAllowedCommentor,
 	EOffChainPostTopic,
+	ICalendarEvent,
 	IVoteCartItem,
 	EConvictionAmount
 } from '@/_shared/types';
@@ -85,6 +86,8 @@ enum EApiRoute {
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	GET_CURRENT_TOKEN_PRICE = 'GET_CURRENT_TOKEN_PRICE',
+	GET_CALENDAR_EVENTS = 'GET_CALENDAR_EVENTS',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
@@ -161,6 +164,9 @@ export class NextApiClientService {
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
+			case EApiRoute.GET_CURRENT_TOKEN_PRICE:
+				path = '/token-price';
+				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
@@ -218,6 +224,10 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
+				method = 'POST';
+				break;
+			case EApiRoute.GET_CALENDAR_EVENTS:
+				path = '/calendar';
 				method = 'POST';
 				break;
 
@@ -723,6 +733,26 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async getCurrentTokenPrice({ symbol }: { symbol: string }) {
+		const queryParams = new URLSearchParams({
+			symbol
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CURRENT_TOKEN_PRICE, queryParams });
+		return this.nextApiClientFetch<{ price: string }>({ url, method });
+	}
+
+	static async getCalendarEvents({ startBlockNo, endBlockNo }: { startBlockNo: number; endBlockNo: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_CALENDAR_EVENTS
+		});
+
+		return this.nextApiClientFetch<ICalendarEvent[]>({
+			url,
+			method,
+			data: { startBlockNo, endBlockNo }
+		});
 	}
 
 	static async addPostSubscription(proposalType: EProposalType, index: string) {
