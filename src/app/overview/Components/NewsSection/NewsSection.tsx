@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ESocial } from '@/_shared/types';
+import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import styles from '../Overview.module.scss';
 
 function NewsSection() {
@@ -26,6 +27,11 @@ function NewsSection() {
 		<div className={styles.news_section_container}>
 			<h2 className={styles.news_section_title}>{t('news')}</h2>
 
+			{isLoading && (
+				<div className='relative'>
+					<LoadingLayover />
+				</div>
+			)}
 			<div className='mt-2 overflow-hidden rounded-[10px] lg:h-[390px]'>
 				{isLoading && <Loader className='mt-32 text-7xl' />}
 				<div className='block dark:hidden'>
