@@ -1732,7 +1732,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 		{
 			id: ENetworkSocial.TWITTER,
 			icon: SocialIcons.Twitter,
-			href: 'https://twitter.com/Polkadot',
+			href: 'https://twitter.com/polkadot',
 			label: 'Twitter'
 		},
 		{
