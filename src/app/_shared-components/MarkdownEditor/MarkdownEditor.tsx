@@ -21,7 +21,7 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MDXEditorProps>((prop
 		{...props}
 		markdown={props.markdown || ''}
 		editorRef={ref}
-		className={cn(!props.readOnly && 'w-full rounded-md border border-border_grey', props.className)}
+		className={cn(!props.readOnly && 'min-h-[200px] w-full rounded-md border border-border_grey', props.className)}
 	/>
 ));
 

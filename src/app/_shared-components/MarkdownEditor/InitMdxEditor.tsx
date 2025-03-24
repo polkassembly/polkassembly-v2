@@ -31,7 +31,9 @@ import {
 	CreateLink,
 	InsertTable,
 	diffSourcePlugin,
-	DiffSourceToggleWrapper
+	DiffSourceToggleWrapper,
+	InsertImage,
+	imagePlugin
 } from '@mdxeditor/editor';
 
 import { Ellipsis } from 'lucide-react';
@@ -40,7 +42,7 @@ import { useTheme } from 'next-themes';
 import { ETheme } from '@/_shared/types';
 import classes from './MardownEditor.module.scss';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover/Popover';
-
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
 	const { theme } = useTheme();
@@ -54,6 +56,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 					<CodeToggle />
 				</div>
 				<BlockTypeSelect />
+				<InsertImage />
 				<div className='flex-1' />
 				<Popover>
 					<PopoverTrigger>
@@ -76,6 +79,22 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		);
 	};
 
+	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
+
+	const imageUploadHandler = async (file: File) => {
+		const form = new FormData();
+		form.append('image', file, file.name);
+		const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
+			body: form,
+			method: 'POST'
+		});
+		const uploadData = await res.json();
+		if (uploadData?.success) {
+			return uploadData.data.url;
+		}
+		return;
+	};
+
 	const plugins = [
 		headingsPlugin(),
 		markdownShortcutPlugin(),
@@ -88,6 +107,9 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		frontmatterPlugin(),
 		diffSourcePlugin({
 			viewMode: 'rich-text'
+		}),
+		imagePlugin({
+			imageUploadHandler
 		}),
 		codeBlockPlugin({ defaultCodeBlockLanguage: '' }),
 		codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'Plain Text', tsx: 'TypeScript', '': 'Unspecified' } })
