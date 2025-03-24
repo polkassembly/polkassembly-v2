@@ -5,45 +5,50 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
-import { EReaction, IPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { IoShareSocialOutline } from 'react-icons/io5';
-import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import Image from 'next/image';
+import { IoShareSocialOutline } from 'react-icons/io5';
+import { BsThreeDots } from 'react-icons/bs';
+import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
+import CommentIcon from '@assets/activityfeed/commentdark.svg';
+import { EReaction, IPostListing } from '@/_shared/types';
 import ReactionButton from './ReactionButton/ReactionButton';
 
-function ActionButton({ icon: Icon, text, onClick }: { icon: React.ReactNode; text: string; onClick: () => void }) {
+function ActionButton({ icon: Icon, text, onClick, className }: { icon: React.ReactNode; text?: string; onClick: () => void; className?: string }) {
 	return (
 		<button
 			type='button'
-			className='flex cursor-pointer items-center text-bg_pink transition-all duration-300 hover:scale-110'
+			className={`flex cursor-pointer items-center text-bg_pink transition-all duration-300 hover:scale-110 ${className || ''}`}
 			onClick={onClick}
 		>
 			{Icon}
-			<span>{text}</span>
+			{text && <span>{text}</span>}
 		</button>
 	);
 }
 
-function ReactionHandler({
+function ReactionBar({
 	postData,
 	setIsDialogOpen,
-	reactionState,
+	isLiked,
+	isDisliked,
 	showLikeGif,
 	showDislikeGif,
-	handleReaction
+	handleReaction,
+	isSubscribed,
+	handleSubscribe
 }: {
 	postData: IPostListing;
 	setIsDialogOpen: (value: boolean) => void;
-	reactionState: {
-		isLiked: boolean;
-		isDisliked: boolean;
-		likesCount: number;
-		dislikesCount: number;
-	};
+
+	isLiked: boolean;
+	isDisliked: boolean;
 	showLikeGif: boolean;
 	showDislikeGif: boolean;
 	handleReaction: (reaction: EReaction) => void;
+	isSubscribed?: boolean;
+	handleSubscribe?: () => void;
 }) {
 	const router = useRouter();
 	const { user } = useUser();
@@ -58,8 +63,8 @@ function ReactionHandler({
 	};
 
 	const handleShare = () => {
-		const titlePart = postData?.title ? ` for ${postData.title}` : '';
-		const message = `The referendum${titlePart} is now live for @Polkassembly \nCast your vote here: ${global?.window?.location?.href}`;
+		const titlePart = postData?.title ? `for "${postData.title}"` : '';
+		const message = `The referendum ${titlePart} is now live for @Polkassembly \nCast your vote here: ${global?.window?.location?.href}`;
 		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
 		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
 		global?.window?.open(url);
@@ -75,26 +80,23 @@ function ReactionHandler({
 			setIsDialogOpen(true);
 		}
 	};
+	const isCurrentlySubscribed = postData?.userSubscriptionId || isSubscribed;
 	return (
 		<div className='mb-4 flex items-center justify-between text-xs text-navbar_border'>
 			<div className='flex space-x-5'>
 				<ReactionButton
 					type={EReaction.like}
-					isActive={reactionState.isLiked}
+					isActive={isLiked}
 					showGif={showLikeGif}
 					onClick={handleLike}
 				/>
 				<ReactionButton
 					type={EReaction.dislike}
-					isActive={reactionState.isDisliked}
+					isActive={isDisliked}
 					showGif={showDislikeGif}
 					onClick={handleDislike}
 				/>
-				<ActionButton
-					icon={<IoShareSocialOutline className='mr-2 text-lg text-bg_pink' />}
-					text={t('ActivityFeed.PostItem.share')}
-					onClick={handleShare}
-				/>
+
 				<ActionButton
 					icon={
 						<Image
@@ -108,9 +110,38 @@ function ReactionHandler({
 					text={t('ActivityFeed.PostItem.comment')}
 					onClick={handleCommentClick}
 				/>
+
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<BsThreeDots className='text-lg text-bg_pink' />
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						align='start'
+						className='w-40 bg-bg_modal'
+					>
+						{handleSubscribe && (
+							<DropdownMenuItem
+								className='cursor-pointer'
+								onClick={() => handleAuthenticatedAction(handleSubscribe)}
+							>
+								{isCurrentlySubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
+								<span className={`${isCurrentlySubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>
+									{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}
+								</span>
+							</DropdownMenuItem>
+						)}
+						<DropdownMenuItem
+							className='cursor-pointer'
+							onClick={handleShare}
+						>
+							<IoShareSocialOutline className='mr-2 text-basic_text' />
+							<span className='text-basic_text'>{t('ActivityFeed.share')}</span>
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</div>
 		</div>
 	);
 }
 
-export default ReactionHandler;
+export default ReactionBar;

@@ -25,6 +25,10 @@
 		"Live": "ライブ",
 		"CommentPlaceholder": "ここにコメントを入力",
 		"Post": "投稿",
+		"share": "共有",
+		"loading": "読み込み中...",
+		"subscribe": "購読",
+		"unsubscribe": "購読解除",
 		"Navbar": {
 			"All": "すべて",
 			"Root": "ルート",
@@ -90,8 +94,11 @@
 	"Profile": {
 		"settings": "設定",
 		"login": "ログイン",
+		"loginFailed": "ログインに失敗しました",
+		"signupFailed": "登録に失敗しました",
+		"noAccessTokenFound": "アクセストークンが見つかりません。",
 		"logout": "ログアウト",
-		"signUp": "登録",
+		"signUp": "新規登録",
 		"dontHaveAnAccount": "アカウントをお持ちでないですか？",
 		"twoFactorAuth": "二要素認証",
 		"twoFactorAuthDescription": "二段階認証アプリまたは拡張機能を開き、Polkassemblyアカウントの認証コードを入力してください。",
@@ -114,6 +121,8 @@
 		"balance": "残高",
 		"locked": "ロック済み",
 		"on": "日時",
+		"judgements": "判定",
+		"since": "日時",
 		"Activity": {
 			"voted_on_proposal": "投票済み",
 			"created_proposal": "提案を作成",
@@ -233,7 +242,8 @@
 		"saveChanges": "保存",
 		"unfollow": "フォロー解除",
 		"following": "フォロー中",
-		"followers": "フォロワー"
+		"followers": "フォロワー",
+		"enterCredentials": "認証情報を入力してください"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
@@ -241,6 +251,7 @@
 		"Referenda": "レファレンダム"
 	},
 	"ListingPage": {
+		"AllProposals": "すべてのレファレンダム",
 		"AuctionAdmin": "オークション管理者",
 		"AuctionAdminDescription": "オークションを開始するための起点。",
 		"BigSpender": "大口支出者",
@@ -643,14 +654,35 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "プレイメージを作成",
-		"createTreasuryProposal": "財務提案を作成"
+		"existingPreimage": "既存のプレイメージがある",
+		"createTreasuryProposal": "トレジャリー提案を作成（ネイティブ）",
+		"usdxProposal": "USDxトレジャリー提案を作成（Assethub）",
+		"cancelReferendum": "レファレンダムをキャンセル",
+		"killReferendum": "レファレンダムを終了",
+		"goBack": "戻る",
+		"preimageHash": "プレイメージハッシュ",
+		"preimageLength": "プレイメージ長",
+		"preimageHashDescription": "提案を作成するためのプレイメージハッシュを入力してください"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
 		"amount": "金額",
 		"track": "トラック",
 		"createProposal": "提案を作成",
-		"create": "作成"
+		"create": "作成",
+		"proposalCreatedSuccessfully": "提案が正常に作成されました",
+		"proposalCreatedSuccessfullyDescription": "提案は正常に作成されました",
+		"proposalCreationFailed": "提案の作成に失敗しました",
+		"proposalCreationFailedDescription": "提案の作成中にエラーが発生しました",
+		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
+		"preimageNotedSuccessfullyDescription": "プレイメージは正常に記録されました",
+		"preimageNoteFailed": "プレイメージの記録に失敗しました",
+		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
+		"selectTrack": "トラックを選択",
+		"validFrom": "有効開始",
+		"addValidFrom": "有効開始を追加",
+		"invalidBlockHeight": "有効なブロック高を入力してください",
+		"enterFutureBlockHeight": "将来のブロック高を入力してください"
 	},
 	"CreatePreimage": {
 		"addItem": "項目を追加",
@@ -658,6 +690,25 @@
 		"yes": "はい",
 		"no": "いいえ",
 		"uploadFile": "ファイルをアップロード",
-		"includeOption": "オプションを含める"
+		"includeOption": "オプションを含める",
+		"preimageNoteFailed": "プレイメージの記録に失敗しました",
+		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
+		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
+		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
+		"preimageHash": "プレイメージハッシュ",
+		"length": "長さ"
+	},
+	"AddressInput": {
+		"invalidAddress": "無効なアドレス",
+		"noResultsFound": "結果が見つかりません",
+		"placeholder": "アドレスを入力"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "レファレンダムID",
+		"referendumIdDescription": "キャンセルするレファレンダムIDを入力してください",
+		"thisReferendumIsNotOngoing": "このレファレンダムは進行中ではありません"
+	},
+	"errorMessages": {
+		"valueTooLarge": "値が大きすぎます"
 	}
 }

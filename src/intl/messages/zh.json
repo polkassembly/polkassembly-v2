@@ -25,6 +25,10 @@
 		"Live": "实时",
 		"CommentPlaceholder": "在此输入您的评论",
 		"Post": "发布",
+		"share": "分享",
+		"loading": "加载中...",
+		"subscribe": "订阅",
+		"unsubscribe": "取消订阅",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",
@@ -90,7 +94,10 @@
 	"Profile": {
 		"settings": "设置",
 		"login": "登录",
-		"logout": "登出",
+		"loginFailed": "登录失败",
+		"signupFailed": "注册失败",
+		"noAccessTokenFound": "未找到访问令牌。",
+		"logout": "退出登录",
 		"signUp": "注册",
 		"dontHaveAnAccount": "还没有账户？",
 		"twoFactorAuth": "双重认证",
@@ -177,6 +184,8 @@
 		"badgesDescription": "在Polkassembly中参与时解锁、接收和赚取徽章",
 		"userSince": "用户自",
 		"rank": "等级",
+		"judgements": "判定",
+		"since": "于",
 		"Settings": {
 			"settings": "设置",
 			"deleteAccount": "删除账户",
@@ -233,7 +242,8 @@
 		"saveChanges": "保存",
 		"unfollow": "取消关注",
 		"following": "关注中",
-		"followers": "粉丝"
+		"followers": "粉丝",
+		"enterCredentials": "请输入您的登录凭据"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
@@ -241,6 +251,7 @@
 		"Referenda": "公投"
 	},
 	"ListingPage": {
+		"AllProposals": "所有公投",
 		"AuctionAdmin": "拍卖管理员",
 		"AuctionAdminDescription": "启动拍卖的来源。",
 		"BigSpender": "大额支出者",
@@ -642,15 +653,36 @@
 		"proposals": "提案"
 	},
 	"CreateProposal": {
-		"createPreimage": "创建预映像",
-		"createTreasuryProposal": "创建国库提案"
+		"createPreimage": "创建原像",
+		"existingPreimage": "已有原像",
+		"createTreasuryProposal": "创建国库提案（原生）",
+		"usdxProposal": "创建USDx国库提案（Assethub）",
+		"cancelReferendum": "取消公投",
+		"killReferendum": "终止公投",
+		"goBack": "返回",
+		"preimageHash": "原像哈希",
+		"preimageLength": "原像长度",
+		"preimageHashDescription": "输入原像哈希以创建提案"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
 		"amount": "金额",
 		"track": "轨道",
 		"createProposal": "创建提案",
-		"create": "创建"
+		"create": "创建",
+		"proposalCreatedSuccessfully": "提案创建成功",
+		"proposalCreatedSuccessfullyDescription": "提案已成功创建",
+		"proposalCreationFailed": "提案创建失败",
+		"proposalCreationFailedDescription": "创建提案时发生错误",
+		"preimageNotedSuccessfully": "预映像记录成功",
+		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
+		"preimageNoteFailed": "预映像记录失败",
+		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"selectTrack": "选择轨道",
+		"validFrom": "生效时间",
+		"addValidFrom": "添加生效时间",
+		"invalidBlockHeight": "请输入有效的区块高度",
+		"enterFutureBlockHeight": "请输入未来的区块高度"
 	},
 	"CreatePreimage": {
 		"addItem": "添加项目",
@@ -658,6 +690,25 @@
 		"yes": "是",
 		"no": "否",
 		"uploadFile": "上传文件",
-		"includeOption": "包含选项"
+		"includeOption": "包含选项",
+		"preimageNoteFailed": "预映像记录失败",
+		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"preimageNotedSuccessfully": "预映像记录成功",
+		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
+		"preimageHash": "预映像哈希",
+		"length": "长度"
+	},
+	"AddressInput": {
+		"invalidAddress": "无效地址",
+		"noResultsFound": "未找到结果",
+		"placeholder": "请输入地址"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "公投ID",
+		"referendumIdDescription": "请输入要取消的公投ID",
+		"thisReferendumIsNotOngoing": "此公投未在进行中"
+	},
+	"errorMessages": {
+		"valueTooLarge": "数值过大"
 	}
 }

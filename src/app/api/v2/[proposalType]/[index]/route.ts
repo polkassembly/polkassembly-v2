@@ -9,13 +9,14 @@ import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { ValidatorService } from '@shared/_services/validator_service';
-import { EAllowedCommentor, EProposalType } from '@shared/types';
+import { EAllowedCommentor, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
+import { COOKIE_HEADER_ACTION_NAME } from '@/_shared/_constants/cookieHeaderActionName';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -24,15 +25,42 @@ const zodParamsSchema = z.object({
 	index: z.string()
 });
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPost>> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 	const network = await getNetworkFromHeaders();
+
+	let isUserAuthenticated = false;
+	let accessToken: string | undefined;
+	let refreshToken: string | undefined;
+	let userId: number | undefined;
+
+	// 1. check if user is authenticated
+	try {
+		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		isUserAuthenticated = true;
+		accessToken = newAccessToken;
+		refreshToken = newRefreshToken;
+		if (accessToken) {
+			userId = AuthService.GetUserIdFromAccessToken(accessToken);
+		}
+	} catch {
+		isUserAuthenticated = false;
+	}
 
 	// Get post data from cache
 	let post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 
 	if (post) {
-		return NextResponse.json(post);
+		const response = NextResponse.json(post);
+
+		if (accessToken) {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
+		}
+		if (refreshToken) {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
+		}
+
+		return response;
 	}
 
 	post = await fetchPostData({ network, proposalType, indexOrHash: index });
@@ -41,10 +69,28 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });
 	post = { ...post, reactions };
 
+	// fetch and add user subscription to post
+
+	if (isUserAuthenticated && userId) {
+		const userSubscription = await OffChainDbService.GetPostSubscriptionByPostAndUserId({ network, proposalType, indexOrHash: index, userId });
+		if (userSubscription) {
+			post = { ...post, userSubscriptionId: userSubscription.id };
+		}
+	}
+
 	// Cache the post data
 	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
-	return NextResponse.json(post);
+	const response = NextResponse.json(post);
+
+	if (accessToken) {
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
+	}
+	if (refreshToken) {
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
+	}
+
+	return response;
 });
 
 // update post

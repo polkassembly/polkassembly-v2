@@ -41,14 +41,14 @@ function UrlText({ text }: { text: string }) {
 		parts.push(text.slice(lastIndex));
 	}
 
-	// eslint-disable-next-line react/jsx-no-useless-fragment
-	return <>{parts}</>;
+	// Replace fragment with span to prevent DOM node issues
+	return <span className='inline'>{parts}</span>;
 }
 
 function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unknown> }) {
 	if (!argumentsJSON) return null;
 	return (
-		<>
+		<tbody>
 			{Object.entries(argumentsJSON).map(([name, value]) => {
 				return (
 					<tr
@@ -62,13 +62,15 @@ function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unkno
 							</td>
 						) : (
 							<td>
-								<ArgumentsTable argumentsJSON={value as Record<string, unknown>} />
+								<table className='w-full'>
+									<ArgumentsTable argumentsJSON={value as Record<string, unknown>} />
+								</table>
 							</td>
 						)}
 					</tr>
 				);
 			})}
-		</>
+		</tbody>
 	);
 }
 

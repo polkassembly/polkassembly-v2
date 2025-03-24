@@ -8,13 +8,15 @@ import { useCallback, useMemo, useState } from 'react';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Copy } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { NotificationType } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
+import PreimageDetailsView from '../PreimageDetailsView/PreimageDetailsView';
 
 function ManualExtrinsic() {
+	const t = useTranslations();
 	const [extrinsicFn, setExtrinsicFn] = useState<SubmittableExtrinsic<'promise'> | null>();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
@@ -39,20 +41,21 @@ function ManualExtrinsic() {
 				setIsLoading(false);
 				toast({
 					status: NotificationType.SUCCESS,
-					title: 'Preimage noted successfully',
-					description: 'The preimage has been noted successfully'
+					title: t('CreatePreimage.preimageNotedSuccessfully'),
+					description: t('CreatePreimage.preimageNotedSuccessfullyDescription')
 				});
 			},
 			onFailed: () => {
 				setIsLoading(false);
 				toast({
 					status: NotificationType.ERROR,
-					title: 'Failed to note preimage',
-					description: 'There was an error while noting the preimage'
+					title: t('CreatePreimage.preimageNoteFailed'),
+					description: t('CreatePreimage.preimageNoteFailedDescription')
 				});
 			}
 		});
-	}, [apiService, extrinsicFn, toast, userPreferences.address?.address]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [apiService, extrinsicFn, userPreferences.address?.address]);
 
 	return (
 		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>
@@ -60,25 +63,10 @@ function ManualExtrinsic() {
 				<Extrinsic onChange={setExtrinsicFn} />
 			</div>
 			{extrinsicDetails && (
-				<div className='flex flex-col gap-y-2 rounded-lg bg-grey_bg p-2 text-text_primary'>
-					<div className='flex items-start justify-between gap-x-6'>
-						<p className='whitespace-nowrap'>Preimage Hash</p>
-						<div className='flex flex-wrap items-center justify-end break-all text-right'>
-							{extrinsicDetails.preimageHash}
-							<Button
-								variant='ghost'
-								size='icon'
-								onClick={() => navigator.clipboard.writeText(`${extrinsicDetails.preimageHash}`)}
-							>
-								<Copy size={16} />
-							</Button>
-						</div>
-					</div>
-					<div className='flex items-center justify-between'>
-						<p>Length</p>
-						<p>{extrinsicDetails.preimageLength}</p>
-					</div>
-				</div>
+				<PreimageDetailsView
+					preimageHash={extrinsicDetails.preimageHash}
+					preimageLength={extrinsicDetails.preimageLength}
+				/>
 			)}
 			<div className='flex justify-end'>
 				<Button

@@ -21,11 +21,11 @@ export const GET = withErrorHandling(async () => {
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const zodQuerySchema = z.object({
+	const zodBodySchema = z.object({
 		tags: z.array(z.custom<ITag>())
 	});
 
-	const { tags } = zodQuerySchema.parse(await getReqBody(req));
+	const { tags } = zodBodySchema.parse(await getReqBody(req));
 
 	if (!tags.length || tags.some((tag) => !ValidatorService.isValidTag(tag.value))) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);

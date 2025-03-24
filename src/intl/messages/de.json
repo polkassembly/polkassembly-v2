@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Schreiben Sie hier Ihren Kommentar",
 		"Post": "Beitrag",
+		"share": "Teilen",
+		"loading": "Wird geladen...",
+		"subscribe": "Abonnieren",
+		"unsubscribe": "Entfernen",
 		"Navbar": {
 			"All": "Alle",
 			"Root": "Root",
@@ -90,6 +94,9 @@
 	"Profile": {
 		"settings": "Einstellungen",
 		"login": "Anmelden",
+		"loginFailed": "Anmeldung fehlgeschlagen",
+		"signupFailed": "Registrierung fehlgeschlagen",
+		"noAccessTokenFound": "Kein Zugriffstoken gefunden.",
 		"logout": "Abmelden",
 		"signUp": "Registrieren",
 		"dontHaveAnAccount": "Noch kein Konto?",
@@ -177,6 +184,8 @@
 		"badgesDescription": "Schalte Abzeichen frei, erhalte und verdiene sie, während du dich in Polkassembly engagierst",
 		"userSince": "Benutzer seit",
 		"rank": "Rang",
+		"judgements": "Beurteilungen",
+		"since": "Seit",
 		"Settings": {
 			"settings": "Einstellungen",
 			"deleteAccount": "Konto löschen",
@@ -233,7 +242,8 @@
 		"saveChanges": "Speichern",
 		"unfollow": "Entfolgen",
 		"following": "Folgend",
-		"followers": "Follower"
+		"followers": "Follower",
+		"enterCredentials": "Bitte geben Sie Ihre Anmeldedaten ein"
 	},
 	"ListingTab": {
 		"Analytics": "Analysen",
@@ -241,6 +251,7 @@
 		"Referenda": "Referenden"
 	},
 	"ListingPage": {
+		"AllProposals": "Alle Referenden",
 		"AuctionAdmin": "Auktions-Administrator",
 		"AuctionAdminDescription": "Ursprung für das Starten von Auktionen.",
 		"BigSpender": "Großausgeber",
@@ -644,14 +655,35 @@
 	},
 	"CreateProposal": {
 		"createPreimage": "Preimage erstellen",
-		"createTreasuryProposal": "Treasury-Vorschlag erstellen"
+		"existingPreimage": "Bereits ein Preimage vorhanden",
+		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Native)",
+		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)",
+		"cancelReferendum": "Referendum abbrechen",
+		"killReferendum": "Referendum beenden",
+		"goBack": "Zurück",
+		"preimageHash": "Preimage-Hash",
+		"preimageLength": "Preimage-Länge",
+		"preimageHashDescription": "Geben Sie den Preimage-Hash ein, um einen Vorschlag zu erstellen"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
 		"amount": "Betrag",
 		"track": "Track",
 		"createProposal": "Vorschlag erstellen",
-		"create": "Erstellen"
+		"create": "Erstellen",
+		"proposalCreatedSuccessfully": "Vorschlag erfolgreich erstellt",
+		"proposalCreatedSuccessfullyDescription": "Der Vorschlag wurde erfolgreich erstellt",
+		"proposalCreationFailed": "Erstellung des Vorschlags fehlgeschlagen",
+		"proposalCreationFailedDescription": "Bei der Erstellung des Vorschlags ist ein Fehler aufgetreten",
+		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
+		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
+		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
+		"selectTrack": "Track auswählen",
+		"validFrom": "Gültig ab",
+		"addValidFrom": "Gültig ab hinzufügen",
+		"invalidBlockHeight": "Bitte geben Sie eine gültige Blockhöhe ein",
+		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
 	},
 	"CreatePreimage": {
 		"addItem": "Element hinzufügen",
@@ -659,6 +691,25 @@
 		"yes": "Ja",
 		"no": "Nein",
 		"uploadFile": "Datei hochladen",
-		"includeOption": "Option einschließen"
+		"includeOption": "Option einschließen",
+		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
+		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
+		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
+		"preimageHash": "Preimage-Hash",
+		"length": "Länge"
+	},
+	"AddressInput": {
+		"invalidAddress": "Ungültige Adresse",
+		"noResultsFound": "Keine Ergebnisse gefunden",
+		"placeholder": "Adresse eingeben"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Referendum-ID",
+		"referendumIdDescription": "Geben Sie die Referendum-ID zum Abbrechen ein",
+		"thisReferendumIsNotOngoing": "Dieses Referendum läuft nicht"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Der Wert ist zu groß"
 	}
 }

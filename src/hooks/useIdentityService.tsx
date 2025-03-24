@@ -15,6 +15,7 @@ export const useIdentityService = () => {
 	const [identityCache, setIdentityCache] = useAtom(identityCacheAtom);
 
 	const getCachedIdentity = async (address: string) => {
+		if (!address) return null;
 		const formattedAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
 
 		if (!formattedAddress) return null;

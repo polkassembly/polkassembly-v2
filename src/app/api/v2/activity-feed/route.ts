@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser, IReaction } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -23,7 +23,31 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 const ACTIVITY_FEED_PROPOSAL_TYPE = EProposalType.REFERENDUM_V2;
 const COOKIE_HEADER_ACTION_NAME = 'Set-Cookie';
 
+// Helper function to create consistent response with auth cookies
+async function createResponse(data: IGenericListingResponse<IPostListing>, accessToken?: string, refreshToken?: string) {
+	const response = NextResponse.json(data);
+
+	// Add auth cookies if available
+	const cookiePromises = [];
+	if (accessToken) {
+		cookiePromises.push(AuthService.GetAccessTokenCookie(accessToken));
+	}
+	if (refreshToken) {
+		cookiePromises.push(AuthService.GetRefreshTokenCookie(refreshToken));
+	}
+
+	if (cookiePromises.length > 0) {
+		const cookies = await Promise.all(cookiePromises);
+		cookies.forEach((cookie) => {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, cookie);
+		});
+	}
+
+	return response;
+}
+
 export const GET = withErrorHandling(async (req: NextRequest) => {
+	// Parse query parameters
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
@@ -31,51 +55,30 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
-
 	const { page, limit, origin: origins } = zodQuerySchema.parse(searchParamsObject);
 
-	let isUserAuthenticated = false;
-	let accessToken: string | undefined;
-	let refreshToken: string | undefined;
-	let userId: number | undefined;
+	// Fetch network and authenticate user in parallel
+	const [network, authResult] = await Promise.all([
+		getNetworkFromHeaders(),
+		AuthService.ValidateAuthAndRefreshTokens().catch(() => ({ newAccessToken: undefined, newRefreshToken: undefined }))
+	]);
 
-	// 1. check if user is authenticated
-	try {
-		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
-		isUserAuthenticated = true;
-		accessToken = newAccessToken;
-		refreshToken = newRefreshToken;
-		if (accessToken) {
-			userId = AuthService.GetUserIdFromAccessToken(accessToken);
-		}
-	} catch {
-		isUserAuthenticated = false;
-	}
-
-	const network = await getNetworkFromHeaders();
+	const { newAccessToken: accessToken, newRefreshToken: refreshToken } = authResult;
+	const isUserAuthenticated = !!accessToken;
+	const userId = accessToken ? AuthService.GetUserIdFromAccessToken(accessToken) : undefined;
 
 	// Try to get from cache first
 	const cachedData = await RedisService.GetActivityFeed({ network, page, limit, userId, origins });
 	if (cachedData) {
-		const response = NextResponse.json(cachedData);
-
-		if (accessToken) {
-			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
-		}
-		if (refreshToken) {
-			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
-		}
-		return response;
+		return createResponse(cachedData, accessToken, refreshToken);
 	}
 
-	let userAddresses: string[] = [];
+	// Fetch user addresses if authenticated (needed for filtering posts not voted by user)
+	const userAddressesPromise =
+		isUserAuthenticated && userId ? OffChainDbService.GetAddressesForUserId(userId).then((addresses) => addresses.map((a) => a.address)) : Promise.resolve([]);
 
-	if (isUserAuthenticated && accessToken && userId) {
-		userAddresses = (await OffChainDbService.GetAddressesForUserId(userId)).map((a) => a.address);
-	}
-
-	let posts: IPostListing[] = [];
-	let totalCount = 0;
+	// Fetch user addresses first, then use them for on-chain posts query
+	const userAddresses = await userAddressesPromise;
 
 	const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({
 		network,
@@ -87,84 +90,71 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		notVotedByAddresses: isUserAuthenticated && userAddresses.length ? userAddresses : undefined
 	});
 
-	// Fetch off-chain data
-	const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
-		return OffChainDbService.GetOffChainPostData({
-			network,
-			indexOrHash: postInfo.index!.toString(),
-			proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
-			proposer: postInfo.proposer || ''
-		});
-	});
+	if (onChainPostsListingResponse.items.length === 0) {
+		const emptyResponse: IGenericListingResponse<IPostListing> = { items: [], totalCount: onChainPostsListingResponse.totalCount };
 
-	const offChainData = await Promise.all(offChainDataPromises);
+		// Cache empty results too
+		await RedisService.SetActivityFeed({ network, page, limit, data: emptyResponse, userId, origins });
 
-	let userReactions: (IReaction | null)[] = [];
-
-	if (isUserAuthenticated && accessToken && userId) {
-		// fetch user reaction for each post
-		const userReactionPromises = onChainPostsListingResponse.items.map((postInfo) => {
-			return OffChainDbService.GetUserReactionForPost({
-				network,
-				proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
-				indexOrHash: postInfo.index!.toString(),
-				userId
-			});
-		});
-
-		userReactions = await Promise.all(userReactionPromises);
+		return createResponse(emptyResponse, accessToken, refreshToken);
 	}
 
-	// Merge on-chain and off-chain data
-	posts = onChainPostsListingResponse.items.map((postInfo, index) => ({
-		...offChainData[Number(index)],
-		dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
+	// Prepare all data fetching operations in parallel
+	const postDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
+		const indexOrHash = postInfo.index!.toString();
+
+		// For each post, fetch off-chain data, reactions, and subscriptions in parallel
+		return Promise.all([
+			// Off-chain post data
+			OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType: ACTIVITY_FEED_PROPOSAL_TYPE, proposer: postInfo.proposer || '' }),
+
+			// Post reactions
+			OffChainDbService.GetPostReactions({ network, proposalType: ACTIVITY_FEED_PROPOSAL_TYPE, indexOrHash }),
+
+			// User subscription (only if authenticated)
+			isUserAuthenticated && userId
+				? OffChainDbService.GetPostSubscriptionByPostAndUserId({ network, proposalType: ACTIVITY_FEED_PROPOSAL_TYPE, indexOrHash, userId })
+				: Promise.resolve(null)
+		]).then(([offChainData, reactions, subscription]) => ({ postInfo, offChainData, reactions, subscriptionId: subscription?.id || null }));
+	});
+
+	// Wait for all post data to be fetched
+	const postsData = await Promise.all(postDataPromises);
+
+	// Create merged posts with on-chain and off-chain data
+	const posts = postsData.map(({ postInfo, offChainData, reactions, subscriptionId }) => ({
+		...offChainData,
+		dataSource: offChainData?.dataSource || EDataSource.POLKASSEMBLY,
 		network,
 		proposalType: ACTIVITY_FEED_PROPOSAL_TYPE,
 		onChainInfo: postInfo,
-		userReaction: userReactions[Number(index)] || undefined
+		reactions,
+		...(subscriptionId ? { userSubscriptionId: subscriptionId } : {})
 	}));
 
 	// Sort posts by comment count in descending order
-	posts.sort((a, b) => {
-		const commentsA = a.metrics?.comments || 0;
-		const commentsB = b.metrics?.comments || 0;
-		return commentsB - commentsA;
-	});
+	posts.sort((a, b) => (b.metrics?.comments || 0) - (a.metrics?.comments || 0));
 
-	// fetch public user for each post
+	// Fetch public users for all posts in parallel
 	const publicUserPromises = posts.map((post) => {
 		if (ValidatorService.isValidUserId(Number(post.userId || -1))) {
 			return OffChainDbService.GetPublicUserById(Number(post.userId));
 		}
-		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo?.proposer || '')) {
+		if (post.onChainInfo?.proposer && ValidatorService.isValidWeb3Address(post.onChainInfo.proposer)) {
 			return OffChainDbService.GetPublicUserByAddress(post.onChainInfo.proposer);
 		}
-		return null;
+		return Promise.resolve(null);
 	});
 
 	const publicUsers = await Promise.all(publicUserPromises);
 
-	posts = posts.map((post, index) => ({
-		...post,
-		...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {})
-	}));
+	// Merge public user data with posts
+	const enrichedPosts = posts.map((post, index) => ({ ...post, ...(publicUsers[Number(index)] ? { publicUser: publicUsers[Number(index)] as IPublicUser } : {}) }));
 
-	totalCount = onChainPostsListingResponse.totalCount;
+	const responseData: IGenericListingResponse<IPostListing> = { items: enrichedPosts, totalCount: onChainPostsListingResponse.totalCount };
 
-	const responseData: IGenericListingResponse<IPostListing> = { items: posts, totalCount };
+	// Cache the response (don't await to avoid blocking the response)
+	RedisService.SetActivityFeed({ network, page, limit, data: responseData, userId, origins }).catch((error) => console.error('Failed to cache activity feed:', error));
 
-	// Cache the response
-	await RedisService.SetActivityFeed({ network, page, limit, data: responseData, userId, origins });
-
-	const response = NextResponse.json(responseData);
-
-	if (accessToken) {
-		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
-	}
-	if (refreshToken) {
-		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
-	}
-
-	return response;
+	return createResponse(responseData, accessToken, refreshToken);
 });
