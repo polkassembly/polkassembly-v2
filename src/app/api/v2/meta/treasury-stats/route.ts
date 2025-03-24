@@ -14,18 +14,21 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { headers } from 'next/headers';
+import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 export const maxDuration = 300;
 
 const zodQuerySchema = z.object({
 	from: z.date().optional(),
-	to: z.date().optional()
+	to: z.date().optional(),
+	limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
+	page: z.coerce.number().optional().default(1)
 });
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse<ITreasuryStats[]>> => {
 	const network = await getNetworkFromHeaders();
-	const { from, to } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
-	const treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to });
+	const { from, to, limit, page } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to, limit, page });
 	return NextResponse.json(treasuryStats);
 });
 
