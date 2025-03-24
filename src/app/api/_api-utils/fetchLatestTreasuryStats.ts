@@ -37,8 +37,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			loans: {
 				dot: config.loanAmounts.dot,
 				usdc: config.loanAmounts.usdc
-			},
-			nativeTokenUsdPrice: ''
+			}
 		};
 
 		// Helper function to safely extract balance from results
@@ -242,12 +241,12 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const fetchNativeTokenPriceInUsd = async () => {
 			const response = await (await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${network}&vs_currencies=usd`)).json();
 			// check if data is of type CoinGeckoResponse
-			if (!response || typeof response !== 'object' || !(network in response) || !('usd' in response[network]) || typeof response[network].usd !== 'number') {
+			if (!response || typeof response !== 'object' || !(network in response) || !('usd' in response[network]) || typeof response[network]?.usd !== 'number') {
 				return;
 			}
 
 			const data = response as CoinGeckoResponse;
-			treasuryStats.nativeTokenUsdPrice = data.usd.toString();
+			treasuryStats.nativeTokenUsdPrice = data[network].usd.toString();
 		};
 
 		// Execute all tasks
