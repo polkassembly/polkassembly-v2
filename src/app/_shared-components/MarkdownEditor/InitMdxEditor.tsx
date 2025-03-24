@@ -40,9 +40,9 @@ import { Ellipsis } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import { ETheme } from '@/_shared/types';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import classes from './MardownEditor.module.scss';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover/Popover';
-import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
 	const { theme } = useTheme();
@@ -92,7 +92,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		if (uploadData?.success) {
 			return uploadData.data.url;
 		}
-		return;
+		return undefined;
 	};
 
 	const plugins = [
