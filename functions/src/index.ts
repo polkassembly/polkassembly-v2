@@ -36,7 +36,7 @@ export const scheduledTreasuryStatsFetch = onSchedule(
 	}
 );
 
-export const callTreasuryStatsFetch = onRequest(async (request) => {
+export const callTreasuryStatsFetch = onRequest(async (request, response) => {
 	try {
 		const { TOOLS_PASSPHRASE } = process.env;
 
@@ -49,6 +49,8 @@ export const callTreasuryStatsFetch = onRequest(async (request) => {
 		}
 
 		await fetchLatestTreasuryStats({ toolsPassphrase });
+
+		response.json({ message: 'Treasury stats fetched successfully' });
 	} catch (error) {
 		logger.error('Error in callTreasuryStatsFetch:', error);
 		throw new HttpsError('internal', 'Error in callTreasuryStatsFetch');
