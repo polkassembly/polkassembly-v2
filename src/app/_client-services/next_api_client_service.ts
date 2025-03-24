@@ -769,8 +769,12 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	static async getTreasuryStats() {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS });
+	static async getTreasuryStats({ from, to }: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: from?.toISOString() || '',
+			to: to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 }

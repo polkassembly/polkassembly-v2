@@ -12,7 +12,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { FaArrowUp } from 'react-icons/fa';
 import { FiChevronRight } from 'react-icons/fi';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ITreasuryStats } from '@/_shared/types';
 
 const plancksToDot = (plancks: string) => {
 	return Number(plancks) / 10000000000;
@@ -24,11 +24,18 @@ const formatMillion = (value: number) => {
 
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
-	const network = getCurrentNetwork();
 
-	const getTreasuryStats = async () => {
-		const response = await NextApiClientService.getTreasuryStats();
-		return response.data;
+	const getTreasuryStats = async (): Promise<ITreasuryStats[]> => {
+		const to = new Date();
+		const from = new Date();
+		from.setFullYear(to.getFullYear() - 1);
+
+		const response = await NextApiClientService.getTreasuryStats({ from, to });
+		if (Array.isArray(response.data)) {
+			return response.data;
+		} else {
+			return [];
+		}
 	};
 
 	const {
@@ -40,10 +47,8 @@ export default function TreasuryStats() {
 		queryFn: getTreasuryStats
 	});
 
-	// Transform chart data for Recharts
 	const chartData = useMemo(() => {
 		const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
-		// Generate sample data that looks like the wave in the image
 		const values = [26, 25, 24, 24, 23, 22, 23, 24, 25, 26];
 
 		return months.map((month, index) => ({
@@ -68,8 +73,8 @@ export default function TreasuryStats() {
 		return {
 			dot: totalDot,
 			dotFormatted: formatMillion(totalDot),
-			usdcFormatted: formatMillion(data.total.totalUsdc / 1000000),
-			usdtFormatted: formatMillion(data.total.totalUsdt / 1000000),
+			usdcFormatted: formatMillion(Number(data.total.totalUsdc) / 1000000),
+			usdtFormatted: formatMillion(Number(data.total.totalUsdt) / 1000000),
 			mythFormatted: formatMillion(Number(data.total.totalMyth) / 1000000000000000000),
 			dotPrice: 4.76,
 			dotPriceChange: 8.48,
@@ -110,7 +115,6 @@ export default function TreasuryStats() {
 	return (
 		<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 			<div>
-				{/* Header and price */}
 				<div className='flex items-center justify-between'>
 					<div className='flex items-center gap-1 text-wallet_btn_text'>
 						<p className='text-sm'>Treasury</p>
@@ -124,8 +128,6 @@ export default function TreasuryStats() {
 						</span>
 					</div>
 				</div>
-
-				{/* Treasury amounts */}
 				<div className='mt-1'>
 					<div className='flex items-center gap-2'>
 						<span className='text-xl font-bold text-btn_secondary_text'>~${stats.totalValueUsd}M</span>
@@ -154,7 +156,6 @@ export default function TreasuryStats() {
 					</div>
 				</div>
 
-				{/* Chart using shadcn UI area chart - fixed height */}
 				<div className='mt-4 h-[40px] w-full'>
 					<ChartContainer
 						config={chartConfig}
@@ -189,8 +190,6 @@ export default function TreasuryStats() {
 						</AreaChart>
 					</ChartContainer>
 				</div>
-
-				{/* Month labels below chart */}
 				<div className='mt-1 flex justify-between px-1 text-xs text-gray-500'>
 					{chartData.map((item) => (
 						<div key={item.month}>{item.month}</div>
