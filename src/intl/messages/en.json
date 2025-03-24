@@ -94,8 +94,12 @@
 	"Profile": {
 		"settings": "Settings",
 		"login": "Login",
+		"loginFailed": "Failed to login",
+		"signupFailed": "Failed to signup",
+		"noAccessTokenFound": "No Access token found.",
 		"logout": "Logout",
 		"signUp": "Sign Up",
+		"enterCredentials": "Please enter your credentials",
 		"dontHaveAnAccount": "Don't have an account?",
 		"twoFactorAuth": "Two Factor Authentication",
 		"twoFactorAuthDescription": "Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.",
@@ -247,6 +251,7 @@
 		"Referenda": "Referenda"
 	},
 	"ListingPage": {
+		"AllProposals": "All Referenda",
 		"AuctionAdmin": "Auction Admin",
 		"AuctionAdminDescription": "Origin for starting auctions.",
 		"BigSpender": "Big Spender",

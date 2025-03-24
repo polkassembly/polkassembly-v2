@@ -552,9 +552,12 @@ export interface ISidebarMenuItem {
 	heading?: string;
 }
 
-export interface IErrorResponse {
-	status: StatusCodes;
+export interface IMessageResponse {
 	message: string;
+}
+
+export interface IErrorResponse extends IMessageResponse {
+	status: StatusCodes;
 	name: string;
 }
 
@@ -936,4 +939,54 @@ export interface IClaimedBountyProposal {
 	payee: string;
 	reward: string;
 	statusHistory: Array<{ timestamp: string }>;
+}
+
+// generic types are for insignificant tokens if we decide to add later
+export interface ITreasuryStats {
+	network: ENetwork;
+	createdAt: Date;
+	updatedAt: Date;
+	relayChain: {
+		dot: string;
+		myth: string;
+		[key: string]: string;
+	};
+	ambassador: {
+		usdt: string;
+		[key: string]: string;
+	};
+	assetHub: {
+		dot: string;
+		usdc: string;
+		usdt: string;
+		[key: string]: string;
+	};
+	hydration: {
+		dot: string;
+		usdc: string;
+		usdt: string;
+		[key: string]: string;
+	};
+	bounties: {
+		dot: string;
+		[key: string]: string;
+	};
+	fellowship: {
+		dot: string;
+		usdt: string;
+		[key: string]: string;
+	};
+	total: {
+		totalDot: string;
+		totalUsdc: string;
+		totalUsdt: string;
+		totalMyth: string;
+		[key: string]: string;
+	};
+	loans: {
+		dot: string;
+		usdc: string;
+		[key: string]: string;
+	};
+	[key: string]: unknown;
 }

@@ -94,8 +94,11 @@
 	"Profile": {
 		"settings": "設定",
 		"login": "ログイン",
+		"loginFailed": "ログインに失敗しました",
+		"signupFailed": "登録に失敗しました",
+		"noAccessTokenFound": "アクセストークンが見つかりません。",
 		"logout": "ログアウト",
-		"signUp": "登録",
+		"signUp": "新規登録",
 		"dontHaveAnAccount": "アカウントをお持ちでないですか？",
 		"twoFactorAuth": "二要素認証",
 		"twoFactorAuthDescription": "二段階認証アプリまたは拡張機能を開き、Polkassemblyアカウントの認証コードを入力してください。",
@@ -239,7 +242,8 @@
 		"saveChanges": "保存",
 		"unfollow": "フォロー解除",
 		"following": "フォロー中",
-		"followers": "フォロワー"
+		"followers": "フォロワー",
+		"enterCredentials": "認証情報を入力してください"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
@@ -247,6 +251,7 @@
 		"Referenda": "レファレンダム"
 	},
 	"ListingPage": {
+		"AllProposals": "すべてのレファレンダム",
 		"AuctionAdmin": "オークション管理者",
 		"AuctionAdminDescription": "オークションを開始するための起点。",
 		"BigSpender": "大口支出者",

@@ -150,10 +150,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
-				path = '/users/id';
-				break;
 			case EApiRoute.GET_FOLLOWING:
 			case EApiRoute.GET_FOLLOWERS:
+			case EApiRoute.GET_BATCH_VOTE_CART:
 				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
