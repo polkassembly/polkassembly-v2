@@ -608,10 +608,6 @@
 		"findYourRank": "Finde deinen Rang in der Ökosystem",
 		"searchUsername": "Benutzername suchen"
 	},
-	"BlockEditor": {
-		"placeholder": "Geben Sie / ein, um zu starten",
-		"errorUpdatingContent": "Fehler beim Aktualisieren des Inhalts"
-	},
 	"SetIdentity": {
 		"displayName": "Anzeigename",
 		"legalName": "Rechtlicher Name",
