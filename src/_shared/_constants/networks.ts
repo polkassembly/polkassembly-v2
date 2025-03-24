@@ -85,6 +85,7 @@ interface INetworkDetails {
 	tokenSymbol: string;
 	rpcEndpoints: IRpcEndpoint[];
 	supportedAssets: Record<string, INetworkTreasuryAssets>;
+	foreignAssets: Record<string, INetworkTreasuryAssets>;
 	peopleChainDetails: IPeopleChainDetails;
 	trackDetails: Partial<Record<EPostOrigin, ITrackInfo>>;
 	palletInstance?: string;
@@ -94,7 +95,8 @@ interface INetworkDetails {
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
 	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
 	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT' },
-	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' }
+	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' },
+	[EAssets.MYTH]: { name: 'mythos', tokenDecimal: 18, symbol: 'MYTH' }
 } as const;
 
 const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
@@ -1734,15 +1736,24 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		supportedAssets: {
 			'1984': {
 				...treasuryAssetsData[EAssets.USDT],
-				index: '1984'
+				index: '1984',
+				tokenDecimal: 6
 			},
 			'1337': {
 				...treasuryAssetsData[EAssets.USDC],
-				index: '1337'
+				index: '1337',
+				tokenDecimal: 6
 			},
 			'30': {
 				...treasuryAssetsData[EAssets.DED],
 				index: '30'
+			}
+		},
+		foreignAssets: {
+			[EAssets.MYTH]: {
+				...treasuryAssetsData[EAssets.MYTH],
+				index: '30',
+				tokenDecimal: 18
 			}
 		},
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT],
@@ -1764,6 +1775,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				index: '1984'
 			}
 		},
+		foreignAssets: {},
 		tokenSymbol: 'KSM',
 		rpcEndpoints: [
 			{
@@ -1846,6 +1858,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		],
 		supportedAssets: {},
+		foreignAssets: {},
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.WESTEND],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.WESTEND]
 	}

@@ -647,7 +647,8 @@ export interface IVoteData {
 export enum EAssets {
 	DED = 'DED',
 	USDT = 'USDT',
-	USDC = 'USDC'
+	USDC = 'USDC',
+	MYTH = 'MYTH'
 }
 
 export enum EPostDetailsTab {
