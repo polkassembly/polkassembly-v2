@@ -5,7 +5,6 @@
 /* eslint-disable lines-between-class-members */
 
 import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EPostOrigin,
@@ -151,10 +150,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
-				path = '/users/id';
-				break;
 			case EApiRoute.GET_FOLLOWING:
 			case EApiRoute.GET_FOLLOWERS:
+			case EApiRoute.GET_BATCH_VOTE_CART:
 				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
@@ -270,7 +268,7 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
-		const response = await fetchPF(url, {
+		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
