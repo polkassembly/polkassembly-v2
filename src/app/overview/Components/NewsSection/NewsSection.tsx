@@ -3,22 +3,15 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Loader } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import React, { FC, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import { useTranslations } from 'next-intl';
-
 import styles from '../Overview.module.scss';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ESocial } from '@/_shared/types';
 
-interface INewsProps {
-	twitter: string;
-}
-
-const NewsSection: FC<INewsProps> = (props) => {
-	const { twitter } = props;
+const NewsSection = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const network = getCurrentNetwork();
 
@@ -33,7 +26,7 @@ const NewsSection: FC<INewsProps> = (props) => {
 		<div className={styles.news_section_container}>
 			<h2 className={styles.news_section_title}>{t('news')}</h2>
 
-			<div className='overflow-hidden rounded-[10px] lg:h-[400px]'>
+			<div className='mt-2 overflow-hidden rounded-[10px] lg:h-[390px]'>
 				{isLoading && <Loader className='mt-32 text-7xl' />}
 				<div className='block dark:hidden'>
 					<TwitterTimelineEmbed

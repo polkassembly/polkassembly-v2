@@ -21,6 +21,8 @@ import NewsSection from './NewsSection/NewsSection';
 import SpendPeriod from './SpendPeriod/SpendPeriod';
 import CalendarEvents from './CalendarEvents/CalendarEvents';
 import TreasuryStats from './TreasuryStats/TreasuryStats';
+import { useState } from 'react';
+import Gallery from './Gallery/Gallery';
 
 enum EOverviewTabs {
 	All = 'all',
@@ -39,7 +41,7 @@ function Overview({
 	const network = getCurrentNetwork();
 	const router = useRouter();
 	const t = useTranslations('Overview');
-
+	const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 	return (
 		<div className={styles.overview_container}>
 			<h1 className={styles.overview_title}>{t('overview')}</h1>
@@ -54,12 +56,19 @@ function Overview({
 						</span>
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
-						{t('joinCommunity')} <span className='cursor-pointer text-bg_pink'>{t('viewGallery')}</span>
+						{t('joinCommunity')}{' '}
+						<span
+							onClick={() => setIsGalleryOpen(!isGalleryOpen)}
+							className='cursor-pointer text-bg_pink'
+						>
+							{t(isGalleryOpen ? 'minimizeGallery' : 'viewGallery')}
+						</span>
 					</p>
 					<span className='block pt-3 lg:hidden'>
 						<AboutSocialLinks />
 					</span>
 				</div>
+				{isGalleryOpen && <Gallery />}
 			</div>
 
 			{/* Treasury and Spend Period */}
