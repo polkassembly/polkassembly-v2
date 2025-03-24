@@ -961,5 +961,6 @@ export interface ITreasuryStats {
 		usdc: string;
 		[key: string]: string;
 	};
+	nativeTokenUsdPrice: string;
 	[key: string]: unknown;
 }
