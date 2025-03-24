@@ -32,7 +32,8 @@ import {
 	EConvictionAmount,
 	EVoteDecision,
 	IPostSubscription,
-	ECommentSentiment
+	ECommentSentiment,
+	ITreasuryStats
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -322,6 +323,10 @@ export class OffChainDbService {
 
 	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
 		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
+	}
+
+	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from?: Date; to?: Date }): Promise<ITreasuryStats[]> {
+		return FirestoreService.GetTreasuryStats({ network, from, to });
 	}
 
 	// helper methods
@@ -805,5 +810,9 @@ export class OffChainDbService {
 
 	static async DeletePostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
 		return FirestoreService.DeletePostSubscription({ network, indexOrHash, proposalType, userId });
+	}
+
+	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
+		return FirestoreService.SaveTreasuryStats({ treasuryStats });
 	}
 }

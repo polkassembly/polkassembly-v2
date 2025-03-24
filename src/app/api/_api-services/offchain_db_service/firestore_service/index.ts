@@ -30,7 +30,8 @@ import {
 	EVoteDecision,
 	EConvictionAmount,
 	IPostSubscription,
-	ECommentSentiment
+	ECommentSentiment,
+	ITreasuryStats
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -680,6 +681,37 @@ export class FirestoreService extends FirestoreUtils {
 		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef().where('userId', '==', userId).where('network', '==', network).count();
 		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
 		return postSubscriptionsQuerySnapshot.data().count || 0;
+	}
+
+	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from?: Date; to?: Date }): Promise<ITreasuryStats[]> {
+		const treasuryStatsQuery = this.treasuryStatsCollectionRef().where('network', '==', network);
+
+		if (from) {
+			treasuryStatsQuery.where('createdAt', '>=', from);
+		}
+
+		if (to) {
+			treasuryStatsQuery.where('createdAt', '<=', to);
+		}
+
+		const treasuryStatsQuerySnapshot = await treasuryStatsQuery.get();
+
+		if (treasuryStatsQuerySnapshot.empty) {
+			return [];
+		}
+
+		return treasuryStatsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt.toDate(),
+				updatedAt: data.updatedAt.toDate()
+			} as ITreasuryStats;
+		});
+	}
+
+	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
+		await this.treasuryStatsCollectionRef().add(treasuryStats);
 	}
 
 	// write methods
