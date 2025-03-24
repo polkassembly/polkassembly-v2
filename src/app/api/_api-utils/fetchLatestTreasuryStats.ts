@@ -347,7 +347,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// get myth price from coingecko
 		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
-		const mythPriceInUsd = mythPrice[String(network)]?.usd;
+		const mythPriceInUsd = mythPrice?.mythos?.usd;
 
 		if (mythPriceInUsd) {
 			const totalDotInUsd = new BN(treasuryStats.nativeTokenUsdPrice || '0').mul(new BN(treasuryStats.total?.totalDot || '0'));
