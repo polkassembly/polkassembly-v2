@@ -55,7 +55,9 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 					<ListsToggle />
 					<CodeToggle />
 				</div>
-				<BlockTypeSelect />
+				<div className='[&_button]:w-[8rem] md:[&_button]:w-[9rem]'>
+					<BlockTypeSelect />
+				</div>
 				<InsertImage />
 				<div className='flex-1' />
 				<Popover>
