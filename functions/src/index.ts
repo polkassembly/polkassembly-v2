@@ -15,7 +15,7 @@ dotenv.config();
 // Fetch treasury stats every 6 hours
 export const scheduledTreasuryStatsFetch = onSchedule(
 	{
-		schedule: 'every 12 hours',
+		schedule: 'every 6 hours',
 		timeZone: 'UTC',
 		retryCount: 3,
 		timeoutSeconds: 300 // 5 minutes
@@ -36,7 +36,7 @@ export const scheduledTreasuryStatsFetch = onSchedule(
 	}
 );
 
-export const callTreasuryStatsFetch = onRequest(async (request) => {
+export const callTreasuryStatsFetch = onRequest(async (request, response) => {
 	try {
 		const { TOOLS_PASSPHRASE } = process.env;
 
@@ -49,6 +49,8 @@ export const callTreasuryStatsFetch = onRequest(async (request) => {
 		}
 
 		await fetchLatestTreasuryStats({ toolsPassphrase });
+
+		response.json({ message: 'Treasury stats fetch complete' });
 	} catch (error) {
 		logger.error('Error in callTreasuryStatsFetch:', error);
 		throw new HttpsError('internal', 'Error in callTreasuryStatsFetch');

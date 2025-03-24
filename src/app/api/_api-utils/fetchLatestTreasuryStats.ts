@@ -7,6 +7,10 @@ import { ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from './apiError';
 
+interface CoinGeckoResponse {
+	[network: string]: { usd: number };
+}
+
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
 	try {
 		const { ApiPromise, WsProvider } = await import('@polkadot/api');
@@ -233,8 +237,20 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			};
 		};
 
+		// Fetch current price of native token in USD
+		const fetchNativeTokenPriceInUsd = async () => {
+			const response = await (await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${network}&vs_currencies=usd`)).json();
+			// check if data is of type CoinGeckoResponse
+			if (!response || typeof response !== 'object' || !(network in response) || !('usd' in response[network]) || typeof response[network]?.usd !== 'number') {
+				return;
+			}
+
+			const data = response as CoinGeckoResponse;
+			treasuryStats.nativeTokenUsdPrice = data[network].usd.toString();
+		};
+
 		// Execute all tasks
-		await Promise.all([...relayChainTasks, ...assetHubTasks, fetchHydrationBalances()]);
+		await Promise.all([...relayChainTasks, ...assetHubTasks, fetchHydrationBalances(), fetchNativeTokenPriceInUsd()]);
 
 		// Calculate totals after all data is fetched
 		const calculateTotal = (propertyName: 'dot' | 'usdc' | 'usdt' | 'myth'): string => {
