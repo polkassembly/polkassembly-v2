@@ -37,8 +37,8 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 	}
 
 	if (!network) {
-		// if still no network found and is vercel (main deployment) link, return default network
-		if (host?.includes('vercel.app')) {
+		// if still no network found and is vercel (main deployment) link or test link, return default network
+		if (host?.includes('vercel.app') || subdomain === 'test') {
 			return defaultNetwork as ENetwork;
 		}
 

@@ -89,3 +89,11 @@
 .darkIcon {
 	filter: invert(56%) sepia(0%) saturate(15%) hue-rotate(141deg) brightness(101%) contrast(93%) !important;
 }
+
+[data-radix-popper-content-wrapper] {
+	@apply z-50;
+}
+
+.radix-tooltip-content {
+	@apply relative z-50;
+}

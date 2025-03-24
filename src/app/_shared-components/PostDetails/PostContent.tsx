@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl';
 import BlockEditor from '../BlockEditor/BlockEditor';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
+import PostActions from './PostActions/PostActions';
 
 function PostContent({
 	postData,
@@ -68,6 +69,7 @@ function PostContent({
 				</span>
 			) : null}
 			<Separator className='my-4 bg-border_grey' />
+			<PostActions postData={postData} />
 			<div className='flex items-center justify-between'>
 				<div />
 				<div>

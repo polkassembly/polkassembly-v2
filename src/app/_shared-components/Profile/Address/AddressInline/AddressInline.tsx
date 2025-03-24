@@ -15,19 +15,32 @@ import styles from './AddressInline.module.scss';
 interface Props {
 	address: string;
 	className?: string;
-	onChainIdentity: IOnChainIdentity;
+	onChainIdentity?: IOnChainIdentity;
 	addressDisplayText?: string;
 	iconSize?: number;
 	showIdenticon?: boolean;
 	textClassName?: string;
 	redirectToProfile?: boolean;
+	userProfileUrl?: string;
 }
 
-function AddressInline({ address, onChainIdentity, addressDisplayText, className, iconSize = 20, showIdenticon = true, textClassName, redirectToProfile = true }: Props) {
+function AddressInline({
+	address,
+	onChainIdentity,
+	addressDisplayText,
+	className,
+	iconSize = 20,
+	showIdenticon = true,
+	textClassName,
+	redirectToProfile = true,
+	userProfileUrl
+}: Props) {
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
 			title={addressDisplayText || address}
+			data-tip
+			data-for={`tooltip-${address}`}
 		>
 			{showIdenticon && (
 				<Identicon
@@ -37,10 +50,10 @@ function AddressInline({ address, onChainIdentity, addressDisplayText, className
 					theme='polkadot'
 				/>
 			)}
-			{redirectToProfile ? (
+			{redirectToProfile && userProfileUrl ? (
 				<Link
 					className={styles.container}
-					href={`/user/address/${address}`}
+					href={userProfileUrl}
 				>
 					<IdentityBadge
 						onChainIdentity={onChainIdentity}

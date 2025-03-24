@@ -34,8 +34,6 @@ function BatchVote({
 	const queryClient = useQueryClient();
 	const currentIndexRef = useRef(0);
 
-	const [loading, setLoading] = useState(false);
-
 	const fetchBatchVoteCart = async () => {
 		if (!user?.id) return [];
 
@@ -47,10 +45,13 @@ function BatchVote({
 		return data.voteCart;
 	};
 
-	const { data: voteCart, isFetching } = useQuery({
+	const { data: voteCart, isLoading } = useQuery({
 		queryKey: [EReactQueryKeys.BATCH_VOTE_CART, user?.id],
 		queryFn: fetchBatchVoteCart,
-		staleTime: FIVE_MIN_IN_MILLI
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false,
+		retryOnMount: false,
+		refetchOnWindowFocus: false
 	});
 
 	const [skippedProposals, setSkippedProposals] = useState<IPostListing[]>([]);
@@ -81,8 +82,6 @@ function BatchVote({
 		title?: string;
 	}) => {
 		if (!user?.id) return;
-
-		setLoading(true);
 
 		const amount = BatchVotingClientService.getAmountForDecision({
 			voteDecision,
@@ -137,34 +136,29 @@ function BatchVote({
 			// Revert to previous state if the API call fails
 			queryClient.setQueryData([EReactQueryKeys.BATCH_VOTE_CART, user.id], previousData);
 			console.error('Failed to add to vote cart:', error);
-		} finally {
-			setLoading(false);
 		}
 	};
 
 	return (
 		<div>
 			<div className='hidden grid-cols-1 place-items-start gap-4 sm:grid lg:grid-cols-3'>
-				<div className='relative col-span-2 w-full rounded-2xl bg-bg_modal p-4'>
-					{isFetching && <LoadingLayover />}
+				<div className='col-span-2 w-full rounded-2xl bg-bg_modal p-4'>
 					<ProposalScreen
 						proposals={filteredProposals}
 						addToVoteCart={addToVoteCart}
-						disableButtons={loading}
 						onSkip={onSkipProposal}
 					/>
 				</div>
 				<div className='relative col-span-1 w-full rounded-2xl bg-bg_modal p-4'>
-					{isFetching && <LoadingLayover />}
+					{isLoading && <LoadingLayover />}
 					<VoteCart voteCart={voteCart || []} />
 				</div>
 			</div>
 			<TinderVoting
-				disableButtons={loading}
 				filteredProposals={filteredProposals}
 				currentIndexRef={currentIndexRef}
 				addToVoteCart={addToVoteCart}
-				isFetching={isFetching}
+				isLoading={isLoading}
 				voteCart={voteCart || []}
 				onSkip={onSkipProposal}
 			/>

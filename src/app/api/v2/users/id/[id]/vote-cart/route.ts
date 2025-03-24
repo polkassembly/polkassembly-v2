@@ -49,11 +49,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		postIndexOrHash: z.string().min(1, 'Post index or hash is required'),
 		proposalType: z.nativeEnum(EProposalType),
-		decision: z.nativeEnum(EVoteDecision).refine((val) => val !== EVoteDecision.SPLIT_ABSTAIN, 'SPLIT_ABSTAIN decision is not supported'),
+		decision: z.nativeEnum(EVoteDecision),
 		amount: z.object({
-			abstain: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
-			aye: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
-			nay: z.string().refine(ValidatorService.isValidVoteAmount).optional()
+			abstain: z.string().refine(ValidatorService.isValidAmount).optional(),
+			aye: z.string().refine(ValidatorService.isValidAmount).optional(),
+			nay: z.string().refine(ValidatorService.isValidAmount).optional()
 		}),
 		conviction: z.nativeEnum(EConvictionAmount)
 	});
@@ -98,11 +98,11 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		id: z.string().min(1, 'Vote cart item id is required'),
-		decision: z.nativeEnum(EVoteDecision).refine((val) => val !== EVoteDecision.SPLIT_ABSTAIN, 'SPLIT_ABSTAIN decision is not supported'),
+		decision: z.nativeEnum(EVoteDecision),
 		amount: z.object({
-			abstain: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
-			aye: z.string().refine(ValidatorService.isValidVoteAmount).optional(),
-			nay: z.string().refine(ValidatorService.isValidVoteAmount).optional()
+			abstain: z.string().refine(ValidatorService.isValidAmount).optional(),
+			aye: z.string().refine(ValidatorService.isValidAmount).optional(),
+			nay: z.string().refine(ValidatorService.isValidAmount).optional()
 		}),
 		conviction: z.nativeEnum(EConvictionAmount)
 	});

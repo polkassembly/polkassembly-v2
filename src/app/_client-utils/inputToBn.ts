@@ -25,8 +25,9 @@ function isValidNumber(bn: BN, isZeroable?: boolean): boolean {
 	);
 }
 
-export function inputToBn(input: string, network: ENetwork, isZeroable?: boolean): { bnValue: BN; isValid: boolean } {
-	const tokenDecimal = NETWORKS_DETAILS[`${network}`].tokenDecimals;
+export function inputToBn(input: string, network: ENetwork, isZeroable?: boolean, assetId?: string | null): { bnValue: BN; isValid: boolean } {
+	const networkDetails = NETWORKS_DETAILS[`${network}`];
+	const tokenDecimal = assetId ? networkDetails.supportedAssets[`${assetId}`].tokenDecimal || networkDetails.tokenDecimals : networkDetails.tokenDecimals;
 	const tokenDecimalBN = new BN(tokenDecimal);
 
 	const isDecimalValue = input.match(/^(\d+)\.(\d+)$/);
