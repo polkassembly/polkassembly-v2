@@ -22,7 +22,7 @@
 			}
 		}
 	},
-	"plugins": ["@typescript-eslint", "header", "import"],
+	"plugins": ["@typescript-eslint", "header", "import", "sonarjs"],
 	"extends": [
 		"next/core-web-vitals",
 		"next/typescript",

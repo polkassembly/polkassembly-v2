@@ -325,8 +325,8 @@ export class OffChainDbService {
 		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
 	}
 
-	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from?: Date; to?: Date }): Promise<ITreasuryStats[]> {
-		return FirestoreService.GetTreasuryStats({ network, from, to });
+	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
+		return FirestoreService.GetTreasuryStats({ network, from, to, limit, page });
 	}
 
 	// helper methods
