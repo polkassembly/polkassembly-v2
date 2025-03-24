@@ -78,6 +78,12 @@ function Create() {
 					{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum />}
 					{!step && (
 						<div className='flex flex-col gap-y-4'>
+							<Link
+								href='/create/discussion'
+								className='flex w-full items-center justify-start p-2'
+							>
+								{t('CreateProposal.createDiscussion')}
+							</Link>
 							<Button
 								variant='outline'
 								size='lg'

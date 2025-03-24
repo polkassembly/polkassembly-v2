@@ -673,6 +673,7 @@
 		"proposals": "Proposals"
 	},
 	"CreateProposal": {
+		"createDiscussion": "Create Discussion",
 		"createPreimage": "Create Preimage",
 		"existingPreimage": "Already have a Preimage",
 		"createTreasuryProposal": "Create Treasury Proposal (Native)",
