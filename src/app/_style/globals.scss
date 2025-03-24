@@ -96,7 +96,7 @@
 
 	[role='dialog'],
 	svg {
-		background-color: var(--baseBase); /* Use theme-based background */
+		background-color: var(--baseBg); /* Use theme-based background */
 		border-color: var(--baseBorder);
 		color: var(--baseText);
 		fill: var(--baseBorder);
@@ -106,7 +106,7 @@
 .mdxeditor-select-content {
 	z-index: 100 !important;
 	[role='option'] {
-		background-color: var(--baseBase); /* Use theme-based background */
+		background-color: var(--baseBg); /* Use theme-based background */
 		border-color: var(--baseBorder);
 		color: var(--baseText);
 	}
@@ -115,7 +115,7 @@
 .mdxeditor-source-editor,
 .mdxeditor-diff-editor {
 	.cm-editor {
-		background-color: var(--baseBase); /* Use theme-based background */
+		background-color: var(--baseBg); /* Use theme-based background */
 		border-color: var(--baseBorder);
 		color: var(--baseText);
 	}

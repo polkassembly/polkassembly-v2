@@ -101,7 +101,7 @@
 		--accentTextContrast: #fff; /* btn_primary_text */
 
 		/* Gray colors from theme */
-		--baseBase: #f6f7f9; /* page_background */
+		--baseBase: transparent; /* page_background */
 		--baseBgSubtle: #eff1f3; /* post_btn_bg */
 		--baseBg: #f4f6f8; /* grey_bg */
 		--baseBgHover: #e3e4e4; /* search_bg */
@@ -132,7 +132,7 @@
 		--accentTextContrast: #fff; /* btn_primary_text */
 
 		/* Gray colors from theme for dark mode */
-		--baseBase: #1c1d1f; /* page_background */
+		--baseBase: transparent; /* page_background */
 		--baseBgSubtle: #262626; /* active_proposal_bg */
 		--baseBg: #222222; /* grey_bg */
 		--baseBgHover: #2e2e2e; /* activity_selected_tab */
@@ -147,7 +147,6 @@
 
 		/* Set page background color for dark mode */
 		--basePageBg: #1c1d1f; /* page_background */
-		background: var(--basePageBg);
 		color: var(--baseText);
 	}
 
@@ -169,25 +168,6 @@
 			/* Additional dialog styling */
 			border-radius: 8px;
 			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-			/* Elements inside dialog */
-			// input,
-			// textarea,
-			// select {
-			// 	background-color: var(--baseBgSubtle);
-			// 	border-color: var(--baseBorder);
-			// 	color: var(--baseText);
-			// }
-
-			// button {
-			// 	background-color: var(--accentBg);
-			// 	color: var(--accentText);
-			// 	border-color: var(--accentBorder);
-
-			// 	&:hover {
-			// 		background-color: var(--accentBgHover);
-			// 	}
-			// }
 		}
 	}
 }

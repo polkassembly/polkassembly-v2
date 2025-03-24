@@ -4,54 +4,26 @@
 
 'use client';
 
-import React, { useState } from 'react';
 import { IPostListing } from '@/_shared/types';
-import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
 import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
-	const [showMore, setShowMore] = useState(false);
-
-	const t = useTranslations();
-
-	const handleShowMore = () => {
-		setShowMore(true);
-	};
-
-	const handleShowLess = () => {
-		setShowMore(false);
-	};
-
-	const truncatedData = showMore ? postData?.content.trim() : postData?.content?.trim().slice(0, 4);
+	const { content } = postData;
 
 	return (
 		<div>
 			<MarkdownEditor
-				markdown={truncatedData}
+				markdown={content}
 				readOnly
-				className={isModalOpen ? '' : 'max-h-full border-none'}
+				className={cn(isModalOpen ? '' : 'max-h-full border-none')}
+				contentEditableClassName='p-0'
+				truncate
 			/>
 
-			{showMore ? (
-				<span
-					onClick={handleShowLess}
-					className='cursor-pointer text-sm font-medium text-text_pink'
-					aria-hidden='true'
-				>
-					{t('ActivityFeed.PostItem.showLess')}
-				</span>
-			) : !showMore && postData?.content?.trim() && postData?.content?.trim().length > 4 ? (
-				<span
-					onClick={handleShowMore}
-					className='cursor-pointer text-sm font-medium text-text_pink'
-					aria-hidden='true'
-				>
-					{t('ActivityFeed.PostItem.showMore')}
-				</span>
-			) : null}
 			<Separator className='my-4 bg-border_grey' />
 			<PostActions postData={postData} />
 			<div className='flex items-center justify-between'>
