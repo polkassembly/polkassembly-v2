@@ -7,7 +7,7 @@ import { ENetwork } from '../types';
 
 // TODO: fetch this from pjs api if possible
 export function getAssetDataByIndexForNetwork({ network, generalIndex }: { network: ENetwork; generalIndex: string }) {
-	const networkDetails = NETWORKS_DETAILS[network];
+	const networkDetails = NETWORKS_DETAILS[network as ENetwork];
 
 	if (!networkDetails) {
 		throw new Error(`Network ${network} not found`);
