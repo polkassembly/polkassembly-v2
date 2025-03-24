@@ -5,6 +5,7 @@
 'use client';
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@ui/Tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -21,7 +22,6 @@ import NewsSection from './NewsSection/NewsSection';
 import SpendPeriod from './SpendPeriod/SpendPeriod';
 import CalendarEvents from './CalendarEvents/CalendarEvents';
 import TreasuryStats from './TreasuryStats/TreasuryStats';
-import { useState } from 'react';
 import Gallery from './Gallery/Gallery';
 
 enum EOverviewTabs {
@@ -57,12 +57,13 @@ function Overview({
 					</div>
 					<p className='mt-5 text-sm text-btn_secondary_text'>
 						{t('joinCommunity')}{' '}
-						<span
+						<button
+							type='button'
 							onClick={() => setIsGalleryOpen(!isGalleryOpen)}
 							className='cursor-pointer text-bg_pink'
 						>
 							{t(isGalleryOpen ? 'minimizeGallery' : 'viewGallery')}
-						</span>
+						</button>
 					</p>
 					<span className='block pt-3 lg:hidden'>
 						<AboutSocialLinks />

@@ -14,10 +14,10 @@ import { dayjs } from '@shared/_utils/dayjsInit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import styles from './SpendPeriod.module.scss';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ITreasuryStats } from '@/_shared/types';
 import { useQuery } from '@tanstack/react-query';
+import styles from './SpendPeriod.module.scss';
 
 function SpendPeriod() {
 	const { apiService } = usePolkadotApiService();
@@ -32,7 +32,7 @@ function SpendPeriod() {
 		return Array.isArray(response.data) ? response.data : [];
 	};
 
-	const { data: treasuryStats, isFetching } = useQuery({
+	const { data: treasuryStats } = useQuery({
 		queryKey: ['treasuryStats'],
 		queryFn: getTreasuryStats
 	});

@@ -6,12 +6,12 @@ import { Loader } from 'lucide-react';
 import { useState } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import { useTranslations } from 'next-intl';
-import styles from '../Overview.module.scss';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ESocial } from '@/_shared/types';
+import styles from '../Overview.module.scss';
 
-const NewsSection = () => {
+function NewsSection() {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const network = getCurrentNetwork();
 
@@ -35,8 +35,8 @@ const NewsSection = () => {
 						sourceType='profile'
 						screenName={profile}
 						options={{ height: 450 }}
-						noHeader={true}
-						noFooter={true}
+						noHeader
+						noFooter
 						theme='dark'
 						noBorders
 					/>
@@ -48,8 +48,8 @@ const NewsSection = () => {
 						sourceType='profile'
 						screenName={profile}
 						options={{ height: 450 }}
-						noHeader={true}
-						noFooter={true}
+						noHeader
+						noFooter
 						theme='dark'
 						noBorders
 					/>
@@ -57,6 +57,6 @@ const NewsSection = () => {
 			</div>
 		</div>
 	);
-};
+}
 
 export default NewsSection;

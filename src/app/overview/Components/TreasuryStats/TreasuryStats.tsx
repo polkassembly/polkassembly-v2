@@ -3,7 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 'use client';
-import { Area, AreaChart, ResponsiveContainer, XAxis, Tooltip as RechartsTooltip } from 'recharts';
+
+import { Area, AreaChart, ResponsiveContainer, XAxis, Tooltip as RechartsTooltip, TooltipProps } from 'recharts';
 import { type ChartConfig, ChartContainer } from '@ui/chart';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -13,37 +14,39 @@ import { FiChevronRight } from 'react-icons/fi';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ITreasuryStats } from '@/_shared/types';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image';
 import DotIcon from '@assets/icons/dot.png';
 import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
 import { Separator } from '@/app/_shared-components/Separator';
 
-const TokenDisplay = ({ icon, amount, symbol }: { icon: any; amount: string; symbol: string }) => (
-	<div className='flex items-center gap-1'>
-		<Image
-			src={icon}
-			alt={symbol}
-			width={16}
-			height={16}
-		/>
-		<span className='text-xs text-btn_secondary_text'>
-			{amount}M {symbol}
-		</span>
-	</div>
-);
+function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: string; symbol: string }) {
+	return (
+		<div className='flex items-center gap-1'>
+			<Image
+				src={icon}
+				alt={symbol}
+				width={16}
+				height={16}
+			/>
+			<span className='text-xs text-btn_secondary_text'>
+				{amount}M {symbol}
+			</span>
+		</div>
+	);
+}
 
-const PriceChange = ({ value }: { value: number }) => {
+function PriceChange({ value }: { value: number }) {
 	const isPositive = value > 0;
 	return (
 		<span className={`flex items-center gap-1 text-xs ${isPositive ? 'text-success' : 'text-failure'}`}>
 			{value.toFixed(2)}% {isPositive ? <FaCaretUp /> : <FaCaretDown />}
 		</span>
 	);
-};
+}
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
 	if (!active || !payload?.length) return null;
 	return (
 		<div className='rounded border border-border_grey bg-bg_modal p-2 shadow-lg'>
@@ -51,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 			<p className='text-sm text-btn_secondary_text'>{payload[0].payload.displayValue}</p>
 		</div>
 	);
-};
+}
 
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
@@ -71,11 +74,7 @@ export default function TreasuryStats() {
 		return Array.isArray(response.data) ? response.data : [];
 	};
 
-	const {
-		data: treasuryStats,
-		isLoading,
-		error
-	} = useQuery({
+	const { data: treasuryStats, isLoading } = useQuery({
 		queryKey: ['treasuryStats'],
 		queryFn: getTreasuryStats
 	});
@@ -133,7 +132,7 @@ export default function TreasuryStats() {
 		}
 	}, [treasuryStats]);
 
-	if (isLoading || error || !stats) {
+	if (isLoading || !stats) {
 		return (
 			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 				<div className='p-3'>
@@ -233,26 +232,26 @@ export default function TreasuryStats() {
 									fillOpacity={0.4}
 									stroke='rgba(175, 184, 239, 0.8)'
 									strokeWidth={1.5}
-									isAnimationActive={true}
+									isAnimationActive
 								/>
 							</AreaChart>
 						</ResponsiveContainer>
 					</ChartContainer>
 				</div>
-				<div className='hidden justify-between px-1 text-xs text-gray-500 sm:hidden md:flex lg:flex'>
-					{chartData.map((item, index) => (
+				<div className='hidden justify-between px-1 text-xs text-text_primary sm:hidden md:flex lg:flex'>
+					{chartData.map((item) => (
 						<div
-							key={`${item.month}-${index}`}
+							key={item.month}
 							className='text-center'
 						>
 							{item.month}
 						</div>
 					))}
 				</div>
-				<div className='flex justify-between px-1 text-xs text-gray-500 sm:flex md:hidden lg:hidden'>
-					{chartData.slice(-6).map((item, index) => (
+				<div className='flex justify-between px-1 text-xs text-text_primary sm:flex md:hidden lg:hidden'>
+					{chartData.slice(-6).map((item) => (
 						<div
-							key={`${item.month}-${index}`}
+							key={`${item.month}`}
 							className='text-center'
 						>
 							{item.month}

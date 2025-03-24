@@ -40,7 +40,7 @@ const GalleryData = [
 	}
 ];
 
-const Gallery = () => {
+function Gallery() {
 	return (
 		<div className='flex flex-wrap gap-4 p-4 lg:gap-8'>
 			{GalleryData.map((item) => (
@@ -71,6 +71,6 @@ const Gallery = () => {
 			))}
 		</div>
 	);
-};
+}
 
 export default Gallery;
