@@ -5,16 +5,33 @@
 import { StatusCodes } from 'http-status-codes';
 import { ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { BN } from '@polkadot/util';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
 	[network: string]: { usd: number; usd_24h_change: number };
 }
 
+// Convert decimal price to integer by multiplying by 10^PRICE_DECIMALS
+const USD_PRICE_DECIMALS = 18; // Using 18 decimals for price precision
+const USD_PRICE_MULTIPLIER = new BN(10).pow(new BN(USD_PRICE_DECIMALS));
+
+// Convert price string to BN, handling decimals
+const priceStringToBN = (priceStr: string | number): BN => {
+	if (!priceStr) return new BN(0);
+	// Convert to string and remove any commas
+	const cleanPrice = priceStr.toString().replace(/,/g, '');
+	// Split on decimal point
+	const [whole, decimal = ''] = cleanPrice.split('.');
+	// Combine whole and decimal, padding decimal with zeros
+	const paddedDecimal = decimal.padEnd(USD_PRICE_DECIMALS, '0');
+	// Combine whole and padded decimal, removing any leading zeros
+	return new BN(whole + paddedDecimal);
+};
+
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
 	try {
 		const { ApiPromise, WsProvider } = await import('@polkadot/api');
-		const { BN } = await import('@polkadot/util');
 		const { TREASURY_NETWORK_CONFIG } = await import('@/_shared/_constants/treasury');
 
 		const config = TREASURY_NETWORK_CONFIG[network as ENetwork];
@@ -349,9 +366,19 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
 		const mythPriceInUsd = mythPrice?.mythos?.usd;
 
-		if (mythPriceInUsd) {
-			const totalDotInUsd = new BN(treasuryStats.nativeTokenUsdPrice || '0').mul(new BN(treasuryStats.total?.totalDot || '0'));
-			const totalMythInUsd = new BN(mythPriceInUsd).mul(new BN(treasuryStats.total?.totalMyth || '0'));
+		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice) {
+			const nativeTokenPriceBN = priceStringToBN(treasuryStats.nativeTokenUsdPrice);
+			const mythPriceBN = priceStringToBN(mythPriceInUsd);
+
+			const totalDotInUsd = nativeTokenPriceBN.mul(new BN(treasuryStats.total?.totalDot || '0')).div(USD_PRICE_MULTIPLIER);
+			const totalMythInUsd = mythPriceBN.mul(new BN(treasuryStats.total?.totalMyth || '0')).div(USD_PRICE_MULTIPLIER);
+
+			console.log({
+				totalDotInUsd: totalDotInUsd.toString(),
+				totalMythInUsd: totalMythInUsd.toString(),
+				totalUsdc: new BN(treasuryStats.total?.totalUsdc || '0').toString(),
+				totalUsdt: new BN(treasuryStats.total?.totalUsdt || '0').toString()
+			});
 
 			const totalInUsd = totalDotInUsd
 				.add(totalMythInUsd)
@@ -366,6 +393,8 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				}
 			};
 		}
+
+		console.log({ ...treasuryStats });
 
 		// Disconnect all APIs
 		await Promise.all([relayChainApi.disconnect(), assetHubApi.disconnect(), hydrationApi.disconnect()]);
