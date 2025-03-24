@@ -19,8 +19,9 @@ import { cn } from '@/lib/utils';
 import AboutSocialLinks from './AboutSocialLinks/AboutSocialLinks';
 import styles from './Overview.module.scss';
 import NewsSection from './NewsSection/NewsSection';
-import SpendPeriod from '../SpendPeriod/SpendPeriod';
+import SpendPeriod from './SpendPeriod/SpendPeriod';
 import CalendarEvents from './CalendarEvents/CalendarEvents';
+import TreasuryStats from './TreasuryStats/TreasuryStats';
 
 enum EOverviewTabs {
 	All = 'all',
@@ -66,16 +67,7 @@ function Overview({
 
 			{/* Treasury and Spend Period */}
 			<div className='mt-6 grid gap-4 lg:grid-cols-2'>
-				<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
-					<div className='p-3'>
-						<p className='text-sm text-wallet_btn_text'>
-							{t('treasury')} <MdInfoOutline className='inline-block text-lg' />
-						</p>
-						<div className='mt-4 flex items-center justify-center'>
-							<p className='text-sm text-btn_secondary_text'>{t('comingSoon')}</p>
-						</div>
-					</div>
-				</div>
+				<TreasuryStats />
 				<SpendPeriod tokenPrice={tokenPrice} />
 			</div>
 
