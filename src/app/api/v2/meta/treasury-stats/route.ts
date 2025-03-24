@@ -19,8 +19,8 @@ import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/l
 export const maxDuration = 300;
 
 const zodQuerySchema = z.object({
-	from: z.date().optional(),
-	to: z.date().optional(),
+	from: z.coerce.date().optional(),
+	to: z.coerce.date().optional(),
 	limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 	page: z.coerce.number().optional().default(1)
 });
