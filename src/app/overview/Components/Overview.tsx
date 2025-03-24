@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import AboutSocialLinks from './AboutSocialLinks/AboutSocialLinks';
 import styles from './Overview.module.scss';
 import NewsSection from './NewsSection/NewsSection';
-import SpendPeriod from '../SpendPeriod/SpendPeriod';
+import SpendPeriod from './SpendPeriod/SpendPeriod';
 import CalendarEvents from './CalendarEvents/CalendarEvents';
 
 enum EOverviewTabs {
