@@ -190,11 +190,11 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			group: 'Origin',
 			name: 'root',
 			maxDeciding: 1,
-			decisionDeposit: new BN('100000000000000'),
-			preparePeriod: 80,
-			decisionPeriod: 200,
-			confirmPeriod: 120,
-			minEnactmentPeriod: 50,
+			decisionDeposit: new BN('1000000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
 			minApproval: {
 				reciprocal: {
 					factor: 222222224,
@@ -245,7 +245,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			decisionDeposit: new BN('4000000000000'),
 			preparePeriod: 2400,
 			decisionPeriod: 403200,
-			confirmPeriod: 28800,
+			confirmPeriod: 100800,
 			minEnactmentPeriod: 14400,
 			minApproval: {
 				linearDecreasing: {
@@ -272,7 +272,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			decisionDeposit: new BN('2000000000000'),
 			preparePeriod: 2400,
 			decisionPeriod: 403200,
-			confirmPeriod: 14400,
+			confirmPeriod: 57600,
 			minEnactmentPeriod: 14400,
 			minApproval: {
 				linearDecreasing: {
@@ -299,7 +299,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			decisionDeposit: new BN('1000000000000'),
 			preparePeriod: 2400,
 			decisionPeriod: 403200,
-			confirmPeriod: 7200,
+			confirmPeriod: 28800,
 			minEnactmentPeriod: 14400,
 			minApproval: {
 				linearDecreasing: {
@@ -346,13 +346,14 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.SMALL_TIPPER]: {
 			trackId: 30,
 			description: 'Origin able to spend up to 250 DOT from the treasury at once',
+			maxSpend: new BN('250').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
 			group: 'Treasury',
 			name: 'small_tipper',
 			maxDeciding: 200,
-			decisionDeposit: new BN('30000000000'),
+			decisionDeposit: new BN('10000000000'),
 			preparePeriod: 10,
-			decisionPeriod: 140,
-			confirmPeriod: 40,
+			decisionPeriod: 100800,
+			confirmPeriod: 100,
 			minEnactmentPeriod: 10,
 			minApproval: {
 				linearDecreasing: {
@@ -379,7 +380,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			decisionDeposit: new BN('10000000000000'),
 			preparePeriod: 1200,
 			decisionPeriod: 403200,
-			confirmPeriod: 1800,
+			confirmPeriod: 100800,
 			minEnactmentPeriod: 14400,
 			minApproval: {
 				reciprocal: {
@@ -402,11 +403,11 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			group: 'Origin',
 			name: 'whitelisted_caller',
 			maxDeciding: 100,
-			decisionDeposit: new BN('10000000000000000'),
-			preparePeriod: 60,
-			decisionPeriod: 200,
-			confirmPeriod: 40,
-			minEnactmentPeriod: 30,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 300,
+			decisionPeriod: 403200,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
 			minApproval: {
 				reciprocal: {
 					factor: 270899180,
@@ -1454,12 +1455,11 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			description: TREASURER_DESCRIPTION,
 			group: 'Origin',
 			name: 'treasurer',
-			maxSpend: new BN('10000000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.WESTEND]))),
 			maxDeciding: 10,
 			decisionDeposit: new BN('10000000000000'),
 			preparePeriod: 1200,
 			decisionPeriod: 403200,
-			confirmPeriod: 1800,
+			confirmPeriod: 100800,
 			minEnactmentPeriod: 14400,
 			minApproval: {
 				reciprocal: {
