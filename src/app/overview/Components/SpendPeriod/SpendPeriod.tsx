@@ -15,8 +15,11 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import styles from './SpendPeriod.module.scss';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { ITreasuryStats } from '@/_shared/types';
+import { useQuery } from '@tanstack/react-query';
 
-function SpendPeriod({ tokenPrice }: { tokenPrice?: string }) {
+function SpendPeriod() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -24,6 +27,17 @@ function SpendPeriod({ tokenPrice }: { tokenPrice?: string }) {
 	const [nextBurn, setNextBurn] = useState<{ value: string; valueUSD: string } | null>(null);
 	const [isNextBurnLoading, setIsNextBurnLoading] = useState<boolean>(true);
 	const t = useTranslations('Overview');
+	const getTreasuryStats = async (): Promise<ITreasuryStats[]> => {
+		const response = await NextApiClientService.getTreasuryStats({});
+		return Array.isArray(response.data) ? response.data : [];
+	};
+
+	const { data: treasuryStats, isFetching } = useQuery({
+		queryKey: ['treasuryStats'],
+		queryFn: getTreasuryStats
+	});
+
+	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
 
 	useEffect(() => {
 		if (!apiService) return;

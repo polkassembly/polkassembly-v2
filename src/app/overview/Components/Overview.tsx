@@ -28,15 +28,13 @@ enum EOverviewTabs {
 }
 
 function Overview({
-	trackDetails,
-	tokenPrice
+	trackDetails
 }: {
 	trackDetails: {
 		all: IGenericListingResponse<IPostListing> | null;
 		discussion: IGenericListingResponse<IPostListing> | null;
 		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
 	};
-	tokenPrice?: string;
 }) {
 	const network = getCurrentNetwork();
 	const router = useRouter();
@@ -67,7 +65,7 @@ function Overview({
 			{/* Treasury and Spend Period */}
 			<div className='mt-6 grid gap-4 lg:grid-cols-2'>
 				<TreasuryStats />
-				<SpendPeriod tokenPrice={tokenPrice} />
+				<SpendPeriod />
 			</div>
 
 			{/* Latest Activity */}

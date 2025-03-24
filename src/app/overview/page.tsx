@@ -73,14 +73,10 @@ async function OverviewPage() {
 	const trackDetails = await fetchTrackDetails();
 
 	const symbol = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
-	const tokenPrice = await NextApiClientService.getCurrentTokenPrice({ symbol });
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-8'>
-			<Overview
-				trackDetails={trackDetails || { all: null, discussion: null, tracks: [] }}
-				tokenPrice={tokenPrice.data ? tokenPrice.data.price : undefined}
-			/>
+			<Overview trackDetails={trackDetails || { all: null, discussion: null, tracks: [] }} />
 		</div>
 	);
 }

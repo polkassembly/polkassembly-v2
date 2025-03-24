@@ -32,7 +32,8 @@ import {
 	EOffChainPostTopic,
 	ICalendarEvent,
 	IVoteCartItem,
-	EConvictionAmount
+	EConvictionAmount,
+	ITreasuryStats
 } from '@/_shared/types';
 import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
@@ -86,7 +87,6 @@ enum EApiRoute {
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
-	GET_CURRENT_TOKEN_PRICE = 'GET_CURRENT_TOKEN_PRICE',
 	GET_CALENDAR_EVENTS = 'GET_CALENDAR_EVENTS',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
@@ -164,9 +164,6 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
-				break;
-			case EApiRoute.GET_CURRENT_TOKEN_PRICE:
-				path = '/token-price';
 				break;
 			case EApiRoute.GET_TREASURY_STATS:
 				path = '/meta/treasury-stats';
@@ -739,14 +736,6 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 
-	static async getCurrentTokenPrice({ symbol }: { symbol: string }) {
-		const queryParams = new URLSearchParams({
-			symbol
-		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CURRENT_TOKEN_PRICE, queryParams });
-		return this.nextApiClientFetch<{ price: string }>({ url, method });
-	}
-
 	static async getCalendarEvents({ startBlockNo, endBlockNo }: { startBlockNo: number; endBlockNo: number }) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_CALENDAR_EVENTS
@@ -769,12 +758,12 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	static async getTreasuryStats({ from, to }: { from?: Date; to?: Date }) {
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
 		const queryParams = new URLSearchParams({
-			from: from?.toISOString() || '',
-			to: to?.toISOString() || ''
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
-		return this.nextApiClientFetch<{ message: string }>({ url, method });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 }
