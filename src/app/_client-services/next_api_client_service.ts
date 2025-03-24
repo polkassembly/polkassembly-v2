@@ -95,7 +95,8 @@ enum EApiRoute {
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
-	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION'
+	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS'
 }
 
 export class NextApiClientService {
@@ -166,6 +167,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_CURRENT_TOKEN_PRICE:
 				path = '/token-price';
+				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -762,6 +766,11 @@ export class NextApiClientService {
 
 	static async deletePostSubscription(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getTreasuryStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 }

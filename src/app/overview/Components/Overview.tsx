@@ -7,7 +7,6 @@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@ui/Tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/Table';
-import { MdInfoOutline } from 'react-icons/md';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
