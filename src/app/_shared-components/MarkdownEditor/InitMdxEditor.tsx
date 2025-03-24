@@ -35,11 +35,15 @@ import {
 } from '@mdxeditor/editor';
 
 import { Ellipsis } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes';
+import { ETheme } from '@/_shared/types';
 import classes from './MardownEditor.module.scss';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover/Popover';
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+	const { theme } = useTheme();
 	const toolbarContents = () => {
 		return (
 			<div className='flex items-center gap-x-1 md:gap-x-2'>
@@ -103,6 +107,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 			<MDXEditor
 				plugins={plugins}
 				{...props}
+				className={cn(theme === ETheme.DARK ? 'dark-theme' : '', props.className)}
 				ref={editorRef}
 				onError={(error) => {
 					console.error(error);
