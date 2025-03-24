@@ -17,7 +17,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './AddTags.module.scss';
 import { Input } from '../../Input';
 
-export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) => void; disabled: boolean }) {
+export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) => void; disabled?: boolean }) {
 	const t = useTranslations();
 	const [open, setOpen] = useState(false);
 	const [selectedValues, setSelectedValues] = useState<ITag[]>([]);

@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
@@ -147,23 +146,26 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user preferences
 	useEffect(() => {
+		const locale = CookieClientService.getLocaleCookie();
+		const theme = CookieClientService.getThemeCookie();
+		const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+
 		setUserPreferences({
 			...userPreferences,
-			locale: userPreferences.locale,
-			theme: userPreferences.theme,
-			...(user?.loginAddress
+			locale: locale || userPreferences.locale,
+			theme: theme || userPreferences.theme,
+			...(accessTokenPayload?.loginAddress
 				? {
 						address: {
-							address: user?.loginAddress
+							address: accessTokenPayload.loginAddress
 						}
 					}
 				: {}),
-			wallet: user?.loginWallet
+			wallet: accessTokenPayload?.loginWallet
 		});
 
-		dayjs.locale(userPreferences.locale);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
+	}, []);
 
 	// set user
 	useEffect(() => {

@@ -6,7 +6,6 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { fetchPF } from '@shared/_utils/fetchPF';
 import { ENetwork, ENotificationTrigger, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 
@@ -40,7 +39,7 @@ export class NotificationService {
 			return;
 		}
 
-		await fetchPF(`${this.NOTIFICATION_ENGINE_URL}`, {
+		await fetch(`${this.NOTIFICATION_ENGINE_URL}`, {
 			body: JSON.stringify({
 				args,
 				trigger
