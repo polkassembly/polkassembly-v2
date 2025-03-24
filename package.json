@@ -13,7 +13,7 @@
     "format:fix": "prettier --write --ignore-path .gitignore ."
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "dependencies": {
     "@editorjs/editorjs": "^2.30.7",
