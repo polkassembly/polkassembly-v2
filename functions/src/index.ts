@@ -50,7 +50,7 @@ export const callTreasuryStatsFetch = onRequest(async (request, response) => {
 
 		await fetchLatestTreasuryStats({ toolsPassphrase });
 
-		response.json({ message: 'Treasury stats fetched successfully' });
+		response.json({ message: 'Treasury stats fetch complete' });
 	} catch (error) {
 		logger.error('Error in callTreasuryStatsFetch:', error);
 		throw new HttpsError('internal', 'Error in callTreasuryStatsFetch');
