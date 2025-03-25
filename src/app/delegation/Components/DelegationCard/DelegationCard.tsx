@@ -8,7 +8,6 @@ import { IoMdTrendingUp } from 'react-icons/io';
 import { IoPersonAdd } from 'react-icons/io5';
 import { EDelegateSource, ENetwork, IDelegate } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
@@ -23,8 +22,9 @@ import { FaFilter } from 'react-icons/fa';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
 import { useTranslations } from 'next-intl';
 import { MdSort } from 'react-icons/md';
+import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import PlatformLogos, { getPlatformStyles } from '../PlatformLogos/PlatformLogos';
-import DelegateSearchInput from '../DelegateSearchInput';
+import DelegateSearchInput from '../DelegateSearchInput/DelegateSearchInput';
 import styles from '../Delegation.module.scss';
 
 interface DelegateCardProps {
@@ -93,12 +93,12 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 						{delegate.bio.length > 0 ? (
 							delegate.bio.includes('<') ? (
 								<div className='bio-content'>
-									<BlockEditor
-										data={delegate.bio}
-										readOnly
-										id={`delegate-bio-${delegate.address}`}
-										className='text-sm text-text_primary'
-									/>
+									<div className='flex max-h-40 w-full overflow-hidden border-none'>
+										<MarkdownEditor
+											markdown={delegate.bio}
+											readOnly
+										/>
+									</div>
 									{delegate.bio.length > 100 && (
 										<button
 											className='cursor-pointer text-xs font-medium text-blue-600'
@@ -238,7 +238,5 @@ function DelegationCard({ delegates }: { delegates: IDelegate[] }) {
 		</div>
 	);
 }
-
-DelegationCard.displayName = 'DelegationCard';
 
 export default memo(DelegationCard);

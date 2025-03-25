@@ -13,7 +13,7 @@ import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 import DelegationPopupCard from '../DelegationPopupCard/DelegationPopupCard';
 import SocialLinks from '../SocialLinks/SocialLinks';
-import MyDelegateTracks from '../MyDelegateTracks';
+import MyDelegateTracks from '../MyDelegateTracks/MyDelegateTracks';
 
 function MyDelegation() {
 	const { user } = useUser();

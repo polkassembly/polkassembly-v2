@@ -15,7 +15,7 @@ import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
-import styles from './Delegation.module.scss';
+import styles from '../Delegation.module.scss';
 
 function MyDelegateTracks() {
 	const { user } = useUser();
@@ -132,7 +132,7 @@ function MyDelegateTracks() {
 				<Table>
 					<TableHeader>
 						<TableRow className={styles.tableRow}>
-							<TableHead className={styles.tableCell_1}>#</TableHead>
+							<TableHead className='px-6 py-4 first:rounded-tl-lg last:rounded-tr-lg'>#</TableHead>
 							<TableHead className={styles.tableCell_2}>{t('tracks')}</TableHead>
 							<TableHead className={styles.tableCell}>{t('description')}</TableHead>
 							<TableHead className={styles.tableCell}>{t('activeProposals')}</TableHead>
@@ -145,7 +145,7 @@ function MyDelegateTracks() {
 
 							return (
 								<TableRow key={track.track}>
-									<TableCell className={styles.tableCell_3}>{index + 1}</TableCell>
+									<TableCell className='px-6 py-4'>{index + 1}</TableCell>
 									<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
 									<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
 									<TableCell className={styles.tableCell_3}>{track.active_proposals_count}</TableCell>
