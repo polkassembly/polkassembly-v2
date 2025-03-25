@@ -8,7 +8,7 @@ import { Area, AreaChart, ResponsiveContainer, XAxis, Tooltip as RechartsTooltip
 import { type ChartConfig, ChartContainer } from '@ui/chart';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { MdInfoOutline } from 'react-icons/md';
 import { FiChevronRight } from 'react-icons/fi';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
@@ -20,8 +20,25 @@ import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
 import { Separator } from '@/app/_shared-components/Separator';
+import LoadingLayover from '@/app/_shared-components/LoadingLayover';
+import { TreasuryDetailsDialog } from './TreasuryDialog';
 
-function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: string; symbol: string }) {
+function formatNumberWithSuffix(value: number): { formatted: string; suffix: string } {
+	if (value >= 1_000_000_000) {
+		return { formatted: (value / 1_000_000_000).toFixed(2), suffix: 'B' };
+	}
+	if (value >= 1_000_000) {
+		return { formatted: (value / 1_000_000).toFixed(2), suffix: 'M' };
+	}
+	if (value >= 1_000) {
+		return { formatted: (value / 1_000).toFixed(2), suffix: 'K' };
+	}
+	return { formatted: value.toFixed(2), suffix: '' };
+}
+
+function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: number; symbol: string }) {
+	const { formatted, suffix } = formatNumberWithSuffix(amount);
+
 	return (
 		<div className='flex items-center gap-1'>
 			<Image
@@ -31,7 +48,8 @@ function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount:
 				height={16}
 			/>
 			<span className='text-xs text-btn_secondary_text'>
-				{amount}M {symbol}
+				{formatted}
+				{suffix} {symbol}
 			</span>
 		</div>
 	);
@@ -58,6 +76,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
+	const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
 	const chartConfig = {
 		value: {
@@ -74,7 +93,7 @@ export default function TreasuryStats() {
 		return Array.isArray(response.data) ? response.data : [];
 	};
 
-	const { data: treasuryStats, isLoading } = useQuery({
+	const { data: treasuryStats, isFetching } = useQuery({
 		queryKey: ['treasuryStats'],
 		queryFn: getTreasuryStats
 	});
@@ -84,7 +103,7 @@ export default function TreasuryStats() {
 
 		const currentDate = new Date('2025-03-24');
 		const currentMonthDot = Number(treasuryStats[0]?.total?.totalDot || 0) / 10000000000;
-		const baselineValue = currentMonthDot / 1_000_000;
+		const baselineValue = currentMonthDot;
 
 		// Use 12 months by default, will be filtered in the view based on screen size
 		return Array.from({ length: 12 }, (_, i) => {
@@ -94,11 +113,12 @@ export default function TreasuryStats() {
 			const isCurrentMonth = date.getMonth() === currentDate.getMonth() && date.getFullYear() === currentDate.getFullYear();
 
 			const historicalValue = isCurrentMonth ? baselineValue : baselineValue * (0.85 + (i / 11) * 0.3);
+			const { formatted, suffix } = formatNumberWithSuffix(historicalValue);
 
 			return {
 				month: date.toLocaleString('en-US', { month: 'short' }),
 				value: Number(historicalValue.toFixed(2)),
-				displayValue: `${historicalValue.toFixed(2)}M DOT`
+				displayValue: `${formatted}${suffix} DOT`
 			};
 		});
 	}, [treasuryStats]);
@@ -115,15 +135,15 @@ export default function TreasuryStats() {
 			const totalUsdt = Number(data?.total?.totalUsdt || 0) / 1_000_000;
 			const totalMyth = Number(data?.total?.totalMyth || 0) / 1e18;
 
-			const totalUsdValue = Number((totalDot * tokenPrice + totalUsdc + totalUsdt).toFixed(2));
+			const totalValueUsd = totalDot * tokenPrice + totalUsdc + totalUsdt;
 
 			return {
-				dotFormatted: (totalDot / 1_000_000).toFixed(2),
-				usdcFormatted: (totalUsdc / 1_000_000).toFixed(2),
-				usdtFormatted: (totalUsdt / 1_000_000).toFixed(2),
-				mythFormatted: (totalMyth / 1_000_000).toFixed(2),
+				totalDot,
+				totalUsdc,
+				totalUsdt,
+				totalMyth,
 				dotPrice: tokenPrice.toFixed(2),
-				totalValueUsd: totalUsdValue,
+				totalValueUsd,
 				dot24hChange
 			};
 		} catch (error) {
@@ -132,20 +152,22 @@ export default function TreasuryStats() {
 		}
 	}, [treasuryStats]);
 
-	if (isLoading || !stats) {
+	if (isFetching || !stats) {
 		return (
 			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 				<div className='p-3'>
 					<p className='text-sm text-wallet_btn_text'>
 						{t('treasury')} <MdInfoOutline className='inline-block text-lg' />
 					</p>
-					<div className='mt-4 flex items-center justify-center'>
-						<p className='text-sm text-btn_secondary_text'>{isLoading ? 'Loading treasury stats...' : t('comingSoon')}</p>
+					<div className='relative mt-10'>
+						<LoadingLayover />
 					</div>
 				</div>
 			</div>
 		);
 	}
+
+	const { formatted: totalValueFormatted, suffix: totalValueSuffix } = formatNumberWithSuffix(stats.totalValueUsd);
 
 	return (
 		<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
@@ -163,16 +185,23 @@ export default function TreasuryStats() {
 				</div>
 
 				<div className='flex items-center gap-2'>
-					<span className='text-xl font-bold text-btn_secondary_text'>~${(stats.totalValueUsd / 1_000_000).toFixed(2)}M</span>
-					<span className='flex items-center text-xs text-pink-500'>
-						Details <FiChevronRight className='ml-1' />
+					<span className='text-xl font-bold text-btn_secondary_text'>
+						~${totalValueFormatted}
+						{totalValueSuffix}
 					</span>
+					<button
+						type='button'
+						onClick={() => setIsDetailsDialogOpen(true)}
+						className='flex items-center text-xs text-pink-500 hover:text-pink-600'
+					>
+						Details <FiChevronRight className='ml-1' />
+					</button>
 				</div>
 
 				<div className='flex flex-wrap items-center gap-2'>
 					<TokenDisplay
 						icon={DotIcon}
-						amount={stats.dotFormatted}
+						amount={stats.totalDot}
 						symbol='DOT'
 					/>
 					<Separator
@@ -181,7 +210,7 @@ export default function TreasuryStats() {
 					/>
 					<TokenDisplay
 						icon={UsdcIcon}
-						amount={stats.usdcFormatted}
+						amount={stats.totalUsdc}
 						symbol='USDC'
 					/>
 					<Separator
@@ -190,7 +219,7 @@ export default function TreasuryStats() {
 					/>
 					<TokenDisplay
 						icon={UsdtIcon}
-						amount={stats.usdtFormatted}
+						amount={stats.totalUsdt}
 						symbol='USDt'
 					/>
 					<Separator
@@ -199,7 +228,7 @@ export default function TreasuryStats() {
 					/>
 					<TokenDisplay
 						icon={MythIcon}
-						amount={stats.mythFormatted}
+						amount={stats.totalMyth}
 						symbol='MYTH'
 					/>
 				</div>
@@ -259,6 +288,13 @@ export default function TreasuryStats() {
 					))}
 				</div>
 			</div>
+			{treasuryStats?.[0] && (
+				<TreasuryDetailsDialog
+					isOpen={isDetailsDialogOpen}
+					onClose={() => setIsDetailsDialogOpen(false)}
+					data={treasuryStats[0]}
+				/>
+			)}
 		</div>
 	);
 }
