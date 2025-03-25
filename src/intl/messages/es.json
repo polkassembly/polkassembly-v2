@@ -609,10 +609,6 @@
 		"findYourRank": "Encuentra tu rango en el ecosistema",
 		"searchUsername": "Buscar nombre de usuario"
 	},
-	"BlockEditor": {
-		"placeholder": "Escribe / para comenzar",
-		"errorUpdatingContent": "Error al actualizar el contenido"
-	},
 	"SetIdentity": {
 		"displayName": "Nombre para mostrar",
 		"legalName": "Nombre legal",

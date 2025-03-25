@@ -41,8 +41,6 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { OutputData } from '@editorjs/editorjs';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { ON_CHAIN_ACTIVITY_NAMES } from '@/_shared/_constants/onChainActivityNames';
 import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
 import { APIError } from '../../_api-utils/apiError';
@@ -151,15 +149,12 @@ export class OffChainDbService {
 		}
 
 		const content = getDefaultPostContent(proposalType, proposer);
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && ValidatorService.isValidNumber(indexOrHash) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 			title: DEFAULT_POST_TITLE,
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			tags: [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,
@@ -476,7 +471,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 		address?: string;
 		sentiment?: ECommentSentiment;
@@ -504,7 +499,7 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		return FirestoreService.UpdateComment({ commentId, content, isSpam, aiSentiment });
 	}
 
@@ -614,7 +609,7 @@ export class OffChainDbService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
@@ -660,7 +655,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 	}) {
@@ -690,7 +685,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 	}) {

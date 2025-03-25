@@ -609,10 +609,6 @@
 		"findYourRank": "生態系でのランクを見つける",
 		"searchUsername": "ユーザー名を検索"
 	},
-	"BlockEditor": {
-		"placeholder": "/ を入力して開始",
-		"errorUpdatingContent": "コンテンツの更新中にエラーが発生しました"
-	},
 	"SetIdentity": {
 		"displayName": "表示名",
 		"legalName": "法的名",

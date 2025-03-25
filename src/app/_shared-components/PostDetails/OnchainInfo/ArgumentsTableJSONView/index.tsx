@@ -2,13 +2,17 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import * as React from 'react';
-import ReactJson from 'react-json-view';
+import dynamic from 'next/dynamic';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import ArgumentsTable from './ArgumentsTable';
 import classes from './ArgumentsTable.module.scss';
+
+const ReactJson = dynamic(() => import('react-json-view'), {
+	ssr: false
+});
 
 interface Props {
 	className?: string;

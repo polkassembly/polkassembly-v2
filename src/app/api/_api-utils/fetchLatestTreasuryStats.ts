@@ -3,18 +3,42 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { StatusCodes } from 'http-status-codes';
-import { ENetwork, ITreasuryStats } from '@/_shared/types';
+import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
 	[network: string]: { usd: number; usd_24h_change: number };
 }
 
+function decimalToBN(priceStr: string | number): {
+	value: BN;
+	decimals: number;
+} {
+	const CONVERSION_DECIMALS = 18; // Using 18 decimals for price precision
+
+	if (!priceStr) return { value: new BN(0), decimals: CONVERSION_DECIMALS };
+
+	// Convert to string and remove any commas
+	const cleanPrice = priceStr.toString().replace(/,/g, '');
+	// Split on decimal point
+	const [whole, decimal = ''] = cleanPrice.split('.');
+	// Combine whole and decimal, padding decimal with zeros
+	const paddedDecimal = decimal.padEnd(CONVERSION_DECIMALS, '0');
+	// Remove any leading zeros from whole number and combine with padded decimal
+	const combinedStr = whole.replace(/^0+/, '') + paddedDecimal;
+	// Convert to BN directly without division
+	return {
+		value: new BN(combinedStr),
+		decimals: CONVERSION_DECIMALS
+	};
+}
+
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
 	try {
 		const { ApiPromise, WsProvider } = await import('@polkadot/api');
-		const { BN } = await import('@polkadot/util');
 		const { TREASURY_NETWORK_CONFIG } = await import('@/_shared/_constants/treasury');
 
 		const config = TREASURY_NETWORK_CONFIG[network as ENetwork];
@@ -27,9 +51,9 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			network,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			relayChain: { dot: '', myth: '' },
+			relayChain: { dot: '' },
 			ambassador: { usdt: '' },
-			assetHub: { dot: '', usdc: '', usdt: '' },
+			assetHub: { dot: '', usdc: '', usdt: '', myth: '' },
 			hydration: { dot: '', usdc: '', usdt: '' },
 			bounties: { dot: '' },
 			fellowship: { dot: '', usdt: '' },
@@ -109,7 +133,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 							if (!id) return new BN(0);
 
 							try {
-								const response = await fetch(`https://polkadot.subsquare.io/api/treasury/bounties/${id}`);
+								const response = await fetch(`https://${network}.subsquare.io/api/treasury/bounties/${id}`);
 								if (!response.ok) return new BN(0);
 
 								const result = await response.json();
@@ -237,8 +261,8 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				.then((balance) => {
 					treasuryStats = {
 						...treasuryStats,
-						relayChain: {
-							...treasuryStats.relayChain,
+						assetHub: {
+							...treasuryStats.assetHub,
 							myth: getBalanceIfExists(balance)
 						}
 					};
@@ -347,16 +371,40 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// get myth price from coingecko
 		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
-		const mythPriceInUsd = mythPrice[String(network)]?.usd;
+		const mythPriceInUsd = mythPrice?.mythos?.usd;
 
-		if (mythPriceInUsd) {
-			const totalDotInUsd = new BN(treasuryStats.nativeTokenUsdPrice || '0').mul(new BN(treasuryStats.total?.totalDot || '0'));
-			const totalMythInUsd = new BN(mythPriceInUsd).mul(new BN(treasuryStats.total?.totalMyth || '0'));
+		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice) {
+			const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice);
+			const mythPriceBN = decimalToBN(mythPriceInUsd);
 
-			const totalInUsd = totalDotInUsd
-				.add(totalMythInUsd)
-				.add(new BN(treasuryStats.total?.totalUsdc || '0'))
-				.add(new BN(treasuryStats.total?.totalUsdt || '0'));
+			// Convert token amounts to BN with proper decimal handling
+			const dotWithoutDecimals = treasuryStats.total?.totalDot ? new BN(treasuryStats.total?.totalDot || '0') : BN_ZERO;
+			const mythWithoutDecimals = treasuryStats.total?.totalMyth ? new BN(treasuryStats.total?.totalMyth || '0') : BN_ZERO;
+			const usdcWithoutDecimals = treasuryStats.total?.totalUsdc ? new BN(treasuryStats.total?.totalUsdc || '0') : BN_ZERO;
+			const usdtWithoutDecimals = treasuryStats.total?.totalUsdt ? new BN(treasuryStats.total?.totalUsdt || '0') : BN_ZERO;
+
+			// Calculate USD values with proper decimal handling
+			const dotDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
+			const mythDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].foreignAssets[EAssets.MYTH].tokenDecimal);
+			const usdcDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdcIndex].tokenDecimal);
+			const usdtDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdtIndex].tokenDecimal);
+
+			// Calculate total values in USD with proper decimal handling
+			const totalDotInUsd = dotWithoutDecimals
+				.mul(nativeTokenPriceBN.value)
+				.div(new BN(10).pow(dotDecimals))
+				.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
+
+			const totalMythInUsd = mythWithoutDecimals
+				.mul(mythPriceBN.value)
+				.div(new BN(10).pow(mythDecimals))
+				.div(new BN(10).pow(new BN(mythPriceBN.decimals)));
+
+			// USDC and USDT are already in USD, just need to handle their decimals
+			const totalUsdcInUsd = usdcWithoutDecimals.div(new BN(10).pow(usdcDecimals));
+			const totalUsdtInUsd = usdtWithoutDecimals.div(new BN(10).pow(usdtDecimals));
+
+			const totalInUsd = totalDotInUsd.add(totalMythInUsd).add(totalUsdcInUsd).add(totalUsdtInUsd);
 
 			treasuryStats = {
 				...treasuryStats,

@@ -35,7 +35,6 @@ import {
 	EConvictionAmount,
 	ITreasuryStats
 } from '@/_shared/types';
-import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
@@ -441,7 +440,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
-	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: OutputData } }) {
+	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
@@ -465,7 +464,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
@@ -714,7 +713,7 @@ export class NextApiClientService {
 		topic
 	}: {
 		proposalType: EProposalType;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];

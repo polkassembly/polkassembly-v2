@@ -18,7 +18,6 @@ import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
-import dynamic from 'next/dynamic';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
@@ -28,13 +27,12 @@ import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReacti
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
+import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionBar from '../ReactionBar';
-
-const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
 
 function ActivityFeedPostItem({
 	postData,
@@ -210,10 +208,9 @@ function ActivityFeedPostItem({
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
 				<div className='flex max-h-40 w-full overflow-hidden border-none'>
-					<BlockEditor
-						data={postData.content}
+					<MarkdownEditor
+						markdown={postData.content}
 						readOnly
-						id={`post-content-${postData.index}`}
 					/>
 				</div>
 				<Link

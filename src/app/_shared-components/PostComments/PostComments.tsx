@@ -28,7 +28,10 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 		queryKey: ['comments', proposalType, index],
 		queryFn: () => fetchComments(),
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
 	});
 
 	return (
