@@ -96,7 +96,7 @@ function DelegationPopupCard() {
 							</div>
 						</div>
 					</div>
-					<div className='mx-4 mb-2 rounded-md bg-info_bg px-4 py-2 text-sm'>
+					<div className='bg-info_bg mx-4 mb-2 rounded-md px-4 py-2 text-sm'>
 						<p className='flex items-center gap-1 text-wallet_btn_text'>
 							<MdInfoOutline className='mr-1 inline-block text-lg' />
 							{t('wantToLearnMoreAboutDelegationProcessBeforeLockingYourTokensClick')}

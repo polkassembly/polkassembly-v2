@@ -15,8 +15,9 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { ENetwork, IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
-import styles from './DelegationSupplyData.module.scss';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+
+import styles from './DelegationSupplyData.module.scss';
 
 const ZERO_BN = new BN(0);
 
