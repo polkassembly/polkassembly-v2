@@ -25,7 +25,7 @@ function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBala
 	const [balance, setBalance] = useState<string>('0');
 	const [loading, setLoading] = useState(false);
 
-	const apiService = usePolkadotApiService();
+	const { apiService } = usePolkadotApiService();
 
 	const network = getCurrentNetwork();
 

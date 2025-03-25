@@ -2,13 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { RefObject, useRef, useState } from 'react';
+import { RefObject, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { IPostListing } from '@/_shared/types';
+import { EActivityFeedTab, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -18,33 +18,52 @@ import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
-import dynamic from 'next/dynamic';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { usePostReactions } from '@/hooks/usePostReactions';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
+import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
-import ReactionHandler from '../ReactionHandler';
+import ReactionBar from '../ReactionBar';
 
-const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
-
-function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
+function ActivityFeedPostItem({
+	postData,
+	voteButton = true,
+	commentBox = true,
+	preventClick,
+	onUnsubscribe
+}: {
+	postData: IPostListing;
+	voteButton?: boolean;
+	commentBox?: boolean;
+	preventClick?: boolean;
+	onUnsubscribe?: (postId: string | number) => void;
+}) {
 	const { user } = useUser();
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const isInSubscriptionTab = useMemo(() => {
+		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
+	}, [searchParams]);
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
-	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments || 0);
+	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction } = usePostReactions(postData);
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe } = usePostReactions({
+		reactions: postData?.reactions,
+		proposalType: postData?.proposalType,
+		indexOrHash: postData?.index?.toString() || postData?.hash,
+		isSubscribed: !!postData?.userSubscriptionId || isInSubscriptionTab
+	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -53,6 +72,18 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			router.push('/login');
 		} else {
 			setIsDialogOpen(true);
+		}
+	};
+
+	const handleSubscribeClick = async () => {
+		try {
+			const result = (await handleSubscribe()) as SubscriptionResult;
+
+			if (isInSubscriptionTab && result.wasUnsubscribed && !result.error) {
+				onUnsubscribe?.(postData?.index || postData?.hash || '');
+			}
+		} catch (error) {
+			console.error('Error handling subscription:', error);
 		}
 	};
 
@@ -65,28 +96,20 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 
 	const timeRemaining = postData.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(postData.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
-
+	const likeCount = reactionState.isLiked !== undefined || null ? reactionState.likesCount : 0;
+	const dislikeCount = reactionState.isDisliked !== undefined || null ? reactionState.dislikesCount : 0;
 	const formatOriginText = (text: string): string => {
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
-	const handleContainerClick = (e: React.MouseEvent) => {
-		if (!(e.target instanceof Element)) return;
-
-		const isExcludedSection =
-			e.target.closest(`.${styles.castVoteButton}`) || e.target.closest('[data-reaction-handler="true"]') || e.target.closest('[data-comment-input="true"]');
-
-		if (!isExcludedSection) {
-			router.push(`/referenda/${postData.index}`);
-		}
-	};
-
 	return (
-		<div
-			aria-hidden='true'
-			onClick={handleContainerClick}
-			className={styles.container}
-		>
+		<div className={styles.container}>
+			{!preventClick && (
+				<Link
+					href={`/referenda/${postData.index}`}
+					className='absolute left-0 top-0 z-20 h-full w-full rounded-xl'
+				/>
+			)}
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center text-wallet_btn_text'>
@@ -108,8 +131,8 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 					</span>
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				{canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
-					<div>
+				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					<div className='relative z-50'>
 						{user?.id ? (
 							<Dialog>
 								<DialogTrigger asChild>
@@ -131,7 +154,10 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 								</DialogTitle>
 							</Dialog>
 						) : (
-							<Link href='/login'>
+							<Link
+								href='/login'
+								className='relative z-50'
+							>
 								<span className={`${styles.castVoteButton} cursor-pointer`}>
 									<Image
 										src={VoteIcon}
@@ -150,16 +176,20 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			{/* Post Info Section */}
 			<div className='flex items-center justify-between gap-2'>
 				<div className='mb-3 flex items-center gap-2 text-xs text-btn_secondary_text'>
-					<span className='font-medium'>
+					<span className='z-50 font-medium'>
 						<Address address={postData.onChainInfo?.proposer || ''} />
 					</span>
 					<span>in</span>
 					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
-					<span>|</span>
-					<span className='flex items-center gap-2'>
-						<FaRegClock className='text-sm' />
-						{dayjs.utc(postData.onChainInfo?.createdAt).fromNow()}
-					</span>
+					{postData.onChainInfo?.createdAt && (
+						<>
+							<span>|</span>
+							<span className='flex items-center gap-2'>
+								<FaRegClock className='text-sm' />
+								{dayjs(postData.onChainInfo?.createdAt).fromNow()}
+							</span>
+						</>
+					)}
 				</div>
 				<VotingProgress
 					timeRemaining={timeRemaining}
@@ -177,32 +207,31 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-96 overflow-hidden border-none lg:w-full'>
-					<BlockEditor
-						data={postData.content}
+				<div className='flex max-h-40 w-full overflow-hidden border-none'>
+					<MarkdownEditor
+						markdown={postData.content}
 						readOnly
-						id={`post-content-${postData.index}`}
 					/>
 				</div>
 				<Link
 					href={`/referenda/${postData.index}`}
-					className='ml-1 cursor-pointer text-xs font-medium text-blue-600'
+					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
 				>
 					{t('ActivityFeed.PostItem.readMore')}
 				</Link>
 			</div>
 
 			{/* Metrics Section */}
-			{(reactionState.likesCount > 0 || reactionState.dislikesCount > 0 || commentCount > 0) && (
+			{(likeCount || dislikeCount || commentCount !== null) && (
 				<div className='flex items-center justify-end'>
 					<div className='flex items-center gap-2 text-xs text-text_primary'>
 						<span>
-							{reactionState.likesCount} {t('ActivityFeed.PostItem.likes')}
+							{likeCount} {t('ActivityFeed.PostItem.likes')}
 						</span>
 						<span>|</span>
 
 						<span>
-							{reactionState.dislikesCount} {t('ActivityFeed.PostItem.dislikes')}
+							{dislikeCount} {t('ActivityFeed.PostItem.dislikes')}
 						</span>
 						<span>|</span>
 
@@ -216,31 +245,37 @@ function ActivityFeedPostItem({ postData }: { postData: IPostListing }) {
 			<hr className='my-4 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
-			<div
-				aria-hidden='true'
-				onClick={(e) => e.stopPropagation()}
-				data-comment-input='true'
-			>
-				<ReactionHandler
-					postData={postData}
-					setIsDialogOpen={setIsDialogOpen}
-					reactionState={reactionState}
-					showLikeGif={showLikeGif}
-					showDislikeGif={showDislikeGif}
-					handleReaction={handleReaction}
-				/>
+			{commentBox && (
+				<div
+					aria-hidden='true'
+					onClick={(e) => e.stopPropagation()}
+					data-comment-input='true'
+					className='relative z-50'
+				>
+					<ReactionBar
+						postData={postData}
+						setIsDialogOpen={setIsDialogOpen}
+						isLiked={reactionState.isLiked}
+						isDisliked={reactionState.isDisliked}
+						showLikeGif={showLikeGif}
+						showDislikeGif={showDislikeGif}
+						handleReaction={handleReaction}
+						isSubscribed={isSubscribed}
+						handleSubscribe={handleSubscribeClick}
+					/>
 
-				<CommentInput
-					inputRef={inputRef as RefObject<HTMLInputElement>}
-					onClick={handleCommentClick}
-				/>
-			</div>
+					<CommentInput
+						inputRef={inputRef as RefObject<HTMLInputElement>}
+						onClick={handleCommentClick}
+					/>
+				</div>
+			)}
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
 				postData={postData}
-				onCommentAdded={() => setCommentCount((prev) => prev + 1)}
+				onCommentAdded={() => setCommentCount((prev) => (prev ? prev + 1 : 1))}
 			/>
 		</div>
 	);

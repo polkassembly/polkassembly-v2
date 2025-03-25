@@ -97,7 +97,19 @@ export const THEME_COLORS = {
 		delegation_card_w3f: '#282526',
 		delegation_card_nova: '#E2EAFB',
 		delegation_nova_border: '#3C74E1',
-		delegation_polkadot_border: '#7A67DF'
+		delegation_polkadot_border: '#7A67DF',
+		address_tooltip_bg: '#FFF',
+		address_tooltip_text: '#9aa7b9',
+		social_link: '#EDEFF3',
+		toast_error_bg: '#FBDBD9',
+		toast_error_border: '#ED4D42',
+		toast_error_text: '#F04248',
+		toast_warning_bg: '#FEF7D1',
+		toast_warning_border: '#F7C752',
+		toast_warning_text: '#F7C752',
+		toast_info_bg: '#E6F4FF',
+		toast_info_border: '#91CAFF',
+		toast_info_text: '#3288FF'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -191,6 +203,18 @@ export const THEME_COLORS = {
 		delegation_card_w3f: '#272526',
 		delegation_card_nova: '#141C2D',
 		delegation_nova_border: '#3C74E1',
-		delegation_polkadot_border: '#7A67DF'
+		delegation_polkadot_border: '#7A67DF',
+		address_tooltip_bg: '#1C1D1F',
+		address_tooltip_text: '#595959',
+		social_link: '#EDEFF3',
+		toast_error_bg: '#452626',
+		toast_error_border: '#ED4D42',
+		toast_error_text: '#F04248',
+		toast_warning_bg: '#363125',
+		toast_warning_border: '#8F6F21',
+		toast_warning_text: '#F7C752',
+		toast_info_bg: '#27323D',
+		toast_info_border: '#1677FE',
+		toast_info_text: '#3288FF'
 	}
 };

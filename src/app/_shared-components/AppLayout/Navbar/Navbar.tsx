@@ -117,6 +117,7 @@ function Navbar() {
 									<Address
 										address={user.addresses[0]}
 										walletAddressName={user.username}
+										disableTooltip
 									/>
 								) : (
 									<p>{user.username}</p>
@@ -126,6 +127,9 @@ function Navbar() {
 						<DropdownMenuContent className='min-w-[100px]'>
 							<DropdownMenuItem>
 								<Link href={`/user/id/${user.id}`}>{t('Profile.profile')}</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Link href='/set-identity'>{t('SetIdentity.setIdentity')}</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
 								<Button

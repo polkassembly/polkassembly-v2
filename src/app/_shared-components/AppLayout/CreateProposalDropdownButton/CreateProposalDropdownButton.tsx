@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
-import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
+// import TreasuryProposalIcon from '@assets/sidebar/treasury-proposal.svg';
 import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
 import { ETheme } from '@/_shared/types';
 import DiscussionIcon from '@assets/sidebar/discussion-icon.svg';
@@ -24,8 +24,8 @@ function CreateProposalDropdownButton({ state }: { state: 'collapsed' | 'expande
 	const t = useTranslations();
 	const { user } = useUser();
 	const menuItems = [
-		{ title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
-		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: '#' },
+		// { title: t('CreateProposalDropdownButton.treasuryProposal'), icon: TreasuryProposalIcon, url: '#' },
+		{ title: t('CreateProposalDropdownButton.proposal'), icon: ProposalIcon, url: user?.id ? '/create' : '/login?nextUrl=create' },
 		{ title: t('CreateProposalDropdownButton.discussionPost'), icon: DiscussionIcon, url: user?.id ? '/create/discussion' : '/login?nextUrl=create/discussion' }
 	];
 

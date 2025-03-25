@@ -7,9 +7,9 @@ import { useMemo } from 'react';
 import { polkadotApiAtom } from '@/app/_atoms/polkadotJsApi/polkadotJsApiAtom';
 
 export const usePolkadotApiService = () => {
-	const [api] = useAtom(polkadotApiAtom);
+	const [apiService] = useAtom(polkadotApiAtom);
 
 	return useMemo(() => {
-		return api;
-	}, [api]);
+		return { apiService };
+	}, [apiService]);
 };

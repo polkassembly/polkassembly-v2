@@ -67,10 +67,10 @@ function LeadboardRow({ user, isCurrentUser, isBottom = false }: TableRowProps) 
 			</TableCell>
 			<TableCell className={styles.tableContentCell_last}>
 				{!isCurrentUser && (
-					<>
+					<div className='flex items-center gap-1'>
 						<IoPersonAdd className='text-lg text-text_primary' />
 						<HiMiniCurrencyDollar className='text-2xl text-text_primary' />
-					</>
+					</div>
 				)}
 			</TableCell>
 		</TableRow>

@@ -57,7 +57,7 @@ function Login({ isModal }: { isModal?: boolean }) {
 	};
 
 	return (
-		<>
+		<div className='login-container'>
 			{!isModal && (
 				<div className={classes.header}>
 					<HeaderLabel />
@@ -76,25 +76,27 @@ function Login({ isModal }: { isModal?: boolean }) {
 					/>
 				) : isWeb2Signup ? (
 					<Web2Signup
-						onWalletChange={switchToWeb3Login}
+						onWalletChange={() => {
+							switchToWeb3Login();
+						}}
 						switchToLogin={switchToWeb2Login}
 					/>
 				) : isWeb3Login ? (
 					<Web3Login
-						onWalletChange={switchToWeb3Login}
 						switchToWeb2={switchToWeb2Login}
-						switchToSignup={switchToWeb2Signup}
 						onTfaEnabled={onTfaEnabled}
 					/>
 				) : (
 					<Web2Login
-						onWalletChange={switchToWeb3Login}
+						onWalletChange={() => {
+							switchToWeb3Login();
+						}}
 						switchToSignup={switchToWeb2Signup}
 						onTfaEnabled={onTfaEnabled}
 					/>
 				)}
 			</div>
-		</>
+		</div>
 	);
 }
 

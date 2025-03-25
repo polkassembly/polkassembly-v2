@@ -24,7 +24,9 @@ export const ERROR_CODES = {
 	COMMENT_NOT_FOUND: 'COMMENT_NOT_FOUND',
 	USER_NOT_FOUND: 'USER_NOT_FOUND',
 	CONTENT_SUMMARY_NOT_FOUND_ERROR: 'CONTENT_SUMMARY_NOT_FOUND_ERROR',
-	FORBIDDEN: 'FORBIDDEN'
+	FORBIDDEN: 'FORBIDDEN',
+	ALREADY_EXISTS: 'ALREADY_EXISTS',
+	NETWORK_NOT_SUPPORTED: 'NETWORK_NOT_SUPPORTED'
 };
 
 export const ERROR_MESSAGES = {
@@ -49,5 +51,7 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.COMMENT_NOT_FOUND]: 'Comment not found.',
 	[ERROR_CODES.USER_NOT_FOUND]: 'User not found.',
 	[ERROR_CODES.CONTENT_SUMMARY_NOT_FOUND_ERROR]: 'Content summary not found and/or could not be generated.',
-	[ERROR_CODES.FORBIDDEN]: 'You are not allowed to do this action.'
+	[ERROR_CODES.FORBIDDEN]: 'You are not allowed to do this action.',
+	[ERROR_CODES.ALREADY_EXISTS]: 'This resource already exists.',
+	[ERROR_CODES.NETWORK_NOT_SUPPORTED]: 'Network not supported for this action.'
 };

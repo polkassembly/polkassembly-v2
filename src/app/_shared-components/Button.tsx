@@ -23,7 +23,7 @@ export const buttonSizes = {
 	default: 'h-9 px-4 py-2',
 	sm: 'h-8 rounded-md px-3 text-xs',
 	lg: 'h-10 rounded-md px-8',
-	icon: 'px-2 sm:px-4 py-1',
+	icon: 'px-2 py-1',
 	pagination: 'px-2 sm:px-3 h-8 w-8 py-1'
 };
 

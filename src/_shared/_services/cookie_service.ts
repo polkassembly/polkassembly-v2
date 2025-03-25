@@ -67,4 +67,9 @@ export class CookieService {
 	static async setLocaleCookie(value: string) {
 		await this.setCookieValueByName(ECookieNames.LOCALE, value);
 	}
+
+	static async getCookieHeaders() {
+		const cookieStore = await cookies();
+		return { Cookie: cookieStore.toString() };
+	}
 }

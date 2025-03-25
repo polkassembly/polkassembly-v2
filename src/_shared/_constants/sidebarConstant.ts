@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Home from '@assets/sidebar/homeicon.svg';
+import All from '@assets/activityfeed/All.svg';
 import Discussion from '@assets/sidebar/discussion-icon.svg';
 import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
@@ -39,7 +40,7 @@ const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuI
 		items: item.items ? ActiveItems(item.items, pathname) : undefined
 	}));
 const getTrackItems = (networkKey: ENetwork, trackGroup: string, t: (key: string) => string, trackCounts?: Record<string, number>) => {
-	const tracks = NETWORKS_DETAILS[networkKey as ENetwork]?.tracks || {};
+	const tracks = NETWORKS_DETAILS[`${networkKey}`]?.trackDetails || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === trackGroup)
 		.map(([trackKey, track]) => {
@@ -81,7 +82,7 @@ const getOriginIcon = (key: string) => {
 };
 
 const getOriginsItems = (networkKey: ENetwork, t: (key: string) => string) => {
-	const tracks = NETWORKS_DETAILS[networkKey as ENetwork]?.tracks || {};
+	const tracks = NETWORKS_DETAILS[`${networkKey}`]?.trackDetails || {};
 	return Object.entries(tracks)
 		.filter(([, track]) => track.group === 'Origin')
 		.map(([key, track]) => {
@@ -136,7 +137,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 								{ title: t('Sidebar.onChainBounties'), url: '/bounty/onchain-bounty' }
 							]
 						},
-						{ title: t('Sidebar.batchVoting'), url: '#', icon: BatchVoting, isNew: false }
+						{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }
 					],
 					pathname
 				),
@@ -148,6 +149,11 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							url: '',
 							items: ActiveItems(
 								[
+									{
+										title: t('ActivityFeed.Navbar.All'),
+										url: '/all',
+										icon: All
+									},
 									{
 										title: t('Sidebar.treasury'),
 										url: '',

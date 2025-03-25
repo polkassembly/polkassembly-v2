@@ -5,7 +5,6 @@
 'use client';
 
 import Image from 'next/image';
-import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
@@ -24,12 +23,13 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } fro
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
+import { ComponentProps } from 'react';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateProposalDropdownButton from '../CreateProposalDropdownButton/CreateProposalDropdownButton';
 import styles from './AppSidebar.module.scss';
 
-function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const t = useTranslations();
 	const pathname = usePathname();
@@ -66,7 +66,7 @@ function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	const data = getSidebarData(network, pathname, t);
 
 	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity') },
+		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity'), url: user?.id ? '/set-identity' : '/login?nextUrl=set-identity' },
 		{ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard'), url: '/leaderboard' },
 		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation'), url: '/delegation' },
 		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile'), url: user?.id ? `/user/${user.id}` : '/login' }

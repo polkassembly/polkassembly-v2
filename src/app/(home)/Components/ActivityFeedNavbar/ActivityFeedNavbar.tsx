@@ -2,37 +2,30 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENetwork, EPostOrigin, IPostListing } from '@/_shared/types';
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { ENetwork, EPostOrigin } from '@/_shared/types';
+import { useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
 import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
 import GovernanceIcon from '@assets/sidebar/admin-icon.svg';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { cn } from '@/lib/utils';
 import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
 import { FaAngleDown } from 'react-icons/fa';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/Popover/Popover';
 import styles from './ActivityFeedNavbar.module.scss';
 
-function ActivityFeedNavbar({
-	gov2LatestPosts,
-	currentTab,
-	setCurrentTab
-}: {
-	gov2LatestPosts: IPostListing[];
-	currentTab: EPostOrigin | 'All';
-	setCurrentTab: (tab: EPostOrigin | 'All') => void;
-}) {
+function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
-	const trackInfo = NETWORKS_DETAILS[network as ENetwork].tracks;
-	const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
@@ -98,10 +91,9 @@ function ActivityFeedNavbar({
 			}
 		});
 
-		// Remove empty categories
-		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === t('ActivityFeed.Navbar.All')));
+		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === ALL_CATEGORY));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [trackInfo, t]);
+	}, [trackInfo, t, ALL_CATEGORY]);
 
 	const formatTrackName = (name: string) => {
 		return name.replace(/([A-Z])/g, ' $1').trim();
@@ -112,14 +104,7 @@ function ActivityFeedNavbar({
 			setCurrentTab('All');
 		} else if ([ROOT_CATEGORY, WISH_FOR_CHANGE_CATEGORY].includes(category)) {
 			setCurrentTab(category as EPostOrigin);
-		} else {
-			setExpandedCategory(expandedCategory === category ? null : category);
 		}
-	};
-
-	const getPostCount = (origin: EPostOrigin) => {
-		const count = gov2LatestPosts?.filter((post: IPostListing) => post?.onChainInfo?.origin === origin).length || 0;
-		return count > 0 ? `(${count})` : '';
 	};
 
 	const isActiveCategory = (category: string, tracks: EPostOrigin[]) => {
@@ -140,14 +125,10 @@ function ActivityFeedNavbar({
 				ref={containerRef}
 			>
 				{Object.entries(categoryStructure).map(([category, tracks]) => (
-					<Popover key={category}>
-						<PopoverTrigger asChild>
-							<div className='flex-shrink-0'>
-								<button
-									type='button'
-									className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
-									onClick={() => handleCategoryClick(category)}
-								>
+					<div key={category}>
+						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
+							<DropdownMenu>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
@@ -157,36 +138,45 @@ function ActivityFeedNavbar({
 											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
 										<span className='ml-1'>{category}</span>
-										{tracks?.length > 1 && (
-											<span className='ml-0.5'>
-												<FaAngleDown />
-											</span>
-										)}
+										<span className='ml-0.5'>
+											<FaAngleDown />
+										</span>
 									</span>
-								</button>
-							</div>
-						</PopoverTrigger>
-						{expandedCategory === category && tracks && tracks.length > 0 && (
-							<PopoverContent
-								sideOffset={5}
-								className={styles.popoverContent}
-							>
-								<div className='w-full'>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align='start'
+									className={styles.popoverContent}
+								>
 									{tracks.map((track) => (
-										<div key={track}>
-											<button
-												type='button'
-												className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
-												onClick={() => setCurrentTab(track)}
-											>
-												{formatTrackName(track)} {getPostCount(track)}
-											</button>
-										</div>
+										<DropdownMenuItem
+											key={track}
+											className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
+											onSelect={() => setCurrentTab(track)}
+										>
+											{formatTrackName(track)}
+										</DropdownMenuItem>
 									))}
-								</div>
-							</PopoverContent>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						) : (
+							<button
+								type='button'
+								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
+								onClick={() => handleCategoryClick(category)}
+							>
+								<span className='flex items-center whitespace-nowrap'>
+									<Image
+										src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
+										alt={category}
+										width={20}
+										height={20}
+										className={cn('h-5 w-5', styles.darkIcon)}
+									/>
+									<span className='ml-1'>{category}</span>
+								</span>
+							</button>
 						)}
-					</Popover>
+					</div>
 				))}
 			</div>
 		</div>

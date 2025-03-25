@@ -9,7 +9,6 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
-import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
@@ -20,10 +19,12 @@ import { Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
+import UserIcon from '@assets/profile/user-icon.svg';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
+import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 function SingleComment({
 	commentData,
@@ -111,19 +112,41 @@ function SingleComment({
 				</DialogContent>
 			</Dialog>
 			<div>
-				<Identicon
-					size={30}
-					value={comment.user.addresses[0]}
-					theme='polkadot'
-				/>
+				{comment.user.addresses[0] ? (
+					<Identicon
+						size={30}
+						value={comment.user.addresses[0]}
+						theme='polkadot'
+					/>
+				) : comment.user.profileDetails?.image ? (
+					<Image
+						src={comment.user.profileDetails.image}
+						alt='profile'
+						className='rounded-full'
+						width={30}
+						height={30}
+					/>
+				) : (
+					<div className='w-[30px]'>
+						<Image
+							src={UserIcon}
+							alt='profile'
+							className='rounded-full'
+						/>
+					</div>
+				)}
 			</div>
 			<div className={classes.innerWrapper}>
 				<div className='flex items-center gap-x-2'>
 					<span className={classes.username}>
-						<Address
-							address={comment.user.addresses[0]}
-							showIdenticon={false}
-						/>
+						{comment.user.addresses[0] ? (
+							<Address
+								address={comment.user.addresses[0]}
+								showIdenticon={false}
+							/>
+						) : (
+							<span className='text-text_primary'>{comment.user.username}</span>
+						)}
 					</span>
 					<Separator
 						orientation='vertical'
@@ -131,11 +154,10 @@ function SingleComment({
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
 				</div>
-				<BlockEditor
+				<MarkdownEditor
 					readOnly
-					data={comment.content}
+					markdown={comment.content}
 					className={classes.editor}
-					id={`comment-${comment.id}`}
 				/>
 
 				{user && (
@@ -187,7 +209,6 @@ function SingleComment({
 						proposalType={proposalType}
 						parentCommentId={comment.id}
 						onCancel={() => setReply(false)}
-						editorId={`new-comment-${comment.id}`}
 						onConfirm={(newComment, publicUser) => {
 							setComment((prev) => {
 								if (!prev) return null;

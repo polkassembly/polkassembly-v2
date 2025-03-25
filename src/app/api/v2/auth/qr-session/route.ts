@@ -82,18 +82,17 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
 	}
 
-	// Get existing refresh token for this user
-	const existingRefreshToken = await RedisService.GetRefreshToken(user.id);
-
-	if (!existingRefreshToken) {
-		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Refresh token not found, please login on desktop');
-	}
-
 	// Generate access token for mobile device
 	const accessToken = await AuthService.GetSignedAccessToken(user);
 
-	// Store the same refresh token for the mobile device
-	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(existingRefreshToken);
+	// Generate a new refresh token for the mobile device
+	// This supports multi-device login by creating a separate token for this device
+	const refreshToken = await AuthService.GetRefreshToken({
+		userId: user.id
+	});
+
+	// Create cookies with the tokens
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken);
 	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken);
 
 	// Delete used QR session

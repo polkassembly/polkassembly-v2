@@ -11,7 +11,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
 	const paramsValue = await params;
 	const hash = paramsValue.hash || '';
-	const hashData = await NextApiClientService.fetchPreimageByHashApi({ hash });
+	const hashData = await NextApiClientService.fetchPreimageByHash({ hash });
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>

@@ -11,10 +11,11 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 const CACHE_DURATION = FIVE_MIN_IN_MILLI;
 
 export const useIdentityService = () => {
-	const [api] = useAtom(identityApiAtom);
+	const [peopleChainApiService] = useAtom(identityApiAtom);
 	const [identityCache, setIdentityCache] = useAtom(identityCacheAtom);
 
 	const getCachedIdentity = async (address: string) => {
+		if (!address) return null;
 		const formattedAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
 
 		if (!formattedAddress) return null;
@@ -28,9 +29,9 @@ export const useIdentityService = () => {
 		}
 
 		// If no valid cache, fetch new data
-		if (!api) return null;
+		if (!peopleChainApiService) return null;
 
-		const identity = await api.getOnChainIdentity(formattedAddress);
+		const identity = await peopleChainApiService.getOnChainIdentity(formattedAddress);
 
 		// Update cache
 		setIdentityCache((prev) => ({
@@ -46,8 +47,9 @@ export const useIdentityService = () => {
 
 	return useMemo(() => {
 		return {
-			getOnChainIdentity: getCachedIdentity
+			getOnChainIdentity: getCachedIdentity,
+			identityService: peopleChainApiService
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [api, identityCache]);
+	}, [peopleChainApiService, identityCache]);
 };
