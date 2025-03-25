@@ -12,8 +12,9 @@ import {
 	IGenericListingResponse,
 	IVoteCurve,
 	IPreimage,
-	IDelegationStats,
-	EDelegationType
+	EDelegationType,
+	IDelegate,
+	ITrackDelegationData
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -151,7 +152,11 @@ export class OnChainDbService {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
 	}
 
-	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<IDelegationStats> {
+	static async GetTotalDelegationStats({ network, type }: { network: ENetwork; type: EDelegationType }): Promise<{
+		totalDelegatedVotes: number;
+		votingDelegations: IDelegate[];
+		totalDelegates: number;
+	}> {
 		return SubsquidService.GetTotalDelegationStats({ network, type });
 	}
 
@@ -159,11 +164,11 @@ export class OnChainDbService {
 		return SubsquidService.GetVotesCountForTimespan({ network, address, createdAtGte });
 	}
 
-	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+	static async GetAllTrackLevelAnalyticsDelegationData({ network, address }: { network: ENetwork; address: string }): Promise<IDelegate[]> {
 		return SubsquidService.GetAllTrackLevelAnalyticsDelegationData({ network, address });
 	}
 
-	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<number> {
+	static async GetActiveDelegationsToOrFromAddressForTrack({ network, address, track }: { network: ENetwork; address: string; track: number }): Promise<ITrackDelegationData> {
 		return SubsquidService.GetActiveDelegationsToOrFromAddressForTrack({ network, address, track });
 	}
 }

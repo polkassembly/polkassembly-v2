@@ -820,20 +820,18 @@ export class OffChainDbService {
 		network,
 		address,
 		bio,
-		createAt,
-		isNovaWalletDelegate,
+		createdAt,
 		name,
 		userId
 	}: {
 		network: ENetwork;
 		address: string;
 		bio: string;
-		createAt: Date;
-		isNovaWalletDelegate: boolean;
+		createdAt: Date;
 		name: string;
 		userId: number;
 	}) {
-		return FirestoreService.CreateDelegate({ network, address, bio, createAt, isNovaWalletDelegate, name, userId });
+		return FirestoreService.CreateDelegate({ network, address, bio, createdAt, name, userId });
 	}
 
 	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {

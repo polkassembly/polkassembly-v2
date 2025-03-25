@@ -1294,8 +1294,23 @@ export class FirestoreService extends FirestoreUtils {
 
 	static async GetAllDelegates(network: ENetwork): Promise<IDelegate[]> {
 		try {
-			const delegatesSnapshot = await this.delegatesCollectionRef().doc(network).collection('addresses').get();
-			return delegatesSnapshot.docs.map((doc) => doc.data() as IDelegate);
+			const delegateDoc = await this.delegatesCollectionRef().doc(network).get();
+
+			if (!delegateDoc.exists) {
+				return [];
+			}
+			const delegatesData = delegateDoc.data();
+			if (!delegatesData) {
+				return [];
+			}
+			return Object.entries(delegatesData).map(([userId, data]) => {
+				const delegateData = data as Omit<IDelegate, 'delegateId'>;
+
+				return {
+					...delegateData,
+					userId: Number(userId)
+				};
+			});
 		} catch (error) {
 			console.error('Error fetching delegates:', error);
 			return [];
@@ -1306,32 +1321,30 @@ export class FirestoreService extends FirestoreUtils {
 		network,
 		address,
 		bio,
-		createAt,
-		isNovaWalletDelegate,
+		createdAt,
 		name,
 		userId
 	}: {
 		network: ENetwork;
 		address: string;
 		bio: string;
-		createAt: Date;
-		isNovaWalletDelegate: boolean;
+		createdAt: Date;
 		name: string;
 		userId: number;
 	}) {
 		const delegate = await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).get();
 		if (delegate.exists) {
-			return delegate.data() as IDelegate;
+			throw new Error('Delegate already exists');
 		}
 
-		const newDelegate = {
+		const newDelegate: IDelegate = {
 			address,
 			bio,
-			dataSource: EDelegateSource.POLKASSEMBLY,
-			created_at: createAt,
-			isNovaWalletDelegate,
-			name,
-			user_id: userId
+			dataSource: [EDelegateSource.POLKASSEMBLY],
+			createdAt,
+			username: name,
+			userId,
+			updatedAt: new Date()
 		};
 
 		await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).set(newDelegate);

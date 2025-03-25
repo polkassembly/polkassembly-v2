@@ -876,79 +876,6 @@ export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }
 
-export interface IDelegationStats {
-	votingDelegations?: {
-		balance: string;
-		to: string;
-		from: string;
-	}[];
-	totalDelegatedBalance: string;
-	totalDelegatedVotes: {
-		totalCount: number;
-	};
-	totalDelegates: number;
-	totalDelegators: number;
-}
-
-export enum EDelegationType {
-	OPEN_GOV = 'OpenGov',
-	DEMOCRACY = 'Democracy'
-}
-
-export interface IDelegateStats {
-	address: string;
-	delegatedBalance: string;
-	receivedDelegationsCount: number;
-	votedProposalCount: number;
-}
-
-export enum EDelegateSource {
-	PARITY = 'parity',
-	POLKASSEMBLY = 'polkassembly',
-	W3F = 'w3f',
-	NOVA = 'nova',
-	NA = 'individual'
-}
-
-export interface IDelegate {
-	address: string;
-	dataSource: EDelegateSource[];
-	username?: string;
-	image?: string;
-	bio: string;
-	delegatedBalance: string;
-	receivedDelegationsCount: number;
-	votedProposalCount: {
-		convictionVotesConnection: {
-			totalCount: number;
-		};
-	};
-}
-
-export enum ETrackDelegationStatus {
-	ALL = 'all',
-	DELEGATED = 'delegated',
-	RECEIVED_DELEGATION = 'received_delegation',
-	UNDELEGATED = 'undelegated'
-}
-
-export interface IDelegation {
-	track: number;
-	to: string;
-	from: string;
-	lockPeriod: number;
-	balance: string;
-	createdAt: Date;
-}
-
-export interface ITrackDelegation {
-	track: number;
-	active_proposals_count: number;
-	status: ETrackDelegationStatus[];
-	recieved_delegation_count: number;
-	delegations: IDelegation[];
-}
-
 export interface IParamDef {
 	name: string;
 	length?: number;
@@ -981,6 +908,82 @@ export enum NotificationType {
 	ERROR = 'error',
 	WARNING = 'warning',
 	INFO = 'info'
+}
+
+export interface IDelegationStats {
+	votingDelegations?: {
+		balance: string;
+		to: string;
+		from: string;
+	}[];
+	totalDelegatedBalance: string;
+	totalDelegatedVotes: number;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export enum EDelegationType {
+	OPEN_GOV = 'OpenGov',
+	DEMOCRACY = 'Democracy'
+}
+
+export interface IDelegateStats {
+	address: string;
+	delegatedBalance: string;
+	receivedDelegationsCount: number;
+	votedProposalCount: number;
+}
+
+export enum EDelegateSource {
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly',
+	W3F = 'w3f',
+	NOVA = 'nova',
+	NA = 'individual'
+}
+
+export interface IDelegate {
+	address: string;
+	network?: ENetwork;
+	createdAt: Date;
+	updatedAt: Date;
+	dataSource: EDelegateSource[];
+	username?: string;
+	image?: string;
+	bio: string;
+	userId?: number;
+	delegatedBalance?: string;
+	receivedDelegationsCount?: number;
+	votedProposalCount?: number;
+}
+
+export enum ETrackDelegationStatus {
+	ALL = 'all',
+	DELEGATED = 'delegated',
+	RECEIVED_DELEGATION = 'received_delegation',
+	UNDELEGATED = 'undelegated'
+}
+
+export interface IDelegation {
+	track: number;
+	to: string;
+	from: string;
+	lockPeriod: number;
+	balance: string;
+	createdAt: Date;
+}
+
+export interface ITrackDelegation {
+	track: number;
+	active_proposals_count: number;
+	status: ETrackDelegationStatus[];
+	recieved_delegation_count: number;
+	delegations: IDelegation[];
+}
+
+export interface ITrackDelegationData {
+	votingDelegations: IDelegation[];
+	proposalsConnection?: number;
 }
 
 // generic types are for insignificant tokens if we decide to add later

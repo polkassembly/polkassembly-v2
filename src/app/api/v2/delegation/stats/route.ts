@@ -11,6 +11,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 interface DelegationCounts {
 	delegates: Record<string, number>;
@@ -40,57 +41,36 @@ const calculateDelegationStats = (votingDelegations: SimplifiedVotingDelegation[
 };
 const formatDelegationStats = (counts: DelegationCounts, totalDelegatedVotes: number): IDelegationStats => ({
 	totalDelegatedBalance: counts.totalBalance.toString(),
-	totalDelegatedVotes: {
-		totalCount: totalDelegatedVotes
-	},
+	totalDelegatedVotes,
 	totalDelegates: Object.keys(counts.delegates).length,
 	totalDelegators: Object.keys(counts.delegators).length
 });
 
-export async function GET(): Promise<NextResponse> {
-	try {
-		const network = await getNetworkFromHeaders();
-		if (!network) {
-			throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-		}
+export const GET = withErrorHandling(async (): Promise<NextResponse> => {
+	const network = await getNetworkFromHeaders();
 
-		const cachedStats = await RedisService.GetDelegationStats(network);
-		if (cachedStats) {
-			return NextResponse.json(cachedStats);
-		}
-
-		const data = await OnChainDbService.GetTotalDelegationStats({
-			network,
-			type: EDelegationType.OPEN_GOV
-		});
-
-		if (!data || !Array.isArray(data.votingDelegations)) {
-			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid delegation data structure');
-		}
-		const counts = calculateDelegationStats(data.votingDelegations);
-		const stats = formatDelegationStats(counts, data?.totalDelegatedVotes?.totalCount || 0);
-
-		await RedisService.SetDelegationStats(network, stats);
-
-		return NextResponse.json(stats);
-	} catch (error) {
-		console.error('Delegation Stats Error:', error);
-
-		if (error instanceof APIError) {
-			return NextResponse.json({ error: error.message }, { status: error.status });
-		}
-		console.error('Detailed error:', {
-			error,
-			message: error instanceof Error ? error.message : 'Unknown error',
-			stack: error instanceof Error ? error.stack : undefined
-		});
-
-		return NextResponse.json(
-			{
-				error: 'Failed to fetch delegation statistics',
-				status: StatusCodes.INTERNAL_SERVER_ERROR
-			},
-			{ status: StatusCodes.INTERNAL_SERVER_ERROR }
-		);
+	const cachedStats = await RedisService.GetDelegationStats(network);
+	if (cachedStats) {
+		return NextResponse.json(cachedStats);
 	}
-}
+
+	const data = (await OnChainDbService.GetTotalDelegationStats({
+		network,
+		type: EDelegationType.OPEN_GOV
+	})) as unknown as {
+		totalDelegatedVotes: number;
+		votingDelegations: SimplifiedVotingDelegation[];
+		totalDelegates: number;
+	};
+
+	if (!data || !Array.isArray(data.votingDelegations)) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid delegation data structure');
+	}
+	const counts = calculateDelegationStats(data.votingDelegations);
+	console.log('totalDelegatedVotes', data?.totalDelegatedVotes);
+	const stats = formatDelegationStats(counts, data?.totalDelegatedVotes || 0);
+
+	await RedisService.SetDelegationStats(network, stats);
+
+	return NextResponse.json(stats);
+});
