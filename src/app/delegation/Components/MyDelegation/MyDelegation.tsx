@@ -9,16 +9,14 @@ import UserIcon from '@assets/profile/user-icon.svg';
 import Image from 'next/image';
 import Address from '@ui/Profile/Address/Address';
 import { useUser } from '@/hooks/useUser';
-import { Button } from '@ui/Button';
-import { useTranslations } from 'next-intl';
 import DelegationPopupCard from '../DelegationPopupCard/DelegationPopupCard';
 import SocialLinks from '../SocialLinks/SocialLinks';
 import MyDelegateTracks from '../MyDelegateTracks/MyDelegateTracks';
 import styles from './MyDelegation.module.scss';
+import BecomeDelegateDialog from '../BecomeDelegateDialog/BecomeDelegateDialog';
 
 function MyDelegation() {
 	const { user } = useUser();
-	const t = useTranslations('Delegation');
 
 	if (!user) {
 		return null;
@@ -47,7 +45,7 @@ function MyDelegation() {
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
 					<div className={styles.myDelegationContainerButton}>
-						<Button variant='secondary'>{t('becomeDelegate')}</Button>
+						<BecomeDelegateDialog />
 					</div>
 				</div>
 			</div>
