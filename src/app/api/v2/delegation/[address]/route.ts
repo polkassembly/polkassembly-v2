@@ -24,45 +24,45 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const { address } = querySchema.parse(await params);
 
-	if (!network) {
-		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
+	const encodedAddress = getEncodedAddress(address, network);
+	console.log('encodedAddress', encodedAddress);
+	if (!encodedAddress && !isAddress(address)) {
+		throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.BAD_REQUEST);
 	}
 
 	const cachedDelegates = await RedisService.GetDelegates(network);
 
 	if (cachedDelegates) {
-		return NextResponse.json({ delegates: cachedDelegates });
-	}
-
-	if (address) {
-		const encodedAddress = getEncodedAddress(address, network);
-		if (!encodedAddress && !isAddress(address)) {
-			throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.BAD_REQUEST);
+		const delegate = cachedDelegates.find((d: IDelegate) => d.address === address);
+		if (delegate) {
+			return NextResponse.json({ delegate });
 		}
 	}
+
 	const delegateSources = await fetchAllDelegateSources(network);
 	if (!delegateSources.length) {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 	}
 
-	const targetAddresses = address ? [address] : delegateSources.map((d) => d.address);
-	const analytics = await fetchDelegateAnalytics(network, targetAddresses);
+	const delegate = delegateSources.find((d) => d.address === address);
+	if (!delegate) {
+		throw new APIError(ERROR_CODES.ADDRESS_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND);
+	}
 
-	const combinedDelegates = delegateSources
-		.map((delegate) => ({
-			...delegate,
-			...(analytics.find((a) => a.address === delegate.address) || {
-				delegatedBalance: '0',
-				receivedDelegationsCount: 0,
-				votedProposalCount: 0
-			})
-		}))
-		.filter((d) => d.votedProposalCount > 0 || d.receivedDelegationsCount > 0);
+	const analytics = await fetchDelegateAnalytics(network, [address]);
 
-	await RedisService.SetDelegates(network, combinedDelegates as unknown as IDelegate[]);
+	const combinedDelegate = {
+		...delegate,
+		...(analytics.find((a) => a.address === delegate.address) || {
+			delegatedBalance: '0',
+			receivedDelegationsCount: 0,
+			votedProposalCount: 0
+		})
+	};
+
+	await RedisService.SetDelegates(network, [combinedDelegate as unknown as IDelegate]);
 
 	return NextResponse.json({
-		delegates: combinedDelegates,
-		totalDelegates: combinedDelegates.length
+		delegate: combinedDelegate
 	});
 });

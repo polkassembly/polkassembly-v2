@@ -834,6 +834,10 @@ export class OffChainDbService {
 		return FirestoreService.CreateDelegate({ network, address, bio, createdAt, name, userId });
 	}
 
+	static async UpdateDelegate({ network, address, bio, name, userId }: { network: ENetwork; address: string; bio: string; name: string; userId: number }) {
+		return FirestoreService.UpdateDelegate({ network, address, bio, name, userId });
+	}
+
 	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
 		return FirestoreService.SaveTreasuryStats({ treasuryStats });
 	}

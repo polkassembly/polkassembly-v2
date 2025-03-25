@@ -94,9 +94,11 @@ enum EApiRoute {
 	GET_DELEGATION_STATS = 'GET_DELEGATION_STATS',
 	GET_DELEGATES = 'GET_DELEGATES',
 	CREATE_DELEGATE = 'CREATE_DELEGATE',
+	UPDATE_DELEGATE = 'UPDATE_DELEGATE',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
-	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION'
+	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
+	GET_DELEGATE_BY_ADDRESS = 'GET_DELEGATE_BY_ADDRESS'
 }
 
 export class NextApiClientService {
@@ -169,6 +171,7 @@ export class NextApiClientService {
 				path = '/delegation/stats';
 				break;
 			case EApiRoute.GET_DELEGATES:
+			case EApiRoute.GET_DELEGATE_BY_ADDRESS:
 				path = '/delegation';
 				break;
 			case EApiRoute.POSTS_LISTING:
@@ -241,6 +244,7 @@ export class NextApiClientService {
 				path = '/users/id';
 				method = 'PATCH';
 				break;
+			case EApiRoute.UPDATE_DELEGATE:
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
 				method = 'PATCH';
 				break;
@@ -752,6 +756,16 @@ export class NextApiClientService {
 	static async createDelegate(address: string, bio: string, name: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, bio, name } });
+	}
+
+	static async updateDelegate(address: string, bio: string, name: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, bio, name } });
+	}
+
+	static async getDelegateByAddress(address: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_BY_ADDRESS, routeSegments: [address] });
+		return this.nextApiClientFetch<IDelegate>({ url, method });
 	}
 
 	static async addPostSubscription(proposalType: EProposalType, index: string) {

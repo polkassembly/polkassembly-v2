@@ -103,3 +103,30 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 
 	return NextResponse.json(delegate);
 });
+
+export const PATCH = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
+	const network = await getNetworkFromHeaders();
+
+	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+	if (!newAccessToken) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	const body = await req.json();
+	const { address, bio, name } = CreateDelegateSchema.parse(body);
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+	if (!userId) {
+		throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
+	}
+
+	const delegate = await OffChainDbService.UpdateDelegate({
+		network,
+		address,
+		bio,
+		name,
+		userId
+	});
+
+	return NextResponse.json(delegate);
+});

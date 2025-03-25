@@ -1332,9 +1332,19 @@ export class FirestoreService extends FirestoreUtils {
 		name: string;
 		userId: number;
 	}) {
-		const delegate = await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).get();
-		if (delegate.exists) {
-			throw new Error('Delegate already exists');
+		const delegateDocRef = this.delegatesCollectionRef().doc(network);
+		const delegateDoc = await delegateDocRef.get();
+
+		if (delegateDoc.exists) {
+			const delegatesData = delegateDoc.data();
+
+			if (delegatesData) {
+				const existingDelegate = Object.values(delegatesData).find((d: IDelegate) => d.address === address);
+
+				if (existingDelegate) {
+					throw new Error('Delegate with this address already exists');
+				}
+			}
 		}
 
 		const newDelegate: IDelegate = {
@@ -1347,7 +1357,40 @@ export class FirestoreService extends FirestoreUtils {
 			updatedAt: new Date()
 		};
 
-		await this.delegatesCollectionRef().doc(network).collection('addresses').doc(address).set(newDelegate);
+		await delegateDocRef.set({ [userId]: newDelegate }, { merge: true });
+
+		return newDelegate;
+	}
+
+	static async UpdateDelegate({ network, address, bio, name, userId }: { network: ENetwork; address: string; bio: string; name: string; userId: number }) {
+		const delegateDocRef = this.delegatesCollectionRef().doc(network);
+		const delegateDoc = await delegateDocRef.get();
+
+		if (!delegateDoc.exists) {
+			throw new Error('Delegate not found');
+		}
+
+		const delegatesData = delegateDoc.data();
+
+		if (delegatesData) {
+			const existingDelegate = Object.values(delegatesData).find((d: IDelegate) => d.address === address);
+
+			if (existingDelegate) {
+				throw new Error('Delegate with this address already exists');
+			}
+		}
+
+		const newDelegate: IDelegate = {
+			address,
+			bio,
+			dataSource: [EDelegateSource.POLKASSEMBLY],
+			createdAt: new Date(),
+			username: name,
+			userId,
+			updatedAt: new Date()
+		};
+
+		await delegateDocRef.set({ [userId]: newDelegate }, { merge: true });
 
 		return newDelegate;
 	}

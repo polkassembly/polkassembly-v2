@@ -15,29 +15,55 @@ import { NotificationType } from '@/_shared/types';
 import { Loader2 } from 'lucide-react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { TfiPencil } from 'react-icons/tfi';
 
 export default function BecomeDelegateDialog() {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const { toast } = useToast();
 	const [bio, setBio] = useState('');
+	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
+	const [isDelegated, SetIsDelegated] = useState(false);
+
+	const checkDelegate = async () => {
+		if (!address) return;
+		const delegate = await NextApiClientService.getDelegateByAddress(address);
+		if (delegate.data) {
+			SetIsDelegated(true);
+			setBio(delegate.data.bio);
+		}
+	};
+
+	const { isFetching } = useQuery({
+		queryKey: ['delegate', address],
+		queryFn: checkDelegate,
+		staleTime: FIVE_MIN_IN_MILLI
+	});
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
 		setLoading(true);
-		await NextApiClientService.createDelegate(address, bio, user.username);
+		if (isDelegated) {
+			await NextApiClientService.updateDelegate(address, bio, user.username);
+		} else {
+			await NextApiClientService.createDelegate(address, bio, user.username);
+		}
 		toast({
 			title: 'Delegate created successfully',
 			status: NotificationType.SUCCESS
 		});
 		setLoading(false);
+		setDialogOpen(false);
 	};
 
 	return (
 		<Dialog
+			open={dialogOpen}
 			onOpenChange={() => {
 				setAddress(user?.defaultAddress || null);
 				setBio('');
@@ -46,16 +72,24 @@ export default function BecomeDelegateDialog() {
 			<DialogTrigger asChild>
 				<div>
 					<Button
-						disabled={!user}
+						disabled={!user || isFetching}
+						onClick={() => setDialogOpen(true)}
 						className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
 					>
-						{t('becomeDelegate')}
+						{isDelegated ? (
+							<span className='flex items-center gap-x-2 text-text_pink'>
+								<TfiPencil />
+								Edit
+							</span>
+						) : (
+							t('becomeDelegate')
+						)}
 					</Button>
 				</div>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>
-					<DialogTitle>{t('becomeDelegate')}</DialogTitle>
+					<DialogTitle> {isDelegated ? 'Edit Delegate Details' : t('becomeDelegate')}</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-y-4'>
 					<AddressDropdown
@@ -77,9 +111,12 @@ export default function BecomeDelegateDialog() {
 					</div>
 					<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
 						<AiOutlineInfoCircle className='text-toast_info_border' />
-						<span className='flex items-center gap-x-2 text-sm'>
+						<span className='flex items-center gap-x-2 text-xs'>
 							To add socials to your delegate profile{' '}
-							<span className='flex items-center gap-x-2 text-text_pink'>
+							<Link
+								href='/set-identity'
+								className='flex items-center gap-x-1 text-text_pink'
+							>
 								<Image
 									src={identityIcon}
 									alt='Polkassembly'
@@ -87,7 +124,7 @@ export default function BecomeDelegateDialog() {
 									height={16}
 								/>{' '}
 								Set Identity
-							</span>{' '}
+							</Link>{' '}
 							with Polkassembly
 						</span>
 					</div>
