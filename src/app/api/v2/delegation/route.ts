@@ -33,10 +33,6 @@ const CreateDelegateSchema = z.object({
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
-	if (!network) {
-		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-	}
-
 	const cachedDelegates = await RedisService.GetDelegates(network);
 
 	if (cachedDelegates) {
@@ -82,9 +78,6 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 
 export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
-	if (!network) {
-		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST);
-	}
 
 	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
 	if (!newAccessToken) {
