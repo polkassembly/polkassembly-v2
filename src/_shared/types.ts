@@ -961,3 +961,10 @@ export interface ITreasuryStats {
 	nativeTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
+
+export interface IDelegationStats {
+	totalDelegatedTokens: string;
+	totalDelegatedVotes: number;
+	totalDelegates: number;
+	totalDelegators: number;
+}

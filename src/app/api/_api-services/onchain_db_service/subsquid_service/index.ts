@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
@@ -25,6 +26,7 @@ import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -403,6 +405,35 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
+		};
+	}
+
+	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_CONVICTION_VOTING_DELEGATION_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain conviction voting delegation stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain conviction voting delegation stats from Subsquid');
+		}
+
+		// Calculate total delegated tokens by summing up all balances
+		const totalDelegatedTokens = subsquidData.votingDelegations.reduce((acc: string, delegation: { balance: string }) => {
+			return new BN(acc).add(new BN(delegation.balance)).toString();
+		}, BN_ZERO);
+
+		// Get unique delegates and delegators
+		const uniqueDelegates = new Set(subsquidData.votingDelegations.map((d: { to: string }) => d.to));
+		const uniqueDelegators = new Set(subsquidData.votingDelegations.map((d: { from: string }) => d.from));
+
+		return {
+			totalDelegatedTokens,
+			totalDelegatedVotes: subsquidData.totalDelegatedVotes.totalCount || 0,
+			totalDelegates: uniqueDelegates.size,
+			totalDelegators: uniqueDelegators.size
 		};
 	}
 }

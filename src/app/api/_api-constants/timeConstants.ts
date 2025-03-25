@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+// TODO: standardize naming convention for time constants
+
 export const ONE_DAY = 24 * 60 * 60; // (expressed in seconds)
 export const FIVE_MIN = 5 * 60; // (expressed in seconds)
 export const FIVE_MIN_IN_MILLI = 5 * 60 * 1000; // (expressed in milliseconds)
