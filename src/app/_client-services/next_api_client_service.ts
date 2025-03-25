@@ -31,7 +31,8 @@ import {
 	EAllowedCommentor,
 	EOffChainPostTopic,
 	IVoteCartItem,
-	EConvictionAmount
+	EConvictionAmount,
+	IDelegationStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -91,7 +92,8 @@ enum EApiRoute {
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
-	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION'
+	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
+	GET_DELEGATE_STATS = 'GET_DELEGATE_STATS'
 }
 
 export class NextApiClientService {
@@ -159,6 +161,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.GET_DELEGATE_STATS:
+				path = '/delegation/stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -732,5 +737,10 @@ export class NextApiClientService {
 	static async deletePostSubscription(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getDelegateStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_STATS });
+		return this.nextApiClientFetch<IDelegationStats>({ url, method });
 	}
 }
