@@ -5,7 +5,6 @@
 /* eslint-disable lines-between-class-members */
 
 import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EPostOrigin,
@@ -36,7 +35,6 @@ import {
 	IDelegationStats,
 	IDelegate
 } from '@/_shared/types';
-import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
@@ -94,7 +92,10 @@ enum EApiRoute {
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
 	GET_DELEGATION_STATS = 'GET_DELEGATION_STATS',
-	GET_DELEGATES = 'GET_DELEGATES'
+	GET_DELEGATES = 'GET_DELEGATES',
+	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
+	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
+	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION'
 }
 
 export class NextApiClientService {
@@ -138,6 +139,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_ACTIVITY_FEED:
 				path = '/activity-feed';
 				break;
+			case EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED:
+				path = '/activity-feed/subscriptions';
+				break;
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
@@ -149,10 +153,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
-				path = '/users/id';
-				break;
 			case EApiRoute.GET_FOLLOWING:
 			case EApiRoute.GET_FOLLOWERS:
+			case EApiRoute.GET_BATCH_VOTE_CART:
 				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
@@ -222,6 +225,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
 			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
 				method = 'POST';
 				break;
@@ -245,6 +249,7 @@ export class NextApiClientService {
 				method = 'DELETE';
 				break;
 			case EApiRoute.DELETE_REACTION:
+			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 			case EApiRoute.DELETE_COMMENT:
 				method = 'DELETE';
 				break;
@@ -272,7 +277,7 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
-		const response = await fetchPF(url, {
+		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
@@ -434,7 +439,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
-	static async editProposalDetails(proposalType: EProposalType, index: string, data: { title: string; content: OutputData }) {
+	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
@@ -458,7 +463,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
@@ -516,6 +521,31 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
+	}
+
+	static async getSubscribedActivityFeed({ page, limit = DEFAULT_LISTING_LIMIT, userId }: { page: number; limit?: number; userId: number }) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetSubscriptionFeed', {
+				network: currentNetwork,
+				page,
+				limit,
+				userId
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
@@ -682,7 +712,7 @@ export class NextApiClientService {
 		topic
 	}: {
 		proposalType: EProposalType;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
@@ -712,5 +742,15 @@ export class NextApiClientService {
 	static async getDelegates() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATES });
 		return this.nextApiClientFetch<{ delegates: IDelegate[] }>({ url, method });
+	}
+
+	static async addPostSubscription(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
+	}
+
+	static async deletePostSubscription(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 }

@@ -8,7 +8,13 @@ const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	images: {
-		domains: ['i.ibb.co']
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'i.ibb.co',
+				pathname: '/**'
+			}
+		]
 	},
 	compiler: {
 		removeConsole: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? { exclude: ['error'] } : false

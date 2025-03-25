@@ -24,15 +24,15 @@ function TinderVoting({
 	disableButtons,
 	filteredProposals,
 	addToVoteCart,
-	isFetching,
+	isLoading,
 	voteCart,
 	currentIndexRef,
 	onSkip
 }: {
-	disableButtons: boolean;
+	disableButtons?: boolean;
 	currentIndexRef: RefObject<number>;
 	filteredProposals: IPostListing[];
-	isFetching: boolean;
+	isLoading: boolean;
 	voteCart: IVoteCartItem[];
 	addToVoteCart: ({
 		voteDecision,
@@ -64,7 +64,7 @@ function TinderVoting({
 				proposalIndexOrHash: proposal.index?.toString() || proposal.hash || '',
 				proposalType: proposal.proposalType,
 				title: proposal.title,
-				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.ABSTAIN
+				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.SPLIT_ABSTAIN
 			});
 		}
 	};
@@ -78,7 +78,7 @@ function TinderVoting({
 
 	return (
 		<div className={classes.tinderVoting}>
-			{isFetching && <LoadingLayover />}
+			{isLoading && <LoadingLayover />}
 			<Button
 				variant='ghost'
 				className={classes.skipButton}

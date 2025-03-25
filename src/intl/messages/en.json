@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Type your comment here",
 		"Post": "Post",
+		"share": "Share",
+		"loading": "Loading...",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
 		"Navbar": {
 			"All": "All",
 			"Root": "Root",
@@ -90,8 +94,12 @@
 	"Profile": {
 		"settings": "Settings",
 		"login": "Login",
+		"loginFailed": "Failed to login",
+		"signupFailed": "Failed to signup",
+		"noAccessTokenFound": "No Access token found.",
 		"logout": "Logout",
 		"signUp": "Sign Up",
+		"enterCredentials": "Please enter your credentials",
 		"dontHaveAnAccount": "Don't have an account?",
 		"twoFactorAuth": "Two Factor Authentication",
 		"twoFactorAuthDescription": "Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.",
@@ -198,6 +206,8 @@
 		"riot": "Riot",
 		"discord": "Discord",
 		"saveChanges": "Save",
+		"judgements": "Judgements",
+		"since": "Since",
 		"Settings": {
 			"settings": "Settings",
 			"deleteAccount": "Delete Account",
@@ -241,6 +251,7 @@
 		"Referenda": "Referenda"
 	},
 	"ListingPage": {
+		"AllProposals": "All Referenda",
 		"AuctionAdmin": "Auction Admin",
 		"AuctionAdminDescription": "Origin for starting auctions.",
 		"BigSpender": "Big Spender",
@@ -493,7 +504,11 @@
 		"abstainVoteValue": "Abstain vote value",
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"voteSuccess": "Your vote has been cast successfully",
+		"voteFailed": "Your vote has not been cast successfully",
+		"voteSuccessTitle": "Vote Successful",
+		"voteFailedTitle": "Vote Failed"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance"
@@ -612,10 +627,6 @@
 		"findYourRank": "Find your rank in the ecosystem",
 		"searchUsername": "Enter username to search"
 	},
-	"BlockEditor": {
-		"placeholder": "Type / to start",
-		"errorUpdatingContent": "Error updating content"
-	},
 	"SetIdentity": {
 		"displayName": "Display Name",
 		"legalName": "Legal Name",
@@ -698,5 +709,64 @@
 		"here": "here",
 		"selectDelegate": "Select Delegate",
 		"enterUsernameOrAddressToDelegateVote": "Enter username or address to Delegate vote"
+	},
+	"CreateProposal": {
+		"createPreimage": "Create Preimage",
+		"existingPreimage": "Already have a Preimage",
+		"createTreasuryProposal": "Create Treasury Proposal (Native)",
+		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
+		"cancelReferendum": "Cancel a Referendum",
+		"killReferendum": "Kill a Referendum",
+		"goBack": "Go Back",
+		"preimageHash": "Preimage Hash",
+		"preimageLength": "Preimage Length",
+		"preimageHashDescription": "Enter the preimage hash to create a proposal"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiary",
+		"amount": "Amount",
+		"track": "Track",
+		"createProposal": "Create Proposal",
+		"create": "Create",
+		"proposalCreatedSuccessfully": "Proposal created successfully",
+		"proposalCreatedSuccessfullyDescription": "The proposal has been created successfully",
+		"proposalCreationFailed": "Failed to create proposal",
+		"proposalCreationFailedDescription": "There was an error while creating the proposal",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"selectTrack": "Select Track",
+		"validFrom": "Valid From",
+		"addValidFrom": "Add Valid From",
+		"invalidBlockHeight": "Please enter a valid block height",
+		"enterFutureBlockHeight": "Please enter a future block height"
+	},
+	"CreatePreimage": {
+		"addItem": "Add Item",
+		"removeItem": "Remove Item",
+		"yes": "Yes",
+		"no": "No",
+		"uploadFile": "Upload File",
+		"includeOption": "Include Option",
+		"preimageNoteFailed": "Failed to note preimage",
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"preimageNotedSuccessfully": "Preimage noted successfully",
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageHash": "Preimage Hash",
+		"length": "Length"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Referendum ID",
+		"referendumIdDescription": "Enter the referendum ID to cancel",
+		"thisReferendumIsNotOngoing": "This Referendum is not ongoing"
+	},
+	"AddressInput": {
+		"invalidAddress": "Invalid Address",
+		"noResultsFound": "No results found",
+		"placeholder": "Enter Address"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Value is too large"
 	}
 }

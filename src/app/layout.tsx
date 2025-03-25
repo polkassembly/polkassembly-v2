@@ -3,13 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import '@app/_style/globals.scss';
+
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { DM_Sans as dmSans } from 'next/font/google';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Providers } from './_shared-components/Providers';
-import NotificationsContainer from './_shared-components/NotificationsContainer';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
 import { CookieService } from '../_shared/_services/cookie_service';
@@ -39,10 +40,11 @@ export default async function RootLayout({
 	const user = await CookieService.getUserFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
 
-	const locale = await getLocale();
 	const messages = await getMessages({
-		locale
+		locale: userPreferences.locale
 	});
+
+	dayjs.locale(userPreferences.locale);
 
 	return (
 		<html
@@ -60,7 +62,7 @@ export default async function RootLayout({
 				/>
 				<Providers
 					messages={messages}
-					locale={locale}
+					locale={userPreferences.locale}
 					userPreferences={userPreferences}
 				>
 					<Initializers
@@ -69,7 +71,6 @@ export default async function RootLayout({
 					/>
 					{modal}
 					<AppLayout>{children}</AppLayout>
-					<NotificationsContainer />
 				</Providers>
 			</body>
 		</html>

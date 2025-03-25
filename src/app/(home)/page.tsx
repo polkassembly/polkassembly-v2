@@ -6,16 +6,31 @@ import { Suspense } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { EActivityFeedTab } from '@/_shared/types';
 import { CookieService } from '@/_shared/_services/cookie_service';
-import ActivityFeed from './Components/index';
+import { z } from 'zod';
+import ActivityFeed from './Components/ActivityFeed';
 import { ClientError } from '../_client-utils/clientError';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
+import { redirectFromServer } from '../_client-utils/redirectFromServer';
 
-export default async function Home() {
+const zodParamsSchema = z.object({
+	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.EXPLORE)
+});
+
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ activeTab?: string }> }) {
+	const { tab } = zodParamsSchema.parse(await searchParams);
+
 	const user = await CookieService.getUserFromCookie();
-	const userId = user?.id;
 
-	const { data, error } = await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId });
+	if (!user?.id && tab === EActivityFeedTab.SUBSCRIBED) {
+		return redirectFromServer(`/login?nextUrl=/?tab=${tab}`);
+	}
+
+	const { data, error } =
+		tab === EActivityFeedTab.SUBSCRIBED && user?.id
+			? await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id })
+			: await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -23,7 +38,10 @@ export default async function Home() {
 
 	return (
 		<Suspense fallback={<LoadingSpinner />}>
-			<ActivityFeed initialData={data} />
+			<ActivityFeed
+				initialData={data}
+				activeTab={tab}
+			/>
 		</Suspense>
 	);
 }

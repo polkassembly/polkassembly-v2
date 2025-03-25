@@ -68,23 +68,23 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 					<BalanceInput
 						name={`${voteDecision}-balance`}
 						label={t('VoteReferendum.lockBalance')}
-						onChange={setAyeNayValue}
+						onChange={({ value }) => setAyeNayValue(value)}
 					/>
 				) : (
 					<>
-						{voteDecision === EVoteDecision.ABSTAIN && (
+						{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 							<BalanceInput
 								label={t('VoteReferendum.abstainVoteValue')}
-								onChange={setAbstainValue}
+								onChange={({ value }) => setAbstainValue(value)}
 							/>
 						)}
 						<BalanceInput
 							label={t('VoteReferendum.ayeVoteValue')}
-							onChange={setAbstainAyeValue}
+							onChange={({ value }) => setAbstainAyeValue(value)}
 						/>
 						<BalanceInput
 							label={t('VoteReferendum.nayVoteValue')}
-							onChange={setAbstainNayValue}
+							onChange={({ value }) => setAbstainNayValue(value)}
 						/>
 					</>
 				)}

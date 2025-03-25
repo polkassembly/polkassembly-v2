@@ -25,6 +25,10 @@
 		"Live": "EN VIVO",
 		"CommentPlaceholder": "Escriba su comentario aquí",
 		"Post": "Publicar",
+		"share": "Compartir",
+		"loading": "Cargando...",
+		"subscribe": "Suscribirse",
+		"unsubscribe": "Desuscribirse",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",
@@ -89,8 +93,11 @@
 	},
 	"Profile": {
 		"settings": "Configuración",
-		"login": "Iniciar Sesión",
-		"logout": "Cerrar Sesión",
+		"login": "Iniciar sesión",
+		"loginFailed": "Error al iniciar sesión",
+		"signupFailed": "Error al registrarse",
+		"noAccessTokenFound": "No se encontró el token de acceso.",
+		"logout": "Cerrar sesión",
 		"signUp": "Registrarse",
 		"dontHaveAnAccount": "¿No tienes una cuenta?",
 		"twoFactorAuth": "Autenticación de Dos Factores",
@@ -177,6 +184,8 @@
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
 		"userSince": "Usuario desde",
 		"rank": "Rango",
+		"judgements": "Juicios",
+		"since": "Desde",
 		"Settings": {
 			"settings": "Configuraciones",
 			"deleteAccount": "Eliminar cuenta",
@@ -233,7 +242,8 @@
 		"saveChanges": "Guardar",
 		"unfollow": "Dejar de seguir",
 		"following": "Siguiendo",
-		"followers": "Seguidores"
+		"followers": "Seguidores",
+		"enterCredentials": "Por favor, ingrese sus credenciales"
 	},
 	"ListingTab": {
 		"Analytics": "Analíticas",
@@ -241,6 +251,7 @@
 		"Referenda": "Referendos"
 	},
 	"ListingPage": {
+		"AllProposals": "Todas las Referendos",
 		"AuctionAdmin": "Administrador de Subastas",
 		"AuctionAdminDescription": "Origen para iniciar subastas.",
 		"BigSpender": "Gran Gastador",
@@ -473,7 +484,11 @@
 		"abstainVoteValue": "Valor de Voto de Abstención",
 		"ayeVoteValue": "Valor de Voto Sí",
 		"nayVoteValue": "Valor de Voto No",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"voteSuccess": "Su voto ha sido emitido correctamente",
+		"voteFailed": "Su voto no ha sido emitido correctamente",
+		"voteSuccessTitle": "Voto exitoso",
+		"voteFailedTitle": "Voto fallido"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de Votación"
@@ -592,10 +607,6 @@
 		"findYourRank": "Encuentra tu rango en el ecosistema",
 		"searchUsername": "Buscar nombre de usuario"
 	},
-	"BlockEditor": {
-		"placeholder": "Escribe / para comenzar",
-		"errorUpdatingContent": "Error al actualizar el contenido"
-	},
 	"SetIdentity": {
 		"displayName": "Nombre para mostrar",
 		"legalName": "Nombre legal",
@@ -678,5 +689,64 @@
 		"here": "aquí",
 		"selectDelegate": "Seleccionar delegado",
 		"enterUsernameOrAddressToDelegateVote": "Ingrese un nombre de usuario o dirección para delegar su voto"
+	},
+	"CreateProposal": {
+		"createPreimage": "Crear Preimage",
+		"existingPreimage": "Ya tiene un Preimage",
+		"createTreasuryProposal": "Crear Propuesta de Tesorería (Nativa)",
+		"usdxProposal": "Crear Propuesta de Tesorería USDx (Assethub)",
+		"cancelReferendum": "Cancelar un Referéndum",
+		"killReferendum": "Terminar un Referéndum",
+		"goBack": "Volver",
+		"preimageHash": "Hash del Preimage",
+		"preimageLength": "Longitud del Preimage",
+		"preimageHashDescription": "Ingrese el hash del preimage para crear una propuesta"
+	},
+	"CreateTreasuryProposal": {
+		"beneficiary": "Beneficiario",
+		"amount": "Cantidad",
+		"track": "Pista",
+		"createProposal": "Crear Propuesta",
+		"create": "Crear",
+		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
+		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
+		"proposalCreationFailed": "Error al crear la propuesta",
+		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
+		"preimageNotedSuccessfully": "Preimagen registrada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido registrada exitosamente",
+		"preimageNoteFailed": "Error al registrar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al registrar la preimagen",
+		"selectTrack": "Seleccionar Pista",
+		"validFrom": "Válido Desde",
+		"addValidFrom": "Agregar Válido Desde",
+		"invalidBlockHeight": "Por favor ingrese una altura de bloque válida",
+		"enterFutureBlockHeight": "Por favor ingrese una altura de bloque futura"
+	},
+	"CreatePreimage": {
+		"addItem": "Agregar Elemento",
+		"removeItem": "Eliminar Elemento",
+		"yes": "Sí",
+		"no": "No",
+		"uploadFile": "Subir Archivo",
+		"includeOption": "Incluir Opción",
+		"preimageNoteFailed": "Error al anotar la preimagen",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
+		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
+		"preimageHash": "Hash de Preimagen",
+		"length": "Longitud"
+	},
+	"AddressInput": {
+		"invalidAddress": "Dirección Inválida",
+		"noResultsFound": "No se encontraron resultados",
+		"placeholder": "Ingrese la Dirección"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "ID del Referéndum",
+		"referendumIdDescription": "Ingrese el ID del referéndum para cancelar",
+		"thisReferendumIsNotOngoing": "Este Referéndum no está en curso"
+	},
+	"errorMessages": {
+		"valueTooLarge": "El valor es demasiado grande"
 	}
 }

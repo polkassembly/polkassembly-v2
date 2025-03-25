@@ -12,8 +12,8 @@ import { ELocales, ENetwork, EOffChainPostTopic, EProposalType, ETheme, EVoteDec
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
-import { OutputData } from '@editorjs/editorjs';
-import { BN } from '@polkadot/util';
+import { BN, isHex } from '@polkadot/util';
+import { NETWORKS_DETAILS } from '../_constants/networks';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -219,11 +219,6 @@ export class ValidatorService {
 		return indicators >= options.minIndicators;
 	}
 
-	// TODO: Add more checks for the content
-	static isValidBlockContent(content: OutputData): boolean {
-		return content.blocks.length > 0;
-	}
-
 	static isValidNumber(number: unknown): boolean {
 		return number !== null && number !== undefined && Number.isFinite(Number(number));
 	}
@@ -240,7 +235,7 @@ export class ValidatorService {
 		return Object.values(EOffChainPostTopic).includes(topic as EOffChainPostTopic);
 	}
 
-	static isValidVoteAmount(amount: string): boolean {
+	static isValidAmount(amount: string): boolean {
 		try {
 			const bnAmount = new BN(amount);
 			return bnAmount.gt(new BN(0));
@@ -249,26 +244,30 @@ export class ValidatorService {
 		}
 	}
 
+	static isValidAssetId(assetId: string, network: ENetwork): boolean {
+		return Object.keys(NETWORKS_DETAILS[`${network}`].supportedAssets).includes(assetId);
+	}
+
 	static isValidVoteAmountsForDecision(amount: { abstain?: string; aye?: string; nay?: string }, decision: EVoteDecision): boolean {
 		try {
-			if (decision === EVoteDecision.AYE && !this.isValidVoteAmount(amount.aye || '-1')) {
+			if (decision === EVoteDecision.AYE && !this.isValidAmount(amount.aye || '-1')) {
 				throw new Error();
 			}
 
-			if (decision === EVoteDecision.NAY && !this.isValidVoteAmount(amount.nay || '-1')) {
+			if (decision === EVoteDecision.NAY && !this.isValidAmount(amount.nay || '-1')) {
 				throw new Error();
 			}
 
 			// abstain requires all three amounts
 			if (
-				decision === EVoteDecision.ABSTAIN &&
-				(!this.isValidVoteAmount(amount.abstain || '-1') || !this.isValidVoteAmount(amount.aye || '-1') || !this.isValidVoteAmount(amount.nay || '-1'))
+				decision === EVoteDecision.SPLIT_ABSTAIN &&
+				(!this.isValidAmount(amount.abstain || '-1') || !this.isValidAmount(amount.aye || '-1') || !this.isValidAmount(amount.nay || '-1'))
 			) {
 				throw new Error();
 			}
 
 			// split requires aye or nay
-			if (decision === EVoteDecision.SPLIT && (!this.isValidVoteAmount(amount.aye || '-1') || !this.isValidVoteAmount(amount.nay || '-1'))) {
+			if (decision === EVoteDecision.SPLIT && (!this.isValidAmount(amount.aye || '-1') || !this.isValidAmount(amount.nay || '-1'))) {
 				throw new Error();
 			}
 
@@ -276,5 +275,10 @@ export class ValidatorService {
 		} catch {
 			return false;
 		}
+	}
+
+	static isValidPreimageHash(preimageHash: string): boolean {
+		const bitLength = 256;
+		return isHex(preimageHash, bitLength);
 	}
 }

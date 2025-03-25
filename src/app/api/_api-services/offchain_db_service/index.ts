@@ -32,7 +32,8 @@ import {
 	EConvictionAmount,
 	EVoteDecision,
 	IPostSubscription,
-	ECommentSentiment
+	ECommentSentiment,
+	ITreasuryStats
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -40,8 +41,6 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { OutputData } from '@editorjs/editorjs';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { ON_CHAIN_ACTIVITY_NAMES } from '@/_shared/_constants/onChainActivityNames';
 import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
 import { APIError } from '../../_api-utils/apiError';
@@ -150,15 +149,12 @@ export class OffChainDbService {
 		}
 
 		const content = getDefaultPostContent(proposalType, proposer);
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && ValidatorService.isValidNumber(indexOrHash) ? Number(indexOrHash) : undefined,
 			hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 			title: DEFAULT_POST_TITLE,
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			tags: [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			proposalType,
@@ -200,15 +196,25 @@ export class OffChainDbService {
 	}
 
 	static async GetPostComments({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<ICommentResponse[]> {
-		const firestoreComments = await FirestoreService.GetPostComments({ network, indexOrHash, proposalType });
-		const subsquareComments = await SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType });
+		const [firestoreComments, subsquareComments] = await Promise.all([
+			FirestoreService.GetPostComments({ network, indexOrHash, proposalType }),
+			SubsquareOffChainService.GetPostComments({ network, indexOrHash, proposalType })
+		]);
 
 		// Combine all comments from both sources
 		const allComments = [...firestoreComments, ...subsquareComments];
 
+		// get reactions for each comment
+		const allCommentsWithReactions: ICommentResponse[] = await Promise.all(
+			allComments.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({ network, indexOrHash, proposalType, id: comment.id });
+				return { ...comment, reactions };
+			})
+		);
+
 		// Helper function to build comment tree
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
-			return allComments
+			return allCommentsWithReactions
 				.filter((comment) => comment.parentCommentId === parentId)
 				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
@@ -317,6 +323,10 @@ export class OffChainDbService {
 
 	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
 		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
+	}
+
+	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
+		return FirestoreService.GetTreasuryStats({ network, from, to, limit, page });
 	}
 
 	// helper methods
@@ -461,7 +471,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 		address?: string;
 		sentiment?: ECommentSentiment;
@@ -489,7 +499,7 @@ export class OffChainDbService {
 		return comment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		return FirestoreService.UpdateComment({ commentId, content, isSpam, aiSentiment });
 	}
 
@@ -599,7 +609,7 @@ export class OffChainDbService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
@@ -645,7 +655,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 	}) {
@@ -675,7 +685,7 @@ export class OffChainDbService {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 	}) {
@@ -824,5 +834,9 @@ export class OffChainDbService {
 		userId: number;
 	}) {
 		return FirestoreService.CreateDelegate({ network, address, bio, createAt, isNovaWalletDelegate, name, userId });
+	}
+
+	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
+		return FirestoreService.SaveTreasuryStats({ treasuryStats });
 	}
 }
