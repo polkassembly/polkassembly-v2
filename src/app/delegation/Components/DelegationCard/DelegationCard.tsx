@@ -134,7 +134,7 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 				<div className='border-r border-border_grey p-5 text-center'>
 					<div>
 						<div className='text-sm text-btn_secondary_text'>
-							<span className='text-2xl font-semibold'> {parseBalance(delegate?.delegatedBalance.toString(), 1, false, network)}</span>{' '}
+							<span className='text-2xl font-semibold'> {parseBalance(delegate?.delegatedBalance?.toString() || '0', 1, false, network)}</span>{' '}
 							{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}
 						</div>
 						<span className='text-xs text-delegation_card_text'>{t('votingPower')}</span>
@@ -142,7 +142,7 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 				</div>
 				<div className='border-r border-border_grey p-3 text-center'>
 					<div>
-						<div className='text-2xl font-semibold'>{delegate?.votedProposalCount?.convictionVotesConnection?.totalCount}</div>
+						<div className='text-2xl font-semibold'>{delegate?.votedProposalCount}</div>
 						<span className='text-xs text-delegation_card_text'>{t('votedProposals')}</span>
 						<span className='block text-[10px] text-delegation_card_text'>({t('past30Days')})</span>
 					</div>

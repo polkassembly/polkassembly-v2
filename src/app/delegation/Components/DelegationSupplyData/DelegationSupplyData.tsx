@@ -33,7 +33,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 			try {
 				await apiService.apiReady();
 
-				const supply = await apiService.getDelegationTotalSupply();
+				const supply = await apiService.getTotalActiveIssuance();
 				if (supply) {
 					setTotalSupply(supply);
 				}
@@ -80,7 +80,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegatedVotes')}</p>
-						<p className='text-xl font-semibold'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes.totalCount.toString()))}</p>
+						<p className='text-xl font-semibold'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes))}</p>
 					</div>
 				</div>
 			</div>
