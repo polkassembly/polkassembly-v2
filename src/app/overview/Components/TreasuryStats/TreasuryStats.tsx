@@ -21,6 +21,7 @@ import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
 import { Separator } from '@/app/_shared-components/Separator';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
+import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { TreasuryDetailsDialog } from './TreasuryDialog';
 
 function formatNumberWithSuffix(value: number): { formatted: string; suffix: string } {
@@ -74,9 +75,23 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 	);
 }
 
+const getTreasuryStats = async (): Promise<ITreasuryStats[]> => {
+	const to = new Date();
+	const from = new Date();
+	from.setFullYear(to.getFullYear() - 1);
+	const response = await NextApiClientService.getTreasuryStats({ from, to });
+	return Array.isArray(response.data) ? response.data : [];
+};
+
 export default function TreasuryStats() {
 	const t = useTranslations('Overview');
 	const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+
+	const { data: treasuryStats, isFetching } = useQuery({
+		queryKey: ['treasuryStats'],
+		queryFn: getTreasuryStats,
+		staleTime: STALE_TIME
+	});
 
 	const chartConfig = {
 		value: {
@@ -84,19 +99,6 @@ export default function TreasuryStats() {
 			color: 'hsl(var(--chart-1))'
 		}
 	} satisfies ChartConfig;
-
-	const getTreasuryStats = async (): Promise<ITreasuryStats[]> => {
-		const to = new Date();
-		const from = new Date();
-		from.setFullYear(to.getFullYear() - 1);
-		const response = await NextApiClientService.getTreasuryStats({ from, to });
-		return Array.isArray(response.data) ? response.data : [];
-	};
-
-	const { data: treasuryStats, isFetching } = useQuery({
-		queryKey: ['treasuryStats'],
-		queryFn: getTreasuryStats
-	});
 
 	const chartData = useMemo(() => {
 		if (!treasuryStats?.[0]) return [];
@@ -152,7 +154,7 @@ export default function TreasuryStats() {
 		}
 	}, [treasuryStats]);
 
-	if (isFetching || !stats) {
+	if (isFetching && !stats) {
 		return (
 			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 				<div className='p-3'>
@@ -167,7 +169,7 @@ export default function TreasuryStats() {
 		);
 	}
 
-	const { formatted: totalValueFormatted, suffix: totalValueSuffix } = formatNumberWithSuffix(stats.totalValueUsd);
+	const { formatted: totalValueFormatted, suffix: totalValueSuffix } = formatNumberWithSuffix(stats?.totalValueUsd || 0);
 
 	return (
 		<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
@@ -179,8 +181,8 @@ export default function TreasuryStats() {
 					</div>
 					<div className='flex items-center gap-2'>
 						<p className='text-sm text-wallet_btn_text'>DOT Price</p>
-						<span className='font-semibold text-btn_secondary_text'>${stats.dotPrice}</span>
-						<PriceChange value={stats.dot24hChange} />
+						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice || 0}</span>
+						<PriceChange value={stats?.dot24hChange || 0} />
 					</div>
 				</div>
 
@@ -201,7 +203,7 @@ export default function TreasuryStats() {
 				<div className='flex flex-wrap items-center gap-2'>
 					<TokenDisplay
 						icon={DotIcon}
-						amount={stats.totalDot}
+						amount={stats?.totalDot || 0}
 						symbol='DOT'
 					/>
 					<Separator
@@ -210,7 +212,7 @@ export default function TreasuryStats() {
 					/>
 					<TokenDisplay
 						icon={UsdcIcon}
-						amount={stats.totalUsdc}
+						amount={stats?.totalUsdc || 0}
 						symbol='USDC'
 					/>
 					<Separator
@@ -219,7 +221,7 @@ export default function TreasuryStats() {
 					/>
 					<TokenDisplay
 						icon={UsdtIcon}
-						amount={stats.totalUsdt}
+						amount={stats?.totalUsdt || 0}
 						symbol='USDt'
 					/>
 					<Separator
@@ -228,7 +230,7 @@ export default function TreasuryStats() {
 					/>
 					<TokenDisplay
 						icon={MythIcon}
-						amount={stats.totalMyth}
+						amount={stats?.totalMyth || 0}
 						symbol='MYTH'
 					/>
 				</div>
