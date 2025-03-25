@@ -90,3 +90,33 @@
 .radix-tooltip-content {
 	@apply relative z-50;
 }
+
+.mdxeditor-popup-container {
+	z-index: 100 !important;
+
+	[role='dialog'],
+	svg {
+		background-color: var(--baseBg); /* Use theme-based background */
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+		fill: var(--baseBorder);
+	}
+}
+
+.mdxeditor-select-content {
+	z-index: 100 !important;
+	[role='option'] {
+		background-color: var(--baseBg); /* Use theme-based background */
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+	}
+}
+
+.mdxeditor-source-editor,
+.mdxeditor-diff-editor {
+	.cm-editor {
+		background-color: var(--baseBg); /* Use theme-based background */
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+	}
+}

@@ -37,10 +37,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { firestoreContentToEditorJs } from '@/app/api/_api-utils/firestoreContentToEditorJs';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { OutputData } from '@editorjs/editorjs';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreUtils } from './firestoreUtils';
 
@@ -284,22 +281,10 @@ export class FirestoreService extends FirestoreUtils {
 
 		const postData = postDocSnapshot.docs[0].data();
 
-		let { htmlContent = '', markdownContent = '' } = postData;
-		const formattedContent = firestoreContentToEditorJs(postData.content);
-
-		if (!htmlContent && !markdownContent && formattedContent) {
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-			htmlContent = html;
-			markdownContent = markdown;
-		}
-
 		return {
 			...postData,
-			content: formattedContent,
+			content: postData.content || '',
 			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate() || new Date(), network })) || [],
-			htmlContent,
-			markdownContent,
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
@@ -338,25 +323,14 @@ export class FirestoreService extends FirestoreUtils {
 			const indexOrHash = data.hash || String(data.index);
 			const metrics = await this.GetPostMetrics({ network, indexOrHash, proposalType });
 
-			let { htmlContent = '', markdownContent = '' } = data;
-			const formattedContent = firestoreContentToEditorJs(data.content);
-
-			if (!htmlContent && !markdownContent && formattedContent) {
-				const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-				htmlContent = html;
-				markdownContent = markdown;
-			}
-
 			return {
 				...data,
-				content: formattedContent,
-				htmlContent,
-				markdownContent,
+				content: data.content || '',
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				metrics,
-				allowedCommentor: data.allowedCommentor || EAllowedCommentor.ALL
+				allowedCommentor: data.allowedCommentor || EAllowedCommentor.ALL,
+				dataSource: data.dataSource || EDataSource.POLKASSEMBLY
 			} as IOffChainPost;
 		});
 
@@ -443,21 +417,9 @@ export class FirestoreService extends FirestoreUtils {
 		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
 			const dataRaw = doc.data();
 
-			let { htmlContent = '', markdownContent = '' } = dataRaw;
-			const formattedContent = firestoreContentToEditorJs(dataRaw.content);
-
-			if (!htmlContent && !markdownContent && formattedContent) {
-				const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-				htmlContent = html;
-				markdownContent = markdown;
-			}
-
 			const commentData = {
 				...dataRaw,
-				content: formattedContent,
-				htmlContent,
-				markdownContent,
+				content: dataRaw.content || '',
 				createdAt: dataRaw.createdAt?.toDate(),
 				updatedAt: dataRaw.updatedAt?.toDate(),
 				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
@@ -491,23 +453,12 @@ export class FirestoreService extends FirestoreUtils {
 			return null;
 		}
 
-		let { htmlContent = '', markdownContent = '' } = data;
-		const formattedContent = firestoreContentToEditorJs(data.content);
-
-		if (!htmlContent && !markdownContent && formattedContent) {
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-			htmlContent = html;
-			markdownContent = markdown;
-		}
-
 		return {
 			...data,
-			content: formattedContent,
-			htmlContent,
-			markdownContent,
+			content: data.content || '',
 			createdAt: data.createdAt?.toDate(),
-			updatedAt: data.updatedAt?.toDate()
+			updatedAt: data.updatedAt?.toDate(),
+			dataSource: data.dataSource || EDataSource.POLKASSEMBLY
 		} as IComment;
 	}
 
@@ -732,16 +683,21 @@ export class FirestoreService extends FirestoreUtils {
 		return postSubscriptionsQuerySnapshot.data().count || 0;
 	}
 
-	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from?: Date; to?: Date }): Promise<ITreasuryStats[]> {
-		const treasuryStatsQuery = this.treasuryStatsCollectionRef().where('network', '==', network);
+	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
+		let treasuryStatsQuery = this.treasuryStatsCollectionRef().where('network', '==', network);
 
 		if (from) {
-			treasuryStatsQuery.where('createdAt', '>=', from);
+			treasuryStatsQuery = treasuryStatsQuery.where('createdAt', '>=', from);
 		}
 
 		if (to) {
-			treasuryStatsQuery.where('createdAt', '<=', to);
+			treasuryStatsQuery = treasuryStatsQuery.where('createdAt', '<=', to);
 		}
+
+		treasuryStatsQuery = treasuryStatsQuery
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset(limit * (page - 1));
 
 		const treasuryStatsQuerySnapshot = await treasuryStatsQuery.get();
 
@@ -942,14 +898,12 @@ export class FirestoreService extends FirestoreUtils {
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 		address?: string;
 		sentiment?: ECommentSentiment;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
-
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newComment: IComment = {
 			id: newCommentId,
@@ -957,8 +911,6 @@ export class FirestoreService extends FirestoreUtils {
 			proposalType,
 			userId,
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isDeleted: false,
@@ -974,16 +926,13 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
-
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		const newCommentData: Partial<IComment> = {
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			...(isSpam && { isSpam }),
 			...(aiSentiment && { aiSentiment }),
-			updatedAt: new Date()
+			updatedAt: new Date(),
+			dataSource: EDataSource.POLKASSEMBLY
 		};
 
 		await this.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
@@ -1092,10 +1041,8 @@ export class FirestoreService extends FirestoreUtils {
 		await this.reactionsCollectionRef().doc(id).delete();
 	}
 
-	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: OutputData; title: string; allowedCommentor: EAllowedCommentor }) {
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
-
-		await this.postsCollectionRef().doc(String(id)).set({ content, htmlContent: html, markdownContent: markdown, title, allowedCommentor, updatedAt: new Date() }, { merge: true });
+	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: string; title: string; allowedCommentor: EAllowedCommentor }) {
+		await this.postsCollectionRef().doc(String(id)).set({ content, title, allowedCommentor, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -1112,7 +1059,7 @@ export class FirestoreService extends FirestoreUtils {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		indexOrHash?: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
@@ -1120,7 +1067,6 @@ export class FirestoreService extends FirestoreUtils {
 		topic?: EOffChainPostTopic;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = this.postsCollectionRef().doc().id;
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
 
@@ -1130,8 +1076,6 @@ export class FirestoreService extends FirestoreUtils {
 			proposalType,
 			userId,
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			title,
 			createdAt: new Date(),
 			updatedAt: new Date(),

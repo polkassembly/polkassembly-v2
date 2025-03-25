@@ -627,10 +627,6 @@
 		"findYourRank": "Find your rank in the ecosystem",
 		"searchUsername": "Enter username to search"
 	},
-	"BlockEditor": {
-		"placeholder": "Type / to start",
-		"errorUpdatingContent": "Error updating content"
-	},
 	"SetIdentity": {
 		"displayName": "Display Name",
 		"legalName": "Legal Name",
