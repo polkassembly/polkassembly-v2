@@ -9,10 +9,10 @@ import { useUser } from '@/hooks/useUser';
 import { IDelegate, IDelegationStats } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import styles from './Delegation.module.scss';
-import DelegationSupplyData from './DelegationSupplyData';
-import DelegationCard from './DelegationCard';
-import DelegationPopupCard from './DelegationPopupCard';
-import MyDelegation from './MyDelegation';
+import DelegationSupplyData from './DelegationSupplyData/DelegationSupplyData';
+import DelegationCard from './DelegationCard/DelegationCard';
+import DelegationPopupCard from './DelegationPopupCard/DelegationPopupCard';
+import MyDelegation from './MyDelegation/MyDelegation';
 
 enum EDelegationTab {
 	DASHBOARD = 'Dashboard',

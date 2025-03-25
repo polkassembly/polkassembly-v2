@@ -23,9 +23,9 @@ import { FaFilter } from 'react-icons/fa';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
 import { useTranslations } from 'next-intl';
 import { MdSort } from 'react-icons/md';
-import PlatformLogos, { getPlatformStyles } from './PlatformLogos';
-import DelegateSearchInput from './DelegateSearchInput';
-import styles from './Delegation.module.scss';
+import PlatformLogos, { getPlatformStyles } from '../PlatformLogos/PlatformLogos';
+import DelegateSearchInput from '../DelegateSearchInput';
+import styles from '../Delegation.module.scss';
 
 interface DelegateCardProps {
 	delegate: IDelegate;
@@ -60,7 +60,7 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 						>
 							<Checkbox
 								checked={selectedSources.includes(source.value)}
-								onCheckedChange={(checked) => {
+								onCheckedChange={(checked: boolean) => {
 									setSelectedSources(checked ? [...selectedSources, source.value] : selectedSources.filter((s) => s !== source.value));
 								}}
 							/>

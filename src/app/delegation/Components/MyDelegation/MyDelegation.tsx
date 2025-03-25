@@ -11,9 +11,9 @@ import Address from '@ui/Profile/Address/Address';
 import { useUser } from '@/hooks/useUser';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
-import DelegationPopupCard from './DelegationPopupCard';
-import SocialLinks from './SocialLinks';
-import MyDelegateTracks from './MyDelegateTracks';
+import DelegationPopupCard from '../DelegationPopupCard/DelegationPopupCard';
+import SocialLinks from '../SocialLinks/SocialLinks';
+import MyDelegateTracks from '../MyDelegateTracks';
 
 function MyDelegation() {
 	const { user } = useUser();
