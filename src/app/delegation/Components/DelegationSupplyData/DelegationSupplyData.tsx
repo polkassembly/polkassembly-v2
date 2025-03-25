@@ -16,6 +16,7 @@ import { IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { parseBalance } from '@/app/_client-utils/parseBalance';
 import { useTranslations } from 'next-intl';
+import styles from './DelegationSupplyData.module.scss';
 
 const ZERO_BN = new BN(0);
 
@@ -45,7 +46,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 	}, [apiService]);
 
 	return (
-		<div className='mt-5 flex flex-wrap justify-between gap-3 rounded-lg bg-bg_modal p-6 shadow-lg lg:gap-5'>
+		<div className={styles.delegationSupplyDataContainer}>
 			<div className='flex items-center gap-3'>
 				<Image
 					src={DOT}
@@ -53,11 +54,11 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					className='h-10 w-10'
 				/>
 				<div className='flex flex-col'>
-					<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalSupply')}</p>
+					<p className={styles.totalDelegates}>{t('totalSupply')}</p>
 					<p className='text-xl font-semibold'>{parseBalance(totalSupply.toString(), 2, true, network)}</p>
 				</div>
 			</div>
-			<div className='border-l border-border_grey pl-5'>
+			<div className={styles.borderLeft}>
 				<div className='flex items-center gap-3'>
 					<Image
 						src={tokens}
@@ -65,12 +66,12 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('delegatedTokens')}</p>
+						<p className={styles.totalDelegates}>{t('delegatedTokens')}</p>
 						<p className='text-xl font-semibold'>{parseBalance(delegationStats.totalDelegatedBalance, 2, true, network)}</p>
 					</div>
 				</div>
 			</div>
-			<div className='border-l border-border_grey pl-5'>
+			<div className={styles.borderLeft}>
 				<div className='flex items-center gap-3'>
 					<Image
 						src={votes}
@@ -78,12 +79,12 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalDelegatedVotes')}</p>
+						<p className={styles.totalDelegates}>{t('totalDelegatedVotes')}</p>
 						<p className='text-xl font-semibold'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes.totalCount.toString()))}</p>
 					</div>
 				</div>
 			</div>
-			<div className='border-l border-border_grey pl-5'>
+			<div className={styles.borderLeft}>
 				<div className='flex items-center gap-3'>
 					<Image
 						src={delegates}
@@ -91,12 +92,12 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalDelegates')}</p>
+						<p className={styles.totalDelegates}>{t('totalDelegates')}</p>
 						<p className='text-xl font-semibold'>{delegationStats?.totalDelegates}</p>
 					</div>
 				</div>
 			</div>
-			<div className='border-l border-border_grey pl-5'>
+			<div className={styles.borderLeft}>
 				<div className='flex items-center gap-3'>
 					<Image
 						src={delegatees}
@@ -104,7 +105,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className='text-xs text-wallet_btn_text text-opacity-[70%]'>{t('totalDelegatees')}</p>
+						<p className={styles.totalDelegates}>{t('totalDelegatees')}</p>
 						<p className='text-xl font-semibold'>{delegationStats?.totalDelegators}</p>
 					</div>
 				</div>

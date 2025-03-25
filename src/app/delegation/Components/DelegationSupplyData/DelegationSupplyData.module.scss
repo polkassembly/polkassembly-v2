@@ -1,0 +1,11 @@
+.delegationSupplyDataContainer {
+    @apply mt-5 flex flex-wrap justify-between gap-3 rounded-lg bg-bg_modal p-6 shadow-lg lg:gap-5;
+}
+
+.totalDelegates {
+    @apply text-xs text-wallet_btn_text text-opacity-[70%]
+}
+
+.borderLeft {
+    @apply border-l border-border_grey pl-5;
+}

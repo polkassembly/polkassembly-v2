@@ -6,6 +6,7 @@ import { Input } from '@/app/_shared-components/Input';
 import { Search } from 'lucide-react';
 import { memo, useState, useEffect, ChangeEvent, KeyboardEvent, RefObject } from 'react';
 import { useTranslations } from 'next-intl';
+import styles from './DelegateSearchInput.module.scss';
 
 interface SearchInputProps {
 	searchInputRef: RefObject<HTMLInputElement>;
@@ -31,8 +32,8 @@ function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }:
 	}, [localSearchTerm, handleSearchChange]);
 
 	return (
-		<div className='relative w-full'>
-			<Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500' />
+		<div className={styles.searchInputContainer}>
+			<Search className={styles.searchIcon} />
 			<Input
 				ref={searchInputRef}
 				placeholder={t('enterUsernameOrAddressToDelegateVote')}

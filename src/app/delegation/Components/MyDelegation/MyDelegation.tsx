@@ -14,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import DelegationPopupCard from '../DelegationPopupCard/DelegationPopupCard';
 import SocialLinks from '../SocialLinks/SocialLinks';
 import MyDelegateTracks from '../MyDelegateTracks/MyDelegateTracks';
+import styles from './MyDelegation.module.scss';
 
 function MyDelegation() {
 	const { user } = useUser();
@@ -29,7 +30,7 @@ function MyDelegation() {
 	return (
 		<div>
 			<DelegationPopupCard />
-			<div className='mt-5 flex flex-col items-center justify-center rounded-lg bg-bg_modal p-6 shadow-lg md:flex-row md:gap-x-5'>
+			<div className={styles.myDelegationContainer}>
 				<Image
 					src={profileImage}
 					alt='user icon'
@@ -37,7 +38,7 @@ function MyDelegation() {
 					width={100}
 					height={100}
 				/>
-				<div className='mt-2 flex w-full flex-col items-center justify-center gap-y-5 sm:flex-row sm:gap-x-5 md:mt-0 md:justify-between'>
+				<div className={styles.myDelegationContainerDiv}>
 					<div>
 						<Address
 							address={user.defaultAddress}
@@ -45,7 +46,7 @@ function MyDelegation() {
 						/>
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
-					<div className='mt-5 hidden sm:mt-0 md:block'>
+					<div className={styles.myDelegationContainerButton}>
 						<Button variant='secondary'>{t('becomeDelegate')}</Button>
 					</div>
 				</div>
