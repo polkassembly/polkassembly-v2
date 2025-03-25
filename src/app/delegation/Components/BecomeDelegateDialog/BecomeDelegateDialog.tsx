@@ -7,13 +7,42 @@ import { useUser } from '@/hooks/useUser';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Input } from '@/app/_shared-components/Input';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useState } from 'react';
+import identityIcon from '@assets/icons/identity.svg';
+import { useToast } from '@/hooks/useToast';
+import { NotificationType } from '@/_shared/types';
+import { Loader2 } from 'lucide-react';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
+import Image from 'next/image';
 
 export default function BecomeDelegateDialog() {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
+	const { toast } = useToast();
+	const [bio, setBio] = useState('');
+	const [loading, setLoading] = useState(false);
+
+	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
+
+	const createDelegate = async () => {
+		if (!user || !address) return;
+		setLoading(true);
+		await NextApiClientService.createDelegate(address, bio, user.username);
+		toast({
+			title: 'Delegate created successfully',
+			status: NotificationType.SUCCESS
+		});
+		setLoading(false);
+	};
 
 	return (
-		<Dialog>
+		<Dialog
+			onOpenChange={() => {
+				setAddress(user?.defaultAddress || null);
+				setBio('');
+			}}
+		>
 			<DialogTrigger asChild>
 				<div>
 					<Button
@@ -29,7 +58,10 @@ export default function BecomeDelegateDialog() {
 					<DialogTitle>{t('becomeDelegate')}</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-y-4'>
-					<AddressDropdown withBalance />
+					<AddressDropdown
+						withBalance
+						onChange={(account) => setAddress(account.address)}
+					/>
 					<div className='flex flex-col gap-y-2'>
 						<p className='text-sm text-wallet_btn_text'>
 							Your Delegation Mandate <span className='text-text_pink'>*</span>
@@ -39,13 +71,34 @@ export default function BecomeDelegateDialog() {
 							placeholder='Add message for delegate address '
 							className='w-full'
 							required
+							value={bio}
+							onChange={(e) => setBio(e.target.value)}
 						/>
 					</div>
+					<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
+						<AiOutlineInfoCircle className='text-toast_info_border' />
+						<span className='flex items-center gap-x-2 text-sm'>
+							To add socials to your delegate profile{' '}
+							<span className='flex items-center gap-x-2 text-text_pink'>
+								<Image
+									src={identityIcon}
+									alt='Polkassembly'
+									width={16}
+									height={16}
+								/>{' '}
+								Set Identity
+							</span>{' '}
+							with Polkassembly
+						</span>
+					</div>
+
 					<Button
 						size='lg'
+						disabled={loading}
 						className='w-full'
+						onClick={createDelegate}
 					>
-						Confirm
+						{loading ? <Loader2 className='h-4 w-4 animate-spin' /> : 'Confirm'}
 					</Button>
 				</div>
 			</DialogContent>

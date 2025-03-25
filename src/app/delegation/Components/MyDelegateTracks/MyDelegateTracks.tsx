@@ -24,7 +24,7 @@ function MyDelegateTracks() {
 	const [activeFilter, setActiveFilter] = useState(ETrackDelegationStatus.ALL);
 	const { data, isLoading } = useQuery({
 		queryKey: ['address'],
-		queryFn: () => fetch(`/api/v2/delegation/userData?address=${user?.defaultAddress}`).then((res) => res.json()),
+		queryFn: () => fetch(`/api/v2/delegation/userData/${user?.defaultAddress}`).then((res) => res.json()),
 		enabled: !!user?.defaultAddress
 	});
 
@@ -39,10 +39,10 @@ function MyDelegateTracks() {
 		if (!data) return { all: 0, delegated: 0, received_delegation: 0, undelegated: 0 };
 
 		return {
-			all: data.length,
-			delegated: data.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.DELEGATED)).length,
-			received_delegation: data.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION)).length,
-			undelegated: data.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.UNDELEGATED)).length
+			all: data?.length,
+			delegated: data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.DELEGATED)).length,
+			received_delegation: data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION)).length,
+			undelegated: data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.UNDELEGATED)).length
 		};
 	}, [data]);
 
@@ -51,11 +51,11 @@ function MyDelegateTracks() {
 
 		switch (activeFilter) {
 			case ETrackDelegationStatus.DELEGATED:
-				return data.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.DELEGATED));
+				return data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.DELEGATED));
 			case ETrackDelegationStatus.RECEIVED_DELEGATION:
-				return data.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION));
+				return data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION));
 			case ETrackDelegationStatus.UNDELEGATED:
-				return data.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.UNDELEGATED));
+				return data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.UNDELEGATED));
 			default:
 				return data;
 		}

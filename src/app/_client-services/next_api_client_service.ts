@@ -93,6 +93,7 @@ enum EApiRoute {
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
 	GET_DELEGATION_STATS = 'GET_DELEGATION_STATS',
 	GET_DELEGATES = 'GET_DELEGATES',
+	CREATE_DELEGATE = 'CREATE_DELEGATE',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION'
@@ -217,6 +218,10 @@ export class NextApiClientService {
 			case EApiRoute.CREATE_TAGS:
 				method = 'POST';
 				path = '/meta/tags';
+				break;
+			case EApiRoute.CREATE_DELEGATE:
+				path = '/delegation';
+				method = 'POST';
 				break;
 			case EApiRoute.ADD_TO_BATCH_VOTE_CART:
 			case EApiRoute.FOLLOW_USER:
@@ -742,6 +747,11 @@ export class NextApiClientService {
 	static async getDelegates() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATES });
 		return this.nextApiClientFetch<{ delegates: IDelegate[] }>({ url, method });
+	}
+
+	static async createDelegate(address: string, bio: string, name: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, bio, name } });
 	}
 
 	static async addPostSubscription(proposalType: EProposalType, index: string) {

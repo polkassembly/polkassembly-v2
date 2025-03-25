@@ -16,7 +16,7 @@ async function DelegationPage() {
 				delegationStats={
 					delegationStats ?? {
 						totalDelegatedBalance: '0',
-						totalDelegatedVotes: { totalCount: 0 },
+						totalDelegatedVotes: 0,
 						totalDelegates: 0,
 						totalDelegators: 0
 					}
