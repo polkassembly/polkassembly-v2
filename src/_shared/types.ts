@@ -973,7 +973,8 @@ export enum EDelegateSource {
 	W3F = 'w3f',
 	NOVA = 'nova',
 	PARITY = 'parity',
-	POLKASSEMBLY = 'polkassembly'
+	POLKASSEMBLY = 'polkassembly',
+	INDIVIDUAL = 'individual'
 }
 
 export interface IDelegate {

@@ -8,7 +8,6 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
-	IDelegateDetails,
 	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
@@ -438,32 +437,48 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser' | 'source'>> {
+	static async GetLast30DaysConvictionVoteCountByAddress({ network, address }: { network: ENetwork; address: string }): Promise<number> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_CONVICTION_VOTING_DELEGATION_DETAILS;
+		const query = this.GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS;
 
 		const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address, createdAt_gte: thirtyDaysAgo.toISOString() }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain conviction voting delegation details from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain conviction voting delegation details from Subsquid');
+			console.error(`Error fetching on-chain vote count details from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain vote count details from Subsquid');
 		}
 
-		const votingPower: BN = subsquidData.votingDelegations.reduce((acc: BN, delegation: { balance: string; lockPeriod: number }) => {
-			return new BN(acc).add(new BN(delegation.balance).mul(new BN(delegation.lockPeriod || 1)));
-		}, BN_ZERO);
+		return subsquidData.convictionVotesConnection.totalCount;
+	}
 
-		const details: Omit<IDelegateDetails, 'publicUser' | 'source'> = {
-			address,
-			network,
-			votingPower: votingPower.toString(),
-			receivedDelegationsCount: subsquidData.votingDelegations.length,
-			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount
-		};
+	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network: ENetwork): Promise<Record<string, { votingPower: string; receivedDelegationsCount: number }>> {
+		const gqlClient = this.subsquidGqlClient(network);
 
-		return details;
+		const query = this.GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain all delegates conviction voting power and delegations count from Subsquid: ${subsquidErr}`);
+			throw new APIError(
+				ERROR_CODES.INTERNAL_SERVER_ERROR,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+				'Error fetching on-chain all delegates conviction voting power and delegations count from Subsquid'
+			);
+		}
+
+		const result: Record<string, { votingPower: string; receivedDelegationsCount: number }> = {};
+
+		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number }) => {
+			result[delegation.to] = {
+				votingPower: result[delegation.to]?.votingPower ? new BN(result[delegation.to].votingPower).add(new BN(delegation.balance)).toString() : delegation.balance,
+				receivedDelegationsCount: result[delegation.to]?.receivedDelegationsCount ? result[delegation.to].receivedDelegationsCount + 1 : 1
+			};
+		});
+
+		return result;
 	}
 }
