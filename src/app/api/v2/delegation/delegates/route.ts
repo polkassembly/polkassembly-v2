@@ -5,7 +5,7 @@
 import { NOVA_DELEGATES, PARITY_DELEGATES, W3F_DELEGATES } from '@/_shared/_constants/delegates';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { ENetwork, IDelegate, IDelegateDetails } from '@/_shared/types';
+import { EDelegateSource, ENetwork, IDelegate, IDelegateDetails } from '@/_shared/types';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
@@ -41,7 +41,8 @@ export const GET = withErrorHandling(async () => {
 			address: ValidatorService.isValidSubstrateAddress(w3fDelegate.address) ? getSubstrateAddress(w3fDelegate.address)! : w3fDelegate.address,
 			manifesto: '',
 			network,
-			name: w3fDelegate.name
+			name: w3fDelegate.name,
+			source: EDelegateSource.W3F
 		};
 
 		return delegate;
@@ -55,7 +56,8 @@ export const GET = withErrorHandling(async () => {
 			manifesto: novaDelegate.longDescription || '',
 			network,
 			name: novaDelegate.name,
-			image: novaDelegate.image
+			image: novaDelegate.image,
+			source: EDelegateSource.NOVA
 		};
 
 		return delegate;
@@ -68,7 +70,8 @@ export const GET = withErrorHandling(async () => {
 			address: ValidatorService.isValidSubstrateAddress(parityDelegate.address) ? getSubstrateAddress(parityDelegate.address)! : parityDelegate.address,
 			manifesto: parityDelegate.manifesto || '',
 			network,
-			name: parityDelegate.name
+			name: parityDelegate.name,
+			source: EDelegateSource.PARITY
 		};
 
 		return delegate;
