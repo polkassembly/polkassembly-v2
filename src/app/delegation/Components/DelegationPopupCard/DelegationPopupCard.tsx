@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { IoMdClose } from 'react-icons/io';
-import { Button } from '@ui/Button';
 import PolkaAsset from '@assets/delegation/Track.svg';
 import PolkaBadge from '@assets/delegation/badge.svg';
 import Reverse from '@assets/delegation/reverse.svg';
@@ -14,6 +13,7 @@ import { useTranslations } from 'next-intl';
 import { MdInfoOutline } from 'react-icons/md';
 import Image from 'next/image';
 import styles from '../Delegation.module.scss';
+import BecomeDelegateDialog from '../BecomeDelegateDialog/BecomeDelegateDialog';
 
 function DelegationPopupCard() {
 	const { user } = useUser();
@@ -28,14 +28,7 @@ function DelegationPopupCard() {
 						<div className='flex items-center gap-4'>
 							<Tooltip delayDuration={0}>
 								<TooltipTrigger asChild>
-									<div>
-										<Button
-											disabled={!user}
-											className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
-										>
-											{t('becomeDelegate')}
-										</Button>
-									</div>
+									<BecomeDelegateDialog />
 								</TooltipTrigger>
 								{!user && (
 									<TooltipContent

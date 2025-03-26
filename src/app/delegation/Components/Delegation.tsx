@@ -12,6 +12,7 @@ import styles from './Delegation.module.scss';
 import DelegationPopupCard from './DelegationPopupCard/DelegationPopupCard';
 import DelegationSupplyData from './DelegationSupplyData/DelegationSupplyData';
 import MyDelegation from './MyDelegation/MyDelegation';
+import UserWalletData from './UserWalletData/UserWalletData';
 
 enum EDelegationTab {
 	DASHBOARD = 'Dashboard',
@@ -21,39 +22,49 @@ enum EDelegationTab {
 function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
-	const dashboardContent = (
-		<div>
-			<DelegationPopupCard />
-			<DelegationSupplyData delegationStats={delegationStats} />
-		</div>
-	);
 
 	if (!user) {
-		return <div className='w-full'>{dashboardContent}</div>;
+		return (
+			<div>
+				<UserWalletData />
+				<div className='mt-10 grid grid-cols-1 gap-5 p-5 lg:p-10'>
+					<DelegationPopupCard />
+					<DelegationSupplyData delegationStats={delegationStats} />
+				</div>
+			</div>
+		);
 	}
 
 	return (
-		<div className={styles.delegation}>
-			<Tabs defaultValue={EDelegationTab.MY_DELEGATION}>
-				<TabsList className='mb-4 flex w-full justify-start border-border_grey dark:border-b'>
-					<TabsTrigger
-						className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
-						value={EDelegationTab.DASHBOARD}
-					>
-						{t('dashboard')}
-					</TabsTrigger>
-					<TabsTrigger
-						className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
-						value={EDelegationTab.MY_DELEGATION}
-					>
-						{t('myDelegation')}
-					</TabsTrigger>
-				</TabsList>
-				<TabsContent value={EDelegationTab.DASHBOARD}>{dashboardContent}</TabsContent>
-				<TabsContent value={EDelegationTab.MY_DELEGATION}>
-					<MyDelegation />
-				</TabsContent>
-			</Tabs>
+		<div>
+			<UserWalletData />
+			<div className='mt-10 grid grid-cols-1 gap-5 p-5 lg:p-10'>
+				<div className={styles.delegation}>
+					<Tabs defaultValue={EDelegationTab.MY_DELEGATION}>
+						<TabsList className='mb-4 flex w-full justify-start border-border_grey dark:border-b'>
+							<TabsTrigger
+								className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
+								value={EDelegationTab.DASHBOARD}
+							>
+								{t('dashboard')}
+							</TabsTrigger>
+							<TabsTrigger
+								className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
+								value={EDelegationTab.MY_DELEGATION}
+							>
+								{t('myDelegation')}
+							</TabsTrigger>
+						</TabsList>
+						<TabsContent value={EDelegationTab.DASHBOARD}>
+							<DelegationPopupCard />
+							<DelegationSupplyData delegationStats={delegationStats} />
+						</TabsContent>
+						<TabsContent value={EDelegationTab.MY_DELEGATION}>
+							<MyDelegation />
+						</TabsContent>
+					</Tabs>
+				</div>
+			</div>
 		</div>
 	);
 }

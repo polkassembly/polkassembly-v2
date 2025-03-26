@@ -728,7 +728,7 @@
 		"delegatedTokens": "委任されたトークン",
 		"totalDelegatedVotes": "総委任投票数",
 		"totalDelegates": "総委任者数",
-		"totalDelegatees": "総受け取り委任者数",
+		"totalDelegators": "総委任者数",
 		"clearAll": "すべてクリア",
 		"delegate": "委任者",
 		"noBio": "バイオがありません",

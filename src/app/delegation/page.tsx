@@ -10,18 +10,16 @@ async function DelegationPage() {
 	const { data: delegationStats } = await NextApiClientService.getDelegateStats();
 
 	return (
-		<div className='grid grid-cols-1 gap-5 p-5 lg:p-10'>
-			<Delegation
-				delegationStats={
-					delegationStats ?? {
-						totalDelegatedTokens: '0',
-						totalDelegatedVotes: 0,
-						totalDelegates: 0,
-						totalDelegators: 0
-					}
+		<Delegation
+			delegationStats={
+				delegationStats ?? {
+					totalDelegatedTokens: '0',
+					totalDelegatedVotes: 0,
+					totalDelegates: 0,
+					totalDelegators: 0
 				}
-			/>
-		</div>
+			}
+		/>
 	);
 }
 

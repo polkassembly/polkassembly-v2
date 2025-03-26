@@ -213,16 +213,20 @@ export class PolkadotApiService {
 		let freeBalance = BN_ZERO;
 		let lockedBalance = BN_ZERO;
 		let totalBalance = BN_ZERO;
+		let transferableBalance = BN_ZERO;
 
 		const responseObj = {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 
 		if (!address || !this.api?.derive?.balances?.all) {
 			return responseObj;
 		}
+
+		const existentialDeposit = this.api.consts?.balances?.existentialDeposit ? new BN(this.api.consts.balances.existentialDeposit.toString()) : BN_ZERO;
 
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		await this.api.derive.balances
@@ -239,8 +243,20 @@ export class PolkadotApiService {
 			.then((result: any) => {
 				const free = new BN(result?.data?.free) || BN_ZERO;
 				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
+				const frozen = new BN(result?.data?.frozen || result?.data?.feeFrozen || result?.data?.miscFrozen) || BN_ZERO;
+
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+
+				if (free.gt(frozen)) {
+					transferableBalance = free.sub(frozen);
+
+					if (transferableBalance.lt(existentialDeposit)) {
+						transferableBalance = BN_ZERO;
+					}
+				} else {
+					transferableBalance = BN_ZERO;
+				}
 			})
 			.catch(() => {
 				// TODO: show notification
@@ -249,7 +265,8 @@ export class PolkadotApiService {
 		return {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 	}
 

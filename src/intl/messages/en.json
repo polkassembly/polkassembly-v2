@@ -748,7 +748,7 @@
 		"delegatedTokens": "Delegated Tokens",
 		"totalDelegatedVotes": "Total Delegated Votes",
 		"totalDelegates": "Total Delegates",
-		"totalDelegatees": "Total Delegatees",
+		"totalDelegators": "Total Delegators",
 		"clearAll": "Clear All",
 		"delegate": "Delegate",
 		"noBio": "No Bio",

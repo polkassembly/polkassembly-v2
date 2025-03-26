@@ -728,7 +728,7 @@
 		"delegatedTokens": "已委托的代币",
 		"totalDelegatedVotes": "总委托投票数",
 		"totalDelegates": "总委托者数",
-		"totalDelegatees": "总受托者数",
+		"totalDelegators": "总委任者数",
 		"clearAll": "全部清除",
 		"delegate": "委托",
 		"noBio": "没有生物",

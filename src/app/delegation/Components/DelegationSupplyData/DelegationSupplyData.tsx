@@ -127,7 +127,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 						className='h-10 w-10'
 					/>
 					<div className='flex flex-col'>
-						<p className={styles.totalDelegates}>{t('totalDelegatees')}</p>
+						<p className={styles.totalDelegates}>{t('totalDelegators')}</p>
 						<p className='text-xl font-semibold'>{delegationStats?.totalDelegators}</p>
 					</div>
 				</div>

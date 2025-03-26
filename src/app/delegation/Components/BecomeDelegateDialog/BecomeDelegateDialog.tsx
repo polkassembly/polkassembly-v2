@@ -74,22 +74,20 @@ export default function BecomeDelegateDialog() {
 			}}
 		>
 			<DialogTrigger asChild>
-				<div>
-					<Button
-						disabled={!user || isFetching}
-						onClick={() => setDialogOpen(true)}
-						className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
-					>
-						{isDelegated ? (
-							<>
-								<TfiPencil />
-								Edit
-							</>
-						) : (
-							t('becomeDelegate')
-						)}
-					</Button>
-				</div>
+				<Button
+					disabled={!user || isFetching}
+					onClick={() => setDialogOpen(true)}
+					className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
+				>
+					{isDelegated ? (
+						<>
+							<TfiPencil />
+							Edit
+						</>
+					) : (
+						t('becomeDelegate')
+					)}
+				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>

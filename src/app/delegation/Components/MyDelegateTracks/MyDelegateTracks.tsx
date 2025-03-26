@@ -97,7 +97,6 @@ function MyDelegateTracks() {
 					</Select>
 				</div>
 
-				{/* Desktop Radio Group */}
 				<div className='hidden md:block'>
 					<RadioGroup
 						defaultValue={ETrackDelegationStatus.ALL}
