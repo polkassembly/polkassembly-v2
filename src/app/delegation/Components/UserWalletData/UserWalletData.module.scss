@@ -1,11 +1,11 @@
 .walletInfoBoard {
-    @apply sm:absolute sm:left-0 sm:top-0 hidden h-[60px] w-full mx-auto items-center space-x-3 rounded-b-3xl pl-6 sm:flex;
+    @apply sm:absolute sm:left-0 sm:top-0 hidden h-[80px] w-full mx-auto items-center space-x-3 rounded-b-3xl pl-6 sm:flex;
     background: radial-gradient(99.69% 25520% at 1.22% 0%, #42122c 0%, #a6075c 32.81%, #952863 77.08%, #e5007a 100%);
 
 }
 
 .walletInfoBoard2 {
-    @apply sm:absolute sm:left-0 sm:top-0 hidden h-[60px] w-full mx-auto items-center space-x-3 rounded-b-3xl pl-6 sm:flex;
+    @apply sm:absolute sm:left-0 sm:top-0 hidden h-[80px] w-full mx-auto items-center space-x-3 rounded-b-3xl pl-6 py-3 sm:flex;
     background: radial-gradient(99.69% 25520% at 1.22% 0%, #42122c 0%, #a6075c 32.81%, #952863 77.08%, #e5007a 100%);
 
 }
