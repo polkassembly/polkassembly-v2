@@ -476,7 +476,8 @@
 	},
 	"BalanceInput": {
 		"addBalance": "添加余额",
-		"enterAmount": "输入金额"
+		"enterAmount": "输入金额",
+		"treasuryBalance": "国库余额"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "选择您的投票",
@@ -550,14 +551,17 @@
 			"tooltip": "选择谁可以评论和回复此帖子"
 		},
 		"Topic": {
-			"general": "一般",
+			"general": "常规",
 			"auctionadmin": "拍卖管理员",
-			"generaladmin": "一般管理员",
+			"generaladmin": "常规管理员",
 			"governance": "治理",
-			"root": "根",
+			"root": "根权限",
 			"stakingadmin": "质押管理员",
 			"treasury": "国库",
-			"fellowship": "奖学金"
+			"fellowship": "研究会",
+			"council": "理事会",
+			"democracy": "民主",
+			"whitelist": "白名单"
 		},
 		"titleTooShort": "请提供有效的标题。",
 		"titlePlaceholder": "输入标题",

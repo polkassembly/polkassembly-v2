@@ -50,19 +50,13 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 			}}
 			components={{
 				// eslint-disable-next-line react/no-unstable-nested-components
-				IconLeft: ({ className, ...props }) => (
-					<ChevronLeft
-						className={cn('h-4 w-4', className)}
-						{...props}
-					/>
-				),
-				// eslint-disable-next-line react/no-unstable-nested-components
-				IconRight: ({ className, ...props }) => (
-					<ChevronRight
-						className={cn('h-4 w-4', className)}
-						{...props}
-					/>
-				)
+				Chevron: (p) => {
+					// eslint-disable-next-line react/destructuring-assignment
+					if (p.orientation === 'left') {
+						return <ChevronLeft {...p} />;
+					}
+					return <ChevronRight {...p} />;
+				}
 			}}
 			{...props}
 		/>

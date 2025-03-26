@@ -476,7 +476,8 @@
 	},
 	"BalanceInput": {
 		"addBalance": "残高を追加",
-		"enterAmount": "金額を入力"
+		"enterAmount": "金額を入力",
+		"treasuryBalance": "財務残高"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "投票を選択",
@@ -557,7 +558,10 @@
 			"root": "ルート",
 			"stakingadmin": "ステーキング管理者",
 			"treasury": "財務",
-			"fellowship": "フェローシップ"
+			"fellowship": "フェローシップ",
+			"council": "評議会",
+			"democracy": "民主主義",
+			"whitelist": "ホワイトリスト"
 		},
 		"titleTooShort": "有効なタイトルを入力してください。",
 		"titlePlaceholder": "タイトルを入力",

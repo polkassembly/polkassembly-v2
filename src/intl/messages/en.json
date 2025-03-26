@@ -495,7 +495,8 @@
 		"previous": "Previous"
 	},
 	"BalanceInput": {
-		"enterAmount": "Enter Amount"
+		"enterAmount": "Enter Amount",
+		"treasuryBalance": "Treasury Balance"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Choose your Vote",
@@ -579,7 +580,10 @@
 			"root": "Root",
 			"stakingadmin": "Staking Admin",
 			"treasury": "Treasury",
-			"fellowship": "Fellowship"
+			"fellowship": "Fellowship",
+			"council": "Council",
+			"democracy": "Democracy",
+			"whitelist": "Whitelist"
 		},
 		"please": "Please",
 		"login": "Login",

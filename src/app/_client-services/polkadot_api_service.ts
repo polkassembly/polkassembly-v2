@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
+import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
@@ -727,5 +728,11 @@ export class PolkadotApiService {
 		}
 		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx && tx.paymentInfo(address)));
 		return fees.reduce((acc, fee) => acc.add(new BN(fee?.partialFee || BN_ZERO)), BN_ZERO);
+	}
+
+	async getNativeTreasuryBalance(): Promise<BN> {
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
+		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
 	}
 }

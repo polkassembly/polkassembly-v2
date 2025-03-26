@@ -7,7 +7,6 @@
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import ManualExtrinsic from '@/app/_shared-components/Create/ManualExtrinsic/ManualExtrinsic';
 import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { Button } from '@/app/_shared-components/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -131,16 +130,13 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 				<>
 					<div className='mb-4 flex items-center gap-x-2 text-xl font-semibold text-text_primary'>
 						{step && (
-							<div className='flex'>
-								<Button
-									variant='ghost'
-									size='icon'
-									className='text-lg font-semibold text-text_primary'
-									onClick={() => setStep(undefined)}
-								>
-									<ChevronLeft className='h-4 w-4' />
-								</Button>
-							</div>
+							<button
+								type='button'
+								className='text-text_primary'
+								onClick={() => setStep(undefined)}
+							>
+								<ChevronLeft />
+							</button>
 						)}
 						{titles[step || 'create']}
 					</div>

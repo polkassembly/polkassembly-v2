@@ -476,7 +476,8 @@
 	},
 	"BalanceInput": {
 		"addBalance": "Guthaben hinzufügen",
-		"enterAmount": "Betrag eingeben"
+		"enterAmount": "Betrag eingeben",
+		"treasuryBalance": "Treasury-Guthaben"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Wählen Sie Ihre Stimme",
@@ -551,13 +552,16 @@
 		},
 		"Topic": {
 			"general": "Allgemein",
-			"auctionadmin": "Auktionsadministrator",
-			"generaladmin": "Allgemeiner Administrator",
+			"auctionadmin": "Auktions-Admin",
+			"generaladmin": "Allgemeiner Admin",
 			"governance": "Governance",
 			"root": "Root",
-			"stakingadmin": "Staking-Administrator",
-			"treasury": "Schatzamt",
-			"fellowship": "Gemeinschaft"
+			"stakingadmin": "Staking-Admin",
+			"treasury": "Treasury",
+			"fellowship": "Fellowship",
+			"council": "Rat",
+			"democracy": "Demokratie",
+			"whitelist": "Whitelist"
 		},
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel an.",
 		"titlePlaceholder": "Titel eingeben",

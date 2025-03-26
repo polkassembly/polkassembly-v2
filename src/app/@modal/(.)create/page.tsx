@@ -12,7 +12,6 @@ import { useTranslations } from 'next-intl';
 import { ENetwork, EProposalStep } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { Button } from '@/app/_shared-components/Button';
 import { ChevronLeft } from 'lucide-react';
 
 function CreateModal() {
@@ -50,14 +49,13 @@ function CreateModal() {
 				<DialogHeader>
 					<DialogTitle className='flex items-center gap-x-2'>
 						{step && (
-							<Button
-								variant='ghost'
-								size='icon'
+							<button
+								type='button'
+								className='text-text_primary'
 								onClick={goBack}
-								className='text-lg font-semibold text-text_primary'
 							>
-								<ChevronLeft className='h-4 w-4' />
-							</Button>
+								<ChevronLeft />
+							</button>
 						)}
 						{titles[step || 'create']}
 					</DialogTitle>

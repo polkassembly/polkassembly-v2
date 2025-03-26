@@ -5,6 +5,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { BN } from '@polkadot/util';
@@ -79,9 +80,9 @@ export class AssethubApiService {
 		await this.assethubApi.isReady;
 	}
 
-	async getTreasuryAssetsBalance(): Promise<{ [key: string]: BN }> {
+	async getAssethubTreasuryAssetsBalance(): Promise<{ [key: string]: BN }> {
 		const assetIds = Object.keys(NETWORKS_DETAILS[this.network].supportedAssets || {});
-		const treasuryAddress = NETWORKS_DETAILS[this.network].assethubDetails?.treasuryAddress;
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.assetHubTreasuryAddress;
 		const balances: { [key: string]: BN } = {};
 
 		await Promise.all(

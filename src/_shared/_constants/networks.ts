@@ -76,7 +76,6 @@ interface IPeopleChainDetails {
 
 interface IAssethubDetails {
 	rpcEndpoints: IRpcEndpoint[];
-	treasuryAddress: string;
 }
 
 interface INetworkDetails {
@@ -173,7 +172,6 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 
 const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 	[ENetwork.POLKADOT]: {
-		treasuryAddress: '14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk',
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
