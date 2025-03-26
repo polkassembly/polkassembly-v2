@@ -38,18 +38,29 @@ export const GET = withErrorHandling(async () => {
 
 	await cryptoWaitReady();
 
+	// Fetch all delegate sources in parallel
+	const [novaDelegatesResponse, parityDelegatesResponse, polkassemblyDelegates, allDelegatesWithVotingPowerAndDelegationsCount] = await Promise.all([
+		// Nova delegates
+		NOVA_DELEGATES[network as ENetwork] ? ((await fetch(NOVA_DELEGATES[network as ENetwork])).json() as Promise<INovaDelegate[]>) : Promise.resolve([]),
+		// Parity delegates
+		PARITY_DELEGATES[network as ENetwork] ? ((await fetch(PARITY_DELEGATES[network as ENetwork])).json() as Promise<IParityDelegate[]>) : Promise.resolve([]),
+		// Polkassembly delegates
+		OffChainDbService.GetPolkassemblyDelegates(network),
+		// On-chain delegates with voting power
+		OnChainDbService.GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network)
+	]);
+
+	// Process delegate sources in parallel
 	const delegatesWithSource: Record<string, IDelegate> = {};
 
+	// Process W3F delegates
 	W3F_DELEGATES.forEach((delegate) => {
 		if (delegate.network === network) {
-			delegatesWithSource[delegate.address] = {
-				...delegate
-			};
+			delegatesWithSource[delegate.address] = { ...delegate };
 		}
 	});
 
-	const novaDelegatesUrl = NOVA_DELEGATES[network as ENetwork];
-	const novaDelegatesResponse = novaDelegatesUrl ? ((await (await fetch(novaDelegatesUrl)).json()) as INovaDelegate[]) : [];
+	// Process Nova delegates
 	novaDelegatesResponse.forEach((novaDelegate) => {
 		delegatesWithSource[novaDelegate.address] = {
 			address: novaDelegate.address,
@@ -61,8 +72,7 @@ export const GET = withErrorHandling(async () => {
 		};
 	});
 
-	const parityDelegatesUrl = PARITY_DELEGATES[network as ENetwork];
-	const parityDelegatesResponse = parityDelegatesUrl ? ((await (await fetch(parityDelegatesUrl)).json()) as IParityDelegate[]) : [];
+	// Process Parity delegates
 	parityDelegatesResponse.forEach((parityDelegate) => {
 		delegatesWithSource[parityDelegate.address] = {
 			address: parityDelegate.address,
@@ -73,7 +83,7 @@ export const GET = withErrorHandling(async () => {
 		};
 	});
 
-	const polkassemblyDelegates = await OffChainDbService.GetPolkassemblyDelegates(network);
+	// Process Polkassembly delegates
 	polkassemblyDelegates.forEach((polkassemblyDelegate) => {
 		delegatesWithSource[encodeAddress(polkassemblyDelegate.address, NETWORKS_DETAILS[network as ENetwork].ss58Format)] = {
 			...polkassemblyDelegate,
@@ -81,32 +91,44 @@ export const GET = withErrorHandling(async () => {
 		};
 	});
 
-	const allDelegatesWithVotingPowerAndDelegationsCount = await OnChainDbService.GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network);
+	// Process all delegates in parallel with chunking for better performance
+	const CHUNK_SIZE = 50; // Process 50 delegates at a time
+	const delegateAddresses = Object.keys(allDelegatesWithVotingPowerAndDelegationsCount);
+	const allChunkPromises: Promise<IDelegateDetails>[] = [];
 
-	const allDelegateDetailPromises = Object.entries(allDelegatesWithVotingPowerAndDelegationsCount).map(async ([address, { receivedDelegationsCount, votingPower }]) => {
-		const last30DaysConvictionVoteCount = await OnChainDbService.GetLast30DaysConvictionVoteCountByAddress({ network, address });
-		const publicUser = await OffChainDbService.GetPublicUserByAddress(address);
+	for (let i = 0; i < delegateAddresses.length; i += CHUNK_SIZE) {
+		const chunk = delegateAddresses.slice(i, i + CHUNK_SIZE);
+		chunk.forEach((address) => {
+			allChunkPromises.push(
+				(async () => {
+					const { receivedDelegationsCount, votingPower } = allDelegatesWithVotingPowerAndDelegationsCount[String(address)];
+					const [last30DaysConvictionVoteCount, publicUser] = await Promise.all([
+						OnChainDbService.GetLast30DaysConvictionVoteCountByAddress({ network, address }),
+						OffChainDbService.GetPublicUserByAddress(address)
+					]);
 
-		const delegateDetails: IDelegateDetails = {
-			address,
-			source: delegatesWithSource[String(address)]?.source ?? EDelegateSource.INDIVIDUAL,
-			createdAt: delegatesWithSource[String(address)]?.createdAt,
-			updatedAt: delegatesWithSource[String(address)]?.updatedAt,
-			image: delegatesWithSource[String(address)]?.image,
-			manifesto: delegatesWithSource[String(address)]?.manifesto,
-			name: delegatesWithSource[String(address)]?.name,
-			network,
-			receivedDelegationsCount,
-			votingPower,
-			last30DaysVotedProposalsCount: last30DaysConvictionVoteCount,
-			publicUser: publicUser ?? undefined
-		};
+					return {
+						address,
+						source: delegatesWithSource[String(address)]?.source ?? EDelegateSource.INDIVIDUAL,
+						createdAt: delegatesWithSource[String(address)]?.createdAt,
+						updatedAt: delegatesWithSource[String(address)]?.updatedAt,
+						image: delegatesWithSource[String(address)]?.image,
+						manifesto: delegatesWithSource[String(address)]?.manifesto,
+						name: delegatesWithSource[String(address)]?.name,
+						network,
+						receivedDelegationsCount,
+						votingPower,
+						last30DaysVotedProposalsCount: last30DaysConvictionVoteCount,
+						publicUser: publicUser ?? undefined
+					};
+				})()
+			);
+		});
+	}
 
-		return delegateDetails;
-	});
+	const delegateDetails = await Promise.all(allChunkPromises);
 
-	const delegateDetails: IDelegateDetails[] = await Promise.all(allDelegateDetailPromises);
-
+	// Cache the results
 	await RedisService.SetDelegateDetails(network, delegateDetails);
 
 	return NextResponse.json(delegateDetails);
