@@ -725,7 +725,7 @@ export class PolkadotApiService {
 		if (!this.api) {
 			return null;
 		}
-		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx.paymentInfo(address)));
-		return fees.reduce((acc, fee) => acc.add(new BN(fee.partialFee)), BN_ZERO);
+		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx && tx.paymentInfo(address)));
+		return fees.reduce((acc, fee) => acc.add(new BN(fee?.partialFee || BN_ZERO)), BN_ZERO);
 	}
 }
