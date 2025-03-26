@@ -13,6 +13,7 @@ import DelegationPopupCard from './DelegationPopupCard/DelegationPopupCard';
 import DelegationSupplyData from './DelegationSupplyData/DelegationSupplyData';
 import MyDelegation from './MyDelegation/MyDelegation';
 import UserWalletData from './UserWalletData/UserWalletData';
+import DelegationDetailsCard from './DelegationDetailsCard/DelegationDetailsCard';
 
 enum EDelegationTab {
 	DASHBOARD = 'Dashboard',
@@ -30,6 +31,7 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 				<div className='mt-10 grid grid-cols-1 gap-5 p-5 lg:p-10'>
 					<DelegationPopupCard />
 					<DelegationSupplyData delegationStats={delegationStats} />
+					<DelegationDetailsCard />
 				</div>
 			</div>
 		);
@@ -58,6 +60,7 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 						<TabsContent value={EDelegationTab.DASHBOARD}>
 							<DelegationPopupCard />
 							<DelegationSupplyData delegationStats={delegationStats} />
+							<DelegationDetailsCard />
 						</TabsContent>
 						<TabsContent value={EDelegationTab.MY_DELEGATION}>
 							<MyDelegation />

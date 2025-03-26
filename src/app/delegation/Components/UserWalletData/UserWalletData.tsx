@@ -11,6 +11,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PolkadotIcon from '@assets/delegation/polkadot-logo.svg';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { IoMdLock } from 'react-icons/io';
 import styles from './UserWalletData.module.scss';
@@ -22,6 +23,7 @@ function UserWalletData() {
 	const [balance, setBalance] = useState<string>('0');
 	const [transferableBalance, setTransferableBalance] = useState<string>('0');
 	const [lockedBalance, setLockedBalance] = useState<string>('0');
+	const pathname = usePathname();
 
 	const { data: userBalances } = useQuery({
 		queryKey: ['userBalances', user?.id],
@@ -41,7 +43,7 @@ function UserWalletData() {
 					<div className={styles.walletInfoBoard}>
 						<span className='text-sm font-medium text-white'>To get started with delegation on polkadot</span>
 						<Link
-							href={`/login?nextUrl=${window.location.pathname}`}
+							href={`/login?nextUrl=${pathname}`}
 							className='rounded-md bg-border_blue p-2 text-sm font-semibold text-white'
 						>
 							Connect wallet
@@ -51,7 +53,7 @@ function UserWalletData() {
 					<div className={styles.walletInfoBoard2}>
 						<div className='flex items-center gap-x-10 text-btn_primary_text'>
 							<div className='flex flex-col items-center'>
-								<span className='font-medium'>{formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</span>
+								<span className='text-2xl font-medium'>{formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</span>
 
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<Image
@@ -64,7 +66,7 @@ function UserWalletData() {
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
-								<span className='font-medium'>{formatBnBalance(transferableBalance, { numberAfterComma: 2, withUnit: true }, network)}</span>
+								<span className='text-2xl font-medium'>{formatBnBalance(transferableBalance, { numberAfterComma: 2, withUnit: true }, network)}</span>
 
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<FaCircleCheck className='text-base text-success' />
@@ -72,9 +74,9 @@ function UserWalletData() {
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
-								<span className='font-medium'>{formatBnBalance(lockedBalance, { numberAfterComma: 2, withUnit: true }, network)}</span>
+								<span className='text-2xl font-medium'>{formatBnBalance(lockedBalance, { numberAfterComma: 2, withUnit: true }, network)}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
-									<IoMdLock className='text-lock text-base' />
+									<IoMdLock className='text-base text-lock' />
 									Total Locked
 								</span>
 							</div>

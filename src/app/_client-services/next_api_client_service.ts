@@ -32,7 +32,8 @@ import {
 	EOffChainPostTopic,
 	IVoteCartItem,
 	EConvictionAmount,
-	IDelegationStats
+	IDelegationStats,
+	IDelegateDetails
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -93,7 +94,8 @@ enum EApiRoute {
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
-	GET_DELEGATE_STATS = 'GET_DELEGATE_STATS'
+	GET_DELEGATE_STATS = 'GET_DELEGATE_STATS',
+	FETCH_DELEGATES = 'FETCH_DELEGATES'
 }
 
 export class NextApiClientService {
@@ -164,6 +166,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_DELEGATE_STATS:
 				path = '/delegation/stats';
+				break;
+			case EApiRoute.FETCH_DELEGATES:
+				path = '/delegation/delegates';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -742,5 +747,10 @@ export class NextApiClientService {
 	static async getDelegateStats() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_STATS });
 		return this.nextApiClientFetch<IDelegationStats>({ url, method });
+	}
+
+	static async fetchDelegates() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_DELEGATES });
+		return this.nextApiClientFetch<IDelegateDetails[]>({ url, method });
 	}
 }
