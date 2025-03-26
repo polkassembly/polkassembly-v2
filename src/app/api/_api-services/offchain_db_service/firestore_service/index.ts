@@ -32,7 +32,8 @@ import {
 	IPostSubscription,
 	ECommentSentiment,
 	ITreasuryStats,
-	IDelegate
+	IDelegate,
+	EDelegateSource
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -727,6 +728,7 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			return {
 				...data,
+				source: EDelegateSource.POLKASSEMBLY,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate()
 			} as IDelegate;

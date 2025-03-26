@@ -969,9 +969,17 @@ export interface IDelegationStats {
 	totalDelegators: number;
 }
 
+export enum EDelegateSource {
+	W3F = 'w3f',
+	NOVA = 'nova',
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly'
+}
+
 export interface IDelegate {
 	network: ENetwork;
 	address: string;
+	source: EDelegateSource;
 	image?: string; // if available, otherwise use the image from the public user
 	manifesto?: string; // markdown
 	name?: string; // name of the delegate available via some third party sources
