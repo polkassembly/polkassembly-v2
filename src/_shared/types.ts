@@ -981,7 +981,7 @@ export interface IDelegate {
 	id?: string;
 	network: ENetwork;
 	address: string;
-	source: EDelegateSource;
+	sources: EDelegateSource[];
 	image?: string; // if available, otherwise use the image from the public user
 	manifesto?: string; // markdown
 	name?: string; // name of the delegate available via some third party sources

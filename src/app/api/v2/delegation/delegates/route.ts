@@ -74,7 +74,7 @@ export const GET = withErrorHandling(async () => {
 			image: novaDelegate.image,
 			manifesto: novaDelegate.longDescription,
 			name: novaDelegate.name,
-			source: EDelegateSource.NOVA,
+			sources: [...(delegatesWithSource[novaDelegate.address]?.sources ?? []), EDelegateSource.NOVA],
 			network
 		};
 	});
@@ -85,7 +85,7 @@ export const GET = withErrorHandling(async () => {
 			address: parityDelegate.address,
 			manifesto: parityDelegate.manifesto,
 			name: parityDelegate.name,
-			source: EDelegateSource.PARITY,
+			sources: [...(delegatesWithSource[parityDelegate.address]?.sources ?? []), EDelegateSource.PARITY],
 			network
 		};
 	});
@@ -94,7 +94,7 @@ export const GET = withErrorHandling(async () => {
 	polkassemblyDelegates.forEach((polkassemblyDelegate) => {
 		delegatesWithSource[encodeAddress(polkassemblyDelegate.address, NETWORKS_DETAILS[network as ENetwork].ss58Format)] = {
 			...polkassemblyDelegate,
-			source: EDelegateSource.POLKASSEMBLY
+			sources: [...(delegatesWithSource[polkassemblyDelegate.address]?.sources ?? []), EDelegateSource.POLKASSEMBLY]
 		};
 	});
 
@@ -116,7 +116,7 @@ export const GET = withErrorHandling(async () => {
 
 					return {
 						address,
-						source: delegatesWithSource[String(address)]?.source ?? EDelegateSource.INDIVIDUAL,
+						sources: delegatesWithSource[String(address)]?.sources ?? [EDelegateSource.INDIVIDUAL],
 						createdAt: delegatesWithSource[String(address)]?.createdAt,
 						updatedAt: delegatesWithSource[String(address)]?.updatedAt,
 						image: delegatesWithSource[String(address)]?.image,
