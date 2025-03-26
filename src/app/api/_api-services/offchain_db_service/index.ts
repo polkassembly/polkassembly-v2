@@ -33,7 +33,8 @@ import {
 	EVoteDecision,
 	IPostSubscription,
 	ECommentSentiment,
-	ITreasuryStats
+	ITreasuryStats,
+	IDelegate
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -327,6 +328,10 @@ export class OffChainDbService {
 
 	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
 		return FirestoreService.GetTreasuryStats({ network, from, to, limit, page });
+	}
+
+	static async GetPolkassemblyDelegates(network: ENetwork): Promise<IDelegate[]> {
+		return FirestoreService.GetPolkassemblyDelegates(network);
 	}
 
 	// helper methods

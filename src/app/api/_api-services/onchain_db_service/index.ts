@@ -12,12 +12,15 @@ import {
 	IGenericListingResponse,
 	IVoteCurve,
 	IPreimage,
-	IDelegationStats
+	IDelegationStats,
+	IDelegateDetails
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { encodeAddress } from '@polkadot/util-crypto';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { SubsquidService } from './subsquid_service';
 import { SubsquareOnChainService } from './subsquare_onchain_service';
 import { SubscanOnChainService } from './subscan_onchain_service';
@@ -152,5 +155,12 @@ export class OnChainDbService {
 
 	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
+	}
+
+	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser'>> {
+		return SubsquidService.GetConvictionVotingDelegationDetails({
+			network,
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
+		});
 	}
 }

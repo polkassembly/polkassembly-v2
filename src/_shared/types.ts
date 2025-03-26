@@ -968,3 +968,20 @@ export interface IDelegationStats {
 	totalDelegates: number;
 	totalDelegators: number;
 }
+
+export interface IDelegate {
+	network: ENetwork;
+	address: string;
+	image?: string; // if available, otherwise use the image from the public user
+	manifesto?: string; // markdown
+	name?: string; // name of the delegate available via some third party sources
+	createdAt?: Date; // not available for w3f, nova and parity
+	updatedAt?: Date; // not available for w3f, nova and parity
+}
+
+export interface IDelegateDetails extends IDelegate {
+	publicUser?: IPublicUser;
+	votingPower: string;
+	receivedDelegationsCount: number;
+	last30DaysVotedProposalsCount: number;
+}
