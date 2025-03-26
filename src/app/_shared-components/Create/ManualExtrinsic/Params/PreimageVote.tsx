@@ -51,7 +51,7 @@ function PreimageVoteComp({ onChange }: { onChange: (value: IVote) => void }) {
 	return (
 		<div className='flex flex-col gap-y-2'>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='flex w-full items-center rounded border border-border_grey px-4 py-2'>{vote.aye ? 'Aye' : 'Nay'}</DropdownMenuTrigger>
+				<DropdownMenuTrigger>{vote.aye ? 'Aye' : 'Nay'}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{optAyeRef.current.map((option) => (
 						<DropdownMenuItem
@@ -65,9 +65,7 @@ function PreimageVoteComp({ onChange }: { onChange: (value: IVote) => void }) {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='flex w-full items-center rounded border border-border_grey px-4 py-2'>
-					{optConvRef.current[vote.conviction]?.text || 'None'}
-				</DropdownMenuTrigger>
+				<DropdownMenuTrigger>{optConvRef.current[vote.conviction]?.text || 'None'}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{optConvRef.current.map((option) => (
 						<DropdownMenuItem

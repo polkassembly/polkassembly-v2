@@ -11,7 +11,7 @@ import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/Wall
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
@@ -20,39 +20,50 @@ import MultipleBeneficiaryForm from '@/app/_shared-components/Create/MultipleBen
 import SelectTrack from '@/app/_shared-components/Create/SelectTrack/SelectTrack';
 import EnactmentForm from '@/app/_shared-components/Create/EnactmentForm/EnactmentForm';
 import PreimageDetailsView from '@/app/_shared-components/Create/PreimageDetailsView/PreimageDetailsView';
+import { Separator } from '@/app/_shared-components/Separator';
+import TxFeesDetailsView from '@/app/_shared-components/Create/TxFeesDetailsView/TxFeesDetailsView';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { dayjs } from '@shared/_utils/dayjsInit';
 
 function TreasuryProposalAssethub() {
 	const t = useTranslations();
+
 	const { apiService } = usePolkadotApiService();
+	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null }]);
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
 	const [selectedTrack, setSelectedTrack] = useState<string>('');
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
-
-	const [preimageDetails, setPreimageDetails] = useState<{ preimageHash: string; preimageLength: number }>({
-		preimageHash: '',
-		preimageLength: 0
-	});
 
 	const formData = useForm();
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		if (!apiService) return;
+	const tx = useMemo(() => {
+		if (!apiService) return null;
 
-		const tx = apiService.getTreasurySpendExtrinsic({ beneficiaries });
-		if (!tx) return;
-
-		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
-		if (!preImage) {
-			setPreimageDetails({ preimageHash: '', preimageLength: 0 });
-			return;
-		}
-
-		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
+		return apiService.getTreasurySpendExtrinsic({ beneficiaries });
 	}, [apiService, beneficiaries]);
+
+	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
+
+	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx }), [apiService, tx]);
+
+	const submitProposalTx = useMemo(
+		() =>
+			apiService &&
+			preimageDetails &&
+			apiService.getSubmitProposalTx({
+				track: selectedTrack,
+				preimageHash: preimageDetails.preimageHash,
+				preimageLength: preimageDetails.preimageLength,
+				enactment: selectedEnactment,
+				enactmentValue: advancedDetails[`${selectedEnactment}`]
+			}),
+		[apiService, selectedTrack, preimageDetails, selectedEnactment, advancedDetails]
+	);
 
 	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
 		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength) {
@@ -60,7 +71,7 @@ function TreasuryProposalAssethub() {
 			return;
 		}
 
-		apiService.createTreasuryProposal({
+		apiService.createProposal({
 			address: userPreferences.address.address,
 			track: selectedTrack,
 			preimageHash,
@@ -88,26 +99,16 @@ function TreasuryProposalAssethub() {
 
 	const createPreimage = async () => {
 		if (
+			!tx ||
 			!apiService ||
 			!beneficiaries.length ||
 			beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount) || b.isInvalid) ||
-			!userPreferences.address?.address
+			!userPreferences.address?.address ||
+			!preimageDetails
 		)
 			return;
 
-		const tx = apiService.getTreasurySpendExtrinsic({ beneficiaries });
-		if (!tx) return;
-
 		setLoading(true);
-
-		const preImage = apiService.getPreimageTxDetails({ extrinsicFn: tx });
-
-		if (!preImage) {
-			setLoading(false);
-			return;
-		}
-
-		setPreimageDetails({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
 
 		await apiService.notePreimage({
 			address: userPreferences.address.address,
@@ -118,7 +119,7 @@ function TreasuryProposalAssethub() {
 					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				createProposal({ preimageHash: preImage.preimageHash, preimageLength: preImage.preimageLength });
+				createProposal({ preimageHash: preimageDetails.preimageHash, preimageLength: preimageDetails.preimageLength });
 			},
 			onFailed: () => {
 				toast({
@@ -161,12 +162,25 @@ function TreasuryProposalAssethub() {
 					/>
 				</div>
 
-				{preimageDetails.preimageHash && (
+				{preimageDetails && (
 					<PreimageDetailsView
 						preimageHash={preimageDetails.preimageHash}
 						preimageLength={preimageDetails.preimageLength}
 					/>
 				)}
+
+				{notePreimageTx && submitProposalTx && (
+					<TxFeesDetailsView
+						extrinsicFn={[notePreimageTx, submitProposalTx]}
+						extraFees={[
+							{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
+							{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
+						]}
+					/>
+				)}
+
+				<Separator />
+
 				<div className='flex justify-end'>
 					<Button
 						type='submit'

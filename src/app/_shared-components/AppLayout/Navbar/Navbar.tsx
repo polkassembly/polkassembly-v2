@@ -13,7 +13,6 @@ import { ELocales } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { ChevronDown } from 'lucide-react';
 import { FaBars } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 import { useState } from 'react';
@@ -104,14 +103,12 @@ function Navbar() {
 				<span>
 					<NetworkDropdown />
 				</span>
-				{user?.id ? (
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								variant='ghost'
-								className='rounded-3xl border border-border_grey bg-wallet_disabled_bg text-sm text-text_primary'
-								size='sm'
-								rightIcon={<ChevronDown size={12} />}
+				<span>
+					{user?.id ? (
+						<DropdownMenu>
+							<DropdownMenuTrigger
+								className='rounded-3xl border border-border_grey bg-wallet_disabled_bg px-3 py-2 text-sm normal-case text-text_primary'
+								asChild
 							>
 								{user.addresses && user.addresses.length > 0 ? (
 									<Address
@@ -122,31 +119,41 @@ function Navbar() {
 								) : (
 									<p>{user.username}</p>
 								)}
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent className='min-w-[100px]'>
-							<DropdownMenuItem>
-								<Link href={`/user/id/${user.id}`}>{t('Profile.profile')}</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Link href='/set-identity'>{t('SetIdentity.setIdentity')}</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Button
-									variant='ghost'
-									className='p-0'
-									onClick={() => AuthClientService.logout(() => setUser(null))}
-								>
-									{t('Profile.logout')}
-								</Button>
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				) : (
-					<Link href='/login'>
-						<Button>{t('Profile.login')}</Button>
-					</Link>
-				)}
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuItem>
+									<Link
+										className='w-full'
+										href={`/user/id/${user.id}`}
+									>
+										{t('Profile.profile')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem>
+									<Link
+										className='w-full'
+										href='/set-identity'
+									>
+										{t('SetIdentity.setIdentity')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem>
+									<Button
+										variant='ghost'
+										className='flex w-full justify-start p-0 text-sm'
+										onClick={() => AuthClientService.logout(() => setUser(null))}
+									>
+										{t('Profile.logout')}
+									</Button>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					) : (
+						<Link href='/login'>
+							<Button>{t('Profile.login')}</Button>
+						</Link>
+					)}
+				</span>
 				<RPCSwitchDropdown />
 				<span>
 					<ThemeToggleButton />

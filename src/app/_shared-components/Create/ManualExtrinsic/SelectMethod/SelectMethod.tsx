@@ -35,10 +35,7 @@ function SelectMethod({
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger
-				className='flex w-full cursor-pointer items-center gap-x-2 rounded border border-border_grey px-4 py-2'
-				asChild
-			>
+			<DropdownMenuTrigger>
 				<div>{selectedMethod || 'Select Method'}</div>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='max-h-[300px] overflow-y-auto'>

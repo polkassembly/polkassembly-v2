@@ -464,6 +464,7 @@ export interface IBeneficiary {
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
+	id?: string;
 	isInvalid?: boolean;
 }
 
@@ -891,8 +892,8 @@ export interface ICallState {
 }
 
 export enum EEnactment {
-	At_Block_No = 'at_block_number',
-	After_No_Of_Blocks = 'after_no_of_Blocks'
+	After_No_Of_Blocks = 'after_no_of_Blocks',
+	At_Block_No = 'at_block_number'
 }
 
 export interface IWritePostFormFields {
@@ -960,4 +961,13 @@ export interface ITreasuryStats {
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
+}
+
+export enum EProposalStep {
+	CREATE_PREIMAGE = 'CREATE_PREIMAGE',
+	EXISTING_PREIMAGE = 'EXISTING_PREIMAGE',
+	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
+	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
+	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
 }

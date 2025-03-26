@@ -475,7 +475,8 @@
 		"previous": "上一页"
 	},
 	"BalanceInput": {
-		"addBalance": "添加余额"
+		"addBalance": "添加余额",
+		"enterAmount": "输入金额"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "选择您的投票",
@@ -649,16 +650,29 @@
 		"proposals": "提案"
 	},
 	"CreateProposal": {
-		"createPreimage": "创建原像",
-		"existingPreimage": "已有原像",
-		"createTreasuryProposal": "创建国库提案（原生）",
-		"usdxProposal": "创建USDx国库提案（Assethub）",
+		"create": "创建",
+		"quickActions": "快速操作",
+		"submitProposal": "提交提案",
+		"createDiscussion": "讨论帖",
+		"createPreimage": "新建预映像",
+		"existingPreimage": "我已有预映像",
+		"spend": "支出",
+		"from": "从",
+		"Treasury": "国库",
+		"usdxProposal": "从资产中心支出资产（USDx、DOT等）",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
+		"createDiscussionDescription": "开始对话并收集反馈。",
+		"createPreimageDescription": "提交带有新预映像哈希的提案。",
+		"existingPreimageDescription": "使用现有预映像哈希进行提交。",
+		"createTreasuryProposalDescription": "提议国库支出",
+		"usdxProposalDescription": "从资产中心申请资金（USDx、DOT等）。",
+		"cancelReferendumDescription": "提议取消活跃的公投。",
+		"killReferendumDescription": "在通过前终止公投。",
 		"goBack": "返回",
-		"preimageHash": "原像哈希",
-		"preimageLength": "原像长度",
-		"preimageHashDescription": "输入原像哈希以创建提案"
+		"preimageHash": "预映像哈希",
+		"preimageLength": "长度",
+		"preimageHashDescription": "输入哈希"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -669,11 +683,11 @@
 		"proposalCreatedSuccessfully": "提案创建成功",
 		"proposalCreatedSuccessfullyDescription": "提案已成功创建",
 		"proposalCreationFailed": "提案创建失败",
-		"proposalCreationFailedDescription": "创建提案时发生错误",
+		"proposalCreationFailedDescription": "创建提案时出现错误",
 		"preimageNotedSuccessfully": "预映像记录成功",
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageNoteFailed": "预映像记录失败",
-		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"preimageNoteFailedDescription": "记录预映像时出现错误",
 		"selectTrack": "选择轨道",
 		"validFrom": "生效时间",
 		"addValidFrom": "添加生效时间",
@@ -681,14 +695,14 @@
 		"enterFutureBlockHeight": "请输入未来的区块高度"
 	},
 	"CreatePreimage": {
-		"addItem": "添加项目",
-		"removeItem": "删除项目",
+		"addItem": "添加受益人/支付",
+		"removeItem": "移除支付",
 		"yes": "是",
 		"no": "否",
 		"uploadFile": "上传文件",
 		"includeOption": "包含选项",
 		"preimageNoteFailed": "预映像记录失败",
-		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"preimageNoteFailedDescription": "记录预映像时出现错误",
 		"preimageNotedSuccessfully": "预映像记录成功",
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageHash": "预映像哈希",
@@ -697,14 +711,20 @@
 	"AddressInput": {
 		"invalidAddress": "无效地址",
 		"noResultsFound": "未找到结果",
-		"placeholder": "请输入地址"
+		"placeholder": "选择/输入地址"
 	},
 	"KillCancelReferendum": {
-		"referendumId": "公投ID",
-		"referendumIdDescription": "请输入要取消的公投ID",
-		"thisReferendumIsNotOngoing": "此公投未在进行中"
+		"referendumId": "输入公投索引",
+		"referendumIdDescription": "在此输入",
+		"thisReferendumIsNotOngoing": "警告！不是进行中的公投",
+		"viewReferendum": "查看提案"
 	},
 	"errorMessages": {
 		"valueTooLarge": "数值过大"
+	},
+	"TxFees": {
+		"preimageDeposit": "预映像押金",
+		"submissionDeposit": "提交押金",
+		"gasFees": "燃料费"
 	}
 }

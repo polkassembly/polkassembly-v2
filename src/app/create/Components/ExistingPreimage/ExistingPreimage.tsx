@@ -10,8 +10,8 @@ import { Form } from '@/app/_shared-components/Form';
 import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { BN, BN_HUNDRED, BN_ONE } from '@polkadot/util';
-import { useEffect, useState } from 'react';
+import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
@@ -20,9 +20,14 @@ import EnactmentForm from '@/app/_shared-components/Create/EnactmentForm/Enactme
 import { useDebounce } from '@/hooks/useDebounce';
 import InputText from '@/app/_shared-components/Create/ManualExtrinsic/Params/InputText';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { Separator } from '@/app/_shared-components/Separator';
+import TxFeesDetailsView from '@/app/_shared-components/Create/TxFeesDetailsView/TxFeesDetailsView';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 function ExistingPreimage() {
 	const t = useTranslations();
+	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
 	const [selectedTrack, setSelectedTrack] = useState<string>('');
@@ -32,6 +37,18 @@ function ExistingPreimage() {
 	const { value: preimageHash, debouncedValue: debouncedPreimageHash, setValue: setPreimageHash } = useDebounce('', 500);
 	const [preimageLength, setPreimageLength] = useState(0);
 	const [isValidPreimageHash, setIsValidPreimageHash] = useState(false);
+
+	const submitProposalTx = useMemo(() => {
+		if (!apiService) return null;
+
+		return apiService.getSubmitProposalTx({
+			track: selectedTrack,
+			preimageHash: debouncedPreimageHash,
+			preimageLength,
+			enactment: selectedEnactment,
+			enactmentValue: advancedDetails[`${selectedEnactment}`]
+		});
+	}, [apiService, selectedEnactment, selectedTrack, debouncedPreimageHash, preimageLength, advancedDetails]);
 
 	const formData = useForm();
 	const { toast } = useToast();
@@ -69,7 +86,7 @@ function ExistingPreimage() {
 
 		setLoading(true);
 
-		apiService.createTreasuryProposal({
+		apiService.createProposal({
 			address: userPreferences.address.address,
 			track: selectedTrack,
 			preimageHash: debouncedPreimageHash,
@@ -106,18 +123,16 @@ function ExistingPreimage() {
 					<AddressDropdown withBalance />
 
 					<div className='flex flex-col gap-y-1'>
-						<p className='text-sm text-wallet_btn_text'>{t('CreateProposal.preimageHash')}</p>
+						<p className='flex items-center justify-between text-sm text-wallet_btn_text'>
+							{t('CreateProposal.preimageHash')}
+							<span className='text-xs font-medium text-text_primary'>
+								{t('CreateProposal.preimageLength')} {preimageLength || '--'}
+							</span>
+						</p>
 						<InputText
 							onChange={setPreimageHash}
 							placeholder={t('CreateProposal.preimageHashDescription')}
 							value={preimageHash}
-						/>
-					</div>
-					<div className='flex flex-col gap-y-1'>
-						<p className='text-sm text-wallet_btn_text'>{t('CreateProposal.preimageLength')}</p>
-						<InputText
-							disabled
-							value={preimageLength}
 						/>
 					</div>
 
@@ -133,7 +148,14 @@ function ExistingPreimage() {
 						advancedDetails={advancedDetails}
 						onEnactmentValueChange={setAdvancedDetails}
 					/>
+
+					<TxFeesDetailsView
+						extrinsicFn={[submitProposalTx]}
+						extraFees={[{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }]}
+					/>
 				</div>
+
+				<Separator />
 
 				<div className='flex justify-end'>
 					<Button

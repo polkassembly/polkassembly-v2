@@ -44,15 +44,12 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 		<div>
 			<DropdownMenu>
 				<DropdownMenuTrigger
-					className={cn(className, 'w-full bg-network_dropdown_bg')}
+					className={cn(className, 'relative flex w-full items-center gap-3 rounded-md border border-border_grey bg-network_dropdown_bg p-1.5')}
 					disabled={isLoading}
+					noArrow
 				>
-					<div className='cursor-pointer'>
-						<div className='relative flex items-center gap-3 rounded-md border-[1px] border-border_grey p-1.5'>
-							{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
-							<span className='block text-xs font-semibold text-text_primary md:hidden'>{currentEndpoint.name}</span>
-						</div>
-					</div>
+					{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
+					<span className='block text-xs font-semibold text-text_primary md:hidden'>{currentEndpoint.name}</span>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-96 border-border_grey sm:w-60'>
 					{rpcEndpoints.map((endpoint, index) => (

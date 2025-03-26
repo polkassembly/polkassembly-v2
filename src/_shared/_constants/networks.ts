@@ -74,8 +74,15 @@ interface IPeopleChainDetails {
 	identityMinDeposit: BN;
 }
 
+interface IAssethubDetails {
+	rpcEndpoints: IRpcEndpoint[];
+	treasuryAddress: string;
+}
+
 interface INetworkDetails {
 	key: ENetwork;
+	preimageBaseDeposit?: BN;
+	submissionDeposit?: BN;
 	name: string;
 	govtype: EGovType;
 	blockTime: number;
@@ -87,6 +94,7 @@ interface INetworkDetails {
 	supportedAssets: Record<string, INetworkTreasuryAssets>;
 	foreignAssets: Record<string, INetworkTreasuryAssets>;
 	peopleChainDetails: IPeopleChainDetails;
+	assethubDetails?: IAssethubDetails;
 	trackDetails: Partial<Record<EPostOrigin, ITrackInfo>>;
 	palletInstance?: string;
 	parachain?: string;
@@ -158,6 +166,38 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			{
 				name: VIA_PARITY,
 				url: 'wss://westend-people-rpc.polkadot.io'
+			}
+		]
+	}
+} as const;
+
+const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
+	[ENetwork.POLKADOT]: {
+		treasuryAddress: '14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk',
+		rpcEndpoints: [
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://statemint.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://sys.ibp.network/asset-hub-polkadot'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://asset-hub-polkadot.dotters.network'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
 			}
 		]
 	}
@@ -1434,6 +1474,8 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
+		preimageBaseDeposit: new BN('400000000000'),
+		submissionDeposit: new BN('10000000000'),
 		name: 'Polkadot',
 		govtype: EGovType.OPENGOV,
 		parachain: '1000',
@@ -1501,10 +1543,12 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		},
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.POLKADOT],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.POLKADOT]
 	},
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
+		submissionDeposit: new BN('33333333333'),
 		govtype: EGovType.OPENGOV,
 		parachain: '1000',
 		palletInstance: '50',
@@ -1556,6 +1600,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.WESTEND]: {
 		key: ENetwork.WESTEND,
+		submissionDeposit: new BN('30000000000'),
 		name: 'Westend',
 		govtype: EGovType.OPENGOV,
 		blockTime: 6000,

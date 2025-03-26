@@ -1,19 +1,11 @@
-.dropdownTrigger {
-    @apply flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2
-}
-
-.dropdownTriggerText {
-    @apply text-sm text-text_primary text-opacity-60
-}
-
 .dropdownOption {
-    @apply flex w-full items-center gap-x-2
+	@apply flex w-full items-center gap-x-2;
 }
 
 .dropdownOptionText {
-    @apply text-sm text-text_primary text-opacity-60
+	@apply text-sm text-text_primary text-opacity-60;
 }
 
 .fallbackText {
-    @apply text-center text-text_primary;
+	@apply text-center text-text_primary;
 }

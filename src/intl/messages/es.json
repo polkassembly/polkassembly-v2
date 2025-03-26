@@ -475,7 +475,8 @@
 		"previous": "Anterior"
 	},
 	"BalanceInput": {
-		"addBalance": "Agregar Saldo"
+		"addBalance": "Agregar Saldo",
+		"enterAmount": "Ingrese el monto"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Elija su Voto",
@@ -649,16 +650,29 @@
 		"proposals": "Propuestas"
 	},
 	"CreateProposal": {
-		"createPreimage": "Crear Preimage",
-		"existingPreimage": "Ya tiene un Preimage",
-		"createTreasuryProposal": "Crear Propuesta de Tesorería (Nativa)",
-		"usdxProposal": "Crear Propuesta de Tesorería USDx (Assethub)",
+		"create": "Crear",
+		"quickActions": "Acciones Rápidas",
+		"submitProposal": "Enviar Propuesta",
+		"createDiscussion": "Publicación de Discusión",
+		"createPreimage": "Nueva Preimage",
+		"existingPreimage": "Ya tengo una Preimage",
+		"spend": "Gastar",
+		"from": "de",
+		"Treasury": "Tesorería",
+		"usdxProposal": "Gastar Activos de AssetHub (USDx, DOT, etc.)",
 		"cancelReferendum": "Cancelar un Referéndum",
 		"killReferendum": "Terminar un Referéndum",
+		"createDiscussionDescription": "Inicia una conversación y reúne comentarios.",
+		"createPreimageDescription": "Envía una propuesta con un nuevo hash de preimage.",
+		"existingPreimageDescription": "Usa un hash de preimage existente para el envío.",
+		"createTreasuryProposalDescription": "Proponer gasto de tesorería en",
+		"usdxProposalDescription": "Solicitar financiamiento de AssetHub (USDx, DOT, etc.).",
+		"cancelReferendumDescription": "Proponer cancelar un referéndum activo.",
+		"killReferendumDescription": "Terminar un referéndum antes de que pase.",
 		"goBack": "Volver",
-		"preimageHash": "Hash del Preimage",
-		"preimageLength": "Longitud del Preimage",
-		"preimageHashDescription": "Ingrese el hash del preimage para crear una propuesta"
+		"preimageHash": "Hash de Preimage",
+		"preimageLength": "Longitud",
+		"preimageHashDescription": "Ingresar Hash"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
@@ -670,10 +684,10 @@
 		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
 		"proposalCreationFailed": "Error al crear la propuesta",
 		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
-		"preimageNotedSuccessfully": "Preimagen registrada exitosamente",
-		"preimageNotedSuccessfullyDescription": "La preimagen ha sido registrada exitosamente",
-		"preimageNoteFailed": "Error al registrar la preimagen",
-		"preimageNoteFailedDescription": "Hubo un error al registrar la preimagen",
+		"preimageNotedSuccessfully": "Preimage registrada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimage ha sido registrada exitosamente",
+		"preimageNoteFailed": "Error al registrar preimage",
+		"preimageNoteFailedDescription": "Hubo un error al registrar la preimage",
 		"selectTrack": "Seleccionar Pista",
 		"validFrom": "Válido Desde",
 		"addValidFrom": "Agregar Válido Desde",
@@ -681,30 +695,36 @@
 		"enterFutureBlockHeight": "Por favor ingrese una altura de bloque futura"
 	},
 	"CreatePreimage": {
-		"addItem": "Agregar Elemento",
-		"removeItem": "Eliminar Elemento",
+		"addItem": "Agregar Beneficiario/Pagos",
+		"removeItem": "Eliminar Pago",
 		"yes": "Sí",
 		"no": "No",
 		"uploadFile": "Subir Archivo",
 		"includeOption": "Incluir Opción",
-		"preimageNoteFailed": "Error al anotar la preimagen",
-		"preimageNoteFailedDescription": "Hubo un error al anotar la preimagen",
-		"preimageNotedSuccessfully": "Preimagen anotada exitosamente",
-		"preimageNotedSuccessfullyDescription": "La preimagen ha sido anotada exitosamente",
-		"preimageHash": "Hash de Preimagen",
+		"preimageNoteFailed": "Error al registrar preimage",
+		"preimageNoteFailedDescription": "Hubo un error al registrar la preimage",
+		"preimageNotedSuccessfully": "Preimage registrada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimage ha sido registrada exitosamente",
+		"preimageHash": "Hash de Preimage",
 		"length": "Longitud"
 	},
 	"AddressInput": {
 		"invalidAddress": "Dirección Inválida",
 		"noResultsFound": "No se encontraron resultados",
-		"placeholder": "Ingrese la Dirección"
+		"placeholder": "Seleccionar/Ingresar Dirección"
 	},
 	"KillCancelReferendum": {
-		"referendumId": "ID del Referéndum",
-		"referendumIdDescription": "Ingrese el ID del referéndum para cancelar",
-		"thisReferendumIsNotOngoing": "Este Referéndum no está en curso"
+		"referendumId": "Ingresar Índice de Referéndum",
+		"referendumIdDescription": "Escriba Aquí",
+		"thisReferendumIsNotOngoing": "¡Advertencia! No es un Referéndum en Curso",
+		"viewReferendum": "Ver Propuesta"
 	},
 	"errorMessages": {
 		"valueTooLarge": "El valor es demasiado grande"
+	},
+	"TxFees": {
+		"preimageDeposit": "Depósito de Preimage",
+		"submissionDeposit": "Depósito de Envío",
+		"gasFees": "Tarifas de Gas"
 	}
 }

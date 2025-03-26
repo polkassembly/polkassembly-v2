@@ -9,15 +9,18 @@ import Image from 'next/image';
 import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/hooks/useUser';
 import style from './CreateButton.module.scss';
 
 function CreateButton({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
 
+	const { user } = useUser();
+
 	return (
 		<div className={`${style.card} ${state === 'collapsed' ? 'w-full' : 'lg:w-[200px]'}`}>
 			<Link
-				href='/create'
+				href={user ? '/create' : '/login?nextUrl=create'}
 				className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}
 			>
 				<Image
