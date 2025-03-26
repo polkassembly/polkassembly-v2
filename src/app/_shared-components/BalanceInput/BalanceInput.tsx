@@ -9,6 +9,9 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { bnToInput } from '@/app/_client-utils/bnToInput';
 import { ChevronDown } from 'lucide-react';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useUser } from '@/hooks/useUser';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -20,7 +23,8 @@ function BalanceInput({
 	name,
 	disabled,
 	defaultValue,
-	multiAsset
+	multiAsset,
+	showBalance = false
 }: {
 	label: string;
 	placeholder?: string;
@@ -29,10 +33,14 @@ function BalanceInput({
 	disabled?: boolean;
 	defaultValue?: BN;
 	multiAsset?: boolean;
+	showBalance?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
+	const { user } = useUser();
 	const [error, setError] = useState('');
+	const { apiService } = usePolkadotApiService();
+	const [balance, setBalance] = useState<string | null>(null);
 
 	const networkDetails = NETWORKS_DETAILS[`${network}`];
 	const { supportedAssets } = networkDetails;
@@ -45,6 +53,13 @@ function BalanceInput({
 	}));
 
 	const [valueString, setValueString] = useState('');
+
+	const getBalance = async (address: string) => {
+		if (!apiService) return;
+
+		const { totalBalance } = await apiService.getUserBalances({ address });
+		setBalance(totalBalance.toString());
+	};
 
 	const onBalanceChange = (value: string | null): void => {
 		const { bnValue, isValid } = inputToBn(value || '', network, false, assetId);
@@ -65,9 +80,24 @@ function BalanceInput({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [defaultValue]);
 
+	useEffect(() => {
+		if (user?.defaultAddress) getBalance(user.defaultAddress);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user]);
+
 	return (
 		<div className='min-w-[200px]'>
-			<p className={classes.label}>{label}</p>
+			{showBalance ? (
+				<div className='flex justify-between'>
+					<p className={classes.label}>{label}</p>
+					<p className='text-xs text-text_primary'>
+						Balance: <span className='text-text_pink'>{balance ? `${formatBnBalance(balance, { withUnit: true, numberAfterComma: 2 }, network)}` : 'Loading...'}</span>
+					</p>
+				</div>
+			) : (
+				<p className={classes.label}>{label}</p>
+			)}
+
 			<div className='relative'>
 				<Input
 					className='w-full'

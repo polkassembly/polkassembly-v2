@@ -1,15 +1,21 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-
 import { useTranslations } from 'next-intl';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IoPersonAdd } from 'react-icons/io5';
 import { EDelegateSource, ENetwork, IDelegateDetails } from '@/_shared/types';
 import { parseBalance } from '@/app/_client-utils/parseBalance';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogDescription } from '@ui/Dialog/Dialog';
+import { Button } from '@/app/_shared-components/Button';
+import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
+import { useUser } from '@/hooks/useUser';
+import { Label } from '@/app/_shared-components/Label';
+import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
+import { Separator } from '@/app/_shared-components/Separator';
 import PlatformLogos from '../PlatformLogos/PlatformLogos';
 
 interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
@@ -52,6 +58,9 @@ const getPlatformStyles = (platforms: EDelegateSource[]) => {
 
 const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 	const t = useTranslations('Delegation');
+	const [open, setOpen] = useState(false);
+	const { user } = useUser();
+
 	return (
 		<div className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'>
 			<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles(delegate.sources)}`}>
@@ -60,51 +69,96 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 			<div className='p-4'>
 				<div className='flex items-center justify-between gap-2'>
 					<Address address={delegate.address} />
-					<div className='flex items-center gap-1 text-text_pink'>
-						<IoPersonAdd />
-						<span>{t('delegate')}</span>
-					</div>
+					<Dialog
+						open={open}
+						onOpenChange={setOpen}
+					>
+						<DialogTrigger asChild>
+							<div className='flex cursor-pointer items-center gap-1 text-text_pink'>
+								<IoPersonAdd />
+								<span>{t('delegate')}</span>
+							</div>
+						</DialogTrigger>
+						<DialogContent className='max-w-2xl p-6'>
+							<DialogHeader>
+								<div className='flex items-center gap-2 text-btn_secondary_text'>
+									<IoPersonAdd />
+									<span>{t('delegate')}</span>
+								</div>
+							</DialogHeader>
+							<DialogDescription>
+								<div className='flex flex-col gap-4'>
+									<Label>Your Address</Label>
+									<AddressInput
+										disabled
+										className='bg-network_dropdown_bg'
+										placeholder={user?.defaultAddress}
+									/>
+									<Label>Delegate To</Label>
+									<AddressInput value={delegate.address} />
+									<BalanceInput
+										showBalance
+										label='Balance'
+									/>
+								</div>
+							</DialogDescription>
+							<Separator
+								className='mt-5 w-full'
+								orientation='horizontal'
+							/>
+							<DialogFooter>
+								<Button
+									variant='secondary'
+									className='btn-cancel'
+									onClick={() => setOpen(false)}
+								>
+									Cancel
+								</Button>
+								<Button className='btn-delegate'>Delegate</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				</div>
-				<div className='h-24 px-5'>
-					<div className='text-sm text-text_primary'>
-						{delegate?.manifesto && delegate?.manifesto.length > 0 ? (
-							delegate?.manifesto?.includes('<') ? (
-								<div className='bio-content'>
-									<div className='flex max-h-40 w-full overflow-hidden border-none'>
-										<MarkdownEditor
-											markdown={delegate.manifesto}
-											readOnly
-										/>
-									</div>
-									{delegate?.manifesto?.length > 100 && (
+			</div>
+			<div className='h-24 px-5'>
+				<div className='text-sm text-text_primary'>
+					{delegate?.manifesto && delegate?.manifesto.length > 0 ? (
+						delegate?.manifesto?.includes('<') ? (
+							<div className='bio-content'>
+								<div className='flex max-h-40 w-full overflow-hidden border-none'>
+									<MarkdownEditor
+										markdown={delegate.manifesto}
+										readOnly
+									/>
+								</div>
+								{delegate?.manifesto?.length > 100 && (
+									<button
+										className='cursor-pointer text-xs font-medium text-blue-600'
+										type='button'
+									>
+										{t('readMore')}
+									</button>
+								)}
+							</div>
+						) : (
+							<div className='bio-content'>
+								<span>{delegate?.manifesto?.slice(0, 100)}</span>
+								{delegate?.manifesto?.length > 100 && (
+									<>
+										<span>... </span>
 										<button
 											className='cursor-pointer text-xs font-medium text-blue-600'
 											type='button'
 										>
 											{t('readMore')}
 										</button>
-									)}
-								</div>
-							) : (
-								<div className='bio-content'>
-									<span>{delegate?.manifesto?.slice(0, 100)}</span>
-									{delegate?.manifesto?.length > 100 && (
-										<>
-											<span>... </span>
-											<button
-												className='cursor-pointer text-xs font-medium text-blue-600'
-												type='button'
-											>
-												{t('readMore')}
-											</button>
-										</>
-									)}
-								</div>
-							)
-						) : (
-							<span>{t('noBio')}</span>
-						)}
-					</div>
+									</>
+								)}
+							</div>
+						)
+					) : (
+						<span>{t('noBio')}</span>
+					)}
 				</div>
 			</div>
 			<div className='grid grid-cols-3 items-center border-t border-border_grey'>

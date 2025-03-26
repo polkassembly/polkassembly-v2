@@ -76,7 +76,9 @@ function DelegationDetailsCard() {
 			const result = await NextApiClientService.fetchDelegates();
 			return result || { data: [] };
 		},
-		staleTime: STALE_TIME
+		staleTime: STALE_TIME,
+		refetchOnWindowFocus: false,
+		refetchInterval: false
 	});
 
 	const searchInputRef = useRef<HTMLInputElement>(null);

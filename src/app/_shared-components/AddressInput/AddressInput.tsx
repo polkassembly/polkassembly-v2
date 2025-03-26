@@ -20,12 +20,14 @@ interface AddressInputProps {
 	placeholder?: string;
 	onChange?: (value: string) => void;
 	className?: string;
+	disabled?: boolean;
+	value?: string;
 }
 
-export default function AddressInput({ placeholder, onChange, className }: AddressInputProps) {
+export default function AddressInput({ placeholder, onChange, className, disabled, value }: AddressInputProps) {
 	const t = useTranslations();
 	const [isOpen, setIsOpen] = useState(false);
-	const [searchValue, setSearchValue] = useState('');
+	const [searchValue, setSearchValue] = useState(value || '');
 	const inputRef = useRef<HTMLInputElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState('');
@@ -109,6 +111,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 				<Input
 					ref={inputRef}
 					type='text'
+					disabled={disabled}
 					value={searchValue}
 					onChange={(e) => {
 						onAccountChange({ address: e.target.value, name: '' });
