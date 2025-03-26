@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IDelegateDetails,
 	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
@@ -421,8 +422,8 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		// Calculate total delegated tokens by summing up all balances
-		const totalDelegatedTokens = subsquidData.votingDelegations.reduce((acc: string, delegation: { balance: string }) => {
-			return new BN(acc).add(new BN(delegation.balance)).toString();
+		const totalDelegatedTokens: BN = subsquidData.votingDelegations.reduce((acc: BN, delegation: { balance: string }) => {
+			return new BN(acc).add(new BN(delegation.balance));
 		}, BN_ZERO);
 
 		// Get unique delegates and delegators
@@ -430,10 +431,39 @@ export class SubsquidService extends SubsquidUtils {
 		const uniqueDelegators = new Set(subsquidData.votingDelegations.map((d: { from: string }) => d.from));
 
 		return {
-			totalDelegatedTokens,
+			totalDelegatedTokens: totalDelegatedTokens.toString(),
 			totalDelegatedVotes: subsquidData.totalDelegatedVotes.totalCount || 0,
 			totalDelegates: uniqueDelegates.size,
 			totalDelegators: uniqueDelegators.size
 		};
+	}
+
+	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser'>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_CONVICTION_VOTING_DELEGATION_DETAILS;
+
+		const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address, createdAt_gte: thirtyDaysAgo.toISOString() }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain conviction voting delegation details from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain conviction voting delegation details from Subsquid');
+		}
+
+		const votingPower: BN = subsquidData.votingDelegations.reduce((acc: BN, delegation: { balance: string; lockPeriod: number }) => {
+			return new BN(acc).add(new BN(delegation.balance).mul(new BN(delegation.lockPeriod || 1)));
+		}, BN_ZERO);
+
+		const details: Omit<IDelegateDetails, 'publicUser'> = {
+			address,
+			network,
+			votingPower: votingPower.toString(),
+			receivedDelegationsCount: subsquidData.votingDelegations.length,
+			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount
+		};
+
+		return details;
 	}
 }

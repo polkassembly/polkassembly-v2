@@ -31,7 +31,8 @@ import {
 	EConvictionAmount,
 	IPostSubscription,
 	ECommentSentiment,
-	ITreasuryStats
+	ITreasuryStats,
+	IDelegate
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -717,6 +718,19 @@ export class FirestoreService extends FirestoreUtils {
 
 	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
 		await this.treasuryStatsCollectionRef().add(treasuryStats);
+	}
+
+	static async GetPolkassemblyDelegates(network: ENetwork): Promise<IDelegate[]> {
+		const delegatesQuery = this.delegatesCollectionRef().where('network', '==', network);
+		const delegatesQuerySnapshot = await delegatesQuery.get();
+		return delegatesQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IDelegate;
+		});
 	}
 
 	// write methods

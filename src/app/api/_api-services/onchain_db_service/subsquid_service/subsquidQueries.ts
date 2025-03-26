@@ -616,4 +616,16 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_CONVICTION_VOTING_DELEGATION_DETAILS = `
+		query GetConvictionVotingDelegationDetails($address_eq: String!, $createdAt_gte: DateTime!){
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address_eq}) {
+				balance
+				lockPeriod
+			}
+			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
 }
