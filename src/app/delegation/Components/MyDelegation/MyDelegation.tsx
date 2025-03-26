@@ -1,10 +1,6 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-
-'use client';
-
-import React from 'react';
 import UserIcon from '@assets/profile/user-icon.svg';
 import Image from 'next/image';
 import Address from '@ui/Profile/Address/Address';
@@ -13,6 +9,7 @@ import DelegationPopupCard from '../DelegationPopupCard/DelegationPopupCard';
 import SocialLinks from '../SocialLinks/SocialLinks';
 import MyDelegateTracks from '../MyDelegateTracks/MyDelegateTracks';
 import styles from './MyDelegation.module.scss';
+import BecomeDelegateDialog from '../BecomeDelegateDialog/BecomeDelegateDialog';
 
 function MyDelegation() {
 	const { user } = useUser();
@@ -43,7 +40,9 @@ function MyDelegation() {
 						/>
 						<SocialLinks socialLinks={socialLinks} />
 					</div>
-					<div className={styles.myDelegationContainerButton}>{/* <BecomeDelegateDialog /> */}</div>
+					<div className={styles.myDelegationContainerButton}>
+						<BecomeDelegateDialog />
+					</div>
 				</div>
 			</div>
 			<MyDelegateTracks />
