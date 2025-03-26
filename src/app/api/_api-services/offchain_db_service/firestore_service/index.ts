@@ -1221,6 +1221,27 @@ export class FirestoreService extends FirestoreUtils {
 		conviction: EConvictionAmount;
 		network: ENetwork;
 	}): Promise<IVoteCartItem> {
+		const existingVoteCartItem = await this.voteCartItemsCollectionRef()
+			.where('userId', '==', userId)
+			.where('postIndexOrHash', '==', postIndexOrHash)
+			.where('proposalType', '==', proposalType)
+			.where('network', '==', network)
+			.limit(1)
+			.get();
+
+		if (existingVoteCartItem.docs.length) {
+			await existingVoteCartItem.docs[0].ref.set({ decision, amount, conviction, updatedAt: new Date() }, { merge: true });
+			const data = existingVoteCartItem.docs[0].data();
+			return {
+				...data,
+				decision,
+				amount,
+				conviction,
+				createdAt: data.createdAt?.toDate?.(),
+				updatedAt: new Date()
+			} as IVoteCartItem;
+		}
+
 		const newVoteCartItemId = this.voteCartItemsCollectionRef().doc().id;
 
 		const voteCartItem: IVoteCartItem = {
@@ -1304,5 +1325,29 @@ export class FirestoreService extends FirestoreUtils {
 		if (postSubscription.docs.length) {
 			await postSubscription.docs[0].ref.delete();
 		}
+	}
+
+	static async AddPolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		const existingDelegate = await this.delegatesCollectionRef().where('network', '==', network).where('address', '==', address).limit(1).get();
+
+		if (existingDelegate.docs.length) {
+			throw new APIError(ERROR_CODES.ALREADY_EXISTS, StatusCodes.CONFLICT, 'This address is already registered as a delegate.');
+		}
+
+		const newPolkassemblyDelegateId = this.delegatesCollectionRef().doc().id;
+
+		const polkassemblyDelegate: IDelegate = {
+			id: newPolkassemblyDelegateId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			network,
+			address,
+			manifesto,
+			source: EDelegateSource.POLKASSEMBLY
+		};
+
+		await this.delegatesCollectionRef().doc(newPolkassemblyDelegateId).set(polkassemblyDelegate);
+
+		return newPolkassemblyDelegateId;
 	}
 }

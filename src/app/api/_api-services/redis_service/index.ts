@@ -435,4 +435,8 @@ export class RedisService {
 	static async SetDelegateDetails(network: ENetwork, data: IDelegateDetails[]): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
 	}
+
+	static async DeleteDelegateDetails(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATE_DETAILS}-${network}` });
+	}
 }

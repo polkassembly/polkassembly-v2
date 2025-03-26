@@ -978,6 +978,7 @@ export enum EDelegateSource {
 }
 
 export interface IDelegate {
+	id?: string;
 	network: ENetwork;
 	address: string;
 	source: EDelegateSource;

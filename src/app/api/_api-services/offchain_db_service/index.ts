@@ -820,4 +820,8 @@ export class OffChainDbService {
 	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
 		return FirestoreService.SaveTreasuryStats({ treasuryStats });
 	}
+
+	static async AddPolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		return FirestoreService.AddPolkassemblyDelegate({ network, address, manifesto });
+	}
 }
