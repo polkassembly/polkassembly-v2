@@ -3,14 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NOVA_DELEGATES, PARITY_DELEGATES, W3F_DELEGATES } from '@/_shared/_constants/delegates';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { EDelegateSource, ENetwork, IDelegate, IDelegateDetails } from '@/_shared/types';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { encodeAddress, cryptoWaitReady } from '@polkadot/util-crypto';
 import { NextResponse } from 'next/server';
 
 interface INovaDelegate {
@@ -36,63 +36,76 @@ export const GET = withErrorHandling(async () => {
 		return NextResponse.json(cachedDelegateDetails);
 	}
 
-	const w3fDelegates: IDelegate[] = (W3F_DELEGATES[network as ENetwork] || []).map((w3fDelegate) => {
-		const delegate: IDelegate = {
-			address: ValidatorService.isValidSubstrateAddress(w3fDelegate.address) ? getSubstrateAddress(w3fDelegate.address)! : w3fDelegate.address,
-			manifesto: '',
-			network,
-			name: w3fDelegate.name,
-			source: EDelegateSource.W3F
-		};
+	await cryptoWaitReady();
 
-		return delegate;
+	const delegatesWithSource: Record<string, IDelegate> = {};
+
+	W3F_DELEGATES.forEach((delegate) => {
+		if (delegate.network === network) {
+			delegatesWithSource[delegate.address] = {
+				...delegate
+			};
+		}
 	});
 
 	const novaDelegatesUrl = NOVA_DELEGATES[network as ENetwork];
 	const novaDelegatesResponse = novaDelegatesUrl ? ((await (await fetch(novaDelegatesUrl)).json()) as INovaDelegate[]) : [];
-	const novaDelegates = novaDelegatesResponse.map((novaDelegate) => {
-		const delegate: IDelegate = {
-			address: ValidatorService.isValidSubstrateAddress(novaDelegate.address) ? getSubstrateAddress(novaDelegate.address)! : novaDelegate.address,
-			manifesto: novaDelegate.longDescription || '',
-			network,
-			name: novaDelegate.name,
+	novaDelegatesResponse.forEach((novaDelegate) => {
+		delegatesWithSource[novaDelegate.address] = {
+			address: novaDelegate.address,
 			image: novaDelegate.image,
-			source: EDelegateSource.NOVA
+			manifesto: novaDelegate.longDescription,
+			name: novaDelegate.name,
+			source: EDelegateSource.NOVA,
+			network
 		};
-
-		return delegate;
 	});
 
 	const parityDelegatesUrl = PARITY_DELEGATES[network as ENetwork];
 	const parityDelegatesResponse = parityDelegatesUrl ? ((await (await fetch(parityDelegatesUrl)).json()) as IParityDelegate[]) : [];
-	const parityDelegates = parityDelegatesResponse.map((parityDelegate) => {
-		const delegate: IDelegate = {
-			address: ValidatorService.isValidSubstrateAddress(parityDelegate.address) ? getSubstrateAddress(parityDelegate.address)! : parityDelegate.address,
-			manifesto: parityDelegate.manifesto || '',
-			network,
+	parityDelegatesResponse.forEach((parityDelegate) => {
+		delegatesWithSource[parityDelegate.address] = {
+			address: parityDelegate.address,
+			manifesto: parityDelegate.manifesto,
 			name: parityDelegate.name,
-			source: EDelegateSource.PARITY
+			source: EDelegateSource.PARITY,
+			network
 		};
-
-		return delegate;
 	});
 
 	const polkassemblyDelegates = await OffChainDbService.GetPolkassemblyDelegates(network);
-
-	const delegates: IDelegate[] = [...w3fDelegates, ...novaDelegates, ...parityDelegates, ...polkassemblyDelegates];
-
-	const delegateDetailsPromises = delegates.map(async (delegate) => {
-		const delegateDetails = await OnChainDbService.GetConvictionVotingDelegationDetails({ network, address: delegate.address });
-		const publicUser = await OffChainDbService.GetPublicUserByAddress(delegate.address);
-
-		return {
-			...delegate,
-			...delegateDetails,
-			publicUser: publicUser ?? undefined
+	polkassemblyDelegates.forEach((polkassemblyDelegate) => {
+		delegatesWithSource[encodeAddress(polkassemblyDelegate.address, NETWORKS_DETAILS[network as ENetwork].ss58Format)] = {
+			...polkassemblyDelegate,
+			source: EDelegateSource.POLKASSEMBLY
 		};
 	});
 
-	const delegateDetails: IDelegateDetails[] = await Promise.all(delegateDetailsPromises);
+	const allDelegatesWithVotingPowerAndDelegationsCount = await OnChainDbService.GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network);
+
+	const allDelegateDetailPromises = Object.entries(allDelegatesWithVotingPowerAndDelegationsCount).map(async ([address, { receivedDelegationsCount, votingPower }]) => {
+		const last30DaysConvictionVoteCount = await OnChainDbService.GetLast30DaysConvictionVoteCountByAddress({ network, address });
+		const publicUser = await OffChainDbService.GetPublicUserByAddress(address);
+
+		const delegateDetails: IDelegateDetails = {
+			address,
+			source: delegatesWithSource[String(address)]?.source ?? EDelegateSource.INDIVIDUAL,
+			createdAt: delegatesWithSource[String(address)]?.createdAt,
+			updatedAt: delegatesWithSource[String(address)]?.updatedAt,
+			image: delegatesWithSource[String(address)]?.image,
+			manifesto: delegatesWithSource[String(address)]?.manifesto,
+			name: delegatesWithSource[String(address)]?.name,
+			network,
+			receivedDelegationsCount,
+			votingPower,
+			last30DaysVotedProposalsCount: last30DaysConvictionVoteCount,
+			publicUser: publicUser ?? undefined
+		};
+
+		return delegateDetails;
+	});
+
+	const delegateDetails: IDelegateDetails[] = await Promise.all(allDelegateDetailPromises);
 
 	await RedisService.SetDelegateDetails(network, delegateDetails);
 

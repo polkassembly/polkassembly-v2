@@ -12,8 +12,7 @@ import {
 	IGenericListingResponse,
 	IVoteCurve,
 	IPreimage,
-	IDelegationStats,
-	IDelegateDetails
+	IDelegationStats
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -157,10 +156,14 @@ export class OnChainDbService {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
 	}
 
-	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser' | 'source'>> {
-		return SubsquidService.GetConvictionVotingDelegationDetails({
+	static async GetLast30DaysConvictionVoteCountByAddress({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+		return SubsquidService.GetLast30DaysConvictionVoteCountByAddress({
 			network,
 			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
 		});
+	}
+
+	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network: ENetwork) {
+		return SubsquidService.GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network);
 	}
 }
