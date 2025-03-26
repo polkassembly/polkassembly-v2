@@ -18,20 +18,16 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [sortBy, setSortBy] = useState<SortOption>('VOTING_POWER');
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
-
-	// Group delegates by address
 	const groupedDelegates = useMemo(() => {
 		const delegateGroups: { [address: string]: GroupedDelegateDetails } = {};
 
 		delegates.forEach((delegate) => {
 			if (!delegateGroups[delegate.address]) {
-				// Create a new entry for this address
 				delegateGroups[delegate.address] = {
 					...delegate,
 					sources: [delegate.source]
 				};
 			} else {
-				// Add this source to the existing entry
 				delegateGroups[delegate.address].sources.push(delegate.source);
 			}
 		});
@@ -49,7 +45,6 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const filterBySource = useCallback(
 		(delegate: GroupedDelegateDetails) => {
 			if (selectedSources.length === 0) return true;
-			// Check if any of the delegate's sources match any of the selected sources
 			return selectedSources.some((source) => delegate.sources.includes(source));
 		},
 		[selectedSources]

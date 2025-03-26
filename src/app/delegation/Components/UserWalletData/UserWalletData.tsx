@@ -27,7 +27,8 @@ function UserWalletData() {
 
 	const { data: userBalances } = useQuery({
 		queryKey: ['userBalances', user?.id],
-		queryFn: () => apiService?.getUserBalances({ address: user?.loginAddress || '' })
+		queryFn: () => apiService?.getUserBalances({ address: user?.loginAddress || '' }),
+		enabled: !!user?.id && !!user?.loginAddress
 	});
 
 	useEffect(() => {
