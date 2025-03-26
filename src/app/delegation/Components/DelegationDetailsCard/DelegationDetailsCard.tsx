@@ -19,9 +19,14 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { Checkbox } from '@/app/_shared-components/checkbox';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
+import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import DelegateSearchInput from '../DelegateSearchInput/DelegateSearchInput';
 import styles from '../Delegation.module.scss';
 import DelegateCard from '../DelegationCard/DelegationCard';
+
+interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
+	sources: EDelegateSource[];
+}
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
@@ -67,7 +72,13 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 function DelegationDetailsCard() {
 	const { data: delegates, isFetching } = useQuery({
 		queryKey: ['delegates'],
-		queryFn: () => NextApiClientService.fetchDelegates()
+		queryFn: async () => {
+			const result = await NextApiClientService.fetchDelegates();
+			return result || { data: [] };
+		},
+		staleTime: STALE_TIME,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false
 	});
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
@@ -130,7 +141,7 @@ function DelegationDetailsCard() {
 					{paginatedDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full items-center gap-5 lg:grid-cols-2'>
-								{paginatedDelegates.map((delegate: IDelegateDetails) => (
+								{paginatedDelegates.map((delegate: GroupedDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}
 										delegate={delegate}

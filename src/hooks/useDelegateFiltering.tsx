@@ -8,6 +8,10 @@ import { useCallback, useMemo, useState } from 'react';
 
 type SortOption = 'VOTING_POWER' | 'VOTED_PROPOSALS' | 'RECEIVED_DELEGATIONS';
 
+interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
+	sources: EDelegateSource[];
+}
+
 const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>([]);
@@ -15,7 +19,27 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
 
-	const searchDelegate = useCallback((delegate: IDelegateDetails, query: string) => {
+	// Group delegates by address
+	const groupedDelegates = useMemo(() => {
+		const delegateGroups: { [address: string]: GroupedDelegateDetails } = {};
+
+		delegates.forEach((delegate) => {
+			if (!delegateGroups[delegate.address]) {
+				// Create a new entry for this address
+				delegateGroups[delegate.address] = {
+					...delegate,
+					sources: [delegate.source]
+				};
+			} else {
+				// Add this source to the existing entry
+				delegateGroups[delegate.address].sources.push(delegate.source);
+			}
+		});
+
+		return Object.values(delegateGroups);
+	}, [delegates]);
+
+	const searchDelegate = useCallback((delegate: GroupedDelegateDetails, query: string) => {
 		if (!query || query.trim() === '') return true;
 
 		const searchTerm = query.toLowerCase().trim();
@@ -23,15 +47,16 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	}, []);
 
 	const filterBySource = useCallback(
-		(delegate: IDelegateDetails) => {
+		(delegate: GroupedDelegateDetails) => {
 			if (selectedSources.length === 0) return true;
-			return selectedSources.includes(delegate.source);
+			// Check if any of the delegate's sources match any of the selected sources
+			return selectedSources.some((source) => delegate.sources.includes(source));
 		},
 		[selectedSources]
 	);
 
 	const sortDelegates = useCallback(
-		(a: IDelegateDetails, b: IDelegateDetails) => {
+		(a: GroupedDelegateDetails, b: GroupedDelegateDetails) => {
 			switch (sortBy) {
 				case 'VOTING_POWER':
 					return Number(BigInt(b.votingPower || '0') - BigInt(a.votingPower || '0'));
@@ -47,10 +72,10 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	);
 
 	const filteredAndSortedDelegates = useMemo(() => {
-		const searchFiltered = delegates.filter((delegate) => searchDelegate(delegate, searchQuery));
+		const searchFiltered = groupedDelegates.filter((delegate) => searchDelegate(delegate, searchQuery));
 		const sourceFiltered = searchFiltered.filter(filterBySource);
 		return sourceFiltered.sort(sortDelegates);
-	}, [delegates, searchQuery, filterBySource, sortDelegates, searchDelegate]);
+	}, [groupedDelegates, searchQuery, filterBySource, sortDelegates, searchDelegate]);
 
 	const paginatedDelegates = useMemo(() => {
 		const start = (currentPage - 1) * itemsPerPage;

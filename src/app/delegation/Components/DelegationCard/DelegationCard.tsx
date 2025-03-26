@@ -12,8 +12,12 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import PlatformLogos from '../PlatformLogos/PlatformLogos';
 
+interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
+	sources: EDelegateSource[];
+}
+
 interface DelegateCardProps {
-	delegate: IDelegateDetails;
+	delegate: GroupedDelegateDetails;
 	network: ENetwork;
 }
 
@@ -24,7 +28,7 @@ const getPlatformStyles = (platforms: EDelegateSource[]) => {
 		return DEFAULT_PLATFORM_STYLE;
 	}
 
-	if (platforms.length > 2) {
+	if (platforms.length > 1) {
 		return 'border-wallet_btn_text bg-delegation_bgcard';
 	}
 
@@ -50,8 +54,8 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 	const t = useTranslations('Delegation');
 	return (
 		<div className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'>
-			<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles([delegate.source])}`}>
-				<PlatformLogos platforms={[delegate.source]} />
+			<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles(delegate.sources)}`}>
+				<PlatformLogos platforms={delegate.sources} />
 			</div>
 			<div className='p-4'>
 				<div className='flex items-center justify-between gap-2'>
