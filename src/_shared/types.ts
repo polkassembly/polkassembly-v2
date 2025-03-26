@@ -971,3 +971,37 @@ export enum EProposalStep {
 	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
 	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
 }
+
+export interface IDelegationStats {
+	totalDelegatedTokens: string;
+	totalDelegatedVotes: number;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export enum EDelegateSource {
+	W3F = 'w3f',
+	NOVA = 'nova',
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly',
+	INDIVIDUAL = 'individual'
+}
+
+export interface IDelegate {
+	id?: string;
+	network: ENetwork;
+	address: string;
+	sources: EDelegateSource[];
+	image?: string; // if available, otherwise use the image from the public user
+	manifesto?: string; // markdown
+	name?: string; // name of the delegate available via some third party sources
+	createdAt?: Date; // not available for w3f, nova and parity
+	updatedAt?: Date; // not available for w3f, nova and parity
+}
+
+export interface IDelegateDetails extends IDelegate {
+	publicUser?: IPublicUser;
+	votingPower: string;
+	receivedDelegationsCount: number;
+	last30DaysVotedProposalsCount: number;
+}

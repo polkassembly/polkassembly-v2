@@ -57,4 +57,6 @@ export class FirestoreUtils {
 	protected static postSubscriptionsCollectionRef = () => this.firestoreDb.collection('post_subscriptions');
 
 	protected static treasuryStatsCollectionRef = () => this.firestoreDb.collection('treasury_stats');
+
+	protected static delegatesCollectionRef = () => this.firestoreDb.collection('delegates');
 }

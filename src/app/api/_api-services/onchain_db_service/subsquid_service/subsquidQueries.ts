@@ -602,4 +602,49 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_CONVICTION_VOTING_DELEGATION_STATS = `
+		query GetConvictionVotingDelegationStats {
+			totalDelegatedVotes: convictionDelegatedVotesConnection(orderBy: id_ASC, where: {removedAtBlock_isNull: true}) {
+				totalCount
+			}
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov}) {
+				from
+				to
+				balance
+				track
+			}
+		}
+	`;
+
+	protected static GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS = `
+		query GetLast30DaysConvictionVoteCountByAddress($address_eq: String!, $createdAt_gte: DateTime!){
+			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT = `
+		query GetAllDelegatesConvictionVotingPowerAndDelegationsCount {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov}) {
+				to
+				balance
+				lockPeriod
+			}
+		}
+	`;
+
+	protected static GET_DELEGATE_DETAILS = `
+		query GetDelegateDetails($address_eq: String!, $createdAt_gte: DateTime!) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address_eq}) {
+				to
+				balance
+				lockPeriod
+			}
+			convictionVotesConnection(where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
 }
