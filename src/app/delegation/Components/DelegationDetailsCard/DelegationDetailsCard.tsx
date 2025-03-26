@@ -3,11 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { memo, RefObject, useRef } from 'react';
-import Address from '@ui/Profile/Address/Address';
 import { IoMdTrendingUp } from 'react-icons/io';
-import { IoPersonAdd } from 'react-icons/io5';
-import { EDelegateSource, ENetwork, IDelegateDetails } from '@/_shared/types';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { Label } from '@/app/_shared-components/Label';
@@ -17,50 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/app/_shared-
 import { FaFilter } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 import { MdSort } from 'react-icons/md';
-import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
-import { parseBalance } from '@/app/_client-utils/parseBalance';
 import { useQuery } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Checkbox } from '@/app/_shared-components/checkbox';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
-import PlatformLogos from '../PlatformLogos/PlatformLogos';
 import DelegateSearchInput from '../DelegateSearchInput/DelegateSearchInput';
 import styles from '../Delegation.module.scss';
-
-interface DelegateCardProps {
-	delegate: IDelegateDetails;
-	network: ENetwork;
-}
-
-const DEFAULT_PLATFORM_STYLE = 'border-navbar_border bg-delegation_card_polkassembly';
-
-export const getPlatformStyles = (platforms: EDelegateSource[]) => {
-	if (!Array.isArray(platforms) || platforms.length === 0) {
-		return DEFAULT_PLATFORM_STYLE;
-	}
-
-	if (platforms.length > 2) {
-		return 'border-wallet_btn_text bg-delegation_bgcard';
-	}
-
-	const platform = String(platforms[0]).toLowerCase();
-	switch (platform) {
-		case 'polkassembly':
-			return DEFAULT_PLATFORM_STYLE;
-		case 'parity':
-			return 'border-delegation_polkadot_border bg-delegation_card_polkadot';
-		case 'w3f':
-			return 'border-btn_secondary_text text-btn_primary_text bg-delegation_card_w3f';
-		case 'nova':
-			return 'border-delegation_nova_border bg-delegation_card_nova';
-		case 'individual':
-		case 'na':
-			return 'border-btn_secondary_text bg-delegation_card_polkassembly';
-		default:
-			return 'border-wallet_btn_text bg-delegation_bgcard';
-	}
-};
+import DelegateCard from '../DelegationCard/DelegationCard';
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
@@ -100,91 +61,6 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 				</div>
 			</PopoverContent>
 		</Popover>
-	);
-});
-
-const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
-	const t = useTranslations('Delegation');
-	return (
-		<div className='cursor-pointer rounded-md border border-border_grey hover:border-bg_pink'>
-			<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles([delegate.source])}`}>
-				<PlatformLogos platforms={[delegate.source]} />
-			</div>
-			<div className='p-4'>
-				<div className='flex items-center justify-between gap-2'>
-					<Address address={delegate.address} />
-					<div className='flex items-center gap-1 text-text_pink'>
-						<IoPersonAdd />
-						<span>{t('delegate')}</span>
-					</div>
-				</div>
-				<div className='h-24 px-5'>
-					<div className='text-sm text-text_primary'>
-						{delegate?.manifesto && delegate?.manifesto.length > 0 ? (
-							delegate?.manifesto?.includes('<') ? (
-								<div className='bio-content'>
-									<div className='flex max-h-40 w-full overflow-hidden border-none'>
-										<MarkdownEditor
-											markdown={delegate.manifesto}
-											readOnly
-										/>
-									</div>
-									{delegate?.manifesto?.length > 100 && (
-										<button
-											className='cursor-pointer text-xs font-medium text-blue-600'
-											type='button'
-										>
-											{t('readMore')}
-										</button>
-									)}
-								</div>
-							) : (
-								<div className='bio-content'>
-									<span>{delegate?.manifesto?.slice(0, 100)}</span>
-									{delegate?.manifesto?.length > 100 && (
-										<>
-											<span>... </span>
-											<button
-												className='cursor-pointer text-xs font-medium text-blue-600'
-												type='button'
-											>
-												{t('readMore')}
-											</button>
-										</>
-									)}
-								</div>
-							)
-						) : (
-							<span>{t('noBio')}</span>
-						)}
-					</div>
-				</div>
-			</div>
-			<div className='grid grid-cols-3 items-center border-t border-border_grey'>
-				<div className='border-r border-border_grey p-5 text-center'>
-					<div>
-						<div className='text-sm text-btn_secondary_text'>
-							<span className='text-2xl font-semibold'> {parseBalance(delegate?.votingPower?.toString() || '0', 1, false, network)}</span>{' '}
-							{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}
-						</div>
-						<span className='text-xs text-delegation_card_text'>{t('votingPower')}</span>
-					</div>
-				</div>
-				<div className='border-r border-border_grey p-3 text-center'>
-					<div>
-						<div className='text-2xl font-semibold'>{delegate?.last30DaysVotedProposalsCount}</div>
-						<span className='text-xs text-delegation_card_text'>{t('votedProposals')}</span>
-						<span className='block text-[10px] text-delegation_card_text'>({t('past30Days')})</span>
-					</div>
-				</div>
-				<div className='p-5 text-center'>
-					<div>
-						<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
-						<span className='text-xs text-delegation_card_text lg:whitespace-nowrap'>{t('receivedDelegations')}</span>
-					</div>
-				</div>
-			</div>
-		</div>
 	);
 });
 
