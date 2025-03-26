@@ -438,7 +438,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser'>> {
+	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser' | 'source'>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_CONVICTION_VOTING_DELEGATION_DETAILS;
@@ -456,7 +456,7 @@ export class SubsquidService extends SubsquidUtils {
 			return new BN(acc).add(new BN(delegation.balance).mul(new BN(delegation.lockPeriod || 1)));
 		}, BN_ZERO);
 
-		const details: Omit<IDelegateDetails, 'publicUser'> = {
+		const details: Omit<IDelegateDetails, 'publicUser' | 'source'> = {
 			address,
 			network,
 			votingPower: votingPower.toString(),
