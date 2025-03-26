@@ -157,7 +157,7 @@ export class OnChainDbService {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
 	}
 
-	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser'>> {
+	static async GetConvictionVotingDelegationDetails({ network, address }: { network: ENetwork; address: string }): Promise<Omit<IDelegateDetails, 'publicUser' | 'source'>> {
 		return SubsquidService.GetConvictionVotingDelegationDetails({
 			network,
 			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
