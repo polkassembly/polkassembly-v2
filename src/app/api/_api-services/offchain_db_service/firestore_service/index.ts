@@ -735,6 +735,22 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
+	static async GetPolkassemblyDelegateByAddress({ network, address }: { network: ENetwork; address: string }): Promise<IDelegate | null> {
+		const delegateQuery = this.delegatesCollectionRef().where('address', '==', address).where('network', '==', network).limit(1);
+		const delegateQuerySnapshot = await delegateQuery.get();
+		if (delegateQuerySnapshot.empty) {
+			return null;
+		}
+
+		const data = delegateQuerySnapshot.docs[0].data();
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IDelegate;
+	}
+
 	// write methods
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
 		const apiUsageUpdate = {
@@ -1349,5 +1365,23 @@ export class FirestoreService extends FirestoreUtils {
 		await this.delegatesCollectionRef().doc(newPolkassemblyDelegateId).set(polkassemblyDelegate);
 
 		return newPolkassemblyDelegateId;
+	}
+
+	static async UpdatePolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		const existingDelegate = await this.delegatesCollectionRef().where('network', '==', network).where('address', '==', address).limit(1).get();
+
+		if (!existingDelegate.docs.length) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'This address is not registered as a delegate.');
+		}
+
+		await existingDelegate.docs[0].ref.set({ manifesto, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async DeletePolkassemblyDelegate({ network, address }: { network: ENetwork; address: string }) {
+		const delegate = await this.delegatesCollectionRef().where('network', '==', network).where('address', '==', address).limit(1).get();
+
+		if (delegate.docs.length) {
+			await delegate.docs[0].ref.delete();
+		}
 	}
 }

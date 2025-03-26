@@ -634,4 +634,17 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_DELEGATE_DETAILS = `
+		query GetDelegateDetails($address_eq: String!, $createdAt_gte: DateTime!) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address_eq}) {
+				to
+				balance
+				lockPeriod
+			}
+			convictionVotesConnection(where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
 }
