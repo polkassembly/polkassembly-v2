@@ -728,7 +728,7 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			return {
 				...data,
-				source: EDelegateSource.POLKASSEMBLY,
+				sources: [EDelegateSource.POLKASSEMBLY],
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate()
 			} as IDelegate;
@@ -1343,7 +1343,7 @@ export class FirestoreService extends FirestoreUtils {
 			network,
 			address,
 			manifesto,
-			source: EDelegateSource.POLKASSEMBLY
+			sources: [EDelegateSource.POLKASSEMBLY]
 		};
 
 		await this.delegatesCollectionRef().doc(newPolkassemblyDelegateId).set(polkassemblyDelegate);
