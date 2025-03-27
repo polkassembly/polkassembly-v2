@@ -40,8 +40,6 @@ function MyDelegateTracks() {
 		enabled: !!user?.defaultAddress
 	});
 
-	console.log('data?.trackDelegationStats', data);
-
 	const FILTER_OPTIONS = [
 		{ value: EDelegationStatus.ALL, label: t('all') },
 		{ value: EDelegationStatus.DELEGATED, label: t('delegated') },

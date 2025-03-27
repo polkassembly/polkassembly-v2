@@ -102,7 +102,7 @@ enum EApiRoute {
 	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
 	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE'
 }
-// users/address/{{address}}/delegation/tracks
+
 export class NextApiClientService {
 	private static isServerSide() {
 		return !global?.window;
