@@ -4,22 +4,26 @@
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useState } from 'react';
+import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: string; onChange: (track: string) => void; isTreasury?: boolean }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
-	const trackArr: string[] = [];
+	const trackArr: { name: string; trackId: number }[] = [];
+
+	const [track, setTrack] = useState<{ name: string; trackId: number }>();
 
 	if (network) {
 		Object.entries(NETWORKS_DETAILS?.[`${network}`].trackDetails).forEach(([key, value]) => {
 			if (isTreasury) {
-				if ('maxSpend' in value) {
-					trackArr.push(key);
+				if ('maxSpend' in value || (network === ENetwork.WESTEND && key === EPostOrigin.TREASURER)) {
+					trackArr.push({ name: key, trackId: value.trackId });
 				}
 			} else {
-				trackArr.push(key);
+				trackArr.push({ name: key, trackId: value.trackId });
 			}
 		});
 	}
@@ -27,16 +31,19 @@ function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: 
 		<div className='flex flex-col gap-y-1'>
 			<p className='text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='flex w-full items-center gap-x-2 rounded border border-border_grey px-4 py-2'>
-					{selectedTrack || t('CreateTreasuryProposal.selectTrack')}
+				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>
+					{track?.trackId && `[${track?.trackId}]`} {selectedTrack?.split(/(?=[A-Z])/).join(' ') || t('CreateTreasuryProposal.selectTrack')}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
-					{trackArr.map((track) => (
+					{trackArr.map((tr) => (
 						<DropdownMenuItem
-							key={track}
-							onClick={() => onChange(track)}
+							key={tr.trackId}
+							onClick={() => {
+								setTrack(tr);
+								onChange(tr.name);
+							}}
 						>
-							{track.split(/(?=[A-Z])/).join(' ')}
+							[{tr.trackId}] {tr.name.split(/(?=[A-Z])/).join(' ')}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>

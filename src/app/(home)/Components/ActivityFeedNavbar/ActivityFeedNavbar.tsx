@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils';
 import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
-import { FaAngleDown } from 'react-icons/fa';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -128,7 +127,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 					<div key={category}>
 						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
 							<DropdownMenu>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium', 'border-none')}>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
@@ -138,9 +137,6 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
 										<span className='ml-1'>{category}</span>
-										<span className='ml-0.5'>
-											<FaAngleDown />
-										</span>
 									</span>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent

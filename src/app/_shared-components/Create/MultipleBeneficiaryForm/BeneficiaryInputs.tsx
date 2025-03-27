@@ -2,10 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Minus } from 'lucide-react';
+import { CalendarRange, Minus, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN } from '@polkadot/util';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { IBeneficiaryInput } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@shared/_utils/dayjsInit';
@@ -14,10 +14,11 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import AddressInput from '../../AddressInput/AddressInput';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import { Button } from '../../Button';
-import { Switch } from '../../Switch';
-import InputNumber from '../ManualExtrinsic/Params/InputNumber';
+import { Calendar } from '../../Calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 
 function BeneficiaryInputs({
+	index,
 	beneficiaries,
 	onBeneficiaryChange,
 	onAmountChange,
@@ -26,6 +27,7 @@ function BeneficiaryInputs({
 	multiAsset,
 	stagedPayment
 }: {
+	index: number;
 	beneficiaries: IBeneficiaryInput[];
 	onBeneficiaryChange: ({ beneficiary }: { beneficiary: string }) => void;
 	onAmountChange: ({ amount, assetId }: { amount: BN; assetId: string | null }) => void;
@@ -38,10 +40,11 @@ function BeneficiaryInputs({
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 
-	const [switchStagedPayment, setSwitchStagedPayment] = useState(false);
 	const [blockHeight, setBlockHeight] = useState<BN>();
-	const [errorInValidFrom, setErrorInValidFrom] = useState<string>();
 	const [payoutDate, setPayoutDate] = useState<Date>();
+	const [validFrom, setValidFrom] = useState<BN>();
+
+	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
@@ -53,69 +56,90 @@ function BeneficiaryInputs({
 		getCurrentBlockNumber();
 	}, [apiService]);
 
-	const handleValidFromChange = (value: number) => {
-		if (blockHeight && value > blockHeight.toNumber()) {
-			const blocksPerDay = getBlocksPerDay(network);
-			const diffInBlocks = value - blockHeight.toNumber();
-			const totalDays = Math.floor(diffInBlocks / blocksPerDay);
-			const date = dayjs().add(totalDays, 'day').toDate();
+	useEffect(() => {
+		if (!payoutDate) return;
 
-			if (!date) {
-				onValidFromChange({ validFrom: new BN(value), isInvalid: true });
-				setErrorInValidFrom(t('CreateTreasuryProposal.invalidBlockHeight'));
-				return;
-			}
+		const blocksPerDay = getBlocksPerDay(network);
+		const diffInBlocks = dayjs(payoutDate).diff(dayjs(), 'day') * blocksPerDay;
+		const blocks = blockHeight ? blockHeight.add(new BN(diffInBlocks || 100)) : undefined;
+		onValidFromChange({ validFrom: blocks, isInvalid: !blocks });
+		setValidFrom(blocks);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [payoutDate, blockHeight, network]);
 
-			onValidFromChange({ validFrom: new BN(value), isInvalid: false });
-			setErrorInValidFrom('');
-			setPayoutDate(date);
-		} else {
-			onValidFromChange({ validFrom: undefined, isInvalid: true });
-			setPayoutDate(undefined);
-			setErrorInValidFrom(t('CreateTreasuryProposal.enterFutureBlockHeight'));
+	useLayoutEffect(() => {
+		if (ref.current && index !== 0) {
+			ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		}
-	};
+		return () => {
+			ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+			ref.current = null;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
-		<div className='flex w-full flex-col gap-y-2'>
-			<div className='flex items-end gap-x-2'>
-				<div className='flex-1'>
-					<p className='mb-1 text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.beneficiary')}</p>
-					<AddressInput
-						className='flex-1'
-						onChange={(value) => onBeneficiaryChange({ beneficiary: value })}
+		<div
+			ref={ref}
+			className='flex w-full flex-col gap-y-2 rounded-lg border border-border_grey p-3 pb-6'
+		>
+			<AddressInput
+				className='w-full'
+				onChange={(value) => onBeneficiaryChange({ beneficiary: value })}
+			/>
+			<div className='relative flex w-full items-center gap-x-2 pl-12'>
+				<div className='absolute left-0 left-4 top-0 h-1/2 w-8 rounded-bl-lg border-b-2 border-l-2 border-dashed border-border_grey'>
+					<div className='absolute -bottom-1.5 -right-1.5 z-20 h-3 w-3 rounded-full bg-border_grey' />
+				</div>
+				<div className={stagedPayment ? 'w-1/2' : 'w-full'}>
+					<BalanceInput
+						multiAsset={multiAsset}
+						onChange={({ value, assetId }) => onAmountChange({ amount: value, assetId })}
+						showTreasuryBalance
 					/>
 				</div>
-				<BalanceInput
-					multiAsset={multiAsset}
-					label={t('CreateTreasuryProposal.amount')}
-					onChange={({ value, assetId }) => onAmountChange({ amount: value, assetId })}
-				/>
-			</div>
-			{stagedPayment && (
-				<div>
-					<div className='mb-1 flex w-full items-center justify-end gap-x-2'>
-						<span className='text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.addValidFrom')}</span>
-						<Switch
-							checked={switchStagedPayment}
-							onCheckedChange={(checked) => {
-								setSwitchStagedPayment(checked);
-								setPayoutDate(undefined);
-								setErrorInValidFrom('');
-								onValidFromChange({ validFrom: undefined, isInvalid: false });
-							}}
-						/>
-					</div>
-					{switchStagedPayment && (
-						<div>
-							<p className='mb-1 text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.validFrom')}</p>
-							<InputNumber onChange={(value) => handleValidFromChange(value)} />
-							{payoutDate && <p className='text-sm text-wallet_btn_text'>Valid From: {dayjs(payoutDate).format("Do MMM 'YY")}</p>}
-							{errorInValidFrom && <p className='text-sm text-failure'>{errorInValidFrom}</p>}
+				{stagedPayment && (
+					<>
+						<span className='text-sm text-wallet_btn_text'>on</span>
+						<div className='flex flex-1 items-center gap-x-2'>
+							<Popover>
+								<PopoverTrigger className='flex w-full items-center justify-start gap-x-2 rounded-lg border border-border_grey px-4 py-3 text-sm font-normal text-text_primary'>
+									<CalendarRange className='h-4 w-4' />
+									<p className='flex-1 text-left'>{payoutDate ? dayjs(payoutDate).format("Do MMM 'YY") : 'Immediately'}</p>
+									{payoutDate && (
+										<Button
+											variant='ghost'
+											size='icon'
+											onClick={() => {
+												setPayoutDate(undefined);
+												setValidFrom(undefined);
+												onValidFromChange({ validFrom: undefined });
+											}}
+										>
+											<X className='h-4 w-4' />
+										</Button>
+									)}
+								</PopoverTrigger>
+								<PopoverContent>
+									<Calendar
+										mode='single'
+										selected={payoutDate}
+										onSelect={setPayoutDate}
+										disabled={(date) => date.getDay() < new Date().getDay()}
+										initialFocus
+									/>
+								</PopoverContent>
+							</Popover>
+							{payoutDate && validFrom && (
+								<div className='flex flex-1 items-center gap-x-1 text-sm text-wallet_btn_text'>
+									<span>&#8776;</span>
+									<span>{validFrom.toNumber()}</span>
+								</div>
+							)}
 						</div>
-					)}
-				</div>
-			)}
+					</>
+				)}
+			</div>
 			{beneficiaries.length > 1 && (
 				<div className='flex w-full justify-end text-text_pink'>
 					<Button

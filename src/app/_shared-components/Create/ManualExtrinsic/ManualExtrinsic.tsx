@@ -11,21 +11,29 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { NotificationType } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
+import { BN_ZERO } from '@polkadot/util';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
 import PreimageDetailsView from '../PreimageDetailsView/PreimageDetailsView';
+import { Separator } from '../../Separator';
+import TxFeesDetailsView from '../TxFeesDetailsView/TxFeesDetailsView';
 
 function ManualExtrinsic() {
 	const t = useTranslations();
 	const [extrinsicFn, setExtrinsicFn] = useState<SubmittableExtrinsic<'promise'> | null>();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
+	const network = getCurrentNetwork();
 
 	const { toast } = useToast();
 
 	const [isLoading, setIsLoading] = useState(false);
 
 	const extrinsicDetails = useMemo(() => extrinsicFn && apiService?.getPreimageTxDetails({ extrinsicFn }), [apiService, extrinsicFn]);
+
+	const notePreimageTx = useMemo(() => apiService?.getNotePreimageTx({ extrinsicFn }), [apiService, extrinsicFn]);
 
 	const notePreimage = useCallback(async () => {
 		if (!userPreferences.address?.address || !extrinsicFn) {
@@ -68,6 +76,13 @@ function ManualExtrinsic() {
 					preimageLength={extrinsicDetails.preimageLength}
 				/>
 			)}
+			{notePreimageTx && extrinsicDetails && (
+				<TxFeesDetailsView
+					extrinsicFn={[notePreimageTx]}
+					extraFees={[{ name: 'Preimage Deposit', value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO }]}
+				/>
+			)}
+			<Separator />
 			<div className='flex justify-end'>
 				<Button
 					disabled={!extrinsicDetails?.preimageHash}

@@ -17,7 +17,7 @@ function SelectTopic({ onChange, disabled }: { onChange: (topic: EOffChainPostTo
 
 	return (
 		<div className={classes.topicContainer}>
-			{Object.values(EOffChainPostTopic).map((topic: EOffChainPostTopic) => (
+			{Object.values(EOffChainPostTopic).map((topic) => (
 				<Button
 					disabled={disabled}
 					key={topic}

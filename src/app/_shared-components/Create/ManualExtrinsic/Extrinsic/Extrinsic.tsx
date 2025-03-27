@@ -77,7 +77,6 @@ export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtr
 			/>
 			<Params
 				params={extrinsic.params}
-				values={paramValues}
 				onChange={setParamValues}
 			/>
 		</div>
