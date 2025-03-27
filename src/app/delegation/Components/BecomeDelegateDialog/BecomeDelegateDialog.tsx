@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Input } from '@/app/_shared-components/Input';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
 import { useToast } from '@/hooks/useToast';
 import { NotificationType, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
@@ -31,19 +31,25 @@ export default function BecomeDelegateDialog() {
 	const [manifesto, setManifesto] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [checkingDelegate, setCheckingDelegate] = useState(true);
+	const [checkingDelegate, setCheckingDelegate] = useState(false);
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const [isCurrentAddressDelegate, setIsCurrentAddressDelegate] = useState(false);
+	const [initialCheckComplete, setInitialCheckComplete] = useState(false);
 
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
 
+	const buttonText = useMemo(() => {
+		if (!initialCheckComplete || checkingDelegate) return <Loader2 className='h-4 w-4 animate-spin' />;
+		if (isCurrentAddressDelegate) return 'Edit';
+		return t('becomeDelegate');
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [initialCheckComplete, checkingDelegate, isCurrentAddressDelegate]);
+
 	const checkExistingDelegate = async () => {
-		if (!address) {
-			setCheckingDelegate(false);
-			return;
-		}
+		if (!address) return;
+
 		setCheckingDelegate(true);
 		try {
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
@@ -62,12 +68,18 @@ export default function BecomeDelegateDialog() {
 			});
 		} finally {
 			setCheckingDelegate(false);
+			setInitialCheckComplete(true);
 		}
 	};
 
 	useEffect(() => {
-		checkExistingDelegate();
-	}, [user, delegates]);
+		if (dialogOpen) {
+			checkExistingDelegate();
+		} else {
+			setIsCurrentAddressDelegate(false);
+			setInitialCheckComplete(false);
+		}
+	}, [address, dialogOpen, delegates]);
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
@@ -117,7 +129,6 @@ export default function BecomeDelegateDialog() {
 			setDialogOpen(false);
 		} catch (error) {
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
-
 			toast({
 				title: 'Error updating delegate',
 				status: NotificationType.ERROR,
@@ -146,14 +157,17 @@ export default function BecomeDelegateDialog() {
 					className={`${!user || checkingDelegate ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
 					{checkingDelegate ? (
-						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
+						<>
+							<Loader2 className='mr-2 h-4 w-4 animate-spin' />
+							{buttonText}
+						</>
 					) : isCurrentAddressDelegate ? (
 						<>
 							<TfiPencil />
-							Edit
+							{buttonText}
 						</>
 					) : (
-						t('becomeDelegate')
+						buttonText
 					)}
 				</Button>
 			</DialogTrigger>
@@ -172,7 +186,7 @@ export default function BecomeDelegateDialog() {
 						)}
 					</DialogTitle>
 				</DialogHeader>
-				{checkingDelegate ? (
+				{!initialCheckComplete || checkingDelegate ? (
 					<div className='flex h-40 items-center justify-center'>
 						<Loader2 className='h-8 w-8 animate-spin' />
 					</div>
@@ -221,7 +235,14 @@ export default function BecomeDelegateDialog() {
 							className='w-full'
 							onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}
 						>
-							{loading ? <Loader2 className='h-4 w-4 animate-spin' /> : 'Confirm'}
+							{loading ? (
+								<div className='flex items-center gap-2'>
+									<Loader2 className='h-4 w-4 animate-spin' />
+									<span>Processing...</span>
+								</div>
+							) : (
+								'Confirm'
+							)}
 						</Button>
 					</div>
 				)}

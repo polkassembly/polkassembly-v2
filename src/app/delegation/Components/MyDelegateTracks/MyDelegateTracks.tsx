@@ -16,7 +16,6 @@ import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from '../Delegation.module.scss';
 
