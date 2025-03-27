@@ -183,10 +183,12 @@ function Web2Login({
 				small
 				onWalletChange={onWalletChange}
 				hidePreference
+				disabled={loading}
 			/>
 			<SwitchToWeb2Signup
 				className='mt-4 justify-center'
 				switchToSignup={switchToSignup}
+				disabled={loading}
 			/>
 		</div>
 	);

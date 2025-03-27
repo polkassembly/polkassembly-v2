@@ -705,12 +705,13 @@
 		"no": "No",
 		"uploadFile": "Subir Archivo",
 		"includeOption": "Incluir Opción",
-		"preimageNoteFailed": "Error al registrar preimage",
-		"preimageNoteFailedDescription": "Hubo un error al registrar la preimage",
-		"preimageNotedSuccessfully": "Preimage registrada exitosamente",
-		"preimageNotedSuccessfullyDescription": "La preimage ha sido registrada exitosamente",
-		"preimageHash": "Hash de Preimage",
-		"length": "Longitud"
+		"preimageNoteFailed": "Error al anotar preimage",
+		"preimageNoteFailedDescription": "Hubo un error al anotar el preimage",
+		"preimageNotedSuccessfully": "Preimage anotado exitosamente",
+		"preimageNotedSuccessfullyDescription": "El preimage ha sido anotado exitosamente",
+		"preimageHash": "Hash del Preimage",
+		"length": "Longitud",
+		"beneficiary": "Beneficiario"
 	},
 	"AddressInput": {
 		"invalidAddress": "Dirección Inválida",
