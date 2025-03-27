@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Input } from '@/app/_shared-components/Input';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
 import { useToast } from '@/hooks/useToast';
 import { NotificationType, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
@@ -31,7 +31,7 @@ export default function BecomeDelegateDialog() {
 	const [manifesto, setManifesto] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [initialLoading, setInitialLoading] = useState(true);
+	const [checkingDelegate, setCheckingDelegate] = useState(false);
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const [isCurrentAddressDelegate, setIsCurrentAddressDelegate] = useState(false);
@@ -39,17 +39,12 @@ export default function BecomeDelegateDialog() {
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
 
-	const existingDelegate = useMemo(() => {
-		if (!address || !delegates.length) return null;
-		return delegates.find((delegate) => delegate.address === address);
-	}, [address, delegates]);
-
 	const checkExistingDelegate = async () => {
-		if (!address) {
-			setInitialLoading(false);
-			return;
-		}
+		if (!address) return;
+
+		setCheckingDelegate(true);
 		try {
+			const existingDelegate = delegates.find((delegate) => delegate.address === address);
 			setIsCurrentAddressDelegate(!!existingDelegate);
 			if (existingDelegate) {
 				setManifesto(existingDelegate.manifesto || '');
@@ -64,40 +59,14 @@ export default function BecomeDelegateDialog() {
 				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
 		} finally {
-			setInitialLoading(false);
+			setCheckingDelegate(false);
 		}
 	};
 
 	useEffect(() => {
-		if (user?.defaultAddress) {
-			setAddress(user.defaultAddress);
-			checkExistingDelegate();
-		} else {
-			setInitialLoading(false);
-		}
+		checkExistingDelegate();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user, delegates]);
-
-	const buttonContent = useMemo(() => {
-		if (initialLoading) {
-			return (
-				<div className='flex items-center gap-2'>
-					<Loader2 className='h-4 w-4 animate-spin' />
-				</div>
-			);
-		}
-
-		if (isCurrentAddressDelegate) {
-			return (
-				<div className='flex items-center gap-2'>
-					<TfiPencil />
-					<span>Edit</span>
-				</div>
-			);
-		}
-
-		return <span>Become Delegate</span>;
-	}, [initialLoading, isCurrentAddressDelegate]);
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
@@ -170,11 +139,20 @@ export default function BecomeDelegateDialog() {
 		>
 			<DialogTrigger asChild>
 				<Button
-					disabled={!user || initialLoading}
+					disabled={!user || checkingDelegate}
 					onClick={() => setDialogOpen(true)}
-					className={`${!user || initialLoading ? 'cursor-not-allowed opacity-50' : ''} min-w-[160px]`}
+					className={`${!user || checkingDelegate ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
-					{buttonContent}
+					{checkingDelegate ? (
+						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
+					) : isCurrentAddressDelegate ? (
+						<>
+							<TfiPencil />
+							Edit
+						</>
+					) : (
+						<>Become Delegate</>
+					)}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
