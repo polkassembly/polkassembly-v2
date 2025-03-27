@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogDescription } from '@ui/Dialog/Dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogFooter, DialogTitle, DialogHeader } from '@ui/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
 import { IoPersonAdd } from 'react-icons/io5';
@@ -11,8 +11,18 @@ import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
+import { EConvictionAmount } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { BN } from '@polkadot/util';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { Checkbox } from '@/app/_shared-components/checkbox';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { X } from 'lucide-react';
 
 interface DelegateDialogProps {
 	open: boolean;
@@ -21,17 +31,45 @@ interface DelegateDialogProps {
 	children?: ReactNode;
 }
 
+const lockPeriods = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
+
 function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogProps) {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const router = useRouter();
+	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
+	const [balance, setBalance] = useState<string>('');
+	const network = getCurrentNetwork();
+	const tracks = Object.keys(NETWORKS_DETAILS[network].trackDetails);
+	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
+	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!user) {
 			router.push('/login');
 		} else {
 			setOpen(isOpen);
+			setBalance('');
 		}
+	};
+
+	const toggleAllTracks = () => {
+		if (isAllTracksSelected) {
+			setSelectedTracks([]);
+		} else {
+			setSelectedTracks(tracks);
+		}
+		setIsAllTracksSelected(!isAllTracksSelected);
+	};
+
+	const isBalanceValid = () => {
+		if (!balance || balance === '0') return false;
+		const balanceNum = parseFloat(balance);
+		return balanceNum > 0;
+	};
+
+	const handleBalanceChange = ({ value }: { value: BN; assetId: string | null }) => {
+		setBalance(value.toString());
 	};
 
 	return (
@@ -42,27 +80,103 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className='max-w-2xl p-6'>
 				<DialogHeader>
-					<div className='flex items-center gap-2 text-btn_secondary_text'>
-						<IoPersonAdd />
-						<span>{t('delegate')}</span>
-					</div>
+					<DialogTitle>
+						<div className='flex items-center gap-2 text-btn_secondary_text'>
+							<IoPersonAdd />
+							<span>{t('delegate')}</span>
+						</div>
+					</DialogTitle>
 				</DialogHeader>
-				<DialogDescription>
-					<div className='flex flex-col gap-4'>
-						<Label>Your Address</Label>
-						<AddressInput
-							disabled
-							className='bg-network_dropdown_bg'
-							placeholder={user?.defaultAddress}
-						/>
-						<Label>Delegate To</Label>
-						<AddressInput value={delegate.address} />
-						<BalanceInput
-							showBalance
-							label='Balance'
-						/>
+				<div className='flex flex-col gap-4'>
+					<Label>Your Address</Label>
+					<AddressInput
+						disabled
+						className='bg-network_dropdown_bg'
+						placeholder={user?.defaultAddress}
+					/>
+					<Label>Delegate To</Label>
+					<AddressInput value={delegate.address} />
+					<BalanceInput
+						showBalance
+						label='Balance'
+						defaultValue={new BN(balance || '0')}
+						onChange={handleBalanceChange}
+					/>
+					<div className='w-full'>
+						<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
+						<ConvictionSelector onConvictionChange={setConviction} />
 					</div>
-				</DialogDescription>
+					<div className='flex flex-col gap-2 rounded-lg bg-page_background p-4'>
+						<div className='flex items-center justify-between gap-2'>
+							<p className='text-sm text-wallet_btn_text'>Lock Period</p>
+							<p className='text-sm text-wallet_btn_text'>
+								{conviction}x voting balance for duration ({lockPeriods[conviction]})
+							</p>
+						</div>
+						{balance && (
+							<div className='flex items-center justify-between gap-2'>
+								<p className='text-sm text-wallet_btn_text'>Votes</p>
+								<p className='text-sm text-wallet_btn_text'>
+									{balance ? `${formatBnBalance(new BN(balance).muln(conviction + 1).toString(), { withUnit: true, numberAfterComma: 2 }, network)}` : <Skeleton className='h-4' />}
+								</p>
+							</div>
+						)}
+					</div>
+					<div className='flex flex-col gap-4'>
+						<Tooltip>
+							<div className='flex items-center justify-between gap-2 px-2'>
+								<p className='text-sm text-wallet_btn_text'>Selected track(s)</p>
+								<div className='flex cursor-pointer items-center gap-2'>
+									<Checkbox
+										checked={isAllTracksSelected}
+										onCheckedChange={toggleAllTracks}
+									/>
+									<TooltipTrigger asChild>
+										<span className='text-sm text-wallet_btn_text'>Delegate to all available tracks</span>
+									</TooltipTrigger>
+								</div>
+							</div>
+
+							<TooltipContent
+								side='top'
+								align='center'
+								sideOffset={10}
+								className='max-h-[200px] overflow-auto rounded-lg border border-border_grey bg-bg_modal p-4'
+							>
+								<div className='flex flex-col gap-2'>
+									{tracks.map((track) => (
+										<div
+											key={track}
+											className='flex items-center gap-2 py-1'
+										>
+											<Checkbox
+												checked={selectedTracks.includes(track)}
+												onCheckedChange={() => {
+													setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
+												}}
+											/>
+											<span>{track}</span>
+										</div>
+									))}
+								</div>
+							</TooltipContent>
+						</Tooltip>
+						<div className='flex flex-wrap gap-2'>
+							{selectedTracks.map((track) => (
+								<span
+									key={track}
+									className='flex items-center gap-1 rounded-full bg-grey_bg px-3 py-1 text-xs'
+								>
+									{track}
+									<X
+										className='h-3 w-3 cursor-pointer'
+										onClick={() => setSelectedTracks((prev) => prev.filter((t) => t !== track))}
+									/>
+								</span>
+							))}
+						</div>
+					</div>
+				</div>
 				<Separator
 					className='mt-5 w-full'
 					orientation='horizontal'
@@ -75,7 +189,12 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					>
 						Cancel
 					</Button>
-					<Button className='btn-delegate'>Delegate</Button>
+					<Button
+						className='btn-delegate'
+						disabled={!isBalanceValid()}
+					>
+						Delegate
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
