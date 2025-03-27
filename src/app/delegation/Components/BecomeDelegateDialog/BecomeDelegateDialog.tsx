@@ -64,12 +64,8 @@ export default function BecomeDelegateDialog() {
 	};
 
 	useEffect(() => {
-		if (dialogOpen) {
-			checkExistingDelegate();
-		} else {
-			setIsCurrentAddressDelegate(false);
-		}
-	}, [address, dialogOpen, delegates]);
+		checkExistingDelegate();
+	}, [user, delegates]);
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
@@ -138,7 +134,6 @@ export default function BecomeDelegateDialog() {
 				if (!open) {
 					setAddress(user?.defaultAddress || null);
 					setManifesto('');
-					setIsCurrentAddressDelegate(false);
 				}
 			}}
 		>
