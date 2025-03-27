@@ -4,7 +4,7 @@
 
 import { Input } from '@/app/_shared-components/Input';
 import { Search } from 'lucide-react';
-import { memo, useState, useEffect, ChangeEvent, KeyboardEvent, RefObject } from 'react';
+import { memo, useCallback, ChangeEvent, KeyboardEvent, RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import styles from './DelegateSearchInput.module.scss';
 
@@ -15,21 +15,15 @@ interface SearchInputProps {
 }
 
 function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }: SearchInputProps) {
-	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
-
 	const t = useTranslations('Delegation');
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const { value } = e.target;
-		setLocalSearchTerm(value);
-	};
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			handleSearchChange(localSearchTerm);
-		}, 300);
-
-		return () => clearTimeout(timer);
-	}, [localSearchTerm, handleSearchChange]);
+	const handleInputChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value } = e.target;
+			handleSearchChange(value);
+		},
+		[handleSearchChange]
+	);
 
 	return (
 		<div className={styles.searchInputContainer}>
@@ -37,7 +31,7 @@ function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }:
 			<Input
 				ref={searchInputRef}
 				placeholder={t('enterUsernameOrAddressToDelegateVote')}
-				value={localSearchTerm}
+				defaultValue={searchTerm}
 				onChange={handleInputChange}
 				className='pl-10'
 				onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {

@@ -16,7 +16,6 @@ import { IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import { parseBalance } from '@/app/_client-utils/parseBalance';
-
 import styles from './DelegationSupplyData.module.scss';
 
 const ZERO_BN = new BN(0);

@@ -6,7 +6,7 @@ import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PolkadotIcon from '@assets/delegation/polkadot-logo.svg';
@@ -20,9 +20,6 @@ function UserWalletData() {
 	const { user } = useUser();
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	const [balance, setBalance] = useState<string>('0');
-	const [transferableBalance, setTransferableBalance] = useState<string>('0');
-	const [lockedBalance, setLockedBalance] = useState<string>('0');
 	const pathname = usePathname();
 
 	const { data: userBalances } = useQuery({
@@ -31,11 +28,14 @@ function UserWalletData() {
 		enabled: !!user?.id && !!user?.loginAddress
 	});
 
-	useEffect(() => {
-		setBalance(userBalances?.totalBalance.toString() || '0');
-		setTransferableBalance(userBalances?.transferableBalance.toString() || '0');
-		setLockedBalance(userBalances?.lockedBalance.toString() || '0');
-	}, [userBalances]);
+	const balances = useMemo(
+		() => ({
+			balance: formatBnBalance(userBalances?.totalBalance?.toString() || '0', { numberAfterComma: 2, withUnit: true }, network),
+			transferableBalance: formatBnBalance(userBalances?.transferableBalance?.toString() || '0', { numberAfterComma: 2, withUnit: true }, network),
+			lockedBalance: formatBnBalance(userBalances?.lockedBalance?.toString() || '0', { numberAfterComma: 2, withUnit: true }, network)
+		}),
+		[userBalances, network]
+	);
 
 	return (
 		<div className='px-10'>
@@ -54,8 +54,7 @@ function UserWalletData() {
 					<div className={styles.walletInfoBoard2}>
 						<div className='flex items-center gap-x-10 text-btn_primary_text'>
 							<div className='flex flex-col items-center'>
-								<span className='text-2xl font-medium'>{formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</span>
-
+								<span className='text-2xl font-medium'>{balances.balance}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<Image
 										src={PolkadotIcon}
@@ -67,15 +66,14 @@ function UserWalletData() {
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
-								<span className='text-2xl font-medium'>{formatBnBalance(transferableBalance, { numberAfterComma: 2, withUnit: true }, network)}</span>
-
+								<span className='text-2xl font-medium'>{balances.transferableBalance}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<FaCircleCheck className='text-base text-success' />
 									Transferable
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
-								<span className='text-2xl font-medium'>{formatBnBalance(lockedBalance, { numberAfterComma: 2, withUnit: true }, network)}</span>
+								<span className='text-2xl font-medium'>{balances.lockedBalance}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<IoMdLock className='text-base text-lock' />
 									Total Locked
