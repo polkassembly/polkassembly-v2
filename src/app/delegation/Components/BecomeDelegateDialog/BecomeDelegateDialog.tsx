@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Input } from '@/app/_shared-components/Input';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
 import { useToast } from '@/hooks/useToast';
 import { NotificationType, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
@@ -40,13 +40,6 @@ export default function BecomeDelegateDialog() {
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
 
-	const buttonText = useMemo(() => {
-		if (!initialCheckComplete || checkingDelegate) return <Loader2 className='h-4 w-4 animate-spin' />;
-		if (isCurrentAddressDelegate) return 'Edit';
-		return t('becomeDelegate');
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [initialCheckComplete, checkingDelegate, isCurrentAddressDelegate]);
-
 	const checkExistingDelegate = async () => {
 		if (!address) return;
 
@@ -73,12 +66,7 @@ export default function BecomeDelegateDialog() {
 	};
 
 	useEffect(() => {
-		if (dialogOpen) {
-			checkExistingDelegate();
-		} else {
-			setIsCurrentAddressDelegate(false);
-			setInitialCheckComplete(false);
-		}
+		checkExistingDelegate();
 	}, [address, dialogOpen, delegates]);
 
 	const createDelegate = async () => {
@@ -157,17 +145,14 @@ export default function BecomeDelegateDialog() {
 					className={`${!user || checkingDelegate ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
 					{checkingDelegate ? (
-						<>
-							<Loader2 className='mr-2 h-4 w-4 animate-spin' />
-							{buttonText}
-						</>
+						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
 					) : isCurrentAddressDelegate ? (
 						<>
 							<TfiPencil />
-							{buttonText}
+							Edit
 						</>
 					) : (
-						buttonText
+						<>Become Delegate</>
 					)}
 				</Button>
 			</DialogTrigger>
