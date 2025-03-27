@@ -100,15 +100,15 @@ export const GET = withErrorHandling(async () => {
 
 	// Process all delegates in parallel with chunking for better performance
 	const CHUNK_SIZE = 50; // Process 50 delegates at a time
-	const delegateAddresses = Object.keys(allDelegatesWithVotingPowerAndDelegationsCount);
+	const allDelegateAddresses = new Set([...Object.keys(delegatesWithSource), ...Object.keys(allDelegatesWithVotingPowerAndDelegationsCount)]);
 	const allChunkPromises: Promise<IDelegateDetails>[] = [];
 
-	for (let i = 0; i < delegateAddresses.length; i += CHUNK_SIZE) {
-		const chunk = delegateAddresses.slice(i, i + CHUNK_SIZE);
+	for (let i = 0; i < allDelegateAddresses.size; i += CHUNK_SIZE) {
+		const chunk = Array.from(allDelegateAddresses).slice(i, i + CHUNK_SIZE);
 		chunk.forEach((address) => {
 			allChunkPromises.push(
 				(async () => {
-					const { receivedDelegationsCount, votingPower } = allDelegatesWithVotingPowerAndDelegationsCount[String(address)];
+					const { receivedDelegationsCount = 0, votingPower = '0' } = allDelegatesWithVotingPowerAndDelegationsCount[String(address)] ?? {};
 					const [last30DaysConvictionVoteCount, publicUser] = await Promise.all([
 						OnChainDbService.GetLast30DaysConvictionVoteCountByAddress({ network, address }),
 						OffChainDbService.GetPublicUserByAddress(address)
