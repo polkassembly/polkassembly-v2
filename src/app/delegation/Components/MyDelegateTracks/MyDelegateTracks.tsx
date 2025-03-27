@@ -16,8 +16,8 @@ import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import styles from '../Delegation.module.scss';
 import Link from 'next/link';
+import styles from '../Delegation.module.scss';
 
 function MyDelegateTracks() {
 	const { user } = useUser();
