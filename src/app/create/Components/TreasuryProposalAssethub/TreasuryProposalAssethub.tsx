@@ -22,6 +22,7 @@ import TxFeesDetailsView from '@/app/_shared-components/Create/TxFeesDetailsView
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 function TreasuryProposalAssethub() {
 	const t = useTranslations();
@@ -136,6 +137,7 @@ function TreasuryProposalAssethub() {
 				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+					<SwitchWalletOrAddress />
 					<MultipleBeneficiaryForm
 						beneficiaries={beneficiaries}
 						onChange={(value) => setBeneficiaries(value)}

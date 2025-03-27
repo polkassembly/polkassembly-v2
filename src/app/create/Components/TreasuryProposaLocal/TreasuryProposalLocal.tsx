@@ -23,6 +23,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 function TreasuryProposalLocal() {
 	const t = useTranslations();
@@ -144,6 +145,7 @@ function TreasuryProposalLocal() {
 				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+					<SwitchWalletOrAddress />
 					<MultipleBeneficiaryForm
 						beneficiaries={beneficiaries}
 						onChange={(value) => setBeneficiaries(value)}

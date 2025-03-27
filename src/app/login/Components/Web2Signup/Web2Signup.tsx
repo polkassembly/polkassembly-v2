@@ -128,6 +128,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 						<div>
 							<FormField
 								control={formData.control}
+								disabled={loading}
 								name='username'
 								key='username'
 								rules={{
@@ -155,6 +156,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 
 						<div>
 							<FormField
+								disabled={loading}
 								control={formData.control}
 								name='email'
 								key='email'
@@ -248,6 +250,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 					small
 					onWalletChange={onWalletChange}
 					hidePreference
+					disabled={loading}
 				/>
 				<p className={classes.switchToLogin}>
 					{t('Profile.alreadyHaveAnAccount')}
@@ -255,6 +258,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 						onClick={switchToLogin}
 						variant='ghost'
 						className='p-0 text-text_pink'
+						disabled={loading}
 					>
 						{t('Profile.login')}
 					</Button>
