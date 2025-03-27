@@ -25,7 +25,8 @@ function BalanceInput({
 	defaultValue,
 	multiAsset,
 	className,
-	showTreasuryBalance
+	showTreasuryBalance,
+	defaultAssetId
 }: {
 	label?: string;
 	placeholder?: string;
@@ -33,6 +34,7 @@ function BalanceInput({
 	name?: string;
 	disabled?: boolean;
 	defaultValue?: BN;
+	defaultAssetId?: string | null;
 	multiAsset?: boolean;
 	className?: string;
 	showTreasuryBalance?: boolean;
@@ -73,11 +75,12 @@ function BalanceInput({
 	};
 
 	useEffect(() => {
-		if (!defaultValue) return;
+		if (!defaultValue || defaultValue.isZero()) return;
 
-		setValueString(bnToInput(defaultValue, network));
+		setValueString(bnToInput(defaultValue, network, defaultAssetId));
+		setAssetId(defaultAssetId || null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [defaultValue]);
+	}, [network]);
 
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
