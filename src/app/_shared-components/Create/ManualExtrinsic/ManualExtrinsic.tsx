@@ -32,7 +32,7 @@ function ManualExtrinsic() {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const extrinsicDetails = useMemo(() => extrinsicFn && apiService?.getPreimageTxDetails({ extrinsicFn }), [apiService, extrinsicFn]);
+	const extrinsicDetails = useMemo(() => (extrinsicFn ? apiService?.getPreimageTxDetails({ extrinsicFn }) : null), [apiService, extrinsicFn]);
 
 	const notePreimageTx = useMemo(() => apiService?.getNotePreimageTx({ extrinsicFn }), [apiService, extrinsicFn]);
 
