@@ -3,6 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { atom } from 'jotai';
-import { IDelegateDetails } from '@/_shared/types';
+import { IDelegateDetails, ITrackDelegationStats } from '@/_shared/types';
 
 export const delegatesAtom = atom<IDelegateDetails[]>([]);
+
+export const delegateUserTracksAtom = atom<ITrackDelegationStats[]>([]);

@@ -17,6 +17,8 @@ import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useRouter } from 'next/navigation';
+import { useAtom } from 'jotai';
+import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
 import styles from '../Delegation.module.scss';
 
 function MyDelegateTracks() {
@@ -24,9 +26,10 @@ function MyDelegateTracks() {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
 	const router = useRouter();
+	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [activeFilter, setActiveFilter] = useState<EDelegationStatus | 'all'>(EDelegationStatus.ALL);
 
-	const { data, isLoading } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
+	const { isLoading } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
 		queryKey: ['address'],
 		queryFn: async () => {
 			if (!user?.defaultAddress) {
@@ -36,6 +39,7 @@ function MyDelegateTracks() {
 			if (!response.data) {
 				return { delegationStats: [] };
 			}
+			setDelegateUserTracks(response.data.delegationStats);
 			return response.data.delegationStats ? response.data : { delegationStats: [] };
 		},
 		enabled: !!user?.defaultAddress
@@ -49,30 +53,30 @@ function MyDelegateTracks() {
 	] as const;
 
 	const tabCounts = useMemo(() => {
-		if (!data?.delegationStats) return { all: 0, delegated: 0, undelegated: 0 };
+		if (!delegateUserTracks) return { all: 0, delegated: 0, undelegated: 0 };
 
-		const tracks = data.delegationStats;
+		const tracks = delegateUserTracks;
 		return {
 			all: tracks.length,
 			delegated: tracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.DELEGATED).length,
 			undelegated: tracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.UNDELEGATED).length,
 			received: tracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.RECEIVED).length
 		};
-	}, [data]);
+	}, [delegateUserTracks]);
 
 	const filteredTracks = useMemo(() => {
-		if (!data?.delegationStats) return [];
+		if (!delegateUserTracks) return [];
 		switch (activeFilter) {
 			case EDelegationStatus.DELEGATED:
-				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.DELEGATED);
+				return delegateUserTracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.DELEGATED);
 			case EDelegationStatus.RECEIVED:
-				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.RECEIVED);
+				return delegateUserTracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.RECEIVED);
 			case EDelegationStatus.UNDELEGATED:
-				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.UNDELEGATED);
+				return delegateUserTracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.UNDELEGATED);
 			default:
-				return data?.delegationStats;
+				return delegateUserTracks;
 		}
-	}, [data, activeFilter]);
+	}, [delegateUserTracks, activeFilter]);
 
 	return (
 		<div className='mt-6 rounded-lg bg-bg_modal p-6 shadow-lg'>

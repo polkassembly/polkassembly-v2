@@ -771,26 +771,6 @@ export class PolkadotApiService {
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
 	}
 
-	async getDelegationInfo({ address, track }: { address: string; track: number }) {
-		if (!this.api) return null;
-
-		try {
-			const votingInfo = await this.api.query.convictionVoting.votingFor(address, track);
-			if (votingInfo) {
-				const { target, conviction, balance } = votingInfo as any;
-				return {
-					target: target.toString(),
-					conviction: conviction.toNumber(),
-					balance: new BN(balance.toString())
-				};
-			}
-			return null;
-		} catch (error) {
-			console.error('Error getting delegation info:', error);
-			return null;
-		}
-	}
-
 	async delegate({
 		address,
 		delegateAddress,
@@ -809,6 +789,8 @@ export class PolkadotApiService {
 		onFailed: (error: string) => void;
 	}) {
 		if (!this.api) return;
+
+		console.log('tracks', tracks, 'delegateAddress', delegateAddress, 'conviction', conviction, 'balance', balance);
 
 		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
 
@@ -837,5 +819,16 @@ export class PolkadotApiService {
 			onSuccess,
 			onFailed
 		});
+	}
+
+	async getDelegateTxFee({ address, tracks, conviction, balance }: { address: string; tracks: number[]; conviction: number; balance: BN }): Promise<BN> {
+		if (!this.api) return BN_ZERO;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, address, conviction, balance));
+
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+
+		const info = await tx?.paymentInfo(address);
+		return new BN(info?.partialFee?.toString() || '0');
 	}
 }

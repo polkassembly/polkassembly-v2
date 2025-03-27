@@ -10,10 +10,10 @@ import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { ReactNode, useState, useMemo, useEffect } from 'react';
+import { ReactNode, useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
-import { EConvictionAmount } from '@/_shared/types';
+import { EConvictionAmount, EDelegationStatus, EPostOrigin, NotificationType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BN } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -21,9 +21,12 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Checkbox } from '@/app/_shared-components/checkbox';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import { X } from 'lucide-react';
+import { Info, X } from 'lucide-react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { Alert } from '@/app/_shared-components/Alert';
+import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
+import { useAtom } from 'jotai';
+import { useToast } from '@/hooks/useToast';
 
 interface DelegateDialogProps {
 	open: boolean;
@@ -32,7 +35,15 @@ interface DelegateDialogProps {
 	children?: ReactNode;
 }
 
-const lockPeriods = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
+interface DelegationInfo {
+	[trackId: number]: {
+		target: string;
+		conviction: number;
+		balance: BN;
+	};
+}
+
+const LOCK_PERIODS = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
 
 function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogProps) {
 	const { user } = useUser();
@@ -40,106 +51,149 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const router = useRouter();
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	// eslint-disable-next-line
+	const { toast } = useToast();
+
+	// Track data
+	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[network].trackDetails), [network]);
+	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
+
+	// Component state
 	const [isDelegated, setIsDelegated] = useState(false);
-	const [delegationInfo, setDelegationInfo] = useState<{
-		target: string;
-		conviction: number;
-		balance: BN;
-	} | null>(null);
+	const [delegationInfo, setDelegationInfo] = useState<DelegationInfo | null>(null);
 	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
 	const [balance, setBalance] = useState<string>('');
-	const tracks = Object.keys(NETWORKS_DETAILS[network].trackDetails);
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 	const [isBalanceError, setIsBalanceError] = useState<boolean>(false);
 	const [loading, setLoading] = useState(false);
+	const [txFee, setTxFee] = useState<string>('');
 
-	const checkDelegationStatus = async () => {
-		if (!apiService || !user?.defaultAddress || selectedTracks.length === 0) return;
+	const selectedTrackIds = useMemo(
+		() => selectedTracks.map((track) => NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId).filter((id): id is number => id !== undefined),
+		[selectedTracks, network]
+	);
 
-		// const track = parseInt(selectedTracks[0]);
-		// // const isCurrentlyDelegated = await apiService.isDelegated({
-		// // address: user.defaultAddress,
-		// // track
-		// // });
+	const firstTrackId = useMemo(() => (delegationInfo ? (Object.keys(delegationInfo)[0] as unknown as number) : null), [delegationInfo]);
 
-		// setIsDelegated(isCurrentlyDelegated);
-
-		const info = await apiService.getDelegationInfo({
-			address: user.defaultAddress,
-			track: 0
-		});
-
-		console.log('info', info);
-
-		setDelegationInfo(info);
-		if (info) {
-			setBalance(info.balance.toString());
-			setConviction(info.conviction);
-		}
-	};
-
-	useEffect(() => {
-		checkDelegationStatus();
-	}, [user?.defaultAddress, selectedTracks, apiService]);
-
-	const handleOpenChange = (isOpen: boolean) => {
-		if (!user) {
-			router.push('/login');
-		} else {
-			setOpen(isOpen);
-			setBalance('');
-			setIsBalanceError(false);
-		}
-	};
-
-	const toggleAllTracks = () => {
-		if (isAllTracksSelected) {
-			setSelectedTracks([]);
-		} else {
-			setSelectedTracks(tracks);
-		}
-		setIsAllTracksSelected(!isAllTracksSelected);
-	};
+	const currentDelegation = useMemo(() => (firstTrackId !== null && delegationInfo ? delegationInfo[firstTrackId] : null), [firstTrackId, delegationInfo]);
 
 	const isBalanceValid = useMemo(() => {
-		if (!balance || balance === '0') return false;
-		if (!userBalance) return false;
+		if (!balance || balance === '0' || !userBalance) return false;
+
 		const enteredBalance = new BN(balance);
 		const requiredBalance = enteredBalance.muln(conviction + 1);
-		const isValid = enteredBalance.gt(new BN(0)) && requiredBalance.lte(new BN(userBalance));
-		setIsBalanceError(!isValid);
-		return isValid;
-	}, [balance, userBalance, conviction]);
+		const totalRequired = txFee ? requiredBalance.add(new BN(txFee)) : requiredBalance;
 
-	const handleBalanceChange = ({ value }: { value: BN; assetId: string | null }) => {
+		return enteredBalance.gt(new BN(0)) && totalRequired.lte(new BN(userBalance));
+	}, [balance, userBalance, conviction, txFee]);
+
+	useEffect(() => {
+		setIsBalanceError(balance !== '' && !isBalanceValid);
+	}, [balance, isBalanceValid]);
+
+	// Callback functions
+	const handleOpenChange = useCallback(
+		(isOpen: boolean) => {
+			if (!user) {
+				router.push('/login');
+			} else {
+				setOpen(isOpen);
+				if (isOpen) {
+					// Reset states only when opening
+					setBalance('');
+					setIsBalanceError(false);
+					setSelectedTracks([]);
+					setIsAllTracksSelected(false);
+				}
+			}
+		},
+		[user, router, setOpen]
+	);
+
+	const toggleAllTracks = useCallback(() => {
+		setSelectedTracks((prevSelected) => (prevSelected.length === tracks.length ? [] : [...tracks]));
+		setIsAllTracksSelected((prev) => !prev);
+	}, [tracks]);
+
+	const toggleTrack = useCallback((track: string) => {
+		setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
+	}, []);
+
+	const handleBalanceChange = useCallback(({ value }: { value: BN; assetId: string | null }) => {
 		setBalance(value.toString());
-	};
+	}, []);
 
-	const getBalance = async (address: string) => {
-		if (!apiService) return;
+	const checkDelegationStatus = useCallback(async () => {
+		if (!apiService || !user?.defaultAddress || selectedTrackIds.length === 0) return;
 
-		const { totalBalance } = await apiService.getUserBalances({ address });
-		setUserBalance(totalBalance.toString());
-	};
+		const isDelegatedStatus = selectedTrackIds.some((trackId) => delegateUserTracks.find((t) => t.trackId === trackId)?.status === EDelegationStatus.DELEGATED);
 
-	const handleSubmit = async () => {
-		if (!apiService || !user?.defaultAddress || selectedTracks.length === 0) return;
+		setIsDelegated(isDelegatedStatus);
+
+		const delegationInfoData = selectedTrackIds.reduce(
+			(acc, curr) => ({
+				...acc,
+				[curr]: delegateUserTracks.find((t) => t.trackId === curr)
+			}),
+			{}
+		) as DelegationInfo;
+
+		setDelegationInfo(delegationInfoData);
+	}, [apiService, user?.defaultAddress, selectedTrackIds, delegateUserTracks]);
+
+	const getBalance = useCallback(
+		async (address: string) => {
+			if (!apiService) return;
+
+			try {
+				const { totalBalance } = await apiService.getUserBalances({ address });
+				setUserBalance(totalBalance.toString());
+			} catch (error) {
+				console.error('Failed to fetch user balance:', error);
+			}
+		},
+		[apiService]
+	);
+
+	const calculateTxFee = useCallback(async () => {
+		if (!apiService || !user?.defaultAddress || !balance || selectedTrackIds.length === 0) return;
+
+		try {
+			const fee = await apiService.getDelegateTxFee({
+				address: user.defaultAddress,
+				tracks: selectedTrackIds,
+				conviction,
+				balance: new BN(balance)
+			});
+			setTxFee(fee.toString());
+		} catch (error) {
+			console.error('Failed to calculate transaction fee:', error);
+		}
+	}, [apiService, user?.defaultAddress, balance, selectedTrackIds, conviction]);
+
+	const handleSubmit = useCallback(async () => {
+		if (!apiService || !user?.defaultAddress || selectedTrackIds.length === 0) return;
 
 		setLoading(true);
 		try {
 			if (isDelegated) {
 				await apiService.undelegate({
 					address: user.defaultAddress,
-					tracks: selectedTracks.map((track) => parseInt(track, 10)),
+					tracks: selectedTrackIds,
 					onSuccess: () => {
 						setOpen(false);
 						checkDelegationStatus();
+						toast({
+							title: 'Undelegated successfully',
+							status: NotificationType.SUCCESS
+						});
 					},
 					onFailed: (error) => {
-						console.error('Failed to undelegate:', error);
+						toast({
+							title: error,
+							status: NotificationType.ERROR
+						});
 					}
 				});
 			} else {
@@ -148,24 +202,40 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					delegateAddress: delegate.address,
 					balance: new BN(balance),
 					conviction,
-					tracks: selectedTracks.map((track) => parseInt(track, 10)),
+					tracks: selectedTrackIds,
 					onSuccess: () => {
 						setOpen(false);
 						checkDelegationStatus();
+						toast({
+							title: 'Delegated successfully',
+							status: NotificationType.SUCCESS
+						});
 					},
 					onFailed: (error) => {
-						console.error('Failed to delegate:', error);
+						toast({
+							title: error,
+							status: NotificationType.ERROR
+						});
 					}
 				});
 			}
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [apiService, user?.defaultAddress, selectedTrackIds, isDelegated, delegate.address, balance, conviction, setOpen, checkDelegationStatus, toast]);
 
 	useEffect(() => {
 		if (user?.defaultAddress) getBalance(user.defaultAddress);
-	}, [user]);
+	}, [user, getBalance]);
+
+	useEffect(() => {
+		checkDelegationStatus();
+		calculateTxFee();
+	}, [checkDelegationStatus, calculateTxFee]);
+
+	useEffect(() => {
+		setIsAllTracksSelected(selectedTracks.length === tracks.length);
+	}, [selectedTracks, tracks]);
 
 	return (
 		<Dialog
@@ -183,10 +253,10 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-4'>
-					{isDelegated && delegationInfo && (
+					{isDelegated && currentDelegation && (
 						<Alert variant='info'>
-							Currently delegating {formatBnBalance(delegationInfo.balance.toString(), { withUnit: true }, network)} with {delegationInfo.conviction}x conviction to{' '}
-							{delegationInfo.target}
+							Currently delegating {formatBnBalance(currentDelegation.balance.toString(), { withUnit: true }, network)} with {currentDelegation.conviction}x conviction to{' '}
+							{currentDelegation.target}
 						</Alert>
 					)}
 
@@ -216,7 +286,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 								<div className='flex items-center justify-between gap-2'>
 									<p className='text-sm text-wallet_btn_text'>Lock Period</p>
 									<p className='text-sm text-wallet_btn_text'>
-										{conviction}x voting balance for duration ({lockPeriods[conviction]})
+										{conviction}x voting balance for duration ({LOCK_PERIODS[conviction]})
 									</p>
 								</div>
 								{balance && (
@@ -260,9 +330,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 										>
 											<Checkbox
 												checked={selectedTracks.includes(track)}
-												onCheckedChange={() => {
-													setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
-												}}
+												onCheckedChange={() => toggleTrack(track)}
 											/>
 											<span>{track}</span>
 										</div>
@@ -279,12 +347,21 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 									{track}
 									<X
 										className='h-3 w-3 cursor-pointer'
-										onClick={() => setSelectedTracks((prev) => prev.filter((t) => t !== track))}
+										onClick={() => toggleTrack(track)}
 									/>
 								</span>
 							))}
 						</div>
 					</div>
+					{selectedTrackIds.length > 0 && txFee && (
+						<Alert
+							variant='info'
+							className='flex items-center gap-2'
+						>
+							<Info className='h-4 w-4' />
+							<p>An approximate fees of {formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} will be applied to the transaction</p>
+						</Alert>
+					)}
 				</div>
 				<Separator
 					className='mt-5 w-full'
@@ -301,7 +378,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					</Button>
 					<Button
 						className='btn-delegate'
-						disabled={isDelegated ? !selectedTracks.length : !isBalanceValid || !selectedTracks.length}
+						disabled={isDelegated ? !selectedTrackIds.length : !isBalanceValid || !selectedTrackIds.length || loading}
 						onClick={handleSubmit}
 					>
 						{loading ? 'Processing...' : isDelegated ? 'Undelegate' : 'Delegate'}
