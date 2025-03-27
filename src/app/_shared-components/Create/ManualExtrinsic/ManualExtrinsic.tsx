@@ -19,6 +19,7 @@ import { Button } from '../../Button';
 import PreimageDetailsView from '../PreimageDetailsView/PreimageDetailsView';
 import { Separator } from '../../Separator';
 import TxFeesDetailsView from '../TxFeesDetailsView/TxFeesDetailsView';
+import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 function ManualExtrinsic() {
 	const t = useTranslations();
@@ -67,7 +68,8 @@ function ManualExtrinsic() {
 
 	return (
 		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>
-			<div className='flex-1 overflow-y-auto'>
+			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+				<SwitchWalletOrAddress />
 				<Extrinsic onChange={setExtrinsicFn} />
 			</div>
 			{extrinsicDetails && (

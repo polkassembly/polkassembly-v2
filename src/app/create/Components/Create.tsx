@@ -158,12 +158,6 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 					</p>
 				) : (
 					<>
-						{step && (
-							<>
-								<WalletButtons small />
-								<AddressDropdown withBalance />
-							</>
-						)}
 						{step === EProposalStep.CREATE_PREIMAGE && <ManualExtrinsic />}
 						{step === EProposalStep.EXISTING_PREIMAGE && <ExistingPreimage />}
 						{step === EProposalStep.CREATE_TREASURY_PROPOSAL && <TreasuryProposalLocal />}

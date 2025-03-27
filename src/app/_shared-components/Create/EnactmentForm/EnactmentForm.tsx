@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BN, BN_THOUSAND, BN_ZERO } from '@polkadot/util';
 import { EEnactment } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -30,6 +30,8 @@ function EnactmentForm({
 	const { apiService } = usePolkadotApiService();
 	const [enactment, setEnactment] = useState<EEnactment>(selectedEnactment);
 
+	const ref = useRef<HTMLDivElement>(null);
+
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
 			const blockHeight = await apiService?.getCurrentBlockHeight();
@@ -42,7 +44,11 @@ function EnactmentForm({
 	}, [apiService]);
 
 	return (
-		<Collapsible className='rounded-lg border border-border_grey bg-page_background p-4'>
+		<Collapsible
+			ref={ref}
+			onOpenChange={(open) => open && ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+			className='rounded-lg border border-border_grey bg-page_background p-4'
+		>
 			<CollapsibleTrigger className='w-full'>
 				<div className='flex w-full items-center justify-between gap-x-2'>
 					<p className='font-medium text-text_primary'>Advanced</p>

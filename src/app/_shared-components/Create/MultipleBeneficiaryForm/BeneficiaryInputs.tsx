@@ -120,13 +120,13 @@ function BeneficiaryInputs({
 										</Button>
 									)}
 								</PopoverTrigger>
-								<PopoverContent>
+								<PopoverContent className='w-auto'>
 									<Calendar
+										animate
 										mode='single'
 										selected={payoutDate}
 										onSelect={setPayoutDate}
-										disabled={(date) => date.getDay() < new Date().getDay()}
-										initialFocus
+										disabled={(date) => date < new Date()}
 									/>
 								</PopoverContent>
 							</Popover>
