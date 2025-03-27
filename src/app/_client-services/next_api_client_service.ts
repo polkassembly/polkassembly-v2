@@ -33,7 +33,8 @@ import {
 	IVoteCartItem,
 	EConvictionAmount,
 	IDelegationStats,
-	IDelegateDetails
+	IDelegateDetails,
+	ITrackDelegationStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -101,7 +102,7 @@ enum EApiRoute {
 	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
 	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE'
 }
-
+// users/address/{{address}}/delegation/tracks
 export class NextApiClientService {
 	private static isServerSide() {
 		return !global?.window;
@@ -774,5 +775,10 @@ export class NextApiClientService {
 	static async updatePADelegate({ address, manifesto }: { address: string; manifesto: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_PA_DELEGATE, routeSegments: [address] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
+	}
+
+	static async getDelegateTracks({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
+		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
 	}
 }

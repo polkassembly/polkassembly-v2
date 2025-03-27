@@ -1007,6 +1007,7 @@ export interface IDelegateDetails extends IDelegate {
 }
 
 export enum EDelegationStatus {
+	ALL = 'all',
 	RECEIVED = 'received',
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated'

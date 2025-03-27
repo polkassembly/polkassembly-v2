@@ -4,7 +4,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENetwork } from '@/_shared/types';
+import { EDelegationStatus, ITrackDelegationStats, ENetwork } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
@@ -15,57 +15,63 @@ import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import styles from '../Delegation.module.scss';
-
-enum ETrackDelegationStatus {
-	ALL = 'all',
-	DELEGATED = 'delegated',
-	RECEIVED_DELEGATION = 'received_delegation',
-	UNDELEGATED = 'undelegated'
-}
 
 function MyDelegateTracks() {
 	const { user } = useUser();
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
-	const [activeFilter, setActiveFilter] = useState(ETrackDelegationStatus.ALL);
-	const { data, isLoading } = useQuery({
+	const [activeFilter, setActiveFilter] = useState<EDelegationStatus | 'all'>(EDelegationStatus.ALL);
+
+	const { data, isLoading } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
 		queryKey: ['address'],
-		queryFn: () => fetch(`/api/v2/delegation/userData/${user?.defaultAddress}`).then((res) => res.json()),
+		queryFn: async () => {
+			if (!user?.defaultAddress) {
+				return { delegationStats: [] }; // Changed from trackDelegationStats to delegationStats
+			}
+			const response = await NextApiClientService.getDelegateTracks({ address: user.defaultAddress });
+			if (!response.data) {
+				return { delegationStats: [] };
+			}
+			console.log('response.data', response.data);
+			return response.data.delegationStats ? response.data : { delegationStats: [] };
+		},
 		enabled: !!user?.defaultAddress
 	});
 
+	console.log('data?.trackDelegationStats', data);
+
 	const FILTER_OPTIONS = [
-		{ value: ETrackDelegationStatus.ALL, label: t('all') },
-		{ value: ETrackDelegationStatus.DELEGATED, label: t('delegated') },
-		{ value: ETrackDelegationStatus.RECEIVED_DELEGATION, label: t('receivedDelegation') },
-		{ value: ETrackDelegationStatus.UNDELEGATED, label: t('undelegated') }
+		{ value: EDelegationStatus.ALL, label: t('all') },
+		{ value: EDelegationStatus.DELEGATED, label: t('delegated') },
+		{ value: EDelegationStatus.RECEIVED, label: t('receivedDelegation') },
+		{ value: EDelegationStatus.UNDELEGATED, label: t('undelegated') }
 	] as const;
 
 	const tabCounts = useMemo(() => {
-		if (!data) return { all: 0, delegated: 0, received_delegation: 0, undelegated: 0 };
+		if (!data?.delegationStats) return { all: 0, delegated: 0, undelegated: 0 };
 
+		const tracks = data.delegationStats;
 		return {
-			all: data?.length
-			// delegated: data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.DELEGATED)).length,
-			// received_delegation: data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION)).length,
-			// undelegated: data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.UNDELEGATED)).length
+			all: tracks.length,
+			delegated: tracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.DELEGATED).length,
+			undelegated: tracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.UNDELEGATED).length,
+			received: tracks.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.RECEIVED).length
 		};
 	}, [data]);
 
 	const filteredTracks = useMemo(() => {
-		if (!data) return [];
-
-		// eslint-disable-next-line
+		if (!data?.delegationStats) return [];
 		switch (activeFilter) {
-			// case ETrackDelegationStatus.DELEGATED:
-			// return data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.DELEGATED));
-			// case ETrackDelegationStatus.RECEIVED_DELEGATION:
-			// return data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION));
-			// case ETrackDelegationStatus.UNDELEGATED:
-			// return data?.filter((track: ITrackDelegation) => track.status.includes(ETrackDelegationStatus.UNDELEGATED));
+			case EDelegationStatus.DELEGATED:
+				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status.includes(EDelegationStatus.DELEGATED));
+			case EDelegationStatus.RECEIVED:
+				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status.includes(EDelegationStatus.RECEIVED));
+			case EDelegationStatus.UNDELEGATED:
+				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status.includes(EDelegationStatus.UNDELEGATED));
 			default:
-				return data;
+				return data?.delegationStats;
 		}
 	}, [data, activeFilter]);
 
@@ -77,8 +83,8 @@ function MyDelegateTracks() {
 				<div className='mt-4 md:hidden'>
 					<Select
 						value={activeFilter}
-						onValueChange={(value: ETrackDelegationStatus) => {
-							setActiveFilter(value as ETrackDelegationStatus);
+						onValueChange={(value: EDelegationStatus | 'all') => {
+							setActiveFilter(value as EDelegationStatus);
 						}}
 					>
 						<SelectTrigger className={styles.selectTrigger}>
@@ -99,11 +105,11 @@ function MyDelegateTracks() {
 
 				<div className='hidden md:block'>
 					<RadioGroup
-						defaultValue={ETrackDelegationStatus.ALL}
+						defaultValue={EDelegationStatus.ALL}
 						value={activeFilter}
 						name='track-filter'
 						className='flex flex-row space-x-2 lg:space-x-4'
-						onValueChange={(value: ETrackDelegationStatus) => {
+						onValueChange={(value: EDelegationStatus) => {
 							setActiveFilter(value);
 						}}
 					>
@@ -135,7 +141,7 @@ function MyDelegateTracks() {
 				<div className='flex h-full items-center justify-center'>
 					<LoadingSpinner />
 				</div>
-			) : filteredTracks.length > 0 ? (
+			) : filteredTracks && filteredTracks.length > 0 ? (
 				<Table>
 					<TableHeader>
 						<TableRow className={styles.tableRow}>
@@ -147,35 +153,35 @@ function MyDelegateTracks() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-						{filteredTracks.map((track: any, index: number) => {
-							const trackDetails = Object.values(NETWORKS_DETAILS[network as ENetwork].trackDetails).find((detail) => detail.trackId === track.track);
+						{filteredTracks &&
+							filteredTracks.map((track: ITrackDelegationStats, index: number) => {
+								const trackDetails = Object.values(NETWORKS_DETAILS[network as ENetwork].trackDetails).find((detail) => detail.trackId === track.trackId);
 
-							return (
-								<TableRow key={track.track}>
-									<TableCell className='px-6 py-4'>{index + 1}</TableCell>
-									<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
-									<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
-									<TableCell className={styles.tableCell_3}>{track.active_proposals_count}</TableCell>
-									<TableCell className={styles.tableCell_3}>
-										{track.status.length > 0 ? (
-											<span
-												className={cn(
-													'rounded-[26px] px-3 py-1.5 text-center text-sm',
-													track.status.includes(ETrackDelegationStatus.RECEIVED_DELEGATION) && 'bg-received_delegation_bg',
-													track.status.includes(ETrackDelegationStatus.DELEGATED) && 'bg-delegated_delegation_bg',
-													track.status.includes(ETrackDelegationStatus.UNDELEGATED) && 'bg-undelegated_delegation_bg'
-												)}
-											>
-												{track.status.map((status: string) => status.split('_').join(' ').charAt(0).toUpperCase() + status.split('_').join(' ').slice(1)).join(', ')}
-											</span>
-										) : (
-											<span className='px-3 py-1.5 text-center text-sm'>-</span>
-										)}
-									</TableCell>
-								</TableRow>
-							);
-						})}
+								return (
+									<TableRow key={track.trackId}>
+										<TableCell className='px-6 py-4'>{index + 1}</TableCell>
+										<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
+										<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
+										<TableCell className={styles.tableCell_3}>{track.activeProposalsCount}</TableCell>
+										<TableCell className={styles.tableCell_3}>
+											{track.status.length > 0 ? (
+												<span
+													className={cn(
+														'rounded-[26px] px-3 py-1.5 text-center text-sm text-text_primary',
+														track.status.includes(EDelegationStatus.RECEIVED) && 'bg-received_delegation_bg',
+														track.status.includes(EDelegationStatus.DELEGATED) && 'bg-delegated_delegation_bg',
+														track.status.includes(EDelegationStatus.UNDELEGATED) && 'bg-undelegated_delegation_bg'
+													)}
+												>
+													{track.status && track.status.length > 0 ? track.status.charAt(0).toUpperCase() + track.status.slice(1) : '-'}
+												</span>
+											) : (
+												<span className='px-3 py-1.5 text-center text-sm'>-</span>
+											)}
+										</TableCell>
+									</TableRow>
+								);
+							})}
 					</TableBody>
 				</Table>
 			) : (
