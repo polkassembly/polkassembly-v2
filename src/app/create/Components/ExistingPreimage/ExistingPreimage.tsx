@@ -4,12 +4,10 @@
 
 import { EEnactment, NotificationType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
-import { Form } from '@/app/_shared-components/Form';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
 import SelectTrack from '@/app/_shared-components/Create/SelectTrack/SelectTrack';
@@ -48,7 +46,6 @@ function ExistingPreimage() {
 		});
 	}, [apiService, selectedEnactment, selectedTrack, debouncedPreimageHash, preimageLength, advancedDetails]);
 
-	const formData = useForm();
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
@@ -111,65 +108,60 @@ function ExistingPreimage() {
 	};
 
 	return (
-		<Form {...formData}>
-			<form
-				onSubmit={formData.handleSubmit(createProposal)}
-				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
-			>
-				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<SwitchWalletOrAddress />
-					<div className='flex flex-col gap-y-1'>
-						<p className='flex items-center justify-between text-sm text-wallet_btn_text'>
-							{t('CreateProposal.preimageHash')}
-							<span className='text-xs font-medium text-text_primary'>
-								{t('CreateProposal.preimageLength')} {preimageLength || '--'}
-							</span>
-						</p>
-						<InputText
-							onChange={setPreimageHash}
-							placeholder={t('CreateProposal.preimageHashDescription')}
-							value={preimageHash}
-						/>
-					</div>
-
-					<SelectTrack
-						selectedTrack={selectedTrack}
-						onChange={(track) => setSelectedTrack(track)}
-					/>
-
-					<EnactmentForm
-						selectedEnactment={selectedEnactment}
-						onEnactmentChange={setSelectedEnactment}
-						advancedDetails={advancedDetails}
-						onEnactmentValueChange={setAdvancedDetails}
-					/>
-
-					<TxFeesDetailsView
-						extrinsicFn={[submitProposalTx]}
-						extraFees={[{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }]}
+		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
+			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+				<SwitchWalletOrAddress />
+				<div className='flex flex-col gap-y-1'>
+					<p className='flex items-center justify-between text-sm text-wallet_btn_text'>
+						{t('CreateProposal.preimageHash')}
+						<span className='text-xs font-medium text-text_primary'>
+							{t('CreateProposal.preimageLength')} {preimageLength || '--'}
+						</span>
+					</p>
+					<InputText
+						onChange={setPreimageHash}
+						placeholder={t('CreateProposal.preimageHashDescription')}
+						value={preimageHash}
 					/>
 				</div>
 
-				<Separator />
+				<SelectTrack
+					selectedTrack={selectedTrack}
+					onChange={(track) => setSelectedTrack(track)}
+				/>
 
-				<div className='flex justify-end'>
-					<Button
-						type='submit'
-						isLoading={loading}
-						disabled={
-							!userPreferences.address?.address ||
-							!selectedTrack ||
-							!selectedEnactment ||
-							!preimageLength ||
-							!isValidPreimageHash ||
-							!ValidatorService.isValidPreimageHash(preimageHash)
-						}
-					>
-						{t('CreateTreasuryProposal.createProposal')}
-					</Button>
-				</div>
-			</form>
-		</Form>
+				<EnactmentForm
+					selectedEnactment={selectedEnactment}
+					onEnactmentChange={setSelectedEnactment}
+					advancedDetails={advancedDetails}
+					onEnactmentValueChange={setAdvancedDetails}
+				/>
+
+				<TxFeesDetailsView
+					extrinsicFn={[submitProposalTx]}
+					extraFees={[{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }]}
+				/>
+			</div>
+
+			<Separator />
+
+			<div className='flex justify-end'>
+				<Button
+					onClick={createProposal}
+					isLoading={loading}
+					disabled={
+						!userPreferences.address?.address ||
+						!selectedTrack ||
+						!selectedEnactment ||
+						!preimageLength ||
+						!isValidPreimageHash ||
+						!ValidatorService.isValidPreimageHash(preimageHash)
+					}
+				>
+					{t('CreateTreasuryProposal.createProposal')}
+				</Button>
+			</div>
+		</div>
 	);
 }
 
