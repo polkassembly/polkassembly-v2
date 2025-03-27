@@ -112,7 +112,11 @@ function ReactionBar({
 				/>
 
 				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
+					<DropdownMenuTrigger
+						asChild
+						className='border-none'
+						noArrow
+					>
 						<BsThreeDots className='text-lg text-bg_pink' />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent

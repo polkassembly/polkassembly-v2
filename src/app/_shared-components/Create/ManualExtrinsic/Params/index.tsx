@@ -18,12 +18,17 @@ function Params({ params, values, onChange }: { params: IParamDef[]; values?: un
 	};
 
 	useEffect(() => {
+		setParamValues(values || []);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [params]);
+
+	useEffect(() => {
 		onChange(paramValues);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [paramValues]);
 
 	return (
-		<div className='flex flex-col gap-y-4 pl-2'>
+		<div className='flex flex-col gap-y-4 border-l-2 border-dashed border-border_grey pl-2'>
 			{params &&
 				params.map((param, index) => {
 					return (
