@@ -35,7 +35,6 @@ export default function BecomeDelegateDialog() {
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const [isCurrentAddressDelegate, setIsCurrentAddressDelegate] = useState(false);
-	const [initialCheckComplete, setInitialCheckComplete] = useState(false);
 
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
@@ -61,13 +60,13 @@ export default function BecomeDelegateDialog() {
 			});
 		} finally {
 			setCheckingDelegate(false);
-			setInitialCheckComplete(true);
 		}
 	};
 
 	useEffect(() => {
 		checkExistingDelegate();
-	}, [address, dialogOpen, delegates]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user, delegates]);
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
@@ -158,79 +157,63 @@ export default function BecomeDelegateDialog() {
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>
-					<DialogTitle>
-						{checkingDelegate ? (
+					<DialogTitle>{isCurrentAddressDelegate ? 'Edit Delegate Details' : t('becomeDelegate')}</DialogTitle>
+				</DialogHeader>
+
+				<div className='flex flex-col gap-y-4'>
+					<AddressDropdown
+						withBalance
+						onChange={(account) => setAddress(account.address)}
+					/>
+					<div className='flex flex-col gap-y-2'>
+						<p className='text-sm text-wallet_btn_text'>
+							Your Delegation Manifesto <span className='text-text_pink'>*</span>
+						</p>
+						<Input
+							title='Your Delegation Mandate'
+							placeholder='Add message for delegate address '
+							className='w-full'
+							required
+							value={manifesto}
+							onChange={(e) => setManifesto(e.target.value)}
+						/>
+					</div>
+					<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
+						<AiOutlineInfoCircle className='text-toast_info_border' />
+						<span className='flex items-center gap-x-2 text-xs'>
+							To add socials to your delegate profile{' '}
+							<Link
+								href='/set-identity'
+								className='flex items-center gap-x-1 text-text_pink'
+							>
+								<Image
+									src={identityIcon}
+									alt='Polkassembly'
+									width={16}
+									height={16}
+								/>{' '}
+								Set Identity
+							</Link>{' '}
+							with Polkassembly
+						</span>
+					</div>
+
+					<Button
+						size='lg'
+						disabled={loading}
+						className='w-full'
+						onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}
+					>
+						{loading ? (
 							<div className='flex items-center gap-2'>
 								<Loader2 className='h-4 w-4 animate-spin' />
-								Checking delegate status...
+								<span>Processing...</span>
 							</div>
-						) : isCurrentAddressDelegate ? (
-							'Edit Delegate Details'
 						) : (
-							t('becomeDelegate')
+							'Confirm'
 						)}
-					</DialogTitle>
-				</DialogHeader>
-				{!initialCheckComplete || checkingDelegate ? (
-					<div className='flex h-40 items-center justify-center'>
-						<Loader2 className='h-8 w-8 animate-spin' />
-					</div>
-				) : (
-					<div className='flex flex-col gap-y-4'>
-						<AddressDropdown
-							withBalance
-							onChange={(account) => setAddress(account.address)}
-						/>
-						<div className='flex flex-col gap-y-2'>
-							<p className='text-sm text-wallet_btn_text'>
-								Your Delegation Manifesto <span className='text-text_pink'>*</span>
-							</p>
-							<Input
-								title='Your Delegation Mandate'
-								placeholder='Add message for delegate address '
-								className='w-full'
-								required
-								value={manifesto}
-								onChange={(e) => setManifesto(e.target.value)}
-							/>
-						</div>
-						<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
-							<AiOutlineInfoCircle className='text-toast_info_border' />
-							<span className='flex items-center gap-x-2 text-xs'>
-								To add socials to your delegate profile{' '}
-								<Link
-									href='/set-identity'
-									className='flex items-center gap-x-1 text-text_pink'
-								>
-									<Image
-										src={identityIcon}
-										alt='Polkassembly'
-										width={16}
-										height={16}
-									/>{' '}
-									Set Identity
-								</Link>{' '}
-								with Polkassembly
-							</span>
-						</div>
-
-						<Button
-							size='lg'
-							disabled={loading}
-							className='w-full'
-							onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}
-						>
-							{loading ? (
-								<div className='flex items-center gap-2'>
-									<Loader2 className='h-4 w-4 animate-spin' />
-									<span>Processing...</span>
-								</div>
-							) : (
-								'Confirm'
-							)}
-						</Button>
-					</div>
-				)}
+					</Button>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);
