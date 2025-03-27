@@ -40,7 +40,7 @@ export default function BecomeDelegateDialog() {
 	const network = getCurrentNetwork();
 
 	const checkExistingDelegate = async () => {
-		if (!address) return;
+		if (!address) return setCheckingDelegate(false);
 		try {
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
 			setIsCurrentAddressDelegate(!!existingDelegate);

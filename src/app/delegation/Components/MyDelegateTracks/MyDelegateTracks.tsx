@@ -17,6 +17,7 @@ import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import styles from '../Delegation.module.scss';
+import Link from 'next/link';
 
 function MyDelegateTracks() {
 	const { user } = useUser();
@@ -155,28 +156,33 @@ function MyDelegateTracks() {
 								const trackDetails = Object.values(NETWORKS_DETAILS[network as ENetwork].trackDetails).find((detail) => detail.trackId === track.trackId);
 
 								return (
-									<TableRow key={track.trackId}>
-										<TableCell className='px-6 py-4'>{index + 1}</TableCell>
-										<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
-										<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
-										<TableCell className={styles.tableCell_3}>{track.activeProposalsCount}</TableCell>
-										<TableCell className={styles.tableCell_3}>
-											{track.status ? (
-												<span
-													className={cn(
-														'rounded-[26px] px-3 py-1.5 text-center text-sm text-text_primary',
-														track.status === EDelegationStatus.RECEIVED && 'bg-received_delegation_bg',
-														track.status === EDelegationStatus.DELEGATED && 'bg-delegated_delegation_bg',
-														track.status === EDelegationStatus.UNDELEGATED && 'bg-undelegated_delegation_bg'
-													)}
-												>
-													{track.status ? track.status.charAt(0).toUpperCase() + track.status.slice(1) : '-'}
-												</span>
-											) : (
-												<span className='px-3 py-1.5 text-center text-sm'>-</span>
-											)}
-										</TableCell>
-									</TableRow>
+									<Link
+										key={trackDetails?.name}
+										href={`/delegation/${trackDetails?.name.replace(/_/g, '-')}`}
+									>
+										<TableRow>
+											<TableCell className='px-6 py-4'>{index + 1}</TableCell>
+											<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
+											<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
+											<TableCell className={styles.tableCell_3}>{track.activeProposalsCount}</TableCell>
+											<TableCell className={styles.tableCell_3}>
+												{track.status ? (
+													<span
+														className={cn(
+															'rounded-[26px] px-3 py-1.5 text-center text-sm text-text_primary',
+															track.status === EDelegationStatus.RECEIVED && 'bg-received_delegation_bg',
+															track.status === EDelegationStatus.DELEGATED && 'bg-delegated_delegation_bg',
+															track.status === EDelegationStatus.UNDELEGATED && 'bg-undelegated_delegation_bg'
+														)}
+													>
+														{track.status ? track.status.charAt(0).toUpperCase() + track.status.slice(1) : '-'}
+													</span>
+												) : (
+													<span className='px-3 py-1.5 text-center text-sm'>-</span>
+												)}
+											</TableCell>
+										</TableRow>
+									</Link>
 								);
 							})}
 					</TableBody>
