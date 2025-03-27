@@ -24,10 +24,13 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
+import { useRouter } from 'next/navigation';
 
 function TreasuryProposalLocal() {
 	const t = useTranslations();
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
+
+	const router = useRouter();
 
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
@@ -89,7 +92,7 @@ function TreasuryProposalLocal() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				window.location.reload();
+				router.back();
 				redirectFromServer(`/referenda/${postId}?created=true`);
 			},
 			onFailed: () => {
