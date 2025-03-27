@@ -712,7 +712,9 @@
 		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
 		"preimageHash": "Preimage-Hash",
 		"length": "Länge",
-		"beneficiary": "Begünstigter"
+		"beneficiary": "Begünstigter",
+		"noBeneficiarySelected": "Kein Begünstigter ausgewählt",
+		"on": "an"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",

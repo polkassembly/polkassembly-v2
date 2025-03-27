@@ -712,7 +712,9 @@
 		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
 		"preimageHash": "プレイメージハッシュ",
 		"length": "長さ",
-		"beneficiary": "受取人"
+		"beneficiary": "受取人",
+		"noBeneficiarySelected": "受取人が選択されていません",
+		"on": "オン"
 	},
 	"AddressInput": {
 		"invalidAddress": "無効なアドレス",

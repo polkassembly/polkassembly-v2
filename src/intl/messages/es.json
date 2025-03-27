@@ -712,7 +712,9 @@
 		"preimageNotedSuccessfullyDescription": "El preimage ha sido anotado exitosamente",
 		"preimageHash": "Hash del Preimage",
 		"length": "Longitud",
-		"beneficiary": "Beneficiario"
+		"beneficiary": "Beneficiario",
+		"noBeneficiarySelected": "Ningún Beneficiario Seleccionado",
+		"on": "en"
 	},
 	"AddressInput": {
 		"invalidAddress": "Dirección Inválida",

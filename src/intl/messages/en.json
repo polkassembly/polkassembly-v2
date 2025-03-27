@@ -731,7 +731,9 @@
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageHash": "Preimage Hash",
 		"length": "Length",
-		"beneficiary": "Beneficiary"
+		"beneficiary": "Beneficiary",
+		"noBeneficiarySelected": "No Beneficiary Selected",
+		"on": "on"
 	},
 	"KillCancelReferendum": {
 		"referendumId": "Enter Referendum Index",

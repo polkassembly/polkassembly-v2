@@ -67,6 +67,7 @@ function MultipleBeneficiaryForm({
 						onRemoveBeneficiary={() => removeBeneficiary(index)}
 						multiAsset={multiAsset}
 						stagedPayment={stagedPayment}
+						beneficiary={b}
 					/>
 				))}
 			</div>
