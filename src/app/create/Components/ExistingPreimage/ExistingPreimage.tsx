@@ -20,6 +20,8 @@ import TxFeesDetailsView from '@/app/_shared-components/Create/TxFeesDetailsView
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
+import Link from 'next/link';
+import { SquareArrowOutUpRight } from 'lucide-react';
 
 function ExistingPreimage() {
 	const t = useTranslations();
@@ -123,6 +125,18 @@ function ExistingPreimage() {
 						placeholder={t('CreateProposal.preimageHashDescription')}
 						value={preimageHash}
 					/>
+					{preimageHash && isValidPreimageHash && (
+						<div className='flex w-full items-center justify-end'>
+							<Link
+								href={`/preimages/${preimageHash}`}
+								target='_blank'
+								className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
+							>
+								<SquareArrowOutUpRight className='h-4 w-4' />
+								{t('CreateProposal.viewPreimage')}
+							</Link>
+						</div>
+					)}
 				</div>
 
 				<SelectTrack

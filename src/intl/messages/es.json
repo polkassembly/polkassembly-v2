@@ -676,7 +676,8 @@
 		"goBack": "Volver",
 		"preimageHash": "Hash de Preimage",
 		"preimageLength": "Longitud",
-		"preimageHashDescription": "Ingresar Hash"
+		"preimageHashDescription": "Ingresar Hash",
+		"viewPreimage": "Ver Preimage"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
