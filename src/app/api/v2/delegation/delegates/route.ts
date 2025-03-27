@@ -3,15 +3,22 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NOVA_DELEGATES, PARITY_DELEGATES, W3F_DELEGATES } from '@/_shared/_constants/delegates';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EDelegateSource, ENetwork, IDelegate, IDelegateDetails } from '@/_shared/types';
+import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { APIError } from '@/app/api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { encodeAddress, cryptoWaitReady } from '@polkadot/util-crypto';
+import { StatusCodes } from 'http-status-codes';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 interface INovaDelegate {
 	address: string;
@@ -67,7 +74,7 @@ export const GET = withErrorHandling(async () => {
 			image: novaDelegate.image,
 			manifesto: novaDelegate.longDescription,
 			name: novaDelegate.name,
-			source: EDelegateSource.NOVA,
+			sources: [...(delegatesWithSource[novaDelegate.address]?.sources ?? []), EDelegateSource.NOVA],
 			network
 		};
 	});
@@ -78,7 +85,7 @@ export const GET = withErrorHandling(async () => {
 			address: parityDelegate.address,
 			manifesto: parityDelegate.manifesto,
 			name: parityDelegate.name,
-			source: EDelegateSource.PARITY,
+			sources: [...(delegatesWithSource[parityDelegate.address]?.sources ?? []), EDelegateSource.PARITY],
 			network
 		};
 	});
@@ -87,7 +94,7 @@ export const GET = withErrorHandling(async () => {
 	polkassemblyDelegates.forEach((polkassemblyDelegate) => {
 		delegatesWithSource[encodeAddress(polkassemblyDelegate.address, NETWORKS_DETAILS[network as ENetwork].ss58Format)] = {
 			...polkassemblyDelegate,
-			source: EDelegateSource.POLKASSEMBLY
+			sources: [...(delegatesWithSource[polkassemblyDelegate.address]?.sources ?? []), EDelegateSource.POLKASSEMBLY]
 		};
 	});
 
@@ -109,7 +116,7 @@ export const GET = withErrorHandling(async () => {
 
 					return {
 						address,
-						source: delegatesWithSource[String(address)]?.source ?? EDelegateSource.INDIVIDUAL,
+						sources: delegatesWithSource[String(address)]?.sources ?? [EDelegateSource.INDIVIDUAL],
 						createdAt: delegatesWithSource[String(address)]?.createdAt,
 						updatedAt: delegatesWithSource[String(address)]?.updatedAt,
 						image: delegatesWithSource[String(address)]?.image,
@@ -132,4 +139,34 @@ export const GET = withErrorHandling(async () => {
 	await RedisService.SetDelegateDetails(network, delegateDetails);
 
 	return NextResponse.json(delegateDetails);
+});
+
+// Add Polkassembly delegate
+export const POST = withErrorHandling(async (req: Request) => {
+	const zodBodySchema = z.object({
+		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address'),
+		manifesto: z.string().min(1, 'Manifesto is required')
+	});
+
+	const { address, manifesto } = zodBodySchema.parse(await getReqBody(req));
+
+	const network = await getNetworkFromHeaders();
+
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	// check if address belongs to the user
+	const user = await OffChainDbService.GetUserByAddress(address);
+	if (!user || user.id !== AuthService.GetUserIdFromAccessToken(newAccessToken)) {
+		throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN, 'You are not allowed to add this address as a delegate.');
+	}
+
+	const newPolkassemblyDelegateId = await OffChainDbService.AddPolkassemblyDelegate({ network, address, manifesto });
+
+	// invalidate delegate details cache
+	await RedisService.DeleteDelegateDetails(network);
+
+	const response = NextResponse.json({ id: newPolkassemblyDelegateId });
+	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+	return response;
 });

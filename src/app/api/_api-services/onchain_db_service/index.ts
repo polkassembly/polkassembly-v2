@@ -166,4 +166,8 @@ export class OnChainDbService {
 	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network: ENetwork) {
 		return SubsquidService.GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network);
 	}
+
+	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }) {
+		return SubsquidService.GetDelegateDetails({ network, address });
+	}
 }

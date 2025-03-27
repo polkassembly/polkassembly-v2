@@ -481,4 +481,33 @@ export class SubsquidService extends SubsquidUtils {
 
 		return result;
 	}
+
+	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }): Promise<{
+		votingPower: string;
+		receivedDelegationsCount: number;
+		last30DaysVotedProposalsCount: number;
+	}> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_DELEGATE_DETAILS;
+
+		const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address, createdAt_gte: thirtyDaysAgo.toISOString() }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain delegate details from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain delegate details from Subsquid');
+		}
+
+		const votingPower = subsquidData.votingDelegations.reduce((acc: BN, delegation: { balance: string }) => {
+			return new BN(acc).add(new BN(delegation.balance));
+		}, BN_ZERO);
+
+		return {
+			votingPower: votingPower.toString(),
+			receivedDelegationsCount: subsquidData.votingDelegations.length,
+			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount
+		};
+	}
 }

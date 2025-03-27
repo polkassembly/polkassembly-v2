@@ -334,6 +334,10 @@ export class OffChainDbService {
 		return FirestoreService.GetPolkassemblyDelegates(network);
 	}
 
+	static async GetPolkassemblyDelegateByAddress({ network, address }: { network: ENetwork; address: string }): Promise<IDelegate | null> {
+		return FirestoreService.GetPolkassemblyDelegateByAddress({ network, address });
+	}
+
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
@@ -819,5 +823,17 @@ export class OffChainDbService {
 
 	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
 		return FirestoreService.SaveTreasuryStats({ treasuryStats });
+	}
+
+	static async AddPolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		return FirestoreService.AddPolkassemblyDelegate({ network, address, manifesto });
+	}
+
+	static async UpdatePolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		return FirestoreService.UpdatePolkassemblyDelegate({ network, address, manifesto });
+	}
+
+	static async DeletePolkassemblyDelegate({ network, address }: { network: ENetwork; address: string }) {
+		return FirestoreService.DeletePolkassemblyDelegate({ network, address });
 	}
 }
