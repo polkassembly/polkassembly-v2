@@ -120,7 +120,6 @@
     "eslint-plugin-react-hooks": "^4",
     "eslint-plugin-security": "^1",
     "eslint-plugin-simple-import-sort": "^12",
-    "eslint-plugin-sonarjs": "^0",
     "husky": "^9.1.5",
     "lint-staged": "^15.2.9",
     "postcss": "^8",
