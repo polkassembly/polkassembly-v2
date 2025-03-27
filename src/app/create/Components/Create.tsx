@@ -4,7 +4,6 @@
 
 'use client';
 
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import ManualExtrinsic from '@/app/_shared-components/Create/ManualExtrinsic/ManualExtrinsic';
 import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { useUser } from '@/hooks/useUser';
@@ -24,7 +23,6 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/app/_shared-components/Separator';
 import { ENetwork, EProposalStep } from '@/_shared/types';
-import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
