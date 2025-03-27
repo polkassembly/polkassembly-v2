@@ -27,6 +27,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Link from 'next/link';
 import { SquareArrowOutUpRight, TriangleAlert } from 'lucide-react';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 function CancelReferendum() {
 	const t = useTranslations();
@@ -164,6 +165,7 @@ function CancelReferendum() {
 				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+					<SwitchWalletOrAddress />
 					<div className='flex flex-col gap-y-2'>
 						<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
 						<InputNumber

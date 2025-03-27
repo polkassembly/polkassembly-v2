@@ -700,17 +700,18 @@
 	},
 	"CreatePreimage": {
 		"addItem": "添加受益人/支付",
-		"removeItem": "移除支付",
+		"removeItem": "删除支付",
 		"yes": "是",
 		"no": "否",
 		"uploadFile": "上传文件",
 		"includeOption": "包含选项",
 		"preimageNoteFailed": "预映像记录失败",
-		"preimageNoteFailedDescription": "记录预映像时出现错误",
+		"preimageNoteFailedDescription": "记录预映像时发生错误",
 		"preimageNotedSuccessfully": "预映像记录成功",
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageHash": "预映像哈希",
-		"length": "长度"
+		"length": "长度",
+		"beneficiary": "受益人"
 	},
 	"AddressInput": {
 		"invalidAddress": "无效地址",

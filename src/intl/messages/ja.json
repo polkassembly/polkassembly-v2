@@ -699,7 +699,7 @@
 		"enterFutureBlockHeight": "将来のブロック高を入力してください"
 	},
 	"CreatePreimage": {
-		"addItem": "受益者/支払いを追加",
+		"addItem": "受取人/支払いを追加",
 		"removeItem": "支払いを削除",
 		"yes": "はい",
 		"no": "いいえ",
@@ -710,7 +710,8 @@
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
 		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
 		"preimageHash": "プレイメージハッシュ",
-		"length": "長さ"
+		"length": "長さ",
+		"beneficiary": "受取人"
 	},
 	"AddressInput": {
 		"invalidAddress": "無効なアドレス",

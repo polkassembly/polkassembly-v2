@@ -705,12 +705,13 @@
 		"no": "Nein",
 		"uploadFile": "Datei hochladen",
 		"includeOption": "Option einschließen",
-		"preimageNoteFailed": "Preimage-Notierung fehlgeschlagen",
-		"preimageNoteFailedDescription": "Bei der Notierung des Preimage ist ein Fehler aufgetreten",
+		"preimageNoteFailed": "Preimage-Notiz fehlgeschlagen",
+		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
 		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
 		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
 		"preimageHash": "Preimage-Hash",
-		"length": "Länge"
+		"length": "Länge",
+		"beneficiary": "Begünstigter"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",
