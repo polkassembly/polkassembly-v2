@@ -44,6 +44,7 @@ export default function BecomeDelegateDialog() {
 			setCheckingDelegate(false);
 			return;
 		}
+		setCheckingDelegate(true);
 		try {
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
 			setIsCurrentAddressDelegate(!!existingDelegate);
