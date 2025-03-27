@@ -41,7 +41,7 @@ export default function PollForProposal({ index, referer }: { index: string; ref
 				}
 			} catch (err) {
 				if (!isMounted) return;
-				setError(err instanceof Error ? err.message : 'Failed to fetch data');
+				console.log(err);
 			}
 		};
 

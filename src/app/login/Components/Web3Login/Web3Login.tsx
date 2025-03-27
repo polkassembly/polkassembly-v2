@@ -97,7 +97,6 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				status: NotificationType.ERROR,
 				title: t('Profile.loginFailed')
 			});
-		} finally {
 			setLoading(false);
 		}
 	};

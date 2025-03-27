@@ -111,7 +111,6 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 				status: NotificationType.ERROR,
 				title: t('Profile.signupFailed')
 			});
-		} finally {
 			setLoading(false);
 		}
 	};

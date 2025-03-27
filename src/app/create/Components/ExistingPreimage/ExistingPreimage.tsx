@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EEnactment, NotificationType } from '@/_shared/types';
-import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import { Button } from '@/app/_shared-components/Button';
 import { Form } from '@/app/_shared-components/Form';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -97,8 +96,7 @@ function ExistingPreimage() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				window.location.reload();
-				redirectFromServer(`/referenda/${postId}?created=true`);
+				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {
 				toast({

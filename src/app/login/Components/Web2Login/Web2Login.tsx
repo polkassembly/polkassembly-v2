@@ -107,7 +107,6 @@ function Web2Login({
 				status: NotificationType.ERROR,
 				title: t('Profile.loginFailed')
 			});
-		} finally {
 			setLoading(false);
 		}
 	};

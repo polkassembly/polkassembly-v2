@@ -7,7 +7,6 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { EEnactment, EPostOrigin, EProposalType, NotificationType } from '@/_shared/types';
-import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import { Button } from '@/app/_shared-components/Button';
 import { Form } from '@/app/_shared-components/Form';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -109,8 +108,7 @@ function CancelReferendum() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				window.location.reload();
-				redirectFromServer(`/referenda/${postId}?created=true`);
+				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {
 				toast({
