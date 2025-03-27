@@ -24,10 +24,6 @@ import DelegateSearchInput from '../DelegateSearchInput/DelegateSearchInput';
 import styles from '../Delegation.module.scss';
 import DelegateCard from '../DelegationCard/DelegationCard';
 
-interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
-	sources: EDelegateSource[];
-}
-
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
 	return (
@@ -142,7 +138,7 @@ function DelegationDetailsCard() {
 					{paginatedDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full items-center gap-5 lg:grid-cols-2'>
-								{paginatedDelegates.map((delegate: GroupedDelegateDetails) => (
+								{paginatedDelegates.map((delegate: IDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}
 										delegate={delegate}

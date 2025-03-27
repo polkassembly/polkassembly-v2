@@ -8,34 +8,14 @@ import { useCallback, useMemo, useState } from 'react';
 
 type SortOption = 'VOTING_POWER' | 'VOTED_PROPOSALS' | 'RECEIVED_DELEGATIONS';
 
-interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
-	sources: EDelegateSource[];
-}
-
 const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>([]);
 	const [sortBy, setSortBy] = useState<SortOption>('VOTING_POWER');
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
-	const groupedDelegates = useMemo(() => {
-		const delegateGroups: { [address: string]: GroupedDelegateDetails } = {};
 
-		delegates.forEach((delegate) => {
-			if (!delegateGroups[delegate.address]) {
-				delegateGroups[delegate.address] = {
-					...delegate,
-					sources: [delegate.source]
-				};
-			} else {
-				delegateGroups[delegate.address].sources.push(delegate.source);
-			}
-		});
-
-		return Object.values(delegateGroups);
-	}, [delegates]);
-
-	const searchDelegate = useCallback((delegate: GroupedDelegateDetails, query: string) => {
+	const searchDelegate = useCallback((delegate: IDelegateDetails, query: string) => {
 		if (!query || query.trim() === '') return true;
 
 		const searchTerm = query.toLowerCase().trim();
@@ -43,7 +23,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	}, []);
 
 	const filterBySource = useCallback(
-		(delegate: GroupedDelegateDetails) => {
+		(delegate: IDelegateDetails) => {
 			if (selectedSources.length === 0) return true;
 			return selectedSources.some((source) => delegate.sources.includes(source));
 		},
@@ -51,7 +31,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	);
 
 	const sortDelegates = useCallback(
-		(a: GroupedDelegateDetails, b: GroupedDelegateDetails) => {
+		(a: IDelegateDetails, b: IDelegateDetails) => {
 			switch (sortBy) {
 				case 'VOTING_POWER':
 					return Number(BigInt(b.votingPower || '0') - BigInt(a.votingPower || '0'));
@@ -67,10 +47,11 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	);
 
 	const filteredAndSortedDelegates = useMemo(() => {
-		const searchFiltered = groupedDelegates.filter((delegate) => searchDelegate(delegate, searchQuery));
+		const searchFiltered = delegates.filter((delegate) => searchDelegate(delegate, searchQuery));
 		const sourceFiltered = searchFiltered.filter(filterBySource);
 		return sourceFiltered.sort(sortDelegates);
-	}, [groupedDelegates, searchQuery, filterBySource, sortDelegates, searchDelegate]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchQuery, filterBySource, sortDelegates, searchDelegate]);
 
 	const paginatedDelegates = useMemo(() => {
 		const start = (currentPage - 1) * itemsPerPage;

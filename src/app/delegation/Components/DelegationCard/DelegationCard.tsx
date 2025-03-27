@@ -18,12 +18,8 @@ import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Separator } from '@/app/_shared-components/Separator';
 import PlatformLogos from '../PlatformLogos/PlatformLogos';
 
-interface GroupedDelegateDetails extends Omit<IDelegateDetails, 'source'> {
-	sources: EDelegateSource[];
-}
-
 interface DelegateCardProps {
-	delegate: GroupedDelegateDetails;
+	delegate: IDelegateDetails;
 	network: ENetwork;
 }
 
