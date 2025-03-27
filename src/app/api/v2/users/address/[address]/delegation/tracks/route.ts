@@ -19,19 +19,13 @@ const zodParamsSchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string }> }) => {
 	const [{ address }, network] = await Promise.all([zodParamsSchema.parse(await params), getNetworkFromHeaders()]);
 
-	console.log({ address, network });
-
 	const { trackDetails } = NETWORKS_DETAILS[network as ENetwork];
 	const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
-
-	console.log({ allTrackIds });
 
 	const [allVoteDelegations, activeProposalsCountByTrackIds] = await Promise.all([
 		OnChainDbService.GetConvictionVoteDelegationsByAddress({ network, address }),
 		OnChainDbService.GetActiveProposalsCountByTrackIds({ network, trackIds: allTrackIds })
 	]);
-
-	console.log({ allVoteDelegations, activeProposalsCountByTrackIds });
 
 	// for each track, get the delegation status and active proposals
 	const delegationStats = Object.values(trackDetails).map((track) => {
