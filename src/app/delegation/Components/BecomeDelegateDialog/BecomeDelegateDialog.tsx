@@ -31,7 +31,7 @@ export default function BecomeDelegateDialog() {
 	const [manifesto, setManifesto] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [checkingDelegate, setCheckingDelegate] = useState(false);
+	const [checkingDelegate, setCheckingDelegate] = useState(true);
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const [isCurrentAddressDelegate, setIsCurrentAddressDelegate] = useState(false);
@@ -41,8 +41,6 @@ export default function BecomeDelegateDialog() {
 
 	const checkExistingDelegate = async () => {
 		if (!address) return;
-
-		setCheckingDelegate(true);
 		try {
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
 			setIsCurrentAddressDelegate(!!existingDelegate);
