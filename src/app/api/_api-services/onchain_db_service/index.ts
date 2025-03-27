@@ -168,6 +168,20 @@ export class OnChainDbService {
 	}
 
 	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }) {
-		return SubsquidService.GetDelegateDetails({ network, address });
+		return SubsquidService.GetDelegateDetails({
+			network,
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
+		});
+	}
+
+	static async GetConvictionVoteDelegationsByAddress({ network, address }: { network: ENetwork; address: string }) {
+		return SubsquidService.GetConvictionVoteDelegationsByAddress({
+			network,
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
+		});
+	}
+
+	static async GetActiveProposalsCountByTrackIds({ network, trackIds }: { network: ENetwork; trackIds: number[] }) {
+		return SubsquidService.GetActiveProposalsCountByTrackIds({ network, trackIds });
 	}
 }

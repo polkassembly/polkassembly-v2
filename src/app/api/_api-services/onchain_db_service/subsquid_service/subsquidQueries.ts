@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+
 export class SubsquidQueries {
 	// single proposal queries
 
@@ -647,4 +649,32 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_CONVICTION_VOTE_DELEGATIONS_BY_ADDRESS = `
+		query GetConvictionVoteDelegationsByAddress($address_eq: String!) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address_eq}) {
+				to
+				from
+				track
+			}
+		}
+	`;
+
+	protected static GET_ACTIVE_PROPOSALS_COUNT_BY_TRACK_IDS = (trackIds: number[]) => {
+		const trackQueries = trackIds
+			.map(
+				(trackId) => `
+				track_${trackId}: proposalsConnection(orderBy: id_ASC, where: {status_in: [${ACTIVE_PROPOSAL_STATUSES.join(',')}], trackNumber_eq: ${trackId}}) {
+					totalCount
+				}
+			`
+			)
+			.join('\n');
+
+		return `
+			query GetActiveProposalsCountByTrackIds {
+				${trackQueries}
+			}
+		`;
+	};
 }

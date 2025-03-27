@@ -1005,3 +1005,15 @@ export interface IDelegateDetails extends IDelegate {
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
 }
+
+export enum EDelegationStatus {
+	RECEIVED = 'received',
+	DELEGATED = 'delegated',
+	UNDELEGATED = 'undelegated'
+}
+
+export interface ITrackDelegationStats {
+	trackId: number;
+	status: EDelegationStatus;
+	activeProposalsCount: number;
+}
