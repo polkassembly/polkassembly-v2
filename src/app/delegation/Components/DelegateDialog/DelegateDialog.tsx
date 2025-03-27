@@ -23,6 +23,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { X } from 'lucide-react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { Alert } from '@/app/_shared-components/Alert';
 
 interface DelegateDialogProps {
 	open: boolean;
@@ -38,15 +39,51 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const t = useTranslations('Delegation');
 	const router = useRouter();
 	const { apiService } = usePolkadotApiService();
-
+	const network = getCurrentNetwork();
+	// eslint-disable-next-line
+	const [isDelegated, setIsDelegated] = useState(false);
+	const [delegationInfo, setDelegationInfo] = useState<{
+		target: string;
+		conviction: number;
+		balance: BN;
+	} | null>(null);
 	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
 	const [balance, setBalance] = useState<string>('');
-	const network = getCurrentNetwork();
 	const tracks = Object.keys(NETWORKS_DETAILS[network].trackDetails);
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 	const [isBalanceError, setIsBalanceError] = useState<boolean>(false);
+	const [loading, setLoading] = useState(false);
+
+	const checkDelegationStatus = async () => {
+		if (!apiService || !user?.defaultAddress || selectedTracks.length === 0) return;
+
+		// const track = parseInt(selectedTracks[0]);
+		// // const isCurrentlyDelegated = await apiService.isDelegated({
+		// // address: user.defaultAddress,
+		// // track
+		// // });
+
+		// setIsDelegated(isCurrentlyDelegated);
+
+		const info = await apiService.getDelegationInfo({
+			address: user.defaultAddress,
+			track: 0
+		});
+
+		console.log('info', info);
+
+		setDelegationInfo(info);
+		if (info) {
+			setBalance(info.balance.toString());
+			setConviction(info.conviction);
+		}
+	};
+
+	useEffect(() => {
+		checkDelegationStatus();
+	}, [user?.defaultAddress, selectedTracks, apiService]);
 
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!user) {
@@ -88,10 +125,48 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		setUserBalance(totalBalance.toString());
 	};
 
+	const handleSubmit = async () => {
+		if (!apiService || !user?.defaultAddress || selectedTracks.length === 0) return;
+
+		setLoading(true);
+		try {
+			if (isDelegated) {
+				await apiService.undelegate({
+					address: user.defaultAddress,
+					tracks: selectedTracks.map((track) => parseInt(track, 10)),
+					onSuccess: () => {
+						setOpen(false);
+						checkDelegationStatus();
+					},
+					onFailed: (error) => {
+						console.error('Failed to undelegate:', error);
+					}
+				});
+			} else {
+				await apiService.delegate({
+					address: user.defaultAddress,
+					delegateAddress: delegate.address,
+					balance: new BN(balance),
+					conviction,
+					tracks: selectedTracks.map((track) => parseInt(track, 10)),
+					onSuccess: () => {
+						setOpen(false);
+						checkDelegationStatus();
+					},
+					onFailed: (error) => {
+						console.error('Failed to delegate:', error);
+					}
+				});
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {
 		if (user?.defaultAddress) getBalance(user.defaultAddress);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
+
 	return (
 		<Dialog
 			open={open}
@@ -103,46 +178,59 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					<DialogTitle>
 						<div className='flex items-center gap-2 text-btn_secondary_text'>
 							<IoPersonAdd />
-							<span>{t('delegate')}</span>
+							<span>{isDelegated ? t('undelegate') : t('delegate')}</span>
 						</div>
 					</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-4'>
+					{isDelegated && delegationInfo && (
+						<Alert variant='info'>
+							Currently delegating {formatBnBalance(delegationInfo.balance.toString(), { withUnit: true }, network)} with {delegationInfo.conviction}x conviction to{' '}
+							{delegationInfo.target}
+						</Alert>
+					)}
+
 					<Label>Your Address</Label>
 					<AddressInput
 						disabled
 						className='bg-network_dropdown_bg'
 						placeholder={user?.defaultAddress}
 					/>
-					<Label>Delegate To</Label>
-					<AddressInput value={delegate.address} />
-					<BalanceInput
-						showBalance
-						label='Balance'
-						defaultValue={new BN(balance || '0')}
-						onChange={handleBalanceChange}
-					/>
-					{isBalanceError && <p className='text-sm text-red-500'>You don&apos;t have enough balance to delegate</p>}
-					<div className='w-full'>
-						<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
-						<ConvictionSelector onConvictionChange={setConviction} />
-					</div>
-					<div className='flex flex-col gap-2 rounded-lg bg-page_background p-4'>
-						<div className='flex items-center justify-between gap-2'>
-							<p className='text-sm text-wallet_btn_text'>Lock Period</p>
-							<p className='text-sm text-wallet_btn_text'>
-								{conviction}x voting balance for duration ({lockPeriods[conviction]})
-							</p>
-						</div>
-						{balance && (
-							<div className='flex items-center justify-between gap-2'>
-								<p className='text-sm text-wallet_btn_text'>Votes</p>
-								<p className='text-sm text-wallet_btn_text'>
-									{balance ? `${formatBnBalance(new BN(balance).muln(conviction + 1).toString(), { withUnit: true, numberAfterComma: 2 }, network)}` : <Skeleton className='h-4' />}
-								</p>
+
+					{!isDelegated && (
+						<>
+							<Label>Delegate To</Label>
+							<AddressInput value={delegate.address} />
+							<BalanceInput
+								showBalance
+								label='Balance'
+								defaultValue={new BN(balance || '0')}
+								onChange={handleBalanceChange}
+							/>
+							{isBalanceError && <p className='text-sm text-red-500'>You don&apos;t have enough balance to delegate</p>}
+							<div className='w-full'>
+								<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
+								<ConvictionSelector onConvictionChange={setConviction} />
 							</div>
-						)}
-					</div>
+							<div className='flex flex-col gap-2 rounded-lg bg-page_background p-4'>
+								<div className='flex items-center justify-between gap-2'>
+									<p className='text-sm text-wallet_btn_text'>Lock Period</p>
+									<p className='text-sm text-wallet_btn_text'>
+										{conviction}x voting balance for duration ({lockPeriods[conviction]})
+									</p>
+								</div>
+								{balance && (
+									<div className='flex items-center justify-between gap-2'>
+										<p className='text-sm text-wallet_btn_text'>Votes</p>
+										<p className='text-sm text-wallet_btn_text'>
+											{balance ? formatBnBalance(new BN(balance).muln(conviction + 1).toString(), { withUnit: true, numberAfterComma: 2 }, network) : <Skeleton className='h-4' />}
+										</p>
+									</div>
+								)}
+							</div>
+						</>
+					)}
+
 					<div className='flex flex-col gap-4'>
 						<Tooltip>
 							<div className='flex items-center justify-between gap-2 px-2'>
@@ -153,7 +241,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 										onCheckedChange={toggleAllTracks}
 									/>
 									<TooltipTrigger asChild>
-										<span className='text-sm text-wallet_btn_text'>Delegate to all available tracks</span>
+										<span className='text-sm text-wallet_btn_text'>{isDelegated ? 'Undelegate from all tracks' : 'Delegate to all available tracks'}</span>
 									</TooltipTrigger>
 								</div>
 							</div>
@@ -207,14 +295,16 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						variant='secondary'
 						className='btn-cancel'
 						onClick={() => setOpen(false)}
+						disabled={loading}
 					>
 						Cancel
 					</Button>
 					<Button
 						className='btn-delegate'
-						disabled={!isBalanceValid}
+						disabled={isDelegated ? !selectedTracks.length : !isBalanceValid || !selectedTracks.length}
+						onClick={handleSubmit}
 					>
-						Delegate
+						{loading ? 'Processing...' : isDelegated ? 'Undelegate' : 'Delegate'}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

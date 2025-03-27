@@ -770,4 +770,72 @@ export class PolkadotApiService {
 		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
 	}
+
+	async getDelegationInfo({ address, track }: { address: string; track: number }) {
+		if (!this.api) return null;
+
+		try {
+			const votingInfo = await this.api.query.convictionVoting.votingFor(address, track);
+			if (votingInfo) {
+				const { target, conviction, balance } = votingInfo as any;
+				return {
+					target: target.toString(),
+					conviction: conviction.toNumber(),
+					balance: new BN(balance.toString())
+				};
+			}
+			return null;
+		} catch (error) {
+			console.error('Error getting delegation info:', error);
+			return null;
+		}
+	}
+
+	async delegate({
+		address,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api) return;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed
+		});
+	}
+
+	async undelegate({ address, tracks, onSuccess, onFailed }: { address: string; tracks: number[]; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api) return;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
+
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed
+		});
+	}
 }
