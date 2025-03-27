@@ -22,6 +22,8 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
+const ERROR_UNKNOWN = 'An unknown error occurred';
+
 export default function BecomeDelegateDialog() {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
@@ -29,23 +31,41 @@ export default function BecomeDelegateDialog() {
 	const [manifesto, setManifesto] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [checkingDelegate, setCheckingDelegate] = useState(false);
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
 
-	useEffect(() => {
-		if (address) {
+	const checkExistingDelegate = async () => {
+		if (!address) return;
+
+		setCheckingDelegate(true);
+		try {
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
 			if (existingDelegate) {
 				setManifesto(existingDelegate.manifesto || '');
 			} else {
 				setManifesto('');
 			}
+		} catch (error) {
+			console.error('Error checking delegate status:', error);
+			toast({
+				title: 'Error checking delegate status',
+				status: NotificationType.ERROR,
+				description: error instanceof Error ? error.message : ERROR_UNKNOWN
+			});
+		} finally {
+			setCheckingDelegate(false);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [address, dialogOpen]);
+	};
+
+	useEffect(() => {
+		if (dialogOpen) {
+			checkExistingDelegate();
+		}
+	}, [address, dialogOpen, delegates]);
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
@@ -74,7 +94,7 @@ export default function BecomeDelegateDialog() {
 			toast({
 				title: 'Error creating delegate',
 				status: NotificationType.ERROR,
-				description: error instanceof Error ? error.message : 'An unknown error occurred'
+				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
 		} finally {
 			setLoading(false);
@@ -99,7 +119,7 @@ export default function BecomeDelegateDialog() {
 			toast({
 				title: 'Error updating delegate',
 				status: NotificationType.ERROR,
-				description: error instanceof Error ? error.message : 'An unknown error occurred'
+				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
 		} finally {
 			setLoading(false);
@@ -121,11 +141,13 @@ export default function BecomeDelegateDialog() {
 		>
 			<DialogTrigger asChild>
 				<Button
-					disabled={!user}
+					disabled={!user || checkingDelegate}
 					onClick={() => setDialogOpen(true)}
-					className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
+					className={`${!user || checkingDelegate ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
-					{isCurrentAddressDelegate ? (
+					{checkingDelegate ? (
+						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
+					) : isCurrentAddressDelegate ? (
 						<>
 							<TfiPencil />
 							Edit
@@ -137,55 +159,72 @@ export default function BecomeDelegateDialog() {
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>
-					<DialogTitle>{isCurrentAddressDelegate ? 'Edit Delegate Details' : t('becomeDelegate')}</DialogTitle>
+					<DialogTitle>
+						{checkingDelegate ? (
+							<div className='flex items-center gap-2'>
+								<Loader2 className='h-4 w-4 animate-spin' />
+								Checking delegate status...
+							</div>
+						) : isCurrentAddressDelegate ? (
+							'Edit Delegate Details'
+						) : (
+							t('becomeDelegate')
+						)}
+					</DialogTitle>
 				</DialogHeader>
-				<div className='flex flex-col gap-y-4'>
-					<AddressDropdown
-						withBalance
-						onChange={(account) => setAddress(account.address)}
-					/>
-					<div className='flex flex-col gap-y-2'>
-						<p className='text-sm text-wallet_btn_text'>
-							Your Delegation Manifesto <span className='text-text_pink'>*</span>
-						</p>
-						<Input
-							title='Your Delegation Mandate'
-							placeholder='Add message for delegate address '
-							className='w-full'
-							required
-							value={manifesto}
-							onChange={(e) => setManifesto(e.target.value)}
+				{checkingDelegate ? (
+					<div className='flex h-40 items-center justify-center'>
+						<Loader2 className='h-8 w-8 animate-spin' />
+					</div>
+				) : (
+					<div className='flex flex-col gap-y-4'>
+						<AddressDropdown
+							withBalance
+							onChange={(account) => setAddress(account.address)}
 						/>
-					</div>
-					<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
-						<AiOutlineInfoCircle className='text-toast_info_border' />
-						<span className='flex items-center gap-x-2 text-xs'>
-							To add socials to your delegate profile{' '}
-							<Link
-								href='/set-identity'
-								className='flex items-center gap-x-1 text-text_pink'
-							>
-								<Image
-									src={identityIcon}
-									alt='Polkassembly'
-									width={16}
-									height={16}
-								/>{' '}
-								Set Identity
-							</Link>{' '}
-							with Polkassembly
-						</span>
-					</div>
+						<div className='flex flex-col gap-y-2'>
+							<p className='text-sm text-wallet_btn_text'>
+								Your Delegation Manifesto <span className='text-text_pink'>*</span>
+							</p>
+							<Input
+								title='Your Delegation Mandate'
+								placeholder='Add message for delegate address '
+								className='w-full'
+								required
+								value={manifesto}
+								onChange={(e) => setManifesto(e.target.value)}
+							/>
+						</div>
+						<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
+							<AiOutlineInfoCircle className='text-toast_info_border' />
+							<span className='flex items-center gap-x-2 text-xs'>
+								To add socials to your delegate profile{' '}
+								<Link
+									href='/set-identity'
+									className='flex items-center gap-x-1 text-text_pink'
+								>
+									<Image
+										src={identityIcon}
+										alt='Polkassembly'
+										width={16}
+										height={16}
+									/>{' '}
+									Set Identity
+								</Link>{' '}
+								with Polkassembly
+							</span>
+						</div>
 
-					<Button
-						size='lg'
-						disabled={loading}
-						className='w-full'
-						onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}
-					>
-						{loading ? <Loader2 className='h-4 w-4 animate-spin' /> : 'Confirm'}
-					</Button>
-				</div>
+						<Button
+							size='lg'
+							disabled={loading}
+							className='w-full'
+							onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}
+						>
+							{loading ? <Loader2 className='h-4 w-4 animate-spin' /> : 'Confirm'}
+						</Button>
+					</div>
+				)}
 			</DialogContent>
 		</Dialog>
 	);
