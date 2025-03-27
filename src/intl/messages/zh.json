@@ -712,7 +712,9 @@
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageHash": "预映像哈希",
 		"length": "长度",
-		"beneficiary": "受益人"
+		"beneficiary": "受益人",
+		"noBeneficiarySelected": "未选择受益人",
+		"on": "开启"
 	},
 	"AddressInput": {
 		"invalidAddress": "无效地址",

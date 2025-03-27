@@ -6,8 +6,9 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 
-export function bnToInput(bn: BN, network: ENetwork): string {
-	const tokenDecimal = NETWORKS_DETAILS[`${network}`].tokenDecimals;
+export function bnToInput(bn: BN, network: ENetwork, assetId?: string | null): string {
+	const networkDetails = NETWORKS_DETAILS[`${network}`];
+	const tokenDecimal = assetId ? networkDetails.supportedAssets[`${assetId}`].tokenDecimal || networkDetails.tokenDecimals : networkDetails.tokenDecimals;
 
 	if (bn.isZero()) {
 		return '0';
