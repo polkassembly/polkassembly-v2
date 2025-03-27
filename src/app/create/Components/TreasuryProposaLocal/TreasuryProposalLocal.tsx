@@ -4,12 +4,10 @@
 
 import { EEnactment, IBeneficiaryInput, NotificationType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
-import { Form } from '@/app/_shared-components/Form';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -38,7 +36,6 @@ function TreasuryProposalLocal() {
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
-	const formData = useForm();
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
@@ -139,75 +136,70 @@ function TreasuryProposalLocal() {
 	};
 
 	return (
-		<Form {...formData}>
-			<form
-				onSubmit={formData.handleSubmit(createPreimage)}
-				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
-			>
-				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<SwitchWalletOrAddress />
-					<MultipleBeneficiaryForm
-						beneficiaries={beneficiaries}
-						onChange={(value) => setBeneficiaries(value)}
-					/>
-					<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-4 font-medium text-text_primary'>
-						<span>Requested Amount</span>
-						<span>
-							{formatter.format(Number(formatBnBalance(totalAmount, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-						</span>
-					</div>
-
-					<SelectTrack
-						selectedTrack={selectedTrack}
-						onChange={(track) => setSelectedTrack(track)}
-						isTreasury
-					/>
-
-					<EnactmentForm
-						selectedEnactment={selectedEnactment}
-						onEnactmentChange={setSelectedEnactment}
-						advancedDetails={advancedDetails}
-						onEnactmentValueChange={setAdvancedDetails}
-					/>
+		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
+			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+				<SwitchWalletOrAddress />
+				<MultipleBeneficiaryForm
+					beneficiaries={beneficiaries}
+					onChange={(value) => setBeneficiaries(value)}
+				/>
+				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-4 font-medium text-text_primary'>
+					<span>Requested Amount</span>
+					<span>
+						{formatter.format(Number(formatBnBalance(totalAmount, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+					</span>
 				</div>
 
-				{preimageDetails && (
-					<PreimageDetailsView
-						preimageHash={preimageDetails.preimageHash}
-						preimageLength={preimageDetails.preimageLength}
-					/>
-				)}
+				<SelectTrack
+					selectedTrack={selectedTrack}
+					onChange={(track) => setSelectedTrack(track)}
+					isTreasury
+				/>
 
-				{notePreimageTx && submitProposalTx && (
-					<TxFeesDetailsView
-						extrinsicFn={[notePreimageTx, submitProposalTx]}
-						extraFees={[
-							{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
-							{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
-						]}
-					/>
-				)}
+				<EnactmentForm
+					selectedEnactment={selectedEnactment}
+					onEnactmentChange={setSelectedEnactment}
+					advancedDetails={advancedDetails}
+					onEnactmentValueChange={setAdvancedDetails}
+				/>
+			</div>
 
-				<Separator />
+			{preimageDetails && (
+				<PreimageDetailsView
+					preimageHash={preimageDetails.preimageHash}
+					preimageLength={preimageDetails.preimageLength}
+				/>
+			)}
 
-				<div className='flex justify-end'>
-					<Button
-						type='submit'
-						isLoading={loading}
-						disabled={
-							totalAmount.isZero() ||
-							!beneficiaries.length ||
-							beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
-							!userPreferences.address?.address ||
-							!selectedTrack ||
-							!selectedEnactment
-						}
-					>
-						{t('CreateTreasuryProposal.createProposal')}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			{notePreimageTx && submitProposalTx && (
+				<TxFeesDetailsView
+					extrinsicFn={[notePreimageTx, submitProposalTx]}
+					extraFees={[
+						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
+						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
+					]}
+				/>
+			)}
+
+			<Separator />
+
+			<div className='flex justify-end'>
+				<Button
+					onClick={createPreimage}
+					isLoading={loading}
+					disabled={
+						totalAmount.isZero() ||
+						!beneficiaries.length ||
+						beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
+						!userPreferences.address?.address ||
+						!selectedTrack ||
+						!selectedEnactment
+					}
+				>
+					{t('CreateTreasuryProposal.createProposal')}
+				</Button>
+			</div>
+		</div>
 	);
 }
 
