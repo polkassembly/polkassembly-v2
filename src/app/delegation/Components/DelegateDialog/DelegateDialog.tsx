@@ -53,11 +53,9 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const network = getCurrentNetwork();
 	const { toast } = useToast();
 
-	// Track data
 	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[network].trackDetails), [network]);
 	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
 
-	// Component state
 	const [isDelegated, setIsDelegated] = useState(false);
 	const [delegationInfo, setDelegationInfo] = useState<DelegationInfo | null>(null);
 	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
@@ -92,7 +90,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		setIsBalanceError(balance !== '' && !isBalanceValid);
 	}, [balance, isBalanceValid]);
 
-	// Callback functions
 	const handleOpenChange = useCallback(
 		(isOpen: boolean) => {
 			if (!user) {
@@ -100,7 +97,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 			} else {
 				setOpen(isOpen);
 				if (isOpen) {
-					// Reset states only when opening
 					setBalance('');
 					setIsBalanceError(false);
 					setSelectedTracks([]);
