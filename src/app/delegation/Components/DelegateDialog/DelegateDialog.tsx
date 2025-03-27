@@ -11,7 +11,7 @@ import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
 import { EConvictionAmount } from '@/_shared/types';
@@ -43,6 +43,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const tracks = Object.keys(NETWORKS_DETAILS[network].trackDetails);
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
+	const [userBalance, setUserBalance] = useState<BN | null>(null);
 
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!user) {
@@ -62,14 +63,18 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		setIsAllTracksSelected(!isAllTracksSelected);
 	};
 
-	const isBalanceValid = () => {
+	const isBalanceValid = useMemo(() => {
 		if (!balance || balance === '0') return false;
-		const balanceNum = parseFloat(balance);
-		return balanceNum > 0;
-	};
+		if (!userBalance) return false;
+		const enteredBalance = new BN(balance);
+		return enteredBalance.gt(new BN(0)) && enteredBalance.lte(userBalance);
+	}, [balance, userBalance]);
 
-	const handleBalanceChange = ({ value }: { value: BN; assetId: string | null }) => {
+	const handleBalanceChange = ({ value, userBalance: newUserBalance }: { value: BN; userBalance?: BN; assetId: string | null }) => {
 		setBalance(value.toString());
+		if (newUserBalance) {
+			setUserBalance(newUserBalance);
+		}
 	};
 
 	return (
@@ -102,6 +107,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						defaultValue={new BN(balance || '0')}
 						onChange={handleBalanceChange}
 					/>
+					{isBalanceValid && <p className='text-sm text-red-500'>Entered Balance is invalid</p>}
 					<div className='w-full'>
 						<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
 						<ConvictionSelector onConvictionChange={setConviction} />
@@ -191,7 +197,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					</Button>
 					<Button
 						className='btn-delegate'
-						disabled={!isBalanceValid()}
+						disabled={!isBalanceValid}
 					>
 						Delegate
 					</Button>

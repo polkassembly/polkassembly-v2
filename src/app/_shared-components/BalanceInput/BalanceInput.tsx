@@ -12,9 +12,11 @@ import { cn } from '@/lib/utils';
 import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useUser } from '@/hooks/useUser';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
+import { Skeleton } from '../Skeleton';
 
 function BalanceInput({
 	label,
@@ -25,7 +27,8 @@ function BalanceInput({
 	defaultValue,
 	multiAsset,
 	className,
-	showTreasuryBalance
+	showTreasuryBalance,
+	showBalance = false
 }: {
 	label?: string;
 	placeholder?: string;
@@ -36,10 +39,13 @@ function BalanceInput({
 	multiAsset?: boolean;
 	className?: string;
 	showTreasuryBalance?: boolean;
+	showBalance?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const [error, setError] = useState('');
+	const { user } = useUser();
+	const [userBalance, setUserBalance] = useState<string | null>(null);
 
 	const { apiService } = usePolkadotApiService();
 	const { assethubApiService } = useAssethubApiService();
@@ -59,6 +65,13 @@ function BalanceInput({
 	}));
 
 	const [valueString, setValueString] = useState('');
+
+	const getBalance = async (address: string) => {
+		if (!apiService) return;
+
+		const { totalBalance } = await apiService.getUserBalances({ address });
+		setUserBalance(totalBalance.toString());
+	};
 
 	const onBalanceChange = (value: string | null): void => {
 		const { bnValue, isValid } = inputToBn(value || '', network, false, assetId);
@@ -80,6 +93,11 @@ function BalanceInput({
 	}, [defaultValue]);
 
 	useEffect(() => {
+		if (user?.defaultAddress) getBalance(user.defaultAddress);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user]);
+
+	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
 			const balances = await assethubApiService?.getAssethubTreasuryAssetsBalance();
@@ -91,15 +109,25 @@ function BalanceInput({
 	useEffect(() => {
 		const fetchNativeTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !apiService || multiAsset) return;
-			const balance = await apiService?.getNativeTreasuryBalance();
-			setNativeTreasuryBalance(balance);
+			const userBalance = await apiService?.getNativeTreasuryBalance();
+			setNativeTreasuryBalance(userBalance);
 		};
 		fetchNativeTreasuryBalance();
 	}, [showTreasuryBalance, multiAsset, apiService]);
 
 	return (
 		<div className='min-w-[200px]'>
-			{label && <p className={classes.label}>{label}</p>}
+			<div className='flex justify-between'>
+				{label && <p className={classes.label}>{label}</p>}
+				{showBalance && (
+					<p className='text-xs text-text_primary'>
+						Balance:{' '}
+						<span className='text-text_pink'>
+							{userBalance ? `${formatBnBalance(userBalance, { withUnit: true, numberAfterComma: 2 }, network)}` : <Skeleton className='h-4' />}
+						</span>
+					</p>
+				)}
+			</div>
 			<div className='relative'>
 				<Input
 					className={cn('w-full', className)}
