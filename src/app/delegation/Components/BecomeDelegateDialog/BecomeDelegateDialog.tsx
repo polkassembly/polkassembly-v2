@@ -7,60 +7,106 @@ import { useUser } from '@/hooks/useUser';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Input } from '@/app/_shared-components/Input';
-// import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState } from 'react';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useState, useEffect } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
 import { useToast } from '@/hooks/useToast';
-import { NotificationType } from '@/_shared/types';
+import { NotificationType, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
 import { Loader2 } from 'lucide-react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { useQueryClient } from '@tanstack/react-query';
 import { TfiPencil } from 'react-icons/tfi';
+import { useAtom } from 'jotai';
+import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 export default function BecomeDelegateDialog() {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const { toast } = useToast();
-	const [bio, setBio] = useState('');
+	const [manifesto, setManifesto] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
-	// eslint-disable-next-line
-	const [isDelegated, SetIsDelegated] = useState(false);
+	const [delegates, setDelegates] = useAtom(delegatesAtom);
 
-	const checkDelegate = async () => {
-		// if (!address) return;
-		// const delegate = await NextApiClientService.getDelegateByAddress(address);
-		// if (delegate.data) {
-		// SetIsDelegated(true);
-		// setBio(delegate.data.bio);
-		// }
-	};
+	const queryClient = useQueryClient();
+	const network = getCurrentNetwork();
 
-	const { isFetching } = useQuery({
-		queryKey: ['delegate', address],
-		queryFn: checkDelegate,
-		staleTime: FIVE_MIN_IN_MILLI
-	});
+	useEffect(() => {
+		if (address) {
+			const existingDelegate = delegates.find((delegate) => delegate.address === address);
+			if (existingDelegate) {
+				setManifesto(existingDelegate.manifesto || '');
+			} else {
+				setManifesto('');
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [address, dialogOpen]);
 
 	const createDelegate = async () => {
 		if (!user || !address) return;
 		setLoading(true);
-		// if (isDelegated) {
-		// await NextApiClientService.updateDelegate(address, bio, user.username);
-		// } else {
-		// await NextApiClientService.createDelegate(address, bio, user.username);
-		// }
-		toast({
-			title: 'Delegate created successfully',
-			status: NotificationType.SUCCESS
-		});
-		setLoading(false);
-		setDialogOpen(false);
+		try {
+			const optimisticDelegate: IDelegateDetails = {
+				address,
+				manifesto,
+				sources: [EDelegateSource.POLKASSEMBLY],
+				votingPower: '0',
+				last30DaysVotedProposalsCount: 0,
+				receivedDelegationsCount: 0,
+				network: network as ENetwork
+			};
+
+			setDelegates((prev) => [...prev, optimisticDelegate]);
+			await NextApiClientService.createPADelegate({ address, manifesto });
+			queryClient.invalidateQueries({ queryKey: ['delegates'] });
+			toast({
+				title: 'Delegate created successfully',
+				status: NotificationType.SUCCESS
+			});
+			setDialogOpen(false);
+		} catch (error) {
+			setDelegates((prev) => prev.filter((d) => d.address !== address));
+			toast({
+				title: 'Error creating delegate',
+				status: NotificationType.ERROR,
+				description: error instanceof Error ? error.message : 'An unknown error occurred'
+			});
+		} finally {
+			setLoading(false);
+		}
 	};
+
+	const updateDelegate = async () => {
+		if (!user || !address) return;
+		setLoading(true);
+		try {
+			setDelegates((prev) => prev.map((d) => (d.address === address ? { ...d, manifesto } : d)));
+			await NextApiClientService.updatePADelegate({ address, manifesto });
+			queryClient.invalidateQueries({ queryKey: ['delegates'] });
+			toast({
+				title: 'Delegate updated successfully',
+				status: NotificationType.SUCCESS
+			});
+			setDialogOpen(false);
+		} catch (error) {
+			queryClient.invalidateQueries({ queryKey: ['delegates'] });
+
+			toast({
+				title: 'Error updating delegate',
+				status: NotificationType.ERROR,
+				description: error instanceof Error ? error.message : 'An unknown error occurred'
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const isCurrentAddressDelegate = address ? delegates.some((delegate) => delegate.address === address) : false;
 
 	return (
 		<Dialog
@@ -69,17 +115,17 @@ export default function BecomeDelegateDialog() {
 				setDialogOpen(open);
 				if (!open) {
 					setAddress(user?.defaultAddress || null);
-					setBio('');
+					setManifesto('');
 				}
 			}}
 		>
 			<DialogTrigger asChild>
 				<Button
-					disabled={!user || isFetching}
+					disabled={!user}
 					onClick={() => setDialogOpen(true)}
 					className={`${!user ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
-					{isDelegated ? (
+					{isCurrentAddressDelegate ? (
 						<>
 							<TfiPencil />
 							Edit
@@ -91,7 +137,7 @@ export default function BecomeDelegateDialog() {
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>
-					<DialogTitle> {isDelegated ? 'Edit Delegate Details' : t('becomeDelegate')}</DialogTitle>
+					<DialogTitle>{isCurrentAddressDelegate ? 'Edit Delegate Details' : t('becomeDelegate')}</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-y-4'>
 					<AddressDropdown
@@ -100,15 +146,15 @@ export default function BecomeDelegateDialog() {
 					/>
 					<div className='flex flex-col gap-y-2'>
 						<p className='text-sm text-wallet_btn_text'>
-							Your Delegation Mandate <span className='text-text_pink'>*</span>
+							Your Delegation Manifesto <span className='text-text_pink'>*</span>
 						</p>
 						<Input
 							title='Your Delegation Mandate'
 							placeholder='Add message for delegate address '
 							className='w-full'
 							required
-							value={bio}
-							onChange={(e) => setBio(e.target.value)}
+							value={manifesto}
+							onChange={(e) => setManifesto(e.target.value)}
 						/>
 					</div>
 					<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
@@ -135,7 +181,7 @@ export default function BecomeDelegateDialog() {
 						size='lg'
 						disabled={loading}
 						className='w-full'
-						onClick={createDelegate}
+						onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}
 					>
 						{loading ? <Loader2 className='h-4 w-4 animate-spin' /> : 'Confirm'}
 					</Button>

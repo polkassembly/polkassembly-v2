@@ -47,6 +47,8 @@ import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
+const DELEGATE_API_PATH = '/delegation/delegates';
+
 enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
@@ -95,7 +97,9 @@ enum EApiRoute {
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
 	GET_DELEGATE_STATS = 'GET_DELEGATE_STATS',
-	FETCH_DELEGATES = 'FETCH_DELEGATES'
+	FETCH_DELEGATES = 'FETCH_DELEGATES',
+	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
+	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE'
 }
 
 export class NextApiClientService {
@@ -168,7 +172,7 @@ export class NextApiClientService {
 				path = '/delegation/stats';
 				break;
 			case EApiRoute.FETCH_DELEGATES:
-				path = '/delegation/delegates';
+				path = DELEGATE_API_PATH;
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -223,6 +227,10 @@ export class NextApiClientService {
 				path = '/users/id';
 				method = 'POST';
 				break;
+			case EApiRoute.CREATE_PA_DELEGATE:
+				path = DELEGATE_API_PATH;
+				method = 'POST';
+				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
@@ -234,6 +242,10 @@ export class NextApiClientService {
 			case EApiRoute.EDIT_USER_PROFILE:
 			case EApiRoute.EDIT_BATCH_VOTE_CART_ITEM:
 				path = '/users/id';
+				method = 'PATCH';
+				break;
+			case EApiRoute.UPDATE_PA_DELEGATE:
+				path = DELEGATE_API_PATH;
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
@@ -752,5 +764,15 @@ export class NextApiClientService {
 	static async fetchDelegates() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_DELEGATES });
 		return this.nextApiClientFetch<IDelegateDetails[]>({ url, method });
+	}
+
+	static async createPADelegate({ address, manifesto }: { address: string; manifesto: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_PA_DELEGATE });
+		return this.nextApiClientFetch<{ id: string }>({ url, method, data: { address, manifesto } });
+	}
+
+	static async updatePADelegate({ address, manifesto }: { address: string; manifesto: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_PA_DELEGATE, routeSegments: [address] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
 	}
 }

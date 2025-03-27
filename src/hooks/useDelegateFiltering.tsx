@@ -50,8 +50,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 		const searchFiltered = delegates.filter((delegate) => searchDelegate(delegate, searchQuery));
 		const sourceFiltered = searchFiltered.filter(filterBySource);
 		return sourceFiltered.sort(sortDelegates);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchQuery, filterBySource, sortDelegates, searchDelegate]);
+	}, [searchQuery, filterBySource, sortDelegates, searchDelegate, delegates]);
 
 	const paginatedDelegates = useMemo(() => {
 		const start = (currentPage - 1) * itemsPerPage;

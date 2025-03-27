@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, RefObject, useRef } from 'react';
+import { memo, RefObject, useRef, useState } from 'react';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -20,6 +20,8 @@ import useDelegateFiltering from '@/hooks/useDelegateFiltering';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import { useQuery } from '@tanstack/react-query';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
+import { useAtom } from 'jotai';
+import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import DelegateSearchInput from '../DelegateSearchInput/DelegateSearchInput';
 import styles from '../Delegation.module.scss';
 import DelegateCard from '../DelegationCard/DelegationCard';
@@ -66,20 +68,34 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 });
 
 function DelegationDetailsCard() {
-	const { data: delegates, isFetching } = useQuery({
-		queryKey: ['delegates'],
-		queryFn: async () => {
-			const result = await NextApiClientService.fetchDelegates();
-			return result || { data: [] };
-		},
-		staleTime: STALE_TIME,
-		refetchOnWindowFocus: false,
-		refetchInterval: false
-	});
+	const [delegates, setDelegates] = useAtom(delegatesAtom);
+
+	const [isLoading, setIsLoading] = useState(false);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
+
+	useQuery({
+		queryKey: ['delegates'],
+		queryFn: async () => {
+			if (delegates.length > 0) {
+				return { data: delegates };
+			}
+
+			setIsLoading(true);
+			try {
+				const result = await NextApiClientService.fetchDelegates();
+				if (result?.data) {
+					setDelegates(result.data);
+				}
+				return result || { data: [] };
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		staleTime: STALE_TIME
+	});
 
 	const {
 		paginatedDelegates,
@@ -93,7 +109,7 @@ function DelegationDetailsCard() {
 		currentPage,
 		handlePageChange,
 		itemsPerPage
-	} = useDelegateFiltering(delegates?.data ?? []);
+	} = useDelegateFiltering(delegates);
 
 	return (
 		<div className='mt-5 min-h-80 w-full rounded-lg bg-bg_modal p-4 shadow-lg'>
@@ -129,7 +145,7 @@ function DelegationDetailsCard() {
 					</Select>
 				</div>
 			</div>
-			{isFetching ? (
+			{isLoading ? (
 				<div className='relative mt-20'>
 					<LoadingLayover />
 				</div>
@@ -165,5 +181,4 @@ function DelegationDetailsCard() {
 		</div>
 	);
 }
-
 export default memo(DelegationDetailsCard);

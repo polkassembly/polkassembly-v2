@@ -15,6 +15,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
+import { Skeleton } from '../Skeleton';
 
 function BalanceInput({
 	label,
@@ -91,7 +92,8 @@ function BalanceInput({
 				<div className='flex justify-between'>
 					<p className={classes.label}>{label}</p>
 					<p className='text-xs text-text_primary'>
-						Balance: <span className='text-text_pink'>{balance ? `${formatBnBalance(balance, { withUnit: true, numberAfterComma: 2 }, network)}` : 'Loading...'}</span>
+						Balance:{' '}
+						<span className='text-text_pink'>{balance ? `${formatBnBalance(balance, { withUnit: true, numberAfterComma: 2 }, network)}` : <Skeleton className='h-4' />}</span>
 					</p>
 				</div>
 			) : (
