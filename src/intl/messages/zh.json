@@ -676,7 +676,8 @@
 		"goBack": "返回",
 		"preimageHash": "预映像哈希",
 		"preimageLength": "长度",
-		"preimageHashDescription": "输入哈希"
+		"preimageHashDescription": "输入哈希",
+		"viewPreimage": "查看预映像"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",

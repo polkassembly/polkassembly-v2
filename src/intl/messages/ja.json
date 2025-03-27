@@ -676,7 +676,8 @@
 		"goBack": "戻る",
 		"preimageHash": "プレイメージハッシュ",
 		"preimageLength": "長さ",
-		"preimageHashDescription": "ハッシュを入力"
+		"preimageHashDescription": "ハッシュを入力",
+		"viewPreimage": "プレイメージを表示"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",

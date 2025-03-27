@@ -4,11 +4,9 @@
 
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { EEnactment, EPostOrigin, EProposalType, NotificationType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
-import { Form } from '@/app/_shared-components/Form';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
@@ -40,7 +38,6 @@ function KillReferendum() {
 
 	const { debouncedValue: debouncedReferendumId, setValue: setReferendumId, value: referendumId } = useDebounce<number | undefined>(undefined, 500);
 
-	const formData = useForm();
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
@@ -158,87 +155,80 @@ function KillReferendum() {
 	};
 
 	return (
-		<Form {...formData}>
-			<form
-				onSubmit={formData.handleSubmit(createPreimage)}
-				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
-			>
-				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<SwitchWalletOrAddress />
-					<div className='flex flex-col gap-y-2'>
-						<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
-						<InputNumber
-							onChange={setReferendumId}
-							placeholder={t('KillCancelReferendum.referendumIdDescription')}
-							value={referendumId}
-						/>
-						{isFetching ? (
-							<Skeleton className='h-4 w-full' />
+		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
+			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+				<SwitchWalletOrAddress />
+				<div className='flex flex-col gap-y-2'>
+					<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
+					<InputNumber
+						onChange={setReferendumId}
+						placeholder={t('KillCancelReferendum.referendumIdDescription')}
+						value={referendumId}
+					/>
+					{isFetching ? (
+						<Skeleton className='h-4 w-full' />
+					) : (
+						data &&
+						(canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ? (
+							<div className='flex items-center gap-x-4 rounded-lg bg-bg_pink/10 px-4 py-2 text-sm font-medium text-text_primary'>
+								<span>#{data.index}</span>
+								<span className='flex-1 truncate'>{data.title}</span>
+								<Link
+									href={`/referenda/${data.index}`}
+									target='_blank'
+									className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
+								>
+									<SquareArrowOutUpRight className='h-4 w-4' />
+									{t('KillCancelReferendum.viewReferendum')}
+								</Link>
+							</div>
 						) : (
-							data &&
-							(canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ? (
-								<div className='flex items-center gap-x-4 rounded-lg bg-bg_pink/10 px-4 py-2 text-sm font-medium text-text_primary'>
-									<span>#{data.index}</span>
-									<span className='flex-1 truncate'>{data.title}</span>
-									<Link
-										href={`/referenda/${data.index}`}
-										target='_blank'
-										className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
-									>
-										<SquareArrowOutUpRight className='h-4 w-4' />
-										{t('KillCancelReferendum.viewReferendum')}
-									</Link>
-								</div>
-							) : (
-								<div className='flex items-center justify-center gap-x-2 rounded-lg bg-warning/10 p-2 text-sm font-medium text-warning'>
-									<TriangleAlert />
-									{t('KillCancelReferendum.thisReferendumIsNotOngoing')}
-								</div>
-							))
-						)}
-						{error && <div className='flex items-center gap-x-4 rounded-lg bg-failure/10 p-2 text-sm font-medium text-failure'>{error.message}</div>}
-					</div>
-
-					<EnactmentForm
-						selectedEnactment={selectedEnactment}
-						onEnactmentChange={setSelectedEnactment}
-						advancedDetails={advancedDetails}
-						onEnactmentValueChange={setAdvancedDetails}
-					/>
+							<div className='flex items-center justify-center gap-x-2 rounded-lg bg-warning/10 p-2 text-sm font-medium text-warning'>
+								<TriangleAlert />
+								{t('KillCancelReferendum.thisReferendumIsNotOngoing')}
+							</div>
+						))
+					)}
+					{error && <div className='flex items-center gap-x-4 rounded-lg bg-failure/10 p-2 text-sm font-medium text-failure'>{error.message}</div>}
 				</div>
 
-				{preimageDetails && (
-					<PreimageDetailsView
-						preimageHash={preimageDetails.preimageHash}
-						preimageLength={preimageDetails.preimageLength}
-					/>
-				)}
+				<EnactmentForm
+					selectedEnactment={selectedEnactment}
+					onEnactmentChange={setSelectedEnactment}
+					advancedDetails={advancedDetails}
+					onEnactmentValueChange={setAdvancedDetails}
+				/>
+			</div>
 
-				{notePreimageTx && submitProposalTx && (
-					<TxFeesDetailsView
-						extrinsicFn={[notePreimageTx, submitProposalTx]}
-						extraFees={[
-							{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
-							{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
-						]}
-					/>
-				)}
+			{preimageDetails && (
+				<PreimageDetailsView
+					preimageHash={preimageDetails.preimageHash}
+					preimageLength={preimageDetails.preimageLength}
+				/>
+			)}
 
-				<Separator />
+			{notePreimageTx && submitProposalTx && (
+				<TxFeesDetailsView
+					extrinsicFn={[notePreimageTx, submitProposalTx]}
+					extraFees={[
+						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
+						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
+					]}
+				/>
+			)}
 
-				<div className='flex justify-end'>
-					<Button
-						type='submit'
-						isLoading={loading}
-						disabled={
-							!userPreferences.address?.address || !selectedEnactment || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)
-						}
-					>
-						{t('CreateTreasuryProposal.createProposal')}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<Separator />
+
+			<div className='flex justify-end'>
+				<Button
+					onClick={createPreimage}
+					isLoading={loading}
+					disabled={!userPreferences.address?.address || !selectedEnactment || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)}
+				>
+					{t('CreateTreasuryProposal.createProposal')}
+				</Button>
+			</div>
+		</div>
 	);
 }
 
