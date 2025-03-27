@@ -34,6 +34,7 @@ export default function BecomeDelegateDialog() {
 	const [checkingDelegate, setCheckingDelegate] = useState(false);
 	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
+	const [isCurrentAddressDelegate, setIsCurrentAddressDelegate] = useState(false);
 
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
@@ -44,6 +45,7 @@ export default function BecomeDelegateDialog() {
 		setCheckingDelegate(true);
 		try {
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
+			setIsCurrentAddressDelegate(!!existingDelegate);
 			if (existingDelegate) {
 				setManifesto(existingDelegate.manifesto || '');
 			} else {
@@ -64,6 +66,8 @@ export default function BecomeDelegateDialog() {
 	useEffect(() => {
 		if (dialogOpen) {
 			checkExistingDelegate();
+		} else {
+			setIsCurrentAddressDelegate(false);
 		}
 	}, [address, dialogOpen, delegates]);
 
@@ -126,8 +130,6 @@ export default function BecomeDelegateDialog() {
 		}
 	};
 
-	const isCurrentAddressDelegate = address ? delegates.some((delegate) => delegate.address === address) : false;
-
 	return (
 		<Dialog
 			open={dialogOpen}
@@ -136,6 +138,7 @@ export default function BecomeDelegateDialog() {
 				if (!open) {
 					setAddress(user?.defaultAddress || null);
 					setManifesto('');
+					setIsCurrentAddressDelegate(false);
 				}
 			}}
 		>

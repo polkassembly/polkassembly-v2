@@ -1,7 +1,6 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-
 import { Dialog, DialogTrigger, DialogContent, DialogFooter, DialogTitle, DialogHeader } from '@ui/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
@@ -11,7 +10,7 @@ import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { ReactNode, useState, useMemo } from 'react';
+import { ReactNode, useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
 import { EConvictionAmount } from '@/_shared/types';
@@ -23,6 +22,7 @@ import { Checkbox } from '@/app/_shared-components/checkbox';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { X } from 'lucide-react';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 
 interface DelegateDialogProps {
 	open: boolean;
@@ -37,13 +37,16 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const router = useRouter();
+	const { apiService } = usePolkadotApiService();
+
 	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
 	const [balance, setBalance] = useState<string>('');
 	const network = getCurrentNetwork();
 	const tracks = Object.keys(NETWORKS_DETAILS[network].trackDetails);
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
-	const [userBalance, setUserBalance] = useState<BN | null>(null);
+	const [userBalance, setUserBalance] = useState<string | null>(null);
+	const [isBalanceError, setIsBalanceError] = useState<boolean>(false);
 
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!user) {
@@ -51,6 +54,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		} else {
 			setOpen(isOpen);
 			setBalance('');
+			setIsBalanceError(false);
 		}
 	};
 
@@ -67,16 +71,27 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		if (!balance || balance === '0') return false;
 		if (!userBalance) return false;
 		const enteredBalance = new BN(balance);
-		return enteredBalance.gt(new BN(0)) && enteredBalance.lte(userBalance);
-	}, [balance, userBalance]);
+		const requiredBalance = enteredBalance.muln(conviction + 1);
+		const isValid = enteredBalance.gt(new BN(0)) && requiredBalance.lte(new BN(userBalance));
+		setIsBalanceError(!isValid);
+		return isValid;
+	}, [balance, userBalance, conviction]);
 
-	const handleBalanceChange = ({ value, userBalance: newUserBalance }: { value: BN; userBalance?: BN; assetId: string | null }) => {
+	const handleBalanceChange = ({ value }: { value: BN; assetId: string | null }) => {
 		setBalance(value.toString());
-		if (newUserBalance) {
-			setUserBalance(newUserBalance);
-		}
 	};
 
+	const getBalance = async (address: string) => {
+		if (!apiService) return;
+
+		const { totalBalance } = await apiService.getUserBalances({ address });
+		setUserBalance(totalBalance.toString());
+	};
+
+	useEffect(() => {
+		if (user?.defaultAddress) getBalance(user.defaultAddress);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user]);
 	return (
 		<Dialog
 			open={open}
@@ -107,7 +122,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						defaultValue={new BN(balance || '0')}
 						onChange={handleBalanceChange}
 					/>
-					{isBalanceValid && <p className='text-sm text-red-500'>Entered Balance is invalid</p>}
+					{isBalanceError && <p className='text-sm text-red-500'>You don&apos;t have enough balance to delegate</p>}
 					<div className='w-full'>
 						<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
 						<ConvictionSelector onConvictionChange={setConviction} />

@@ -28,7 +28,7 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 		return (
 			<div>
 				<UserWalletData />
-				<div className='mt-16 grid grid-cols-1 gap-5 p-5 lg:p-10'>
+				<div className='grid grid-cols-1 gap-5 p-5 lg:mt-16 lg:p-10'>
 					<DelegationPopupCard />
 					<DelegationSupplyData delegationStats={delegationStats} />
 					<DelegationDetailsCard />
@@ -40,7 +40,7 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 	return (
 		<div>
 			<UserWalletData />
-			<div className='mt-16 grid grid-cols-1 gap-5 p-5 lg:p-10'>
+			<div className='grid grid-cols-1 gap-5 p-5 lg:mt-16 lg:p-10'>
 				<div className={styles.delegation}>
 					<Tabs defaultValue={EDelegationTab.MY_DELEGATION}>
 						<TabsList className='mb-4 flex w-full justify-start border-border_grey dark:border-b'>
