@@ -28,13 +28,12 @@ function MyDelegateTracks() {
 		queryKey: ['address'],
 		queryFn: async () => {
 			if (!user?.defaultAddress) {
-				return { delegationStats: [] }; // Changed from trackDelegationStats to delegationStats
+				return { delegationStats: [] };
 			}
 			const response = await NextApiClientService.getDelegateTracks({ address: user.defaultAddress });
 			if (!response.data) {
 				return { delegationStats: [] };
 			}
-			console.log('response.data', response.data);
 			return response.data.delegationStats ? response.data : { delegationStats: [] };
 		},
 		enabled: !!user?.defaultAddress
@@ -63,11 +62,11 @@ function MyDelegateTracks() {
 		if (!data?.delegationStats) return [];
 		switch (activeFilter) {
 			case EDelegationStatus.DELEGATED:
-				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status.includes(EDelegationStatus.DELEGATED));
+				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.DELEGATED);
 			case EDelegationStatus.RECEIVED:
-				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status.includes(EDelegationStatus.RECEIVED));
+				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.RECEIVED);
 			case EDelegationStatus.UNDELEGATED:
-				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status.includes(EDelegationStatus.UNDELEGATED));
+				return data?.delegationStats.filter((track: ITrackDelegationStats) => track.status === EDelegationStatus.UNDELEGATED);
 			default:
 				return data?.delegationStats;
 		}
@@ -162,16 +161,16 @@ function MyDelegateTracks() {
 										<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
 										<TableCell className={styles.tableCell_3}>{track.activeProposalsCount}</TableCell>
 										<TableCell className={styles.tableCell_3}>
-											{track.status.length > 0 ? (
+											{track.status ? (
 												<span
 													className={cn(
 														'rounded-[26px] px-3 py-1.5 text-center text-sm text-text_primary',
-														track.status.includes(EDelegationStatus.RECEIVED) && 'bg-received_delegation_bg',
-														track.status.includes(EDelegationStatus.DELEGATED) && 'bg-delegated_delegation_bg',
-														track.status.includes(EDelegationStatus.UNDELEGATED) && 'bg-undelegated_delegation_bg'
+														track.status === EDelegationStatus.RECEIVED && 'bg-received_delegation_bg',
+														track.status === EDelegationStatus.DELEGATED && 'bg-delegated_delegation_bg',
+														track.status === EDelegationStatus.UNDELEGATED && 'bg-undelegated_delegation_bg'
 													)}
 												>
-													{track.status && track.status.length > 0 ? track.status.charAt(0).toUpperCase() + track.status.slice(1) : '-'}
+													{track.status ? track.status.charAt(0).toUpperCase() + track.status.slice(1) : '-'}
 												</span>
 											) : (
 												<span className='px-3 py-1.5 text-center text-sm'>-</span>
