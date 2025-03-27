@@ -8,10 +8,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { EEnactment, EPostOrigin, EProposalType, NotificationType } from '@/_shared/types';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Button } from '@/app/_shared-components/Button';
 import { Form } from '@/app/_shared-components/Form';
-import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
@@ -110,7 +108,8 @@ function KillReferendum() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				redirectFromServer(`/referenda/${postId}`);
+				window.location.reload();
+				redirectFromServer(`/referenda/${postId}?created=true`);
 			},
 			onFailed: () => {
 				toast({
@@ -166,9 +165,6 @@ function KillReferendum() {
 				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<WalletButtons small />
-					<AddressDropdown withBalance />
-
 					<div className='flex flex-col gap-y-2'>
 						<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
 						<InputNumber

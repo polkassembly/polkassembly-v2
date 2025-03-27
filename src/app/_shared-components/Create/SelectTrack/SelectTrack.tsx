@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useState } from 'react';
+import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: string; onChange: (track: string) => void; isTreasury?: boolean }) {
@@ -18,7 +19,7 @@ function SelectTrack({ selectedTrack, onChange, isTreasury }: { selectedTrack?: 
 	if (network) {
 		Object.entries(NETWORKS_DETAILS?.[`${network}`].trackDetails).forEach(([key, value]) => {
 			if (isTreasury) {
-				if ('maxSpend' in value) {
+				if ('maxSpend' in value || (network === ENetwork.WESTEND && key === EPostOrigin.TREASURER)) {
 					trackArr.push({ name: key, trackId: value.trackId });
 				}
 			} else {

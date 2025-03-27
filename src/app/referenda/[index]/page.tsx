@@ -5,14 +5,32 @@
 import { EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
-import React from 'react';
+import React, { Suspense } from 'react';
+import { headers } from 'next/headers';
+import PollForProposal from './PollForProposal';
 
-async function Referenda({ params }: { params: Promise<{ index: string }> }) {
+async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {
 	const { index } = await params;
+	const { created } = await searchParams;
+
+	const headersList = await headers();
+	const referer = headersList.get('referer');
 
 	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: index });
 
-	if (error || !data) return <div className='text-center text-text_primary'>{error?.message}</div>;
+	// If created=true and no data, we'll poll on the client side
+	if (created && created === 'true' && (!data || error)) {
+		return (
+			<Suspense fallback={<div className='flex h-screen items-center justify-center'>Loading...</div>}>
+				<PollForProposal
+					index={index}
+					referer={referer}
+				/>
+			</Suspense>
+		);
+	}
+
+	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
 	return (
 		<div className='h-full w-full bg-page_background'>

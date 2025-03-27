@@ -3,11 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EEnactment, IBeneficiaryInput, NotificationType } from '@/_shared/types';
-import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Button } from '@/app/_shared-components/Button';
 import { Form } from '@/app/_shared-components/Form';
-import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
@@ -26,6 +23,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 
 function TreasuryProposalLocal() {
 	const t = useTranslations();
@@ -91,7 +89,8 @@ function TreasuryProposalLocal() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				redirectFromServer(`/referenda/${postId}`);
+				window.location.reload();
+				redirectFromServer(`/referenda/${postId}?created=true`);
 			},
 			onFailed: () => {
 				toast({
@@ -147,9 +146,6 @@ function TreasuryProposalLocal() {
 				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<WalletButtons small />
-					<AddressDropdown withBalance />
-
 					<MultipleBeneficiaryForm
 						beneficiaries={beneficiaries}
 						onChange={(value) => setBeneficiaries(value)}

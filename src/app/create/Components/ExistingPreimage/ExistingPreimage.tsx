@@ -4,10 +4,8 @@
 
 import { EEnactment, NotificationType } from '@/_shared/types';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Button } from '@/app/_shared-components/Button';
 import { Form } from '@/app/_shared-components/Form';
-import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
@@ -99,7 +97,8 @@ function ExistingPreimage() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: NotificationType.SUCCESS
 				});
-				redirectFromServer(`/referenda/${postId}`);
+				window.location.reload();
+				redirectFromServer(`/referenda/${postId}?created=true`);
 			},
 			onFailed: () => {
 				toast({
@@ -119,9 +118,6 @@ function ExistingPreimage() {
 				className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<WalletButtons small />
-					<AddressDropdown withBalance />
-
 					<div className='flex flex-col gap-y-1'>
 						<p className='flex items-center justify-between text-sm text-wallet_btn_text'>
 							{t('CreateProposal.preimageHash')}
@@ -139,7 +135,6 @@ function ExistingPreimage() {
 					<SelectTrack
 						selectedTrack={selectedTrack}
 						onChange={(track) => setSelectedTrack(track)}
-						isTreasury
 					/>
 
 					<EnactmentForm
