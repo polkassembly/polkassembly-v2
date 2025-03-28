@@ -101,7 +101,7 @@ export class ValidatorService {
 	}
 
 	static isValidUserId(userId: number): boolean {
-		return !isNaN(userId) && userId > 0;
+		return this.isValidNumber(userId) && userId > 0;
 	}
 
 	static isValidWeb3Address(address: string): boolean {

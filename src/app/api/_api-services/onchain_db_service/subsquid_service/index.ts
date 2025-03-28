@@ -516,7 +516,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		let query = this.GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS;
 
-		const isValidTrackNumber = !Number.isNaN(trackNum) && ValidatorService.isValidTrackNumber({ trackNum: Number(trackNum), network });
+		const isValidTrackNumber = ValidatorService.isValidNumber(trackNum) && ValidatorService.isValidTrackNumber({ trackNum: Number(trackNum), network });
 
 		if (isValidTrackNumber) {
 			query = this.GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS_AND_TRACK_NUMBER;
