@@ -66,7 +66,7 @@ function BalanceInput({
 	const onBalanceChange = (value: string | null, id?: string | null): void => {
 		const { bnValue, isValid } = inputToBn(value || '', network, false, id || assetId);
 
-		if (isValid && ValidatorService.isValidNumber(Number(value))) {
+		if (isValid && ValidatorService.isValidNumber(value)) {
 			setError('');
 			onChange?.({ value: bnValue, assetId: id || assetId });
 		} else {
