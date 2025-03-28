@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, NotificationType } from '@/_shared/types';
+import { EEnactment, EPostOrigin, NotificationType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -28,7 +28,7 @@ function ExistingPreimage() {
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
-	const [selectedTrack, setSelectedTrack] = useState<string>('');
+	const [selectedTrack, setSelectedTrack] = useState<{ name: EPostOrigin; trackId: number }>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
@@ -37,10 +37,10 @@ function ExistingPreimage() {
 	const [isValidPreimageHash, setIsValidPreimageHash] = useState(false);
 
 	const submitProposalTx = useMemo(() => {
-		if (!apiService) return null;
+		if (!apiService || !selectedTrack || !debouncedPreimageHash || !preimageLength) return null;
 
 		return apiService.getSubmitProposalTx({
-			track: selectedTrack,
+			track: selectedTrack.name,
 			preimageHash: debouncedPreimageHash,
 			preimageLength,
 			enactment: selectedEnactment,
@@ -85,7 +85,7 @@ function ExistingPreimage() {
 
 		apiService.createProposal({
 			address: userPreferences.address.address,
-			track: selectedTrack,
+			track: selectedTrack.name,
 			preimageHash: debouncedPreimageHash,
 			preimageLength,
 			enactment: selectedEnactment,
@@ -141,7 +141,7 @@ function ExistingPreimage() {
 
 				<SelectTrack
 					selectedTrack={selectedTrack}
-					onChange={(track) => setSelectedTrack(track)}
+					onChange={setSelectedTrack}
 				/>
 
 				<EnactmentForm
