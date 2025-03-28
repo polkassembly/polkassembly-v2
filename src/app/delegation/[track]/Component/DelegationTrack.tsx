@@ -6,7 +6,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EPostOrigin } from '@/_shared/types';
+import { EDelegationStatus, EPostOrigin } from '@/_shared/types';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
@@ -21,9 +21,9 @@ function DelegationTrack({ trackName }: { trackName: string }) {
 	const [isActiveProposalOpen, setIsActiveProposalOpen] = useState(false);
 	const trackDescription = NETWORKS_DETAILS[network].trackDetails[trackName as EPostOrigin]?.description;
 	const trackId = NETWORKS_DETAILS[network].trackDetails[trackName as EPostOrigin]?.trackId;
-	const isDelegated = delegateUserTracks?.some((track) => track.trackId === trackId);
+	const trackDelegation = delegateUserTracks?.find((track) => track.trackId === trackId);
+	const isDelegated = trackDelegation?.status === EDelegationStatus.DELEGATED;
 	const [open, setOpen] = useState(false);
-
 	return (
 		<div>
 			<div className='flex h-80 flex-col justify-between gap-5 rounded-lg bg-bg_modal p-5'>
@@ -43,7 +43,11 @@ function DelegationTrack({ trackName }: { trackName: string }) {
 					<p className='text-sm text-text_primary'>{trackDescription}</p>
 				</div>
 				<div className='flex h-full items-center justify-center gap-2'>
-					<p className='text-sm text-text_primary'>Voting power for this track has not been delegated yet</p>
+					{isDelegated ? (
+						<p className='text-sm text-text_primary'>Voting power for this track has been delegated</p>
+					) : (
+						<p className='text-sm text-text_primary'>Voting power for this track has not been delegated yet</p>
+					)}
 					<DelegateDialog
 						open={open}
 						setOpen={setOpen}
@@ -51,7 +55,7 @@ function DelegationTrack({ trackName }: { trackName: string }) {
 					>
 						<div className='flex cursor-pointer items-center gap-1 text-text_pink'>
 							<IoPersonAdd />
-							<span>Delegate</span>
+							<span>{isDelegated ? 'Redelegate' : 'Delegate'}</span>
 						</div>
 					</DelegateDialog>
 				</div>
