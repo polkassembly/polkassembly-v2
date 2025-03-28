@@ -41,9 +41,8 @@ export default function BecomeDelegateDialog() {
 
 	const checkExistingDelegate = async () => {
 		if (!address) return;
-
-		setCheckingDelegate(true);
 		try {
+			setCheckingDelegate(true);
 			const existingDelegate = delegates.find((delegate) => delegate.address === address);
 			setIsCurrentAddressDelegate(!!existingDelegate);
 			if (existingDelegate) {
@@ -139,9 +138,9 @@ export default function BecomeDelegateDialog() {
 		>
 			<DialogTrigger asChild>
 				<Button
-					disabled={!user || checkingDelegate}
+					disabled={!user || checkingDelegate || delegates.length === 0}
 					onClick={() => setDialogOpen(true)}
-					className={`${!user || checkingDelegate ? 'cursor-not-allowed opacity-50' : ''}`}
+					className={`${!user || checkingDelegate || delegates.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
 					{checkingDelegate ? (
 						<Loader2 className='mr-2 h-4 w-4 animate-spin' />

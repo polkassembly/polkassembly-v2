@@ -21,7 +21,7 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Checkbox } from '@/app/_shared-components/checkbox';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import { Info, X } from 'lucide-react';
+import { Info, Loader, X } from 'lucide-react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { Alert } from '@/app/_shared-components/Alert';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
@@ -116,9 +116,12 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
 	}, []);
 
-	const handleBalanceChange = useCallback(({ value }: { value: BN; assetId: string | null }) => {
-		setBalance(value.toString());
-	}, []);
+	const handleBalanceChange = useCallback(
+		({ value }: { value: BN; assetId: string | null }) => {
+			setBalance(value.toString());
+		},
+		[network]
+	);
 
 	const checkDelegationStatus = useCallback(async () => {
 		if (!apiService || !user?.defaultAddress || selectedTrackIds.length === 0) return;
@@ -171,8 +174,8 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const handleSubmit = useCallback(async () => {
 		if (!apiService || !user?.defaultAddress || selectedTrackIds.length === 0) return;
 
-		setLoading(true);
 		try {
+			setLoading(true);
 			if (isDelegated) {
 				await apiService.undelegate({
 					address: user.defaultAddress,
@@ -184,12 +187,14 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 							title: 'Undelegated successfully',
 							status: NotificationType.SUCCESS
 						});
+						setLoading(false);
 					},
 					onFailed: (error) => {
 						toast({
 							title: error,
 							status: NotificationType.ERROR
 						});
+						setLoading(false);
 					}
 				});
 			} else {
@@ -206,19 +211,26 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 							title: 'Delegated successfully',
 							status: NotificationType.SUCCESS
 						});
+						setLoading(false);
 					},
 					onFailed: (error) => {
 						toast({
 							title: error,
 							status: NotificationType.ERROR
 						});
+						setLoading(false);
 					}
 				});
 			}
-		} finally {
+		} catch (error) {
+			console.error('Transaction error:', error);
+			toast({
+				title: 'Transaction failed',
+				status: NotificationType.ERROR
+			});
 			setLoading(false);
 		}
-	}, [apiService, user?.defaultAddress, selectedTrackIds, isDelegated, delegate.address, balance, conviction, setOpen, checkDelegationStatus, toast]);
+	}, [apiService, user?.defaultAddress, selectedTrackIds, isDelegated, delegate.address, balance, conviction, setOpen, checkDelegationStatus, toast, network, txFee]);
 
 	useEffect(() => {
 		if (user?.defaultAddress) getBalance(user.defaultAddress);
@@ -374,10 +386,10 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					</Button>
 					<Button
 						className='btn-delegate'
-						disabled={isDelegated ? !selectedTrackIds.length : !isBalanceValid || !selectedTrackIds.length || loading}
+						disabled={loading || (isDelegated ? !selectedTrackIds.length : !isBalanceValid || !selectedTrackIds.length)}
 						onClick={handleSubmit}
 					>
-						{loading ? 'Processing...' : isDelegated ? 'Undelegate' : 'Delegate'}
+						{loading ? <Loader className='animate-spin' /> : isDelegated ? 'Undelegate' : 'Delegate'}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

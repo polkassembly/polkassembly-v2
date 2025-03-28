@@ -790,8 +790,6 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api) return;
 
-		console.log('tracks', tracks, 'delegateAddress', delegateAddress, 'conviction', conviction, 'balance', balance);
-
 		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
 
 		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
@@ -801,7 +799,8 @@ export class PolkadotApiService {
 			address,
 			errorMessageFallback: 'Failed to delegate',
 			onSuccess,
-			onFailed
+			onFailed,
+			waitTillFinalizedHash: true
 		});
 	}
 
