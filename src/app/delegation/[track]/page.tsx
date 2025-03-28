@@ -5,10 +5,9 @@ import DelegationTrack from './Component/DelegationTrack';
 
 async function DelegationTrackPage({ params }: { params: Promise<{ track: string }> }) {
 	const { track } = await params;
-	const trackName = track.charAt(0).toUpperCase() + track.slice(1).replace(/-/g, ' ');
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
-			<DelegationTrack trackName={trackName} />
+			<DelegationTrack track={track} />
 		</div>
 	);
 }

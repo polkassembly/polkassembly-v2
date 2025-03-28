@@ -34,7 +34,8 @@ import {
 	EConvictionAmount,
 	IDelegationStats,
 	IDelegateDetails,
-	ITrackDelegationStats
+	ITrackDelegationStats,
+	ITrackDelegationDetails
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -780,5 +781,9 @@ export class NextApiClientService {
 	static async getDelegateTracks({ address }: { address: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
+	}
+	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
+		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
 	}
 }
