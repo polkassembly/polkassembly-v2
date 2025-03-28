@@ -63,7 +63,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		[selectedTracks, network]
 	);
 
-	// Check if delegate is in delegates list
 	const isValidDelegate = useMemo(() => delegates.some((d) => d.address === delegate.address), [delegates, delegate.address]);
 
 	const isBalanceValid = useMemo(() => {
@@ -98,16 +97,25 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	);
 
 	const toggleAllTracks = useCallback(() => {
-		setSelectedTracks((prevSelected) => (prevSelected?.length === tracks?.length ? [] : [...tracks]));
-		setIsAllTracksSelected((prev) => !prev);
-	}, [tracks]);
+		const availableTracks = tracks.filter((track) => {
+			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
+			return !delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
+		});
+
+		setSelectedTracks((prevSelected) => {
+			if (prevSelected.length === availableTracks.length) {
+				return [];
+			}
+			return [...availableTracks];
+		});
+	}, [tracks, network, delegateUserTracks]);
 
 	const toggleTrack = useCallback(
 		(track: string) => {
 			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
 			const isTrackDelegated = delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
 
-			// Prevent toggling already delegated tracks
+			// Skip if already delegated
 			if (isTrackDelegated) {
 				return;
 			}
@@ -166,11 +174,8 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 				conviction,
 				tracks: selectedTrackIds,
 				onSuccess: () => {
-					// Optimistically update delegateUserTracks to reflect successful delegation
 					setDelegateUserTracks((prev) => {
 						const updatedTracks = [...prev];
-
-						// Update existing tracks
 						selectedTrackIds.forEach((trackId) => {
 							const trackIndex = updatedTracks.findIndex((t) => t.trackId === trackId);
 
@@ -181,7 +186,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 									activeProposalsCount: updatedTracks[trackIndex].activeProposalsCount
 								};
 							} else {
-								// Add new track if it doesn't exist
 								updatedTracks.push({
 									trackId,
 									status: EDelegationStatus.DELEGATED,
@@ -193,7 +197,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						return updatedTracks;
 					});
 
-					// Increment receivedDelegationsCount for the delegate
 					setDelegates((prev) => {
 						const delegateIndex = prev.findIndex((d) => d.address === delegate.address);
 
@@ -243,8 +246,13 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	}, [calculateTxFee]);
 
 	useEffect(() => {
-		setIsAllTracksSelected(selectedTracks?.length === tracks?.length);
-	}, [selectedTracks, tracks]);
+		const availableTracks = tracks.filter((track) => {
+			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
+			return !delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
+		});
+
+		setIsAllTracksSelected(selectedTracks.length > 0 && selectedTracks.length === availableTracks.length);
+	}, [selectedTracks, tracks, network, delegateUserTracks]);
 
 	return (
 		<Dialog
@@ -336,7 +344,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 												className='flex items-center gap-2 py-1'
 											>
 												<Checkbox
-													checked={selectedTracks.includes(track)}
+													checked={isTrackDelegated || selectedTracks.includes(track)}
 													onCheckedChange={() => toggleTrack(track)}
 													disabled={isTrackDelegated}
 												/>
