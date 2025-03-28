@@ -174,14 +174,23 @@ export class OnChainDbService {
 		});
 	}
 
-	static async GetConvictionVoteDelegationsByAddress({ network, address }: { network: ENetwork; address: string }) {
-		return SubsquidService.GetConvictionVoteDelegationsByAddress({
+	static async GetConvictionVoteDelegationsToAndFromAddress({ network, address, trackNum }: { network: ENetwork; address: string; trackNum?: number }) {
+		return SubsquidService.GetConvictionVoteDelegationsToAndFromAddress({
 			network,
-			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address,
+			trackNum
 		});
 	}
 
 	static async GetActiveProposalsCountByTrackIds({ network, trackIds }: { network: ENetwork; trackIds: number[] }) {
 		return SubsquidService.GetActiveProposalsCountByTrackIds({ network, trackIds });
+	}
+
+	static async GetActiveProposalListingsWithVoteForAddressByTrackId({ network, trackId, voterAddress }: { network: ENetwork; trackId: number; voterAddress: string }) {
+		const formattedVoterAddress = ValidatorService.isValidSubstrateAddress(voterAddress)
+			? encodeAddress(voterAddress, NETWORKS_DETAILS[network as ENetwork].ss58Format)
+			: voterAddress;
+
+		return SubsquidService.GetActiveProposalListingsWithVoteForAddressByTrackId({ network, trackId, voterAddress: formattedVoterAddress });
 	}
 }

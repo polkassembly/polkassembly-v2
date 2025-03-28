@@ -281,4 +281,10 @@ export class ValidatorService {
 		const bitLength = 256;
 		return isHex(preimageHash, bitLength);
 	}
+
+	static isValidTrackNumber({ trackNum, network }: { trackNum: number; network: ENetwork }): boolean {
+		const { trackDetails } = NETWORKS_DETAILS[`${network}`];
+		const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
+		return allTrackIds.includes(trackNum);
+	}
 }
