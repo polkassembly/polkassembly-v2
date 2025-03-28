@@ -13,6 +13,7 @@ import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
@@ -38,8 +39,8 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 
 	const ayePercent = (ayeVotesNumber / totalVotesNumber) * 100;
 	const nayPercent = 100 - ayePercent;
-	const isAyeNaN = isNaN(ayePercent);
-	const isNayNaN = isNaN(nayPercent);
+	const isAyeNaN = !ValidatorService.isValidNumber(ayePercent);
+	const isNayNaN = !ValidatorService.isValidNumber(nayPercent);
 
 	return (
 		<div className={classes.voteSummaryWrapper}>

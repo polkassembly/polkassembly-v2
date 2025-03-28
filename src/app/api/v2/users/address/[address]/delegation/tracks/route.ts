@@ -23,7 +23,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
 
 	const [allVoteDelegations, activeProposalsCountByTrackIds] = await Promise.all([
-		OnChainDbService.GetConvictionVoteDelegationsByAddress({ network, address }),
+		OnChainDbService.GetConvictionVoteDelegationsToAndFromAddress({ network, address }),
 		OnChainDbService.GetActiveProposalsCountByTrackIds({ network, trackIds: allTrackIds })
 	]);
 

@@ -298,7 +298,7 @@ export class SubsquidService extends SubsquidUtils {
 				totalVotingPower?: string;
 				delegatedVotingPower?: string;
 			}) => ({
-				balanceValue: vote.decision === 'abstain' ? vote.balance.abstain : vote.balance.value,
+				balanceValue: vote.decision === 'abstain' ? vote.balance.abstain || '0' : vote.balance.value || '0',
 				decision: vote.decision === 'yes' ? EVoteDecision.AYE : vote.decision === 'no' ? EVoteDecision.NAY : (vote.decision as EVoteDecision),
 				lockPeriod: vote.lockPeriod,
 				createdAt: vote.createdAt ? new Date(vote.createdAt) : new Date(vote.timestamp || ''),
@@ -511,12 +511,18 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetConvictionVoteDelegationsByAddress({ network, address }: { network: ENetwork; address: string }) {
+	static async GetConvictionVoteDelegationsToAndFromAddress({ network, address, trackNum }: { network: ENetwork; address: string; trackNum?: number }) {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_CONVICTION_VOTE_DELEGATIONS_BY_ADDRESS;
+		let query = this.GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address }).toPromise();
+		const isValidTrackNumber = ValidatorService.isValidNumber(trackNum) && ValidatorService.isValidTrackNumber({ trackNum: Number(trackNum), network });
+
+		if (isValidTrackNumber) {
+			query = this.GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS_AND_TRACK_NUMBER;
+		}
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address, ...(isValidTrackNumber && { trackNumber_eq: trackNum }) }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain conviction vote delegations by address from Subsquid: ${subsquidErr}`);
@@ -527,6 +533,9 @@ export class SubsquidService extends SubsquidUtils {
 			to: string;
 			from: string;
 			track: number;
+			balance: string;
+			createdAt: Date;
+			lockPeriod: number;
 		}[];
 	}
 
@@ -549,5 +558,100 @@ export class SubsquidService extends SubsquidUtils {
 		});
 
 		return result;
+	}
+
+	static async GetActiveProposalListingsWithVoteForAddressByTrackId({
+		network,
+		trackId,
+		voterAddress
+	}: {
+		network: ENetwork;
+		trackId: number;
+		voterAddress: string;
+	}): Promise<IGenericListingResponse<IOnChainPostListing & { delegateVote?: IVoteData }>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ACTIVE_PROPOSAL_LISTINGS_WITH_VOTE_FOR_ADDRESS_BY_TRACK_ID;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { trackNumber_eq: trackId, voter_eq: voterAddress }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain active proposal listings by track id from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain active proposal listings by track id from Subsquid');
+		}
+
+		const posts: (IOnChainPostListing & { delegateVote?: IVoteData })[] = await Promise.all(
+			subsquidData.proposalsConnection.edges.map(
+				async (edge: {
+					node: {
+						createdAt: Date;
+						description?: string | null;
+						index: number;
+						origin: EPostOrigin;
+						proposer?: string;
+						status?: EProposalStatus;
+						hash?: string;
+						preimage?: {
+							proposedCall?: {
+								args?: Record<string, unknown>;
+							};
+						};
+						statusHistory?: Array<{
+							status: EProposalStatus;
+							timestamp: string;
+						}>;
+						convictionVoting?: Array<{
+							balance: { value?: string; aye?: string; nay?: string; abstain?: string };
+							decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+							lockPeriod: number;
+							createdAt: string;
+							selfVotingPower: string;
+							totalVotingPower: string;
+							delegatedVotingPower: string;
+						}>;
+					};
+				}) => {
+					const proposal = edge.node;
+
+					const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+					const delegateVoteData = proposal.convictionVoting?.[0];
+
+					const delegateVote: IVoteData | undefined = delegateVoteData
+						? {
+								balanceValue: delegateVoteData.decision === 'abstain' ? delegateVoteData.balance.abstain || '0' : delegateVoteData.balance.value || '0',
+								decision:
+									delegateVoteData.decision === 'yes' ? EVoteDecision.AYE : delegateVoteData.decision === 'no' ? EVoteDecision.NAY : (delegateVoteData.decision as EVoteDecision),
+								lockPeriod: delegateVoteData.lockPeriod,
+								createdAt: new Date(delegateVoteData.createdAt),
+								voterAddress,
+								selfVotingPower: delegateVoteData.selfVotingPower,
+								totalVotingPower: delegateVoteData.totalVotingPower,
+								delegatedVotingPower: delegateVoteData.delegatedVotingPower
+							}
+						: undefined;
+
+					return {
+						createdAt: new Date(proposal.createdAt),
+						description: proposal.description || '',
+						index: proposal.index,
+						origin: proposal.origin,
+						proposer: proposal.proposer || '',
+						status: proposal.status || EProposalStatus.Unknown,
+						type: EProposalType.REFERENDUM_V2,
+						hash: proposal.hash || '',
+						voteMetrics: await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, index: Number(proposal.index) }),
+						beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+						decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
+						preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
+						delegateVote
+					};
+				}
+			)
+		);
+
+		return {
+			items: posts,
+			totalCount: subsquidData.proposalsConnection.totalCount
+		};
 	}
 }

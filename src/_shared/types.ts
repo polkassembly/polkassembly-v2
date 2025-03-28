@@ -1018,3 +1018,21 @@ export interface ITrackDelegationStats {
 	status: EDelegationStatus;
 	activeProposalsCount: number;
 }
+
+export interface IPostWithDelegateVote extends IPostListing {
+	delegateVote?: IVoteData;
+}
+
+interface ITrackDelegation {
+	address: string;
+	balance: string;
+	createdAt: Date;
+	lockPeriod: number;
+}
+
+export interface ITrackDelegationDetails {
+	receivedDelegations?: ITrackDelegation[];
+	delegatedTo?: ITrackDelegation[];
+	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
+	status: EDelegationStatus;
+}

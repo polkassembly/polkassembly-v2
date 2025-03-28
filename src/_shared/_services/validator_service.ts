@@ -101,7 +101,7 @@ export class ValidatorService {
 	}
 
 	static isValidUserId(userId: number): boolean {
-		return !isNaN(userId) && userId > 0;
+		return this.isValidNumber(userId) && userId > 0;
 	}
 
 	static isValidWeb3Address(address: string): boolean {
@@ -280,5 +280,11 @@ export class ValidatorService {
 	static isValidPreimageHash(preimageHash: string): boolean {
 		const bitLength = 256;
 		return isHex(preimageHash, bitLength);
+	}
+
+	static isValidTrackNumber({ trackNum, network }: { trackNum: number; network: ENetwork }): boolean {
+		const { trackDetails } = NETWORKS_DETAILS[`${network}`];
+		const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
+		return allTrackIds.includes(trackNum);
 	}
 }

@@ -650,12 +650,28 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_CONVICTION_VOTE_DELEGATIONS_BY_ADDRESS = `
-		query GetConvictionVoteDelegationsByAddress($address_eq: String!) {
-			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address_eq}) {
+	protected static GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS = `
+		query GetConvictionVoteDelegationsToAndFromAddress($address_eq: String!) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, to_eq: $address_eq, OR: {from_eq: $address_eq}}) {
 				to
 				from
 				track
+				balance
+				createdAt
+				lockPeriod
+			}
+		}
+	`;
+
+	protected static GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS_AND_TRACK_NUMBER = `
+		query GetConvictionVoteDelegationsToAndFromAddressAndTrackNumber($address_eq: String!, $trackNumber_eq: Int!,) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, to_eq: $address_eq, track_eq: $trackNumber_eq, OR: {from_eq: $address_eq}}) {
+				to
+				from
+				track
+				balance
+				createdAt
+				lockPeriod
 			}
 		}
 	`;
@@ -677,4 +693,48 @@ export class SubsquidQueries {
 			}
 		`;
 	};
+
+	protected static GET_ACTIVE_PROPOSAL_LISTINGS_WITH_VOTE_FOR_ADDRESS_BY_TRACK_ID = `
+		query GetActiveProposalListingsWithVoteForAddressByTrackId($trackNumber_eq: Int!, $voter_eq: String = "") {
+			proposalsConnection(orderBy: id_ASC, where: {trackNumber_eq: $trackNumber_eq, status_in: [${ACTIVE_PROPOSAL_STATUSES.join(',')}], type_eq: ReferendumV2}) {
+				edges {
+					node {
+						createdAt
+						description
+						index
+						origin
+						proposer
+						status,
+						hash,
+						preimage {
+							proposedCall {
+								args
+							}
+						}
+						statusHistory {
+							status
+							timestamp
+						}
+						convictionVoting(where: {voter_eq: $voter_eq, removedAtBlock_isNull: true}) {
+							balance {
+								... on StandardVoteBalance {
+									value
+								}
+								... on SplitVoteBalance {
+									aye
+									nay
+									abstain
+								}
+							}
+							createdAt
+							decision
+							lockPeriod
+							totalVotingPower
+							selfVotingPower
+						}
+					}
+				}
+			}
+		}
+	`;
 }
