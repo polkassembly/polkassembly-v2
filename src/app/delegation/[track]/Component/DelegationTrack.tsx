@@ -86,7 +86,7 @@ function DelegationTrack({ track }: { track: string }) {
 						<p className='text-2xl font-bold text-btn_secondary_text'>{trackName}</p>
 						<span
 							className={cn(
-								'rounded-[26px] px-3 py-1.5 text-center text-xs text-text_primary',
+								'rounded-[26px] px-3 py-1.5 text-center text-xs text-btn_secondary_text',
 								isDelegated && 'bg-delegated_delegation_bg',
 								!isDelegated && 'bg-undelegated_delegation_bg'
 							)}
@@ -165,7 +165,7 @@ function DelegationTrack({ track }: { track: string }) {
 				<div className='flex items-center justify-between'>
 					<div className='flex items-center gap-2'>
 						<p className='text-2xl font-bold text-btn_secondary_text'>Active Proposals</p>
-						<span className='ml-1 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-sm font-medium'>
+						<span className='ml-1 flex h-7 w-7 items-center justify-center rounded-full bg-grey_bg text-sm font-medium'>
 							{activeProposals.length > 0 ? activeProposals.length : 0}
 						</span>
 					</div>
