@@ -13,6 +13,10 @@ import { useAtom } from 'jotai';
 import { IoPersonAdd } from 'react-icons/io5';
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { MdKeyboardArrowRight } from 'react-icons/md';
+import Image from 'next/image';
+import UndelegatedTrack from '@assets/delegation/undelegated.svg';
+import Link from 'next/link';
 import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
 
 function DelegationTrack({ trackName }: { trackName: string }) {
@@ -26,6 +30,18 @@ function DelegationTrack({ trackName }: { trackName: string }) {
 	const [open, setOpen] = useState(false);
 	return (
 		<div>
+			<div className='mb-4 flex items-center gap-2 text-btn_secondary_text'>
+				<Link
+					href='/delegation'
+					className='cursor-pointer text-sm'
+				>
+					Dashboard
+				</Link>
+				<span className='mt-[-2px]'>
+					<MdKeyboardArrowRight className='text-sm' />
+				</span>
+				<span className='cursor-pointer text-sm capitalize text-text_pink'>{trackName}</span>
+			</div>
 			<div className='flex h-80 flex-col justify-between gap-5 rounded-lg bg-bg_modal p-5'>
 				<div>
 					<div className='flex items-center gap-4'>
@@ -42,7 +58,16 @@ function DelegationTrack({ trackName }: { trackName: string }) {
 					</div>
 					<p className='text-sm text-text_primary'>{trackDescription}</p>
 				</div>
-				<div className='flex h-full items-center justify-center gap-2'>
+				<div className='flex items-center justify-center'>
+					<Image
+						src={!isDelegated && UndelegatedTrack}
+						alt='delegation-track'
+						width={150}
+						height={150}
+					/>
+				</div>
+
+				<div className='flex items-center justify-center gap-2'>
 					{isDelegated ? (
 						<p className='text-sm text-text_primary'>Voting power for this track has been delegated</p>
 					) : (
