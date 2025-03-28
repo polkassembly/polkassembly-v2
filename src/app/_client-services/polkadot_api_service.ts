@@ -522,7 +522,7 @@ export class PolkadotApiService {
 		enactment,
 		enactmentValue
 	}: {
-		track: string;
+		track: EPostOrigin;
 		preimageHash: string;
 		preimageLength: number;
 		enactment: EEnactment;
@@ -670,7 +670,7 @@ export class PolkadotApiService {
 		onFailed
 	}: {
 		address: string;
-		track: string;
+		track: EPostOrigin;
 		preimageHash: string;
 		preimageLength: number;
 		enactment: EEnactment;

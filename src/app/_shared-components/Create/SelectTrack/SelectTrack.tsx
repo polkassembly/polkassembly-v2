@@ -4,10 +4,39 @@
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
+
+const getMaxSpend = (network: ENetwork, trackName: EPostOrigin) => {
+	return NETWORKS_DETAILS[`${network}`].trackDetails[`${trackName}`]?.maxSpend || BN_ZERO;
+};
+
+const getTracksForNetwork = (network: ENetwork, isTreasury?: boolean) => {
+	const trackArr: { name: EPostOrigin; trackId: number }[] = [];
+	if (!network) return trackArr;
+
+	Object.entries(NETWORKS_DETAILS[`${network}`].trackDetails).forEach(([key, value]) => {
+		if (isTreasury) {
+			if ('maxSpend' in value || (network === ENetwork.WESTEND && key === EPostOrigin.TREASURER)) {
+				trackArr.push({ name: key as EPostOrigin, trackId: value.trackId });
+			}
+		} else {
+			trackArr.push({ name: key as EPostOrigin, trackId: value.trackId });
+		}
+	});
+
+	return trackArr;
+};
+
+const getSortedTracks = (tracks: { name: EPostOrigin; trackId: number }[], network: ENetwork) => {
+	return [...tracks].sort((a, b) => {
+		const maxSpendA = getMaxSpend(network, a.name);
+		const maxSpendB = getMaxSpend(network, b.name);
+		return maxSpendA.gte(maxSpendB) ? 1 : -1;
+	});
+};
 
 function SelectTrack({
 	selectedTrack,
@@ -15,67 +44,55 @@ function SelectTrack({
 	isTreasury,
 	requestedAmount
 }: {
-	selectedTrack?: string;
-	onChange: (track: EPostOrigin) => void;
+	selectedTrack?: { name: EPostOrigin; trackId: number };
+	onChange: (track: { name: EPostOrigin; trackId: number }) => void;
 	isTreasury?: boolean;
 	requestedAmount?: BN;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
-	const trackArr: { name: EPostOrigin; trackId: number }[] = [];
+	const trackArr = useMemo(() => getTracksForNetwork(network, isTreasury), [network, isTreasury]);
 
-	const [track, setTrack] = useState<{ name: string; trackId: number }>();
+	const sortedTracks = useMemo(() => getSortedTracks(trackArr, network), [trackArr, network]);
 
-	if (network) {
-		Object.entries(NETWORKS_DETAILS?.[`${network}`].trackDetails).forEach(([key, value]) => {
-			if (isTreasury) {
-				if ('maxSpend' in value || (network === ENetwork.WESTEND && key === EPostOrigin.TREASURER)) {
-					trackArr.push({ name: key as EPostOrigin, trackId: value.trackId });
-				}
-			} else {
-				trackArr.push({ name: key as EPostOrigin, trackId: value.trackId });
-			}
-		});
-	}
-
-	useEffect(() => {
-		if (!requestedAmount || requestedAmount.isZero()) return;
-
-		const tracks = [...trackArr];
-		const filteredTrack = tracks
-			.sort((a, b) => {
-				const maxSpendA = NETWORKS_DETAILS?.[`${network}`].trackDetails[`${a.name}`]?.maxSpend;
-				const maxSpendB = NETWORKS_DETAILS?.[`${network}`].trackDetails[`${b.name}`]?.maxSpend;
-				return maxSpendA?.gte(maxSpendB || BN_ZERO) ? 1 : -1;
-			})
-			.find((tr) => {
-				const maxSpend = NETWORKS_DETAILS?.[`${network}`].trackDetails[`${tr.name}`]?.maxSpend;
-				return maxSpend && maxSpend.gte(requestedAmount);
-			});
-
-		if (filteredTrack) {
-			setTrack(filteredTrack);
-			onChange(filteredTrack.name);
+	const appropriateTrack = useMemo(() => {
+		if (!requestedAmount || requestedAmount.isZero()) {
+			return selectedTrack;
 		}
+
+		const suitableTrack = sortedTracks.find((tr) => {
+			const maxSpend = getMaxSpend(network, tr.name);
+			return maxSpend.gte(requestedAmount);
+		});
+
+		const trackToUse = suitableTrack || sortedTracks[sortedTracks.length - 1];
+
+		if (trackToUse) {
+			onChange(trackToUse);
+		}
+
+		return trackToUse;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [network, requestedAmount]);
+	}, [network, requestedAmount, sortedTracks]);
+
+	const formatTrackName = useMemo(() => {
+		if (!appropriateTrack) {
+			return t('CreateTreasuryProposal.selectTrack');
+		}
+		return `[${appropriateTrack.trackId}] ${appropriateTrack.name.split(/(?=[A-Z])/).join(' ')}`;
+	}, [appropriateTrack, t]);
 
 	return (
 		<div className='flex flex-col gap-y-1'>
 			<p className='text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>
-					{track?.trackId && `[${track?.trackId}]`} {selectedTrack?.split(/(?=[A-Z])/).join(' ') || t('CreateTreasuryProposal.selectTrack')}
-				</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>{formatTrackName}</DropdownMenuTrigger>
 				<DropdownMenuContent>
-					{trackArr.map((tr) => (
+					{sortedTracks.map((tr) => (
 						<DropdownMenuItem
 							key={tr.trackId}
-							onClick={() => {
-								setTrack(tr);
-								onChange(tr.name);
-							}}
+							onClick={() => onChange(tr)}
 						>
 							[{tr.trackId}] {tr.name.split(/(?=[A-Z])/).join(' ')}
 						</DropdownMenuItem>
@@ -86,4 +103,4 @@ function SelectTrack({
 	);
 }
 
-export default SelectTrack;
+export default React.memo(SelectTrack);

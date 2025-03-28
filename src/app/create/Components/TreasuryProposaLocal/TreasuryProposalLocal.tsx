@@ -32,7 +32,7 @@ function TreasuryProposalLocal() {
 	const { userPreferences } = useUserPreferences();
 	const [totalAmount, setTotalAmount] = useState<BN>(BN_ZERO);
 	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
-	const [selectedTrack, setSelectedTrack] = useState<EPostOrigin>();
+	const [selectedTrack, setSelectedTrack] = useState<{ name: EPostOrigin; trackId: number }>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
@@ -55,7 +55,7 @@ function TreasuryProposalLocal() {
 			preimageDetails &&
 			selectedTrack &&
 			apiService.getSubmitProposalTx({
-				track: selectedTrack,
+				track: selectedTrack.name,
 				preimageHash: preimageDetails.preimageHash,
 				preimageLength: preimageDetails.preimageLength,
 				enactment: selectedEnactment,
@@ -76,7 +76,7 @@ function TreasuryProposalLocal() {
 
 		apiService.createProposal({
 			address: userPreferences.address.address,
-			track: selectedTrack,
+			track: selectedTrack.name,
 			preimageHash,
 			preimageLength,
 			enactment: selectedEnactment,
@@ -153,7 +153,7 @@ function TreasuryProposalLocal() {
 
 				<SelectTrack
 					selectedTrack={selectedTrack}
-					onChange={(track) => setSelectedTrack(track)}
+					onChange={setSelectedTrack}
 					isTreasury
 					requestedAmount={totalAmount}
 				/>

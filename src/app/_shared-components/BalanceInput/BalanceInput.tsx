@@ -65,7 +65,7 @@ function BalanceInput({
 	const onBalanceChange = (value: string | null): void => {
 		const { bnValue, isValid } = inputToBn(value || '', network, false, assetId);
 
-		if (isValid) {
+		if (isValid && !isNaN(Number(value))) {
 			setError('');
 			onChange?.({ value: bnValue, assetId });
 		} else {
