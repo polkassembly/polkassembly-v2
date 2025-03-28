@@ -179,7 +179,7 @@ function DelegationTrack({ track }: { track: string }) {
 				</div>
 
 				{isActiveProposalOpen && (
-					<div className='mt-2 flex flex-col gap-5'>
+					<div className='mt-2 flex max-h-[500px] flex-col gap-5 overflow-y-auto'>
 						{activeProposals.length > 0 ? (
 							activeProposals.map((proposal) => (
 								<div
