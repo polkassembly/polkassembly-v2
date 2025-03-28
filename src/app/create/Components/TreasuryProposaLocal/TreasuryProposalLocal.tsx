@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, IBeneficiaryInput, NotificationType } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, NotificationType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -32,7 +32,7 @@ function TreasuryProposalLocal() {
 	const { userPreferences } = useUserPreferences();
 	const [totalAmount, setTotalAmount] = useState<BN>(BN_ZERO);
 	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
-	const [selectedTrack, setSelectedTrack] = useState<string>('');
+	const [selectedTrack, setSelectedTrack] = useState<EPostOrigin>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
@@ -53,6 +53,7 @@ function TreasuryProposalLocal() {
 		() =>
 			apiService &&
 			preimageDetails &&
+			selectedTrack &&
 			apiService.getSubmitProposalTx({
 				track: selectedTrack,
 				preimageHash: preimageDetails.preimageHash,
@@ -68,7 +69,7 @@ function TreasuryProposalLocal() {
 	}, [beneficiaries]);
 
 	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
-		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength) {
+		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength || !selectedTrack) {
 			setLoading(false);
 			return;
 		}
@@ -154,6 +155,7 @@ function TreasuryProposalLocal() {
 					selectedTrack={selectedTrack}
 					onChange={(track) => setSelectedTrack(track)}
 					isTreasury
+					requestedAmount={totalAmount}
 				/>
 
 				<EnactmentForm
