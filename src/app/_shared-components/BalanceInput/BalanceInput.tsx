@@ -83,6 +83,11 @@ function BalanceInput({
 	}, [network]);
 
 	useEffect(() => {
+		onBalanceChange(valueString);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [assetId]);
+
+	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
 			const balances = await assethubApiService?.getAssethubTreasuryAssetsBalance();
@@ -131,11 +136,7 @@ function BalanceInput({
 								{[{ label: networkDetails.tokenSymbol, value: null }, ...assetOptions].map((option) => (
 									<DropdownMenuItem
 										key={option.value}
-										onClick={() => {
-											setAssetId(option.value);
-											onBalanceChange(null);
-											setValueString('');
-										}}
+										onClick={() => setAssetId(option.value)}
 									>
 										{option.label}
 									</DropdownMenuItem>
