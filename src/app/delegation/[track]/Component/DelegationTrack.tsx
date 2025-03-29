@@ -235,6 +235,10 @@ function DelegationTrack({ track }: { track: string }) {
 											)}
 										</div>
 									</div>
+									<div className='flex items-center gap-2'>
+										<span className='text-xs text-text_primary'>Votes:</span>
+										<span className='text-xs text-text_primary'>{proposal?.delegateVote?.decision || 'Not Voted yet'}</span>
+									</div>
 								</div>
 							))
 						) : (
