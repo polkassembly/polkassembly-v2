@@ -27,6 +27,7 @@ import { Alert } from '@/app/_shared-components/Alert';
 import { delegateUserTracksAtom, delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
+import { cn } from '@/lib/utils';
 import styles from './DelegateDialog.module.scss';
 
 interface DelegateDialogProps {
@@ -332,22 +333,24 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 								side='top'
 								align='center'
 								sideOffset={10}
-								className={styles.tooltipContent}
+								className={cn(styles.tooltipContent, 'bg-bg_modal')}
 							>
 								<div className='flex flex-col gap-2'>
 									{tracks.map((track) => {
 										const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
 										const isTrackDelegated = delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
+										const isChecked = isTrackDelegated || selectedTracks.includes(track);
 
 										return (
 											<div
 												key={track}
-												className='flex items-center gap-2 py-1'
+												className={cn('flex items-center gap-2 rounded-md px-2 py-1 transition-colors', isChecked ? 'bg-page_background' : '')}
 											>
 												<Checkbox
-													checked={isTrackDelegated || selectedTracks.includes(track)}
+													checked={isChecked}
 													onCheckedChange={() => toggleTrack(track)}
 													disabled={isTrackDelegated}
+													className='h-5 w-5 rounded-md border border-border_grey data-[state=checked]:border-text_pink data-[state=checked]:bg-text_pink data-[state=checked]:text-white'
 												/>
 												<span className={isTrackDelegated ? 'text-text_secondary' : ''}>
 													{track} {isTrackDelegated && '(Already delegated)'}

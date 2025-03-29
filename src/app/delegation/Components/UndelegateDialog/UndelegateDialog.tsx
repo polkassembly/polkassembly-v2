@@ -9,7 +9,7 @@ import { Label } from '@/app/_shared-components/Label';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { ReactNode, useState, useMemo, useEffect, useCallback } from 'react';
+import React, { ReactNode, useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { EDelegationStatus, EPostOrigin, NotificationType, IDelegateDetails } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -24,15 +24,17 @@ import { delegateUserTracksAtom, delegatesAtom } from '@/app/_atoms/delegation/d
 import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { BN } from '@polkadot/util';
+import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 
 interface UndelegateDialogProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	delegate: { address: string };
+	delegate: { address: string; balance: string };
 	children?: ReactNode;
+	disabled?: boolean;
 }
 
-function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialogProps) {
+function UndelegateDialog({ open, setOpen, delegate, children, disabled }: UndelegateDialogProps) {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const router = useRouter();
@@ -62,6 +64,10 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 
 	const handleOpenChange = useCallback(
 		(isOpen: boolean) => {
+			if (disabled && isOpen) {
+				return; // Don't open modal if disabled
+			}
+
 			if (!user) {
 				router.push('/login');
 			} else {
@@ -72,7 +78,7 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 				}
 			}
 		},
-		[user, router, setOpen]
+		[user, router, setOpen, disabled]
 	);
 
 	const toggleAllTracks = useCallback(() => {
@@ -105,7 +111,7 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 				address: user.defaultAddress,
 				tracks: selectedTrackIds,
 				conviction: 0,
-				balance: new BN(0)
+				balance: new BN(delegate.balance)
 			});
 			setTxFee(fee.toString());
 		} catch (error) {
@@ -162,7 +168,9 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 		setIsAllTracksSelected(selectedTracks.length > 0 && selectedTracks.length === delegatedTracks.length);
 	}, [selectedTracks, delegatedTracks]);
 
-	return (
+	return disabled ? (
+		<div className='pointer-events-none opacity-50'>{children}</div>
+	) : (
 		<Dialog
 			open={open}
 			onOpenChange={handleOpenChange}
@@ -184,7 +192,20 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 						className='bg-network_dropdown_bg'
 						placeholder={user?.defaultAddress}
 					/>
+					<Label>Delegate To</Label>
+					<AddressInput
+						disabled
+						className='bg-network_dropdown_bg'
+						placeholder={delegate.address}
+					/>
 
+					<Label>Balance</Label>
+					<BalanceInput
+						showBalance
+						label='Balance'
+						defaultValue={new BN(delegate.balance || '0')}
+						disabled
+					/>
 					{delegatedTracks.length === 0 ? (
 						<Alert variant='info'>You don&apos;t have any delegated tracks with this delegate. Nothing to undelegate.</Alert>
 					) : (
@@ -203,7 +224,6 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 										</TooltipTrigger>
 									</div>
 								</div>
-
 								<TooltipContent
 									side='top'
 									align='center'
@@ -211,26 +231,25 @@ function UndelegateDialog({ open, setOpen, delegate, children }: UndelegateDialo
 									className='max-h-[200px] overflow-auto rounded-lg border border-border_grey bg-bg_modal p-4'
 								>
 									<div className='flex flex-col gap-2'>
-										{tracks.map((track) => {
-											const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
-											const isTrackDelegated = delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
-
-											return (
-												<div
-													key={track}
-													className='flex items-center gap-2 py-1'
-												>
-													<Checkbox
-														checked={selectedTracks.includes(track)}
-														onCheckedChange={() => toggleTrack(track)}
-														disabled={!isTrackDelegated}
-													/>
-													<span className={!isTrackDelegated ? 'text-text_secondary' : ''}>
-														{track} {!isTrackDelegated && '(Not delegated)'}
-													</span>
-												</div>
-											);
-										})}
+										{tracks
+											.filter((track) => {
+												const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
+												return delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
+											})
+											.map((track) => {
+												return (
+													<div
+														key={track}
+														className='flex items-center gap-2 py-1'
+													>
+														<Checkbox
+															checked={selectedTracks.includes(track)}
+															onCheckedChange={() => toggleTrack(track)}
+														/>
+														<span>{track}</span>
+													</div>
+												);
+											})}
 									</div>
 								</TooltipContent>
 							</Tooltip>

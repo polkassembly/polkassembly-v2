@@ -24,6 +24,9 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { FaRegClock } from 'react-icons/fa';
 import { Separator } from '@/app/_shared-components/Separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
 import UndelegateDialog from '../../Components/UndelegateDialog/UndelegateDialog';
 
@@ -43,7 +46,15 @@ function DelegationTrack({ track }: { track: string }) {
 	const trackDelegation = delegateUserTracks?.find((track) => track.trackId === trackId);
 	const isDelegated = trackDelegation?.status === EDelegationStatus.DELEGATED;
 	const [openDelegate, setOpenDelegate] = useState(false);
-	const [openUndelegate, setOpenUndelegate] = useState(false);
+	const [openUndelegateAddresses, setOpenUndelegateAddresses] = useState<Record<string, boolean>>({});
+
+	const handleOpenUndelegate = (address: string, isOpen: boolean) => {
+		setOpenUndelegateAddresses((prev) => ({
+			...prev,
+			[address]: isOpen
+		}));
+	};
+
 	const { data: delegateTrackResponse } = useQuery({
 		queryKey: ['delegateTrack', trackId],
 		queryFn: async () => {
@@ -56,15 +67,6 @@ function DelegationTrack({ track }: { track: string }) {
 	});
 
 	const activeProposals = delegateTrackResponse?.data?.activeProposalListingWithDelegateVote?.items || [];
-
-	const delegateAddress = (() => {
-		try {
-			return delegateTrackResponse?.data?.delegatedTo?.[0]?.address || '';
-		} catch (error) {
-			console.error('Error getting delegate address:', error);
-			return '';
-		}
-	})();
 
 	return (
 		<div>
@@ -80,7 +82,7 @@ function DelegationTrack({ track }: { track: string }) {
 				</span>
 				<span className='cursor-pointer text-sm capitalize text-text_pink'>{trackName}</span>
 			</div>
-			<div className='flex h-96 flex-col justify-between gap-5 rounded-lg bg-bg_modal p-5'>
+			<div className='flex flex-col justify-between gap-5 rounded-lg bg-bg_modal p-5'>
 				<div>
 					<div className='flex items-center gap-4'>
 						<p className='text-2xl font-bold text-btn_secondary_text'>{trackName}</p>
@@ -106,58 +108,72 @@ function DelegationTrack({ track }: { track: string }) {
 								width={150}
 								height={150}
 							/>
-							<p className='text-sm text-text_primary'>Voting power for this track has not been delegated yet</p>
+							<p className='flex items-center gap-2 text-sm text-text_primary'>
+								Voting power for this track has not been delegated yet{' '}
+								<DelegateDialog
+									open={openDelegate}
+									setOpen={setOpenDelegate}
+									delegate={{ address: '' }}
+								>
+									<button
+										type='button'
+										className='flex cursor-pointer items-center gap-1 text-text_pink'
+									>
+										<IoPersonAdd />
+										<span>Delegate</span>
+									</button>
+								</DelegateDialog>
+							</p>
 						</>
 					) : (
-						<>
-							<div className='flex w-full items-center justify-center rounded-lg bg-delegated_delegation_bg p-4'>
-								<p className='text-sm'>
-									Delegated to:{' '}
-									<span className='font-medium'>
-										{delegateAddress.slice(0, 6)}...{delegateAddress.slice(-6)}
-									</span>
-								</p>
-							</div>
-							<p className='text-sm text-text_primary'>Voting power for this track has been delegated</p>
-						</>
-					)}
-				</div>
-
-				<div className='flex items-center justify-center gap-4'>
-					{isDelegated ? (
-						<div className='flex gap-4'>
-							<DelegateDialog
-								open={openDelegate}
-								setOpen={setOpenDelegate}
-								delegate={{ address: '' }}
-							>
-								<div className='flex cursor-pointer items-center gap-1 text-text_pink'>
-									<IoPersonAdd />
-									<span>Redelegate</span>
-								</div>
-							</DelegateDialog>
-							<UndelegateDialog
-								open={openUndelegate}
-								setOpen={setOpenUndelegate}
-								delegate={{ address: delegateAddress }}
-							>
-								<div className='flex cursor-pointer items-center gap-1 text-text_pink'>
-									<IoPersonRemove />
-									<span>Undelegate</span>
-								</div>
-							</UndelegateDialog>
+						<div className='flex w-full items-center justify-center p-4'>
+							<Table className='w-full overflow-y-auto border-border_grey'>
+								<TableHeader>
+									<TableRow className='overflow-hidden rounded-t-lg bg-page_background px-6'>
+										<TableHead className='p-6 first:rounded-tl-lg last:rounded-tr-lg'>#</TableHead>
+										<TableHead className='w-1/4 px-6 py-5'>Delegated to</TableHead>
+										<TableHead className='p-6'>Vote Balance</TableHead>
+										<TableHead className='p-6'>Delegated on</TableHead>
+										<TableHead className='p-6 last:rounded-tr-lg'>Action</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{delegateTrackResponse?.data?.delegatedTo?.map((delegation, index) => (
+										<TableRow key={delegation.address}>
+											<TableCell className='p-6'>{index + 1}</TableCell>
+											<TableCell className='w-1/4 px-6 py-5'>{delegation.address}</TableCell>
+											<TableCell className='p-6'>{formatBnBalance(delegation.balance, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}</TableCell>
+											<TableCell className='p-6'>{dayjs(delegation.createdAt).format('DD MMM YYYY')}</TableCell>
+											<TableCell className='p-6 last:rounded-tr-lg'>
+												<div className='flex items-center gap-1'>
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<UndelegateDialog
+																open={openUndelegateAddresses[delegation.address] || false}
+																setOpen={(isOpen) => handleOpenUndelegate(delegation.address, isOpen)}
+																delegate={{ address: delegation.address, balance: delegation.balance }}
+																disabled={delegation.lockPeriod > 0}
+															>
+																<button
+																	type='button'
+																	className='flex cursor-pointer items-center gap-1 text-text_pink'
+																>
+																	<IoPersonRemove />
+																	<span>Undelegate</span>
+																</button>
+															</UndelegateDialog>
+														</TooltipTrigger>
+														<TooltipContent className='bg-bg_modal text-sm text-text_primary'>
+															{delegation.lockPeriod > 0 ? <p>You can undelegate after {delegation.lockPeriod} days</p> : <p>You can undelegate now</p>}
+														</TooltipContent>
+													</Tooltip>
+												</div>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
 						</div>
-					) : (
-						<DelegateDialog
-							open={openDelegate}
-							setOpen={setOpenDelegate}
-							delegate={{ address: '' }}
-						>
-							<div className='flex cursor-pointer items-center gap-1 text-text_pink'>
-								<IoPersonAdd />
-								<span>Delegate</span>
-							</div>
-						</DelegateDialog>
 					)}
 				</div>
 			</div>
