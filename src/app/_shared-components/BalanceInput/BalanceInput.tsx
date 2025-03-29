@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUser } from '@/hooks/useUser';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
@@ -75,15 +76,15 @@ function BalanceInput({
 		setUserBalance(totalBalance.toString());
 	};
 
-	const onBalanceChange = (value: string | null): void => {
-		const { bnValue, isValid } = inputToBn(value || '', network, false, assetId);
+	const onBalanceChange = (value: string | null, id?: string | null): void => {
+		const { bnValue, isValid } = inputToBn(value || '', network, false, id || assetId);
 
-		if (isValid) {
+		if (isValid && ValidatorService.isValidNumber(value)) {
 			setError('');
-			onChange?.({ value: bnValue, assetId });
+			onChange?.({ value: bnValue, assetId: id || assetId });
 		} else {
 			setError('Invalid Amount');
-			onChange?.({ value: BN_ZERO, assetId });
+			onChange?.({ value: BN_ZERO, assetId: id || assetId });
 		}
 	};
 
@@ -161,8 +162,7 @@ function BalanceInput({
 										key={option.value}
 										onClick={() => {
 											setAssetId(option.value);
-											onBalanceChange(null);
-											setValueString('');
+											onBalanceChange(valueString, option.value);
 										}}
 									>
 										{option.label}
