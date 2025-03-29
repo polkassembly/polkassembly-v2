@@ -27,6 +27,7 @@ import { Alert } from '@/app/_shared-components/Alert';
 import { delegateUserTracksAtom, delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
+import styles from './DelegateDialog.module.scss';
 
 interface DelegateDialogProps {
 	open: boolean;
@@ -263,7 +264,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 			<DialogContent className='max-w-2xl p-6'>
 				<DialogHeader>
 					<DialogTitle>
-						<div className='flex items-center gap-2 text-btn_secondary_text'>
+						<div className={styles.titleContainer}>
 							<IoPersonAdd />
 							<span>{t('delegate')}</span>
 						</div>
@@ -290,22 +291,22 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						defaultValue={new BN(balance || '0')}
 						onChange={handleBalanceChange}
 					/>
-					{isBalanceError && <p className='text-sm text-red-500'>You don&apos;t have enough balance to delegate</p>}
+					{isBalanceError && <p className={styles.balanceError}>You don&apos;t have enough balance to delegate</p>}
 					<div className='w-full'>
 						<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
 						<ConvictionSelector onConvictionChange={setConviction} />
 					</div>
-					<div className='flex flex-col gap-2 rounded-lg bg-page_background p-4'>
-						<div className='flex items-center justify-between gap-2'>
-							<p className='text-sm text-wallet_btn_text'>Lock Period</p>
-							<p className='text-sm text-wallet_btn_text'>
+					<div className={styles.convictionContainer}>
+						<div className={styles.convictionItem}>
+							<p className={styles.convictionItemLabel}>Lock Period</p>
+							<p className={styles.convictionItemLabel}>
 								{conviction}x voting balance for duration ({LOCK_PERIODS[conviction]})
 							</p>
 						</div>
 						{balance && (
-							<div className='flex items-center justify-between gap-2'>
-								<p className='text-sm text-wallet_btn_text'>Votes</p>
-								<p className='text-sm text-wallet_btn_text'>
+							<div className={styles.convictionItem}>
+								<p className={styles.convictionItemLabel}>Votes</p>
+								<p className={styles.convictionItemLabel}>
 									{balance ? formatBnBalance(new BN(balance).muln(conviction + 1).toString(), { withUnit: true, numberAfterComma: 2 }, network) : <Skeleton className='h-4' />}
 								</p>
 							</div>
@@ -314,7 +315,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 
 					<div className='flex flex-col gap-4'>
 						<Tooltip>
-							<div className='flex items-center justify-between gap-2 px-2'>
+							<div className={styles.selectedTracksContainer}>
 								<p className='text-sm text-wallet_btn_text'>Selected track(s)</p>
 								<div className='flex cursor-pointer items-center gap-2'>
 									<Checkbox
@@ -331,7 +332,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 								side='top'
 								align='center'
 								sideOffset={10}
-								className='max-h-[200px] overflow-auto rounded-lg border border-border_grey bg-bg_modal p-4'
+								className={styles.tooltipContent}
 							>
 								<div className='flex flex-col gap-2'>
 									{tracks.map((track) => {
@@ -361,7 +362,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 							{selectedTracks.map((track) => (
 								<span
 									key={track}
-									className='flex items-center gap-1 rounded-full bg-grey_bg px-3 py-1 text-xs'
+									className={styles.track}
 								>
 									{track}
 									<X

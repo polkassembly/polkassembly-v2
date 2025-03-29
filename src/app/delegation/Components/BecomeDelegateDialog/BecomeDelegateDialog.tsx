@@ -21,6 +21,7 @@ import { TfiPencil } from 'react-icons/tfi';
 import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import styles from './BecomeDelegateDialog.module.scss';
 
 const ERROR_UNKNOWN = 'An unknown error occurred';
 
@@ -177,13 +178,13 @@ export default function BecomeDelegateDialog() {
 							onChange={(e) => setManifesto(e.target.value)}
 						/>
 					</div>
-					<div className='flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary'>
+					<div className={styles.infoContainer}>
 						<AiOutlineInfoCircle className='text-toast_info_border' />
-						<span className='flex items-center gap-x-2 text-xs'>
+						<span className={styles.infoText}>
 							To add socials to your delegate profile{' '}
 							<Link
 								href='/set-identity'
-								className='flex items-center gap-x-1 text-text_pink'
+								className={styles.link}
 							>
 								<Image
 									src={identityIcon}

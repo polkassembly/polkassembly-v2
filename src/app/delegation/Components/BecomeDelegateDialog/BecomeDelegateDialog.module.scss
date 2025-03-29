@@ -1,0 +1,11 @@
+.infoContainer {
+    @apply flex items-center gap-x-2 rounded-md bg-bg_light_blue p-3 text-sm text-text_primary;
+}
+
+.link {
+    @apply flex items-center gap-x-1 text-text_pink;
+}
+
+.infoText {
+    @apply flex items-center gap-x-2 text-xs;
+}
