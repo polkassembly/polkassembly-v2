@@ -10,6 +10,10 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
 
 const zodParamsSchema = z.object({
 	address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
@@ -27,6 +31,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		OnChainDbService.GetActiveProposalsCountByTrackIds({ network, trackIds: allTrackIds })
 	]);
 
+	const encodedAddress = await getEncodedAddress(address, network);
+
+	if (!encodedAddress) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Address is not a valid web-3 address');
+	}
+
 	// for each track, get the delegation status and active proposals
 	const delegationStats = Object.values(trackDetails).map((track) => {
 		const trackDelegationStats: ITrackDelegationStats = {
@@ -39,9 +49,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		const trackDelegations = allVoteDelegations.filter((delegation) => delegation.track === track.trackId);
 
 		if (trackDelegations.length > 0) {
-			const delegation = trackDelegations.find((d) => d.from === address || d.to === address);
+			const delegation = trackDelegations.find((d) => d.from === encodedAddress || d.to === encodedAddress);
 			if (delegation) {
-				trackDelegationStats.status = delegation.from === address ? EDelegationStatus.DELEGATED : EDelegationStatus.RECEIVED;
+				trackDelegationStats.status = delegation.from === encodedAddress ? EDelegationStatus.DELEGATED : EDelegationStatus.RECEIVED;
 			}
 		}
 
