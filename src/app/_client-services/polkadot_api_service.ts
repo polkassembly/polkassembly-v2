@@ -804,12 +804,10 @@ export class PolkadotApiService {
 		});
 	}
 
-	async undelegate({ address, tracks, onSuccess, onFailed }: { address: string; tracks: number[]; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async undelegate({ address, trackId, onSuccess, onFailed }: { address: string; trackId: number; onSuccess: () => void; onFailed: (error: string) => void }) {
 		if (!this.api) return;
 
-		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
-
-		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+		const tx = this.api.tx.convictionVoting.undelegate(trackId);
 
 		await this.executeTx({
 			tx,

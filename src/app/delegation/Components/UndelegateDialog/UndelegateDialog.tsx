@@ -1,6 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 import { Dialog, DialogTrigger, DialogContent, DialogFooter, DialogTitle, DialogHeader } from '@ui/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
@@ -8,19 +9,15 @@ import { IoPersonRemove } from 'react-icons/io5';
 import { Label } from '@/app/_shared-components/Label';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
-import { useTranslations } from 'next-intl';
-import React, { ReactNode, useState, useMemo, useEffect, useCallback } from 'react';
+import { ReactNode, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { EDelegationStatus, EPostOrigin, NotificationType, IDelegateDetails } from '@/_shared/types';
+import { NotificationType, EDelegationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { Checkbox } from '@/app/_shared-components/checkbox';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import { Info, Loader, X } from 'lucide-react';
+import { Info, Loader } from 'lucide-react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { Alert } from '@/app/_shared-components/Alert';
-import { delegateUserTracksAtom, delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
+import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { BN } from '@polkadot/util';
@@ -32,84 +29,43 @@ interface UndelegateDialogProps {
 	delegate: { address: string; balance: string };
 	children?: ReactNode;
 	disabled?: boolean;
+	trackId?: number;
+	trackName?: string;
 }
 
-function UndelegateDialog({ open, setOpen, delegate, children, disabled }: UndelegateDialogProps) {
+function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId, trackName }: UndelegateDialogProps) {
 	const { user } = useUser();
-	const t = useTranslations('Delegation');
 	const router = useRouter();
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { toast } = useToast();
-
-	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[network].trackDetails), [network]);
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
-	const [, setDelegates] = useAtom(delegatesAtom);
 
-	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
-	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [txFee, setTxFee] = useState<string>('');
-	const delegatedTracks = useMemo(() => {
-		return tracks.filter((track) => {
-			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
-			return delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
-		});
-	}, [tracks, network, delegateUserTracks]);
-
-	const selectedTrackIds = useMemo(
-		() => selectedTracks.map((track) => NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId).filter((id): id is number => id !== undefined),
-		[selectedTracks, network]
-	);
 
 	const handleOpenChange = useCallback(
 		(isOpen: boolean) => {
 			if (disabled && isOpen) {
-				return; // Don't open modal if disabled
+				return;
 			}
 
 			if (!user) {
 				router.push('/login');
 			} else {
 				setOpen(isOpen);
-				if (isOpen) {
-					setSelectedTracks([]);
-					setIsAllTracksSelected(false);
-				}
 			}
 		},
 		[user, router, setOpen, disabled]
 	);
 
-	const toggleAllTracks = useCallback(() => {
-		if (selectedTracks.length === delegatedTracks.length) {
-			setSelectedTracks([]);
-			setIsAllTracksSelected(false);
-		} else {
-			setSelectedTracks(delegatedTracks);
-			setIsAllTracksSelected(true);
-		}
-	}, [selectedTracks, delegatedTracks]);
-
-	const toggleTrack = useCallback(
-		(track: string) => {
-			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
-			const isTrackDelegated = delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
-			if (!isTrackDelegated) {
-				return;
-			}
-			setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
-		},
-		[network, delegateUserTracks]
-	);
-
 	const calculateTxFee = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || selectedTrackIds?.length === 0) return;
+		if (!apiService || !user?.defaultAddress || !trackId) return;
 
 		try {
 			const fee = await apiService.getDelegateTxFee({
 				address: user.defaultAddress,
-				tracks: selectedTrackIds,
+				tracks: trackId ? [trackId] : [],
 				conviction: 0,
 				balance: new BN(delegate.balance)
 			});
@@ -117,23 +73,32 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled }: Undel
 		} catch (error) {
 			console.error('Failed to calculate transaction fee:', error);
 		}
-	}, [apiService, user?.defaultAddress, selectedTrackIds]);
+	}, [apiService, user?.defaultAddress, trackId]);
 
 	const handleSubmit = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || selectedTrackIds?.length === 0) return;
+		if (!apiService || !user?.defaultAddress || !trackId) return;
 
 		try {
 			setLoading(true);
 			await apiService.undelegate({
 				address: user.defaultAddress,
-				tracks: selectedTrackIds,
+				trackId,
 				onSuccess: () => {
-					setDelegateUserTracks((prev) => prev.map((track) => (selectedTrackIds.includes(track.trackId) ? { ...track, status: EDelegationStatus.UNDELEGATED } : track)));
-					setDelegates((prev: IDelegateDetails[]) =>
-						prev.map((d: IDelegateDetails) =>
-							d.address === delegate.address ? { ...d, receivedDelegationsCount: Math.max(0, (d.receivedDelegationsCount || 0) - selectedTrackIds.length) } : d
-						)
-					);
+					// Optimistically update the track status
+					if (delegateUserTracks) {
+						setDelegateUserTracks(
+							delegateUserTracks.map((track) => {
+								if (track.trackId === trackId) {
+									// Update the status to UNDELEGATED
+									return {
+										...track,
+										status: EDelegationStatus.UNDELEGATED
+									};
+								}
+								return track;
+							})
+						);
+					}
 
 					setOpen(false);
 					toast({
@@ -158,15 +123,11 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled }: Undel
 			});
 			setLoading(false);
 		}
-	}, [apiService, user?.defaultAddress, selectedTrackIds, setDelegateUserTracks, setDelegates, delegate.address, setOpen, toast]);
+	}, [apiService, user?.defaultAddress, trackId, setDelegateUserTracks, delegateUserTracks, setOpen, toast]);
 
 	useEffect(() => {
 		calculateTxFee();
 	}, [calculateTxFee]);
-
-	useEffect(() => {
-		setIsAllTracksSelected(selectedTracks.length > 0 && selectedTracks.length === delegatedTracks.length);
-	}, [selectedTracks, delegatedTracks]);
 
 	return disabled ? (
 		<div className='pointer-events-none opacity-50'>{children}</div>
@@ -181,7 +142,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled }: Undel
 					<DialogTitle>
 						<div className='flex items-center gap-2 text-btn_secondary_text'>
 							<IoPersonRemove />
-							<span>{t('undelegate')}</span>
+							<span>Undelegate</span>
 						</div>
 					</DialogTitle>
 				</DialogHeader>
@@ -199,77 +160,20 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled }: Undel
 						placeholder={delegate.address}
 					/>
 
-					<Label>Balance</Label>
 					<BalanceInput
 						showBalance
 						label='Balance'
 						defaultValue={new BN(delegate.balance || '0')}
 						disabled
 					/>
-					{delegatedTracks.length === 0 ? (
-						<Alert variant='info'>You don&apos;t have any delegated tracks with this delegate. Nothing to undelegate.</Alert>
-					) : (
-						<div className='flex flex-col gap-4'>
-							<Tooltip>
-								<div className='flex items-center justify-between gap-2 px-2'>
-									<p className='text-sm text-wallet_btn_text'>Selected track(s) to undelegate</p>
-									<div className='flex cursor-pointer items-center gap-2'>
-										<Checkbox
-											checked={isAllTracksSelected}
-											onCheckedChange={toggleAllTracks}
-											disabled={delegatedTracks.length === 0}
-										/>
-										<TooltipTrigger asChild>
-											<span className='text-sm text-wallet_btn_text'>Undelegate from all tracks ({delegatedTracks.length})</span>
-										</TooltipTrigger>
-									</div>
-								</div>
-								<TooltipContent
-									side='top'
-									align='center'
-									sideOffset={10}
-									className='max-h-[200px] overflow-auto rounded-lg border border-border_grey bg-bg_modal p-4'
-								>
-									<div className='flex flex-col gap-2'>
-										{tracks
-											.filter((track) => {
-												const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
-												return delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
-											})
-											.map((track) => {
-												return (
-													<div
-														key={track}
-														className='flex items-center gap-2 py-1'
-													>
-														<Checkbox
-															checked={selectedTracks.includes(track)}
-															onCheckedChange={() => toggleTrack(track)}
-														/>
-														<span>{track}</span>
-													</div>
-												);
-											})}
-									</div>
-								</TooltipContent>
-							</Tooltip>
-							<div className='flex flex-wrap gap-2'>
-								{selectedTracks.map((track) => (
-									<span
-										key={track}
-										className='flex items-center gap-1 rounded-full bg-grey_bg px-3 py-1 text-xs'
-									>
-										{track}
-										<X
-											className='h-3 w-3 cursor-pointer'
-											onClick={() => toggleTrack(track)}
-										/>
-									</span>
-								))}
-							</div>
-						</div>
-					)}
-					{selectedTrackIds?.length > 0 && txFee && (
+
+					<p className='text-sm text-text_primary'>
+						Track:{' '}
+						<span className='text-btn_secondary_text'>
+							{trackName} #{trackId}
+						</span>
+					</p>
+					{txFee && (
 						<Alert
 							variant='info'
 							className='flex items-center gap-2'
@@ -294,7 +198,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled }: Undel
 					</Button>
 					<Button
 						className='btn-undelegate'
-						disabled={loading || !selectedTrackIds?.length || delegatedTracks.length === 0}
+						disabled={loading}
 						onClick={handleSubmit}
 					>
 						{loading ? <Loader className='animate-spin' /> : 'Undelegate'}

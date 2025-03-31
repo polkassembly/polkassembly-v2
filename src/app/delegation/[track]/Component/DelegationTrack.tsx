@@ -58,12 +58,11 @@ function DelegationTrack({ track }: { track: string }) {
 	const { data: delegateTrackResponse } = useQuery({
 		queryKey: ['delegateTrack', trackId],
 		queryFn: async () => {
-			if (user?.loginAddress && trackId) {
-				return NextApiClientService?.getDelegateTrack({ address: user?.loginAddress, trackId });
+			if (user?.defaultAddress && trackId !== undefined) {
+				return NextApiClientService?.getDelegateTrack({ address: user?.defaultAddress, trackId });
 			}
 			return null;
-		},
-		enabled: !!user?.loginAddress && !!trackId
+		}
 	});
 
 	const activeProposals = delegateTrackResponse?.data?.activeProposalListingWithDelegateVote?.items || [];
@@ -153,6 +152,8 @@ function DelegationTrack({ track }: { track: string }) {
 																setOpen={(isOpen) => handleOpenUndelegate(delegation.address, isOpen)}
 																delegate={{ address: delegation.address, balance: delegation.balance }}
 																disabled={delegation.lockPeriod > 0}
+																trackId={trackId}
+																trackName={trackName}
 															>
 																<button
 																	type='button'
