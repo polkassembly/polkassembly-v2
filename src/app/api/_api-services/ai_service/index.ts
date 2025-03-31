@@ -6,7 +6,6 @@ import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICo
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -236,17 +235,14 @@ export class AIService {
 		// fetch post content
 		const post = await fetchPostData({ network, proposalType, indexOrHash: postIndexOrHash });
 
-		if (post.markdownContent) {
-			fullPrompt += `For a post with the following content:\n${post.markdownContent}\n\n`;
+		if (post.content) {
+			fullPrompt += `For a post with the following content:\n${post.content}\n\n`;
 		}
 
 		fullPrompt += 'Analyze the following comments:\n';
 
 		comments.forEach((comment, index) => {
-			// Use markdown content if available, otherwise convert from content
-			const commentText = comment.markdownContent || (comment.content ? htmlAndMarkdownFromEditorJs(comment.content).markdown : '');
-
-			fullPrompt += `### Comment ${index + 1}:\n${commentText}\n\n`;
+			fullPrompt += `### Comment ${index + 1}:\n${comment.content}\n\n`;
 		});
 
 		const summaryResponse = await this.getAIResponse(fullPrompt);
@@ -397,11 +393,9 @@ export class AIService {
 			}
 		}
 
-		const mdContent = offChainPostData.content ? htmlAndMarkdownFromEditorJs(offChainPostData.content).markdown : undefined;
-
 		const postSummary = await this.getPostSummary({
 			network,
-			content: mdContent,
+			content: offChainPostData.content,
 			title: offChainPostData.title,
 			additionalData: {
 				proposer: onChainPostInfo?.proposer,
@@ -413,13 +407,13 @@ export class AIService {
 		});
 
 		const isSpam = await this.getContentSpamCheck({
-			mdContent,
+			mdContent: offChainPostData.content,
 			title: offChainPostData.title
 		});
 
 		const crossValidationResult = onChainPostInfo
 			? await this.validatePostContent({
-					mdContent,
+					mdContent: offChainPostData.content,
 					onChainPostInfo
 				})
 			: null;
@@ -472,7 +466,7 @@ export class AIService {
 			const newComment = flattenedComments.find((comment) => comment.id === newCommentId);
 
 			if (newComment) {
-				const isSpam = await this.getContentSpamCheck({ mdContent: newComment.markdownContent });
+				const isSpam = await this.getContentSpamCheck({ mdContent: newComment.content });
 				if (isSpam) {
 					await OffChainDbService.UpdateComment({ commentId: newCommentId, content: newComment.content, isSpam });
 				}
@@ -505,7 +499,7 @@ export class AIService {
 
 		if (!comment) return null;
 
-		const sentiment = await this.getCommentSentiment({ mdContent: comment.markdownContent });
+		const sentiment = await this.getCommentSentiment({ mdContent: comment.content });
 
 		if (!sentiment) return null;
 

@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+
 export class SubsquidQueries {
 	// single proposal queries
 
@@ -599,6 +601,139 @@ export class SubsquidQueries {
 
 			activeProposalsCount: proposalsConnection(orderBy: id_ASC, where: {status_in: $status_in}) {
 				totalCount
+			}
+		}
+	`;
+
+	protected static GET_CONVICTION_VOTING_DELEGATION_STATS = `
+		query GetConvictionVotingDelegationStats {
+			totalDelegatedVotes: convictionDelegatedVotesConnection(orderBy: id_ASC, where: {removedAtBlock_isNull: true}) {
+				totalCount
+			}
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov}) {
+				from
+				to
+				balance
+				track
+			}
+		}
+	`;
+
+	protected static GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS = `
+		query GetLast30DaysConvictionVoteCountByAddress($address_eq: String!, $createdAt_gte: DateTime!){
+			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT = `
+		query GetAllDelegatesConvictionVotingPowerAndDelegationsCount {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov}) {
+				to
+				balance
+				lockPeriod
+			}
+		}
+	`;
+
+	protected static GET_DELEGATE_DETAILS = `
+		query GetDelegateDetails($address_eq: String!, $createdAt_gte: DateTime!) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq:OpenGov, to_eq: $address_eq}) {
+				to
+				balance
+				lockPeriod
+			}
+			convictionVotesConnection(where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS = `
+		query GetConvictionVoteDelegationsToAndFromAddress($address_eq: String!) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, to_eq: $address_eq, OR: {from_eq: $address_eq}}) {
+				to
+				from
+				track
+				balance
+				createdAt
+				lockPeriod
+			}
+		}
+	`;
+
+	protected static GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS_AND_TRACK_NUMBER = `
+		query GetConvictionVoteDelegationsToAndFromAddressAndTrackNumber($address_eq: String!, $trackNumber_eq: Int!,) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, to_eq: $address_eq, track_eq: $trackNumber_eq, OR: {from_eq: $address_eq}}) {
+				to
+				from
+				track
+				balance
+				createdAt
+				lockPeriod
+			}
+		}
+	`;
+
+	protected static GET_ACTIVE_PROPOSALS_COUNT_BY_TRACK_IDS = (trackIds: number[]) => {
+		const trackQueries = trackIds
+			.map(
+				(trackId) => `
+				track_${trackId}: proposalsConnection(orderBy: id_ASC, where: {status_in: [${ACTIVE_PROPOSAL_STATUSES.join(',')}], trackNumber_eq: ${trackId}}) {
+					totalCount
+				}
+			`
+			)
+			.join('\n');
+
+		return `
+			query GetActiveProposalsCountByTrackIds {
+				${trackQueries}
+			}
+		`;
+	};
+
+	protected static GET_ACTIVE_PROPOSAL_LISTINGS_WITH_VOTE_FOR_ADDRESS_BY_TRACK_ID = `
+		query GetActiveProposalListingsWithVoteForAddressByTrackId($trackNumber_eq: Int!, $voter_eq: String = "") {
+			proposalsConnection(orderBy: id_ASC, where: {trackNumber_eq: $trackNumber_eq, status_in: [${ACTIVE_PROPOSAL_STATUSES.join(',')}], type_eq: ReferendumV2}) {
+				edges {
+					node {
+						createdAt
+						description
+						index
+						origin
+						proposer
+						status,
+						hash,
+						preimage {
+							proposedCall {
+								args
+							}
+						}
+						statusHistory {
+							status
+							timestamp
+						}
+						convictionVoting(where: {voter_eq: $voter_eq, removedAtBlock_isNull: true}) {
+							balance {
+								... on StandardVoteBalance {
+									value
+								}
+								... on SplitVoteBalance {
+									aye
+									nay
+									abstain
+								}
+							}
+							createdAt
+							decision
+							lockPeriod
+							totalVotingPower
+							selfVotingPower
+						}
+					}
+				}
 			}
 		}
 	`;

@@ -7,7 +7,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
-import { ENetwork, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
+import { ENetwork, IDelegateDetails, IDelegationStats, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
@@ -29,7 +29,9 @@ enum ERedisKeys {
 	ACTIVITY_FEED = 'AFD',
 	QR_SESSION = 'QRS',
 	CONTENT_SUMMARY = 'CSM',
-	SUBSCRIPTION_FEED = 'SFD'
+	SUBSCRIPTION_FEED = 'SFD',
+	DELEGATION_STATS = 'DGS',
+	DELEGATE_DETAILS = 'DLD'
 }
 
 export class RedisService {
@@ -60,7 +62,9 @@ export class RedisService {
 			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
-		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`
+		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
+		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
+		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`
 	} as const;
 
 	// helper methods
@@ -410,5 +414,29 @@ export class RedisService {
 
 	static async DeleteQRSession(sessionId: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.QR_SESSION](sessionId), forceCache: true });
+	}
+
+	// Delegation stats caching methods
+	static async GetDelegationStats(network: ENetwork): Promise<IDelegationStats | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network) });
+		return data ? (deepParseJson(data) as IDelegationStats) : null;
+	}
+
+	static async SetDelegationStats(network: ENetwork, data: IDelegationStats): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+	}
+
+	// Delegates caching methods
+	static async GetDelegateDetails(network: ENetwork): Promise<IDelegateDetails[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network) });
+		return data ? (deepParseJson(data) as IDelegateDetails[]) : null;
+	}
+
+	static async SetDelegateDetails(network: ENetwork, data: IDelegateDetails[]): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+	}
+
+	static async DeleteDelegateDetails(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATE_DETAILS}-${network}` });
 	}
 }

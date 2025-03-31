@@ -26,11 +26,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
-import { convertContentForFirestoreServer } from '../../_api-utils/convertContentForFirestoreServer';
 import { RedisService } from '../../_api-services/redis_service';
 import { AIService } from '../../_api-services/ai_service';
 
@@ -188,15 +186,13 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		content: z.string().min(1, 'Content is required'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
 		tags: z.array(z.custom<ITag>()).optional(),
 		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
 	});
 
 	const { content, title, allowedCommentor, topic, tags } = zodBodySchema.parse(await getReqBody(req));
-
-	const formattedContent = convertContentForFirestoreServer(content);
 
 	if (ValidatorService.isValidOnChainProposalType(proposalType) || !ValidatorService.isValidOffChainProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type, cannot create on-chain posts, you can only edit them.');
@@ -206,7 +202,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		network,
 		proposalType,
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-		content: formattedContent,
+		content,
 		title,
 		tags: tags || [],
 		topic: topic || EOffChainPostTopic.GENERAL,

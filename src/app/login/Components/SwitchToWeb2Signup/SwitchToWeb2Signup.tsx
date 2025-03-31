@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import classes from './SwitchToWeb2Signup.module.scss';
 
-function SwitchToWeb2Signup({ switchToSignup, className }: { switchToSignup: () => void; className?: string }) {
+function SwitchToWeb2Signup({ switchToSignup, className, disabled }: { switchToSignup: () => void; className?: string; disabled?: boolean }) {
 	const t = useTranslations();
 	return (
 		<p className={cn(classes.switchToWeb2Signup, className)}>
@@ -16,6 +16,7 @@ function SwitchToWeb2Signup({ switchToSignup, className }: { switchToSignup: () 
 				onClick={switchToSignup}
 				variant='ghost'
 				className='p-0 text-xs text-text_pink sm:text-sm'
+				disabled={disabled}
 			>
 				{t('Profile.signUp')}
 			</Button>

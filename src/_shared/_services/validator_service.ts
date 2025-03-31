@@ -12,7 +12,6 @@ import { ELocales, ENetwork, EOffChainPostTopic, EProposalType, ETheme, EVoteDec
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
-import { OutputData } from '@editorjs/editorjs';
 import { BN, isHex } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '../_constants/networks';
 
@@ -102,7 +101,7 @@ export class ValidatorService {
 	}
 
 	static isValidUserId(userId: number): boolean {
-		return !isNaN(userId) && userId > 0;
+		return this.isValidNumber(userId) && userId > 0;
 	}
 
 	static isValidWeb3Address(address: string): boolean {
@@ -220,11 +219,6 @@ export class ValidatorService {
 		return indicators >= options.minIndicators;
 	}
 
-	// TODO: Add more checks for the content
-	static isValidBlockContent(content: OutputData): boolean {
-		return content.blocks.length > 0;
-	}
-
 	static isValidNumber(number: unknown): boolean {
 		return number !== null && number !== undefined && Number.isFinite(Number(number));
 	}
@@ -286,5 +280,11 @@ export class ValidatorService {
 	static isValidPreimageHash(preimageHash: string): boolean {
 		const bitLength = 256;
 		return isHex(preimageHash, bitLength);
+	}
+
+	static isValidTrackNumber({ trackNum, network }: { trackNum: number; network: ENetwork }): boolean {
+		const { trackDetails } = NETWORKS_DETAILS[`${network}`];
+		const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
+		return allTrackIds.includes(trackNum);
 	}
 }

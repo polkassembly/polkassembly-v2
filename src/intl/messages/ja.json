@@ -475,7 +475,9 @@
 		"previous": "前へ"
 	},
 	"BalanceInput": {
-		"addBalance": "残高を追加"
+		"addBalance": "残高を追加",
+		"enterAmount": "金額を入力",
+		"treasuryBalance": "財務残高"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "投票を選択",
@@ -556,7 +558,10 @@
 			"root": "ルート",
 			"stakingadmin": "ステーキング管理者",
 			"treasury": "財務",
-			"fellowship": "フェローシップ"
+			"fellowship": "フェローシップ",
+			"council": "評議会",
+			"democracy": "民主主義",
+			"whitelist": "ホワイトリスト"
 		},
 		"titleTooShort": "有効なタイトルを入力してください。",
 		"titlePlaceholder": "タイトルを入力",
@@ -607,10 +612,6 @@
 		"findYourRank": "生態系でのランクを見つける",
 		"searchUsername": "ユーザー名を検索"
 	},
-	"BlockEditor": {
-		"placeholder": "/ を入力して開始",
-		"errorUpdatingContent": "コンテンツの更新中にエラーが発生しました"
-	},
 	"SetIdentity": {
 		"displayName": "表示名",
 		"legalName": "法的名",
@@ -653,16 +654,30 @@
 		"proposals": "提案"
 	},
 	"CreateProposal": {
-		"createPreimage": "プレイメージを作成",
-		"existingPreimage": "既存のプレイメージがある",
-		"createTreasuryProposal": "トレジャリー提案を作成（ネイティブ）",
-		"usdxProposal": "USDxトレジャリー提案を作成（Assethub）",
+		"create": "作成",
+		"quickActions": "クイックアクション",
+		"submitProposal": "提案を提出",
+		"createDiscussion": "ディスカッション投稿",
+		"createPreimage": "新規プレイメージ",
+		"existingPreimage": "既存のプレイメージがあります",
+		"spend": "支出",
+		"from": "から",
+		"Treasury": "財務",
+		"usdxProposal": "AssetHubから資産を支出 (USDx, DOT, 等)",
 		"cancelReferendum": "レファレンダムをキャンセル",
 		"killReferendum": "レファレンダムを終了",
+		"createDiscussionDescription": "会話を開始しフィードバックを集める。",
+		"createPreimageDescription": "新しいプレイメージハッシュで提案を提出。",
+		"existingPreimageDescription": "既存のプレイメージハッシュを使用して提出。",
+		"createTreasuryProposalDescription": "財務支出を提案",
+		"usdxProposalDescription": "AssetHubから資金を要求 (USDx, DOT, 等)。",
+		"cancelReferendumDescription": "アクティブなレファレンダムのキャンセルを提案。",
+		"killReferendumDescription": "可決前にレファレンダムを終了。",
 		"goBack": "戻る",
 		"preimageHash": "プレイメージハッシュ",
-		"preimageLength": "プレイメージ長",
-		"preimageHashDescription": "提案を作成するためのプレイメージハッシュを入力してください"
+		"preimageLength": "長さ",
+		"preimageHashDescription": "ハッシュを入力",
+		"viewPreimage": "プレイメージを表示"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -671,11 +686,11 @@
 		"createProposal": "提案を作成",
 		"create": "作成",
 		"proposalCreatedSuccessfully": "提案が正常に作成されました",
-		"proposalCreatedSuccessfullyDescription": "提案は正常に作成されました",
+		"proposalCreatedSuccessfullyDescription": "提案が正常に作成されました",
 		"proposalCreationFailed": "提案の作成に失敗しました",
 		"proposalCreationFailedDescription": "提案の作成中にエラーが発生しました",
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
-		"preimageNotedSuccessfullyDescription": "プレイメージは正常に記録されました",
+		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
 		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
 		"selectTrack": "トラックを選択",
@@ -685,8 +700,8 @@
 		"enterFutureBlockHeight": "将来のブロック高を入力してください"
 	},
 	"CreatePreimage": {
-		"addItem": "項目を追加",
-		"removeItem": "項目を削除",
+		"addItem": "受取人/支払いを追加",
+		"removeItem": "支払いを削除",
 		"yes": "はい",
 		"no": "いいえ",
 		"uploadFile": "ファイルをアップロード",
@@ -696,19 +711,28 @@
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
 		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
 		"preimageHash": "プレイメージハッシュ",
-		"length": "長さ"
+		"length": "長さ",
+		"beneficiary": "受取人",
+		"noBeneficiarySelected": "受取人が選択されていません",
+		"on": "オン"
 	},
 	"AddressInput": {
 		"invalidAddress": "無効なアドレス",
 		"noResultsFound": "結果が見つかりません",
-		"placeholder": "アドレスを入力"
+		"placeholder": "アドレスを選択/入力"
 	},
 	"KillCancelReferendum": {
-		"referendumId": "レファレンダムID",
-		"referendumIdDescription": "キャンセルするレファレンダムIDを入力してください",
-		"thisReferendumIsNotOngoing": "このレファレンダムは進行中ではありません"
+		"referendumId": "レファレンダムインデックスを入力",
+		"referendumIdDescription": "ここに入力",
+		"thisReferendumIsNotOngoing": "警告！進行中のレファレンダムではありません",
+		"viewReferendum": "提案を表示"
 	},
 	"errorMessages": {
 		"valueTooLarge": "値が大きすぎます"
+	},
+	"TxFees": {
+		"preimageDeposit": "プレイメージデポジット",
+		"submissionDeposit": "提出デポジット",
+		"gasFees": "ガス料金"
 	}
 }
