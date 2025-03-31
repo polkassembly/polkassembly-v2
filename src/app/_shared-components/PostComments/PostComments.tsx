@@ -12,6 +12,7 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
+import CollapsibleDropdown from '../utils/SummaryCollapsible/CollapsibleDropdown';
 
 function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
@@ -39,6 +40,13 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 			<p className={classes.title}>
 				{t('PostDetails.comments')} <span className='text-base font-normal'>({data?.length})</span>
 			</p>
+			<div className={classes.summaryComponent}>
+				<CollapsibleDropdown
+					indexOrHash={index}
+					proposalType={proposalType}
+					usedInComments
+				/>
+			</div>
 			{isFetching ? (
 				<Skeleton className='h-4' />
 			) : (
