@@ -10,7 +10,6 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 
 const zodParamsSchema = z.object({
 	address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
@@ -19,13 +18,12 @@ const zodParamsSchema = z.object({
 // get delegation status and active proposals for all tracks
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string }> }) => {
 	const [{ address }, network] = await Promise.all([zodParamsSchema.parse(await params), getNetworkFromHeaders()]);
-	const encodedAddress = await getEncodedAddress(address, network);
 
 	const { trackDetails } = NETWORKS_DETAILS[network as ENetwork];
 	const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
 
 	const [allVoteDelegations, activeProposalsCountByTrackIds] = await Promise.all([
-		OnChainDbService.GetConvictionVoteDelegationsToAndFromAddress({ network, address: encodedAddress || address }),
+		OnChainDbService.GetConvictionVoteDelegationsToAndFromAddress({ network, address }),
 		OnChainDbService.GetActiveProposalsCountByTrackIds({ network, trackIds: allTrackIds })
 	]);
 
@@ -39,10 +37,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 		// Check delegations for the current track
 		const trackDelegations = allVoteDelegations.filter((delegation) => delegation.track === track.trackId);
+
 		if (trackDelegations.length > 0) {
-			const delegation = trackDelegations.find((d) => d.from === encodedAddress || d.to === encodedAddress);
+			const delegation = trackDelegations.find((d) => d.from === address || d.to === address);
 			if (delegation) {
-				trackDelegationStats.status = delegation.from === encodedAddress ? EDelegationStatus.DELEGATED : EDelegationStatus.RECEIVED;
+				trackDelegationStats.status = delegation.from === address ? EDelegationStatus.DELEGATED : EDelegationStatus.RECEIVED;
 			}
 		}
 

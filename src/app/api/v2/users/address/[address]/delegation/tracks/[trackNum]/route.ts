@@ -29,10 +29,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	// get delegations for address
 	const delegationsForTrack = await OnChainDbService.GetConvictionVoteDelegationsToAndFromAddress({ network, address, trackNum });
-	const filteredDelegationsForTrack = delegationsForTrack.filter((delegation) => delegation.track === trackNum);
 
 	// if user has delegated to someone then delegateAddress is the address they delegated to, else it is the address itself
-	const delegateAddress = filteredDelegationsForTrack.find((delegation) => delegation.from === address)?.to || address;
+	const delegateAddress = delegationsForTrack.find((delegation) => delegation.from === address)?.to || address;
 
 	// fetch active proposals for the track
 	const onChainPostsListingWithDelegateVotes = await OnChainDbService.GetActiveProposalListingsWithVoteForAddressByTrackId({
@@ -66,7 +65,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		totalCount: posts.length
 	};
 
-	const receivedDelegations = filteredDelegationsForTrack
+	const receivedDelegations = delegationsForTrack
 		.filter((delegation) => delegation.to === address)
 		.map((delegation) => ({
 			address: delegation.from,
@@ -75,7 +74,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			lockPeriod: delegation.lockPeriod
 		}));
 
-	const delegatedTo = filteredDelegationsForTrack
+	const delegatedTo = delegationsForTrack
 		.filter((delegation) => delegation.from === address)
 		.map((delegation) => ({
 			address: delegation.to,
