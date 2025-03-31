@@ -5,9 +5,8 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { privacyPolicyContent } from './privacy-policy';
-import BlockEditor from '../_shared-components/BlockEditor/BlockEditor';
+import { MarkdownEditor } from '../_shared-components/MarkdownEditor/MarkdownEditor';
 
 export const metadata: Metadata = {
 	title: 'Privacy Policy - Polkassembly',
@@ -36,17 +35,13 @@ export default async function PrivacyPolicyPage() {
 		policyContent = policyContent.replace(/https:\/\/polkassembly\.io/g, `https://${network}.polkassembly.io`);
 	}
 
-	policyContent = convertMarkdownToHtml(privacyPolicyContent);
-
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<div className='rounded-md bg-white p-8 shadow'>
 				<h1 className='mb-6 text-2xl font-semibold'>Privacy Policy</h1>
-				<BlockEditor
-					data={policyContent}
+				<MarkdownEditor
+					markdown={policyContent}
 					readOnly
-					renderFromHtml
-					className='max-h-screen w-full'
 				/>
 			</div>
 		</div>

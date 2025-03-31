@@ -4,27 +4,22 @@
 
 import React from 'react';
 import { Metadata } from 'next';
-import { convertMarkdownToHtml } from '@/_shared/_utils/convertMarkdownToHtml';
 import { termsAndConditionsContent } from './terms-and-conditions';
-import BlockEditor from '../_shared-components/BlockEditor/BlockEditor';
+import { MarkdownEditor } from '../_shared-components/MarkdownEditor/MarkdownEditor';
 
 export const metadata: Metadata = {
 	title: 'Terms and Conditions - Polkassembly',
 	description: 'Terms and Conditions for Polkassembly'
 };
 
-const tncContent = convertMarkdownToHtml(termsAndConditionsContent);
-
 export default function TermsAndConditionsPage() {
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<div className='rounded-md bg-white p-8 shadow'>
 				<h1 className='mb-6 text-2xl font-semibold'>Terms and Conditions</h1>
-				<BlockEditor
-					data={tncContent}
+				<MarkdownEditor
+					markdown={termsAndConditionsContent}
 					readOnly
-					renderFromHtml
-					className='max-h-screen w-full'
 				/>
 			</div>
 		</div>
