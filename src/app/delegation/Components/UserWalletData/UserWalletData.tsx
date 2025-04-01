@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { IoMdLock } from 'react-icons/io';
+import { useTranslations } from 'next-intl';
 import styles from './UserWalletData.module.scss';
 
 function UserWalletData() {
@@ -21,6 +22,7 @@ function UserWalletData() {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const pathname = usePathname();
+	const t = useTranslations('Delegation');
 
 	const { data: userBalances } = useQuery({
 		queryKey: ['userBalances', user?.id],
@@ -42,12 +44,12 @@ function UserWalletData() {
 			<div className='relative'>
 				{!user?.id || !user.loginAddress ? (
 					<div className={styles.walletInfoBoard}>
-						<span className='text-sm font-medium text-white'>To get started with delegation on polkadot</span>
+						<span className='text-sm font-medium text-white'>{t('toGetStartedWithDelegationOnPolkadot')}</span>
 						<Link
 							href={`/login?nextUrl=${pathname}`}
 							className='rounded-md bg-border_blue p-2 text-sm font-semibold text-white'
 						>
-							Connect wallet
+							{t('connectWallet')}
 						</Link>
 					</div>
 				) : (
@@ -62,21 +64,21 @@ function UserWalletData() {
 										width={16}
 										height={16}
 									/>{' '}
-									Balance
+									{t('balance')}
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
 								<span className='text-2xl font-medium'>{balances.transferableBalance}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<FaCircleCheck className='text-base text-success' />
-									Transferable
+									{t('transferable')}
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
 								<span className='text-2xl font-medium'>{balances.lockedBalance}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
 									<IoMdLock className='text-base text-lock' />
-									Total Locked
+									{t('totalLocked')}
 								</span>
 							</div>
 						</div>

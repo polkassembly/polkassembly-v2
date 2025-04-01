@@ -22,7 +22,7 @@ function DelegationPopupCard() {
 	return (
 		<div>
 			{showDelegationInfo && (
-				<div className='mt-5 hidden rounded-lg bg-bg_modal py-4 shadow-lg sm:block'>
+				<div className={styles.delegationPopupCard}>
 					<div className='flex items-center justify-between px-6'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>{t('howToDelegateOnPolkassembly')}</p>
 						<div className='flex items-center gap-4'>
@@ -54,7 +54,7 @@ function DelegationPopupCard() {
 								alt='Polka Asset'
 								className='-mt-5 h-36 w-36'
 							/>
-							<div className='grid max-w-sm grid-cols-[auto_1fr] gap-4 text-sm text-text_primary'>
+							<div className={styles.delegationPopupCardStep}>
 								<p className='whitespace-nowrap font-semibold'>{t('step1')}</p>
 								<div>
 									<p className='font-semibold'>{t('selectTrackForDelegation')}</p>
@@ -62,7 +62,7 @@ function DelegationPopupCard() {
 								</div>
 							</div>
 						</div>
-						<div className='grid grid-cols-[auto_1fr] items-start gap-5'>
+						<div className={styles.delegationPopupCardStepWrapper}>
 							<div className='grid grid-cols-2 items-start'>
 								<Image
 									src={Reverse}
@@ -75,8 +75,8 @@ function DelegationPopupCard() {
 									className='h-auto w-24'
 								/>
 							</div>
-							<div className='grid max-w-lg grid-cols-[auto_1fr] gap-3'>
-								<div className='grid grid-cols-[auto_1fr] items-start gap-4 text-sm text-text_primary'>
+							<div className={styles.delegationPopupCardStepWrapper}>
+								<div className={styles.delegationPopupCardStep}>
 									<p className='whitespace-nowrap font-semibold'>{t('step2')}</p>
 									<div>
 										<p className='font-semibold'>{t('selectDelegate')}</p>

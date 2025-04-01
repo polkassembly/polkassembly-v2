@@ -1,0 +1,60 @@
+.delegationPlatformCard {
+    @apply border-navbar_border bg-delegation_card_polkassembly;
+}
+
+.delegationCardPolkadot {
+    @apply border-delegation_polkadot_border bg-delegation_card_polkadot;
+}
+
+.delegationCardW3f {
+    @apply border-btn_secondary_text text-btn_primary_text bg-delegation_card_w3f;
+}
+
+.delegationCardNova {
+    @apply border-delegation_nova_border bg-delegation_card_nova;
+}
+
+.delegationCardIndividual {
+    @apply border-btn_secondary_text bg-delegation_card_polkassembly;
+}
+
+.delegationCardDefault {
+    @apply border-wallet_btn_text bg-delegation_bgcard;
+}
+
+.delegationCard {
+    @apply cursor-pointer rounded-md border border-border_grey hover:border-bg_pink;
+}
+
+.delegationDialog {
+    @apply flex items-center justify-between gap-2;
+}
+
+.delegationDialogButton {
+    @apply flex cursor-pointer items-center gap-1 text-text_pink;
+}
+
+
+.delegationBioContent {
+    @apply flex max-h-40 w-full overflow-hidden border-none;
+}
+
+.delegationCardStats {
+    @apply grid grid-cols-3 items-center border-t border-border_grey;
+}
+
+.delegationCardStatsItem {
+    @apply border-r border-border_grey p-5 text-center;
+}
+
+.delegationCardStatsItemText {
+    @apply text-xs text-delegation_card_text lg:whitespace-nowrap;
+}
+
+.delegationCardStatsItemTextPast30Days {
+    @apply block text-[10px] text-delegation_card_text;
+}
+
+.readMoreBtn {
+    @apply cursor-pointer text-xs font-medium text-read_more_txt;
+}

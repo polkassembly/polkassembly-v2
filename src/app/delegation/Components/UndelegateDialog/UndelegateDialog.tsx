@@ -22,6 +22,7 @@ import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { BN } from '@polkadot/util';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
+import { useTranslations } from 'next-intl';
 
 interface UndelegateDialogProps {
 	open: boolean;
@@ -36,11 +37,11 @@ interface UndelegateDialogProps {
 function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId, trackName }: UndelegateDialogProps) {
 	const { user } = useUser();
 	const router = useRouter();
+	const t = useTranslations('Delegation');
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { toast } = useToast();
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
-
 	const [loading, setLoading] = useState(false);
 	const [txFee, setTxFee] = useState<string>('');
 
@@ -84,12 +85,10 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 				address: user.defaultAddress,
 				trackId,
 				onSuccess: () => {
-					// Optimistically update the track status
 					if (delegateUserTracks) {
 						setDelegateUserTracks(
 							delegateUserTracks.map((track) => {
 								if (track.trackId === trackId) {
-									// Update the status to UNDELEGATED
 									return {
 										...track,
 										status: EDelegationStatus.UNDELEGATED
@@ -142,18 +141,18 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 					<DialogTitle>
 						<div className='flex items-center gap-2 text-btn_secondary_text'>
 							<IoPersonRemove />
-							<span>Undelegate</span>
+							<span>{t('undelegate')}</span>
 						</div>
 					</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-4'>
-					<Label>Your Address</Label>
+					<Label>{t('yourAddress')}</Label>
 					<AddressInput
 						disabled
 						className='bg-network_dropdown_bg'
 						placeholder={user?.defaultAddress}
 					/>
-					<Label>Delegate To</Label>
+					<Label>{t('delegateTo')}</Label>
 					<AddressInput
 						disabled
 						className='bg-network_dropdown_bg'
@@ -162,13 +161,13 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 
 					<BalanceInput
 						showBalance
-						label='Balance'
+						label={t('balance')}
 						defaultValue={new BN(delegate.balance || '0')}
 						disabled
 					/>
 
 					<p className='text-sm text-text_primary'>
-						Track:{' '}
+						{t('track')}:{' '}
 						<span className='text-btn_secondary_text'>
 							{trackName} #{trackId}
 						</span>
@@ -179,7 +178,9 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 							className='flex items-center gap-2'
 						>
 							<Info className='h-4 w-4' />
-							<p>An approximate fees of {formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} will be applied to the transaction</p>
+							<p>
+								{t('anApproximateFeesOf')} {formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} {t('willBeAppliedToTheTransaction')}
+							</p>
 						</Alert>
 					)}
 				</div>
@@ -194,14 +195,14 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 						onClick={() => setOpen(false)}
 						disabled={loading}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						className='btn-undelegate'
 						disabled={loading}
 						onClick={handleSubmit}
 					>
-						{loading ? <Loader className='animate-spin' /> : 'Undelegate'}
+						{loading ? <Loader className='animate-spin' /> : t('undelegate')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

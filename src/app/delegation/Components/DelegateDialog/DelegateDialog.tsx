@@ -46,11 +46,9 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { toast } = useToast();
-
 	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[network].trackDetails), [network]);
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
-
 	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
 	const [balance, setBalance] = useState<string>('');
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
@@ -116,12 +114,9 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		(track: string) => {
 			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
 			const isTrackDelegated = delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
-
-			// Skip if already delegated
 			if (isTrackDelegated) {
 				return;
 			}
-
 			setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
 		},
 		[network, delegateUserTracks]
@@ -272,41 +267,40 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-4'>
-					<Label>Your Address</Label>
+					<Label>{t('yourAddress')}</Label>
 					<AddressInput
 						disabled
 						className='bg-network_dropdown_bg'
 						placeholder={user?.defaultAddress}
 					/>
 
-					<Label>Delegate To</Label>
+					<Label>{t('delegateTo')}</Label>
 					<AddressInput value={delegate.address} />
 					{delegate.address && !isValidDelegate && (
-						<p className='mt-1 text-sm text-amber-500'>
-							Note: This address is not registered as a delegate. You can still delegate to it, but it won&apos;t appear in the delegates list.
-						</p>
+						<p className='mt-1 text-sm text-amber-500'>{t('noteThisAddressIsNotRegisteredAsADelegateYouCanStillDelegateToItButItWonTAppearInTheDelegatesList')}</p>
 					)}
 					<BalanceInput
 						showBalance
-						label='Balance'
+						label={t('balance')}
 						defaultValue={new BN(balance || '0')}
 						onChange={handleBalanceChange}
 					/>
-					{isBalanceError && <p className={styles.balanceError}>You don&apos;t have enough balance to delegate</p>}
+					{isBalanceError && <p className={styles.balanceError}>{t('youDontHaveEnoughBalanceToDelegate')}</p>}
 					<div className='w-full'>
-						<p className='mb-3 text-sm text-wallet_btn_text'>Conviction</p>
+						<p className='mb-3 text-sm text-wallet_btn_text'>{t('conviction')}</p>
 						<ConvictionSelector onConvictionChange={setConviction} />
 					</div>
 					<div className={styles.convictionContainer}>
 						<div className={styles.convictionItem}>
-							<p className={styles.convictionItemLabel}>Lock Period</p>
+							<p className={styles.convictionItemLabel}>{t('lockPeriod')}</p>
 							<p className={styles.convictionItemLabel}>
-								{conviction}x voting balance for duration ({LOCK_PERIODS[conviction]})
+								{conviction}
+								{t('xVotingBalanceForDuration')} ({LOCK_PERIODS[conviction]})
 							</p>
 						</div>
 						{balance && (
 							<div className={styles.convictionItem}>
-								<p className={styles.convictionItemLabel}>Votes</p>
+								<p className={styles.convictionItemLabel}>{t('votes')}</p>
 								<p className={styles.convictionItemLabel}>
 									{balance ? formatBnBalance(new BN(balance).muln(conviction + 1).toString(), { withUnit: true, numberAfterComma: 2 }, network) : <Skeleton className='h-4' />}
 								</p>
@@ -317,14 +311,14 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					<div className='flex flex-col gap-4'>
 						<Tooltip>
 							<div className={styles.selectedTracksContainer}>
-								<p className='text-sm text-wallet_btn_text'>Selected track(s)</p>
+								<p className='text-sm text-wallet_btn_text'>{t('selectedTrack')}</p>
 								<div className='flex cursor-pointer items-center gap-2'>
 									<Checkbox
 										checked={isAllTracksSelected}
 										onCheckedChange={toggleAllTracks}
 									/>
 									<TooltipTrigger asChild>
-										<span className='text-sm text-wallet_btn_text'>Delegate to all available tracks</span>
+										<span className='text-sm text-wallet_btn_text'>{t('delegateToAllAvailableTracks')}</span>
 									</TooltipTrigger>
 								</div>
 							</div>
@@ -382,7 +376,9 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 							className='flex items-center gap-2'
 						>
 							<Info className='h-4 w-4' />
-							<p>An approximate fees of {formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} will be applied to the transaction</p>
+							<p>
+								{t('anApproximateFeesOf')} {formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} {t('willBeAppliedToTheTransaction')}
+							</p>
 						</Alert>
 					)}
 				</div>
@@ -397,14 +393,14 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						onClick={() => setOpen(false)}
 						disabled={loading}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						className='btn-delegate'
 						disabled={loading || !isBalanceValid || !selectedTrackIds?.length}
 						onClick={handleSubmit}
 					>
-						{loading ? <Loader className='animate-spin' /> : 'Delegate'}
+						{loading ? <Loader className='animate-spin' /> : t('delegate')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

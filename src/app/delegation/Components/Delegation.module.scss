@@ -79,3 +79,23 @@
 .selectContent {
     @apply border-border_grey px-3 py-2;
 }
+
+.delegationDetailsCard {
+    @apply mt-5 min-h-80 w-full rounded-lg bg-bg_modal p-4 shadow-lg;
+}
+
+.delegationDetailsCardTitle {
+    @apply text-xl font-semibold text-btn_secondary_text;
+}
+
+.delegationPopupCardStep {
+    @apply grid grid-cols-[auto_1fr] items-start gap-4 text-sm text-text_primary;
+}
+
+.delegationPopupCardStepWrapper {
+    @apply grid max-w-lg grid-cols-[auto_1fr] gap-3;
+}
+
+.delegationPopupCard {
+    @apply mt-5 hidden rounded-lg bg-bg_modal py-4 shadow-lg sm:block;
+}

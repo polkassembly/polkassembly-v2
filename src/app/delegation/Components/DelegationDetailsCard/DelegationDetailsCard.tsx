@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, RefObject, useRef, useState } from 'react';
+import { memo, RefObject, useRef } from 'react';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -70,29 +70,21 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 function DelegationDetailsCard() {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 
-	const [isLoading, setIsLoading] = useState(false);
-
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
 
-	useQuery({
+	const { isLoading } = useQuery({
 		queryKey: ['delegates'],
 		queryFn: async () => {
 			if (delegates.length > 0) {
 				return { data: delegates };
 			}
-
-			setIsLoading(true);
-			try {
-				const result = await NextApiClientService.fetchDelegates();
-				if (result?.data) {
-					setDelegates(result.data);
-				}
-				return result || { data: [] };
-			} finally {
-				setIsLoading(false);
+			const result = await NextApiClientService.fetchDelegates();
+			if (result?.data) {
+				setDelegates(result.data);
 			}
+			return result || { data: [] };
 		},
 		staleTime: STALE_TIME
 	});
@@ -112,11 +104,11 @@ function DelegationDetailsCard() {
 	} = useDelegateFiltering(delegates);
 
 	return (
-		<div className='mt-5 min-h-80 w-full rounded-lg bg-bg_modal p-4 shadow-lg'>
+		<div className={styles.delegationDetailsCard}>
 			<div className='mb-4 flex items-center justify-between'>
 				<div className='flex items-center gap-2'>
 					<IoMdTrendingUp className='text-xl font-bold text-bg_pink' />
-					<p className='text-xl font-semibold text-btn_secondary_text'>{t('trendingDelegates')}</p>
+					<p className={styles.delegationDetailsCardTitle}>{t('trendingDelegates')}</p>
 				</div>
 			</div>
 			<div className='flex items-center gap-4'>
@@ -173,7 +165,7 @@ function DelegationDetailsCard() {
 						</>
 					) : (
 						<div className='my-20 flex justify-center'>
-							<p className='text-text_secondary text-lg'>No delegates found matching your criteria</p>
+							<p className='text-text_secondary text-lg'>{t('noDelegatesFoundMatchingYourCriteria')}</p>
 						</div>
 					)}
 				</div>

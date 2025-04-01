@@ -87,7 +87,7 @@ function DelegationTrack({ track }: { track: string }) {
 						<TableRow className={styles.tableHeader}>
 							<TableHead className={cn(styles.tableHeaderCell, 'px-6')}>#</TableHead>
 							<TableHead className={styles.addressCell}>{isReceived ? 'Delegated by' : 'Delegated to'}</TableHead>
-							<TableHead className={styles.tableHeaderCell}>{t('Balance')}</TableHead>
+							<TableHead className={styles.tableHeaderCell}>{t('balance')}</TableHead>
 							<TableHead className={styles.tableHeaderCell}>{t('conviction')}</TableHead>
 							<TableHead className={styles.tableHeaderCell}>{t('delegatedOn')}</TableHead>
 							{!isReceived && <TableHead className={styles.tableHeaderCell}>{t('action')}</TableHead>}
