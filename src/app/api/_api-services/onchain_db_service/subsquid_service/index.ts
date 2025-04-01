@@ -529,10 +529,10 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain conviction vote delegations by address from Subsquid');
 		}
 
-		const votingDelegations = {
-			...subsquidData.votingDelegations,
-			createdAt: new Date(subsquidData.votingDelegations.createdAt)
-		};
+		const votingDelegations = subsquidData.votingDelegations.map((delegation: { createdAt: string }) => ({
+			...delegation,
+			createdAt: new Date(delegation.createdAt)
+		}));
 
 		return votingDelegations as {
 			to: string;
