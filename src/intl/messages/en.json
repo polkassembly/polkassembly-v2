@@ -794,7 +794,7 @@
 		"delegatedOn": "Delegated on",
 		"action": "Action",
 		"undelegate": "Undelegate",
-		"youCanUndelegateAfter": "You can undelegate after",
+		"youCanUndelegateAfter": "You can undelegate votes on",
 		"youCanUndelegateNow": "You can undelegate now",
 		"votingPowerForThisTrackHasNotBeenDelegatedYet": "Voting power for this track has not been delegated yet",
 		"noActiveProposalsFoundForThisTrack": "No active proposals found for this track",

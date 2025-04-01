@@ -4,12 +4,9 @@
 
 'use client';
 
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EDelegationStatus, EPostOrigin, IPostWithDelegateVote } from '@/_shared/types';
-import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
+import { EDelegationStatus, IPostWithDelegateVote, ITrackDelegationDetails } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { useAtom } from 'jotai';
 import { IoPersonAdd, IoPersonRemove } from 'react-icons/io5';
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
@@ -21,9 +18,6 @@ import onethird from '@assets/delegation/one-third-time-left-clock.svg';
 import threefourth from '@assets/delegation/three-forth-time-left-clock.svg';
 import whole from '@assets/delegation/whole-time-left-clock.svg';
 import Link from 'next/link';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery } from '@tanstack/react-query';
-import { useUser } from '@/hooks/useUser';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { FaRegClock } from 'react-icons/fa';
@@ -31,7 +25,6 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import { useTranslations } from 'next-intl';
 import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
 import UndelegateDialog from '../../Components/UndelegateDialog/UndelegateDialog';
@@ -60,38 +53,29 @@ const getDelegationProgress = (createdAt: Date, endsAt: Date) => {
 	return Math.min(Math.max((elapsedDuration / totalDuration) * 100, 0), 100);
 };
 
-function DelegationTrack({ track }: { track: string }) {
-	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
+interface DelegationTrackProps {
+	trackDetails: {
+		description: string;
+		trackId: number;
+		name: string;
+	};
+	delegateTrackResponse: ITrackDelegationDetails;
+}
+
+function DelegationTrack({ trackDetails, delegateTrackResponse }: DelegationTrackProps) {
 	const network = getCurrentNetwork();
-	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const [isActiveProposalOpen, setIsActiveProposalOpen] = useState(false);
 	const [openDelegate, setOpenDelegate] = useState(false);
 	const [openUndelegateAddresses, setOpenUndelegateAddresses] = useState<Record<string, boolean>>({});
-	const trackName = track.charAt(0).toUpperCase() + track.slice(1).replace(/-/g, ' ');
-	const trackNameSnakeCase = track.replace(/-/g, '_');
-	const trackOriginEntry = Object.entries(NETWORKS_DETAILS[network].trackDetails).find(([, details]) => details?.name === trackNameSnakeCase);
-	const trackOrigin = trackOriginEntry ? (trackOriginEntry[0] as EPostOrigin) : undefined;
-	const trackDetails = trackOrigin ? NETWORKS_DETAILS[network].trackDetails[trackOrigin] : undefined;
 	const trackDescription = trackDetails?.description;
 	const trackId = trackDetails?.trackId;
-	const trackDelegation = delegateUserTracks?.find((track) => track.trackId === trackId);
-	const isDelegated = trackDelegation?.status === EDelegationStatus.DELEGATED;
-	const isReceived = trackDelegation?.status === EDelegationStatus.RECEIVED;
 
+	const isDelegated = delegateTrackResponse?.status === EDelegationStatus.DELEGATED;
+	const isReceived = delegateTrackResponse?.status === EDelegationStatus.RECEIVED;
 	const handleOpenUndelegate = (address: string, isOpen: boolean) => {
 		setOpenUndelegateAddresses((prev) => ({ ...prev, [address]: isOpen }));
 	};
-
-	const { data: delegateTrackResponse, isLoading: isDelegateTrackLoading } = useQuery({
-		queryKey: ['delegateTrack', trackId],
-		queryFn: async () => {
-			if (user?.defaultAddress && trackId !== undefined) {
-				return NextApiClientService?.getDelegateTrack({ address: user?.defaultAddress, trackId });
-			}
-			return null;
-		}
-	});
 
 	const getTimeRemaining = (endDate: string) => {
 		const timeLeft = new Date(endDate).getTime() - new Date().getTime();
@@ -101,11 +85,14 @@ function DelegationTrack({ track }: { track: string }) {
 		return `${days} d : ${hours} h : ${minutes} m Remaining`;
 	};
 
-	const activeProposals = delegateTrackResponse?.data?.activeProposalListingWithDelegateVote?.items || [];
-	const hasDelegations = (delegateTrackResponse?.data?.delegatedTo?.length ?? 0) > 0 || (delegateTrackResponse?.data?.receivedDelegations?.length ?? 0) > 0;
-
+	const activeProposals = delegateTrackResponse?.activeProposalListingWithDelegateVote?.items || [];
+	const hasDelegations = (delegateTrackResponse?.delegatedTo?.length ?? 0) > 0 || (delegateTrackResponse?.receivedDelegations?.length ?? 0) > 0;
+	const trackName = trackDetails.name
+		.split('_')
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+		.join(' ');
 	const renderDelegationTable = () => {
-		const delegations = isReceived ? delegateTrackResponse?.data?.receivedDelegations || [] : delegateTrackResponse?.data?.delegatedTo || [];
+		const delegations = isReceived ? delegateTrackResponse?.receivedDelegations || [] : delegateTrackResponse?.delegatedTo || [];
 
 		return (
 			<div className={styles.tableContainer}>
@@ -132,19 +119,21 @@ function DelegationTrack({ track }: { track: string }) {
 								<TableCell className='p-6'>
 									<div className='flex items-center gap-2'>
 										<span>{dayjs(delegation.createdAt).format('DD MMM YYYY')}</span>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Image
-													src={getIconForUndelegationTimeLeft(getDelegationProgress(delegation.createdAt, delegation.endsAt))}
-													alt='delegation-progress'
-													width={24}
-													height={24}
-												/>
-											</TooltipTrigger>
-											<TooltipContent className={cn(styles.tooltipContent, 'bg-tooltip_background text-btn_primary_text')}>
-												<p>{`${t('youCanUndelegateAfter')} ${dayjs(delegation.endsAt).format('DD MMM YYYY')}`}</p>
-											</TooltipContent>
-										</Tooltip>
+										{delegation.lockPeriod > 0 && (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Image
+														src={getIconForUndelegationTimeLeft(getDelegationProgress(delegation.createdAt, delegation.endsAt))}
+														alt='delegation-progress'
+														width={24}
+														height={24}
+													/>
+												</TooltipTrigger>
+												<TooltipContent className={cn(styles.tooltipContent, 'bg-tooltip_background text-btn_primary_text')}>
+													<p>{`${t('youCanUndelegateAfter')} ${dayjs(delegation.endsAt).format('DD MMM YYYY')}`}</p>
+												</TooltipContent>
+											</Tooltip>
+										)}
 									</div>
 								</TableCell>
 								{!isReceived && (
@@ -203,14 +192,6 @@ function DelegationTrack({ track }: { track: string }) {
 	};
 
 	const renderContent = () => {
-		if (isDelegateTrackLoading) {
-			return (
-				<div className={styles.loadingContainer}>
-					<LoadingLayover />
-				</div>
-			);
-		}
-
 		if (!isDelegated && !isReceived) {
 			return (
 				<div className={styles.undelegatedContent}>
@@ -247,71 +228,6 @@ function DelegationTrack({ track }: { track: string }) {
 		return null;
 	};
 
-	const renderProposals = () => {
-		return (
-			<div className={cn(styles.proposalsContainer, !isActiveProposalOpen && 'h-auto')}>
-				<div className={styles.proposalsHeader}>
-					<div className={styles.proposalsTitle}>
-						<p className={styles.delegationTrackName}>{t('activeProposals')}</p>
-						<span className={styles.proposalsCount}>{activeProposals.length}</span>
-					</div>
-					<button
-						type='button'
-						className={styles.expandButton}
-						onClick={() => setIsActiveProposalOpen(!isActiveProposalOpen)}
-					>
-						<ChevronDown className={cn('h-6 w-6', isActiveProposalOpen && 'rotate-180')} />
-					</button>
-				</div>
-
-				{isActiveProposalOpen && (
-					<div>
-						{isDelegateTrackLoading ? (
-							<div className={styles.loadingContainer}>
-								<LoadingLayover />
-							</div>
-						) : (
-							<div className={styles.proposalsList}>
-								{activeProposals.length > 0 ? (
-									activeProposals.map((proposal: IPostWithDelegateVote) => (
-										<div
-											key={proposal.index}
-											className={styles.proposalCard}
-										>
-											<div className={styles.proposalDetails}>
-												<div className='flex justify-between'>
-													<div>
-														<Link
-															href={`/referenda/${proposal.index}`}
-															className={styles.proposalTitle}
-														>
-															#{proposal.index} {proposal.title}
-														</Link>
-													</div>
-												</div>
-												<div className={styles.proposalInfo}>
-													<span className={styles.proposalLabel}>{t('by')}:</span>
-													<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
-													{renderProposalTimeInfo(proposal)}
-												</div>
-											</div>
-											<div className={styles.voteInfo}>
-												<span className={styles.proposalLabel}>{t('votes')}:</span>
-												<span className={styles.proposalLabel}>{proposal?.delegateVote?.decision || t('notVotedYet')}</span>
-											</div>
-										</div>
-									))
-								) : (
-									<div className={styles.noProposalsMessage}>{t('noActiveProposalsFoundForThisTrack')}</div>
-								)}
-							</div>
-						)}
-					</div>
-				)}
-			</div>
-		);
-	};
-
 	return (
 		<div>
 			<div className={styles.delegationTrackContainer}>
@@ -343,7 +259,60 @@ function DelegationTrack({ track }: { track: string }) {
 				<div className={styles.contentContainer}>{renderContent()}</div>
 			</div>
 
-			{renderProposals()}
+			<div className={cn(styles.proposalsContainer, !isActiveProposalOpen && 'h-auto')}>
+				<div className={styles.proposalsHeader}>
+					<div className={styles.proposalsTitle}>
+						<p className={styles.delegationTrackName}>{t('activeProposals')}</p>
+						<span className={styles.proposalsCount}>{activeProposals.length}</span>
+					</div>
+					<button
+						type='button'
+						className={styles.expandButton}
+						onClick={() => setIsActiveProposalOpen(!isActiveProposalOpen)}
+					>
+						<ChevronDown className={cn('h-6 w-6', isActiveProposalOpen && 'rotate-180')} />
+					</button>
+				</div>
+
+				{isActiveProposalOpen && (
+					<div>
+						<div className={styles.proposalsList}>
+							{activeProposals.length > 0 ? (
+								activeProposals.map((proposal: IPostWithDelegateVote) => (
+									<div
+										key={proposal.index}
+										className={styles.proposalCard}
+									>
+										<div className={styles.proposalDetails}>
+											<div className='flex justify-between'>
+												<div>
+													<Link
+														href={`/referenda/${proposal.index}`}
+														className={styles.proposalTitle}
+													>
+														#{proposal.index} {proposal.title}
+													</Link>
+												</div>
+											</div>
+											<div className={styles.proposalInfo}>
+												<span className={styles.proposalLabel}>{t('by')}:</span>
+												<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
+												{renderProposalTimeInfo(proposal)}
+											</div>
+										</div>
+										<div className={styles.voteInfo}>
+											<span className={styles.proposalLabel}>{t('votes')}:</span>
+											<span className={styles.proposalLabel}>{proposal?.delegateVote?.decision || t('notVotedYet')}</span>
+										</div>
+									</div>
+								))
+							) : (
+								<div className={styles.noProposalsMessage}>{t('noActiveProposalsFoundForThisTrack')}</div>
+							)}
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

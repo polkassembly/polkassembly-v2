@@ -77,7 +77,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	}, [apiService, user?.defaultAddress, trackId]);
 
 	const handleSubmit = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || !trackId) return;
+		if (!apiService || !user?.defaultAddress || trackId === undefined) return;
 
 		try {
 			setLoading(true);
@@ -101,7 +101,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 
 					setOpen(false);
 					toast({
-						title: 'Undelegated successfully',
+						title: t('undelegatedSuccessfully'),
 						status: NotificationType.SUCCESS
 					});
 					setLoading(false);
@@ -117,12 +117,13 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 		} catch (error) {
 			console.error('Transaction error:', error);
 			toast({
-				title: 'Transaction failed',
+				title: t('transactionFailed'),
 				status: NotificationType.ERROR
 			});
 			setLoading(false);
 		}
-	}, [apiService, user?.defaultAddress, trackId, setDelegateUserTracks, delegateUserTracks, setOpen, toast]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [apiService, user?.defaultAddress, trackId, delegateUserTracks]);
 
 	useEffect(() => {
 		calculateTxFee();

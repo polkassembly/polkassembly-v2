@@ -232,7 +232,8 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 			});
 			setLoading(false);
 		}
-	}, [apiService, user?.defaultAddress, selectedTrackIds, delegate.address, balance, conviction, setDelegateUserTracks, setDelegates, setOpen, toast]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [apiService, user?.defaultAddress, selectedTrackIds, delegate.address, balance, conviction]);
 
 	useEffect(() => {
 		if (user?.defaultAddress) getBalance(user.defaultAddress);
