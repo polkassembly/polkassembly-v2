@@ -652,7 +652,7 @@ export class SubsquidQueries {
 
 	protected static GET_CONVICTION_VOTE_DELEGATIONS_TO_AND_FROM_ADDRESS = `
 		query GetConvictionVoteDelegationsToAndFromAddress($address_eq: String!) {
-			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, to_eq: $address_eq, OR: {from_eq: $address_eq}}) {
+			votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, to_eq: $address_eq, OR: {from_eq: $address_eq, endedAtBlock_isNull: true, type_eq: OpenGov}}) {
 				to
 				from
 				track

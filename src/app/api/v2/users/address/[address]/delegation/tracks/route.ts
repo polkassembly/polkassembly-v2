@@ -31,7 +31,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		OnChainDbService.GetActiveProposalsCountByTrackIds({ network, trackIds: allTrackIds })
 	]);
 
-	const encodedAddress = await getEncodedAddress(address, network);
+	const encodedAddress = getEncodedAddress(address, network);
 
 	if (!encodedAddress) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Address is not a valid web-3 address');
