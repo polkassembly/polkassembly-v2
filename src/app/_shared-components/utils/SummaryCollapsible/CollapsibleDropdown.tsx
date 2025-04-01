@@ -37,7 +37,7 @@ function CollapsibleDropdown({ proposalType, indexOrHash, usedInPostContent = fa
 		<Collapsible className={styles.collapsibleWrapper}>
 			<div className={`${styles.collapsibleInner} ${usedInPostContent ? styles.postContentGradient : styles.commentContentGradient}`}>
 				<CollapsibleTrigger className={styles.collapsibleTrigger}>
-					<span>✨ {usedInPostContent ? t('PostDetails.commentSummary') : t('PostDetails.aiSummary')}</span>
+					<span>✨ {usedInPostContent ? t('PostDetails.aiSummary') : t('PostDetails.commentSummary')}</span>
 					<ChevronDown className={styles.chevronIcon} />
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
