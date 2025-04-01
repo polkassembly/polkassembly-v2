@@ -30,3 +30,11 @@
 .selectedTracksContainer {
     @apply flex items-center justify-between gap-2 px-2;
 }
+
+.tooltipContentData {
+    @apply flex items-center gap-2 rounded-md px-2 py-1 transition-colors;
+}
+
+.checkbox {
+    @apply h-5 w-5 rounded-md border border-border_grey data-[state=checked]:border-text_pink data-[state=checked]:bg-text_pink data-[state=checked]:text-white;
+}

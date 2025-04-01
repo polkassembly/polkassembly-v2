@@ -344,13 +344,13 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 										return (
 											<div
 												key={track}
-												className={cn('flex items-center gap-2 rounded-md px-2 py-1 transition-colors', isChecked ? 'bg-page_background' : '')}
+												className={cn(styles.tooltipContentData, isChecked ? 'bg-page_background' : '')}
 											>
 												<Checkbox
 													checked={isChecked}
 													onCheckedChange={() => toggleTrack(track)}
 													disabled={isTrackDelegated}
-													className='h-5 w-5 rounded-md border border-border_grey data-[state=checked]:border-text_pink data-[state=checked]:bg-text_pink data-[state=checked]:text-white'
+													className={styles.checkbox}
 												/>
 												<span className={isTrackDelegated ? 'text-text_secondary' : ''}>
 													{track} {isTrackDelegated && '(Already delegated)'}

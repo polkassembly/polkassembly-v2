@@ -148,16 +148,16 @@ export default function BecomeDelegateDialog() {
 					) : isCurrentAddressDelegate ? (
 						<>
 							<TfiPencil />
-							Edit
+							{t('edit')}
 						</>
 					) : (
-						<>Become Delegate</>
+						<>{t('becomeDelegate1')}</>
 					)}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>
-					<DialogTitle>{isCurrentAddressDelegate ? 'Edit Delegate Details' : t('becomeDelegate')}</DialogTitle>
+					<DialogTitle>{isCurrentAddressDelegate ? t('editDelegate') : t('becomeDelegate')}</DialogTitle>
 				</DialogHeader>
 
 				<div className='flex flex-col gap-y-4'>
@@ -167,11 +167,11 @@ export default function BecomeDelegateDialog() {
 					/>
 					<div className='flex flex-col gap-y-2'>
 						<p className='text-sm text-wallet_btn_text'>
-							Your Delegation Manifesto <span className='text-text_pink'>*</span>
+							{t('delegationManifesto')} <span className='text-text_pink'>*</span>
 						</p>
 						<Input
-							title='Your Delegation Mandate'
-							placeholder='Add message for delegate address '
+							title={t('delegationMandate')}
+							placeholder={t('addMessageForDelegateAddress')}
 							className='w-full'
 							required
 							value={manifesto}
@@ -181,7 +181,7 @@ export default function BecomeDelegateDialog() {
 					<div className={styles.infoContainer}>
 						<AiOutlineInfoCircle className='text-toast_info_border' />
 						<span className={styles.infoText}>
-							To add socials to your delegate profile{' '}
+							{t('addSocialsToDelegateProfile')}
 							<Link
 								href='/set-identity'
 								className={styles.link}
@@ -192,9 +192,9 @@ export default function BecomeDelegateDialog() {
 									width={16}
 									height={16}
 								/>{' '}
-								Set Identity
+								{t('setIdentity')}
 							</Link>{' '}
-							with Polkassembly
+							{t('withPolkassembly')}
 						</span>
 					</div>
 
@@ -207,10 +207,10 @@ export default function BecomeDelegateDialog() {
 						{loading ? (
 							<div className='flex items-center gap-2'>
 								<Loader2 className='h-4 w-4 animate-spin' />
-								<span>Processing...</span>
+								<span>{t('processing')}</span>
 							</div>
 						) : (
-							'Confirm'
+							t('confirm')
 						)}
 					</Button>
 				</div>
