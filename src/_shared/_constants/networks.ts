@@ -97,6 +97,7 @@ interface INetworkDetails {
 	trackDetails: Partial<Record<EPostOrigin, ITrackInfo>>;
 	palletInstance?: string;
 	parachain?: string;
+	convictionVotingPeriodInBlocks: BN;
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -1542,7 +1543,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		},
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT],
 		assethubDetails: ASSETHUB_DETAILS[ENetwork.POLKADOT],
-		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.POLKADOT]
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.POLKADOT],
+		convictionVotingPeriodInBlocks: new BN('100800')
 	},
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
@@ -1594,7 +1596,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
-		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA]
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
+		convictionVotingPeriodInBlocks: new BN('100800')
 	},
 	[ENetwork.WESTEND]: {
 		key: ENetwork.WESTEND,
@@ -1647,6 +1650,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		supportedAssets: {},
 		foreignAssets: {},
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.WESTEND],
-		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.WESTEND]
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.WESTEND],
+		convictionVotingPeriodInBlocks: new BN('100800')
 	}
 } as const;
