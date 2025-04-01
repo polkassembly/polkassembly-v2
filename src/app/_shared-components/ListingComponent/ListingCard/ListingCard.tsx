@@ -17,7 +17,7 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-import { Progress } from '@/app/_shared-components/Progress';
+import { Progress } from '@/app/_shared-components/Progress/Progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import USDTIcon from '@assets/icons/usdt.svg';
