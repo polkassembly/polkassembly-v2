@@ -816,7 +816,11 @@
 		"delegationTrackName": "Name des Delegations-Tracks",
 		"proposalsCount": "Anzahl der Vorschläge",
 		"expandButton": "Erweitern-Button",
-		"cancel": "Abbrechen"
+		"cancel": "Abbrechen",
+		"votedAye": "Abgestimmt: Ja",
+		"votedNay": "Abgestimmt: Nein",
+		"votedSplit": "Abgestimmt: Split",
+		"votedSplitAbstain": "Abgestimmt: Split Enthaltung"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage-Einzahlung",

@@ -5,7 +5,7 @@
 'use client';
 
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EDelegationStatus, IPostWithDelegateVote, ITrackDelegationDetails } from '@/_shared/types';
+import { EDelegationStatus, EVoteDecision, IPostWithDelegateVote, ITrackDelegationDetails } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { IoPersonAdd, IoPersonRemove } from 'react-icons/io5';
 import { useState } from 'react';
@@ -26,6 +26,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { useTranslations } from 'next-intl';
+import { IoIosInformationCircleOutline } from 'react-icons/io';
 import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
 import UndelegateDialog from '../../Components/UndelegateDialog/UndelegateDialog';
 import styles from './DelegationTrack.module.scss';
@@ -300,9 +301,25 @@ function DelegationTrack({ trackDetails, delegateTrackResponse }: DelegationTrac
 												{renderProposalTimeInfo(proposal)}
 											</div>
 										</div>
-										<div className={styles.voteInfo}>
-											<span className={styles.proposalLabel}>{t('votes')}:</span>
-											<span className={styles.proposalLabel}>{proposal?.delegateVote?.decision || t('notVotedYet')}</span>
+										<div
+											className={cn(
+												styles.voteInfo,
+												proposal?.delegateVote?.decision === EVoteDecision.AYE && styles.aye,
+												proposal?.delegateVote?.decision === EVoteDecision.NAY && styles.nay,
+												proposal?.delegateVote?.decision === EVoteDecision.SPLIT && styles.split,
+												proposal?.delegateVote?.decision === EVoteDecision.SPLIT_ABSTAIN && styles.splitAbstain,
+												!proposal?.delegateVote?.decision && styles.notVoted
+											)}
+										>
+											<span className={styles.proposalLabel}>
+												{proposal?.delegateVote?.decision === EVoteDecision.AYE && t('votedAye')}
+												{proposal?.delegateVote?.decision === EVoteDecision.NAY && t('votedNay')}
+												{proposal?.delegateVote?.decision === EVoteDecision.SPLIT && t('votedSplit')}
+												{proposal?.delegateVote?.decision === EVoteDecision.SPLIT_ABSTAIN && t('votedSplitAbstain')}
+												{!proposal?.delegateVote?.decision && t('notVotedYet')}
+												{proposal?.delegateVote?.decision && ` | Balance: ${proposal?.delegateVote?.balanceValue} | Conviction: ${proposal?.delegateVote?.lockPeriod}x`}
+											</span>
+											{!proposal?.delegateVote?.decision && <IoIosInformationCircleOutline className='text-lg text-warning' />}
 										</div>
 									</div>
 								))

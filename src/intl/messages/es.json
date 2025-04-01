@@ -815,7 +815,11 @@
 		"toGetStartedWithDelegationOnPolkadot": "Para comenzar con la delegación en Polkadot",
 		"connectWallet": "Conectar billetera",
 		"transferable": "Transferible",
-		"totalLocked": "Total bloqueado"
+		"totalLocked": "Total bloqueado",
+		"votedAye": "Votado: Aye",
+		"votedNay": "Votado: Nay",
+		"votedSplit": "Votado: Split",
+		"votedSplitAbstain": "Votado: Split Abstain"
 	},
 	"TxFees": {
 		"preimageDeposit": "Depósito de Preimage",

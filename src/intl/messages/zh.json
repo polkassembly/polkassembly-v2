@@ -815,7 +815,11 @@
 		"toGetStartedWithDelegationOnPolkadot": "开始在Polkadot上进行委托",
 		"connectWallet": "连接钱包",
 		"transferable": "可转账",
-		"totalLocked": "总锁定"
+		"totalLocked": "总锁定",
+		"votedAye": "投票: Aye",
+		"votedNay": "投票: Nay",
+		"votedSplit": "投票: Split",
+		"votedSplitAbstain": "投票: Split Abstain"
 	},
 	"TxFees": {
 		"preimageDeposit": "预映像押金",

@@ -815,7 +815,11 @@
 		"toGetStartedWithDelegationOnPolkadot": "Polkadotでの委任を開始するには",
 		"connectWallet": "ウォレットを接続",
 		"transferable": "転送可能",
-		"totalLocked": "合計ロック"
+		"totalLocked": "合計ロック",
+		"votedAye": "投票: Aye",
+		"votedNay": "投票: Nay",
+		"votedSplit": "投票: Split",
+		"votedSplitAbstain": "投票: Split Abstain"
 	},
 	"TxFees": {
 		"preimageDeposit": "プレイメージデポジット",

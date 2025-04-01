@@ -111,11 +111,11 @@
 }
 
 .proposalCard {
-    @apply rounded-lg border border-border_grey p-6
+    @apply rounded-lg border border-border_grey
 }
 
 .proposalDetails {
-    @apply flex flex-col gap-2
+    @apply flex flex-col gap-2 p-6
 }
 
 .proposalTitle {
@@ -126,18 +126,37 @@
     @apply flex items-center gap-2 text-sm
 }
 
-.proposalLabel {
-    @apply text-xs text-text_primary
-}
 
-.voteInfo {
-    @apply flex items-center gap-2
-}
 
 .noProposalsMessage {
     @apply flex items-center justify-center py-8 text-btn_secondary_text
 }
 
-.loadingContainer {
-    @apply relative my-10
+
+.voteInfo {
+    @apply flex items-center text-sm gap-2 px-4 py-2
+}
+
+.proposalLabel {
+    @apply text-sm text-wallet_btn_text
+}
+
+.aye {
+    @apply bg-success_vote_bg
+}
+
+.nay {
+    @apply bg-failure_vote_bg
+}
+
+.split {
+    @apply bg-info_bg
+}
+
+.splitAbstain {
+    @apply bg-info_bg
+}
+
+.notVoted {
+    @apply rounded-b-md border border-warning bg-warning_vote_bg
 }
