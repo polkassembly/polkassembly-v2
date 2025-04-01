@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-import { Progress } from '../../progress';
+import { Progress } from '../../Progress';
 
 function PeriodProgress({ periodEndsAt, periodName }: { periodEndsAt?: Date; periodName: string }) {
 	return (
