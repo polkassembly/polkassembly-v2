@@ -19,7 +19,7 @@ export const useAISummary = ({ proposalType, indexOrHash }: UseAISummaryProps) =
 		try {
 			const { data, error } = await NextApiClientService.fetchContentSummary({ proposalType, indexOrHash });
 			if (error) {
-				throw new Error(error.message);
+				setFetchError(error.message);
 			}
 			setSummary(data);
 		} catch (err: unknown) {
