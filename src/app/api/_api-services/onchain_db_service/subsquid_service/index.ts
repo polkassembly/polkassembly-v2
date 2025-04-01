@@ -198,7 +198,7 @@ export class SubsquidService extends SubsquidUtils {
 		subsquidData.proposals.forEach(
 			(
 				proposal: {
-					createdAt: Date;
+					createdAt: string;
 					description?: string | null;
 					index: number;
 					origin: EPostOrigin;
@@ -220,7 +220,7 @@ export class SubsquidService extends SubsquidUtils {
 				const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 
 				posts.push({
-					createdAt: proposal.createdAt,
+					createdAt: new Date(proposal.createdAt),
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
@@ -529,7 +529,12 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain conviction vote delegations by address from Subsquid');
 		}
 
-		return subsquidData.votingDelegations as {
+		const votingDelegations = {
+			...subsquidData.votingDelegations,
+			createdAt: new Date(subsquidData.votingDelegations.createdAt)
+		};
+
+		return votingDelegations as {
 			to: string;
 			from: string;
 			track: number;
