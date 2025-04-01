@@ -13,6 +13,7 @@ import { cryptoWaitReady, encodeAddress } from '@polkadot/util-crypto';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { BN } from '@polkadot/util';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 
 // get delegation status and active proposals for all tracks
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string }> }) => {
@@ -68,27 +69,33 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const { convictionVotingPeriodInBlocks } = NETWORKS_DETAILS[network as ENetwork];
 
-	const votingPeriodInMs = convictionVotingPeriodInBlocks.mul(new BN(NETWORKS_DETAILS[network as ENetwork].blockTime)).mul(new BN(1000));
-
 	const receivedDelegations = delegationsForTrack
 		.filter((delegation) => delegation.to === address)
-		.map((delegation) => ({
-			address: delegation.from,
-			balance: delegation.balance,
-			createdAt: new Date(delegation.createdAt),
-			lockPeriod: delegation.lockPeriod,
-			endsAt: new Date(delegation.createdAt.getTime() + votingPeriodInMs.toNumber())
-		}));
+		.map((delegation) => {
+			const voteLockPeriodInMs = convictionVotingPeriodInBlocks.mul(new BN(delegation.lockPeriod)).mul(new BN(NETWORKS_DETAILS[network as ENetwork].blockTime));
+
+			return {
+				address: delegation.from,
+				balance: delegation.balance,
+				createdAt: new Date(delegation.createdAt),
+				lockPeriod: delegation.lockPeriod,
+				endsAt: dayjs(delegation.createdAt).add(voteLockPeriodInMs.toNumber(), 'ms').toDate()
+			};
+		});
 
 	const delegatedTo = delegationsForTrack
 		.filter((delegation) => delegation.from === address)
-		.map((delegation) => ({
-			address: delegation.to,
-			balance: delegation.balance,
-			createdAt: new Date(delegation.createdAt),
-			lockPeriod: delegation.lockPeriod,
-			endsAt: new Date(delegation.createdAt.getTime() + votingPeriodInMs.toNumber())
-		}));
+		.map((delegation) => {
+			const voteLockPeriodInMs = convictionVotingPeriodInBlocks.mul(new BN(delegation.lockPeriod)).mul(new BN(NETWORKS_DETAILS[network as ENetwork].blockTime));
+
+			return {
+				address: delegation.to,
+				balance: delegation.balance,
+				createdAt: new Date(delegation.createdAt),
+				lockPeriod: delegation.lockPeriod,
+				endsAt: dayjs(delegation.createdAt).add(voteLockPeriodInMs.toNumber(), 'ms').toDate()
+			};
+		});
 
 	const response: ITrackDelegationDetails = {
 		receivedDelegations,
