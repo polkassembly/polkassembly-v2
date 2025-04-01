@@ -93,7 +93,8 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 				}
 			}
 		},
-		[user, router, setOpen]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[user]
 	);
 
 	const toggleAllTracks = useCallback(() => {

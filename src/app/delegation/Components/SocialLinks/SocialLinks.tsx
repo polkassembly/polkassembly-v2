@@ -29,7 +29,7 @@ function SocialLinks({ socialLinks }: { socialLinks: IUserSocialDetails[] }) {
 						className='flex h-8 w-8 items-center justify-center rounded-full bg-social_green'
 						rel='noreferrer'
 					>
-						<IconComponent className='text-white' />
+						<IconComponent className='text-btn_primary_text' />
 					</a>
 				);
 			})}

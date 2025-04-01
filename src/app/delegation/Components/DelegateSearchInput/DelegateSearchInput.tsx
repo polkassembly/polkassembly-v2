@@ -22,7 +22,8 @@ function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }:
 			const { value } = e.target;
 			handleSearchChange(value);
 		},
-		[handleSearchChange]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[]
 	);
 
 	return (
