@@ -14,6 +14,7 @@ import { Separator } from '../../Separator';
 import { CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 import styles from './CollapsibleDropdown.module.scss';
+import { useTranslations } from 'next-intl';
 
 interface CollapsibleDropdownProps {
 	proposalType: EProposalType;
@@ -23,20 +24,20 @@ interface CollapsibleDropdownProps {
 }
 
 function CollapsibleDropdown({ proposalType, indexOrHash, usedInPostContent = false, usedInComments = false }: CollapsibleDropdownProps) {
+	const t = useTranslations();
 	const { summary, loading, error } = useAISummary({ proposalType, indexOrHash: indexOrHash ?? '' });
 
 	if (error || loading) return null;
 
-	const shouldShowPostSummary = usedInPostContent && !!summary?.postSummary;
-	const shouldShowCommentsSummary = usedInComments && !!summary?.commentsSummary;
-
-	if (!shouldShowPostSummary && !shouldShowCommentsSummary) return null;
+	const postSummary = usedInPostContent && summary?.postSummary;
+	const commentSummary = usedInComments && summary?.commentsSummary;
+	if (!postSummary && !commentSummary) return null;
 
 	return (
 		<Collapsible className={styles.collapsibleWrapper}>
 			<div className={`${styles.collapsibleInner} ${usedInPostContent ? styles.postContentGradient : styles.commentContentGradient}`}>
 				<CollapsibleTrigger className={styles.collapsibleTrigger}>
-					<span>✨ {usedInPostContent ? 'AI Summary' : 'Comments Summary'}</span>
+					<span>✨ {usedInPostContent ? t('PostDetails.commentSummary') : t('PostDetails.aiSummary')}</span>
 					<ChevronDown className={styles.chevronIcon} />
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
