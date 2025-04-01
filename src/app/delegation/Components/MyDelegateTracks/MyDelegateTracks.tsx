@@ -168,7 +168,7 @@ function MyDelegateTracks() {
 										key={track.trackId}
 										className='cursor-pointer'
 									>
-										<TableCell className='px-6 py-4'>{index + 1}</TableCell>
+										<TableCell className='p-6'>{index + 1}</TableCell>
 										<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
 										<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
 										<TableCell className={styles.tableCell_3}>{track.activeProposalsCount}</TableCell>
@@ -176,7 +176,7 @@ function MyDelegateTracks() {
 											{track.status ? (
 												<span
 													className={cn(
-														'rounded-[26px] px-3 py-1.5 text-center text-sm text-text_primary',
+														'rounded-[26px] px-3 py-1.5 text-center text-sm text-btn_secondary_text',
 														track.status === EDelegationStatus.RECEIVED && 'bg-received_delegation_bg',
 														track.status === EDelegationStatus.DELEGATED && 'bg-delegated_delegation_bg',
 														track.status === EDelegationStatus.UNDELEGATED && 'bg-undelegated_delegation_bg'

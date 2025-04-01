@@ -10,7 +10,7 @@ type SortOption = 'VOTING_POWER' | 'VOTED_PROPOSALS' | 'RECEIVED_DELEGATIONS';
 
 const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>([]);
+	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>(Object.values(EDelegateSource));
 	const [sortBy, setSortBy] = useState<SortOption>('VOTING_POWER');
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;

@@ -3,7 +3,7 @@
 }
 
 .delegationCardPolkadot {
-    @apply border-delegation_polkadot_border bg-delegation_card_polkadot;
+    @apply border-t-delegation_polkadot_border bg-delegation_card_polkadot;
 }
 
 .delegationCardW3f {
@@ -15,7 +15,7 @@
 }
 
 .delegationCardIndividual {
-    @apply border-btn_secondary_text bg-delegation_card_polkassembly;
+    @apply border-btn_secondary_text bg-delegation_bgcard;
 }
 
 .delegationCardDefault {

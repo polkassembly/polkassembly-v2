@@ -228,38 +228,46 @@ function DelegationTrack({ track }: { track: string }) {
 				</div>
 
 				{isActiveProposalOpen && (
-					<div className={styles.proposalsList}>
-						{activeProposals.length > 0 ? (
-							activeProposals.map((proposal: IPostWithDelegateVote) => (
-								<div
-									key={proposal.index}
-									className={styles.proposalCard}
-								>
-									<div className={styles.proposalDetails}>
-										<div className='flex justify-between'>
-											<div>
-												<Link
-													href={`/referenda/${proposal.index}`}
-													className={styles.proposalTitle}
-												>
-													#{proposal.index} {proposal.title}
-												</Link>
+					<div>
+						{isDelegateTrackLoading ? (
+							<div className={styles.loadingContainer}>
+								<LoadingLayover />
+							</div>
+						) : (
+							<div className={styles.proposalsList}>
+								{activeProposals.length > 0 ? (
+									activeProposals.map((proposal: IPostWithDelegateVote) => (
+										<div
+											key={proposal.index}
+											className={styles.proposalCard}
+										>
+											<div className={styles.proposalDetails}>
+												<div className='flex justify-between'>
+													<div>
+														<Link
+															href={`/referenda/${proposal.index}`}
+															className={styles.proposalTitle}
+														>
+															#{proposal.index} {proposal.title}
+														</Link>
+													</div>
+												</div>
+												<div className={styles.proposalInfo}>
+													<span className={styles.proposalLabel}>{t('by')}:</span>
+													<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
+													{renderProposalTimeInfo(proposal)}
+												</div>
+											</div>
+											<div className={styles.voteInfo}>
+												<span className={styles.proposalLabel}>{t('votes')}:</span>
+												<span className={styles.proposalLabel}>{proposal?.delegateVote?.decision || t('notVotedYet')}</span>
 											</div>
 										</div>
-										<div className={styles.proposalInfo}>
-											<span className={styles.proposalLabel}>{t('by')}:</span>
-											<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
-											{renderProposalTimeInfo(proposal)}
-										</div>
-									</div>
-									<div className={styles.voteInfo}>
-										<span className={styles.proposalLabel}>{t('votes')}:</span>
-										<span className={styles.proposalLabel}>{proposal?.delegateVote?.decision || t('notVotedYet')}</span>
-									</div>
-								</div>
-							))
-						) : (
-							<div className={styles.noProposalsMessage}>{t('noActiveProposalsFoundForThisTrack')}</div>
+									))
+								) : (
+									<div className={styles.noProposalsMessage}>{t('noActiveProposalsFoundForThisTrack')}</div>
+								)}
+							</div>
 						)}
 					</div>
 				)}

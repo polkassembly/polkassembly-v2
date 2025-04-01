@@ -24,7 +24,7 @@ const getPlatformStyles = (platforms: EDelegateSource[]) => {
 	}
 
 	if (platforms.length > 1) {
-		return styles.delegationCard;
+		return styles.delegationCardDefault;
 	}
 
 	const platform = String(platforms[0]).toLowerCase();
@@ -51,7 +51,7 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 
 	return (
 		<div className={styles.delegationCard}>
-			<div className={`flex gap-2 rounded-t border py-1 ${getPlatformStyles(delegate.sources)}`}>
+			<div className={`flex gap-2 rounded-t-md border py-1 ${getPlatformStyles(delegate.sources)}`}>
 				<PlatformLogos platforms={delegate.sources} />
 			</div>
 			<div className='p-4'>
