@@ -21,6 +21,7 @@ import { TfiPencil } from 'react-icons/tfi';
 import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import styles from './BecomeDelegateDialog.module.scss';
 
 const ERROR_UNKNOWN = 'An unknown error occurred';
@@ -28,17 +29,18 @@ const ERROR_UNKNOWN = 'An unknown error occurred';
 export default function BecomeDelegateDialog() {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
+	const network = getCurrentNetwork();
 	const { toast } = useToast();
 	const [manifesto, setManifesto] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [checkingDelegate, setCheckingDelegate] = useState(false);
-	const [address, setAddress] = useState<string | null>(user?.defaultAddress || null);
+	const encodedAddress = getEncodedAddress(user?.defaultAddress || '', network);
+	const [address, setAddress] = useState<string | null>(encodedAddress || null);
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const [isCurrentAddressDelegate, setIsCurrentAddressDelegate] = useState(false);
 
 	const queryClient = useQueryClient();
-	const network = getCurrentNetwork();
 
 	const checkExistingDelegate = async () => {
 		if (!address) return;
@@ -132,7 +134,7 @@ export default function BecomeDelegateDialog() {
 			onOpenChange={(open) => {
 				setDialogOpen(open);
 				if (!open) {
-					setAddress(user?.defaultAddress || null);
+					setAddress(encodedAddress || null);
 					setManifesto('');
 				}
 			}}
@@ -163,7 +165,7 @@ export default function BecomeDelegateDialog() {
 				<div className='flex flex-col gap-y-4'>
 					<AddressDropdown
 						withBalance
-						onChange={(account) => setAddress(account.address)}
+						onChange={(account) => setAddress(getEncodedAddress(account.address, network))}
 					/>
 					<div className='flex flex-col gap-y-2'>
 						<p className='text-sm text-wallet_btn_text'>
