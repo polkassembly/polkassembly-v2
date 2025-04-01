@@ -1028,6 +1028,7 @@ interface ITrackDelegation {
 	balance: string;
 	createdAt: Date;
 	lockPeriod: number;
+	endsAt: Date;
 }
 
 export interface ITrackDelegationDetails {
