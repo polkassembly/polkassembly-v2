@@ -83,7 +83,7 @@
 }
 
 .tooltipContent {
-    @apply bg-bg_modal text-sm text-text_primary
+    @apply relative rounded-md bg-tooltip_background px-2 py-1 text-btn_primary_text shadow-lg;
 }
 
 .proposalsContainer {

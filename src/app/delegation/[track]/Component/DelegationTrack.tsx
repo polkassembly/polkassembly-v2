@@ -16,6 +16,10 @@ import { ChevronDown } from 'lucide-react';
 import { MdKeyboardArrowRight } from 'react-icons/md';
 import Image from 'next/image';
 import UndelegatedTrack from '@assets/delegation/undelegated.svg';
+import half from '@assets/delegation/half-time-left-clock.svg';
+import onethird from '@assets/delegation/one-third-time-left-clock.svg';
+import threefourth from '@assets/delegation/three-forth-time-left-clock.svg';
+import whole from '@assets/delegation/whole-time-left-clock.svg';
 import Link from 'next/link';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
@@ -32,6 +36,29 @@ import { useTranslations } from 'next-intl';
 import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
 import UndelegateDialog from '../../Components/UndelegateDialog/UndelegateDialog';
 import styles from './DelegationTrack.module.scss';
+
+const getIconForUndelegationTimeLeft = (percentage: number) => {
+	if (percentage >= 75) {
+		return whole;
+	}
+	if (percentage < 75 && percentage >= 50) {
+		return threefourth;
+	}
+	if (percentage < 50 && percentage >= 25) {
+		return half;
+	}
+	return onethird;
+};
+
+const getDelegationProgress = (createdAt: Date, endsAt: Date) => {
+	const now = new Date();
+	const start = new Date(createdAt);
+	const end = new Date(endsAt);
+
+	const totalDuration = end.getTime() - start.getTime();
+	const elapsedDuration = now.getTime() - start.getTime();
+	return Math.min(Math.max((elapsedDuration / totalDuration) * 100, 0), 100);
+};
 
 function DelegationTrack({ track }: { track: string }) {
 	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
@@ -101,33 +128,43 @@ function DelegationTrack({ track }: { track: string }) {
 									<Address address={delegation.address} />
 								</TableCell>
 								<TableCell className='p-6'>{formatBnBalance(delegation.balance, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}</TableCell>
-								<TableCell className='p-6'>{delegation.lockPeriod}x</TableCell>
-								<TableCell className='p-6'>{dayjs(delegation.createdAt).format('DD MMM YYYY')}</TableCell>
-								{!isReceived && (
-									<TableCell className={styles.actionCell}>
+								<TableCell className='p-6'>{delegation.lockPeriod}x </TableCell>
+								<TableCell className='p-6'>
+									<div className='flex items-center gap-2'>
+										<span>{dayjs(delegation.createdAt).format('DD MMM YYYY')}</span>
 										<Tooltip>
 											<TooltipTrigger asChild>
-												<UndelegateDialog
-													open={openUndelegateAddresses[delegation.address] || false}
-													setOpen={(isOpen) => handleOpenUndelegate(delegation.address, isOpen)}
-													delegate={{ address: delegation.address, balance: delegation.balance }}
-													disabled={delegation.lockPeriod > 0}
-													trackId={trackId}
-													trackName={trackName}
-												>
-													<button
-														type='button'
-														className={styles.undelegateButton}
-													>
-														<IoPersonRemove />
-														<span>{t('undelegate')}</span>
-													</button>
-												</UndelegateDialog>
+												<Image
+													src={getIconForUndelegationTimeLeft(getDelegationProgress(delegation.createdAt, delegation.endsAt))}
+													alt='delegation-progress'
+													width={24}
+													height={24}
+												/>
 											</TooltipTrigger>
-											<TooltipContent className={styles.tooltipContent}>
-												{delegation.lockPeriod > 0 ? <p>{t('youCanUndelegateAfter', { days: delegation.lockPeriod })}</p> : <p>{t('youCanUndelegateNow')}</p>}
+											<TooltipContent className={cn(styles.tooltipContent, 'bg-tooltip_background text-btn_primary_text')}>
+												<p>{`${t('youCanUndelegateAfter')} ${dayjs(delegation.endsAt).format('DD MMM YYYY')}`}</p>
 											</TooltipContent>
 										</Tooltip>
+									</div>
+								</TableCell>
+								{!isReceived && (
+									<TableCell className={styles.actionCell}>
+										<UndelegateDialog
+											open={openUndelegateAddresses[delegation.address] || false}
+											setOpen={(isOpen) => handleOpenUndelegate(delegation.address, isOpen)}
+											delegate={{ address: delegation.address, balance: delegation.balance }}
+											disabled={dayjs().isBefore(dayjs(delegation.endsAt))}
+											trackId={trackId}
+											trackName={trackName}
+										>
+											<button
+												type='button'
+												className={styles.undelegateButton}
+											>
+												<IoPersonRemove />
+												<span>{t('undelegate')}</span>
+											</button>
+										</UndelegateDialog>
 									</TableCell>
 								)}
 							</TableRow>

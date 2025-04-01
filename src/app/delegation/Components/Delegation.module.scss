@@ -3,7 +3,7 @@
 }
 
 .tooltipContent {
-    @apply relative rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg;
+    @apply relative rounded-md bg-tooltip_background px-2 py-1 shadow-lg;
 }
 
 .selectTrigger {
