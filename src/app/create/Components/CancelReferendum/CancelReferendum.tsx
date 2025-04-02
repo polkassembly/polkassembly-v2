@@ -26,6 +26,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Link from 'next/link';
 import { SquareArrowOutUpRight, TriangleAlert } from 'lucide-react';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 function CancelReferendum() {
 	const t = useTranslations();
@@ -125,7 +126,7 @@ function CancelReferendum() {
 			!apiService ||
 			!userPreferences.address?.address ||
 			!data ||
-			!data.index ||
+			!ValidatorService.isValidNumber(data.index) ||
 			!canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ||
 			!preimageDetails
 		)
@@ -224,7 +225,13 @@ function CancelReferendum() {
 				<Button
 					onClick={createPreimage}
 					isLoading={loading}
-					disabled={!userPreferences.address?.address || !selectedEnactment || !data || !data.index || !canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)}
+					disabled={
+						!userPreferences.address?.address ||
+						!selectedEnactment ||
+						!data ||
+						!ValidatorService.isValidNumber(data.index) ||
+						!canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)
+					}
 				>
 					{t('CreateTreasuryProposal.createProposal')}
 				</Button>

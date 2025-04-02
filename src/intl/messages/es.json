@@ -404,7 +404,9 @@
 		"deleteCommentConfirmation": "¿Estás seguro de que quieres eliminar este comentario?",
 		"delete": "Eliminar",
 		"hideReplies": "Ocultar respuestas",
-		"viewReplies": "Ver respuestas"
+		"viewReplies": "Ver respuestas",
+		"commentSummary": "Resumen de Comentarios",
+		"aiSummary": "Resumen de IA"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
