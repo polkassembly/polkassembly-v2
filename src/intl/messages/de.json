@@ -820,7 +820,8 @@
 		"votedAye": "Abgestimmt: Ja",
 		"votedNay": "Abgestimmt: Nein",
 		"votedSplit": "Abgestimmt: Split",
-		"votedSplitAbstain": "Abgestimmt: Split Enthaltung"
+		"votedSplitAbstain": "Abgestimmt: Split Enthaltung",
+		"editDelegate": "Delegierten bearbeiten"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage-Einzahlung",

@@ -6,9 +6,9 @@ import { memo, useState } from 'react';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IoPersonAdd } from 'react-icons/io5';
 import { EDelegateSource, ENetwork, IDelegateDetails } from '@/_shared/types';
-import { parseBalance } from '@/app/_client-utils/parseBalance';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import PlatformLogos from '../PlatformLogos/PlatformLogos';
 import DelegateDialog from '../DelegateDialog/DelegateDialog';
 import styles from './DelegationCard.module.scss';
@@ -114,8 +114,10 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 				<div className={styles.delegationCardStatsItem}>
 					<div>
 						<div className='text-sm text-btn_secondary_text'>
-							<span className='text-2xl font-semibold'> {parseBalance(delegate?.votingPower?.toString() || '0', 1, false, network)}</span>{' '}
-							{NETWORKS_DETAILS[network as ENetwork].tokenSymbol}
+							<span className='text-2xl font-semibold'>
+								{' '}
+								{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+							</span>{' '}
 						</div>
 						<span className={styles.delegationCardStatsItemText}>{t('votingPower')}</span>
 					</div>

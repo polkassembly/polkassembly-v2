@@ -819,7 +819,8 @@
 		"votedAye": "Votado: Aye",
 		"votedNay": "Votado: Nay",
 		"votedSplit": "Votado: Split",
-		"votedSplitAbstain": "Votado: Split Abstain"
+		"votedSplitAbstain": "Votado: Split Abstain",
+		"editDelegate": "Editar delegado"
 	},
 	"TxFees": {
 		"preimageDeposit": "Depósito de Preimage",

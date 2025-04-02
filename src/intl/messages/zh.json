@@ -819,7 +819,8 @@
 		"votedAye": "投票: Aye",
 		"votedNay": "投票: Nay",
 		"votedSplit": "投票: Split",
-		"votedSplitAbstain": "投票: Split Abstain"
+		"votedSplitAbstain": "投票: Split Abstain",
+		"editDelegate": "编辑委托人"
 	},
 	"TxFees": {
 		"preimageDeposit": "预映像押金",

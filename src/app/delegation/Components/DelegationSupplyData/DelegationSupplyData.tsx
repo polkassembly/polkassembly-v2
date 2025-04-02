@@ -15,7 +15,7 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
-import { parseBalance } from '@/app/_client-utils/parseBalance';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import styles from './DelegationSupplyData.module.scss';
 
 const ZERO_BN = new BN(0);
@@ -55,7 +55,9 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 				/>
 				<div className='flex flex-col'>
 					<p className={styles.totalDelegates}>{t('totalSupply')}</p>
-					<p className='text-xl font-semibold'>{parseBalance(totalSupply.toString(), 2, true, network)}</p>
+					<p className='text-xl font-semibold'>
+						{formatUSDWithUnits(formatBnBalance(totalSupply, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
+					</p>
 				</div>
 			</div>
 			<div className={styles.borderLeft}>
@@ -67,7 +69,9 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('delegatedTokens')}</p>
-						<p className='text-xl font-semibold'>{parseBalance(delegationStats.totalDelegatedTokens, 2, true, network)}</p>
+						<p className='text-xl font-semibold'>
+							{formatUSDWithUnits(formatBnBalance(delegationStats.totalDelegatedTokens, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
+						</p>
 					</div>
 				</div>
 			</div>

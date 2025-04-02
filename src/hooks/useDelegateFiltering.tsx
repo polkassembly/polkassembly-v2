@@ -36,9 +36,9 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 				case 'VOTING_POWER':
 					return Number(BigInt(b.votingPower || '0') - BigInt(a.votingPower || '0'));
 				case 'VOTED_PROPOSALS':
-					return (b.last30DaysVotedProposalsCount || 0) - (a.last30DaysVotedProposalsCount || 0);
+					return b.last30DaysVotedProposalsCount - a.last30DaysVotedProposalsCount;
 				case 'RECEIVED_DELEGATIONS':
-					return (b.receivedDelegationsCount || 0) - (a.receivedDelegationsCount || 0);
+					return b.receivedDelegationsCount - a.receivedDelegationsCount;
 				default:
 					return 0;
 			}
