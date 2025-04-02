@@ -293,7 +293,7 @@ export class ValidatorService {
 			return Number(value) >= 0;
 		}
 		if (typeof value === 'string') {
-			return value.trim() !== '' && value.includes('0x');
+			return Boolean(value.trim()) && value.startsWith('0x');
 		}
 		return false;
 	}

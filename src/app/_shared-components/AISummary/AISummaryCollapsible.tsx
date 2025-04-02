@@ -10,21 +10,17 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { EProposalType } from '@/_shared/types';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Separator } from '../Separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
 import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
 import styles from './AISummaryCollapsible.module.scss';
 import { Skeleton } from '../Skeleton';
 
-export enum SummaryType {
-	CONTENT = 'content',
-	COMMENT = 'comment'
-}
-
 interface AISummaryCollapsibleProps {
 	proposalType: EProposalType;
 	indexOrHash: string;
-	summaryType: SummaryType;
+	summaryType: 'content' | 'allComments';
 }
 
 function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISummaryCollapsibleProps) {
@@ -35,13 +31,13 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 		return <Skeleton />;
 	}
 
-	if (error) return null;
+	if (error || !ValidatorService.isValidIndexOrHash(indexOrHash)) return null;
 
 	let summaryContent = null;
 
-	if (summaryType === SummaryType.CONTENT) {
+	if (summaryType === 'content') {
 		summaryContent = data?.postSummary;
-	} else if (summaryType === SummaryType.COMMENT) {
+	} else if (summaryType === 'allComments') {
 		summaryContent = data?.commentsSummary;
 	}
 
@@ -51,9 +47,9 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 
 	return (
 		<Collapsible className={styles.collapsibleWrapper}>
-			<div className={`${styles.collapsibleInner} ${summaryType === SummaryType.CONTENT ? styles.postContentGradient : styles.commentContentGradient}`}>
+			<div className={`${styles.collapsibleInner} ${summaryType === 'content' ? styles.postContentGradient : styles.commentContentGradient}`}>
 				<CollapsibleTrigger className={styles.collapsibleTrigger}>
-					<span>✨ {summaryType === SummaryType.CONTENT ? t('aiSummary') : t('commentSummary')}</span>
+					<span>✨ {summaryType === 'content' ? t('aiSummary') : t('commentSummary')}</span>
 					<ChevronDown className={styles.chevronIcon} />
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>

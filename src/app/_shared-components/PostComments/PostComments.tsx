@@ -9,11 +9,10 @@ import { CommentClientService } from '@/app/_client-services/comment_client_serv
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
-import AISummaryCollapsible, { SummaryType } from '../AISummary/AISummaryCollapsible';
+import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
 function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
@@ -41,15 +40,15 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 			<p className={classes.title}>
 				{t('PostDetails.comments')} <span className='text-base font-normal'>({data?.length})</span>
 			</p>
-			{ValidatorService.isValidIndexOrHash(index) && (
-				<div className={classes.summaryComponent}>
-					<AISummaryCollapsible
-						indexOrHash={index}
-						proposalType={proposalType}
-						summaryType={SummaryType.COMMENT}
-					/>
-				</div>
-			)}
+
+			<div className={classes.summaryComponent}>
+				<AISummaryCollapsible
+					indexOrHash={index}
+					proposalType={proposalType}
+					summaryType='allComments'
+				/>
+			</div>
+
 			{isFetching ? (
 				<Skeleton className='h-4' />
 			) : (

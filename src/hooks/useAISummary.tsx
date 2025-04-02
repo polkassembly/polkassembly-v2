@@ -6,6 +6,7 @@ import { EProposalType, IContentSummary } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 interface UseAISummaryProps {
 	proposalType: EProposalType;
@@ -15,7 +16,7 @@ interface UseAISummaryProps {
 export const useAISummary = ({ proposalType, indexOrHash }: UseAISummaryProps) => {
 	return useQuery<IContentSummary, Error>({
 		queryKey: ['ai-summary', proposalType, indexOrHash],
-		enabled: !!proposalType && !!indexOrHash,
+		enabled: Boolean(proposalType) && ValidatorService.isValidIndexOrHash(indexOrHash),
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchContentSummary({ proposalType, indexOrHash });
 

@@ -6,25 +6,22 @@
 
 import { IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
 import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
-import AISummaryCollapsible, { SummaryType } from '../AISummary/AISummaryCollapsible';
+import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
 
 	return (
 		<div>
-			{(postData?.index || postData?.hash) && ValidatorService.isValidIndexOrHash(postData?.index || postData?.hash) && (
-				<AISummaryCollapsible
-					indexOrHash={String(postData?.index || postData?.hash)}
-					proposalType={postData.proposalType}
-					summaryType={SummaryType.CONTENT}
-				/>
-			)}
+			<AISummaryCollapsible
+				indexOrHash={String(postData?.index || postData?.hash)}
+				proposalType={postData.proposalType}
+				summaryType='content'
+			/>
 
 			<MarkdownEditor
 				markdown={content}
