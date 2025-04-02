@@ -291,7 +291,17 @@
 		"WhitelistedCaller": "Whitelisted Caller",
 		"WhitelistedCallerDescription": "Origin commanded by any members of the Polkadot Fellowship (no Dan grade needed).",
 		"WishForChange": "Wish For Change",
-		"WishForChangeDescription": "Origin for signaling that the network wishes for some change."
+		"WishForChangeDescription": "Origin for signaling that the network wishes for some change.",
+		"TechCommitteeProposal": "Tech Committee Proposal",
+		"TechCommitteeProposalDescription": "This is the place to discuss on-chain tech committee proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"DemocracyProposal": "On Chain Proposals",
+		"DemocracyProposalDescription": "This is the place to discuss on-chain proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"TreasuryProposal": "Treasury Proposal",
+		"TreasuryProposalDescription": "This is the place to discuss on-chain treasury proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"Tip": "Tips",
+		"TipDescription": "This is the place to discuss on-chain tips. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"CouncilMotion": "On Chain Motions",
+		"CouncilMotionDescription": "This is the place to discuss on-chain motions. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them."
 	},
 	"Sidebar": {
 		"onChainIdentity": "On-Chain Identity",
