@@ -138,7 +138,7 @@
 }
 
 .proposalLabel {
-    @apply text-sm text-wallet_btn_text
+    @apply text-sm text-wallet_btn_text flex items-center gap-2
 }
 
 .aye {

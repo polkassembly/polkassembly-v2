@@ -317,7 +317,20 @@ function DelegationTrack({ trackDetails, delegateTrackResponse }: DelegationTrac
 												{proposal?.delegateVote?.decision === EVoteDecision.SPLIT && t('votedSplit')}
 												{proposal?.delegateVote?.decision === EVoteDecision.SPLIT_ABSTAIN && t('votedSplitAbstain')}
 												{!proposal?.delegateVote?.decision && t('notVotedYet')}
-												{proposal?.delegateVote?.decision && ` | Balance: ${proposal?.delegateVote?.balanceValue} | Conviction: ${proposal?.delegateVote?.lockPeriod}x`}
+												{proposal?.delegateVote?.decision && (
+													<div className='flex items-center gap-2'>
+														<Separator
+															orientation='vertical'
+															className='h-4'
+														/>
+														{t('balance')}: {formatBnBalance(proposal?.delegateVote?.balanceValue, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
+														<Separator
+															orientation='vertical'
+															className='h-4'
+														/>
+														{t('conviction')}: {proposal?.delegateVote?.lockPeriod}x
+													</div>
+												)}
 											</span>
 											{!proposal?.delegateVote?.decision && <IoIosInformationCircleOutline className='text-lg text-warning' />}
 										</div>
