@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { EProposalType, IContentSummary } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
-import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 
 interface UseAISummaryProps {
@@ -21,11 +21,11 @@ export const useAISummary = ({ proposalType, indexOrHash }: UseAISummaryProps) =
 			const { data, error } = await NextApiClientService.fetchContentSummary({ proposalType, indexOrHash });
 
 			if (error) {
-				throw new ClientError(ERROR_MESSAGES.API_FETCH_ERROR, error.message);
+				throw new ClientError(ERROR_CODES.API_FETCH_ERROR, error.message);
 			}
 
 			if (!data) {
-				throw new Error('No summary data found.');
+				throw new ClientError(ERROR_CODES.NOT_FOUND, 'No summary data found.');
 			}
 
 			return data;
