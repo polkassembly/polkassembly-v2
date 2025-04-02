@@ -4,18 +4,17 @@
 
 'use client';
 
-import { Collapsible } from '@radix-ui/react-collapsible';
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAISummary } from '@/hooks/useAISummary';
 import { EProposalType } from '@/_shared/types';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
-import { Separator } from '../../Separator';
-import { CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
-import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import { Separator } from '../Separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
+import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
 import styles from './AISummaryCollapsible.module.scss';
-import { Skeleton } from '../../Skeleton';
+import { Skeleton } from '../Skeleton';
 
 interface CollapsibleDropdownProps {
 	proposalType: EProposalType;

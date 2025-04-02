@@ -6,22 +6,22 @@
 
 import { IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { isValidIndexOrHash } from '@/_shared/_utils/isValidIndexOrHash';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
 import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
-import AISummaryCollapsible from '../utils/SummaryCollapsible/AISummaryCollapsible';
+import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
 
 	return (
 		<div>
-			{isValidIndexOrHash(postData?.index) && (
+			{ValidatorService.isValidIndexOrHash(postData?.index) && (
 				<AISummaryCollapsible
 					indexOrHash={String(postData?.index)}
-					proposalType={postData?.proposalType}
+					proposalType={postData.proposalType}
 					isContentSummary
 				/>
 			)}

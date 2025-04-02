@@ -287,4 +287,10 @@ export class ValidatorService {
 		const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
 		return allTrackIds.includes(trackNum);
 	}
+
+	static isValidIndexOrHash(value: unknown): boolean {
+		if (typeof value === 'number') return true;
+		if (typeof value === 'string') return value.trim() !== '';
+		return false;
+	}
 }
