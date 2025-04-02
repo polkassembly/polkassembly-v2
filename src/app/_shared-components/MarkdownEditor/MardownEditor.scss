@@ -6,7 +6,7 @@
 	h4,
 	h5,
 	h6 {
-		@apply mb-1 mt-1 font-bold;
+		@apply mb-2 mt-1 font-bold;
 	}
 
 	h1 {
@@ -35,6 +35,10 @@
 
 	a {
 		@apply text-text_pink no-underline;
+	}
+
+	p {
+		@apply my-4;
 	}
 
 	/* Fix blockquote styling */
@@ -84,6 +88,10 @@
 		@apply mb-0;
 	}
 
+	hr {
+		@apply my-4;
+	}
+
 	/* Custom light theme colors using theme.ts variables */
 	:global(.mdxeditor) {
 		/* Base colors using your theme variables */
@@ -113,6 +121,17 @@
 		--baseSolidHover: #243a57; /* text_primary */
 		--baseText: #243a57; /* text_primary */
 		--baseTextContrast: #243a57; /* text_primary */
+
+		--spacing-0: 0px;
+		--spacing-px: 1px;
+		--spacing-0_5: 0.125rem;
+		--spacing-1: 0.25rem;
+		--spacing-1_5: 0.375rem;
+		--spacing-2: 0.5rem;
+		--spacing-2_5: 0.625rem;
+		--spacing-3: 0.75rem;
+		--spacing-3_5: 0.875rem;
+		--spacing-4: 1rem;
 	}
 
 	/* Custom dark theme colors using theme.ts variables */
@@ -169,5 +188,35 @@
 			border-radius: 8px;
 			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 		}
+	}
+}
+
+.mdxeditor-popup-container {
+	z-index: 100 !important;
+
+	[role='dialog'],
+	svg {
+		background-color: var(--baseBg); /* Use theme-based background */
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+		fill: var(--baseBorder);
+	}
+}
+
+.mdxeditor-select-content {
+	z-index: 100 !important;
+	[role='option'] {
+		background-color: var(--baseBg); /* Use theme-based background */
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+	}
+}
+
+.mdxeditor-source-editor,
+.mdxeditor-diff-editor {
+	.cm-editor {
+		background-color: var(--baseBg); /* Use theme-based background */
+		border-color: var(--baseBorder);
+		color: var(--baseText);
 	}
 }

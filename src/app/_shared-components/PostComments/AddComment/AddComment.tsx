@@ -80,25 +80,16 @@ function AddComment({
 	};
 
 	return (
-		<div className={classes.commentsBox}>
-			<div className={classes.wrapper}>
-				<Identicon
-					value={user?.addresses[0]}
-					theme='polkadot'
-					size={30}
+		<div>
+			<div className='mb-2'>
+				<MarkdownEditor
+					markdown={content || ''}
+					onChange={(data) => {
+						setContent(data);
+						LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
+					}}
+					ref={markdownEditorRef}
 				/>
-				<div className={classes.editorWrapper}>
-					<div className='flex-1'>
-						<MarkdownEditor
-							markdown={content || ''}
-							onChange={(data) => {
-								setContent(data);
-								LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
-							}}
-							ref={markdownEditorRef}
-						/>
-					</div>
-				</div>
 			</div>
 
 			<div className={classes.btnWrapper}>
