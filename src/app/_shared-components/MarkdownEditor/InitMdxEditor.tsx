@@ -228,7 +228,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 				plugins={plugins}
 				{...props}
 				markdown={processedMarkdown}
-				className={cn(theme === ETheme.DARK ? 'dark-theme' : '', props.className)}
+				className={cn(theme === ETheme.DARK ? 'dark-theme' : '', props.readOnly && 'p-0', props.className)}
 				ref={editorRef}
 				onError={(error) => {
 					console.error(error);
