@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 	description: 'Terms of Website Use for Polkassembly'
 };
 
-export default function TermsOfWebsitePage() {
+export default async function TermsOfWebsitePage() {
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<div className='rounded-md bg-white p-8 shadow'>

@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { privacyPolicyContent } from './privacy-policy';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { MarkdownEditor } from '../_shared-components/MarkdownEditor/MarkdownEditor';
 
 export const metadata: Metadata = {
@@ -14,20 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PrivacyPolicyPage() {
-	// Get the host from headers to determine the network
-	const headersList = await headers();
-	const host = headersList.get('host') || 'polkassembly.io';
-
-	// Extract network from the host
-	// For example, 'kusama.polkassembly.io' -> 'kusama'
-	let network = '';
-	if (host && host.includes('.')) {
-		const parts = host.split('.');
-		const [firstPart] = parts;
-		if (parts.length > 1 && firstPart !== 'www' && firstPart !== 'app') {
-			network = firstPart;
-		}
-	}
+	const network = await getNetworkFromHeaders();
 
 	// Replace all instances of 'polkassembly.io' with '{network}.polkassembly.io'
 	let policyContent = privacyPolicyContent;
