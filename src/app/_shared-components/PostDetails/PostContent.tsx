@@ -10,20 +10,20 @@ import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
 import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
-import CollapsibleDropdown from '../utils/SummaryCollapsible/CollapsibleDropdown';
+import AISummaryCollapsible from '../utils/SummaryCollapsible/AISummaryCollapsible';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
-	const proposalType = postData?.proposalType;
-	const indexOrHash = postData?.index?.toString?.();
 
 	return (
 		<div>
-			<CollapsibleDropdown
-				indexOrHash={indexOrHash}
-				proposalType={proposalType}
-				usedInPostContent
-			/>
+			{postData?.index !== null && postData?.index !== undefined && (
+				<AISummaryCollapsible
+					indexOrHash={postData?.index?.toString()}
+					proposalType={postData?.proposalType}
+					isContentSummary
+				/>
+			)}
 			<MarkdownEditor
 				markdown={content}
 				readOnly

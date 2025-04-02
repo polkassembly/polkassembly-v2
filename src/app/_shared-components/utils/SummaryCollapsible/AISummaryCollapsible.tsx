@@ -10,48 +10,54 @@ import { ChevronDown } from 'lucide-react';
 import { useAISummary } from '@/hooks/useAISummary';
 import { EProposalType } from '@/_shared/types';
 import { THEME_COLORS } from '@/app/_style/theme';
+import { useTranslations } from 'next-intl';
 import { Separator } from '../../Separator';
 import { CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
-import styles from './CollapsibleDropdown.module.scss';
-import { useTranslations } from 'next-intl';
+import styles from './AISummaryCollapsible.module.scss';
+import { Skeleton } from '../../Skeleton';
 
 interface CollapsibleDropdownProps {
 	proposalType: EProposalType;
-	indexOrHash?: string;
-	usedInPostContent?: boolean;
-	usedInComments?: boolean;
+	indexOrHash: string;
+	isContentSummary?: boolean;
+	isCommentsSummary?: boolean;
 }
 
-function CollapsibleDropdown({ proposalType, indexOrHash, usedInPostContent = false, usedInComments = false }: CollapsibleDropdownProps) {
-	const t = useTranslations();
-	const { summary, loading, error } = useAISummary({ proposalType, indexOrHash: indexOrHash ?? '' });
+function AISummaryCollapsible({ proposalType, indexOrHash, isContentSummary = false, isCommentsSummary = false }: CollapsibleDropdownProps) {
+	const t = useTranslations('PostDetails');
 
-	if (error || loading) return null;
+	const { data, isLoading, error } = useAISummary({ proposalType, indexOrHash });
 
-	const postSummary = usedInPostContent && summary?.postSummary;
-	const commentSummary = usedInComments && summary?.commentsSummary;
+	if (isLoading) {
+		return <Skeleton />;
+	}
+
+	if (error) return null;
+
+	const postSummary = isContentSummary && data?.postSummary;
+	const commentSummary = isCommentsSummary && data?.commentsSummary;
 	if (!postSummary && !commentSummary) return null;
 
 	return (
 		<Collapsible className={styles.collapsibleWrapper}>
-			<div className={`${styles.collapsibleInner} ${usedInPostContent ? styles.postContentGradient : styles.commentContentGradient}`}>
+			<div className={`${styles.collapsibleInner} ${isContentSummary ? styles.postContentGradient : styles.commentContentGradient}`}>
 				<CollapsibleTrigger className={styles.collapsibleTrigger}>
-					<span>✨ {usedInPostContent ? t('PostDetails.aiSummary') : t('PostDetails.commentSummary')}</span>
+					<span>✨ {isContentSummary ? t('aiSummary') : t('commentSummary')}</span>
 					<ChevronDown className={styles.chevronIcon} />
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
 					<Separator className='m-0 p-0' />
-					{usedInPostContent && summary?.postSummary && (
+					{isContentSummary && data?.postSummary && (
 						<MarkdownEditor
-							markdown={summary.postSummary}
+							markdown={data.postSummary}
 							readOnly
 							className={`${THEME_COLORS.light.btn_primary_text} max-h-full border-none text-sm`}
 						/>
 					)}
-					{usedInComments && summary?.commentsSummary && (
+					{isCommentsSummary && data?.commentsSummary && (
 						<MarkdownEditor
-							markdown={summary.commentsSummary}
+							markdown={data.commentsSummary}
 							readOnly
 							className='mt-4 max-h-full border-none'
 							contentEditableClassName='p-0'
@@ -63,4 +69,4 @@ function CollapsibleDropdown({ proposalType, indexOrHash, usedInPostContent = fa
 	);
 }
 
-export default CollapsibleDropdown;
+export default AISummaryCollapsible;
