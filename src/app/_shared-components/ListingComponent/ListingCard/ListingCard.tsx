@@ -107,7 +107,7 @@ function ListingCard({
 									</span>
 								)}
 
-								{ValidatorService.isValidOnChainProposalType(proposalType) && (
+								{ValidatorService.isValidOnChainProposalType(proposalType) && data.onChainInfo?.origin && (
 									<>
 										<span>|</span>
 										<span className={`${getSpanStyle(data.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{data.onChainInfo?.origin}</span>
