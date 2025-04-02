@@ -6,6 +6,7 @@
 
 import { IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
+import { isValidIndexOrHash } from '@/_shared/_utils/isValidIndexOrHash';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
@@ -17,9 +18,9 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 
 	return (
 		<div>
-			{postData?.index !== null && postData?.index !== undefined && (
+			{isValidIndexOrHash(postData?.index) && (
 				<AISummaryCollapsible
-					indexOrHash={postData?.index?.toString()}
+					indexOrHash={String(postData?.index)}
 					proposalType={postData?.proposalType}
 					isContentSummary
 				/>

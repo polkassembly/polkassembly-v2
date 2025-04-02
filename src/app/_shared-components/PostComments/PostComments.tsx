@@ -9,6 +9,7 @@ import { CommentClientService } from '@/app/_client-services/comment_client_serv
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { isValidIndexOrHash } from '@/_shared/_utils/isValidIndexOrHash';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
@@ -40,7 +41,7 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 			<p className={classes.title}>
 				{t('PostDetails.comments')} <span className='text-base font-normal'>({data?.length})</span>
 			</p>
-			{index !== null && index !== undefined && (
+			{isValidIndexOrHash(index) && (
 				<div className={classes.summaryComponent}>
 					<AISummaryCollapsible
 						indexOrHash={index}
