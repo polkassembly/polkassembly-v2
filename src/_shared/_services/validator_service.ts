@@ -289,8 +289,12 @@ export class ValidatorService {
 	}
 
 	static isValidIndexOrHash(value: unknown): boolean {
-		if (typeof value === 'number') return true;
-		if (typeof value === 'string') return value.trim() !== '';
+		if (this.isValidNumber(value)) {
+			return Number(value) >= 0;
+		}
+		if (typeof value === 'string') {
+			return value.trim() !== '' && value.includes('0x');
+		}
 		return false;
 	}
 }

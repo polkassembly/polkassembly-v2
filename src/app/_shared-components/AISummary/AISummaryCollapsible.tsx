@@ -16,16 +16,18 @@ import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
 import styles from './AISummaryCollapsible.module.scss';
 import { Skeleton } from '../Skeleton';
 
-interface CollapsibleDropdownProps {
+export enum SummaryType {
+	CONTENT = 'content',
+	COMMENT = 'comment'
+}
+interface AISummaryCollapsibleProps {
 	proposalType: EProposalType;
 	indexOrHash: string;
-	isContentSummary?: boolean;
-	isCommentsSummary?: boolean;
+	summaryType: SummaryType;
 }
 
-function AISummaryCollapsible({ proposalType, indexOrHash, isContentSummary = false, isCommentsSummary = false }: CollapsibleDropdownProps) {
+function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISummaryCollapsibleProps) {
 	const t = useTranslations('PostDetails');
-
 	const { data, isLoading, error } = useAISummary({ proposalType, indexOrHash });
 
 	if (isLoading) {
@@ -34,9 +36,12 @@ function AISummaryCollapsible({ proposalType, indexOrHash, isContentSummary = fa
 
 	if (error) return null;
 
-	const postSummary = isContentSummary && data?.postSummary;
-	const commentSummary = isCommentsSummary && data?.commentsSummary;
-	if (!postSummary && !commentSummary) return null;
+	const isContentSummary = summaryType === SummaryType.CONTENT;
+	const isCommentSummary = summaryType === SummaryType.COMMENT;
+
+	if (!(isContentSummary && data?.postSummary) && !(isCommentSummary && data?.commentsSummary)) {
+		return null;
+	}
 
 	return (
 		<Collapsible className={styles.collapsibleWrapper}>
@@ -54,7 +59,7 @@ function AISummaryCollapsible({ proposalType, indexOrHash, isContentSummary = fa
 							className={`${THEME_COLORS.light.btn_primary_text} max-h-full border-none text-sm`}
 						/>
 					)}
-					{isCommentsSummary && data?.commentsSummary && (
+					{isCommentSummary && data?.commentsSummary && (
 						<MarkdownEditor
 							markdown={data.commentsSummary}
 							readOnly

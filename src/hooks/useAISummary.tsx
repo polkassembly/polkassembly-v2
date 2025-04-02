@@ -4,6 +4,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { EProposalType, IContentSummary } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 
 interface UseAISummaryProps {
 	proposalType: EProposalType;
@@ -18,7 +20,7 @@ export const useAISummary = ({ proposalType, indexOrHash }: UseAISummaryProps) =
 			const { data, error } = await NextApiClientService.fetchContentSummary({ proposalType, indexOrHash });
 
 			if (error) {
-				throw new Error(error.message);
+				throw new ClientError(ERROR_MESSAGES.API_FETCH_ERROR, error.message);
 			}
 
 			if (!data) {

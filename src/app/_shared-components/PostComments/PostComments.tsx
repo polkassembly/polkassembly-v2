@@ -13,7 +13,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
-import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
+import AISummaryCollapsible, { SummaryType } from '../AISummary/AISummaryCollapsible';
 
 function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
@@ -46,7 +46,7 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 					<AISummaryCollapsible
 						indexOrHash={index}
 						proposalType={proposalType}
-						isCommentsSummary
+						summaryType={SummaryType.CONTENT}
 					/>
 				</div>
 			)}

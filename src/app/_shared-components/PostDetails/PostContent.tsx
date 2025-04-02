@@ -11,20 +11,21 @@ import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
 import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
-import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
+import AISummaryCollapsible, { SummaryType } from '../AISummary/AISummaryCollapsible';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
 
 	return (
 		<div>
-			{ValidatorService.isValidIndexOrHash(postData?.index) && (
+			{(postData?.index || postData?.hash) && ValidatorService.isValidIndexOrHash(postData?.index || postData?.hash) && (
 				<AISummaryCollapsible
-					indexOrHash={String(postData?.index)}
+					indexOrHash={String(postData?.index || postData?.hash)}
 					proposalType={postData.proposalType}
-					isContentSummary
+					summaryType={SummaryType.CONTENT}
 				/>
 			)}
+
 			<MarkdownEditor
 				markdown={content}
 				readOnly
