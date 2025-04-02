@@ -46,7 +46,7 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 					<AISummaryCollapsible
 						indexOrHash={index}
 						proposalType={proposalType}
-						summaryType={SummaryType.CONTENT}
+						summaryType={SummaryType.COMMENT}
 					/>
 				</div>
 			)}
