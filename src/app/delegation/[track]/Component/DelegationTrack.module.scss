@@ -142,19 +142,19 @@
 }
 
 .aye {
-    @apply bg-success_vote_bg
+    @apply bg-success_vote_bg border-success rounded-b-md border
 }
 
 .nay {
-    @apply bg-failure_vote_bg
+    @apply bg-failure_vote_bg border-failure rounded-b-md border
 }
 
 .split {
-    @apply bg-info_bg
+    @apply bg-info_bg border-info rounded-b-md border
 }
 
 .splitAbstain {
-    @apply bg-info_bg
+    @apply bg-info_bg border-info rounded-b-md border
 }
 
 .notVoted {
