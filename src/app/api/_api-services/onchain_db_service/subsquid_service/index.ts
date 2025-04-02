@@ -55,7 +55,7 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
-			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: indexOrHash }), type_eq: proposalType })
+			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType })
 			.toPromise();
 
 		if (subsquidErr || !subsquidData) {
