@@ -18,7 +18,7 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 	return (
 		<div>
 			<AISummaryCollapsible
-				indexOrHash={String(postData?.index || postData?.hash)}
+				indexOrHash={String(postData?.index ?? postData?.hash)}
 				proposalType={postData.proposalType}
 				summaryType='content'
 			/>
