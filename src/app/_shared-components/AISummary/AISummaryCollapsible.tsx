@@ -1,7 +1,3 @@
-// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
-// This software may be modified and distributed under the terms
-// of the Apache-2.0 license. See the LICENSE file for details.
-
 'use client';
 
 import React from 'react';
@@ -20,6 +16,7 @@ export enum SummaryType {
 	CONTENT = 'content',
 	COMMENT = 'comment'
 }
+
 interface AISummaryCollapsibleProps {
 	proposalType: EProposalType;
 	indexOrHash: string;
@@ -39,7 +36,9 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 	const isContentSummary = summaryType === SummaryType.CONTENT;
 	const isCommentSummary = summaryType === SummaryType.COMMENT;
 
-	if (!(isContentSummary && data?.postSummary) && !(isCommentSummary && data?.commentsSummary)) {
+	const summaryContent = isContentSummary ? data?.postSummary : isCommentSummary ? data?.commentsSummary : null;
+
+	if (!summaryContent) {
 		return null;
 	}
 
@@ -52,21 +51,11 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
 					<Separator className='m-0 p-0' />
-					{isContentSummary && data?.postSummary && (
-						<MarkdownEditor
-							markdown={data.postSummary}
-							readOnly
-							className={`${THEME_COLORS.light.btn_primary_text} max-h-full border-none text-sm`}
-						/>
-					)}
-					{isCommentSummary && data?.commentsSummary && (
-						<MarkdownEditor
-							markdown={data.commentsSummary}
-							readOnly
-							className='mt-4 max-h-full border-none'
-							contentEditableClassName='p-0'
-						/>
-					)}
+					<MarkdownEditor
+						markdown={summaryContent}
+						readOnly
+						className={`${THEME_COLORS.light.btn_primary_text} max-h-full border-none text-sm`}
+					/>
 				</CollapsibleContent>
 			</div>
 		</Collapsible>
