@@ -33,10 +33,13 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 
 	if (error) return null;
 
-	const isContentSummary = summaryType === SummaryType.CONTENT;
-	const isCommentSummary = summaryType === SummaryType.COMMENT;
+	let summaryContent = null;
 
-	const summaryContent = isContentSummary ? data?.postSummary : isCommentSummary ? data?.commentsSummary : null;
+	if (summaryType === SummaryType.CONTENT) {
+		summaryContent = data?.postSummary;
+	} else if (summaryType === SummaryType.COMMENT) {
+		summaryContent = data?.commentsSummary;
+	}
 
 	if (!summaryContent) {
 		return null;
@@ -44,9 +47,9 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 
 	return (
 		<Collapsible className={styles.collapsibleWrapper}>
-			<div className={`${styles.collapsibleInner} ${isContentSummary ? styles.postContentGradient : styles.commentContentGradient}`}>
+			<div className={`${styles.collapsibleInner} ${summaryType === SummaryType.CONTENT ? styles.postContentGradient : styles.commentContentGradient}`}>
 				<CollapsibleTrigger className={styles.collapsibleTrigger}>
-					<span>✨ {isContentSummary ? t('aiSummary') : t('commentSummary')}</span>
+					<span>✨ {summaryType === SummaryType.CONTENT ? t('aiSummary') : t('commentSummary')}</span>
 					<ChevronDown className={styles.chevronIcon} />
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
