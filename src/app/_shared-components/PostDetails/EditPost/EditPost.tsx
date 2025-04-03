@@ -53,7 +53,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 	};
 
 	return (
-		<div className='flex w-full flex-col gap-y-4'>
+		<div className='flex flex-col gap-y-4'>
 			<div>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.title')}</p>
 				<Input
@@ -64,7 +64,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 				/>
 			</div>
 
-			<div>
+			<div className='w-full'>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.content')}</p>
 				<MarkdownEditor
 					markdown={postData?.content}

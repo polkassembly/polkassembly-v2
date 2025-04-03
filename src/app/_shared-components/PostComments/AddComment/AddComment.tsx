@@ -10,7 +10,6 @@ import { EProposalType, IComment, IPublicUser } from '@/_shared/types';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { Button } from '@ui/Button';
-import Identicon from '@polkadot/react-identicon';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
@@ -80,25 +79,16 @@ function AddComment({
 	};
 
 	return (
-		<div className={classes.commentsBox}>
-			<div className={classes.wrapper}>
-				<Identicon
-					value={user?.addresses[0]}
-					theme='polkadot'
-					size={30}
+		<div>
+			<div className='mb-2'>
+				<MarkdownEditor
+					markdown={content || ''}
+					onChange={(data) => {
+						setContent(data);
+						LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
+					}}
+					ref={markdownEditorRef}
 				/>
-				<div className={classes.editorWrapper}>
-					<div className='flex-1'>
-						<MarkdownEditor
-							markdown={content || ''}
-							onChange={(data) => {
-								setContent(data);
-								LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
-							}}
-							ref={markdownEditorRef}
-						/>
-					</div>
-				</div>
 			</div>
 
 			<div className={classes.btnWrapper}>
