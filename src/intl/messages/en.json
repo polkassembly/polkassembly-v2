@@ -402,6 +402,8 @@
 		"delete": "Delete",
 		"hideReplies": "Hide Replies",
 		"viewReplies": "View Replies",
+		"commentSummary": "Comment Summary",
+		"aiSummary": "AI Summary",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",

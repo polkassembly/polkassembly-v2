@@ -43,14 +43,20 @@ export class SubsquidService extends SubsquidUtils {
 		});
 	};
 
-	static async GetPostVoteMetrics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IVoteMetrics> {
+	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
+		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
 			? this.GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX
 			: this.GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { index_eq: index, type_eq: proposalType }).toPromise();
+		if (proposalType === EProposalType.TIP) {
+			query = this.GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH;
+		}
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType })
+			.toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post vote counts from Subsquid: ${subsquidErr}`);
@@ -100,9 +106,10 @@ export class SubsquidService extends SubsquidUtils {
 
 		const proposal = subsquidData.proposals[0];
 
-		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, index: Number(proposal.index) });
+		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
 
-		const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+		const allPeriodEnds =
+			proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 
 		return {
 			createdAt: proposal.createdAt,
@@ -183,12 +190,12 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		// fetch vote counts for each post
-		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number }) => {
-			if (!ValidatorService.isValidNumber(proposal.index)) {
-				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index for proposal');
+		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number; hash?: string }) => {
+			if (!ValidatorService.isValidNumber(proposal.index) && !proposal.hash?.startsWith?.('0x')) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
 			}
 
-			return this.GetPostVoteMetrics({ network, proposalType, index: Number(proposal.index) });
+			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
 		});
 
 		const voteMetrics = await Promise.all(voteMetricsPromises);
@@ -217,7 +224,8 @@ export class SubsquidService extends SubsquidUtils {
 				},
 				index: number
 			) => {
-				const allPeriodEnds = proposal.statusHistory ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+				const allPeriodEnds =
+					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 
 				posts.push({
 					createdAt: new Date(proposal.createdAt),
@@ -644,7 +652,7 @@ export class SubsquidService extends SubsquidUtils {
 						status: proposal.status || EProposalStatus.Unknown,
 						type: EProposalType.REFERENDUM_V2,
 						hash: proposal.hash || '',
-						voteMetrics: await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, index: Number(proposal.index) }),
+						voteMetrics: await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index || proposal.hash)! }),
 						beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 						decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 						preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,

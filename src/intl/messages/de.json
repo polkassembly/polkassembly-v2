@@ -414,7 +414,9 @@
 		"deleteCommentConfirmation": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?",
 		"delete": "Löschen",
 		"hideReplies": "Antworten ausblenden",
-		"viewReplies": "Antworten anzeigen"
+		"viewReplies": "Antworten anzeigen",
+		"commentSummary": "Kommentarzusammenfassung",
+		"aiSummary": "KI-Zusammenfassung"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",

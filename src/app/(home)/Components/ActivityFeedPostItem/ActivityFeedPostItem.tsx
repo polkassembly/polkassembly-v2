@@ -28,6 +28,9 @@ import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -77,13 +80,18 @@ function ActivityFeedPostItem({
 
 	const handleSubscribeClick = async () => {
 		try {
+			if (!ValidatorService.isValidNumber(postData?.index) && !postData?.hash) {
+				throw new ClientError(ERROR_CODES.INVALID_PARAMS_ERROR, 'Post index or hash is undefined');
+			}
+
 			const result = (await handleSubscribe()) as SubscriptionResult;
 
 			if (isInSubscriptionTab && result.wasUnsubscribed && !result.error) {
-				onUnsubscribe?.(postData?.index || postData?.hash || '');
+				onUnsubscribe?.((postData?.index ?? postData?.hash)!);
 			}
 		} catch (error) {
 			console.error('Error handling subscription:', error);
+			// TODO: add toast instead of console.error
 		}
 	};
 

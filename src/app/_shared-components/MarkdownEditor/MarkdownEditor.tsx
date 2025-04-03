@@ -71,16 +71,16 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
 	};
 
 	return (
-		<div>
+		<div className='w-full'>
 			<div
 				ref={editorRef}
-				className={cn(truncate && props.readOnly && !showMore ? 'line-clamp-4' : 'line-clamp-none')}
+				className={cn(truncate && props.readOnly && !showMore ? 'line-clamp-4' : 'line-clamp-none', 'w-full')}
 			>
 				<Editor
 					{...editorProps}
 					markdown={props.markdown || ''}
 					editorRef={ref}
-					className={cn(!props.readOnly && 'min-h-[200px] w-full rounded-md border border-border_grey', props.className)}
+					className={cn(!props.readOnly && 'min-h-[200px] rounded-md border border-border_grey', props.className)}
 					contentEditableClassName={cn(props.contentEditableClassName)}
 				/>
 			</div>

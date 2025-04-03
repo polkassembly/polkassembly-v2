@@ -414,7 +414,9 @@
 		"deleteCommentConfirmation": "您确定要删除此评论吗？",
 		"delete": "删除",
 		"hideReplies": "隐藏回复",
-		"viewReplies": "查看回复"
+		"viewReplies": "查看回复",
+		"commentSummary": "评论摘要",
+		"aiSummary": "AI 摘要"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",

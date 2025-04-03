@@ -255,6 +255,34 @@ export class SubsquidQueries {
 
 	// vote metrics queries
 
+	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH = `
+		query GetVoteMetricsByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!) {
+			noCount: votesConnection(where: {decision_eq: no, proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			yesCount: votesConnection(where: {decision_eq: yes, proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			abstainCount: votesConnection(where: {decision_eq: abstain, proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			splitCount: votesConnection(where: {decision_eq: split, proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			splitAbstainCount: votesConnection(where: {decision_eq: splitAbstain, proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+				totalCount
+			}
+			tally: proposals(where:{hash_eq: $hash_eq, type_eq: $type_eq}) {
+				tally {
+					ayes
+					bareAyes
+					nays
+					support
+				}
+			}
+		}
+	`;
+
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
 			noCount: votesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
