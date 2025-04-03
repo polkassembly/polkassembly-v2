@@ -24,96 +24,39 @@ runConfig:
 env:
   - variable: NEXT_PUBLIC_APP_ENV
     value: production
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: NEXT_PUBLIC_DEFAULT_NETWORK
     value: polkadot
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: IS_CACHE_ENABLED
     value: true
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: IS_AI_ENABLED
     value: true
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: IS_NOTIFICATION_SERVICE_ENABLED
     value: false
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: ACCESS_TOKEN_PRIVATE_KEY
     secret: access-token-private-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: ACCESS_TOKEN_PUBLIC_KEY
     secret: access-token-public-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: ACCESS_TOKEN_PASSPHRASE
     secret: access-token-passphrase
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: REFRESH_TOKEN_PRIVATE_KEY
     secret: refresh-token-private-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: REFRESH_TOKEN_PUBLIC_KEY
     secret: refresh-token-public-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: REFRESH_TOKEN_PASSPHRASE
     secret: refresh-token-passphrase
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: NOTIFICATION_ENGINE_API_KEY # TODO: update with production key
     secret: notification-engine-api-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: SUBSCAN_API_KEY
     secret: subscan-api-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: NEXT_PUBLIC_IMBB_KEY
     secret: next-public-imbb-key
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: NEXT_PUBLIC_POLKASSEMBLY_API_KEY
     secret: next-public-polkassembly-api-key
-    availability:
-      - BUILD
-      - RUNTIME
-  - variable: X_FIREBASE_SERVICE_ACC_CONFIG
+  - variable: FIREBASE_SERVICE_ACC_CONFIG
     secret: firebase-service-acc-config
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: REDIS_URL
     secret: redis-url
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: AI_SERVICE_URL
     secret: ai-service-url
-    availability:
-      - BUILD
-      - RUNTIME
   - variable: TOOLS_PASSPHRASE
     secret: tools-passphrase
-    availability:
-      - BUILD
-      - RUNTIME
