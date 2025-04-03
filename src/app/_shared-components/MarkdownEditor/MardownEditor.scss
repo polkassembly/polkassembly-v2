@@ -6,7 +6,7 @@
 	h4,
 	h5,
 	h6 {
-		@apply mb-1 mt-1 font-bold;
+		@apply mb-2 mt-1 font-bold;
 	}
 
 	h1 {
@@ -35,6 +35,10 @@
 
 	a {
 		@apply text-text_pink no-underline;
+	}
+
+	p {
+		@apply mb-4;
 	}
 
 	/* Fix blockquote styling */
@@ -84,6 +88,10 @@
 		@apply mb-0;
 	}
 
+	hr {
+		@apply my-4;
+	}
+
 	/* Custom light theme colors using theme.ts variables */
 	:global(.mdxeditor) {
 		/* Base colors using your theme variables */
@@ -113,6 +121,7 @@
 		--baseSolidHover: #243a57; /* text_primary */
 		--baseText: #243a57; /* text_primary */
 		--baseTextContrast: #243a57; /* text_primary */
+		--basePageBg: #1c1d1f; /* page_background */
 	}
 
 	/* Custom dark theme colors using theme.ts variables */
@@ -146,7 +155,7 @@
 		--baseTextContrast: #ffffff; /* allowed_commentor_text */
 
 		/* Set page background color for dark mode */
-		--basePageBg: #1c1d1f; /* page_background */
+		--basePageBg: #000; /* page_background */
 		color: var(--baseText);
 	}
 
@@ -159,9 +168,8 @@
 
 		z-index: 100;
 
-		/* Style dialog elements with theme colors */
 		[role='dialog'] {
-			background-color: var(--baseBase); /* Use theme-based background */
+			background-color: var(--baseBase);
 			border-color: var(--baseBorder);
 			color: var(--baseText);
 
@@ -169,5 +177,40 @@
 			border-radius: 8px;
 			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 		}
+	}
+}
+
+.mdxeditor-popup-container {
+	z-index: 100 !important;
+
+	[role='dialog'],
+	svg {
+		background-color: var(--baseBg);
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+		fill: var(--baseBorder);
+	}
+}
+
+.mdxeditor-select-content {
+	z-index: 100 !important;
+	[role='option'] {
+		background-color: var(--baseBg);
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+	}
+}
+
+.mdxeditor-select-trigger {
+	background-color: var(--baseBg);
+	color: var(--baseText);
+}
+
+.mdxeditor-source-editor,
+.mdxeditor-diff-editor {
+	.cm-editor {
+		background-color: var(--baseBg);
+		border-color: var(--baseBorder);
+		color: var(--baseText);
 	}
 }

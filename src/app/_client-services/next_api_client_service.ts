@@ -35,7 +35,8 @@ import {
 	IDelegationStats,
 	IDelegateDetails,
 	ITrackDelegationStats,
-	ITrackDelegationDetails
+	ITrackDelegationDetails,
+	IContentSummary
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -101,7 +102,8 @@ enum EApiRoute {
 	GET_DELEGATE_STATS = 'GET_DELEGATE_STATS',
 	FETCH_DELEGATES = 'FETCH_DELEGATES',
 	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
-	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE'
+	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE',
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
 }
 
 export class NextApiClientService {
@@ -181,8 +183,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_CONTENT_SUMMARY:
 				break;
-
 			// post routes
 			case EApiRoute.LOGOUT:
 				path = '/auth/logout';
@@ -785,5 +787,13 @@ export class NextApiClientService {
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
+	}
+
+	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_CONTENT_SUMMARY,
+			routeSegments: [proposalType, indexOrHash, 'content-summary']
+		});
+		return this.nextApiClientFetch<IContentSummary>({ url, method });
 	}
 }

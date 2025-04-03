@@ -404,7 +404,9 @@
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
 		"delete": "削除",
 		"hideReplies": "返信を非表示",
-		"viewReplies": "返信を表示"
+		"viewReplies": "返信を表示",
+		"commentSummary": "コメントの要約",
+		"aiSummary": "AIの要約"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",

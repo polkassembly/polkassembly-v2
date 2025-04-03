@@ -65,14 +65,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					{isModalOpen && !isOffchainPost && (
 						<div className='pt-5'>{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}</div>
 					)}
-					{!isModalOpen && (
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={EProposalType.REFERENDUM_V2}
-								index={index}
-							/>
-						</div>
-					)}
+					<div className={classes.commentsBox}>
+						<PostComments
+							proposalType={EProposalType.REFERENDUM_V2}
+							index={index}
+						/>
+					</div>
 				</div>
 				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>

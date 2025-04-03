@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
-    "@mdxeditor/editor": "^3.29.0",
+    "@mdxeditor/editor": "^3.29.1",
     "@metamask/eth-sig-util": "^7.0.3",
     "@paralleldrive/cuid2": "^2.2.2",
     "@polkadot/api": "^13.0.1",
