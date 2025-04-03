@@ -11,7 +11,7 @@ function setCorsHeaders(headers: Headers, origin: string) {
 	headers.set('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
 	headers.set(
 		'Access-Control-Allow-Headers',
-		'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, x-network'
+		'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, x-network, x-api-key'
 	);
 	headers.set('Access-Control-Max-Age', '86400');
 }
