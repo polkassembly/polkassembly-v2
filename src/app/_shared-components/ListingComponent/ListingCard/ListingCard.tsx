@@ -68,7 +68,7 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
 
-	const redirectUrl = getPostDetailsUrl(proposalType, index);
+	const redirectUrl = getPostDetailsUrl(proposalType, index, network);
 	return (
 		<Link
 			href={redirectUrl}
