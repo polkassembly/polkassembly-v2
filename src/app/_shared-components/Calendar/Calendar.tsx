@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ChangeEvent, ReactNode, useState } from 'react';
+import { ChangeEvent, ReactNode, useState, HTMLAttributes } from 'react';
 import { DayPicker, SelectSingleEventHandler } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,41 @@ interface CalendarProps {
 	isLoading?: boolean;
 	onMonthChange: (date: Date) => void;
 }
+
+interface DayProps {
+	day: { date: Date };
+	modifiers: unknown;
+}
+
+interface DayWrapperProps {
+	day: { date: Date };
+	renderDay: (date: Date) => ReactNode;
+}
+
+function DayComponent({ day, renderDay }: { day: { date: Date } | undefined; renderDay: (date: Date) => ReactNode }) {
+	if (!day) return <div />;
+	return renderDay(day.date);
+}
+
+function DayWrapper({ renderDay, ...props }: DayWrapperProps) {
+	return (
+		<DayComponent
+			{...props}
+			renderDay={renderDay}
+		/>
+	);
+}
+
+const CalendarDayComponent = ({ renderDay }: { renderDay: (date: Date) => ReactNode }) => {
+	return function DayRenderer(props: DayProps & HTMLAttributes<HTMLDivElement>) {
+		return (
+			<DayWrapper
+				{...props}
+				renderDay={renderDay}
+			/>
+		);
+	};
+};
 
 function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMonthChange }: CalendarProps) {
 	const t = useTranslations();
@@ -138,10 +173,7 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 						className='m-0 p-0'
 						onMonthChange={onMonthChange}
 						components={{
-							Day: ({ date }) => {
-								if (!date) return null;
-								return renderDay(date);
-							}
+							Day: CalendarDayComponent({ renderDay })
 						}}
 						month={selectedDate}
 						classNames={{
