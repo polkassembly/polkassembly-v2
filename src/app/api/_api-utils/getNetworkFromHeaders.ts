@@ -19,7 +19,9 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 
 	const headerNetwork = readonlyHeaders.get('x-network');
 	const host = readonlyHeaders.get('host');
-	const subdomain = host?.split('.')?.[0];
+	const origin = readonlyHeaders.get('origin');
+	const xForwardedHost = readonlyHeaders.get('x-forwarded-host');
+	const subdomain = host?.split('.')?.[0] || xForwardedHost?.split('.')?.[0];
 
 	const network = ValidatorService.isValidNetwork(headerNetwork as ENetwork)
 		? (headerNetwork as ENetwork)
@@ -36,9 +38,13 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 		return defaultNetwork as ENetwork;
 	}
 
+	// Special handling for Cloud Run - if x-forwarded-host exists but doesn't match origin
+	// This happens in Cloud Run/Firebase App Hosting environments
+	const isCloudRunEnvironment = host?.includes('.run.app') || host?.includes('.cloudfunctions.net') || (xForwardedHost && origin && !origin.includes(xForwardedHost));
+
 	if (!network) {
 		// if still no network found and is vercel (main deployment) link or test link, return default network
-		if (host?.includes('.app') || subdomain === 'test') {
+		if (host?.includes('.app') || subdomain === 'test' || isCloudRunEnvironment) {
 			return defaultNetwork as ENetwork;
 		}
 
