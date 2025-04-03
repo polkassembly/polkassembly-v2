@@ -2,13 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ChangeEvent, ReactNode, useState, HTMLAttributes } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { DayPicker, SelectSingleEventHandler } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
-import styles from './Calendar.module.scss';
-import LoadingLayover from '../LoadingLayover';
+import LoadingLayover from '@ui/LoadingLayover';
+import styles from './OverviewCalendar.module.scss';
 
 enum ECalendarView {
 	Month = 'month',
@@ -16,49 +16,13 @@ enum ECalendarView {
 }
 
 interface CalendarProps {
-	cellRender: (date: Date | undefined) => ReactNode;
 	selectedDate: Date;
 	setSelectedDate: (date: Date) => void;
 	isLoading?: boolean;
 	onMonthChange: (date: Date) => void;
 }
 
-interface DayProps {
-	day: { date: Date };
-	modifiers: unknown;
-}
-
-interface DayWrapperProps {
-	day: { date: Date };
-	renderDay: (date: Date) => ReactNode;
-}
-
-function DayComponent({ day, renderDay }: { day: { date: Date } | undefined; renderDay: (date: Date) => ReactNode }) {
-	if (!day) return <div />;
-	return renderDay(day.date);
-}
-
-function DayWrapper({ renderDay, ...props }: DayWrapperProps) {
-	return (
-		<DayComponent
-			{...props}
-			renderDay={renderDay}
-		/>
-	);
-}
-
-const CalendarDayComponent = ({ renderDay }: { renderDay: (date: Date) => ReactNode }) => {
-	return function DayRenderer(props: DayProps & HTMLAttributes<HTMLDivElement>) {
-		return (
-			<DayWrapper
-				{...props}
-				renderDay={renderDay}
-			/>
-		);
-	};
-};
-
-function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMonthChange }: CalendarProps) {
+function Calendar({ selectedDate, setSelectedDate, isLoading, onMonthChange }: CalendarProps) {
 	const t = useTranslations();
 	const [view, setView] = useState<ECalendarView>(ECalendarView.Month);
 
@@ -85,19 +49,9 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 		onMonthChange(newDate);
 	};
 
-	const renderDay = (date: Date) => {
-		const isSelected = date.toDateString() === selectedDate.toDateString();
-		const customContent = cellRender(date);
-
-		return (
-			<div className={cn(styles.calendar_day, isSelected && 'border-2 border-primary_border bg-bg_pink', 'cursor-pointer hover:text-white')}>{customContent || date.getDate()}</div>
-		);
-	};
 	const handleDateSelect = (date: Date) => {
 		setSelectedDate(date);
-
-		// Check if month or year has changed
-		if (date.getMonth() !== selectedDate.getMonth() || date.getFullYear() !== selectedDate.getFullYear()) {
+		if (date.getMonth() !== selectedDate?.getMonth() || date?.getFullYear() !== selectedDate?.getFullYear()) {
 			onMonthChange(date);
 		}
 	};
@@ -169,23 +123,21 @@ function Calendar({ cellRender, selectedDate, setSelectedDate, isLoading, onMont
 						selected={selectedDate}
 						onSelect={handleDateSelect as SelectSingleEventHandler}
 						showOutsideDays
-						fromYear={1900}
+						fromYear={2000}
 						className='m-0 p-0'
 						onMonthChange={onMonthChange}
-						components={{
-							Day: CalendarDayComponent({ renderDay })
-						}}
 						month={selectedDate}
 						classNames={{
 							caption_label: 'text-sm font-medium hidden',
 							nav: 'hidden',
 							table: 'w-full border-collapse',
-							head_row: 'flex gap-2 justify-between w-full',
+							head_row: 'flex flex-row gap-2 justify-between w-full',
 							head_cell: 'text-text_primary text-sm font-medium p-1',
-							row: 'flex gap-2',
+							row: 'flex flex-row gap-2',
 							cell: 'p-0',
 							day: 'w-full h-full',
 							day_today: 'font-bold',
+							selected: 'p-0 m-0 bg-bg_pink text-white rounded-full',
 							day_outside: 'text-gray-400',
 							day_disabled: 'text-text_grey cursor-not-allowed'
 						}}

@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import Calendar from '@/app/_shared-components/Calendar/Calendar';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { dateToBlockNum } from '@/_shared/_utils/dateToBlockNum';
@@ -19,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useQuery } from '@tanstack/react-query';
 import styles from '../Overview.module.scss';
+import OverviewCalendar from '../OverviewCalendar/OverviewCalendar';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 function getSinglePostLinkFromProposalType(proposalType: EProposalType): string {
@@ -129,21 +129,24 @@ export default function CalendarEvents() {
 	const getDateHasEvent = (value: Dayjs): boolean => {
 		const dateMonthKey = value.format('YYYY-MM');
 		const exactDate = value.format(DATE_FORMAT);
-		if (!eventsData[dateMonthKey]) {
+		const monthEvents = eventsData[dateMonthKey];
+		if (!monthEvents || !Array.isArray(monthEvents)) {
 			return false;
 		}
-		return eventsData[dateMonthKey].some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate);
+		return monthEvents.some((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate);
 	};
 
 	const getEventData = (value: Dayjs): ICalendarEvent[] => {
 		const dateMonthKey = value.format('YYYY-MM');
 		const exactDate = value.format(DATE_FORMAT);
-		if (!eventsData[dateMonthKey]) {
+		const monthEvents = eventsData[dateMonthKey];
+		if (!monthEvents || !Array.isArray(monthEvents)) {
 			return [];
 		}
-		return eventsData[dateMonthKey].filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate);
+		return monthEvents.filter((event) => dayjs(event.createdAt).format(DATE_FORMAT) === exactDate);
 	};
 
+	// eslint-disable-next-line
 	const dateCellRender = (value: Date | undefined) => {
 		if (!value) return null;
 		const dateValue = dayjs(value);
@@ -188,8 +191,7 @@ export default function CalendarEvents() {
 				<div>
 					<h2 className={styles.calendar_event_title}>{t('events')}</h2>
 					<div className='hidden xl:block'>
-						<Calendar
-							cellRender={dateCellRender}
+						<OverviewCalendar
 							selectedDate={selectedDate}
 							setSelectedDate={setSelectedDate}
 							isLoading={isFetching}
