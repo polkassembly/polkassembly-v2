@@ -8,7 +8,11 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { bnToInput } from '@/app/_client-utils/bnToInput';
-import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAssethubApiService } from '@/hooks/useAssethubApiService';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -20,24 +24,37 @@ function BalanceInput({
 	name,
 	disabled,
 	defaultValue,
-	multiAsset
+	multiAsset,
+	className,
+	showTreasuryBalance,
+	defaultAssetId
 }: {
-	label: string;
+	label?: string;
 	placeholder?: string;
 	onChange?: ({ value, assetId }: { value: BN; assetId: string | null }) => void;
 	name?: string;
 	disabled?: boolean;
 	defaultValue?: BN;
+	defaultAssetId?: string | null;
 	multiAsset?: boolean;
+	className?: string;
+	showTreasuryBalance?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const [error, setError] = useState('');
 
+	const { apiService } = usePolkadotApiService();
+	const { assethubApiService } = useAssethubApiService();
+
+	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
+
 	const networkDetails = NETWORKS_DETAILS[`${network}`];
 	const { supportedAssets } = networkDetails;
 
 	const [assetId, setAssetId] = useState<string | null>(null);
+	const [treasuryBalance, setTreasuryBalance] = useState<{ [key: string]: BN } | null>(null);
+	const [nativeTreasuryBalance, setNativeTreasuryBalance] = useState<BN | null>(null);
 
 	const assetOptions = Object.values(supportedAssets).map((asset) => ({
 		label: asset.symbol,
@@ -46,32 +63,51 @@ function BalanceInput({
 
 	const [valueString, setValueString] = useState('');
 
-	const onBalanceChange = (value: string | null): void => {
-		const { bnValue, isValid } = inputToBn(value || '', network, false, assetId);
+	const onBalanceChange = (value: string | null, id?: string | null): void => {
+		const { bnValue, isValid } = inputToBn(value || '', network, false, id || assetId);
 
-		if (isValid) {
+		if (isValid && ValidatorService.isValidNumber(value)) {
 			setError('');
-			onChange?.({ value: bnValue, assetId });
+			onChange?.({ value: bnValue, assetId: id || assetId });
 		} else {
 			setError('Invalid Amount');
-			onChange?.({ value: BN_ZERO, assetId });
+			onChange?.({ value: BN_ZERO, assetId: id || assetId });
 		}
 	};
 
 	useEffect(() => {
-		if (!defaultValue) return;
+		if (!defaultValue || defaultValue.isZero()) return;
 
-		setValueString(bnToInput(defaultValue, network));
+		setValueString(bnToInput(defaultValue, network, defaultAssetId));
+		setAssetId(defaultAssetId || null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [defaultValue]);
+	}, [network]);
+
+	useEffect(() => {
+		const fetchTreasuryBalance = async () => {
+			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
+			const balances = await assethubApiService?.getAssethubTreasuryAssetsBalance();
+			setTreasuryBalance(balances);
+		};
+		fetchTreasuryBalance();
+	}, [assethubApiService, showTreasuryBalance, multiAsset]);
+
+	useEffect(() => {
+		const fetchNativeTreasuryBalance = async () => {
+			if (!showTreasuryBalance || !apiService || multiAsset) return;
+			const balance = await apiService?.getNativeTreasuryBalance();
+			setNativeTreasuryBalance(balance);
+		};
+		fetchNativeTreasuryBalance();
+	}, [showTreasuryBalance, multiAsset, apiService]);
 
 	return (
 		<div className='min-w-[200px]'>
-			<p className={classes.label}>{label}</p>
+			{label && <p className={classes.label}>{label}</p>}
 			<div className='relative'>
 				<Input
-					className='w-full'
-					placeholder={placeholder || t('BalanceInput.addBalance')}
+					className={cn('w-full', className)}
+					placeholder={placeholder || t('BalanceInput.enterAmount')}
 					onChange={(e) => {
 						onBalanceChange(e.target.value);
 						setValueString(e.target.value);
@@ -84,14 +120,13 @@ function BalanceInput({
 				{assetOptions.length === 0 || !multiAsset ? (
 					<div className={classes.tokenSymbol}>{NETWORKS_DETAILS[`${network}`].tokenSymbol}</div>
 				) : (
-					<div className={classes.tokenSymbol}>
+					<div>
 						<DropdownMenu>
 							<DropdownMenuTrigger
 								disabled={disabled}
-								className='flex w-full items-center gap-x-2'
+								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white'
 							>
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
-								<ChevronDown className='text-xs text-white' />
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
 								{[{ label: networkDetails.tokenSymbol, value: null }, ...assetOptions].map((option) => (
@@ -99,8 +134,7 @@ function BalanceInput({
 										key={option.value}
 										onClick={() => {
 											setAssetId(option.value);
-											onBalanceChange(null);
-											setValueString('');
+											onBalanceChange(valueString, option.value);
 										}}
 									>
 										{option.label}
@@ -110,6 +144,34 @@ function BalanceInput({
 						</DropdownMenu>
 					</div>
 				)}
+				{showTreasuryBalance ? (
+					multiAsset && treasuryBalance ? (
+						<div className='absolute right-0 my-1 flex items-center gap-x-1 text-xs text-wallet_btn_text'>
+							<p>{t('BalanceInput.treasuryBalance')}:</p>
+							<p className='flex items-center gap-x-1 text-text_pink'>
+								{formatter.format(
+									Number(
+										formatBnBalance(
+											assetId ? treasuryBalance[`${assetId}`].toString() : treasuryBalance[`${networkDetails.tokenSymbol}`].toString(),
+											{ withThousandDelimitor: false },
+											network,
+											assetId
+										)
+									)
+								)}
+								<span>{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}</span>
+							</p>
+						</div>
+					) : nativeTreasuryBalance && !nativeTreasuryBalance.isZero() ? (
+						<div className='absolute right-0 my-1 flex items-center gap-x-1 text-xs text-wallet_btn_text'>
+							<p>{t('BalanceInput.treasuryBalance')}:</p>
+							<p className='flex items-center gap-x-1 text-text_pink'>
+								{formatter.format(Number(formatBnBalance(nativeTreasuryBalance?.toString() || '0', { withThousandDelimitor: false }, network)))}
+								<span>{networkDetails.tokenSymbol}</span>
+							</p>
+						</div>
+					) : null
+				) : null}
 				{error && !disabled && <p className='absolute left-0 my-1 text-sm text-failure'>{error}</p>}
 			</div>
 		</div>

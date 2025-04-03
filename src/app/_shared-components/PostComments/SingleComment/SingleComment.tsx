@@ -176,30 +176,35 @@ function SingleComment({
 						>
 							{t('PostDetails.reply')}
 						</Button>
-						{comment.userId === user.id && (
-							<DropdownMenu>
-								<DropdownMenuTrigger>
-									<Ellipsis
-										className='text-text_primary/[0.8]'
-										size={14}
-									/>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent>
-									<DropdownMenuItem>
-										<Button
-											variant='ghost'
-											className='p-0 text-sm text-text_primary'
-											disabled={comment.userId !== user.id}
-											onClick={() => setOpenDeleteModal(true)}
-											size='sm'
-											isLoading={loading}
-										>
-											{t('PostDetails.delete')}
-										</Button>
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						)}
+						<div>
+							{comment.userId === user.id && (
+								<DropdownMenu>
+									<DropdownMenuTrigger
+										noArrow
+										className='border-none'
+									>
+										<Ellipsis
+											className='text-text_primary/[0.8]'
+											size={14}
+										/>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent>
+										<DropdownMenuItem>
+											<Button
+												variant='ghost'
+												className='p-0 text-sm text-text_primary'
+												disabled={comment.userId !== user.id}
+												onClick={() => setOpenDeleteModal(true)}
+												size='sm'
+												isLoading={loading}
+											>
+												{t('PostDetails.delete')}
+											</Button>
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
+						</div>
 					</div>
 				)}
 

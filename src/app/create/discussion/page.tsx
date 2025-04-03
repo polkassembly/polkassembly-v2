@@ -3,12 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import CreateDiscussionComponent from '@/app/create/discussion/Component/CreateDiscussion/CreateDiscussion';
-import classes from './Component/CreateDiscussion/CreateDiscussion.module.scss';
 
 async function Discussion() {
 	return (
-		<div className={classes.rootClass}>
-			<div className={classes.createDiscussionComp}>
+		<div className='flex h-full w-full items-start justify-center p-8 sm:p-20'>
+			<div className='mx-auto w-full max-w-screen-lg rounded-lg bg-bg_modal p-6 shadow-lg'>
 				<CreateDiscussionComponent />
 			</div>
 		</div>

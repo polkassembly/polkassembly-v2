@@ -24,10 +24,7 @@ function Bool({ onChange }: { onChange: (value: boolean) => void }) {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger
-				asChild
-				className='w-full rounded border border-border_grey px-4 py-2'
-			>
+			<DropdownMenuTrigger>
 				<div>{current ? t('CreatePreimage.yes') : t('CreatePreimage.no')}</div>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>

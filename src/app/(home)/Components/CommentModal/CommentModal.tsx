@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import React, { useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import Image from 'next/image';
@@ -70,7 +72,7 @@ function CommentModal({
 				onOpenChange={setIsDialogOpen}
 			>
 				<DialogTitle>
-					<DialogContent className='max-w-xl pb-4 pt-3 lg:max-w-2xl'>
+					<DialogContent className='max-w-max pb-4 pt-3'>
 						<DialogHeader className='px-4'>
 							<div className='flex items-start gap-4 text-xs text-btn_secondary_text'>
 								<div className='flex w-10 flex-col gap-5'>
@@ -109,7 +111,7 @@ function CommentModal({
 										#{postData.index} <span className='font-semibold'>{postData.title?.slice(0, 80).concat('...')}</span>
 									</span>
 									<span className='text-xs text-text_pink'>{t('ActivityFeed.PostItem.commentingOnProposal')}</span>
-									<div className='w-full pt-5'>
+									<div className='max-w-lg pt-5 lg:max-w-xl'>
 										<MarkdownEditor
 											markdown={content || ''}
 											onChange={(data) => {

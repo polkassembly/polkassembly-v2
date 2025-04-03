@@ -33,7 +33,8 @@ import {
 	ICalendarEvent,
 	IVoteCartItem,
 	EConvictionAmount,
-	ITreasuryStats
+	ITreasuryStats,
+	IContentSummary
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -95,7 +96,8 @@ enum EApiRoute {
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
-	GET_TREASURY_STATS = 'GET_TREASURY_STATS'
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
 }
 
 export class NextApiClientService {
@@ -172,8 +174,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_CONTENT_SUMMARY:
 				break;
-
 			// post routes
 			case EApiRoute.LOGOUT:
 				path = '/auth/logout';
@@ -764,5 +766,13 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
 		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
+	}
+
+	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_CONTENT_SUMMARY,
+			routeSegments: [proposalType, indexOrHash, 'content-summary']
+		});
+		return this.nextApiClientFetch<IContentSummary>({ url, method });
 	}
 }

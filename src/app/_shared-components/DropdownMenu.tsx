@@ -6,13 +6,11 @@
 
 import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { Check, ChevronRight, Circle } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Circle } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
-
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
@@ -43,6 +41,23 @@ const DropdownMenuSubTrigger = React.forwardRef<
 ));
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
 
+const DropdownMenuTrigger = React.forwardRef<
+	React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+	React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger> & { noArrow?: boolean }
+>(({ className, children, noArrow, ...props }, ref) => (
+	<DropdownMenuPrimitive.Trigger
+		ref={ref}
+		className={cn('w-full cursor-pointer gap-x-2 rounded-lg border border-border_grey px-4 py-3 text-sm font-medium capitalize text-placeholder', className)}
+		{...props}
+	>
+		<div className='flex w-full items-center justify-between gap-x-2'>
+			{children}
+			{!noArrow && <ChevronDown className='h-4 w-4' />}
+		</div>
+	</DropdownMenuPrimitive.Trigger>
+));
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName;
+
 const DropdownMenuSubContent = React.forwardRef<React.ElementRef<typeof DropdownMenuPrimitive.SubContent>, React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>>(
 	({ className, ...props }, ref) => (
 		<DropdownMenuPrimitive.SubContent
@@ -64,7 +79,7 @@ const DropdownMenuContent = React.forwardRef<React.ElementRef<typeof DropdownMen
 				ref={ref}
 				sideOffset={sideOffset}
 				className={cn(
-					'z-50 max-h-[300px] w-[--radix-dropdown-menu-trigger-width] overflow-hidden overflow-y-auto rounded-md border-0 bg-bg_modal p-1 text-popover-foreground shadow-md',
+					'z-50 max-h-[300px] w-[--radix-dropdown-menu-trigger-width] min-w-min overflow-hidden overflow-y-auto rounded-md border-0 bg-bg_modal p-1 text-popover-foreground shadow-md',
 					'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
 					className
 				)}

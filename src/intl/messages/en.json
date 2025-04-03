@@ -393,6 +393,8 @@
 		"delete": "Delete",
 		"hideReplies": "Hide Replies",
 		"viewReplies": "View Replies",
+		"commentSummary": "Comment Summary",
+		"aiSummary": "AI Summary",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -497,7 +499,8 @@
 		"previous": "Previous"
 	},
 	"BalanceInput": {
-		"addBalance": "Add Balance"
+		"enterAmount": "Enter Amount",
+		"treasuryBalance": "Treasury Balance"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Choose your Vote",
@@ -581,7 +584,10 @@
 			"root": "Root",
 			"stakingadmin": "Staking Admin",
 			"treasury": "Treasury",
-			"fellowship": "Fellowship"
+			"fellowship": "Fellowship",
+			"council": "Council",
+			"democracy": "Democracy",
+			"whitelist": "Whitelist"
 		},
 		"please": "Please",
 		"login": "Login",
@@ -703,16 +709,30 @@
 		"proposals": "Proposals"
 	},
 	"CreateProposal": {
-		"createPreimage": "Create Preimage",
-		"existingPreimage": "Already have a Preimage",
-		"createTreasuryProposal": "Create Treasury Proposal (Native)",
-		"usdxProposal": "Create USDx Treasury Proposal (Assethub)",
+		"create": "Create",
+		"quickActions": "Quick Actions",
+		"submitProposal": "Submit Proposal",
+		"createDiscussion": "Discussion Post",
+		"createPreimage": "New Preimage",
+		"existingPreimage": "I already have a Preimage",
+		"spend": "Spend",
+		"from": "from",
+		"Treasury": "Treasury",
+		"usdxProposal": "Spend Assets from AssetHub (USDx, DOT, etc.)",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
+		"createDiscussionDescription": "Start a conversation and gather feedback.",
+		"createPreimageDescription": "Submit a proposal with a new preimage hash.",
+		"existingPreimageDescription": "Use an existing preimage hash for submission.",
+		"createTreasuryProposalDescription": "Propose treasury spending in",
+		"usdxProposalDescription": "Request funding from AssetHub (USDx, DOT, etc.).",
+		"cancelReferendumDescription": "Propose to cancel an active referendum.",
+		"killReferendumDescription": "Terminate a referendum before it passes.",
 		"goBack": "Go Back",
 		"preimageHash": "Preimage Hash",
-		"preimageLength": "Preimage Length",
-		"preimageHashDescription": "Enter the preimage hash to create a proposal"
+		"preimageLength": "Length",
+		"preimageHashDescription": "Enter Hash",
+		"viewPreimage": "View Preimage"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -735,8 +755,8 @@
 		"enterFutureBlockHeight": "Please enter a future block height"
 	},
 	"CreatePreimage": {
-		"addItem": "Add Item",
-		"removeItem": "Remove Item",
+		"addItem": "Add Beneficiary/Payouts",
+		"removeItem": "Remove Payout",
 		"yes": "Yes",
 		"no": "No",
 		"uploadFile": "Upload File",
@@ -746,19 +766,28 @@
 		"preimageNotedSuccessfully": "Preimage noted successfully",
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageHash": "Preimage Hash",
-		"length": "Length"
+		"length": "Length",
+		"beneficiary": "Beneficiary",
+		"noBeneficiarySelected": "No Beneficiary Selected",
+		"on": "on"
 	},
 	"KillCancelReferendum": {
-		"referendumId": "Referendum ID",
-		"referendumIdDescription": "Enter the referendum ID to cancel",
-		"thisReferendumIsNotOngoing": "This Referendum is not ongoing"
+		"referendumId": "Enter Referendum Index",
+		"referendumIdDescription": "Type Here",
+		"thisReferendumIsNotOngoing": "Warning!  Not an Ongoing Referendum",
+		"viewReferendum": "View Proposal"
 	},
 	"AddressInput": {
 		"invalidAddress": "Invalid Address",
 		"noResultsFound": "No results found",
-		"placeholder": "Enter Address"
+		"placeholder": "Select/Enter Address"
 	},
 	"errorMessages": {
 		"valueTooLarge": "Value is too large"
+	},
+	"TxFees": {
+		"preimageDeposit": "Preimage Deposit",
+		"submissionDeposit": "Submission Deposit",
+		"gasFees": "Gas Fees"
 	}
 }

@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
+import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
@@ -539,6 +540,14 @@ export class PolkadotApiService {
 		return Number(status.value?.len);
 	}
 
+	getNotePreimageTx({ extrinsicFn }: { extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult> | null }) {
+		if (!this.api || !extrinsicFn) {
+			return null;
+		}
+		const encodedTx = extrinsicFn.method.toHex();
+		return this.api.tx.preimage.notePreimage(encodedTx);
+	}
+
 	async notePreimage({
 		address,
 		extrinsicFn,
@@ -554,8 +563,11 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const encodedTx = extrinsicFn.method.toHex();
-		const notePreimageTx = this.api.tx.preimage.notePreimage(encodedTx);
+		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn });
+		if (!notePreimageTx) {
+			onFailed?.();
+			return;
+		}
 		await this.executeTx({
 			tx: notePreimageTx,
 			address,
@@ -568,6 +580,29 @@ export class PolkadotApiService {
 				onFailed?.();
 			}
 		});
+	}
+
+	getSubmitProposalTx({
+		track,
+		preimageHash,
+		preimageLength,
+		enactment,
+		enactmentValue
+	}: {
+		track: EPostOrigin;
+		preimageHash: string;
+		preimageLength: number;
+		enactment: EEnactment;
+		enactmentValue: BN;
+	}) {
+		if (!this.api || !track || !preimageHash || !preimageLength || !enactmentValue) {
+			return null;
+		}
+		return this.api.tx.referenda.submit(
+			{ Origins: track },
+			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
+			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
+		);
 	}
 
 	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
@@ -691,7 +726,7 @@ export class PolkadotApiService {
 		return this.api.tx.referenda.kill(referendumId);
 	}
 
-	async createTreasuryProposal({
+	async createProposal({
 		address,
 		track,
 		preimageHash,
@@ -702,7 +737,7 @@ export class PolkadotApiService {
 		onFailed
 	}: {
 		address: string;
-		track: string;
+		track: EPostOrigin;
 		preimageHash: string;
 		preimageLength: number;
 		enactment: EEnactment;
@@ -722,11 +757,11 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const tx = this.api.tx.referenda.submit(
-			{ Origins: track },
-			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
-			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
-		);
+		const tx = this.getSubmitProposalTx({ track, preimageHash, preimageLength, enactment, enactmentValue });
+		if (!tx) {
+			onFailed?.();
+			return;
+		}
 
 		const postId = Number(await this.api.query.referenda.referendumCount());
 		await this.executeTx({
@@ -752,5 +787,19 @@ export class PolkadotApiService {
 			return null;
 		}
 		return this.api.derive.chain.bestNumber();
+	}
+
+	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
+		if (!this.api) {
+			return null;
+		}
+		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx && tx.paymentInfo(address)));
+		return fees.reduce((acc, fee) => acc.add(new BN(fee?.partialFee || BN_ZERO)), BN_ZERO);
+	}
+
+	async getNativeTreasuryBalance(): Promise<BN> {
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
+		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
 	}
 }

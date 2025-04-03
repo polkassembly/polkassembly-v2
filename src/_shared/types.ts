@@ -464,6 +464,7 @@ export interface IBeneficiary {
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
+	id?: string;
 	isInvalid?: boolean;
 }
 
@@ -906,8 +907,8 @@ export interface ICallState {
 }
 
 export enum EEnactment {
-	At_Block_No = 'at_block_number',
-	After_No_Of_Blocks = 'after_no_of_Blocks'
+	After_No_Of_Blocks = 'after_no_of_Blocks',
+	At_Block_No = 'at_block_number'
 }
 
 export interface IWritePostFormFields {
@@ -975,4 +976,78 @@ export interface ITreasuryStats {
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
+}
+
+export enum EProposalStep {
+	CREATE_PREIMAGE = 'CREATE_PREIMAGE',
+	EXISTING_PREIMAGE = 'EXISTING_PREIMAGE',
+	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
+	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
+	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
+}
+
+export interface IDelegationStats {
+	totalDelegatedTokens: string;
+	totalDelegatedVotes: number;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export enum EDelegateSource {
+	W3F = 'w3f',
+	NOVA = 'nova',
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly',
+	INDIVIDUAL = 'individual'
+}
+
+export interface IDelegate {
+	id?: string;
+	network: ENetwork;
+	address: string;
+	sources: EDelegateSource[];
+	image?: string; // if available, otherwise use the image from the public user
+	manifesto?: string; // markdown
+	name?: string; // name of the delegate available via some third party sources
+	createdAt?: Date; // not available for w3f, nova and parity
+	updatedAt?: Date; // not available for w3f, nova and parity
+}
+
+export interface IDelegateDetails extends IDelegate {
+	publicUser?: IPublicUser;
+	votingPower: string;
+	receivedDelegationsCount: number;
+	last30DaysVotedProposalsCount: number;
+}
+
+export enum EDelegationStatus {
+	RECEIVED = 'received',
+	DELEGATED = 'delegated',
+	UNDELEGATED = 'undelegated'
+}
+
+export interface ITrackDelegationStats {
+	trackId: number;
+	status: EDelegationStatus;
+	activeProposalsCount: number;
+}
+
+export interface IPostWithDelegateVote extends IPostListing {
+	delegateVote?: IVoteData;
+}
+
+interface ITrackDelegation {
+	address: string;
+	balance: string;
+	createdAt: Date;
+	lockPeriod: number;
+	endsAt: Date;
+}
+
+export interface ITrackDelegationDetails {
+	receivedDelegations?: ITrackDelegation[];
+	delegatedTo?: ITrackDelegation[];
+	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
+	status: EDelegationStatus;
 }

@@ -33,15 +33,17 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 					{t('EditPost.editPostButton')}
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='max-w-3xl p-6'>
+			<DialogContent className='max-w-max p-6'>
 				<DialogHeader>
 					<DialogTitle>{t('EditPost.edit')}</DialogTitle>
 				</DialogHeader>
-				<EditPost
-					postData={postData}
-					onEditPostSuccess={onEditPostSuccess}
-					onClose={() => setIsOpen(false)}
-				/>
+				<div className='max-w-3xl'>
+					<EditPost
+						postData={postData}
+						onEditPostSuccess={onEditPostSuccess}
+						onClose={() => setIsOpen(false)}
+					/>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

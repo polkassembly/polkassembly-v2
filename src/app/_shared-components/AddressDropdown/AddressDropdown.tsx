@@ -87,7 +87,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 				</div>
 				<DropdownMenuTrigger
 					disabled={disabled}
-					className={classes.dropdownTrigger}
+					className='normal-case'
 				>
 					<Address
 						address={userPreferences?.address?.address || ''}

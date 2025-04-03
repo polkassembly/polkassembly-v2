@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import { MDXEditorMethods } from '@mdxeditor/editor';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
@@ -26,7 +27,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 		if (
 			!title.trim() ||
 			!content ||
-			!postData?.index ||
+			!ValidatorService.isValidNumber(postData?.index) ||
 			!postData?.proposalType ||
 			!user ||
 			!user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')
@@ -39,20 +40,20 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 		const { data, error } = await NextApiClientService.editProposalDetails({
 			proposalType: postData.proposalType,
-			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
+			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index!.toString(),
 			data: { title, content }
 		});
 
 		if (!error && data) {
 			onEditPostSuccess?.(title, content);
-			LocalStorageClientService.deleteEditPostData({ postId: postData.index.toString() });
+			LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
 			onClose?.();
 		}
 		setIsLoading(false);
 	};
 
 	return (
-		<div className='flex w-full flex-col gap-y-4'>
+		<div className='flex flex-col gap-y-4'>
 			<div>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.title')}</p>
 				<Input
@@ -63,7 +64,7 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 				/>
 			</div>
 
-			<div>
+			<div className='w-full'>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.content')}</p>
 				<MarkdownEditor
 					markdown={postData?.content}
