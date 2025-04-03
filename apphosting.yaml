@@ -1,0 +1,62 @@
+# Settings for Backend (on Cloud Run).
+# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
+runConfig:
+  minInstances: 0
+  # maxInstances: 100
+  # concurrency: 80
+  # cpu: 1
+  # memoryMiB: 512
+
+  # Environment variables and secrets.
+  # env:
+  # Configure environment variables.
+  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
+  # - variable: MESSAGE
+  #   value: Hello world!
+  #   availability:
+  #     - BUILD
+  #     - RUNTIME
+
+  # Grant access to secrets in Cloud Secret Manager.
+  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
+  # - variable: MY_SECRET
+  #   secret: mySecretRef
+env:
+  - variable: NEXT_PUBLIC_APP_ENV
+    value: production
+  - variable: NEXT_PUBLIC_DEFAULT_NETWORK
+    value: polkadot
+  - variable: IS_CACHE_ENABLED
+    value: true
+  - variable: IS_AI_ENABLED
+    value: true
+  - variable: IS_NOTIFICATION_SERVICE_ENABLED
+    value: false
+  - variable: ACCESS_TOKEN_PRIVATE_KEY
+    secret: access-token-private-key
+  - variable: ACCESS_TOKEN_PUBLIC_KEY
+    secret: access-token-public-key
+  - variable: ACCESS_TOKEN_PASSPHRASE
+    secret: access-token-passphrase
+  - variable: REFRESH_TOKEN_PRIVATE_KEY
+    secret: refresh-token-private-key
+  - variable: REFRESH_TOKEN_PUBLIC_KEY
+    secret: refresh-token-public-key
+  - variable: REFRESH_TOKEN_PASSPHRASE
+    secret: refresh-token-passphrase
+  - variable: NOTIFICATION_ENGINE_API_KEY # TODO: update with production key
+    secret: notification-engine-api-key
+  - variable: SUBSCAN_API_KEY
+    secret: subscan-api-key
+  - variable: NEXT_PUBLIC_IMBB_KEY
+    secret: next-public-imbb-key
+  - variable: NEXT_PUBLIC_POLKASSEMBLY_API_KEY
+    secret: next-public-polkassembly-api-key
+  - variable: X_FIREBASE_SERVICE_ACC_CONFIG
+    secret: firebase-service-acc-config
+  - variable: REDIS_URL
+    secret: redis-url
+  - variable: AI_SERVICE_URL
+    secret: ai-service-url
+  - variable: TOOLS_PASSPHRASE
+    secret: tools-passphrase
