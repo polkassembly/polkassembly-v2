@@ -7,6 +7,17 @@ const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	rewrites: async () => ({
+		beforeFiles: [
+			{
+				source: '/_next/static/chunks/app/@:routeGroup/:path*',
+				destination: '/_next/static/chunks/app/%40:routeGroup/:path*'
+			}
+			// more parrallel rewrites
+		],
+		afterFiles: [],
+		fallback: []
+	}),
 	async headers() {
 		return [
 			{
