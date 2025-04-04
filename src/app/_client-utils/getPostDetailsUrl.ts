@@ -4,7 +4,13 @@
 
 import { EProposalType } from '@/_shared/types';
 
-export const getPostDetailsUrl = (proposalType: EProposalType, proposalId: number, network: string) => {
+interface PostDetailsParams {
+	proposalType: EProposalType;
+	proposalId: number;
+	network: string;
+}
+
+export const getPostDetailsUrl = ({ proposalType, proposalId, network }: PostDetailsParams) => {
 	// eslint-disable-next-line sonarjs/no-small-switch
 	switch (proposalType) {
 		case EProposalType.DEMOCRACY_PROPOSAL:
