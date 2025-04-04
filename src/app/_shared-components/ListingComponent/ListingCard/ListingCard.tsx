@@ -70,15 +70,19 @@ function ListingCard({
 	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
 
 	const redirectUrl = getPostDetailsUrl({ proposalType, proposalId: index, network });
+
 	return (
 		<Link
 			href={redirectUrl}
 			className='w-full'
-			target={ARCHIVE_PROPOSAL_TYPES.includes(proposalType) ? '_blank' : undefined}
 			onClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
-				redirectFromServer(redirectUrl);
+				if (ARCHIVE_PROPOSAL_TYPES.includes(proposalType)) {
+					window.open(redirectUrl, '_blank');
+				} else {
+					redirectFromServer(redirectUrl);
+				}
 			}}
 		>
 			<div className={`${styles.listingCard} ${backgroundColor}`}>
