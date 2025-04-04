@@ -76,7 +76,7 @@
     "lucide-react": "^0.465.0",
     "marked": "^15.0.6",
     "multiformats": "^13.3.2",
-    "next": "^15.2.3",
+    "next": "^15.2.4",
     "next-intl": "^3.26.1",
     "next-themes": "^0.3.0",
     "nextjs-toploader": "^3.8.16",
