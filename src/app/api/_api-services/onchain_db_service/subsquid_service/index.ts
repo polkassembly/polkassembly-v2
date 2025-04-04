@@ -305,6 +305,14 @@ export class SubsquidService extends SubsquidUtils {
 				selfVotingPower?: string;
 				totalVotingPower?: string;
 				delegatedVotingPower?: string;
+				delegatedVotes?: {
+					voter: string;
+					votingPower: string;
+					createdAt: string;
+					lockPeriod: number;
+					balance: { value?: string; aye?: string; nay?: string; abstain?: string };
+					decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+				}[];
 			}) => ({
 				balanceValue: vote.decision === 'abstain' ? vote.balance.abstain || '0' : vote.balance.value || '0',
 				decision: vote.decision === 'yes' ? EVoteDecision.AYE : vote.decision === 'no' ? EVoteDecision.NAY : (vote.decision as EVoteDecision),
@@ -313,7 +321,15 @@ export class SubsquidService extends SubsquidUtils {
 				voterAddress: vote.voter,
 				selfVotingPower: vote.selfVotingPower,
 				totalVotingPower: vote.totalVotingPower,
-				delegatedVotingPower: vote.delegatedVotingPower
+				delegatedVotingPower: vote.delegatedVotingPower,
+				delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
+					voterAddress: delegatedVote.voter,
+					totalVotingPower: delegatedVote.votingPower,
+					createdAt: new Date(delegatedVote.createdAt),
+					lockPeriod: delegatedVote.lockPeriod,
+					balanceValue: delegatedVote.decision === 'abstain' ? delegatedVote.balance.abstain || '0' : delegatedVote.balance.value || '0',
+					decision: delegatedVote.decision === 'yes' ? EVoteDecision.AYE : delegatedVote.decision === 'no' ? EVoteDecision.NAY : (delegatedVote.decision as EVoteDecision)
+				}))
 			})
 		);
 
