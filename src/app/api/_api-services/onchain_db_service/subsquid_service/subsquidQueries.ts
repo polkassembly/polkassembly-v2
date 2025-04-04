@@ -369,7 +369,7 @@ export class SubsquidQueries {
 
 	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
-			votes:convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -388,6 +388,17 @@ export class SubsquidQueries {
 				selfVotingPower
 				totalVotingPower
 				delegatedVotingPower
+				delegatedVotes {
+					balance {
+						... on StandardVoteBalance {
+							value
+						}
+					}
+					createdAt
+					voter
+					votingPower
+					lockPeriod
+				}
 			}
 			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
@@ -467,6 +478,17 @@ export class SubsquidQueries {
 				selfVotingPower
 				totalVotingPower
 				delegatedVotingPower
+				delegatedVotes {
+					voter
+					votingPower
+					createdAt
+					lockPeriod
+					balance {
+						... on StandardVoteBalance {
+							value
+						}
+					}
+				}
 			}
 			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: $decision_eq}, orderBy: id_ASC) {
 				totalCount
