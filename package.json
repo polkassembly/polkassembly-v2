@@ -11,7 +11,8 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --check --ignore-path .gitignore .",
-    "format:fix": "prettier --write --ignore-path .gitignore ."
+    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "prepare": "husky"
   },
   "engines": {
     "node": "22"
@@ -139,11 +140,6 @@
     "**/*.(md|css|scss|html)": [
       "yarn prettier --write"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "resolutions": {
     "@types/react": "npm:types-react@19.0.0-rc.1",
