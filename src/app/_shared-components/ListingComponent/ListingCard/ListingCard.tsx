@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -68,11 +69,12 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
 
-	const redirectUrl = getPostDetailsUrl(proposalType, index, network);
+	const redirectUrl = getPostDetailsUrl({ proposalType, proposalId: index, network });
 	return (
 		<Link
 			href={redirectUrl}
 			className='w-full'
+			target={ARCHIVE_PROPOSAL_TYPES.includes(proposalType) ? '_blank' : undefined}
 			onClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();

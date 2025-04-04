@@ -8,7 +8,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 
-async function ReferendaPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
+async function TipsPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
 	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
@@ -29,4 +29,4 @@ async function ReferendaPage({ searchParams }: { searchParams: Promise<{ page?: 
 	);
 }
 
-export default ReferendaPage;
+export default TipsPage;
