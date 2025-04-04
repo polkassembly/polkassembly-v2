@@ -10,13 +10,15 @@ import { EAllowedCommentor, ENetwork, EProposalType } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { updatePostServer } from '../../_api-utils/updatePostServer';
+import { RedisService } from '../redis_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
 }
 
 enum EWebhookEvent {
-	POST_EDITED = 'post_edited'
+	POST_EDITED = 'post_edited',
+	PROPOSAL_STATUS_CHANGED = 'proposal_status_changed'
 }
 
 export class WebhookService {
@@ -32,6 +34,10 @@ export class WebhookService {
 			content: z.string().min(1, 'Content is required'),
 			authorId: z.number().refine((authorId) => ValidatorService.isValidUserId(authorId), 'Not a valid author ID'),
 			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
+		}),
+		[EWebhookEvent.PROPOSAL_STATUS_CHANGED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), 'Not a valid index or hash'),
+			proposalType: z.nativeEnum(EProposalType)
 		})
 	} as const;
 
@@ -42,7 +48,9 @@ export class WebhookService {
 		// eslint-disable-next-line sonarjs/no-small-switch
 		switch (webhookEvent) {
 			case EWebhookEvent.POST_EDITED:
-				return this.handlePostEdited({ network, params });
+				return this.handlePostEdited({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> });
+			case EWebhookEvent.PROPOSAL_STATUS_CHANGED:
+				return this.handleProposalStatusChanged({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_CHANGED]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -52,5 +60,22 @@ export class WebhookService {
 		const { indexOrHash, content, authorId, proposalType, title, allowedCommentor } = params;
 
 		await updatePostServer({ network, proposalType, indexOrHash, content, title, allowedCommentor, userId: authorId });
+	}
+
+	private static async handleProposalStatusChanged({
+		network,
+		params
+	}: {
+		network: ENetwork;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_CHANGED]>;
+	}) {
+		const { indexOrHash, proposalType } = params;
+
+		// Invalidate caches
+		await RedisService.DeletePostData({ network, proposalType, indexOrHash });
+		await RedisService.DeletePostsListing({ network, proposalType });
+		await RedisService.DeleteActivityFeed({ network });
+		await RedisService.DeleteAllSubscriptionFeedsForNetwork(network);
+		await RedisService.DeleteDelegationStats(network);
 	}
 }

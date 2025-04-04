@@ -53,4 +53,7 @@ export async function updatePostServer({
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash });
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
+	await RedisService.DeleteAllSubscriptionFeedsForNetwork(network);
+	await RedisService.DeleteDelegationStats(network);
 }
