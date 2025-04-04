@@ -393,11 +393,17 @@ export class SubsquidQueries {
 						... on StandardVoteBalance {
 							value
 						}
+						... on SplitVoteBalance {
+							aye
+							nay
+							abstain
+						}
 					}
 					createdAt
 					voter
 					votingPower
 					lockPeriod
+					decision
 				}
 			}
 			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
@@ -487,7 +493,13 @@ export class SubsquidQueries {
 						... on StandardVoteBalance {
 							value
 						}
+						... on SplitVoteBalance {
+							aye
+							nay
+							abstain
+						}
 					}
+					decision
 				}
 			}
 			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: $decision_eq}, orderBy: id_ASC) {

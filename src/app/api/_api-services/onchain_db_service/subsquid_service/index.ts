@@ -310,7 +310,8 @@ export class SubsquidService extends SubsquidUtils {
 					votingPower: string;
 					createdAt: string;
 					lockPeriod: number;
-					balance: { value: string };
+					balance: { value?: string; aye?: string; nay?: string; abstain?: string };
+					decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
 				}[];
 			}) => ({
 				balanceValue: vote.decision === 'abstain' ? vote.balance.abstain || '0' : vote.balance.value || '0',
@@ -323,10 +324,11 @@ export class SubsquidService extends SubsquidUtils {
 				delegatedVotingPower: vote.delegatedVotingPower,
 				delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
 					voterAddress: delegatedVote.voter,
-					votingPower: delegatedVote.votingPower,
+					totalVotingPower: delegatedVote.votingPower,
 					createdAt: new Date(delegatedVote.createdAt),
 					lockPeriod: delegatedVote.lockPeriod,
-					balance: delegatedVote.balance.value
+					balance: delegatedVote.decision === 'abstain' ? delegatedVote.balance.abstain || '0' : delegatedVote.balance.value || '0',
+					decision: delegatedVote.decision === 'yes' ? EVoteDecision.AYE : delegatedVote.decision === 'no' ? EVoteDecision.NAY : (delegatedVote.decision as EVoteDecision)
 				}))
 			})
 		);

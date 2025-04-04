@@ -646,7 +646,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
-	delegatedVotes?: IDelegatedVote[];
+	delegatedVotes?: IVoteData[];
 }
 
 export enum EAssets {
