@@ -638,6 +638,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	delegatedVotes?: IVoteData[];
 }
 
 export enum EAssets {
