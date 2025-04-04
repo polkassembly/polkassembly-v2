@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAllowedCommentor, ENetwork, EProposalType, EWebhookEvent } from '@/_shared/types';
+import { EAllowedCommentor, ENetwork, EProposalType } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { updatePostServer } from '../../_api-utils/updatePostServer';
@@ -15,7 +15,15 @@ if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
 }
 
+enum EWebhookEvent {
+	POST_EDITED = 'post_edited'
+}
+
 export class WebhookService {
+	private static readonly zodParamsSchema = z.object({
+		webhookEvent: z.nativeEnum(EWebhookEvent)
+	});
+
 	private static readonly zodEventBodySchemas = {
 		[EWebhookEvent.POST_EDITED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), 'Not a valid index or hash'),
@@ -27,11 +35,12 @@ export class WebhookService {
 		})
 	} as const;
 
-	static async handleIncomingEvent({ event, body, network }: { event: EWebhookEvent; body: unknown; network: ENetwork }) {
-		const params = this.zodEventBodySchemas[event as EWebhookEvent].parse(body);
+	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
+		const { webhookEvent } = this.zodParamsSchema.parse({ event });
+		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
 		// eslint-disable-next-line sonarjs/no-small-switch
-		switch (event) {
+		switch (webhookEvent) {
 			case EWebhookEvent.POST_EDITED:
 				return this.handlePostEdited({ network, params });
 			default:

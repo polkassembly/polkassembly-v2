@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { EWebhookEvent } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { WebhookService } from '@/app/api/_api-services/webhook_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -13,15 +12,10 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-
-const zodParamsSchema = z.object({
-	webhookEvent: z.nativeEnum(EWebhookEvent)
-});
 
 // Handle Indexer Events
 export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ webhookEvent: string }> }): Promise<NextResponse> => {
-	const { webhookEvent } = zodParamsSchema.parse(await params);
+	const { webhookEvent = '' } = await params;
 
 	const network = await getNetworkFromHeaders();
 
@@ -35,7 +29,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	console.log('Webhook event received: ', { webhookEvent, network, body });
 
-	await WebhookService.handleIncomingEvent({ event: webhookEvent as EWebhookEvent, body, network });
+	await WebhookService.handleIncomingEvent({ event: webhookEvent, body, network });
 
 	return NextResponse.json({ message: `Webhook event ${webhookEvent} processed successfully.`, params: { webhookEvent, network, body } });
 });
