@@ -1036,3 +1036,7 @@ export interface ITrackDelegationDetails {
 	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
 	status: EDelegationStatus;
 }
+
+export enum EWebhookEvent {
+	POST_EDITED = 'post_edited'
+}

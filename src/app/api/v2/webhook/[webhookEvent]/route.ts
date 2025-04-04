@@ -3,7 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { EWebhookEvent } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
+import { WebhookService } from '@/app/api/_api-services/webhook_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
@@ -13,23 +15,13 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-enum EIndexerEvent {
-	PROPOSAL_CREATED = 'proposal_created'
-}
-
 const zodParamsSchema = z.object({
-	indexerEvent: z.nativeEnum(EIndexerEvent)
+	webhookEvent: z.nativeEnum(EWebhookEvent)
 });
 
-const zodEventBodySchemas = {
-	[EIndexerEvent.PROPOSAL_CREATED]: z.object({
-		indexOrHash: z.string()
-	})
-} as const;
-
 // Handle Indexer Events
-export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ indexerEvent: string }> }): Promise<NextResponse> => {
-	const { indexerEvent } = zodParamsSchema.parse(await params);
+export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ webhookEvent: string }> }): Promise<NextResponse> => {
+	const { webhookEvent } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
 
@@ -39,7 +31,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
 	}
 
-	const body = zodEventBodySchemas[indexerEvent as EIndexerEvent].parse(await getReqBody(req));
+	const body = await getReqBody(req);
 
-	return NextResponse.json({ message: `Indexer event ${indexerEvent} processed for network ${network} with params: ${JSON.stringify(body)} successfully` });
+	console.log('Webhook event received: ', { webhookEvent, network, body });
+
+	await WebhookService.handleIncomingEvent({ event: webhookEvent as EWebhookEvent, body, network });
+
+	return NextResponse.json({ message: `Webhook event ${webhookEvent} processed successfully.`, params: { webhookEvent, network, body } });
 });
