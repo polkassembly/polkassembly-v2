@@ -291,7 +291,17 @@
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
 		"WhitelistedCallerDescription": "Polkadotフェローシップの任意のメンバーによって指示される起点（段級不要）。",
 		"WishForChange": "変更への願い",
-		"WishForChangeDescription": "ネットワークが何らかの変更を望んでいることを示すための起点。"
+		"WishForChangeDescription": "ネットワークが何らかの変更を望んでいることを示すための起点。",
+		"CouncilMotion": "評議会モーション",
+		"CouncilMotionDescription": "ここはオンチェーンモーションを議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"TechCommitteeProposal": "技術委員会提案",
+		"TechCommitteeProposalDescription": "ここはオンチェーン技術委員会提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"DemocracyProposal": "民主主義提案",
+		"DemocracyProposalDescription": "ここはオンチェーン民主主義提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"TreasuryProposal": "財務提案",
+		"TreasuryProposalDescription": "ここはオンチェーン財務提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"Tip": "チップ",
+		"TipDescription": "ここはオンチェーンチップを議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。"
 	},
 	"Sidebar": {
 		"onChainIdentity": "オンチェーンアイデンティティ",
