@@ -1,0 +1,78 @@
+{
+	"root": true,
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module"
+	},
+	"env": {
+		"browser": false,
+		"node": true,
+		"es6": true
+	},
+	"settings": {
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".ts"]
+			},
+			"typescript": {
+				"alwaysTryTypes": true,
+				"project": "./tsconfig.json"
+			}
+		}
+	},
+	"ignorePatterns": ["lib/**"],
+	"plugins": ["@typescript-eslint", "header", "import"],
+	"extends": ["plugin:@typescript-eslint/recommended", "airbnb", "google", "prettier", "plugin:prettier/recommended"],
+	"rules": {
+		"@typescript-eslint/no-duplicate-enum-values": "off",
+		"@typescript-eslint/no-unused-vars": "error",
+		"@typescript-eslint/no-explicit-any": "error",
+		"import/extensions": [
+			"error",
+			"ignorePackages",
+			{
+				"js": "never",
+				"ts": "never"
+			}
+		],
+		"no-nested-ternary": "off",
+		"import/prefer-default-export": "off",
+		"header/header": [2, "./header.js"],
+		"no-tabs": [
+			"error",
+			{
+				"allowIndentationTabs": true
+			}
+		],
+		"no-trailing-spaces": ["warn"],
+		"object-curly-spacing": ["error", "always"],
+		"quotes": [
+			"error",
+			"single",
+			{
+				"avoidEscape": true
+			}
+		],
+		"semi": [2, "always"],
+		"switch-colon-spacing": [
+			"error",
+			{
+				"after": true,
+				"before": false
+			}
+		],
+		"no-shadow": "off",
+		"@typescript-eslint/no-shadow": "warn",
+		"no-restricted-globals": "off",
+		"import/no-default-export": "error",
+		"require-jsdoc": "off"
+	},
+	"overrides": [
+		{
+			"files": ["./*.ts"],
+			"rules": {
+				"import/no-default-export": "off"
+			}
+		}
+	]
+}

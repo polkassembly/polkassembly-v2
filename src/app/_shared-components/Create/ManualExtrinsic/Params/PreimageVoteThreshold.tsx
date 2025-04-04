@@ -33,7 +33,7 @@ function PreimageVoteThresholdComp({ onChange }: { onChange: (value: number) => 
 	return (
 		<div className='flex flex-col gap-y-2'>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='flex w-full items-center rounded border border-border_grey px-4 py-2'>{textMap[`${voteThreshold}`]}</DropdownMenuTrigger>
+				<DropdownMenuTrigger>{textMap[`${voteThreshold}`]}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{options.map((option) => (
 						<DropdownMenuItem

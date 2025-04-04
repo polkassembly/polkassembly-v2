@@ -16,11 +16,17 @@ interface IPostData {
 	isSubscribed?: boolean;
 }
 
+export interface SubscriptionResult {
+	isSubscribed: boolean;
+	wasUnsubscribed: boolean;
+	error?: boolean;
+}
+
 export const usePostReactions = (postData: IPostData) => {
 	const { user } = useUser();
 	const { toast } = useToastLib();
 
-	const [isSubscribed, setIsSubscribed] = useState(postData?.isSubscribed || false);
+	const [isSubscribed, setIsSubscribed] = useState(!!postData?.isSubscribed);
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
 		const reactionsArray = postData?.reactions || [];
 
@@ -51,7 +57,7 @@ export const usePostReactions = (postData: IPostData) => {
 
 	// TODO: Remove this useEffect and make Optimistic update
 	useEffect(() => {
-		setIsSubscribed(postData?.isSubscribed || false);
+		setIsSubscribed(!!postData?.isSubscribed);
 	}, [postData?.isSubscribed]);
 
 	useEffect(() => {
@@ -67,8 +73,11 @@ export const usePostReactions = (postData: IPostData) => {
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 			try {
 				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
-				showGifSetter(true);
-				setTimeout(() => showGifSetter(false), 1500);
+				if (!isDeleteAction) {
+					showGifSetter(true);
+					setTimeout(() => showGifSetter(false), 1500);
+				}
+
 				setReactionState((prev) => ({
 					...prev,
 					isLiked: isLikeAction ? !prev.isLiked : false,
@@ -103,23 +112,28 @@ export const usePostReactions = (postData: IPostData) => {
 		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
 	);
 
-	const handleSubscribe = useCallback(async () => {
+	const handleSubscribe = async (): Promise<SubscriptionResult> => {
 		if (!postData?.indexOrHash) {
 			throw new ClientError('Index or hash is required');
 		}
 
-		setIsSubscribed(!isSubscribed);
+		setIsSubscribed((prevIsSubscribed) => !prevIsSubscribed);
+
 		toast({
 			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
 			status: !isSubscribed ? NotificationType.SUCCESS : NotificationType.INFO
 		});
 
 		try {
-			if (isSubscribed) {
-				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
-			} else {
+			if (!isSubscribed) {
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
+			} else {
+				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			}
+			return {
+				isSubscribed: !isSubscribed,
+				wasUnsubscribed: isSubscribed
+			};
 		} catch (error) {
 			setIsSubscribed(isSubscribed);
 			toast({
@@ -127,9 +141,13 @@ export const usePostReactions = (postData: IPostData) => {
 				status: NotificationType.ERROR
 			});
 			console.error('Failed to update subscription:', error);
+			return {
+				isSubscribed,
+				wasUnsubscribed: false,
+				error: true
+			};
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isSubscribed, subscriptionParams, postData?.indexOrHash]);
+	};
 
 	return {
 		reactionState,

@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "NodeNext",
+		"esModuleInterop": true,
+		"moduleResolution": "NodeNext",
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"outDir": "lib",
+		"sourceMap": true,
+		"strict": true,
+		"target": "es2017",
+		"baseUrl": "./"
+	},
+	"compileOnSave": true,
+	"include": ["src"],
+	"exclude": ["node_modules", "lib"]
+}

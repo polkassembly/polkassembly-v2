@@ -19,31 +19,49 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 
 	const headerNetwork = readonlyHeaders.get('x-network');
 	const host = readonlyHeaders.get('host');
-	const subdomain = host?.split('.')?.[0];
+	const origin = readonlyHeaders.get('origin');
+	const xForwardedHost = readonlyHeaders.get('x-forwarded-host');
+	const subdomain = host?.split('.')?.[0] || xForwardedHost?.split('.')?.[0];
 
+	// Debug header information
+	console.log('DEBUG getNetworkFromHeaders:', {
+		headerNetwork,
+		host,
+		origin,
+		xForwardedHost,
+		subdomain,
+		defaultNetwork
+	});
+
+	// Try to determine network from x-network header or subdomain
 	const network = ValidatorService.isValidNetwork(headerNetwork as ENetwork)
 		? (headerNetwork as ENetwork)
 		: ValidatorService.isValidNetwork(subdomain as ENetwork)
 			? (subdomain as ENetwork)
 			: null;
 
-	if (network) return network;
+	if (network) {
+		console.log('DEBUG: Found valid network from headers:', network);
+		return network;
+	}
 
-	// check if it is vercel preview link or localhost
+	// Check if it is vercel preview link, localhost, or Cloud Run deployment
 	const isDevelopmentOrPreviewEnv = NEXT_PUBLIC_APP_ENV !== EAppEnv.PRODUCTION;
+	const isCloudRunOrHostedEnv =
+		host?.includes('.run.app') ||
+		host?.includes('.cloudfunctions.net') ||
+		host?.includes('.web.app') ||
+		host?.includes('.firebase.app') ||
+		(xForwardedHost && origin && !origin.includes(xForwardedHost)) ||
+		NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION; // Always apply this fallback in production
 
-	if (isDevelopmentOrPreviewEnv) {
+	// In development or special environments, use default network
+	if (isDevelopmentOrPreviewEnv || isCloudRunOrHostedEnv) {
+		console.log('DEBUG: Using default network:', defaultNetwork);
 		return defaultNetwork as ENetwork;
 	}
 
-	if (!network) {
-		// if still no network found and is vercel (main deployment) link, return default network
-		if (host?.includes('vercel.app')) {
-			return defaultNetwork as ENetwork;
-		}
-
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request headers');
-	}
-
-	return network;
+	// If we get here, we couldn't determine a valid network
+	console.log('DEBUG: Failed to determine network from headers');
+	throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request headers');
 }

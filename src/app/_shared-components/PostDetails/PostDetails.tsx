@@ -7,7 +7,6 @@
 import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { OutputData } from '@editorjs/editorjs';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { canVote } from '@/_shared/_utils/canVote';
 import PostHeader from './PostHeader/PostHeader';
@@ -24,7 +23,7 @@ import OnchainInfo from './OnchainInfo/OnchainInfo';
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
 	const [post, setPost] = useState<IPost>(postData || ({} as IPost));
 
-	const onEditPostSuccess = (title: string, content: OutputData) => {
+	const onEditPostSuccess = (title: string, content: string) => {
 		setPost((prev) => ({ ...prev, title, content }));
 	};
 
@@ -66,14 +65,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					{isModalOpen && !isOffchainPost && (
 						<div className='pt-5'>{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}</div>
 					)}
-					{!isModalOpen && (
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={EProposalType.REFERENDUM_V2}
-								index={index}
-							/>
-						</div>
-					)}
+					<div className={classes.commentsBox}>
+						<PostComments
+							proposalType={EProposalType.REFERENDUM_V2}
+							index={index}
+						/>
+					</div>
 				</div>
 				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>

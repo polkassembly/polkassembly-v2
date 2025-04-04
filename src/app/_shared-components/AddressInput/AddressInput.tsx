@@ -87,12 +87,13 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 			ref={dropdownRef}
 		>
 			{getSubstrateAddress(searchValue) ? (
-				<div className='flex w-full items-center justify-between gap-x-2 rounded-md border border-border_grey p-2'>
+				<div className='flex w-full items-center justify-between gap-x-2 rounded-xl border border-border_grey bg-address_input_bg px-4 py-3'>
 					<Address
 						address={searchValue}
 						walletAddressName=''
 						redirectToProfile={false}
 						iconSize={20}
+						disableTooltip
 					/>
 					<Button
 						onClick={() => {
@@ -116,12 +117,12 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 					onClick={() => setIsOpen(true)}
 					onFocus={() => setIsOpen(true)}
 					placeholder={placeholder || t('AddressInput.placeholder')}
-					className={`w-full rounded-md border border-border_grey p-2 outline-none ${className}`}
+					className={`w-full rounded-xl bg-address_input_bg placeholder:text-sm placeholder:font-medium placeholder:text-text_primary ${className}`}
 				/>
 			)}
-			{error && <p className='absolute left-0 my-1 text-sm text-failure'>{error}</p>}
+			{error && <p className='my-1 text-sm text-failure'>{error}</p>}
 			{isOpen && (
-				<div className='absolute z-20 mt-1 flex max-h-[300px] w-full flex-col gap-y-2 overflow-y-auto rounded-md border border-border_grey bg-white p-2 shadow-lg'>
+				<div className='absolute z-50 mt-1 flex max-h-[300px] w-full flex-col gap-y-2 overflow-y-auto rounded-xl border border-border_grey bg-white px-4 py-3 shadow-lg'>
 					{filteredOptions.length > 0 ? (
 						filteredOptions.map((account) => (
 							<button
@@ -137,6 +138,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 									address={account.address}
 									walletAddressName={account.name}
 									redirectToProfile={false}
+									disableTooltip
 								/>
 							</button>
 						))

@@ -8,10 +8,8 @@ import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IContentSummary, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { convertHtmlToEditorJsServer } from '@/app/api/_api-utils/convertHtmlToEditorJsServer';
-import { convertMarkdownToEditorJsServer } from '@/app/api/_api-utils/convertMarkdownToEditorJsServer';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { htmlToMarkdown } from '@/_shared/_utils/htmlToMarkdown';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -61,10 +59,8 @@ export class SubsquareOffChainService {
 			if (!content) {
 				content = getDefaultPostContent(proposalType, data?.proposer);
 			} else {
-				content = data?.contentType === 'markdown' ? convertMarkdownToEditorJsServer(data.content) : convertHtmlToEditorJsServer(data.content);
+				content = data?.contentType === 'markdown' ? data.content : htmlToMarkdown(data.content);
 			}
-
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 			if (!title && !content) {
 				return null;
@@ -76,8 +72,6 @@ export class SubsquareOffChainService {
 				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 				title: title || DEFAULT_POST_TITLE,
 				content,
-				htmlContent: html,
-				markdownContent: markdown,
 				createdAt: data?.createdAt ? new Date(data.createdAt) : undefined,
 				updatedAt: data?.updatedAt ? new Date(data.updatedAt) : undefined,
 				tags: [],
@@ -127,16 +121,12 @@ export class SubsquareOffChainService {
 			const processComment = async (comment: any): Promise<ICommentResponse> => {
 				const publicUser = await FirestoreService.GetPublicUserByAddress(comment.author.address);
 
-				const content = comment.contentType === 'markdown' ? convertMarkdownToEditorJsServer(comment.content) : convertHtmlToEditorJsServer(comment.content);
-
-				const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
+				const content = comment.contentType === 'markdown' ? comment.content : htmlToMarkdown(comment.content);
 
 				return {
 					// eslint-disable-next-line no-underscore-dangle
 					id: comment._id,
 					content,
-					htmlContent: html,
-					markdownContent: markdown,
 					userId: publicUser?.id ?? 0,
 					user: publicUser ?? {
 						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
