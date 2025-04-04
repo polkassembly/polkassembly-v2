@@ -390,6 +390,10 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-*` });
 	}
 
+	static async DeleteAllSubscriptionFeedsForNetwork(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
+	}
+
 	// toolkit methods
 
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
@@ -424,6 +428,10 @@ export class RedisService {
 
 	static async SetDelegationStats(network: ENetwork, data: IDelegationStats): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+	}
+
+	static async DeleteDelegationStats(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATION_STATS}-${network}` });
 	}
 
 	// Delegates caching methods
