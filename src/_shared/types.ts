@@ -629,14 +629,6 @@ export interface IOnChainIdentity {
 	parentProxyAddress: string;
 }
 
-export interface IDelegatedVote {
-	voterAddress: string;
-	votingPower: string;
-	createdAt: Date;
-	lockPeriod: number;
-	balance: string;
-}
-
 export interface IVoteData {
 	balanceValue: string;
 	decision: EVoteDecision;

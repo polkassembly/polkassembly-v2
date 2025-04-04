@@ -327,7 +327,7 @@ export class SubsquidService extends SubsquidUtils {
 					totalVotingPower: delegatedVote.votingPower,
 					createdAt: new Date(delegatedVote.createdAt),
 					lockPeriod: delegatedVote.lockPeriod,
-					balance: delegatedVote.decision === 'abstain' ? delegatedVote.balance.abstain || '0' : delegatedVote.balance.value || '0',
+					balanceValue: delegatedVote.decision === 'abstain' ? delegatedVote.balance.abstain || '0' : delegatedVote.balance.value || '0',
 					decision: delegatedVote.decision === 'yes' ? EVoteDecision.AYE : delegatedVote.decision === 'no' ? EVoteDecision.NAY : (delegatedVote.decision as EVoteDecision)
 				}))
 			})
