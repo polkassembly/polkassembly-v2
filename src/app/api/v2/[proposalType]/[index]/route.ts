@@ -7,14 +7,13 @@ import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { ValidatorService } from '@shared/_services/validator_service';
 import { EAllowedCommentor, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
 import { COOKIE_HEADER_ACTION_NAME } from '@/_shared/_constants/cookieHeaderActionName';
+import { updatePostServer } from '@/app/api/_api-utils/updatePostServer';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -107,34 +106,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
 
-	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
-		await OffChainDbService.UpdateOffChainPost({
-			network,
-			indexOrHash: index,
-			proposalType: proposalType as EProposalType,
-			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content,
-			title,
-			allowedCommentor
-		});
-	} else {
-		await OffChainDbService.UpdateOnChainPost({
-			network,
-			indexOrHash: index,
-			proposalType: proposalType as EProposalType,
-			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content,
-			title,
-			allowedCommentor
-		});
-	}
-
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
-
-	// Invalidate caches
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-	await RedisService.DeletePostsListing({ network, proposalType });
-	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
+	await updatePostServer({ network, proposalType, indexOrHash: index, content, title, allowedCommentor, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
