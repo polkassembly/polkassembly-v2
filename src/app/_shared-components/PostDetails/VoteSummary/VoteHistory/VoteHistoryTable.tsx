@@ -1,6 +1,3 @@
-// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
-// This software may be modified and distributed under the terms
-// of the Apache-2.0 license. See the LICENSE file for details.
 import { IVoteData } from '@/_shared/types';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import React, { useState } from 'react';
@@ -15,6 +12,7 @@ import Address from '../../../Profile/Address/Address';
 import { Button } from '../../../Button';
 import LoadingLayover from '../../../LoadingLayover';
 import classes from './VoteHistory.module.scss';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 
 function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	return sort === 'asc' ? (
@@ -80,6 +78,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 
 	const [sorting, setSorting] = useState<SortingState>([]);
+	const [openRow, setOpenRow] = useState<string | null>(null);
 
 	const table = useReactTable({
 		data: votes,
@@ -115,22 +114,86 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 					))}
 				</TableHeader>
 				<TableBody className='flex-1 overflow-y-auto'>
-					{table.getRowModel().rows.map((vote) => (
-						<TableRow key={`${vote.original.balanceValue}-${vote.original.voterAddress}`}>
-							<TableCell className='max-w-[200px] py-4'>
-								<Address address={vote.original.voterAddress} />
-							</TableCell>
-							<TableCell className='py-4'>
-								{formatBalance(vote.original.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</TableCell>
-							<TableCell className='py-4'>
-								{formatBalance(vote.original.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</TableCell>
-							<TableCell className='py-4'>
-								{formatBalance(vote.original.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</TableCell>
-						</TableRow>
-					))}
+					{table.getRowModel().rows.map((vote) => {
+						const voteData = vote.original;
+						const isOpen = openRow === voteData.voterAddress;
+						const voterDelegations = voteData.delegatedVotes && Array.isArray(voteData.delegatedVotes) ? voteData.delegatedVotes : [];
+
+						const renderCollapsible = voterDelegations.length > 0;
+
+						return (
+							<React.Fragment key={voteData.voterAddress}>
+								{renderCollapsible ? (
+									<Collapsible
+										key={voteData.voterAddress}
+										open={isOpen}
+										onOpenChange={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
+									>
+										<CollapsibleTrigger asChild>
+											<TableRow className='cursor-pointer'>
+												<TableCell className='max-w-[200px] py-4'>
+													<div className='flex items-center gap-2'>
+														<Address address={voteData.voterAddress} />
+														<button className='collapsibleButton'>{isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>
+													</div>
+												</TableCell>
+												<TableCell className='py-4'>
+													{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+												</TableCell>
+												<TableCell className='py-4'>
+													{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+												</TableCell>
+												<TableCell className='py-4'>
+													{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+												</TableCell>
+											</TableRow>
+										</CollapsibleTrigger>
+
+										<CollapsibleContent asChild>
+											<TableRow className='collapsibleContent'>
+												<TableCell colSpan={4}>
+													<div className='pl-6 pt-2 text-xs text-muted-foreground'>
+														<strong>Delegation List</strong>
+														<div className='mt-2 space-y-1'>
+															{voterDelegations.map((delegator: any, index) => (
+																<div
+																	key={index}
+																	className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'
+																>
+																	<span>{delegator.delegator}</span>
+																	<span>{formatBalance(delegator.capital)} /d</span>
+																	<span>
+																		{formatBalance(delegator.votingPower)} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+																	</span>
+																</div>
+															))}
+														</div>
+													</div>
+												</TableCell>
+											</TableRow>
+										</CollapsibleContent>
+									</Collapsible>
+								) : (
+									<TableRow className='cursor-pointer'>
+										<TableCell className='max-w-[200px] py-4'>
+											<div className='flex items-center gap-2'>
+												<Address address={voteData.voterAddress} />
+											</div>
+										</TableCell>
+										<TableCell className='py-4'>
+											{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										</TableCell>
+										<TableCell className='py-4'>
+											{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										</TableCell>
+										<TableCell className='py-4'>
+											{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										</TableCell>
+									</TableRow>
+								)}
+							</React.Fragment>
+						);
+					})}
 				</TableBody>
 			</Table>
 		</div>
