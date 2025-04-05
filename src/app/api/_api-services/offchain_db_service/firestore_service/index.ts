@@ -1384,4 +1384,12 @@ export class FirestoreService extends FirestoreUtils {
 			await delegate.docs[0].ref.delete();
 		}
 	}
+
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash).limit(1).get();
+
+		if (post.docs.length) {
+			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+		}
+	}
 }

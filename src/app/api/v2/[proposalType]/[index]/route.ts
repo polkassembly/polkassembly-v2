@@ -14,6 +14,9 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
 import { COOKIE_HEADER_ACTION_NAME } from '@/_shared/_constants/cookieHeaderActionName';
 import { updatePostServer } from '@/app/api/_api-utils/updatePostServer';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { StatusCodes } from 'http-status-codes';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -109,6 +112,41 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	await updatePostServer({ network, proposalType, indexOrHash: index, content, title, allowedCommentor, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
+});
+
+// delete off-chain post (soft-delete)
+export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType, index } = zodParamsSchema.parse(await params);
+
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	const network = await getNetworkFromHeaders();
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
+	const post = await OffChainDbService.GetOffChainPostData({ network, proposalType, indexOrHash: index });
+
+	if (!post) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+	}
+
+	if (post.userId !== userId) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash: index });
+
+	// Invalidate caches
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
+	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
+
+	const response = NextResponse.json({ message: 'Post deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 
