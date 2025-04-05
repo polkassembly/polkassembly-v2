@@ -836,4 +836,8 @@ export class OffChainDbService {
 	static async DeletePolkassemblyDelegate({ network, address }: { network: ENetwork; address: string }) {
 		return FirestoreService.DeletePolkassemblyDelegate({ network, address });
 	}
+
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		return FirestoreService.DeleteOffChainPost({ network, proposalType, indexOrHash });
+	}
 }
