@@ -30,7 +30,7 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 			: null;
 
 	if (network) {
-		console.log('DEBUG: Found valid network from headers:', network);
+		console.log('Found valid network from headers:', network);
 		return network;
 	}
 
@@ -39,11 +39,11 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 
 	// In development or special environments, use default network
 	if (isDevelopmentOrPreviewEnv) {
-		console.log('DEBUG: Using default network:', defaultNetwork);
+		console.log('Using default network:', defaultNetwork);
 		return defaultNetwork as ENetwork;
 	}
 
 	// If we get here, we couldn't determine a valid network
-	console.log('DEBUG: Failed to determine network from headers');
+	console.log('Failed to determine network from headers');
 	throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request headers');
 }

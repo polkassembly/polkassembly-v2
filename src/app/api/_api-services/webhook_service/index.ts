@@ -90,7 +90,7 @@ export class WebhookService {
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
-		const { webhookEvent } = this.zodParamsSchema.parse({ event });
+		const { webhookEvent } = this.zodParamsSchema.parse({ webhookEvent: event });
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
 		// eslint-disable-next-line sonarjs/no-small-switch
