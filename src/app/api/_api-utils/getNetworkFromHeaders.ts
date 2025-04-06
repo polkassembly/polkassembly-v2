@@ -19,19 +19,8 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 
 	const headerNetwork = readonlyHeaders.get('x-network');
 	const host = readonlyHeaders.get('host');
-	const origin = readonlyHeaders.get('origin');
 	const xForwardedHost = readonlyHeaders.get('x-forwarded-host');
 	const subdomain = host?.split('.')?.[0] || xForwardedHost?.split('.')?.[0];
-
-	// Debug header information
-	console.log('DEBUG getNetworkFromHeaders:', {
-		headerNetwork,
-		host,
-		origin,
-		xForwardedHost,
-		subdomain,
-		defaultNetwork
-	});
 
 	// Try to determine network from x-network header or subdomain
 	const network = ValidatorService.isValidNetwork(headerNetwork as ENetwork)
@@ -47,16 +36,9 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 
 	// Check if it is vercel preview link, localhost, or Cloud Run deployment
 	const isDevelopmentOrPreviewEnv = NEXT_PUBLIC_APP_ENV !== EAppEnv.PRODUCTION;
-	const isCloudRunOrHostedEnv =
-		host?.includes('.run.app') ||
-		host?.includes('.cloudfunctions.net') ||
-		host?.includes('.web.app') ||
-		host?.includes('.firebase.app') ||
-		(xForwardedHost && origin && !origin.includes(xForwardedHost)) ||
-		NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION; // Always apply this fallback in production
 
 	// In development or special environments, use default network
-	if (isDevelopmentOrPreviewEnv || isCloudRunOrHostedEnv) {
+	if (isDevelopmentOrPreviewEnv) {
 		console.log('DEBUG: Using default network:', defaultNetwork);
 		return defaultNetwork as ENetwork;
 	}

@@ -21,7 +21,14 @@ enum EWebhookEvent {
 	POST_EDITED = 'post_edited',
 	POST_DELETED = 'post_deleted',
 	PROPOSAL_CREATED = 'proposal_created',
-	PROPOSAL_ENDED = 'proposal_ended'
+	PROPOSAL_ENDED = 'proposal_ended',
+	VOTED = 'voted',
+	BOUNTY_CLAIMED = 'bounty_claimed',
+	DECISION_DEPOSIT_PLACED = 'decision_deposit_placed',
+	REMOVED_VOTE = 'removed_vote',
+	TIPPED = 'tipped',
+	DELEGATED = 'delegated',
+	UNDELEGATED = 'undelegated'
 }
 
 export class WebhookService {
@@ -48,6 +55,35 @@ export class WebhookService {
 			proposalType: z.nativeEnum(EProposalType)
 		}),
 		[EWebhookEvent.PROPOSAL_ENDED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		// TODO: fix below:
+		[EWebhookEvent.VOTED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.BOUNTY_CLAIMED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.DECISION_DEPOSIT_PLACED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.REMOVED_VOTE]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.TIPPED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.DELEGATED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.UNDELEGATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		})
