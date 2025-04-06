@@ -20,7 +20,8 @@ if (!TOOLS_PASSPHRASE) {
 enum EWebhookEvent {
 	POST_EDITED = 'post_edited',
 	POST_DELETED = 'post_deleted',
-	PROPOSAL_STATUS_CHANGED = 'proposal_status_changed'
+	PROPOSAL_CREATED = 'proposal_created',
+	PROPOSAL_ENDED = 'proposal_ended'
 }
 
 export class WebhookService {
@@ -42,7 +43,11 @@ export class WebhookService {
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		}),
-		[EWebhookEvent.PROPOSAL_STATUS_CHANGED]: z.object({
+		[EWebhookEvent.PROPOSAL_CREATED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
+		}),
+		[EWebhookEvent.PROPOSAL_ENDED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		})
@@ -58,8 +63,12 @@ export class WebhookService {
 				return this.handlePostEdited({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> });
 			case EWebhookEvent.POST_DELETED:
 				return this.handlePostDeleted({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_DELETED]> });
-			case EWebhookEvent.PROPOSAL_STATUS_CHANGED:
-				return this.handleProposalStatusChanged({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_CHANGED]> });
+			case EWebhookEvent.PROPOSAL_CREATED:
+			case EWebhookEvent.PROPOSAL_ENDED:
+				return this.handleProposalStatusChanged({
+					network,
+					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>
+				});
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -88,7 +97,7 @@ export class WebhookService {
 		params
 	}: {
 		network: ENetwork;
-		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_CHANGED]>;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>;
 	}) {
 		const { indexOrHash, proposalType } = params;
 
