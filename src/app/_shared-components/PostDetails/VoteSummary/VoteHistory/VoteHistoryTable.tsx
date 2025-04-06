@@ -91,6 +91,8 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 		}
 	});
 
+	console.log('votes', votes);
+
 	const formatBalance = (balance: string) => {
 		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
 	};
@@ -117,7 +119,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 					{table.getRowModel().rows.map((vote) => {
 						const voteData = vote.original;
 						const isOpen = openRow === voteData.voterAddress;
-						const voterDelegations = voteData.delegatedVotes && Array.isArray(voteData.delegatedVotes) ? voteData.delegatedVotes : [];
+						const voterDelegations = Array.isArray(voteData.delegatedVotes) ? voteData.delegatedVotes : [];
 
 						const renderCollapsible = voterDelegations.length > 0;
 
@@ -129,13 +131,13 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 										open={isOpen}
 										onOpenChange={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
 									>
-										<CollapsibleTrigger asChild>
+										<CollapsibleTrigger
+											asChild
+											className='w-full'
+										>
 											<TableRow className='cursor-pointer'>
 												<TableCell className='max-w-[200px] py-4'>
-													<div className='flex items-center gap-2'>
-														<Address address={voteData.voterAddress} />
-														<button className='collapsibleButton'>{isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>
-													</div>
+													<Address address={voteData.voterAddress} />
 												</TableCell>
 												<TableCell className='py-4'>
 													{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
@@ -145,6 +147,9 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 												</TableCell>
 												<TableCell className='py-4'>
 													{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+												</TableCell>
+												<TableCell className='py-4'>
+													{voterDelegations.length > 0 && <button className='collapsibleButton'>{isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>}
 												</TableCell>
 											</TableRow>
 										</CollapsibleTrigger>
@@ -160,10 +165,11 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 																	key={index}
 																	className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'
 																>
-																	<span>{delegator.delegator}</span>
-																	<span>{formatBalance(delegator.capital)} /d</span>
+																	<Address address={delegator?.voterAddress} />
+
+																	<span>{delegator?.lockPeriod || '0'}/d</span>
 																	<span>
-																		{formatBalance(delegator.votingPower)} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+																		{formatBalance(delegator?.totalVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 																	</span>
 																</div>
 															))}
