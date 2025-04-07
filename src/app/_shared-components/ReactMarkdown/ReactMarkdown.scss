@@ -1,0 +1,214 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+.markdown-body {
+	font-family: var(--font-dmSans);
+	line-height: 1.65;
+	word-wrap: break-word;
+	color: var(--text_primary);
+	font-size: 0.95rem;
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin-top: 24px;
+		margin-bottom: 16px;
+		font-weight: 600;
+		line-height: 1.25;
+		color: var(--text_primary);
+	}
+
+	h1 {
+		font-size: 2em;
+		border-bottom: 1px solid var(--border_grey);
+		padding-bottom: 0.3em;
+	}
+
+	h2 {
+		font-size: 1.5em;
+		border-bottom: 1px solid var(--border_grey);
+		padding-bottom: 0.3em;
+	}
+
+	h3 {
+		font-size: 1.25em;
+	}
+
+	h4 {
+		font-size: 1em;
+	}
+
+	h5 {
+		font-size: 0.875em;
+	}
+
+	h6 {
+		font-size: 0.85em;
+	}
+
+	a {
+		color: var(--text_pink);
+		text-decoration: none;
+		transition: color 0.2s ease-in-out;
+
+		&:hover {
+			text-decoration: underline;
+			color: var(--text_pink_secondary);
+		}
+
+		&:focus {
+			outline: 2px solid var(--text_pink);
+			outline-offset: 2px;
+		}
+	}
+
+	p,
+	blockquote,
+	ul,
+	ol,
+	dl,
+	table,
+	pre,
+	details {
+		margin-top: 0;
+		margin-bottom: 16px;
+	}
+
+	blockquote {
+		padding: 0 1em;
+		border-left: 0.25em solid var(--border_grey);
+		color: var(--btn_secondary_text);
+		font-style: italic;
+	}
+
+	ul,
+	ol {
+		padding-left: 2em;
+	}
+
+	ul ul,
+	ul ol,
+	ol ol,
+	ol ul {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	li {
+		margin-bottom: 0.25em;
+
+		&::marker {
+			color: var(--text_secondary);
+		}
+	}
+
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+		width: 100%;
+		overflow: auto;
+		margin-bottom: 16px;
+		display: block;
+		overflow-x: auto;
+
+		th {
+			font-weight: 600;
+			background-color: var(--bg_secondary);
+		}
+
+		th,
+		td {
+			padding: 6px 13px;
+			border: 1px solid var(--border_grey);
+		}
+
+		tr {
+			border-top: 1px solid var(--border_grey);
+			background-color: var(--bg_modal);
+		}
+
+		tr:nth-child(2n) {
+			background-color: var(--bg_secondary);
+		}
+	}
+
+	img {
+		max-width: 100%;
+		box-sizing: content-box;
+		background-color: var(--bg_modal);
+		border-radius: 4px;
+		border: 1px solid var(--border_grey);
+		margin: 4px 0;
+	}
+
+	code {
+		padding: 0.2em 0.4em;
+		margin: 0;
+		font-size: 85%;
+		border-radius: 3px;
+		background-color: var(--bg_secondary);
+		font-family:
+			ui-monospace,
+			SFMono-Regular,
+			SF Mono,
+			Menlo,
+			Consolas,
+			Liberation Mono,
+			monospace;
+	}
+
+	pre {
+		padding: 16px;
+		overflow: auto;
+		font-size: 85%;
+		line-height: 1.45;
+		background-color: var(--bg_secondary);
+		border-radius: 6px;
+		word-wrap: normal;
+
+		code {
+			padding: 0;
+			margin: 0;
+			border: 0;
+			background-color: transparent;
+			overflow: visible;
+			line-height: inherit;
+			word-wrap: normal;
+			max-width: 100%;
+			display: block;
+		}
+	}
+
+	hr {
+		height: 0.25em;
+		padding: 0;
+		margin: 24px 0;
+		background-color: var(--border_grey);
+		border: 0;
+	}
+
+	// Task lists
+	input[type='checkbox'] {
+		margin-right: 0.5em;
+		vertical-align: middle;
+	}
+
+	// Highlight
+	mark {
+		background-color: rgba(var(--text_pink_rgb), 0.2);
+		padding: 0.1em 0.2em;
+		border-radius: 2px;
+	}
+
+	// Custom styles for embedded content
+	iframe,
+	video {
+		max-width: 100%;
+		border: 1px solid var(--border_grey);
+		border-radius: 4px;
+	}
+}

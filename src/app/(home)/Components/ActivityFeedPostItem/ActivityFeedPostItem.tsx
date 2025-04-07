@@ -27,7 +27,7 @@ import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReacti
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
-import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { ReactMarkdown } from '@/app/_shared-components/ReactMarkdown/ReactMarkdown';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -216,9 +216,10 @@ function ActivityFeedPostItem({
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
 				<div className='flex max-h-40 w-full overflow-hidden border-none'>
-					<MarkdownEditor
+					<ReactMarkdown
 						markdown={postData.content}
-						readOnly
+						truncate
+						showReadMore
 					/>
 				</div>
 				<Link
