@@ -28,7 +28,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { TreasuryDetailsDialog } from './ActivityFeedTreasuryDialog';
+import { TreasuryDetailsDialog } from '../ActivityFeedTreasuryDialog/ActivityFeedTreasuryDialog';
 
 function formatNumberWithSuffix(value: number): { formatted: string; suffix: string } {
 	if (value >= 1_000_000_000) {
