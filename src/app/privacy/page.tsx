@@ -4,9 +4,9 @@
 
 import React from 'react';
 import { Metadata } from 'next';
+import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import { privacyPolicyContent } from './privacy-policy';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
-import { MarkdownEditor } from '../_shared-components/MarkdownEditor/MarkdownEditor';
 
 export const metadata: Metadata = {
 	title: 'Privacy Policy - Polkassembly',
@@ -26,10 +26,7 @@ export default async function PrivacyPolicyPage() {
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
 			<div className='rounded-md bg-white p-8 shadow'>
 				<h1 className='mb-6 text-2xl font-semibold'>Privacy Policy</h1>
-				<MarkdownEditor
-					markdown={policyContent}
-					readOnly
-				/>
+				<MarkdownViewer markdown={policyContent} />
 			</div>
 		</div>
 	);

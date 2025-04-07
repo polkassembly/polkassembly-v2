@@ -20,11 +20,11 @@ import { CommentClientService } from '@/app/_client-services/comment_client_serv
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
+import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
-import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 function SingleComment({
 	commentData,
@@ -154,8 +154,7 @@ function SingleComment({
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
 				</div>
-				<MarkdownEditor
-					readOnly
+				<MarkdownViewer
 					markdown={comment.content}
 					className={classes.editor}
 				/>

@@ -4,7 +4,7 @@
 
 'use client';
 
-import './ReactMarkdown.scss';
+import './MarkdownViewer.scss';
 import React, { forwardRef, useRef } from 'react';
 import ReactMarkdownLib from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -163,7 +163,7 @@ interface ReactMarkdownProps {
 	truncate?: boolean;
 }
 
-export const ReactMarkdown = forwardRef<HTMLDivElement, ReactMarkdownProps>((props, ref) => {
+export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((props, ref) => {
 	const { markdown, className, truncate } = props;
 	const containerRef = useRef<HTMLDivElement>(null);
 
