@@ -5,7 +5,7 @@
 'use client';
 
 import './MarkdownViewer.scss';
-import React, { forwardRef, useRef } from 'react';
+import { useState, forwardRef, useRef, ReactNode } from 'react';
 import ReactMarkdownLib from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -80,7 +80,7 @@ const markdownComponents: Components = {
 			}
 
 			let remaining = children;
-			const elements: React.ReactNode[] = [];
+			const elements: ReactNode[] = [];
 			let index = 0;
 
 			matches.forEach((match) => {
@@ -161,11 +161,13 @@ interface ReactMarkdownProps {
 	markdown: string;
 	className?: string;
 	truncate?: boolean;
+	maxLines?: number;
 }
 
 export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((props, ref) => {
-	const { markdown, className, truncate } = props;
+	const { markdown, className, truncate = false, maxLines = 4 } = props;
 	const containerRef = useRef<HTMLDivElement>(null);
+	const [showMore, setShowMore] = useState(!truncate);
 
 	const setRefs = (node: HTMLDivElement | null) => {
 		containerRef.current = node;
@@ -178,11 +180,15 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((pr
 		}
 	};
 
+	const toggleShowMore = () => {
+		setShowMore(!showMore);
+	};
+
 	return (
 		<div className='w-full'>
 			<div
 				ref={setRefs}
-				className={cn('markdown-body', truncate ? 'line-clamp-4' : 'line-clamp-none', 'w-full', className)}
+				className={cn('markdown-body', truncate && !showMore ? `line-clamp-${maxLines}` : 'line-clamp-none', 'w-full', className)}
 			>
 				<ReactMarkdownLib
 					components={markdownComponents}
@@ -192,6 +198,15 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((pr
 					{markdown || ''}
 				</ReactMarkdownLib>
 			</div>
+			{truncate && (
+				<button
+					type='button'
+					onClick={toggleShowMore}
+					className='mt-2 cursor-pointer text-sm font-medium text-text_pink hover:underline'
+				>
+					{showMore ? 'Show Less' : 'Show More'}
+				</button>
+			)}
 		</div>
 	);
 });

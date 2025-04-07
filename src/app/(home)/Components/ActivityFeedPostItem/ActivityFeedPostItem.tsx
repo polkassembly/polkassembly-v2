@@ -215,18 +215,12 @@ function ActivityFeedPostItem({
 				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 			</div>
 			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-full overflow-hidden border-none'>
+				<div className='flex w-full overflow-hidden border-none'>
 					<MarkdownViewer
 						markdown={postData.content}
 						truncate
 					/>
 				</div>
-				<Link
-					href={`/referenda/${postData.index}`}
-					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
-				>
-					{t('ActivityFeed.PostItem.readMore')}
-				</Link>
 			</div>
 
 			{/* Metrics Section */}
