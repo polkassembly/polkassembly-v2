@@ -211,6 +211,7 @@ export default function ActivityFeedTreasury() {
 				setIsNextBurnLoading(false);
 			}
 		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService]);
 
 	if (isFetching && !stats) {
