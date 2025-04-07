@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import RelayIcon from '@assets/icons/relay-chain-icon.svg';
 import AssetHubIcon from '@assets/icons/asset-hub-icon.svg';
