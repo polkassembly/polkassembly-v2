@@ -110,6 +110,8 @@ function ActivityFeedPostItem({
 		return text.replace(/([A-Z])/g, ' $1').trim();
 	};
 
+	const content = `#${postData.index} ${postData.title}`;
+
 	return (
 		<div className={styles.container}>
 			{!preventClick && (
@@ -211,10 +213,7 @@ function ActivityFeedPostItem({
 
 			{/* Post Content Section */}
 			<div>
-				<div className='flex gap-2'>
-					<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
-					<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
-				</div>
+				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{content}</h3>
 				<div className='mb-4 text-sm text-btn_secondary_text'>
 					<div className='-ml-2.5 flex max-h-40 w-full overflow-hidden border-none'>
 						<MarkdownEditor
