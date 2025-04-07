@@ -100,8 +100,8 @@ export class ValidatorService {
 		}
 	}
 
-	static isValidUserId(userId: number): boolean {
-		return this.isValidNumber(userId) && userId > 0;
+	static isValidUserId(userId: unknown): boolean {
+		return this.isValidNumber(userId) && Number(userId) > 0;
 	}
 
 	static isValidWeb3Address(address: string): boolean {

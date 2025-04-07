@@ -31,6 +31,8 @@ enum EWebhookEvent {
 	UNDELEGATED = 'undelegated'
 }
 
+// TODO: add handling for on-chain reputation scores
+
 export class WebhookService {
 	private static readonly zodParamsSchema = z.object({
 		webhookEvent: z.nativeEnum(EWebhookEvent)
@@ -58,7 +60,6 @@ export class WebhookService {
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		}),
-		// TODO: fix below:
 		[EWebhookEvent.VOTED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
@@ -93,7 +94,6 @@ export class WebhookService {
 		const { webhookEvent } = this.zodParamsSchema.parse({ webhookEvent: event });
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
-		// eslint-disable-next-line sonarjs/no-small-switch
 		switch (webhookEvent) {
 			case EWebhookEvent.POST_EDITED:
 				return this.handlePostEdited({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> });
@@ -105,6 +105,14 @@ export class WebhookService {
 					network,
 					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>
 				});
+			case EWebhookEvent.VOTED:
+			case EWebhookEvent.BOUNTY_CLAIMED:
+			case EWebhookEvent.DECISION_DEPOSIT_PLACED:
+			case EWebhookEvent.REMOVED_VOTE:
+			case EWebhookEvent.TIPPED:
+			case EWebhookEvent.DELEGATED:
+			case EWebhookEvent.UNDELEGATED:
+				return this.handleOtherEvent({ network, params });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -143,5 +151,24 @@ export class WebhookService {
 		await RedisService.DeleteActivityFeed({ network });
 		await RedisService.DeleteAllSubscriptionFeedsForNetwork(network);
 		await RedisService.DeleteDelegationStats(network);
+	}
+
+	private static async handleOtherEvent({
+		network,
+		params
+	}: {
+		network: ENetwork;
+		params: z.infer<
+			(typeof WebhookService.zodEventBodySchemas)[
+				| EWebhookEvent.VOTED
+				| EWebhookEvent.BOUNTY_CLAIMED
+				| EWebhookEvent.DECISION_DEPOSIT_PLACED
+				| EWebhookEvent.REMOVED_VOTE
+				| EWebhookEvent.TIPPED
+				| EWebhookEvent.DELEGATED
+				| EWebhookEvent.UNDELEGATED]
+		>;
+	}) {
+		console.log('TODO: add handling for event ', { network, params });
 	}
 }

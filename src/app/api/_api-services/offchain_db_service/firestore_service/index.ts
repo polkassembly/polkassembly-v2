@@ -1135,9 +1135,15 @@ export class FirestoreService extends FirestoreUtils {
 			.set({ ...activity, id: newActivityId });
 	}
 
-	static async IncrementUserProfileScore(userId: number, score: number) {
+	static async IncrementUserProfileScore({ userId, score }: { userId: number; score: number }) {
 		await this.usersCollectionRef()
 			.doc(userId.toString())
+			.set({ profileScore: this.increment(score) }, { merge: true });
+	}
+
+	static async IncrementAddressProfileScore({ address, score }: { address: string; score: number }) {
+		await this.addressesCollectionRef()
+			.doc(address)
 			.set({ profileScore: this.increment(score) }, { merge: true });
 	}
 
