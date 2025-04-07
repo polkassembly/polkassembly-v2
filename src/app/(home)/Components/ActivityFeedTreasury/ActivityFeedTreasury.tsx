@@ -94,7 +94,7 @@ export default function ActivityFeedTreasury() {
 	const [nextBurn, setNextBurn] = useState<{ value: string; valueUSD: string } | null>(null);
 	const [isNextBurnLoading, setIsNextBurnLoading] = useState<boolean>(true);
 
-	const { data: treasuryStats } = useQuery({
+	const { data: treasuryStats, isLoading } = useQuery({
 		queryKey: ['treasuryStats'],
 		queryFn: getTreasuryStats,
 		staleTime: STALE_TIME
@@ -224,10 +224,14 @@ export default function ActivityFeedTreasury() {
 				</div>
 
 				<div className='flex items-center gap-2'>
-					<span className='text-xl font-bold text-btn_secondary_text'>
-						~${totalValueFormatted}
-						{totalValueSuffix}
-					</span>
+					{isLoading ? (
+						<Skeleton className='h-7 w-32' />
+					) : (
+						<span className='text-xl font-bold text-btn_secondary_text'>
+							~${totalValueFormatted}
+							{totalValueSuffix}
+						</span>
+					)}
 					<button
 						type='button'
 						onClick={() => setIsDetailsDialogOpen(true)}
@@ -238,81 +242,114 @@ export default function ActivityFeedTreasury() {
 				</div>
 
 				<div className='flex flex-wrap items-center gap-2'>
-					<TokenDisplay
-						icon={DotIcon}
-						amount={stats?.totalDot || 0}
-						symbol='DOT'
-					/>
-					<Separator
-						orientation='vertical'
-						className='h-3'
-					/>
-					<TokenDisplay
-						icon={UsdcIcon}
-						amount={stats?.totalUsdc || 0}
-						symbol='USDC'
-					/>
-					<Separator
-						orientation='vertical'
-						className='h-3'
-					/>
-					<TokenDisplay
-						icon={UsdtIcon}
-						amount={stats?.totalUsdt || 0}
-						symbol='USDt'
-					/>
-					<Separator
-						orientation='vertical'
-						className='h-3'
-					/>
-					<TokenDisplay
-						icon={MythIcon}
-						amount={stats?.totalMyth || 0}
-						symbol='MYTH'
-					/>
+					{isLoading ? (
+						<>
+							<Skeleton className='h-4 w-16' />
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<Skeleton className='h-4 w-16' />
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<Skeleton className='h-4 w-16' />
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<Skeleton className='h-4 w-16' />
+						</>
+					) : (
+						<>
+							<TokenDisplay
+								icon={DotIcon}
+								amount={stats?.totalDot || 0}
+								symbol='DOT'
+							/>
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<TokenDisplay
+								icon={UsdcIcon}
+								amount={stats?.totalUsdc || 0}
+								symbol='USDC'
+							/>
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<TokenDisplay
+								icon={UsdtIcon}
+								amount={stats?.totalUsdt || 0}
+								symbol='USDt'
+							/>
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<TokenDisplay
+								icon={MythIcon}
+								amount={stats?.totalMyth || 0}
+								symbol='MYTH'
+							/>
+						</>
+					)}
 				</div>
 
 				<div className='h-[30px] w-full sm:h-[35px] md:h-[60px]'>
-					<ChartContainer
-						config={chartConfig}
-						className='h-[30px] w-full sm:h-[35px] md:h-[60px]'
-					>
-						<ResponsiveContainer
-							width='100%'
-							height='100%'
+					{isLoading ? (
+						<Skeleton className='h-full w-full' />
+					) : (
+						<ChartContainer
+							config={chartConfig}
+							className='h-[30px] w-full sm:h-[35px] md:h-[60px]'
 						>
-							<AreaChart
-								data={chartData}
-								margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+							<ResponsiveContainer
+								width='100%'
+								height='100%'
 							>
-								<XAxis
-									dataKey='month'
-									axisLine={false}
-									tickLine={false}
-									tick={{ fontSize: 10, fill: 'var(--text-primary)' }}
-									height={20}
-									tickMargin={1}
-									tickCount={8}
-								/>
-								<RechartsTooltip content={CustomTooltip} />
-								<Area
-									type='monotone'
-									dataKey='value'
-									fill='rgba(223, 228, 255, 0.4)'
-									fillOpacity={0.4}
-									stroke='rgba(175, 184, 239, 0.8)'
-									strokeWidth={1.5}
-									isAnimationActive
-								/>
-							</AreaChart>
-						</ResponsiveContainer>
-					</ChartContainer>
+								<AreaChart
+									data={chartData}
+									margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+								>
+									<XAxis
+										dataKey='month'
+										axisLine={false}
+										tickLine={false}
+										tick={{ fontSize: 10, fill: 'var(--text-primary)' }}
+										height={20}
+										tickMargin={1}
+										tickCount={8}
+									/>
+									<RechartsTooltip content={CustomTooltip} />
+									<Area
+										type='monotone'
+										dataKey='value'
+										fill='rgba(223, 228, 255, 0.4)'
+										fillOpacity={0.4}
+										stroke='rgba(175, 184, 239, 0.8)'
+										strokeWidth={1.5}
+										isAnimationActive
+									/>
+								</AreaChart>
+							</ResponsiveContainer>
+						</ChartContainer>
+					)}
 				</div>
 			</div>
 			<div className='mt-3 flex items-center justify-center gap-2 rounded-lg bg-dot_price_bg p-2'>
 				<p className='text-sm text-wallet_btn_text'>{t('dotPrice')}</p>
-				<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice || 0}</span>
-				<PriceChange value={stats?.dot24hChange || 0} />
+				{isLoading ? (
+					<Skeleton className='h-5 w-12' />
+				) : (
+					<>
+						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice || 0}</span>
+						<PriceChange value={stats?.dot24hChange || 0} />
+					</>
+				)}
 			</div>
 			<Separator
 				orientation='horizontal'
@@ -320,8 +357,8 @@ export default function ActivityFeedTreasury() {
 			/>
 
 			<div className='flex items-center gap-3'>
-				{isNextBurnLoading ? (
-					<Skeleton className='h-4 w-20' />
+				{isNextBurnLoading || isLoading ? (
+					<Skeleton className='h-8 w-24' />
 				) : nextBurn ? (
 					<div className='flex flex-col'>
 						<div className='flex items-center gap-1 text-wallet_btn_text'>
