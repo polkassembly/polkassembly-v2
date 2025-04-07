@@ -109,7 +109,6 @@ export default function ActivityFeedTreasury() {
 			color: 'hsl(var(--chart-1))'
 		}
 	} satisfies ChartConfig;
-	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
 	const showValueUSD = nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '';
 
 	const chartData = useMemo(() => {
@@ -135,55 +134,6 @@ export default function ActivityFeedTreasury() {
 			};
 		});
 	}, [treasuryStats]);
-
-	useEffect(() => {
-		if (!apiService) return;
-		(async () => {
-			try {
-				const burnResult = await apiService.getNextBurnData();
-				if (!burnResult) {
-					setNextBurn(null);
-					return;
-				}
-				const value = formatUSDWithUnits(
-					formatBnBalance(
-						burnResult,
-						{
-							numberAfterComma: 0,
-							withThousandDelimitor: false,
-							withUnit: false
-						},
-						network
-					)
-				);
-				let valueUSD = '';
-				if (tokenPrice) {
-					const nextBurnValueUSD = parseFloat(
-						formatBnBalance(
-							burnResult,
-							{
-								numberAfterComma: 2,
-								withThousandDelimitor: false,
-								withUnit: false
-							},
-							network
-						)
-					);
-					valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(tokenPrice)).toString());
-				}
-
-				setNextBurn({
-					value,
-					valueUSD
-				});
-			} catch (error) {
-				console.error('Error fetching burn data:', error);
-				setNextBurn(null);
-			} finally {
-				setIsNextBurnLoading(false);
-			}
-		})();
-	}, [apiService, tokenPrice]);
 
 	const stats = useMemo(() => {
 		if (!treasuryStats?.[0]) return null;
@@ -213,6 +163,55 @@ export default function ActivityFeedTreasury() {
 			return null;
 		}
 	}, [treasuryStats]);
+
+	useEffect(() => {
+		if (!apiService) return;
+		(async () => {
+			try {
+				const burnResult = await apiService.getNextBurnData();
+				if (!burnResult) {
+					setNextBurn(null);
+					return;
+				}
+				const value = formatUSDWithUnits(
+					formatBnBalance(
+						burnResult,
+						{
+							numberAfterComma: 0,
+							withThousandDelimitor: false,
+							withUnit: false
+						},
+						network
+					)
+				);
+				let valueUSD = '';
+				if (stats?.dotPrice) {
+					const nextBurnValueUSD = parseFloat(
+						formatBnBalance(
+							burnResult,
+							{
+								numberAfterComma: 2,
+								withThousandDelimitor: false,
+								withUnit: false
+							},
+							network
+						)
+					);
+					valueUSD = formatUSDWithUnits((nextBurnValueUSD * Number(stats?.dotPrice)).toString());
+				}
+
+				setNextBurn({
+					value,
+					valueUSD
+				});
+			} catch (error) {
+				console.error('Error fetching burn data:', error);
+				setNextBurn(null);
+			} finally {
+				setIsNextBurnLoading(false);
+			}
+		})();
+	}, [apiService]);
 
 	if (isFetching && !stats) {
 		return (

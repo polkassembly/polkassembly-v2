@@ -18,6 +18,7 @@ import { ReactElement } from 'react';
 import { ITreasuryStats } from '@/_shared/types';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useTranslations } from 'next-intl';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 
 type TFunction = ReturnType<typeof useTranslations>;
 
@@ -25,51 +26,6 @@ interface TreasuryDetailsDialogProps {
 	isOpen: boolean;
 	onClose: () => void;
 	data: ITreasuryStats;
-}
-
-/**
- * Formats a number with appropriate units (B, M, K) based on its magnitude.
- */
-function formatUSDWithUnits(value: string | number, toFixed: number = 2): string {
-	if (value === null || value === undefined || (typeof value === 'number' && isNaN(value))) {
-		return '0';
-	}
-
-	let numValue = typeof value === 'string' ? parseFloat(value) : value;
-	let suffix = '';
-
-	if (typeof value === 'string') {
-		const arr = value.split(' ');
-		if (arr.length > 1) {
-			numValue = parseFloat(arr[0]);
-			suffix = ` ${arr[1]}`;
-		}
-	}
-
-	let formatted = '';
-	if (Math.abs(numValue) >= 1.0e9) {
-		formatted = (Math.abs(numValue) / 1.0e9).toFixed(toFixed);
-		suffix = `B${suffix}`;
-	} else if (Math.abs(numValue) >= 1.0e6) {
-		formatted = (Math.abs(numValue) / 1.0e6).toFixed(toFixed);
-		suffix = `M${suffix}`;
-	} else if (Math.abs(numValue) >= 1.0e3) {
-		formatted = (Math.abs(numValue) / 1.0e3).toFixed(toFixed);
-		suffix = `K${suffix}`;
-	} else {
-		formatted = Math.abs(numValue).toFixed(toFixed);
-	}
-
-	formatted = formatted.replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
-	if (formatted.endsWith('.')) {
-		formatted = formatted.slice(0, -1);
-	}
-
-	if (numValue < 0) {
-		formatted = `-${formatted}`;
-	}
-
-	return formatted + suffix;
 }
 
 interface TokenValueDisplayProps {
@@ -264,7 +220,7 @@ const formatTreasuryValues = (data: ITreasuryStats) => {
 	const formatDotToUsd = (dotAmount: string): string => {
 		const dot = getExactDot(dotAmount);
 		const usdValue = dot * Number(data.nativeTokenUsdPrice);
-		return formatUSDWithUnits(usdValue);
+		return formatUSDWithUnits(usdValue.toString());
 	};
 
 	// Helper function to get the exact USD value for a given DOT amount
@@ -416,7 +372,7 @@ const renderOtherSections = (data: ITreasuryStats, treasury: ReturnType<typeof f
 		/>
 		<OtherSection
 			title={t('ambassador')}
-			usdValue={String(formatUSDWithUnits(treasury.ambassadorValue))}
+			usdValue={String(formatUSDWithUnits(treasury.ambassadorValue.toString()))}
 			dotValue={treasury.ambassadorValue}
 			externalLink='https://assethub-polkadot.subscan.io/account/13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX'
 		/>
