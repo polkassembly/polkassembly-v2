@@ -234,7 +234,7 @@ export default function ActivityFeedTreasury() {
 	return (
 		<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 			<div className='flex flex-col space-y-2'>
-				<div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+				<div className='flex flex-row items-center justify-between'>
 					<div className='flex items-center gap-1 text-wallet_btn_text'>
 						<p className='text-sm'>{t('treasury')}</p>
 						<MdInfoOutline className='text-md' />
@@ -249,7 +249,7 @@ export default function ActivityFeedTreasury() {
 					<button
 						type='button'
 						onClick={() => setIsDetailsDialogOpen(true)}
-						className='flex items-center text-xs text-pink-500 hover:text-pink-600'
+						className='flex items-center text-xs text-text_pink'
 					>
 						{t('details')} <FiChevronRight className='ml-1' />
 					</button>
