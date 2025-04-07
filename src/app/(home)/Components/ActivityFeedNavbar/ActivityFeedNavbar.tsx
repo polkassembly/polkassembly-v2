@@ -127,7 +127,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 					<div key={category}>
 						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
 							<DropdownMenu>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium', 'border-none')}>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab px-2 font-medium', 'border-none')}>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
@@ -136,7 +136,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 											height={20}
 											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
-										<span className='ml-1'>{category}</span>
+										<span className='ml-1 text-sm text-basic_text'>{category}</span>
 									</span>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
@@ -168,7 +168,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 										height={20}
 										className={cn('h-5 w-5', styles.darkIcon)}
 									/>
-									<span className='ml-1'>{category}</span>
+									<span className='ml-1 text-sm'>{category}</span>
 								</span>
 							</button>
 						)}

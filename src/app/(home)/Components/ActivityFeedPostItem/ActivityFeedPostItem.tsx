@@ -210,23 +210,25 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Post Content Section */}
-			<div className='flex gap-2'>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
-			</div>
-			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-full overflow-hidden border-none'>
-					<MarkdownEditor
-						markdown={postData.content}
-						readOnly
-					/>
+			<div>
+				<div className='flex gap-2'>
+					<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
+					<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
 				</div>
-				<Link
-					href={`/referenda/${postData.index}`}
-					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
-				>
-					{t('ActivityFeed.PostItem.readMore')}
-				</Link>
+				<div className='mb-4 text-sm text-btn_secondary_text'>
+					<div className='-ml-2.5 flex max-h-40 w-full overflow-hidden border-none'>
+						<MarkdownEditor
+							markdown={postData.content}
+							readOnly
+						/>
+					</div>
+					<Link
+						href={`/referenda/${postData.index}`}
+						className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
+					>
+						{t('ActivityFeed.PostItem.readMore')}
+					</Link>
+				</div>
 			</div>
 
 			{/* Metrics Section */}
@@ -250,7 +252,7 @@ function ActivityFeedPostItem({
 				</div>
 			)}
 
-			<hr className='my-4 border-[0.7px] border-primary_border' />
+			<hr className='mb-1 mt-3.5 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
 			{commentBox && (
