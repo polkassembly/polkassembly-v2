@@ -1039,3 +1039,13 @@ export interface ITrackDelegationDetails {
 	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
 	status: EDelegationStatus;
 }
+
+export interface ITreasuryTokenStats {
+	totalDot: number;
+	totalUsdc: number;
+	totalUsdt: number;
+	totalMyth: number;
+	dotPrice: string;
+	totalValueUsd: number;
+	dot24hChange: number;
+}
