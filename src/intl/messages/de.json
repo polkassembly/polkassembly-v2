@@ -62,7 +62,23 @@
 			"showLessComments": "Weniger Kommentare anzeigen",
 			"commentingOnProposal": "Kommentieren des Vorschlags"
 		},
-		"NoRank": "um Ihren Rang zu sehen"
+		"NoRank": "um Ihren Rang zu sehen",
+		"nextBurn": "Nächste Verbrennung",
+		"treasury": "Finanzverwaltung",
+		"unavailable": "Nicht verfügbar",
+		"details": "Details",
+		"dotPrice": "DOT-Preis",
+		"address": "Adresse",
+		"acrossNetworks": "Über Netzwerke",
+		"loadingTreasuryData": "Lade Finanzdaten...",
+		"treasuryDistribution": "Finanzverteilung",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"hydration": "Hydration",
+		"loans": "Kredite",
+		"bounties": "Prämien",
+		"ambassador": "Ambassador",
+		"fellowships": "Fellowships"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Bitte wählen Sie eine Brieftasche",

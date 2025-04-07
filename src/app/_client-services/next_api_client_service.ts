@@ -32,7 +32,8 @@ import {
 	EOffChainPostTopic,
 	IVoteCartItem,
 	EConvictionAmount,
-	IContentSummary
+	IContentSummary,
+	ITreasuryStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -93,7 +94,8 @@ enum EApiRoute {
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS'
 }
 
 export class NextApiClientService {
@@ -161,6 +163,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
+				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -756,5 +761,14 @@ export class NextApiClientService {
 			routeSegments: [proposalType, indexOrHash, 'content-summary']
 		});
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 }

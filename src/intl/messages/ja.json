@@ -62,7 +62,23 @@
 			"showLessComments": "コメントを減らす",
 			"commentingOnProposal": "提案にコメント中"
 		},
-		"NoRank": "ランクを見る"
+		"NoRank": "ランクを見る",
+		"nextBurn": "次の燃焼",
+		"treasury": "財務",
+		"unavailable": "利用不可",
+		"details": "詳細",
+		"dotPrice": "DOT価格",
+		"address": "アドレス",
+		"acrossNetworks": "ネットワーク間",
+		"loadingTreasuryData": "財務データを読み込んでいます...",
+		"treasuryDistribution": "財務分配",
+		"relayChain": "リレーチェーン",
+		"assetHub": "アセットハブ",
+		"hydration": "水素化",
+		"loans": "ローン",
+		"bounties": "報奨金",
+		"ambassador": "大使",
+		"fellowships": "フェローシップ"
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",

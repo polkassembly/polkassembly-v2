@@ -13,8 +13,9 @@ import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { getTypeDef } from '@polkadot/types';
+import { Permill } from '@polkadot/types/interfaces';
 import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
-import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { BN, BN_HUNDRED, BN_MILLION, BN_ZERO, u8aConcat, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -734,5 +735,42 @@ export class PolkadotApiService {
 		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
 		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
+	}
+
+	async getNextBurnData() {
+		try {
+			if (!this.api.consts.treasury) {
+				return null;
+			}
+			const treasuryAccount = u8aConcat(
+				'modl',
+				this.api.consts.treasury.palletId ? this.api.consts.treasury.palletId.toU8a(true) : `${['polymesh', 'polymesh-test'].includes(this.network) ? 'pm' : 'pr'}/trsry`,
+				new Uint8Array(32)
+			);
+			if (!this.api.query.system?.account) {
+				return null;
+			}
+			const accountInfo = await this.api.query.system.account(treasuryAccount);
+			let freeBalance = BN_ZERO;
+			try {
+				freeBalance = new BN((accountInfo as any).data.free) || BN_ZERO;
+			} catch (error) {
+				console.error('Error accessing treasury balance:', error);
+				return null;
+			}
+			if (!this.api.consts.treasury.burn) {
+				return null;
+			}
+			const burnPercent = this.api.consts.treasury.burn as Permill;
+			if (freeBalance.lte(BN_ZERO) || burnPercent.isZero()) {
+				return null;
+			}
+
+			const burn = burnPercent.mul(freeBalance).div(BN_MILLION);
+			return burn.toString();
+		} catch (error) {
+			console.error('Error getting next burn data:', error);
+			return null;
+		}
 	}
 }

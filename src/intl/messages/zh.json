@@ -62,7 +62,23 @@
 			"showLessComments": "显示更少评论",
 			"commentingOnProposal": "正在评论提案"
 		},
-		"NoRank": "查看您的排名"
+		"NoRank": "查看您的排名",
+		"nextBurn": "下一次燃烧",
+		"treasury": "国库",
+		"unavailable": "不可用",
+		"details": "详情",
+		"dotPrice": "DOT价格",
+		"address": "地址",
+		"acrossNetworks": "跨网络",
+		"loadingTreasuryData": "加载国库数据...",
+		"treasuryDistribution": "国库分配",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"hydration": "Hydration",
+		"loans": "贷款",
+		"bounties": "赏金",
+		"ambassador": "大使",
+		"fellowships": "Fellowships"
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",

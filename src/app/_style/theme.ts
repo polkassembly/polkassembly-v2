@@ -109,7 +109,8 @@ export const THEME_COLORS = {
 		create_cancel_bg: '#00B252',
 		create_kill_bg: '#FC2626',
 		address_input_bg: '#66A5FF2E',
-		warning: '#F89118'
+		warning: '#F89118',
+		dot_price_bg: '#f9f9f9'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -215,6 +216,7 @@ export const THEME_COLORS = {
 		create_cancel_bg: '#00B252',
 		create_kill_bg: '#FC2626',
 		address_input_bg: '#66A5FF2E',
-		warning: '#F89118'
+		warning: '#F89118',
+		dot_price_bg: '#343336'
 	}
 };

@@ -8,6 +8,7 @@ import ActivityFeedAbout from './Sidebar/ActivityFeedAbout/ActivityFeedAbout';
 import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal/ActivityFeedActiveProposal';
 import ActivityFeedRankCard from './Sidebar/ActivityFeedRankCard';
 import ActivityFeedFeaturesSection from './Sidebar/ActivityFeedFeaturesSection/ActivityFeedFeaturesSection';
+import ActivityFeedTreasury from './ActivityFeedTreasury/ActivityFeedTreasury';
 
 function ActivityFeedSidebar() {
 	const { user } = useUser();
@@ -18,6 +19,7 @@ function ActivityFeedSidebar() {
 			{user?.id && <ActivityFeedActiveProposal />}
 			<ActivityFeedRankCard />
 			<ActivityFeedFeaturesSection />
+			<ActivityFeedTreasury />
 		</div>
 	);
 }

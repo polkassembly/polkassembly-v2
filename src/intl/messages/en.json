@@ -62,7 +62,23 @@
 			"showLessComments": "Show less comments",
 			"commentingOnProposal": "Commenting on proposal"
 		},
-		"NoRank": "to see your rank"
+		"NoRank": "to see your rank",
+		"nextBurn": "Next Burn",
+		"treasury": "Treasury",
+		"unavailable": "Unavailable",
+		"details": "Details",
+		"dotPrice": "DOT Price",
+		"address": "Address",
+		"acrossNetworks": "Across Networks",
+		"loadingTreasuryData": "Loading treasury data...",
+		"treasuryDistribution": "Treasury Distribution",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"hydration": "Hydration",
+		"loans": "Loans",
+		"bounties": "Bounties",
+		"ambassador": "Ambassador",
+		"fellowships": "Fellowships"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",

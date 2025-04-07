@@ -62,7 +62,23 @@
 			"showLessComments": "Mostrar menos comentarios",
 			"commentingOnProposal": "Comentando en la propuesta"
 		},
-		"NoRank": "para ver tu rango"
+		"NoRank": "para ver tu rango",
+		"nextBurn": "Próxima quema",
+		"treasury": "Administración de Finanzas",
+		"unavailable": "No disponible",
+		"details": "Detalles",
+		"dotPrice": "Precio de DOT",
+		"address": "Dirección",
+		"acrossNetworks": "En Redes",
+		"loadingTreasuryData": "Cargando datos de tesorería...",
+		"treasuryDistribution": "Distribución de Tesorería",
+		"relayChain": "Cadena Relay",
+		"assetHub": "Hub de Activos",
+		"hydration": "Hidratación",
+		"loans": "Préstamos",
+		"bounties": "Recompensas",
+		"ambassador": "Embajador",
+		"fellowships": "Fellowships"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione billetera",
