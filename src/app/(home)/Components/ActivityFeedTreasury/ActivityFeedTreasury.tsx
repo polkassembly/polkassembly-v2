@@ -18,7 +18,6 @@ import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
 import { Separator } from '@/app/_shared-components/Separator';
-import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
@@ -95,7 +94,7 @@ export default function ActivityFeedTreasury() {
 	const [nextBurn, setNextBurn] = useState<{ value: string; valueUSD: string } | null>(null);
 	const [isNextBurnLoading, setIsNextBurnLoading] = useState<boolean>(true);
 
-	const { data: treasuryStats, isFetching } = useQuery({
+	const { data: treasuryStats } = useQuery({
 		queryKey: ['treasuryStats'],
 		queryFn: getTreasuryStats,
 		staleTime: STALE_TIME
@@ -211,21 +210,6 @@ export default function ActivityFeedTreasury() {
 		})();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService]);
-
-	if (isFetching && !stats) {
-		return (
-			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
-				<div className='p-3'>
-					<p className='text-sm text-wallet_btn_text'>
-						{t('treasury')} <MdInfoOutline className='inline-block text-lg' />
-					</p>
-					<div className='relative mt-10'>
-						<LoadingLayover />
-					</div>
-				</div>
-			</div>
-		);
-	}
 
 	const { formatted: totalValueFormatted, suffix: totalValueSuffix } = formatNumberWithSuffix(stats?.totalValueUsd || 0);
 

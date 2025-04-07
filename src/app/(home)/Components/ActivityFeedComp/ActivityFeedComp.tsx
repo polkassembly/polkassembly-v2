@@ -16,7 +16,7 @@ import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 
 function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericListingResponse<IPostListing>; activeTab: EActivityFeedTab }) {
-	const t = useTranslations();
+	const t = useTranslations('ActivityFeed');
 	const { state } = useSidebar();
 
 	return (
@@ -26,7 +26,7 @@ function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericLis
 					<div className={styles.activityFeedContainer}>
 						<div className={styles.activityFeedToggleButton}>
 							<div>
-								<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
+								<h1 className={styles.activityFeedTitle}>{t('title')}</h1>
 							</div>
 							<ActivityFeedToggleButton activeTab={activeTab} />
 						</div>
