@@ -78,7 +78,9 @@
 		"loans": "Préstamos",
 		"bounties": "Recompensas",
 		"ambassador": "Embajador",
-		"fellowships": "Fellowships"
+		"fellowships": "Fellowships",
+		"dataUnavailable": "Datos no disponibles",
+		"noChartData": "No hay datos disponibles para el gráfico"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Por favor seleccione billetera",

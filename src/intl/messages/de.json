@@ -78,7 +78,9 @@
 		"loans": "Kredite",
 		"bounties": "Prämien",
 		"ambassador": "Ambassador",
-		"fellowships": "Fellowships"
+		"fellowships": "Fellowships",
+		"dataUnavailable": "Daten nicht verfügbar",
+		"noChartData": "Keine Diagrammdaten verfügbar"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Bitte wählen Sie eine Brieftasche",

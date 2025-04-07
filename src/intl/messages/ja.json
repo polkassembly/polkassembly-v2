@@ -78,7 +78,9 @@
 		"loans": "ローン",
 		"bounties": "報奨金",
 		"ambassador": "大使",
-		"fellowships": "フェローシップ"
+		"fellowships": "フェローシップ",
+		"dataUnavailable": "データが利用できません",
+		"noChartData": "グラフデータがありません"
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",

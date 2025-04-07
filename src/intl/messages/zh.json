@@ -78,7 +78,9 @@
 		"loans": "贷款",
 		"bounties": "赏金",
 		"ambassador": "大使",
-		"fellowships": "Fellowships"
+		"fellowships": "Fellowships",
+		"dataUnavailable": "数据不可用",
+		"noChartData": "没有图表数据"
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",

@@ -78,7 +78,9 @@
 		"loans": "Loans",
 		"bounties": "Bounties",
 		"ambassador": "Ambassador",
-		"fellowships": "Fellowships"
+		"fellowships": "Fellowships",
+		"dataUnavailable": "Data Unavailable",
+		"noChartData": "No chart data available"
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
