@@ -24,7 +24,7 @@ export default async function PrivacyPolicyPage() {
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
-			<div className='rounded-md bg-white p-8 shadow'>
+			<div className='rounded-md bg-bg_modal p-8 shadow'>
 				<h1 className='mb-6 text-2xl font-semibold'>Privacy Policy</h1>
 				<MarkdownViewer markdown={policyContent} />
 			</div>
