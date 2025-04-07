@@ -198,24 +198,8 @@ const getExactTokenAmount = (amount: string, divisor: number = 1e6): number => {
 	return Number(amount) / divisor || 0;
 };
 
-// Calculate token amounts
-const calculateTokenAmounts = (data: ITreasuryStats) => {
-	return {
-		relayChainDot: getExactDot(data?.relayChain?.dot || '0'),
-		assetHubDot: getExactDot(data?.assetHub?.dot || '0'),
-		assetHubUsdc: getExactTokenAmount(data?.assetHub?.usdc || '0'),
-		assetHubUsdt: getExactTokenAmount(data?.assetHub?.usdt || '0'),
-		hydrationDot: getExactDot(data?.hydration?.dot || '0'),
-		hydrationUsdc: getExactTokenAmount(data?.hydration?.usdc || '0'),
-		hydrationUsdt: getExactTokenAmount(data?.hydration?.usdt || '0'),
-		bountiesDot: getExactDot(data?.bounties?.dot || '0'),
-		ambassadorValue: data?.ambassador?.dot ? getExactDot(data.ambassador.dot) : getExactTokenAmount(data?.ambassador?.usdt || '0'),
-		fellowshipDot: getExactDot(data?.fellowship?.dot || '0'),
-		fellowshipUsdt: getExactTokenAmount(data?.fellowship?.usdt || '0')
-	};
-};
-
-const formatTreasuryValues = (data: ITreasuryStats) => {
+// Calculate USD values
+const calculateUsdValues = (data: ITreasuryStats) => {
 	// Helper function to format DOT to USD
 	const formatDotToUsd = (dotAmount: string): string => {
 		const dot = getExactDot(dotAmount);
@@ -228,9 +212,6 @@ const formatTreasuryValues = (data: ITreasuryStats) => {
 		const dot = getExactDot(dotAmount);
 		return (dot * Number(data.nativeTokenUsdPrice)).toString();
 	};
-
-	// Get token amounts
-	const tokenAmounts = calculateTokenAmounts(data);
 
 	return {
 		// Formatted USD values
@@ -249,10 +230,30 @@ const formatTreasuryValues = (data: ITreasuryStats) => {
 		exactBountiesUsd: getExactDotToUsd(data?.bounties?.dot || '0'),
 		exactAmbassadorUsd: getExactDotToUsd(data?.ambassador?.dot || '0'),
 		exactFellowshipUsd: getExactDotToUsd(data?.fellowship?.dot || '0'),
-		exactLoansUsd: getExactDotToUsd(data?.loans?.dot || '0'),
+		exactLoansUsd: getExactDotToUsd(data?.loans?.dot || '0')
+	};
+};
 
-		// Use pre-calculated token amounts
-		...tokenAmounts
+const calculateTokenAmounts = (data: ITreasuryStats) => {
+	return {
+		relayChainDot: getExactDot(data?.relayChain?.dot || '0'),
+		assetHubDot: getExactDot(data?.assetHub?.dot || '0'),
+		assetHubUsdc: getExactTokenAmount(data?.assetHub?.usdc || '0'),
+		assetHubUsdt: getExactTokenAmount(data?.assetHub?.usdt || '0'),
+		hydrationDot: getExactDot(data?.hydration?.dot || '0'),
+		hydrationUsdc: getExactTokenAmount(data?.hydration?.usdc || '0'),
+		hydrationUsdt: getExactTokenAmount(data?.hydration?.usdt || '0'),
+		bountiesDot: getExactDot(data?.bounties?.dot || '0'),
+		ambassadorValue: data?.ambassador?.dot ? getExactDot(data.ambassador.dot) : getExactTokenAmount(data?.ambassador?.usdt || '0'),
+		fellowshipDot: getExactDot(data?.fellowship?.dot || '0'),
+		fellowshipUsdt: getExactTokenAmount(data?.fellowship?.usdt || '0')
+	};
+};
+
+const formatTreasuryValues = (data: ITreasuryStats) => {
+	return {
+		...calculateUsdValues(data),
+		...calculateTokenAmounts(data)
 	};
 };
 
