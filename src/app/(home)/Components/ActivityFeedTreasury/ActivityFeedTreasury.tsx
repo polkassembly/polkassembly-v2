@@ -27,6 +27,16 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { TreasuryDetailsDialog } from '../ActivityFeedTreasuryDialog/ActivityFeedTreasuryDialog';
 
+type TreasuryStats = {
+	totalDot: number;
+	totalUsdc: number;
+	totalUsdt: number;
+	totalMyth: number;
+	dotPrice: string;
+	totalValueUsd: number;
+	dot24hChange: number;
+} | null;
+
 function formatNumberWithSuffix(value: number): { formatted: string; suffix: string } {
 	if (value >= 1_000_000_000) {
 		return { formatted: (value / 1_000_000_000).toFixed(2), suffix: 'B' };
@@ -41,6 +51,8 @@ function formatNumberWithSuffix(value: number): { formatted: string; suffix: str
 }
 
 function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: number; symbol: string }) {
+	if (!amount) return null;
+
 	const { formatted, suffix } = formatNumberWithSuffix(amount);
 
 	return (
@@ -56,6 +68,67 @@ function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount:
 				{suffix} {symbol}
 			</span>
 		</div>
+	);
+}
+
+function TokensList({ stats }: { stats: TreasuryStats }) {
+	if (!stats) return null;
+
+	return (
+		<>
+			{stats.totalDot ? (
+				<TokenDisplay
+					icon={DotIcon}
+					amount={stats.totalDot}
+					symbol='DOT'
+				/>
+			) : null}
+
+			{stats.totalDot && (stats.totalUsdc || stats.totalUsdt || stats.totalMyth) ? (
+				<Separator
+					orientation='vertical'
+					className='h-3'
+				/>
+			) : null}
+
+			{stats.totalUsdc ? (
+				<TokenDisplay
+					icon={UsdcIcon}
+					amount={stats.totalUsdc}
+					symbol='USDC'
+				/>
+			) : null}
+
+			{stats.totalUsdc && (stats.totalUsdt || stats.totalMyth) ? (
+				<Separator
+					orientation='vertical'
+					className='h-3'
+				/>
+			) : null}
+
+			{stats.totalUsdt ? (
+				<TokenDisplay
+					icon={UsdtIcon}
+					amount={stats.totalUsdt}
+					symbol='USDt'
+				/>
+			) : null}
+
+			{stats.totalUsdt && stats.totalMyth ? (
+				<Separator
+					orientation='vertical'
+					className='h-3'
+				/>
+			) : null}
+
+			{stats.totalMyth ? (
+				<TokenDisplay
+					icon={MythIcon}
+					amount={stats.totalMyth}
+					symbol='MYTH'
+				/>
+			) : null}
+		</>
 	);
 }
 
@@ -262,40 +335,7 @@ export default function ActivityFeedTreasury() {
 							<Skeleton className='h-4 w-16' />
 						</>
 					) : (
-						<>
-							<TokenDisplay
-								icon={DotIcon}
-								amount={stats?.totalDot || 0}
-								symbol='DOT'
-							/>
-							<Separator
-								orientation='vertical'
-								className='h-3'
-							/>
-							<TokenDisplay
-								icon={UsdcIcon}
-								amount={stats?.totalUsdc || 0}
-								symbol='USDC'
-							/>
-							<Separator
-								orientation='vertical'
-								className='h-3'
-							/>
-							<TokenDisplay
-								icon={UsdtIcon}
-								amount={stats?.totalUsdt || 0}
-								symbol='USDt'
-							/>
-							<Separator
-								orientation='vertical'
-								className='h-3'
-							/>
-							<TokenDisplay
-								icon={MythIcon}
-								amount={stats?.totalMyth || 0}
-								symbol='MYTH'
-							/>
-						</>
+						<TokensList stats={stats} />
 					)}
 				</div>
 
@@ -344,11 +384,13 @@ export default function ActivityFeedTreasury() {
 				<p className='text-sm text-wallet_btn_text'>{t('dotPrice')}</p>
 				{isLoading ? (
 					<Skeleton className='h-5 w-12' />
-				) : (
+				) : stats?.dotPrice && Number(stats.dotPrice) !== 0 ? (
 					<>
-						<span className='font-semibold text-btn_secondary_text'>${stats?.dotPrice || 0}</span>
-						<PriceChange value={stats?.dot24hChange || 0} />
+						<span className='font-semibold text-btn_secondary_text'>${stats.dotPrice}</span>
+						{stats.dot24hChange ? <PriceChange value={stats.dot24hChange} /> : null}
 					</>
+				) : (
+					<span className='text-xs text-wallet_btn_text'>{t('unavailable')}</span>
 				)}
 			</div>
 			<Separator
