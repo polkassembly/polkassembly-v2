@@ -1,5 +1,5 @@
 .tableContainer {
-	@apply relative flex max-h-[500px] flex-col overflow-auto;
+	@apply relative flex max-h-[500px] w-full flex-col overflow-auto;
 }
 
 .table {

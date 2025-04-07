@@ -1,3 +1,6 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
 import { IVoteData } from '@/_shared/types';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import React, { useState } from 'react';
@@ -7,12 +10,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
+import { Collapsible, CollapsibleContent } from '@/app/_shared-components/Collapsible';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
 import Address from '../../../Profile/Address/Address';
 import { Button } from '../../../Button';
 import LoadingLayover from '../../../LoadingLayover';
 import classes from './VoteHistory.module.scss';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 
 function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	return sort === 'asc' ? (
@@ -91,8 +95,6 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 		}
 	});
 
-	console.log('votes', votes);
-
 	const formatBalance = (balance: string) => {
 		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
 	};
@@ -115,85 +117,115 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 						</TableRow>
 					))}
 				</TableHeader>
-				<TableBody className='flex-1 overflow-y-auto'>
+				<TableBody>
 					{table.getRowModel().rows.map((vote) => {
 						const voteData = vote.original;
 						const isOpen = openRow === voteData.voterAddress;
 						const voterDelegations = Array.isArray(voteData.delegatedVotes) ? voteData.delegatedVotes : [];
-
 						const renderCollapsible = voterDelegations.length > 0;
 
 						return (
 							<React.Fragment key={voteData.voterAddress}>
-								{renderCollapsible ? (
-									<Collapsible
-										key={voteData.voterAddress}
-										open={isOpen}
-										onOpenChange={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
-									>
-										<CollapsibleTrigger
-											asChild
-											className='w-full'
-										>
-											<TableRow className='cursor-pointer'>
-												<TableCell className='max-w-[200px] py-4'>
-													<Address address={voteData.voterAddress} />
-												</TableCell>
-												<TableCell className='py-4'>
-													{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-												</TableCell>
-												<TableCell className='py-4'>
-													{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-												</TableCell>
-												<TableCell className='py-4'>
-													{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-												</TableCell>
-												<TableCell className='py-4'>
-													{voterDelegations.length > 0 && <button className='collapsibleButton'>{isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</button>}
-												</TableCell>
-											</TableRow>
-										</CollapsibleTrigger>
+								<TableRow className='cursor-pointer'>
+									<TableCell className='max-w-[200px] py-4'>
+										<Address address={voteData.voterAddress} />
+									</TableCell>
+									<TableCell className='py-4'>
+										{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</TableCell>
+									<TableCell className='py-4'>
+										{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</TableCell>
+									<TableCell className='py-4'>
+										{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</TableCell>
+									<TableCell className='py-4'>
+										{renderCollapsible && (
+											<button
+												type='submit'
+												className='collapsibleButton'
+												onClick={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
+											>
+												{isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+											</button>
+										)}
+									</TableCell>
+								</TableRow>
 
-										<CollapsibleContent asChild>
-											<TableRow className='collapsibleContent'>
-												<TableCell colSpan={4}>
-													<div className='pl-6 pt-2 text-xs text-muted-foreground'>
-														<strong>Delegation List</strong>
-														<div className='mt-2 space-y-1'>
-															{voterDelegations.map((delegator: any, index) => (
+								{renderCollapsible && (
+									<TableRow>
+										<TableCell colSpan={5}>
+											<Collapsible
+												open={isOpen}
+												onOpenChange={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
+											>
+												<CollapsibleContent asChild>
+													<div>
+														<div>
+															<div className='flex items-center justify-between'>
+																<span>Vote Detail</span>
+																<span>{dayjs(voteData.createdAt ?? '').format("Do MMM 'YY")}</span>
+															</div>
+															<div className='flex justify-between'>
+																<div className='flex w-[200px] flex-col gap-1'>
+																	<div className='text-lightBlue dark:text-blue-dark-medium text-xs font-medium'>Self Votes</div>
+																	<div className='flex justify-between'>
+																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Voting Power</span>
+																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																	</div>
+																	<div className='flex justify-between'>
+																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Conviction</span>
+																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0x</span>
+																	</div>
+																	<div className='flex justify-between'>
+																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Capital</span>
+																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																	</div>
+																</div>
+																<div className='border-section-light-container dark:border-separatorDark border-y-0 border-l-2 border-r-0 border-dashed dark:border-[#3B444F]' />
+																<div className='mr-3 flex w-[200px] flex-col gap-1'>
+																	<div className='text-lightBlue dark:text-blue-dark-medium text-xs font-medium'>Delegated Votes</div>
+																	<div className='flex justify-between'>
+																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Voting Power</span>
+																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																	</div>
+																	<div className='flex justify-between'>
+																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Delegators</span>
+																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0x</span>
+																	</div>
+																	<div className='flex justify-between'>
+																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Capital</span>
+																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																	</div>
+																</div>
+															</div>
+														</div>
+
+														<div className='pt-2 text-xs text-muted-foreground'>
+															<strong>Delegation List</strong>
+															<div className='flex items-center justify-between'>
+																<span>Delegators</span>
+																<span>Capital</span>
+																<span>Voting Power</span>
+															</div>
+															{voterDelegations.map((delegator: IVoteData) => (
 																<div
-																	key={index}
-																	className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'
+																	key={delegator?.voterAddress}
+																	className='mt-2 space-y-1 border-b border-dashed border-gray-400'
 																>
-																	<Address address={delegator?.voterAddress} />
-
-																	<span>{delegator?.lockPeriod || '0'}/d</span>
-																	<span>
-																		{formatBalance(delegator?.totalVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-																	</span>
+																	<div className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'>
+																		<Address address={delegator?.voterAddress} />
+																		<span>{delegator?.lockPeriod || '0'} /d</span>
+																		<span>
+																			{formatBalance(delegator?.totalVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+																		</span>
+																	</div>
 																</div>
 															))}
 														</div>
 													</div>
-												</TableCell>
-											</TableRow>
-										</CollapsibleContent>
-									</Collapsible>
-								) : (
-									<TableRow className='cursor-pointer'>
-										<TableCell className='max-w-[200px] py-4'>
-											<div className='flex items-center gap-2'>
-												<Address address={voteData.voterAddress} />
-											</div>
-										</TableCell>
-										<TableCell className='py-4'>
-											{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-										</TableCell>
-										<TableCell className='py-4'>
-											{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-										</TableCell>
-										<TableCell className='py-4'>
-											{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+												</CollapsibleContent>
+											</Collapsible>
 										</TableCell>
 									</TableRow>
 								)}
