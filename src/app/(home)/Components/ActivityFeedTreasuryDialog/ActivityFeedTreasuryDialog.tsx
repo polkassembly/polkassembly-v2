@@ -28,7 +28,7 @@ interface TreasuryDetailsDialogProps {
 	data: ITreasuryStats;
 }
 
-interface OtherSectionProps {
+interface OtherNetworkSectionProps {
 	title: string;
 	usdValue: string;
 	dotValue: number;
@@ -36,7 +36,7 @@ interface OtherSectionProps {
 	fellowshipUsdt?: number;
 }
 
-function OtherSection({ title, usdValue, dotValue, externalLink, fellowshipUsdt }: OtherSectionProps) {
+function OtherNetworkSection({ title, usdValue, dotValue, externalLink, fellowshipUsdt }: OtherNetworkSectionProps) {
 	return (
 		<div>
 			<div className='flex items-center gap-2 text-btn_secondary_text'>
@@ -78,7 +78,6 @@ function OtherSection({ title, usdValue, dotValue, externalLink, fellowshipUsdt 
 }
 
 export function TreasuryDetailsDialog({ isOpen, onClose, data }: TreasuryDetailsDialogProps): ReactElement {
-	const isDataLoaded = !!data;
 	const t = useTranslations('ActivityFeed');
 	const treasury = formatTreasuryValues(data);
 	return (
@@ -90,7 +89,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: TreasuryDetails
 				<DialogHeader>
 					<DialogTitle className='text-2xl font-medium text-slate-800'>{t('treasuryDistribution')}</DialogTitle>
 				</DialogHeader>
-				{!isDataLoaded ? (
+				{!data && !treasury ? (
 					<div className='py-2 text-center'>{t('loadingTreasuryData')}</div>
 				) : (
 					<div>
@@ -99,48 +98,48 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: TreasuryDetails
 							<NetworkSection
 								title={t('relayChain')}
 								icon={RelayIcon}
-								usdValue={treasury?.relayChainUsd || '0'}
-								dotValue={treasury?.relayChainDot || 0}
+								usdValue={treasury?.relayChainUsd}
+								dotValue={treasury?.relayChainDot}
 							/>
 							<NetworkSection
 								title={t('assetHub')}
 								icon={AssetHubIcon}
-								usdValue={treasury?.assetHubUsd || '0'}
-								dotValue={treasury?.assetHubDot || 0}
-								usdcValue={treasury?.assetHubUsdc || 0}
-								usdtValue={treasury?.assetHubUsdt || 0}
+								usdValue={treasury?.assetHubUsd}
+								dotValue={treasury?.assetHubDot}
+								usdcValue={treasury?.assetHubUsdc}
+								usdtValue={treasury?.assetHubUsdt}
 								usdtExternalLink='https://assethub-polkadot.subscan.io/account/14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk'
 							/>
 							<NetworkSection
 								title={t('hydration')}
 								icon={HydrationIcon}
-								usdValue={treasury?.hydrationUsd || '0'}
-								dotValue={treasury?.hydrationDot || 0}
-								usdcValue={treasury?.hydrationUsdc || 0}
-								usdtValue={treasury?.hydrationUsdt || 0}
+								usdValue={treasury?.hydrationUsd}
+								dotValue={treasury?.hydrationDot}
+								usdcValue={treasury?.hydrationUsdc}
+								usdtValue={treasury?.hydrationUsdt}
 								usdtExternalLink='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
 								secondUsdtExternalLink='https://hydration.subscan.io/account/7KCp4eenFS4CowF9SpQE5BBCj5MtoBA3K811tNyRmhLfH1aV'
 							/>
 						</div>
 						<div className='my-4 border-t border-border_grey' />
 						<div>
-							<OtherSection
+							<OtherNetworkSection
 								title={t('bounties')}
-								usdValue={treasury?.bountiesUsd || '0'}
-								dotValue={treasury?.bountiesDot || 0}
+								usdValue={treasury?.bountiesUsd}
+								dotValue={treasury?.bountiesDot}
 								externalLink='https://polkadot.polkassembly.io/bounty-dashboard'
 							/>
-							<OtherSection
+							<OtherNetworkSection
 								title={t('ambassador')}
-								usdValue={String(formatUSDWithUnits(treasury?.ambassadorValue?.toString() || '0'))}
-								dotValue={treasury?.ambassadorValue || 0}
+								usdValue={String(formatUSDWithUnits(treasury?.ambassadorValue?.toString()))}
+								dotValue={treasury?.ambassadorValue}
 								externalLink='https://assethub-polkadot.subscan.io/account/13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX'
 							/>
-							<OtherSection
+							<OtherNetworkSection
 								title={t('fellowships')}
-								usdValue={treasury?.fellowshipUsd || '0'}
-								dotValue={treasury?.fellowshipDot || 0}
-								fellowshipUsdt={treasury?.fellowshipUsdt || 0}
+								usdValue={treasury?.fellowshipUsd}
+								dotValue={treasury?.fellowshipDot}
+								fellowshipUsdt={treasury?.fellowshipUsdt}
 							/>
 							<LoansSection data={data} />
 						</div>{' '}
