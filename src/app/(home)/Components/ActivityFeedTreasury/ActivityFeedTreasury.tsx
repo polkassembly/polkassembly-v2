@@ -27,7 +27,7 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { TreasuryDetailsDialog } from '../ActivityFeedTreasuryDialog/ActivityFeedTreasuryDialog';
 
-type TreasuryStats = {
+type TreasuryTokenStats = {
 	totalDot: number;
 	totalUsdc: number;
 	totalUsdt: number;
@@ -71,7 +71,7 @@ function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount:
 	);
 }
 
-function TokensList({ stats }: { stats: TreasuryStats }) {
+function TokensList({ stats }: { stats: TreasuryTokenStats }) {
 	if (!stats) return null;
 
 	return (
