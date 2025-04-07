@@ -20,7 +20,8 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { useTranslations } from 'next-intl';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 
-type TFunction = ReturnType<typeof useTranslations>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TFunction = any;
 
 interface TreasuryDetailsDialogProps {
 	isOpen: boolean;
