@@ -57,7 +57,11 @@
 
 		&:hover {
 			text-decoration: underline;
-			color: var(--text_pink_secondary);
+			color: var(--text_pink);
+		}
+
+		&:visited {
+			color: var(--text_pink);
 		}
 
 		&:focus {
@@ -66,14 +70,7 @@
 		}
 	}
 
-	p,
-	blockquote,
-	ul,
-	ol,
-	dl,
-	table,
-	pre,
-	details {
+	p {
 		margin-top: 0;
 		margin-bottom: 16px;
 	}
@@ -88,6 +85,8 @@
 	ul,
 	ol {
 		padding-left: 2em;
+		margin-top: 0;
+		margin-bottom: 16px;
 	}
 
 	ul ul,
@@ -191,20 +190,37 @@
 		border: 0;
 	}
 
-	// Task lists
 	input[type='checkbox'] {
 		margin-right: 0.5em;
 		vertical-align: middle;
 	}
 
-	// Highlight
 	mark {
 		background-color: rgba(var(--text_pink_rgb), 0.2);
 		padding: 0.1em 0.2em;
 		border-radius: 2px;
 	}
 
-	// Custom styles for embedded content
+	a[href^='http'],
+	a[href^='https'],
+	a[href^='www.'] {
+		color: var(--text_pink);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	a[href^='mailto:'] {
+		color: var(--text_pink);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
 	iframe,
 	video {
 		max-width: 100%;
