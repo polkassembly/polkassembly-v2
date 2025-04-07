@@ -50,7 +50,7 @@ const DropdownMenuTrigger = React.forwardRef<
 		className={cn('w-full cursor-pointer gap-x-2 rounded-lg border border-border_grey px-2 py-3 text-sm font-normal capitalize text-placeholder', className)}
 		{...props}
 	>
-		<div className='flex w-full items-center justify-between gap-x-1'>
+		<div className='flex w-full items-center justify-between gap-x-2'>
 			{children}
 			{!noArrow && <ChevronDown className='h-4 w-4' />}
 		</div>
