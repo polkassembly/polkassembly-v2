@@ -210,12 +210,12 @@ export default function ActivityFeedTreasury() {
 
 		try {
 			const data = treasuryStats[0];
-			const totalDot = Number(data?.total?.totalDot || 0) / 10000000000;
-			const tokenPrice = Number(data.nativeTokenUsdPrice) || 0;
-			const dot24hChange = Number(data?.nativeTokenUsdPrice24hChange) || 0;
-			const totalUsdc = Number(data?.total?.totalUsdc || 0) / 1_000_000;
-			const totalUsdt = Number(data?.total?.totalUsdt || 0) / 1_000_000;
-			const totalMyth = Number(data?.total?.totalMyth || 0) / 1e18;
+			const totalDot = Number(data?.total?.totalDot) / 10000000000;
+			const tokenPrice = Number(data.nativeTokenUsdPrice);
+			const dot24hChange = Number(data?.nativeTokenUsdPrice24hChange);
+			const totalUsdc = Number(data?.total?.totalUsdc) / 1_000_000;
+			const totalUsdt = Number(data?.total?.totalUsdt) / 1_000_000;
+			const totalMyth = Number(data?.total?.totalMyth) / 1e18;
 
 			const totalValueUsd = totalDot * tokenPrice + totalUsdc + totalUsdt;
 
