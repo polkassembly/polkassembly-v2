@@ -366,6 +366,7 @@
 		"loginToVote": "投票するにはログイン",
 		"requested": "リクエスト済み",
 		"beneficiary": "受益者",
+		"noVotes": "投票が見つかりません",
 		"description": "説明",
 		"timeline": "タイムライン",
 		"more": "もっと",

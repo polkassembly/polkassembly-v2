@@ -367,6 +367,7 @@
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
 		"description": "Descripción",
+		"noVotes": "No se encontraron votos",
 		"timeline": "Línea de Tiempo",
 		"more": "más",
 		"referendum": "Referendo",

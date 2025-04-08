@@ -366,6 +366,7 @@
 		"loginToVote": "登录以投票",
 		"requested": "已请求",
 		"beneficiary": "受益人",
+		"noVotes": "未找到投票",
 		"description": "描述",
 		"timeline": "时间线",
 		"more": "更多",

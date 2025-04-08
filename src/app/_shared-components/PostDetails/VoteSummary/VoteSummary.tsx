@@ -16,16 +16,22 @@ import { ChevronRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import Image from 'next/image';
+import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 import { Skeleton } from '../../Skeleton';
 
+const AYE_COLOR = '#6DE1A2';
+const NAY_COLOR = '#FF778F';
+const NONE_CHART_VALUE = 0;
+
 function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
@@ -40,9 +46,9 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 		const ongoingReferendaTally = await apiService.getOngoingReferendaTally({ postIndex: Number(index) });
 		if (!ongoingReferendaTally) {
 			setTally({
-				aye: voteMetrics?.[EVoteDecision.AYE].value || '0',
-				nay: voteMetrics?.[EVoteDecision.NAY].value || '0',
-				support: voteMetrics?.support?.value || '0'
+				aye: voteMetrics?.[EVoteDecision.AYE].value || null,
+				nay: voteMetrics?.[EVoteDecision.NAY].value || null,
+				support: voteMetrics?.support?.value || null
 			});
 			setLoading(false);
 		} else {
@@ -55,8 +61,8 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 		if (!apiService) return;
 		const totalIssuance = await apiService?.getTotalIssuance();
 		const inactiveIssuance = await apiService?.getInactiveIssuance();
-		const totalIssuanceBN = new BN(totalIssuance?.toString() || '0');
-		const inactiveIssuanceBN = new BN(inactiveIssuance?.toString() || '0');
+		const totalIssuanceBN = new BN(totalIssuance?.toString() || BN_ZERO.toString());
+		const inactiveIssuanceBN = new BN(inactiveIssuance?.toString() || BN_ZERO.toString());
 		setIssuance(totalIssuanceBN.sub(inactiveIssuanceBN));
 	}, [apiService]);
 
@@ -68,25 +74,29 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 
 	if (!voteMetrics) return null;
 
-	const ayeVotesNumber = Number(formatBnBalance(tally.aye || '0', { numberAfterComma: 6, withThousandDelimitor: false }, network));
-	const totalVotesNumber = Number(formatBnBalance(new BN(tally.aye || '0').add(new BN(tally.nay || '0')), { numberAfterComma: 6, withThousandDelimitor: false }, network));
+	const ayeVotesNumber = Number(formatBnBalance(tally.aye || BN_ZERO.toString(), { numberAfterComma: 6, withThousandDelimitor: false }, network));
+	const totalVotesNumber = Number(
+		formatBnBalance(new BN(tally.aye || BN_ZERO.toString()).add(new BN(tally.nay || BN_ZERO.toString())), { numberAfterComma: 6, withThousandDelimitor: false }, network)
+	);
 
 	const ayePercent = (ayeVotesNumber / totalVotesNumber) * 100;
 	const nayPercent = 100 - ayePercent;
 	const isAyeNaN = !ValidatorService.isValidNumber(ayePercent);
 	const isNayNaN = !ValidatorService.isValidNumber(nayPercent);
+	const AYE_TITLE = t('PostDetails.aye');
+	const NAY_TITLE = t('PostDetails.nay');
 
 	return (
 		<div className={classes.voteSummaryWrapper}>
 			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
-			{loading || !tally.aye || !tally.nay ? (
+			{loading ? (
 				<Skeleton className='h-[220px] w-full' />
-			) : (
+			) : tally?.aye && tally?.nay ? (
 				<>
 					<div className={classes.voteSummaryPieChart}>
 						<div className={classes.voteSummaryPieChartAyeNay}>
-							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 50 : ayePercent.toFixed(1)}%</p>
-							<p className={classes.voteSummaryPieChartAyeNayTitle}>{t('PostDetails.aye')}</p>
+							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
+							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
 						<PieChart
 							className='w-[47%] xl:w-[49%]'
@@ -96,35 +106,40 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							rounded
 							lineWidth={15}
 							data={[
-								{ color: '#6DE1A2', title: 'Aye', value: isAyeNaN ? 50 : ayePercent },
-								{ color: '#FF778F', title: 'Nay', value: isNayNaN ? 50 : nayPercent }
+								{ color: AYE_COLOR, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+								{ color: NAY_COLOR, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
 							]}
 						/>
 
 						<div className={classes.voteSummaryPieChartAyeNay}>
-							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 50 : nayPercent.toFixed(1)}%</p>
-							<p className={classes.voteSummaryPieChartAyeNayTitle}>{t('PostDetails.nay')}</p>
+							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
+							<p className={classes.voteSummaryPieChartAyeNayTitle}>{NAY_TITLE}</p>
 						</div>
 					</div>
+
 					<div className={classes.voteSummaryTable}>
 						<div className={classes.voteSummaryTableItem}>
 							<p className={classes.voteSummaryTableItemTitle}>
 								<span>
-									{t('PostDetails.aye')} ({voteMetrics[EVoteDecision.AYE].count})
+									{AYE_TITLE} ({voteMetrics[EVoteDecision.AYE].count})
 								</span>
-								<span>{formatUSDWithUnits(formatBnBalance(tally.aye || '0', { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
+								<span>{formatUSDWithUnits(formatBnBalance(tally.aye, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
 							</p>
 							<p className={classes.voteSummaryTableItemTitle}>
 								<span>{t('PostDetails.support')}</span>
-								<span>{formatUSDWithUnits(formatBnBalance(tally.support || '0', { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
+								<span>
+									{formatUSDWithUnits(formatBnBalance(tally.support || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+								</span>
 							</p>
 						</div>
 						<div className={classes.voteSummaryTableItem}>
 							<p className={classes.voteSummaryTableItemTitle}>
 								<span>
-									{t('PostDetails.nay')} ({voteMetrics[EVoteDecision.NAY].count})
+									{NAY_TITLE} ({voteMetrics[EVoteDecision.NAY].count})
 								</span>
-								<span>{formatUSDWithUnits(formatBnBalance(tally.nay || '0', { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
+								<span>
+									{formatUSDWithUnits(formatBnBalance(tally.nay || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+								</span>
 							</p>
 							<p className={classes.voteSummaryTableItemTitle}>
 								<span>{t('PostDetails.issuance')}</span>
@@ -138,6 +153,16 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 						</div>
 					</div>
 				</>
+			) : (
+				<div className={classes.voteSummaryTableNoActivity}>
+					<Image
+						src={NoActivity}
+						alt='no activity'
+						width={150}
+						height={150}
+					/>
+					<p className={classes.voteSummaryTableNoActivityTitle}>{t('PostDetails.noVotes')}</p>
+				</div>
 			)}
 			<Dialog>
 				<DialogTrigger
