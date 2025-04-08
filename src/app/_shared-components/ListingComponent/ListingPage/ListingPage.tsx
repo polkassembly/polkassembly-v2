@@ -36,8 +36,8 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
-	const initialPage = parseInt(searchParams?.get('page') || '1', 10);
-	const initialTrackStatus = searchParams?.get('trackStatus') || 'all';
+	const initialPage = parseInt(searchParams.get('page') || '1', 10);
+	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
 	const { user } = useUser();
 
 	const STATUSES = [
@@ -95,7 +95,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
-			const params = new URLSearchParams(searchParams?.toString());
+			const params = new URLSearchParams(searchParams.toString());
 
 			params.set('trackStatus', newStatuses.length > 0 ? newStatuses.join(',') : 'all');
 			router.push(`?${params.toString()}`, { scroll: false });
