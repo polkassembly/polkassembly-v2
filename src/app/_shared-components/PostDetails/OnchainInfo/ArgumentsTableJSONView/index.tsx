@@ -45,8 +45,8 @@ function ArgumentsTableJSONView({ className, postArguments }: Props) {
 							>
 								<thead>
 									<tr className={classes.tableHeader}>
-										<th className='min-w-[160px] p-2'>{t('PostDetails.OnchainInfo.name')}</th>
-										<th className='w-full p-2'>{t('PostDetails.OnchainInfo.value')}</th>
+										<th className='p-2'>{t('PostDetails.OnchainInfo.name')}</th>
+										<th className='p-2'>{t('PostDetails.OnchainInfo.value')}</th>
 									</tr>
 								</thead>
 								<tbody className={classes.tableBody}>

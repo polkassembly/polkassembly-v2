@@ -267,7 +267,7 @@ export class SubsquidService extends SubsquidUtils {
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const subsquidDecision = decision === EVoteDecision.AYE ? 'yes' : decision === EVoteDecision.NAY ? 'no' : decision;
+		const subsquidDecision = decision === EVoteDecision.AYE ? 'yes' : decision === EVoteDecision.NAY ? 'no' : 'abstain';
 
 		const query =
 			proposalType === EProposalType.TIP

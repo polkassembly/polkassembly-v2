@@ -118,6 +118,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 									alt='Beneficiary'
 									width={14}
 									height={14}
+									className='darkIcon'
 								/>
 								<span className={classes.beneficiaryText}>{t('PostDetails.beneficiary')}:</span>
 							</div>
