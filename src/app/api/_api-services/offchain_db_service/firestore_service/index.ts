@@ -1135,9 +1135,15 @@ export class FirestoreService extends FirestoreUtils {
 			.set({ ...activity, id: newActivityId });
 	}
 
-	static async IncrementUserProfileScore(userId: number, score: number) {
+	static async IncrementUserProfileScore({ userId, score }: { userId: number; score: number }) {
 		await this.usersCollectionRef()
 			.doc(userId.toString())
+			.set({ profileScore: this.increment(score) }, { merge: true });
+	}
+
+	static async IncrementAddressProfileScore({ address, score }: { address: string; score: number }) {
+		await this.addressesCollectionRef()
+			.doc(address)
 			.set({ profileScore: this.increment(score) }, { merge: true });
 	}
 
@@ -1382,6 +1388,14 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (delegate.docs.length) {
 			await delegate.docs[0].ref.delete();
+		}
+	}
+
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash).limit(1).get();
+
+		if (post.docs.length) {
+			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
 		}
 	}
 }

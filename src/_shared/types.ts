@@ -200,6 +200,7 @@ export interface IUserAddress {
 	wallet?: EWallet;
 	isMultisig?: boolean;
 	proxyFor?: IAddressProxyForEntry[];
+	profileScore?: number;
 }
 
 export interface IHashedPassword {
@@ -761,7 +762,8 @@ export interface IActivityMetadata {
 
 export interface IUserActivity {
 	id: string;
-	userId: number;
+	userId?: number;
+	address?: string;
 	name: EActivityName;
 	subActivityName?: EActivityName;
 	category: EActivityCategory;

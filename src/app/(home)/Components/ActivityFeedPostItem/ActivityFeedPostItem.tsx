@@ -54,7 +54,7 @@ function ActivityFeedPostItem({
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const isInSubscriptionTab = useMemo(() => {
-		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
+		return searchParams?.get('tab') === EActivityFeedTab.SUBSCRIBED;
 	}, [searchParams]);
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
