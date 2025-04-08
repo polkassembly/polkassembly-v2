@@ -7,7 +7,8 @@
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { useMemo } from 'react';
 import Trophy from '@assets/leaderboard/Trophy.png';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import Image from 'next/image';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
