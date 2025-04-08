@@ -18,7 +18,7 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { formatNumberWithSuffix } from '@/app/_client-utils/formatNumberWithSuffix';
+import { formatNumberWithSuffix } from '@/_shared/_utils/formatNumberWithSuffix';
 import { TreasuryDetailsDialog } from '../ActivityFeedTreasuryDialog/ActivityFeedTreasuryDialog';
 import TreasuryChart from './Components/TreasuryChart';
 import NextBurnDisplay from './Components/NextBurnDisplay';

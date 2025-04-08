@@ -10,7 +10,7 @@ import DotIcon from '@assets/icons/dot.png';
 import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
-import { formatNumberWithSuffix } from '@/app/_client-utils/formatNumberWithSuffix';
+import { formatNumberWithSuffix } from '@/_shared/_utils/formatNumberWithSuffix';
 
 function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: number; symbol: string }) {
 	if (!amount) return null;
