@@ -11,7 +11,7 @@ import DotIcon from '@assets/icons/dot.png';
 import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import TokenValueDisplay from './TokenValueDisplay';
-// of the Apache-2.0 license. See the LICENSE file for details.
+
 interface NetworkSectionProps {
 	title: string;
 	icon: StaticImageData;
