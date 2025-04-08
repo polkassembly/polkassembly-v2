@@ -27,10 +27,10 @@ import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReacti
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
-import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -210,23 +210,16 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Post Content Section */}
-			<div className='flex gap-2'>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
-			</div>
-			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-full overflow-hidden border-none'>
-					<MarkdownEditor
-						markdown={postData.content}
-						readOnly
-					/>
+			<div>
+				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{`#${postData.index} ${postData.title}`}</h3>
+				<div className='mb-4 text-sm text-btn_secondary_text'>
+					<div className='flex w-full overflow-hidden border-none'>
+						<MarkdownViewer
+							markdown={postData.content}
+							truncate
+						/>
+					</div>
 				</div>
-				<Link
-					href={`/referenda/${postData.index}`}
-					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
-				>
-					{t('ActivityFeed.PostItem.readMore')}
-				</Link>
 			</div>
 
 			{/* Metrics Section */}
@@ -250,7 +243,7 @@ function ActivityFeedPostItem({
 				</div>
 			)}
 
-			<hr className='my-4 border-[0.7px] border-primary_border' />
+			<hr className='mb-1 mt-3.5 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
 			{commentBox && (

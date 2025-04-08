@@ -39,8 +39,18 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 
 	// In development or special environments, use default network
 	if (isDevelopmentOrPreviewEnv) {
-		console.log('Using default network:', defaultNetwork);
+		console.log('Not production env, using default network:', defaultNetwork);
 		return defaultNetwork as ENetwork;
+	}
+
+	if (!network) {
+		// if still no network found and is vercel (main deployment) link or test link, return default network
+		if (host?.includes('.app') || subdomain === 'test') {
+			console.log('Vercel link or test link, using default network:', defaultNetwork);
+			return defaultNetwork as ENetwork;
+		}
+
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request headers');
 	}
 
 	// If we get here, we couldn't determine a valid network

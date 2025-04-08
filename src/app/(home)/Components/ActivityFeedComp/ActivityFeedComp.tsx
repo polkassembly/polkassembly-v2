@@ -21,7 +21,7 @@ function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericLis
 
 	return (
 		<div className={cn('min-h-screen bg-page_background pt-5', state === ESidebarState.EXPANDED ? 'px-10 lg:px-16' : 'px-10 lg:px-20')}>
-			<div className='container mx-auto grid grid-cols-12 gap-5'>
+			<div className='container mx-auto grid grid-cols-12 gap-4'>
 				<div className='col-span-12'>
 					<div className={styles.activityFeedContainer}>
 						<div className={styles.activityFeedToggleButton}>
