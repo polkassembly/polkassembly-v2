@@ -84,7 +84,7 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	const handlePageChange = (page: number) => {
 		setState((prev) => ({ ...prev, currentPage: page }));
-		const params = new URLSearchParams(searchParams?.toString());
+		const params = new URLSearchParams(searchParams.toString());
 		params.set('page', page.toString());
 		params.set('trackStatus', state.selectedStatuses.length > 0 ? state.selectedStatuses.join(',') : 'all');
 		router.push(`?${params.toString()}`, { scroll: false });
