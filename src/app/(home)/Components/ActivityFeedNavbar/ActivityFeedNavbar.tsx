@@ -127,7 +127,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 					<div key={category}>
 						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
 							<DropdownMenu>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab px-2 font-medium', 'border-none')}>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab px-2', 'border-none px-2 font-normal')}>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
