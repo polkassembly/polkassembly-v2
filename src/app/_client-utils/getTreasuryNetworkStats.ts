@@ -5,62 +5,68 @@
 import { ITreasuryStats } from '@/_shared/types';
 import { formatUSDWithUnits } from './formatUSDWithUnits';
 
-const getExactDot = (dotAmount: string): number => {
-	return Number(dotAmount) / 1e10 || 0;
+const getExactDot = (dotAmount: string | undefined): number => {
+	if (!dotAmount) return 0;
+	return Number(dotAmount) / 1e10;
 };
 
-const getExactTokenAmount = (amount: string, divisor: number = 1e6): number => {
-	return Number(amount) / divisor || 0;
+const getExactTokenAmount = (amount: string | undefined, divisor: number = 1e6): number => {
+	if (!amount) return 0;
+	return Number(amount) / divisor;
 };
 
 const calculateUsdValues = (data: ITreasuryStats) => {
-	const formatDotToUsd = (dotAmount: string): string => {
+	const formatDotToUsd = (dotAmount: string | undefined): string => {
+		if (!dotAmount) return '';
 		const dot = getExactDot(dotAmount);
 		const usdValue = dot * Number(data.nativeTokenUsdPrice);
 		return formatUSDWithUnits(usdValue.toString());
 	};
 
-	const getExactDotToUsd = (dotAmount: string): string => {
+	const getExactDotToUsd = (dotAmount: string | undefined): string => {
+		if (!dotAmount) return '';
 		const dot = getExactDot(dotAmount);
 		return (dot * Number(data.nativeTokenUsdPrice)).toString();
 	};
 
 	return {
-		relayChainUsd: formatDotToUsd(data?.relayChain?.dot || '0'),
-		assetHubUsd: formatDotToUsd(data?.assetHub?.dot || '0'),
-		hydrationUsd: formatDotToUsd(data?.hydration?.dot || '0'),
-		bountiesUsd: formatDotToUsd(data?.bounties?.dot || '0'),
-		ambassadorUsd: formatDotToUsd(data?.ambassador?.dot || '0'),
-		fellowshipUsd: formatDotToUsd(data?.fellowship?.dot || '0'),
-		loansUsd: formatDotToUsd(data?.loans?.dot || '0'),
+		relayChainUsd: formatDotToUsd(data?.relayChain?.dot),
+		assetHubUsd: formatDotToUsd(data?.assetHub?.dot),
+		hydrationUsd: formatDotToUsd(data?.hydration?.dot),
+		bountiesUsd: formatDotToUsd(data?.bounties?.dot),
+		ambassadorUsd: formatDotToUsd(data?.ambassador?.dot),
+		fellowshipUsd: formatDotToUsd(data?.fellowship?.dot),
+		loansUsd: formatDotToUsd(data?.loans?.dot),
 
-		exactRelayChainUsd: getExactDotToUsd(data?.relayChain?.dot || '0'),
-		exactAssetHubUsd: getExactDotToUsd(data?.assetHub?.dot || '0'),
-		exactHydrationUsd: getExactDotToUsd(data?.hydration?.dot || '0'),
-		exactBountiesUsd: getExactDotToUsd(data?.bounties?.dot || '0'),
-		exactAmbassadorUsd: getExactDotToUsd(data?.ambassador?.dot || '0'),
-		exactFellowshipUsd: getExactDotToUsd(data?.fellowship?.dot || '0'),
-		exactLoansUsd: getExactDotToUsd(data?.loans?.dot || '0')
+		exactRelayChainUsd: getExactDotToUsd(data?.relayChain?.dot),
+		exactAssetHubUsd: getExactDotToUsd(data?.assetHub?.dot),
+		exactHydrationUsd: getExactDotToUsd(data?.hydration?.dot),
+		exactBountiesUsd: getExactDotToUsd(data?.bounties?.dot),
+		exactAmbassadorUsd: getExactDotToUsd(data?.ambassador?.dot),
+		exactFellowshipUsd: getExactDotToUsd(data?.fellowship?.dot),
+		exactLoansUsd: getExactDotToUsd(data?.loans?.dot)
 	};
 };
 
 const calculateTokenAmounts = (data: ITreasuryStats) => {
 	return {
-		relayChainDot: getExactDot(data?.relayChain?.dot || '0'),
-		assetHubDot: getExactDot(data?.assetHub?.dot || '0'),
-		assetHubUsdc: getExactTokenAmount(data?.assetHub?.usdc || '0'),
-		assetHubUsdt: getExactTokenAmount(data?.assetHub?.usdt || '0'),
-		hydrationDot: getExactDot(data?.hydration?.dot || '0'),
-		hydrationUsdc: getExactTokenAmount(data?.hydration?.usdc || '0'),
-		hydrationUsdt: getExactTokenAmount(data?.hydration?.usdt || '0'),
-		bountiesDot: getExactDot(data?.bounties?.dot || '0'),
-		ambassadorValue: data?.ambassador?.dot ? getExactDot(data.ambassador.dot) : getExactTokenAmount(data?.ambassador?.usdt || '0'),
-		fellowshipDot: getExactDot(data?.fellowship?.dot || '0'),
-		fellowshipUsdt: getExactTokenAmount(data?.fellowship?.usdt || '0')
+		relayChainDot: data?.relayChain?.dot ? getExactDot(data.relayChain.dot) : '',
+		assetHubDot: data?.assetHub?.dot ? getExactDot(data.assetHub.dot) : '',
+		assetHubUsdc: data?.assetHub?.usdc ? getExactTokenAmount(data.assetHub.usdc) : '',
+		assetHubUsdt: data?.assetHub?.usdt ? getExactTokenAmount(data.assetHub.usdt) : '',
+		hydrationDot: data?.hydration?.dot ? getExactDot(data.hydration.dot) : '',
+		hydrationUsdc: data?.hydration?.usdc ? getExactTokenAmount(data.hydration.usdc) : '',
+		hydrationUsdt: data?.hydration?.usdt ? getExactTokenAmount(data.hydration.usdt) : '',
+		bountiesDot: data?.bounties?.dot ? getExactDot(data.bounties.dot) : '',
+		ambassadorValue: data?.ambassador?.dot ? getExactDot(data.ambassador.dot) : data?.ambassador?.usdt ? getExactTokenAmount(data.ambassador.usdt) : '',
+		fellowshipDot: data?.fellowship?.dot ? getExactDot(data.fellowship.dot) : '',
+		fellowshipUsdt: data?.fellowship?.usdt ? getExactTokenAmount(data.fellowship.usdt) : ''
 	};
 };
 
 export const formatTreasuryValues = (data: ITreasuryStats) => {
+	if (!data) return {};
+
 	return {
 		...calculateUsdValues(data),
 		...calculateTokenAmounts(data)
