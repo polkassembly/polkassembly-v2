@@ -41,7 +41,6 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 
 	const getOngoingTally = useCallback(async () => {
 		if (!apiService) return;
-		setLoading(true);
 		const ongoingReferendaTally = await apiService.getOngoingReferendaTally({ postIndex: Number(index) });
 		if (!ongoingReferendaTally) {
 			setTally({
@@ -54,7 +53,8 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 			setTally(ongoingReferendaTally);
 			setLoading(false);
 		}
-	}, [apiService, index, voteMetrics]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [apiService]);
 
 	const getIssuance = useCallback(async () => {
 		if (!apiService) return;
