@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
-import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
+import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
@@ -23,11 +23,9 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 				summaryType='content'
 			/>
 
-			<MarkdownEditor
+			<MarkdownViewer
 				markdown={content}
-				readOnly
 				className={cn(isModalOpen ? '' : 'max-h-full border-none')}
-				contentEditableClassName='p-0'
 				truncate
 			/>
 

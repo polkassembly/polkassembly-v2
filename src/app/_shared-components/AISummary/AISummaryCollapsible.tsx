@@ -8,14 +8,14 @@ import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAISummary } from '@/hooks/useAISummary';
 import { EProposalType } from '@/_shared/types';
-import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { THEME_COLORS } from '@/app/_style/theme';
 import { Separator } from '../Separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
-import { MarkdownEditor } from '../MarkdownEditor/MarkdownEditor';
 import styles from './AISummaryCollapsible.module.scss';
 import { Skeleton } from '../Skeleton';
+import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 
 interface AISummaryCollapsibleProps {
 	proposalType: EProposalType;
@@ -54,10 +54,9 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISumm
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
 					<Separator className='m-0 p-0' />
-					<MarkdownEditor
+					<MarkdownViewer
 						markdown={summaryContent}
-						readOnly
-						className={`${THEME_COLORS.light.btn_primary_text} max-h-full border-none text-sm`}
+						className={`${THEME_COLORS.light.btn_primary_text}`}
 					/>
 				</CollapsibleContent>
 			</div>
