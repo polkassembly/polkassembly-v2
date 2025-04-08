@@ -109,7 +109,9 @@ export const THEME_COLORS = {
 		create_cancel_bg: '#00B252',
 		create_kill_bg: '#FC2626',
 		address_input_bg: '#66A5FF2E',
-		warning: '#F89118'
+		warning: '#F89118',
+		aye_color: '#6DE1A2',
+		nay_color: '#FF778F'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -215,6 +217,8 @@ export const THEME_COLORS = {
 		create_cancel_bg: '#00B252',
 		create_kill_bg: '#FC2626',
 		address_input_bg: '#66A5FF2E',
-		warning: '#F89118'
+		warning: '#F89118',
+		aye_color: '#6DE1A2',
+		nay_color: '#FF778F'
 	}
 };

@@ -29,3 +29,6 @@
 .voteSummaryTableItemTitle {
 	@apply flex items-center justify-between capitalize
 }
+.voteSummaryTableNoActivity{
+	@apply flex flex-col items-center justify-center gap-y-2
+}

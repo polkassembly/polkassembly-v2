@@ -82,7 +82,7 @@ function ReactionBar({
 	};
 	const isCurrentlySubscribed = postData?.userSubscriptionId || isSubscribed;
 	return (
-		<div className='mb-4 flex items-center justify-between text-xs text-navbar_border'>
+		<div className='mb-1.5 flex items-center justify-between text-xs text-navbar_border'>
 			<div className='flex space-x-5'>
 				<ReactionButton
 					type={EReaction.like}
