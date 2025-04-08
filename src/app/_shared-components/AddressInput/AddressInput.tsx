@@ -122,7 +122,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 			)}
 			{error && <p className='my-1 text-sm text-failure'>{error}</p>}
 			{isOpen && (
-				<div className='absolute z-50 mt-1 flex max-h-[300px] w-full flex-col gap-y-2 overflow-y-auto rounded-xl border border-border_grey bg-white px-4 py-3 shadow-lg'>
+				<div className='absolute z-50 mt-1 flex max-h-[300px] w-full flex-col gap-y-2 overflow-y-auto rounded-xl border border-border_grey bg-bg_modal px-4 py-3 shadow-lg'>
 					{filteredOptions.length > 0 ? (
 						filteredOptions.map((account) => (
 							<button
