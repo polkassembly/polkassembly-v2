@@ -11,7 +11,6 @@ import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
 import { formatNumberWithSuffix } from '@/app/_client-utils/formatNumberWithSuffix';
-import { ITreasuryTokenStats } from '@/_shared/types';
 
 function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: number; symbol: string }) {
 	if (!amount) return null;
@@ -33,7 +32,23 @@ function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount:
 		</div>
 	);
 }
-function TreasuryTokensDisplay({ isLoading, treasuryError, stats }: { isLoading: boolean; treasuryError: unknown; stats: ITreasuryTokenStats | null }) {
+function TreasuryTokensDisplay({
+	isLoading,
+	treasuryError,
+	stats
+}: {
+	isLoading: boolean;
+	treasuryError: unknown;
+	stats: {
+		totalDot: number;
+		totalUsdc: number;
+		totalUsdt: number;
+		totalMyth: number;
+		dotPrice: string;
+		totalValueUsd: number;
+		dot24hChange: number;
+	} | null;
+}) {
 	const t = useTranslations('ActivityFeed');
 
 	if (isLoading) {

@@ -5,7 +5,7 @@
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useTranslations } from 'next-intl';
 import { Area, AreaChart, ResponsiveContainer, XAxis, Tooltip as RechartsTooltip, TooltipProps } from 'recharts';
-import { type ChartConfig, ChartContainer } from '@ui/chart';
+import { type ChartConfig, ChartContainer } from '@ui/Chart';
 
 interface ChartDataItem {
 	month: string;

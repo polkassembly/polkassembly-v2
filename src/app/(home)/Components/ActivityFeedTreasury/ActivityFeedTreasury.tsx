@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { type ChartConfig } from '@ui/chart';
+import { type ChartConfig } from '@ui/Chart';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,7 +10,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { FiChevronRight } from 'react-icons/fi';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ITreasuryStats, ITreasuryTokenStats } from '@/_shared/types';
+import { ITreasuryStats } from '@/_shared/types';
 import { Separator } from '@/app/_shared-components/Separator';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -87,7 +87,23 @@ function TreasuryValueDisplay({
 	);
 }
 
-function DotPriceDisplay({ isLoading, treasuryError, stats }: { isLoading: boolean; treasuryError: unknown; stats: ITreasuryTokenStats | null }) {
+function DotPriceDisplay({
+	isLoading,
+	treasuryError,
+	stats
+}: {
+	isLoading: boolean;
+	treasuryError: unknown;
+	stats: {
+		totalDot: number;
+		totalUsdc: number;
+		totalUsdt: number;
+		totalMyth: number;
+		dotPrice: string;
+		totalValueUsd: number;
+		dot24hChange: number;
+	} | null;
+}) {
 	const t = useTranslations('ActivityFeed');
 
 	if (isLoading) {
