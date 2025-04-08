@@ -267,7 +267,8 @@ export class SubsquidService extends SubsquidUtils {
 	}) {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const subsquidDecision = decision === EVoteDecision.AYE ? 'yes' : decision === EVoteDecision.NAY ? 'no' : 'abstain';
+		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
+		const subsquidDecisionIn = decision ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : null;
 
 		const query =
 			proposalType === EProposalType.TIP
@@ -284,8 +285,16 @@ export class SubsquidService extends SubsquidUtils {
 
 		const variables =
 			proposalType === EProposalType.TIP
-				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_eq: subsquidDecision }) }
-				: { index_eq: Number(indexOrHash), type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_eq: subsquidDecision }) };
+				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_in: subsquidDecisionIn }) }
+				: {
+						index_eq: Number(indexOrHash),
+						type_eq: proposalType,
+						limit,
+						offset: (page - 1) * limit,
+						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
+						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
+						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
+					};
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
@@ -313,24 +322,27 @@ export class SubsquidService extends SubsquidUtils {
 					balance: { value?: string; aye?: string; nay?: string; abstain?: string };
 					decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
 				}[];
-			}) => ({
-				balanceValue: vote.decision === 'abstain' ? vote.balance.abstain || '0' : vote.balance.value || '0',
-				decision: vote.decision === 'yes' ? EVoteDecision.AYE : vote.decision === 'no' ? EVoteDecision.NAY : (vote.decision as EVoteDecision),
-				lockPeriod: vote.lockPeriod,
-				createdAt: vote.createdAt ? new Date(vote.createdAt) : new Date(vote.timestamp || ''),
-				voterAddress: vote.voter,
-				selfVotingPower: vote.selfVotingPower,
-				totalVotingPower: vote.totalVotingPower,
-				delegatedVotingPower: vote.delegatedVotingPower,
-				delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
-					voterAddress: delegatedVote.voter,
-					totalVotingPower: delegatedVote.votingPower,
-					createdAt: new Date(delegatedVote.createdAt),
-					lockPeriod: delegatedVote.lockPeriod,
-					balanceValue: delegatedVote.decision === 'abstain' ? delegatedVote.balance.abstain || '0' : delegatedVote.balance.value || '0',
-					decision: delegatedVote.decision === 'yes' ? EVoteDecision.AYE : delegatedVote.decision === 'no' ? EVoteDecision.NAY : (delegatedVote.decision as EVoteDecision)
-				}))
-			})
+			}) => {
+				const balanceValue = this.getVoteBalanceValueForVoteHistory({ balance: vote.balance, decision: decision || (vote.decision as EVoteDecision) });
+				return {
+					balanceValue,
+					decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: subsquidDecision || vote.decision }),
+					lockPeriod: vote.lockPeriod,
+					createdAt: vote.createdAt ? new Date(vote.createdAt) : new Date(vote.timestamp || ''),
+					voterAddress: vote.voter,
+					selfVotingPower: this.getSelfVotingPower({ balance: balanceValue, selfVotingPower: vote.selfVotingPower || null, lockPeriod: vote.lockPeriod }),
+					totalVotingPower: vote.totalVotingPower,
+					delegatedVotingPower: vote.delegatedVotingPower,
+					delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
+						voterAddress: delegatedVote.voter,
+						totalVotingPower: delegatedVote.votingPower,
+						createdAt: new Date(delegatedVote.createdAt),
+						lockPeriod: delegatedVote.lockPeriod,
+						balanceValue: delegatedVote.decision === 'abstain' ? delegatedVote.balance.abstain || '0' : delegatedVote.balance.value,
+						decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: delegatedVote.decision })
+					}))
+				};
+			}
 		);
 
 		return {
