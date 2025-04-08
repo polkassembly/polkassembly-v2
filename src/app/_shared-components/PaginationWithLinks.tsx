@@ -96,7 +96,8 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				TopLoader.done();
 			}
 		},
-		[searchParams, pathname, router, TopLoader, pageSizeSelectOptions, pageSearchParam]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[searchParams, pathname, pageSizeSelectOptions, pageSearchParam]
 	);
 
 	const handlePageClick = useCallback(

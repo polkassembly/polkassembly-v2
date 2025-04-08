@@ -9,7 +9,8 @@ import { ETheme, IGenericListingResponse, IPreimage } from '@/_shared/types';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import ReactJson from 'react-json-view';
 import { useTranslations } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../Table';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
@@ -19,7 +20,7 @@ import PreimageRow from './PreimageRow';
 
 function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const searchParams = useSearchParams();
-	const page = searchParams.get('page') || 1;
+	const page = searchParams?.get('page') || 1;
 	const { userPreferences } = useUserPreferences();
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
