@@ -106,16 +106,24 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 			setCurrentPage(pageNumber);
 			if (onClick) {
 				onClick(pageNumber);
+				// Add small delay to allow toploader to be visible
+				try {
+					await new Promise((resolve) => {
+						setTimeout(resolve, 100);
+					});
+				} finally {
+					TopLoader.done();
+				}
+				return;
 			}
+
 			try {
-				await new Promise((resolve) => {
-					setTimeout(resolve, 100);
-				});
+				await router.push(buildLink(pageNumber));
 			} finally {
 				TopLoader.done();
 			}
 		},
-		[TopLoader, onClick]
+		[TopLoader, onClick, router, buildLink]
 	);
 
 	const renderPageNumbers = () => {
