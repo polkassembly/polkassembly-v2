@@ -5,10 +5,8 @@
 'use client';
 
 import { type ReactNode, useCallback, useState, useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useRouter } from 'nextjs-toploader/app';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useTopLoader } from 'nextjs-toploader';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from './Pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select/Select';
 
@@ -68,63 +66,32 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
-	const TopLoader = useTopLoader();
+
 	const [currentPage, setCurrentPage] = useState(page);
 
 	useEffect(() => {
 		setCurrentPage(page);
 	}, [page]);
 
-	const buildLink = (page: number) => {
-		const newSearchParams = new URLSearchParams(searchParams || undefined);
-		newSearchParams.set(pageSearchParam || 'page', String(page));
-		return `${pathname}?${newSearchParams.toString()}`;
-	};
-
 	const totalPageCount = Math.ceil(totalCount / pageSize);
 
 	const navToPageSize = useCallback(
-		async (newPageSize: number) => {
-			TopLoader.start();
+		(newPageSize: number) => {
 			const key = pageSizeSelectOptions?.pageSizeSearchParam || 'pageSize';
 			const newSearchParams = new URLSearchParams(searchParams || undefined);
 			newSearchParams.set(key, String(newPageSize));
 			newSearchParams.delete(pageSearchParam || 'page');
-			try {
-				await router.push(`${pathname}?${newSearchParams.toString()}`);
-			} finally {
-				TopLoader.done();
-			}
+			router.push(`${pathname}?${newSearchParams.toString()}`);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[searchParams, pathname, pageSizeSelectOptions, pageSearchParam]
+		[searchParams, pathname]
 	);
 
-	const handlePageClick = useCallback(
-		async (pageNumber: number) => {
-			TopLoader.start();
-			setCurrentPage(pageNumber);
-			if (onClick) {
-				onClick(pageNumber);
-				// Add small delay to allow toploader to be visible
-				try {
-					await new Promise((resolve) => {
-						setTimeout(resolve, 100);
-					});
-				} finally {
-					TopLoader.done();
-				}
-				return;
-			}
-
-			try {
-				await router.push(buildLink(pageNumber));
-			} finally {
-				TopLoader.done();
-			}
-		},
-		[TopLoader, onClick, router, buildLink]
-	);
+	const buildLink = (pageNumber: number) => {
+		const newSearchParams = new URLSearchParams(searchParams || undefined);
+		newSearchParams.set(pageSearchParam || 'page', String(pageNumber));
+		return `${pathname}?${newSearchParams.toString()}`;
+	};
 
 	const renderPageNumbers = () => {
 		const items: ReactNode[] = [];
@@ -136,7 +103,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 					<PaginationItem key={i}>
 						<PaginationLink
 							href={buildLink(i)}
-							onClick={() => handlePageClick(i)}
+							onClick={() => {
+								setCurrentPage(i);
+								onClick?.(i);
+							}}
 							isActive={currentPage === i}
 						>
 							{i}
@@ -149,7 +119,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				<PaginationItem key={1}>
 					<PaginationLink
 						href={buildLink(1)}
-						onClick={() => handlePageClick(1)}
+						onClick={() => {
+							setCurrentPage(1);
+							onClick?.(1);
+						}}
 						isActive={currentPage === 1}
 					>
 						1
@@ -173,7 +146,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 					<PaginationItem key={i}>
 						<PaginationLink
 							href={buildLink(i)}
-							onClick={() => handlePageClick(i)}
+							onClick={() => {
+								setCurrentPage(i);
+								onClick?.(i);
+							}}
 							isActive={currentPage === i}
 						>
 							{i}
@@ -194,7 +170,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				<PaginationItem key={totalPageCount}>
 					<PaginationLink
 						href={buildLink(totalPageCount)}
-						onClick={() => handlePageClick(totalPageCount)}
+						onClick={() => {
+							setCurrentPage(totalPageCount);
+							onClick?.(totalPageCount);
+						}}
 						isActive={currentPage === totalPageCount}
 					>
 						{totalPageCount}
@@ -222,7 +201,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 					<PaginationItem>
 						<PaginationPrevious
 							href={buildLink(Math.max(currentPage - 1, 1))}
-							onClick={() => handlePageClick(Math.max(currentPage - 1, 1))}
+							onClick={() => {
+								setCurrentPage(Math.max(currentPage - 1, 1));
+								onClick?.(Math.max(currentPage - 1, 1));
+							}}
 							aria-disabled={currentPage === 1}
 							tabIndex={currentPage === 1 ? -1 : undefined}
 							className={currentPage === 1 ? 'pointer-events-none opacity-50' : undefined}
@@ -232,7 +214,10 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 					<PaginationItem>
 						<PaginationNext
 							href={buildLink(Math.min(currentPage + 1, totalPageCount))}
-							onClick={() => handlePageClick(Math.min(currentPage + 1, totalPageCount))}
+							onClick={() => {
+								setCurrentPage(Math.min(currentPage + 1, totalPageCount));
+								onClick?.(Math.min(currentPage + 1, totalPageCount));
+							}}
 							aria-disabled={currentPage === totalPageCount}
 							tabIndex={currentPage === totalPageCount ? -1 : undefined}
 							className={currentPage === totalPageCount ? 'pointer-events-none opacity-50' : undefined}
