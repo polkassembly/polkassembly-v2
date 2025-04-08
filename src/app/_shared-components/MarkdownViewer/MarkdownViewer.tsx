@@ -14,8 +14,14 @@ import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 
-const URL_REGEX =
-	/\b(https?:\/\/|www\.)[a-z0-9]+([-.][a-z0-9]+)*\.[a-z]{2,}(:[0-9]{1,5})?(\/\S*)?\b|\b[a-z0-9]+([-.][a-z0-9]+)*\.(com|org|net|io|gov|edu|co|biz|info|app|dev|xyz|me|tech|online|site|ru|uk|ca|au|de|fr|jp|cn|br|in|nl|es|it)\b|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/gi;
+const extractUrlsAndEmails = (text: string): string[] => {
+	const words = text.split(/\s+/);
+
+	return words.filter((word) => {
+		const cleanWord = word.replace(/[.,;:!?]$/, '');
+		return ValidatorService.isUrl(cleanWord) || ValidatorService.isValidEmail(cleanWord);
+	});
+};
 
 const markdownComponents: Components = {
 	div: 'div',
@@ -46,13 +52,14 @@ const markdownComponents: Components = {
 	},
 	p: ({ children, ...props }) => {
 		if (typeof children === 'string') {
-			const matches = children.match(URL_REGEX) || [];
+			const textContent = children;
+			const matches = extractUrlsAndEmails(textContent);
 
 			if (matches.length === 0) {
 				return <p {...props}>{children}</p>;
 			}
 
-			let remaining = children;
+			let remaining = textContent;
 			const elements: ReactNode[] = [];
 			let index = 0;
 
@@ -65,12 +72,10 @@ const markdownComponents: Components = {
 					}
 
 					if (ValidatorService.isUrl(match)) {
-						const url = ValidatorService.ensureSecureUrl(match);
-
 						elements.push(
 							<a
 								key={`link-${index}`}
-								href={url}
+								href={match}
 								target='_blank'
 								rel='noopener noreferrer'
 								className='text-text_pink hover:underline'
@@ -141,9 +146,18 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((pr
 	const { markdown, className, truncate = false, maxLines = 4 } = props;
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [showMore, setShowMore] = useState(!truncate);
+	const [contentExceedsMaxLines, setContentExceedsMaxLines] = useState(false);
 
 	const setRefs = (node: HTMLDivElement | null) => {
 		containerRef.current = node;
+
+		if (node && truncate) {
+			const style = window.getComputedStyle(node);
+			const lineHeight = parseInt(style.lineHeight, 10) || 20;
+			const containerHeight = node.scrollHeight;
+			const lines = Math.floor(containerHeight / lineHeight);
+			setContentExceedsMaxLines(lines > maxLines);
+		}
 
 		if (typeof ref === 'function') {
 			ref(node);
@@ -171,7 +185,7 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((pr
 					{markdown || ''}
 				</ReactMarkdownLib>
 			</div>
-			{truncate && (
+			{truncate && contentExceedsMaxLines && (
 				<button
 					type='button'
 					onClick={toggleShowMore}
