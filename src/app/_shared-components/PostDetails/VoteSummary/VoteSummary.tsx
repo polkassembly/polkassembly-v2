@@ -67,12 +67,12 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	}, [apiService]);
 
 	useEffect(() => {
-		if (!voteMetrics) return;
+		if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return;
 		getIssuance();
 		getOngoingTally();
 	}, [getOngoingTally, getIssuance, voteMetrics]);
 
-	if (!voteMetrics) return null;
+	if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return null;
 
 	const ayeVotesNumber = Number(formatBnBalance(tally.aye || BN_ZERO.toString(), { numberAfterComma: 6, withThousandDelimitor: false }, network));
 	const totalVotesNumber = Number(
