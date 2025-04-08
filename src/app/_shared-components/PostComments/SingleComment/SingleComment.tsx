@@ -170,6 +170,7 @@ function SingleComment({
 								<Image
 									src={ReplyIcon}
 									alt='reply'
+									className='darkIcon'
 								/>
 							}
 						>
