@@ -444,6 +444,7 @@ export enum EPostOrigin {
 }
 
 export enum EVoteDecision {
+	ABSTAIN = 'abstain',
 	AYE = 'aye',
 	NAY = 'nay',
 	SPLIT = 'split',
