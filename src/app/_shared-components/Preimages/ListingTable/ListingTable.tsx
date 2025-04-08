@@ -19,7 +19,7 @@ import PreimageRow from './PreimageRow';
 
 function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const searchParams = useSearchParams();
-	const page = searchParams?.get('page') || 1;
+	const page = searchParams.get('page') || 1;
 	const { userPreferences } = useUserPreferences();
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
