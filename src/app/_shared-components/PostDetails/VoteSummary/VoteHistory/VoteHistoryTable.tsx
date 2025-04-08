@@ -162,56 +162,86 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 												<CollapsibleContent asChild>
 													<div>
 														<div>
-															<div className='flex items-center justify-between'>
-																<span>Vote Detail</span>
-																<span>{dayjs(voteData.createdAt ?? '').format("Do MMM 'YY")}</span>
+															<div className='mb-3 mt-2 flex items-center justify-between'>
+																<span className='text-sm font-medium text-text_primary'>Vote Detail</span>
+																<span className='text-xs text-text_primary'>{dayjs(voteData.createdAt ?? '').format("Do MMM 'YY")}</span>
 															</div>
 															<div className='flex justify-between'>
 																<div className='flex w-[200px] flex-col gap-1'>
-																	<div className='text-lightBlue dark:text-blue-dark-medium text-xs font-medium'>Self Votes</div>
+																	<div className='text-xs font-medium text-basic_text'>Self Votes</div>
 																	<div className='flex justify-between'>
-																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Voting Power</span>
-																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																		<span
+																			className='flex items-center gap-1 text-xs'
+																			style={{ color: THEME_COLORS.light.placeholder }}
+																		>
+																			Voting Power
+																		</span>
+																		<span className='text-xs text-text_primary'>0 dot</span>
 																	</div>
 																	<div className='flex justify-between'>
-																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Conviction</span>
-																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0x</span>
+																		<span
+																			className='flex items-center gap-1 text-xs'
+																			style={{ color: THEME_COLORS.light.placeholder }}
+																		>
+																			Conviction
+																		</span>
+																		<span className='text-xs text-text_primary'>0x</span>
 																	</div>
 																	<div className='flex justify-between'>
-																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Capital</span>
-																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																		<span
+																			className='flex items-center gap-1 text-xs'
+																			style={{ color: THEME_COLORS.light.placeholder }}
+																		>
+																			Capital
+																		</span>
+																		<span className='text-xs text-text_primary'>0 dot</span>
 																	</div>
 																</div>
-																<div className='border-section-light-container dark:border-separatorDark border-y-0 border-l-2 border-r-0 border-dashed dark:border-[#3B444F]' />
+																<div className='border-y-0 border-l-2 border-r-0 border-dashed border-primary_border' />
 																<div className='mr-3 flex w-[200px] flex-col gap-1'>
-																	<div className='text-lightBlue dark:text-blue-dark-medium text-xs font-medium'>Delegated Votes</div>
+																	<div className='text-text-basic_text text-xs font-medium'>Delegated Votes</div>
 																	<div className='flex justify-between'>
-																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Voting Power</span>
-																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																		<span
+																			className='flex items-center gap-1 text-xs'
+																			style={{ color: THEME_COLORS.light.placeholder }}
+																		>
+																			Voting Power
+																		</span>
+																		<span className='text-xs text-text_primary'>0 dot</span>
 																	</div>
 																	<div className='flex justify-between'>
-																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Delegators</span>
-																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0x</span>
+																		<span
+																			className='flex items-center gap-1 text-xs'
+																			style={{ color: THEME_COLORS.light.placeholder }}
+																		>
+																			Delegators
+																		</span>
+																		<span className='text-xs text-text_primary'>0x</span>
 																	</div>
 																	<div className='flex justify-between'>
-																		<span className='text-blue-light-helper dark:text-blue-dark-medium flex items-center gap-1 text-xs'>Capital</span>
-																		<span className='text-bodyBlue dark:text-blue-dark-high text-xs'>0 dot</span>
+																		<span
+																			className='flex items-center gap-1 text-xs'
+																			style={{ color: THEME_COLORS.light.placeholder }}
+																		>
+																			Capital
+																		</span>
+																		<span className='text-xs text-text_primary'>0 dot</span>
 																	</div>
 																</div>
 															</div>
 														</div>
 
-														<div className='pt-2 text-xs text-muted-foreground'>
-															<strong>Delegation List</strong>
+														<div className='mt-3 border-b-0 border-l-0 border-r-0 border-t-2 border-dashed border-primary_border pt-2 text-xs text-muted-foreground'>
+															<span className='mb-2.5 mt-1 text-sm font-medium text-text_primary'>Delegation List</span>
 															<div className='flex items-center justify-between'>
-																<span>Delegators</span>
-																<span>Capital</span>
-																<span>Voting Power</span>
+																<span className='text-xs font-medium text-basic_text'>Delegators</span>
+																<span className='text-xs font-medium text-basic_text'>Capital</span>
+																<span className='text-xs font-medium text-basic_text'>Voting Power</span>
 															</div>
 															{voterDelegations.map((delegator: IVoteData) => (
 																<div
 																	key={delegator?.voterAddress}
-																	className='mt-2 space-y-1 border-b border-dashed border-gray-400'
+																	className='my-2 space-y-1 border-b border-dashed border-primary_border'
 																>
 																	<div className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'>
 																		<Address address={delegator?.voterAddress} />
