@@ -93,52 +93,64 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: TreasuryDetails
 					<div>
 						<h2 className='text-text_grey'>{t('acrossNetworks')}</h2>
 						<div>
-							<NetworkSection
-								title={t('relayChain')}
-								icon={RelayIcon}
-								usdValue={treasury?.relayChainUsd}
-								dotValue={treasury?.relayChainDot}
-							/>
-							<NetworkSection
-								title={t('assetHub')}
-								icon={AssetHubIcon}
-								usdValue={treasury?.assetHubUsd}
-								dotValue={treasury?.assetHubDot}
-								usdcValue={treasury?.assetHubUsdc}
-								usdtValue={treasury?.assetHubUsdt}
-								usdtExternalLink='https://assethub-polkadot.subscan.io/account/14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk'
-							/>
-							<NetworkSection
-								title={t('hydration')}
-								icon={HydrationIcon}
-								usdValue={treasury?.hydrationUsd}
-								dotValue={treasury?.hydrationDot}
-								usdcValue={treasury?.hydrationUsdc}
-								usdtValue={treasury?.hydrationUsdt}
-								usdtExternalLink='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
-								secondUsdtExternalLink='https://hydration.subscan.io/account/7KCp4eenFS4CowF9SpQE5BBCj5MtoBA3K811tNyRmhLfH1aV'
-							/>
+							{treasury?.relayChainDot && treasury.relayChainUsd && (
+								<NetworkSection
+									title={t('relayChain')}
+									icon={RelayIcon}
+									usdValue={treasury.relayChainUsd}
+									dotValue={treasury.relayChainDot}
+								/>
+							)}
+							{treasury?.assetHubDot && treasury.assetHubUsd && (
+								<NetworkSection
+									title={t('assetHub')}
+									icon={AssetHubIcon}
+									usdValue={treasury.assetHubUsd}
+									dotValue={treasury.assetHubDot}
+									usdcValue={treasury.assetHubUsdc || undefined}
+									usdtValue={treasury.assetHubUsdt || undefined}
+									usdtExternalLink='https://assethub-polkadot.subscan.io/account/14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk'
+								/>
+							)}
+							{treasury?.hydrationDot && treasury.hydrationUsd && (
+								<NetworkSection
+									title={t('hydration')}
+									icon={HydrationIcon}
+									usdValue={treasury.hydrationUsd}
+									dotValue={treasury.hydrationDot}
+									usdcValue={treasury.hydrationUsdc || undefined}
+									usdtValue={treasury.hydrationUsdt || undefined}
+									usdtExternalLink='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
+									secondUsdtExternalLink='https://hydration.subscan.io/account/7KCp4eenFS4CowF9SpQE5BBCj5MtoBA3K811tNyRmhLfH1aV'
+								/>
+							)}
 						</div>
 						<div className='my-4 border-t border-border_grey' />
 						<div>
-							<OtherNetworkSection
-								title={t('bounties')}
-								usdValue={treasury?.bountiesUsd}
-								dotValue={treasury?.bountiesDot}
-								externalLink='https://polkadot.polkassembly.io/bounty-dashboard'
-							/>
-							<OtherNetworkSection
-								title={t('ambassador')}
-								usdValue={String(formatUSDWithUnits(treasury?.ambassadorValue?.toString()))}
-								dotValue={treasury?.ambassadorValue}
-								externalLink='https://assethub-polkadot.subscan.io/account/13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX'
-							/>
-							<OtherNetworkSection
-								title={t('fellowships')}
-								usdValue={treasury?.fellowshipUsd}
-								dotValue={treasury?.fellowshipDot}
-								fellowshipUsdt={treasury?.fellowshipUsdt}
-							/>
+							{treasury?.bountiesDot && treasury.bountiesUsd && (
+								<OtherNetworkSection
+									title={t('bounties')}
+									usdValue={treasury.bountiesUsd}
+									dotValue={treasury.bountiesDot}
+									externalLink='https://polkadot.polkassembly.io/bounty-dashboard'
+								/>
+							)}
+							{treasury?.ambassadorValue && (
+								<OtherNetworkSection
+									title={t('ambassador')}
+									usdValue={formatUSDWithUnits(treasury.ambassadorValue.toString())}
+									dotValue={treasury.ambassadorValue}
+									externalLink='https://assethub-polkadot.subscan.io/account/13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX'
+								/>
+							)}
+							{treasury?.fellowshipDot && treasury.fellowshipUsd && (
+								<OtherNetworkSection
+									title={t('fellowships')}
+									usdValue={treasury.fellowshipUsd}
+									dotValue={treasury.fellowshipDot}
+									fellowshipUsdt={treasury.fellowshipUsdt || undefined}
+								/>
+							)}
 							<LoansSection data={data} />
 						</div>{' '}
 					</div>
