@@ -18,13 +18,12 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
+import { THEME_COLORS } from '@/app/_style/theme';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 import { Skeleton } from '../../Skeleton';
 
-const AYE_COLOR = '#6DE1A2';
-const NAY_COLOR = '#FF778F';
 const NONE_CHART_VALUE = 0;
 
 function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
@@ -63,7 +62,8 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 		const inactiveIssuance = await apiService?.getInactiveIssuance();
 		const totalIssuanceBN = new BN(totalIssuance?.toString() || BN_ZERO.toString());
 		const inactiveIssuanceBN = new BN(inactiveIssuance?.toString() || BN_ZERO.toString());
-		setIssuance(totalIssuanceBN.sub(inactiveIssuanceBN));
+		const activeIssuance = totalIssuanceBN.sub(inactiveIssuanceBN);
+		setIssuance(activeIssuance.lte(BN_ZERO) ? null : activeIssuance);
 	}, [apiService]);
 
 	useEffect(() => {
@@ -91,7 +91,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
 			{loading ? (
 				<Skeleton className='h-[220px] w-full' />
-			) : tally?.aye && tally?.nay ? (
+			) : tally?.aye && tally?.nay && tally?.support ? (
 				<>
 					<div className={classes.voteSummaryPieChart}>
 						<div className={classes.voteSummaryPieChartAyeNay}>
@@ -106,8 +106,8 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							rounded
 							lineWidth={15}
 							data={[
-								{ color: AYE_COLOR, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-								{ color: NAY_COLOR, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
+								{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+								{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
 							]}
 						/>
 
@@ -127,9 +127,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							</p>
 							<p className={classes.voteSummaryTableItemTitle}>
 								<span>{t('PostDetails.support')}</span>
-								<span>
-									{formatUSDWithUnits(formatBnBalance(tally.support || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
-								</span>
+								<span>{formatUSDWithUnits(formatBnBalance(tally.support, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
 							</p>
 						</div>
 						<div className={classes.voteSummaryTableItem}>
@@ -141,15 +139,12 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 									{formatUSDWithUnits(formatBnBalance(tally.nay || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 								</span>
 							</p>
-							<p className={classes.voteSummaryTableItemTitle}>
-								<span>{t('PostDetails.issuance')}</span>
-								<span>
-									{formatUSDWithUnits(
-										formatBnBalance(issuance || BN_ZERO?.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()),
-										1
-									)}
-								</span>
-							</p>
+							{issuance && (
+								<p className={classes.voteSummaryTableItemTitle}>
+									<span>{t('PostDetails.issuance')}</span>
+									<span>{formatUSDWithUnits(formatBnBalance(issuance, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()), 1)}</span>
+								</p>
+							)}
 						</div>
 					</div>
 				</>
