@@ -297,4 +297,27 @@ export class ValidatorService {
 		}
 		return false;
 	}
+
+	static ensureSecureUrl(url: string): string {
+		if (!url || typeof url !== 'string') return url;
+
+		if (url.startsWith('https://')) {
+			return url;
+		}
+
+		if (url.startsWith('http://')) {
+			return url.replace('http://', 'https://');
+		}
+
+		if (url.startsWith('www.')) {
+			return `https://${url}`;
+		}
+
+		const domainPattern = /^([a-z0-9]+([-.][a-z0-9]+)*\.(com|org|net|io|gov|edu|co|biz|info|app|dev|xyz|me|tech|online|site|ru|uk|ca|au|de|fr|jp|cn|br|in|nl|es|it))$/i;
+		if (domainPattern.test(url)) {
+			return `https://${url}`;
+		}
+
+		return url;
+	}
 }

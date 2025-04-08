@@ -12,37 +12,10 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 const URL_REGEX =
 	/\b(https?:\/\/|www\.)[a-z0-9]+([-.][a-z0-9]+)*\.[a-z]{2,}(:[0-9]{1,5})?(\/\S*)?\b|\b[a-z0-9]+([-.][a-z0-9]+)*\.(com|org|net|io|gov|edu|co|biz|info|app|dev|xyz|me|tech|online|site|ru|uk|ca|au|de|fr|jp|cn|br|in|nl|es|it)\b|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/gi;
-
-const isUrl = (text: string): boolean => {
-	return (
-		/^(https?:\/\/|www\.)/i.test(text) ||
-		/^[a-z0-9]+([-.][a-z0-9]+)*\.(com|org|net|io|gov|edu|co|biz|info|app|dev|xyz|me|tech|online|site|ru|uk|ca|au|de|fr|jp|cn|br|in|nl|es|it)$/i.test(text)
-	);
-};
-
-const isEmail = (text: string): boolean => {
-	return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(text);
-};
-
-const ensureHttps = (url: string): string => {
-	if (url.startsWith('http://') || url.startsWith('https://')) {
-		return url;
-	}
-
-	if (url.startsWith('www.')) {
-		return `https://${url}`;
-	}
-
-	const domainPattern = /^([a-z0-9]+([-.][a-z0-9]+)*\.(com|org|net|io|gov|edu|co|biz|info|app|dev|xyz|me|tech|online|site|ru|uk|ca|au|de|fr|jp|cn|br|in|nl|es|it))$/i;
-	if (domainPattern.test(url)) {
-		return `https://${url}`;
-	}
-
-	return url;
-};
 
 const markdownComponents: Components = {
 	div: 'div',
@@ -91,8 +64,8 @@ const markdownComponents: Components = {
 						index += 1;
 					}
 
-					if (isUrl(match)) {
-						const url = ensureHttps(match);
+					if (ValidatorService.isUrl(match)) {
+						const url = ValidatorService.ensureSecureUrl(match);
 
 						elements.push(
 							<a
@@ -105,7 +78,7 @@ const markdownComponents: Components = {
 								{match}
 							</a>
 						);
-					} else if (isEmail(match)) {
+					} else if (ValidatorService.isValidEmail(match)) {
 						elements.push(
 							<a
 								key={`email-${index}`}
