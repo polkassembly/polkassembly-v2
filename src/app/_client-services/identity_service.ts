@@ -14,7 +14,6 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity } from '@shared/types';
-import { deepParseJson } from 'deep-parse-json';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -314,7 +313,7 @@ export class IdentityService {
 	}
 
 	async getRegistrars() {
-		const res = await this.peopleChainApi?.query?.identity?.registrars?.().then((e) => JSON.parse(e.toString()));
-		return deepParseJson(res.toString());
+		const res = await this.peopleChainApi?.query?.identity?.registrars?.();
+		return res.toJSON() as unknown as { account: string; fee: number; fields: number }[];
 	}
 }

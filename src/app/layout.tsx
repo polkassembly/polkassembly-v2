@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import '@app/_style/globals.scss';
+
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { DM_Sans as dmSans } from 'next/font/google';

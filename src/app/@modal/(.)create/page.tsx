@@ -5,15 +5,38 @@
 'use client';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import CreateComponent from '@/app/create/Components/Create';
+import CreateComponent, { CreateRef } from '@/app/create/Components/Create';
+import { useTranslations } from 'next-intl';
+import { ENetwork, EProposalStep } from '@/_shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ChevronLeft } from 'lucide-react';
 
 function CreateModal() {
 	const router = useRouter();
+	const t = useTranslations();
+	const network = getCurrentNetwork();
+	const [step, setStep] = useState<EProposalStep>();
+	const createRef = useRef<CreateRef>(null);
 
 	const handleOpenChange = () => {
 		router.back();
+	};
+
+	const titles = {
+		create: t('CreateProposal.create'),
+		[EProposalStep.CREATE_PREIMAGE]: t('CreateProposal.createPreimage'),
+		[EProposalStep.EXISTING_PREIMAGE]: t('CreateProposal.existingPreimage'),
+		[EProposalStep.CREATE_TREASURY_PROPOSAL]: `${t('CreateProposal.spend')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.from')} ${NETWORKS_DETAILS[network as ENetwork]?.name} ${t('CreateProposal.Treasury')}`,
+		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
+		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
+		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum')
+	};
+
+	const goBack = () => {
+		createRef.current?.setStep(undefined);
 	};
 
 	return (
@@ -24,10 +47,25 @@ function CreateModal() {
 		>
 			<DialogContent className='max-w-screen-md p-6'>
 				<DialogHeader>
-					<DialogTitle>New Proposal</DialogTitle>
+					<DialogTitle className='flex items-center gap-x-2'>
+						{step && (
+							<button
+								type='button'
+								className='text-text_primary'
+								onClick={goBack}
+							>
+								<ChevronLeft />
+							</button>
+						)}
+						{titles[step || 'create']}
+					</DialogTitle>
 				</DialogHeader>
 				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
-					<CreateComponent />
+					<CreateComponent
+						ref={createRef}
+						isModal
+						onStepChange={setStep}
+					/>
 				</div>
 			</DialogContent>
 		</Dialog>

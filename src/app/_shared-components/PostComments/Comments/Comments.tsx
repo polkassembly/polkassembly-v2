@@ -69,7 +69,6 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 					<AddComment
 						proposalType={proposalType}
 						proposalIndex={index}
-						editorId={`new-comment-${index}`}
 						onConfirm={(newComment, publicUser) => {
 							setAllComments((prev) => [
 								...prev,
