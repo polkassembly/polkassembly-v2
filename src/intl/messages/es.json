@@ -748,5 +748,45 @@
 		"preimageDeposit": "Depósito de Preimage",
 		"submissionDeposit": "Depósito de Envío",
 		"gasFees": "Tarifas de Gas"
+	},
+	"VoteSummary": {
+		"title": "Resumen de Voto",
+		"voteDetails": {
+			"title": "Detalles del Voto",
+			"date": "Fecha",
+			"selfVotes": "Votos Propios",
+			"votingPower": "Poder de Votación",
+			"conviction": "Convicción",
+			"capital": "Capital",
+			"delegatedVotes": "Votos Delegados",
+			"delegators": "Delegadores",
+			"delegatedVotingPower": "Poder de Votación Delegado",
+			"delegationList": "Lista de Delegaciones",
+			"delegator": "Delegador",
+			"delegatorCapital": "Capital del Delegador",
+			"delegatorVotingPower": "Poder de Votación del Delegador",
+			"votePowerTooltip": "Poder de voto basado en saldo bloqueado",
+			"delegatedVoteTooltip": "Poder de voto basado en votos delegados",
+			"delegationTooltip": "Lista de delegadores que apoyan esta propuesta",
+			"voteTimestamp": "Voto emitido el"
+		},
+		"buttons": {
+			"expand": "Expandir",
+			"collapse": "Colapsar",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "Delegador",
+				"capital": "Capital",
+				"votingPower": "Poder de Votación"
+			},
+			"noDelegations": "No hay delegaciones disponibles"
+		},
+		"errors": {
+			"invalidData": "Datos inválidos",
+			"fetchError": "Error al obtener los datos"
+		}
 	}
 }

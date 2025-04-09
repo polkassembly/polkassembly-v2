@@ -748,5 +748,45 @@
 		"preimageDeposit": "Preimage-Einzahlung",
 		"submissionDeposit": "Einreichungs-Einzahlung",
 		"gasFees": "Gas-Gebühren"
+	},
+	"VoteSummary": {
+		"title": "Abstimmungszusammenfassung",
+		"voteDetails": {
+			"title": "Abstimmungsdetails",
+			"date": "Datum",
+			"selfVotes": "Selbstabstimmungen",
+			"votingPower": "Stimmrecht",
+			"conviction": "Überzeugung",
+			"capital": "Kapital",
+			"delegatedVotes": "Delegierte Stimmen",
+			"delegators": "Delegierte",
+			"delegatedVotingPower": "Delegiertes Stimmrecht",
+			"delegationList": "Delegiertenliste",
+			"delegator": "Delegierter",
+			"delegatorCapital": "Kapital des Delegierten",
+			"delegatorVotingPower": "Stimmrecht des Delegierten",
+			"votePowerTooltip": "Stimmrecht basierend auf gesperrtem Kapital",
+			"delegatedVoteTooltip": "Stimmrecht basierend auf delegierten Stimmen",
+			"delegationTooltip": "Liste der Delegierten, die diesen Vorschlag unterstützen",
+			"voteTimestamp": "Abstimmungszeit"
+		},
+		"buttons": {
+			"expand": "Erweitern",
+			"collapse": "Zusammenklappen",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "Delegierter",
+				"capital": "Kapital",
+				"votingPower": "Stimmrecht"
+			},
+			"noDelegations": "Keine Delegationen verfügbar"
+		},
+		"errors": {
+			"invalidData": "Ungültige Daten",
+			"fetchError": "Fehler beim Abrufen der Daten"
+		}
 	}
 }
