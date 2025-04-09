@@ -790,6 +790,20 @@ export class NextApiClientService {
 	}
 
 	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetContentSummary', {
+				network: currentNetwork,
+				proposalType,
+				indexOrHash
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_CONTENT_SUMMARY,
 			routeSegments: [proposalType, indexOrHash, 'content-summary']

@@ -181,21 +181,21 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				),
 				endItems: ActiveItems(
 					[
-						{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics', icon: GovAnalytics },
-						{ title: t('Sidebar.calendar'), url: '/calendar', icon: CalendarIcon },
+						{ title: t('Sidebar.govAnalytics'), url: '#', icon: GovAnalytics },
+						{ title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
 						{
 							title: t('Sidebar.community'),
-							url: '/community',
+							url: '#',
 							icon: CommunityIcon,
 							items: [
-								{ title: t('Sidebar.members'), url: '/members' },
-								{ title: t('Sidebar.ecosystemProjects'), url: '/ecosystem-projects' }
+								{ title: t('Sidebar.members'), url: '#' },
+								{ title: t('Sidebar.ecosystemProjects'), url: '#' }
 							]
 						},
-						{ title: t('Sidebar.parachains'), url: '/parachains', icon: ParachainsIcon },
+						{ title: t('Sidebar.parachains'), url: '#', icon: ParachainsIcon },
 						{
 							title: t('Sidebar.archived'),
-							url: '/archived',
+							url: '#',
 							icon: ArchivedIcon,
 							items: [
 								{
