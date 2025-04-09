@@ -11,6 +11,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { useTranslations } from 'next-intl';
 import { IVoteData } from '@/_shared/types';
+import { BN } from '@polkadot/util';
 
 function DelegatedVotesDropdown({
 	isOpen,
@@ -27,6 +28,16 @@ function DelegatedVotesDropdown({
 	const t = useTranslations('VoteSummary');
 
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
+
+	const calculateDelegatedCapital = () => {
+		const totalCapital = new BN(0);
+		voterDelegations.forEach((delegator: IVoteData) => {
+			const delegatorBalance = new BN(delegator?.balanceValue || '0');
+			totalCapital.iadd(delegatorBalance);
+		});
+
+		return totalCapital.toString();
+	};
 
 	const formatBalance = (balance: string) => {
 		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
@@ -83,7 +94,9 @@ function DelegatedVotesDropdown({
 									</div>
 									<div className='my-[2px] flex justify-between'>
 										<span className='flex items-center gap-1 text-xs text-basic_text'>{t('voteDetails.capital')}</span>
-										<span className='text-xs text-basic_text dark:text-btn_primary_text'>0</span>
+										<span className='text-xs text-basic_text dark:text-btn_primary_text'>
+											{formatBalance(calculateDelegatedCapital())} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										</span>
 									</div>
 								</div>
 							</div>
@@ -92,7 +105,7 @@ function DelegatedVotesDropdown({
 								<span className='mb-2.5 mt-1 text-sm font-medium text-basic_text dark:text-btn_primary_text'>{t('voteDetails.delegationList')}</span>
 								<div className='mt-2 flex items-center justify-between'>
 									<span className='w-1/2 text-xs font-medium text-basic_text dark:text-btn_primary_text'>{t('delegation.delegatorListHeader.delegator')}</span>
-									<span className='w-1/4 text-xs font-medium text-basic_text dark:text-btn_primary_text'>{t('delegation.delegatorListHeader.capital')}</span>
+									<span className='w-1/4 text-xs font-medium text-basic_text dark:text-btn_primary_text'>{t('delegation.delegatorListHeader.conviction')}</span>
 									<span className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>{t('delegation.delegatorListHeader.votingPower')}</span>
 								</div>
 								{voterDelegations.map((delegator: IVoteData) => (

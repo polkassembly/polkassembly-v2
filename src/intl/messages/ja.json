@@ -779,7 +779,7 @@
 		"delegation": {
 			"delegatorListHeader": {
 				"delegator": "委任者",
-				"capital": "資本",
+				"conviction": "確信",
 				"votingPower": "投票力"
 			},
 			"noDelegations": "委任は利用できません"

@@ -779,7 +779,7 @@
 		"delegation": {
 			"delegatorListHeader": {
 				"delegator": "Delegador",
-				"capital": "Capital",
+				"conviction": "Convicción",
 				"votingPower": "Poder de Votación"
 			},
 			"noDelegations": "No hay delegaciones disponibles"

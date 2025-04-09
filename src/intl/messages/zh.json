@@ -779,7 +779,7 @@
 		"delegation": {
 			"delegatorListHeader": {
 				"delegator": "委托人",
-				"capital": "资本",
+				"conviction": "信念",
 				"votingPower": "投票权"
 			},
 			"noDelegations": "没有可用的委托"
