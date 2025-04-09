@@ -87,7 +87,7 @@ function Footer() {
 								<div className={styles.footer_container_2_link_a}>
 									<div>
 										<a
-											href='https://feedback.polkassembly.io/'
+											href='https://polkassembly.featureos.app/'
 											target='_blank'
 											rel='noreferrer'
 											className='flex items-center gap-x-1'
@@ -98,7 +98,7 @@ function Footer() {
 									</div>
 									<div>
 										<a
-											href='https://feedback.polkassembly.io'
+											href='https://polkassembly.featureos.app/'
 											target='_blank'
 											rel='noreferrer'
 											className='flex items-center gap-x-1'
