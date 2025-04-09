@@ -19,7 +19,7 @@ import { useTranslations } from 'next-intl';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import styles from './Bounty.module.scss';
 
-function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGenericListingResponse<IPostListing>; tokenPrice?: number }) {
+function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGenericListingResponse<IPostListing>; tokenPrice: number }) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
@@ -70,7 +70,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 										<div className={styles.bounty_proposal_wrapper_text}>
 											<div className='flex items-baseline gap-x-2'>
 												<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
-													{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, String(tokenPrice ?? 0))}
+													{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, tokenPrice)}
 												</h2>
 											</div>
 											<div className={styles.bounty_proposal_div}>

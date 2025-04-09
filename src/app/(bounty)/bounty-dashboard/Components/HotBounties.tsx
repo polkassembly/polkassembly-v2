@@ -19,7 +19,7 @@ import { useTranslations } from 'next-intl';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import styles from './Bounty.module.scss';
 
-export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice?: number }) {
+export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: number }) {
 	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
@@ -67,7 +67,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 									<div className='flex w-full'>
 										<div className={styles.hotbounties_wrapper}>
 											<div className='flex items-baseline gap-x-2'>
-												<h2 className={styles.hotbounties_wrapper_text}>{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, String(tokenPrice ?? 0))}</h2>
+												<h2 className={styles.hotbounties_wrapper_text}>{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, tokenPrice)}</h2>
 											</div>
 											<div className={styles.hotbounties_div}>
 												<span className={styles.bounty_proposal_div_span} />

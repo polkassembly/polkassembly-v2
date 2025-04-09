@@ -17,7 +17,7 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_sha
 import { useTranslations } from 'next-intl';
 import styles from './Bounty.module.scss';
 
-function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice?: number }) {
+function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: number }) {
 	const network = getCurrentNetwork();
 	const unit = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
 	const [api, setApi] = useState<CarouselApi>();
@@ -87,9 +87,7 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 											<div className={styles.bounty_User_Activity_Carousel}>
 												<Address address={activity?.address} />
 												<span className={styles.bounty_User_Activity_Carousel_Content}>{t('claimed')}</span>
-												<span className={styles.bounty_User_Activity_Carousel_Token_Amount}>
-													{formatTokenValue(String(activity?.amount ?? 0), network, String(tokenPrice ?? 0), unit)}
-												</span>
+												<span className={styles.bounty_User_Activity_Carousel_Token_Amount}>{formatTokenValue(activity?.amount, network, tokenPrice, unit)}</span>
 												<span className={styles.bounty_User_Activity_Carousel_Content}>{t('bounty')}</span>
 												<span className={styles.bounty_User_Activity_Carousel_Span} />
 												<span className={styles.bounty_User_Activity_Carousel_Date}>{dayjs(activity?.created_at).format("DD[th] MMM 'YY")}</span>

@@ -34,23 +34,28 @@ function BountyDashboard({
 			</div>
 			{bountiesStats && (
 				<BountyHeader
-					tokenPrice={tokenPrice}
+					tokenPrice={tokenPrice ?? 0}
 					bountiesStats={bountiesStats}
 				/>
 			)}
 			{hotBounties && (
 				<HotBounties
 					hotBounties={hotBounties}
-					tokenPrice={tokenPrice}
+					tokenPrice={tokenPrice ?? 0}
 				/>
 			)}
 			{bountyProposals && (
 				<BountyProposal
 					bountyProposals={bountyProposals}
-					tokenPrice={tokenPrice}
+					tokenPrice={tokenPrice ?? 0}
 				/>
 			)}
-			{userActivities && userActivities.length > 0 && <BountiesUserActivity userActivities={userActivities} />}
+			{userActivities && userActivities.length > 0 && (
+				<BountiesUserActivity
+					userActivities={userActivities}
+					tokenPrice={tokenPrice ?? 0}
+				/>
+			)}
 		</div>
 	);
 }

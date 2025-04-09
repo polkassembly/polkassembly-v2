@@ -505,6 +505,7 @@ export class SubsquidService extends SubsquidUtils {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX, { index_eq: index }).toPromise();
+			console.log('response by index', response.data);
 
 			return response as { data: { proposals: IBountyProposal[] } };
 		} catch (error) {

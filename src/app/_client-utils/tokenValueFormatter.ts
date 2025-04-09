@@ -16,20 +16,20 @@ export const formatNumberWithSuffix = (value: number): string => {
 	return cleanedValue.toFixed(1);
 };
 
-export const getFormattedValue = (value: string, network: string, currentTokenPrice: string): string => {
+export const getFormattedValue = (value: string, network: string, currentTokenPrice: number): string => {
 	const numericValue = Number(formatBnBalance(value, { numberAfterComma: 1, withThousandDelimitor: false }, network as ENetwork));
 
-	if (isNaN(Number(currentTokenPrice))) {
+	if (isNaN(currentTokenPrice)) {
 		return formatNumberWithSuffix(numericValue);
 	}
 
-	const tokenPrice = Number(currentTokenPrice);
+	const tokenPrice = currentTokenPrice;
 	const dividedValue = numericValue * tokenPrice;
 
 	return formatNumberWithSuffix(dividedValue);
 };
 
-export const formatTokenValue = (value: string, network: string, tokenPrice: string, unit?: string): string => {
+export const formatTokenValue = (value: string, network: string, tokenPrice: number, unit?: string): string => {
 	if (isNaN(Number(tokenPrice))) {
 		return `${getFormattedValue(value, network, tokenPrice)} ${unit ?? ''}`;
 	}
