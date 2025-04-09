@@ -15,6 +15,7 @@ import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import classes from './TwoFactorAuth.module.scss';
 
 interface IFormFields {
@@ -87,7 +88,7 @@ function TwoFactorAuth({ tfaToken, loginAddress, loginWallet, goBack }: { tfaTok
 							rules={{
 								required: true,
 								validate: (value) => {
-									if (value.length !== 6 || Number.isNaN(Number(value))) return 'Please provide a valid authentication code.';
+									if (value.length !== 6 || !ValidatorService.isValidNumber(value)) return 'Please provide a valid authentication code.';
 									return true;
 								}
 							}}

@@ -8,8 +8,12 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { ENetwork, EPostOrigin, EProposalStatus, IBeneficiary } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EVoteDecision, IBeneficiary } from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { SubsquidQueries } from './subsquidQueries';
 
 interface IStatusHistory {
@@ -22,6 +26,7 @@ interface IPeriodEndDates {
 	preparePeriodEnd: Date | null;
 	confirmationPeriodEnd: Date | null;
 }
+const DEFAULT_LOCK_PERIOD = new BN('10').div(new BN('100'));
 
 export class SubsquidUtils extends SubsquidQueries {
 	/**
@@ -117,12 +122,16 @@ export class SubsquidUtils extends SubsquidQueries {
 
 		try {
 			const networkDetails = NETWORKS_DETAILS[network as ENetwork];
-			const blockTime = networkDetails?.blockTime || 6000; // Default 6s if not found
+			const blockTime = networkDetails?.blockTime;
+
+			if (!blockTime) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Block time not found for network');
+			}
+
 			const trackData = networkDetails?.trackDetails[origin as keyof typeof networkDetails.trackDetails];
 
 			if (!trackData) {
-				console.error('Track data not found for network:', network);
-				return result;
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Track data not found for network');
 			}
 
 			// Calculate decision period end
@@ -151,5 +160,43 @@ export class SubsquidUtils extends SubsquidQueries {
 			console.error('Error calculating period end dates:', error);
 			return result;
 		}
+	}
+
+	protected static convertVoteDecisionToSubsquidFormat({ decision }: { decision: EVoteDecision }): string {
+		return decision === EVoteDecision.AYE ? 'yes' : decision === EVoteDecision.NAY ? 'no' : 'abstain';
+	}
+
+	protected static convertVoteDecisionToSubsquidFormatArray({ decision }: { decision: EVoteDecision }): string[] {
+		return decision === EVoteDecision.AYE ? ['yes', 'abstain'] : decision === EVoteDecision.NAY ? ['no', 'abstain'] : ['abstain'];
+	}
+
+	protected static convertSubsquidVoteDecisionToVoteDecision({ decision }: { decision: string }): EVoteDecision {
+		return decision === 'yes' ? EVoteDecision.AYE : decision === 'no' ? EVoteDecision.NAY : (decision as EVoteDecision);
+	}
+
+	protected static getVoteBalanceValueForVoteHistory({
+		balance,
+		decision
+	}: {
+		balance: { value?: string; aye?: string; nay?: string; abstain?: string };
+		decision: EVoteDecision;
+	}): string {
+		if (decision === EVoteDecision.AYE) {
+			return balance?.value || balance?.aye || '0';
+		}
+
+		if (decision === EVoteDecision.NAY) {
+			return balance?.value || balance?.nay || '0';
+		}
+
+		return balance?.abstain || '0';
+	}
+
+	protected static getSelfVotingPower({ balance, selfVotingPower, lockPeriod }: { balance: string; selfVotingPower: string | null; lockPeriod: null | number }): string {
+		if (new BN(selfVotingPower || '0').gt(BN_ZERO)) return selfVotingPower || '0';
+		if (lockPeriod === null) {
+			return balance;
+		}
+		return new BN(balance).mul(!lockPeriod ? DEFAULT_LOCK_PERIOD : new BN(lockPeriod)).toString();
 	}
 }

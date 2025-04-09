@@ -97,7 +97,6 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				status: NotificationType.ERROR,
 				title: t('Profile.loginFailed')
 			});
-		} finally {
 			setLoading(false);
 		}
 	};
@@ -105,8 +104,11 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	return (
 		<div className='w-full'>
 			<div className='flex flex-col gap-y-4'>
-				<WalletButtons small />
-				<AddressDropdown />
+				<WalletButtons
+					small
+					disabled={loading}
+				/>
+				<AddressDropdown disabled={loading} />
 			</div>
 
 			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
@@ -128,6 +130,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						variant='ghost'
 						className='px-0 text-text_pink'
 						onClick={switchToWeb2}
+						disabled={loading}
 					>
 						{t('Profile.loginwithusername')}
 					</Button>

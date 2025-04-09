@@ -1,11 +1,11 @@
 .wrapper {
-    @apply flex flex-col gap-y-4
+	@apply flex w-full flex-col gap-y-4;
 }
 
 .loginToComment {
-    @apply bg-bg_light_blue flex w-full items-center justify-center gap-x-1 rounded-lg p-4 text-text_primary shadow-md;
+	@apply flex w-full items-center justify-center gap-x-1 rounded-lg bg-address_input_bg p-4 text-text_primary shadow-md;
 }
 
 .loadMoreComments {
-    @apply flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary;
+	@apply flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary;
 }

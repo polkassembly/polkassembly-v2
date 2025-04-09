@@ -291,7 +291,17 @@
 		"WhitelistedCaller": "Zugelassener Aufrufer",
 		"WhitelistedCallerDescription": "Ursprung, der von allen Mitgliedern der Polkadot Fellowship gesteuert wird (kein Dan-Grad erforderlich).",
 		"WishForChange": "Wunsch nach Veränderung",
-		"WishForChangeDescription": "Ursprung für die Signalisierung, dass das Netzwerk eine Änderung wünscht."
+		"WishForChangeDescription": "Ursprung für die Signalisierung, dass das Netzwerk eine Änderung wünscht.",
+		"CouncilMotion": "On Chain Motions",
+		"CouncilMotionDescription": "This is the place to discuss on-chain motions. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"TechCommitteeProposal": "Tech Committee Proposal",
+		"TechCommitteeProposalDescription": "This is the place to discuss on-chain tech committee proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"DemocracyProposal": "On Chain Proposals",
+		"DemocracyProposalDescription": "This is the place to discuss on-chain proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"TreasuryProposal": "Treasury Proposal",
+		"TreasuryProposalDescription": "This is the place to discuss on-chain treasury proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"Tip": "Tips",
+		"TipDescription": "This is the place to discuss on-chain tips. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them."
 	},
 	"Sidebar": {
 		"onChainIdentity": "On-Chain-Identität",
@@ -357,6 +367,7 @@
 		"requested": "Angefordert",
 		"beneficiary": "Begünstigter",
 		"description": "Beschreibung",
+		"noVotes": "Keine Abstimmungen gefunden",
 		"timeline": "Zeitlinie",
 		"more": "mehr",
 		"referendum": "Referendum",
@@ -379,6 +390,7 @@
 		"split": "Geteilt",
 		"support": "Unterstützung",
 		"bareAyes": "Einfache Ja-Stimmen",
+		"issuance": "Issuance",
 		"viewVoteHistory": "Abstimmungsverlauf anzeigen",
 		"voteHistory": "Abstimmungsverlauf",
 		"delegated": "Delegiert",
@@ -404,7 +416,9 @@
 		"deleteCommentConfirmation": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?",
 		"delete": "Löschen",
 		"hideReplies": "Antworten ausblenden",
-		"viewReplies": "Antworten anzeigen"
+		"viewReplies": "Antworten anzeigen",
+		"commentSummary": "Kommentarzusammenfassung",
+		"aiSummary": "KI-Zusammenfassung"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -475,7 +489,9 @@
 		"previous": "Zurück"
 	},
 	"BalanceInput": {
-		"addBalance": "Guthaben hinzufügen"
+		"addBalance": "Guthaben hinzufügen",
+		"enterAmount": "Betrag eingeben",
+		"treasuryBalance": "Treasury-Guthaben"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Wählen Sie Ihre Stimme",
@@ -529,7 +545,6 @@
 		"searchByHash": "Nach Hash suchen",
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
-
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
 		"title": "Titel",
@@ -551,13 +566,16 @@
 		},
 		"Topic": {
 			"general": "Allgemein",
-			"auctionadmin": "Auktionsadministrator",
-			"generaladmin": "Allgemeiner Administrator",
+			"auctionadmin": "Auktions-Admin",
+			"generaladmin": "Allgemeiner Admin",
 			"governance": "Governance",
 			"root": "Root",
-			"stakingadmin": "Staking-Administrator",
-			"treasury": "Schatzamt",
-			"fellowship": "Gemeinschaft"
+			"stakingadmin": "Staking-Admin",
+			"treasury": "Treasury",
+			"fellowship": "Fellowship",
+			"council": "Rat",
+			"democracy": "Demokratie",
+			"whitelist": "Whitelist"
 		},
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel an.",
 		"titlePlaceholder": "Titel eingeben",
@@ -608,10 +626,6 @@
 		"findYourRank": "Finde deinen Rang in der Ökosystem",
 		"searchUsername": "Benutzername suchen"
 	},
-	"BlockEditor": {
-		"placeholder": "Geben Sie / ein, um zu starten",
-		"errorUpdatingContent": "Fehler beim Aktualisieren des Inhalts"
-	},
 	"SetIdentity": {
 		"displayName": "Anzeigename",
 		"legalName": "Rechtlicher Name",
@@ -654,16 +668,30 @@
 		"proposals": "Vorschläge"
 	},
 	"CreateProposal": {
-		"createPreimage": "Preimage erstellen",
-		"existingPreimage": "Bereits ein Preimage vorhanden",
-		"createTreasuryProposal": "Treasury-Vorschlag erstellen (Native)",
-		"usdxProposal": "USDx Treasury-Vorschlag erstellen (Assethub)",
+		"create": "Erstellen",
+		"quickActions": "Schnellaktionen",
+		"submitProposal": "Vorschlag einreichen",
+		"createDiscussion": "Diskussionsbeitrag",
+		"createPreimage": "Neues Preimage",
+		"existingPreimage": "Ich habe bereits ein Preimage",
+		"spend": "Ausgeben",
+		"from": "von",
+		"Treasury": "Treasury",
+		"usdxProposal": "Assets von AssetHub ausgeben (USDx, DOT, etc.)",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
+		"createDiscussionDescription": "Starten Sie eine Konversation und sammeln Sie Feedback.",
+		"createPreimageDescription": "Reichen Sie einen Vorschlag mit einem neuen Preimage-Hash ein.",
+		"existingPreimageDescription": "Verwenden Sie einen existierenden Preimage-Hash zur Einreichung.",
+		"createTreasuryProposalDescription": "Treasury-Ausgaben vorschlagen in",
+		"usdxProposalDescription": "Finanzierung von AssetHub beantragen (USDx, DOT, etc.).",
+		"cancelReferendumDescription": "Vorschlag zum Abbruch eines aktiven Referendums.",
+		"killReferendumDescription": "Beenden Sie ein Referendum, bevor es angenommen wird.",
 		"goBack": "Zurück",
 		"preimageHash": "Preimage-Hash",
-		"preimageLength": "Preimage-Länge",
-		"preimageHashDescription": "Geben Sie den Preimage-Hash ein, um einen Vorschlag zu erstellen"
+		"preimageLength": "Länge",
+		"preimageHashDescription": "Hash eingeben",
+		"viewPreimage": "Preimage anzeigen"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -677,8 +705,8 @@
 		"proposalCreationFailedDescription": "Bei der Erstellung des Vorschlags ist ein Fehler aufgetreten",
 		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
 		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
-		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
-		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
+		"preimageNoteFailed": "Preimage-Notierung fehlgeschlagen",
+		"preimageNoteFailedDescription": "Bei der Notierung des Preimage ist ein Fehler aufgetreten",
 		"selectTrack": "Track auswählen",
 		"validFrom": "Gültig ab",
 		"addValidFrom": "Gültig ab hinzufügen",
@@ -686,30 +714,39 @@
 		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
 	},
 	"CreatePreimage": {
-		"addItem": "Element hinzufügen",
-		"removeItem": "Element entfernen",
+		"addItem": "Begünstigten/Auszahlungen hinzufügen",
+		"removeItem": "Auszahlung entfernen",
 		"yes": "Ja",
 		"no": "Nein",
 		"uploadFile": "Datei hochladen",
 		"includeOption": "Option einschließen",
-		"preimageNoteFailed": "Notieren des Preimage fehlgeschlagen",
+		"preimageNoteFailed": "Preimage-Notiz fehlgeschlagen",
 		"preimageNoteFailedDescription": "Beim Notieren des Preimage ist ein Fehler aufgetreten",
 		"preimageNotedSuccessfully": "Preimage erfolgreich notiert",
 		"preimageNotedSuccessfullyDescription": "Das Preimage wurde erfolgreich notiert",
 		"preimageHash": "Preimage-Hash",
-		"length": "Länge"
+		"length": "Länge",
+		"beneficiary": "Begünstigter",
+		"noBeneficiarySelected": "Kein Begünstigter ausgewählt",
+		"on": "an"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",
 		"noResultsFound": "Keine Ergebnisse gefunden",
-		"placeholder": "Adresse eingeben"
+		"placeholder": "Adresse auswählen/eingeben"
 	},
 	"KillCancelReferendum": {
-		"referendumId": "Referendum-ID",
-		"referendumIdDescription": "Geben Sie die Referendum-ID zum Abbrechen ein",
-		"thisReferendumIsNotOngoing": "Dieses Referendum läuft nicht"
+		"referendumId": "Referendum-Index eingeben",
+		"referendumIdDescription": "Hier eingeben",
+		"thisReferendumIsNotOngoing": "Warnung! Kein laufendes Referendum",
+		"viewReferendum": "Vorschlag anzeigen"
 	},
 	"errorMessages": {
-		"valueTooLarge": "Der Wert ist zu groß"
+		"valueTooLarge": "Wert ist zu groß"
+	},
+	"TxFees": {
+		"preimageDeposit": "Preimage-Einzahlung",
+		"submissionDeposit": "Einreichungs-Einzahlung",
+		"gasFees": "Gas-Gebühren"
 	}
 }

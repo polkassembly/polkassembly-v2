@@ -43,8 +43,8 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	const handleUnsubscribe = (postId: string | number) => {
 		setLocalPosts((prevPosts) =>
 			prevPosts.filter((post) => {
-				const postIdentifier = post.index || post.hash || '';
-				return postIdentifier.toString() !== postId.toString();
+				const postIdentifier = post.index ?? post.hash;
+				return postIdentifier?.toString() !== postId.toString();
 			})
 		);
 		queryClient.setQueryData<QueryData>(['subscribedActivityFeed', userId], (oldData) => {
@@ -54,8 +54,8 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 				pages: oldData.pages.map((page) => ({
 					...page,
 					items: page.items.filter((post) => {
-						const postIdentifier = post.index || post.hash || '';
-						return postIdentifier.toString() !== postId.toString();
+						const postIdentifier = post.index ?? post.hash;
+						return postIdentifier?.toString() !== postId.toString();
 					})
 				}))
 			};

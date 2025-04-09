@@ -10,6 +10,7 @@ import { THEME_COLORS } from './src/app/_style/theme';
 const config: Config = {
 	content: ['./src/pages/**/*.{js,ts,jsx,tsx,mdx}', './src/components/**/*.{js,ts,jsx,tsx,mdx}', './src/app/**/*.{js,ts,jsx,tsx,mdx}'],
 	darkMode: ['class'],
+	important: true,
 	// eslint-disable-next-line global-require, @typescript-eslint/no-require-imports
 	plugins: [createThemes(THEME_COLORS), require('tailwindcss-animate')],
 	theme: {

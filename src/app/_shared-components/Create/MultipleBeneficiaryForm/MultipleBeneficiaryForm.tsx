@@ -1,11 +1,12 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { Plus } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { Button } from '@/app/_shared-components/Button';
 import { IBeneficiaryInput } from '@/_shared/types';
+import { dayjs } from '@shared/_utils/dayjsInit';
 import BeneficiaryInputs from './BeneficiaryInputs';
 
 function MultipleBeneficiaryForm({
@@ -42,20 +43,23 @@ function MultipleBeneficiaryForm({
 	};
 
 	const addBeneficiary = () => {
-		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null }]);
+		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
 	};
 
 	const removeBeneficiary = (index: number) => {
-		onChange(beneficiaries.filter((_, i) => i !== index));
+		const newArray = [...beneficiaries];
+		newArray.splice(index, 1);
+		onChange(newArray);
 	};
 
 	return (
-		<div className='flex flex-col gap-y-4'>
+		<div className='flex flex-col gap-y-1'>
+			<p className='text-sm text-wallet_btn_text'>{t('CreatePreimage.beneficiary')}</p>
 			<div className='flex flex-col gap-y-6'>
-				{beneficiaries.map((_, index) => (
+				{beneficiaries.map((b, index) => (
 					<BeneficiaryInputs
-						// eslint-disable-next-line react/no-array-index-key
-						key={index}
+						key={b.id}
+						index={index}
 						beneficiaries={beneficiaries}
 						onBeneficiaryChange={({ beneficiary }) => handleBeneficiaryChange({ beneficiary, index })}
 						onAmountChange={({ amount, assetId }) => handleAmountChange({ amount, assetId, index })}
@@ -63,6 +67,7 @@ function MultipleBeneficiaryForm({
 						onRemoveBeneficiary={() => removeBeneficiary(index)}
 						multiAsset={multiAsset}
 						stagedPayment={stagedPayment}
+						beneficiary={b}
 					/>
 				))}
 			</div>
@@ -71,7 +76,7 @@ function MultipleBeneficiaryForm({
 					onClick={addBeneficiary}
 					variant='ghost'
 					size='sm'
-					leftIcon={<Plus />}
+					leftIcon={<PlusCircle />}
 				>
 					{t('CreatePreimage.addItem')}
 				</Button>

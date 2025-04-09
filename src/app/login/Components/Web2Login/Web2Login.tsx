@@ -107,7 +107,6 @@ function Web2Login({
 				status: NotificationType.ERROR,
 				title: t('Profile.loginFailed')
 			});
-		} finally {
 			setLoading(false);
 		}
 	};
@@ -184,10 +183,12 @@ function Web2Login({
 				small
 				onWalletChange={onWalletChange}
 				hidePreference
+				disabled={loading}
 			/>
 			<SwitchToWeb2Signup
 				className='mt-4 justify-center'
 				switchToSignup={switchToSignup}
+				disabled={loading}
 			/>
 		</div>
 	);

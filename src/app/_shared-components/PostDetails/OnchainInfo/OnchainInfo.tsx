@@ -55,10 +55,10 @@ function OnchainInfo({ proposalType, index, onchainInfo }: { proposalType: EProp
 					</div>
 					<div className={classes.infoRow}>
 						<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.description')}</p>
-						<p className={classes.infoRowValue}>{data?.proposedCall.description}</p>
+						<p className={classes.infoRowValue}>{data?.proposedCall?.description}</p>
 					</div>
 					<div>
-						<ArgumentsTableJSONView postArguments={data?.proposedCall.args || {}} />
+						<ArgumentsTableJSONView postArguments={data?.proposedCall?.args || {}} />
 					</div>
 				</div>
 			)}

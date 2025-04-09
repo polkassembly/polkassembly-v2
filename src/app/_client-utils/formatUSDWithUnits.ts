@@ -2,8 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { ValidatorService } from '@/_shared/_services/validator_service';
+
 export const formatUSDWithUnits = (usd: string, numberAfterDot?: number) => {
-	const toFixed = numberAfterDot && !isNaN(Number(numberAfterDot)) ? numberAfterDot : 2;
+	const toFixed = numberAfterDot && ValidatorService.isValidNumber(numberAfterDot) ? numberAfterDot : 2;
 	let newUsd = usd;
 	let suffix = '';
 	if (typeof usd === 'string') {

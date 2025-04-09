@@ -7,7 +7,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
-import { ENetwork, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
+import { ENetwork, IContentSummary, IDelegateDetails, IDelegationStats, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
@@ -31,7 +31,9 @@ enum ERedisKeys {
 	CONTENT_SUMMARY = 'CSM',
 	SUBSCRIPTION_FEED = 'SFD',
 	TOKEN_PRICE = 'TKP',
-	CALENDAR_DATA = 'CLD'
+	CALENDAR_DATA = 'CLD',
+	DELEGATION_STATS = 'DGS',
+	DELEGATE_DETAILS = 'DLD'
 }
 
 export class RedisService {
@@ -64,7 +66,9 @@ export class RedisService {
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
 		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
 		[ERedisKeys.TOKEN_PRICE]: (symbol: string): string => `${ERedisKeys.TOKEN_PRICE}-${symbol.toLowerCase()}`,
-		[ERedisKeys.CALENDAR_DATA]: (network: string, startBlockNo: number, endBlockNo: number): string => `${ERedisKeys.CALENDAR_DATA}-${network}-${startBlockNo}-${endBlockNo}`
+		[ERedisKeys.CALENDAR_DATA]: (network: string, startBlockNo: number, endBlockNo: number): string => `${ERedisKeys.CALENDAR_DATA}-${network}-${startBlockNo}-${endBlockNo}`,
+		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
+		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`
 	} as const;
 
 	// helper methods
@@ -302,12 +306,23 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*` });
 	}
 
-	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<string | null> {
-		return this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType) });
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<IContentSummary | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType) });
+		return data ? (deepParseJson(data) as IContentSummary) : null;
 	}
 
-	static async SetContentSummary({ network, indexOrHash, proposalType, data }: { network: string; indexOrHash: string; proposalType: string; data: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: data, ttlSeconds: ONE_DAY });
+	static async SetContentSummary({
+		network,
+		indexOrHash,
+		proposalType,
+		data
+	}: {
+		network: string;
+		indexOrHash: string;
+		proposalType: string;
+		data: IContentSummary;
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
@@ -390,6 +405,10 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-*` });
 	}
 
+	static async DeleteAllSubscriptionFeedsForNetwork(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
+	}
+
 	// toolkit methods
 
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
@@ -436,5 +455,33 @@ export class RedisService {
 
 	static async DeleteCalendarData({ network, startBlockNo, endBlockNo }: { network: string; startBlockNo: number; endBlockNo: number }): Promise<void> {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.CALENDAR_DATA}-${network}-${startBlockNo}-${endBlockNo}` });
+	}
+
+	// Delegation stats caching methods
+	static async GetDelegationStats(network: ENetwork): Promise<IDelegationStats | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network) });
+		return data ? (deepParseJson(data) as IDelegationStats) : null;
+	}
+
+	static async SetDelegationStats(network: ENetwork, data: IDelegationStats): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+	}
+
+	static async DeleteDelegationStats(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATION_STATS}-${network}` });
+	}
+
+	// Delegates caching methods
+	static async GetDelegateDetails(network: ENetwork): Promise<IDelegateDetails[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network) });
+		return data ? (deepParseJson(data) as IDelegateDetails[]) : null;
+	}
+
+	static async SetDelegateDetails(network: ENetwork, data: IDelegateDetails[]): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+	}
+
+	static async DeleteDelegateDetails(network: ENetwork): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATE_DETAILS}-${network}` });
 	}
 }
