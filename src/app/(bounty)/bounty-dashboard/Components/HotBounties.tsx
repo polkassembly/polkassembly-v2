@@ -15,11 +15,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
 import { useTranslations } from 'next-intl';
+import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import styles from './Bounty.module.scss';
 
-export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
+export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice?: number }) {
 	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
@@ -67,7 +67,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 									<div className='flex w-full'>
 										<div className={styles.hotbounties_wrapper}>
 											<div className='flex items-baseline gap-x-2'>
-												<h2 className={styles.hotbounties_wrapper_text}>{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}</h2>
+												<h2 className={styles.hotbounties_wrapper_text}>{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, String(tokenPrice ?? 0))}</h2>
 											</div>
 											<div className={styles.hotbounties_div}>
 												<span className={styles.bounty_proposal_div_span} />
@@ -98,11 +98,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											<span className='text-[18px] text-btn_secondary_text'>{bounty.title?.slice(0, 28)}</span>
 										</h4>
 										<div className={styles.hotbounties_wrapper_editor_text}>
-											<BlockEditor
-												data={{ blocks: bounty.content?.blocks?.slice(0, 2) || [] }}
-												readOnly
-												id={`bounty-content-${bounty.index}`}
-											/>{' '}
+											<MarkdownViewer markdown={bounty.content} />
 										</div>
 										<div className='mb-2 mt-8 flex items-center text-sm'>
 											<Address

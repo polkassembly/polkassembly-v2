@@ -5,7 +5,6 @@
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
-import BlockEditor from '@/app/_shared-components/BlockEditor/BlockEditor';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
 import { spaceGroteskFont } from '@/app/_style/fonts';
@@ -17,9 +16,10 @@ import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { useTranslations } from 'next-intl';
+import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import styles from './Bounty.module.scss';
 
-function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGenericListingResponse<IPostListing>; tokenPrice: string | number }) {
+function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGenericListingResponse<IPostListing>; tokenPrice?: number }) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const network = getCurrentNetwork();
@@ -70,7 +70,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 										<div className={styles.bounty_proposal_wrapper_text}>
 											<div className='flex items-baseline gap-x-2'>
 												<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
-													{formatTokenValue(String(bounty.onChainInfo?.reward), network, tokenPrice as string)}
+													{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, String(tokenPrice ?? 0))}
 												</h2>
 											</div>
 											<div className={styles.bounty_proposal_div}>
@@ -109,11 +109,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 											<span className='text-[18px] text-btn_secondary_text'>{bounty.title?.slice(0, 28)}</span>
 										</h4>
 										<div className={styles.bounty_proposal_wrapper_img_text}>
-											<BlockEditor
-												data={{ blocks: bounty.content?.blocks?.slice(0, 1) || [] }}
-												readOnly
-												id={`bounty-content-${bounty.index}`}
-											/>
+											<MarkdownViewer markdown={bounty.content} />
 										</div>
 										<div className='mb-2 mt-5 flex items-center justify-between text-sm'>
 											<Address

@@ -17,7 +17,7 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/app/_sha
 import { useTranslations } from 'next-intl';
 import styles from './Bounty.module.scss';
 
-function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: string | number }) {
+function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice?: number }) {
 	const network = getCurrentNetwork();
 	const unit = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
 	const [api, setApi] = useState<CarouselApi>();

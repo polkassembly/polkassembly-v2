@@ -11,7 +11,7 @@ async function page() {
 	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
 
 	const { data: treasuryStats } = await NextApiClientService.getTreasuryStats();
-	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice || 0;
+	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
 
 	const { data: hotBounties } = await NextApiClientService.fetchListingData({
 		proposalType: EProposalType.BOUNTY,
@@ -32,18 +32,10 @@ async function page() {
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
 			<BountyDashboard
 				tokenPrice={Number(tokenPrice)}
-				bountiesStats={
-					bountiesStats || {
-						activeBounties: '0',
-						availableBountyPool: 'N/A',
-						peopleEarned: 'N/A',
-						totalBountyPool: '0',
-						totalRewarded: 'N/A'
-					}
-				}
-				hotBounties={hotBounties || { items: [], totalCount: 0 }}
-				bountyProposals={bountyProposals || { items: [], totalCount: 0 }}
-				userActivities={userActivities || []}
+				bountiesStats={bountiesStats}
+				hotBounties={hotBounties}
+				bountyProposals={bountyProposals}
+				userActivities={userActivities}
 			/>
 		</div>
 	);

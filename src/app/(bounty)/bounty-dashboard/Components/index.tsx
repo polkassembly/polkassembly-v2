@@ -17,11 +17,11 @@ function BountyDashboard({
 	bountyProposals,
 	userActivities
 }: {
-	tokenPrice: number;
-	bountiesStats: IBountyStats;
-	hotBounties: IGenericListingResponse<IPostListing>;
-	bountyProposals: IGenericListingResponse<IPostListing>;
-	userActivities: IBountyUserActivity[];
+	tokenPrice?: number;
+	bountiesStats?: IBountyStats | null;
+	hotBounties?: IGenericListingResponse<IPostListing> | null;
+	bountyProposals?: IGenericListingResponse<IPostListing> | null;
+	userActivities?: IBountyUserActivity[] | null;
 }) {
 	return (
 		<div>
@@ -32,30 +32,25 @@ function BountyDashboard({
 					<CuratorDashboardButton /> */}
 				</div>
 			</div>
-			<BountyHeader
-				tokenPrice={tokenPrice}
-				bountiesStats={
-					bountiesStats || {
-						activeBounties: '0',
-						availableBountyPool: 'N/A',
-						peopleEarned: 'N/A',
-						totalBountyPool: '0',
-						totalRewarded: 'N/A'
-					}
-				}
-			/>
-			<HotBounties
-				hotBounties={hotBounties || { items: [], totalCount: 0 }}
-				tokenPrice={tokenPrice}
-			/>
-			<BountyProposal
-				bountyProposals={bountyProposals || { items: [], totalCount: 0 }}
-				tokenPrice={tokenPrice}
-			/>
-			<BountiesUserActivity
-				userActivities={userActivities || []}
-				tokenPrice={tokenPrice}
-			/>
+			{bountiesStats && (
+				<BountyHeader
+					tokenPrice={tokenPrice}
+					bountiesStats={bountiesStats}
+				/>
+			)}
+			{hotBounties && (
+				<HotBounties
+					hotBounties={hotBounties}
+					tokenPrice={tokenPrice}
+				/>
+			)}
+			{bountyProposals && (
+				<BountyProposal
+					bountyProposals={bountyProposals}
+					tokenPrice={tokenPrice}
+				/>
+			)}
+			{userActivities && userActivities.length > 0 && <BountiesUserActivity userActivities={userActivities} />}
 		</div>
 	);
 }

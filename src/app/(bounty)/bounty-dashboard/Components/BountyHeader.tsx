@@ -35,7 +35,7 @@ function StatItem({ label, value }: { label: string; value: string }) {
 	);
 }
 
-function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice: number }) {
+function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountyStats; tokenPrice?: number }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Bounty');
 	const { data: bountyAmount = '0', isLoading } = useQuery({
@@ -46,7 +46,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 		},
 		enabled: !!network
 	});
-	const availableBounty = !isNaN(Number(tokenPrice)) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
+	const availableBounty = tokenPrice && !isNaN(Number(tokenPrice)) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
 
 	return (
 		<div className='mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
@@ -93,11 +93,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						/>
 						<StatItem
 							label='Total Rewarded'
-							value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice?.toString() || '', NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 						<StatItem
 							label='Total Bounty Pool'
-							value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice?.toString() || '', NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 						/>
 					</div>
 				</div>
@@ -163,11 +163,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 							/>
 							<StatItem
 								label='Total Rewarded'
-								value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+								value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice?.toString() || '', NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 							<StatItem
 								label='Total Bounty Pool'
-								value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice.toString(), NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+								value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice?.toString() || '', NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 						</div>
 						<div className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line}>
