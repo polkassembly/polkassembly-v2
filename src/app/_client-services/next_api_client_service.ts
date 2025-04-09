@@ -34,7 +34,8 @@ import {
 	IBountyUserActivity,
 	IVoteCartItem,
 	EConvictionAmount,
-	IContentSummary
+	IContentSummary,
+	ITreasuryStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -88,7 +89,6 @@ enum EApiRoute {
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
 	FETCH_BOUNTIES_STATS = 'FETCH_BOUNTIES_STATS',
-	GET_TOKEN_PRICE = 'GET_TOKEN_PRICE',
 	FETCH_BOUNTIES_USER_ACTIVITY = 'FETCH_BOUNTIES_USER_ACTIVITY',
 	GET_CHILD_BOUNTIES = 'GET_CHILD_BOUNTIES',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
@@ -100,7 +100,8 @@ enum EApiRoute {
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS'
 }
 
 export class NextApiClientService {
@@ -178,8 +179,8 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY:
 				path = '/bounties/user-activity';
 				break;
-			case EApiRoute.GET_TOKEN_PRICE:
-				path = '/token-price';
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.GET_CHILD_BOUNTIES:
 			case EApiRoute.POSTS_LISTING:
@@ -803,5 +804,14 @@ export class NextApiClientService {
 			routeSegments: [proposalType, indexOrHash, 'content-summary']
 		});
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 }

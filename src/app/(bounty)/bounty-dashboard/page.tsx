@@ -9,7 +9,10 @@ import BountyDashboard from './Components';
 
 async function page() {
 	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
-	const { data: tokenPrice } = await NextApiClientService.getTokenPrice();
+
+	const { data: treasuryStats } = await NextApiClientService.getTreasuryStats();
+	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice || 0;
+
 	const { data: hotBounties } = await NextApiClientService.fetchListingData({
 		proposalType: EProposalType.BOUNTY,
 		page: 1,
@@ -28,7 +31,7 @@ async function page() {
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
 			<BountyDashboard
-				tokenPrice={tokenPrice?.price || 0}
+				tokenPrice={Number(tokenPrice)}
 				bountiesStats={
 					bountiesStats || {
 						activeBounties: '0',
