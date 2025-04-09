@@ -3,11 +3,11 @@
 }
 
 .dialogTitle {
-	@apply -mx-6 border-0 border-b-[1px] border-solid border-border_grey px-6 pb-2 text-lg tracking-wide text-btn_secondary_text;
+	@apply -mx-6 px-6 pb-2 text-lg tracking-wide text-btn_secondary_text;
 }
 
 .contentContainer {
-	@apply mt-6 flex flex-col items-center justify-center gap-6 text-btn_secondary_text;
+	@apply flex flex-col items-center justify-center gap-6 text-btn_secondary_text;
 }
 
 .messageText {
