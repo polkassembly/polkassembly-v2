@@ -1,19 +1,11 @@
+.tabs {
+	@apply flex w-full items-center justify-center gap-x-2 rounded text-sm text-wallet_btn_text;
+}
+
 .tableContainer {
-	@apply relative flex max-h-[500px] w-full flex-col overflow-auto;
+	@apply relative flex max-h-[500px] flex-col;
 }
 
 .table {
-	@apply min-h-[200px] w-full;
-}
-
-.collapsibleContent {
-	@apply bg-transparent;
-}
-
-.tableRowContent {
-	@apply w-full;
-}
-
-.collapsibleButton {
-	@apply rounded bg-gray-200 p-2 text-sm text-wallet_btn_text;
+	@apply min-h-[200px];
 }

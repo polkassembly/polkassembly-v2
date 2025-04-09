@@ -10,13 +10,12 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
-import { Collapsible, CollapsibleContent } from '@/app/_shared-components/Collapsible';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
 import Address from '../../../Profile/Address/Address';
 import { Button } from '../../../Button';
 import LoadingLayover from '../../../LoadingLayover';
 import classes from './VoteHistory.module.scss';
+import DelegatedVotesDropdown from './DelegatedVotesDropdown/DelegatedVotesDropdown';
 
 function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	return sort === 'asc' ? (
@@ -153,87 +152,12 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 								</TableRow>
 
 								{renderCollapsible && (
-									<TableRow>
-										<TableCell colSpan={5}>
-											<Collapsible
-												open={isOpen}
-												onOpenChange={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
-											>
-												<CollapsibleContent asChild>
-													<div>
-														<div>
-															<div className='mb-3 mt-2 flex items-center justify-between'>
-																<span className='text-sm font-medium text-basic_text dark:text-btn_primary_text'>Vote Detail</span>
-																<span className='text-xs text-text_primary'>{dayjs(voteData.createdAt ?? '').format("Do MMM 'YY")}</span>
-															</div>
-															<div className='flex justify-between'>
-																<div className='flex w-[200px] flex-col gap-1'>
-																	<div className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>Self Votes</div>
-																	<div className='flex justify-between'>
-																		<span className='flex items-center gap-1 text-xs text-basic_text'>Voting Power</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>
-																			{formatBalance(voteData?.selfVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-																		</span>
-																	</div>
-																	<div className='flex justify-between'>
-																		<span className='flex items-center gap-1 text-xs text-basic_text'>Conviction</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>{voteData?.lockPeriod || '0'}x</span>
-																	</div>
-																	<div className='flex justify-between'>
-																		<span className='flex items-center gap-1 text-xs text-basic_text'>Capital</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>
-																			{formatBalance(voteData?.balanceValue?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-																		</span>
-																	</div>
-																</div>
-																<div className='border-y-0 border-l-2 border-r-0 border-dashed border-primary_border' />
-																<div className='mr-3 flex w-[200px] flex-col gap-1'>
-																	<div className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>Delegated Votes</div>
-																	<div className='flex justify-between'>
-																		<span className='flex items-center gap-1 text-xs text-basic_text'>Voting Power</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>
-																			{formatBalance(voteData?.delegatedVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-																		</span>
-																	</div>
-																	<div className='flex justify-between'>
-																		<span className='flex items-center gap-1 text-xs text-basic_text'>Delegators</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>{voterDelegations.length || '0'}</span>
-																	</div>
-																	<div className='flex justify-between'>
-																		<span className='flex items-center gap-1 text-xs text-basic_text'>Capital</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0</span>
-																	</div>
-																</div>
-															</div>
-														</div>
-
-														<div className='mt-3 border-b-0 border-l-0 border-r-0 border-t-2 border-dashed border-primary_border pt-2 text-xs text-muted-foreground'>
-															<span className='mb-2.5 mt-1 text-sm font-medium text-basic_text dark:text-btn_primary_text'>Delegation List</span>
-															<div className='flex items-center justify-between'>
-																<span className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>Delegators</span>
-																<span className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>Capital</span>
-																<span className='text-xs font-medium text-btn_primary_text'>Voting Power</span>
-															</div>
-															{voterDelegations.map((delegator: IVoteData) => (
-																<div
-																	key={delegator?.voterAddress}
-																	className='mt-2 space-y-1 border-b border-dashed border-primary_border pb-3'
-																>
-																	<div className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'>
-																		<Address address={delegator?.voterAddress} />
-																		<span>{delegator?.lockPeriod || '0'}/d</span>
-																		<span>
-																			{formatBalance(delegator?.totalVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-																		</span>
-																	</div>
-																</div>
-															))}
-														</div>
-													</div>
-												</CollapsibleContent>
-											</Collapsible>
-										</TableCell>
-									</TableRow>
+									<DelegatedVotesDropdown
+										isOpen={isOpen}
+										setOpenRow={setOpenRow}
+										voteData={voteData}
+										voterDelegations={voterDelegations}
+									/>
 								)}
 							</React.Fragment>
 						);
