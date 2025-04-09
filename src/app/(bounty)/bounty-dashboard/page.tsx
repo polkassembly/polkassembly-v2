@@ -10,7 +10,10 @@ import BountyDashboard from './Components';
 async function page() {
 	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
 
-	const { data: treasuryStats } = await NextApiClientService.getTreasuryStats();
+	const to = new Date();
+	const from = new Date();
+	from.setFullYear(to.getFullYear() - 1);
+	const { data: treasuryStats } = await NextApiClientService.getTreasuryStats({ from, to });
 	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
 
 	const { data: hotBounties } = await NextApiClientService.fetchListingData({
