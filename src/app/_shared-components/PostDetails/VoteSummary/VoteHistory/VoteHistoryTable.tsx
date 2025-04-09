@@ -171,15 +171,19 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 																	<div className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>Self Votes</div>
 																	<div className='flex justify-between'>
 																		<span className='flex items-center gap-1 text-xs text-basic_text'>Voting Power</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0 dot</span>
+																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>
+																			{formatBalance(voteData?.selfVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+																		</span>
 																	</div>
 																	<div className='flex justify-between'>
 																		<span className='flex items-center gap-1 text-xs text-basic_text'>Conviction</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0x</span>
+																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>{voteData?.lockPeriod || '0'}x</span>
 																	</div>
 																	<div className='flex justify-between'>
 																		<span className='flex items-center gap-1 text-xs text-basic_text'>Capital</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0 dot</span>
+																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>
+																			{formatBalance(voteData?.balanceValue?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+																		</span>
 																	</div>
 																</div>
 																<div className='border-y-0 border-l-2 border-r-0 border-dashed border-primary_border' />
@@ -187,15 +191,17 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 																	<div className='text-xs font-medium text-basic_text dark:text-btn_primary_text'>Delegated Votes</div>
 																	<div className='flex justify-between'>
 																		<span className='flex items-center gap-1 text-xs text-basic_text'>Voting Power</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0 dot</span>
+																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>
+																			{formatBalance(voteData?.delegatedVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+																		</span>
 																	</div>
 																	<div className='flex justify-between'>
 																		<span className='flex items-center gap-1 text-xs text-basic_text'>Delegators</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0x</span>
+																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>{voterDelegations.length || '0'}</span>
 																	</div>
 																	<div className='flex justify-between'>
 																		<span className='flex items-center gap-1 text-xs text-basic_text'>Capital</span>
-																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0 dot</span>
+																		<span className='text-xs text-basic_text dark:text-btn_primary_text'>0</span>
 																	</div>
 																</div>
 															</div>
@@ -211,11 +217,11 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 															{voterDelegations.map((delegator: IVoteData) => (
 																<div
 																	key={delegator?.voterAddress}
-																	className='my-2 space-y-1 border-b border-dashed border-primary_border'
+																	className='mt-2 space-y-1 border-b border-dashed border-primary_border pb-3'
 																>
 																	<div className='flex justify-between text-[11px] font-normal text-neutral-700 dark:text-neutral-300 sm:text-xs'>
 																		<Address address={delegator?.voterAddress} />
-																		<span>{delegator?.lockPeriod || '0'} /d</span>
+																		<span>{delegator?.lockPeriod || '0'}/d</span>
 																		<span>
 																			{formatBalance(delegator?.totalVotingPower?.toString() || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 																		</span>
