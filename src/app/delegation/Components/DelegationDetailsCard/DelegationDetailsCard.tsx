@@ -89,19 +89,8 @@ function DelegationDetailsCard() {
 		staleTime: STALE_TIME
 	});
 
-	const {
-		paginatedDelegates,
-		totalDelegates,
-		searchQuery,
-		handleSearchChange,
-		selectedSources,
-		handleSourceChange,
-		sortBy,
-		handleSortChange,
-		currentPage,
-		handlePageChange,
-		itemsPerPage
-	} = useDelegateFiltering(delegates);
+	const { paginatedDelegates, totalDelegates, searchQuery, handleSearchChange, selectedSources, handleSourceChange, sortBy, handleSortChange, currentPage, itemsPerPage } =
+		useDelegateFiltering(delegates);
 
 	return (
 		<div className={styles.delegationDetailsCard}>
@@ -159,7 +148,7 @@ function DelegationDetailsCard() {
 									page={currentPage}
 									pageSize={itemsPerPage}
 									totalCount={totalDelegates}
-									onClick={handlePageChange}
+									pageSearchParam='page'
 								/>
 							</div>
 						</>

@@ -57,10 +57,6 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 		return filteredAndSortedDelegates.slice(start, start + itemsPerPage);
 	}, [filteredAndSortedDelegates, currentPage, itemsPerPage]);
 
-	const handlePageChange = useCallback((page: number) => {
-		setCurrentPage(page);
-	}, []);
-
 	const handleSearchChange = useCallback((value: string) => {
 		setSearchQuery(value);
 		setCurrentPage(1);
@@ -86,7 +82,6 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 		sortBy,
 		handleSortChange,
 		currentPage,
-		handlePageChange,
 		itemsPerPage
 	};
 };
