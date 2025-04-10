@@ -19,7 +19,7 @@ import classes from './VoteHistory.module.scss';
 
 function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
-	const [tab, setTab] = useState(EVoteDecision.AYE);
+	const [tab, setTab] = useState<EVoteDecision>(EVoteDecision.AYE);
 	const [page, setPage] = useState(1);
 
 	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision) => {
@@ -55,7 +55,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.AYE ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						{t('PostDetails.aye')}
+						{t('PostDetails.aye')} {!!data?.totalCounts?.[EVoteDecision.AYE] && `(${data?.totalCounts?.[EVoteDecision.AYE]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
@@ -65,14 +65,14 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.NAY ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						{t('PostDetails.nay')}
+						{t('PostDetails.nay')} {!!data?.totalCounts?.[EVoteDecision.NAY] && `(${data?.totalCounts?.[EVoteDecision.NAY]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
 						value={EVoteDecision.SPLIT_ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
-						{t('PostDetails.abstain')}
+						{t('PostDetails.abstain')} {!!data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN] && `(${data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]})`}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={EVoteDecision.AYE}>
@@ -97,7 +97,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 			<PaginationWithLinks
 				page={page}
 				pageSize={DEFAULT_LISTING_LIMIT}
-				totalCount={data?.totalCount || 0}
+				totalCount={data?.totalCounts?.[tab as EVoteDecision] || 0}
 				onClick={(pageNumber) => {
 					setPage(pageNumber);
 				}}

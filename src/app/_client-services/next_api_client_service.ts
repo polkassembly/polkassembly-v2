@@ -482,7 +482,15 @@ export class NextApiClientService {
 			decision
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
-		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
+		return this.nextApiClientFetch<{
+			votes: IVoteData[];
+			totalCounts: {
+				[EVoteDecision.AYE]: number;
+				[EVoteDecision.NAY]: number;
+				[EVoteDecision.SPLIT_ABSTAIN]: number;
+				[EVoteDecision.SPLIT]: number;
+			};
+		}>({ url, method });
 	}
 
 	// activity feed
