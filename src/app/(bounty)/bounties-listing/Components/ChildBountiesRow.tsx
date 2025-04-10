@@ -65,7 +65,7 @@ function ChildBountiesRow({
 			<TableRow className={styles.childBountyRow}>
 				<TableCell
 					colSpan={7}
-					className='p-4 text-center'
+					className='p-6 text-center'
 				>
 					{t('Bounties.noChildBountiesFound')}
 				</TableCell>
@@ -77,7 +77,7 @@ function ChildBountiesRow({
 			key={childBounty.index}
 			className={`${styles.tableBodyRow} ${styles.childBountyRow}`}
 		>
-			<TableCell className={styles.tableCellBody_1}>
+			<TableCell className='p-6'>
 				<div className='flex h-6 items-center justify-start space-x-4 pl-2 pt-1'>
 					{childBounties.items.length === 1 || index === childBounties.items.length - 1 ? (
 						<Image
@@ -106,7 +106,7 @@ function ChildBountiesRow({
 					? formatBnBalance(childBounty.onChainInfo.reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
 					: '-'}
 			</TableCell>
-			<TableCell className={styles.tableCell_createdAt}>
+			<TableCell className={styles.tableCell_ChildBountyCreatedAt}>
 				{' '}
 				<Clock className='h-4 w-4' /> {childBounty.onChainInfo?.createdAt ? dayjs.utc(childBounty.onChainInfo.createdAt).format("DD MMM 'YY") : '-'}
 			</TableCell>

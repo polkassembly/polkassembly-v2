@@ -41,7 +41,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 							className={styles.tableBodyRow}
 							key={item?.index}
 						>
-							<TableCell className={styles.tableCellBody}>
+							<TableCell className='p-6'>
 								<div className='flex items-center gap-2'>
 									{item.onChainInfo?.childBountiesCount && item.onChainInfo?.childBountiesCount > 0 ? (
 										<div className='flex items-center gap-2'>
@@ -65,7 +65,9 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 								</div>
 							</TableCell>
 							<TableCell className={styles.tableCell}>{item.onChainInfo?.curator ? <Address address={item.onChainInfo?.curator} /> : '-'}</TableCell>
-							<TableCell className={styles.tableCell}>{item.title}</TableCell>
+							<TableCell className={styles.tableCell}>
+								<span className='block max-w-[20ch] truncate'>{item.title}</span>
+							</TableCell>
 							<TableCell className={styles.tableCell}>
 								{item.onChainInfo?.reward
 									? formatBnBalance(item.onChainInfo.reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
@@ -81,7 +83,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 									status={item.onChainInfo?.status}
 								/>
 							</TableCell>
-							<TableCell className={styles.tableCellBody_last}>{item.tags && item.tags.length > 0 ? item.tags.join(', ') : 'N/A'}</TableCell>
+							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? item.tags.join(', ') : 'N/A'}</TableCell>
 						</TableRow>
 						{expandedRows.includes(item.index ?? 0) && (
 							<ChildBountiesRow

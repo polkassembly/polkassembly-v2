@@ -169,6 +169,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
+			case EApiRoute.FETCH_CHILD_BOUNTIES:
 				break;
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -727,14 +728,6 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 
-	static async fetchChildBountiesApi({ bountyIndex }: { bountyIndex: number }) {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.FETCH_CHILD_BOUNTIES,
-			routeSegments: [bountyIndex.toString(), 'child-bounties']
-		});
-		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
-	}
-
 	static async addPostSubscription(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
 		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
@@ -765,5 +758,13 @@ export class NextApiClientService {
 			routeSegments: [proposalType, indexOrHash, 'content-summary']
 		});
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async fetchChildBountiesApi({ bountyIndex }: { bountyIndex: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_CHILD_BOUNTIES,
+			routeSegments: [EProposalType.BOUNTY, bountyIndex.toString(), 'child-bounties']
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 }
