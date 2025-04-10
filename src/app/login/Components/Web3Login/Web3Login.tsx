@@ -4,7 +4,7 @@
 
 'use client';
 
-import { NotificationType } from '@/_shared/types';
+import { ENotificationStatus } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -94,7 +94,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 		} catch {
 			// TODO: add to language files
 			toast({
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				title: t('Profile.loginFailed')
 			});
 			setLoading(false);

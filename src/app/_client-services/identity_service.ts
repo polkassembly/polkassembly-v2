@@ -9,7 +9,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
-import { hexToString, isHex } from '@polkadot/util';
+import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
@@ -248,6 +248,7 @@ export class IdentityService {
 		const { isGood, unverified } = IdentityService.processIdentityInfo(identityInfo);
 		const verifiedByPolkassembly = this.checkVerifiedByPolkassembly(identityInfo);
 		const identity = identityInfo?.info;
+		const identityHash = identityInfo?.info?.hash?.toHex();
 
 		return {
 			discord: identity?.discord?.Raw || '',
@@ -266,8 +267,19 @@ export class IdentityService {
 			parentProxyTitle: parentProxyInfo?.title || null,
 			twitter: identity?.twitter?.Raw || '',
 			verifiedByPolkassembly: verifiedByPolkassembly || false,
-			web: identity?.web?.Raw || ''
+			web: identity?.web?.Raw || '',
+			hash: identityHash
 		};
+	}
+
+	getOnChainIdentityTx({ displayName, email, legalName, twitter, matrix }: { displayName: string; email: string; legalName?: string; twitter?: string; matrix?: string }) {
+		return this.peopleChainApi?.tx.identity.setIdentity({
+			display: { [displayName ? 'raw' : 'none']: displayName || null },
+			legal: { [legalName ? 'raw' : 'none']: legalName || null },
+			email: { [email ? 'raw' : 'none']: email || null },
+			twitter: { [twitter ? 'raw' : 'none']: twitter || null },
+			matrix: { [matrix ? 'raw' : 'none']: matrix || null }
+		});
 	}
 
 	async setOnChainIdentity({
@@ -290,12 +302,12 @@ export class IdentityService {
 		onFailed?: () => void;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
-		const setIdentityTx = this.peopleChainApi?.tx.identity.setIdentity({
-			display: { [displayName ? 'raw' : 'none']: displayName || null },
-			email: { [email ? 'raw' : 'none']: email || null },
-			legal: { [legalName ? 'raw' : 'none']: legalName || null },
-			twitter: { [twitter ? 'raw' : 'none']: twitter || null },
-			matrix: { [matrix ? 'raw' : 'none']: matrix || null }
+		const setIdentityTx = this.getOnChainIdentityTx({
+			displayName,
+			email,
+			legalName,
+			twitter,
+			matrix
 		});
 
 		await this.executeTx({
@@ -315,5 +327,49 @@ export class IdentityService {
 	async getRegistrars() {
 		const res = await this.peopleChainApi?.query?.identity?.registrars?.();
 		return res.toJSON() as unknown as { account: string; fee: number; fields: number }[];
+	}
+
+	async getUserBalances({ address }: { address: string }) {
+		let freeBalance = BN_ZERO;
+		let lockedBalance = BN_ZERO;
+		let totalBalance = BN_ZERO;
+
+		const responseObj = {
+			freeBalance,
+			lockedBalance,
+			totalBalance
+		};
+
+		if (!address || !this.peopleChainApi?.derive?.balances?.all) {
+			return responseObj;
+		}
+
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		await this.peopleChainApi.derive.balances
+			.all(encodedAddress)
+			.then((result) => {
+				lockedBalance = new BN(result.lockedBalance || lockedBalance);
+			})
+			.catch(() => {
+				// TODO: show notification
+			});
+
+		await this.peopleChainApi.query.system
+			.account(encodedAddress)
+			.then((result: any) => {
+				const free = new BN(result?.data?.free) || BN_ZERO;
+				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
+				totalBalance = free.add(reserved);
+				freeBalance = free;
+			})
+			.catch(() => {
+				// TODO: show notification
+			});
+
+		return {
+			freeBalance,
+			lockedBalance,
+			totalBalance
+		};
 	}
 }

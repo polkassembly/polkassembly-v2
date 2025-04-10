@@ -297,4 +297,49 @@ export class ValidatorService {
 		}
 		return false;
 	}
+
+	static isValidTwitterHandle(handle: string): boolean {
+		if (!handle || typeof handle !== 'string') return false;
+
+		// Remove @ symbol if present
+		const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
+
+		// Twitter handle rules:
+		// - 4-15 characters long
+		// - Only alphanumeric characters and underscores
+		// - Cannot start with a number
+		const twitterHandleRegex = /^[a-zA-Z][a-zA-Z0-9_]{3,14}$/;
+
+		return twitterHandleRegex.test(cleanHandle);
+	}
+
+	static isValidMatrixHandle(handle: string): boolean {
+		if (!handle || typeof handle !== 'string') return false;
+
+		// Matrix handle format: @username:domain.tld
+		// Example: @alice:matrix.org
+
+		// Remove @ symbol if present
+		const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
+
+		// Check if handle contains domain part
+		if (!cleanHandle.includes(':')) return false;
+
+		const [username, domain] = cleanHandle.split(':');
+
+		// Username rules:
+		// - 1-255 characters long
+		// - Only alphanumeric characters, underscores, hyphens, and periods
+		// - Cannot start or end with a period
+		// - Cannot have consecutive periods
+		// eslint-disable-next-line no-useless-escape
+		const usernameRegex = /^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*$/;
+
+		// Domain rules:
+		// - Valid domain format
+		// - Cannot be empty
+		const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9][a-zA-Z0-9-]*)*\.[a-zA-Z]{2,}$/;
+
+		return usernameRegex.test(username) && domainRegex.test(domain);
+	}
 }

@@ -16,7 +16,17 @@ import { useTranslations } from 'next-intl';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import classes from './SetIdentityFees.module.scss';
 
-function SetIdentityFees({ txFee, onNext }: { txFee: BN; onNext: () => void }) {
+function SetIdentityFees({
+	onNext,
+	setTxFee,
+	onRequestJudgement,
+	disabledRequestJudgement
+}: {
+	onNext: () => void;
+	setTxFee: (txFee: BN) => void;
+	onRequestJudgement: () => void;
+	disabledRequestJudgement: boolean;
+}) {
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 	const network = getCurrentNetwork();
 	const t = useTranslations();
@@ -36,9 +46,11 @@ function SetIdentityFees({ txFee, onNext }: { txFee: BN; onNext: () => void }) {
 
 			const fees = registrars?.[`${polkassemblyRegistrarIndex}`]?.fee;
 			setRegistrarFees(new BN(fees || 0));
+			setTxFee(minDeposit.add(new BN(fees || 0)));
 		};
 
 		fetchRegistrarFees();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [identityService, network]);
 
 	return (
@@ -74,7 +86,7 @@ function SetIdentityFees({ txFee, onNext }: { txFee: BN; onNext: () => void }) {
 						<div className={classes.feeItem}>
 							<p className={classes.feeItemText}>{t('SetIdentity.minimumDeposit')}</p>
 							<p className={classes.feeItemValue}>
-								{formatter.format(Number(formatBnBalance(txFee, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+								{formatter.format(Number(formatBnBalance(minDeposit, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 							</p>
 						</div>
 						<div className={classes.feeItem}>
@@ -90,7 +102,8 @@ function SetIdentityFees({ txFee, onNext }: { txFee: BN; onNext: () => void }) {
 			<Button onClick={onNext}>{t('SetIdentity.letBegin')}</Button>
 			<Button
 				variant='secondary'
-				disabled
+				onClick={onRequestJudgement}
+				disabled={disabledRequestJudgement}
 			>
 				{t('SetIdentity.requestJudgement')}
 			</Button>

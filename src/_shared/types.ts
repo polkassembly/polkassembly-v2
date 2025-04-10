@@ -627,6 +627,7 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
+	hash?: string;
 }
 
 export interface IVoteData {
@@ -905,7 +906,7 @@ export interface IWritePostFormFields {
 	allowedCommentor: EAllowedCommentor;
 }
 
-export enum NotificationType {
+export enum ENotificationStatus {
 	SUCCESS = 'success',
 	ERROR = 'error',
 	WARNING = 'warning',
@@ -1036,4 +1037,25 @@ export interface ITrackDelegationDetails {
 	delegatedTo?: ITrackDelegation[];
 	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
 	status: EDelegationStatus;
+}
+
+export enum ESocialVerificationStatus {
+	VERIFIED = 'verified',
+	PENDING = 'pending',
+	UNVERIFIED = 'unverified'
+}
+
+export interface ISocialHandle {
+	userId: number;
+	address: string;
+	social: ESocial;
+	handle: string;
+	status: ESocialVerificationStatus;
+	verificationToken?: {
+		token?: string;
+		secret?: string;
+		expiresAt?: Date;
+	};
+	createdAt?: Date;
+	updatedAt?: Date;
 }

@@ -33,7 +33,10 @@ import {
 	ECommentSentiment,
 	ITreasuryStats,
 	IDelegate,
-	EDelegateSource
+	EDelegateSource,
+	ESocial,
+	ISocialHandle,
+	ESocialVerificationStatus
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1382,6 +1385,100 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (delegate.docs.length) {
 			await delegate.docs[0].ref.delete();
+		}
+	}
+
+	static async UpdateUserSocialHandle({
+		userId,
+		address,
+		social,
+		handle,
+		status,
+		verificationToken
+	}: {
+		userId: number;
+		address?: string;
+		social: ESocial;
+		handle: string;
+		status: ESocialVerificationStatus;
+		verificationToken?: {
+			token?: string;
+			secret?: string;
+			expiresAt?: Date;
+		};
+	}) {
+		// Check if the user already has this social handle type
+		const userSocialHandleQuery = address
+			? await this.userSocialsCollectionRef().where('userId', '==', userId).where('address', '==', address).where('social', '==', social).limit(1).get()
+			: await this.userSocialsCollectionRef().where('userId', '==', userId).where('social', '==', social).limit(1).get();
+
+		if (!userSocialHandleQuery.empty) {
+			// Update existing social handle
+			const docId = userSocialHandleQuery.docs[0].id;
+			const existingSocialHandle = userSocialHandleQuery.docs[0].data();
+			await this.userSocialsCollectionRef()
+				.doc(docId)
+				.set(
+					{
+						...existingSocialHandle,
+						status,
+						updatedAt: new Date()
+					},
+					{ merge: true }
+				);
+			return {
+				...existingSocialHandle,
+				status,
+				updatedAt: new Date()
+			} as ISocialHandle;
+		}
+		// Create new social handle
+		const newSocialVerificationId = this.userSocialsCollectionRef().doc().id;
+
+		const socialHandle = {
+			userId,
+			address,
+			social,
+			handle,
+			status,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+
+		await this.userSocialsCollectionRef()
+			.doc(newSocialVerificationId)
+			.set({ ...socialHandle, verificationToken }, { merge: true });
+		return { ...socialHandle, verificationToken: { token: verificationToken?.token } };
+	}
+
+	static async GetUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		const socialVerification = await this.userSocialsCollectionRef().where('userId', '==', userId).where('address', '==', address).get();
+
+		const socialHandles = {} as Record<ESocial, ISocialHandle>;
+
+		socialVerification.docs.forEach((doc) => {
+			const data = doc.data() as ISocialHandle;
+			socialHandles[data.social] = data;
+		});
+
+		return socialHandles;
+	}
+
+	static async GetSocialHandleByToken({ token }: { token: string }) {
+		const socialVerification = await this.userSocialsCollectionRef().where('verificationToken.token', '==', token).limit(1).get();
+
+		if (socialVerification.docs.length) {
+			return socialVerification.docs[0].data() as ISocialHandle;
+		}
+
+		return null;
+	}
+
+	static async UpdateSocialHandleByToken({ token, status }: { token: string; status: ESocialVerificationStatus }) {
+		const userSocialHandleQuery = await this.userSocialsCollectionRef().where('verificationToken.token', '==', token).limit(1).get();
+
+		if (userSocialHandleQuery.docs.length) {
+			await userSocialHandleQuery.docs[0].ref.set({ status, updatedAt: new Date() }, { merge: true });
 		}
 	}
 }

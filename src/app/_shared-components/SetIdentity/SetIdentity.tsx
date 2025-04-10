@@ -12,13 +12,22 @@ import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { useToast } from '@/hooks/useToast';
+import { ENotificationStatus, IOnChainIdentity } from '@/_shared/types';
+import Link from 'next/link';
+import { useUser } from '@/hooks/useUser';
+import Image from 'next/image';
+import EmailIcon from '@assets/icons/email-icon-dark.svg';
+import TwitterIcon from '@assets/icons/twitter-icon-dark.svg';
+import RiotIcon from '@assets/icons/riot-icon.svg';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
+import SocialVerifications from './SocialVerifications/SocialVerifications';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -34,9 +43,23 @@ enum ESetIdentityStep {
 	SOCIAL_VERIFICATION
 }
 
+function SocialIcon({ icon }: { icon: string }) {
+	return (
+		<div className='flex h-10 w-10 items-center justify-center rounded-full bg-border_grey/40'>
+			<Image
+				src={icon}
+				alt='social icon'
+				width={24}
+				height={24}
+			/>
+		</div>
+	);
+}
 function SetIdentity() {
 	const t = useTranslations();
+	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
+	const { toast } = useToast();
 
 	const network = getCurrentNetwork();
 
@@ -49,13 +72,31 @@ function SetIdentity() {
 
 	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
 
+	const [txFee, setTxFee] = useState<BN>(BN_ZERO);
+
+	const [userBalance, setUserBalance] = useState<BN>(BN_ZERO);
+
+	const [identityValues, setIdentityValues] = useState<IOnChainIdentity>();
+
 	useEffect(() => {
-		const getTxFee = async () => {
+		const fetchUserBalances = async () => {
+			if (!identityService || !network || !userPreferences.address?.address) return;
+
+			const balances = await identityService.getUserBalances({ address: userPreferences.address.address });
+
+			setUserBalance(balances.freeBalance);
+		};
+
+		fetchUserBalances();
+	}, [identityService, network, userPreferences.address?.address]);
+
+	useEffect(() => {
+		const setDefaultIdentityValues = async () => {
 			if (!identityService || !network || !userPreferences.address?.address) return;
 
 			setIdentityLoading(true);
 			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
-
+			setIdentityValues(identityInfo);
 			formData.setValue('displayName', identityInfo.display);
 			formData.setValue('legalName', identityInfo.legal);
 			formData.setValue('email', identityInfo.email);
@@ -64,7 +105,7 @@ function SetIdentity() {
 
 			setIdentityLoading(false);
 		};
-		getTxFee();
+		setDefaultIdentityValues();
 	}, [formData, identityService, network, userPreferences.address?.address]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
@@ -82,28 +123,62 @@ function SetIdentity() {
 			matrix,
 			onSuccess: () => {
 				setLoading(false);
+				toast({
+					status: ENotificationStatus.SUCCESS,
+					title: t('SetIdentity.success'),
+					description: t('SetIdentity.successDescription')
+				});
+				setStep(ESetIdentityStep.SOCIAL_VERIFICATION);
 			},
 			onFailed: () => {
 				setLoading(false);
+				toast({
+					status: ENotificationStatus.ERROR,
+					title: t('SetIdentity.failed'),
+					description: t('SetIdentity.failedDescription')
+				});
 			}
 		});
 	};
 
+	if (!user) {
+		return (
+			<p className='flex items-center gap-x-1 text-center text-sm text-text_primary'>
+				{t('SetIdentity.please')}
+				<Link
+					href='/login'
+					className='text-text_pink'
+				>
+					{t('SetIdentity.login')}
+				</Link>{' '}
+				{t('SetIdentity.toSet')}
+			</p>
+		);
+	}
+
 	return step === ESetIdentityStep.GAS_FEE ? (
 		<SetIdentityFees
-			txFee={NETWORKS_DETAILS[`${network}`].peopleChainDetails.identityMinDeposit}
+			setTxFee={setTxFee}
 			onNext={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
+			onRequestJudgement={() => setStep(ESetIdentityStep.SOCIAL_VERIFICATION)}
+			disabledRequestJudgement={!identityValues?.display || !identityValues?.email || !identityValues?.hash}
 		/>
+	) : step === ESetIdentityStep.SOCIAL_VERIFICATION ? (
+		<SocialVerifications />
 	) : (
 		<Form {...formData}>
-			<form onSubmit={formData.handleSubmit(handleSetIdentity)}>
-				<div className='flex flex-col gap-y-4'>
+			<form
+				className='flex flex-1 flex-col overflow-y-hidden'
+				onSubmit={formData.handleSubmit(handleSetIdentity)}
+			>
+				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
 					<WalletButtons small />
 					<AddressDropdown
 						withBalance
 						disabled={identityLoading}
 					/>
-					<Separator />
+
+					{/* Display Name */}
 					<FormField
 						control={formData.control}
 						name='displayName'
@@ -129,11 +204,20 @@ function SetIdentity() {
 							</FormItem>
 						)}
 					/>
+
+					{/* Legal Name */}
 					<FormField
 						control={formData.control}
 						name='legalName'
 						key='legalName'
 						disabled={loading}
+						rules={{
+							required: true,
+							validate: (value) => {
+								if (value?.length === 0) return 'Invalid Display Name';
+								return true;
+							}
+						}}
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>{t('SetIdentity.legalName')}</FormLabel>
@@ -147,6 +231,12 @@ function SetIdentity() {
 							</FormItem>
 						)}
 					/>
+
+					<Separator />
+
+					<p className='font-semibold text-wallet_btn_text'>Socials</p>
+
+					{/* Email */}
 					<FormField
 						control={formData.control}
 						name='email'
@@ -159,62 +249,95 @@ function SetIdentity() {
 							}
 						}}
 						render={({ field }) => (
-							<FormItem>
-								<FormLabel>{t('SetIdentity.email')}</FormLabel>
-								<FormControl>
-									<Input
-										placeholder={t('SetIdentity.email')}
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
+							<FormItem className='flex items-center gap-x-2'>
+								<div className='flex w-28 items-center gap-x-2'>
+									<SocialIcon icon={EmailIcon} />
+									<FormLabel>{t('SetIdentity.email')}</FormLabel>
+								</div>
+								<div className='flex-1'>
+									<FormControl>
+										<Input
+											placeholder={t('SetIdentity.emailPlaceholder')}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</div>
 							</FormItem>
 						)}
 					/>
+
+					{/* Twitter */}
 					<FormField
 						control={formData.control}
 						name='twitter'
 						key='twitter'
 						disabled={loading}
+						rules={{
+							validate: (value) => {
+								if (value && !ValidatorService.isValidTwitterHandle(value)) return 'Invalid Twitter Handle';
+								return true;
+							}
+						}}
 						render={({ field }) => (
-							<FormItem>
-								<FormLabel>{t('SetIdentity.twitter')}</FormLabel>
-								<FormControl>
-									<Input
-										placeholder={t('SetIdentity.twitter')}
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
+							<FormItem className='flex items-center gap-x-2'>
+								<div className='flex w-28 items-center gap-x-2'>
+									<SocialIcon icon={TwitterIcon} />
+									<FormLabel>{t('SetIdentity.twitter')}</FormLabel>
+								</div>
+								<div className='flex-1'>
+									<FormControl>
+										<Input
+											placeholder={t('SetIdentity.twitterPlaceholder')}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</div>
 							</FormItem>
 						)}
 					/>
+
+					{/* Matrix */}
 					<FormField
 						control={formData.control}
 						name='matrix'
 						key='matrix'
+						rules={{
+							validate: (value) => {
+								if (value && !ValidatorService.isValidMatrixHandle(value)) return 'Invalid Matrix Handle';
+								return true;
+							}
+						}}
 						disabled={loading}
 						render={({ field }) => (
-							<FormItem>
-								<FormLabel>{t('SetIdentity.matrix')}</FormLabel>
-								<FormControl>
-									<Input
-										placeholder={t('SetIdentity.matrix')}
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
+							<FormItem className='flex items-center gap-x-2'>
+								<div className='flex w-28 items-center gap-x-2'>
+									<SocialIcon icon={RiotIcon} />
+									<FormLabel>{t('SetIdentity.riot')}</FormLabel>
+								</div>
+								<div className='flex-1'>
+									<FormControl>
+										<Input
+											placeholder={t('SetIdentity.riotPlaceholder')}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</div>
 							</FormItem>
 						)}
 					/>
-					<div className='flex justify-end'>
-						<Button
-							isLoading={loading}
-							type='submit'
-						>
-							{t('SetIdentity.setIdentity')}
-						</Button>
-					</div>
+				</div>
+				<Separator className='my-4' />
+				<div className='flex justify-end'>
+					<Button
+						isLoading={loading}
+						disabled={userBalance.lt(txFee)}
+						type='submit'
+					>
+						{t('SetIdentity.setIdentity')}
+					</Button>
 				</div>
 			</form>
 		</Form>

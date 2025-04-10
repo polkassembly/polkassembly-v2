@@ -6,7 +6,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { ENetwork, ENotificationTrigger, IUser } from '@shared/types';
+import { ENetwork, ENotificationTrigger, ESocial, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 
 if (IS_NOTIFICATION_SERVICE_ENABLED && !NOTIFICATION_ENGINE_API_KEY) {
@@ -49,13 +49,17 @@ export class NotificationService {
 		}).catch((e) => console.error('Notification not sent', e));
 	}
 
-	static async SendVerificationEmail(user: IUser, token: string): Promise<void> {
+	static async SendVerificationEmail(user: IUser, token: string, email?: string): Promise<void> {
+		console.log('email', email);
+
+		if (!email || !['aadarsh@polkassembly.io', 'aadarsh012@gmail.com', 'aadarshshaw24@gmail.com'].includes(email)) return;
 		await this.sendNotification({
 			network: user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK,
 			trigger: ENotificationTrigger.VERIFY_EMAIL,
 			args: {
-				email: user.email,
-				verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
+				email: email || user.email,
+				verifyUrl: `http://localhost:3000/confirm-verification?social=${ESocial.EMAIL}&token=${token}`
+				// verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
 			}
 		});
 	}

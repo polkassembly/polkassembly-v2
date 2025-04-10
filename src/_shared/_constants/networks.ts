@@ -152,12 +152,12 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		identityMinDeposit: new BN('10008500000'),
 		rpcEndpoints: [
 			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://sys.ibp.network/people-westend'
+				name: VIA_DWELLIR,
+				url: 'wss://people-westend-rpc.n.dwellir.com'
 			},
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://kusama-rpc.dwellir.com'
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://sys.ibp.network/people-westend'
 			},
 			{
 				name: VIA_IBP_GEODNS2,
