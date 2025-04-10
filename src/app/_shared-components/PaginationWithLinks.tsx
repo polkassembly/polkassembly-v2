@@ -80,10 +80,9 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 			const key = pageSizeSelectOptions?.pageSizeSearchParam || 'pageSize';
 			const newSearchParams = new URLSearchParams(searchParams || undefined);
 			newSearchParams.set(key, String(newPageSize));
-			newSearchParams.delete(pageSearchParam || 'page');
+			newSearchParams.delete(pageSearchParam || 'page'); // Clear the page number when changing page size
 			router.push(`${pathname}?${newSearchParams.toString()}`);
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[searchParams, pathname]
 	);
 
