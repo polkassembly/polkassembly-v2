@@ -67,10 +67,12 @@ export class SubsquidQueries {
 				proposer
 				status,
 				hash,
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -94,10 +96,12 @@ export class SubsquidQueries {
 				proposer
 				status,
 				hash,
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -130,10 +134,12 @@ export class SubsquidQueries {
 					proposer
 					status,
 					hash,
+					reward,
 					preimage {
 							proposedCall {
 									args
 							}
+							section
 					}
 					statusHistory {
 							status
@@ -174,10 +180,12 @@ export class SubsquidQueries {
 					proposer
 					status,
 					hash,
+					reward,
 					preimage {
 							proposedCall {
 									args
 							}
+							section
 					}
 					statusHistory {
 							status
@@ -209,10 +217,12 @@ export class SubsquidQueries {
 				proposer
 				status
 				hash,
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -236,10 +246,12 @@ export class SubsquidQueries {
 				proposer
 				status
 				hash,
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
