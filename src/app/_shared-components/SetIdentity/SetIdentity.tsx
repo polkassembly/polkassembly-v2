@@ -21,6 +21,9 @@ import Image from 'next/image';
 import EmailIcon from '@assets/icons/email-icon-dark.svg';
 import TwitterIcon from '@assets/icons/twitter-icon-dark.svg';
 import RiotIcon from '@assets/icons/riot-icon.svg';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useQuery } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
@@ -72,23 +75,27 @@ function SetIdentity() {
 
 	const [step, setStep] = useState<ESetIdentityStep>(ESetIdentityStep.GAS_FEE);
 
-	const [txFee, setTxFee] = useState<BN>(BN_ZERO);
-
-	const [userBalance, setUserBalance] = useState<BN>(BN_ZERO);
-
 	const [identityValues, setIdentityValues] = useState<IOnChainIdentity>();
 
-	useEffect(() => {
-		const fetchUserBalances = async () => {
-			if (!identityService || !network || !userPreferences.address?.address) return;
+	const fetchRegistrarFees = async () => {
+		if (!identityService) return null;
 
-			const balances = await identityService.getUserBalances({ address: userPreferences.address.address });
+		const registrars = await identityService.getRegistrars();
+		const { polkassemblyRegistrarIndex } = NETWORKS_DETAILS[`${network}`].peopleChainDetails;
+		if (!polkassemblyRegistrarIndex) return null;
 
-			setUserBalance(balances.freeBalance);
-		};
+		return new BN(registrars?.[`${polkassemblyRegistrarIndex}`]?.fee);
+	};
 
-		fetchUserBalances();
-	}, [identityService, network, userPreferences.address?.address]);
+	const { data: registrarFee } = useQuery({
+		queryKey: ['socials', user?.id, userPreferences.address?.address],
+		queryFn: () => fetchRegistrarFees(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
+	});
 
 	useEffect(() => {
 		const setDefaultIdentityValues = async () => {
@@ -96,6 +103,7 @@ function SetIdentity() {
 
 			setIdentityLoading(true);
 			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
+
 			setIdentityValues(identityInfo);
 			formData.setValue('displayName', identityInfo.display);
 			formData.setValue('legalName', identityInfo.legal);
@@ -121,6 +129,7 @@ function SetIdentity() {
 			legalName,
 			twitter,
 			matrix,
+			registrarFee: registrarFee || BN_ZERO,
 			onSuccess: () => {
 				setLoading(false);
 				toast({
@@ -158,10 +167,10 @@ function SetIdentity() {
 
 	return step === ESetIdentityStep.GAS_FEE ? (
 		<SetIdentityFees
-			setTxFee={setTxFee}
 			onNext={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
 			onRequestJudgement={() => setStep(ESetIdentityStep.SOCIAL_VERIFICATION)}
 			disabledRequestJudgement={!identityValues?.display || !identityValues?.email}
+			registrarFee={registrarFee || BN_ZERO}
 		/>
 	) : step === ESetIdentityStep.SOCIAL_VERIFICATION ? (
 		<SocialVerifications />
@@ -333,7 +342,6 @@ function SetIdentity() {
 				<div className='flex justify-end'>
 					<Button
 						isLoading={loading}
-						disabled={userBalance.lt(txFee)}
 						type='submit'
 					>
 						{t('SetIdentity.setIdentity')}

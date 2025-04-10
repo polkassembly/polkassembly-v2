@@ -289,6 +289,7 @@ export class IdentityService {
 		legalName,
 		twitter,
 		matrix,
+		registrarFee,
 		onSuccess,
 		onFailed
 	}: {
@@ -298,6 +299,7 @@ export class IdentityService {
 		legalName?: string;
 		twitter?: string;
 		matrix?: string;
+		registrarFee: BN;
 		onSuccess?: () => void;
 		onFailed?: () => void;
 	}) {
@@ -310,8 +312,14 @@ export class IdentityService {
 			matrix
 		});
 
+		const { polkassemblyRegistrarIndex } = NETWORKS_DETAILS[`${this.network}`].peopleChainDetails;
+
+		const requestedJudgementTx = this.peopleChainApi.tx?.identity?.requestJudgement(polkassemblyRegistrarIndex, registrarFee.toString());
+
+		const tx = registrarFee && !registrarFee.isZero() ? this.peopleChainApi.tx.utility.batchAll([setIdentityTx, requestedJudgementTx]) : setIdentityTx;
+
 		await this.executeTx({
-			tx: setIdentityTx,
+			tx,
 			address: encodedAddress,
 			errorMessageFallback: 'Failed to set identity',
 			waitTillFinalizedHash: true,

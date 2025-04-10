@@ -130,7 +130,10 @@ function SocialVerifications() {
 			<div className='flex items-center justify-end'>
 				<Button
 					isLoading={loading}
-					disabled={Object.values(socialHandles || {}).length === 0 || Object.values(socialHandles || {}).some((handle) => handle.status !== ESocialVerificationStatus.VERIFIED)}
+					disabled={
+						Object.values(socialHandles || {}).length === 0 ||
+						Object.values(socialHandles || {}).some((handle) => handle.status === ESocialVerificationStatus.UNVERIFIED || handle.status === ESocialVerificationStatus.PENDING)
+					}
 					onClick={proceedForJudgement}
 				>
 					{t('SetIdentity.proceed')}

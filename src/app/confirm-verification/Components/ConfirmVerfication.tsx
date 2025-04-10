@@ -17,6 +17,10 @@ function ConfirmVerfication({ token, social, twitterOauthVerifier }: { token: st
 	const { toast } = useToast();
 
 	useEffect(() => {
+		window.location.reload();
+	}, []);
+
+	useEffect(() => {
 		const verifySocial = async () => {
 			if (!user || !user.id) return;
 
