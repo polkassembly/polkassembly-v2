@@ -107,12 +107,7 @@ export class OnChainDbService {
 
 		return {
 			votes: [],
-			totalCounts: {
-				[EVoteDecision.AYE]: 0,
-				[EVoteDecision.NAY]: 0,
-				[EVoteDecision.SPLIT_ABSTAIN]: 0,
-				[EVoteDecision.SPLIT]: 0
-			}
+			totalCounts: {}
 		};
 	}
 

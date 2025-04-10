@@ -94,14 +94,14 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 					/>
 				</TabsContent>
 			</Tabs>
-			<PaginationWithLinks
-				page={page}
-				pageSize={DEFAULT_LISTING_LIMIT}
-				totalCount={data?.totalCounts?.[tab as EVoteDecision] || 0}
-				onClick={(pageNumber) => {
-					setPage(pageNumber);
-				}}
-			/>
+			{!!data?.totalCounts?.[tab as EVoteDecision] && (
+				<PaginationWithLinks
+					page={page}
+					pageSize={DEFAULT_LISTING_LIMIT}
+					totalCount={data?.totalCounts?.[tab as EVoteDecision] || 0}
+					onPageChange={(newPage) => setPage(newPage)}
+				/>
+			)}
 		</div>
 	);
 }
