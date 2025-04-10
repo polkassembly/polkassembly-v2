@@ -132,7 +132,7 @@ function SocialVerifications() {
 					isLoading={loading}
 					disabled={
 						Object.values(socialHandles || {}).length === 0 ||
-						Object.values(socialHandles || {}).some((handle) => handle.status === ESocialVerificationStatus.UNVERIFIED || handle.status === ESocialVerificationStatus.PENDING)
+						Object.values(socialHandles || {}).some((handle) => handle?.status === ESocialVerificationStatus.UNVERIFIED || handle?.status === ESocialVerificationStatus.PENDING)
 					}
 					onClick={proceedForJudgement}
 				>
