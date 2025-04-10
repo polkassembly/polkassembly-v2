@@ -58,7 +58,7 @@ function DelegationPopupCard() {
 								<p className='whitespace-nowrap font-semibold'>{t('step1')}</p>
 								<div>
 									<p className='font-semibold'>{t('selectTrackForDelegation')}</p>
-									<p>{t('openGovAllowsForTrackLevelAgileDelegationChooseATrackToProceed')}</p>
+									<p className='max-w-xs'>{t('openGovAllowsForTrackLevelAgileDelegationChooseATrackToProceed')}</p>
 								</div>
 							</div>
 						</div>

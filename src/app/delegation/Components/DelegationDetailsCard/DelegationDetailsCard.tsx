@@ -89,8 +89,19 @@ function DelegationDetailsCard() {
 		staleTime: STALE_TIME
 	});
 
-	const { paginatedDelegates, totalDelegates, searchQuery, handleSearchChange, selectedSources, handleSourceChange, sortBy, handleSortChange, currentPage, itemsPerPage } =
-		useDelegateFiltering(delegates);
+	const {
+		paginatedDelegates,
+		totalDelegates,
+		searchQuery,
+		handlePageChange,
+		handleSearchChange,
+		selectedSources,
+		handleSourceChange,
+		sortBy,
+		handleSortChange,
+		currentPage,
+		itemsPerPage
+	} = useDelegateFiltering(delegates);
 
 	return (
 		<div className={styles.delegationDetailsCard}>
@@ -134,7 +145,7 @@ function DelegationDetailsCard() {
 				<div>
 					{paginatedDelegates.length > 0 ? (
 						<>
-							<div className='my-5 grid w-full items-center gap-5 lg:grid-cols-2'>
+							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
 								{paginatedDelegates.map((delegate: IDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}
@@ -148,7 +159,7 @@ function DelegationDetailsCard() {
 									page={currentPage}
 									pageSize={itemsPerPage}
 									totalCount={totalDelegates}
-									pageSearchParam='page'
+									onPageChange={handlePageChange}
 								/>
 							</div>
 						</>
