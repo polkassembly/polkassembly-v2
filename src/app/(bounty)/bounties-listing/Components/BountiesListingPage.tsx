@@ -106,11 +106,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							page={Number(page)}
 							pageSize={DEFAULT_LISTING_LIMIT}
 							totalCount={initialData?.totalCount || 0}
-							onClick={(pageNumber) => {
-								const params = new URLSearchParams(searchParams.toString());
-								params.set('page', pageNumber.toString());
-								router.push(`/bounties-listing?${params.toString()}`);
-							}}
+							pageSearchParam='page'
 						/>
 					</div>
 				)}
