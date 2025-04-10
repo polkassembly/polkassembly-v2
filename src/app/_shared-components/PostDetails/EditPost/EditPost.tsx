@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useRef, useState } from 'react';
-import { EProposalType, IPostListing } from '@/_shared/types';
+import { EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -14,7 +14,15 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
-function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: string) => void; onClose?: () => void }) {
+function EditPost({
+	postData,
+	onEditPostSuccess,
+	onClose
+}: {
+	postData: IPostListing | IPost;
+	onEditPostSuccess?: (title: string, content: string) => void;
+	onClose?: () => void;
+}) {
 	const t = useTranslations();
 	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
 	const [content, setContent] = useState<string | null>(savedContent || postData?.content || null);
