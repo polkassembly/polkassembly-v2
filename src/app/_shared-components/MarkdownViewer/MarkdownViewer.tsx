@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -37,23 +38,30 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: ({ src, alt, ...props }) => {
+	img: ({ src, alt }) => {
 		if (!src) {
 			return null;
 		}
 
 		return (
-			<Image
-				src={src}
-				alt={alt || 'Image'}
-				className={props.className}
-				width={Number(props.width || 256)}
-				height={Number(props.height || 256)}
-				style={props.style}
-				onClick={() => {
-					window.open(src, '_blank');
-				}}
-			/>
+			<Link
+				href={src}
+				target='_blank'
+				rel='noopener noreferrer'
+				className='cursor-pointer'
+			>
+				<Image
+					src={src}
+					alt={alt || 'Image'}
+					height={256}
+					width={256}
+					sizes='100vw'
+					style={{
+						width: '90%',
+						height: 'auto'
+					}}
+				/>
+			</Link>
 		);
 	},
 	a: ({ href, children, ...props }) => {
