@@ -26,11 +26,11 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import styles from './Bounty.module.scss';
 
-function StatItem({ label, value }: { label: string; value: string }) {
+function StatItem({ label, value, isLoading = false }: { label: string; value: string | undefined; isLoading?: boolean }) {
 	return (
 		<div className='flex flex-col'>
 			<span className={styles.bounty_stats_label}>{label}</span>
-			<span className='font-pixeboy text-[28px] font-medium'>{value}</span>
+			{isLoading ? <Skeleton className='h-[28px] w-[100px]' /> : value ? <span className='font-pixeboy text-[28px] font-medium'>{value}</span> : null}
 		</div>
 	);
 }
@@ -46,7 +46,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 		},
 		enabled: !!network
 	});
-	const availableBounty = tokenPrice && !isNaN(tokenPrice) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '$0.00';
+	const availableBounty = tokenPrice && !isNaN(tokenPrice) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '0.00';
 
 	return (
 		<div className='mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
@@ -55,13 +55,15 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 					<div>
 						<span className={styles.bounty_dash_available_bounty_pool}>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
-							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
 							{isLoading ? (
-								<Skeleton className='h-[22px] w-[100px]' />
+								<Skeleton className='h-[46px] w-[200px]' />
 							) : (
-								<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
+								<>
+									<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
+									<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
+									<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
+								</>
 							)}
-							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
 						</div>
 						<div className={styles.bounty_dash_available_bounty_pool_left_bg}>
 							<div className='mb-8 ml-1 flex items-end gap-3'>
@@ -85,19 +87,31 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 					<div className='grid grid-cols-2 gap-x-24 py-7'>
 						<StatItem
 							label='Active Bounties'
-							value={String(bountiesStats.activeBounties)}
+							value={bountiesStats.activeBounties ? String(bountiesStats.activeBounties) : undefined}
+							isLoading={isLoading}
 						/>
 						<StatItem
 							label='Claimants'
-							value={String(bountiesStats.peopleEarned)}
+							value={bountiesStats.peopleEarned ? String(bountiesStats.peopleEarned) : undefined}
+							isLoading={isLoading}
 						/>
 						<StatItem
 							label='Total Rewarded'
-							value={formatTokenValue(String(bountiesStats.totalRewarded ?? 0), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={
+								bountiesStats.totalRewarded
+									? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
+									: undefined
+							}
+							isLoading={isLoading}
 						/>
 						<StatItem
 							label='Total Bounty Pool'
-							value={formatTokenValue(String(bountiesStats.totalBountyPool ?? 0), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+							value={
+								bountiesStats.totalBountyPool
+									? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
+									: undefined
+							}
+							isLoading={isLoading}
 						/>
 					</div>
 				</div>
@@ -148,26 +162,44 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 					<div>
 						<span className='font-pixelify text-base text-bounty_pool_text'>{t('availableBountyPool')}</span>
 						<div className='leading-none'>
-							<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
-							<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
-							<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
-						</div>{' '}
+							{isLoading ? (
+								<Skeleton className='h-[46px] w-[200px]' />
+							) : (
+								<>
+									<span className='font-pixeboy text-[46px] leading-none'>${availableBounty}</span>
+									<span className={`ml-2 text-[22px] font-medium leading-none ${spaceGroteskFont.className}`}>~ {formatUSDWithUnits(bountyAmount, 2)}</span>
+									<span className={`${spaceGroteskFont.className} ml-1 text-[22px] font-medium leading-none`}>{t('dot')}</span>
+								</>
+							)}
+						</div>
 						<div className='grid grid-cols-2 gap-y-8 py-7 pr-4'>
 							<StatItem
 								label='Active Bounties'
-								value={String(bountiesStats.activeBounties)}
+								value={bountiesStats.activeBounties ? String(bountiesStats.activeBounties) : undefined}
+								isLoading={isLoading}
 							/>
 							<StatItem
 								label='No. of People Earned'
-								value={String(bountiesStats.peopleEarned)}
+								value={bountiesStats.peopleEarned ? String(bountiesStats.peopleEarned) : undefined}
+								isLoading={isLoading}
 							/>
 							<StatItem
 								label='Total Rewarded'
-								value={formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+								value={
+									bountiesStats.totalRewarded
+										? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
+										: undefined
+								}
+								isLoading={isLoading}
 							/>
 							<StatItem
 								label='Total Bounty Pool'
-								value={formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+								value={
+									bountiesStats.totalBountyPool
+										? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
+										: undefined
+								}
+								isLoading={isLoading}
 							/>
 						</div>
 						<div className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line}>
