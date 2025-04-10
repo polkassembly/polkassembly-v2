@@ -13,6 +13,7 @@ import remarkBreaks from 'remark-breaks';
 import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import Image from 'next/image';
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -36,7 +37,25 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: 'img',
+	img: ({ src, alt, ...props }) => {
+		if (!src) {
+			return null;
+		}
+
+		return (
+			<Image
+				src={src}
+				alt={alt || 'Image'}
+				className={props.className}
+				width={Number(props.width || 256)}
+				height={Number(props.height || 256)}
+				style={props.style}
+				onClick={() => {
+					window.open(src, '_blank');
+				}}
+			/>
+		);
+	},
 	a: ({ href, children, ...props }) => {
 		return (
 			<a
