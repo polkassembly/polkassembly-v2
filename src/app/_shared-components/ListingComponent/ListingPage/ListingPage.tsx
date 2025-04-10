@@ -96,7 +96,6 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
 			const params = new URLSearchParams(searchParams.toString());
-
 			params.set('trackStatus', newStatuses.length > 0 ? newStatuses.join(',') : 'all');
 			router.push(`?${params.toString()}`, { scroll: false });
 
