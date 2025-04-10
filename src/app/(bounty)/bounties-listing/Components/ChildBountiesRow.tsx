@@ -108,7 +108,7 @@ function ChildBountiesRow({
 					? formatBnBalance(childBounty.onChainInfo.reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
 					: '-'}
 			</TableCell>
-			<TableCell className={styles.tableCell_ChildBountyCreatedAt}>
+			<TableCell className={styles.tableCell_createdAt}>
 				{' '}
 				<Clock className='h-4 w-4' /> {childBounty.onChainInfo?.createdAt ? dayjs.utc(childBounty.onChainInfo.createdAt).format("DD MMM 'YY") : '-'}
 			</TableCell>
