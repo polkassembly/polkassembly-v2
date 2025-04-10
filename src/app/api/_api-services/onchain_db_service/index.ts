@@ -15,12 +15,12 @@ import {
 	IBountyStats,
 	IBountyProposal,
 	IBountyUserActivity,
-	IClaimedBountyProposal,
-	IDelegationStats
+	IDelegationStats,
+	EBountyActivity
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
-import { BN } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { encodeAddress } from '@polkadot/util-crypto';
@@ -160,43 +160,45 @@ export class OnChainDbService {
 	static async getBountyStats(network: ENetwork): Promise<IBountyStats> {
 		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
 		const defaultStats: IBountyStats = {
-			activeBounties: '0',
+			activeBounties: 0,
 			availableBountyPool: 'N/A',
 			peopleEarned: 'N/A',
-			totalBountyPool: '0',
+			totalBountyPool: 0,
 			totalRewarded: 'N/A'
 		};
 
-		if (!activeBountiesResponse?.data?.proposals?.length) {
+		const activeProposals = activeBountiesResponse?.data?.items || [];
+
+		if (!activeProposals.length) {
 			return defaultStats;
 		}
 
-		const activeBounties = String(activeBountiesResponse.data.proposals.length);
-		let totalBountyPool = activeBountiesResponse.data.proposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), new BN(0));
+		const activeBounties = String(activeProposals.length);
+		let totalBountyPool = activeProposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
 
-		const activeBountyIndices = activeBountiesResponse.data.proposals.map(({ index }: IBountyProposal) => parseInt(index, 10));
+		const activeBountyIndices = activeProposals.map(({ index }: IBountyProposal) => index);
 
 		const childBountiesResponse = await SubsquidService.getChildBountiesRewards(network, activeBountyIndices);
 
-		if (!childBountiesResponse?.data?.proposals?.length) {
+		if (!childBountiesResponse?.data?.items?.length) {
 			return {
 				...defaultStats,
-				activeBounties,
-				totalBountyPool: totalBountyPool.toString()
+				activeBounties: Number(activeBounties),
+				totalBountyPool: totalBountyPool.toNumber()
 			};
 		}
 
-		totalBountyPool = childBountiesResponse.data.proposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), new BN(0));
+		totalBountyPool = childBountiesResponse.data.items.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
 
-		const awardedChildBounties = childBountiesResponse.data.proposals.filter((bounty: IBountyProposal) => bounty.statusHistory?.some((item) => item?.status === 'Awarded'));
+		const awardedChildBounties = childBountiesResponse.data.items.filter((bounty: IBountyProposal) => bounty.statusHistory?.some((item) => item?.status === 'Awarded'));
 
-		const totalRewarded = awardedChildBounties.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), new BN(0));
+		const totalRewarded = awardedChildBounties.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
 
 		return {
-			activeBounties,
+			activeBounties: Number(activeBounties),
 			availableBountyPool: totalBountyPool.toString(),
-			peopleEarned: String(childBountiesResponse.data.proposals.length),
-			totalBountyPool: totalBountyPool.toString(),
+			peopleEarned: String(childBountiesResponse.data.items.length),
+			totalBountyPool: totalBountyPool.toNumber(),
 			totalRewarded: totalRewarded.toString()
 		};
 	}
@@ -204,24 +206,27 @@ export class OnChainDbService {
 	static async getBountyUserActivity(network: ENetwork): Promise<IBountyUserActivity[]> {
 		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
 
-		if (!activeBountiesResponse?.data?.proposals?.length) {
+		if (!activeBountiesResponse?.data?.items?.length) {
 			return [];
 		}
 
-		const activeBountyIndices = activeBountiesResponse.data.proposals.map(({ index }: IBountyProposal) => parseInt(index, 10));
+		const activeBountyIndices = activeBountiesResponse.data.items.map(({ index }: IBountyProposal) => index);
 
 		const claimedChildBounties = await SubsquidService.getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(network, activeBountyIndices);
 
-		if (!claimedChildBounties?.data?.proposals?.length) {
+		if (!claimedChildBounties?.data?.items?.length) {
 			return [];
 		}
 
-		return claimedChildBounties.data.proposals.map((proposal) => ({
-			activity: 'claimed',
-			address: (proposal as unknown as IClaimedBountyProposal).payee,
-			amount: (proposal as unknown as IClaimedBountyProposal).reward,
-			created_at: new Date((proposal as unknown as IClaimedBountyProposal).statusHistory[0].timestamp)
-		}));
+		return claimedChildBounties.data.items.map((proposal) => {
+			const claimedProposal = proposal as IBountyProposal;
+			return {
+				activity: EBountyActivity.CLAIMED,
+				address: claimedProposal.payee,
+				amount: claimedProposal.reward,
+				created_at: new Date(claimedProposal.statusHistory[0].timestamp)
+			};
+		});
 	}
 
 	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {

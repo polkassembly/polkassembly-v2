@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextResponse } from 'next/server';
-import { BN } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
@@ -56,7 +56,7 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	);
 
 	await api.disconnect();
-	const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), new BN(0));
+	const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), BN_ZERO);
 	const bountyAmount = total.div(new BN(10).pow(new BN(10))).toString();
 
 	return NextResponse.json({ bountyAmount: bountyAmount.toString() });
