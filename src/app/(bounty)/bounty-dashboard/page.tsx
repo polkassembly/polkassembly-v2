@@ -31,6 +31,8 @@ async function page() {
 
 	const { data: userActivities } = await NextApiClientService.fetchBountiesUserActivity();
 
+	console.log('bountyProposals', bountyProposals);
+	console.log('hotBounties', hotBounties);
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
 			<BountyDashboard

@@ -85,11 +85,11 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 					<div className='grid grid-cols-2 gap-x-24 py-7'>
 						<StatItem
 							label='Active Bounties'
-							value={bountiesStats.activeBounties}
+							value={String(bountiesStats.activeBounties)}
 						/>
 						<StatItem
 							label='Claimants'
-							value={bountiesStats.peopleEarned}
+							value={String(bountiesStats.peopleEarned)}
 						/>
 						<StatItem
 							label='Total Rewarded'
@@ -155,19 +155,19 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						<div className='grid grid-cols-2 gap-y-8 py-7 pr-4'>
 							<StatItem
 								label='Active Bounties'
-								value={bountiesStats.activeBounties}
+								value={String(bountiesStats.activeBounties)}
 							/>
 							<StatItem
 								label='No. of People Earned'
-								value={bountiesStats.peopleEarned}
+								value={String(bountiesStats.peopleEarned)}
 							/>
 							<StatItem
 								label='Total Rewarded'
-								value={formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+								value={formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 							<StatItem
 								label='Total Bounty Pool'
-								value={formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
+								value={formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)}
 							/>
 						</div>
 						<div className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line}>

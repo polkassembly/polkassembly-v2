@@ -499,7 +499,16 @@ export class SubsquidService extends SubsquidUtils {
 				})
 				.toPromise();
 
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching active bounties:', error);
 			return null;
@@ -516,7 +525,17 @@ export class SubsquidService extends SubsquidUtils {
 					index_eq: index
 				})
 				.toPromise();
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching active bounties by index:', error);
 			return null;
@@ -532,7 +551,16 @@ export class SubsquidService extends SubsquidUtils {
 				})
 				.toPromise();
 
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching child bounties:', error);
 			return null;
@@ -549,7 +577,16 @@ export class SubsquidService extends SubsquidUtils {
 				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
 				.toPromise();
 
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching claimed child bounties payees and reward:', error);
 			return null;

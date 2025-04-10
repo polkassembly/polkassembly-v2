@@ -673,6 +673,9 @@ export class SubsquidQueries {
 				index
 				reward
 			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in}) {
+				totalCount
+			}
 		}
 	`;
 
@@ -681,6 +684,21 @@ export class SubsquidQueries {
 			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}) {
 				index
 				reward
+			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX_RANGE = `
+		query RewardsByIndexRange($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_gte: Int!, $index_lte: Int!) {
+			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_gte: $index_gte, index_lte: $index_lte}) {
+				index
+				reward
+			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in, index_gte: $index_gte, index_lte: $index_lte}) {
+				totalCount
 			}
 		}
 	`;
@@ -707,6 +725,9 @@ export class SubsquidQueries {
                     status
                 }
             }
+            proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+                totalCount
+            }
         }
     `;
 
@@ -717,7 +738,10 @@ export class SubsquidQueries {
 				reward
 				statusHistory(where: {status_eq: Claimed}) {
 					timestamp
-						}
+				}
+			}
+			proposalsConnection(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in, statusHistory_some: {status_eq: Claimed}}, orderBy: id_DESC) {
+				totalCount
 			}
 		}
 	`;

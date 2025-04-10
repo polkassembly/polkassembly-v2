@@ -171,23 +171,23 @@ export class OnChainDbService {
 		};
 
 		const activeProposals = activeBountiesResponse?.data?.items || [];
+		const activeBounties = activeBountiesResponse?.data?.totalCount || 0;
 
-		if (!activeProposals.length) {
+		if (!activeBounties) {
 			return defaultStats;
 		}
 
-		const activeBounties = String(activeProposals.length);
 		let totalBountyPool = activeProposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
 
 		const activeBountyIndices = activeProposals.map(({ index }: IBountyProposal) => index);
 
 		const childBountiesResponse = await SubsquidService.getChildBountiesRewards(network, activeBountyIndices);
 
-		if (!childBountiesResponse?.data?.items?.length) {
+		if (!childBountiesResponse?.data?.totalCount) {
 			return {
 				...defaultStats,
 				activeBounties: Number(activeBounties),
-				totalBountyPool: totalBountyPool.toNumber()
+				totalBountyPool: Number(totalBountyPool.toString())
 			};
 		}
 
@@ -200,8 +200,8 @@ export class OnChainDbService {
 		return {
 			activeBounties: Number(activeBounties),
 			availableBountyPool: totalBountyPool.toString(),
-			peopleEarned: String(childBountiesResponse.data.items.length),
-			totalBountyPool: totalBountyPool.toNumber(),
+			peopleEarned: String(childBountiesResponse.data.totalCount),
+			totalBountyPool: Number(totalBountyPool.toString()),
 			totalRewarded: totalRewarded.toString()
 		};
 	}
@@ -209,7 +209,7 @@ export class OnChainDbService {
 	static async getBountyUserActivity(network: ENetwork): Promise<IBountyUserActivity[]> {
 		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
 
-		if (!activeBountiesResponse?.data?.items?.length) {
+		if (!activeBountiesResponse?.data?.totalCount) {
 			return [];
 		}
 
@@ -217,7 +217,7 @@ export class OnChainDbService {
 
 		const claimedChildBounties = await SubsquidService.getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(network, activeBountyIndices);
 
-		if (!claimedChildBounties?.data?.items?.length) {
+		if (!claimedChildBounties?.data?.totalCount) {
 			return [];
 		}
 
