@@ -1,11 +1,19 @@
 .delegationSupplyDataContainer {
-    @apply mt-5 flex flex-wrap justify-between gap-3 rounded-lg bg-bg_modal p-6 shadow-lg lg:gap-5;
+	@apply mt-5 flex flex-row flex-wrap justify-center gap-1.5 rounded-lg bg-bg_modal px-3 py-2 shadow-lg md:justify-between md:px-6 md:py-4 lg:gap-5 lg:p-6;
 }
 
 .totalDelegates {
-    @apply text-xs text-wallet_btn_text text-opacity-[70%]
+	@apply text-xs text-wallet_btn_text text-opacity-[70%];
 }
 
 .borderLeft {
-    @apply border-l border-border_grey pl-5;
+	@apply border-l border-border_grey pl-3 md:pl-5;
+}
+
+.delegationSupplyData {
+	@apply flex flex-col items-center text-center md:flex-row md:gap-3 md:text-start;
+}
+
+.delegationSupplyDataImage {
+	@apply h-6 w-6 md:h-10 md:w-10;
 }

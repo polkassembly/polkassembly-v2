@@ -47,70 +47,70 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 
 	return (
 		<div className={styles.delegationSupplyDataContainer}>
-			<div className='flex items-center gap-3'>
+			<div className={styles.delegationSupplyData}>
 				<Image
 					src={DOT}
 					alt='DOT'
-					className='h-10 w-10'
+					className={styles.delegationSupplyDataImage}
 				/>
 				<div className='flex flex-col'>
 					<p className={styles.totalDelegates}>{t('totalSupply')}</p>
-					<p className='text-xl font-semibold'>
+					<p className='text-md font-semibold md:text-xl'>
 						{formatUSDWithUnits(formatBnBalance(totalSupply, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
 					</p>
 				</div>
 			</div>
 			<div className={styles.borderLeft}>
-				<div className='flex items-center gap-3'>
+				<div className={styles.delegationSupplyData}>
 					<Image
 						src={tokens}
 						alt='Tokens'
-						className='h-10 w-10'
+						className={styles.delegationSupplyDataImage}
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('delegatedTokens')}</p>
-						<p className='text-xl font-semibold'>
+						<p className='text-md font-semibold md:text-xl'>
 							{formatUSDWithUnits(formatBnBalance(delegationStats.totalDelegatedTokens, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
 						</p>
 					</div>
 				</div>
 			</div>
 			<div className={styles.borderLeft}>
-				<div className='flex items-center gap-3'>
+				<div className={styles.delegationSupplyData}>
 					<Image
 						src={votes}
 						alt='Votes'
-						className='h-10 w-10'
+						className={styles.delegationSupplyDataImage}
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegatedVotes')}</p>
-						<p className='text-xl font-semibold'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes))}</p>
+						<p className='text-md font-semibold md:text-xl'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes))}</p>
 					</div>
 				</div>
 			</div>
 			<div className={styles.borderLeft}>
-				<div className='flex items-center gap-3'>
+				<div className={styles.delegationSupplyData}>
 					<Image
 						src={delegates}
 						alt='Delegates'
-						className='h-10 w-10'
+						className={styles.delegationSupplyDataImage}
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegates')}</p>
-						<p className='text-xl font-semibold'>{delegationStats?.totalDelegates}</p>
+						<p className='text-md font-semibold md:text-xl'>{delegationStats?.totalDelegates}</p>
 					</div>
 				</div>
 			</div>
 			<div className={styles.borderLeft}>
-				<div className='flex items-center gap-3'>
+				<div className={styles.delegationSupplyData}>
 					<Image
 						src={delegatees}
 						alt='Delegatees'
-						className='h-10 w-10'
+						className={styles.delegationSupplyDataImage}
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegators')}</p>
-						<p className='text-xl font-semibold'>{delegationStats?.totalDelegators}</p>
+						<p className='text-md font-semibold md:text-xl'>{delegationStats?.totalDelegators}</p>
 					</div>
 				</div>
 			</div>
