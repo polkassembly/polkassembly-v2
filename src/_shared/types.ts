@@ -1039,3 +1039,13 @@ export interface ITrackDelegationDetails {
 	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
 	status: EDelegationStatus;
 }
+
+export interface IVoteHistoryData {
+	votes: IVoteData[];
+	totalCounts: {
+		[EVoteDecision.AYE]?: number;
+		[EVoteDecision.NAY]?: number;
+		[EVoteDecision.SPLIT_ABSTAIN]?: number;
+		[EVoteDecision.SPLIT]?: number;
+	};
+}
