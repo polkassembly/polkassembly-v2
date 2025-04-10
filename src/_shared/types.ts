@@ -880,27 +880,6 @@ export interface IPostSubscription {
 	userId: number;
 }
 
-export interface IBountyStats {
-	availableBountyPool: string;
-	activeBounties: string;
-	peopleEarned: string;
-	totalRewarded: string;
-	totalBountyPool: string;
-}
-
-export interface IBountyUserActivity {
-	amount: string;
-	activity: string;
-	address: string;
-	created_at: Date;
-}
-
-export interface IBountyProposal {
-	index: string;
-	reward: string;
-	statusHistory?: Array<{ status: string }>;
-}
-
 export interface IClaimedBountyProposal {
 	payee: string;
 	reward: string;
@@ -943,6 +922,44 @@ export enum NotificationType {
 	ERROR = 'error',
 	WARNING = 'warning',
 	INFO = 'info'
+}
+
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: number;
+	peopleEarned: string;
+	totalRewarded: string;
+	totalBountyPool: number;
+}
+
+export enum EBountyActivity {
+	CREATED = 'created',
+	CLAIMED = 'claimed',
+	APPROVED = 'approved',
+	REJECTED = 'rejected',
+	CANCELLED = 'cancelled',
+	FUNDED = 'funded',
+	CURATOR_PROPOSED = 'curator_proposed',
+	CURATOR_ASSIGNED = 'curator_assigned',
+	CURATOR_UNASSIGNED = 'curator_unassigned',
+	EXECUTED = 'executed',
+	EXECUTION_FAILED = 'execution_failed',
+	CLOSED = 'closed',
+	AWARDED = 'awarded'
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: EBountyActivity;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: number;
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: string }>;
 }
 
 // generic types are for insignificant tokens if we decide to add later

@@ -668,17 +668,17 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS = `
-        query Rewards {
-            proposals(where: {type_eq: Bounty, status_not_in: [Cancelled,Rejected, Approved, Claimed, Approved]}) {
-                index
-                reward
-            }
-        }
-    `;
+		query Rewards($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!) {
+			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in}) {
+				index
+				reward
+			}
+		}
+	`;
 
 	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX = `
-		query RewardsByIndex($index_eq: Int!) {
-			proposals(where: {type_eq: Bounty, status_not_in: [Cancelled,Rejected, Approved, Claimed, Approved], index_eq: $index_eq}) {
+		query RewardsByIndex($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_eq: Int!) {
+			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}) {
 				index
 				reward
 			}
