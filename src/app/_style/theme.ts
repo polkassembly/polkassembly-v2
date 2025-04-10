@@ -129,7 +129,8 @@ export const THEME_COLORS = {
 		warning_vote_bg: '#FFF7EF',
 		read_more_txt: '#2563eb',
 		aye_color: '#6DE1A2',
-		nay_color: '#FF778F'
+		nay_color: '#FF778F',
+		info_card_bg: '#e7f4ff'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -255,6 +256,7 @@ export const THEME_COLORS = {
 		warning_vote_bg: '#FFF7EF',
 		read_more_txt: '#2563eb',
 		aye_color: '#6DE1A2',
-		nay_color: '#FF778F'
+		nay_color: '#FF778F',
+		info_card_bg: '#28333c'
 	}
 };

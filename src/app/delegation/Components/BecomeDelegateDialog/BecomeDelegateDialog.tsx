@@ -165,6 +165,7 @@ export default function BecomeDelegateDialog() {
 				<div className='flex flex-col gap-y-4'>
 					<AddressDropdown
 						withBalance
+						disabled
 						onChange={(account) => setAddress(getEncodedAddress(account.address, network))}
 					/>
 					<div className='flex flex-col gap-y-2'>
@@ -181,7 +182,7 @@ export default function BecomeDelegateDialog() {
 						/>
 					</div>
 					<div className={styles.infoContainer}>
-						<AiOutlineInfoCircle className='text-toast_info_border' />
+						<AiOutlineInfoCircle className='text-lg text-toast_info_border' />
 						<span className={styles.infoText}>
 							{t('addSocialsToDelegateProfile')}
 							<Link
