@@ -4,7 +4,6 @@
 import React, { useState } from 'react';
 import { IPostListing } from '@/_shared/types';
 import { Pencil } from 'lucide-react';
-import { OutputData } from '@editorjs/editorjs';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
@@ -12,7 +11,7 @@ import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import EditPost from './EditPost';
 
-function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing; onEditPostSuccess: (title: string, content: OutputData) => void }) {
+function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing; onEditPostSuccess: (title: string, content: string) => void }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
@@ -34,15 +33,17 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 					{t('EditPost.editPostButton')}
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='max-w-3xl p-6'>
+			<DialogContent className='max-w-max p-6'>
 				<DialogHeader>
 					<DialogTitle>{t('EditPost.edit')}</DialogTitle>
 				</DialogHeader>
-				<EditPost
-					postData={postData}
-					onEditPostSuccess={onEditPostSuccess}
-					onClose={() => setIsOpen(false)}
-				/>
+				<div className='max-w-3xl'>
+					<EditPost
+						postData={postData}
+						onEditPostSuccess={onEditPostSuccess}
+						onClose={() => setIsOpen(false)}
+					/>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

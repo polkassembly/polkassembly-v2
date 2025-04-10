@@ -291,7 +291,17 @@
 		"WhitelistedCaller": "白名单调用者",
 		"WhitelistedCallerDescription": "由Polkadot研究员的任何成员指挥的来源（无需段位）。",
 		"WishForChange": "期望变更",
-		"WishForChangeDescription": "表明网络希望进行某些变更的来源。"
+		"WishForChangeDescription": "表明网络希望进行某些变更的来源。",
+		"CouncilMotion": "理事会动议",
+		"CouncilMotionDescription": "这里是讨论理事会动议的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
+		"TechCommitteeProposal": "技术委员会提案",
+		"TechCommitteeProposalDescription": "这里是讨论技术委员会提案的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
+		"DemocracyProposal": "民主提案",
+		"DemocracyProposalDescription": "这里是讨论民主提案的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
+		"TreasuryProposal": "国库提案",
+		"TreasuryProposalDescription": "这里是讨论国库提案的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
+		"Tip": "小费",
+		"TipDescription": "这里是讨论小费的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。"
 	},
 	"Sidebar": {
 		"onChainIdentity": "链上身份",
@@ -356,6 +366,7 @@
 		"loginToVote": "登录以投票",
 		"requested": "已请求",
 		"beneficiary": "受益人",
+		"noVotes": "未找到投票",
 		"description": "描述",
 		"timeline": "时间线",
 		"more": "更多",
@@ -379,6 +390,7 @@
 		"split": "分割",
 		"support": "支持",
 		"bareAyes": "纯赞成",
+		"issuance": "发行",
 		"viewVoteHistory": "查看投票历史",
 		"voteHistory": "投票历史",
 		"delegated": "已委托",
@@ -404,7 +416,9 @@
 		"deleteCommentConfirmation": "您确定要删除此评论吗？",
 		"delete": "删除",
 		"hideReplies": "隐藏回复",
-		"viewReplies": "查看回复"
+		"viewReplies": "查看回复",
+		"commentSummary": "评论摘要",
+		"aiSummary": "AI 摘要"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -478,7 +492,9 @@
 		"previous": "上一页"
 	},
 	"BalanceInput": {
-		"addBalance": "添加余额"
+		"addBalance": "添加余额",
+		"enterAmount": "输入金额",
+		"treasuryBalance": "国库余额"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "选择您的投票",
@@ -552,14 +568,17 @@
 			"tooltip": "选择谁可以评论和回复此帖子"
 		},
 		"Topic": {
-			"general": "一般",
+			"general": "常规",
 			"auctionadmin": "拍卖管理员",
-			"generaladmin": "一般管理员",
+			"generaladmin": "常规管理员",
 			"governance": "治理",
-			"root": "根",
+			"root": "根权限",
 			"stakingadmin": "质押管理员",
 			"treasury": "国库",
-			"fellowship": "奖学金"
+			"fellowship": "研究会",
+			"council": "理事会",
+			"democracy": "民主",
+			"whitelist": "白名单"
 		},
 		"titleTooShort": "请提供有效的标题。",
 		"titlePlaceholder": "输入标题",
@@ -609,10 +628,6 @@
 		"leaderboard": "排行榜",
 		"findYourRank": "在生态系统中找到你的排名",
 		"searchUsername": "搜索用户名"
-	},
-	"BlockEditor": {
-		"placeholder": "输入 / 开始",
-		"errorUpdatingContent": "更新内容时出错"
 	},
 	"SetIdentity": {
 		"displayName": "显示名称",
@@ -675,16 +690,30 @@
 		"proposals": "提案"
 	},
 	"CreateProposal": {
-		"createPreimage": "创建原像",
-		"existingPreimage": "已有原像",
-		"createTreasuryProposal": "创建国库提案（原生）",
-		"usdxProposal": "创建USDx国库提案（Assethub）",
+		"create": "创建",
+		"quickActions": "快速操作",
+		"submitProposal": "提交提案",
+		"createDiscussion": "讨论帖",
+		"createPreimage": "新建预映像",
+		"existingPreimage": "我已有预映像",
+		"spend": "支出",
+		"from": "从",
+		"Treasury": "国库",
+		"usdxProposal": "从资产中心支出资产（USDx、DOT等）",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
+		"createDiscussionDescription": "开始对话并收集反馈。",
+		"createPreimageDescription": "提交带有新预映像哈希的提案。",
+		"existingPreimageDescription": "使用现有预映像哈希进行提交。",
+		"createTreasuryProposalDescription": "提议国库支出",
+		"usdxProposalDescription": "从资产中心申请资金（USDx、DOT等）。",
+		"cancelReferendumDescription": "提议取消活跃的公投。",
+		"killReferendumDescription": "在通过前终止公投。",
 		"goBack": "返回",
-		"preimageHash": "原像哈希",
-		"preimageLength": "原像长度",
-		"preimageHashDescription": "输入原像哈希以创建提案"
+		"preimageHash": "预映像哈希",
+		"preimageLength": "长度",
+		"preimageHashDescription": "输入哈希",
+		"viewPreimage": "查看预映像"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -695,11 +724,11 @@
 		"proposalCreatedSuccessfully": "提案创建成功",
 		"proposalCreatedSuccessfullyDescription": "提案已成功创建",
 		"proposalCreationFailed": "提案创建失败",
-		"proposalCreationFailedDescription": "创建提案时发生错误",
+		"proposalCreationFailedDescription": "创建提案时出现错误",
 		"preimageNotedSuccessfully": "预映像记录成功",
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageNoteFailed": "预映像记录失败",
-		"preimageNoteFailedDescription": "记录预映像时发生错误",
+		"preimageNoteFailedDescription": "记录预映像时出现错误",
 		"selectTrack": "选择轨道",
 		"validFrom": "生效时间",
 		"addValidFrom": "添加生效时间",
@@ -707,8 +736,8 @@
 		"enterFutureBlockHeight": "请输入未来的区块高度"
 	},
 	"CreatePreimage": {
-		"addItem": "添加项目",
-		"removeItem": "删除项目",
+		"addItem": "添加受益人/支付",
+		"removeItem": "删除支付",
 		"yes": "是",
 		"no": "否",
 		"uploadFile": "上传文件",
@@ -718,19 +747,28 @@
 		"preimageNotedSuccessfully": "预映像记录成功",
 		"preimageNotedSuccessfullyDescription": "预映像已成功记录",
 		"preimageHash": "预映像哈希",
-		"length": "长度"
+		"length": "长度",
+		"beneficiary": "受益人",
+		"noBeneficiarySelected": "未选择受益人",
+		"on": "开启"
 	},
 	"AddressInput": {
 		"invalidAddress": "无效地址",
 		"noResultsFound": "未找到结果",
-		"placeholder": "请输入地址"
+		"placeholder": "选择/输入地址"
 	},
 	"KillCancelReferendum": {
-		"referendumId": "公投ID",
-		"referendumIdDescription": "请输入要取消的公投ID",
-		"thisReferendumIsNotOngoing": "此公投未在进行中"
+		"referendumId": "输入公投索引",
+		"referendumIdDescription": "在此输入",
+		"thisReferendumIsNotOngoing": "警告！不是进行中的公投",
+		"viewReferendum": "查看提案"
 	},
 	"errorMessages": {
 		"valueTooLarge": "数值过大"
+	},
+	"TxFees": {
+		"preimageDeposit": "预映像押金",
+		"submissionDeposit": "提交押金",
+		"gasFees": "燃料费"
 	}
 }

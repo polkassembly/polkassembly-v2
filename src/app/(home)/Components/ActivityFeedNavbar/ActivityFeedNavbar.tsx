@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils';
 import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
-import { FaAngleDown } from 'react-icons/fa';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -128,7 +127,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 					<div key={category}>
 						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
 							<DropdownMenu>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab px-2', 'border-none px-2 font-normal')}>
 									<span className='flex items-center whitespace-nowrap'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
@@ -137,10 +136,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 											height={20}
 											className={cn('h-5 w-5', styles.darkIcon)}
 										/>
-										<span className='ml-1'>{category}</span>
-										<span className='ml-0.5'>
-											<FaAngleDown />
-										</span>
+										<span className='ml-1 text-sm text-basic_text'>{category}</span>
 									</span>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
@@ -172,7 +168,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 										height={20}
 										className={cn('h-5 w-5', styles.darkIcon)}
 									/>
-									<span className='ml-1'>{category}</span>
+									<span className='ml-1 text-sm'>{category}</span>
 								</span>
 							</button>
 						)}

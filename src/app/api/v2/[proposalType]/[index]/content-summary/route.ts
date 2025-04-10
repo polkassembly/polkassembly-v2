@@ -11,7 +11,6 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
-import { deepParseJson } from 'deep-parse-json';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -29,7 +28,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	// Try to get from cache first
 	const cachedData = await RedisService.GetContentSummary({ network, indexOrHash: index, proposalType });
 	if (cachedData) {
-		return NextResponse.json(deepParseJson(cachedData));
+		return NextResponse.json(cachedData);
 	}
 
 	let contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType });
@@ -58,7 +57,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	// Cache the response
-	await RedisService.SetContentSummary({ network, indexOrHash: index, proposalType, data: JSON.stringify(contentSummary) });
+	await RedisService.SetContentSummary({ network, indexOrHash: index, proposalType, data: contentSummary });
 
 	return NextResponse.json(contentSummary);
 });

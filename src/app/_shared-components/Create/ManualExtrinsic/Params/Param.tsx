@@ -204,7 +204,7 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 	const { apiService } = usePolkadotApiService();
 
 	const title = param.type.type !== 'Null' && (
-		<p className='flex w-full items-center gap-x-1 truncate text-sm font-medium text-text_primary'>
+		<p className='flex w-full items-center gap-x-1 truncate text-sm text-wallet_btn_text'>
 			{param.name && `${param.name}:`} {param.type.type}
 			{param.type.typeName && ` (${param.type.typeName})`}
 		</p>

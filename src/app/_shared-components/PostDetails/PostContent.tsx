@@ -4,72 +4,34 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { OutputData } from '@editorjs/editorjs';
-import { IPostListing } from '@/_shared/types';
-import { useTranslations } from 'next-intl';
-import BlockEditor from '../BlockEditor/BlockEditor';
+import React from 'react';
+import { IPost, IPostListing } from '@/_shared/types';
+import { cn } from '@/lib/utils';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
+import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
+import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 
-function PostContent({
-	postData,
-	isModalOpen,
-	onEditPostSuccess
-}: {
-	postData: IPostListing;
-	isModalOpen: boolean;
-	onEditPostSuccess: (title: string, content: OutputData) => void;
-}) {
-	const [showMore, setShowMore] = useState(false);
-
-	const t = useTranslations();
-
-	const handleShowMore = () => {
-		setShowMore(true);
-	};
-
-	const handleShowLess = () => {
-		setShowMore(false);
-	};
-
-	const truncatedData = showMore
-		? postData?.content
-		: postData?.content && {
-				...postData?.content,
-				blocks: postData?.content.blocks?.slice(0, 4) || []
-			};
+function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
+	const { content } = postData;
 
 	return (
 		<div>
-			<BlockEditor
-				data={truncatedData as OutputData}
-				readOnly
-				id='post-content'
-				className={isModalOpen ? '' : 'max-h-full border-none'}
-				onChange={() => {}}
+			<AISummaryCollapsible
+				indexOrHash={String(postData?.index ?? postData?.hash)}
+				proposalType={postData.proposalType}
+				summaryType='content'
 			/>
 
-			{showMore ? (
-				<span
-					onClick={handleShowLess}
-					className='cursor-pointer text-sm font-medium text-text_pink'
-					aria-hidden='true'
-				>
-					{t('ActivityFeed.PostItem.showLess')}
-				</span>
-			) : !showMore && postData?.content?.blocks?.length && postData?.content?.blocks?.length > 4 ? (
-				<span
-					onClick={handleShowMore}
-					className='cursor-pointer text-sm font-medium text-text_pink'
-					aria-hidden='true'
-				>
-					{t('ActivityFeed.PostItem.showMore')}
-				</span>
-			) : null}
+			<MarkdownViewer
+				markdown={content}
+				className={cn(isModalOpen ? '' : 'max-h-full border-none')}
+				truncate
+			/>
+
 			<Separator className='my-4 bg-border_grey' />
-			<PostActions postData={postData} />
+			<PostActions postData={postData as IPost} />
 			<div className='flex items-center justify-between'>
 				<div />
 				<div>

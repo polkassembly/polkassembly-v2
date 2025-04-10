@@ -6,6 +6,7 @@ import { InputHTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } 
 import { IParamDef } from '@/_shared/types';
 import { BN, BN_ONE, BN_TWO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Input } from '../../../Input';
 
 type InputNumberProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
@@ -71,7 +72,7 @@ function InputNumber({ onChange, ...props }: InputNumberProps) {
 				}}
 				maxLength={maxValueLength}
 				onKeyDown={onKeyDown}
-				className='w-full'
+				className={cn('w-full', props.className)}
 				value={valueString}
 			/>
 			{error && <p className='text-sm text-failure'>{error}</p>}

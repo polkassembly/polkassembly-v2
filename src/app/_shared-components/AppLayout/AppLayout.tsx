@@ -19,7 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 			<SidebarInset>
 				<Navbar />
 				<div className='text-semibold sticky top-[63px] z-40 flex w-full items-center justify-center bg-gradient-to-r from-violet-500 to-fuchsia-500 px-4 py-2 text-white'>
-					Westend is in maintenance mode. Features may be unstable.
+					This site is in maintenance mode. Features may be unstable.
 				</div>
 				<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
 				<Footer />

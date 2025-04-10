@@ -11,7 +11,7 @@ import SelectMethod from '../SelectMethod/SelectMethod';
 // eslint-disable-next-line import/no-cycle
 import Params from '../Params';
 
-export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtrinsic<'promise', ISubmittableResult>) => void }) {
+export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtrinsic<'promise', ISubmittableResult> | null) => void }) {
 	const [selectedSection, setSelectedSection] = useState<string>();
 	const [selectedMethod, setSelectedMethod] = useState<string>();
 	const { apiService } = usePolkadotApiService();
@@ -42,7 +42,9 @@ export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtr
 		(extFn: SubmittableExtrinsicFunction<'promise'>) => {
 			setSelectedMethod(extFn.method);
 			setExtrinsicValues(getCallState(extFn));
+			onChange?.(null);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[getCallState]
 	);
 
@@ -77,7 +79,6 @@ export function Extrinsic({ onChange }: { onChange?: (extrinsic: SubmittableExtr
 			/>
 			<Params
 				params={extrinsic.params}
-				values={paramValues}
 				onChange={setParamValues}
 			/>
 		</div>

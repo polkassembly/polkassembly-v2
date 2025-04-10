@@ -101,7 +101,19 @@ export const THEME_COLORS = {
 		toast_warning_text: '#F7C752',
 		toast_info_bg: '#E6F4FF',
 		toast_info_border: '#91CAFF',
-		toast_info_text: '#3288FF'
+		toast_info_text: '#3288FF',
+		create_option_bg: '#F6F8FB',
+		create_discussion_bg: '#004EFC',
+		create_preimage_bg: '#9A1C9D',
+		create_existing_bg: '#9A1C9D',
+		create_treasury_bg: '#E5007A',
+		create_usdx_bg: '#FFA319',
+		create_cancel_bg: '#00B252',
+		create_kill_bg: '#FC2626',
+		address_input_bg: '#66A5FF2E',
+		warning: '#F89118',
+		aye_color: '#6DE1A2',
+		nay_color: '#FF778F'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -199,6 +211,18 @@ export const THEME_COLORS = {
 		toast_warning_text: '#F7C752',
 		toast_info_bg: '#27323D',
 		toast_info_border: '#1677FE',
-		toast_info_text: '#3288FF'
+		toast_info_text: '#3288FF',
+		create_option_bg: '#2A2B2D',
+		create_discussion_bg: '#004EFC',
+		create_preimage_bg: '#9A1C9D',
+		create_existing_bg: '#9A1C9D',
+		create_treasury_bg: '#E5007A',
+		create_usdx_bg: '#FFA319',
+		create_cancel_bg: '#00B252',
+		create_kill_bg: '#FC2626',
+		address_input_bg: '#66A5FF2E',
+		warning: '#F89118',
+		aye_color: '#6DE1A2',
+		nay_color: '#FF778F'
 	}
 };

@@ -7,7 +7,7 @@
 }
 
 .menuItem {
-	@apply flex w-full cursor-pointer items-center justify-between rounded-md px-1.5 py-1 h-8 text-sm transition-colors duration-200 hover:bg-sidebar_accent;
+	@apply flex h-8 w-full cursor-pointer items-center justify-between rounded-md px-1.5 py-1 text-sm transition-colors duration-200 hover:bg-sidebar_accent;
 }
 
 .subItemCount {
@@ -15,7 +15,7 @@
 }
 
 .sidebarActive {
-	@apply bg-sidebar_menu_active text-sidebar_menu_active_text font-medium;
+	@apply bg-sidebar_menu_active font-medium text-sidebar_menu_active_text;
 }
 
 .iconWrapper {
@@ -24,7 +24,7 @@
 
 .sidebar_selected_icon {
 	filter: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%);
-	fill: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%)
+	fill: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%);
 }
 
 .newBadge {
@@ -72,7 +72,7 @@
 }
 
 .nestedList {
-	@apply space-y-1 pl-4;
+	@apply space-y-1;
 }
 
 .mainCollapsible {

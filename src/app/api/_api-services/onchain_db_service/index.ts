@@ -2,11 +2,24 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork, EPostOrigin, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostListing, IGenericListingResponse, IVoteCurve, IPreimage } from '@shared/types';
+import {
+	ENetwork,
+	EPostOrigin,
+	EProposalStatus,
+	EProposalType,
+	EVoteDecision,
+	IOnChainPostListing,
+	IGenericListingResponse,
+	IVoteCurve,
+	IPreimage,
+	IDelegationStats
+} from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { encodeAddress } from '@polkadot/util-crypto';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { SubsquidService } from './subsquid_service';
 import { SubsquareOnChainService } from './subsquare_onchain_service';
 import { SubscanOnChainService } from './subscan_onchain_service';
@@ -141,5 +154,47 @@ export class OnChainDbService {
 
 	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
 		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
+	}
+
+	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
+		return SubsquidService.GetConvictionVotingDelegationStats(network);
+	}
+
+	static async GetLast30DaysConvictionVoteCountByAddress({ network, address }: { network: ENetwork; address: string }): Promise<number> {
+		return SubsquidService.GetLast30DaysConvictionVoteCountByAddress({
+			network,
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
+		});
+	}
+
+	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network: ENetwork) {
+		return SubsquidService.GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network);
+	}
+
+	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }) {
+		return SubsquidService.GetDelegateDetails({
+			network,
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
+		});
+	}
+
+	static async GetConvictionVoteDelegationsToAndFromAddress({ network, address, trackNum }: { network: ENetwork; address: string; trackNum?: number }) {
+		return SubsquidService.GetConvictionVoteDelegationsToAndFromAddress({
+			network,
+			address: ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address,
+			trackNum
+		});
+	}
+
+	static async GetActiveProposalsCountByTrackIds({ network, trackIds }: { network: ENetwork; trackIds: number[] }) {
+		return SubsquidService.GetActiveProposalsCountByTrackIds({ network, trackIds });
+	}
+
+	static async GetActiveProposalListingsWithVoteForAddressByTrackId({ network, trackId, voterAddress }: { network: ENetwork; trackId: number; voterAddress: string }) {
+		const formattedVoterAddress = ValidatorService.isValidSubstrateAddress(voterAddress)
+			? encodeAddress(voterAddress, NETWORKS_DETAILS[network as ENetwork].ss58Format)
+			: voterAddress;
+
+		return SubsquidService.GetActiveProposalListingsWithVoteForAddressByTrackId({ network, trackId, voterAddress: formattedVoterAddress });
 	}
 }

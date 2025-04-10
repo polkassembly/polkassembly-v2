@@ -13,11 +13,11 @@ import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
-import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { AIService } from '@/app/api/_api-services/ai_service';
+
+const SET_COOKIE = 'Set-Cookie';
 
 const zodParamsSchema = z.object({
 	id: z.string(),
@@ -46,12 +46,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	// 2. read and validate the request body
 	const zodBodySchema = z.object({
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content')
+		content: z.string().min(1, 'Content is required')
 	});
 
 	const { content } = zodBodySchema.parse(await getReqBody(req));
-
-	const formattedContent = convertContentForFirestoreServer(content);
 
 	// 3. check if user is the owner of the comment
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
@@ -68,7 +66,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	await OffChainDbService.UpdateComment({
 		commentId: id,
-		content: formattedContent
+		content
 	});
 
 	const network = await getNetworkFromHeaders();
@@ -85,8 +83,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
 	const response = NextResponse.json({ message: 'Comment updated successfully' });
-	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
-	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 
 	return response;
 });
@@ -124,8 +122,8 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
 	const response = NextResponse.json({ message: 'Comment deleted successfully' });
-	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
-	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 
 	return response;
 });
