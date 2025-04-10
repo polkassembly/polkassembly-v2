@@ -25,6 +25,58 @@ const extractUrlsAndEmails = (text: string): string[] => {
 	});
 };
 
+const isVideoUrl = (url: string): boolean => {
+	const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.wmv'];
+	const videoHostingPatterns = [
+		/youtube\.com\/watch\?v=([^&\s]+)/,
+		/youtu\.be\/([^&\s]+)/,
+		/vimeo\.com\/([^&\s]+)/,
+		/dailymotion\.com\/video\/([^&\s]+)/,
+		/facebook\.com\/watch\/\?v=([^&\s]+)/,
+		/tiktok\.com\/@[^/]+\/video\/([^&\s]+)/
+	];
+
+	return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext)) || videoHostingPatterns.some((pattern) => pattern.test(url));
+};
+
+const getEmbedUrl = (url: string): string | null => {
+	// YouTube
+	if (url.includes('youtube.com/watch')) {
+		const videoId = url.match(/v=([^&\s]+)/)?.[1];
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	}
+	if (url.includes('youtu.be')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	}
+
+	// Vimeo
+	if (url.includes('vimeo.com')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+	}
+
+	// Dailymotion
+	if (url.includes('dailymotion.com/video')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://www.dailymotion.com/embed/video/${videoId}` : null;
+	}
+
+	// Facebook
+	if (url.includes('facebook.com/watch')) {
+		const videoId = url.match(/v=([^&\s]+)/)?.[1];
+		return videoId ? `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}` : null;
+	}
+
+	// TikTok
+	if (url.includes('tiktok.com')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://www.tiktok.com/embed/v2/${videoId}` : null;
+	}
+
+	return null;
+};
+
 const markdownComponents: Components = {
 	div: 'div',
 	table: 'table',
@@ -41,6 +93,53 @@ const markdownComponents: Components = {
 	img: ({ src, alt }) => {
 		if (!src) {
 			return null;
+		}
+
+		const embedUrl = getEmbedUrl(src);
+		if (embedUrl) {
+			return (
+				<div className='video-container'>
+					<iframe
+						src={embedUrl}
+						className='aspect-video h-auto w-full max-w-[90%]'
+						style={{
+							width: '90%',
+							height: 'auto'
+						}}
+						allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+						allowFullScreen
+						title={alt || 'Embedded video'}
+					/>
+				</div>
+			);
+		}
+
+		if (isVideoUrl(src)) {
+			return (
+				<div className='video-container'>
+					<video
+						controls
+						className='h-auto w-full max-w-[90%]'
+						style={{
+							width: '90%',
+							height: 'auto'
+						}}
+						aria-label={alt || 'Video content'}
+					>
+						<source
+							src={src}
+							type={`video/${src.split('.').pop()}`}
+						/>
+						<track
+							kind='captions'
+							src=''
+							srcLang='en'
+							label='English'
+						/>
+						Your browser does not support the video tag.
+					</video>
+				</div>
+			);
 		}
 
 		return (

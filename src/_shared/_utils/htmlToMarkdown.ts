@@ -36,6 +36,29 @@ export function htmlToMarkdown(html: string): string {
 			}
 		});
 
+		// Custom rule for video elements
+		turndownService.addRule('video', {
+			filter: ['video'],
+			replacement(content: string, node: TurndownService.Node) {
+				if (node.nodeType !== 1) return content;
+				const element = node as unknown as HTMLVideoElement;
+				const source = element.querySelector('source');
+				const src = source?.getAttribute('src') || element.getAttribute('src') || '';
+				const width = element.getAttribute('width') || '';
+				const height = element.getAttribute('height') || '';
+				const dimensions = width && height ? ` width="${width}" height="${height}"` : '';
+				return `<video controls${dimensions}>\n  <source src="${src}" />\n</video>`;
+			}
+		});
+
+		// Custom rule for underline elements
+		turndownService.addRule('underline', {
+			filter: ['u', 'ins'],
+			replacement(content: string) {
+				return `_${content}_`;
+			}
+		});
+
 		return turndownService.turndown(html);
 	} catch (error) {
 		console.error('Error converting HTML to Markdown:', error);
