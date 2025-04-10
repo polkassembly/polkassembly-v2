@@ -54,7 +54,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 	const [userBalance, setUserBalance] = useState<string | null>(null);
-	const [isBalanceError, setIsBalanceError] = useState<boolean>(false);
 	const [loading, setLoading] = useState(false);
 	const [txFee, setTxFee] = useState<string>('');
 
@@ -75,10 +74,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		return enteredBalance.gt(new BN(0)) && totalRequired.lte(new BN(userBalance));
 	}, [balance, userBalance, conviction, txFee]);
 
-	useEffect(() => {
-		setIsBalanceError(balance !== '' && !isBalanceValid);
-	}, [balance, isBalanceValid]);
-
 	const handleOpenChange = useCallback(
 		(isOpen: boolean) => {
 			if (!user) {
@@ -87,7 +82,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 				setOpen(isOpen);
 				if (isOpen) {
 					setBalance('');
-					setIsBalanceError(false);
 					setSelectedTracks([]);
 					setIsAllTracksSelected(false);
 				}
@@ -287,7 +281,6 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 						defaultValue={new BN(balance || '0')}
 						onChange={handleBalanceChange}
 					/>
-					{isBalanceError && <p className={styles.balanceError}>{t('youDontHaveEnoughBalanceToDelegate')}</p>}
 					<div className='w-full'>
 						<p className='mb-3 text-sm text-wallet_btn_text'>{t('conviction')}</p>
 						<ConvictionSelector onConvictionChange={setConviction} />

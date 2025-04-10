@@ -47,7 +47,7 @@
 }
 
 .undelegatedMessage {
-	@apply flex items-center gap-2 text-sm text-text_primary;
+	@apply flex flex-col items-center gap-2 text-sm text-text_primary md:flex-row;
 }
 
 .delegateButton {
@@ -111,7 +111,7 @@
 }
 
 .proposalCard {
-	@apply rounded-lg border border-border_grey;
+	@apply w-full rounded-lg border border-border_grey;
 }
 
 .proposalDetails {
