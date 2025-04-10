@@ -7,7 +7,7 @@
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { useMemo } from 'react';
 import Trophy from '@assets/leaderboard/Trophy.png';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
@@ -26,7 +26,6 @@ interface RankRange {
 function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPublicUser>; top3RankData: IGenericListingResponse<IPublicUser> }) {
 	const searchParams = useSearchParams();
 	const page = parseInt(searchParams?.get('page') ?? '1', DEFAULT_LISTING_LIMIT);
-	const router = useRouter();
 	const t = useTranslations();
 	const { user } = useUser();
 
@@ -173,9 +172,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							page={page}
 							pageSize={DEFAULT_LISTING_LIMIT}
 							totalCount={data.totalCount}
-							onClick={(pageNumber) => {
-								router.push(`/leaderboard?page=${pageNumber}`);
-							}}
+							pageSearchParam='page'
 						/>
 					</div>
 				)}

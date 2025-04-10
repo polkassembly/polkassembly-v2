@@ -98,9 +98,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				page={page}
 				pageSize={DEFAULT_LISTING_LIMIT}
 				totalCount={data?.totalCount || 0}
-				onClick={(pageNumber) => {
-					setPage(pageNumber);
-				}}
+				onPageChange={(newPage) => setPage(newPage)}
 			/>
 		</div>
 	);
