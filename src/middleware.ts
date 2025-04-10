@@ -2,11 +2,15 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: Request) {
-	if (request.method === 'OPTIONS') return new Response('OK', { status: 200 });
+export function middleware(request: NextRequest) {
+	// Handle preflight OPTIONS request
+	if (request.method === 'OPTIONS') {
+		return new NextResponse('OK', { status: 200 });
+	}
 
+	// For non-OPTIONS requests
 	return NextResponse.next();
 }
 

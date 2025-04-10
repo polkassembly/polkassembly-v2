@@ -343,18 +343,20 @@ export class OffChainDbService {
 	// helper methods
 	private static async calculateProfileScoreIncrement({
 		userId,
+		address,
 		activityName,
 		activityMetadata,
 		subActivityName
 	}: {
-		userId: number;
+		userId?: number;
+		address?: string;
 		activityName: EActivityName;
 		activityMetadata?: IActivityMetadata;
 		subActivityName?: EActivityName;
 	}) {
 		// TODO: calculate score based on activity name and sub activity name
 		console.log('TODO: calculateProfileScoreIncrement fire and forget a cloud function maybe ?');
-		console.log({ userId, activityName, activityMetadata, subActivityName });
+		console.log({ userId, address, activityName, activityMetadata, subActivityName });
 		return 1;
 	}
 
@@ -362,6 +364,7 @@ export class OffChainDbService {
 
 	private static async saveUserActivity({
 		userId,
+		address,
 		name,
 		network,
 		proposalType,
@@ -370,7 +373,8 @@ export class OffChainDbService {
 		subActivityName,
 		commentId
 	}: {
-		userId: number;
+		userId?: number;
+		address?: string;
 		name: EActivityName;
 		network?: ENetwork;
 		proposalType?: EProposalType;
@@ -381,7 +385,8 @@ export class OffChainDbService {
 	}): Promise<void> {
 		const activity: IUserActivity = {
 			id: '', // Firestore service class will generate this
-			userId,
+			...(userId && { userId }),
+			...(address && { address }),
 			name,
 			category: ON_CHAIN_ACTIVITY_NAMES.includes(name) ? EActivityCategory.ON_CHAIN : EActivityCategory.OFF_CHAIN,
 			...(network && { network }),
@@ -397,7 +402,14 @@ export class OffChainDbService {
 		await FirestoreService.AddUserActivity(activity);
 
 		const score = await this.calculateProfileScoreIncrement({ userId, activityMetadata: metadata, activityName: name, subActivityName });
-		await FirestoreService.IncrementUserProfileScore(userId, score);
+
+		if (ValidatorService.isValidUserId(userId)) {
+			await FirestoreService.IncrementUserProfileScore({ userId: userId!, score });
+		}
+
+		if (address && ValidatorService.isValidWeb3Address(address)) {
+			await FirestoreService.IncrementAddressProfileScore({ address, score });
+		}
 	}
 
 	static async UpdateApiKeyUsage(apiKey: string, apiRoute: string) {
@@ -871,5 +883,9 @@ export class OffChainDbService {
 
 	static async UpdateSocialHandleByToken({ token, status }: { token: string; status: ESocialVerificationStatus }) {
 		return FirestoreService.UpdateSocialHandleByToken({ token, status });
+	}
+
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		return FirestoreService.DeleteOffChainPost({ network, proposalType, indexOrHash });
 	}
 }

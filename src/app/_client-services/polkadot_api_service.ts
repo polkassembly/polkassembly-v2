@@ -735,4 +735,43 @@ export class PolkadotApiService {
 		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
 	}
+
+	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
+		const referendumInfoOf = await this.api?.query?.referenda?.referendumInfoFor(postIndex);
+		const parsedReferendumInfo: any = referendumInfoOf?.toJSON();
+
+		if (!parsedReferendumInfo?.ongoing?.tally) return null;
+
+		return {
+			aye:
+				typeof parsedReferendumInfo.ongoing.tally.ayes === 'string'
+					? new BN(parsedReferendumInfo.ongoing.tally.ayes.slice(2), 'hex')?.toString()
+					: new BN(parsedReferendumInfo.ongoing.tally.ayes)?.toString(),
+			nay:
+				typeof parsedReferendumInfo.ongoing.tally.nays === 'string'
+					? new BN(parsedReferendumInfo.ongoing.tally.nays.slice(2), 'hex')?.toString()
+					: new BN(parsedReferendumInfo.ongoing.tally.nays)?.toString(),
+			support:
+				typeof parsedReferendumInfo.ongoing.tally.support === 'string'
+					? new BN(parsedReferendumInfo.ongoing.tally.support.slice(2), 'hex')?.toString()
+					: new BN(parsedReferendumInfo.ongoing.tally.support)?.toString()
+		};
+	}
+
+	async getInactiveIssuance() {
+		// Paseo logic needs to be implemented
+		if (!this.api) {
+			return null;
+		}
+
+		return this.api.query.balances.inactiveIssuance();
+	}
+
+	async getTotalIssuance() {
+		// Paseo logic needs to be implemented
+		if (!this.api) {
+			return null;
+		}
+		return this.api.query.balances.totalIssuance();
+	}
 }

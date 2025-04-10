@@ -28,7 +28,7 @@ function VotingMetrics({ postData, ayePercent, nayPercent }: VotingMetricsProps)
 			<span>|</span>
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<div>
+					<div className='mt-1'>
 						<VotingBar
 							ayePercent={ayePercent}
 							nayPercent={nayPercent}
