@@ -202,22 +202,22 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 								isLoading={isLoading}
 							/>
 						</div>
-						<div className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line}>
-							<span className={styles.bounty_dash_available_bounty_pool_right_bg_line_3_line_line} />
+						<div className='relative -ml-6 flex items-center justify-between'>
+							<span className='absolute left-0 top-20 h-10 w-20 rotate-90 rounded-t-full bg-bounty_dash_bg shadow-none' />
 							<Image
 								src={DashedLineIcon}
 								alt='bounty icon'
-								className='h-56 w-auto rotate-90'
-								width={209}
-								height={3}
+								className='ml-12 h-52 w-full rotate-90'
+								width={430}
+								height={20}
 							/>
-							<span className={styles.mobileImagesWrapper} />
+							<span className='right-0 h-20 w-10 rounded-l-full bg-bounty_dash_bg shadow-none' />
 						</div>
 						<div className='-ml-4 flex w-full flex-col items-center gap-x-4'>
 							<Image
 								src={BountyCreateMbWhiteIcon}
 								alt='bounty icon'
-								className='w-49 hidden h-10 scale-125 dark:block'
+								className='hidden h-10 w-60 scale-125 dark:block'
 								width={100}
 								height={100}
 							/>
