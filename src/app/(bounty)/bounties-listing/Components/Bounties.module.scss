@@ -23,7 +23,7 @@
 }
 
 .tableBodyRow {
-	@apply overflow-hidden rounded-b-lg rounded-t-lg bg-section_dark_overlay px-6;
+	@apply cursor-pointer overflow-hidden rounded-b-lg rounded-t-lg bg-section_dark_overlay px-6;
 }
 
 .tableCellBody {

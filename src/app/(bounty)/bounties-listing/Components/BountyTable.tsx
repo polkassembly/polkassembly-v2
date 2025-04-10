@@ -13,13 +13,14 @@ import { useChildBounties } from '@/hooks/useChildBounties';
 import { useTranslations } from 'next-intl';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useRouter } from 'nextjs-toploader/app';
 import styles from './Bounties.module.scss';
 import ChildBountiesRow from './ChildBountiesRow';
 
 function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 	const { expandedRows, childBounties, loading, errors, toggleRow } = useChildBounties();
 	const network = getCurrentNetwork();
-
+	const router = useRouter();
 	const t = useTranslations();
 	return (
 		<Table className={styles.table}>
@@ -40,22 +41,28 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 						<TableRow
 							className={styles.tableBodyRow}
 							key={item?.index}
+							onClick={() => router.push(`/bounty/${item.index}`)}
 						>
 							<TableCell className='p-6'>
 								<div className='flex items-center gap-2'>
 									{item.onChainInfo?.childBountiesCount && item.onChainInfo?.childBountiesCount > 0 ? (
-										<div className='flex items-center gap-2'>
-											<div className='w-6'>
+										<div className='relative'>
+											<div className='absolute left-0 top-1/2 -translate-y-1/2'>
 												<button
 													type='button'
-													onClick={() => toggleRow(item.index ?? 0)}
+													onClick={(e) => {
+														e.stopPropagation();
+														toggleRow(item.index ?? 0);
+													}}
 													className='rounded p-1 transition-colors'
 													title={`${expandedRows.includes(item.index ?? 0) ? 'Hide' : 'Show'} child bounties`}
 												>
 													{expandedRows.includes(item.index ?? 0) ? <FaCaretUp className='h-4 w-4 text-navbar_border' /> : <FaCaretDown className='h-4 w-4' />}
 												</button>
 											</div>
-											<span>{item.index}</span>
+											<div className='pl-8'>
+												<span>{item.index}</span>
+											</div>
 										</div>
 									) : (
 										<div className='pl-8'>

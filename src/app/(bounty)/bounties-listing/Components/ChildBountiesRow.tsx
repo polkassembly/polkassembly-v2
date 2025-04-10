@@ -14,6 +14,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '@ui/Profile/Address/Address';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'nextjs-toploader/app';
 import ChildBountiesLevelZeroIcon from '@assets/bounties/bountieslistingchildlevelzero.svg';
 import styles from './Bounties.module.scss';
 
@@ -30,7 +31,7 @@ function ChildBountiesRow({
 }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
-
+	const router = useRouter();
 	if (loading[parentIndex as number]) {
 		return (
 			<TableRow className={styles.childBountyRow}>
@@ -76,6 +77,7 @@ function ChildBountiesRow({
 		<TableRow
 			key={childBounty.index}
 			className={`${styles.tableBodyRow} ${styles.childBountyRow}`}
+			onClick={() => router.push(`/child_bounty/${childBounty.index}`)}
 		>
 			<TableCell className='p-6'>
 				<div className='flex h-6 items-center justify-start space-x-4 pl-2 pt-1'>
