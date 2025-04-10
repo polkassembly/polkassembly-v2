@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { EListingTab, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { BiSort } from 'react-icons/bi';
 import { FaFilter } from 'react-icons/fa6';
 import { MdSearch } from 'react-icons/md';
@@ -35,8 +35,8 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
-	const initialPage = parseInt(searchParams.get('page') || '1', 10);
-	const initialTrackStatus = searchParams.get('trackStatus') || 'all';
+	const initialPage = parseInt(searchParams?.get('page') || '1', 10);
+	const initialTrackStatus = searchParams?.get('trackStatus') || 'all';
 	const { user } = useUser();
 
 	const STATUSES = [
@@ -81,20 +81,12 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
-	const handlePageChange = (page: number) => {
-		setState((prev) => ({ ...prev, currentPage: page }));
-		const params = new URLSearchParams(searchParams.toString());
-		params.set('page', page.toString());
-		params.set('trackStatus', state.selectedStatuses.length > 0 ? state.selectedStatuses.join(',') : 'all');
-		router.push(`?${params.toString()}`, { scroll: false });
-	};
-
 	const handleStatusToggle = (statusStr: string) => {
 		setState((prev) => {
 			const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
-			const params = new URLSearchParams(searchParams.toString());
+			const params = new URLSearchParams(searchParams?.toString() || '');
 			params.set('trackStatus', newStatuses.length > 0 ? newStatuses.join(',') : 'all');
 			router.push(`?${params.toString()}`, { scroll: false });
 
@@ -238,7 +230,6 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 							data={initialData?.items || []}
 							totalCount={initialData?.totalCount || 0}
 							currentPage={state.currentPage}
-							setCurrentPage={handlePageChange}
 						/>
 					) : (
 						<ExternalTab />
