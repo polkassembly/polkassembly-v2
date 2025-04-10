@@ -248,7 +248,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				</div>
 			)}
 			<Pagination className={cn({ 'md:justify-end': pageSizeSelectOptions })}>
-				<PaginationContent className='max-sm:gap-0'>
+				<PaginationContent className='max-sm:gap-1'>
 					<PaginationItem>
 						<PaginationPrevious
 							href={buildLink(Math.max(currentPage - 1, 1))}
