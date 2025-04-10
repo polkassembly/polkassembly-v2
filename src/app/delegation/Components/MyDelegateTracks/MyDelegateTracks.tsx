@@ -16,7 +16,7 @@ import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { useAtom } from 'jotai';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
 import styles from '../Delegation.module.scss';

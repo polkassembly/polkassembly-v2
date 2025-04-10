@@ -11,10 +11,19 @@ import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals'
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import DelegationTrack from './Component/DelegationTrack';
 
-async function DelegationTrackPage({ params }: { params: Promise<{ track: string }> }) {
+interface Props {
+	params: Promise<{ track: string }>;
+}
+
+async function DelegationTrackPage({ params }: Props) {
 	const { track } = await params;
 	const user = await CookieService.getUserFromCookie();
 	const network = getCurrentNetwork();
+
+	if (!track || track === 'undefined') {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid track');
+	}
+
 	const trackNameSnakeCase = track.replace(/-/g, '_');
 	const trackOriginEntry = Object.entries(NETWORKS_DETAILS[network].trackDetails).find(([, details]) => details?.name === trackNameSnakeCase);
 	const trackOrigin = trackOriginEntry ? (trackOriginEntry[0] as EPostOrigin) : undefined;
@@ -24,11 +33,15 @@ async function DelegationTrackPage({ params }: { params: Promise<{ track: string
 	if (!user?.id) {
 		return redirectFromServer(`/login?nextUrl=/delegation/${track}`);
 	}
-	if (!trackId) {
-		throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid track');
+
+	if (!trackDetails || trackId === undefined) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid track details');
 	}
 
-	const { data: delegateTrackResponse, error: delegateTrackError } = await NextApiClientService.getDelegateTrack({ address: user?.defaultAddress, trackId });
+	const { data: delegateTrackResponse, error: delegateTrackError } = await NextApiClientService.getDelegateTrack({
+		address: user.defaultAddress,
+		trackId
+	});
 
 	if (delegateTrackError || !delegateTrackResponse) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, delegateTrackError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
