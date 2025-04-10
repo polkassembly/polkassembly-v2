@@ -10,6 +10,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
+import { Collapsible, CollapsibleContent } from '@/app/_shared-components/Collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
 import Address from '../../../Profile/Address/Address';
 import { Button } from '../../../Button';
@@ -125,7 +126,10 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 
 						return (
 							<React.Fragment key={voteData.voterAddress}>
-								<TableRow className='cursor-pointer'>
+								<TableRow
+									className={renderCollapsible ? 'cursor-pointer' : ''}
+									onClick={() => renderCollapsible && setOpenRow(isOpen ? null : voteData.voterAddress)}
+								>
 									<TableCell className='max-w-[200px] py-4'>
 										<Address address={voteData.voterAddress} />
 									</TableCell>
@@ -141,7 +145,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 									<TableCell className='py-4'>
 										{renderCollapsible && (
 											<button
-												type='submit'
+												type='button'
 												className='collapsibleButton'
 												onClick={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
 											>
@@ -150,15 +154,21 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 										)}
 									</TableCell>
 								</TableRow>
-
-								{renderCollapsible && (
-									<DelegatedVotesDropdown
-										isOpen={isOpen}
-										setOpenRow={setOpenRow}
-										voteData={voteData}
-										voterDelegations={voterDelegations}
-									/>
-								)}
+								<TableCell
+									className='p-0'
+									colSpan={5}
+								>
+									{renderCollapsible && (
+										<Collapsible open={openRow === voteData.voterAddress}>
+											<CollapsibleContent asChild>
+												<DelegatedVotesDropdown
+													voteData={voteData}
+													voterDelegations={voterDelegations}
+												/>
+											</CollapsibleContent>
+										</Collapsible>
+									)}
+								</TableCell>
 							</React.Fragment>
 						);
 					})}
