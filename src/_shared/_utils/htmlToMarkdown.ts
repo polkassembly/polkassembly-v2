@@ -55,7 +55,21 @@ export function htmlToMarkdown(html: string): string {
 		turndownService.addRule('underline', {
 			filter: ['u', 'ins'],
 			replacement(content: string) {
-				return `_${content}_`;
+				return `<u>${content}</u>`;
+			}
+		});
+
+		// Custom rule for spans with text-decoration:underline
+		turndownService.addRule('underlineSpan', {
+			filter: ['span'],
+			replacement(content: string, node: TurndownService.Node) {
+				if (node.nodeType !== 1) return content;
+				const element = node as unknown as HTMLElement;
+				const style = element.getAttribute('style');
+				if (style && style.includes('text-decoration:underline')) {
+					return `<u>${content}</u>`;
+				}
+				return content;
 			}
 		});
 
