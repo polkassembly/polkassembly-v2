@@ -6,18 +6,20 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAllowedCommentor, ENetwork, EProposalType } from '@/_shared/types';
+import { EAllowedCommentor, ENetwork, EOffChainPostTopic, EProposalType } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { updatePostServer } from '../../_api-utils/updatePostServer';
 import { RedisService } from '../redis_service';
 import { OffChainDbService } from '../offchain_db_service';
+import { FirestoreService } from '../offchain_db_service/firestore_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
 }
 
 enum EWebhookEvent {
+	OFF_CHAIN_POST_CREATED = 'off_chain_post_created',
 	POST_EDITED = 'post_edited',
 	POST_DELETED = 'post_deleted',
 	PROPOSAL_CREATED = 'proposal_created',
@@ -39,6 +41,14 @@ export class WebhookService {
 	});
 
 	private static readonly zodEventBodySchemas = {
+		[EWebhookEvent.OFF_CHAIN_POST_CREATED]: z.object({
+			index: z.number().min(0, 'Index is required'),
+			title: z.string().min(1, 'Title is required'),
+			content: z.string().min(1, 'Content is required'),
+			authorId: z.number().refine((authorId) => ValidatorService.isValidUserId(authorId), 'Not a valid author ID'),
+			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
+			topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
+		}),
 		[EWebhookEvent.POST_EDITED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType),
@@ -95,6 +105,8 @@ export class WebhookService {
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
 		switch (webhookEvent) {
+			case EWebhookEvent.OFF_CHAIN_POST_CREATED:
+				return this.handleOffChainPostCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.OFF_CHAIN_POST_CREATED]> });
 			case EWebhookEvent.POST_EDITED:
 				return this.handlePostEdited({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> });
 			case EWebhookEvent.POST_DELETED:
@@ -116,6 +128,28 @@ export class WebhookService {
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
+	}
+
+	private static async handleOffChainPostCreated({
+		network,
+		params
+	}: {
+		network: ENetwork;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.OFF_CHAIN_POST_CREATED]>;
+	}) {
+		const { index, title, content, authorId, allowedCommentor, topic } = params;
+
+		await FirestoreService.CreatePost({
+			network,
+			proposalType: EProposalType.DISCUSSION,
+			userId: authorId,
+			content,
+			title,
+			allowedCommentor,
+			tags: [],
+			topic,
+			indexOrHash: index.toString()
+		});
 	}
 
 	private static async handlePostEdited({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> }) {
@@ -153,22 +187,7 @@ export class WebhookService {
 		await RedisService.DeleteDelegationStats(network);
 	}
 
-	private static async handleOtherEvent({
-		network,
-		params
-	}: {
-		network: ENetwork;
-		params: z.infer<
-			(typeof WebhookService.zodEventBodySchemas)[
-				| EWebhookEvent.VOTED
-				| EWebhookEvent.BOUNTY_CLAIMED
-				| EWebhookEvent.DECISION_DEPOSIT_PLACED
-				| EWebhookEvent.REMOVED_VOTE
-				| EWebhookEvent.TIPPED
-				| EWebhookEvent.DELEGATED
-				| EWebhookEvent.UNDELEGATED]
-		>;
-	}) {
+	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
 		console.log('TODO: add handling for event ', { network, params });
 	}
 }
