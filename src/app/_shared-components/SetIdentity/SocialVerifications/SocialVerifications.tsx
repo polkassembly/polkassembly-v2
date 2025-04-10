@@ -82,8 +82,6 @@ function SocialVerifications() {
 			status: ENotificationStatus.SUCCESS
 		});
 
-		console.log('data', data);
-
 		setLoading(false);
 	};
 
