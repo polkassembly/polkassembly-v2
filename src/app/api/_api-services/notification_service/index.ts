@@ -58,7 +58,7 @@ export class NotificationService {
 			trigger: ENotificationTrigger.VERIFY_EMAIL,
 			args: {
 				email: email || user.email,
-				verifyUrl: `http://localhost:3000/confirm-verification?social=${ESocial.EMAIL}&token=${token}`
+				verifyUrl: `https://polkassembly-v2-git-request-judgement-polkassembly-next.vercel.app/confirm-verification?social=${ESocial.EMAIL}&token=${token}`
 				// verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
 			}
 		});
