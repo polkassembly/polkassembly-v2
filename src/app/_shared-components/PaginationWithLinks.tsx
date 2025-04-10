@@ -87,12 +87,6 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 		[searchParams, pathname]
 	);
 
-	const buildLink = (pageNumber: number) => {
-		const newSearchParams = new URLSearchParams(searchParams || undefined);
-		newSearchParams.set(pageSearchParam || 'page', String(pageNumber));
-		return `${pathname}?${newSearchParams.toString()}`;
-	};
-
 	const renderPageNumbers = () => {
 		const items: ReactNode[] = [];
 		const maxVisiblePages = 5;
@@ -102,7 +96,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				items.push(
 					<PaginationItem key={i}>
 						<PaginationLink
-							href={buildLink(i)}
+							// href={buildLink(i)}
 							onClick={() => {
 								setCurrentPage(i);
 								onClick?.(i);
@@ -118,7 +112,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 			items.push(
 				<PaginationItem key={1}>
 					<PaginationLink
-						href={buildLink(1)}
+						// href={buildLink(1)}
 						onClick={() => {
 							setCurrentPage(1);
 							onClick?.(1);
@@ -145,7 +139,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				items.push(
 					<PaginationItem key={i}>
 						<PaginationLink
-							href={buildLink(i)}
+							// href={buildLink(i)}
 							onClick={() => {
 								setCurrentPage(i);
 								onClick?.(i);
@@ -169,7 +163,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 			items.push(
 				<PaginationItem key={totalPageCount}>
 					<PaginationLink
-						href={buildLink(totalPageCount)}
+						// href={buildLink(totalPageCount)}
 						onClick={() => {
 							setCurrentPage(totalPageCount);
 							onClick?.(totalPageCount);
@@ -200,7 +194,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				<PaginationContent className='max-sm:gap-0'>
 					<PaginationItem>
 						<PaginationPrevious
-							href={buildLink(Math.max(currentPage - 1, 1))}
+							// href={buildLink(Math.max(currentPage - 1, 1))}
 							onClick={() => {
 								setCurrentPage(Math.max(currentPage - 1, 1));
 								onClick?.(Math.max(currentPage - 1, 1));
@@ -213,7 +207,7 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 					{renderPageNumbers()}
 					<PaginationItem>
 						<PaginationNext
-							href={buildLink(Math.min(currentPage + 1, totalPageCount))}
+							// href={buildLink(Math.min(currentPage + 1, totalPageCount))}
 							onClick={() => {
 								setCurrentPage(Math.min(currentPage + 1, totalPageCount));
 								onClick?.(Math.min(currentPage + 1, totalPageCount));
