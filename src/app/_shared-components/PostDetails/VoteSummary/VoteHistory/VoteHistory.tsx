@@ -14,6 +14,7 @@ import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLink
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import VoteHistoryTable from './VoteHistoryTable';
 import classes from './VoteHistory.module.scss';
 
@@ -55,7 +56,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.AYE ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						{t('PostDetails.aye')} {!!data?.totalCounts?.[EVoteDecision.AYE] && `(${data?.totalCounts?.[EVoteDecision.AYE]})`}
+						{t('PostDetails.aye')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.AYE]) && `(${data?.totalCounts?.[EVoteDecision.AYE]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
@@ -65,14 +66,14 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.NAY ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						{t('PostDetails.nay')} {!!data?.totalCounts?.[EVoteDecision.NAY] && `(${data?.totalCounts?.[EVoteDecision.NAY]})`}
+						{t('PostDetails.nay')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.NAY]) && `(${data?.totalCounts?.[EVoteDecision.NAY]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
 						value={EVoteDecision.SPLIT_ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
-						{t('PostDetails.abstain')} {!!data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN] && `(${data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]})`}
+						{t('PostDetails.abstain')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]) && `(${data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]})`}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={EVoteDecision.AYE}>

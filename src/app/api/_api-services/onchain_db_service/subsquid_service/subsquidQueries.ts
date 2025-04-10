@@ -409,13 +409,13 @@ export class SubsquidQueries {
 					decision
 				}
 			}
-    yesCount:  convictionVotesConnection(where: {decision_eq: yes,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+			yesCount:  convictionVotesConnection(where: {decision_eq: yes,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-       noCount:  convictionVotesConnection(where: {decision_eq: no,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+			noCount:  convictionVotesConnection(where: {decision_eq: no,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
-      abstainCount:  convictionVotesConnection(where: {decision_eq: abstain,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+			abstainCount:  convictionVotesConnection(where: {decision_eq: abstain,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
@@ -472,7 +472,7 @@ export class SubsquidQueries {
 			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes}, orderBy: id_ASC) {
 				totalCount
 			}
-				noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no}, orderBy: id_ASC) {
+			noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
@@ -517,13 +517,13 @@ export class SubsquidQueries {
 					decision
 				}
 			}    
-    yesCount:  convictionVotesConnection(where: { AND:{balance:{aye_not_eq: "0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [yes, abstain]}, orderBy: id_ASC) {
+			yesCount:  convictionVotesConnection(where: {AND:{balance:{aye_not_eq:"0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [yes, abstain]}, orderBy: id_ASC) {
 				totalCount
 			}
-      noCount:  convictionVotesConnection(where: {AND:{balance:{nay_not_eq: "0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [no, abstain]}, orderBy: id_ASC) {
+			 noCount:  convictionVotesConnection(where: {AND:{balance:{nay_not_eq: "0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [no, abstain]}, orderBy: id_ASC) {
 				totalCount
 			}
-    abstainCount: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: abstain}, orderBy: id_ASC) {
+			abstainCount: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: abstain}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
