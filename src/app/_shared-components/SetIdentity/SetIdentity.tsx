@@ -169,7 +169,7 @@ function SetIdentity() {
 		<SetIdentityFees
 			onNext={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
 			onRequestJudgement={() => setStep(ESetIdentityStep.SOCIAL_VERIFICATION)}
-			disabledRequestJudgement={!identityValues?.display || !identityValues?.email}
+			disabledRequestJudgement={!identityValues?.display || !identityValues?.email || !identityValues?.hash}
 			registrarFee={registrarFee || BN_ZERO}
 		/>
 	) : step === ESetIdentityStep.SOCIAL_VERIFICATION ? (

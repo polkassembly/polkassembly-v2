@@ -774,7 +774,11 @@ export class NextApiClientService {
 		const queryParams = new URLSearchParams({
 			address
 		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_SOCIAL_HANDLES, routeSegments: [userId.toString(), 'socials'], queryParams });
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_USER_SOCIAL_HANDLES,
+			routeSegments: [userId.toString(), 'socials'],
+			queryParams
+		});
 		return this.nextApiClientFetch<{ socialHandles: Record<ESocial, ISocialHandle> }>({ url, method });
 	}
 

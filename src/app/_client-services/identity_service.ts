@@ -202,7 +202,6 @@ export class IdentityService {
 							// eslint-disable-next-line sonarjs/no-duplicate-string
 							setStatus?.('Transaction failed');
 							console.log('Transaction failed');
-							setStatus?.('Transaction failed');
 							const dispatchError = (event.data as any)?.dispatchError;
 							isFailed = true;
 
@@ -238,17 +237,23 @@ export class IdentityService {
 			});
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	async getOnChainIdentity(address: string): Promise<IOnChainIdentity> {
 		const encodedQueryAddress = getEncodedAddress(address, this.network) || address;
 		const parentProxyInfo = await this.getParentProxyInfo({ address: encodedQueryAddress });
 		const encodedAddress = parentProxyInfo?.address ? getEncodedAddress(parentProxyInfo.address, this.network) : encodedQueryAddress;
 
-		const identityInfo: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress).then((res: any) => res?.toHuman()?.[0] || res?.toHuman());
+		const identityInfoRes: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress);
+
+		const identityInfo = await (identityInfoRes?.toHuman()?.[0] || identityInfoRes?.toHuman?.());
+		const identityHashInfo = await (identityInfoRes?.unwrap()?.[0] || identityInfoRes?.unwrapOr?.(null));
 
 		const { isGood, unverified } = IdentityService.processIdentityInfo(identityInfo);
+
 		const verifiedByPolkassembly = this.checkVerifiedByPolkassembly(identityInfo);
+
 		const identity = identityInfo?.info;
-		const identityHash = identityInfo?.info?.hash?.toHex();
+		const identityHash = identityHashInfo?.info?.hash?.toHex();
 
 		return {
 			discord: identity?.discord?.Raw || '',

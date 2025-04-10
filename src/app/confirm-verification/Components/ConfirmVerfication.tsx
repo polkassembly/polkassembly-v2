@@ -5,20 +5,16 @@
 'use client';
 
 import { ENotificationStatus, ESocial } from '@/_shared/types';
+import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useToast } from '@/hooks/useToast';
-import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 function ConfirmVerfication({ token, social, twitterOauthVerifier }: { token: string; social: ESocial; twitterOauthVerifier: string }) {
 	const [isLoading, setIsLoading] = useState(true);
-	const { user } = useUser();
+	const user = CookieClientService.getAccessTokenPayload();
 	const { toast } = useToast();
-
-	useEffect(() => {
-		window.location.reload();
-	}, []);
 
 	useEffect(() => {
 		const verifySocial = async () => {

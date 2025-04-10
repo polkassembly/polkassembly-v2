@@ -23,7 +23,7 @@ export const getOauthConsumer = (network: ENetwork) => {
 		TWITTER_CONSUMER_API_SECRET_KEY,
 		'1.0A',
 		`https://polkassembly-v2-git-request-judgement-polkassembly-next.vercel.app/confirm-verification?social=${ESocial.TWITTER}`,
-		// 'http://localhost:3000/confirm-verification',
+		// `http://localhost:3000/confirm-verification?social=${ESocial.TWITTER}`,
 		'HMAC-SHA1'
 	);
 };

@@ -31,7 +31,7 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 		return matrixSocialHandle.status;
 	}, [matrixSocialHandle, identityMatrix]);
 
-	const verifyEmail = async () => {
+	const verifyRiot = async () => {
 		if (!user || !identityMatrix || !userPreferences.address?.address) return;
 
 		setLoading(true);
@@ -75,7 +75,7 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 						/>
 					</div>
 				</div>
-				<p className='text-sm text-wallet_btn_text'>{t('SetIdentity.email')}</p>
+				<p className='text-sm text-wallet_btn_text'>{t('SetIdentity.riot')}</p>
 			</div>
 			<div
 				className={cn(
@@ -97,7 +97,7 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 				) : (
 					<Button
 						disabled={riotStatus !== ESocialVerificationStatus.UNVERIFIED}
-						onClick={verifyEmail}
+						onClick={verifyRiot}
 						isLoading={loading}
 						size='sm'
 					>

@@ -1453,7 +1453,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		await this.userSocialsCollectionRef()
 			.doc(newSocialVerificationId)
-			.set({ ...socialHandle, verificationToken }, { merge: true });
+			.set({ ...socialHandle, ...(verificationToken && { verificationToken }) }, { merge: true });
 		return { ...socialHandle, verificationToken: { token: verificationToken?.token } };
 	}
 

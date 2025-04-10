@@ -8,15 +8,14 @@ import { useEffect, useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { useQuery } from '@tanstack/react-query';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
-import { Skeleton } from '../../Skeleton';
 import EmailVerification from './EmailVerification';
 import TwitterVerification from './TwitterVerification';
 import RiotVerification from './RiotVerification';
 import { Separator } from '../../Separator';
 import { Button } from '../../Button';
+import LoadingLayover from '../../LoadingLayover';
 
 function SocialVerifications() {
 	const t = useTranslations();
@@ -31,6 +30,7 @@ function SocialVerifications() {
 
 	const fetchUserSocialHandles = async () => {
 		if (!user || !userPreferences.address?.address) return null;
+
 		const { data, error } = await NextApiClientService.fetchUserSocialHandles({ userId: user.id, address: userPreferences.address.address });
 
 		if (error || !data) {
@@ -41,11 +41,7 @@ function SocialVerifications() {
 	const { data: socialHandles, isFetching } = useQuery({
 		queryKey: ['socials', user?.id, userPreferences.address?.address],
 		queryFn: () => fetchUserSocialHandles(),
-		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI,
-		retry: false,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false
+		placeholderData: (previousData) => previousData
 	});
 
 	useEffect(() => {
@@ -85,27 +81,9 @@ function SocialVerifications() {
 		setLoading(false);
 	};
 
-	if (isFetching) {
-		return (
-			<div className='flex flex-col gap-y-2'>
-				<div className='flex items-center gap-x-4'>
-					<Skeleton className='h-10 w-10 rounded-full' />
-					<Skeleton className='h-4 flex-1 rounded-lg' />
-				</div>
-				<div className='flex items-center gap-x-4'>
-					<Skeleton className='h-10 w-10 rounded-full' />
-					<Skeleton className='h-4 flex-1 rounded-lg' />
-				</div>
-				<div className='flex items-center gap-x-4'>
-					<Skeleton className='h-10 w-10 rounded-full' />
-					<Skeleton className='h-4 flex-1 rounded-lg' />
-				</div>
-			</div>
-		);
-	}
-
 	return (
-		<div className='flex flex-col gap-y-6'>
+		<div className='relative flex flex-col gap-y-6'>
+			{isFetching && <LoadingLayover />}
 			{identityValues?.email && (
 				<EmailVerification
 					identityEmail={identityValues.email}
@@ -129,8 +107,11 @@ function SocialVerifications() {
 				<Button
 					isLoading={loading}
 					disabled={
+						!socialHandles ||
 						Object.values(socialHandles || {}).length === 0 ||
-						Object.values(socialHandles || {}).some((handle) => handle?.status === ESocialVerificationStatus.UNVERIFIED || handle?.status === ESocialVerificationStatus.PENDING)
+						(!!identityValues?.email && socialHandles?.[ESocial.EMAIL]?.status !== ESocialVerificationStatus.VERIFIED) ||
+						(!!identityValues?.twitter && socialHandles?.[ESocial.TWITTER]?.status !== ESocialVerificationStatus.VERIFIED) ||
+						(!!identityValues?.matrix && socialHandles?.[ESocial.RIOT]?.status !== ESocialVerificationStatus.VERIFIED)
 					}
 					onClick={proceedForJudgement}
 				>
