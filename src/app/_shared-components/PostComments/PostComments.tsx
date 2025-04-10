@@ -12,6 +12,7 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
+import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
 function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
@@ -28,7 +29,10 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 		queryKey: ['comments', proposalType, index],
 		queryFn: () => fetchComments(),
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
 	});
 
 	return (
@@ -36,6 +40,15 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 			<p className={classes.title}>
 				{t('PostDetails.comments')} <span className='text-base font-normal'>({data?.length})</span>
 			</p>
+
+			<div className={classes.summaryComponent}>
+				<AISummaryCollapsible
+					indexOrHash={index}
+					proposalType={proposalType}
+					summaryType='allComments'
+				/>
+			</div>
+
 			{isFetching ? (
 				<Skeleton className='h-4' />
 			) : (

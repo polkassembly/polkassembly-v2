@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser } from '@/_shared/types';
+import { EDataSource, EPostOrigin, EProposalType, IPostListing, IGenericListingResponse, IPublicUser, ENetwork } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -14,6 +14,8 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { encodeAddress, cryptoWaitReady } from '@polkadot/util-crypto';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
 // 1.1 if user is logged in fetch all posts where status is active and user has not voted, sorted by createdAt
 // 1.2 if user is not logged in fetch all posts where status is active, sorted by createdAt
@@ -60,7 +62,8 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	// Fetch network and authenticate user in parallel
 	const [network, authResult] = await Promise.all([
 		getNetworkFromHeaders(),
-		AuthService.ValidateAuthAndRefreshTokens().catch(() => ({ newAccessToken: undefined, newRefreshToken: undefined }))
+		AuthService.ValidateAuthAndRefreshTokens().catch(() => ({ newAccessToken: undefined, newRefreshToken: undefined })),
+		cryptoWaitReady()
 	]);
 
 	const { newAccessToken: accessToken, newRefreshToken: refreshToken } = authResult;
@@ -75,7 +78,9 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	// Fetch user addresses if authenticated (needed for filtering posts not voted by user)
 	const userAddressesPromise =
-		isUserAuthenticated && userId ? OffChainDbService.GetAddressesForUserId(userId).then((addresses) => addresses.map((a) => a.address)) : Promise.resolve([]);
+		isUserAuthenticated && userId
+			? OffChainDbService.GetAddressesForUserId(userId).then((addresses) => addresses.map((a) => encodeAddress(a.address, NETWORKS_DETAILS[network as ENetwork].ss58Format)))
+			: Promise.resolve([]);
 
 	// Fetch user addresses first, then use them for on-chain posts query
 	const userAddresses = await userAddressesPromise;

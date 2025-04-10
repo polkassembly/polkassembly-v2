@@ -1,0 +1,84 @@
+.card {
+	@apply relative z-10 mt-4 rounded-[11.5px] bg-[var(--sidebar-background)] p-[2px] text-center;
+}
+
+@property --angle {
+	syntax: '<angle>';
+	initial-value: 0deg;
+	inherits: false;
+}
+
+.card::after,
+.card::before {
+	content: '';
+	@apply absolute left-1/2 top-1/2 z-[-10] h-full w-full -translate-x-1/2 -translate-y-1/2 rounded-[11.5px] p-[2px];
+	background-image: conic-gradient(from var(--angle), #4ffaff, #3c76f4, #0437a7, #4ffaff);
+
+	animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		--angle: 0deg;
+	}
+
+	to {
+		--angle: 360deg;
+	}
+}
+
+.trigger {
+	@apply flex h-9 cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
+}
+
+.triggerCollapsed {
+	@apply p-[5px];
+}
+
+.triggerExpanded {
+	@apply p-[2px] py-[4px];
+}
+
+.triggerText {
+	@apply text-lg font-medium leading-4 text-sidebar_foreground;
+}
+
+.triggerIcon {
+	@apply ml-1 text-lg text-sidebar_foreground;
+}
+
+.popoverContent {
+	@apply w-52 rounded-xl border-none bg-[var(--sidebar-primary-foreground)] p-1.5 text-text_primary shadow-md dark:bg-[var(--sidebar-accent-foreground)];
+}
+
+.menuList {
+	@apply flex flex-col gap-2;
+}
+
+.menuItem {
+	@apply flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 transition-colors ease-in-out;
+
+	&:hover {
+		@apply bg-[var(--sidebar-accent)];
+	}
+
+	&:hover.dark {
+		@apply bg-[var(--sidebar-background)];
+	}
+}
+
+.menuLink {
+	@apply text-sm font-medium text-text_primary;
+
+	.dark & {
+		@apply text-[var(--sidebar-foreground)];
+	}
+}
+
+.newBadge {
+	@apply absolute right-[-12px] top-[-5px] rounded-full bg-[var(--sidebar-ring)] px-[0.4rem] py-[0.1rem] text-xs text-[var(--sidebar-primary-foreground)];
+}
+
+.menuItemIcon {
+	@apply h-6 w-6;
+}

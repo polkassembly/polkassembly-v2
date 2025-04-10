@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Home from '@assets/sidebar/homeicon.svg';
+import All from '@assets/activityfeed/All.svg';
 import Discussion from '@assets/sidebar/discussion-icon.svg';
 import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
@@ -149,6 +150,11 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							items: ActiveItems(
 								[
 									{
+										title: t('ActivityFeed.Navbar.All'),
+										url: '/all',
+										icon: All
+									},
+									{
 										title: t('Sidebar.treasury'),
 										url: '',
 										icon: TreasuryIcon,
@@ -175,21 +181,21 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				),
 				endItems: ActiveItems(
 					[
-						{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics', icon: GovAnalytics },
-						{ title: t('Sidebar.calendar'), url: '/calendar', icon: CalendarIcon },
+						{ title: t('Sidebar.govAnalytics'), url: '#', icon: GovAnalytics },
+						{ title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
 						{
 							title: t('Sidebar.community'),
-							url: '/community',
+							url: '#',
 							icon: CommunityIcon,
 							items: [
-								{ title: t('Sidebar.members'), url: '/members' },
-								{ title: t('Sidebar.ecosystemProjects'), url: '/ecosystem-projects' }
+								{ title: t('Sidebar.members'), url: '#' },
+								{ title: t('Sidebar.ecosystemProjects'), url: '#' }
 							]
 						},
-						{ title: t('Sidebar.parachains'), url: '/parachains', icon: ParachainsIcon },
+						{ title: t('Sidebar.parachains'), url: '#', icon: ParachainsIcon },
 						{
 							title: t('Sidebar.archived'),
-							url: '/archived',
+							url: '#',
 							icon: ArchivedIcon,
 							items: [
 								{

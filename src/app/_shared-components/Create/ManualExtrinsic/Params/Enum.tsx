@@ -88,7 +88,7 @@ function EnumComp({ param, onChange, defaultValue, registry }: { param: IParamDe
 	return (
 		<div className='flex flex-col gap-y-2'>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='flex w-full items-center rounded border border-border_grey px-4 py-2'>{current?.[0]?.name || ''}</DropdownMenuTrigger>
+				<DropdownMenuTrigger>{current?.[0]?.name || ''}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{options.map((option) => (
 						<DropdownMenuItem

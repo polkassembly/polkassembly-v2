@@ -63,8 +63,8 @@ function ReactionBar({
 	};
 
 	const handleShare = () => {
-		const titlePart = postData?.title ? ` for ${postData.title}` : '';
-		const message = `The referendum${titlePart} is now live for @Polkassembly \nCast your vote here: ${global?.window?.location?.href}`;
+		const titlePart = postData?.title ? `for "${postData.title}"` : '';
+		const message = `The referendum ${titlePart} is now live for @Polkassembly \nCast your vote here: ${global?.window?.location?.href}`;
 		const twitterParameters = [`text=${encodeURIComponent(message)}`, `via=${encodeURIComponent('polk_gov')}`];
 		const url = `https://twitter.com/intent/tweet?${twitterParameters.join('&')}`;
 		global?.window?.open(url);
@@ -80,8 +80,9 @@ function ReactionBar({
 			setIsDialogOpen(true);
 		}
 	};
+	const isCurrentlySubscribed = postData?.userSubscriptionId || isSubscribed;
 	return (
-		<div className='mb-4 flex items-center justify-between text-xs text-navbar_border'>
+		<div className='mb-1.5 flex items-center justify-between text-xs text-navbar_border'>
 			<div className='flex space-x-5'>
 				<ReactionButton
 					type={EReaction.like}
@@ -111,7 +112,11 @@ function ReactionBar({
 				/>
 
 				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
+					<DropdownMenuTrigger
+						asChild
+						className='border-none'
+						noArrow
+					>
 						<BsThreeDots className='text-lg text-bg_pink' />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent
@@ -123,8 +128,10 @@ function ReactionBar({
 								className='cursor-pointer'
 								onClick={() => handleAuthenticatedAction(handleSubscribe)}
 							>
-								{isSubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
-								<span className={`${isSubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>{isSubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
+								{isCurrentlySubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
+								<span className={`${isCurrentlySubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>
+									{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}
+								</span>
 							</DropdownMenuItem>
 						)}
 						<DropdownMenuItem

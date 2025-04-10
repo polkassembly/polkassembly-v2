@@ -1,11 +1,11 @@
 .rootClass {
-    @apply flex h-full w-full items-start justify-center p-8 sm:p-10
+	@apply flex h-full w-full items-start justify-center p-8 sm:p-10;
 }
 
 .createDiscussionComp {
-    @apply shadow-lg bg-bg_modal w-full
+	@apply mx-auto w-full max-w-4xl bg-bg_modal shadow-lg;
 }
 
 .header {
-    @apply border-b border-border_grey p-4
+	@apply border-b border-border_grey p-4;
 }

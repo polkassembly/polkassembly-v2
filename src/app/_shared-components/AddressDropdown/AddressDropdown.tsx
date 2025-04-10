@@ -6,16 +6,16 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { EWallet } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { AlertCircle } from 'lucide-react';
 import classes from './AddressDropdown.module.scss';
 import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
 import Address from '../Profile/Address/Address';
+import { Skeleton } from '../Skeleton';
 
 function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (account: InjectedAccount) => void; withBalance?: boolean; disabled?: boolean }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
@@ -24,11 +24,15 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 
 	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
 
-	const getAccounts = async (chosenWallet: EWallet): Promise<undefined> => {
-		if (!walletService) return;
-		const injectedAccounts = await walletService?.getAddressesFromWallet(chosenWallet);
+	const [accountsLoading, setAccountsLoading] = useState(true);
+
+	const getAccounts = useCallback(async () => {
+		if (!walletService || !userPreferences?.wallet) return;
+		setAccountsLoading(true);
+		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
 
 		if (injectedAccounts.length === 0) {
+			setAccounts([]);
 			return;
 		}
 
@@ -37,12 +41,13 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 			...userPreferences,
 			address: injectedAccounts[0]
 		});
-	};
-
-	useEffect(() => {
-		if (userPreferences?.wallet) getAccounts(userPreferences.wallet);
+		setAccountsLoading(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userPreferences?.wallet, walletService]);
+
+	useEffect(() => {
+		getAccounts();
+	}, [getAccounts]);
 
 	const onAccountChange = (a: InjectedAccount) => {
 		setUserPreferences({ ...userPreferences, address: a });
@@ -50,6 +55,14 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 	};
 
 	if (!userPreferences.wallet) return <div className={classes.fallbackText}>{t('AddressDropdown.fallbackText')}</div>;
+
+	if (accountsLoading)
+		return (
+			<div className='flex flex-col gap-y-2'>
+				<Skeleton className='h-8 w-full' />
+				<Skeleton className='h-5 w-1/2' />
+			</div>
+		);
 
 	return !accounts || accounts.length === 0 ? (
 		<Alert
@@ -74,7 +87,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 				</div>
 				<DropdownMenuTrigger
 					disabled={disabled}
-					className={classes.dropdownTrigger}
+					className='normal-case'
 				>
 					<Address
 						address={userPreferences?.address?.address || ''}
@@ -99,6 +112,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 								walletAddressName={item.name}
 								iconSize={25}
 								redirectToProfile={false}
+								disableTooltip
 							/>
 						</button>
 					</DropdownMenuItem>

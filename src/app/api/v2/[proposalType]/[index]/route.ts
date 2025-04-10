@@ -4,19 +4,19 @@
 
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
-import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { ValidatorService } from '@shared/_services/validator_service';
 import { EAllowedCommentor, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
 import { COOKIE_HEADER_ACTION_NAME } from '@/_shared/_constants/cookieHeaderActionName';
+import { updatePostServer } from '@/app/api/_api-utils/updatePostServer';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { StatusCodes } from 'http-status-codes';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -103,44 +103,50 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		content: z.string().min(1, 'Content is required'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
 	});
 
 	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
 
-	const formattedContent = convertContentForFirestoreServer(content);
+	await updatePostServer({ network, proposalType, indexOrHash: index, content, title, allowedCommentor, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
 
-	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
-		await OffChainDbService.UpdateOffChainPost({
-			network,
-			indexOrHash: index,
-			proposalType: proposalType as EProposalType,
-			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content: formattedContent,
-			title,
-			allowedCommentor
-		});
-	} else {
-		await OffChainDbService.UpdateOnChainPost({
-			network,
-			indexOrHash: index,
-			proposalType: proposalType as EProposalType,
-			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content: formattedContent,
-			title,
-			allowedCommentor
-		});
+	const response = NextResponse.json({ message: 'Post updated successfully' });
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
+});
+
+// delete off-chain post (soft-delete)
+export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType, index } = zodParamsSchema.parse(await params);
+
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	const network = await getNetworkFromHeaders();
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
+	const post = await OffChainDbService.GetOffChainPostData({ network, proposalType, indexOrHash: index });
+
+	if (!post) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 	}
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
+	if (post.userId !== userId) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash: index });
 
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
-	const response = NextResponse.json({ message: 'Post updated successfully' });
+	const response = NextResponse.json({ message: 'Post deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

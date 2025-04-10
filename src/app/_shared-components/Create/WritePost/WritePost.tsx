@@ -12,15 +12,18 @@ import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
 import { MessageCircleWarning } from 'lucide-react';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
-import BlockEditor from '../../BlockEditor/BlockEditor';
+import { useRef } from 'react';
+import { MDXEditorMethods } from '@mdxeditor/editor';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
 import classes from './WritePost.module.scss';
+import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostFormFields>; disabled?: boolean }) {
 	const t = useTranslations();
+	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
 	const allowedCommentorsOptions = [
 		{
@@ -84,12 +87,12 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					<FormItem>
 						<FormLabel>{t('Create.description')}*</FormLabel>
 						<FormControl>
-							<BlockEditor
-								className={classes.editor}
-								id='write-post-editor'
+							<MarkdownEditor
+								markdown={field.value || ''}
 								onChange={(data) => {
 									field.onChange(data);
 								}}
+								ref={markdownEditorRef}
 							/>
 						</FormControl>
 

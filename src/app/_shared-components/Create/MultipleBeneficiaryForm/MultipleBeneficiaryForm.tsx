@@ -1,22 +1,24 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { Minus, Plus } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
-import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
 import { Button } from '@/app/_shared-components/Button';
-import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
-import { IBeneficiary } from '@/_shared/types';
+import { IBeneficiaryInput } from '@/_shared/types';
+import { dayjs } from '@shared/_utils/dayjsInit';
+import BeneficiaryInputs from './BeneficiaryInputs';
 
 function MultipleBeneficiaryForm({
 	onChange,
 	beneficiaries,
-	disabledMultiAsset
+	multiAsset,
+	stagedPayment
 }: {
-	onChange: (beneficiary: IBeneficiary[]) => void;
-	beneficiaries: IBeneficiary[];
-	disabledMultiAsset?: boolean;
+	onChange: (beneficiary: IBeneficiaryInput[]) => void;
+	beneficiaries: IBeneficiaryInput[];
+	multiAsset?: boolean;
+	stagedPayment?: boolean;
 }) {
 	const t = useTranslations();
 
@@ -33,50 +35,40 @@ function MultipleBeneficiaryForm({
 		onChange(newArray);
 	};
 
+	const handleValidFromChange = ({ validFrom, isInvalid, index }: { validFrom?: BN; isInvalid?: boolean; index: number }) => {
+		const newArray = [...beneficiaries];
+		newArray[`${index}`].validFromBlock = validFrom ? validFrom.toString() : undefined;
+		newArray[`${index}`].isInvalid = isInvalid;
+		onChange(newArray);
+	};
+
 	const addBeneficiary = () => {
-		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null }]);
+		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
 	};
 
 	const removeBeneficiary = (index: number) => {
-		onChange(beneficiaries.filter((_, i) => i !== index));
+		const newArray = [...beneficiaries];
+		newArray.splice(index, 1);
+		onChange(newArray);
 	};
 
 	return (
-		<div className='flex flex-col gap-y-4'>
+		<div className='flex flex-col gap-y-1'>
+			<p className='text-sm text-wallet_btn_text'>{t('CreatePreimage.beneficiary')}</p>
 			<div className='flex flex-col gap-y-6'>
-				{beneficiaries.map((_, index) => (
-					<div
-						// eslint-disable-next-line react/no-array-index-key
-						key={index}
-						className='flex w-full flex-col gap-y-2'
-					>
-						<div className='flex items-end gap-x-2'>
-							<div className='flex-1'>
-								<p className='mb-1 text-sm text-wallet_btn_text'>{t('CreateTreasuryProposal.beneficiary')}</p>
-								<AddressInput
-									className='flex-1'
-									onChange={(value) => handleBeneficiaryChange({ beneficiary: value, index })}
-								/>
-							</div>
-							<BalanceInput
-								disabledMultiAsset={disabledMultiAsset}
-								label={t('CreateTreasuryProposal.amount')}
-								onChange={({ value, assetId }) => handleAmountChange({ amount: value, assetId, index })}
-							/>
-						</div>
-						{beneficiaries.length > 1 && (
-							<div className='flex w-full justify-end text-text_pink'>
-								<Button
-									onClick={() => removeBeneficiary(index)}
-									variant='ghost'
-									size='sm'
-									leftIcon={<Minus />}
-								>
-									{t('CreatePreimage.removeItem')}
-								</Button>
-							</div>
-						)}
-					</div>
+				{beneficiaries.map((b, index) => (
+					<BeneficiaryInputs
+						key={b.id}
+						index={index}
+						beneficiaries={beneficiaries}
+						onBeneficiaryChange={({ beneficiary }) => handleBeneficiaryChange({ beneficiary, index })}
+						onAmountChange={({ amount, assetId }) => handleAmountChange({ amount, assetId, index })}
+						onValidFromChange={({ validFrom, isInvalid }) => handleValidFromChange({ validFrom, isInvalid, index })}
+						onRemoveBeneficiary={() => removeBeneficiary(index)}
+						multiAsset={multiAsset}
+						stagedPayment={stagedPayment}
+						beneficiary={b}
+					/>
 				))}
 			</div>
 			<div className='flex justify-end text-text_pink'>
@@ -84,7 +76,7 @@ function MultipleBeneficiaryForm({
 					onClick={addBeneficiary}
 					variant='ghost'
 					size='sm'
-					leftIcon={<Plus />}
+					leftIcon={<PlusCircle />}
 				>
 					{t('CreatePreimage.addItem')}
 				</Button>

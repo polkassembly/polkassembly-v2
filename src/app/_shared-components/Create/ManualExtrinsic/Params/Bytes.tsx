@@ -28,7 +28,7 @@ function BytesInput({ onChange, ...props }: BytesInputProps) {
 
 	return (
 		<div>
-			<div className='mb-1 flex w-full justify-end'>
+			<div className='mb-1 flex w-full justify-end gap-x-1'>
 				<span className='text-sm text-text_primary'>{t('CreatePreimage.uploadFile')}</span>
 				<Switch
 					checked={isFileDrop}

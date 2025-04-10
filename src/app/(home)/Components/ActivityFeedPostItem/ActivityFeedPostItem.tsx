@@ -18,52 +18,54 @@ import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { BN } from '@polkadot/util';
 import Address from '@ui/Profile/Address/Address';
-import dynamic from 'next/dynamic';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { usePostReactions } from '@/hooks/usePostReactions';
+import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
 import CommentModal from '../CommentModal/CommentModal';
 import ReactionBar from '../ReactionBar';
 
-const BlockEditor = dynamic(() => import('@ui/BlockEditor/BlockEditor'), { ssr: false });
-
 function ActivityFeedPostItem({
 	postData,
 	voteButton = true,
 	commentBox = true,
-	preventClick
+	preventClick,
+	onUnsubscribe
 }: {
 	postData: IPostListing;
 	voteButton?: boolean;
 	commentBox?: boolean;
 	preventClick?: boolean;
+	onUnsubscribe?: (postId: string | number) => void;
 }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const isInSubscriptionTab = useMemo(() => {
-		return searchParams.get('tab') === EActivityFeedTab.SUBSCRIBED;
+		return searchParams?.get('tab') === EActivityFeedTab.SUBSCRIBED;
 	}, [searchParams]);
 	const t = useTranslations();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const isSubscribed = !!postData?.userSubscriptionId || isInSubscriptionTab;
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, handleSubscribe } = usePostReactions({
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
-		isSubscribed
+		isSubscribed: !!postData?.userSubscriptionId || isInSubscriptionTab
 	});
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -73,6 +75,23 @@ function ActivityFeedPostItem({
 			router.push('/login');
 		} else {
 			setIsDialogOpen(true);
+		}
+	};
+
+	const handleSubscribeClick = async () => {
+		try {
+			if (!ValidatorService.isValidNumber(postData?.index) && !postData?.hash) {
+				throw new ClientError(ERROR_CODES.INVALID_PARAMS_ERROR, 'Post index or hash is undefined');
+			}
+
+			const result = (await handleSubscribe()) as SubscriptionResult;
+
+			if (isInSubscriptionTab && result.wasUnsubscribed && !result.error) {
+				onUnsubscribe?.((postData?.index ?? postData?.hash)!);
+			}
+		} catch (error) {
+			console.error('Error handling subscription:', error);
+			// TODO: add toast instead of console.error
 		}
 	};
 
@@ -170,11 +189,15 @@ function ActivityFeedPostItem({
 					</span>
 					<span>in</span>
 					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
-					<span>|</span>
-					<span className='flex items-center gap-2'>
-						<FaRegClock className='text-sm' />
-						{dayjs.utc(postData.onChainInfo?.createdAt).fromNow()}
-					</span>
+					{postData.onChainInfo?.createdAt && (
+						<>
+							<span>|</span>
+							<span className='flex items-center gap-2'>
+								<FaRegClock className='text-sm' />
+								{dayjs(postData.onChainInfo?.createdAt).fromNow()}
+							</span>
+						</>
+					)}
 				</div>
 				<VotingProgress
 					timeRemaining={timeRemaining}
@@ -187,24 +210,16 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Post Content Section */}
-			<div className='flex gap-2'>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>#{postData.index}</h3>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{postData.title}</h3>
-			</div>
-			<div className='mb-4 text-sm text-btn_secondary_text'>
-				<div className='flex max-h-40 w-full overflow-hidden border-none'>
-					<BlockEditor
-						data={postData.content}
-						readOnly
-						id={`post-content-${postData.index}`}
-					/>
+			<div>
+				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{`#${postData.index} ${postData.title}`}</h3>
+				<div className='mb-4 text-sm text-btn_secondary_text'>
+					<div className='flex w-full overflow-hidden border-none'>
+						<MarkdownViewer
+							markdown={postData.content}
+							truncate
+						/>
+					</div>
 				</div>
-				<Link
-					href={`/referenda/${postData.index}`}
-					className='relative z-50 ml-1 cursor-pointer text-xs font-medium text-blue-600'
-				>
-					{t('ActivityFeed.PostItem.readMore')}
-				</Link>
 			</div>
 
 			{/* Metrics Section */}
@@ -228,7 +243,7 @@ function ActivityFeedPostItem({
 				</div>
 			)}
 
-			<hr className='my-4 border-[0.7px] border-primary_border' />
+			<hr className='mb-1 mt-3.5 border-[0.7px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
 			{commentBox && (
@@ -247,7 +262,7 @@ function ActivityFeedPostItem({
 						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}
 						isSubscribed={isSubscribed}
-						handleSubscribe={handleSubscribe}
+						handleSubscribe={handleSubscribeClick}
 					/>
 
 					<CommentInput
