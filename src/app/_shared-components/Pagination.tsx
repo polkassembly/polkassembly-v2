@@ -41,18 +41,16 @@ PaginationItem.displayName = 'PaginationItem';
 type PaginationLinkProps = {
 	isActive?: boolean;
 	href: string;
-	scroll?: boolean;
 	prefetch?: boolean;
 } & Pick<ButtonProps, 'size'> &
 	React.ComponentProps<'a'>;
 
-function PaginationLink({ className, children, isActive, href, scroll = true, prefetch, size = 'pagination', ...props }: PaginationLinkProps) {
+function PaginationLink({ className, children, isActive, href, prefetch, size = 'pagination', ...props }: PaginationLinkProps) {
 	return (
 		<Link
 			href={href}
 			aria-current={isActive ? 'page' : undefined}
 			className={cn(isActive ? buttonVariants.secondary : buttonVariants.pagination, buttonSizes[`${size}`], 'cursor-pointer', className)}
-			scroll={scroll}
 			prefetch={prefetch}
 			{...props}
 		>
