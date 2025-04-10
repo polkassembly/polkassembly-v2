@@ -4,7 +4,6 @@
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { EProposalStatus, EProposalType } from '@/_shared/types';
-import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 import BountyDashboard from './Components';
 
 async function page() {
@@ -22,23 +21,14 @@ async function page() {
 		statuses: [EProposalStatus.Active, EProposalStatus.Extended]
 	});
 
-	const { data: bountyProposals } = await NextApiClientService.fetchListingData({
-		proposalType: EProposalType.REFERENDUM_V2,
-		page: 1,
-		preimageSection: 'Bounties',
-		statuses: DECIDING_PROPOSAL_STATUSES
-	});
-
 	const { data: userActivities } = await NextApiClientService.fetchBountiesUserActivity();
 
-	console.log('bountyProposals', bountyProposals);
 	return (
 		<div className='grid grid-cols-1 gap-2 p-5 sm:p-10'>
 			<BountyDashboard
 				tokenPrice={Number(tokenPrice)}
 				bountiesStats={bountiesStats}
 				hotBounties={hotBounties}
-				bountyProposals={bountyProposals}
 				userActivities={userActivities}
 			/>
 		</div>

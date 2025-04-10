@@ -27,8 +27,13 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 		if (!api) {
 			return () => {};
 		}
+
 		const interval = setInterval(() => {
-			api.scrollNext();
+			if (api.canScrollNext()) {
+				api.scrollNext();
+			} else {
+				api.scrollTo(0);
+			}
 		}, 3000);
 
 		return () => clearInterval(interval);

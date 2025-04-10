@@ -17,6 +17,7 @@ import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import Link from 'next/link';
 import styles from './Bounty.module.scss';
 
 export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: number }) {
@@ -46,7 +47,12 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 				<h3 className='font-pixelify text-3xl font-bold text-btn_secondary_text'>
 					🔥 Hot Bounties <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
 				</h3>
-				<p className={`${spaceGroteskFont.className} text-2xl font-bold text-navbar_border`}>{t('viewAll')}</p>
+				<Link
+					href='/bounties-listing'
+					className={`${spaceGroteskFont.className} text-2xl font-bold text-navbar_border`}
+				>
+					{t('viewAll')}
+				</Link>
 			</div>
 			<div className='relative'>
 				<Carousel
@@ -63,7 +69,10 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 								key={bounty.index}
 								className='pl-6 md:basis-1/2 lg:basis-1/3'
 							>
-								<div className='relative mx-auto max-w-[363px] overflow-hidden xl:max-w-[420px]'>
+								<Link
+									href={`/bounty/${bounty.index}`}
+									className='relative mx-auto max-w-[363px] overflow-hidden xl:max-w-[420px]'
+								>
 									<div className='flex w-full'>
 										<div className={styles.hotbounties_wrapper}>
 											<div className='flex items-baseline gap-x-2'>
@@ -124,7 +133,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 											size={18}
 										/>
 									</div>
-								</div>
+								</Link>
 							</CarouselItem>
 						))}
 					</CarouselContent>

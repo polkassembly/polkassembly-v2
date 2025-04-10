@@ -7,20 +7,17 @@
 import { IBountyStats, IBountyUserActivity, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import BountiesUserActivity from './BountiesUserActivity';
 import BountyHeader from './BountyHeader';
-import BountyProposal from './BountyProposal';
 import HotBounties from './HotBounties';
 
 function BountyDashboard({
 	tokenPrice,
 	bountiesStats,
 	hotBounties,
-	bountyProposals,
 	userActivities
 }: {
 	tokenPrice?: number;
 	bountiesStats?: IBountyStats | null;
 	hotBounties?: IGenericListingResponse<IPostListing> | null;
-	bountyProposals?: IGenericListingResponse<IPostListing> | null;
 	userActivities?: IBountyUserActivity[] | null;
 }) {
 	return (
@@ -41,12 +38,6 @@ function BountyDashboard({
 			{hotBounties && (
 				<HotBounties
 					hotBounties={hotBounties}
-					tokenPrice={tokenPrice ?? 0}
-				/>
-			)}
-			{bountyProposals && (
-				<BountyProposal
-					bountyProposals={bountyProposals}
 					tokenPrice={tokenPrice ?? 0}
 				/>
 			)}
