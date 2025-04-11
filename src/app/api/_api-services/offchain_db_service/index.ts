@@ -489,7 +489,6 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		address,
 		sentiment
 	}: {
 		network: ENetwork;
@@ -498,7 +497,6 @@ export class OffChainDbService {
 		userId: number;
 		content: string;
 		parentCommentId?: string;
-		address?: string;
 		sentiment?: ECommentSentiment;
 	}) {
 		// check if the post is allowed to be commented on
@@ -508,7 +506,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address, sentiment });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment });
 
 		await this.saveUserActivity({
 			userId,

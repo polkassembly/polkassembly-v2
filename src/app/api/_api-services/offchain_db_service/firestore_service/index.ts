@@ -926,7 +926,6 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		address,
 		sentiment
 	}: {
 		network: ENetwork;
@@ -951,7 +950,6 @@ export class FirestoreService extends FirestoreUtils {
 			isDeleted: false,
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
-			address: address || null,
 			dataSource: EDataSource.POLKASSEMBLY,
 			...(sentiment && { sentiment })
 		};

@@ -142,7 +142,6 @@ export class SubsquareOffChainService {
 					proposalType,
 					indexOrHash,
 					parentCommentId: comment.replyToComment || null,
-					address: comment.author.address,
 					children: [],
 					dataSource: EDataSource.SUBSQUARE
 				};
