@@ -834,7 +834,11 @@
 		"votedNay": "投票: Nay",
 		"votedSplit": "投票: Split",
 		"votedSplitAbstain": "投票: Split Abstain",
-		"editDelegate": "委任者を編集"
+		"editDelegate": "委任者を編集",
+		"undelegatedSuccessfully": "委任解除成功",
+		"delegateUpdatedSuccessfully": "委任更新成功",
+		"errorCreatingDelegate": "委任者の作成に失敗",
+		"delegateCreatedSuccessfully": "委任者が正常に作成されました"
 	},
 	"TxFees": {
 		"preimageDeposit": "プレイメージデポジット",

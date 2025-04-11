@@ -835,7 +835,11 @@
 		"votedNay": "Abgestimmt: Nein",
 		"votedSplit": "Abgestimmt: Split",
 		"votedSplitAbstain": "Abgestimmt: Split Enthaltung",
-		"editDelegate": "Delegierten bearbeiten"
+		"editDelegate": "Delegierten bearbeiten",
+		"undelegatedSuccessfully": "Delegierten erfolgreich aufgehoben",
+		"delegateUpdatedSuccessfully": "Delegierten erfolgreich aktualisiert",
+		"errorCreatingDelegate": "Fehler beim Erstellen von Delegierten",
+		"delegateCreatedSuccessfully": "Delegierten erfolgreich erstellt"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage-Einzahlung",

@@ -853,7 +853,11 @@
 		"votedNay": "Voted: Nay",
 		"votedSplit": "Voted: Split",
 		"votedSplitAbstain": "Voted: Split Abstain",
-		"editDelegate": "Edit Delegate"
+		"editDelegate": "Edit Delegate",
+		"undelegatedSuccessfully": "Undelegated successfully",
+		"delegateUpdatedSuccessfully": "Delegate updated successfully",
+		"errorCreatingDelegate": "Error creating delegate",
+		"delegateCreatedSuccessfully": "Delegate created successfully"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage Deposit",

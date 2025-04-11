@@ -88,14 +88,14 @@ export default function BecomeDelegateDialog() {
 			await NextApiClientService.createPADelegate({ address, manifesto });
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
-				title: 'Delegate created successfully',
+				title: t('delegateCreatedSuccessfully'),
 				status: NotificationType.SUCCESS
 			});
 			setDialogOpen(false);
 		} catch (error) {
 			setDelegates((prev) => prev.filter((d) => d.address !== address));
 			toast({
-				title: 'Error creating delegate',
+				title: t('errorCreatingDelegate'),
 				status: NotificationType.ERROR,
 				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
@@ -112,7 +112,7 @@ export default function BecomeDelegateDialog() {
 			await NextApiClientService.updatePADelegate({ address, manifesto });
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
-				title: 'Delegate updated successfully',
+				title: t('delegateUpdatedSuccessfully'),
 				status: NotificationType.SUCCESS
 			});
 			setDialogOpen(false);

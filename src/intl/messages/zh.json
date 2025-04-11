@@ -834,7 +834,11 @@
 		"votedNay": "投票: Nay",
 		"votedSplit": "投票: Split",
 		"votedSplitAbstain": "投票: Split Abstain",
-		"editDelegate": "编辑委托人"
+		"editDelegate": "编辑委托人",
+		"undelegatedSuccessfully": "委托解除成功",
+		"delegateUpdatedSuccessfully": "委托更新成功",
+		"errorCreatingDelegate": "创建委托失败",
+		"delegateCreatedSuccessfully": "创建委托成功"
 	},
 	"TxFees": {
 		"preimageDeposit": "预映像押金",

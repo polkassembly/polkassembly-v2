@@ -834,7 +834,11 @@
 		"votedNay": "Votado: Nay",
 		"votedSplit": "Votado: Split",
 		"votedSplitAbstain": "Votado: Split Abstain",
-		"editDelegate": "Editar delegado"
+		"editDelegate": "Editar delegado",
+		"undelegatedSuccessfully": "Delegación cancelada exitosamente",
+		"delegateUpdatedSuccessfully": "Delegado actualizado exitosamente",
+		"errorCreatingDelegate": "Error al crear delegado",
+		"delegateCreatedSuccessfully": "Delegado creado exitosamente"
 	},
 	"TxFees": {
 		"preimageDeposit": "Depósito de Preimage",

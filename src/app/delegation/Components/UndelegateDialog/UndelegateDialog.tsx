@@ -32,9 +32,10 @@ interface UndelegateDialogProps {
 	disabled?: boolean;
 	trackId?: number;
 	trackName?: string;
+	onUndelegateSuccess?: () => void;
 }
 
-function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId, trackName }: UndelegateDialogProps) {
+function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId, trackName, onUndelegateSuccess }: UndelegateDialogProps) {
 	const { user } = useUser();
 	const router = useRouter();
 	const t = useTranslations('Delegation');
@@ -105,6 +106,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 						status: NotificationType.SUCCESS
 					});
 					setLoading(false);
+					onUndelegateSuccess?.();
 				},
 				onFailed: (error) => {
 					toast({

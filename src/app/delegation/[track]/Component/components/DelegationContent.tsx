@@ -60,13 +60,18 @@ export function DelegationContent({ isDelegated, isReceived, hasDelegations, del
 	const t = useTranslations('Delegation');
 	const [openDelegate, setOpenDelegate] = useState(false);
 	const [openUndelegateAddresses, setOpenUndelegateAddresses] = useState<Record<string, boolean>>({});
+	const [localDelegations, setLocalDelegations] = useState(delegateTrackResponse?.delegatedTo || []);
 
 	const handleOpenUndelegate = (address: string, isOpen: boolean) => {
 		setOpenUndelegateAddresses((prev) => ({ ...prev, [address]: isOpen }));
 	};
 
+	const handleUndelegateSuccess = (address: string) => {
+		setLocalDelegations((prev) => prev.filter((d) => d.address !== address));
+	};
+
 	const renderDelegationTable = () => {
-		const delegations = isReceived ? delegateTrackResponse?.receivedDelegations || [] : delegateTrackResponse?.delegatedTo || [];
+		const delegations = isReceived ? delegateTrackResponse?.receivedDelegations || [] : localDelegations;
 
 		return (
 			<div className={styles.tableContainer}>
@@ -119,6 +124,7 @@ export function DelegationContent({ isDelegated, isReceived, hasDelegations, del
 											disabled={dayjs().isBefore(dayjs(delegation.endsAt))}
 											trackId={trackId}
 											trackName={trackName}
+											onUndelegateSuccess={() => handleUndelegateSuccess(delegation.address)}
 										>
 											<button
 												type='button'
