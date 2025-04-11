@@ -80,6 +80,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
 							preparePeriodEndsAt={postData?.onChainInfo?.preparePeriodEndsAt}
 							status={postData?.onChainInfo?.status}
+							trackName={postData?.onChainInfo?.origin}
 						/>
 						<VoteSummary
 							proposalType={post.proposalType}
