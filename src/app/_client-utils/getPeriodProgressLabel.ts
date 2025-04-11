@@ -5,7 +5,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
 import { getTrackDays } from './getTrackDays';
 
-export const getPeriodProgressLabel = (endAt: Date | string | null, trackName: EPostOrigin, periodType: 'decision' | 'prepare' | 'confirm'): string => {
+export const getPeriodProgressLabel = ({ endAt, trackName, periodType }: { endAt?: Date; trackName: EPostOrigin; periodType: EPeriodType }): string => {
 	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
 
 	let totalDays = 0;
@@ -22,7 +22,7 @@ export const getPeriodProgressLabel = (endAt: Date | string | null, trackName: E
 			break;
 	}
 
-	if (!endAt || totalDays === 0) return '0 / 0';
+	if (!endAt) return `0 / ${totalDays} days`;
 
 	const endDate = dayjs(endAt);
 	const startDate = endDate.subtract(totalDays, 'days');

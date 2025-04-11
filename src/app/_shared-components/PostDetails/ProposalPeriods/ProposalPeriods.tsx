@@ -18,8 +18,8 @@ function ProposalPeriods({
 	confirmationPeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
-	status?: EProposalStatus;
-	trackName?: EPostOrigin;
+	status: EProposalStatus;
+	trackName: EPostOrigin;
 }) {
 	const t = useTranslations();
 	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;

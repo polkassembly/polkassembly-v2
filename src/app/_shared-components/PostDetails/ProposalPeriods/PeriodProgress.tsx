@@ -11,12 +11,12 @@ interface Props {
 	periodEndsAt?: Date;
 	periodName: string;
 	periodType: EPeriodType;
-	trackName?: EPostOrigin;
+	trackName: EPostOrigin;
 }
 
 function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Props) {
-	const progress = trackName ? calculatePeriodProgress(periodEndsAt || '', trackName, periodType) : 0;
-	const label = trackName ? getPeriodProgressLabel(periodEndsAt || '', trackName, periodType) : undefined;
+	const progress = calculatePeriodProgress({ endAt: periodEndsAt, trackName, periodType });
+	const label = getPeriodProgressLabel({ endAt: periodEndsAt, trackName, periodType });
 
 	return (
 		<div className='flex flex-col gap-y-2'>
@@ -27,7 +27,7 @@ function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Pro
 			/>
 			<div className='flex justify-between text-sm text-text_primary'>
 				<p>{periodName}</p>
-				{label && <p>{label}</p>}
+				<p>{label}</p>
 			</div>
 		</div>
 	);

@@ -6,7 +6,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
 import { getTrackDays } from './getTrackDays';
 
-export const calculatePeriodProgress = (endAt: Date | string | null, trackName: EPostOrigin, periodType: EPeriodType): number => {
+export const calculatePeriodProgress = ({ endAt, trackName, periodType }: { endAt?: Date; trackName: EPostOrigin; periodType: EPeriodType }): number => {
 	if (!endAt) return 0;
 
 	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
