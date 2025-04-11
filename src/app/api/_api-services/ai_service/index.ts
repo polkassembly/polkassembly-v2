@@ -13,6 +13,7 @@ import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { APIError } from '../../_api-utils/apiError';
 import { fetchPostData } from '../../_api-utils/fetchPostData';
+import { RedisService } from '../redis_service';
 
 if (!IS_AI_ENABLED) {
 	console.log('\n ℹ️ Info: AI service is not enabled, AI content will not be generated and/or included in the api data\n');
@@ -439,6 +440,9 @@ export class AIService {
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
 
+		// clear cache for the content summary
+		await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
+
 		return updatedContentSummary;
 	}
 
@@ -488,6 +492,9 @@ export class AIService {
 		};
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
+
+		// clear cache for the content summary
+		await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
 
 		return updatedContentSummary;
 	}
