@@ -766,5 +766,45 @@
 		"preimageDeposit": "预映像押金",
 		"submissionDeposit": "提交押金",
 		"gasFees": "燃料费"
+	},
+	"VoteSummary": {
+		"title": "投票摘要",
+		"voteDetails": {
+			"title": "投票详情",
+			"date": "日期",
+			"selfVotes": "自投",
+			"votingPower": "投票权",
+			"conviction": "定罪",
+			"capital": "资本",
+			"delegatedVotes": "委托投票",
+			"delegators": "委托人",
+			"delegatedVotingPower": "委托投票权",
+			"delegationList": "委托人列表",
+			"delegator": "委托人",
+			"delegatorCapital": "委托人资本",
+			"delegatorVotingPower": "委托人投票权",
+			"votePowerTooltip": "基于锁定余额的投票权",
+			"delegatedVoteTooltip": "基于委托投票的投票权",
+			"delegationTooltip": "支持该提案的委托人列表",
+			"voteTimestamp": "投票时间"
+		},
+		"buttons": {
+			"expand": "展开",
+			"collapse": "收起",
+			"showMore": "显示更多",
+			"showLess": "显示较少"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "委托人",
+				"conviction": "信念",
+				"votingPower": "投票权"
+			},
+			"noDelegations": "没有可用的委托"
+		},
+		"errors": {
+			"invalidData": "无效数据",
+			"fetchError": "获取数据错误"
+		}
 	}
 }

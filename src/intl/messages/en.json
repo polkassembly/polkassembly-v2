@@ -785,5 +785,45 @@
 		"preimageDeposit": "Preimage Deposit",
 		"submissionDeposit": "Submission Deposit",
 		"gasFees": "Gas Fees"
+	},
+	"VoteSummary": {
+		"title": "Vote Summary",
+		"voteDetails": {
+			"title": "Vote Details",
+			"date": "Date",
+			"selfVotes": "Self Votes",
+			"votingPower": "Voting Power",
+			"conviction": "Conviction",
+			"capital": "Capital",
+			"delegatedVotes": "Delegated Votes",
+			"delegators": "Delegators",
+			"delegatedVotingPower": "Delegated Voting Power",
+			"delegationList": "Delegation List",
+			"delegator": "Delegator",
+			"delegatorCapital": "Delegator Capital",
+			"delegatorVotingPower": "Delegator Voting Power",
+			"votePowerTooltip": "Vote power based on locked balance",
+			"delegatedVoteTooltip": "Vote power based on delegated votes",
+			"delegationTooltip": "List of delegators supporting this proposal",
+			"voteTimestamp": "Vote cast on"
+		},
+		"buttons": {
+			"expand": "Expand",
+			"collapse": "Collapse",
+			"showMore": "Show More",
+			"showLess": "Show Less"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "Delegator",
+				"conviction": "Conviction",
+				"votingPower": "Voting Power"
+			},
+			"noDelegations": "No delegations available"
+		},
+		"errors": {
+			"invalidData": "Invalid data",
+			"fetchError": "Error fetching data"
+		}
 	}
 }
