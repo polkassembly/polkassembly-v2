@@ -111,42 +111,65 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		return tracks.some((track) => currentTab === track);
 	};
 
-	useEffect(() => {
+	const scrollToActiveTab = () => {
 		if (containerRef.current) {
-			containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+			const container = containerRef.current;
+			const activeElement = container.querySelector('.bg-activity_selected_tab');
+
+			if (activeElement) {
+				const containerRect = container.getBoundingClientRect();
+				const activeRect = activeElement.getBoundingClientRect();
+
+				const scrollLeft = activeRect.left - containerRect.left - (containerRect.width - activeRect.width) / 2;
+				container.scrollTo({
+					left: container.scrollLeft + scrollLeft,
+					behavior: 'smooth'
+				});
+			}
 		}
+	};
+
+	useEffect(() => {
+		scrollToActiveTab();
 	}, [currentTab]);
 
 	return (
 		<div className='mb-5 w-full'>
 			<div
-				className={`${styles.container} hide_scrollbar`}
+				className={styles.container}
 				ref={containerRef}
 			>
 				{Object.entries(categoryStructure).map(([category, tracks]) => (
-					<div key={category}>
+					<div
+						key={category}
+						className={styles.navItem}
+					>
 						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
-							<DropdownMenu>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab px-2', 'border-none px-2 font-normal')}>
-									<span className='flex items-center whitespace-nowrap'>
+							<DropdownMenu modal={false}>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && styles.activeTab)}>
+									<span className='flex items-center gap-2'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
 											alt={category}
 											width={20}
 											height={20}
-											className={cn('h-5 w-5', styles.darkIcon)}
+											className={cn(styles.darkIcon)}
+											priority
 										/>
-										<span className='ml-1 text-sm text-basic_text'>{category}</span>
+										<span className='text-sm text-basic_text'>{category}</span>
 									</span>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
 									align='start'
+									side='bottom'
+									sideOffset={4}
 									className={styles.popoverContent}
+									avoidCollisions
 								>
 									{tracks.map((track) => (
 										<DropdownMenuItem
 											key={track}
-											className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
+											className={cn(styles.trackName, currentTab === track && styles.activeTab)}
 											onSelect={() => setCurrentTab(track)}
 										>
 											{formatTrackName(track)}
@@ -157,18 +180,19 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 						) : (
 							<button
 								type='button'
-								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
+								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && styles.activeTab)}
 								onClick={() => handleCategoryClick(category)}
 							>
-								<span className='flex items-center whitespace-nowrap'>
+								<span className='flex items-center gap-2'>
 									<Image
 										src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
 										alt={category}
 										width={20}
 										height={20}
-										className={cn('h-5 w-5', styles.darkIcon)}
+										className={cn(styles.darkIcon)}
+										priority
 									/>
-									<span className='ml-1 text-sm'>{category}</span>
+									<span className='text-sm'>{category}</span>
 								</span>
 							</button>
 						)}

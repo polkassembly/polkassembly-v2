@@ -31,6 +31,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
+import { cn } from '@/lib/utils';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -123,7 +124,7 @@ function ActivityFeedPostItem({
 				<div className='flex items-center text-wallet_btn_text'>
 					<span className='text-xl font-bold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
-							<div className={`${styles.beneficiaryContainer} mr-2 text-xl font-semibold text-wallet_btn_text`}>
+							<div className={`${styles.beneficiaryContainer} mr-2`}>
 								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network))
 									.map(([assetId, amount]) =>
 										formatBnBalance(
@@ -139,46 +140,48 @@ function ActivityFeedPostItem({
 					</span>
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
-				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
-					<div className='relative z-50'>
-						{user?.id ? (
-							<Dialog>
-								<DialogTrigger asChild>
-									<span className={`${styles.castVoteButton} cursor-pointer`}>
+				<div className='hidden lg:block'>
+					{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+						<div className='relative z-50'>
+							{user?.id ? (
+								<Dialog>
+									<DialogTrigger asChild>
+										<span className={styles.castVoteButton}>
+											<Image
+												src={VoteIcon}
+												alt=''
+												width={20}
+												height={20}
+											/>
+											<span>{t('PostDetails.castVote')}</span>
+										</span>
+									</DialogTrigger>
+									<DialogTitle>
+										<DialogContent className='max-w-xl p-6'>
+											<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+											<VoteReferendum index={postData?.index?.toString() || ''} />
+										</DialogContent>
+									</DialogTitle>
+								</Dialog>
+							) : (
+								<Link
+									href='/login'
+									className='relative z-50'
+								>
+									<span className={styles.castVoteButton}>
 										<Image
 											src={VoteIcon}
 											alt=''
 											width={20}
 											height={20}
 										/>
-										<span>{t('PostDetails.castVote')}</span>
+										<span>{t('PostDetails.loginToVote')}</span>
 									</span>
-								</DialogTrigger>
-								<DialogTitle>
-									<DialogContent className='max-w-xl p-6'>
-										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-										<VoteReferendum index={postData?.index?.toString() || ''} />
-									</DialogContent>
-								</DialogTitle>
-							</Dialog>
-						) : (
-							<Link
-								href='/login'
-								className='relative z-50'
-							>
-								<span className={`${styles.castVoteButton} cursor-pointer`}>
-									<Image
-										src={VoteIcon}
-										alt=''
-										width={20}
-										height={20}
-									/>
-									<span>{t('PostDetails.loginToVote')}</span>
-								</span>
-							</Link>
-						)}
-					</div>
-				)}
+								</Link>
+							)}
+						</div>
+					)}
+				</div>
 			</div>
 
 			{/* Post Info Section */}
@@ -192,7 +195,7 @@ function ActivityFeedPostItem({
 					{postData.onChainInfo?.createdAt && (
 						<>
 							<span>|</span>
-							<span className='flex items-center gap-2'>
+							<span className='flex items-center gap-2 whitespace-nowrap text-[10px] lg:text-xs'>
 								<FaRegClock className='text-sm' />
 								{dayjs(postData.onChainInfo?.createdAt).fromNow()}
 							</span>
@@ -271,6 +274,49 @@ function ActivityFeedPostItem({
 					/>
 				</div>
 			)}
+
+			<div className='block lg:hidden'>
+				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					<div className='relative z-50 pt-5'>
+						{user?.id ? (
+							<Dialog>
+								<DialogTrigger asChild>
+									<span className={cn(styles.castVoteButton, 'justify-center py-1.5')}>
+										<Image
+											src={VoteIcon}
+											alt=''
+											width={20}
+											height={20}
+										/>
+										<span>{t('PostDetails.castVote')}</span>
+									</span>
+								</DialogTrigger>
+								<DialogTitle>
+									<DialogContent className='max-w-xl p-6'>
+										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+										<VoteReferendum index={postData?.index?.toString() || ''} />
+									</DialogContent>
+								</DialogTitle>
+							</Dialog>
+						) : (
+							<Link
+								href='/login'
+								className='relative z-50'
+							>
+								<span className={styles.castVoteButton}>
+									<Image
+										src={VoteIcon}
+										alt=''
+										width={20}
+										height={20}
+									/>
+									<span>{t('PostDetails.loginToVote')}</span>
+								</span>
+							</Link>
+						)}
+					</div>
+				)}
+			</div>
 
 			<CommentModal
 				isDialogOpen={isDialogOpen}

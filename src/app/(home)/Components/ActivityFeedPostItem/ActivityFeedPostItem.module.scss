@@ -1,5 +1,5 @@
 .originStyle {
-	@apply rounded-md px-1.5 py-1 text-xs;
+	@apply whitespace-nowrap rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
 }
 
 .progressBarContainer {
@@ -19,11 +19,11 @@
 }
 
 .castVoteButton {
-	@apply flex gap-1 rounded-md border-[1px] border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border hover:bg-progress_pink_bg;
+	@apply flex cursor-pointer gap-1 whitespace-nowrap rounded-md border-[1px] border-solid border-navbar_border text-sm font-medium text-navbar_border hover:bg-progress_pink_bg lg:px-3 lg:py-1.5;
 }
 
 .beneficiaryContainer {
-	@apply flex flex-wrap items-center gap-2;
+	@apply flex flex-wrap items-center gap-2 whitespace-nowrap text-base font-semibold text-wallet_btn_text lg:text-xl;
 }
 
 .container {
