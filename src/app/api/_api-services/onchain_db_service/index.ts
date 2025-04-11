@@ -16,7 +16,7 @@ import {
 	IBountyProposal,
 	IBountyUserActivity,
 	IDelegationStats,
-	EBountyActivity
+	EBountyStatus
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -221,7 +221,7 @@ export class OnChainDbService {
 		return claimedChildBounties.data.items.map((proposal) => {
 			const claimedProposal = proposal as IBountyProposal;
 			return {
-				activity: EBountyActivity.CLAIMED,
+				activity: EBountyStatus.CLAIMED,
 				address: claimedProposal.payee,
 				amount: claimedProposal.reward,
 				created_at: new Date(claimedProposal.statusHistory[0].timestamp)
