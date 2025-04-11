@@ -34,7 +34,9 @@ import {
 	IPostSubscription,
 	ECommentSentiment,
 	ITreasuryStats,
-	IDelegate
+	IDelegate,
+	ESocialVerificationStatus,
+	ESocial
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -849,6 +851,40 @@ export class OffChainDbService {
 
 	static async DeletePolkassemblyDelegate({ network, address }: { network: ENetwork; address: string }) {
 		return FirestoreService.DeletePolkassemblyDelegate({ network, address });
+	}
+
+	static async UpdateUserSocialHandle({
+		userId,
+		address,
+		social,
+		handle,
+		status,
+		verificationToken
+	}: {
+		userId: number;
+		address?: string;
+		social: ESocial;
+		handle: string;
+		status: ESocialVerificationStatus;
+		verificationToken?: {
+			token?: string;
+			secret?: string;
+			expiresAt?: Date;
+		};
+	}) {
+		return FirestoreService.UpdateUserSocialHandle({ userId, address, social, handle, status, verificationToken });
+	}
+
+	static async GetUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		return FirestoreService.GetUserSocialHandles({ userId, address });
+	}
+
+	static async GetSocialHandleByToken({ token }: { token: string }) {
+		return FirestoreService.GetSocialHandleByToken({ token });
+	}
+
+	static async UpdateSocialHandleByToken({ token, status }: { token: string; status: ESocialVerificationStatus }) {
+		return FirestoreService.UpdateSocialHandleByToken({ token, status });
 	}
 
 	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
