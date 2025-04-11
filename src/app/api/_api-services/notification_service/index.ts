@@ -23,7 +23,7 @@ export class NotificationService {
 		'Content-Type': 'application/json',
 		'x-api-key': NOTIFICATION_ENGINE_API_KEY,
 		'x-network': network,
-		'x-source': 'polkassembly'
+		'x-source': 'polkassembly_v2'
 	});
 
 	private static async sendNotification({
@@ -36,7 +36,7 @@ export class NotificationService {
 		args: Record<string, string>;
 	}) {
 		if (!IS_NOTIFICATION_SERVICE_ENABLED) {
-			return;
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED is false');
 		}
 
 		await fetch(`${this.NOTIFICATION_ENGINE_URL}`, {
@@ -46,13 +46,17 @@ export class NotificationService {
 			}),
 			headers: this.firebaseFunctionsHeader(network),
 			method: 'POST'
-		}).catch((e) => console.error('Notification not sent', e));
+		}).catch((e) => {
+			console.error('Notification not sent', e);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Notification not sent');
+		});
 	}
 
 	static async SendVerificationEmail(user: IUser, token: string, email?: string): Promise<void> {
 		console.log('email', email);
 
 		if (!email || !['aadarsh@polkassembly.io', 'aadarsh012@gmail.com', 'aadarshshaw24@gmail.com'].includes(email)) return;
+
 		await this.sendNotification({
 			network: user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK,
 			trigger: ENotificationTrigger.VERIFY_EMAIL,
