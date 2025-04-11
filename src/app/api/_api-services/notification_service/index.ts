@@ -14,7 +14,7 @@ if (IS_NOTIFICATION_SERVICE_ENABLED && !NOTIFICATION_ENGINE_API_KEY) {
 }
 
 export class NotificationService {
-	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-polkassembly-dev.cloudfunctions.net/notify';
+	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-notification-engine-672e0.cloudfunctions.net/notify';
 
 	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK as ENetwork;
 
