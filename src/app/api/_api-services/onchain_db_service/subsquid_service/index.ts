@@ -392,7 +392,11 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			votes,
-			totalCount: subsquidData.votesConnection.totalCount
+			totalCounts: {
+				[EVoteDecision.AYE]: subsquidData?.yesCount?.totalCount,
+				[EVoteDecision.NAY]: subsquidData?.noCount?.totalCount,
+				[EVoteDecision.SPLIT_ABSTAIN]: subsquidData?.abstainCount?.totalCount
+			}
 		};
 	}
 

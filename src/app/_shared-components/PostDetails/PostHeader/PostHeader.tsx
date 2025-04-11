@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IPost, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -27,7 +27,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import classes from './PostHeader.module.scss';
 
-function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
+function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 

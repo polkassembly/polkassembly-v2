@@ -4,8 +4,8 @@
 
 'use client';
 
-import { type ReactNode, useCallback, useState, useEffect } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { type ReactNode, useState, useEffect, MouseEvent, useMemo } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from './Pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select/Select';
@@ -17,32 +17,72 @@ export interface PaginationWithLinksProps {
 	};
 	totalCount: number;
 	pageSize: number;
-	page: number;
+	page?: number;
 	pageSearchParam?: string;
-	onClick?: (page: number) => void;
+	onPageChange?: (page: number) => void;
 }
 
 /**
  * Navigate with Nextjs links (need to update your own `pagination.tsx` to use Nextjs Link)
+ * Can also be used with a callback function for state-based pagination
  *
  * @example
  * ```
  * <PaginationWithLinks
-    page={1}
     pageSize={20}
     totalCount={500}
+    // For URL-based navigation:
+    pageSearchParam="page"
+    // OR for state-based pagination:
+    onPageChange={(page) => setPage(page)}
   />
  * ```
  */
 
-function SelectRowsPerPage({ options, setPageSize, pageSize }: { options: number[]; setPageSize: (newSize: number) => void; pageSize: number }) {
+function SelectRowsPerPage({
+	options,
+	pageSize,
+	pathname,
+	searchParams,
+	pageSearchParam,
+	pageSizeSearchParam,
+	onPageSizeChange
+}: {
+	options: number[];
+	pageSize: number;
+	pathname: string;
+	searchParams: URLSearchParams;
+	pageSearchParam?: string;
+	pageSizeSearchParam?: string;
+	onPageSizeChange?: (size: number) => void;
+}) {
+	const buildLink = (newPageSize: number) => {
+		const key = pageSizeSearchParam || 'pageSize';
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		newSearchParams.set(key, String(newPageSize));
+		newSearchParams.delete(pageSearchParam || 'page');
+		return `${pathname}?${newSearchParams.toString()}`;
+	};
+
+	const handlePageSizeChange = (newPageSize: number) => {
+		if (onPageSizeChange) {
+			onPageSizeChange(newPageSize);
+			return;
+		}
+
+		const link = document.createElement('a');
+		link.href = buildLink(newPageSize);
+		link.setAttribute('data-next-page-size', String(newPageSize));
+		link.click();
+	};
+
 	return (
 		<div className='flex items-center gap-4'>
 			<span className='whitespace-nowrap text-sm'>Rows per page</span>
 
 			<Select
 				value={String(pageSize)}
-				onValueChange={(value) => setPageSize(Number(value))}
+				onValueChange={(value) => handlePageSizeChange(Number(value))}
 			>
 				<SelectTrigger>
 					<SelectValue placeholder='Select page size'>{String(pageSize)}</SelectValue>
@@ -62,29 +102,51 @@ function SelectRowsPerPage({ options, setPageSize, pageSize }: { options: number
 	);
 }
 
-export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCount, page, pageSearchParam, onClick }: PaginationWithLinksProps) {
-	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
+export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCount, page, pageSearchParam, onPageChange }: PaginationWithLinksProps) {
+	const pathname = usePathname() || '';
+	const rawSearchParams = useSearchParams();
+	const searchParams = useMemo(() => rawSearchParams || new URLSearchParams(), [rawSearchParams]);
 
-	const [currentPage, setCurrentPage] = useState(page);
+	const pageFromUrl = pageSearchParam ? searchParams.get(pageSearchParam) : null;
+	const initialPage = pageFromUrl ? parseInt(pageFromUrl, 10) : page || 1;
+	const [currentPage, setCurrentPage] = useState(initialPage);
 
+	// Use useEffect to update currentPage when URL parameters or page prop changes
 	useEffect(() => {
-		setCurrentPage(page);
-	}, [page]);
+		if (pageSearchParam) {
+			const pageParam = searchParams.get(pageSearchParam);
+			if (pageParam) {
+				setCurrentPage(parseInt(pageParam, 10));
+			}
+		} else if (page) {
+			setCurrentPage(page);
+		}
+	}, [page, pageSearchParam, searchParams]);
+
+	if (totalCount <= 0 || totalCount <= pageSize) {
+		return null;
+	}
 
 	const totalPageCount = Math.ceil(totalCount / pageSize);
 
-	const navToPageSize = useCallback(
-		(newPageSize: number) => {
-			const key = pageSizeSelectOptions?.pageSizeSearchParam || 'pageSize';
-			const newSearchParams = new URLSearchParams(searchParams || undefined);
-			newSearchParams.set(key, String(newPageSize));
-			newSearchParams.delete(pageSearchParam || 'page'); // Clear the page number when changing page size
-			router.push(`${pathname}?${newSearchParams.toString()}`);
-		},
-		[searchParams, pathname]
-	);
+	const buildLink = (pageNum: number) => {
+		if (onPageChange) {
+			return '#';
+		}
+
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (pageSearchParam) {
+			newSearchParams.set(pageSearchParam, String(pageNum));
+		}
+		return `${pathname}?${newSearchParams.toString()}`;
+	};
+
+	const handlePageClick = (pageNum: number, event?: MouseEvent) => {
+		if (onPageChange) {
+			event?.preventDefault();
+			onPageChange(pageNum);
+		}
+	};
 
 	const renderPageNumbers = () => {
 		const items: ReactNode[] = [];
@@ -95,12 +157,9 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				items.push(
 					<PaginationItem key={i}>
 						<PaginationLink
-							// href={buildLink(i)}
-							onClick={() => {
-								setCurrentPage(i);
-								onClick?.(i);
-							}}
+							href={buildLink(i)}
 							isActive={currentPage === i}
+							onClick={(e) => handlePageClick(i, e)}
 						>
 							{i}
 						</PaginationLink>
@@ -111,12 +170,9 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 			items.push(
 				<PaginationItem key={1}>
 					<PaginationLink
-						// href={buildLink(1)}
-						onClick={() => {
-							setCurrentPage(1);
-							onClick?.(1);
-						}}
+						href={buildLink(1)}
 						isActive={currentPage === 1}
+						onClick={(e) => handlePageClick(1, e)}
 					>
 						1
 					</PaginationLink>
@@ -138,12 +194,9 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				items.push(
 					<PaginationItem key={i}>
 						<PaginationLink
-							// href={buildLink(i)}
-							onClick={() => {
-								setCurrentPage(i);
-								onClick?.(i);
-							}}
+							href={buildLink(i)}
 							isActive={currentPage === i}
+							onClick={(e) => handlePageClick(i, e)}
 						>
 							{i}
 						</PaginationLink>
@@ -162,12 +215,9 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 			items.push(
 				<PaginationItem key={totalPageCount}>
 					<PaginationLink
-						// href={buildLink(totalPageCount)}
-						onClick={() => {
-							setCurrentPage(totalPageCount);
-							onClick?.(totalPageCount);
-						}}
+						href={buildLink(totalPageCount)}
 						isActive={currentPage === totalPageCount}
+						onClick={(e) => handlePageClick(totalPageCount, e)}
 					>
 						{totalPageCount}
 					</PaginationLink>
@@ -184,36 +234,41 @@ export function PaginationWithLinks({ pageSizeSelectOptions, pageSize, totalCoun
 				<div className='flex flex-1 flex-col gap-4'>
 					<SelectRowsPerPage
 						options={pageSizeSelectOptions.pageSizeOptions}
-						setPageSize={navToPageSize}
 						pageSize={pageSize}
+						pathname={pathname}
+						searchParams={searchParams}
+						pageSearchParam={pageSearchParam}
+						pageSizeSearchParam={pageSizeSelectOptions.pageSizeSearchParam}
+						onPageSizeChange={
+							onPageChange
+								? () => {
+										setCurrentPage(1);
+										onPageChange(1);
+									}
+								: undefined
+						}
 					/>
 				</div>
 			)}
 			<Pagination className={cn({ 'md:justify-end': pageSizeSelectOptions })}>
-				<PaginationContent className='max-sm:gap-0'>
+				<PaginationContent className='max-sm:gap-1'>
 					<PaginationItem>
 						<PaginationPrevious
-							// href={buildLink(Math.max(currentPage - 1, 1))}
-							onClick={() => {
-								setCurrentPage(Math.max(currentPage - 1, 1));
-								onClick?.(Math.max(currentPage - 1, 1));
-							}}
+							href={buildLink(Math.max(currentPage - 1, 1))}
 							aria-disabled={currentPage === 1}
 							tabIndex={currentPage === 1 ? -1 : undefined}
 							className={currentPage === 1 ? 'pointer-events-none opacity-50' : undefined}
+							onClick={(e) => handlePageClick(Math.max(currentPage - 1, 1), e)}
 						/>
 					</PaginationItem>
 					{renderPageNumbers()}
 					<PaginationItem>
 						<PaginationNext
-							// href={buildLink(Math.min(currentPage + 1, totalPageCount))}
-							onClick={() => {
-								setCurrentPage(Math.min(currentPage + 1, totalPageCount));
-								onClick?.(Math.min(currentPage + 1, totalPageCount));
-							}}
+							href={buildLink(Math.min(currentPage + 1, totalPageCount))}
 							aria-disabled={currentPage === totalPageCount}
 							tabIndex={currentPage === totalPageCount ? -1 : undefined}
 							className={currentPage === totalPageCount ? 'pointer-events-none opacity-50' : undefined}
+							onClick={(e) => handlePageClick(Math.min(currentPage + 1, totalPageCount), e)}
 						/>
 					</PaginationItem>
 				</PaginationContent>
