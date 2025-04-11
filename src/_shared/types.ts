@@ -495,7 +495,6 @@ export interface IOnChainPostInfo {
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
-	userReaction?: IReaction;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 }
@@ -518,10 +517,6 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
-	/**
-	 * @deprecated Use reactions array instead for better performance and flexibility
-	 */
-	userReaction?: IReaction;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 }
@@ -1069,4 +1064,10 @@ export interface IVoteHistoryData {
 		[EVoteDecision.SPLIT_ABSTAIN]?: number;
 		[EVoteDecision.SPLIT]?: number;
 	};
+}
+
+export enum EPeriodType {
+	PREPARE = 'prepare',
+	DECISION = 'decision',
+	CONFIRM = 'confirm'
 }
