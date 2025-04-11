@@ -17,12 +17,12 @@ import BountyTable from './BountyTable';
 import styles from './Bounties.module.scss';
 
 enum EBountyStatus {
-	All = 'all',
-	Active = 'Active',
-	Proposed = 'Proposed',
-	Claimed = 'Claimed',
-	Cancelled = 'Cancelled',
-	Rejected = 'Rejected'
+	ALL = 'all',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
 }
 
 function BountiesListingPage({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
@@ -34,12 +34,12 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 	const t = useTranslations();
 
 	const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
-		[EBountyStatus.All]: t('Bounties.all'),
-		[EBountyStatus.Active]: t('Bounties.active'),
-		[EBountyStatus.Proposed]: t('Bounties.proposed'),
-		[EBountyStatus.Claimed]: t('Bounties.claimed'),
-		[EBountyStatus.Cancelled]: t('Bounties.cancelled'),
-		[EBountyStatus.Rejected]: t('Bounties.rejected')
+		[EBountyStatus.ALL]: t('Bounties.all'),
+		[EBountyStatus.ACTIVE]: t('Bounties.active'),
+		[EBountyStatus.PROPOSED]: t('Bounties.proposed'),
+		[EBountyStatus.CLAIMED]: t('Bounties.claimed'),
+		[EBountyStatus.CANCELLED]: t('Bounties.cancelled'),
+		[EBountyStatus.REJECTED]: t('Bounties.rejected')
 	};
 
 	const statusValues = Object.values(EBountyStatus);
