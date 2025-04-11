@@ -346,6 +346,12 @@ export interface ITag {
 	network: ENetwork;
 }
 
+export interface IOffChainContentHistoryItem {
+	content: string;
+	title?: string;
+	createdAt: Date;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -367,6 +373,7 @@ export interface IOffChainPost {
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
 	topic?: EOffChainPostTopic;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export enum EProposalStatus {
@@ -592,11 +599,11 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
-	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export interface ICommentResponse extends IComment {
