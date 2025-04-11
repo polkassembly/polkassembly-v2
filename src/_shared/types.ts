@@ -932,25 +932,18 @@ export interface IBountyStats {
 	totalBountyPool: number;
 }
 
-export enum EBountyActivity {
-	CREATED = 'created',
-	CLAIMED = 'claimed',
-	APPROVED = 'approved',
-	REJECTED = 'rejected',
-	CANCELLED = 'cancelled',
-	FUNDED = 'funded',
-	CURATOR_PROPOSED = 'curator_proposed',
-	CURATOR_ASSIGNED = 'curator_assigned',
-	CURATOR_UNASSIGNED = 'curator_unassigned',
-	EXECUTED = 'executed',
-	EXECUTION_FAILED = 'execution_failed',
-	CLOSED = 'closed',
-	AWARDED = 'awarded'
+export enum EBountyStatus {
+	ALL = 'all',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
 }
 
 export interface IBountyUserActivity {
 	amount: string;
-	activity: EBountyActivity;
+	activity: EBountyStatus;
 	address: string;
 	created_at: Date;
 }
