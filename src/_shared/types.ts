@@ -1072,3 +1072,9 @@ export interface IVoteHistoryData {
 		[EVoteDecision.SPLIT]?: number;
 	};
 }
+
+export enum EPeriodType {
+	PREPARE = 'prepare',
+	DECISION = 'decision',
+	CONFIRM = 'confirm'
+}
