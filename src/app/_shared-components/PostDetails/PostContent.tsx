@@ -4,7 +4,6 @@
 
 'use client';
 
-import React from 'react';
 import { IPost, IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Separator } from '../Separator';
@@ -13,7 +12,15 @@ import PostActions from './PostActions/PostActions';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 
-function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPostListing; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
+function PostContent({
+	postData,
+	isModalOpen,
+	onEditPostSuccess
+}: {
+	postData: IPostListing | IPost;
+	isModalOpen: boolean;
+	onEditPostSuccess: (title: string, content: string) => void;
+}) {
 	const { content } = postData;
 
 	return (

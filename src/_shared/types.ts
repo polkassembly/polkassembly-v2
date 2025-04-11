@@ -496,7 +496,6 @@ export interface IOnChainPostInfo {
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
-	userReaction?: IReaction;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 }
@@ -522,10 +521,6 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
-	/**
-	 * @deprecated Use reactions array instead for better performance and flexibility
-	 */
-	userReaction?: IReaction;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 }
@@ -1042,4 +1037,14 @@ export interface ITrackDelegationDetails {
 	delegatedTo?: ITrackDelegation[];
 	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
 	status: EDelegationStatus;
+}
+
+export interface IVoteHistoryData {
+	votes: IVoteData[];
+	totalCounts: {
+		[EVoteDecision.AYE]?: number;
+		[EVoteDecision.NAY]?: number;
+		[EVoteDecision.SPLIT_ABSTAIN]?: number;
+		[EVoteDecision.SPLIT]?: number;
+	};
 }

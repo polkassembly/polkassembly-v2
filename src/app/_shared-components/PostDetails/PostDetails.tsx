@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
+import { EPostDetailsTab, IPost } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -20,8 +20,8 @@ import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
 import OnchainInfo from './OnchainInfo/OnchainInfo';
 
-function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
-	const [post, setPost] = useState<IPost>(postData || ({} as IPost));
+function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
+	const [post, setPost] = useState<IPost>(postData);
 
 	const onEditPostSuccess = (title: string, content: string) => {
 		setPost((prev) => ({ ...prev, title, content }));
@@ -34,7 +34,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 			<div className={classes.headerWrapper}>
 				<PostHeader
 					isModalOpen={isModalOpen ?? false}
-					postData={post as IPostListing}
+					postData={post}
 				/>
 			</div>
 			<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3')}>
@@ -42,7 +42,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					<div className={classes.descBox}>
 						<TabsContent value={EPostDetailsTab.DESCRIPTION}>
 							<PostContent
-								postData={post as IPostListing}
+								postData={post}
 								isModalOpen={isModalOpen ?? false}
 								onEditPostSuccess={onEditPostSuccess}
 							/>
@@ -56,7 +56,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</TabsContent>
 						<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
 							<OnchainInfo
-								proposalType={EProposalType.REFERENDUM_V2}
+								proposalType={post.proposalType}
 								index={index}
 								onchainInfo={postData?.onChainInfo}
 							/>
@@ -67,7 +67,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 					<div className={classes.commentsBox}>
 						<PostComments
-							proposalType={EProposalType.REFERENDUM_V2}
+							proposalType={post.proposalType}
 							index={index}
 						/>
 					</div>
@@ -82,7 +82,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							status={postData?.onChainInfo?.status}
 						/>
 						<VoteSummary
-							proposalType={EProposalType.REFERENDUM_V2}
+							proposalType={post.proposalType}
 							index={index}
 							voteMetrics={postData?.onChainInfo?.voteMetrics}
 						/>
