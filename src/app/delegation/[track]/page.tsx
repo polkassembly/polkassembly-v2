@@ -9,7 +9,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
-import DelegationTrack from './Component/DelegationTrack';
+import DelegationTrack from './Component/DelegationTrack/DelegationTrack';
 
 interface Props {
 	params: Promise<{ track: string }>;

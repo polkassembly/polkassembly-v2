@@ -10,7 +10,7 @@ import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/app/_shared-components/RadioGroup/RadioGroup';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
@@ -29,21 +29,26 @@ function MyDelegateTracks() {
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [activeFilter, setActiveFilter] = useState<EDelegationStatus | 'all'>(EDelegationStatus.ALL);
 
-	const { isLoading } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
-		queryKey: ['address'],
-		queryFn: async () => {
-			if (!user?.defaultAddress) {
-				return { delegationStats: [] };
-			}
-			const response = await NextApiClientService.getDelegateTracks({ address: user.defaultAddress });
-			if (!response.data) {
-				return { delegationStats: [] };
-			}
-			setDelegateUserTracks(response.data.delegationStats);
-			return response.data.delegationStats ? response.data : { delegationStats: [] };
-		},
+	const fetchDelegationStats = async () => {
+		if (!user?.defaultAddress) return { delegationStats: [] };
+		const response = await NextApiClientService.getDelegateTracks({ address: user.defaultAddress });
+		if (!response.data) return { delegationStats: [] };
+		setDelegateUserTracks(response.data.delegationStats);
+		return response.data;
+	};
+
+	const { isLoading, refetch } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
+		queryKey: ['address', user?.defaultAddress],
+		queryFn: fetchDelegationStats,
 		enabled: !!user?.defaultAddress
 	});
+
+	useEffect(() => {
+		const hasUndelegatedTracks = delegateUserTracks?.some((track) => track.status === EDelegationStatus.UNDELEGATED);
+		if (hasUndelegatedTracks) {
+			refetch();
+		}
+	}, [delegateUserTracks, refetch]);
 
 	const FILTER_OPTIONS = [
 		{ value: EDelegationStatus.ALL, label: t('all') },

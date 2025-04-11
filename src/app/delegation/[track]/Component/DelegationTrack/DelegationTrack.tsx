@@ -9,9 +9,9 @@ import { MdKeyboardArrowRight } from 'react-icons/md';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import styles from './DelegationTrack.module.scss';
-import { DelegationHeader } from './components/DelegationHeader';
-import { DelegationContent } from './components/DelegationContent';
-import { ActiveProposals } from './components/ActiveProposals';
+import { DelegationHeader } from '../DelegationHeader';
+import { DelegationContent } from '../DelegationContent';
+import { ActiveProposals } from '../ActiveProposals';
 
 interface DelegationTrackProps {
 	trackDetails: {
@@ -27,10 +27,8 @@ function DelegationTrack({ trackDetails, delegateTrackResponse }: DelegationTrac
 	const trackDescription = trackDetails?.description;
 	const trackId = trackDetails?.trackId;
 
-	const isDelegated = delegateTrackResponse?.status === EDelegationStatus.DELEGATED;
 	const isReceived = delegateTrackResponse?.status === EDelegationStatus.RECEIVED;
 	const activeProposals = delegateTrackResponse?.activeProposalListingWithDelegateVote?.items || [];
-	const hasDelegations = (delegateTrackResponse?.delegatedTo?.length ?? 0) > 0 || (delegateTrackResponse?.receivedDelegations?.length ?? 0) > 0;
 	const trackName = trackDetails.name
 		.split('_')
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -56,16 +54,14 @@ function DelegationTrack({ trackDetails, delegateTrackResponse }: DelegationTrac
 					<DelegationHeader
 						trackName={trackName}
 						trackDescription={trackDescription}
-						isDelegated={isDelegated}
+						trackId={trackId}
 						isReceived={isReceived}
 					/>
 				</div>
 
 				<div className={styles.contentContainer}>
 					<DelegationContent
-						isDelegated={isDelegated}
 						isReceived={isReceived}
-						hasDelegations={hasDelegations}
 						delegateTrackResponse={delegateTrackResponse}
 						trackId={trackId}
 						trackName={trackName}

@@ -2,16 +2,23 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { cn } from '@/lib/utils';
-import styles from '../DelegationTrack.module.scss';
+import { useAtom } from 'jotai';
+import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
+import { EDelegationStatus } from '@/_shared/types';
+import styles from './DelegationTrack/DelegationTrack.module.scss';
 
 interface DelegationHeaderProps {
 	trackName: string;
 	trackDescription: string;
-	isDelegated: boolean;
+	trackId: number;
 	isReceived: boolean;
 }
 
-export function DelegationHeader({ trackName, trackDescription, isDelegated, isReceived }: DelegationHeaderProps) {
+export function DelegationHeader({ trackName, trackDescription, trackId, isReceived }: DelegationHeaderProps) {
+	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
+	const currentTrackStatus = delegateUserTracks?.find((track) => track.trackId === trackId)?.status;
+	const isDelegated = currentTrackStatus === EDelegationStatus.DELEGATED;
+
 	return (
 		<>
 			<div className={styles.trackHeader}>

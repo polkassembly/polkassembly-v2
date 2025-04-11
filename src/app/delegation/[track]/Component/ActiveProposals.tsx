@@ -15,7 +15,7 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { useTranslations } from 'next-intl';
 import { IoIosInformationCircleOutline } from 'react-icons/io';
-import styles from '../DelegationTrack.module.scss';
+import styles from './DelegationTrack/DelegationTrack.module.scss';
 
 interface ActiveProposalsProps {
 	activeProposals: IPostWithDelegateVote[];
