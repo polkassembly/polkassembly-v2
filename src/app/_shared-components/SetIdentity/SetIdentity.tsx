@@ -31,6 +31,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
 import SocialVerifications from './SocialVerifications/SocialVerifications';
+import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -43,6 +44,7 @@ interface ISetIdentityFormFields {
 enum ESetIdentityStep {
 	GAS_FEE,
 	SET_IDENTITY_FORM,
+	IDENTITY_SUCCESS,
 	SOCIAL_VERIFICATION
 }
 
@@ -137,7 +139,7 @@ function SetIdentity() {
 					title: t('SetIdentity.success'),
 					description: t('SetIdentity.successDescription')
 				});
-				setStep(ESetIdentityStep.SOCIAL_VERIFICATION);
+				setStep(ESetIdentityStep.IDENTITY_SUCCESS);
 			},
 			onFailed: () => {
 				setLoading(false);
@@ -171,6 +173,16 @@ function SetIdentity() {
 			onRequestJudgement={() => setStep(ESetIdentityStep.SOCIAL_VERIFICATION)}
 			disabledRequestJudgement={!identityValues?.display || !identityValues?.email || !identityValues?.hash}
 			registrarFee={registrarFee || BN_ZERO}
+		/>
+	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.address?.address ? (
+		<IdentitySuccessScreen
+			address={userPreferences.address.address}
+			email={formData.getValues('email')}
+			displayName={formData.getValues('displayName')}
+			legalName={formData.getValues('legalName')}
+			twitter={formData.getValues('twitter')}
+			matrix={formData.getValues('matrix')}
+			onNext={() => setStep(ESetIdentityStep.SOCIAL_VERIFICATION)}
 		/>
 	) : step === ESetIdentityStep.SOCIAL_VERIFICATION ? (
 		<SocialVerifications />

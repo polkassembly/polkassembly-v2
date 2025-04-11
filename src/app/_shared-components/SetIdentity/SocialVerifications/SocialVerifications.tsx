@@ -10,6 +10,7 @@ import { useUser } from '@/hooks/useUser';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import EmailVerification from './EmailVerification';
 import TwitterVerification from './TwitterVerification';
 import RiotVerification from './RiotVerification';
@@ -23,6 +24,8 @@ function SocialVerifications() {
 	const { user } = useUser();
 	const { identityService } = useIdentityService();
 	const { toast } = useToast();
+
+	const router = useRouter();
 
 	const [identityValues, setIdentityValues] = useState<IOnChainIdentity>();
 
@@ -77,6 +80,8 @@ function SocialVerifications() {
 			description: 'Judgement call made successfully',
 			status: ENotificationStatus.SUCCESS
 		});
+
+		router.back();
 
 		setLoading(false);
 	};

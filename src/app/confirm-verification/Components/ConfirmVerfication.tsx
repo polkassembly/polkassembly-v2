@@ -7,7 +7,9 @@
 import { ENotificationStatus, ESocial } from '@/_shared/types';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useToast } from '@/hooks/useToast';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -15,6 +17,7 @@ function ConfirmVerfication({ token, social, twitterOauthVerifier }: { token: st
 	const [isLoading, setIsLoading] = useState(true);
 	const user = CookieClientService.getAccessTokenPayload();
 	const { toast } = useToast();
+	const t = useTranslations();
 
 	useEffect(() => {
 		const verifySocial = async () => {
@@ -50,11 +53,24 @@ function ConfirmVerfication({ token, social, twitterOauthVerifier }: { token: st
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [social, token, twitterOauthVerifier, user?.id]);
 
-	return isLoading ? (
-		<div>Verifying ...</div>
-	) : (
-		<div>
-			Verification successful <Link href='/'>Go to home</Link>
+	return (
+		<div className='flex flex-col items-center gap-y-2 p-8'>
+			{isLoading ? (
+				<>
+					<LoadingSpinner />
+					<p className='text-sm text-text_primary'>{t('SetIdentity.verifying')}</p>
+				</>
+			) : (
+				<>
+					<p className='text-sm text-text_primary'>{t('SetIdentity.verificationSuccessful')}</p>
+					<Link
+						href='/'
+						className='text-sm text-text_pink'
+					>
+						{t('SetIdentity.goToHome')}
+					</Link>
+				</>
+			)}
 		</div>
 	);
 }
