@@ -5,10 +5,8 @@ import oauth from 'oauth';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ENetwork, ESocial } from '@/_shared/types';
+import { TWITTER_CONSUMER_API_KEY, TWITTER_CONSUMER_API_SECRET_KEY, VERIFICATION_CALLBACK_URL } from '@/app/api/_api-constants/apiEnvVars';
 import { APIError } from './apiError';
-
-const TWITTER_CONSUMER_API_KEY = process.env.TWITTER_CONSUMER_API_KEY || '';
-const TWITTER_CONSUMER_API_SECRET_KEY = process.env.TWITTER_CONSUMER_API_SECRET_KEY || '';
 
 const OAUTH_CONSUMER_ERROR = 'TWITTER_CONSUMER_API_KEY or TWITTER_CONSUMER_API_SECRET_KEY missing in env';
 
@@ -22,8 +20,7 @@ export const getOauthConsumer = (network: ENetwork) => {
 		TWITTER_CONSUMER_API_KEY,
 		TWITTER_CONSUMER_API_SECRET_KEY,
 		'1.0A',
-		`https://polkassembly-v2-git-request-judgement-polkassembly-next.vercel.app/confirm-verification?social=${ESocial.TWITTER}`,
-		// `http://localhost:3000/confirm-verification?social=${ESocial.TWITTER}`,
+		`${VERIFICATION_CALLBACK_URL}?social=${ESocial.TWITTER}`,
 		'HMAC-SHA1'
 	);
 };

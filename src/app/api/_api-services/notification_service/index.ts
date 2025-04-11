@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
-import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
+import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY, VERIFICATION_CALLBACK_URL } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ENetwork, ENotificationTrigger, ESocial, IUser } from '@shared/types';
@@ -68,7 +68,7 @@ export class NotificationService {
 			trigger: ENotificationTrigger.VERIFY_EMAIL,
 			args: {
 				email: email || user.email,
-				verifyUrl: `https://polkassembly-v2-git-request-judgement-polkassembly-next.vercel.app/confirm-verification?social=${ESocial.EMAIL}&token=${token}`
+				verifyUrl: `${VERIFICATION_CALLBACK_URL}?social=${ESocial.EMAIL}&token=${token}`
 				// verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
 			}
 		});
