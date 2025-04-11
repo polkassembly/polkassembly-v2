@@ -144,7 +144,7 @@ export function DelegationContent({ isDelegated, isReceived, hasDelegations, del
 		);
 	};
 
-	if (!isDelegated && !isReceived) {
+	if (!isDelegated || !isReceived) {
 		return (
 			<div className={styles.undelegatedContent}>
 				<Image

@@ -62,7 +62,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	);
 
 	const calculateTxFee = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || !trackId) return;
+		if (!apiService || !user?.defaultAddress || trackId === undefined) return;
 
 		try {
 			const fee = await apiService.getDelegateTxFee({
