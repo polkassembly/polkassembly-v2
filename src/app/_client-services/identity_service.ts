@@ -277,7 +277,7 @@ export class IdentityService {
 		};
 	}
 
-	getOnChainIdentityTx({ displayName, email, legalName, twitter, matrix }: { displayName: string; email: string; legalName?: string; twitter?: string; matrix?: string }) {
+	getSetIdentityTx({ displayName, email, legalName, twitter, matrix }: { displayName: string; email: string; legalName?: string; twitter?: string; matrix?: string }) {
 		return this.peopleChainApi?.tx.identity.setIdentity({
 			display: { [displayName ? 'raw' : 'none']: displayName || null },
 			legal: { [legalName ? 'raw' : 'none']: legalName || null },
@@ -309,7 +309,7 @@ export class IdentityService {
 		onFailed?: () => void;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
-		const setIdentityTx = this.getOnChainIdentityTx({
+		const setIdentityTx = this.getSetIdentityTx({
 			displayName,
 			email,
 			legalName,
