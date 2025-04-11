@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useState } from 'react';
-import { IPostListing } from '@/_shared/types';
+import { IPost, IPostListing } from '@/_shared/types';
 import { Pencil } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -11,7 +11,7 @@ import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import EditPost from './EditPost';
 
-function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing; onEditPostSuccess: (title: string, content: string) => void }) {
+function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing | IPost; onEditPostSuccess: (title: string, content: string) => void }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);

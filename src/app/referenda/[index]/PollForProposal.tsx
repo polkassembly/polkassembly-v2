@@ -70,6 +70,10 @@ export default function PollForProposal({ index, referer }: { index: string; ref
 		);
 	}
 
+	if (!data) {
+		return <div className='text-center text-text_primary'>Failed to load proposal</div>;
+	}
+
 	return (
 		<div className='h-full w-full bg-page_background'>
 			<PostDetails

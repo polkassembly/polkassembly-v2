@@ -14,12 +14,13 @@ import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLink
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import VoteHistoryTable from './VoteHistoryTable';
 import classes from './VoteHistory.module.scss';
 
 function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
-	const [tab, setTab] = useState(EVoteDecision.AYE);
+	const [tab, setTab] = useState<EVoteDecision>(EVoteDecision.AYE);
 	const [page, setPage] = useState(1);
 
 	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision) => {
@@ -55,7 +56,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.AYE ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						{t('PostDetails.aye')}
+						{t('PostDetails.aye')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.AYE]) && `(${data?.totalCounts?.[EVoteDecision.AYE]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white')}
@@ -65,14 +66,14 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 							fill={tab === EVoteDecision.NAY ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
 							className='h-4 w-4'
 						/>
-						{t('PostDetails.nay')}
+						{t('PostDetails.nay')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.NAY]) && `(${data?.totalCounts?.[EVoteDecision.NAY]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(classes.tabs, 'py-1.5 data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white')}
 						value={EVoteDecision.SPLIT_ABSTAIN}
 					>
 						<Ban className='h-4 w-4' />
-						{t('PostDetails.abstain')}
+						{t('PostDetails.abstain')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]) && `(${data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]})`}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={EVoteDecision.AYE}>
@@ -94,12 +95,14 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 					/>
 				</TabsContent>
 			</Tabs>
-			<PaginationWithLinks
-				page={page}
-				pageSize={DEFAULT_LISTING_LIMIT}
-				totalCount={data?.totalCount || 0}
-				onPageChange={(newPage) => setPage(newPage)}
-			/>
+			{!!data?.totalCounts?.[tab as EVoteDecision] && (
+				<PaginationWithLinks
+					page={page}
+					pageSize={DEFAULT_LISTING_LIMIT}
+					totalCount={data?.totalCounts?.[tab as EVoteDecision] || 0}
+					onPageChange={(newPage) => setPage(newPage)}
+				/>
+			)}
 		</div>
 	);
 }

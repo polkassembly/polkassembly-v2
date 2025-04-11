@@ -21,7 +21,6 @@ import {
 	IPostListing,
 	IPost,
 	IPublicUser,
-	IVoteData,
 	IUserActivity,
 	IPreimage,
 	IQRSessionPayload,
@@ -36,7 +35,8 @@ import {
 	IDelegateDetails,
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
-	IContentSummary
+	IContentSummary,
+	IVoteHistoryData
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -506,7 +506,7 @@ export class NextApiClientService {
 			decision
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
-		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
+		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
 	// activity feed
