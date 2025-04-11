@@ -27,5 +27,5 @@
 }
 
 .container {
-	@apply relative z-10 w-full max-w-full overflow-x-hidden rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg;
+	@apply relative z-10 mx-auto w-full max-w-[1200px] overflow-x-hidden rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg;
 }
