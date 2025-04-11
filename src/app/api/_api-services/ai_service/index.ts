@@ -49,16 +49,13 @@ export class AIService {
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
     Analyze the sentiment and provide a breakdown in the following format:
 
-    Users feeling optimistic say: [Summarize main positive points]
+    ### Users feeling optimistic say: [Summarize main positive points if any]
 
-    Users feeling neutral say: [Summarize neutral/questioning points]
+    ### Users feeling neutral say: [Summarize neutral/questioning points if any]
 
-    Users feeling against say: [Summarize main concerns]
+    ### Users feeling against say: [Summarize main concerns if any]
 
-    Important technical points raised:
-    - [List key technical discussions]
-
-    Key questions from the community:
+    ### Key questions from the community:
     - [List main questions]
 
     STRICT RULES: 
