@@ -5,6 +5,16 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
 import { getTrackDays } from './getTrackDays';
 
+const getLabel = (passed: number, totalMinutes: number) => {
+	if (totalMinutes < 60) {
+		return `${Math.round(passed)} / ${Math.round(totalMinutes)} minutes`;
+	}
+	if (totalMinutes < 1440) {
+		return `${Math.round(passed / 60)} / ${Math.round(totalMinutes / 60)} hours`;
+	}
+	return `${Math.round(passed / 1440)} / ${Math.round(totalMinutes / 1440)} days`;
+};
+
 export const getPeriodProgressLabel = ({ endAt, trackName, periodType }: { endAt?: Date; trackName: EPostOrigin; periodType: EPeriodType }): string => {
 	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
 
@@ -21,23 +31,19 @@ export const getPeriodProgressLabel = ({ endAt, trackName, periodType }: { endAt
 			totalDays = decisionDays || 0;
 			break;
 	}
+	const totalMinutes = totalDays * 24 * 60;
 
-	if (!endAt) return `0 / ${totalDays} days`;
+	if (!endAt) {
+		return getLabel(0, totalMinutes);
+	}
 
 	const endDate = dayjs(endAt);
 	const startDate = endDate.subtract(totalDays, 'days');
 	const now = dayjs();
 
 	const diffMinutes = now.diff(startDate, 'minutes');
-	const totalMinutes = totalDays * 24 * 60;
 
 	const passed = Math.max(0, Math.min(totalMinutes, diffMinutes));
 
-	if (totalMinutes < 60) {
-		return `${Math.round(passed)} / ${Math.round(totalMinutes)} minutes`;
-	}
-	if (totalMinutes < 1440) {
-		return `${Math.round(passed / 60)} / ${Math.round(totalMinutes / 60)} hours`;
-	}
-	return `${Math.round(passed / 1440)} / ${Math.round(totalMinutes / 1440)} days`;
+	return getLabel(passed, totalMinutes);
 };
