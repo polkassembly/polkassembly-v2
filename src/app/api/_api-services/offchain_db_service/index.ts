@@ -107,12 +107,14 @@ export class OffChainDbService {
 		network,
 		indexOrHash,
 		proposalType,
-		proposer
+		proposer,
+		getDefaultContent = true
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		proposer?: string;
+		getDefaultContent?: boolean;
 	}): Promise<IOffChainPost> {
 		let post: IOffChainPost | null = null;
 
@@ -149,7 +151,7 @@ export class OffChainDbService {
 			};
 		}
 
-		const content = getDefaultPostContent(proposalType, proposer);
+		const content = getDefaultContent ? getDefaultPostContent(proposalType, proposer) : '';
 
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && ValidatorService.isValidNumber(indexOrHash) ? Number(indexOrHash) : undefined,

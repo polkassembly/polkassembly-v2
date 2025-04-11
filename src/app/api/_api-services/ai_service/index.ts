@@ -3,12 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo, ICrossValidationResult } from '@/_shared/types';
-import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
@@ -185,19 +184,11 @@ export class AIService {
 			fullPrompt += `### Beneficiaries:\n${additionalData.beneficiaries
 				.map((beneficiary) => {
 					try {
-						const assetData = beneficiary.assetId
-							? getAssetDataByIndexForNetwork({
-									network,
-									generalIndex: beneficiary.assetId
-								})
-							: null;
+						const balanceStr = formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId);
 
-						const amount = beneficiary.amount || 'Not specified';
-						const assetSymbol = assetData ? `${assetData.symbol} (${assetData.name})` : NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
-
-						return `${beneficiary.address} (Amount: ${amount} ${assetSymbol})`;
+						return `${beneficiary.address} (Amount: ${balanceStr})`;
 					} catch {
-						// Fallback to basic format if asset lookup fails
+						// Fallback to basic format if asset lookup or formatting fails
 						return `${beneficiary.address} (Amount: ${beneficiary.amount || 'Not specified'})`;
 					}
 				})
@@ -273,14 +264,17 @@ export class AIService {
 
 		const response = await this.getAIResponse(fullPrompt);
 
-		if (!response || typeof response !== 'string' || !['true', 'false'].includes(response.toLowerCase())) {
+		// extract the result from the response using regex
+		const resultRegex = /(true|false)/;
+		const result = response?.match(resultRegex)?.[0];
+
+		if (!result || typeof result !== 'string' || !['true', 'false'].includes(result.toLowerCase())) {
 			return null;
 		}
 
 		console.log('spam check response', response);
 
-		// Check if response is exactly 'true' or 'false'
-		return response?.toLowerCase() === 'true';
+		return result.toLowerCase() === 'true';
 	}
 
 	private static async getCommentSentiment({ mdContent }: { mdContent: string }): Promise<ECommentSentiment | null> {
@@ -292,11 +286,15 @@ export class AIService {
 
 		const response = await this.getAIResponse(fullPrompt);
 
-		if (!response || typeof response !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(response.toLowerCase())) {
+		// extract the sentiment from the response using regex
+		const sentimentRegex = /(against|slightly_against|neutral|slightly_for|for)/;
+		const sentiment = response?.match(sentimentRegex)?.[0];
+
+		if (!sentiment || typeof sentiment !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(sentiment.toLowerCase())) {
 			return null;
 		}
 
-		return response.toLowerCase() as ECommentSentiment;
+		return sentiment as ECommentSentiment;
 	}
 
 	/**
@@ -383,7 +381,7 @@ export class AIService {
 	}
 
 	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
-		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
+		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType, getDefaultContent: false });
 
 		let onChainPostInfo: IOnChainPostInfo | null = null;
 		if (ValidatorService.isValidOnChainProposalType(proposalType)) {
