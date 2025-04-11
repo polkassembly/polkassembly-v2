@@ -35,26 +35,32 @@ export class NotificationService {
 		trigger: ENotificationTrigger;
 		args: Record<string, string>;
 	}) {
-		if (!IS_NOTIFICATION_SERVICE_ENABLED) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED is false');
+		if (!IS_NOTIFICATION_SERVICE_ENABLED || !NOTIFICATION_ENGINE_API_KEY) {
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found');
 		}
 
-		await fetch(`${this.NOTIFICATION_ENGINE_URL}`, {
-			body: JSON.stringify({
-				args,
-				trigger
-			}),
-			headers: this.firebaseFunctionsHeader(network),
-			method: 'POST'
-		}).catch((e) => {
+		try {
+			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}`, {
+				body: JSON.stringify({
+					args,
+					trigger
+				}),
+				headers: this.firebaseFunctionsHeader(network),
+				method: 'POST'
+			});
+
+			const { data, error } = (await res.json()) as { data?: string; error?: string };
+
+			if (error || !data) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, error || 'Error in sending Notification');
+			}
+		} catch (e) {
 			console.error('Notification not sent', e);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Notification not sent');
-		});
+		}
 	}
 
 	static async SendVerificationEmail(user: IUser, token: string, email?: string): Promise<void> {
-		console.log('email', email);
-
 		if (!email || !['aadarsh@polkassembly.io', 'aadarsh012@gmail.com', 'aadarshshaw24@gmail.com'].includes(email)) return;
 
 		await this.sendNotification({
