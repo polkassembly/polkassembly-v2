@@ -303,7 +303,7 @@ function ActivityFeedPostItem({
 								href='/login'
 								className='relative z-50'
 							>
-								<span className={styles.castVoteButton}>
+								<span className={cn(styles.castVoteButton, 'justify-center py-1.5')}>
 									<Image
 										src={VoteIcon}
 										alt=''
