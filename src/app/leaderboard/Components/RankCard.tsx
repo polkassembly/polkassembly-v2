@@ -61,7 +61,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 				{/* Content overlay with flex layout to separate top and bottom content */}
 				<div className='absolute left-0 top-0 flex h-full w-full flex-col justify-between pb-5'>
 					{/* Top Section - Rank and Score */}
-					<div className={`${state === 'collapsed' ? 'pt-0 xl:pt-2 2xl:pt-1' : 'pt-0 xl:pt-3 2xl:pt-1'} flex flex-col items-center`}>
+					<div className={`${state === 'collapsed' ? 'pt-2 xl:pt-2 2xl:pt-1' : 'pt-1.5 xl:pt-3 2xl:pt-1'} flex flex-col items-center`}>
 						<p className={`${styles.rankCardText} text-xs sm:text-sm`}>
 							{t('Profile.rank')} 0{place}
 						</p>

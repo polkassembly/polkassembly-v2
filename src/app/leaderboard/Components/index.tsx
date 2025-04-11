@@ -113,14 +113,14 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							<Image
 								src={Trophy}
 								alt='Cup'
-								className='h-auto w-40 md:w-52 lg:w-64'
+								className='h-32 w-24 md:w-52 lg:w-64'
 								width={50}
 								height={100}
 								priority
 							/>
 						</div>
 						<div className='flex flex-col items-center justify-center text-center'>
-							<p className='text-4xl font-semibold text-white'>{t('Leaderboard.leaderboard')}</p>
+							<p className='text-2xl font-semibold text-white lg:text-4xl'>{t('Leaderboard.leaderboard')}</p>
 							<p className='whitespace-nowrap text-white'>{t('Leaderboard.findYourRank')}</p>
 						</div>
 					</div>
