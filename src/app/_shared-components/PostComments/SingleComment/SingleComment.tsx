@@ -127,11 +127,11 @@ function SingleComment({
 						height={30}
 					/>
 				) : (
-					<div className='w-[30px]'>
+					<div>
 						<Image
 							src={UserIcon}
 							alt='profile'
-							className='rounded-full'
+							className='h-[30px] w-[30px] rounded-full'
 						/>
 					</div>
 				)}
