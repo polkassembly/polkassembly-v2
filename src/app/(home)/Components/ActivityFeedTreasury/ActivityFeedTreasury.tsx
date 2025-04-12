@@ -156,16 +156,34 @@ export default function ActivityFeedTreasury() {
 	const chartData = useMemo(() => {
 		if (!treasuryStats?.length) return [];
 
+		const last12Months = Array.from({ length: 12 }, (_, i) => {
+			const date = new Date();
+			date.setMonth(date.getMonth() - (11 - i));
+			return {
+				date,
+				month: date.toLocaleString('en-US', { month: 'short' }),
+				timestamp: date.getTime()
+			};
+		});
+
 		const sortedStats = [...treasuryStats].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-		return sortedStats.map((stat) => {
+		const statsMap = new Map();
+		sortedStats.forEach((stat) => {
 			const date = new Date(stat.createdAt);
+			const monthKey = date.toLocaleString('en-US', { month: 'short' });
 			const totalDot = Number(stat.total?.totalDot || 0) / 10000000000;
+			statsMap.set(monthKey, totalDot);
+		});
+
+		// Map each month to its data point
+		return last12Months.map(({ month }) => {
+			const value = statsMap.get(month) || 0;
 
 			return {
-				month: date.toLocaleString('en-US', { month: 'short' }),
-				value: Number(totalDot.toFixed(2)),
-				displayValue: `${format.number(totalDot, {
+				month,
+				value: Number(value.toFixed(2)),
+				displayValue: `${format.number(value, {
 					notation: 'compact',
 					maximumFractionDigits: 2
 				})} DOT`
