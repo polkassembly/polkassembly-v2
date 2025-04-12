@@ -64,12 +64,10 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 	const [trackData, setTrackData] = useState<ITrackDelegationDetails | null>(delegateTrackResponse);
 
 	const currentTrackStatus = delegateUserTracks?.find((track) => track.trackId === trackId)?.status;
-	const isDelegated = currentTrackStatus === EDelegationStatus.DELEGATED;
+	const isDelegated = currentTrackStatus === EDelegationStatus.DELEGATED || trackData?.status === EDelegationStatus.DELEGATED;
 
 	const hasTrackData =
-		trackData &&
-		((isReceived && Array.isArray(trackData.receivedDelegations) && trackData.receivedDelegations.length > 0) ||
-			(!isReceived && Array.isArray(trackData.delegatedTo) && trackData.delegatedTo.length > 0));
+		trackData && ((isReceived && Array.isArray(trackData.receivedDelegations)) || (!isReceived && Array.isArray(trackData.delegatedTo) && trackData.delegatedTo.length > 0));
 
 	useEffect(() => {
 		if (delegateTrackResponse) {
@@ -165,7 +163,7 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 		);
 	};
 
-	if ((!isDelegated && !isReceived) || !hasTrackData) {
+	if (!isDelegated && !isReceived && !hasTrackData) {
 		return (
 			<div className={styles.undelegatedContent}>
 				<Image

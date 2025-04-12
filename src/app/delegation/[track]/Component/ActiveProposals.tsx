@@ -89,7 +89,7 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 									<div className={styles.proposalDetails}>
 										<div className='flex items-center gap-2 md:hidden'>
 											<span className={styles.proposalLabel}>{t('by')}: </span>
-											<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
+											<div className='flex items-center gap-1 pl-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
 											{proposal.onChainInfo?.createdAt && (
 												<div className='flex items-center gap-1.5 whitespace-nowrap text-text_primary md:hidden'>
 													<Separator
@@ -113,8 +113,8 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 										</div>
 										<div className={styles.proposalInfo}>
 											<div className='hidden md:flex'>
-												<span className={styles.proposalLabel}>{t('by')}:</span>
-												<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
+												<span className={styles.proposalLabel}>{t('by')}: </span>
+												<div className='flex items-center gap-1 pl-2'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
 											</div>
 											{renderProposalTimeInfo(proposal)}
 										</div>
