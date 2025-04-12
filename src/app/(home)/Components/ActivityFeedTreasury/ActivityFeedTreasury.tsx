@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { type ChartConfig } from '@ui/Chart';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { MdInfoOutline } from 'react-icons/md';
@@ -18,7 +18,6 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { formatNumberWithSuffix } from '@/_shared/_utils/formatNumberWithSuffix';
 import { TreasuryDetailsDialog } from '../ActivityFeedTreasuryDialog/ActivityFeedTreasuryDialog';
 import TreasuryChart from './Components/TreasuryChart';
 import NextBurnDisplay from './Components/NextBurnDisplay';
@@ -128,6 +127,7 @@ function DotPriceDisplay({
 
 export default function ActivityFeedTreasury() {
 	const t = useTranslations('ActivityFeed');
+	const format = useFormatter();
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -154,28 +154,24 @@ export default function ActivityFeedTreasury() {
 	const showValueUSD = Boolean(nextBurn?.valueUSD && nextBurn.valueUSD !== '0' && nextBurn.valueUSD !== '');
 
 	const chartData = useMemo(() => {
-		if (!treasuryStats?.[0]) return [];
+		if (!treasuryStats?.length) return [];
 
-		const currentDate = new Date('2025-03-24');
-		const currentMonthDot = Number(treasuryStats[0]?.total?.totalDot || 0) / 10000000000;
-		const baselineValue = currentMonthDot;
+		const sortedStats = [...treasuryStats].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-		return Array.from({ length: 12 }, (_, i) => {
-			const date = new Date(currentDate);
-			date.setMonth(currentDate.getMonth() - (11 - i));
-
-			const isCurrentMonth = date.getMonth() === currentDate.getMonth() && date.getFullYear() === currentDate.getFullYear();
-
-			const historicalValue = isCurrentMonth ? baselineValue : baselineValue * (0.85 + (i / 11) * 0.3);
-			const { formatted, suffix } = formatNumberWithSuffix(historicalValue);
+		return sortedStats.map((stat) => {
+			const date = new Date(stat.createdAt);
+			const totalDot = Number(stat.total?.totalDot || 0) / 10000000000;
 
 			return {
 				month: date.toLocaleString('en-US', { month: 'short' }),
-				value: Number(historicalValue.toFixed(2)),
-				displayValue: `${formatted}${suffix} DOT`
+				value: Number(totalDot.toFixed(2)),
+				displayValue: `${format.number(totalDot, {
+					notation: 'compact',
+					maximumFractionDigits: 2
+				})} DOT`
 			};
 		});
-	}, [treasuryStats]);
+	}, [treasuryStats, format]);
 
 	const stats = useMemo(() => {
 		if (!treasuryStats?.[0]) return null;
@@ -259,7 +255,17 @@ export default function ActivityFeedTreasury() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService]);
 
-	const { formatted: totalValueFormatted, suffix: totalValueSuffix } = formatNumberWithSuffix(stats?.totalValueUsd || 0);
+	const { totalValueFormatted, totalValueSuffix } = useMemo(() => {
+		const value = stats?.totalValueUsd || 0;
+		return {
+			totalValueFormatted: format.number(value, {
+				notation: 'compact',
+				maximumFractionDigits: 2
+			}),
+			totalValueSuffix: ''
+		};
+	}, [stats?.totalValueUsd, format]);
+
 	const hasData = !!stats && !treasuryError;
 	const showTotalValue = hasData && !!stats?.totalValueUsd && stats.totalValueUsd > 0;
 

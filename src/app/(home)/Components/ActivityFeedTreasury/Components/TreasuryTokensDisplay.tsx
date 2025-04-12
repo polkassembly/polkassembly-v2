@@ -4,18 +4,21 @@
 
 import { Separator } from '@/app/_shared-components/Separator';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import Image, { StaticImageData } from 'next/image';
 import DotIcon from '@assets/icons/dot.png';
 import UsdcIcon from '@assets/icons/usdc.svg';
 import UsdtIcon from '@assets/icons/usdt.svg';
 import MythIcon from '@assets/icons/myth.svg';
-import { formatNumberWithSuffix } from '@/_shared/_utils/formatNumberWithSuffix';
 
 function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount: number; symbol: string }) {
+	const format = useFormatter();
 	if (!amount) return null;
 
-	const { formatted, suffix } = formatNumberWithSuffix(amount);
+	const formattedAmount = format.number(amount, {
+		notation: 'compact',
+		maximumFractionDigits: 2
+	});
 
 	return (
 		<div className='flex items-center gap-1'>
@@ -26,8 +29,7 @@ function TokenDisplay({ icon, amount, symbol }: { icon: StaticImageData; amount:
 				height={16}
 			/>
 			<span className='text-xs text-btn_secondary_text'>
-				{formatted}
-				{suffix} {symbol}
+				{formattedAmount} {symbol}
 			</span>
 		</div>
 	);
