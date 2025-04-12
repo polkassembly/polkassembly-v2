@@ -857,7 +857,9 @@
 		"undelegatedSuccessfully": "Delegierten erfolgreich aufgehoben",
 		"delegateUpdatedSuccessfully": "Delegierten erfolgreich aktualisiert",
 		"errorCreatingDelegate": "Fehler beim Erstellen von Delegierten",
-		"delegateCreatedSuccessfully": "Delegierten erfolgreich erstellt"
+		"delegateCreatedSuccessfully": "Delegierten erfolgreich erstellt",
+		"enterDelegateAddress": "Delegiertenadresse eingeben",
+		"youCannotDelegateToYourself": "Sie können sich nicht selbst delegieren"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage-Einzahlung",

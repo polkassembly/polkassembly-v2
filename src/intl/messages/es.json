@@ -856,7 +856,9 @@
 		"undelegatedSuccessfully": "Delegación cancelada exitosamente",
 		"delegateUpdatedSuccessfully": "Delegado actualizado exitosamente",
 		"errorCreatingDelegate": "Error al crear delegado",
-		"delegateCreatedSuccessfully": "Delegado creado exitosamente"
+		"delegateCreatedSuccessfully": "Delegado creado exitosamente",
+		"enterDelegateAddress": "Ingresar dirección del delegado",
+		"youCannotDelegateToYourself": "No puede delegar a sí mismo"
 	},
 	"TxFees": {
 		"preimageDeposit": "Depósito de Preimage",
