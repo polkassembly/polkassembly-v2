@@ -15,7 +15,7 @@ import { FaFilter } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 import { MdSort } from 'react-icons/md';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { Checkbox } from '@/app/_shared-components/checkbox';
+import { Checkbox } from '@/app/_shared-components/Checkbox';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import { useQuery } from '@tanstack/react-query';

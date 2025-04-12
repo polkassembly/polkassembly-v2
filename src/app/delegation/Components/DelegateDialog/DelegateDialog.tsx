@@ -18,7 +18,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BN } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { Checkbox } from '@/app/_shared-components/checkbox';
+import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { Info, Loader, X } from 'lucide-react';
