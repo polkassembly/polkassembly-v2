@@ -11,7 +11,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useState, useEffect } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
 import { useToast } from '@/hooks/useToast';
-import { NotificationType, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
+import { ENotificationStatus, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
 import { Loader2 } from 'lucide-react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import Image from 'next/image';
@@ -57,7 +57,7 @@ export default function BecomeDelegateDialog() {
 			console.error('Error checking delegate status:', error);
 			toast({
 				title: 'Error checking delegate status',
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
 		} finally {
@@ -89,14 +89,14 @@ export default function BecomeDelegateDialog() {
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
 				title: t('delegateCreatedSuccessfully'),
-				status: NotificationType.SUCCESS
+				status: ENotificationStatus.SUCCESS
 			});
 			setDialogOpen(false);
 		} catch (error) {
 			setDelegates((prev) => prev.filter((d) => d.address !== address));
 			toast({
 				title: t('errorCreatingDelegate'),
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
 		} finally {
@@ -113,14 +113,14 @@ export default function BecomeDelegateDialog() {
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
 				title: t('delegateUpdatedSuccessfully'),
-				status: NotificationType.SUCCESS
+				status: ENotificationStatus.SUCCESS
 			});
 			setDialogOpen(false);
 		} catch (error) {
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
 				title: 'Error updating delegate',
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				description: error instanceof Error ? error.message : ERROR_UNKNOWN
 			});
 		} finally {

@@ -47,7 +47,7 @@ function WalletButton({
 			size='icon'
 			disabled={disabled}
 			variant='outline'
-			// if it is disabled, we change the bg color to bg-page_bg
+			type='button'
 			className={cn(wallet === userPreferences.wallet && !hidePreference && 'border border-navbar_border', disabled ? 'bg-wallet_disabled_bg' : 'bg-bg_modal')}
 		>
 			<WalletIcon wallet={wallet} />
@@ -64,6 +64,7 @@ function WalletButton({
 			leftIcon={<WalletIcon wallet={wallet} />}
 			disabled={disabled}
 			size='lg'
+			type='button'
 		>
 			<span>{label}</span>
 		</Button>

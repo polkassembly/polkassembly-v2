@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import { dayjs } from '@shared/_utils/dayjsInit';
-import { EProposalStatus } from '@/_shared/types';
+import { EPeriodType, EPostOrigin, EProposalStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
@@ -12,12 +12,14 @@ function ProposalPeriods({
 	confirmationPeriodEndsAt,
 	decisionPeriodEndsAt,
 	preparePeriodEndsAt,
-	status
+	status,
+	trackName
 }: {
 	confirmationPeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
-	status?: EProposalStatus;
+	status: EProposalStatus;
+	trackName: EPostOrigin;
 }) {
 	const t = useTranslations();
 	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;
@@ -50,10 +52,14 @@ function ProposalPeriods({
 					<PeriodProgress
 						periodEndsAt={decisionPeriodEndsAt}
 						periodName={t('PostDetails.decisionPeriod')}
+						trackName={trackName}
+						periodType={EPeriodType.DECISION}
 					/>
 					<PeriodProgress
 						periodEndsAt={confirmationPeriodEndsAt}
 						periodName={t('PostDetails.confirmationPeriod')}
+						trackName={trackName}
+						periodType={EPeriodType.CONFIRM}
 					/>
 				</div>
 			) : (
@@ -61,6 +67,8 @@ function ProposalPeriods({
 					<PeriodProgress
 						periodEndsAt={preparePeriodEndsAt}
 						periodName={t('PostDetails.preparePeriod')}
+						trackName={trackName}
+						periodType={EPeriodType.PREPARE}
 					/>
 				</div>
 			)}

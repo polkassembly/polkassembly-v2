@@ -346,6 +346,12 @@ export interface ITag {
 	network: ENetwork;
 }
 
+export interface IOffChainContentHistoryItem {
+	content: string;
+	title?: string;
+	createdAt: Date;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -367,6 +373,7 @@ export interface IOffChainPost {
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
 	topic?: EOffChainPostTopic;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export enum EProposalStatus {
@@ -592,11 +599,11 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
-	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export interface ICommentResponse extends IComment {
@@ -623,6 +630,7 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
+	hash?: string;
 }
 
 export interface IVoteData {
@@ -902,7 +910,7 @@ export interface IWritePostFormFields {
 	allowedCommentor: EAllowedCommentor;
 }
 
-export enum NotificationType {
+export enum ENotificationStatus {
 	SUCCESS = 'success',
 	ERROR = 'error',
 	WARNING = 'warning',
@@ -1036,6 +1044,26 @@ export interface ITrackDelegationDetails {
 	status: EDelegationStatus;
 }
 
+export enum ESocialVerificationStatus {
+	VERIFIED = 'verified',
+	PENDING = 'pending',
+	UNVERIFIED = 'unverified'
+}
+
+export interface ISocialHandle {
+	userId: number;
+	address: string;
+	social: ESocial;
+	handle: string;
+	status: ESocialVerificationStatus;
+	verificationToken?: {
+		token?: string;
+		secret?: string;
+		expiresAt?: Date;
+	};
+	createdAt?: Date;
+	updatedAt?: Date;
+}
 export interface IVoteHistoryData {
 	votes: IVoteData[];
 	totalCounts: {
@@ -1044,4 +1072,10 @@ export interface IVoteHistoryData {
 		[EVoteDecision.SPLIT_ABSTAIN]?: number;
 		[EVoteDecision.SPLIT]?: number;
 	};
+}
+
+export enum EPeriodType {
+	PREPARE = 'prepare',
+	DECISION = 'decision',
+	CONFIRM = 'confirm'
 }

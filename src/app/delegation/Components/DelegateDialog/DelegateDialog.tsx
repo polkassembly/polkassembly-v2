@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl';
 import { ReactNode, useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
-import { EConvictionAmount, EDelegationStatus, EPostOrigin, NotificationType } from '@/_shared/types';
+import { EConvictionAmount, EDelegationStatus, EPostOrigin, ENotificationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BN } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -208,14 +208,14 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					setOpen(false);
 					toast({
 						title: 'Delegated successfully',
-						status: NotificationType.SUCCESS
+						status: ENotificationStatus.SUCCESS
 					});
 					setLoading(false);
 				},
 				onFailed: (error) => {
 					toast({
 						title: error,
-						status: NotificationType.ERROR
+						status: ENotificationStatus.ERROR
 					});
 					setLoading(false);
 				}
@@ -224,7 +224,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 			console.error('Transaction error:', error);
 			toast({
 				title: 'Transaction failed',
-				status: NotificationType.ERROR
+				status: ENotificationStatus.ERROR
 			});
 			setLoading(false);
 		}

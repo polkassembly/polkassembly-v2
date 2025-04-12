@@ -11,7 +11,7 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';
 import { ReactNode, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { NotificationType, EDelegationStatus } from '@/_shared/types';
+import { ENotificationStatus, EDelegationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Info, Loader } from 'lucide-react';
@@ -103,7 +103,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 					setOpen(false);
 					toast({
 						title: t('undelegatedSuccessfully'),
-						status: NotificationType.SUCCESS
+						status: ENotificationStatus.SUCCESS
 					});
 					setLoading(false);
 					onUndelegateSuccess?.();
@@ -111,7 +111,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 				onFailed: (error) => {
 					toast({
 						title: error,
-						status: NotificationType.ERROR
+						status: ENotificationStatus.ERROR
 					});
 					setLoading(false);
 				}
@@ -120,7 +120,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 			console.error('Transaction error:', error);
 			toast({
 				title: t('transactionFailed'),
-				status: NotificationType.ERROR
+				status: ENotificationStatus.ERROR
 			});
 			setLoading(false);
 		}
