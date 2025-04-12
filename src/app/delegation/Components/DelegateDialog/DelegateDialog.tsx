@@ -139,11 +139,11 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	);
 
 	const calculateTxFee = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || !balance || selectedTrackIds?.length === 0) return;
+		if (!apiService || !balance || selectedTrackIds?.length === 0) return;
 
 		try {
 			const fee = await apiService.getDelegateTxFee({
-				address: user.defaultAddress,
+				address: delegate.address,
 				tracks: selectedTrackIds,
 				conviction,
 				balance: new BN(balance)
@@ -152,7 +152,8 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 		} catch (error) {
 			console.error('Failed to calculate transaction fee:', error);
 		}
-	}, [apiService, user?.defaultAddress, balance, selectedTrackIds, conviction]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [apiService, balance, selectedTrackIds, conviction, delegate.address]);
 
 	const handleSubmit = useCallback(async () => {
 		if (!apiService || !user?.defaultAddress || selectedTrackIds?.length === 0) return;

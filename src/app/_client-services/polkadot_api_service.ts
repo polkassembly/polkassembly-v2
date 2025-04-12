@@ -823,11 +823,8 @@ export class PolkadotApiService {
 		if (!this.api) return BN_ZERO;
 
 		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, address, conviction, balance));
-
-		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
-
-		const info = await tx?.paymentInfo(address);
-		return new BN(info?.partialFee?.toString() || '0');
+		const fee = await this.getTxFee({ extrinsicFn: txs, address });
+		return fee || BN_ZERO;
 	}
 
 	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
