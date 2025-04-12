@@ -21,8 +21,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-component
 import { useTranslations } from 'next-intl';
 import { useAtom } from 'jotai';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
-import { useUser } from '@/hooks/useUser';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
 import UndelegateDialog from '../../Components/UndelegateDialog/UndelegateDialog';
 import styles from './DelegationTrack/DelegationTrack.module.scss';
@@ -60,7 +58,6 @@ interface DelegationContentProps {
 export function DelegationContent({ isReceived, delegateTrackResponse, trackId, trackName }: DelegationContentProps) {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
-	const { user } = useUser();
 	const [openDelegate, setOpenDelegate] = useState(false);
 	const [openUndelegateAddresses, setOpenUndelegateAddresses] = useState<Record<string, boolean>>({});
 	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
@@ -69,35 +66,16 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 	const currentTrackStatus = delegateUserTracks?.find((track) => track.trackId === trackId)?.status;
 	const isDelegated = currentTrackStatus === EDelegationStatus.DELEGATED;
 
-	// Check if there's actual data to show
-	const hasTrackData = trackData && ((isReceived && Array.isArray(trackData.receivedDelegations)) || (!isReceived && Array.isArray(trackData.delegatedTo)));
+	const hasTrackData =
+		trackData &&
+		((isReceived && Array.isArray(trackData.receivedDelegations) && trackData.receivedDelegations.length > 0) ||
+			(!isReceived && Array.isArray(trackData.delegatedTo) && trackData.delegatedTo.length > 0));
 
 	useEffect(() => {
 		if (delegateTrackResponse) {
 			setTrackData(delegateTrackResponse);
 		}
 	}, [delegateTrackResponse]);
-
-	useEffect(() => {
-		async function fetchTrackData() {
-			if (!user?.defaultAddress) return;
-			try {
-				const data = await NextApiClientService.getDelegateTrack({
-					address: user.defaultAddress,
-					trackId
-				});
-				if (data.data) {
-					setTrackData(data.data);
-				}
-			} catch (error) {
-				console.error('Error fetching track data:', error);
-			}
-		}
-
-		if (isDelegated) {
-			fetchTrackData();
-		}
-	}, [user?.defaultAddress, trackId, isDelegated]);
 
 	const handleOpenUndelegate = (address: string, isOpen: boolean) => {
 		setOpenUndelegateAddresses((prev) => ({ ...prev, [address]: isOpen }));
@@ -187,7 +165,7 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 		);
 	};
 
-	if (!isDelegated || !hasTrackData) {
+	if ((!isDelegated && !isReceived) || !hasTrackData) {
 		return (
 			<div className={styles.undelegatedContent}>
 				<Image
