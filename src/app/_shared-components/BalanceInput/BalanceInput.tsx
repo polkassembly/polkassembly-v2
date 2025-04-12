@@ -13,7 +13,7 @@ import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { useUser } from '@/hooks/useUser';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -47,7 +47,7 @@ function BalanceInput({
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const [error, setError] = useState('');
-	const { user } = useUser();
+	const { userPreferences } = useUserPreferences();
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 
 	const { apiService } = usePolkadotApiService();
@@ -97,9 +97,9 @@ function BalanceInput({
 	}, [network]);
 
 	useEffect(() => {
-		if (user?.defaultAddress) getBalance(user.defaultAddress);
+		if (userPreferences?.address?.address) getBalance(userPreferences.address.address);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user]);
+	}, [userPreferences?.address]);
 
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
