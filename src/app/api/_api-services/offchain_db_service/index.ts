@@ -34,7 +34,9 @@ import {
 	IPostSubscription,
 	ECommentSentiment,
 	ITreasuryStats,
-	IDelegate
+	IDelegate,
+	ESocialVerificationStatus,
+	ESocial
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -107,12 +109,14 @@ export class OffChainDbService {
 		network,
 		indexOrHash,
 		proposalType,
-		proposer
+		proposer,
+		getDefaultContent = true
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		proposer?: string;
+		getDefaultContent?: boolean;
 	}): Promise<IOffChainPost> {
 		let post: IOffChainPost | null = null;
 
@@ -149,7 +153,7 @@ export class OffChainDbService {
 			};
 		}
 
-		const content = getDefaultPostContent(proposalType, proposer);
+		const content = getDefaultContent ? getDefaultPostContent(proposalType, proposer) : '';
 
 		return {
 			index: proposalType !== EProposalType.TIP && indexOrHash.trim() !== '' && ValidatorService.isValidNumber(indexOrHash) ? Number(indexOrHash) : undefined,
@@ -485,7 +489,6 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		address,
 		sentiment
 	}: {
 		network: ENetwork;
@@ -494,7 +497,6 @@ export class OffChainDbService {
 		userId: number;
 		content: string;
 		parentCommentId?: string;
-		address?: string;
 		sentiment?: ECommentSentiment;
 	}) {
 		// check if the post is allowed to be commented on
@@ -504,7 +506,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, address, sentiment });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment });
 
 		await this.saveUserActivity({
 			userId,
@@ -847,6 +849,40 @@ export class OffChainDbService {
 
 	static async DeletePolkassemblyDelegate({ network, address }: { network: ENetwork; address: string }) {
 		return FirestoreService.DeletePolkassemblyDelegate({ network, address });
+	}
+
+	static async UpdateUserSocialHandle({
+		userId,
+		address,
+		social,
+		handle,
+		status,
+		verificationToken
+	}: {
+		userId: number;
+		address?: string;
+		social: ESocial;
+		handle: string;
+		status: ESocialVerificationStatus;
+		verificationToken?: {
+			token?: string;
+			secret?: string;
+			expiresAt?: Date;
+		};
+	}) {
+		return FirestoreService.UpdateUserSocialHandle({ userId, address, social, handle, status, verificationToken });
+	}
+
+	static async GetUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		return FirestoreService.GetUserSocialHandles({ userId, address });
+	}
+
+	static async GetSocialHandleByToken({ token }: { token: string }) {
+		return FirestoreService.GetSocialHandleByToken({ token });
+	}
+
+	static async UpdateSocialHandleByToken({ token, status }: { token: string; status: ESocialVerificationStatus }) {
+		return FirestoreService.UpdateSocialHandleByToken({ token, status });
 	}
 
 	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {

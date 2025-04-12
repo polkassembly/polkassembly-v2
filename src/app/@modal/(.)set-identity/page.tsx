@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dia
 import { useRouter } from 'next/navigation';
 import SetIdentity from '@/app/_shared-components/SetIdentity/SetIdentity';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import ShieldUser from '@assets/icons/shield-user.svg';
 
 function SetIdentityModal() {
 	const t = useTranslations();
@@ -25,9 +27,19 @@ function SetIdentityModal() {
 		>
 			<DialogContent className='max-w-xl p-6'>
 				<DialogHeader>
-					<DialogTitle>{t('SetIdentity.onChainIdentity')}</DialogTitle>
+					<DialogTitle className='flex items-center gap-x-2 text-xl font-semibold text-text_primary'>
+						<Image
+							src={ShieldUser}
+							alt='logo'
+							width={24}
+							height={24}
+						/>
+						{t('SetIdentity.onChainIdentity')}
+					</DialogTitle>
 				</DialogHeader>
-				<SetIdentity />
+				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden'>
+					<SetIdentity />
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

@@ -2,18 +2,33 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
-import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { Progress } from '@/app/_shared-components/Progress/Progress';
+import { EPeriodType, EPostOrigin } from '@/_shared/types';
+import { getPeriodProgressLabel } from '@/app/_client-utils/getPeriodProgressLabel';
+import { calculatePeriodProgress } from '@/app/_client-utils/calculatePeriodProgress';
 
-function PeriodProgress({ periodEndsAt, periodName }: { periodEndsAt?: Date; periodName: string }) {
+interface Props {
+	periodEndsAt?: Date;
+	periodName: string;
+	periodType: EPeriodType;
+	trackName: EPostOrigin;
+}
+
+function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Props) {
+	const progress = calculatePeriodProgress({ endAt: periodEndsAt, trackName, periodType });
+	const label = getPeriodProgressLabel({ endAt: periodEndsAt, trackName, periodType });
+
 	return (
 		<div className='flex flex-col gap-y-2'>
 			<Progress
 				className='bg-progress_pink_bg'
 				indicatorClassName='bg-bg_pink'
-				value={calculateDecisionProgress(periodEndsAt || '')}
+				value={progress}
 			/>
-			<p className='text-sm text-text_primary'>{periodName}</p>
+			<div className='flex justify-between text-sm text-text_primary'>
+				<p>{periodName}</p>
+				<p>{label}</p>
+			</div>
 		</div>
 	);
 }

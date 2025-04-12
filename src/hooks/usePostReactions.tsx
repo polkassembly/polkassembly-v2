@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IReaction, NotificationType } from '@/_shared/types';
+import { EProposalType, EReaction, IReaction, ENotificationStatus } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ClientError } from '@/app/_client-utils/clientError';
@@ -121,7 +121,7 @@ export const usePostReactions = (postData: IPostData) => {
 
 		toast({
 			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
-			status: !isSubscribed ? NotificationType.SUCCESS : NotificationType.INFO
+			status: !isSubscribed ? ENotificationStatus.SUCCESS : ENotificationStatus.INFO
 		});
 
 		try {
@@ -138,7 +138,7 @@ export const usePostReactions = (postData: IPostData) => {
 			setIsSubscribed(isSubscribed);
 			toast({
 				title: 'Failed to update subscription',
-				status: NotificationType.ERROR
+				status: ENotificationStatus.ERROR
 			});
 			console.error('Failed to update subscription:', error);
 			return {

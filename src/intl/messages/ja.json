@@ -628,21 +628,39 @@
 	},
 	"SetIdentity": {
 		"displayName": "表示名",
-		"legalName": "法的名",
+		"legalName": "本名",
 		"email": "メール",
 		"twitter": "Twitter",
-		"matrix": "マトリックス",
+		"riot": "Riot",
+		"emailPlaceholder": "メールアドレスを入力",
+		"twitterPlaceholder": "@Twitterユーザー名",
+		"riotPlaceholder": "@ユーザー名.matrix.org",
 		"setIdentity": "アイデンティティを設定",
-		"onChainIdentity": "オンチェーンアイデンティティ",
-		"identityDescription1": "Polkadotは、任命された登録機関を通じてユーザーの資格情報を検証するオンチェーンIDを提供し、より大きな信頼とサポートを実現します。",
-		"identityDescription2": "検証が成功すると、ユーザーは信頼できるステータスを象徴する緑のチェックマークを受け取ります。この検証済みステータスシンボルは、財務部からの資金要請や討論・提案への参加時の信頼性を高めます。",
+		"onChainIdentity": "オンチェーンID",
+		"identityDescription1": "Polkadotは、任命されたレジストラを通じてユーザーの資格情報を検証するオンチェーンIDを提供し、より大きな信頼とサポートを生み出します。",
+		"identityDescription2": "検証が成功すると、ユーザーは信頼できるステータスを象徴する緑のチェックマークを受け取ります。この検証済みステータスシンボルは、国庫からの資金申請や議論・提案への参加時の信頼性を高めます。",
 		"letBegin": "始めましょう",
-		"requestJudgement": "判断を要請（近日公開）",
+		"requestJudgement": "判定をリクエスト",
 		"minimumDeposit": "最低預入額",
-		"registrarFee": "登録機関手数料",
+		"registrarFee": "レジストラ料金",
 		"totalAmountRequired": "必要総額",
-		"viewAmountBreakup": "金額の内訳を表示",
-		"registrarFees": "登録手数料"
+		"viewAmountBreakup": "金額内訳を表示",
+		"registrarFees": "レジストラ料金",
+		"success": "アイデンティティの設定に成功",
+		"successDescription": "アイデンティティが正常に設定されました",
+		"failed": "アイデンティティの設定に失敗",
+		"failedDescription": "アイデンティティの設定中にエラーが発生しました",
+		"proceed": "続行",
+		"please": "お願い",
+		"login": "ログイン",
+		"toSet": "アイデンティティを設定するには",
+		"identitySuccess": "オンチェーンID登録を開始",
+		"successCta": "検証プロセスを始めましょう",
+		"address": "アドレス",
+		"verifying": "検証中...",
+		"verificationSuccessful": "検証成功",
+		"verificationFailed": "検証失敗",
+		"goToHome": "ホームへ"
 	},
 	"Bounty": {
 		"availableBountyPool": "利用可能な報奨金プール",
@@ -758,5 +776,45 @@
 		"preimageDeposit": "プレイメージデポジット",
 		"submissionDeposit": "提出デポジット",
 		"gasFees": "ガス料金"
+	},
+	"VoteSummary": {
+		"title": "投票の概要",
+		"voteDetails": {
+			"title": "投票の詳細",
+			"date": "日付",
+			"selfVotes": "自己投票",
+			"votingPower": "投票力",
+			"conviction": "確信",
+			"capital": "資本",
+			"delegatedVotes": "委任投票",
+			"delegators": "委任者",
+			"delegatedVotingPower": "委任された投票力",
+			"delegationList": "委任リスト",
+			"delegator": "委任者",
+			"delegatorCapital": "委任者資本",
+			"delegatorVotingPower": "委任者投票力",
+			"votePowerTooltip": "ロックされたバランスに基づく投票力",
+			"delegatedVoteTooltip": "委任投票に基づく投票力",
+			"delegationTooltip": "この提案を支持する委任者のリスト",
+			"voteTimestamp": "投票日時"
+		},
+		"buttons": {
+			"expand": "展開",
+			"collapse": "折りたたむ",
+			"showMore": "もっと見る",
+			"showLess": "少なく表示"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "委任者",
+				"conviction": "確信",
+				"votingPower": "投票力"
+			},
+			"noDelegations": "委任は利用できません"
+		},
+		"errors": {
+			"invalidData": "無効なデータ",
+			"fetchError": "データの取得エラー"
+		}
 	}
 }

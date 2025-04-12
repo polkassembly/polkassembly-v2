@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import type { ToastActionElement, ToastProps } from '@ui/Toaster/Toast';
-import { NotificationType } from '@/_shared/types';
+import { ENotificationStatus } from '@/_shared/types';
 import { ReactNode, useEffect, useState } from 'react';
 
 const TOAST_LIMIT = 1;
@@ -14,8 +14,8 @@ type ToasterToast = ToastProps & {
 	title?: ReactNode;
 	description?: ReactNode;
 	action?: ToastActionElement;
-	status?: NotificationType;
-	variant?: NotificationType;
+	status?: ENotificationStatus;
+	variant?: ENotificationStatus;
 };
 
 type ActionType = {

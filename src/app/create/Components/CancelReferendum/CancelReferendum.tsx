@@ -5,7 +5,7 @@
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { EEnactment, EPostOrigin, EProposalType, NotificationType } from '@/_shared/types';
+import { EEnactment, EPostOrigin, EProposalType, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -105,7 +105,7 @@ function CancelReferendum() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreatedSuccessfully'),
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
@@ -113,7 +113,7 @@ function CancelReferendum() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreationFailed'),
 					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
@@ -141,7 +141,7 @@ function CancelReferendum() {
 				toast({
 					title: t('CreateTreasuryProposal.preimageNotedSuccessfully'),
 					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				createProposal({ preimageHash: preimageDetails.preimageHash, preimageLength: preimageDetails.preimageLength });
 			},
@@ -149,7 +149,7 @@ function CancelReferendum() {
 				toast({
 					title: t('CreateTreasuryProposal.preimageNoteFailed'),
 					description: t('CreateTreasuryProposal.preimageNoteFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
