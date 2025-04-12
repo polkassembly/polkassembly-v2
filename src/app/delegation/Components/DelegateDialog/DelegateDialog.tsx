@@ -64,11 +64,17 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 
 	const isValidDelegate = useMemo(() => delegates.some((d) => d.address === delegate.address), [delegates, delegate.address]);
 
+	const getConvictionMultiplier = (conviction: number): number => {
+		if (conviction === 0) return 0.1;
+		return conviction;
+	};
+
 	const isBalanceValid = useMemo(() => {
 		if (!balance || balance === '0' || !userBalance) return false;
 
 		const enteredBalance = new BN(balance);
-		const requiredBalance = enteredBalance.muln(conviction + 1);
+		const multiplier = getConvictionMultiplier(conviction);
+		const requiredBalance = new BN(Math.floor(Number(balance) * multiplier).toString());
 		const totalRequired = txFee ? requiredBalance.add(new BN(txFee)) : requiredBalance;
 
 		return enteredBalance.gt(new BN(0)) && totalRequired.lte(new BN(userBalance));
@@ -298,7 +304,11 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 							<div className={styles.convictionItem}>
 								<p className={styles.convictionItemLabel}>{t('votes')}</p>
 								<p className={styles.convictionItemLabel}>
-									{balance ? formatBnBalance(new BN(balance).muln(conviction + 1).toString(), { withUnit: true, numberAfterComma: 2 }, network) : <Skeleton className='h-4' />}
+									{balance ? (
+										formatBnBalance(new BN(Math.floor(Number(balance) * getConvictionMultiplier(conviction)).toString()), { withUnit: true, numberAfterComma: 2 }, network)
+									) : (
+										<Skeleton className='h-4' />
+									)}
 								</p>
 							</div>
 						)}

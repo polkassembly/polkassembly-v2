@@ -88,7 +88,7 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 								>
 									<div className={styles.proposalDetails}>
 										<div className='flex items-center gap-2 md:hidden'>
-											<span className={styles.proposalLabel}>{t('by')}:</span>
+											<span className={styles.proposalLabel}>{t('by')}: </span>
 											<div className='flex items-center gap-1'>{proposal.onChainInfo?.proposer && <Address address={proposal.onChainInfo?.proposer} />}</div>
 											{proposal.onChainInfo?.createdAt && (
 												<div className='flex items-center gap-1.5 whitespace-nowrap text-text_primary md:hidden'>
