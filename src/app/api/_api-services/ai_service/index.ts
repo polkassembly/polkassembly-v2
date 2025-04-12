@@ -44,6 +44,7 @@ export class AIService {
     - No introductory text or commentary
     - Use technical/blockchain terminology appropriately
     - Keep information factual and objective
+		- Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
@@ -163,7 +164,7 @@ export class AIService {
 		}
 
 		if (content) {
-			fullPrompt += `### Main Content:\n${content}\n\n`;
+			fullPrompt += `### User Provided Description:\n${content}\n\n`;
 		}
 
 		if (additionalData.proposer) {
@@ -257,7 +258,7 @@ export class AIService {
 		}
 
 		if (mdContent) {
-			fullPrompt += `\n\n### Main Content:\n${mdContent}\n\n`;
+			fullPrompt += `\n\n### User Provided Description:\n${mdContent}\n\n`;
 		}
 
 		const response = await this.getAIResponse(fullPrompt);
