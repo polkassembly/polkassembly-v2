@@ -875,7 +875,9 @@
 		"undelegatedSuccessfully": "Undelegated successfully",
 		"delegateUpdatedSuccessfully": "Delegate updated successfully",
 		"errorCreatingDelegate": "Error creating delegate",
-		"delegateCreatedSuccessfully": "Delegate created successfully"
+		"delegateCreatedSuccessfully": "Delegate created successfully",
+		"enterDelegateAddress": "Enter Delegate Address",
+		"youCannotDelegateToYourself": "You cannot delegate to yourself"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage Deposit",

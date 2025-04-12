@@ -178,6 +178,7 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 						open={openDelegate}
 						setOpen={setOpenDelegate}
 						delegate={{ address: '' }}
+						trackId={trackId}
 					>
 						<button
 							type='button'

@@ -28,6 +28,7 @@ import { delegateUserTracksAtom, delegatesAtom } from '@/app/_atoms/delegation/d
 import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
+import { Input } from '@/app/_shared-components/Input';
 import styles from './DelegateDialog.module.scss';
 
 interface DelegateDialogProps {
@@ -35,11 +36,12 @@ interface DelegateDialogProps {
 	setOpen: (open: boolean) => void;
 	delegate: { address: string };
 	children?: ReactNode;
+	trackId?: number;
 }
 
 const LOCK_PERIODS = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
 
-function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogProps) {
+function DelegateDialog({ open, setOpen, delegate: initialDelegate, children, trackId }: DelegateDialogProps) {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const router = useRouter();
@@ -48,7 +50,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const { toast } = useToast();
 	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[network].trackDetails), [network]);
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
-	const [delegates, setDelegates] = useAtom(delegatesAtom);
+	const [, setDelegates] = useAtom(delegatesAtom);
 	const [conviction, setConviction] = useState<EConvictionAmount>(EConvictionAmount.ZERO);
 	const [balance, setBalance] = useState<string>('');
 	const [isAllTracksSelected, setIsAllTracksSelected] = useState(false);
@@ -56,13 +58,12 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [txFee, setTxFee] = useState<string>('');
+	const [delegate, setDelegate] = useState<{ address: string }>(initialDelegate);
 
 	const selectedTrackIds = useMemo(
 		() => selectedTracks.map((track) => NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId).filter((id): id is number => id !== undefined),
 		[selectedTracks, network]
 	);
-
-	const isValidDelegate = useMemo(() => delegates.some((d) => d.address === delegate.address), [delegates, delegate.address]);
 
 	const getConvictionMultiplier = (conviction: number): number => {
 		if (conviction === 0) return 0.1;
@@ -88,13 +89,21 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 				setOpen(isOpen);
 				if (isOpen) {
 					setBalance('');
-					setSelectedTracks([]);
+					if (trackId === undefined) {
+						setSelectedTracks([]);
+					} else {
+						const trackName = Object.entries(NETWORKS_DETAILS[network].trackDetails).find(([, details]) => details.trackId === trackId)?.[0];
+
+						if (trackName) {
+							setSelectedTracks([trackName]);
+						}
+					}
 					setIsAllTracksSelected(false);
 				}
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[user]
+		[user, trackId, network]
 	);
 
 	const toggleAllTracks = useCallback(() => {
@@ -246,6 +255,16 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 	}, [calculateTxFee]);
 
 	useEffect(() => {
+		if (trackId) {
+			const trackName = Object.entries(NETWORKS_DETAILS[network].trackDetails).find(([, details]) => details.trackId === trackId)?.[0];
+
+			if (trackName) {
+				setSelectedTracks([trackName]);
+			}
+		}
+	}, [trackId, network]);
+
+	useEffect(() => {
 		const availableTracks = tracks.filter((track) => {
 			const trackId = NETWORKS_DETAILS[network].trackDetails[track as EPostOrigin]?.trackId;
 			return !delegateUserTracks.some((t) => t.trackId === trackId && t.status === EDelegationStatus.DELEGATED);
@@ -253,6 +272,16 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 
 		setIsAllTracksSelected(selectedTracks.length > 0 && selectedTracks.length === availableTracks.length);
 	}, [selectedTracks, tracks, network, delegateUserTracks]);
+
+	useEffect(() => {
+		if (open && trackId) {
+			const trackName = Object.entries(NETWORKS_DETAILS[network].trackDetails).find(([, details]) => details.trackId === trackId)?.[0];
+
+			if (trackName) {
+				setSelectedTracks([trackName]);
+			}
+		}
+	}, [open, trackId, network]);
 
 	return (
 		<Dialog
@@ -278,10 +307,14 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					/>
 
 					<Label>{t('delegateTo')}</Label>
-					<AddressInput value={delegate.address} />
-					{delegate.address && !isValidDelegate && (
-						<p className='mt-1 text-sm text-amber-500'>{t('noteThisAddressIsNotRegisteredAsADelegateYouCanStillDelegateToItButItWonTAppearInTheDelegatesList')}</p>
-					)}
+					<Input
+						value={delegate.address}
+						className='bg-network_dropdown_bg'
+						onChange={(e) => setDelegate((prev) => ({ ...prev, address: e.target.value }))}
+						placeholder={t('enterDelegateAddress')}
+					/>
+					{delegate.address && user?.defaultAddress === delegate.address && <p className='text-sm text-toast_error_text'>{t('youCannotDelegateToYourself')}</p>}
+
 					<BalanceInput
 						showBalance
 						label={t('balance')}
@@ -403,7 +436,7 @@ function DelegateDialog({ open, setOpen, delegate, children }: DelegateDialogPro
 					</Button>
 					<Button
 						className='btn-delegate'
-						disabled={loading || !isBalanceValid || !selectedTrackIds?.length}
+						disabled={loading || !isBalanceValid || !selectedTrackIds?.length || !delegate.address || user?.defaultAddress === delegate.address}
 						onClick={handleSubmit}
 					>
 						{loading ? <Loader className='animate-spin' /> : t('delegate')}
