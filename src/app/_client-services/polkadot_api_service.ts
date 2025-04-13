@@ -723,12 +723,11 @@ export class PolkadotApiService {
 	}
 
 	async getBountyAmount() {
-		let activePjsBounties = await this.api?.derive.bounties?.bounties();
-		activePjsBounties = activePjsBounties.filter((item: any) => {
+		const allBounties = await this.api?.derive.bounties?.bounties();
+		return allBounties.filter((item: any) => {
 			const { isFunded, isCuratorProposed, isActive } = item?.bounty?.status || {};
 			return isFunded || isCuratorProposed || isActive;
 		});
-		return activePjsBounties;
 	}
 
 	async getAccountData(address: string) {
