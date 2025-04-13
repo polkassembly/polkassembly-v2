@@ -114,7 +114,8 @@ export const THEME_COLORS = {
 		warning: '#F89118',
 		aye_color: '#6DE1A2',
 		nay_color: '#FF778F',
-		bg_code: '#fbfbfd'
+		bg_code: '#fbfbfd',
+		create_bounty_btn: '#FF50AD'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -225,6 +226,7 @@ export const THEME_COLORS = {
 		warning: '#F89118',
 		aye_color: '#6DE1A2',
 		nay_color: '#FF778F',
-		bg_code: '#222222'
+		bg_code: '#222222',
+		create_bounty_btn: '#FF50AD'
 	}
 };

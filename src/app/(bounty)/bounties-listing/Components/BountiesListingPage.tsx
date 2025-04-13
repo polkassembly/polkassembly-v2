@@ -61,7 +61,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 				<div className='flex gap-2'>
 					<button
 						type='button'
-						className='flex w-full cursor-pointer items-center justify-center gap-[6px] rounded-[14px] border-none bg-gradient-to-b from-[#FF50AD] via-[#E5007A] to-[#E5007A] px-[22px] py-[11px] md:w-auto md:justify-normal'
+						className='flex w-full cursor-pointer items-center justify-center gap-[6px] rounded-[14px] border-none bg-gradient-to-b from-create_bounty_btn via-navbar_border to-navbar_border px-[22px] py-[11px] md:w-auto md:justify-normal'
 					>
 						<Image
 							src={ProposalIcon}
@@ -70,7 +70,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							width={15}
 							height={15}
 						/>
-						<span className='font-bold text-white'>{t('Bounties.createBountyProposal')}</span>
+						<span className='font-bold text-btn_primary_text'>{t('Bounties.createBountyProposal')}</span>
 					</button>
 				</div>
 			</div>
