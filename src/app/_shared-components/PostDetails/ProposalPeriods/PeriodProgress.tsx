@@ -25,9 +25,9 @@ function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Pro
 				indicatorClassName='bg-bg_pink'
 				value={progress}
 			/>
-			<div className='flex justify-between text-sm text-text_primary'>
-				<p>{periodName}</p>
-				<p>{label}</p>
+			<div className='flex items-center justify-between text-sm text-text_primary'>
+				<span>{periodName}</span>
+				<span className='text-xs text-basic_text'>{label}</span>
 			</div>
 		</div>
 	);
