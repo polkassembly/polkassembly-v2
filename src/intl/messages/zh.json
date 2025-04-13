@@ -806,5 +806,10 @@
 			"invalidData": "无效数据",
 			"fetchError": "获取数据错误"
 		}
-	}
+	},
+	"timeUnits": {
+      "minutes": "分钟",
+      "hours": "小时",
+      "days": "天"
+    }
 }

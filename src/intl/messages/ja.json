@@ -806,5 +806,10 @@
 			"invalidData": "無効なデータ",
 			"fetchError": "データの取得エラー"
 		}
-	}
+	},
+	"timeUnits": {
+		"minutes": "分",
+		"hours": "時間",
+		"days": "日"
+	  }
 }

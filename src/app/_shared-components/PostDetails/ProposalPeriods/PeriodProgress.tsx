@@ -6,6 +6,7 @@ import { Progress } from '@/app/_shared-components/Progress/Progress';
 import { EPeriodType, EPostOrigin } from '@/_shared/types';
 import { getPeriodProgressLabel } from '@/app/_client-utils/getPeriodProgressLabel';
 import { calculatePeriodProgress } from '@/app/_client-utils/calculatePeriodProgress';
+import { useTranslations } from 'next-intl';
 
 interface Props {
 	periodEndsAt?: Date;
@@ -15,8 +16,17 @@ interface Props {
 }
 
 function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Props) {
+	const t = useTranslations('timeUnits');
+
 	const progress = calculatePeriodProgress({ endAt: periodEndsAt, trackName, periodType });
-	const label = getPeriodProgressLabel({ endAt: periodEndsAt, trackName, periodType });
+	const label = getPeriodProgressLabel({
+		endAt: periodEndsAt,
+		trackName,
+		periodType,
+		minutes: t('minutes'),
+		hours: t('hours'),
+		days: t('days')
+	});
 
 	return (
 		<div className='flex flex-col gap-y-2'>

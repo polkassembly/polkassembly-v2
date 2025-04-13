@@ -806,5 +806,10 @@
 			"invalidData": "Datos inválidos",
 			"fetchError": "Error al obtener los datos"
 		}
-	}
+	},
+	"timeUnits": {
+		"minutes": "minutos",
+		"hours": "horas",
+		"days": "días"
+	  }
 }
