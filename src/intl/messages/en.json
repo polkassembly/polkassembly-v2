@@ -385,6 +385,7 @@
 		"votingStarted": "Voting has Started",
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
+		"minEnactmentPeriod": "Enactment Period",
 		"summary": "Summary",
 		"aye": "Aye",
 		"nay": "Nay",

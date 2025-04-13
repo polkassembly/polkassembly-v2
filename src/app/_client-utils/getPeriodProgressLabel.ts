@@ -30,21 +30,16 @@ export const getPeriodProgressLabel = ({
 	hours: string;
 	days: string;
 }): string => {
-	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
+	const { decisionDays, prepareDays, confirmDays, enactmentDays } = getTrackDays(trackName);
 
-	let totalDays = 0;
-	switch (periodType) {
-		case EPeriodType.PREPARE:
-			totalDays = prepareDays || 0;
-			break;
-		case EPeriodType.CONFIRM:
-			totalDays = confirmDays || 0;
-			break;
-		case EPeriodType.DECISION:
-		default:
-			totalDays = decisionDays || 0;
-			break;
-	}
+	const periodDaysMapping = {
+		[EPeriodType.PREPARE]: prepareDays,
+		[EPeriodType.CONFIRM]: confirmDays,
+		[EPeriodType.DECISION]: decisionDays,
+		[EPeriodType.ENACTMENT]: enactmentDays
+	};
+
+	const totalDays = periodDaysMapping[periodType] || 0;
 	const totalMinutes = totalDays * 24 * 60;
 
 	if (!endAt) {

@@ -12,12 +12,14 @@ function ProposalPeriods({
 	confirmationPeriodEndsAt,
 	decisionPeriodEndsAt,
 	preparePeriodEndsAt,
+	minEnactmentPeriodStarts,
 	status,
 	trackName
 }: {
 	confirmationPeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
+	minEnactmentPeriodStarts?: Date | null;
 	status: EProposalStatus;
 	trackName: EPostOrigin;
 }) {
@@ -69,6 +71,17 @@ function ProposalPeriods({
 						periodName={t('PostDetails.preparePeriod')}
 						trackName={trackName}
 						periodType={EPeriodType.PREPARE}
+					/>
+				</div>
+			)}
+
+			{minEnactmentPeriodStarts && (
+				<div>
+					<PeriodProgress
+						periodEndsAt={minEnactmentPeriodStarts}
+						periodName={t('PostDetails.minEnactmentPeriod')}
+						trackName={trackName}
+						periodType={EPeriodType.ENACTMENT}
 					/>
 				</div>
 			)}

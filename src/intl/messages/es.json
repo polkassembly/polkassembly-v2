@@ -384,6 +384,7 @@
 		"votingStarted": "La votación ha comenzado",
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
+		"minEnactmentPeriod": "Período de Ejecución",
 		"summary": "Resumen",
 		"aye": "Sí",
 		"nay": "No",

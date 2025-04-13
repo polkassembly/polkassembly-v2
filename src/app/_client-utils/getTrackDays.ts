@@ -10,6 +10,7 @@ interface TrackPeriodOutput {
 	prepareDays?: number;
 	decisionDays?: number;
 	confirmDays?: number;
+	enactmentDays?: number;
 }
 
 export function getTrackDays(trackName: EPostOrigin): TrackPeriodOutput {
@@ -26,6 +27,7 @@ export function getTrackDays(trackName: EPostOrigin): TrackPeriodOutput {
 	return {
 		prepareDays: toDays(track.preparePeriod),
 		decisionDays: toDays(track.decisionPeriod),
-		confirmDays: toDays(track.confirmPeriod)
+		confirmDays: toDays(track.confirmPeriod),
+		enactmentDays: toDays(track.minEnactmentPeriod)
 	};
 }

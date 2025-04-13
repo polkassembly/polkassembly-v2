@@ -384,6 +384,7 @@
 		"votingStarted": "投票が開始されました",
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
+		"minEnactmentPeriod": "実施期間",
 		"summary": "要約",
 		"aye": "賛成",
 		"nay": "反対",

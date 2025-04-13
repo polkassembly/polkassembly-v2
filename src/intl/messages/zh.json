@@ -384,6 +384,7 @@
 		"votingStarted": "投票已开始",
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
+		"minEnactmentPeriod": "实施期",
 		"summary": "摘要",
 		"aye": "赞成",
 		"nay": "反对",
