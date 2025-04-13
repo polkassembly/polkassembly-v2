@@ -7,7 +7,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React, { Suspense } from 'react';
 import { headers } from 'next/headers';
-import PollForProposal from '@/app/referenda/[index]/PollForProposal';
+import PollForProposal from '@ui/PollForProposal';
 
 async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {
 	const { index } = await params;
