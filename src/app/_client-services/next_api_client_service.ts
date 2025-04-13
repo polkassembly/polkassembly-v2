@@ -29,9 +29,12 @@ import {
 	ITag,
 	EAllowedCommentor,
 	EOffChainPostTopic,
+	IBountyStats,
+	IBountyUserActivity,
 	IVoteCartItem,
 	EConvictionAmount,
 	IContentSummary,
+	ITreasuryStats,
 	ISocialHandle,
 	IVoteHistoryData
 } from '@/_shared/types';
@@ -86,15 +89,20 @@ enum EApiRoute {
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	FETCH_BOUNTIES_STATS = 'FETCH_BOUNTIES_STATS',
+	FETCH_BOUNTIES_USER_ACTIVITY = 'FETCH_BOUNTIES_USER_ACTIVITY',
+	GET_CHILD_BOUNTIES = 'GET_CHILD_BOUNTIES',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
+	GET_BOUNTY_AMOUNT = 'GET_BOUNTY_AMOUNT',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
 	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
@@ -168,6 +176,19 @@ export class NextApiClientService {
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
+			case EApiRoute.FETCH_BOUNTIES_STATS:
+				path = '/bounties/stats';
+				break;
+			case EApiRoute.GET_BOUNTY_AMOUNT:
+				path = '/bounties/stats/amount';
+				break;
+			case EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY:
+				path = '/bounties/user-activity';
+				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
+				break;
+			case EApiRoute.GET_CHILD_BOUNTIES:
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
@@ -264,7 +285,7 @@ export class NextApiClientService {
 
 		const url = new URL(`${baseURL}${path}${segments}`);
 		if (queryParams) {
-			queryParams.forEach((value, key) => url.searchParams.set(key, value));
+			queryParams.forEach((value, key) => url.searchParams.append(key, value));
 		}
 
 		return { url, method };
@@ -358,7 +379,8 @@ export class NextApiClientService {
 		statuses,
 		origins = [],
 		tags = [],
-		limit = DEFAULT_LISTING_LIMIT
+		limit = DEFAULT_LISTING_LIMIT,
+		preimageSection
 	}: {
 		proposalType: string;
 		page: number;
@@ -366,6 +388,7 @@ export class NextApiClientService {
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
+		preimageSection?: string;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
 		if (this.isServerSide()) {
@@ -378,7 +401,8 @@ export class NextApiClientService {
 				limit,
 				statuses,
 				origins,
-				tags
+				tags,
+				preimageSection
 			});
 
 			if (cachedData) {
@@ -405,6 +429,10 @@ export class NextApiClientService {
 
 		if (origins?.length) {
 			origins.forEach((origin) => queryParams.append('origin', origin));
+		}
+
+		if (preimageSection?.length) {
+			queryParams.append('preimageSection', preimageSection);
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
@@ -738,6 +766,26 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 
+	static async fetchBountiesStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_STATS });
+		return this.nextApiClientFetch<IBountyStats>({ url, method });
+	}
+
+	static async fetchBountiesUserActivity() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY });
+		return this.nextApiClientFetch<IBountyUserActivity[]>({ url, method });
+	}
+
+	static async getChildBounties(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CHILD_BOUNTIES, routeSegments: [proposalType, index, 'child-bounties'] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	static async getBountyAmount() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_BOUNTY_AMOUNT });
+		return this.nextApiClientFetch<{ bountyAmount: string }>({ url, method });
+	}
+
 	static async addPostSubscription(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
 		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
@@ -768,6 +816,15 @@ export class NextApiClientService {
 			routeSegments: [proposalType, indexOrHash, 'content-summary']
 		});
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 
 	static async fetchUserSocialHandles({ userId, address }: { userId: number; address: string }) {

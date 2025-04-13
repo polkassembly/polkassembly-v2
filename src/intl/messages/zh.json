@@ -662,6 +662,16 @@
 		"verificationFailed": "验证失败",
 		"goToHome": "返回首页"
 	},
+	"Bounty": {
+		"availableBountyPool": "可用赏金池",
+		"viewAll": "查看全部",
+		"dot": "DOT",
+		"claimed": "已认领",
+		"childBounties": "子赏金",
+		"bountyProposal": "赏金提案",
+		"vote": "投票",
+		"bountyDashboard": "赏金仪表盘"
+	},
 	"BatchVote": {
 		"batchVoting": "批量投票",
 		"please": "请",

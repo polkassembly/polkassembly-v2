@@ -662,6 +662,16 @@
 		"verificationFailed": "検証失敗",
 		"goToHome": "ホームへ"
 	},
+	"Bounty": {
+		"availableBountyPool": "利用可能な報奨金プール",
+		"viewAll": "すべて表示",
+		"dot": "DOT",
+		"claimed": "クレーム済み",
+		"childBounties": "子供の報奨金",
+		"bountyProposal": "報奨金提案",
+		"vote": "投票",
+		"bountyDashboard": "報奨金ダッシュボード"
+	},
 	"BatchVote": {
 		"batchVoting": "一括投票",
 		"please": "お願いします",

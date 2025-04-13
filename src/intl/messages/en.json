@@ -681,6 +681,16 @@
 		"verificationFailed": "Verification failed",
 		"goToHome": "Go to home"
 	},
+	"Bounty": {
+		"availableBountyPool": "Available Bounty Pool",
+		"viewAll": "View All",
+		"dot": "DOT",
+		"claimed": "Claimed",
+		"bounty": "Bounty",
+		"vote": "Vote",
+		"bountyProposal": "Bounty Proposal",
+		"childBounties": "Child Bounties"
+	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
 		"please": "Please",

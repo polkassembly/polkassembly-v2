@@ -497,6 +497,7 @@ export interface IOnChainPostInfo {
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
+	curator?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -509,6 +510,7 @@ export interface IPost extends IOffChainPost {
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
+	childBountiesCount?: number;
 	index?: number;
 	origin: EPostOrigin;
 	proposer: string;
@@ -517,6 +519,8 @@ export interface IOnChainPostListing {
 	hash?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	curator?: string;
+	reward?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
 }
@@ -879,6 +883,12 @@ export interface IPostSubscription {
 	userId: number;
 }
 
+export interface IClaimedBountyProposal {
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ timestamp: string }>;
+}
+
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }
@@ -915,6 +925,37 @@ export enum ENotificationStatus {
 	ERROR = 'error',
 	WARNING = 'warning',
 	INFO = 'info'
+}
+
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: number;
+	peopleEarned: string;
+	totalRewarded: string;
+	totalBountyPool: number;
+}
+
+export enum EBountyStatus {
+	ALL = 'all',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: EBountyStatus;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: number;
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: string }>;
 }
 
 // generic types are for insignificant tokens if we decide to add later
