@@ -246,7 +246,7 @@ export class IdentityService {
 		const identityInfoRes: any = await this.peopleChainApi?.query.identity?.identityOf(encodedAddress);
 
 		const identityInfo = await (identityInfoRes?.toHuman()?.[0] || identityInfoRes?.toHuman?.());
-		const identityHashInfo = await (identityInfoRes?.unwrap()?.[0] || identityInfoRes?.unwrapOr?.(null));
+		const identityHashInfo = await (identityInfoRes?.unwrapOr?.(null)?.[0] || identityInfoRes?.unwrapOr?.(null));
 
 		const { isGood, unverified } = IdentityService.processIdentityInfo(identityInfo);
 
@@ -273,7 +273,7 @@ export class IdentityService {
 			twitter: identity?.twitter?.Raw || '',
 			verifiedByPolkassembly: verifiedByPolkassembly || false,
 			web: identity?.web?.Raw || '',
-			hash: identityHash
+			...(identityHash && { hash: identityHash })
 		};
 	}
 

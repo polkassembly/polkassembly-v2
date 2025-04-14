@@ -36,7 +36,8 @@ import {
 	EDelegateSource,
 	ESocial,
 	ISocialHandle,
-	ESocialVerificationStatus
+	ESocialVerificationStatus,
+	IPostLink
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1074,8 +1075,26 @@ export class FirestoreService extends FirestoreUtils {
 		await this.reactionsCollectionRef().doc(id).delete();
 	}
 
-	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: string; title: string; allowedCommentor: EAllowedCommentor }) {
-		await this.postsCollectionRef().doc(String(id)).set({ content, title, allowedCommentor, updatedAt: new Date() }, { merge: true });
+	static async UpdatePost({
+		id,
+		content,
+		title,
+		allowedCommentor,
+		linkedPost
+	}: {
+		id?: string;
+		content: string;
+		title: string;
+		allowedCommentor: EAllowedCommentor;
+		linkedPost?: IPostLink;
+	}) {
+		if (!id) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Post ID is required');
+		}
+
+		await this.postsCollectionRef()
+			.doc(String(id))
+			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -1087,7 +1106,8 @@ export class FirestoreService extends FirestoreUtils {
 		title,
 		allowedCommentor,
 		tags,
-		topic
+		topic,
+		linkedPost
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -1098,6 +1118,7 @@ export class FirestoreService extends FirestoreUtils {
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
 		topic?: EOffChainPostTopic;
+		linkedPost?: IPostLink;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = this.postsCollectionRef().doc().id;
 
@@ -1114,7 +1135,8 @@ export class FirestoreService extends FirestoreUtils {
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY,
 			allowedCommentor,
-			isDeleted: false
+			isDeleted: false,
+			...(linkedPost && { linkedPost })
 		};
 		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
 		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
