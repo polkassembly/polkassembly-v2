@@ -633,8 +633,11 @@
 		"displayName": "显示名称",
 		"legalName": "法定名称",
 		"email": "电子邮件",
-		"twitter": "推特",
-		"matrix": "矩阵",
+		"twitter": "Twitter",
+		"riot": "Riot",
+		"emailPlaceholder": "输入您的电子邮件地址",
+		"twitterPlaceholder": "@您的Twitter名称",
+		"riotPlaceholder": "@您的名称.matrix.org",
 		"setIdentity": "设置身份",
 		"onChainIdentity": "链上身份"
 	},
@@ -656,15 +659,30 @@
 		"cancelled": "取消",
 		"rejected": "拒绝",
 		"onChainIdentity": "链上身份",
-		"identityDescription1": "Polkadot通过指定的注册商提供链上身份验证用户凭证的功能，建立更大的信任和支持。",
-		"identityDescription2": "一旦成功验证，用户将收到一个绿色的验证标记，象征着他们的可信状态。这个已验证的状态标志在申请财政部资金或参与讨论和提案时可以提高可信度。",
+		"identityDescription1": "Polkadot通过指定的注册商提供链上身份验证用户凭证，从而建立更大的信任和支持。",
+		"identityDescription2": "成功验证后，用户将获得一个绿色勾号，象征其可信状态。这个已验证的状态符号在申请国库资金或参与讨论和提案时提高了可信度。",
 		"letBegin": "让我们开始",
-		"requestJudgement": "请求判断（即将推出）",
+		"requestJudgement": "请求判定",
 		"minimumDeposit": "最低存款",
-		"registrarFee": "注册费",
+		"registrarFee": "注册商费用",
 		"totalAmountRequired": "所需总金额",
 		"viewAmountBreakup": "查看金额明细",
-		"registrarFees": "注册费"
+		"registrarFees": "注册商费用",
+		"success": "身份设置成功",
+		"successDescription": "您的身份已成功设置",
+		"failed": "身份设置失败",
+		"failedDescription": "设置身份时出现错误",
+		"proceed": "继续",
+		"please": "请",
+		"login": "登录",
+		"toSet": "设置身份",
+		"identitySuccess": "链上身份注册已启动",
+		"successCta": "让我们开始您的验证流程",
+		"address": "地址",
+		"verifying": "正在验证...",
+		"verificationSuccessful": "验证成功",
+		"verificationFailed": "验证失败",
+		"goToHome": "返回首页"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",
@@ -770,5 +788,45 @@
 		"preimageDeposit": "预映像押金",
 		"submissionDeposit": "提交押金",
 		"gasFees": "燃料费"
+	},
+	"VoteSummary": {
+		"title": "投票摘要",
+		"voteDetails": {
+			"title": "投票详情",
+			"date": "日期",
+			"selfVotes": "自投",
+			"votingPower": "投票权",
+			"conviction": "定罪",
+			"capital": "资本",
+			"delegatedVotes": "委托投票",
+			"delegators": "委托人",
+			"delegatedVotingPower": "委托投票权",
+			"delegationList": "委托人列表",
+			"delegator": "委托人",
+			"delegatorCapital": "委托人资本",
+			"delegatorVotingPower": "委托人投票权",
+			"votePowerTooltip": "基于锁定余额的投票权",
+			"delegatedVoteTooltip": "基于委托投票的投票权",
+			"delegationTooltip": "支持该提案的委托人列表",
+			"voteTimestamp": "投票时间"
+		},
+		"buttons": {
+			"expand": "展开",
+			"collapse": "收起",
+			"showMore": "显示更多",
+			"showLess": "显示较少"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "委托人",
+				"conviction": "信念",
+				"votingPower": "投票权"
+			},
+			"noDelegations": "没有可用的委托"
+		},
+		"errors": {
+			"invalidData": "无效数据",
+			"fetchError": "获取数据错误"
+		}
 	}
 }

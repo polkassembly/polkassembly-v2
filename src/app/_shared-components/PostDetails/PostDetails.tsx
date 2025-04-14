@@ -75,12 +75,15 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				{!isModalOpen && !isOffchainPost && (
 					<div className={classes.rightWrapper}>
 						{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}
-						<ProposalPeriods
-							confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
-							decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
-							preparePeriodEndsAt={postData?.onChainInfo?.preparePeriodEndsAt}
-							status={postData?.onChainInfo?.status}
-						/>
+						{postData?.onChainInfo && (
+							<ProposalPeriods
+								confirmationPeriodEndsAt={postData.onChainInfo.confirmationPeriodEndsAt}
+								decisionPeriodEndsAt={postData.onChainInfo.decisionPeriodEndsAt}
+								preparePeriodEndsAt={postData.onChainInfo.preparePeriodEndsAt}
+								status={postData.onChainInfo.status}
+								trackName={postData.onChainInfo.origin}
+							/>
+						)}
 						<VoteSummary
 							proposalType={post.proposalType}
 							index={index}

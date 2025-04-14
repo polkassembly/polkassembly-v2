@@ -10,11 +10,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
+import { Collapsible, CollapsibleContent } from '@/app/_shared-components/Collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
 import Address from '../../../Profile/Address/Address';
 import { Button } from '../../../Button';
 import LoadingLayover from '../../../LoadingLayover';
 import classes from './VoteHistory.module.scss';
+import DelegatedVotesDropdown from './DelegatedVotesDropdown/DelegatedVotesDropdown';
 
 function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	return sort === 'asc' ? (
@@ -80,6 +82,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 
 	const [sorting, setSorting] = useState<SortingState>([]);
+	const [openRow, setOpenRow] = useState<string | null>(null);
 
 	const table = useReactTable({
 		data: votes,
@@ -114,23 +117,61 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 						</TableRow>
 					))}
 				</TableHeader>
-				<TableBody className='flex-1 overflow-y-auto'>
-					{table.getRowModel().rows.map((vote) => (
-						<TableRow key={`${vote.original.balanceValue}-${vote.original.voterAddress}`}>
-							<TableCell className='max-w-[200px] py-4'>
-								<Address address={vote.original.voterAddress} />
-							</TableCell>
-							<TableCell className='py-4'>
-								{formatBalance(vote.original.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</TableCell>
-							<TableCell className='py-4'>
-								{formatBalance(vote.original.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</TableCell>
-							<TableCell className='py-4'>
-								{formatBalance(vote.original.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</TableCell>
-						</TableRow>
-					))}
+				<TableBody>
+					{table.getRowModel().rows.map((vote) => {
+						const voteData = vote.original;
+						const isOpen = openRow === voteData.voterAddress;
+						const voterDelegations = Array.isArray(voteData.delegatedVotes) ? voteData.delegatedVotes : [];
+						const renderCollapsible = voterDelegations.length > 0;
+
+						return (
+							<React.Fragment key={voteData.voterAddress}>
+								<TableRow
+									className={renderCollapsible ? 'cursor-pointer' : ''}
+									onClick={() => renderCollapsible && setOpenRow(isOpen ? null : voteData.voterAddress)}
+								>
+									<TableCell className='max-w-[200px] py-4'>
+										<Address address={voteData.voterAddress} />
+									</TableCell>
+									<TableCell className='py-4'>
+										{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</TableCell>
+									<TableCell className='py-4'>
+										{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</TableCell>
+									<TableCell className='py-4'>
+										{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</TableCell>
+									<TableCell className='py-4'>
+										{renderCollapsible && (
+											<button
+												type='button'
+												className='collapsibleButton'
+												onClick={() => setOpenRow(isOpen ? null : voteData.voterAddress)}
+											>
+												{isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+											</button>
+										)}
+									</TableCell>
+								</TableRow>
+								<TableCell
+									className='p-0'
+									colSpan={5}
+								>
+									{renderCollapsible && (
+										<Collapsible open={openRow === voteData.voterAddress}>
+											<CollapsibleContent asChild>
+												<DelegatedVotesDropdown
+													voteData={voteData}
+													voterDelegations={voterDelegations}
+												/>
+											</CollapsibleContent>
+										</Collapsible>
+									)}
+								</TableCell>
+							</React.Fragment>
+						);
+					})}
 				</TableBody>
 			</Table>
 		</div>

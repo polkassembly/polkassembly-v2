@@ -5,13 +5,21 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import ShieldUser from '@assets/icons/shield-user.svg';
 
 function HeaderTitle() {
 	const t = useTranslations();
 
 	return (
-		<div>
-			<h1 className='text-lg font-semibold text-text_primary'>{t('SetIdentity.onChainIdentity')}</h1>
+		<div className='flex items-center gap-x-2'>
+			<Image
+				src={ShieldUser}
+				alt='logo'
+				width={24}
+				height={24}
+			/>
+			<h1 className='text-xl font-semibold text-text_primary'>{t('SetIdentity.onChainIdentity')}</h1>
 		</div>
 	);
 }

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { EProposalType } from '@/_shared/types';
+import { EProposalType, IContentSummary } from '@/_shared/types';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { SubsquareOffChainService } from '@/app/api/_api-services/offchain_db_service/subsquare_offchain_service';
@@ -25,13 +25,16 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
+	let contentSummary: IContentSummary | null = null;
+
 	// Try to get from cache first
 	const cachedData = await RedisService.GetContentSummary({ network, indexOrHash: index, proposalType });
-	if (cachedData) {
-		return NextResponse.json(cachedData);
-	}
 
-	let contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType });
+	contentSummary = cachedData;
+
+	if (!cachedData) {
+		contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType });
+	}
 
 	if (!contentSummary?.postSummary) {
 		// try and generate content summary
