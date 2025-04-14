@@ -722,6 +722,19 @@ export class PolkadotApiService {
 		return this.api.derive.chain.bestNumber();
 	}
 
+	async getBountyAmount() {
+		const allBounties = await this.api?.derive.bounties?.bounties();
+		return allBounties.filter((item: any) => {
+			const { isFunded, isCuratorProposed, isActive } = item?.bounty?.status || {};
+			return isFunded || isCuratorProposed || isActive;
+		});
+	}
+
+	async getAccountData(address: string) {
+		const accountData = (await this.api.query.system.account(address)) as any;
+		return new BN(accountData?.data?.free.toString()).add(new BN(accountData?.data?.reserved.toString()));
+	}
+
 	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
 		if (!this.api) {
 			return null;
