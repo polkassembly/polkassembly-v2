@@ -114,6 +114,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			createdAt: proposal.createdAt,
+			curator: proposal.curator || '',
 			proposer: proposal.proposer || '',
 			status: proposal.status,
 			index: proposal.index,
@@ -203,15 +204,17 @@ export class SubsquidService extends SubsquidUtils {
 
 		const posts: IOnChainPostListing[] = [];
 
-		subsquidData.proposals.forEach(
-			(
+		const postsPromises = subsquidData.proposals.map(
+			async (
 				proposal: {
 					createdAt: string;
 					description?: string | null;
 					index: number;
 					origin: EPostOrigin;
 					proposer?: string;
+					curator?: string;
 					status?: EProposalStatus;
+					reward?: string;
 					hash?: string;
 					preimage?: {
 						proposedCall?: {
@@ -227,13 +230,31 @@ export class SubsquidService extends SubsquidUtils {
 			) => {
 				const allPeriodEnds =
 					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+				let childBountiesCount = 0;
 
-				posts.push({
+				// child bounties count
+				if (proposalType === EProposalType.BOUNTY) {
+					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES;
+
+					const { data } = await gqlClient
+						.query(childBountiesCountGQL, {
+							parentBountyIndex_eq: proposal.index
+						})
+						.toPromise();
+					if (data) {
+						childBountiesCount = data?.totalChildBounties?.totalCount || 0;
+					}
+				}
+
+				return {
 					createdAt: new Date(proposal.createdAt),
+					childBountiesCount: childBountiesCount || 0,
+					curator: proposal.curator,
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
+					reward: proposal.reward || '',
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
@@ -241,9 +262,17 @@ export class SubsquidService extends SubsquidUtils {
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
-				});
+				};
 			}
 		);
+
+		const resolvedPosts = await Promise.allSettled(postsPromises);
+
+		resolvedPosts?.forEach((result) => {
+			if (result.status === 'fulfilled' && result?.value) {
+				posts.push(result.value);
+			}
+		});
 
 		return {
 			items: posts,

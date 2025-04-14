@@ -16,7 +16,7 @@ async function Referenda({ params, searchParams }: { params: Promise<{ index: st
 	const headersList = await headers();
 	const referer = headersList.get('referer');
 
-	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: index });
+	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
 
 	// If created=true and no data, we'll poll on the client side
 	if (created && created === 'true' && (!data || error)) {

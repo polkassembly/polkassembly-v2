@@ -92,6 +92,7 @@ enum EApiRoute {
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	FETCH_CHILD_BOUNTIES = 'FETCH_CHILD_BOUNTIES',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
@@ -190,6 +191,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
+			case EApiRoute.FETCH_CHILD_BOUNTIES:
 				break;
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -821,6 +823,14 @@ export class NextApiClientService {
 			routeSegments: [proposalType, indexOrHash, 'content-summary']
 		});
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async fetchChildBountiesApi({ bountyIndex }: { bountyIndex: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_CHILD_BOUNTIES,
+			routeSegments: [EProposalType.BOUNTY, bountyIndex.toString(), 'child-bounties']
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
 	static async fetchUserSocialHandles({ userId, address }: { userId: number; address: string }) {

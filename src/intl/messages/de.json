@@ -482,7 +482,10 @@
 		"started": "Gestartet",
 		"passed": "Bestanden",
 		"proposed": "Vorgeschlagen",
-		"created": "Erstellt"
+		"created": "Erstellt",
+		"curatorassigned": "Curator zugewiesen",
+		"curatorunassigned": "Curator nicht zugewiesen",
+		"curatorproposed": "Curator vorgeschlagen"
 	},
 	"Pagination": {
 		"next": "Weiter",
@@ -636,6 +639,25 @@
 		"twitterPlaceholder": "@IhrTwitterName",
 		"riotPlaceholder": "@IhrName.matrix.org",
 		"setIdentity": "Identität festlegen",
+		"onChainIdentity": "On-Chain-Identität"
+	},
+	"Bounties": {
+		"onchainBounties": "Onchain-Prämien",
+		"createBountyProposal": "Prämie erstellen",
+		"loadingChildBounties": "Kinderprämien laden...",
+		"noChildBountiesFound": "Keine Kinderprämien gefunden",
+		"curator": "Curator",
+		"title": "Titel",
+		"amount": "Betrag",
+		"date": "Datum",
+		"status": "Status",
+		"categories": "Kategorien",
+		"all": "Alle",
+		"active": "Aktiv",
+		"proposed": "Vorgeschlagen",
+		"claimed": "Beansprucht",
+		"cancelled": "Abgebrochen",
+		"rejected": "Abgelehnt",
 		"onChainIdentity": "On-Chain-Identität",
 		"identityDescription1": "Polkadot bietet On-Chain-Identitäten, die die Anmeldedaten der Benutzer durch ernannte Registrare überprüfen und so mehr Vertrauen und Unterstützung schaffen.",
 		"identityDescription2": "Nach erfolgreicher Überprüfung erhalten Benutzer ein grünes Häkchen, das ihren vertrauenswürdigen Status symbolisiert. Dieses verifizierte Statussymbol erhöht die Glaubwürdigkeit bei der Beantragung von Mitteln aus dem Treasury oder bei der Teilnahme an Diskussionen und Vorschlägen.",
