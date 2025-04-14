@@ -26,7 +26,7 @@ import { useUser } from '@/hooks/useUser';
 import { ComponentProps } from 'react';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
-import CreateButton from '../CreateButton/CreateButton';
+import QuickActions from '../QuickActions/QuickActions';
 import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: ComponentProps<typeof Sidebar>) {
@@ -99,7 +99,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 			<div className='mt-5'>{generateGridData(headerData, 'header')}</div>
 
 			<div className='px-4'>
-				<CreateButton state={state} />
+				<QuickActions state={state} />
 			</div>
 			<SidebarContent>
 				<NavMain sections={data} />

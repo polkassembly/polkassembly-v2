@@ -6,13 +6,13 @@
 
 import React from 'react';
 import Image from 'next/image';
-import PencilIcon from '@assets/sidebar/create-pencil-icon.svg';
+import QuickActionsIcon from '@assets/icons/quickactions.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
-import style from './CreateButton.module.scss';
+import style from './QuickActions.module.scss';
 
-function CreateButton({ state }: { state: 'collapsed' | 'expanded' }) {
+function QuickActions({ state }: { state: 'collapsed' | 'expanded' }) {
 	const t = useTranslations();
 
 	const { user } = useUser();
@@ -24,15 +24,15 @@ function CreateButton({ state }: { state: 'collapsed' | 'expanded' }) {
 				className={`${style.trigger} ${state === 'collapsed' ? style.triggerCollapsed : style.triggerExpanded}`}
 			>
 				<Image
-					src={PencilIcon}
-					alt='Create Pencil Icon'
+					src={QuickActionsIcon}
+					alt='Quick Actions Icon'
 					width={20}
 					height={20}
 				/>
-				{state !== 'collapsed' && <span className={style.triggerText}>{t('CreateProposalDropdownButton.create')}</span>}
+				{state !== 'collapsed' && <span className={style.triggerText}>{t('CreateProposalDropdownButton.quickActions')}</span>}
 			</Link>
 		</div>
 	);
 }
 
-export default CreateButton;
+export default QuickActions;

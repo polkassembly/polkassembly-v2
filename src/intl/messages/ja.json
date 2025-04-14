@@ -89,7 +89,8 @@
 		"createPost": "投稿を作成",
 		"createProposal": "提案を作成",
 		"noData": "データがありません",
-		"contentWillBeAvailableSoon": "コンテンツはまもなく利用可能になります..."
+		"contentWillBeAvailableSoon": "コンテンツはまもなく利用可能になります...",
+		"quickActions": "クイックアクション"
 	},
 	"Profile": {
 		"settings": "設定",

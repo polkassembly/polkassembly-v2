@@ -89,7 +89,8 @@
 		"createPost": "创建帖子",
 		"createProposal": "创建提案",
 		"noData": "暂无数据",
-		"contentWillBeAvailableSoon": "内容即将可用..."
+		"contentWillBeAvailableSoon": "内容即将可用...",
+		"quickActions": "快速操作"
 	},
 	"Profile": {
 		"settings": "设置",

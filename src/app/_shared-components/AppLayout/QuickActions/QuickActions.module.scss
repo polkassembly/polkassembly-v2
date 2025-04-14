@@ -1,0 +1,60 @@
+.card {
+	@apply relative mt-4 rounded-[11.5px] bg-gradient-to-b from-[#3C76F4] to-[#0437A7] p-[1px];
+}
+
+.trigger {
+	@apply flex h-9 w-full cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
+}
+
+.triggerCollapsed {
+	@apply p-[5px];
+}
+
+.triggerExpanded {
+	@apply p-[2px] py-[4px];
+}
+
+.triggerText {
+	@apply text-lg font-medium leading-4;
+	@apply bg-gradient-to-b from-[#ACCEFF] from-[-25%] to-[#00429B] to-[100%] bg-clip-text text-transparent;
+}
+
+.triggerIcon {
+	@apply ml-1 text-lg text-sidebar_foreground;
+}
+
+.popoverContent {
+	@apply w-52 rounded-xl border-none bg-[var(--sidebar-primary-foreground)] p-1.5 text-text_primary shadow-md dark:bg-[var(--sidebar-accent-foreground)];
+}
+
+.menuList {
+	@apply flex flex-col gap-2;
+}
+
+.menuItem {
+	@apply flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 transition-colors ease-in-out;
+
+	&:hover {
+		@apply bg-[var(--sidebar-accent)];
+	}
+
+	&:hover.dark {
+		@apply bg-[var(--sidebar-background)];
+	}
+}
+
+.menuLink {
+	@apply text-sm font-medium text-text_primary;
+
+	.dark & {
+		@apply text-[var(--sidebar-foreground)];
+	}
+}
+
+.newBadge {
+	@apply absolute right-[-12px] top-[-5px] rounded-full bg-[var(--sidebar-ring)] px-[0.4rem] py-[0.1rem] text-xs text-[var(--sidebar-primary-foreground)];
+}
+
+.menuItemIcon {
+	@apply h-6 w-6;
+}

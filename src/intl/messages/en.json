@@ -89,7 +89,8 @@
 		"createPost": "Create Post",
 		"createProposal": "Create Proposal",
 		"noData": "No data available",
-		"contentWillBeAvailableSoon": "Content will be available soon..."
+		"contentWillBeAvailableSoon": "Content will be available soon...",
+		"quickActions": "Quick Actions"
 	},
 	"Profile": {
 		"settings": "Settings",

@@ -89,7 +89,8 @@
 		"createPost": "Crear Publicación",
 		"createProposal": "Crear Propuesta",
 		"noData": "No hay datos disponibles",
-		"contentWillBeAvailableSoon": "El contenido estará disponible pronto..."
+		"contentWillBeAvailableSoon": "El contenido estará disponible pronto...",
+		"quickActions": "Acciones Rápidas"
 	},
 	"Profile": {
 		"settings": "Configuración",

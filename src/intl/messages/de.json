@@ -89,7 +89,8 @@
 		"createPost": "Beitrag erstellen",
 		"createProposal": "Vorschlag erstellen",
 		"noData": "Keine Daten verfügbar",
-		"contentWillBeAvailableSoon": "Inhalt wird in Kürze verfügbar sein..."
+		"contentWillBeAvailableSoon": "Inhalt wird in Kürze verfügbar sein...",
+		"quickActions": "Schnellaktionen"
 	},
 	"Profile": {
 		"settings": "Einstellungen",
