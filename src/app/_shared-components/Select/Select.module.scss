@@ -1,5 +1,5 @@
 .trigger {
-    @apply flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background;
+    @apply flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-border_grey hover:border-text_pink bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background;
     @apply placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring;
     @apply disabled:cursor-not-allowed disabled:opacity-50;
     @apply [&>span]:line-clamp-1;
@@ -41,7 +41,7 @@
 }
 
 .item {
-    @apply relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none;
+    @apply relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none;
     @apply focus:bg-accent focus:text-accent-foreground;
     @apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 
