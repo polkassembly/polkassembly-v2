@@ -603,7 +603,10 @@
 		"advisorycommittee": "咨询委员会",
 		"grant": "拨款",
 		"community": "社区",
-		"technicalcommittee": "技术委员会"
+		"technicalcommittee": "技术委员会",
+		"decisionPeriodInfo": "提案可能需要的时间来获得批准。如果提案在决策期间结束时未获得批准，将被拒绝。",
+   		"confirmPeriodInfo": "在决策期间，公投必须满足最低批准和支持标准，以便通过的总时间。",
+        "enactmentPeriodInfo": "提案在批准后必须在调度队列中的时间。"
 	},
 	"Header": {
 		"polkadot": "波卡点＆平行链",

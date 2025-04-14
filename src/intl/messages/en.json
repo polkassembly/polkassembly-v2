@@ -439,7 +439,11 @@
 			"grant": "Grant",
 			"community": "Community",
 			"technicalcommittee": "Technical Committee"
-		}
+		},
+		"decisionPeriodInfo": "Amount of time a proposal may take to be approved. If the proposal is not approved by the end of the decision period, it gets rejected.",
+		"confirmPeriodInfo": "Total time the referenda must meet both the min approval and support criteria during the decision period in order to pass.",
+		"enactmentPeriodInfo": "Time that the proposal must be in dispatch queue after approval."
+
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelled",

@@ -603,7 +603,10 @@
 		"advisorycommittee": "Comité asesor",
 		"grant": "Subvención",
 		"community": "Comunidad",
-		"technicalcommittee": "Comité Técnico"
+		"technicalcommittee": "Comité Técnico",
+		"decisionPeriodInfo": "Tiempo durante el cual una propuesta puede ser aprobada. Si la propuesta no es aprobada al final del período de decisión, se rechazará.",
+		"confirmPeriodInfo": "Tiempo total que el referéndum debe cumplir tanto con los criterios de aprobación mínima como de apoyo durante el período de decisión para pasar.",
+		"enactmentPeriodInfo": "Tiempo que la propuesta debe permanecer en la cola de despacho después de la aprobación."
 	},
 	"Header": {
 		"polkadot": "Polkadot y Parachains",

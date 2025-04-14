@@ -603,7 +603,10 @@
 		"advisorycommittee": "諮問委員会",
 		"grant": "助成金",
 		"community": "コミュニティ",
-		"technicalcommittee": "技術委員会"
+		"technicalcommittee": "技術委員会",
+		"decisionPeriodInfo": "提案が承認されるまでの時間。提案が決定期間の終了までに承認されない場合、却下されます。",
+		"confirmPeriodInfo": "決定期間中に提案が最低承認基準と支持基準を満たす必要があり、それをクリアすることで通過するための総時間。",
+		"enactmentPeriodInfo": "承認後、提案がディスパッチキューに入っている必要がある時間。"
 	},
 	"Header": {
 		"polkadot": "ポルカドット＆パラチェーン",

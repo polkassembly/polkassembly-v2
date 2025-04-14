@@ -603,7 +603,10 @@
 		"advisorycommittee": "Beratungsausschuss",
 		"grant": "Zuschuss",
 		"community": "Gemeinschaft",
-		"technicalcommittee": "Technisches Komitee"
+		"technicalcommittee": "Technisches Komitee",
+		"decisionPeriodInfo": "Zeitraum, in dem ein Vorschlag zur Genehmigung eingereicht werden kann. Wenn der Vorschlag nicht bis zum Ende des Entscheidungszeitraums genehmigt wird, wird er abgelehnt.",
+		"confirmPeriodInfo": "Gesamtzeit, die das Referendum benötigt, um sowohl die Mindestanforderungen als auch die Unterstützungskriterien während des Entscheidungszeitraums zu erfüllen, um zu bestehen.",
+		"enactmentPeriodInfo": "Zeitraum, in dem der Vorschlag nach der Genehmigung in der Ausführungswarteschlange bleiben muss."
 	},
 	"Header": {
 		"polkadot": "Polkadot & Parachains",

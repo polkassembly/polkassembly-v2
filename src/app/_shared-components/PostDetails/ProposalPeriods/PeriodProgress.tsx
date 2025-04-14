@@ -4,9 +4,11 @@
 import React from 'react';
 import { Progress } from '@/app/_shared-components/Progress/Progress';
 import { EPeriodType, EPostOrigin } from '@/_shared/types';
-import { getPeriodProgressLabel } from '@/app/_client-utils/getPeriodProgressLabel';
 import { calculatePeriodProgress } from '@/app/_client-utils/calculatePeriodProgress';
+import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import PeriodProgressLabel from './PeriodProgressLabel';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../Tooltip';
 
 interface Props {
 	periodEndsAt?: Date;
@@ -16,17 +18,23 @@ interface Props {
 }
 
 function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Props) {
-	const t = useTranslations('timeUnits');
-
+	const t = useTranslations('PostDetails');
 	const progress = calculatePeriodProgress({ endAt: periodEndsAt, trackName, periodType });
-	const label = getPeriodProgressLabel({
-		endAt: periodEndsAt,
-		trackName,
-		periodType,
-		minutes: t('minutes'),
-		hours: t('hours'),
-		days: t('days')
-	});
+
+	const getTooltipText = (type: EPeriodType) => {
+		switch (type) {
+			case EPeriodType.DECISION:
+				return t('decisionPeriodInfo');
+			case EPeriodType.CONFIRM:
+				return t('confirmPeriodInfo');
+			case EPeriodType.ENACTMENT:
+				return t('enactmentPeriodInfo');
+			default:
+				return null;
+		}
+	};
+
+	const tooltipText = getTooltipText(periodType);
 
 	return (
 		<div className='flex flex-col gap-y-2'>
@@ -36,8 +44,28 @@ function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Pro
 				value={progress}
 			/>
 			<div className='flex items-center justify-between text-sm text-text_primary'>
-				<span>{periodName}</span>
-				<span className='text-xs text-basic_text'>{label}</span>
+				<div className='flex items-center justify-between gap-x-1'>
+					<span>{periodName}</span>
+					{tooltipText && (
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger>
+									<Info className='text-text-grey h-[14px] w-[14px]' />
+								</TooltipTrigger>
+								<TooltipContent className='max-w-48 bg-tooltip_background p-2 text-white'>
+									<p>{tooltipText}</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					)}
+				</div>
+				<span className='text-xs text-basic_text'>
+					<PeriodProgressLabel
+						endAt={periodEndsAt}
+						trackName={trackName}
+						periodType={periodType}
+					/>
+				</span>
 			</div>
 		</div>
 	);
