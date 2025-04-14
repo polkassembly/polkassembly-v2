@@ -7,6 +7,7 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { TypeDef } from '@polkadot/types/types';
 import { StatusCodes } from 'http-status-codes';
+import { BN } from '@polkadot/util';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
@@ -928,11 +929,11 @@ export enum ENotificationStatus {
 }
 
 export interface IBountyStats {
-	availableBountyPool: string;
+	availableBountyPool: BN;
 	activeBounties: number;
-	peopleEarned: string;
-	totalRewarded: string;
-	totalBountyPool: number;
+	peopleEarned: number;
+	totalRewarded: BN;
+	totalBountyPool: BN;
 }
 
 export enum EBountyStatus {
@@ -1054,6 +1055,7 @@ export interface IDelegateDetails extends IDelegate {
 }
 
 export enum EDelegationStatus {
+	ALL = 'all',
 	RECEIVED = 'received',
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated'

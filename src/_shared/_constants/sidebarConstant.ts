@@ -122,7 +122,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 					[
 						...baseConfig.initalItems,
 						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
-						{ title: t('Sidebar.delegation'), url: '#', icon: Delegation },
+						{ title: t('Sidebar.delegation'), url: '/delegation', icon: Delegation },
 						{
 							title: t('Sidebar.bounty'),
 							url: '',
@@ -134,7 +134,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 									url: '/bounty-dashboard',
 									count: trackCounts.bounty_dashboard || 0
 								},
-								{ title: t('Sidebar.onChainBounties'), url: '/bounty/onchain-bounty' }
+								{ title: t('Sidebar.onChainBounties'), url: '/bounties-listing' }
 							]
 						},
 						{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }

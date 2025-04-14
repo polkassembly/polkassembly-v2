@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAllowedCommentor, ENetwork, EProposalType } from '@/_shared/types';
+import { EAllowedCommentor, ENetwork, EProposalType, IPostLink } from '@/_shared/types';
 import { AIService } from '../_api-services/ai_service';
 import { OffChainDbService } from '../_api-services/offchain_db_service';
 import { RedisService } from '../_api-services/redis_service';
@@ -15,7 +15,8 @@ export async function updatePostServer({
 	content,
 	title,
 	allowedCommentor,
-	userId
+	userId,
+	linkedPost
 }: {
 	network: ENetwork;
 	proposalType: EProposalType;
@@ -24,6 +25,7 @@ export async function updatePostServer({
 	title: string;
 	allowedCommentor: EAllowedCommentor;
 	userId: number;
+	linkedPost?: IPostLink;
 }) {
 	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 		await OffChainDbService.UpdateOffChainPost({
@@ -33,7 +35,8 @@ export async function updatePostServer({
 			userId,
 			content,
 			title,
-			allowedCommentor
+			allowedCommentor,
+			linkedPost
 		});
 	} else {
 		await OffChainDbService.UpdateOnChainPost({
@@ -43,7 +46,8 @@ export async function updatePostServer({
 			userId,
 			content,
 			title,
-			allowedCommentor
+			allowedCommentor,
+			linkedPost
 		});
 	}
 

@@ -130,6 +130,11 @@ export class AIService {
 				return null;
 			}
 
+			console.log('AI Service Response', {
+				prompt,
+				response: aiResponse
+			});
+
 			return aiResponse;
 		} catch (error) {
 			console.error('Error in generating AI response', error);
@@ -457,7 +462,7 @@ export class AIService {
 	}): Promise<IContentSummary | null> {
 		const commentsTree = await OffChainDbService.GetPostComments({ network, indexOrHash, proposalType });
 
-		const flattenedComments = commentsTree.flatMap((comment) => comment.children || [comment]);
+		const flattenedComments = commentsTree.flatMap((comment) => (comment.children && comment.children.length ? comment.children : [comment]));
 
 		if (!flattenedComments.length) return null;
 

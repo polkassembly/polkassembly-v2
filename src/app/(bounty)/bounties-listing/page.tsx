@@ -3,15 +3,24 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EProposalType } from '@/_shared/types';
-import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import BountiesListingPage from './Components/BountiesListingPage';
 
-async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ page?: string; trackStatus?: string }> }) {
+async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
 	const searchParamsValue = await searchParams;
-	const page = parseInt(searchParamsValue.page || '1', 10);
-	const statuses = searchParamsValue.trackStatus === 'all' ? [] : searchParamsValue.trackStatus?.split(',') || [];
+	const pageParam = searchParamsValue.page?.split('?')[0];
+	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
+	const { status: paramStatus } = searchParamsValue;
+	const [urlStatus] = searchParamsValue.page?.includes('status=') ? searchParamsValue.page.split('status=') : [];
+	const status = paramStatus || urlStatus;
+
+	let statuses: string[] = [];
+	if (status && status !== 'all') {
+		statuses = [status];
+	}
 
 	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.BOUNTY, page, statuses });
 
@@ -20,11 +29,8 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 	}
 
 	return (
-		<div>
-			<ListingPage
-				proposalType={EProposalType.BOUNTY}
-				initialData={data || { items: [], totalCount: 0 }}
-			/>
+		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
+			<BountiesListingPage initialData={data || { items: [], totalCount: 0 }} />
 		</div>
 	);
 }
