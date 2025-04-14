@@ -1,101 +1,101 @@
 .delegation_title {
-    @apply text-btn_secondary_text text-2xl font-semibold;
+	@apply text-2xl font-semibold text-btn_secondary_text;
 }
 
 .tooltipContent {
-    @apply relative rounded-md bg-tooltip_background px-2 py-1 shadow-lg;
+	@apply relative rounded-md bg-tooltip_background px-2 py-1 shadow-lg;
 }
 
 .selectTrigger {
-    @apply m-0 w-5 border-border_grey p-0;
+	@apply m-0 w-5 border-border_grey p-0;
 }
 
 .selectContent {
-    @apply border-border_grey px-3 py-2;
+	@apply border-border_grey px-3 py-2;
 }
 
 .tableRow {
-    @apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+	@apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
 }
 
 .tableCell_1 {
-    @apply p-4 first:rounded-tl-lg last:rounded-tr-lg
+	@apply p-4 first:rounded-tl-lg last:rounded-tr-lg;
 }
 
 .tableCell_last {
-    @apply p-4 last:rounded-tr-lg
+	@apply p-4 last:rounded-tr-lg;
 }
 
 .tableCell_3 {
-    @apply px-6 py-5;
+	@apply px-6 py-5;
 }
 
 .tableCell_2 {
-    @apply w-1/4 px-6 py-5;
+	@apply w-1/4 px-6 py-5;
 }
 
 .tableCell {
-    @apply p-4 whitespace-nowrap;
+	@apply whitespace-nowrap p-4;
 }
 
 .activeTab {
-    @apply bg-sidebar_menu_active;
+	@apply bg-sidebar_menu_active;
 }
 
 .activeTabText {
-    @apply rounded-full px-4 py-2 text-btn_secondary_text text-sm;
+	@apply rounded-full px-4 py-2 text-sm text-btn_secondary_text;
 }
 
 .radioButton {
-    @apply w-5 h-5 rounded-full border-2 border-border_grey inline-flex items-center justify-center cursor-pointer;
+	@apply inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border-2 border-border_grey;
 
-    &[data-state='checked'] {
-        &::after {
-            @apply content-[''] block w-2 h-2 rounded-full bg-btn_primary_text;
-        }
-    }
+	&[data-state='checked'] {
+		&::after {
+			@apply block h-2 w-2 rounded-full bg-btn_primary_text content-[''];
+		}
+	}
 }
 
 .radioLabel {
-    @apply text-btn_secondary_text text-sm cursor-pointer;
+	@apply cursor-pointer text-sm text-btn_secondary_text;
 }
 
 .radioGroup {
-    @apply flex flex-wrap gap-4;
+	@apply flex flex-wrap gap-4;
 }
 
 .radioWrapper {
-    @apply flex items-center rounded-full border border-border_grey px-4 py-2 transition-all duration-200;
+	@apply flex items-center rounded-full border border-border_grey px-4 py-2 transition-all duration-200;
 
-    &[data-state='checked'] {
-        @apply bg-btn_primary_text;
-    }
+	&[data-state='checked'] {
+		@apply bg-btn_primary_text;
+	}
 }
 
 .selectTrigger {
-    @apply flex h-10 w-full items-center justify-between rounded-full px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+	@apply flex h-10 w-full items-center justify-between rounded-full px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 .selectContent {
-    @apply border-border_grey px-3 py-2;
+	@apply border-border_grey px-3 py-2;
 }
 
 .delegationDetailsCard {
-    @apply mt-5 min-h-80 w-full rounded-lg bg-bg_modal p-4 shadow-lg;
+	@apply mt-5 min-h-80 w-full rounded-lg bg-bg_modal p-4 shadow-lg;
 }
 
 .delegationDetailsCardTitle {
-    @apply text-xl font-semibold text-btn_secondary_text;
+	@apply text-xl font-semibold text-btn_secondary_text;
 }
 
 .delegationPopupCardStep {
-    @apply grid grid-cols-[auto_1fr] items-start gap-4 text-sm text-text_primary;
+	@apply grid grid-cols-[auto_1fr] items-start gap-4 text-sm text-text_primary;
 }
 
 .delegationPopupCardStepWrapper {
-    @apply grid max-w-lg grid-cols-[auto_1fr] gap-3;
+	@apply grid max-w-lg grid-cols-[auto_1fr] gap-3;
 }
 
 .delegationPopupCard {
-    @apply mt-5 hidden rounded-lg bg-bg_modal py-4 shadow-lg sm:block;
+	@apply mt-5 hidden rounded-lg bg-bg_modal py-4 shadow-lg sm:block;
 }
