@@ -7,6 +7,7 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { TypeDef } from '@polkadot/types/types';
 import { StatusCodes } from 'http-status-codes';
+import { BN } from '@polkadot/util';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
@@ -921,6 +922,37 @@ export enum ENotificationStatus {
 	INFO = 'info'
 }
 
+export interface IBountyStats {
+	availableBountyPool: BN;
+	activeBounties: number;
+	peopleEarned: number;
+	totalRewarded: BN;
+	totalBountyPool: BN;
+}
+
+export enum EBountyStatus {
+	ALL = 'all',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: EBountyStatus;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: number;
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: string }>;
+}
+
 // generic types are for insignificant tokens if we decide to add later
 export interface ITreasuryStats {
 	network: ENetwork;
@@ -1017,6 +1049,7 @@ export interface IDelegateDetails extends IDelegate {
 }
 
 export enum EDelegationStatus {
+	ALL = 'all',
 	RECEIVED = 'received',
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated'

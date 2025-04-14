@@ -1,0 +1,11 @@
+.myDelegationContainer {
+	@apply mt-5 flex flex-col items-center justify-center rounded-lg bg-bg_modal p-6 shadow-lg md:flex-row md:gap-x-5;
+}
+
+.myDelegationContainerDiv {
+	@apply mt-2 flex w-full flex-col items-center justify-center gap-y-5 sm:flex-row sm:gap-x-5 md:mt-0 md:justify-between;
+}
+
+.myDelegationContainerButton {
+	@apply mt-5 hidden sm:mt-0 md:block;
+}

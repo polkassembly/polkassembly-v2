@@ -1,0 +1,159 @@
+.delegationTrackContainer {
+	@apply mb-4 flex items-center gap-2 text-btn_secondary_text;
+}
+
+.delegationName {
+	@apply cursor-pointer text-sm capitalize text-text_pink;
+}
+
+.delegationTrackName {
+	@apply text-2xl font-bold text-btn_secondary_text;
+}
+
+.trackInfoContainer {
+	@apply flex flex-col justify-between gap-5 rounded-lg bg-bg_modal p-5;
+}
+
+.trackHeader {
+	@apply flex items-center gap-4;
+}
+
+.statusBadge {
+	@apply rounded-[26px] px-3 py-1.5 text-center text-xs text-btn_secondary_text;
+}
+
+.delegatedBadge {
+	@apply bg-delegated_delegation_bg;
+}
+
+.receivedBadge {
+	@apply bg-received_delegation_bg;
+}
+
+.undelegatedBadge {
+	@apply bg-undelegated_delegation_bg;
+}
+
+.trackDescription {
+	@apply text-sm text-text_primary;
+}
+
+.contentContainer {
+	@apply flex flex-col items-center justify-center gap-4;
+}
+
+.undelegatedContent {
+	@apply flex flex-col items-center justify-center gap-4;
+}
+
+.undelegatedMessage {
+	@apply flex flex-col items-center gap-2 text-sm text-text_primary md:flex-row;
+}
+
+.delegateButton {
+	@apply flex cursor-pointer items-center gap-1 text-text_pink;
+}
+
+.tableContainer {
+	@apply flex w-full items-center justify-center p-4;
+}
+
+.delegationTable {
+	@apply w-full overflow-y-auto border-border_grey;
+}
+
+.tableHeader {
+	@apply overflow-hidden rounded-t-lg bg-page_background px-6;
+}
+
+.tableHeaderCell {
+	@apply p-6 first:rounded-tl-lg last:rounded-tr-lg;
+}
+
+.addressCell {
+	@apply w-1/4 px-6 py-5;
+}
+
+.actionCell {
+	@apply p-6 last:rounded-tr-lg;
+}
+
+.undelegateButton {
+	@apply flex cursor-pointer items-center gap-1 text-text_pink;
+}
+
+.tooltipContent {
+	@apply relative rounded-md bg-tooltip_background px-2 py-1 text-btn_primary_text shadow-lg;
+}
+
+.proposalsContainer {
+	@apply mt-10 flex flex-col gap-5 rounded-lg bg-bg_modal p-5;
+}
+
+.proposalsHeader {
+	@apply flex items-center justify-between;
+}
+
+.proposalsTitle {
+	@apply flex items-center gap-2;
+}
+
+.proposalsCount {
+	@apply ml-1 flex h-7 w-7 items-center justify-center rounded-full bg-grey_bg text-sm font-medium;
+}
+
+.expandButton {
+	@apply text-sm text-text_primary;
+}
+
+.proposalsList {
+	@apply mt-2 flex max-h-[500px] flex-col gap-5 overflow-y-auto;
+}
+
+.proposalCard {
+	@apply w-full rounded-lg border border-border_grey;
+}
+
+.proposalDetails {
+	@apply flex flex-col gap-2 p-6;
+}
+
+.proposalTitle {
+	@apply text-sm font-medium text-btn_secondary_text;
+}
+
+.proposalInfo {
+	@apply flex items-center gap-2 text-sm;
+}
+
+.noProposalsMessage {
+	@apply flex items-center justify-center py-8 text-btn_secondary_text;
+}
+
+.voteInfo {
+	@apply flex items-center gap-2 px-4 py-2 text-sm;
+}
+
+.proposalLabel {
+	@apply flex items-center gap-2 text-sm text-wallet_btn_text;
+}
+
+.aye {
+	@apply rounded-b-md border border-success bg-voted_bg;
+}
+
+.nay {
+	@apply rounded-b-md border border-failure bg-voted_bg;
+}
+
+.split {
+	@apply rounded-b-md border border-info bg-info_card_bg;
+}
+
+.splitAbstain {
+	@apply rounded-b-md border border-info_card_bg bg-info_bg;
+}
+
+.notVoted {
+	@apply rounded-b-md border border-warning bg-not_voted_bg;
+}
