@@ -90,7 +90,8 @@
 		"createProposal": "创建提案",
 		"noData": "暂无数据",
 		"contentWillBeAvailableSoon": "内容即将可用...",
-		"quickActions": "快速操作"
+		"quickActions": "快速操作",
+		"quickActionsDescription": "使用快速引导流程创建提案和讨论"
 	},
 	"Profile": {
 		"settings": "设置",

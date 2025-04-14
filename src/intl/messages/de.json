@@ -90,7 +90,8 @@
 		"createProposal": "Vorschlag erstellen",
 		"noData": "Keine Daten verfügbar",
 		"contentWillBeAvailableSoon": "Inhalt wird in Kürze verfügbar sein...",
-		"quickActions": "Schnellaktionen"
+		"quickActions": "Schnellaktionen",
+		"quickActionsDescription": "Erstellen Sie Vorschläge und Diskussionsbeiträge mit schnellen leitfähigen Flüssen"
 	},
 	"Profile": {
 		"settings": "Einstellungen",

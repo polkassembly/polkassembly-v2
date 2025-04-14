@@ -90,7 +90,8 @@
 		"createProposal": "提案を作成",
 		"noData": "データがありません",
 		"contentWillBeAvailableSoon": "コンテンツはまもなく利用可能になります...",
-		"quickActions": "クイックアクション"
+		"quickActions": "クイックアクション",
+		"quickActionsDescription": "クイックガイド付きの提案と議論を作成"
 	},
 	"Profile": {
 		"settings": "設定",

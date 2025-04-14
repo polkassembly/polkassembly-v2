@@ -90,7 +90,8 @@
 		"createProposal": "Crear Propuesta",
 		"noData": "No hay datos disponibles",
 		"contentWillBeAvailableSoon": "El contenido estará disponible pronto...",
-		"quickActions": "Acciones Rápidas"
+		"quickActions": "Acciones Rápidas",
+		"quickActionsDescription": "Crea propuestas y discusiones con flujos guiados rápidos"
 	},
 	"Profile": {
 		"settings": "Configuración",
