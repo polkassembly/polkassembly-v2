@@ -163,43 +163,41 @@ export default function BecomeDelegateDialog() {
 				</DialogHeader>
 
 				<div className='flex flex-col gap-y-4'>
-					<div className='overflow-y-auto-auto max-h-[80vh]'>
-						<AddressDropdown
-							withBalance
-							onChange={(account) => setAddress(getEncodedAddress(account.address, network))}
+					<AddressDropdown
+						withBalance
+						onChange={(account) => setAddress(getEncodedAddress(account.address, network))}
+					/>
+					<div className='flex flex-col gap-y-2'>
+						<p className='text-sm text-wallet_btn_text'>
+							{t('delegationManifesto')} <span className='text-text_pink'>*</span>
+						</p>
+						<Input
+							title={t('delegationMandate')}
+							placeholder={t('addMessageForDelegateAddress')}
+							className='w-full'
+							required
+							value={manifesto}
+							onChange={(e) => setManifesto(e.target.value)}
 						/>
-						<div className='flex flex-col gap-y-2'>
-							<p className='text-sm text-wallet_btn_text'>
-								{t('delegationManifesto')} <span className='text-text_pink'>*</span>
-							</p>
-							<Input
-								title={t('delegationMandate')}
-								placeholder={t('addMessageForDelegateAddress')}
-								className='w-full'
-								required
-								value={manifesto}
-								onChange={(e) => setManifesto(e.target.value)}
-							/>
-						</div>
-						<div className={styles.infoContainer}>
-							<AiOutlineInfoCircle className='text-lg text-toast_info_border' />
-							<span className={styles.infoText}>
-								{t('addSocialsToDelegateProfile')}
-								<Link
-									href='/set-identity'
-									className={styles.link}
-								>
-									<Image
-										src={identityIcon}
-										alt='Polkassembly'
-										width={16}
-										height={16}
-									/>{' '}
-									{t('setIdentity')}
-								</Link>{' '}
-								{t('withPolkassembly')}
-							</span>
-						</div>
+					</div>
+					<div className={styles.infoContainer}>
+						<AiOutlineInfoCircle className='text-lg text-toast_info_border' />
+						<span className={styles.infoText}>
+							{t('addSocialsToDelegateProfile')}
+							<Link
+								href='/set-identity'
+								className={styles.link}
+							>
+								<Image
+									src={identityIcon}
+									alt='Polkassembly'
+									width={16}
+									height={16}
+								/>{' '}
+								{t('setIdentity')}
+							</Link>{' '}
+							{t('withPolkassembly')}
+						</span>
 					</div>
 
 					<Button

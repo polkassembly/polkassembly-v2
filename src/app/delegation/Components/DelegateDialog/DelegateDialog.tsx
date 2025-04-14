@@ -298,7 +298,7 @@ function DelegateDialog({ open, setOpen, delegate: initialDelegate, children, tr
 						</div>
 					</DialogTitle>
 				</DialogHeader>
-				<div className='flex flex-col gap-4'>
+				<div className='flex max-h-[80vh] flex-col gap-4 overflow-y-auto'>
 					<Label>{t('yourAddress')}</Label>
 					<AddressInput
 						disabled
