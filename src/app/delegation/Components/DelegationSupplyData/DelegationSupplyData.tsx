@@ -33,9 +33,9 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 			try {
 				await apiService.apiReady();
 
-				const supply = await apiService.getTotalActiveIssuance();
+				const supply = await apiService.getTotalIssuance();
 				if (supply) {
-					setTotalSupply(supply);
+					setTotalSupply(new BN(supply.toString()));
 				}
 			} catch (err) {
 				console.error('Error fetching total supply:', err);
