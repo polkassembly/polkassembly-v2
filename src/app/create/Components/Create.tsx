@@ -107,7 +107,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 		create: t('CreateProposal.create'),
 		[EProposalStep.CREATE_PREIMAGE]: t('CreateProposal.createPreimage'),
 		[EProposalStep.EXISTING_PREIMAGE]: t('CreateProposal.existingPreimage'),
-		[EProposalStep.CREATE_TREASURY_PROPOSAL]: `${t('CreateProposal.spend')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.from')} ${NETWORKS_DETAILS[network as ENetwork]?.name} ${t('CreateProposal.Treasury')}`,
+		[EProposalStep.CREATE_TREASURY_PROPOSAL]: `${t('CreateProposal.spend')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.Treasury')}`,
 		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
 		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
 		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum')
@@ -164,7 +164,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum />}
 						{!step && (
 							<div className='flex flex-col gap-y-4'>
-								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.quickActions')}</p>
+								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.trendingNow')}</p>
 								<CreateOption
 									href='/create/discussion'
 									label={t('CreateProposal.createDiscussion')}
@@ -184,7 +184,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 								<CreateOption
 									label={titles[EProposalStep.CREATE_TREASURY_PROPOSAL]}
 									onClick={() => setStep(EProposalStep.CREATE_TREASURY_PROPOSAL)}
-									description={`${t('CreateProposal.createTreasuryProposalDescription')} ${NETWORKS_DETAILS[network as ENetwork]?.name}`}
+									description={`${t('CreateProposal.createTreasuryProposalDescription')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.fromAssethub')}`}
 									icon={TreasuryProposalIcon}
 									iconClassName='bg-create_treasury_bg/10'
 								/>

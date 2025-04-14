@@ -13,6 +13,8 @@ import { ENetwork, EProposalStep } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ChevronLeft } from 'lucide-react';
+import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
+import Image from 'next/image';
 
 function CreateModal() {
 	const router = useRouter();
@@ -57,7 +59,19 @@ function CreateModal() {
 								<ChevronLeft />
 							</button>
 						)}
-						{titles[step || 'create']}
+						{step ? (
+							titles[step]
+						) : (
+							<div className='flex items-center gap-x-2'>
+								<Image
+									src={TreasuryIcon}
+									alt='Treasury Icon'
+									width={24}
+									height={24}
+								/>
+								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.quickActions')}</p>
+							</div>
+						)}
 					</DialogTitle>
 				</DialogHeader>
 				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
