@@ -739,24 +739,6 @@ export class PolkadotApiService {
 		return this.api.derive.chain.bestNumber();
 	}
 
-	async getTotalActiveIssuance(): Promise<BN> {
-		if (!this.api) throw new Error('API not initialized');
-		try {
-			const totalIssuance = await this.api.query.balances.totalIssuance();
-			const inactiveIssuance = await this.api.query.balances.inactiveIssuance();
-
-			if (!totalIssuance || !inactiveIssuance) {
-				console.error('Failed to fetch issuance values');
-				throw new Error('Failed to fetch issuance values');
-			}
-
-			return new BN(totalIssuance.toString()).sub(new BN(inactiveIssuance.toString()));
-		} catch (error) {
-			console.error('Error in getTotalActiveIssuance:', error);
-			throw new Error('Failed to retrieve total active issuance');
-		}
-	}
-
 	async getBountyAmount() {
 		const allBounties = await this.api?.derive.bounties?.bounties();
 		return allBounties.filter((item: any) => {
