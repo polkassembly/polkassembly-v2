@@ -57,12 +57,12 @@ function Navbar() {
 	};
 	return (
 		<nav className={classes.navbar}>
-			<div className='flex items-center pl-8 md:pl-0'>
+			<div className='flex items-center pl-12 md:pl-0'>
 				<PaLogo
 					variant='full'
-					className='md:hidden'
+					className='w-[120px] md:hidden'
 				/>
-				<div className='border-l-[1px] border-bg_pink pl-3 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
+				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
 			<div
