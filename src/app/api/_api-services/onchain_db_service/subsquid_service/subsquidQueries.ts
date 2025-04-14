@@ -15,7 +15,6 @@ export class SubsquidQueries {
 				createdAt
 				proposer
 				status
-				curator
 				description
 				origin,
 				preimage {
@@ -66,14 +65,14 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
-				reward
 				status,
-				curator,
 				hash,
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -96,13 +95,13 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
-				reward
 				hash,
-				curator
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -133,14 +132,14 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
-					reward
-					curator
 					status,
 					hash,
+					reward,
 					preimage {
 							proposedCall {
 									args
 							}
+							section
 					}
 					statusHistory {
 							status
@@ -179,14 +178,14 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
-					reward
-					curator
 					status,
 					hash,
+					reward,
 					preimage {
 							proposedCall {
 									args
 							}
+							section
 					}
 					statusHistory {
 							status
@@ -216,14 +215,14 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
-				reward
 				status
 				hash,
-				curator
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -245,14 +244,14 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
-				reward
 				status
-				curator
 				hash,
+				reward,
 				preimage {
 					proposedCall {
 						args
 					}
+					section
 				}
 				statusHistory {
 					status
@@ -710,6 +709,9 @@ export class SubsquidQueries {
 				index
 				reward
 			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in}) {
+				totalCount
+			}
 		}
 	`;
 
@@ -719,33 +721,23 @@ export class SubsquidQueries {
 				index
 				reward
 			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}) {
+				totalCount
+			}
 		}
 	`;
 
-	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
-	query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
-	totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
-    totalCount
-  }  
-	childBounties:proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
-    description
-    index
-    status
-    reward
-    createdAt
-    curator
-    payee
-    proposer
-    origin   
-  }
-}`;
-
-	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES = `
-query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
- totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
-    totalCount
-}  
-}`;
+	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX_RANGE = `
+		query RewardsByIndexRange($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_gte: Int!, $index_lte: Int!) {
+			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_gte: $index_gte, index_lte: $index_lte}) {
+				index
+				reward
+			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in, index_gte: $index_gte, index_lte: $index_lte}) {
+				totalCount
+			}
+		}
+	`;
 
 	protected static GET_CONVICTION_VOTING_DELEGATION_STATS = `
 		query GetConvictionVotingDelegationStats {
@@ -769,6 +761,9 @@ query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!, $c
                     status
                 }
             }
+            proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+                totalCount
+            }
         }
     `;
 
@@ -779,7 +774,10 @@ query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!, $c
 				reward
 				statusHistory(where: {status_eq: Claimed}) {
 					timestamp
-						}
+				}
+			}
+			proposalsConnection(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in, statusHistory_some: {status_eq: Claimed}}, orderBy: id_DESC) {
+				totalCount
 			}
 		}
 	`;
@@ -902,4 +900,29 @@ query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!, $c
 			}
 		}
 	`;
+
+	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
+	query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
+		totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
+			totalCount
+		}  
+		childBounties:proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
+		description
+		index
+		status
+		reward
+		createdAt
+		curator
+		payee
+		proposer
+		origin   
+		}
+	}`;
+
+	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES = `
+	query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
+		totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
+			totalCount
+		}  
+	}`;
 }

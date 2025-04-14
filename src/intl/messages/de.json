@@ -684,6 +684,16 @@
 		"verificationFailed": "Verifizierung fehlgeschlagen",
 		"goToHome": "Zur Startseite"
 	},
+	"Bounty": {
+		"availableBountyPool": "Verfügbare Prämie-Pool",
+		"viewAll": "Alle anzeigen",
+		"dot": "DOT",
+		"claimed": "Beansprucht",
+		"childBounties": "Kinderprämien",
+		"bountyProposal": "Prämie-Vorschlag",
+		"vote": "Abstimmen",
+		"bountyDashboard": "Prämie-Dashboard"
+	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",
 		"please": "Bitte",

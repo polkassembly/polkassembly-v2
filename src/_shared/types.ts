@@ -884,6 +884,12 @@ export interface IPostSubscription {
 	userId: number;
 }
 
+export interface IClaimedBountyProposal {
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ timestamp: string }>;
+}
+
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }

@@ -665,6 +665,16 @@
 		"verificationFailed": "Error en la verificación",
 		"goToHome": "Ir al inicio"
 	},
+	"Bounty": {
+		"availableBountyPool": "Piscina de Prémios Disponibles",
+		"viewAll": "Ver Todo",
+		"dot": "DOT",
+		"claimed": "Reclamado",
+		"childBounties": "Subprémios",
+		"bountyProposal": "Propuesta de Prémio",
+		"vote": "Votar",
+		"bountyDashboard": "Panel de Prémios"
+	},
 	"BatchVote": {
 		"batchVoting": "Votación por lotes",
 		"please": "Por favor",

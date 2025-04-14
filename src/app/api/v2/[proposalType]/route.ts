@@ -41,20 +41,21 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
-		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
+		limit: z.preprocess((val) => (Array.isArray(val) ? Number(val[0]) : Number(val)), z.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)),
+		status: z.preprocess((val) => (typeof val === 'string' ? val.split(',') : Array.isArray(val) ? val : []), z.array(z.nativeEnum(EProposalStatus))).optional(),
 		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional(),
-		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional() // max 30 tags because of firestore query limit
+		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional(),
+		preimageSection: z.preprocess((val) => (Array.isArray(val) ? val[0] : val), z.string()).optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, status: statuses, origin: origins, tags } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, status: statuses, origin: origins, tags, preimageSection } = zodQuerySchema.parse(searchParamsObject);
 
 	const network = await getNetworkFromHeaders();
 
 	// Try to get from cache first
-	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
+	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags, preimageSection });
 	if (cachedData) {
 		return NextResponse.json(cachedData);
 	}
@@ -64,7 +65,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// 1. if proposal type is on-chain, get on-chain posts from onchain_db_service, then get the corresponding off-chain data from offchain_db_service for each on-chain post
 	if (ValidatorService.isValidOnChainProposalType(proposalType) && !tags?.length) {
-		const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins });
+		const onChainPostsListingResponse = await OnChainDbService.GetOnChainPostsListing({ network, proposalType, limit, page, statuses, origins, preimageSection });
 
 		// Fetch off-chain data
 		const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {

@@ -138,7 +138,8 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		statuses,
 		origins,
-		notVotedByAddresses
+		notVotedByAddresses,
+		preimageSection
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -147,6 +148,7 @@ export class SubsquidService extends SubsquidUtils {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
+		preimageSection?: string;
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -175,13 +177,27 @@ export class SubsquidService extends SubsquidUtils {
 				status_in: statuses,
 				type_eq: proposalType,
 				origin_in: origins,
-				voters: notVotedByAddresses
+				voters: notVotedByAddresses,
+				section_eq: preimageSection
 			})
 			.toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain posts listing from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain posts listing from Subsquid');
+		}
+
+		if (preimageSection?.length && subsquidData.proposals) {
+			const updatedProposals = await Promise.all(
+				subsquidData.proposals.map(async (proposal: { preimage?: { proposedCall?: { args?: Record<string, unknown> } }; reward?: string }) => {
+					if (proposal.preimage?.proposedCall?.args?.bountyId) {
+						const bountyProposals = await this.getActiveBountiesWithRewardsByIndex(network, Number(proposal.preimage?.proposedCall?.args.bountyId));
+						return { ...proposal, reward: bountyProposals?.data.items[0].reward };
+					}
+					return proposal;
+				})
+			);
+			subsquidData.proposals = updatedProposals;
 		}
 
 		if (subsquidData.proposals.length === 0) {
@@ -220,6 +236,7 @@ export class SubsquidService extends SubsquidUtils {
 						proposedCall?: {
 							args?: Record<string, unknown>;
 						};
+						section?: string;
 					};
 					statusHistory?: Array<{
 						status: EProposalStatus;
@@ -232,7 +249,6 @@ export class SubsquidService extends SubsquidUtils {
 					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 				let childBountiesCount = 0;
 
-				// child bounties count
 				if (proposalType === EProposalType.BOUNTY) {
 					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES;
 
@@ -245,8 +261,7 @@ export class SubsquidService extends SubsquidUtils {
 						childBountiesCount = data?.totalChildBounties?.totalCount || 0;
 					}
 				}
-
-				return {
+				posts.push({
 					createdAt: new Date(proposal.createdAt),
 					childBountiesCount: childBountiesCount || 0,
 					curator: proposal.curator,
@@ -262,7 +277,7 @@ export class SubsquidService extends SubsquidUtils {
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
-				};
+				});
 			}
 		);
 
@@ -488,7 +503,16 @@ export class SubsquidService extends SubsquidUtils {
 				})
 				.toPromise();
 
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching active bounties:', error);
 			return null;
@@ -505,7 +529,17 @@ export class SubsquidService extends SubsquidUtils {
 					index_eq: index
 				})
 				.toPromise();
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching active bounties by index:', error);
 			return null;
@@ -521,7 +555,16 @@ export class SubsquidService extends SubsquidUtils {
 				})
 				.toPromise();
 
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching child bounties:', error);
 			return null;
@@ -538,7 +581,16 @@ export class SubsquidService extends SubsquidUtils {
 				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
 				.toPromise();
 
-			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
 		} catch (error) {
 			console.error('Error fetching claimed child bounties payees and reward:', error);
 			return null;
