@@ -124,6 +124,7 @@ export class SubsquidService extends SubsquidUtils {
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 			confirmationPeriodEndsAt: allPeriodEnds?.confirmationPeriodEnd ?? undefined,
+			enactmentPeriodEndsAt: allPeriodEnds?.enactmentPeriodEnd ?? undefined,
 			timeline: proposal.statusHistory as IStatusHistoryItem[],
 			preimageArgs: proposal.preimage?.proposedCall?.args
 		};
@@ -688,6 +689,7 @@ export class SubsquidService extends SubsquidUtils {
 						beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 						decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 						preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
+						enactmentPeriodEndsAt: allPeriodEnds?.enactmentPeriodEnd ?? undefined,
 						delegateVote
 					};
 				}

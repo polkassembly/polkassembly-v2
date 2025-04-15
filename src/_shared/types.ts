@@ -495,6 +495,7 @@ export interface IOnChainPostInfo {
 	preparePeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
 	confirmationPeriodEndsAt?: Date;
+	enactmentPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
 }

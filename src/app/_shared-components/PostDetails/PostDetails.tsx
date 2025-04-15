@@ -20,14 +20,6 @@ import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
 import OnchainInfo from './OnchainInfo/OnchainInfo';
 
-const getMinEnactmentPeriodStarts = (timeline: Array<{ status: string; timestamp: Date }>) => {
-	const lastTimelineItem = timeline[timeline.length - 1];
-	if (lastTimelineItem.status === 'Confirmed') {
-		return lastTimelineItem.timestamp;
-	}
-	return null;
-};
-
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
 
@@ -36,8 +28,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	};
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post.proposalType);
-
-	const minEnactmentPeriodStarts = postData?.onChainInfo?.timeline ? getMinEnactmentPeriodStarts(postData.onChainInfo.timeline) : null;
 
 	return (
 		<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
@@ -90,7 +80,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								confirmationPeriodEndsAt={postData.onChainInfo.confirmationPeriodEndsAt}
 								decisionPeriodEndsAt={postData.onChainInfo.decisionPeriodEndsAt}
 								preparePeriodEndsAt={postData.onChainInfo.preparePeriodEndsAt}
-								minEnactmentPeriodStarts={minEnactmentPeriodStarts}
+								enactmentPeriodEndsAt={postData.onChainInfo.enactmentPeriodEndsAt}
 								status={postData.onChainInfo.status}
 								trackName={postData.onChainInfo.origin}
 							/>

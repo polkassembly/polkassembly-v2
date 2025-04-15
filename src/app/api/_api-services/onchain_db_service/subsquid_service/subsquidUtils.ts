@@ -25,6 +25,7 @@ interface IPeriodEndDates {
 	decisionPeriodEnd: Date | null;
 	preparePeriodEnd: Date | null;
 	confirmationPeriodEnd: Date | null;
+	enactmentPeriodEnd: Date | null;
 }
 const DEFAULT_LOCK_PERIOD = new BN('10').div(new BN('100'));
 
@@ -117,7 +118,8 @@ export class SubsquidUtils extends SubsquidQueries {
 		const result: IPeriodEndDates = {
 			decisionPeriodEnd: null,
 			preparePeriodEnd: null,
-			confirmationPeriodEnd: null
+			confirmationPeriodEnd: null,
+			enactmentPeriodEnd: null
 		};
 
 		try {
@@ -153,6 +155,13 @@ export class SubsquidUtils extends SubsquidQueries {
 			if (confirmStartedStatus?.timestamp && trackData.confirmPeriod) {
 				const confirmPeriodMs = Number(trackData.confirmPeriod) * blockTime;
 				result.confirmationPeriodEnd = dayjs(confirmStartedStatus.timestamp).add(confirmPeriodMs, 'millisecond').toDate();
+			}
+
+			// Calculate enactment period end
+			const enactedStatus = statusHistory.find((status) => status.status === EProposalStatus.Confirmed);
+			if (enactedStatus?.timestamp && trackData.minEnactmentPeriod) {
+				const enactmentPeriodMs = Number(trackData.minEnactmentPeriod) * blockTime;
+				result.enactmentPeriodEnd = dayjs(enactedStatus.timestamp).add(enactmentPeriodMs, 'millisecond').toDate();
 			}
 
 			return result;

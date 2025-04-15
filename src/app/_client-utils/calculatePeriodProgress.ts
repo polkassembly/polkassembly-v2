@@ -4,25 +4,21 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
-import { getTrackDays } from './getTrackDays';
+import { getTrackPeriodDays } from './getTrackPeriodDays';
 
 export const calculatePeriodProgress = ({ endAt, trackName, periodType }: { endAt?: Date; trackName: EPostOrigin; periodType: EPeriodType }): number => {
 	if (!endAt) return 0;
 
-	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
+	const { decisionDays, prepareDays, confirmDays, enactmentDays } = getTrackPeriodDays(trackName);
 
-	let totalDays: number | undefined;
-	switch (periodType) {
-		case EPeriodType.PREPARE:
-			totalDays = prepareDays;
-			break;
-		case EPeriodType.CONFIRM:
-			totalDays = confirmDays;
-			break;
-		case EPeriodType.DECISION:
-		default:
-			totalDays = decisionDays;
-	}
+	const periodDaysMapper: { [key in EPeriodType]: number | undefined } = {
+		[EPeriodType.PREPARE]: prepareDays,
+		[EPeriodType.CONFIRM]: confirmDays,
+		[EPeriodType.DECISION]: decisionDays,
+		[EPeriodType.ENACTMENT]: enactmentDays
+	};
+
+	const totalDays = periodDaysMapper[periodType] || 0;
 
 	if (!totalDays) return 0;
 

@@ -4,7 +4,7 @@
 import React from 'react';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
-import { getTrackPeriodDays } from '@/app/_client-utils/getTrackDays';
+import { getTrackPeriodDays } from '@/app/_client-utils/getTrackPeriodDays';
 import { useTranslations } from 'next-intl';
 import { MINUTES_IN_DAY, MINUTES_IN_HOUR } from '@/_shared/_constants/timeConstants';
 
