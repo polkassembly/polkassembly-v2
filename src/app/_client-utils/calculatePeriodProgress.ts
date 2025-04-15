@@ -11,14 +11,14 @@ export const calculatePeriodProgress = ({ endAt, trackName, periodType }: { endA
 
 	const { decisionDays, prepareDays, confirmDays, enactmentDays } = getTrackPeriodDays(trackName);
 
-	const periodDaysMapper: { [key in EPeriodType]: number | undefined } = {
+	const periodDaysMapping: { [key in EPeriodType]: number | undefined } = {
 		[EPeriodType.PREPARE]: prepareDays,
 		[EPeriodType.CONFIRM]: confirmDays,
 		[EPeriodType.DECISION]: decisionDays,
 		[EPeriodType.ENACTMENT]: enactmentDays
 	};
 
-	const totalDays = periodDaysMapper[periodType] || 0;
+	const totalDays = periodDaysMapping[periodType] || 0;
 
 	if (!totalDays) return 0;
 
