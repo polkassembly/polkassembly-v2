@@ -13,9 +13,8 @@ interface TrackPeriodOutput {
 	enactmentDays?: number;
 }
 
-export function getTrackDays(trackName: EPostOrigin): TrackPeriodOutput {
+export function getTrackPeriodDays(trackName: EPostOrigin): TrackPeriodOutput {
 	const network = getCurrentNetwork();
-
 	const track = NETWORKS_DETAILS[`${network}`]?.trackDetails?.[`${trackName}`];
 
 	if (!track) {

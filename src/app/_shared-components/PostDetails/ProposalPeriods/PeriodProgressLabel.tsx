@@ -4,8 +4,9 @@
 import React from 'react';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
-import { getTrackDays } from '@/app/_client-utils/getTrackDays';
+import { getTrackPeriodDays } from '@/app/_client-utils/getTrackDays';
 import { useTranslations } from 'next-intl';
+import { MINUTES_IN_DAY, MINUTES_IN_HOUR } from '@/_shared/_constants/timeConstants';
 
 interface PeriodProgressLabelProps {
 	endAt?: Date;
@@ -15,7 +16,7 @@ interface PeriodProgressLabelProps {
 
 function PeriodProgressLabel({ endAt, trackName, periodType }: PeriodProgressLabelProps) {
 	const t = useTranslations('timeUnits');
-	const { decisionDays, prepareDays, confirmDays, enactmentDays } = getTrackDays(trackName);
+	const { decisionDays, prepareDays, confirmDays, enactmentDays } = getTrackPeriodDays(trackName);
 
 	const periodDaysMapping = {
 		[EPeriodType.PREPARE]: prepareDays,
@@ -28,13 +29,13 @@ function PeriodProgressLabel({ endAt, trackName, periodType }: PeriodProgressLab
 	const totalMinutes = totalDays * 24 * 60;
 
 	const getLabel = (passed: number, totalMinutes: number) => {
-		if (totalMinutes < 60) {
+		if (totalMinutes < MINUTES_IN_HOUR) {
 			return `${Math.round(passed)} / ${Math.round(totalMinutes)} ${t('minutes')}`;
 		}
-		if (totalMinutes < 1440) {
-			return `${Math.round(passed / 60)} / ${Math.round(totalMinutes / 60)} ${t('hours')}`;
+		if (totalMinutes < MINUTES_IN_DAY) {
+			return `${Math.round(passed / MINUTES_IN_HOUR)} / ${Math.round(totalMinutes / MINUTES_IN_HOUR)} ${t('hours')}`;
 		}
-		return `${Math.round(passed / 1440)} / ${Math.round(totalMinutes / 1440)} ${t('days')}`;
+		return `${Math.round(passed / MINUTES_IN_DAY)} / ${Math.round(totalMinutes / MINUTES_IN_DAY)} ${t('days')}`;
 	};
 
 	if (!endAt) {
