@@ -6,7 +6,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
 import { getTrackPeriodDays } from '@/app/_client-utils/getTrackPeriodDays';
 import { useTranslations } from 'next-intl';
-import { MINUTES_IN_DAY, MINUTES_IN_HOUR } from '@/_shared/_constants/timeConstants';
+import { HOURS_IN_DAY, MINUTES_IN_DAY, MINUTES_IN_HOUR } from '@/_shared/_constants/timeConstants';
 
 interface PeriodProgressLabelProps {
 	endAt?: Date;
@@ -26,7 +26,7 @@ function PeriodProgressLabel({ endAt, trackName, periodType }: PeriodProgressLab
 	};
 
 	const totalDays = periodDaysMapping[periodType] || 0;
-	const totalMinutes = totalDays * 24 * 60;
+	const totalMinutes = totalDays * HOURS_IN_DAY * MINUTES_IN_HOUR;
 
 	const getLabel = (passed: number, totalMinutes: number) => {
 		if (totalMinutes < MINUTES_IN_HOUR) {

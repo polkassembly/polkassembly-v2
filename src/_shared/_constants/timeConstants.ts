@@ -3,3 +3,4 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 export const MINUTES_IN_HOUR = 60;
 export const MINUTES_IN_DAY = 1440;
+export const HOURS_IN_DAY = 24;
