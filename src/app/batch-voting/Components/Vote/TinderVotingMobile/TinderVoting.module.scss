@@ -8,7 +8,7 @@
 }
 
 .proposalCard {
-	@apply absolute top-0 w-full cursor-grab touch-none will-change-transform;
+	@apply absolute top-0 w-full cursor-grab touch-none bg-bg_modal will-change-transform;
 	transition:
 		transform 0.3s ease-in,
 		opacity 0.3s ease-in;
