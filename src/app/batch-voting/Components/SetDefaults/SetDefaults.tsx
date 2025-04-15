@@ -42,7 +42,7 @@ function SetDefaults({
 				<WalletButtons small />
 				<AddressDropdown withBalance />
 				<div className='w-full'>
-					<p className='mb-1 text-sm text-wallet_btn_text'>{t('BatchVote.chooseYourVote')}</p>
+					<p className='mb-1 text-xs text-wallet_btn_text sm:text-sm'>{t('BatchVote.chooseYourVote')}</p>
 					<ChooseVote
 						voteDecision={voteDecision}
 						onVoteDecisionChange={onVoteDecisionChange}

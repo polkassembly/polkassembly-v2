@@ -7,7 +7,7 @@ import CreateDiscussionComponent from '@/app/create/discussion/Component/CreateD
 async function Discussion() {
 	return (
 		<div className='flex h-full w-full items-start justify-center p-8 sm:p-20'>
-			<div className='mx-auto w-full max-w-screen-lg rounded-lg bg-bg_modal p-6 shadow-lg'>
+			<div className='mx-auto w-full max-w-screen-lg rounded-lg bg-bg_modal p-4 shadow-lg sm:p-6'>
 				<CreateDiscussionComponent />
 			</div>
 		</div>

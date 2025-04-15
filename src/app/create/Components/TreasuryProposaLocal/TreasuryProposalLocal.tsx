@@ -138,7 +138,7 @@ function TreasuryProposalLocal() {
 
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
-			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+			<div className='flex flex-1 flex-col gap-y-2 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress />
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}

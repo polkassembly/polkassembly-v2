@@ -82,7 +82,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 		<DropdownMenu>
 			<div>
 				<div className='mb-1 flex items-center justify-between gap-x-12'>
-					<p className='text-sm text-wallet_btn_text'>{t('AddressDropdown.chooseLinkedAccount')}</p>
+					<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('AddressDropdown.chooseLinkedAccount')}</p>
 					{withBalance && <Balance address={userPreferences?.address?.address || ''} />}
 				</div>
 				<DropdownMenuTrigger

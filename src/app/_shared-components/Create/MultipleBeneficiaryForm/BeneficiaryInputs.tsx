@@ -97,7 +97,7 @@ function BeneficiaryInputs({
 					address={beneficiary.address}
 				/>
 			) : (
-				<p className='text-sm text-wallet_btn_text'>{t('CreatePreimage.noBeneficiarySelected')}</p>
+				<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('CreatePreimage.noBeneficiarySelected')}</p>
 			)}
 			<div className='flex items-center gap-x-4'>
 				{beneficiary.amount && (

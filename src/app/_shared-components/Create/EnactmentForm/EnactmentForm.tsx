@@ -58,7 +58,7 @@ function EnactmentForm({
 			<CollapsibleContent>
 				<Separator className='my-4' />
 				<div className='flex flex-col gap-y-2'>
-					<p className='text-sm text-wallet_btn_text'>Enactment Blocks</p>
+					<p className='text-xs text-wallet_btn_text sm:text-sm'>Enactment Blocks</p>
 					<RadioGroup
 						className='flex items-center gap-x-4'
 						onValueChange={(e) => {
