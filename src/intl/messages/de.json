@@ -606,7 +606,16 @@
 		"technicalcommittee": "Technisches Komitee",
 		"decisionPeriodInfo": "Zeitraum, in dem ein Vorschlag zur Genehmigung eingereicht werden kann. Wenn der Vorschlag nicht bis zum Ende des Entscheidungszeitraums genehmigt wird, wird er abgelehnt.",
 		"confirmPeriodInfo": "Gesamtzeit, die das Referendum benötigt, um sowohl die Mindestanforderungen als auch die Unterstützungskriterien während des Entscheidungszeitraums zu erfüllen, um zu bestehen.",
-		"enactmentPeriodInfo": "Zeitraum, in dem der Vorschlag nach der Genehmigung in der Ausführungswarteschlange bleiben muss."
+		"enactmentPeriodInfo": "Zeitraum, in dem der Vorschlag nach der Genehmigung in der Ausführungswarteschlange bleiben muss.",
+		"proposalCancelledInfo": "Der Vorschlag wurde über die Referendums-Stornierungsstrecke abgebrochen",
+		"proposalKilledInfo": "Der Vorschlag wurde im Block über die Referendums-Killer-Strecke getötet und die Einzahlung wurde geschliffen",
+		"proposalTimedOutInfo": "Der Vorschlag ist abgelaufen, da die Entscheidungsgebühr nicht rechtzeitig eingezahlt wurde",
+		"proposalRejectedInfo": "Die Genehmigung war geringer als der Schwellenwert für diese Strecke.",
+		"proposalExecutionFailedInfo": "Die Ausführung des Vorschlags ist fehlgeschlagen",
+		"proposalApprovalThresholdFailedInfo": "Die Genehmigung war geringer als der Schwellenwert für diese Strecke.",
+		"proposalFailed": "Vorschlag fehlgeschlagen",
+		"proposalKiller": "Vorschlagskiller",
+		"proposalTimedOut": "Vorschlag ist abgelaufen"
 	},
 	"Header": {
 		"polkadot": "Polkadot & Parachains",

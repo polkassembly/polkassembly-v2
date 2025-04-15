@@ -606,7 +606,16 @@
 		"technicalcommittee": "技术委员会",
 		"decisionPeriodInfo": "提案可能需要的时间来获得批准。如果提案在决策期间结束时未获得批准，将被拒绝。",
    		"confirmPeriodInfo": "在决策期间，公投必须满足最低批准和支持标准，以便通过的总时间。",
-        "enactmentPeriodInfo": "提案在批准后必须在调度队列中的时间。"
+        "enactmentPeriodInfo": "提案在批准后必须在调度队列中的时间。",
+		"proposalCancelledInfo": "提案已通过公投取消者轨道取消",
+		"proposalKilledInfo": "提案已在区块中通过公投杀手轨道被杀死，存款已被削减",
+		"proposalTimedOutInfo": "提案超时，因为决策存款未按时支付",
+		"proposalRejectedInfo": "批准低于该轨道的阈值。",
+		"proposalExecutionFailedInfo": "提案执行失败",
+		"proposalApprovalThresholdFailedInfo": "批准低于该轨道的阈值。",
+		"proposalFailed": "提案失败",
+		"proposalKiller": "提案杀手",
+		"proposalTimedOut": "提案超时"
 	},
 	"Header": {
 		"polkadot": "波卡点＆平行链",

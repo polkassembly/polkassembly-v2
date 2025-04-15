@@ -24,68 +24,110 @@ function ProposalPeriods({
 	trackName: EPostOrigin;
 }) {
 	const t = useTranslations();
-	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;
-	const decisionPeriodEnded = decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(dayjs()) : false;
-	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
+	const now = dayjs();
 
-	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
-	const isEnactmentPeriodEnded = enactmentPeriodEndsAt ? dayjs(enactmentPeriodEndsAt).isBefore(dayjs(), 'day') : false;
+	const periodEnds = {
+		prepare: preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(now) : false,
+		decision: decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(now) : false,
+		confirmation: confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(now) : false,
+		enactment: enactmentPeriodEndsAt ? dayjs(enactmentPeriodEndsAt).isBefore(now, 'day') : false
+	};
+
+	const isProposalFailed = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled, EProposalStatus.Killed, EProposalStatus.ExecutionFailed].includes(
+		status
+	);
+
+	const proposalFailureMessages: { [key in EProposalStatus]?: string } = {
+		[EProposalStatus.Cancelled]: 'PostDetails.proposalCancelledInfo',
+		[EProposalStatus.Killed]: 'PostDetails.proposalKilledInfo',
+		[EProposalStatus.TimedOut]: 'PostDetails.proposalTimedOutInfo',
+		[EProposalStatus.Rejected]: 'PostDetails.proposalRejectedInfo',
+		[EProposalStatus.ExecutionFailed]: 'PostDetails.proposalExecutionFailedInfo'
+	};
+
+	const getProposalFailureMessage = () => t(proposalFailureMessages[status] || 'PostDetails.proposalApprovalThresholdFailedInfo');
+
+	const renderFailureMessage = () => {
+		const failureMessages: { [key in EProposalStatus]?: string } = {
+			[EProposalStatus.Killed]: t('PostDetails.proposalKiller'),
+			[EProposalStatus.TimedOut]: t('PostDetails.proposalTimedOut')
+		};
+		return failureMessages[status] || t('PostDetails.proposalFailed');
+	};
+
+	if (isProposalFailed) {
+		return (
+			<div className={classes.proposalPeriodsWrapper}>
+				<div className='flex items-center justify-between'>
+					<div className={classes.proposalPeriodsHeaderTitle}>{renderFailureMessage()}</div>
+					<div className={classes.proposalPeriodsHeaderPeriods}>
+						<p className={classes.proposalPeriodsHeaderPeriodsNumber}>
+							{Math.min(3, [periodEnds.prepare, periodEnds.decision, periodEnds.confirmation].filter(Boolean).length + 1)}
+						</p>
+						<span className='pl-1 pr-2'>of 3</span>
+					</div>
+				</div>
+				<span className='mt-0 pt-0 text-sm text-basic_text'>{getProposalFailureMessage()}</span>
+			</div>
+		);
+	}
 
 	return (
 		<div className={classes.proposalPeriodsWrapper}>
 			<div className={classes.proposalPeriodsHeader}>
 				<p className={classes.proposalPeriodsHeaderTitle}>
-					{confirmationPeriodEnded
-						? status === EProposalStatus.Passed || EProposalStatus.Executed
+					{periodEnds.confirmation
+						? status === EProposalStatus.Passed || status === EProposalStatus.Executed
 							? t('PostDetails.proposalPassed')
 							: t('PostDetails.proposalFailed')
-						: decisionPeriodEnded
+						: periodEnds.decision
 							? t('PostDetails.confirmationPeriod')
-							: preparePeriodEnded
+							: periodEnds.prepare
 								? t('PostDetails.votingStarted')
 								: t('PostDetails.preparePeriod')}
 				</p>
 				<div className={classes.proposalPeriodsHeaderPeriods}>
-					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
+					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{Math.min(3, [periodEnds.prepare, periodEnds.decision, periodEnds.confirmation].filter(Boolean).length + 1)}</p>
 					<span className='pl-1 pr-2'>of 3</span>
 				</div>
 			</div>
-			{confirmationPeriodEnded ? null : preparePeriodEnded ? (
-				<div className='flex flex-col gap-y-6'>
-					<PeriodProgress
-						periodEndsAt={decisionPeriodEndsAt}
-						periodName={t('PostDetails.decisionPeriod')}
-						trackName={trackName}
-						periodType={EPeriodType.DECISION}
-					/>
-					<PeriodProgress
-						periodEndsAt={confirmationPeriodEndsAt}
-						periodName={t('PostDetails.confirmationPeriod')}
-						trackName={trackName}
-						periodType={EPeriodType.CONFIRM}
-					/>
-				</div>
-			) : (
-				<div>
+
+			{/* Proposal Periods */}
+			<div>
+				{periodEnds.confirmation ? null : periodEnds.prepare ? (
+					<div className='flex flex-col gap-y-6'>
+						<PeriodProgress
+							periodEndsAt={decisionPeriodEndsAt}
+							periodName={t('PostDetails.decisionPeriod')}
+							trackName={trackName}
+							periodType={EPeriodType.DECISION}
+						/>
+						<PeriodProgress
+							periodEndsAt={confirmationPeriodEndsAt}
+							periodName={t('PostDetails.confirmationPeriod')}
+							trackName={trackName}
+							periodType={EPeriodType.CONFIRM}
+						/>
+					</div>
+				) : (
 					<PeriodProgress
 						periodEndsAt={preparePeriodEndsAt}
 						periodName={t('PostDetails.preparePeriod')}
 						trackName={trackName}
 						periodType={EPeriodType.PREPARE}
 					/>
-				</div>
-			)}
+				)}
 
-			{enactmentPeriodEndsAt && !isEnactmentPeriodEnded && (
-				<div>
+				{/* Enactment Period */}
+				{enactmentPeriodEndsAt && !periodEnds.enactment && (
 					<PeriodProgress
 						periodEndsAt={enactmentPeriodEndsAt}
 						periodName={t('PostDetails.minEnactmentPeriod')}
 						trackName={trackName}
 						periodType={EPeriodType.ENACTMENT}
 					/>
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 }

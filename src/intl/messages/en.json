@@ -442,7 +442,15 @@
 		},
 		"decisionPeriodInfo": "Amount of time a proposal may take to be approved. If the proposal is not approved by the end of the decision period, it gets rejected.",
 		"confirmPeriodInfo": "Total time the referenda must meet both the min approval and support criteria during the decision period in order to pass.",
-		"enactmentPeriodInfo": "Time that the proposal must be in dispatch queue after approval."
+		"enactmentPeriodInfo": "Time that the proposal must be in dispatch queue after approval.",
+		"proposalCancelledInfo": "The proposal has been cancelled via the referendum canceller track",
+		"proposalKilledInfo": "The proposal has been killed via the referendum killer track and the deposit was slashed",
+		"proposalTimedOutInfo": "The proposal has been timed out as the decision deposit was not placed in due time",
+		"proposalRejectedInfo": "The approval was lesser than the threshold for this track.",
+		"proposalExecutionFailedInfo": "The execution of the proposal failed",
+		"proposalApprovalThresholdFailedInfo": "The approval was lesser than the threshold for this track.",
+		"proposalKiller": "Proposal Killer",
+		"proposalTimedOut": "Proposal Timed Out"
 
 	},
 	"ListingPage_Status": {
