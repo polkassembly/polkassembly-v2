@@ -21,17 +21,14 @@ function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Pro
 	const t = useTranslations('PostDetails');
 	const progress = calculatePeriodProgress({ endAt: periodEndsAt, trackName, periodType });
 
+	const tooltipTextMapping: { [key in EPeriodType]?: string } = {
+		[EPeriodType.DECISION]: t('decisionPeriodInfo'),
+		[EPeriodType.CONFIRM]: t('confirmPeriodInfo'),
+		[EPeriodType.ENACTMENT]: t('enactmentPeriodInfo')
+	};
+
 	const getTooltipText = (type: EPeriodType) => {
-		switch (type) {
-			case EPeriodType.DECISION:
-				return t('decisionPeriodInfo');
-			case EPeriodType.CONFIRM:
-				return t('confirmPeriodInfo');
-			case EPeriodType.ENACTMENT:
-				return t('enactmentPeriodInfo');
-			default:
-				return null;
-		}
+		return tooltipTextMapping[type] || null;
 	};
 
 	const tooltipText = getTooltipText(periodType);
