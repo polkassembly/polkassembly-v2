@@ -9,7 +9,7 @@ import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { Ban, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { createRef, RefObject, useMemo } from 'react';
+import { createRef, useMemo } from 'react';
 import TinderCard from 'react-tinder-card';
 import VoteCart from '../VoteCart/VoteCart';
 import classes from './TinderVoting.module.scss';
@@ -26,11 +26,9 @@ function TinderVoting({
 	addToVoteCart,
 	isLoading,
 	voteCart,
-	currentIndexRef,
 	onSkip
 }: {
 	disableButtons?: boolean;
-	currentIndexRef: RefObject<number>;
 	filteredProposals: IPostListing[];
 	isLoading: boolean;
 	voteCart: IVoteCartItem[];
@@ -66,7 +64,7 @@ function TinderVoting({
 			} else if (dir === ESwipeDirection.LEFT) {
 				voteDecision = EVoteDecision.NAY;
 			} else if (dir === ESwipeDirection.UP) {
-				voteDecision = EVoteDecision.SPLIT;
+				voteDecision = EVoteDecision.SPLIT_ABSTAIN;
 			}
 
 			addToVoteCart({
@@ -78,26 +76,14 @@ function TinderVoting({
 		}
 	};
 
-	const outOfFrame = (idx: number) => {
-		if (currentIndexRef.current >= idx && childRefs[`${idx}`]?.current) {
-			try {
-				const cardRef = childRefs[`${idx}`].current;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				if (cardRef && typeof (cardRef as any).restoreCard === 'function') {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					(cardRef as any).restoreCard();
-				}
-			} catch (error) {
-				console.log('Could not restore card', error);
-			}
-		}
-	};
-
 	const swipeThreshold = 50;
 	const swipeRequirementType = 'position';
 
 	return (
-		<div className={classes.tinderVoting}>
+		<div
+			className={classes.tinderVoting}
+			key={`tinder-voting-${filteredProposals.length}`}
+		>
 			{isLoading && <LoadingLayover />}
 			<Button
 				variant='ghost'
@@ -121,9 +107,9 @@ function TinderVoting({
 						key={`${proposal.title}-${proposal.index}`}
 						onSwipe={(dir) => onSwipe(dir as ESwipeDirection)}
 						preventSwipe={['down']}
-						onCardLeftScreen={() => outOfFrame(index)}
 						swipeRequirementType={swipeRequirementType}
 						swipeThreshold={swipeThreshold}
+						flickOnSwipe
 					>
 						<div
 							data-swipeable='true'
