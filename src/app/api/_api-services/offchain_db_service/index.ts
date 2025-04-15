@@ -297,8 +297,8 @@ export class OffChainDbService {
 		return FirestoreService.GetFollowing(userId);
 	}
 
-	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
-		const voteCartItems = await FirestoreService.GetVoteCart(userId);
+	static async GetVoteCart({ userId, network }: { userId: number; network: ENetwork }): Promise<IVoteCartItem[]> {
+		const voteCartItems = await FirestoreService.GetVoteCart({ userId, network });
 
 		// fetch title for each vote cart item
 		return Promise.all(

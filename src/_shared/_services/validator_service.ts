@@ -238,14 +238,10 @@ export class ValidatorService {
 	static isValidAmount(amount: string): boolean {
 		try {
 			const bnAmount = new BN(amount);
-			return bnAmount.gt(new BN(0));
+			return bnAmount.gte(new BN(0));
 		} catch {
 			return false;
 		}
-	}
-
-	static isValidAssetId(assetId: string, network: ENetwork): boolean {
-		return Object.keys(NETWORKS_DETAILS[`${network}`].supportedAssets).includes(assetId);
 	}
 
 	static isValidVoteAmountsForDecision(amount: { abstain?: string; aye?: string; nay?: string }, decision: EVoteDecision): boolean {
@@ -275,6 +271,10 @@ export class ValidatorService {
 		} catch {
 			return false;
 		}
+	}
+
+	static isValidAssetId(assetId: string, network: ENetwork): boolean {
+		return Object.keys(NETWORKS_DETAILS[`${network}`].supportedAssets).includes(assetId);
 	}
 
 	static isValidPreimageHash(preimageHash: string): boolean {
