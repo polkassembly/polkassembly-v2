@@ -46,6 +46,10 @@ function PeriodProgressLabel({ endAt, trackName, periodType }: PeriodProgressLab
 	const startDate = endDate.subtract(totalDays, 'days');
 	const now = dayjs();
 
+	if (endDate.isBefore(now, 'day')) {
+		return null;
+	}
+
 	const diffMinutes = now.diff(startDate, 'minutes');
 	const passed = Math.max(0, Math.min(totalMinutes, diffMinutes));
 

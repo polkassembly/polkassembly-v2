@@ -29,6 +29,7 @@ function ProposalPeriods({
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
 
 	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
+	const isEnactmentPeriodEnded = enactmentPeriodEndsAt ? dayjs(enactmentPeriodEndsAt).isBefore(dayjs(), 'day') : false;
 
 	return (
 		<div className={classes.proposalPeriodsWrapper}>
@@ -75,7 +76,7 @@ function ProposalPeriods({
 				</div>
 			)}
 
-			{enactmentPeriodEndsAt && (
+			{enactmentPeriodEndsAt && !isEnactmentPeriodEnded && (
 				<div>
 					<PeriodProgress
 						periodEndsAt={enactmentPeriodEndsAt}
