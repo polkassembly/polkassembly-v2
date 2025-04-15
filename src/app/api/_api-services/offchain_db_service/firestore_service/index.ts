@@ -617,8 +617,8 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
-		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId);
+	static async GetVoteCart({ userId, network }: { userId: number; network: ENetwork }): Promise<IVoteCartItem[]> {
+		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const voteCartQuerySnapshot = await voteCartQuery.get();
 		return voteCartQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();

@@ -26,6 +26,8 @@ const zodParamsSchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
+	const network = await getNetworkFromHeaders();
+
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
@@ -34,7 +36,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 	}
 
-	const voteCart = await OffChainDbService.GetVoteCart(userId);
+	const voteCart = await OffChainDbService.GetVoteCart({ userId, network });
 
 	const response = NextResponse.json({ voteCart });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
