@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
+import { EPostDetailsTab, EProposalType, IPost, IPostListing, EProposalStatus, EPostOrigin } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -96,7 +96,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 								decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
 								preparePeriodEndsAt={postData?.onChainInfo?.preparePeriodEndsAt}
-								status={postData?.onChainInfo?.status}
+								status={postData?.onChainInfo?.status || EProposalStatus.Unknown}
+								trackName={postData?.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
 								proposalType={EProposalType.REFERENDUM_V2}
