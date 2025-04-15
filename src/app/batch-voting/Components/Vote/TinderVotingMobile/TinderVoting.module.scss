@@ -8,14 +8,14 @@
 }
 
 .proposalCard {
-	@apply absolute top-0 w-full cursor-grab touch-none opacity-100 will-change-transform;
+	@apply absolute top-0 w-full cursor-grab touch-none will-change-transform;
 	transition:
 		transform 0.3s ease-in,
 		opacity 0.3s ease-in;
 }
 
 .proposalCard:nth-child(n + 4) {
-	@apply opacity-0;
+	@apply hidden;
 }
 
 .proposalCard:nth-child(1) {
@@ -23,11 +23,11 @@
 }
 
 .proposalCard:nth-child(2) {
-	@apply z-[9] opacity-90;
+	@apply z-[9] opacity-100;
 }
 
 .proposalCard:nth-child(3) {
-	@apply z-[8] opacity-80;
+	@apply z-[8] opacity-100;
 }
 
 .voteButtons {
