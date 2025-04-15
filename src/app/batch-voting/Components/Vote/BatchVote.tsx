@@ -4,8 +4,8 @@
 
 import { canVote } from '@/_shared/_utils/canVote';
 import { EConvictionAmount, EProposalType, EReactQueryKeys, EVoteDecision, IPostListing, IVoteCartItem } from '@/_shared/types';
-import { BN, BN_ONE } from '@polkadot/util';
-import { useState, useMemo } from 'react';
+import { BN } from '@polkadot/util';
+import { useState, useMemo, useRef } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -32,6 +32,7 @@ function BatchVote({
 }) {
 	const { user } = useUser();
 	const queryClient = useQueryClient();
+	const currentIndexRef = useRef(0);
 
 	const fetchBatchVoteCart = async () => {
 		if (!user?.id) return [];
@@ -82,20 +83,12 @@ function BatchVote({
 	}) => {
 		if (!user?.id) return;
 
-		// Ensure we're not using zero values for any vote amount
-		const ensureNonZeroValue = (bn: BN) => (bn.isZero() ? BN_ONE : bn);
-		// Apply non-zero check to all values
-		const safeAyeNayValue = ensureNonZeroValue(defaultAyeNayValue);
-		const safeAbstainValue = ensureNonZeroValue(defaultAbstainValue);
-		const safeAbstainAyeValue = ensureNonZeroValue(defaultAbstainAyeValue);
-		const safeAbstainNayValue = ensureNonZeroValue(defaultAbstainNayValue);
-
 		const amount = BatchVotingClientService.getAmountForDecision({
 			voteDecision,
-			ayeNayValue: safeAyeNayValue,
-			abstainValue: safeAbstainValue,
-			abstainAyeValue: safeAbstainAyeValue,
-			abstainNayValue: safeAbstainNayValue
+			ayeNayValue: defaultAyeNayValue,
+			abstainValue: defaultAbstainValue,
+			abstainAyeValue: defaultAbstainAyeValue,
+			abstainNayValue: defaultAbstainNayValue
 		});
 
 		// Create the new vote cart item
@@ -163,6 +156,7 @@ function BatchVote({
 			</div>
 			<TinderVoting
 				filteredProposals={filteredProposals}
+				currentIndexRef={currentIndexRef}
 				addToVoteCart={addToVoteCart}
 				isLoading={isLoading}
 				voteCart={voteCart || []}
