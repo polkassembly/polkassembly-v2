@@ -60,21 +60,41 @@ function TinderVoting({
 	const onSwipe = (dir: ESwipeDirection) => {
 		if (filteredProposals.length > 0) {
 			const proposal = filteredProposals[0];
+			let voteDecision = EVoteDecision.AYE;
+			if (dir === ESwipeDirection.RIGHT) {
+				voteDecision = EVoteDecision.AYE;
+			} else if (dir === ESwipeDirection.LEFT) {
+				voteDecision = EVoteDecision.NAY;
+			} else if (dir === ESwipeDirection.UP) {
+				voteDecision = EVoteDecision.SPLIT;
+			}
+
 			addToVoteCart({
 				proposalIndexOrHash: proposal.index?.toString() || proposal.hash || '',
 				proposalType: proposal.proposalType,
 				title: proposal.title,
-				voteDecision: dir === ESwipeDirection.RIGHT ? EVoteDecision.AYE : dir === ESwipeDirection.LEFT ? EVoteDecision.NAY : EVoteDecision.SPLIT_ABSTAIN
+				voteDecision
 			});
 		}
 	};
 
 	const outOfFrame = (idx: number) => {
-		if (currentIndexRef.current >= idx) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(childRefs[`${idx}`].current as any).restoreCard();
+		if (currentIndexRef.current >= idx && childRefs[`${idx}`]?.current) {
+			try {
+				const cardRef = childRefs[`${idx}`].current;
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				if (cardRef && typeof (cardRef as any).restoreCard === 'function') {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					(cardRef as any).restoreCard();
+				}
+			} catch (error) {
+				console.log('Could not restore card', error);
+			}
 		}
 	};
+
+	const swipeThreshold = 50;
+	const swipeRequirementType = 'position';
 
 	return (
 		<div className={classes.tinderVoting}>
@@ -89,7 +109,10 @@ function TinderVoting({
 			{filteredProposals.map((proposal, index) => (
 				<div
 					className={classes.proposalCard}
-					style={{ zIndex: filteredProposals.length - index }}
+					style={{
+						zIndex: filteredProposals.length - index,
+						transform: index === 0 ? 'scale(1)' : `scale(${Math.max(0.95 - index * 0.05, 0.8)}) translateY(-${index * 5}px)`
+					}}
 					key={`${proposal.title}-${proposal.index}`}
 				>
 					<TinderCard
@@ -99,8 +122,13 @@ function TinderVoting({
 						onSwipe={(dir) => onSwipe(dir as ESwipeDirection)}
 						preventSwipe={['down']}
 						onCardLeftScreen={() => outOfFrame(index)}
+						swipeRequirementType={swipeRequirementType}
+						swipeThreshold={swipeThreshold}
 					>
-						<div className='h-[350px] rounded-2xl bg-bg_modal p-4'>
+						<div
+							data-swipeable='true'
+							className='relative w-full cursor-grab touch-manipulation'
+						>
 							<ActivityFeedPostItem
 								commentBox={false}
 								voteButton={false}

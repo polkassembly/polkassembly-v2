@@ -1,19 +1,39 @@
 .tinderVoting {
-  @apply relative flex h-[450px] flex-col-reverse sm:hidden;
+	@apply relative flex h-[450px] flex-col-reverse sm:hidden;
+	@apply touch-none [perspective:1000px];
 }
 
 .skipButton {
-  @apply absolute right-0 top-0 z-50 text-sm text-text_pink
+	@apply absolute right-0 top-0 z-50 text-sm text-text_pink;
 }
 
 .proposalCard {
-  @apply absolute top-0 w-full;
+	@apply absolute top-0 w-full cursor-grab touch-none opacity-100 will-change-transform;
+	transition:
+		transform 0.3s ease-in,
+		opacity 0.3s ease-in;
+}
+
+.proposalCard:nth-child(n + 4) {
+	@apply opacity-0;
+}
+
+.proposalCard:nth-child(1) {
+	@apply z-10 opacity-100;
+}
+
+.proposalCard:nth-child(2) {
+	@apply z-[9] opacity-90;
+}
+
+.proposalCard:nth-child(3) {
+	@apply z-[8] opacity-80;
 }
 
 .voteButtons {
-  @apply flex w-full items-center justify-center gap-x-4 p-4
+	@apply relative z-50 flex w-full items-center justify-center gap-x-4 p-4;
 }
 
 .voteCart {
-  @apply flex items-center justify-between gap-x-4
+	@apply flex items-center justify-between gap-x-4;
 }
