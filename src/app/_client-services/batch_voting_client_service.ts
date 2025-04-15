@@ -4,7 +4,6 @@
 
 import { EProposalType, EVoteDecision, EConvictionAmount } from '@/_shared/types';
 import { BN } from '@polkadot/util';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { NextApiClientService } from './next_api_client_service';
 
 export class BatchVotingClientService extends NextApiClientService {
@@ -47,10 +46,6 @@ export class BatchVotingClientService extends NextApiClientService {
 		amount: { abstain?: string; aye?: string; nay?: string };
 		conviction: EConvictionAmount;
 	}) {
-		if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-			throw new Error('Invalid vote amount');
-		}
-
 		return this.addToBatchVoteCartApi({ userId, postIndexOrHash, proposalType, decision, amount, conviction });
 	}
 
@@ -67,10 +62,6 @@ export class BatchVotingClientService extends NextApiClientService {
 		amount: { abstain?: string; aye?: string; nay?: string };
 		conviction: EConvictionAmount;
 	}) {
-		if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-			throw new Error('Invalid vote amount');
-		}
-
 		return this.editBatchVoteCartItemApi({ userId, id, decision, amount, conviction });
 	}
 

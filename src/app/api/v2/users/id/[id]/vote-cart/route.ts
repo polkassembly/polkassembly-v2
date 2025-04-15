@@ -14,6 +14,7 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { EVoteDecision, EProposalType, EConvictionAmount } from '@/_shared/types';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { BN } from '@polkadot/util';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -51,19 +52,23 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		proposalType: z.nativeEnum(EProposalType),
 		decision: z.nativeEnum(EVoteDecision),
 		amount: z.object({
-			abstain: z.string().refine(ValidatorService.isValidAmount).optional(),
-			aye: z.string().refine(ValidatorService.isValidAmount).optional(),
-			nay: z.string().refine(ValidatorService.isValidAmount).optional()
+			abstain: z
+				.string()
+				.refine((value) => BN.isBN(new BN(value)))
+				.optional(),
+			aye: z
+				.string()
+				.refine((value) => BN.isBN(new BN(value)))
+				.optional(),
+			nay: z
+				.string()
+				.refine((value) => BN.isBN(new BN(value)))
+				.optional()
 		}),
 		conviction: z.nativeEnum(EConvictionAmount)
 	});
 
 	const { postIndexOrHash, proposalType, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
-
-	// additional validation for amount and votes
-	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid amount(s) for decision');
-	}
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
@@ -100,19 +105,23 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		id: z.string().min(1, 'Vote cart item id is required'),
 		decision: z.nativeEnum(EVoteDecision),
 		amount: z.object({
-			abstain: z.string().refine(ValidatorService.isValidAmount).optional(),
-			aye: z.string().refine(ValidatorService.isValidAmount).optional(),
-			nay: z.string().refine(ValidatorService.isValidAmount).optional()
+			abstain: z
+				.string()
+				.refine((value) => BN.isBN(new BN(value)))
+				.optional(),
+			aye: z
+				.string()
+				.refine((value) => BN.isBN(new BN(value)))
+				.optional(),
+			nay: z
+				.string()
+				.refine((value) => BN.isBN(new BN(value)))
+				.optional()
 		}),
 		conviction: z.nativeEnum(EConvictionAmount)
 	});
 
 	const { id: voteCartItemId, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
-
-	// additional validation for amount and votes
-	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid amount(s) for decision');
-	}
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 

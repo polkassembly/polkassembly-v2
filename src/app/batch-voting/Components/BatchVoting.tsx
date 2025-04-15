@@ -9,11 +9,9 @@ import { TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tab
 import { Tabs } from '@/app/_shared-components/Tabs/Tabs';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import SetDefaults from './SetDefaults/SetDefaults';
 import BatchVote from './Vote/BatchVote';
 
@@ -34,21 +32,6 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 	const [tab, setTab] = useState<EBatchVotingTab>(EBatchVotingTab.SET_DEFAULTS);
 
 	const { user } = useUser();
-
-	const isValidAmount = useMemo(
-		() =>
-			ValidatorService.isValidVoteAmountsForDecision(
-				BatchVotingClientService.getAmountForDecision({
-					voteDecision,
-					ayeNayValue: defaultAyeNayValue,
-					abstainValue: defaultAbstainValue,
-					abstainAyeValue: defaultAbstainAyeValue,
-					abstainNayValue: defaultAbstainNayValue
-				}),
-				voteDecision
-			),
-		[voteDecision, defaultAyeNayValue, defaultAbstainValue, defaultAbstainAyeValue, defaultAbstainNayValue]
-	);
 
 	return (
 		<div className='flex flex-col gap-y-4'>
@@ -74,12 +57,7 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 					<div className='rounded-2xl bg-bg_modal px-6 pt-2'>
 						<TabsList>
 							<TabsTrigger value={EBatchVotingTab.SET_DEFAULTS}>{t('BatchVote.setDefaults')}</TabsTrigger>
-							<TabsTrigger
-								disabled={!isValidAmount}
-								value={EBatchVotingTab.VOTE}
-							>
-								{t('BatchVote.vote')}
-							</TabsTrigger>
+							<TabsTrigger value={EBatchVotingTab.VOTE}>{t('BatchVote.vote')}</TabsTrigger>
 						</TabsList>
 					</div>
 					<TabsContent
@@ -95,7 +73,6 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 							onDefaultAbstainAyeValueChange={setDefaultAbstainAyeValue}
 							onDefaultAbstainNayValueChange={setDefaultAbstainNayValue}
 							onNext={() => setTab(EBatchVotingTab.VOTE)}
-							isInvalidAmount={!isValidAmount}
 						/>
 					</TabsContent>
 					<TabsContent value={EBatchVotingTab.VOTE}>

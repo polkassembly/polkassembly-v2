@@ -11,6 +11,7 @@ import { Ban, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { createRef, RefObject, useMemo } from 'react';
 import TinderCard from 'react-tinder-card';
+import { cn } from '@/lib/utils';
 import VoteCart from '../VoteCart/VoteCart';
 import classes from './TinderVoting.module.scss';
 
@@ -66,7 +67,7 @@ function TinderVoting({
 			} else if (dir === ESwipeDirection.LEFT) {
 				voteDecision = EVoteDecision.NAY;
 			} else if (dir === ESwipeDirection.UP) {
-				voteDecision = EVoteDecision.SPLIT;
+				voteDecision = EVoteDecision.SPLIT_ABSTAIN;
 			}
 
 			addToVoteCart({
@@ -97,7 +98,10 @@ function TinderVoting({
 	const swipeRequirementType = 'position';
 
 	return (
-		<div className={classes.tinderVoting}>
+		<div
+			className={classes.tinderVoting}
+			key={`tinder-voting-${filteredProposals.length}`}
+		>
 			{isLoading && <LoadingLayover />}
 			<Button
 				variant='ghost'
@@ -108,10 +112,9 @@ function TinderVoting({
 			</Button>
 			{filteredProposals.map((proposal, index) => (
 				<div
-					className={classes.proposalCard}
+					className={cn(classes.proposalCard, index !== 0 && 'hidden')}
 					style={{
-						zIndex: filteredProposals.length - index,
-						transform: index === 0 ? 'scale(1)' : `scale(${Math.max(0.95 - index * 0.05, 0.8)}) translateY(-${index * 5}px)`
+						zIndex: filteredProposals.length - index
 					}}
 					key={`${proposal.title}-${proposal.index}`}
 				>
@@ -124,6 +127,7 @@ function TinderVoting({
 						onCardLeftScreen={() => outOfFrame(index)}
 						swipeRequirementType={swipeRequirementType}
 						swipeThreshold={swipeThreshold}
+						flickOnSwipe
 					>
 						<div
 							data-swipeable='true'

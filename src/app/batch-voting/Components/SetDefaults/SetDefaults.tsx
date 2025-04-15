@@ -22,8 +22,7 @@ function SetDefaults({
 	onDefaultAbstainValueChange,
 	onDefaultAbstainAyeValueChange,
 	onDefaultAbstainNayValueChange,
-	onNext,
-	isInvalidAmount
+	onNext
 }: {
 	voteDecision: EVoteDecision;
 	onVoteDecisionChange: (voteDecision: EVoteDecision) => void;
@@ -33,7 +32,6 @@ function SetDefaults({
 	onDefaultAbstainAyeValueChange: (ayeVoteValue: BN) => void;
 	onDefaultAbstainNayValueChange: (nayVoteValue: BN) => void;
 	onNext: () => void;
-	isInvalidAmount: boolean;
 }) {
 	const t = useTranslations();
 	return (
@@ -83,12 +81,7 @@ function SetDefaults({
 				</div>
 				<Separator />
 				<div className='flex w-full justify-end'>
-					<Button
-						onClick={onNext}
-						disabled={isInvalidAmount}
-					>
-						{t('BatchVote.next')}
-					</Button>
+					<Button onClick={onNext}>{t('BatchVote.next')}</Button>
 				</div>
 			</div>
 		</div>

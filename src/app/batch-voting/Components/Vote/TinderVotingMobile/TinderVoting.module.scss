@@ -14,22 +14,6 @@
 		opacity 0.3s ease-in;
 }
 
-.proposalCard:nth-child(n + 4) {
-	@apply hidden;
-}
-
-.proposalCard:nth-child(1) {
-	@apply z-10 opacity-100;
-}
-
-.proposalCard:nth-child(2) {
-	@apply z-[9] opacity-100;
-}
-
-.proposalCard:nth-child(3) {
-	@apply z-[8] opacity-100;
-}
-
 .voteButtons {
 	@apply relative z-50 flex w-full items-center justify-center gap-x-4 p-4;
 }
