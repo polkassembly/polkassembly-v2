@@ -93,7 +93,8 @@ export class OnChainDbService {
 		indexOrHash,
 		page,
 		limit,
-		decision
+		decision,
+		voterAddress
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -101,8 +102,9 @@ export class OnChainDbService {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
+		voterAddress?: string;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress });
 		if (postVoteData) return postVoteData;
 
 		return {
