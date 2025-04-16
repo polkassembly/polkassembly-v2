@@ -9,7 +9,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
-import { NotificationType } from '@/_shared/types';
+import { ENotificationStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -49,7 +49,7 @@ function ManualExtrinsic() {
 			onSuccess: () => {
 				setIsLoading(false);
 				toast({
-					status: NotificationType.SUCCESS,
+					status: ENotificationStatus.SUCCESS,
 					title: t('CreatePreimage.preimageNotedSuccessfully'),
 					description: t('CreatePreimage.preimageNotedSuccessfullyDescription')
 				});
@@ -57,7 +57,7 @@ function ManualExtrinsic() {
 			onFailed: () => {
 				setIsLoading(false);
 				toast({
-					status: NotificationType.ERROR,
+					status: ENotificationStatus.ERROR,
 					title: t('CreatePreimage.preimageNoteFailed'),
 					description: t('CreatePreimage.preimageNoteFailedDescription')
 				});

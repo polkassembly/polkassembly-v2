@@ -18,7 +18,14 @@ import { THEME_COLORS } from './_style/theme';
 
 export const metadata: Metadata = {
 	title: 'Polkassembly',
-	description: 'Polkassembly but so much better'
+	description: 'Polkassembly but so much better',
+	viewport: {
+		width: 'device-width',
+		initialScale: 1,
+		maximumScale: 1,
+		minimumScale: 1,
+		userScalable: false
+	}
 };
 
 const fontDmSans = dmSans({

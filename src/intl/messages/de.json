@@ -646,21 +646,39 @@
 	},
 	"SetIdentity": {
 		"displayName": "Anzeigename",
-		"legalName": "Rechtlicher Name",
+		"legalName": "Gesetzlicher Name",
 		"email": "E-Mail",
 		"twitter": "Twitter",
-		"matrix": "Matrix",
+		"riot": "Riot",
+		"emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+		"twitterPlaceholder": "@IhrTwitterName",
+		"riotPlaceholder": "@IhrName.matrix.org",
 		"setIdentity": "Identität festlegen",
 		"onChainIdentity": "On-Chain-Identität",
-		"identityDescription1": "Polkadot bietet On-Chain-Identitäten, die die Anmeldeinformationen der Benutzer durch ernannte Registrare überprüfen und dadurch größeres Vertrauen und Unterstützung schaffen.",
-		"identityDescription2": "Nach erfolgreicher Überprüfung erhalten Benutzer ein grünes Häkchen als Symbol für ihren vertrauenswürdigen Status. Dieses Verifizierungssymbol erhöht die Vertrauenswürdigkeit bei der Beantragung von Mitteln aus der Treasury oder der Teilnahme an Diskussionen und Vorschlägen.",
-		"letBegin": "Lass uns beginnen",
-		"requestJudgement": "Urteil anfordern (Demnächst verfügbar)",
-		"minimumDeposit": "Mindesteinzahlung",
+		"identityDescription1": "Polkadot bietet On-Chain-Identitäten, die die Anmeldedaten der Benutzer durch ernannte Registrare überprüfen und so mehr Vertrauen und Unterstützung schaffen.",
+		"identityDescription2": "Nach erfolgreicher Überprüfung erhalten Benutzer ein grünes Häkchen, das ihren vertrauenswürdigen Status symbolisiert. Dieses verifizierte Statussymbol erhöht die Glaubwürdigkeit bei der Beantragung von Mitteln aus dem Treasury oder bei der Teilnahme an Diskussionen und Vorschlägen.",
+		"letBegin": "Lassen Sie uns beginnen",
+		"requestJudgement": "Urteil anfordern",
+		"minimumDeposit": "Mindesteinlage",
 		"registrarFee": "Registrierungsgebühr",
-		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
-		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
-		"registrarFees": "Registrierungsgebühren"
+		"totalAmountRequired": "Gesamtbetrag erforderlich",
+		"viewAmountBreakup": "Betragsaufschlüsselung anzeigen",
+		"registrarFees": "Registrierungsgebühren",
+		"success": "Identität erfolgreich festgelegt",
+		"successDescription": "Ihre Identität wurde erfolgreich festgelegt",
+		"failed": "Fehler beim Festlegen der Identität",
+		"failedDescription": "Beim Festlegen Ihrer Identität ist ein Fehler aufgetreten",
+		"proceed": "Fortfahren",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toSet": "Um Identität festzulegen",
+		"identitySuccess": "On-Chain-Identitätsregistrierung gestartet",
+		"successCta": "Lassen Sie uns Ihren Verifizierungsprozess starten",
+		"address": "Adresse",
+		"verifying": "Wird überprüft...",
+		"verificationSuccessful": "Verifizierung erfolgreich",
+		"verificationFailed": "Verifizierung fehlgeschlagen",
+		"goToHome": "Zur Startseite"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",
@@ -766,5 +784,45 @@
 		"preimageDeposit": "Preimage-Einzahlung",
 		"submissionDeposit": "Einreichungs-Einzahlung",
 		"gasFees": "Gas-Gebühren"
+	},
+	"VoteSummary": {
+		"title": "Abstimmungszusammenfassung",
+		"voteDetails": {
+			"title": "Abstimmungsdetails",
+			"date": "Datum",
+			"selfVotes": "Selbstabstimmungen",
+			"votingPower": "Stimmrecht",
+			"conviction": "Überzeugung",
+			"capital": "Kapital",
+			"delegatedVotes": "Delegierte Stimmen",
+			"delegators": "Delegierte",
+			"delegatedVotingPower": "Delegiertes Stimmrecht",
+			"delegationList": "Delegiertenliste",
+			"delegator": "Delegierter",
+			"delegatorCapital": "Kapital des Delegierten",
+			"delegatorVotingPower": "Stimmrecht des Delegierten",
+			"votePowerTooltip": "Stimmrecht basierend auf gesperrtem Kapital",
+			"delegatedVoteTooltip": "Stimmrecht basierend auf delegierten Stimmen",
+			"delegationTooltip": "Liste der Delegierten, die diesen Vorschlag unterstützen",
+			"voteTimestamp": "Abstimmungszeit"
+		},
+		"buttons": {
+			"expand": "Erweitern",
+			"collapse": "Zusammenklappen",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "Delegierter",
+				"conviction": "Überzeugung",
+				"votingPower": "Stimmrecht"
+			},
+			"noDelegations": "Keine Delegationen verfügbar"
+		},
+		"errors": {
+			"invalidData": "Ungültige Daten",
+			"fetchError": "Fehler beim Abrufen der Daten"
+		}
 	}
 }

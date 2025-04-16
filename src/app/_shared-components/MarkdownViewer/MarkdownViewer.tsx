@@ -13,6 +13,8 @@ import remarkBreaks from 'remark-breaks';
 import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -21,6 +23,58 @@ const extractUrlsAndEmails = (text: string): string[] => {
 		const cleanWord = word.replace(/[.,;:!?]$/, '');
 		return ValidatorService.isUrl(cleanWord) || ValidatorService.isValidEmail(cleanWord);
 	});
+};
+
+const isVideoUrl = (url: string): boolean => {
+	const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.wmv'];
+	const videoHostingPatterns = [
+		/youtube\.com\/watch\?v=([^&\s]+)/,
+		/youtu\.be\/([^&\s]+)/,
+		/vimeo\.com\/([^&\s]+)/,
+		/dailymotion\.com\/video\/([^&\s]+)/,
+		/facebook\.com\/watch\/\?v=([^&\s]+)/,
+		/tiktok\.com\/@[^/]+\/video\/([^&\s]+)/
+	];
+
+	return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext)) || videoHostingPatterns.some((pattern) => pattern.test(url));
+};
+
+const getEmbedUrl = (url: string): string | null => {
+	// YouTube
+	if (url.includes('youtube.com/watch')) {
+		const videoId = url.match(/v=([^&\s]+)/)?.[1];
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	}
+	if (url.includes('youtu.be')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	}
+
+	// Vimeo
+	if (url.includes('vimeo.com')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+	}
+
+	// Dailymotion
+	if (url.includes('dailymotion.com/video')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://www.dailymotion.com/embed/video/${videoId}` : null;
+	}
+
+	// Facebook
+	if (url.includes('facebook.com/watch')) {
+		const videoId = url.match(/v=([^&\s]+)/)?.[1];
+		return videoId ? `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}` : null;
+	}
+
+	// TikTok
+	if (url.includes('tiktok.com')) {
+		const videoId = url.split('/').pop();
+		return videoId ? `https://www.tiktok.com/embed/v2/${videoId}` : null;
+	}
+
+	return null;
 };
 
 const markdownComponents: Components = {
@@ -36,7 +90,79 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: 'img',
+	img: ({ src, alt }) => {
+		if (!src) {
+			return null;
+		}
+
+		const embedUrl = getEmbedUrl(src);
+		if (embedUrl) {
+			return (
+				<div className='video-container'>
+					<iframe
+						src={embedUrl}
+						className='aspect-video h-auto w-full max-w-[90%]'
+						style={{
+							width: '90%',
+							height: 'auto'
+						}}
+						allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+						allowFullScreen
+						title={alt || 'Embedded video'}
+					/>
+				</div>
+			);
+		}
+
+		if (isVideoUrl(src)) {
+			return (
+				<div className='video-container'>
+					<video
+						controls
+						className='h-auto w-full max-w-[90%]'
+						style={{
+							width: '90%',
+							height: 'auto'
+						}}
+						aria-label={alt || 'Video content'}
+					>
+						<source
+							src={src}
+							type={`video/${src.split('.').pop()}`}
+						/>
+						<track
+							kind='captions'
+							src=''
+							srcLang='en'
+							label='English'
+						/>
+						Your browser does not support the video tag.
+					</video>
+				</div>
+			);
+		}
+
+		return (
+			<Link
+				href={src}
+				target='_blank'
+				rel='noopener noreferrer'
+				className='cursor-pointer'
+			>
+				<Image
+					src={src}
+					alt={alt || 'Image'}
+					height={256}
+					width={256}
+					sizes='100vw'
+					style={{
+						width: '90%',
+						height: 'auto'
+					}}
+				/>
+			</Link>
+		);
+	},
 	a: ({ href, children, ...props }) => {
 		return (
 			<a

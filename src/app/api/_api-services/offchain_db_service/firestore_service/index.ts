@@ -33,7 +33,11 @@ import {
 	ECommentSentiment,
 	ITreasuryStats,
 	IDelegate,
-	EDelegateSource
+	EDelegateSource,
+	ESocial,
+	ISocialHandle,
+	ESocialVerificationStatus,
+	IPostLink
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -526,8 +530,8 @@ export class FirestoreService extends FirestoreUtils {
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
-	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
-		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', id);
+	static async GetUserActivitiesByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IUserActivity[]> {
+		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const userActivityQuerySnapshot = await userActivityQuery.get();
 		return userActivityQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -614,8 +618,8 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
-		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId);
+	static async GetVoteCart({ userId, network }: { userId: number; network: ENetwork }): Promise<IVoteCartItem[]> {
+		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const voteCartQuerySnapshot = await voteCartQuery.get();
 		return voteCartQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -923,7 +927,6 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		address,
 		sentiment
 	}: {
 		network: ENetwork;
@@ -948,7 +951,6 @@ export class FirestoreService extends FirestoreUtils {
 			isDeleted: false,
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
-			address: address || null,
 			dataSource: EDataSource.POLKASSEMBLY,
 			...(sentiment && { sentiment })
 		};
@@ -1073,8 +1075,26 @@ export class FirestoreService extends FirestoreUtils {
 		await this.reactionsCollectionRef().doc(id).delete();
 	}
 
-	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: string; title: string; allowedCommentor: EAllowedCommentor }) {
-		await this.postsCollectionRef().doc(String(id)).set({ content, title, allowedCommentor, updatedAt: new Date() }, { merge: true });
+	static async UpdatePost({
+		id,
+		content,
+		title,
+		allowedCommentor,
+		linkedPost
+	}: {
+		id?: string;
+		content: string;
+		title: string;
+		allowedCommentor: EAllowedCommentor;
+		linkedPost?: IPostLink;
+	}) {
+		if (!id) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Post ID is required');
+		}
+
+		await this.postsCollectionRef()
+			.doc(String(id))
+			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -1086,7 +1106,8 @@ export class FirestoreService extends FirestoreUtils {
 		title,
 		allowedCommentor,
 		tags,
-		topic
+		topic,
+		linkedPost
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -1097,6 +1118,7 @@ export class FirestoreService extends FirestoreUtils {
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
 		topic?: EOffChainPostTopic;
+		linkedPost?: IPostLink;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = this.postsCollectionRef().doc().id;
 
@@ -1113,7 +1135,8 @@ export class FirestoreService extends FirestoreUtils {
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY,
 			allowedCommentor,
-			isDeleted: false
+			isDeleted: false,
+			...(linkedPost && { linkedPost })
 		};
 		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
 		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
@@ -1388,6 +1411,100 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (delegate.docs.length) {
 			await delegate.docs[0].ref.delete();
+		}
+	}
+
+	static async UpdateUserSocialHandle({
+		userId,
+		address,
+		social,
+		handle,
+		status,
+		verificationToken
+	}: {
+		userId: number;
+		address?: string;
+		social: ESocial;
+		handle: string;
+		status: ESocialVerificationStatus;
+		verificationToken?: {
+			token?: string;
+			secret?: string;
+			expiresAt?: Date;
+		};
+	}) {
+		// Check if the user already has this social handle type
+		const userSocialHandleQuery = address
+			? await this.userSocialsCollectionRef().where('userId', '==', userId).where('address', '==', address).where('social', '==', social).limit(1).get()
+			: await this.userSocialsCollectionRef().where('userId', '==', userId).where('social', '==', social).limit(1).get();
+
+		if (!userSocialHandleQuery.empty) {
+			// Update existing social handle
+			const docId = userSocialHandleQuery.docs[0].id;
+			const existingSocialHandle = userSocialHandleQuery.docs[0].data();
+			await this.userSocialsCollectionRef()
+				.doc(docId)
+				.set(
+					{
+						...existingSocialHandle,
+						status,
+						updatedAt: new Date()
+					},
+					{ merge: true }
+				);
+			return {
+				...existingSocialHandle,
+				status,
+				updatedAt: new Date()
+			} as ISocialHandle;
+		}
+		// Create new social handle
+		const newSocialVerificationId = this.userSocialsCollectionRef().doc().id;
+
+		const socialHandle = {
+			userId,
+			address,
+			social,
+			handle,
+			status,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+
+		await this.userSocialsCollectionRef()
+			.doc(newSocialVerificationId)
+			.set({ ...socialHandle, ...(verificationToken && { verificationToken }) }, { merge: true });
+		return { ...socialHandle, verificationToken: { token: verificationToken?.token } };
+	}
+
+	static async GetUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		const socialVerification = await this.userSocialsCollectionRef().where('userId', '==', userId).where('address', '==', address).get();
+
+		const socialHandles = {} as Record<ESocial, ISocialHandle>;
+
+		socialVerification.docs.forEach((doc) => {
+			const data = doc.data() as ISocialHandle;
+			socialHandles[data.social] = data;
+		});
+
+		return socialHandles;
+	}
+
+	static async GetSocialHandleByToken({ token }: { token: string }) {
+		const socialVerification = await this.userSocialsCollectionRef().where('verificationToken.token', '==', token).limit(1).get();
+
+		if (socialVerification.docs.length) {
+			return socialVerification.docs[0].data() as ISocialHandle;
+		}
+
+		return null;
+	}
+
+	static async UpdateSocialHandleByToken({ token, status }: { token: string; status: ESocialVerificationStatus }) {
+		const userSocialHandleQuery = await this.userSocialsCollectionRef().where('verificationToken.token', '==', token).limit(1).get();
+
+		if (userSocialHandleQuery.docs.length) {
+			await userSocialHandleQuery.docs[0].ref.set({ status, updatedAt: new Date() }, { merge: true });
 		}
 	}
 

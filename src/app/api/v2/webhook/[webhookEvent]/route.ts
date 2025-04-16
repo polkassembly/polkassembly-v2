@@ -22,7 +22,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const readonlyHeaders = await headers();
 	const passphrase = readonlyHeaders.get('x-tools-passphrase');
 	if (!passphrase?.trim() || passphrase !== TOOLS_PASSPHRASE) {
-		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
+		console.error('Unauthorized. received passphrase: ', passphrase);
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized.');
 	}
 
 	const body = await getReqBody(req);

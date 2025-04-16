@@ -47,7 +47,7 @@ function EnactmentForm({
 		<Collapsible
 			ref={ref}
 			onOpenChange={(open) => open && ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-			className='rounded-lg border border-border_grey bg-page_background p-4'
+			className='rounded-lg border border-border_grey bg-page_background p-2 max-sm:text-sm sm:p-4'
 		>
 			<CollapsibleTrigger className='w-full'>
 				<div className='flex w-full items-center justify-between gap-x-2'>
@@ -58,7 +58,7 @@ function EnactmentForm({
 			<CollapsibleContent>
 				<Separator className='my-4' />
 				<div className='flex flex-col gap-y-2'>
-					<p className='text-sm text-wallet_btn_text'>Enactment Blocks</p>
+					<p className='text-xs text-wallet_btn_text sm:text-sm'>Enactment Blocks</p>
 					<RadioGroup
 						className='flex items-center gap-x-4'
 						onValueChange={(e) => {

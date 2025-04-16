@@ -21,7 +21,6 @@ import {
 	IPostListing,
 	IPost,
 	IPublicUser,
-	IVoteData,
 	IUserActivity,
 	IPreimage,
 	IQRSessionPayload,
@@ -33,7 +32,9 @@ import {
 	IVoteCartItem,
 	EConvictionAmount,
 	IContentSummary,
-	ITreasuryStats
+	ITreasuryStats,
+	ISocialHandle,
+	IVoteHistoryData
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -95,7 +96,11 @@ enum EApiRoute {
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
-	GET_TREASURY_STATS = 'GET_TREASURY_STATS'
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
+	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
+	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
+	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
+	JUDGEMENT_CALL = 'JUDGEMENT_CALL'
 }
 
 export class NextApiClientService {
@@ -156,6 +161,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_FOLLOWING:
 			case EApiRoute.GET_FOLLOWERS:
 			case EApiRoute.GET_BATCH_VOTE_CART:
+			case EApiRoute.GET_USER_SOCIAL_HANDLES:
 				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
@@ -217,6 +223,8 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.ADD_TO_BATCH_VOTE_CART:
 			case EApiRoute.FOLLOW_USER:
+			case EApiRoute.INIT_SOCIAL_VERIFICATION:
+			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
 				path = '/users/id';
 				method = 'POST';
 				break;
@@ -224,6 +232,10 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
+				method = 'POST';
+				break;
+			case EApiRoute.JUDGEMENT_CALL:
+				path = '/identity/judgement-call';
 				method = 'POST';
 				break;
 
@@ -487,7 +499,7 @@ export class NextApiClientService {
 			decision
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
-		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
+		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
 	// activity feed
@@ -770,5 +782,32 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
 		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
+	}
+
+	static async fetchUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		const queryParams = new URLSearchParams({
+			address
+		});
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_USER_SOCIAL_HANDLES,
+			routeSegments: [userId.toString(), 'socials'],
+			queryParams
+		});
+		return this.nextApiClientFetch<{ socialHandles: Record<ESocial, ISocialHandle> }>({ url, method });
+	}
+
+	static async initSocialVerification({ userId, social, handle, address }: { userId: number; social: ESocial; handle: string; address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.INIT_SOCIAL_VERIFICATION, routeSegments: [userId.toString(), 'socials', 'init-verification'] });
+		return this.nextApiClientFetch<ISocialHandle>({ url, method, data: { social, handle, address } });
+	}
+
+	static async confirmSocialVerification({ userId, social, token, twitterOauthVerifier }: { userId: number; social: ESocial; token: string; twitterOauthVerifier?: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CONFIRM_SOCIAL_VERIFICATION, routeSegments: [userId.toString(), 'socials', 'confirm-verification'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { social, token, twitterOauthVerifier } });
+	}
+
+	static async judgementCall({ userAddress, identityHash }: { userAddress: string; identityHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.JUDGEMENT_CALL });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { userAddress, identityHash } });
 	}
 }

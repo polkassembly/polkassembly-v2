@@ -346,6 +346,12 @@ export interface ITag {
 	network: ENetwork;
 }
 
+export interface IOffChainContentHistoryItem {
+	content: string;
+	title?: string;
+	createdAt: Date;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -367,6 +373,7 @@ export interface IOffChainPost {
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
 	topic?: EOffChainPostTopic;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export enum EProposalStatus {
@@ -495,7 +502,6 @@ export interface IOnChainPostInfo {
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
-	userReaction?: IReaction;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 }
@@ -518,10 +524,6 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
-	/**
-	 * @deprecated Use reactions array instead for better performance and flexibility
-	 */
-	userReaction?: IReaction;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 }
@@ -597,11 +599,11 @@ export interface IComment {
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
-	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export interface ICommentResponse extends IComment {
@@ -628,6 +630,7 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
+	hash?: string;
 }
 
 export interface IVoteData {
@@ -758,6 +761,10 @@ export interface IActivityMetadata {
 
 	// for follow/unfollow
 	userId?: number;
+
+	// for posts
+	title?: string;
+	content?: string;
 }
 
 export interface IUserActivity {
@@ -907,7 +914,7 @@ export interface IWritePostFormFields {
 	allowedCommentor: EAllowedCommentor;
 }
 
-export enum NotificationType {
+export enum ENotificationStatus {
 	SUCCESS = 'success',
 	ERROR = 'error',
 	WARNING = 'warning',
@@ -1038,4 +1045,40 @@ export interface ITrackDelegationDetails {
 	delegatedTo?: ITrackDelegation[];
 	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
 	status: EDelegationStatus;
+}
+
+export enum ESocialVerificationStatus {
+	VERIFIED = 'verified',
+	PENDING = 'pending',
+	UNVERIFIED = 'unverified'
+}
+
+export interface ISocialHandle {
+	userId: number;
+	address: string;
+	social: ESocial;
+	handle: string;
+	status: ESocialVerificationStatus;
+	verificationToken?: {
+		token?: string;
+		secret?: string;
+		expiresAt?: Date;
+	};
+	createdAt?: Date;
+	updatedAt?: Date;
+}
+export interface IVoteHistoryData {
+	votes: IVoteData[];
+	totalCounts: {
+		[EVoteDecision.AYE]?: number;
+		[EVoteDecision.NAY]?: number;
+		[EVoteDecision.SPLIT_ABSTAIN]?: number;
+		[EVoteDecision.SPLIT]?: number;
+	};
+}
+
+export enum EPeriodType {
+	PREPARE = 'prepare',
+	DECISION = 'decision',
+	CONFIRM = 'confirm'
 }

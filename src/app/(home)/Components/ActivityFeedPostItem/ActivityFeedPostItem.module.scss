@@ -1,5 +1,5 @@
 .originStyle {
-	@apply rounded-md px-1.5 py-1 text-xs;
+	@apply whitespace-normal break-words rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
 }
 
 .progressBarContainer {
@@ -15,17 +15,17 @@
 }
 
 .requestedAmount {
-	@apply flex items-center gap-1 whitespace-nowrap text-base font-medium text-text_primary;
+	@apply flex items-center gap-1 break-words text-base font-medium text-text_primary;
 }
 
 .castVoteButton {
-	@apply flex gap-1 rounded-md border-[1px] border-solid border-navbar_border px-3 py-1 text-sm font-medium text-navbar_border hover:bg-progress_pink_bg;
+	@apply flex cursor-pointer gap-1 whitespace-normal rounded-md border-[1px] border-solid border-navbar_border text-sm font-medium text-navbar_border hover:bg-progress_pink_bg lg:px-3 lg:py-1.5;
 }
 
 .beneficiaryContainer {
-	@apply flex flex-wrap items-center gap-2;
+	@apply flex flex-wrap items-center gap-2 break-all text-base font-semibold text-wallet_btn_text lg:text-xl;
 }
 
 .container {
-	@apply relative z-10 w-full rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg;
+	@apply relative z-10 mx-auto w-full max-w-[1200px] overflow-x-hidden rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg;
 }

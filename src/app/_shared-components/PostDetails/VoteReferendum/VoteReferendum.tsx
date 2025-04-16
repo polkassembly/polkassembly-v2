@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, NotificationType } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -53,7 +53,7 @@ function VoteReferendum({ index }: { index: string }) {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
 						description: t('VoteReferendum.voteSuccess'),
-						status: NotificationType.SUCCESS
+						status: ENotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
 				},
@@ -61,7 +61,7 @@ function VoteReferendum({ index }: { index: string }) {
 					toast({
 						title: t('VoteReferendum.voteFailedTitle'),
 						description: t('VoteReferendum.voteFailed'),
-						status: NotificationType.ERROR
+						status: ENotificationStatus.ERROR
 					});
 					setIsLoading(false);
 				},

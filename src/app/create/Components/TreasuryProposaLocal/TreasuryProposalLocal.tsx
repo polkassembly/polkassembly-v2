@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, NotificationType } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -85,7 +85,7 @@ function TreasuryProposalLocal() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreatedSuccessfully'),
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
@@ -93,7 +93,7 @@ function TreasuryProposalLocal() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreationFailed'),
 					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
@@ -121,7 +121,7 @@ function TreasuryProposalLocal() {
 				toast({
 					title: t('CreateTreasuryProposal.preimageNotedSuccessfully'),
 					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				createProposal({ preimageHash: preimageDetails.preimageHash, preimageLength: preimageDetails.preimageLength });
 			},
@@ -129,7 +129,7 @@ function TreasuryProposalLocal() {
 				toast({
 					title: t('CreateTreasuryProposal.preimageNoteFailed'),
 					description: t('CreateTreasuryProposal.preimageNoteFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
@@ -138,13 +138,13 @@ function TreasuryProposalLocal() {
 
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
-			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress />
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}
 					onChange={(value) => setBeneficiaries(value)}
 				/>
-				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-4 font-medium text-text_primary'>
+				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-2 font-medium text-text_primary max-sm:text-sm sm:p-4'>
 					<span>Requested Amount</span>
 					<span>
 						{formatter.format(Number(formatBnBalance(totalAmount, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}

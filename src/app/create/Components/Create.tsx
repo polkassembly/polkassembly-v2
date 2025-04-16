@@ -63,7 +63,7 @@ function CreateOption({
 	const buttonComponent = (
 		<button
 			type='button'
-			className='flex flex-1 items-center gap-x-2 rounded-lg bg-create_option_bg px-4 py-2 text-text_primary transition-all duration-200 ease-in hover:bg-bg_pink/10 hover:text-text_pink'
+			className='flex flex-1 items-center gap-x-2 rounded-lg bg-create_option_bg px-2 py-1 text-text_primary transition-all duration-200 ease-in hover:bg-bg_pink/10 hover:text-text_pink sm:px-4 sm:py-2'
 			onClick={onClick}
 			disabled={disabled}
 		>
@@ -87,7 +87,7 @@ function CreateOption({
 	);
 
 	return (
-		<div className='flex items-center gap-x-4'>
+		<div className='flex items-center gap-x-2 sm:gap-x-4'>
 			{iconComponent}
 			{component}
 		</div>

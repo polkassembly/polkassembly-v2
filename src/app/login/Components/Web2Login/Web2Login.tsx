@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWallet, NotificationType } from '@/_shared/types';
+import { EWallet, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { Input } from '@ui/Input';
@@ -57,7 +57,7 @@ function Web2Login({
 
 		if (!emailOrUsername || !password) {
 			toast({
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				title: t('Profile.enterCredentials')
 			});
 			return;
@@ -104,7 +104,7 @@ function Web2Login({
 			}
 		} catch {
 			toast({
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				title: t('Profile.loginFailed')
 			});
 			setLoading(false);

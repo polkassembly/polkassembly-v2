@@ -107,7 +107,7 @@ export class OnChainDbService {
 
 		return {
 			votes: [],
-			totalCount: 0
+			totalCounts: {}
 		};
 	}
 

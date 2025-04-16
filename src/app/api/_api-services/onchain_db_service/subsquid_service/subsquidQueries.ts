@@ -361,7 +361,10 @@ export class SubsquidQueries {
 				voter
 			}
 
-			votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes}, orderBy: id_ASC) {
+				totalCount
+			}
+				noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
@@ -406,7 +409,13 @@ export class SubsquidQueries {
 					decision
 				}
 			}
-			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+			yesCount:  convictionVotesConnection(where: {decision_eq: yes,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+				totalCount
+			}
+			noCount:  convictionVotesConnection(where: {decision_eq: no,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+				totalCount
+			}
+			abstainCount:  convictionVotesConnection(where: {decision_eq: abstain,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
@@ -432,7 +441,10 @@ export class SubsquidQueries {
 				voter
 			}
 
-			votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
+			yesCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: yes}, orderBy: id_ASC) {
+				totalCount
+			}
+			noCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: no}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
@@ -457,15 +469,18 @@ export class SubsquidQueries {
 				timestamp
 				voter
 			}
-			votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: $decision_eq}, orderBy: id_ASC) {
+			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes}, orderBy: id_ASC) {
+				totalCount
+			}
+			noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
 	`;
 
 	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = `
-		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!) {
-			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: $decision_eq}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_in: [VoteDecision!], $aye_not_eq: BigInt, $nay_not_eq: BigInt, $value_isNull: Boolean) {
+			votes: convictionVotes(where: {AND:{balance:{aye_not_eq: $aye_not_eq}, OR:{balance: {nay_not_eq: $nay_not_eq}, OR:{balance:{value_isNull: $value_isNull}}}},  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: $decision_in}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -501,8 +516,14 @@ export class SubsquidQueries {
 					}
 					decision
 				}
+			}    
+			yesCount:  convictionVotesConnection(where: {AND:{balance:{aye_not_eq:"0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [yes, abstain]}, orderBy: id_ASC) {
+				totalCount
 			}
-			votesConnection: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: $decision_eq}, orderBy: id_ASC) {
+			 noCount:  convictionVotesConnection(where: {AND:{balance:{nay_not_eq: "0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [no, abstain]}, orderBy: id_ASC) {
+				totalCount
+			}
+			abstainCount: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: abstain}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
@@ -527,7 +548,10 @@ export class SubsquidQueries {
 				timestamp
 				voter
 			}
-			votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: $decision_eq}, orderBy: id_ASC) {
+			yesCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: yes}, orderBy: id_ASC) {
+				totalCount
+			}
+			noCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: no}, orderBy: id_ASC) {
 				totalCount
 			}
 		}

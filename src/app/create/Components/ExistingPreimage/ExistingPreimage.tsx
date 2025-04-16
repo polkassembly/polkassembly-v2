@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, NotificationType } from '@/_shared/types';
+import { EEnactment, EPostOrigin, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -94,7 +94,7 @@ function ExistingPreimage() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreatedSuccessfully'),
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
@@ -102,7 +102,7 @@ function ExistingPreimage() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreationFailed'),
 					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
