@@ -34,7 +34,7 @@ function SpamPostModal({ open, setOpen, proposalType }: { open: boolean; setOpen
 					<div className={classes.buttonContainer}>
 						<Button
 							variant='secondary'
-							onClick={() => router.push('/discussions')}
+							onClick={() => router.back()}
 						>
 							Go Back
 						</Button>
