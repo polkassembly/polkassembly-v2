@@ -7,7 +7,7 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NotificationType } from '@/_shared/types';
+import { ENotificationStatus } from '@/_shared/types';
 import styles from './Toaster.module.scss';
 
 const ToastProvider = ToastPrimitives.Provider;
@@ -30,10 +30,10 @@ const toastVariants = cva(
 		variants: {
 			variant: {
 				default: 'bg-background',
-				[NotificationType.SUCCESS]: 'bg-green-500 text-white',
-				[NotificationType.WARNING]: 'bg-toast_warning_bg text-btn_secondary_text',
-				[NotificationType.INFO]: 'bg-toast_info_bg border border-toast_info_border text-btn_secondary_text',
-				[NotificationType.ERROR]: 'bg-toast_error_bg text-btn_secondary_text'
+				[ENotificationStatus.SUCCESS]: 'bg-green-500 text-white',
+				[ENotificationStatus.WARNING]: 'bg-toast_warning_bg text-btn_secondary_text',
+				[ENotificationStatus.INFO]: 'bg-toast_info_bg border border-toast_info_border text-btn_secondary_text',
+				[ENotificationStatus.ERROR]: 'bg-toast_error_bg text-btn_secondary_text'
 			}
 		},
 		defaultVariants: {
@@ -43,7 +43,7 @@ const toastVariants = cva(
 );
 const Toast = forwardRef<
 	ElementRef<typeof ToastPrimitives.Root>,
-	ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants> & { status?: NotificationType }
+	ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants> & { status?: ENotificationStatus }
 >(({ className, variant, status, ...props }, ref) => {
 	const finalVariant = status || variant;
 	return (

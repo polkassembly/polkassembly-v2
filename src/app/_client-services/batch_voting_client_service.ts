@@ -48,7 +48,7 @@ export class BatchVotingClientService extends NextApiClientService {
 		conviction: EConvictionAmount;
 	}) {
 		if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-			throw new Error('Invalid vote amount');
+			throw new Error('Invalid vote amounts');
 		}
 
 		return this.addToBatchVoteCartApi({ userId, postIndexOrHash, proposalType, decision, amount, conviction });
@@ -68,7 +68,7 @@ export class BatchVotingClientService extends NextApiClientService {
 		conviction: EConvictionAmount;
 	}) {
 		if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-			throw new Error('Invalid vote amount');
+			throw new Error('Invalid vote amounts');
 		}
 
 		return this.editBatchVoteCartItemApi({ userId, id, decision, amount, conviction });

@@ -4,7 +4,7 @@
 import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
-import { ESignupSteps, EWallet, NotificationType } from '@/_shared/types';
+import { ESignupSteps, EWallet, ENotificationStatus } from '@/_shared/types';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
@@ -108,7 +108,7 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 			}
 		} catch {
 			toast({
-				status: NotificationType.ERROR,
+				status: ENotificationStatus.ERROR,
 				title: t('Profile.signupFailed')
 			});
 			setLoading(false);

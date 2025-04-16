@@ -54,7 +54,7 @@ function MultipleBeneficiaryForm({
 
 	return (
 		<div className='flex flex-col gap-y-1'>
-			<p className='text-sm text-wallet_btn_text'>{t('CreatePreimage.beneficiary')}</p>
+			<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('CreatePreimage.beneficiary')}</p>
 			<div className='flex flex-col gap-y-6'>
 				{beneficiaries.map((b, index) => (
 					<BeneficiaryInputs

@@ -6,7 +6,7 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { IPublicUser, IFollowEntry, IOnChainIdentity, NotificationType } from '@/_shared/types';
+import { IPublicUser, IFollowEntry, IOnChainIdentity, ENotificationStatus } from '@/_shared/types';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useUser } from '@/hooks/useUser';
 import { dayjs } from '@shared/_utils/dayjsInit';
@@ -78,7 +78,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 		navigator.clipboard.writeText(text);
 		toast({
 			title: 'Address copied to clipboard',
-			status: NotificationType.INFO
+			status: ENotificationStatus.INFO
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

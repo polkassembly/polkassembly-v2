@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAllowedCommentor, ENetwork, EOffChainPostTopic, EProposalType } from '@/_shared/types';
+import { EAllowedCommentor, ENetwork, EOffChainPostTopic, EProposalType, ITag } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { updatePostServer } from '../../_api-utils/updatePostServer';
@@ -47,7 +47,14 @@ export class WebhookService {
 			content: z.string().min(1, 'Content is required'),
 			authorId: z.number().refine((authorId) => ValidatorService.isValidUserId(authorId), 'Not a valid author ID'),
 			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
-			topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
+			topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL),
+			tags: z.array(z.string().min(1, 'Tag is required')).optional(),
+			linkedPost: z
+				.object({
+					indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+					proposalType: z.nativeEnum(EProposalType)
+				})
+				.optional()
 		}),
 		[EWebhookEvent.POST_EDITED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
@@ -55,8 +62,14 @@ export class WebhookService {
 			title: z.string().min(1, 'Title is required'),
 			content: z.string().min(1, 'Content is required'),
 			authorId: z.number().refine((authorId) => ValidatorService.isValidUserId(authorId), 'Not a valid author ID'),
-			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
-			// TODO: add support for tags and linked post
+			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
+			tags: z.array(z.string().min(1, 'Tag is required')).optional(),
+			linkedPost: z
+				.object({
+					indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+					proposalType: z.nativeEnum(EProposalType)
+				})
+				.optional()
 		}),
 		[EWebhookEvent.POST_DELETED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
@@ -137,25 +150,36 @@ export class WebhookService {
 		network: ENetwork;
 		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.OFF_CHAIN_POST_CREATED]>;
 	}) {
-		const { index, title, content, authorId, allowedCommentor, topic } = params;
+		const { index, title, content, authorId, allowedCommentor, topic, tags, linkedPost } = params;
 
-		await FirestoreService.CreatePost({
-			network,
-			proposalType: EProposalType.DISCUSSION,
-			userId: authorId,
-			content,
-			title,
-			allowedCommentor,
-			tags: [],
-			topic,
-			indexOrHash: index.toString()
-		});
+		const processedTags: ITag[] = tags?.filter((tag) => ValidatorService.isValidTag(tag)).map((tag) => ({ value: tag, network, lastUsedAt: new Date() })) ?? [];
+
+		await Promise.all([
+			processedTags.length > 0 ? OffChainDbService.CreateTags(processedTags) : Promise.resolve(),
+			FirestoreService.CreatePost({
+				network,
+				proposalType: EProposalType.DISCUSSION,
+				userId: authorId,
+				content,
+				title,
+				allowedCommentor,
+				tags: processedTags,
+				topic,
+				indexOrHash: index.toString(),
+				linkedPost
+			})
+		]);
 	}
 
 	private static async handlePostEdited({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> }) {
-		const { indexOrHash, content, authorId, proposalType, title, allowedCommentor } = params;
+		const { indexOrHash, content, authorId, proposalType, title, allowedCommentor, tags, linkedPost } = params;
 
-		await updatePostServer({ network, proposalType, indexOrHash, content, title, allowedCommentor, userId: authorId });
+		const processedTags: ITag[] = tags?.filter((tag) => ValidatorService.isValidTag(tag)).map((tag) => ({ value: tag, network, lastUsedAt: new Date() })) ?? [];
+
+		await Promise.all([
+			processedTags.length > 0 ? OffChainDbService.CreateTags(processedTags) : Promise.resolve(),
+			updatePostServer({ network, proposalType, indexOrHash, content, title, allowedCommentor, userId: authorId, linkedPost })
+		]);
 	}
 
 	private static async handlePostDeleted({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_DELETED]> }) {

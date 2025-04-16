@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, NotificationType } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -78,7 +78,7 @@ function TreasuryProposalAssethub() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreatedSuccessfully'),
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
@@ -86,7 +86,7 @@ function TreasuryProposalAssethub() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreationFailed'),
 					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
@@ -113,7 +113,7 @@ function TreasuryProposalAssethub() {
 				toast({
 					title: t('CreateTreasuryProposal.preimageNotedSuccessfully'),
 					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
-					status: NotificationType.SUCCESS
+					status: ENotificationStatus.SUCCESS
 				});
 				createProposal({ preimageHash: preimageDetails.preimageHash, preimageLength: preimageDetails.preimageLength });
 			},
@@ -121,7 +121,7 @@ function TreasuryProposalAssethub() {
 				toast({
 					title: t('CreateTreasuryProposal.preimageNoteFailed'),
 					description: t('CreateTreasuryProposal.preimageNoteFailedDescription'),
-					status: NotificationType.ERROR
+					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
 			}
@@ -129,8 +129,8 @@ function TreasuryProposalAssethub() {
 	};
 
 	return (
-		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
-			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+		<div className='flex w-full flex-1 flex-col gap-y-2 overflow-hidden sm:gap-y-4'>
+			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress />
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}

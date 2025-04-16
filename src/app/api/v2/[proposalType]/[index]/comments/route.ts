@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ECommentSentiment, EProposalType, IComment } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
@@ -42,14 +41,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		content: z.string().min(1, 'Content is required'),
 		parentCommentId: z.string().optional(),
-		address: z
-			.string()
-			.refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
-			.optional(),
 		sentiment: z.nativeEnum(ECommentSentiment).optional()
 	});
 
-	const { content, parentCommentId, address, sentiment } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, sentiment } = zodBodySchema.parse(await getReqBody(req));
 
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
@@ -58,7 +53,6 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content,
 		parentCommentId,
-		address,
 		sentiment
 	});
 

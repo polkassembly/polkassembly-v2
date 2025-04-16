@@ -44,7 +44,7 @@ function ProposalScreen({
 				<div className='relative flex h-full flex-col gap-y-4'>
 					<Button
 						variant='ghost'
-						className='absolute right-0 top-0 text-sm text-text_pink'
+						className='absolute right-0 top-0 z-50 text-sm text-text_pink'
 						onClick={() => onSkip(currentProposal)}
 					>
 						{t('BatchVote.skip')}

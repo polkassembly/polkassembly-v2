@@ -57,12 +57,12 @@ function Navbar() {
 	};
 	return (
 		<nav className={classes.navbar}>
-			<div className='flex items-center pl-8 md:pl-0'>
+			<div className='flex items-center pl-12 md:pl-0'>
 				<PaLogo
 					variant='full'
-					className='md:hidden'
+					className='w-[120px] md:hidden'
 				/>
-				<div className='border-l-[1px] border-bg_pink pl-3 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
+				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
 			<div
@@ -176,7 +176,7 @@ function Navbar() {
 
 			{isModalOpen && (
 				<div className='absolute left-0 top-full z-50 w-full border-t-[3px] border-navbar_border bg-bg_modal p-4 pb-10 shadow-md md:hidden'>
-					<div className='flex flex-col gap-5 pt-10'>
+					<div className='flex flex-col gap-5 pt-14'>
 						<div>
 							<p className='pb-1 text-sm text-text_primary'>{t('Header.network')}</p>
 							<NetworkDropdown className='w-full' />
@@ -209,9 +209,55 @@ function Navbar() {
 						</div>
 						<ThemeToggleButton className='w-full' />
 						<div>
-							<Link href='/login'>
-								<Button className='w-full'>{t('Profile.login')}</Button>
-							</Link>
+							{user?.id ? (
+								<DropdownMenu>
+									<DropdownMenuTrigger
+										className='rounded-3xl border border-border_grey bg-wallet_disabled_bg px-3 py-2 text-sm normal-case text-text_primary'
+										asChild
+									>
+										{user.addresses && user.addresses.length > 0 ? (
+											<Address
+												address={user.addresses[0]}
+												walletAddressName={user.username}
+												disableTooltip
+											/>
+										) : (
+											<p>{user.username}</p>
+										)}
+									</DropdownMenuTrigger>
+									<DropdownMenuContent>
+										<DropdownMenuItem>
+											<Link
+												className='w-full'
+												href={`/user/id/${user.id}`}
+											>
+												{t('Profile.profile')}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem>
+											<Link
+												className='w-full'
+												href='/set-identity'
+											>
+												{t('SetIdentity.setIdentity')}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem>
+											<Button
+												variant='ghost'
+												className='flex w-full justify-start p-0 text-sm'
+												onClick={() => AuthClientService.logout(() => setUser(null))}
+											>
+												{t('Profile.logout')}
+											</Button>
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							) : (
+								<Link href='/login'>
+									<Button>{t('Profile.login')}</Button>
+								</Link>
+							)}
 						</div>
 					</div>
 				</div>
