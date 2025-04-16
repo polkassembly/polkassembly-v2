@@ -418,7 +418,9 @@
 		"hideReplies": "Antworten ausblenden",
 		"viewReplies": "Antworten anzeigen",
 		"commentSummary": "Kommentarzusammenfassung",
-		"aiSummary": "KI-Zusammenfassung"
+		"aiSummary": "KI-Zusammenfassung",
+		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
+		"hideLikelySpam": "Wahrscheinliche Spam ausblenden"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",

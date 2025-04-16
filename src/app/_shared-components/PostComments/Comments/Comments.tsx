@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
-import { HiOutlineArrowDownCircle, HiOutlineArrowUpCircle } from 'react-icons/hi2';
+import { HiOutlineArrowDownCircle, HiOutlineArrowUpCircle, HiOutlineChevronDown, HiOutlineChevronUp } from 'react-icons/hi2';
 import { useTranslations } from 'next-intl';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
@@ -20,7 +20,11 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	const [allComments, setAllComments] = useState<ICommentResponse[]>(comments);
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
-	const commentsToShow = showMore ? allComments : allComments.slice(0, 2);
+	const [showSpam, setShowSpam] = useState(false);
+
+	const regularComments = allComments.filter((comment) => !comment.isSpam);
+	const spamComments = allComments.filter((comment) => comment.isSpam);
+	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -41,7 +45,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						commentData={item}
 					/>
 				))}
-				{showMore && allComments?.length > 2 ? (
+				{showMore && regularComments?.length > 2 ? (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowLess}
@@ -51,7 +55,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							{t('ActivityFeed.PostItem.showLessComments')} <HiOutlineArrowUpCircle className='text-lg' />
 						</span>
 					</div>
-				) : !showMore && allComments?.length > 2 ? (
+				) : !showMore && regularComments?.length > 2 ? (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowMore}
@@ -62,6 +66,34 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						</span>
 					</div>
 				) : null}
+
+				{spamComments.length > 0 && (
+					<div className='mt-4 border-y border-border_grey py-4'>
+						<button
+							type='button'
+							onClick={() => setShowSpam(!showSpam)}
+							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-pink-500'
+							aria-expanded={showSpam}
+							aria-controls='spam-comments-section'
+						>
+							{showSpam ? t('PostDetails.hideLikelySpam') : t('PostDetails.showLikelySpam')}
+							<span className='text-pink-500'>({spamComments.length})</span>
+							{showSpam ? <HiOutlineChevronUp className='text-base' /> : <HiOutlineChevronDown className='text-base' />}
+						</button>
+						{showSpam && (
+							<div className='mt-4 flex flex-col gap-y-4'>
+								{spamComments.map((item) => (
+									<SingleComment
+										proposalType={proposalType}
+										index={index}
+										key={item.id}
+										commentData={item}
+									/>
+								))}
+							</div>
+						)}
+					</div>
+				)}
 			</div>
 
 			{user ? (

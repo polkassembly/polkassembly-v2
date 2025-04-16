@@ -418,7 +418,9 @@
 		"hideReplies": "Ocultar respuestas",
 		"viewReplies": "Ver respuestas",
 		"commentSummary": "Resumen de Comentarios",
-		"aiSummary": "Resumen de IA"
+		"aiSummary": "Resumen de IA",
+		"showLikelySpam": "Mostrar Comentarios de Spam",
+		"hideLikelySpam": "Ocultar Comentarios de Spam"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

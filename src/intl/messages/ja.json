@@ -418,7 +418,9 @@
 		"hideReplies": "返信を非表示",
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
-		"aiSummary": "AIの要約"
+		"aiSummary": "AI要約",
+		"showLikelySpam": "疑わしいスパムを表示",
+		"hideLikelySpam": "疑わしいスパムを非表示"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",

@@ -418,7 +418,9 @@
 		"hideReplies": "隐藏回复",
 		"viewReplies": "查看回复",
 		"commentSummary": "评论摘要",
-		"aiSummary": "AI 摘要"
+		"aiSummary": "AI 摘要",
+		"showLikelySpam": "显示疑似垃圾评论",
+		"hideLikelySpam": "隐藏疑似垃圾评论"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",

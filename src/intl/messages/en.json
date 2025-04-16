@@ -406,6 +406,8 @@
 		"viewReplies": "View Replies",
 		"commentSummary": "Comment Summary",
 		"aiSummary": "AI Summary",
+		"showLikelySpam": "Show Likely Spam",
+		"hideLikelySpam": "Hide Likely Spam",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -674,7 +676,7 @@
 		"login": "Login",
 		"toSet": "To Set Identity",
 		"identitySuccess": "On-chain identity registration initiated",
-		"successCta": "Let’s start your verification process",
+		"successCta": "Let's start your verification process",
 		"address": "Address",
 		"verifying": "Verifying...",
 		"verificationSuccessful": "Verification successful",
