@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, IPost, IPostListing, EProposalStatus, EPostOrigin } from '@/_shared/types';
+import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -51,7 +51,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				<div className={classes.headerWrapper}>
 					<PostHeader
 						isModalOpen={isModalOpen ?? false}
-						postData={post as IPostListing}
+						postData={post}
 					/>
 				</div>
 				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3')}>
@@ -59,7 +59,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
 								<PostContent
-									postData={post as IPostListing}
+									postData={post}
 									isModalOpen={isModalOpen ?? false}
 									onEditPostSuccess={onEditPostSuccess}
 								/>
