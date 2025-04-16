@@ -119,7 +119,7 @@ function CartItem({ voteCartItem }: { voteCartItem: IVoteCartItem }) {
 								<Pencil />
 							</Button>
 						</DialogTrigger>
-						<DialogContent className='max-w-xl p-6'>
+						<DialogContent className='max-w-xl p-3 sm:p-6'>
 							<DialogTitle>{t('BatchVote.editVote')}</DialogTitle>
 							<EditCartItem
 								voteCartItem={voteCartItem}
