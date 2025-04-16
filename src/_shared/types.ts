@@ -761,6 +761,10 @@ export interface IActivityMetadata {
 
 	// for follow/unfollow
 	userId?: number;
+
+	// for posts
+	title?: string;
+	content?: string;
 }
 
 export interface IUserActivity {

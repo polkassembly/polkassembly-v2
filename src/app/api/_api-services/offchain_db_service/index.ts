@@ -263,8 +263,19 @@ export class OffChainDbService {
 		return FirestoreService.GetPublicUserById(id);
 	}
 
-	static async GetUserActivitiesByUserId(userId: number): Promise<IUserActivity[]> {
-		return FirestoreService.GetUserActivitiesByUserId(userId);
+	static async GetUserActivitiesByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IUserActivity[]> {
+		const activities = await FirestoreService.GetUserActivitiesByUserId({ userId, network });
+
+		// fetch post data for each activity
+		return Promise.all(
+			activities.map(async (activity) => {
+				const post =
+					activity.indexOrHash && activity.proposalType
+						? await this.GetOffChainPostData({ network, indexOrHash: activity.indexOrHash, proposalType: activity.proposalType })
+						: null;
+				return { ...activity, metadata: { ...activity.metadata, title: post?.title } };
+			})
+		);
 	}
 
 	static async GetUserReactionForPost({

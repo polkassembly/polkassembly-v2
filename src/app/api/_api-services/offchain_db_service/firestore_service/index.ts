@@ -530,8 +530,8 @@ export class FirestoreService extends FirestoreUtils {
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
-	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
-		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', id);
+	static async GetUserActivitiesByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IUserActivity[]> {
+		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const userActivityQuerySnapshot = await userActivityQuery.get();
 		return userActivityQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
