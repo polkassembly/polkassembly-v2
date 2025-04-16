@@ -138,13 +138,13 @@ function TreasuryProposalLocal() {
 
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
-			<div className='flex flex-1 flex-col gap-y-2 overflow-y-auto sm:gap-y-4'>
+			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress />
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}
 					onChange={(value) => setBeneficiaries(value)}
 				/>
-				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-4 font-medium text-text_primary'>
+				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-2 font-medium text-text_primary max-sm:text-sm sm:p-4'>
 					<span>Requested Amount</span>
 					<span>
 						{formatter.format(Number(formatBnBalance(totalAmount, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}

@@ -10,7 +10,7 @@ import { Separator } from '../_shared-components/Separator';
 async function SetIdentityPage() {
 	return (
 		<div className={classes.rootClass}>
-			<div className='mx-auto w-full max-w-3xl rounded-2xl bg-bg_modal p-6 shadow-lg'>
+			<div className='mx-auto w-full max-w-3xl rounded-2xl bg-bg_modal p-3 shadow-lg sm:p-6'>
 				<HeaderTitle />
 				<Separator className='my-4' />
 				<SetIdentity />
