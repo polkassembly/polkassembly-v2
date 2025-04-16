@@ -27,7 +27,6 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { BN, BN_ZERO } from '@polkadot/util';
-import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -251,16 +250,13 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	// FIXME: refactor this function
-	// eslint-disable-next-line sonarjs/cognitive-complexity
 	static async GetPostVoteData({
 		network,
 		proposalType,
 		indexOrHash,
 		page,
 		limit,
-		decision,
-		voterAddress: address
+		decision
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -268,10 +264,7 @@ export class SubsquidService extends SubsquidUtils {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
 	}) {
-		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
-
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
@@ -280,26 +273,19 @@ export class SubsquidService extends SubsquidUtils {
 		const query =
 			proposalType === EProposalType.TIP
 				? subsquidDecision
-					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
-					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
+					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION
+					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
 				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
 					? subsquidDecision
-						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
+						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
+						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
 					: subsquidDecision
-						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
+						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
 
 		const variables =
 			proposalType === EProposalType.TIP
-				? {
-						hash_eq: indexOrHash,
-						type_eq: proposalType,
-						limit,
-						offset: (page - 1) * limit,
-						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
-						...(voterAddress && { voter_eq: voterAddress })
-					}
+				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_in: subsquidDecisionIn }) }
 				: {
 						index_eq: Number(indexOrHash),
 						type_eq: proposalType,
@@ -307,8 +293,7 @@ export class SubsquidService extends SubsquidUtils {
 						offset: (page - 1) * limit,
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(voterAddress && { voter_eq: voterAddress })
+						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
 					};
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
