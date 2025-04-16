@@ -157,10 +157,10 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 					</div>
 				</div>
 				<div className='flex w-full flex-col gap-y-2'>
-					<div className='flex items-start justify-between gap-x-2'>
-						<div className='flex flex-col gap-y-1'>
+					<div className='flex w-full flex-col justify-between gap-x-2 gap-y-3 sm:flex-row sm:items-start'>
+						<div className='flex w-full flex-col gap-y-1'>
 							<p className={classes.profileHeaderTextTitle}>{userProfileData.username}</p>
-							<div className='flex flex-wrap items-center gap-x-2'>
+							<div className='flex flex-wrap items-center justify-center gap-x-2 gap-y-2 sm:justify-start'>
 								{userProfileData.createdAt && (
 									<p className={classes.profileHeaderTextSince}>
 										<span>{t('Profile.userSince')}: </span>{' '}
@@ -219,7 +219,7 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 								>
 									<DialogTrigger asChild>
 										<Button
-											className='rounded-3xl px-6 font-medium'
+											className='w-full rounded-3xl px-6 font-medium sm:w-auto'
 											size='lg'
 											leftIcon={
 												<Pencil
@@ -246,7 +246,7 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 							) : (
 								<Button
 									size='lg'
-									className='rounded-3xl'
+									className='w-full rounded-3xl sm:w-auto'
 									leftIcon={<ShieldPlus />}
 									isLoading={loading}
 									onClick={isFollowing ? unfollowUser : followUser}
@@ -257,10 +257,10 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 							)}
 						</div>
 					</div>
-					{userProfileData.profileDetails.bio && <p className='text-text_primary'>{userProfileData.profileDetails.bio}</p>}
+					{userProfileData.profileDetails.bio && <p className='text-center text-text_primary sm:text-left'>{userProfileData.profileDetails.bio}</p>}
 				</div>
 			</div>
-			<TabsList>
+			<TabsList className='flex w-full overflow-x-auto'>
 				<TabsTrigger
 					className='uppercase'
 					value={EProfileTabs.OVERVIEW}
