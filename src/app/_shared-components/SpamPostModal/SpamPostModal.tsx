@@ -7,10 +7,11 @@ import Image from 'next/image';
 import { EProposalType } from '@/_shared/types';
 import SpamGif from '@assets/reactions/spam-gif.gif';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import classes from './SpamPostModal.module.scss';
 import { Button } from '../Button';
 
-function SpamPostModal({ open, setOpen, proposalType }: { open: boolean; setOpen: (open: boolean) => void; proposalType: string }) {
+function SpamPostModal({ open, setOpen, proposalType }: { open: boolean; setOpen: (open: boolean) => void; proposalType: EProposalType }) {
 	const router = useRouter();
 
 	return (
@@ -29,9 +30,7 @@ function SpamPostModal({ open, setOpen, proposalType }: { open: boolean; setOpen
 						width={180}
 						height={180}
 					/>
-					<span className={classes.messageText}>
-						This {`${[EProposalType.DISCUSSION, EProposalType.GRANT].includes(proposalType as EProposalType) ? 'Post' : 'Proposal'}`} is flagged as Spam.
-					</span>
+					<span className={classes.messageText}>This {`${ValidatorService.isValidOffChainProposalType(proposalType) ? 'Post' : 'Proposal'}`} is flagged as Spam.</span>
 					<div className={classes.buttonContainer}>
 						<Button
 							variant='secondary'

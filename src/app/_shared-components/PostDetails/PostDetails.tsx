@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, EProposalType, IPost, IPostListing, EProposalStatus, EPostOrigin } from '@/_shared/types';
+import { EPostDetailsTab, IPost, IPostListing, EProposalStatus, EPostOrigin } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -22,8 +22,8 @@ import PostContent from './PostContent';
 import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 
-function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData?: IPost }) {
-	const [post, setPost] = useState<IPost>(postData || ({} as IPost));
+function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
+	const [post, setPost] = useState<IPost>(postData);
 	const [showSpamModal, setShowSpamModal] = useState(false);
 
 	const onEditPostSuccess = (title: string, content: string) => {
@@ -73,7 +73,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
 								<OnchainInfo
-									proposalType={EProposalType.REFERENDUM_V2}
+									proposalType={post.proposalType}
 									index={index}
 									onchainInfo={postData?.onChainInfo}
 								/>
@@ -84,7 +84,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						)}
 						<div className={classes.commentsBox}>
 							<PostComments
-								proposalType={EProposalType.REFERENDUM_V2}
+								proposalType={post.proposalType}
 								index={index}
 							/>
 						</div>
@@ -100,7 +100,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={postData?.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={EProposalType.REFERENDUM_V2}
+								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 							/>

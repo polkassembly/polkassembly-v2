@@ -73,6 +73,8 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							type='button'
 							onClick={() => setShowSpam(!showSpam)}
 							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-pink-500'
+							aria-expanded={showSpam}
+							aria-controls='spam-comments-section'
 						>
 							{showSpam ? t('PostDetails.hideLikelySpam') : t('PostDetails.showLikelySpam')}
 							<span className='text-pink-500'>({spamComments.length})</span>
