@@ -79,7 +79,7 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 											{t('Profile.Settings.edit')}
 										</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-xl p-6'>
+									<DialogContent className='max-w-xl p-3 sm:p-6'>
 										<DialogHeader>
 											<DialogTitle>{t('Profile.Settings.editUsername')}</DialogTitle>
 										</DialogHeader>
@@ -121,7 +121,7 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 												{t('Profile.Settings.edit')}
 											</Button>
 										</DialogTrigger>
-										<DialogContent className='max-w-xl p-6'>
+										<DialogContent className='max-w-xl p-3 sm:p-6'>
 											<DialogHeader>
 												<DialogTitle>{t('Profile.Settings.editEmail')}</DialogTitle>
 											</DialogHeader>
@@ -147,7 +147,7 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 									</p>
 									<p className='text-left text-sm text-text_primary'>{t('Profile.Settings.enableTfaDescription')}</p>
 								</DialogTrigger>
-								<DialogContent className='max-w-xl p-6'>
+								<DialogContent className='max-w-xl p-3 sm:p-6'>
 									<DialogHeader className='text-xl font-semibold text-text_primary'>
 										<DialogTitle>{t('Profile.Settings.tfaAuth')}</DialogTitle>
 									</DialogHeader>
@@ -184,7 +184,7 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 											{t('Profile.Settings.linkAddress')}
 										</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-xl p-6'>
+									<DialogContent className='max-w-xl p-3 sm:p-6'>
 										<DialogHeader>
 											<DialogTitle>{t('Profile.Settings.linkAddress')}</DialogTitle>
 										</DialogHeader>
@@ -221,7 +221,7 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 									<DialogTrigger>
 										<Button variant='destructive'>{t('Profile.Settings.deleteMyAccount')}</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-xl p-6'>
+									<DialogContent className='max-w-xl p-3 sm:p-6'>
 										<DialogHeader>
 											<DialogTitle>{t('Profile.Settings.deleteAccount')}</DialogTitle>
 										</DialogHeader>

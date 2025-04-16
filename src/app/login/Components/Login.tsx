@@ -63,7 +63,7 @@ function Login({ isModal }: { isModal?: boolean }) {
 					<HeaderLabel />
 				</div>
 			)}
-			<div className={!isModal ? 'px-6 py-6 sm:px-12' : ''}>
+			<div className={!isModal ? 'px-4 py-4 sm:px-12' : ''}>
 				{isTFAEnabled && userPreferences.address && userPreferences.wallet ? (
 					<TwoFactorAuth
 						tfaToken={tfaToken}

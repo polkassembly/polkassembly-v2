@@ -130,7 +130,7 @@ function TreasuryProposalAssethub() {
 
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-2 overflow-hidden sm:gap-y-4'>
-			<div className='flex flex-1 flex-col gap-y-2 overflow-y-auto sm:gap-y-4'>
+			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress />
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}

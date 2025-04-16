@@ -164,7 +164,7 @@ function BeneficiaryInputs({
 							<div className='flex h-[46px] items-center text-sm text-wallet_btn_text'>{t('CreatePreimage.on')}</div>
 							<div className='flex flex-1 flex-col gap-y-1'>
 								<Popover>
-									<PopoverTrigger className='flex w-full items-center justify-start gap-x-2 rounded-lg border border-border_grey px-4 py-3 text-sm font-normal text-text_primary'>
+									<PopoverTrigger className='flex w-full items-center justify-start gap-x-2 rounded-lg border border-border_grey px-2 py-2 text-sm font-normal text-text_primary sm:px-4 sm:py-3'>
 										<CalendarRange size={14} />
 										<p className='flex-1 text-left'>{payoutDate ? dayjs(payoutDate).format("Do MMM 'YY") : 'Immediately'}</p>
 										{payoutDate && (
