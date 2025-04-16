@@ -33,7 +33,7 @@ function VoteReferendumButton({ index }: { index: string }) {
 					{t('PostDetails.castVote')}
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='max-w-xl p-6'>
+			<DialogContent className='max-w-xl p-3 sm:p-6'>
 				<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
 				<VoteReferendum index={index} />
 			</DialogContent>

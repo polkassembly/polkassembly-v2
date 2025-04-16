@@ -45,7 +45,7 @@ function CreateModal() {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className='max-w-screen-md p-6'>
+			<DialogContent className='max-w-screen-md p-4 sm:p-6'>
 				<DialogHeader>
 					<DialogTitle className='flex items-center gap-x-2'>
 						{step && (

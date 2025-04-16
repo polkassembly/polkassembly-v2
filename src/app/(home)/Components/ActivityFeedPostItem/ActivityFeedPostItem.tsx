@@ -155,7 +155,7 @@ function ActivityFeedPostItem({
 									</span>
 								</DialogTrigger>
 								<DialogTitle>
-									<DialogContent className='max-w-xl p-6'>
+									<DialogContent className='max-w-xl p-3 sm:p-6'>
 										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
 										<VoteReferendum index={postData?.index?.toString() || ''} />
 									</DialogContent>
