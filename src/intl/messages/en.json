@@ -406,8 +406,8 @@
 		"viewReplies": "View Replies",
 		"commentSummary": "Comment Summary",
 		"aiSummary": "AI Summary",
-		"showSpamComments": "Show Spam Comments",
-		"hideSpamComments": "Hide Spam Comments",
+		"showLikelySpam": "Show Likely Spam",
+		"hideLikelySpam": "Hide Likely Spam",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",

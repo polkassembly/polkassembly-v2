@@ -38,7 +38,6 @@ function SingleComment({
 	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
 }) {
 	const [reply, setReply] = useState<boolean>(false);
-	const [showSpam, setShowSpam] = useState<boolean>(false);
 	const t = useTranslations();
 
 	const [comment, setComment] = useState<ICommentResponse | null>(commentData);
@@ -157,20 +156,8 @@ function SingleComment({
 				</div>
 				<MarkdownViewer
 					markdown={comment.content}
-					className={`${classes.editor} ${comment.isSpam && !showSpam ? classes.spamComment : ''}`}
+					className={classes.editor}
 				/>
-
-				{comment.isSpam && (
-					<div className={classes.spamControls}>
-						<Button
-							variant='ghost'
-							size='sm'
-							onClick={() => setShowSpam(!showSpam)}
-						>
-							<span className='text-pink-500'>{showSpam ? t('PostDetails.hideSpamComments') : t('PostDetails.showSpamComments')}</span>
-						</Button>
-					</div>
-				)}
 
 				{user && (
 					<div className={classes.tools}>

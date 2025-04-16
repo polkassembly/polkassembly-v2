@@ -419,8 +419,8 @@
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
-		"showSpamComments": "スパムコメントを表示",
-		"hideSpamComments": "スパムコメントを非表示"
+		"showLikelySpam": "疑わしいスパムを表示",
+		"hideLikelySpam": "疑わしいスパムを非表示"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
