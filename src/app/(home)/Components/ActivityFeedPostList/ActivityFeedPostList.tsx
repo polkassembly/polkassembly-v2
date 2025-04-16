@@ -167,7 +167,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 					</p>
 				</div>
 			) : (
-				<div className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
+				<div className='hide_scrollbar flex flex-col gap-5 pb-16'>
 					{filteredPosts?.map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
