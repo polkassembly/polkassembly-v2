@@ -11,14 +11,15 @@ import { allowedNetwork } from '@/_shared/_constants/searchConstants';
 import { useSearchConfig } from '@/hooks/useSearchConfig';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import CustomSearchBox from './CustomSearchBox';
 import Filters from './Filters';
 import SearchResults from './SearchResults';
 import styles from './Search.module.scss';
 
-const ALGOLIA_APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID ?? '';
-const ALGOLIA_SEARCH_API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY ?? '';
-const searchClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_API_KEY);
+const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY } = getSharedEnvVars();
+
+const searchClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
 
 function Search() {
 	const [activeIndex, setActiveIndex] = useState<ESearchType | null>(null);
