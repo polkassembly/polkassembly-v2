@@ -92,7 +92,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 			if (isTrackDelegated) {
 				return;
 			}
-			setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
+			setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((tr) => tr !== track) : [...prev, track]));
 		},
 		[network, delegateUserTracks]
 	);
