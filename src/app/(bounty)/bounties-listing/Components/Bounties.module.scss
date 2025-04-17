@@ -31,7 +31,7 @@
 }
 
 .no_data {
-	@apply py-2 text-center text-btn_secondary_text;
+	@apply flex flex-col items-center justify-center py-2 text-center text-btn_secondary_text;
 }
 
 .table {

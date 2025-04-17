@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
+import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import BountyTable from './BountyTable';
 import styles from './Bounties.module.scss';
 
@@ -21,7 +22,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 	const router = useRouter();
 	const pageParam = searchParams.get('page')?.split('?')[0];
 	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
-	const status = searchParams.get('status') || EBountyStatus.ALL;
+	const status = searchParams.get('status') ? JSON.parse(decodeURIComponent(searchParams.get('status') || '')) : EBountyStatus.ALL;
 	const t = useTranslations();
 
 	const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
@@ -90,7 +91,19 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 						key={statusValue}
 						value={statusValue}
 					>
-						{initialData.totalCount > 1 ? <BountyTable filteredItems={initialData?.items} /> : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}
+						{initialData?.totalCount ? (
+							<BountyTable filteredItems={initialData?.items} />
+						) : (
+							<p className={styles.no_data}>
+								<Image
+									src={NoActivity}
+									alt='no data'
+									width={300}
+									height={300}
+								/>
+								{t('CreateProposalDropdownButton.noData')}
+							</p>
+						)}
 					</TabsContent>
 				))}
 
