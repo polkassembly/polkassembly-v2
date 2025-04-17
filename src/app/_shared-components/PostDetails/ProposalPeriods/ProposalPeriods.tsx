@@ -9,6 +9,8 @@ import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
 import PeriodDetailModal from './PeriodDetailModal/PeriodDetailModal';
 
+const MAX_PERIODS = 3;
+
 function ProposalPeriods({
 	confirmationPeriodEndsAt,
 	decisionPeriodEndsAt,
@@ -28,6 +30,8 @@ function ProposalPeriods({
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
 
 	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
+
+	const periodsToShow = Math.min((periodsEnded?.length || 0) + 1, MAX_PERIODS);
 
 	return (
 		<div className={classes.proposalPeriodsWrapper}>
@@ -52,8 +56,8 @@ function ProposalPeriods({
 						tabIndex={0}
 						style={{ cursor: 'pointer', background: 'none', border: 'none' }}
 					>
-						<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
-						<span className='pl-1 pr-2'>of 3</span>
+						<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsToShow}</p>
+						<span className='pl-1 pr-2'>of {MAX_PERIODS}</span>
 					</button>
 				</PeriodDetailModal>
 			</div>
