@@ -297,8 +297,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
-						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
-						...(voterAddress && { voter_eq: voterAddress })
+						...(subsquidDecision && { decision_in: subsquidDecisionIn })
 					}
 				: {
 						index_eq: Number(indexOrHash),
@@ -307,8 +306,7 @@ export class SubsquidService extends SubsquidUtils {
 						offset: (page - 1) * limit,
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(voterAddress && { voter_eq: voterAddress })
+						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
 					};
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
