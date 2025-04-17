@@ -85,36 +85,11 @@
 	}
 
 	ol {
-		@apply list-none;
-		counter-reset: item;
+		@apply list-decimal pl-8;
 
 		> li {
-			@apply mb-2;
-			counter-increment: item;
-
-			&::before {
-				@apply font-bold;
-				content: counter(item) '. ';
-			}
-		}
-
-		ul {
-			@apply list-none;
-			counter-reset: sub-item;
-
-			li {
-				@apply mb-2;
-				counter-increment: sub-item;
-
-				&::before {
-					@apply mr-[5px];
-					content: counter(sub-item, lower-alpha) '. ';
-				}
-
-				&::marker {
-					content: '';
-				}
-			}
+			@apply relative mb-2 pl-1;
+			display: list-item;
 		}
 	}
 
