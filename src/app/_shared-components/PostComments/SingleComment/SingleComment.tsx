@@ -5,7 +5,7 @@
 'use client';
 
 import { EProposalType, ICommentResponse, IVoteData } from '@/_shared/types';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -48,7 +49,6 @@ function SingleComment({
 	const [loading, setLoading] = useState<boolean>(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 	const [voteData, setVoteData] = useState<IVoteData[] | null>(null);
-	const [isLoadingVotes, setIsLoadingVotes] = useState<boolean>(false);
 	const [showVoteDetails, setShowVoteDetails] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
@@ -86,38 +86,35 @@ function SingleComment({
 		}
 	};
 
-	async function fetchVoteData() {
-		if (!comment) return;
-		setIsLoadingVotes(true);
-		const { data, error } = await NextApiClientService.userCommentVotes({
-			userId: comment.userId,
-			page: 1,
-			limit: 10,
-			proposalType,
-			indexOrHash: index
-		});
+	const { isLoading: isLoadingVotes } = useQuery({
+		queryKey: ['userCommentVotes', comment?.userId, proposalType, index],
+		queryFn: async () => {
+			if (!comment) return null;
 
-		if (data && !error) {
-			if (Array.isArray(data) && data.length > 0) {
-				const responseData = data[0];
-				setVoteData(responseData.votes);
-			} else if (data.votes) {
-				setVoteData(data.votes);
-			} else {
-				setVoteData([]);
+			const { data, error } = await NextApiClientService.userCommentVotes({
+				userId: comment.userId,
+				page: 1,
+				limit: 10,
+				proposalType,
+				indexOrHash: index
+			});
+
+			if (data && !error) {
+				if (Array.isArray(data) && data.length > 0) {
+					const responseData = data[0];
+					setVoteData(responseData.votes);
+				} else if (data.votes) {
+					setVoteData(data.votes);
+				} else {
+					setVoteData([]);
+				}
+				return data;
 			}
-		}
+			return null;
+		},
+		enabled: !!comment
+	});
 
-		setIsLoadingVotes(false);
-	}
-
-	useEffect(() => {
-		fetchVoteData();
-	}, [comment, proposalType, index]);
-
-	const hasVoted = voteData && voteData.length > 0;
-	const userVoteType = hasVoted ? voteData[0]?.decision : null;
-	const voteInfo = hasVoted ? voteData[0] : null;
 	const votedText = t('PostDetails.voted');
 
 	if (!comment) {
@@ -151,9 +148,9 @@ function SingleComment({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-			{voteInfo && (
+			{voteData && voteData.length > 0 && (
 				<VoteCommentsDialog
-					voteInfo={voteInfo}
+					voteInfo={voteData[0]}
 					showVoteDetails={showVoteDetails}
 					setShowVoteDetails={setShowVoteDetails}
 				/>
@@ -203,9 +200,10 @@ function SingleComment({
 					{isLoadingVotes ? (
 						<Skeleton className='h-3 w-3' />
 					) : (
-						hasVoted && (
+						voteData &&
+						voteData.length > 0 && (
 							<VoteDetailsButton
-								userVoteType={userVoteType}
+								userVoteType={voteData[0]?.decision}
 								votedText={votedText}
 								setShowVoteDetails={setShowVoteDetails}
 							/>
