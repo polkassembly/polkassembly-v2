@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse } from '@/_shared/types';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { EProposalType, EVoteDecision, ICommentResponse, IVoteData } from '@/_shared/types';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -21,6 +21,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -44,9 +45,40 @@ function SingleComment({
 	const [showReplies, setShowReplies] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+	const [voteData, setVoteData] = useState<IVoteData[] | null>(null);
+	const [isLoadingVotes, setIsLoadingVotes] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
 
+	useEffect(() => {
+		async function fetchVoteData() {
+			if (!comment) return;
+
+			setIsLoadingVotes(true);
+			try {
+				const { data, error } = await NextApiClientService.userCommentVotes({
+					userId: comment.userId,
+					page: 1,
+					limit: 10,
+					proposalType,
+					indexOrHash: index
+				});
+
+				if (data && !error) {
+					setVoteData(data.votes);
+					console.log('voteData for comment author', data.votes);
+				}
+			} catch (err) {
+				console.error('Failed to fetch vote data:', err);
+			} finally {
+				setIsLoadingVotes(false);
+			}
+		}
+
+		fetchVoteData();
+	}, [comment, proposalType, index]);
+
+	console.log('voteData', voteData);
 	const handleDeleteComment = async () => {
 		if (!user || !comment || user.id !== comment.user.id) {
 			throw new ClientError('You are not the owner of this comment');
@@ -79,6 +111,10 @@ function SingleComment({
 			setComment(null);
 		}
 	};
+
+	// Check if the comment author has voted on this proposal
+	const hasVoted = voteData && voteData.length > 0;
+	const userVoteType = hasVoted ? voteData[0]?.decision : null;
 
 	if (!comment) {
 		return null;
@@ -153,6 +189,28 @@ function SingleComment({
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
+					{isLoadingVotes ? (
+						<span className='text-xs text-gray-500'>Checking votes...</span>
+					) : (
+						hasVoted && (
+							<>
+								<Separator
+									orientation='vertical'
+									className='h-3'
+								/>
+								<div className='flex items-center gap-x-1 text-xs'>
+									<span>{t('PostDetails.voted')}</span>
+									{userVoteType === EVoteDecision.AYE ? (
+										<span className='text-green-500'>{t('PostDetails.aye')}</span>
+									) : userVoteType === EVoteDecision.NAY ? (
+										<span className='text-red-500'>{t('PostDetails.nay')}</span>
+									) : (
+										<span>{userVoteType}</span>
+									)}
+								</div>
+							</>
+						)
+					)}
 				</div>
 				<MarkdownViewer
 					markdown={comment.content}
