@@ -7,6 +7,7 @@ import { EPeriodType, EPostOrigin, EProposalStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
+import PeriodDetailModal from './PeriodDetailModal/PeriodDetailModal';
 
 function ProposalPeriods({
 	confirmationPeriodEndsAt,
@@ -42,10 +43,19 @@ function ProposalPeriods({
 								? t('PostDetails.votingStarted')
 								: t('PostDetails.preparePeriod')}
 				</p>
-				<div className={classes.proposalPeriodsHeaderPeriods}>
-					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
-					<span className='pl-1 pr-2'>of 3</span>
-				</div>
+
+				<PeriodDetailModal>
+					<button
+						className={classes.proposalPeriodsHeaderPeriods}
+						aria-label='Open proposal periods details'
+						type='button'
+						tabIndex={0}
+						style={{ cursor: 'pointer', background: 'none', border: 'none' }}
+					>
+						<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
+						<span className='pl-1 pr-2'>of 3</span>
+					</button>
+				</PeriodDetailModal>
 			</div>
 			{confirmationPeriodEnded ? null : preparePeriodEnded ? (
 				<div className='flex flex-col gap-y-6'>
