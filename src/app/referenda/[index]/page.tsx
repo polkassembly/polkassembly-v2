@@ -7,7 +7,27 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React, { Suspense } from 'react';
 import { headers } from 'next/headers';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import PollForProposal from './PollForProposal';
+
+export async function generateMetadata({ params }: { params: { index: string } }): Promise<Metadata> {
+	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: params.index });
+
+	// Default description and title
+	let { description, title } = OPENGRAPH_METADATA;
+
+	// Use post title in description if available
+	if (data) {
+		title = `Polkassembly - Referendum #${params.index}`;
+		description = `Referendum #${params.index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+	}
+
+	return {
+		title,
+		description
+	};
+}
 
 async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {
 	const { index } = await params;

@@ -10,6 +10,7 @@ import { DM_Sans as dmSans } from 'next/font/google';
 import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { Providers } from './_shared-components/Providers';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
@@ -17,9 +18,8 @@ import { CookieService } from '../_shared/_services/cookie_service';
 import { THEME_COLORS } from './_style/theme';
 
 export const metadata: Metadata = {
-	title: 'Polkassembly',
-	description:
-		'A governance platform for substrate-based networks that enables users to participate in on-chain governance through discussing and voting on proposals, referendums, and treasury spending'
+	title: OPENGRAPH_METADATA.title,
+	description: OPENGRAPH_METADATA.description
 };
 
 export const viewport: Viewport = {
