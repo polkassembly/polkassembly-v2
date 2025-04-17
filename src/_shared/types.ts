@@ -935,7 +935,7 @@ export interface IBountyStats {
 }
 
 export enum EBountyStatus {
-	ALL = 'all',
+	ALL = 'All',
 	ACTIVE = 'Active',
 	PROPOSED = 'Proposed',
 	CLAIMED = 'Claimed',

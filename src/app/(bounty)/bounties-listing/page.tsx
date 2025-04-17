@@ -33,7 +33,6 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 	const { status: paramStatus } = searchParamsValue;
 	const [urlStatus] = searchParamsValue.page?.includes('status=') ? searchParamsValue.page.split('status=') : [];
 	const status = paramStatus || urlStatus ? JSON.parse(decodeURIComponent(paramStatus || urlStatus)) : EBountyStatus.ALL;
-	console.log(status, 'status', { paramStatus }, { urlStatus });
 
 	let statuses: string[] = [];
 
