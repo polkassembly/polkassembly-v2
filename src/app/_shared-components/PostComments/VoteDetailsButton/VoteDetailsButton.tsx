@@ -27,8 +27,8 @@ function VoteDetailsButton({
 			case EVoteDecision.AYE:
 				return (
 					<div className='flex items-center gap-x-1'>
-						<AiFillLike className='text-green-500' />
-						<span className='font-medium text-green-500'>
+						<AiFillLike className='text-success' />
+						<span className='font-medium text-success'>
 							{votedText} {t('PostDetails.aye')}
 						</span>
 					</div>
@@ -36,8 +36,8 @@ function VoteDetailsButton({
 			case EVoteDecision.NAY:
 				return (
 					<div className='flex items-center gap-x-1'>
-						<AiFillDislike className='text-red-500' />
-						<span className='font-medium text-red-500'>
+						<AiFillDislike className='text-failure' />
+						<span className='font-medium text-failure'>
 							{votedText} {t('PostDetails.nay')}
 						</span>
 					</div>
@@ -48,11 +48,10 @@ function VoteDetailsButton({
 						<Image
 							src={SplitImg}
 							alt='split'
-							className='text-[#FECA7E]'
 							width={14}
 							height={14}
 						/>
-						<span className='font-medium text-[#FECA7E]'>
+						<span className='font-medium text-toast_warning_text'>
 							{votedText} {t('PostDetails.split')}
 						</span>
 					</div>
@@ -63,11 +62,10 @@ function VoteDetailsButton({
 						<Image
 							src={SplitAbstainImg}
 							alt='split abstain'
-							className='text-bodyBlue dark:text-blue-dark-high'
 							width={14}
 							height={14}
 						/>
-						<span className='text-bodyBlue dark:text-blue-dark-high font-medium'>
+						<span className='font-medium text-toast_warning_text'>
 							{votedText} {t('PostDetails.abstain')}
 						</span>
 					</div>

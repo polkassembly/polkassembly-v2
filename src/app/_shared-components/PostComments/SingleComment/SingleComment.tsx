@@ -53,40 +53,6 @@ function SingleComment({
 
 	const user = useAtomValue(userAtom);
 
-	useEffect(() => {
-		async function fetchVoteData() {
-			if (!comment) return;
-
-			setIsLoadingVotes(true);
-			try {
-				const { data, error } = await NextApiClientService.userCommentVotes({
-					userId: comment.userId,
-					page: 1,
-					limit: 10,
-					proposalType,
-					indexOrHash: index
-				});
-
-				if (data && !error) {
-					if (Array.isArray(data) && data.length > 0) {
-						const responseData = data[0];
-						setVoteData(responseData.votes);
-					} else if (data.votes) {
-						setVoteData(data.votes);
-					} else {
-						setVoteData([]);
-					}
-				}
-			} catch (err) {
-				console.error('Failed to fetch vote data:', err);
-			} finally {
-				setIsLoadingVotes(false);
-			}
-		}
-
-		fetchVoteData();
-	}, [comment, proposalType, index]);
-
 	const handleDeleteComment = async () => {
 		if (!user || !comment || user.id !== comment.user.id) {
 			throw new ClientError('You are not the owner of this comment');
@@ -119,6 +85,35 @@ function SingleComment({
 			setComment(null);
 		}
 	};
+
+	async function fetchVoteData() {
+		if (!comment) return;
+		setIsLoadingVotes(true);
+		const { data, error } = await NextApiClientService.userCommentVotes({
+			userId: comment.userId,
+			page: 1,
+			limit: 10,
+			proposalType,
+			indexOrHash: index
+		});
+
+		if (data && !error) {
+			if (Array.isArray(data) && data.length > 0) {
+				const responseData = data[0];
+				setVoteData(responseData.votes);
+			} else if (data.votes) {
+				setVoteData(data.votes);
+			} else {
+				setVoteData([]);
+			}
+		}
+
+		setIsLoadingVotes(false);
+	}
+
+	useEffect(() => {
+		fetchVoteData();
+	}, [comment, proposalType, index]);
 
 	const hasVoted = voteData && voteData.length > 0;
 	const userVoteType = hasVoted ? voteData[0]?.decision : null;
