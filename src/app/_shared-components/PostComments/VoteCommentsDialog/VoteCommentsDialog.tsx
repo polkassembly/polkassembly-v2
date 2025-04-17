@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@ui/Dialog/Dialog';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IVoteData } from '@/_shared/types';
