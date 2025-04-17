@@ -13,6 +13,7 @@ import Address from '../../Profile/Address/Address';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
 import { Collapsible, CollapsibleContent } from '../../Collapsible';
 import { Separator } from '../../Separator';
+import styles from './VoteCommentsDialog.module.scss';
 
 function VoteCommentsDialog({
 	voteInfo,
@@ -88,38 +89,38 @@ function VoteCommentsDialog({
 						<Collapsible open={expanded}>
 							<CollapsibleContent className='border-b-2 border-text_pink pb-4'>
 								<div className='px-4'>
-									<div className='my-4 border-t border-dotted border-border_grey opacity-70' />
+									<div className={styles.separator} />
 									<div className='mb-2 flex items-center gap-2'>
-										<span className='flex items-center gap-1 text-xs font-semibold text-btn_secondary_text'>
+										<span className={styles.calendartext}>
 											<IoCalendarOutline /> {new Date(voteInfo.createdAt).toLocaleDateString()} {new Date(voteInfo.createdAt).toLocaleTimeString()}
 										</span>
 										<span className='text-xs text-text_primary'>{votingPowerText}: &lt;1%</span>
 									</div>
 
-									<div className='my-4 border-t border-dotted border-border_grey opacity-70' />
+									<div className={styles.separator} />
 
 									<div>
-										<h3 className='mb-4 text-sm font-medium text-btn_secondary_text'>{t('PostDetails.voteBreakdown')}</h3>
+										<h3 className={styles.postvotebreakdown}>{t('PostDetails.voteBreakdown')}</h3>
 
 										<div className='grid grid-cols-2 gap-8'>
 											<div>
-												<h4 className='mb-1 text-xs font-medium text-text_primary'>{t('PostDetails.selfVotes')}</h4>
-												<div className='flex items-center gap-2 text-xs text-text_primary'>
+												<h4 className={styles.postvotetext}>{t('PostDetails.selfVotes')}</h4>
+												<div className={styles.postvotetext}>
 													<span>{votingPowerText}</span>
 													{voteInfo.selfVotingPower && (
-														<span className='ml-auto text-btn_secondary_text'>
+														<span className={styles.valuelabel}>
 															{formatBnBalance(voteInfo.selfVotingPower?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
 														</span>
 													)}
 												</div>
-												<div className='flex items-center gap-2 text-xs text-text_primary'>
+												<div className={styles.postvotetext}>
 													<span>{convictionText}</span>
-													<span className='ml-auto text-btn_secondary_text'>{getConvictionText(voteInfo.lockPeriod)}</span>
+													<span className={styles.valuelabel}>{getConvictionText(voteInfo.lockPeriod)}</span>
 												</div>
-												<div className='flex items-center gap-2 text-xs text-text_primary'>
+												<div className={styles.postvotetext}>
 													<span>{t('PostDetails.capital')}</span>
 													{voteInfo.balanceValue && (
-														<span className='ml-auto text-btn_secondary_text'>
+														<span className={styles.valuelabel}>
 															{formatBnBalance(voteInfo.balanceValue?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
 														</span>
 													)}
@@ -128,23 +129,23 @@ function VoteCommentsDialog({
 
 											{voteInfo.delegatedVotes && voteInfo.delegatedVotes.length > 0 && (
 												<div>
-													<h4 className='mb-1 text-xs font-medium text-text_primary'>{t('PostDetails.delegatedVotes')}</h4>
-													<div className='flex items-center gap-2 text-xs text-text_primary'>
+													<h4 className={styles.postvotedelegatebreakdown}>{t('PostDetails.delegatedVotes')}</h4>
+													<div className={styles.postvotetext}>
 														<span>{votingPowerText}</span>
 														{voteInfo.delegatedVotingPower && (
-															<span className='ml-auto text-btn_secondary_text'>
+															<span className={styles.valuelabel}>
 																{formatBnBalance(voteInfo.delegatedVotingPower?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
 															</span>
 														)}
 													</div>
-													<div className='flex items-center gap-2 text-xs text-text_primary'>
+													<div className={styles.postvotetext}>
 														<span>{t('PostDetails.delegators')}</span>
-														<span className='ml-auto text-btn_secondary_text'>{voteInfo.delegatedVotes.length}</span>
+														<span className={styles.valuelabel}>{voteInfo.delegatedVotes.length}</span>
 													</div>
-													<div className='flex items-center gap-2 text-xs text-text_primary'>
+													<div className={styles.postvotetext}>
 														<span>{t('PostDetails.capital')}</span>
 														{voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0) && (
-															<span className='ml-auto text-btn_secondary_text'>
+															<span className={styles.valuelabel}>
 																{formatBnBalance(
 																	voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0).toString(),
 																	{ withUnit: true, numberAfterComma: 2, compactNotation: true },
@@ -160,18 +161,17 @@ function VoteCommentsDialog({
 
 									{voteInfo.delegatedVotes && voteInfo.delegatedVotes.length > 0 && (
 										<>
-											<div className='my-4 border-t border-dotted border-border_grey opacity-70' />
+											<div className={styles.separator} />
 
 											<div className='mt-4'>
-												<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{t('PostDetails.delegationList')}</h3>
-
-												<Table className='text-xs'>
+												<h3 className={styles.delegationlist}>{t('PostDetails.delegationList')}</h3>
+												<Table>
 													<TableHeader>
 														<TableRow>
-															<TableHead className='text-text_primary'>{t('PostDetails.delegators')}</TableHead>
-															<TableHead className='text-text_primary'>{t('PostDetails.amount')}</TableHead>
-															<TableHead className='text-text_primary'>{convictionText}</TableHead>
-															<TableHead className='text-text_primary'>{votingPowerText}</TableHead>
+															<TableHead className={styles.tablecelltext}>{t('PostDetails.delegators')}</TableHead>
+															<TableHead className={styles.tablecelltext}>{t('PostDetails.amount')}</TableHead>
+															<TableHead className={styles.tablecelltext}>{convictionText}</TableHead>
+															<TableHead className={styles.tablecelltext}>{votingPowerText}</TableHead>
 														</TableRow>
 													</TableHeader>
 													<TableBody>

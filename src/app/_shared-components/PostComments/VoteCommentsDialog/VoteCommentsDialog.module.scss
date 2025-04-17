@@ -1,0 +1,31 @@
+.separator {
+	@apply my-4 border-t border-dotted border-border_grey opacity-70;
+}
+
+.tablecelltext {
+	@apply text-xs text-text_primary;
+}
+
+.valuelabel {
+	@apply ml-auto text-btn_secondary_text;
+}
+
+.calendartext {
+	@apply flex items-center gap-1 text-xs font-semibold text-btn_secondary_text;
+}
+
+.postvotebreakdown {
+	@apply mb-4 text-sm font-medium text-btn_secondary_text;
+}
+
+.delegationlist {
+	@apply mb-2 text-sm font-medium text-btn_secondary_text;
+}
+
+.postvotedelegatebreakdown {
+	@apply mb-1 text-xs font-medium text-text_primary;
+}
+
+.postvotetext {
+	@apply flex items-center gap-2 text-xs text-text_primary;
+}
