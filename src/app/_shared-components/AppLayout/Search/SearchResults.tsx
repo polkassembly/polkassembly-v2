@@ -316,7 +316,7 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 						page={currentRefinement + 1}
 						pageSize={10}
 						totalCount={results?.nbHits || 0}
-						onClick={(newPage) => refine(newPage - 1)}
+						onPageChange={(newPage) => refine(newPage - 1)}
 					/>
 					{!isSuperSearch && (
 						<>
