@@ -4,11 +4,11 @@
 import { Input } from '@ui/Input';
 import { IoIosSearch } from 'react-icons/io';
 import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch';
-import { KeyboardEvent, useRef, useState, useCallback, FocusEvent, useMemo, memo, ChangeEvent } from 'react';
-import debounce from 'lodash/debounce';
+import { KeyboardEvent, useRef, useState, useCallback, FocusEvent, useMemo, memo, ChangeEvent, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { ESearchType } from '@/_shared/types';
+import { useDebounce } from '@/hooks/useDebounce';
 import SearchSuggestions from './SearchSuggestions';
 import styles from './Search.module.scss';
 
@@ -32,11 +32,16 @@ function CustomSearchBox({ onSearch, onTypeChange, ...props }: CustomSearchBoxPr
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { inputValue, showSuggestions } = searchState;
 
-	const debouncedSearch = useMemo(() => {
-		const search = debounce((value: string) => {
-			refine(value);
-		}, 300);
+	const { debouncedValue: debouncedSearchTerm, setValue: setSearchTerm } = useDebounce<string>('', 300);
 
+	// Set up effect to handle the debounced value
+	useEffect(() => {
+		if (debouncedSearchTerm.length >= 3) {
+			refine(debouncedSearchTerm);
+		}
+	}, [debouncedSearchTerm, refine]);
+
+	const debouncedSearch = useMemo(() => {
 		return (value: string) => {
 			setSearchState((prev) => ({
 				...prev,
@@ -44,10 +49,10 @@ function CustomSearchBox({ onSearch, onTypeChange, ...props }: CustomSearchBoxPr
 				showSuggestions: value.length >= 3
 			}));
 			if (value.length >= 3) {
-				search(value);
+				setSearchTerm(value);
 			}
 		};
-	}, [refine]);
+	}, [setSearchTerm]);
 
 	const handleInputChange = useCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
