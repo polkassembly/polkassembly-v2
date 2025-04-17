@@ -10,16 +10,17 @@ import React from 'react';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 
-export async function generateMetadata({ params }: { params: { index: string } }): Promise<Metadata> {
-	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.DISCUSSION, indexOrHash: params.index });
+export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
+	const { index } = await params;
+	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.DISCUSSION, indexOrHash: index });
 
 	// Default description and title
 	let { description, title } = OPENGRAPH_METADATA;
 
 	// Use post title in description if available
 	if (data) {
-		title = `Polkassembly - Discussion #${params.index}`;
-		description = `Discussion #${params.index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+		title = `Polkassembly - Discussion #${index}`;
+		description = `Discussion #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
 	}
 
 	return {
