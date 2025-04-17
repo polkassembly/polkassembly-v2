@@ -319,6 +319,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		postsQuery = postsQuery
 			.where('isDeleted', '==', false)
+			.orderBy('createdAt', 'desc')
 			.limit(limit)
 			.offset((page - 1) * limit);
 
