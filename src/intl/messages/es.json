@@ -420,7 +420,18 @@
 		"commentSummary": "Resumen de Comentarios",
 		"aiSummary": "Resumen de IA",
 		"showLikelySpam": "Mostrar Comentarios de Spam",
-		"hideLikelySpam": "Ocultar Comentarios de Spam"
+		"hideLikelySpam": "Ocultar Comentarios de Spam",
+		"voted": "Votado",
+		"votes": "Votos",
+		"vote": "Voto",
+		"amount": "Cantidad",
+		"conviction": "Convicción",
+		"voteBreakdown": "Desglose de Votos",
+		"selfVotes": "Votos Propios",
+		"delegators": "Delegadores",
+		"delegatedVotes": "Votos Delegados",
+		"delegatedVotingPower": "Poder de Voto Delegado",
+		"delegationList": "Lista de Delegaciones"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

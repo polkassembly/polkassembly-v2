@@ -420,7 +420,18 @@
 		"commentSummary": "Kommentarzusammenfassung",
 		"aiSummary": "KI-Zusammenfassung",
 		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
-		"hideLikelySpam": "Wahrscheinliche Spam ausblenden"
+		"hideLikelySpam": "Wahrscheinliche Spam ausblenden",
+		"voted": "Abgestimmt",
+		"votes": "Abstimmungen",
+		"vote": "Abstimmung",
+		"amount": "Betrag",
+		"conviction": "Überzeugung",
+		"voteBreakdown": "Abstimmungsaufbruch",
+		"selfVotes": "Selbstabstimmungen",
+		"delegators": "Delegierte",
+		"delegatedVotes": "Delegierende Abstimmungen",
+		"delegatedVotingPower": "Delegierende Stimmgewicht",
+		"delegationList": "Delegationsliste"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
