@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IPost, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -25,9 +25,10 @@ import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import PostTags from '@ui/PostDetails/PostTags/PostTags';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
+import Link from 'next/link';
 import classes from './PostHeader.module.scss';
 
-function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModalOpen: boolean }) {
+function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
@@ -86,16 +87,29 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
-						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
-						{postData?.createdAt && (
+						{postData?.onChainInfo?.proposer ? (
 							<>
+								<Address address={postData.onChainInfo?.proposer} />
 								<Separator
 									orientation='vertical'
 									className='h-3'
 								/>
-								<CreatedAtTime createdAt={postData.createdAt} />
 							</>
-						)}
+						) : postData.publicUser?.username ? (
+							<>
+								<Link
+									href={`/user/${postData.publicUser?.username}`}
+									className='text-text_secondary text-xs'
+								>
+									{postData.publicUser?.username}
+								</Link>
+								<Separator
+									orientation='vertical'
+									className='h-3'
+								/>
+							</>
+						) : null}
+						{postData?.createdAt && <CreatedAtTime createdAt={postData.createdAt} />}
 						{postData.tags && postData.tags.length > 0 && (
 							<>
 								<Separator
@@ -118,6 +132,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing; isModal
 									alt='Beneficiary'
 									width={14}
 									height={14}
+									className='darkIcon'
 								/>
 								<span className={classes.beneficiaryText}>{t('PostDetails.beneficiary')}:</span>
 							</div>

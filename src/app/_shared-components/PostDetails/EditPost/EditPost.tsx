@@ -1,34 +1,41 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React, { useState } from 'react';
-import { EProposalType, IPostListing } from '@/_shared/types';
-import { OutputData } from '@editorjs/editorjs';
+import React, { useRef, useState } from 'react';
+import { EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
-import BlockEditor from '../../BlockEditor/BlockEditor';
+import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { MDXEditorMethods } from '@mdxeditor/editor';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
-function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostListing; onEditPostSuccess?: (title: string, content: OutputData) => void; onClose?: () => void }) {
+function EditPost({
+	postData,
+	onEditPostSuccess,
+	onClose
+}: {
+	postData: IPostListing | IPost;
+	onEditPostSuccess?: (title: string, content: string) => void;
+	onClose?: () => void;
+}) {
 	const t = useTranslations();
 	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
-	const [content, setContent] = useState<OutputData | null>(savedContent || postData?.content || null);
+	const [content, setContent] = useState<string | null>(savedContent || postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
 	const [isLoading, setIsLoading] = useState(false);
-
+	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const { user } = useUser();
 
 	const editPost = async () => {
 		if (
 			!title.trim() ||
 			!content ||
-			!ValidatorService.isValidBlockContent(content) ||
-			!postData?.index ||
+			!ValidatorService.isValidNumber(postData?.index) ||
 			!postData?.proposalType ||
 			!user ||
 			!user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')
@@ -41,20 +48,20 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 
 		const { data, error } = await NextApiClientService.editProposalDetails({
 			proposalType: postData.proposalType,
-			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
+			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index!.toString(),
 			data: { title, content }
 		});
 
 		if (!error && data) {
 			onEditPostSuccess?.(title, content);
-			LocalStorageClientService.deleteEditPostData({ postId: postData.index.toString() });
+			LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
 			onClose?.();
 		}
 		setIsLoading(false);
 	};
 
 	return (
-		<div className='flex w-full flex-col gap-y-4'>
+		<div className='flex flex-col gap-y-4'>
 			<div>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.title')}</p>
 				<Input
@@ -65,27 +72,22 @@ function EditPost({ postData, onEditPostSuccess, onClose }: { postData: IPostLis
 				/>
 			</div>
 
-			<div>
+			<div className='w-full'>
 				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.content')}</p>
-				<BlockEditor
-					data={postData?.content}
-					id='post-content-edit'
+				<MarkdownEditor
+					markdown={postData?.content}
 					onChange={(data) => {
 						setContent(data);
 						if (postData.index) {
 							LocalStorageClientService.setEditPostData({ postId: postData.index.toString(), data });
 						}
 					}}
+					ref={markdownEditorRef}
 				/>
 			</div>
 			<div className='flex justify-end'>
 				<Button
-					disabled={
-						!title.trim() ||
-						!content ||
-						!ValidatorService.isValidBlockContent(content) ||
-						(title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content))
-					}
+					disabled={!title.trim() || !content?.trim() || (title === postData?.title && content?.trim() === postData?.content?.trim())}
 					onClick={editPost}
 					isLoading={isLoading}
 				>

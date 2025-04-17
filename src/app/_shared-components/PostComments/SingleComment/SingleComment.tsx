@@ -9,7 +9,6 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
-import BlockEditor from '@ui/BlockEditor/BlockEditor';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
@@ -21,6 +20,7 @@ import { CommentClientService } from '@/app/_client-services/comment_client_serv
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
+import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -127,11 +127,11 @@ function SingleComment({
 						height={30}
 					/>
 				) : (
-					<div className='w-[30px]'>
+					<div>
 						<Image
 							src={UserIcon}
 							alt='profile'
-							className='rounded-full'
+							className='h-[30px] w-[30px] rounded-full'
 						/>
 					</div>
 				)}
@@ -154,11 +154,9 @@ function SingleComment({
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
 				</div>
-				<BlockEditor
-					readOnly
-					data={comment.content}
+				<MarkdownViewer
+					markdown={comment.content}
 					className={classes.editor}
-					id={`comment-${comment.id}`}
 				/>
 
 				{user && (
@@ -172,35 +170,41 @@ function SingleComment({
 								<Image
 									src={ReplyIcon}
 									alt='reply'
+									className='darkIcon'
 								/>
 							}
 						>
 							{t('PostDetails.reply')}
 						</Button>
-						{comment.userId === user.id && (
-							<DropdownMenu>
-								<DropdownMenuTrigger>
-									<Ellipsis
-										className='text-text_primary/[0.8]'
-										size={14}
-									/>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent>
-									<DropdownMenuItem>
-										<Button
-											variant='ghost'
-											className='p-0 text-sm text-text_primary'
-											disabled={comment.userId !== user.id}
-											onClick={() => setOpenDeleteModal(true)}
-											size='sm'
-											isLoading={loading}
-										>
-											{t('PostDetails.delete')}
-										</Button>
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						)}
+						<div>
+							{comment.userId === user.id && (
+								<DropdownMenu>
+									<DropdownMenuTrigger
+										noArrow
+										className='border-none'
+									>
+										<Ellipsis
+											className='text-text_primary/[0.8]'
+											size={14}
+										/>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent>
+										<DropdownMenuItem>
+											<Button
+												variant='ghost'
+												className='p-0 text-sm text-text_primary'
+												disabled={comment.userId !== user.id}
+												onClick={() => setOpenDeleteModal(true)}
+												size='sm'
+												isLoading={loading}
+											>
+												{t('PostDetails.delete')}
+											</Button>
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
+						</div>
 					</div>
 				)}
 
@@ -210,7 +214,6 @@ function SingleComment({
 						proposalType={proposalType}
 						parentCommentId={comment.id}
 						onCancel={() => setReply(false)}
-						editorId={`new-comment-${comment.id}`}
 						onConfirm={(newComment, publicUser) => {
 							setComment((prev) => {
 								if (!prev) return null;

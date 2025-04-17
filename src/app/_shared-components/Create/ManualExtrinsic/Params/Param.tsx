@@ -31,6 +31,7 @@ import BTreeMapComp from './BTreeMap';
 import VectorComp from './Vector';
 import PreimageVoteComp from './PreimageVote';
 import PreimageVoteThresholdComp from './PreimageVoteThreshold';
+import Amount from './Amount';
 
 export interface ComponentProps {
 	className?: string;
@@ -70,7 +71,7 @@ const SPECIAL_TYPES = ['AccountId', 'AccountId20', 'AccountId32', 'AccountIndex'
 
 const componentDef: TypeToComponent[] = [
 	{ c: Account, t: ['AccountId', 'Address', 'LookupSource', 'MultiAddress'] },
-	{ c: InputNumber, t: ['AccountIndex', 'i8', 'i16', 'i32', 'i64', 'i128', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'] },
+	{ c: Amount, t: ['AccountIndex', 'i8', 'i16', 'i32', 'i64', 'i128', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'] },
 	{ c: BalanceInput, t: ['Amount', 'Balance', 'BalanceOf'] },
 	{ c: Bool, t: ['bool'] },
 	{ c: BytesInput, t: ['Bytes', 'Vec<u8>'] },
@@ -203,7 +204,7 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 	const { apiService } = usePolkadotApiService();
 
 	const title = param.type.type !== 'Null' && (
-		<p className='flex w-full items-center gap-x-1 truncate text-sm font-medium text-text_primary'>
+		<p className='flex w-full items-center gap-x-1 truncate text-sm text-wallet_btn_text'>
 			{param.name && `${param.name}:`} {param.type.type}
 			{param.type.typeName && ` (${param.type.typeName})`}
 		</p>

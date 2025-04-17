@@ -3,11 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import '@app/_style/globals.scss';
-import type { Metadata } from 'next';
+
+import type { Metadata, Viewport } from 'next';
 import { ReactNode } from 'react';
 import { DM_Sans as dmSans } from 'next/font/google';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { Providers } from './_shared-components/Providers';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
@@ -15,8 +18,16 @@ import { CookieService } from '../_shared/_services/cookie_service';
 import { THEME_COLORS } from './_style/theme';
 
 export const metadata: Metadata = {
-	title: 'Polkassembly',
-	description: 'Polkassembly but so much better'
+	title: OPENGRAPH_METADATA.title,
+	description: OPENGRAPH_METADATA.description
+};
+
+export const viewport: Viewport = {
+	width: 'device-width',
+	initialScale: 1,
+	maximumScale: 1,
+	minimumScale: 1,
+	userScalable: false
 };
 
 const fontDmSans = dmSans({
@@ -38,10 +49,11 @@ export default async function RootLayout({
 	const user = await CookieService.getUserFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
 
-	const locale = await getLocale();
 	const messages = await getMessages({
-		locale
+		locale: userPreferences.locale
 	});
+
+	dayjs.locale(userPreferences.locale);
 
 	return (
 		<html
@@ -59,7 +71,7 @@ export default async function RootLayout({
 				/>
 				<Providers
 					messages={messages}
-					locale={locale}
+					locale={userPreferences.locale}
 					userPreferences={userPreferences}
 				>
 					<Initializers

@@ -8,15 +8,15 @@ import { NextApiClientService } from '../_client-services/next_api_client_servic
 import { ClientError } from '../_client-utils/clientError';
 
 async function BatchVotingPage() {
-	const { data, error } = await NextApiClientService.fetchActivityFeed({ page: 1, limit: 10 });
+	const { data: activityFeedData, error: activityFeedError } = await NextApiClientService.fetchActivityFeed({ page: 1, limit: 10 });
 
-	if (error || !data) {
-		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	if (activityFeedError || !activityFeedData) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, activityFeedError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
 
 	return (
 		<div className='h-full w-full bg-page_background px-4 py-6 md:px-8 lg:px-12'>
-			<BatchVoting proposals={data.items || []} />
+			<BatchVoting proposals={activityFeedData.items || []} />
 		</div>
 	);
 }

@@ -4,18 +4,19 @@
 
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
-import { convertContentForFirestoreServer } from '@/app/api/_api-utils/convertContentForFirestoreServer';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { ValidatorService } from '@shared/_services/validator_service';
-import { EAllowedCommentor, EProposalType } from '@shared/types';
+import { EAllowedCommentor, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { isValidRichContent } from '@/_shared/_utils/isValidRichContent';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
+import { COOKIE_HEADER_ACTION_NAME } from '@/_shared/_constants/cookieHeaderActionName';
+import { updatePostServer } from '@/app/api/_api-utils/updatePostServer';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { StatusCodes } from 'http-status-codes';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -24,15 +25,42 @@ const zodParamsSchema = z.object({
 	index: z.string()
 });
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPost>> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 	const network = await getNetworkFromHeaders();
+
+	let isUserAuthenticated = false;
+	let accessToken: string | undefined;
+	let refreshToken: string | undefined;
+	let userId: number | undefined;
+
+	// 1. check if user is authenticated
+	try {
+		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		isUserAuthenticated = true;
+		accessToken = newAccessToken;
+		refreshToken = newRefreshToken;
+		if (accessToken) {
+			userId = AuthService.GetUserIdFromAccessToken(accessToken);
+		}
+	} catch {
+		isUserAuthenticated = false;
+	}
 
 	// Get post data from cache
 	let post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 
 	if (post) {
-		return NextResponse.json(post);
+		const response = NextResponse.json(post);
+
+		if (accessToken) {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
+		}
+		if (refreshToken) {
+			response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
+		}
+
+		return response;
 	}
 
 	post = await fetchPostData({ network, proposalType, indexOrHash: index });
@@ -41,10 +69,34 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });
 	post = { ...post, reactions };
 
+	// fetch and add content summary to post
+	const contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
+	if (contentSummary) {
+		post = { ...post, contentSummary };
+	}
+
+	// fetch and add user subscription to post
+
+	if (isUserAuthenticated && userId) {
+		const userSubscription = await OffChainDbService.GetPostSubscriptionByPostAndUserId({ network, proposalType, indexOrHash: index, userId });
+		if (userSubscription) {
+			post = { ...post, userSubscriptionId: userSubscription.id };
+		}
+	}
+
 	// Cache the post data
 	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
-	return NextResponse.json(post);
+	const response = NextResponse.json(post);
+
+	if (accessToken) {
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetAccessTokenCookie(accessToken));
+	}
+	if (refreshToken) {
+		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
+	}
+
+	return response;
 });
 
 // update post
@@ -57,44 +109,50 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		title: z.string().min(1, 'Title is required'),
-		content: z.union([z.custom<Record<string, unknown>>(), z.string()]).refine(isValidRichContent, 'Invalid content'),
+		content: z.string().min(1, 'Content is required'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
 	});
 
 	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
 
-	const formattedContent = convertContentForFirestoreServer(content);
+	await updatePostServer({ network, proposalType, indexOrHash: index, content, title, allowedCommentor, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
 
-	if (ValidatorService.isValidOffChainProposalType(proposalType)) {
-		await OffChainDbService.UpdateOffChainPost({
-			network,
-			indexOrHash: index,
-			proposalType: proposalType as EProposalType,
-			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content: formattedContent,
-			title,
-			allowedCommentor
-		});
-	} else {
-		await OffChainDbService.UpdateOnChainPost({
-			network,
-			indexOrHash: index,
-			proposalType: proposalType as EProposalType,
-			userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
-			content: formattedContent,
-			title,
-			allowedCommentor
-		});
+	const response = NextResponse.json({ message: 'Post updated successfully' });
+	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+
+	return response;
+});
+
+// delete off-chain post (soft-delete)
+export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+	const { proposalType, index } = zodParamsSchema.parse(await params);
+
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	const network = await getNetworkFromHeaders();
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
+	const post = await OffChainDbService.GetOffChainPostData({ network, proposalType, indexOrHash: index });
+
+	if (!post) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 	}
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
+	if (post.userId !== userId) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash: index });
 
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 	await RedisService.DeletePostsListing({ network, proposalType });
+	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
 
-	const response = NextResponse.json({ message: 'Post updated successfully' });
+	const response = NextResponse.json({ message: 'Post deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append(SET_COOKIE, await AuthService.GetRefreshTokenCookie(newRefreshToken));
 

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, NotificationType } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -53,7 +53,7 @@ function VoteReferendum({ index }: { index: string }) {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
 						description: t('VoteReferendum.voteSuccess'),
-						status: NotificationType.SUCCESS
+						status: ENotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
 				},
@@ -61,7 +61,7 @@ function VoteReferendum({ index }: { index: string }) {
 					toast({
 						title: t('VoteReferendum.voteFailedTitle'),
 						description: t('VoteReferendum.voteFailed'),
-						status: NotificationType.ERROR
+						status: ENotificationStatus.ERROR
 					});
 					setIsLoading(false);
 				},
@@ -102,7 +102,7 @@ function VoteReferendum({ index }: { index: string }) {
 								<BalanceInput
 									name={`${voteDecision}-balance`}
 									label={t('VoteReferendum.lockBalance')}
-									onChange={setBalance}
+									onChange={({ value }) => setBalance(value)}
 								/>
 								<div>
 									<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
@@ -114,16 +114,16 @@ function VoteReferendum({ index }: { index: string }) {
 								{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 									<BalanceInput
 										label={t('VoteReferendum.abstainVoteValue')}
-										onChange={setAbstainVoteValue}
+										onChange={({ value }) => setAbstainVoteValue(value)}
 									/>
 								)}
 								<BalanceInput
 									label={t('VoteReferendum.ayeVoteValue')}
-									onChange={setAyeVoteValue}
+									onChange={({ value }) => setAyeVoteValue(value)}
 								/>
 								<BalanceInput
 									label={t('VoteReferendum.nayVoteValue')}
-									onChange={setNayVoteValue}
+									onChange={({ value }) => setNayVoteValue(value)}
 								/>
 							</>
 						)}

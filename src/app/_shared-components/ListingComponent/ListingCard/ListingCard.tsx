@@ -17,7 +17,7 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-import { Progress } from '@ui/progress';
+import { Progress } from '@/app/_shared-components/Progress/Progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import USDTIcon from '@assets/icons/usdt.svg';
@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
 import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
 
@@ -68,7 +69,8 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
 
-	const redirectUrl = getPostDetailsUrl(proposalType, index);
+	const redirectUrl = getPostDetailsUrl({ proposalType, proposalId: index, network });
+
 	return (
 		<Link
 			href={redirectUrl}
@@ -76,7 +78,11 @@ function ListingCard({
 			onClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
-				redirectFromServer(redirectUrl);
+				if (ARCHIVE_PROPOSAL_TYPES.includes(proposalType)) {
+					window.open(redirectUrl, '_blank');
+				} else {
+					redirectFromServer(redirectUrl);
+				}
 			}}
 		>
 			<div className={`${styles.listingCard} ${backgroundColor}`}>
@@ -107,7 +113,7 @@ function ListingCard({
 									</span>
 								)}
 
-								{ValidatorService.isValidOnChainProposalType(proposalType) && (
+								{ValidatorService.isValidOnChainProposalType(proposalType) && data.onChainInfo?.origin && (
 									<>
 										<span>|</span>
 										<span className={`${getSpanStyle(data.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{data.onChainInfo?.origin}</span>

@@ -1,0 +1,7 @@
+.post_actions_container {
+	@apply flex cursor-pointer items-center gap-1 rounded-md bg-grey_bg p-1.5;
+}
+
+.selected_text {
+	@apply text-bg_pink;
+}

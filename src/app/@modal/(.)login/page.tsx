@@ -30,7 +30,7 @@ function Login() {
 						<HeaderLabel />
 					</DialogTitle>
 				</DialogHeader>
-				<div className='px-4'>
+				<div className='sm:px-4'>
 					<LoginComponent isModal />
 				</div>
 			</DialogContent>

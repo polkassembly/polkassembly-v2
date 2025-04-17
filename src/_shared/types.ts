@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { OutputData } from '@editorjs/editorjs';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
@@ -201,6 +200,7 @@ export interface IUserAddress {
 	wallet?: EWallet;
 	isMultisig?: boolean;
 	proxyFor?: IAddressProxyForEntry[];
+	profileScore?: number;
 }
 
 export interface IHashedPassword {
@@ -334,7 +334,10 @@ export enum EOffChainPostTopic {
 	ROOT = 'root',
 	STAKING_ADMIN = 'stakingAdmin',
 	TREASURY = 'treasury',
-	FELLOWSHIP = 'fellowship'
+	FELLOWSHIP = 'fellowship',
+	COUNCIL = 'council',
+	DEMOCRACY = 'democracy',
+	WHITELIST = 'whitelist'
 }
 
 export interface ITag {
@@ -343,15 +346,19 @@ export interface ITag {
 	network: ENetwork;
 }
 
+export interface IOffChainContentHistoryItem {
+	content: string;
+	title?: string;
+	createdAt: Date;
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
 	hash?: string;
 	userId?: number;
 	title?: string;
-	content?: OutputData;
-	htmlContent: string;
-	markdownContent: string;
+	content: string;
 	createdAt?: Date;
 	updatedAt?: Date;
 	tags?: ITag[];
@@ -366,6 +373,7 @@ export interface IOffChainPost {
 	linkedPost?: IPostLink;
 	publicUser?: IPublicUser;
 	topic?: EOffChainPostTopic;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export enum EProposalStatus {
@@ -463,6 +471,11 @@ export interface IBeneficiary {
 	validFromBlock?: string;
 }
 
+export interface IBeneficiaryInput extends IBeneficiary {
+	id?: string;
+	isInvalid?: boolean;
+}
+
 export interface IStatusHistoryItem {
 	status: EProposalStatus;
 	timestamp: Date;
@@ -489,8 +502,9 @@ export interface IOnChainPostInfo {
 export interface IPost extends IOffChainPost {
 	onChainInfo?: IOnChainPostInfo;
 	publicUser?: IPublicUser;
-	userReaction?: IReaction;
 	reactions?: IReaction[];
+	userSubscriptionId?: string;
+	contentSummary?: IContentSummary;
 }
 
 export interface IOnChainPostListing {
@@ -511,7 +525,8 @@ export interface IOnChainPostListing {
 export interface IPostListing extends IOffChainPost {
 	onChainInfo?: IOnChainPostListing;
 	publicUser?: IPublicUser;
-	userReaction?: IReaction;
+	reactions?: IReaction[];
+	userSubscriptionId?: string;
 }
 
 export interface IGenericListingResponse<T> {
@@ -539,9 +554,12 @@ export interface ISidebarMenuItem {
 	heading?: string;
 }
 
-export interface IErrorResponse {
-	status: StatusCodes;
+export interface IMessageResponse {
 	message: string;
+}
+
+export interface IErrorResponse extends IMessageResponse {
+	status: StatusCodes;
 	name: string;
 }
 
@@ -552,8 +570,8 @@ export enum EWeb3LoginScreens {
 }
 
 export enum EActivityFeedTab {
-	EXPLORE = 'EXPLORE',
-	FOLLOWING = 'FOLLOWING'
+	EXPLORE = 'explore',
+	SUBSCRIBED = 'subscribed'
 }
 
 export enum EListingTab {
@@ -576,19 +594,17 @@ export interface IComment {
 	createdAt: Date;
 	updatedAt: Date;
 	userId: number;
-	content: OutputData;
-	htmlContent: string;
-	markdownContent: string;
+	content: string;
 	network: ENetwork;
 	proposalType: EProposalType;
 	indexOrHash: string;
 	parentCommentId: string | null;
 	isDeleted: boolean;
-	address: string | null;
 	dataSource: EDataSource;
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
+	history?: IOffChainContentHistoryItem[];
 }
 
 export interface ICommentResponse extends IComment {
@@ -615,6 +631,7 @@ export interface IOnChainIdentity {
 	verifiedByPolkassembly: boolean;
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
+	hash?: string;
 }
 
 export interface IVoteData {
@@ -626,12 +643,14 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	delegatedVotes?: IVoteData[];
 }
 
 export enum EAssets {
 	DED = 'DED',
 	USDT = 'USDT',
-	USDC = 'USDC'
+	USDC = 'USDC',
+	MYTH = 'MYTH'
 }
 
 export enum EPostDetailsTab {
@@ -743,11 +762,16 @@ export interface IActivityMetadata {
 
 	// for follow/unfollow
 	userId?: number;
+
+	// for posts
+	title?: string;
+	content?: string;
 }
 
 export interface IUserActivity {
 	id: string;
-	userId: number;
+	userId?: number;
+	address?: string;
 	name: EActivityName;
 	subActivityName?: EActivityName;
 	category: EActivityCategory;
@@ -879,23 +903,185 @@ export interface ICallState {
 }
 
 export enum EEnactment {
-	At_Block_No = 'at_block_number',
-	After_No_Of_Blocks = 'after_no_of_Blocks'
+	After_No_Of_Blocks = 'after_no_of_Blocks',
+	At_Block_No = 'at_block_number'
 }
 
 export interface IWritePostFormFields {
 	title: string;
-	description: OutputData;
+	description: string;
 	tags: ITag[];
 	topic: EOffChainPostTopic;
 	allowedCommentor: EAllowedCommentor;
 }
 
-export enum NotificationType {
+export enum ENotificationStatus {
 	SUCCESS = 'success',
 	ERROR = 'error',
 	WARNING = 'warning',
 	INFO = 'info'
+}
+
+// generic types are for insignificant tokens if we decide to add later
+export interface ITreasuryStats {
+	network: ENetwork;
+	createdAt: Date;
+	updatedAt: Date;
+	relayChain: {
+		dot?: string;
+		myth?: string;
+		[key: string]: string | undefined;
+	};
+	ambassador?: {
+		usdt?: string;
+		[key: string]: string | undefined;
+	};
+	assetHub?: {
+		dot?: string;
+		usdc?: string;
+		usdt?: string;
+		[key: string]: string | undefined;
+	};
+	hydration?: {
+		dot?: string;
+		usdc?: string;
+		usdt?: string;
+		[key: string]: string | undefined;
+	};
+	bounties?: {
+		dot?: string;
+		[key: string]: string | undefined;
+	};
+	fellowship?: {
+		dot?: string;
+		usdt?: string;
+		[key: string]: string | undefined;
+	};
+	total?: {
+		totalDot?: string;
+		totalUsdc?: string;
+		totalUsdt?: string;
+		totalMyth?: string;
+		[key: string]: string | undefined;
+	};
+	loans?: {
+		dot?: string;
+		usdc?: string;
+		[key: string]: string | undefined;
+	};
+	nativeTokenUsdPrice?: string;
+	nativeTokenUsdPrice24hChange?: string;
+	[key: string]: unknown;
+}
+
+export enum EProposalStep {
+	CREATE_PREIMAGE = 'CREATE_PREIMAGE',
+	EXISTING_PREIMAGE = 'EXISTING_PREIMAGE',
+	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
+	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
+	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
+}
+
+export interface IDelegationStats {
+	totalDelegatedTokens: string;
+	totalDelegatedVotes: number;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export enum EDelegateSource {
+	W3F = 'w3f',
+	NOVA = 'nova',
+	PARITY = 'parity',
+	POLKASSEMBLY = 'polkassembly',
+	INDIVIDUAL = 'individual'
+}
+
+export interface IDelegate {
+	id?: string;
+	network: ENetwork;
+	address: string;
+	sources: EDelegateSource[];
+	image?: string; // if available, otherwise use the image from the public user
+	manifesto?: string; // markdown
+	name?: string; // name of the delegate available via some third party sources
+	createdAt?: Date; // not available for w3f, nova and parity
+	updatedAt?: Date; // not available for w3f, nova and parity
+}
+
+export interface IDelegateDetails extends IDelegate {
+	publicUser?: IPublicUser;
+	votingPower: string;
+	receivedDelegationsCount: number;
+	last30DaysVotedProposalsCount: number;
+}
+
+export enum EDelegationStatus {
+	RECEIVED = 'received',
+	DELEGATED = 'delegated',
+	UNDELEGATED = 'undelegated'
+}
+
+export interface ITrackDelegationStats {
+	trackId: number;
+	status: EDelegationStatus;
+	activeProposalsCount: number;
+}
+
+export interface IPostWithDelegateVote extends IPostListing {
+	delegateVote?: IVoteData;
+}
+
+interface ITrackDelegation {
+	address: string;
+	balance: string;
+	createdAt: Date;
+	lockPeriod: number;
+	endsAt: Date;
+}
+
+export interface ITrackDelegationDetails {
+	receivedDelegations?: ITrackDelegation[];
+	delegatedTo?: ITrackDelegation[];
+	activeProposalListingWithDelegateVote: IGenericListingResponse<IPostWithDelegateVote>;
+	status: EDelegationStatus;
+}
+
+export enum ESocialVerificationStatus {
+	VERIFIED = 'verified',
+	PENDING = 'pending',
+	UNVERIFIED = 'unverified'
+}
+
+export interface ISocialHandle {
+	userId: number;
+	address: string;
+	social: ESocial;
+	handle: string;
+	status: ESocialVerificationStatus;
+	verificationToken?: {
+		token?: string;
+		secret?: string;
+		expiresAt?: Date;
+	};
+	createdAt?: Date;
+	updatedAt?: Date;
+}
+export interface IVoteHistoryData {
+	votes: IVoteData[];
+	totalCounts: {
+		[EVoteDecision.AYE]?: number;
+		[EVoteDecision.NAY]?: number;
+		[EVoteDecision.SPLIT_ABSTAIN]?: number;
+		[EVoteDecision.SPLIT]?: number;
+	};
+}
+
+export enum EPeriodType {
+	PREPARE = 'prepare',
+	DECISION = 'decision',
+	CONFIRM = 'confirm'
 }
 
 export enum ESearchType {

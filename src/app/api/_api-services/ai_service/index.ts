@@ -2,20 +2,18 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo, ICrossValidationResult } from '@/_shared/types';
-import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { APIError } from '../../_api-utils/apiError';
 import { fetchPostData } from '../../_api-utils/fetchPostData';
+import { RedisService } from '../redis_service';
 
 if (!IS_AI_ENABLED) {
 	console.log('\n ℹ️ Info: AI service is not enabled, AI content will not be generated and/or included in the api data\n');
@@ -46,21 +44,19 @@ export class AIService {
     - No introductory text or commentary
     - Use technical/blockchain terminology appropriately
     - Keep information factual and objective
+		- Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
     Analyze the sentiment and provide a breakdown in the following format:
 
-    Users feeling optimistic say: [Summarize main positive points]
+    ### Users feeling optimistic say: [Summarize main positive points if any]
 
-    Users feeling neutral say: [Summarize neutral/questioning points]
+    ### Users feeling neutral say: [Summarize neutral/questioning points if any]
 
-    Users feeling against say: [Summarize main concerns]
+    ### Users feeling against say: [Summarize main concerns if any]
 
-    Important technical points raised:
-    - [List key technical discussions]
-
-    Key questions from the community:
+    ### Key questions from the community:
     - [List main questions]
 
     STRICT RULES: 
@@ -74,17 +70,22 @@ export class AIService {
     Check for:
     - Irrelevant promotional content
     - Off-topic discussions
-    - Duplicate proposals
     - Malicious links
     - Impersonation attempts
     - Low-quality or automated content
     - Cryptocurrency scams or unauthorized token promotions
     - Phishing attempts
     - Excessive cross-posting
-    - Unrelated commercial advertising
-
+    - Unrelated commercial advertising especially if it's not related to Polkadot governance or funding
+		- Crypto recovery advertising
+		- Gambling
+		- Pornography
+		- Illegal content
+		- known spoof/fake/scam news websites
+		- Known fake/scam news social media accounts
+		
     STRICT RULES:
-    - Consider the technical nature of governance discussions when evaluating.
+    - Consider the technical nature of governance and funding discussions when evaluating.
     - A post being controversial or having strong opinions does not make it spam.
     - Return ONLY ONE WORD, either 'true' or 'false' without ANY additional text or explanation.
 		`,
@@ -114,7 +115,7 @@ export class AIService {
 		}
 
 		try {
-			const response = await fetchPF(this.AI_SERVICE_URL, {
+			const response = await fetch(this.AI_SERVICE_URL, {
 				method: 'POST',
 				body: JSON.stringify({ text: prompt }),
 				headers: {
@@ -133,6 +134,11 @@ export class AIService {
 				console.log('AI service returned empty response');
 				return null;
 			}
+
+			console.log('AI Service Response', {
+				prompt,
+				response: aiResponse
+			});
 
 			return aiResponse;
 		} catch (error) {
@@ -168,7 +174,7 @@ export class AIService {
 		}
 
 		if (content) {
-			fullPrompt += `### Main Content:\n${content}\n\n`;
+			fullPrompt += `### User Provided Description:\n${content}\n\n`;
 		}
 
 		if (additionalData.proposer) {
@@ -187,19 +193,11 @@ export class AIService {
 			fullPrompt += `### Beneficiaries:\n${additionalData.beneficiaries
 				.map((beneficiary) => {
 					try {
-						const assetData = beneficiary.assetId
-							? getAssetDataByIndexForNetwork({
-									network,
-									generalIndex: beneficiary.assetId
-								})
-							: null;
+						const balanceStr = formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId);
 
-						const amount = beneficiary.amount || 'Not specified';
-						const assetSymbol = assetData ? `${assetData.symbol} (${assetData.name})` : NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
-
-						return `${beneficiary.address} (Amount: ${amount} ${assetSymbol})`;
+						return `${beneficiary.address} (Amount: ${balanceStr})`;
 					} catch {
-						// Fallback to basic format if asset lookup fails
+						// Fallback to basic format if asset lookup or formatting fails
 						return `${beneficiary.address} (Amount: ${beneficiary.amount || 'Not specified'})`;
 					}
 				})
@@ -237,17 +235,14 @@ export class AIService {
 		// fetch post content
 		const post = await fetchPostData({ network, proposalType, indexOrHash: postIndexOrHash });
 
-		if (post.markdownContent) {
-			fullPrompt += `For a post with the following content:\n${post.markdownContent}\n\n`;
+		if (post.content) {
+			fullPrompt += `For a post with the following content:\n${post.content}\n\n`;
 		}
 
 		fullPrompt += 'Analyze the following comments:\n';
 
 		comments.forEach((comment, index) => {
-			// Use markdown content if available, otherwise convert from content
-			const commentText = comment.markdownContent || (comment.content ? htmlAndMarkdownFromEditorJs(comment.content).markdown : '');
-
-			fullPrompt += `### Comment ${index + 1}:\n${commentText}\n\n`;
+			fullPrompt += `### Comment ${index + 1}:\n${comment.content}\n\n`;
 		});
 
 		const summaryResponse = await this.getAIResponse(fullPrompt);
@@ -273,19 +268,22 @@ export class AIService {
 		}
 
 		if (mdContent) {
-			fullPrompt += `\n\n### Main Content:\n${mdContent}\n\n`;
+			fullPrompt += `\n\n### User Provided Content:\n${mdContent}\n\n`;
 		}
 
 		const response = await this.getAIResponse(fullPrompt);
 
-		if (!response || typeof response !== 'string' || !['true', 'false'].includes(response.toLowerCase())) {
+		// extract the result from the response using regex
+		const resultRegex = /(true|false)/;
+		const result = response?.match(resultRegex)?.[0];
+
+		if (!result || typeof result !== 'string' || !['true', 'false'].includes(result.toLowerCase())) {
 			return null;
 		}
 
 		console.log('spam check response', response);
 
-		// Check if response is exactly 'true' or 'false'
-		return response?.toLowerCase() === 'true';
+		return result.toLowerCase() === 'true';
 	}
 
 	private static async getCommentSentiment({ mdContent }: { mdContent: string }): Promise<ECommentSentiment | null> {
@@ -297,11 +295,15 @@ export class AIService {
 
 		const response = await this.getAIResponse(fullPrompt);
 
-		if (!response || typeof response !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(response.toLowerCase())) {
+		// extract the sentiment from the response using regex
+		const sentimentRegex = /(against|slightly_against|neutral|slightly_for|for)/;
+		const sentiment = response?.match(sentimentRegex)?.[0];
+
+		if (!sentiment || typeof sentiment !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(sentiment.toLowerCase())) {
 			return null;
 		}
 
-		return response.toLowerCase() as ECommentSentiment;
+		return sentiment as ECommentSentiment;
 	}
 
 	/**
@@ -388,7 +390,7 @@ export class AIService {
 	}
 
 	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
-		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
+		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType, getDefaultContent: false });
 
 		let onChainPostInfo: IOnChainPostInfo | null = null;
 		if (ValidatorService.isValidOnChainProposalType(proposalType)) {
@@ -398,11 +400,9 @@ export class AIService {
 			}
 		}
 
-		const mdContent = offChainPostData.content ? htmlAndMarkdownFromEditorJs(offChainPostData.content).markdown : undefined;
-
 		const postSummary = await this.getPostSummary({
 			network,
-			content: mdContent,
+			content: offChainPostData.content,
 			title: offChainPostData.title,
 			additionalData: {
 				proposer: onChainPostInfo?.proposer,
@@ -414,13 +414,13 @@ export class AIService {
 		});
 
 		const isSpam = await this.getContentSpamCheck({
-			mdContent,
+			mdContent: offChainPostData.content,
 			title: offChainPostData.title
 		});
 
 		const crossValidationResult = onChainPostInfo
 			? await this.validatePostContent({
-					mdContent,
+					mdContent: offChainPostData.content,
 					onChainPostInfo
 				})
 			: null;
@@ -448,6 +448,9 @@ export class AIService {
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
 
+		// clear cache for the content summary
+		await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
+
 		return updatedContentSummary;
 	}
 
@@ -464,7 +467,7 @@ export class AIService {
 	}): Promise<IContentSummary | null> {
 		const commentsTree = await OffChainDbService.GetPostComments({ network, indexOrHash, proposalType });
 
-		const flattenedComments = commentsTree.flatMap((comment) => comment.children || [comment]);
+		const flattenedComments = commentsTree.flatMap((comment) => (comment.children && comment.children.length ? comment.children : [comment]));
 
 		if (!flattenedComments.length) return null;
 
@@ -473,7 +476,7 @@ export class AIService {
 			const newComment = flattenedComments.find((comment) => comment.id === newCommentId);
 
 			if (newComment) {
-				const isSpam = await this.getContentSpamCheck({ mdContent: newComment.markdownContent });
+				const isSpam = await this.getContentSpamCheck({ mdContent: newComment.content });
 				if (isSpam) {
 					await OffChainDbService.UpdateComment({ commentId: newCommentId, content: newComment.content, isSpam });
 				}
@@ -498,6 +501,9 @@ export class AIService {
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
 
+		// clear cache for the content summary
+		await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
+
 		return updatedContentSummary;
 	}
 
@@ -506,7 +512,7 @@ export class AIService {
 
 		if (!comment) return null;
 
-		const sentiment = await this.getCommentSentiment({ mdContent: comment.markdownContent });
+		const sentiment = await this.getCommentSentiment({ mdContent: comment.content });
 
 		if (!sentiment) return null;
 

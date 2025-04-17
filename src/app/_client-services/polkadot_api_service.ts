@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
+import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
@@ -14,10 +15,11 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { getTypeDef } from '@polkadot/types';
 import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiary, IParamDef, IVoteCartItem } from '@shared/types';
+import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -458,6 +460,27 @@ export class PolkadotApiService {
 		};
 	}
 
+	async getPreimageLengthFromPreimageHash({ preimageHash }: { preimageHash: string }) {
+		if (!this.api || !preimageHash || !ValidatorService.isValidPreimageHash(preimageHash)) {
+			return null;
+		}
+		const statusFor = (await this.api.query.preimage.statusFor?.(preimageHash)) as any;
+		const requestStatusFor = (await this.api.query.preimage.requestStatusFor?.(preimageHash)) as any;
+
+		const status = statusFor?.isSome ? statusFor.unwrapOr(null) : requestStatusFor.unwrapOr(null);
+
+		if (!status) return null;
+		return Number(status.value?.len);
+	}
+
+	getNotePreimageTx({ extrinsicFn }: { extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult> | null }) {
+		if (!this.api || !extrinsicFn) {
+			return null;
+		}
+		const encodedTx = extrinsicFn.method.toHex();
+		return this.api.tx.preimage.notePreimage(encodedTx);
+	}
+
 	async notePreimage({
 		address,
 		extrinsicFn,
@@ -473,8 +496,11 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const encodedTx = extrinsicFn.method.toHex();
-		const notePreimageTx = this.api.tx.preimage.notePreimage(encodedTx);
+		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn });
+		if (!notePreimageTx) {
+			onFailed?.();
+			return;
+		}
 		await this.executeTx({
 			tx: notePreimageTx,
 			address,
@@ -489,7 +515,30 @@ export class PolkadotApiService {
 		});
 	}
 
-	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+	getSubmitProposalTx({
+		track,
+		preimageHash,
+		preimageLength,
+		enactment,
+		enactmentValue
+	}: {
+		track: EPostOrigin;
+		preimageHash: string;
+		preimageLength: number;
+		enactment: EEnactment;
+		enactmentValue: BN;
+	}) {
+		if (!this.api || !track || !preimageHash || !preimageLength || !enactmentValue) {
+			return null;
+		}
+		return this.api.tx.referenda.submit(
+			{ Origins: track },
+			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
+			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
+		);
+	}
+
+	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}
@@ -497,7 +546,7 @@ export class PolkadotApiService {
 
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
-				tx.push(this.api.tx.treasury.spendLocal(beneficiary.amount.toString(), beneficiary.address));
+				tx.push(this.api.tx?.treasury?.spendLocal(beneficiary.amount.toString(), beneficiary.address));
 			}
 		});
 
@@ -508,7 +557,109 @@ export class PolkadotApiService {
 		return this.api.tx.utility.batchAll(tx);
 	}
 
-	async createTreasuryProposal({
+	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
+		if (!this.api) {
+			return null;
+		}
+		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+
+		beneficiaries.forEach((beneficiary) => {
+			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
+				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
+					tx.push(
+						this.api.tx?.treasury?.spend(
+							{
+								V3: {
+									assetId: {
+										Concrete: {
+											parents: 0,
+											interior: {
+												X2: [
+													{
+														PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+													},
+													{
+														GeneralIndex: beneficiary.assetId
+													}
+												]
+											}
+										}
+									},
+									location: {
+										parents: 0,
+										interior: {
+											X1: { Parachain: NETWORKS_DETAILS[this.network]?.parachain }
+										}
+									}
+								}
+							},
+							beneficiary.amount.toString(),
+							{ V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							beneficiary.validFromBlock || null
+						)
+					);
+				} else {
+					tx.push(
+						this.api.tx?.treasury?.spend(
+							{
+								V4: {
+									location: {
+										parents: 0,
+										interior: {
+											X1: [
+												{
+													Parachain: NETWORKS_DETAILS[this.network]?.parachain
+												}
+											]
+										}
+									},
+									assetId: {
+										parents: 1,
+										interior: 'here'
+									}
+								}
+							},
+							beneficiary.amount.toString(),
+							{
+								V4: {
+									parents: 0,
+									interior: {
+										X1: [
+											{
+												AccountId32: {
+													id: decodeAddress(beneficiary.address),
+													network: null
+												}
+											}
+										]
+									}
+								}
+							},
+							beneficiary.validFromBlock || null
+						)
+					);
+				}
+			}
+		});
+
+		if (tx.length === 0) return null;
+
+		if (tx.length === 1) return tx[0];
+
+		return this.api.tx.utility.batchAll(tx);
+	}
+
+	getCancelReferendumExtrinsic({ referendumId }: { referendumId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.referenda.cancel(referendumId);
+	}
+
+	getKillReferendumExtrinsic({ referendumId }: { referendumId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.referenda.kill(referendumId);
+	}
+
+	async createProposal({
 		address,
 		track,
 		preimageHash,
@@ -519,7 +670,7 @@ export class PolkadotApiService {
 		onFailed
 	}: {
 		address: string;
-		track: string;
+		track: EPostOrigin;
 		preimageHash: string;
 		preimageLength: number;
 		enactment: EEnactment;
@@ -539,11 +690,11 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const tx = this.api.tx.referenda.submit(
-			{ Origins: track },
-			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
-			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
-		);
+		const tx = this.getSubmitProposalTx({ track, preimageHash, preimageLength, enactment, enactmentValue });
+		if (!tx) {
+			onFailed?.();
+			return;
+		}
 
 		const postId = Number(await this.api.query.referenda.referendumCount());
 		await this.executeTx({
@@ -564,10 +715,63 @@ export class PolkadotApiService {
 		return this.api?.registry;
 	}
 
-	async getCurrentBlockNumber() {
+	async getCurrentBlockHeight() {
 		if (!this.api) {
 			return null;
 		}
 		return this.api.derive.chain.bestNumber();
+	}
+
+	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
+		if (!this.api) {
+			return null;
+		}
+		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx && tx.paymentInfo(address)));
+		return fees.reduce((acc, fee) => acc.add(new BN(fee?.partialFee || BN_ZERO)), BN_ZERO);
+	}
+
+	async getNativeTreasuryBalance(): Promise<BN> {
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
+		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
+	}
+
+	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
+		const referendumInfoOf = await this.api?.query?.referenda?.referendumInfoFor(postIndex);
+		const parsedReferendumInfo: any = referendumInfoOf?.toJSON();
+
+		if (!parsedReferendumInfo?.ongoing?.tally) return null;
+
+		return {
+			aye:
+				typeof parsedReferendumInfo.ongoing.tally.ayes === 'string'
+					? new BN(parsedReferendumInfo.ongoing.tally.ayes.slice(2), 'hex')?.toString()
+					: new BN(parsedReferendumInfo.ongoing.tally.ayes)?.toString(),
+			nay:
+				typeof parsedReferendumInfo.ongoing.tally.nays === 'string'
+					? new BN(parsedReferendumInfo.ongoing.tally.nays.slice(2), 'hex')?.toString()
+					: new BN(parsedReferendumInfo.ongoing.tally.nays)?.toString(),
+			support:
+				typeof parsedReferendumInfo.ongoing.tally.support === 'string'
+					? new BN(parsedReferendumInfo.ongoing.tally.support.slice(2), 'hex')?.toString()
+					: new BN(parsedReferendumInfo.ongoing.tally.support)?.toString()
+		};
+	}
+
+	async getInactiveIssuance() {
+		// Paseo logic needs to be implemented
+		if (!this.api) {
+			return null;
+		}
+
+		return this.api.query.balances.inactiveIssuance();
+	}
+
+	async getTotalIssuance() {
+		// Paseo logic needs to be implemented
+		if (!this.api) {
+			return null;
+		}
+		return this.api.query.balances.totalIssuance();
 	}
 }

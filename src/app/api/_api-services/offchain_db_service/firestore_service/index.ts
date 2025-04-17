@@ -30,16 +30,20 @@ import {
 	EVoteDecision,
 	EConvictionAmount,
 	IPostSubscription,
-	ECommentSentiment
+	ECommentSentiment,
+	ITreasuryStats,
+	IDelegate,
+	EDelegateSource,
+	ESocial,
+	ISocialHandle,
+	ESocialVerificationStatus,
+	IPostLink
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
-import { firestoreContentToEditorJs } from '@/app/api/_api-utils/firestoreContentToEditorJs';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { OutputData } from '@editorjs/editorjs';
-import { htmlAndMarkdownFromEditorJs } from '@/_shared/_utils/htmlAndMarkdownFromEditorJs';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { FirestoreUtils } from './firestoreUtils';
 
@@ -283,22 +287,10 @@ export class FirestoreService extends FirestoreUtils {
 
 		const postData = postDocSnapshot.docs[0].data();
 
-		let { htmlContent = '', markdownContent = '' } = postData;
-		const formattedContent = firestoreContentToEditorJs(postData.content);
-
-		if (!htmlContent && !markdownContent && formattedContent) {
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-			htmlContent = html;
-			markdownContent = markdown;
-		}
-
 		return {
 			...postData,
-			content: formattedContent,
+			content: postData.content || '',
 			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate() || new Date(), network })) || [],
-			htmlContent,
-			markdownContent,
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
@@ -327,6 +319,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		postsQuery = postsQuery
 			.where('isDeleted', '==', false)
+			.orderBy('createdAt', 'desc')
 			.limit(limit)
 			.offset((page - 1) * limit);
 
@@ -337,25 +330,14 @@ export class FirestoreService extends FirestoreUtils {
 			const indexOrHash = data.hash || String(data.index);
 			const metrics = await this.GetPostMetrics({ network, indexOrHash, proposalType });
 
-			let { htmlContent = '', markdownContent = '' } = data;
-			const formattedContent = firestoreContentToEditorJs(data.content);
-
-			if (!htmlContent && !markdownContent && formattedContent) {
-				const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-				htmlContent = html;
-				markdownContent = markdown;
-			}
-
 			return {
 				...data,
-				content: formattedContent,
-				htmlContent,
-				markdownContent,
+				content: data.content || '',
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				metrics,
-				allowedCommentor: data.allowedCommentor || EAllowedCommentor.ALL
+				allowedCommentor: data.allowedCommentor || EAllowedCommentor.ALL,
+				dataSource: data.dataSource || EDataSource.POLKASSEMBLY
 			} as IOffChainPost;
 		});
 
@@ -442,21 +424,9 @@ export class FirestoreService extends FirestoreUtils {
 		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
 			const dataRaw = doc.data();
 
-			let { htmlContent = '', markdownContent = '' } = dataRaw;
-			const formattedContent = firestoreContentToEditorJs(dataRaw.content);
-
-			if (!htmlContent && !markdownContent && formattedContent) {
-				const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-				htmlContent = html;
-				markdownContent = markdown;
-			}
-
 			const commentData = {
 				...dataRaw,
-				content: formattedContent,
-				htmlContent,
-				markdownContent,
+				content: dataRaw.content || '',
 				createdAt: dataRaw.createdAt?.toDate(),
 				updatedAt: dataRaw.updatedAt?.toDate(),
 				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
@@ -490,23 +460,12 @@ export class FirestoreService extends FirestoreUtils {
 			return null;
 		}
 
-		let { htmlContent = '', markdownContent = '' } = data;
-		const formattedContent = firestoreContentToEditorJs(data.content);
-
-		if (!htmlContent && !markdownContent && formattedContent) {
-			const { html, markdown } = htmlAndMarkdownFromEditorJs(formattedContent);
-
-			htmlContent = html;
-			markdownContent = markdown;
-		}
-
 		return {
 			...data,
-			content: formattedContent,
-			htmlContent,
-			markdownContent,
+			content: data.content || '',
 			createdAt: data.createdAt?.toDate(),
-			updatedAt: data.updatedAt?.toDate()
+			updatedAt: data.updatedAt?.toDate(),
+			dataSource: data.dataSource || EDataSource.POLKASSEMBLY
 		} as IComment;
 	}
 
@@ -572,8 +531,8 @@ export class FirestoreService extends FirestoreUtils {
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
-	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
-		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', id);
+	static async GetUserActivitiesByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IUserActivity[]> {
+		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const userActivityQuerySnapshot = await userActivityQuery.get();
 		return userActivityQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -660,8 +619,8 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
-		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId);
+	static async GetVoteCart({ userId, network }: { userId: number; network: ENetwork }): Promise<IVoteCartItem[]> {
+		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const voteCartQuerySnapshot = await voteCartQuery.get();
 		return voteCartQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -729,6 +688,72 @@ export class FirestoreService extends FirestoreUtils {
 		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef().where('userId', '==', userId).where('network', '==', network).count();
 		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
 		return postSubscriptionsQuerySnapshot.data().count || 0;
+	}
+
+	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
+		let treasuryStatsQuery = this.treasuryStatsCollectionRef().where('network', '==', network);
+
+		if (from) {
+			treasuryStatsQuery = treasuryStatsQuery.where('createdAt', '>=', from);
+		}
+
+		if (to) {
+			treasuryStatsQuery = treasuryStatsQuery.where('createdAt', '<=', to);
+		}
+
+		treasuryStatsQuery = treasuryStatsQuery
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset(limit * (page - 1));
+
+		const treasuryStatsQuerySnapshot = await treasuryStatsQuery.get();
+
+		if (treasuryStatsQuerySnapshot.empty) {
+			return [];
+		}
+
+		return treasuryStatsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt.toDate(),
+				updatedAt: data.updatedAt.toDate()
+			} as ITreasuryStats;
+		});
+	}
+
+	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
+		await this.treasuryStatsCollectionRef().add(treasuryStats);
+	}
+
+	static async GetPolkassemblyDelegates(network: ENetwork): Promise<IDelegate[]> {
+		const delegatesQuery = this.delegatesCollectionRef().where('network', '==', network);
+		const delegatesQuerySnapshot = await delegatesQuery.get();
+		return delegatesQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				sources: [EDelegateSource.POLKASSEMBLY],
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IDelegate;
+		});
+	}
+
+	static async GetPolkassemblyDelegateByAddress({ network, address }: { network: ENetwork; address: string }): Promise<IDelegate | null> {
+		const delegateQuery = this.delegatesCollectionRef().where('address', '==', address).where('network', '==', network).limit(1);
+		const delegateQuerySnapshot = await delegateQuery.get();
+		if (delegateQuerySnapshot.empty) {
+			return null;
+		}
+
+		const data = delegateQuerySnapshot.docs[0].data();
+
+		return {
+			...data,
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate()
+		} as IDelegate;
 	}
 
 	// write methods
@@ -903,21 +928,18 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		address,
 		sentiment
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 		address?: string;
 		sentiment?: ECommentSentiment;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
-
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newComment: IComment = {
 			id: newCommentId,
@@ -925,14 +947,11 @@ export class FirestoreService extends FirestoreUtils {
 			proposalType,
 			userId,
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isDeleted: false,
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
-			address: address || null,
 			dataSource: EDataSource.POLKASSEMBLY,
 			...(sentiment && { sentiment })
 		};
@@ -942,16 +961,13 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: OutputData; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
-
+	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
 		const newCommentData: Partial<IComment> = {
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			...(isSpam && { isSpam }),
 			...(aiSentiment && { aiSentiment }),
-			updatedAt: new Date()
+			updatedAt: new Date(),
+			dataSource: EDataSource.POLKASSEMBLY
 		};
 
 		await this.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
@@ -1060,10 +1076,26 @@ export class FirestoreService extends FirestoreUtils {
 		await this.reactionsCollectionRef().doc(id).delete();
 	}
 
-	static async UpdatePost({ id, content, title, allowedCommentor }: { id?: string; content: OutputData; title: string; allowedCommentor: EAllowedCommentor }) {
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
+	static async UpdatePost({
+		id,
+		content,
+		title,
+		allowedCommentor,
+		linkedPost
+	}: {
+		id?: string;
+		content: string;
+		title: string;
+		allowedCommentor: EAllowedCommentor;
+		linkedPost?: IPostLink;
+	}) {
+		if (!id) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Post ID is required');
+		}
 
-		await this.postsCollectionRef().doc(String(id)).set({ content, htmlContent: html, markdownContent: markdown, title, allowedCommentor, updatedAt: new Date() }, { merge: true });
+		await this.postsCollectionRef()
+			.doc(String(id))
+			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
 	}
 
 	static async CreatePost({
@@ -1075,20 +1107,21 @@ export class FirestoreService extends FirestoreUtils {
 		title,
 		allowedCommentor,
 		tags,
-		topic
+		topic,
+		linkedPost
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		userId: number;
-		content: OutputData;
+		content: string;
 		indexOrHash?: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
 		topic?: EOffChainPostTopic;
+		linkedPost?: IPostLink;
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = this.postsCollectionRef().doc().id;
-		const { html, markdown } = htmlAndMarkdownFromEditorJs(content);
 
 		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
 
@@ -1098,14 +1131,13 @@ export class FirestoreService extends FirestoreUtils {
 			proposalType,
 			userId,
 			content,
-			htmlContent: html,
-			markdownContent: markdown,
 			title,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			dataSource: EDataSource.POLKASSEMBLY,
 			allowedCommentor,
-			isDeleted: false
+			isDeleted: false,
+			...(linkedPost && { linkedPost })
 		};
 		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
 		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
@@ -1127,9 +1159,15 @@ export class FirestoreService extends FirestoreUtils {
 			.set({ ...activity, id: newActivityId });
 	}
 
-	static async IncrementUserProfileScore(userId: number, score: number) {
+	static async IncrementUserProfileScore({ userId, score }: { userId: number; score: number }) {
 		await this.usersCollectionRef()
 			.doc(userId.toString())
+			.set({ profileScore: this.increment(score) }, { merge: true });
+	}
+
+	static async IncrementAddressProfileScore({ address, score }: { address: string; score: number }) {
+		await this.addressesCollectionRef()
+			.doc(address)
 			.set({ profileScore: this.increment(score) }, { merge: true });
 	}
 
@@ -1229,6 +1267,27 @@ export class FirestoreService extends FirestoreUtils {
 		conviction: EConvictionAmount;
 		network: ENetwork;
 	}): Promise<IVoteCartItem> {
+		const existingVoteCartItem = await this.voteCartItemsCollectionRef()
+			.where('userId', '==', userId)
+			.where('postIndexOrHash', '==', postIndexOrHash)
+			.where('proposalType', '==', proposalType)
+			.where('network', '==', network)
+			.limit(1)
+			.get();
+
+		if (existingVoteCartItem.docs.length) {
+			await existingVoteCartItem.docs[0].ref.set({ decision, amount, conviction, updatedAt: new Date() }, { merge: true });
+			const data = existingVoteCartItem.docs[0].data();
+			return {
+				...data,
+				decision,
+				amount,
+				conviction,
+				createdAt: data.createdAt?.toDate?.(),
+				updatedAt: new Date()
+			} as IVoteCartItem;
+		}
+
 		const newVoteCartItemId = this.voteCartItemsCollectionRef().doc().id;
 
 		const voteCartItem: IVoteCartItem = {
@@ -1311,6 +1370,150 @@ export class FirestoreService extends FirestoreUtils {
 
 		if (postSubscription.docs.length) {
 			await postSubscription.docs[0].ref.delete();
+		}
+	}
+
+	static async AddPolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		const existingDelegate = await this.delegatesCollectionRef().where('network', '==', network).where('address', '==', address).limit(1).get();
+
+		if (existingDelegate.docs.length) {
+			throw new APIError(ERROR_CODES.ALREADY_EXISTS, StatusCodes.CONFLICT, 'This address is already registered as a delegate.');
+		}
+
+		const newPolkassemblyDelegateId = this.delegatesCollectionRef().doc().id;
+
+		const polkassemblyDelegate: IDelegate = {
+			id: newPolkassemblyDelegateId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			network,
+			address,
+			manifesto,
+			sources: [EDelegateSource.POLKASSEMBLY]
+		};
+
+		await this.delegatesCollectionRef().doc(newPolkassemblyDelegateId).set(polkassemblyDelegate);
+
+		return newPolkassemblyDelegateId;
+	}
+
+	static async UpdatePolkassemblyDelegate({ network, address, manifesto }: { network: ENetwork; address: string; manifesto: string }) {
+		const existingDelegate = await this.delegatesCollectionRef().where('network', '==', network).where('address', '==', address).limit(1).get();
+
+		if (!existingDelegate.docs.length) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'This address is not registered as a delegate.');
+		}
+
+		await existingDelegate.docs[0].ref.set({ manifesto, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async DeletePolkassemblyDelegate({ network, address }: { network: ENetwork; address: string }) {
+		const delegate = await this.delegatesCollectionRef().where('network', '==', network).where('address', '==', address).limit(1).get();
+
+		if (delegate.docs.length) {
+			await delegate.docs[0].ref.delete();
+		}
+	}
+
+	static async UpdateUserSocialHandle({
+		userId,
+		address,
+		social,
+		handle,
+		status,
+		verificationToken
+	}: {
+		userId: number;
+		address?: string;
+		social: ESocial;
+		handle: string;
+		status: ESocialVerificationStatus;
+		verificationToken?: {
+			token?: string;
+			secret?: string;
+			expiresAt?: Date;
+		};
+	}) {
+		// Check if the user already has this social handle type
+		const userSocialHandleQuery = address
+			? await this.userSocialsCollectionRef().where('userId', '==', userId).where('address', '==', address).where('social', '==', social).limit(1).get()
+			: await this.userSocialsCollectionRef().where('userId', '==', userId).where('social', '==', social).limit(1).get();
+
+		if (!userSocialHandleQuery.empty) {
+			// Update existing social handle
+			const docId = userSocialHandleQuery.docs[0].id;
+			const existingSocialHandle = userSocialHandleQuery.docs[0].data();
+			await this.userSocialsCollectionRef()
+				.doc(docId)
+				.set(
+					{
+						...existingSocialHandle,
+						status,
+						updatedAt: new Date()
+					},
+					{ merge: true }
+				);
+			return {
+				...existingSocialHandle,
+				status,
+				updatedAt: new Date()
+			} as ISocialHandle;
+		}
+		// Create new social handle
+		const newSocialVerificationId = this.userSocialsCollectionRef().doc().id;
+
+		const socialHandle = {
+			userId,
+			address,
+			social,
+			handle,
+			status,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+
+		await this.userSocialsCollectionRef()
+			.doc(newSocialVerificationId)
+			.set({ ...socialHandle, ...(verificationToken && { verificationToken }) }, { merge: true });
+		return { ...socialHandle, verificationToken: { token: verificationToken?.token } };
+	}
+
+	static async GetUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		const socialVerification = await this.userSocialsCollectionRef().where('userId', '==', userId).where('address', '==', address).get();
+
+		const socialHandles = {} as Record<ESocial, ISocialHandle>;
+
+		socialVerification.docs.forEach((doc) => {
+			const data = doc.data() as ISocialHandle;
+			socialHandles[data.social] = data;
+		});
+
+		return socialHandles;
+	}
+
+	static async GetSocialHandleByToken({ token }: { token: string }) {
+		const socialVerification = await this.userSocialsCollectionRef().where('verificationToken.token', '==', token).limit(1).get();
+
+		if (socialVerification.docs.length) {
+			return socialVerification.docs[0].data() as ISocialHandle;
+		}
+
+		return null;
+	}
+
+	static async UpdateSocialHandleByToken({ token, status }: { token: string; status: ESocialVerificationStatus }) {
+		const userSocialHandleQuery = await this.userSocialsCollectionRef().where('verificationToken.token', '==', token).limit(1).get();
+
+		if (userSocialHandleQuery.docs.length) {
+			await userSocialHandleQuery.docs[0].ref.set({ status, updatedAt: new Date() }, { merge: true });
+		}
+	}
+
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash).limit(1).get();
+
+		if (post.docs.length) {
+			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
 		}
 	}
 }

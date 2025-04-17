@@ -25,6 +25,8 @@ const zodParamsSchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
+	const network = await getNetworkFromHeaders();
+
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
@@ -33,7 +35,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 	}
 
-	const voteCart = await OffChainDbService.GetVoteCart(userId);
+	const voteCart = await OffChainDbService.GetVoteCart({ userId, network });
 
 	const response = NextResponse.json({ voteCart });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
@@ -49,7 +51,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		postIndexOrHash: z.string().min(1, 'Post index or hash is required'),
 		proposalType: z.nativeEnum(EProposalType),
-		decision: z.nativeEnum(EVoteDecision).refine((val) => val !== EVoteDecision.SPLIT_ABSTAIN, 'SPLIT_ABSTAIN decision is not supported'),
+		decision: z.nativeEnum(EVoteDecision),
 		amount: z.object({
 			abstain: z.string().refine(ValidatorService.isValidAmount).optional(),
 			aye: z.string().refine(ValidatorService.isValidAmount).optional(),
@@ -60,17 +62,16 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const { postIndexOrHash, proposalType, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
 
-	// additional validation for amount and votes
-	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid amount(s) for decision');
-	}
-
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
 	if (userId !== id) {
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 	}
 
 	const network = await getNetworkFromHeaders();
@@ -98,7 +99,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const zodBodySchema = z.object({
 		id: z.string().min(1, 'Vote cart item id is required'),
-		decision: z.nativeEnum(EVoteDecision).refine((val) => val !== EVoteDecision.SPLIT_ABSTAIN, 'SPLIT_ABSTAIN decision is not supported'),
+		decision: z.nativeEnum(EVoteDecision),
 		amount: z.object({
 			abstain: z.string().refine(ValidatorService.isValidAmount).optional(),
 			aye: z.string().refine(ValidatorService.isValidAmount).optional(),
@@ -109,17 +110,16 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const { id: voteCartItemId, decision, amount, conviction } = zodBodySchema.parse(await getReqBody(req));
 
-	// additional validation for amount and votes
-	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid amount(s) for decision');
-	}
-
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
 	if (userId !== id) {
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+	}
+
+	if (!ValidatorService.isValidVoteAmountsForDecision(amount, decision)) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 	}
 
 	await OffChainDbService.UpdateVoteCartItem({ userId, voteCartItemId, decision, amount, conviction });

@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
@@ -17,7 +19,6 @@ import { cn } from '@/lib/utils';
 import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
-import { FaAngleDown } from 'react-icons/fa';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -110,45 +111,65 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		return tracks.some((track) => currentTab === track);
 	};
 
-	useEffect(() => {
+	const scrollToActiveTab = () => {
 		if (containerRef.current) {
-			containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+			const container = containerRef.current;
+			const activeElement = container.querySelector('.bg-activity_selected_tab');
+
+			if (activeElement) {
+				const containerRect = container.getBoundingClientRect();
+				const activeRect = activeElement.getBoundingClientRect();
+
+				const scrollLeft = activeRect.left - containerRect.left - (containerRect.width - activeRect.width) / 2;
+				container.scrollTo({
+					left: container.scrollLeft + scrollLeft,
+					behavior: 'smooth'
+				});
+			}
 		}
+	};
+
+	useEffect(() => {
+		scrollToActiveTab();
 	}, [currentTab]);
 
 	return (
 		<div className='mb-5 w-full'>
 			<div
-				className={`${styles.container} hide_scrollbar`}
+				className={styles.container}
 				ref={containerRef}
 			>
 				{Object.entries(categoryStructure).map(([category, tracks]) => (
-					<div key={category}>
+					<div
+						key={category}
+						className={styles.navItem}
+					>
 						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
-							<DropdownMenu>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}>
-									<span className='flex items-center whitespace-nowrap'>
+							<DropdownMenu modal={false}>
+								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && styles.activeTab)}>
+									<span className='flex items-center gap-2'>
 										<Image
 											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
 											alt={category}
 											width={20}
 											height={20}
-											className={cn('h-5 w-5', styles.darkIcon)}
+											className={cn(styles.darkIcon)}
+											priority
 										/>
-										<span className='ml-1'>{category}</span>
-										<span className='ml-0.5'>
-											<FaAngleDown />
-										</span>
+										<span className='text-sm text-basic_text'>{category}</span>
 									</span>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
 									align='start'
+									side='bottom'
+									sideOffset={4}
 									className={styles.popoverContent}
+									avoidCollisions
 								>
 									{tracks.map((track) => (
 										<DropdownMenuItem
 											key={track}
-											className={cn(styles.trackName, currentTab === track && 'bg-activity_selected_tab')}
+											className={cn(styles.trackName, currentTab === track && styles.activeTab)}
 											onSelect={() => setCurrentTab(track)}
 										>
 											{formatTrackName(track)}
@@ -159,18 +180,19 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 						) : (
 							<button
 								type='button'
-								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && 'bg-activity_selected_tab font-medium')}
+								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && styles.activeTab)}
 								onClick={() => handleCategoryClick(category)}
 							>
-								<span className='flex items-center whitespace-nowrap'>
+								<span className='flex items-center gap-2'>
 									<Image
 										src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
 										alt={category}
 										width={20}
 										height={20}
-										className={cn('h-5 w-5', styles.darkIcon)}
+										className={cn(styles.darkIcon)}
+										priority
 									/>
-									<span className='ml-1'>{category}</span>
+									<span className='text-sm'>{category}</span>
 								</span>
 							</button>
 						)}

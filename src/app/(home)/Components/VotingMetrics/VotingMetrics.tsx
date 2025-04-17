@@ -7,11 +7,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import VotingBar from '@ui/ListingComponent/VotingBar/VotingBar';
 import { formatBnBalance } from '@app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { IPostListing } from '@/_shared/types';
+import { IPost, IPostListing } from '@/_shared/types';
 import styles from './VotingMetrics.module.scss';
 
 interface VotingMetricsProps {
-	postData: IPostListing;
+	postData: IPostListing | IPost;
 	ayePercent: number;
 	nayPercent: number;
 }
@@ -28,7 +28,7 @@ function VotingMetrics({ postData, ayePercent, nayPercent }: VotingMetricsProps)
 			<span>|</span>
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<div>
+					<div className='mt-1'>
 						<VotingBar
 							ayePercent={ayePercent}
 							nayPercent={nayPercent}

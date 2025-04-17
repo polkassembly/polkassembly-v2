@@ -1,0 +1,19 @@
+.dialogContent {
+	@apply max-w-xl p-6;
+}
+
+.dialogTitle {
+	@apply -mx-6 px-6 pb-2 text-lg tracking-wide text-btn_secondary_text;
+}
+
+.contentContainer {
+	@apply flex flex-col items-center justify-center gap-6 text-btn_secondary_text;
+}
+
+.messageText {
+	@apply text-base font-semibold;
+}
+
+.buttonContainer {
+	@apply flex items-center justify-center gap-6 pb-4 max-sm:gap-2;
+}

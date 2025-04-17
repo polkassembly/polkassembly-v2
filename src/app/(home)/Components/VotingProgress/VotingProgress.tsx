@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
-import { IPostListing } from '@/_shared/types';
-import { Progress } from '@ui/progress';
+import { IPost, IPostListing } from '@/_shared/types';
+import { Progress } from '@/app/_shared-components/Progress/Progress';
 import styles from './VotingProgress.module.scss';
 import VotingMetrics from '../VotingMetrics/VotingMetrics';
 
@@ -15,7 +15,7 @@ interface VotingProgressProps {
 	formattedTime: string;
 	ayePercent: number;
 	nayPercent: number;
-	postData: IPostListing;
+	postData: IPostListing | IPost;
 }
 
 function VotingProgress({ timeRemaining, decisionPeriodPercentage, formattedTime, ayePercent, nayPercent, postData }: VotingProgressProps) {

@@ -25,6 +25,10 @@
 		"Live": "ライブ",
 		"CommentPlaceholder": "ここにコメントを入力",
 		"Post": "投稿",
+		"share": "共有",
+		"loading": "読み込み中...",
+		"subscribe": "購読",
+		"unsubscribe": "購読解除",
 		"Navbar": {
 			"All": "すべて",
 			"Root": "ルート",
@@ -90,8 +94,11 @@
 	"Profile": {
 		"settings": "設定",
 		"login": "ログイン",
+		"loginFailed": "ログインに失敗しました",
+		"signupFailed": "登録に失敗しました",
+		"noAccessTokenFound": "アクセストークンが見つかりません。",
 		"logout": "ログアウト",
-		"signUp": "登録",
+		"signUp": "新規登録",
 		"dontHaveAnAccount": "アカウントをお持ちでないですか？",
 		"twoFactorAuth": "二要素認証",
 		"twoFactorAuthDescription": "二段階認証アプリまたは拡張機能を開き、Polkassemblyアカウントの認証コードを入力してください。",
@@ -235,7 +242,8 @@
 		"saveChanges": "保存",
 		"unfollow": "フォロー解除",
 		"following": "フォロー中",
-		"followers": "フォロワー"
+		"followers": "フォロワー",
+		"enterCredentials": "認証情報を入力してください"
 	},
 	"ListingTab": {
 		"Analytics": "分析",
@@ -243,6 +251,7 @@
 		"Referenda": "レファレンダム"
 	},
 	"ListingPage": {
+		"AllProposals": "すべてのレファレンダム",
 		"AuctionAdmin": "オークション管理者",
 		"AuctionAdminDescription": "オークションを開始するための起点。",
 		"BigSpender": "大口支出者",
@@ -282,7 +291,17 @@
 		"WhitelistedCaller": "ホワイトリストされた呼び出し者",
 		"WhitelistedCallerDescription": "Polkadotフェローシップの任意のメンバーによって指示される起点（段級不要）。",
 		"WishForChange": "変更への願い",
-		"WishForChangeDescription": "ネットワークが何らかの変更を望んでいることを示すための起点。"
+		"WishForChangeDescription": "ネットワークが何らかの変更を望んでいることを示すための起点。",
+		"CouncilMotion": "評議会モーション",
+		"CouncilMotionDescription": "ここはオンチェーンモーションを議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"TechCommitteeProposal": "技術委員会提案",
+		"TechCommitteeProposalDescription": "ここはオンチェーン技術委員会提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"DemocracyProposal": "民主主義提案",
+		"DemocracyProposalDescription": "ここはオンチェーン民主主義提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"TreasuryProposal": "財務提案",
+		"TreasuryProposalDescription": "ここはオンチェーン財務提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"Tip": "チップ",
+		"TipDescription": "ここはオンチェーンチップを議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。"
 	},
 	"Sidebar": {
 		"onChainIdentity": "オンチェーンアイデンティティ",
@@ -347,6 +366,7 @@
 		"loginToVote": "投票するにはログイン",
 		"requested": "リクエスト済み",
 		"beneficiary": "受益者",
+		"noVotes": "投票が見つかりません",
 		"description": "説明",
 		"timeline": "タイムライン",
 		"more": "もっと",
@@ -370,6 +390,7 @@
 		"split": "分割",
 		"support": "サポート",
 		"bareAyes": "単純賛成",
+		"issuance": "発行",
 		"viewVoteHistory": "投票履歴を表示",
 		"voteHistory": "投票履歴",
 		"delegated": "委任済み",
@@ -395,7 +416,11 @@
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
 		"delete": "削除",
 		"hideReplies": "返信を非表示",
-		"viewReplies": "返信を表示"
+		"viewReplies": "返信を表示",
+		"commentSummary": "コメントの要約",
+		"aiSummary": "AI要約",
+		"showLikelySpam": "疑わしいスパムを表示",
+		"hideLikelySpam": "疑わしいスパムを非表示"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -466,7 +491,9 @@
 		"previous": "前へ"
 	},
 	"BalanceInput": {
-		"addBalance": "残高を追加"
+		"addBalance": "残高を追加",
+		"enterAmount": "金額を入力",
+		"treasuryBalance": "財務残高"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "投票を選択",
@@ -547,7 +574,10 @@
 			"root": "ルート",
 			"stakingadmin": "ステーキング管理者",
 			"treasury": "財務",
-			"fellowship": "フェローシップ"
+			"fellowship": "フェローシップ",
+			"council": "評議会",
+			"democracy": "民主主義",
+			"whitelist": "ホワイトリスト"
 		},
 		"titleTooShort": "有効なタイトルを入力してください。",
 		"titlePlaceholder": "タイトルを入力",
@@ -598,27 +628,41 @@
 		"findYourRank": "生態系でのランクを見つける",
 		"searchUsername": "ユーザー名を検索"
 	},
-	"BlockEditor": {
-		"placeholder": "/ を入力して開始",
-		"errorUpdatingContent": "コンテンツの更新中にエラーが発生しました"
-	},
 	"SetIdentity": {
 		"displayName": "表示名",
-		"legalName": "法的名",
+		"legalName": "本名",
 		"email": "メール",
 		"twitter": "Twitter",
-		"matrix": "マトリックス",
+		"riot": "Riot",
+		"emailPlaceholder": "メールアドレスを入力",
+		"twitterPlaceholder": "@Twitterユーザー名",
+		"riotPlaceholder": "@ユーザー名.matrix.org",
 		"setIdentity": "アイデンティティを設定",
-		"onChainIdentity": "オンチェーンアイデンティティ",
-		"identityDescription1": "Polkadotは、任命された登録機関を通じてユーザーの資格情報を検証するオンチェーンIDを提供し、より大きな信頼とサポートを実現します。",
-		"identityDescription2": "検証が成功すると、ユーザーは信頼できるステータスを象徴する緑のチェックマークを受け取ります。この検証済みステータスシンボルは、財務部からの資金要請や討論・提案への参加時の信頼性を高めます。",
+		"onChainIdentity": "オンチェーンID",
+		"identityDescription1": "Polkadotは、任命されたレジストラを通じてユーザーの資格情報を検証するオンチェーンIDを提供し、より大きな信頼とサポートを生み出します。",
+		"identityDescription2": "検証が成功すると、ユーザーは信頼できるステータスを象徴する緑のチェックマークを受け取ります。この検証済みステータスシンボルは、国庫からの資金申請や議論・提案への参加時の信頼性を高めます。",
 		"letBegin": "始めましょう",
-		"requestJudgement": "判断を要請（近日公開）",
+		"requestJudgement": "判定をリクエスト",
 		"minimumDeposit": "最低預入額",
-		"registrarFee": "登録機関手数料",
+		"registrarFee": "レジストラ料金",
 		"totalAmountRequired": "必要総額",
-		"viewAmountBreakup": "金額の内訳を表示",
-		"registrarFees": "登録手数料"
+		"viewAmountBreakup": "金額内訳を表示",
+		"registrarFees": "レジストラ料金",
+		"success": "アイデンティティの設定に成功",
+		"successDescription": "アイデンティティが正常に設定されました",
+		"failed": "アイデンティティの設定に失敗",
+		"failedDescription": "アイデンティティの設定中にエラーが発生しました",
+		"proceed": "続行",
+		"please": "お願い",
+		"login": "ログイン",
+		"toSet": "アイデンティティを設定するには",
+		"identitySuccess": "オンチェーンID登録を開始",
+		"successCta": "検証プロセスを始めましょう",
+		"address": "アドレス",
+		"verifying": "検証中...",
+		"verificationSuccessful": "検証成功",
+		"verificationFailed": "検証失敗",
+		"goToHome": "ホームへ"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",
@@ -644,8 +688,30 @@
 		"proposals": "提案"
 	},
 	"CreateProposal": {
-		"createPreimage": "プレイメージを作成",
-		"createTreasuryProposal": "財務提案を作成"
+		"create": "作成",
+		"quickActions": "クイックアクション",
+		"submitProposal": "提案を提出",
+		"createDiscussion": "ディスカッション投稿",
+		"createPreimage": "新規プレイメージ",
+		"existingPreimage": "既存のプレイメージがあります",
+		"spend": "支出",
+		"from": "から",
+		"Treasury": "財務",
+		"usdxProposal": "AssetHubから資産を支出 (USDx, DOT, 等)",
+		"cancelReferendum": "レファレンダムをキャンセル",
+		"killReferendum": "レファレンダムを終了",
+		"createDiscussionDescription": "会話を開始しフィードバックを集める。",
+		"createPreimageDescription": "新しいプレイメージハッシュで提案を提出。",
+		"existingPreimageDescription": "既存のプレイメージハッシュを使用して提出。",
+		"createTreasuryProposalDescription": "財務支出を提案",
+		"usdxProposalDescription": "AssetHubから資金を要求 (USDx, DOT, 等)。",
+		"cancelReferendumDescription": "アクティブなレファレンダムのキャンセルを提案。",
+		"killReferendumDescription": "可決前にレファレンダムを終了。",
+		"goBack": "戻る",
+		"preimageHash": "プレイメージハッシュ",
+		"preimageLength": "長さ",
+		"preimageHashDescription": "ハッシュを入力",
+		"viewPreimage": "プレイメージを表示"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -660,11 +726,16 @@
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
 		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
-		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました"
+		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
+		"selectTrack": "トラックを選択",
+		"validFrom": "有効開始",
+		"addValidFrom": "有効開始を追加",
+		"invalidBlockHeight": "有効なブロック高を入力してください",
+		"enterFutureBlockHeight": "将来のブロック高を入力してください"
 	},
 	"CreatePreimage": {
-		"addItem": "項目を追加",
-		"removeItem": "項目を削除",
+		"addItem": "受取人/支払いを追加",
+		"removeItem": "支払いを削除",
 		"yes": "はい",
 		"no": "いいえ",
 		"uploadFile": "ファイルをアップロード",
@@ -672,12 +743,71 @@
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
 		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
 		"preimageNotedSuccessfully": "プレイメージが正常に記録されました",
-		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました"
+		"preimageNotedSuccessfullyDescription": "プレイメージが正常に記録されました",
+		"preimageHash": "プレイメージハッシュ",
+		"length": "長さ",
+		"beneficiary": "受取人",
+		"noBeneficiarySelected": "受取人が選択されていません",
+		"on": "オン"
 	},
 	"AddressInput": {
 		"invalidAddress": "無効なアドレス",
 		"noResultsFound": "結果が見つかりません",
-		"placeholder": "アドレスを入力"
+		"placeholder": "アドレスを選択/入力"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "レファレンダムインデックスを入力",
+		"referendumIdDescription": "ここに入力",
+		"thisReferendumIsNotOngoing": "警告！進行中のレファレンダムではありません",
+		"viewReferendum": "提案を表示"
+	},
+	"errorMessages": {
+		"valueTooLarge": "値が大きすぎます"
+	},
+	"TxFees": {
+		"preimageDeposit": "プレイメージデポジット",
+		"submissionDeposit": "提出デポジット",
+		"gasFees": "ガス料金"
+	},
+	"VoteSummary": {
+		"title": "投票の概要",
+		"voteDetails": {
+			"title": "投票の詳細",
+			"date": "日付",
+			"selfVotes": "自己投票",
+			"votingPower": "投票力",
+			"conviction": "確信",
+			"capital": "資本",
+			"delegatedVotes": "委任投票",
+			"delegators": "委任者",
+			"delegatedVotingPower": "委任された投票力",
+			"delegationList": "委任リスト",
+			"delegator": "委任者",
+			"delegatorCapital": "委任者資本",
+			"delegatorVotingPower": "委任者投票力",
+			"votePowerTooltip": "ロックされたバランスに基づく投票力",
+			"delegatedVoteTooltip": "委任投票に基づく投票力",
+			"delegationTooltip": "この提案を支持する委任者のリスト",
+			"voteTimestamp": "投票日時"
+		},
+		"buttons": {
+			"expand": "展開",
+			"collapse": "折りたたむ",
+			"showMore": "もっと見る",
+			"showLess": "少なく表示"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "委任者",
+				"conviction": "確信",
+				"votingPower": "投票力"
+			},
+			"noDelegations": "委任は利用できません"
+		},
+		"errors": {
+			"invalidData": "無効なデータ",
+			"fetchError": "データの取得エラー"
+		}
 	},
 	"Search": {
 		"placeholder": "ここに何かを検索",

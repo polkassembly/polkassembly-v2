@@ -1,0 +1,54 @@
+.collapsibleWrapper {
+	position: relative;
+	width: 100%;
+	border-radius: 16px;
+	padding: 1px;
+	background: linear-gradient(135deg, #cf2dab, #40e8ff, #6a41dd, #b62e76);
+	overflow: hidden;
+	margin-bottom: 16px;
+}
+
+.collapsibleInner {
+	border-radius: 15px;
+	width: 100%;
+	transition: all 0.3s ease-in-out;
+}
+
+.postContentGradient {
+	background: linear-gradient(to bottom, #fdf5ff, #fcfcfc);
+}
+
+.commentContentGradient {
+	background: linear-gradient(to bottom, #f5f8ff, #fcfcfc);
+}
+
+:global(.dark) {
+	.postContentGradient {
+		background: linear-gradient(to bottom, #2a2a34, #1e1e28);
+	}
+
+	.commentContentGradient {
+		background: linear-gradient(to bottom, #202331, #1a1c25);
+	}
+}
+
+.collapsibleTrigger {
+	padding: 16px 20px;
+	display: flex;
+	width: 100%;
+	align-items: center;
+	justify-content: space-between;
+	font-weight: 500;
+	color: var(--listing_page_btn);
+}
+
+.chevronIcon {
+	color: var(--text_primary);
+	font-weight: 600;
+	transition: transform 0.3s ease;
+}
+
+.collapsibleContent {
+	padding: 0rem 1.5rem 1.5rem 1.5rem;
+	font-size: 14px;
+}

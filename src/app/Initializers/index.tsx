@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
@@ -20,6 +19,8 @@ import { PolkadotApiService } from '../_client-services/polkadot_api_service';
 import { IdentityService } from '../_client-services/identity_service';
 import { WalletClientService } from '../_client-services/wallet_service';
 import { walletAtom } from '../_atoms/wallet/walletAtom';
+import { assethubApiAtom } from '../_atoms/polkadotJsApi/assethubApiAtom';
+import { AssethubApiService } from '../_client-services/assethub_api_service';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
@@ -29,9 +30,12 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	const polkadotApi = useAtomValue(polkadotApiAtom);
 	const identityApi = useAtomValue(identityApiAtom);
+	const assethubApi = useAtomValue(assethubApiAtom);
 
 	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
 	const setIdentityApiAtom = useSetAtom(identityApiAtom);
+	const setAssethubApiAtom = useSetAtom(assethubApiAtom);
+
 	const setWalletServiceAtom = useSetAtom(walletAtom);
 
 	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
@@ -61,6 +65,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 		polkadotApi?.reconnect();
 		identityApi?.reconnect();
+		assethubApi?.reconnect();
 
 		if (user?.exp && Date.now() > user.exp * 1000) {
 			if (refreshTokenData?.exp && Date.now() < refreshTokenData.exp * 1000) {
@@ -109,6 +114,34 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [identityApi, network]);
 
+	// init assethub api
+	useEffect(() => {
+		let assethubApiIntervalId: ReturnType<typeof setInterval>;
+
+		(async () => {
+			if (assethubApi) return;
+
+			const newApi = await AssethubApiService.Init(network);
+			setAssethubApiAtom(newApi);
+
+			assethubApiIntervalId = setInterval(async () => {
+				try {
+					await newApi.keepAlive();
+				} catch {
+					await newApi.reconnect();
+				}
+			}, 6000);
+		})();
+
+		return () => {
+			if (assethubApiIntervalId) {
+				clearInterval(assethubApiIntervalId);
+			}
+			assethubApi?.disconnect().then(() => setAssethubApiAtom(null));
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [assethubApi, network]);
+
 	// init polkadot api and wallet service
 	useEffect(() => {
 		let polkadotApiIntervalId: ReturnType<typeof setInterval>;
@@ -147,23 +180,26 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user preferences
 	useEffect(() => {
+		const locale = CookieClientService.getLocaleCookie();
+		const theme = CookieClientService.getThemeCookie();
+		const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+
 		setUserPreferences({
 			...userPreferences,
-			locale: userPreferences.locale,
-			theme: userPreferences.theme,
-			...(user?.loginAddress
+			locale: locale || userPreferences.locale,
+			theme: theme || userPreferences.theme,
+			...(accessTokenPayload?.loginAddress
 				? {
 						address: {
-							address: user?.loginAddress
+							address: accessTokenPayload.loginAddress
 						}
 					}
 				: {}),
-			wallet: user?.loginWallet
+			wallet: accessTokenPayload?.loginWallet
 		});
 
-		dayjs.locale(userPreferences.locale);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user?.loginWallet, userPreferences.locale, userPreferences.theme]);
+	}, []);
 
 	// set user
 	useEffect(() => {

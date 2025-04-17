@@ -12,8 +12,8 @@ import { ELocales, ENetwork, EOffChainPostTopic, EProposalType, ETheme, EVoteDec
 import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
-import { OutputData } from '@editorjs/editorjs';
-import { BN } from '@polkadot/util';
+import { BN, isHex } from '@polkadot/util';
+import { NETWORKS_DETAILS } from '../_constants/networks';
 
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
@@ -100,8 +100,8 @@ export class ValidatorService {
 		}
 	}
 
-	static isValidUserId(userId: number): boolean {
-		return !isNaN(userId) && userId > 0;
+	static isValidUserId(userId: unknown): boolean {
+		return this.isValidNumber(userId) && Number(userId) > 0;
 	}
 
 	static isValidWeb3Address(address: string): boolean {
@@ -219,11 +219,6 @@ export class ValidatorService {
 		return indicators >= options.minIndicators;
 	}
 
-	// TODO: Add more checks for the content
-	static isValidBlockContent(content: OutputData): boolean {
-		return content.blocks.length > 0;
-	}
-
 	static isValidNumber(number: unknown): boolean {
 		return number !== null && number !== undefined && Number.isFinite(Number(number));
 	}
@@ -243,7 +238,7 @@ export class ValidatorService {
 	static isValidAmount(amount: string): boolean {
 		try {
 			const bnAmount = new BN(amount);
-			return bnAmount.gt(new BN(0));
+			return bnAmount.gte(new BN(0));
 		} catch {
 			return false;
 		}
@@ -276,5 +271,75 @@ export class ValidatorService {
 		} catch {
 			return false;
 		}
+	}
+
+	static isValidAssetId(assetId: string, network: ENetwork): boolean {
+		return Object.keys(NETWORKS_DETAILS[`${network}`].supportedAssets).includes(assetId);
+	}
+
+	static isValidPreimageHash(preimageHash: string): boolean {
+		const bitLength = 256;
+		return isHex(preimageHash, bitLength);
+	}
+
+	static isValidTrackNumber({ trackNum, network }: { trackNum: number; network: ENetwork }): boolean {
+		const { trackDetails } = NETWORKS_DETAILS[`${network}`];
+		const allTrackIds = Object.values(trackDetails).map((track) => track.trackId);
+		return allTrackIds.includes(trackNum);
+	}
+
+	static isValidIndexOrHash(value: unknown): boolean {
+		if (this.isValidNumber(value)) {
+			return Number(value) >= 0;
+		}
+		if (typeof value === 'string') {
+			return Boolean(value.trim()) && value.startsWith('0x');
+		}
+		return false;
+	}
+
+	static isValidTwitterHandle(handle: string): boolean {
+		if (!handle || typeof handle !== 'string') return false;
+
+		// Remove @ symbol if present
+		const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
+
+		// Twitter handle rules:
+		// - 4-15 characters long
+		// - Only alphanumeric characters and underscores
+		// - Cannot start with a number
+		const twitterHandleRegex = /^[a-zA-Z][a-zA-Z0-9_]{3,14}$/;
+
+		return twitterHandleRegex.test(cleanHandle);
+	}
+
+	static isValidMatrixHandle(handle: string): boolean {
+		if (!handle || typeof handle !== 'string') return false;
+
+		// Matrix handle format: @username:domain.tld
+		// Example: @alice:matrix.org
+
+		// Remove @ symbol if present
+		const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
+
+		// Check if handle contains domain part
+		if (!cleanHandle.includes(':')) return false;
+
+		const [username, domain] = cleanHandle.split(':');
+
+		// Username rules:
+		// - 1-255 characters long
+		// - Only alphanumeric characters, underscores, hyphens, and periods
+		// - Cannot start or end with a period
+		// - Cannot have consecutive periods
+		// eslint-disable-next-line no-useless-escape
+		const usernameRegex = /^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)*$/;
+
+		// Domain rules:
+		// - Valid domain format
+		// - Cannot be empty
+		const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9][a-zA-Z0-9-]*)*\.[a-zA-Z]{2,}$/;
+
+		return usernameRegex.test(username) && domainRegex.test(domain);
 	}
 }

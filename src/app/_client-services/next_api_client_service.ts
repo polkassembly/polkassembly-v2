@@ -5,7 +5,6 @@
 /* eslint-disable lines-between-class-members */
 
 import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { fetchPF } from '@/_shared/_utils/fetchPF';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import {
 	EPostOrigin,
@@ -22,7 +21,6 @@ import {
 	IPostListing,
 	IPost,
 	IPublicUser,
-	IVoteData,
 	IUserActivity,
 	IPreimage,
 	IQRSessionPayload,
@@ -32,9 +30,11 @@ import {
 	EAllowedCommentor,
 	EOffChainPostTopic,
 	IVoteCartItem,
-	EConvictionAmount
+	EConvictionAmount,
+	IContentSummary,
+	ISocialHandle,
+	IVoteHistoryData
 } from '@/_shared/types';
-import { OutputData } from '@editorjs/editorjs';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
@@ -90,7 +90,15 @@ enum EApiRoute {
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
-	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART'
+	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
+	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
+	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
+	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
+	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
+	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
+	JUDGEMENT_CALL = 'JUDGEMENT_CALL'
 }
 
 export class NextApiClientService {
@@ -134,6 +142,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_ACTIVITY_FEED:
 				path = '/activity-feed';
 				break;
+			case EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED:
+				path = '/activity-feed/subscriptions';
+				break;
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
@@ -145,10 +156,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
-				path = '/users/id';
-				break;
 			case EApiRoute.GET_FOLLOWING:
 			case EApiRoute.GET_FOLLOWERS:
+			case EApiRoute.GET_BATCH_VOTE_CART:
+			case EApiRoute.GET_USER_SOCIAL_HANDLES:
 				path = '/users/id';
 				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
@@ -162,8 +173,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_CONTENT_SUMMARY:
 				break;
-
 			// post routes
 			case EApiRoute.LOGOUT:
 				path = '/auth/logout';
@@ -207,12 +218,19 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.ADD_TO_BATCH_VOTE_CART:
 			case EApiRoute.FOLLOW_USER:
+			case EApiRoute.INIT_SOCIAL_VERIFICATION:
+			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
 				path = '/users/id';
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
 			case EApiRoute.ADD_COMMENT:
+			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
+				method = 'POST';
+				break;
+			case EApiRoute.JUDGEMENT_CALL:
+				path = '/identity/judgement-call';
 				method = 'POST';
 				break;
 
@@ -235,6 +253,7 @@ export class NextApiClientService {
 				method = 'DELETE';
 				break;
 			case EApiRoute.DELETE_REACTION:
+			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 			case EApiRoute.DELETE_COMMENT:
 				method = 'DELETE';
 				break;
@@ -262,7 +281,7 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
-		const response = await fetchPF(url, {
+		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
@@ -424,7 +443,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method });
 	}
 
-	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: OutputData } }) {
+	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
@@ -448,7 +467,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		content: OutputData;
+		content: string;
 		parentCommentId?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
@@ -475,7 +494,7 @@ export class NextApiClientService {
 			decision
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
-		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCount: number }>({ url, method });
+		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
 	// activity feed
@@ -506,6 +525,31 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVITY_FEED, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
+	}
+
+	static async getSubscribedActivityFeed({ page, limit = DEFAULT_LISTING_LIMIT, userId }: { page: number; limit?: number; userId: number }) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetSubscriptionFeed', {
+				network: currentNetwork,
+				page,
+				limit,
+				userId
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_SUBSCRIBED_ACTIVITY_FEED, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
@@ -672,7 +716,7 @@ export class NextApiClientService {
 		topic
 	}: {
 		proposalType: EProposalType;
-		content: OutputData;
+		content: string;
 		title: string;
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
@@ -692,5 +736,64 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async addPostSubscription(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
+	}
+
+	static async deletePostSubscription(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
+		if (this.isServerSide()) {
+			const currentNetwork = await this.getCurrentNetwork();
+
+			const cachedData = await redisServiceSSR('GetContentSummary', {
+				network: currentNetwork,
+				proposalType,
+				indexOrHash
+			});
+
+			if (cachedData) {
+				return { data: cachedData, error: null };
+			}
+		}
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_CONTENT_SUMMARY,
+			routeSegments: [proposalType, indexOrHash, 'content-summary']
+		});
+		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async fetchUserSocialHandles({ userId, address }: { userId: number; address: string }) {
+		const queryParams = new URLSearchParams({
+			address
+		});
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_USER_SOCIAL_HANDLES,
+			routeSegments: [userId.toString(), 'socials'],
+			queryParams
+		});
+		return this.nextApiClientFetch<{ socialHandles: Record<ESocial, ISocialHandle> }>({ url, method });
+	}
+
+	static async initSocialVerification({ userId, social, handle, address }: { userId: number; social: ESocial; handle: string; address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.INIT_SOCIAL_VERIFICATION, routeSegments: [userId.toString(), 'socials', 'init-verification'] });
+		return this.nextApiClientFetch<ISocialHandle>({ url, method, data: { social, handle, address } });
+	}
+
+	static async confirmSocialVerification({ userId, social, token, twitterOauthVerifier }: { userId: number; social: ESocial; token: string; twitterOauthVerifier?: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CONFIRM_SOCIAL_VERIFICATION, routeSegments: [userId.toString(), 'socials', 'confirm-verification'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { social, token, twitterOauthVerifier } });
+	}
+
+	static async judgementCall({ userAddress, identityHash }: { userAddress: string; identityHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.JUDGEMENT_CALL });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { userAddress, identityHash } });
 	}
 }

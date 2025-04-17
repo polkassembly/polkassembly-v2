@@ -25,6 +25,10 @@
 		"Live": "LIVE",
 		"CommentPlaceholder": "Type your comment here",
 		"Post": "Post",
+		"share": "Share",
+		"loading": "Loading...",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
 		"Navbar": {
 			"All": "All",
 			"Root": "Root",
@@ -90,8 +94,12 @@
 	"Profile": {
 		"settings": "Settings",
 		"login": "Login",
+		"loginFailed": "Failed to login",
+		"signupFailed": "Failed to signup",
+		"noAccessTokenFound": "No Access token found.",
 		"logout": "Logout",
 		"signUp": "Sign Up",
+		"enterCredentials": "Please enter your credentials",
 		"dontHaveAnAccount": "Don't have an account?",
 		"twoFactorAuth": "Two Factor Authentication",
 		"twoFactorAuthDescription": "Please open the two-step verification app or extension and input the authentication code for your Polkassembly account.",
@@ -243,6 +251,7 @@
 		"Referenda": "Referenda"
 	},
 	"ListingPage": {
+		"AllProposals": "All Referenda",
 		"AuctionAdmin": "Auction Admin",
 		"AuctionAdminDescription": "Origin for starting auctions.",
 		"BigSpender": "Big Spender",
@@ -282,7 +291,17 @@
 		"WhitelistedCaller": "Whitelisted Caller",
 		"WhitelistedCallerDescription": "Origin commanded by any members of the Polkadot Fellowship (no Dan grade needed).",
 		"WishForChange": "Wish For Change",
-		"WishForChangeDescription": "Origin for signaling that the network wishes for some change."
+		"WishForChangeDescription": "Origin for signaling that the network wishes for some change.",
+		"TechCommitteeProposal": "Tech Committee Proposal",
+		"TechCommitteeProposalDescription": "This is the place to discuss on-chain tech committee proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"DemocracyProposal": "On Chain Proposals",
+		"DemocracyProposalDescription": "This is the place to discuss on-chain proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"TreasuryProposal": "Treasury Proposal",
+		"TreasuryProposalDescription": "This is the place to discuss on-chain treasury proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"Tip": "Tips",
+		"TipDescription": "This is the place to discuss on-chain tips. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"CouncilMotion": "On Chain Motions",
+		"CouncilMotionDescription": "This is the place to discuss on-chain motions. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them."
 	},
 	"Sidebar": {
 		"onChainIdentity": "On-Chain Identity",
@@ -356,6 +375,7 @@
 		"please": "Please",
 		"login": "Login",
 		"toComment": "to comment",
+		"noVotes": "No Votes Found",
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
@@ -371,6 +391,7 @@
 		"split": "Split",
 		"support": "Support",
 		"bareAyes": "Bare Ayes",
+		"issuance": "Issuance",
 		"viewVoteHistory": "View Vote History",
 		"voteHistory": "Vote History",
 		"delegated": "Delegated",
@@ -383,6 +404,10 @@
 		"delete": "Delete",
 		"hideReplies": "Hide Replies",
 		"viewReplies": "View Replies",
+		"commentSummary": "Comment Summary",
+		"aiSummary": "AI Summary",
+		"showLikelySpam": "Show Likely Spam",
+		"hideLikelySpam": "Hide Likely Spam",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -486,7 +511,8 @@
 		"previous": "Previous"
 	},
 	"BalanceInput": {
-		"addBalance": "Add Balance"
+		"enterAmount": "Enter Amount",
+		"treasuryBalance": "Treasury Balance"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Choose your Vote",
@@ -570,7 +596,10 @@
 			"root": "Root",
 			"stakingadmin": "Staking Admin",
 			"treasury": "Treasury",
-			"fellowship": "Fellowship"
+			"fellowship": "Fellowship",
+			"council": "Council",
+			"democracy": "Democracy",
+			"whitelist": "Whitelist"
 		},
 		"please": "Please",
 		"login": "Login",
@@ -618,27 +647,41 @@
 		"findYourRank": "Find your rank in the ecosystem",
 		"searchUsername": "Enter username to search"
 	},
-	"BlockEditor": {
-		"placeholder": "Type / to start",
-		"errorUpdatingContent": "Error updating content"
-	},
 	"SetIdentity": {
 		"displayName": "Display Name",
 		"legalName": "Legal Name",
 		"email": "Email",
 		"twitter": "Twitter",
-		"matrix": "Matrix",
+		"riot": "Riot",
+		"emailPlaceholder": "Enter your email address",
+		"twitterPlaceholder": "@YourTwitterName",
+		"riotPlaceholder": "@Yourname.matrix.org",
 		"setIdentity": "Set Identity",
 		"onChainIdentity": "On-chain Identity",
 		"identityDescription1": "Polkadot offers on-chain identities that verify users' credentials through appointed registrars, instilling greater trust and support.",
 		"identityDescription2": "Once successfully verified, users receive a green checkmark, symbolising their trusted status. This verified status symbol enhances trustworthiness when requesting funds from the treasury or participating in discussions and proposals.",
 		"letBegin": "Let's Begin",
-		"requestJudgement": "Request Judgement (Coming Soon)",
+		"requestJudgement": "Request Judgement",
 		"minimumDeposit": "Minimum Deposit",
 		"registrarFee": "Registrar Fee",
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
-		"registrarFees": "Registrar Fees"
+		"registrarFees": "Registrar Fees",
+		"success": "Identity set successfully",
+		"successDescription": "Your identity has been set successfully",
+		"failed": "Failed to set identity",
+		"failedDescription": "There was an error while setting your identity",
+		"proceed": "Proceed",
+		"please": "Please",
+		"login": "Login",
+		"toSet": "To Set Identity",
+		"identitySuccess": "On-chain identity registration initiated",
+		"successCta": "Let's start your verification process",
+		"address": "Address",
+		"verifying": "Verifying...",
+		"verificationSuccessful": "Verification successful",
+		"verificationFailed": "Verification failed",
+		"goToHome": "Go to home"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
@@ -664,8 +707,30 @@
 		"proposals": "Proposals"
 	},
 	"CreateProposal": {
-		"createPreimage": "Create Preimage",
-		"createTreasuryProposal": "Create Treasury Proposal"
+		"create": "Create",
+		"quickActions": "Quick Actions",
+		"submitProposal": "Submit Proposal",
+		"createDiscussion": "Discussion Post",
+		"createPreimage": "New Preimage",
+		"existingPreimage": "I already have a Preimage",
+		"spend": "Spend",
+		"from": "from",
+		"Treasury": "Treasury",
+		"usdxProposal": "Spend Assets from AssetHub (USDx, DOT, etc.)",
+		"cancelReferendum": "Cancel a Referendum",
+		"killReferendum": "Kill a Referendum",
+		"createDiscussionDescription": "Start a conversation and gather feedback.",
+		"createPreimageDescription": "Submit a proposal with a new preimage hash.",
+		"existingPreimageDescription": "Use an existing preimage hash for submission.",
+		"createTreasuryProposalDescription": "Propose treasury spending in",
+		"usdxProposalDescription": "Request funding from AssetHub (USDx, DOT, etc.).",
+		"cancelReferendumDescription": "Propose to cancel an active referendum.",
+		"killReferendumDescription": "Terminate a referendum before it passes.",
+		"goBack": "Go Back",
+		"preimageHash": "Preimage Hash",
+		"preimageLength": "Length",
+		"preimageHashDescription": "Enter Hash",
+		"viewPreimage": "View Preimage"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -680,11 +745,16 @@
 		"preimageNotedSuccessfully": "Preimage noted successfully",
 		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
 		"preimageNoteFailed": "Failed to note preimage",
-		"preimageNoteFailedDescription": "There was an error while noting the preimage"
+		"preimageNoteFailedDescription": "There was an error while noting the preimage",
+		"selectTrack": "Select Track",
+		"validFrom": "Valid From",
+		"addValidFrom": "Add Valid From",
+		"invalidBlockHeight": "Please enter a valid block height",
+		"enterFutureBlockHeight": "Please enter a future block height"
 	},
 	"CreatePreimage": {
-		"addItem": "Add Item",
-		"removeItem": "Remove Item",
+		"addItem": "Add Beneficiary/Payouts",
+		"removeItem": "Remove Payout",
 		"yes": "Yes",
 		"no": "No",
 		"uploadFile": "Upload File",
@@ -692,12 +762,71 @@
 		"preimageNoteFailed": "Failed to note preimage",
 		"preimageNoteFailedDescription": "There was an error while noting the preimage",
 		"preimageNotedSuccessfully": "Preimage noted successfully",
-		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully"
+		"preimageNotedSuccessfullyDescription": "The preimage has been noted successfully",
+		"preimageHash": "Preimage Hash",
+		"length": "Length",
+		"beneficiary": "Beneficiary",
+		"noBeneficiarySelected": "No Beneficiary Selected",
+		"on": "on"
+	},
+	"KillCancelReferendum": {
+		"referendumId": "Enter Referendum Index",
+		"referendumIdDescription": "Type Here",
+		"thisReferendumIsNotOngoing": "Warning!  Not an Ongoing Referendum",
+		"viewReferendum": "View Proposal"
 	},
 	"AddressInput": {
 		"invalidAddress": "Invalid Address",
 		"noResultsFound": "No results found",
-		"placeholder": "Enter Address"
+		"placeholder": "Select/Enter Address"
+	},
+	"errorMessages": {
+		"valueTooLarge": "Value is too large"
+	},
+	"TxFees": {
+		"preimageDeposit": "Preimage Deposit",
+		"submissionDeposit": "Submission Deposit",
+		"gasFees": "Gas Fees"
+	},
+	"VoteSummary": {
+		"title": "Vote Summary",
+		"voteDetails": {
+			"title": "Vote Details",
+			"date": "Date",
+			"selfVotes": "Self Votes",
+			"votingPower": "Voting Power",
+			"conviction": "Conviction",
+			"capital": "Capital",
+			"delegatedVotes": "Delegated Votes",
+			"delegators": "Delegators",
+			"delegatedVotingPower": "Delegated Voting Power",
+			"delegationList": "Delegation List",
+			"delegator": "Delegator",
+			"delegatorCapital": "Delegator Capital",
+			"delegatorVotingPower": "Delegator Voting Power",
+			"votePowerTooltip": "Vote power based on locked balance",
+			"delegatedVoteTooltip": "Vote power based on delegated votes",
+			"delegationTooltip": "List of delegators supporting this proposal",
+			"voteTimestamp": "Vote cast on"
+		},
+		"buttons": {
+			"expand": "Expand",
+			"collapse": "Collapse",
+			"showMore": "Show More",
+			"showLess": "Show Less"
+		},
+		"delegation": {
+			"delegatorListHeader": {
+				"delegator": "Delegator",
+				"conviction": "Conviction",
+				"votingPower": "Voting Power"
+			},
+			"noDelegations": "No delegations available"
+		},
+		"errors": {
+			"invalidData": "Invalid data",
+			"fetchError": "Error fetching data"
+		}
 	},
 	"Search": {
 		"placeholder": "Type here to search for something",

@@ -22,8 +22,7 @@ function SetDefaults({
 	onDefaultAbstainValueChange,
 	onDefaultAbstainAyeValueChange,
 	onDefaultAbstainNayValueChange,
-	onNext,
-	isInvalidAmount
+	onNext
 }: {
 	voteDecision: EVoteDecision;
 	onVoteDecisionChange: (voteDecision: EVoteDecision) => void;
@@ -33,18 +32,17 @@ function SetDefaults({
 	onDefaultAbstainAyeValueChange: (ayeVoteValue: BN) => void;
 	onDefaultAbstainNayValueChange: (nayVoteValue: BN) => void;
 	onNext: () => void;
-	isInvalidAmount: boolean;
 }) {
 	const t = useTranslations();
 	return (
 		<div>
 			<div className='p-4'>{t('BatchVote.setDefaults')}</div>
 			<Separator />
-			<div className='flex w-full flex-col items-center gap-y-4 px-24 py-4'>
+			<div className='flex w-full flex-col gap-y-4 px-24 py-4'>
 				<WalletButtons small />
 				<AddressDropdown withBalance />
 				<div className='w-full'>
-					<p className='mb-1 text-sm text-wallet_btn_text'>{t('BatchVote.chooseYourVote')}</p>
+					<p className='mb-1 text-xs text-wallet_btn_text sm:text-sm'>{t('BatchVote.chooseYourVote')}</p>
 					<ChooseVote
 						voteDecision={voteDecision}
 						onVoteDecisionChange={onVoteDecisionChange}
@@ -56,23 +54,23 @@ function SetDefaults({
 						<BalanceInput
 							name={`${voteDecision}-balance`}
 							label={t('VoteReferendum.lockBalance')}
-							onChange={onDefaultAyeNayValueChange}
+							onChange={({ value }) => onDefaultAyeNayValueChange(value)}
 						/>
 					) : (
 						<>
 							{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
 								<BalanceInput
 									label={t('VoteReferendum.abstainVoteValue')}
-									onChange={onDefaultAbstainValueChange}
+									onChange={({ value }) => onDefaultAbstainValueChange(value)}
 								/>
 							)}
 							<BalanceInput
 								label={t('VoteReferendum.ayeVoteValue')}
-								onChange={onDefaultAbstainAyeValueChange}
+								onChange={({ value }) => onDefaultAbstainAyeValueChange(value)}
 							/>
 							<BalanceInput
 								label={t('VoteReferendum.nayVoteValue')}
-								onChange={onDefaultAbstainNayValueChange}
+								onChange={({ value }) => onDefaultAbstainNayValueChange(value)}
 							/>
 						</>
 					)}
@@ -83,12 +81,7 @@ function SetDefaults({
 				</div>
 				<Separator />
 				<div className='flex w-full justify-end'>
-					<Button
-						onClick={onNext}
-						disabled={isInvalidAmount}
-					>
-						{t('BatchVote.next')}
-					</Button>
+					<Button onClick={onNext}>{t('BatchVote.next')}</Button>
 				</div>
 			</div>
 		</div>

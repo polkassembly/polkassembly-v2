@@ -7,6 +7,27 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ClientError } from '@/app/_client-utils/clientError';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React from 'react';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+
+export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
+	const { index } = await params;
+	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.DISCUSSION, indexOrHash: index });
+
+	// Default description and title
+	let { description, title } = OPENGRAPH_METADATA;
+
+	// Use post title in description if available
+	if (data) {
+		title = `Polkassembly - Discussion #${index}`;
+		description = `Discussion #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+	}
+
+	return {
+		title,
+		description
+	};
+}
 
 async function DiscussionPost({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
