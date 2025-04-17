@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, EVoteDecision, ICommentResponse, IVoteData } from '@/_shared/types';
+import { EProposalType, ICommentResponse, IVoteData } from '@/_shared/types';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
@@ -26,6 +26,9 @@ import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
+import { Skeleton } from '../../Skeleton';
+import VoteCommentsDialog from '../VoteCommentsDialog/VoteCommentsDialog';
+import VoteDetailsButton from '../VoteDetailsButton/VoteDetailsButton';
 
 function SingleComment({
 	commentData,
@@ -40,13 +43,13 @@ function SingleComment({
 }) {
 	const [reply, setReply] = useState<boolean>(false);
 	const t = useTranslations();
-
 	const [comment, setComment] = useState<ICommentResponse | null>(commentData);
 	const [showReplies, setShowReplies] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 	const [voteData, setVoteData] = useState<IVoteData[] | null>(null);
 	const [isLoadingVotes, setIsLoadingVotes] = useState<boolean>(false);
+	const [showVoteDetails, setShowVoteDetails] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
 
@@ -65,8 +68,14 @@ function SingleComment({
 				});
 
 				if (data && !error) {
-					setVoteData(data.votes);
-					console.log('voteData for comment author', data.votes);
+					if (Array.isArray(data) && data.length > 0) {
+						const responseData = data[0];
+						setVoteData(responseData.votes);
+					} else if (data.votes) {
+						setVoteData(data.votes);
+					} else {
+						setVoteData([]);
+					}
 				}
 			} catch (err) {
 				console.error('Failed to fetch vote data:', err);
@@ -78,7 +87,6 @@ function SingleComment({
 		fetchVoteData();
 	}, [comment, proposalType, index]);
 
-	console.log('voteData', voteData);
 	const handleDeleteComment = async () => {
 		if (!user || !comment || user.id !== comment.user.id) {
 			throw new ClientError('You are not the owner of this comment');
@@ -112,9 +120,10 @@ function SingleComment({
 		}
 	};
 
-	// Check if the comment author has voted on this proposal
 	const hasVoted = voteData && voteData.length > 0;
 	const userVoteType = hasVoted ? voteData[0]?.decision : null;
+	const voteInfo = hasVoted ? voteData[0] : null;
+	const votedText = t('PostDetails.voted');
 
 	if (!comment) {
 		return null;
@@ -147,6 +156,13 @@ function SingleComment({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+			{voteInfo && (
+				<VoteCommentsDialog
+					voteInfo={voteInfo}
+					showVoteDetails={showVoteDetails}
+					setShowVoteDetails={setShowVoteDetails}
+				/>
+			)}
 			<div>
 				{comment.user.addresses[0] ? (
 					<Identicon
@@ -190,25 +206,14 @@ function SingleComment({
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
 					{isLoadingVotes ? (
-						<span className='text-xs text-gray-500'>Checking votes...</span>
+						<Skeleton className='h-3 w-3' />
 					) : (
 						hasVoted && (
-							<>
-								<Separator
-									orientation='vertical'
-									className='h-3'
-								/>
-								<div className='flex items-center gap-x-1 text-xs'>
-									<span>{t('PostDetails.voted')}</span>
-									{userVoteType === EVoteDecision.AYE ? (
-										<span className='text-green-500'>{t('PostDetails.aye')}</span>
-									) : userVoteType === EVoteDecision.NAY ? (
-										<span className='text-red-500'>{t('PostDetails.nay')}</span>
-									) : (
-										<span>{userVoteType}</span>
-									)}
-								</div>
-							</>
+							<VoteDetailsButton
+								userVoteType={userVoteType}
+								votedText={votedText}
+								setShowVoteDetails={setShowVoteDetails}
+							/>
 						)
 					)}
 				</div>
