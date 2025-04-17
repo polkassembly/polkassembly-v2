@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EBountyStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import ProposalIcon from '@assets/icons/proposal.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
@@ -16,21 +16,12 @@ import { useTranslations } from 'next-intl';
 import BountyTable from './BountyTable';
 import styles from './Bounties.module.scss';
 
-enum EBountyStatus {
-	ALL = 'all',
-	ACTIVE = 'Active',
-	PROPOSED = 'Proposed',
-	CLAIMED = 'Claimed',
-	CANCELLED = 'Cancelled',
-	REJECTED = 'Rejected'
-}
-
 function BountiesListingPage({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pageParam = searchParams.get('page')?.split('?')[0];
 	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
-	const status = searchParams.get('status') || 'all';
+	const status = searchParams.get('status') || EBountyStatus.ALL;
 	const t = useTranslations();
 
 	const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
@@ -50,7 +41,10 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 		}
 		const params = new URLSearchParams();
 		params.set('page', '1');
-		params.set('status', value);
+
+		if (value !== EBountyStatus.ALL) {
+			params.set('status', encodeURIComponent(JSON.stringify(value)));
+		}
 		router.push(`/bounties-listing?${params.toString()}`);
 	};
 

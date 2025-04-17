@@ -198,7 +198,7 @@ export class SubsquidService extends SubsquidUtils {
 				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
 			}
 
-			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
+			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(!ValidatorService.isValidNumber(proposal.index) ? proposal.hash : proposal.index) });
 		});
 
 		const voteMetrics = await Promise.all(voteMetricsPromises);
