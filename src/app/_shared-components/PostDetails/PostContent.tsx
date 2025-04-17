@@ -38,7 +38,7 @@ function PostContent({
 			/>
 
 			<Separator className='my-4 bg-border_grey' />
-			<PostActions postData={postData} />
+			<PostActions postData={postData as IPost} />
 			<div className='flex items-center justify-between'>
 				<div />
 				<div>

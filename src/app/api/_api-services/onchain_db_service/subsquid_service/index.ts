@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IBountyProposal,
 	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
@@ -114,6 +115,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			createdAt: proposal.createdAt,
+			curator: proposal.curator || '',
 			proposer: proposal.proposer || '',
 			status: proposal.status,
 			index: proposal.index,
@@ -203,15 +205,17 @@ export class SubsquidService extends SubsquidUtils {
 
 		const posts: IOnChainPostListing[] = [];
 
-		subsquidData.proposals.forEach(
-			(
+		const postsPromises = subsquidData.proposals.map(
+			async (
 				proposal: {
 					createdAt: string;
 					description?: string | null;
 					index: number;
 					origin: EPostOrigin;
 					proposer?: string;
+					curator?: string;
 					status?: EProposalStatus;
+					reward?: string;
 					hash?: string;
 					preimage?: {
 						proposedCall?: {
@@ -227,13 +231,31 @@ export class SubsquidService extends SubsquidUtils {
 			) => {
 				const allPeriodEnds =
 					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+				let childBountiesCount = 0;
 
-				posts.push({
+				// child bounties count
+				if (proposalType === EProposalType.BOUNTY) {
+					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES;
+
+					const { data } = await gqlClient
+						.query(childBountiesCountGQL, {
+							parentBountyIndex_eq: proposal.index
+						})
+						.toPromise();
+					if (data) {
+						childBountiesCount = data?.totalChildBounties?.totalCount || 0;
+					}
+				}
+
+				return {
 					createdAt: new Date(proposal.createdAt),
+					childBountiesCount: childBountiesCount || 0,
+					curator: proposal.curator,
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
+					reward: proposal.reward || '',
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
@@ -241,9 +263,17 @@ export class SubsquidService extends SubsquidUtils {
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
-				});
+				};
 			}
 		);
+
+		const resolvedPosts = await Promise.allSettled(postsPromises);
+
+		resolvedPosts?.forEach((result) => {
+			if (result.status === 'fulfilled' && result?.value) {
+				posts.push(result.value);
+			}
+		});
 
 		return {
 			items: posts,
@@ -458,6 +488,90 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
+		};
+	}
+
+	static async getActiveBountiesWithRewards(network: ENetwork): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS, {
+					type_eq: EProposalType.BOUNTY,
+					status_not_in: [EProposalStatus.Cancelled, EProposalStatus.Rejected, EProposalStatus.Approved, EProposalStatus.Claimed]
+				})
+				.toPromise();
+
+			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+		} catch (error) {
+			console.error('Error fetching active bounties:', error);
+			return null;
+		}
+	}
+
+	static async getActiveBountiesWithRewardsByIndex(network: ENetwork, index: number): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX, {
+					type_eq: EProposalType.BOUNTY,
+					status_not_in: [EProposalStatus.Cancelled, EProposalStatus.Rejected, EProposalStatus.Approved, EProposalStatus.Claimed],
+					index_eq: index
+				})
+				.toPromise();
+			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+		} catch (error) {
+			console.error('Error fetching active bounties by index:', error);
+			return null;
+		}
+	}
+
+	static async getChildBountiesRewards(network: ENetwork, parentBountyIndices: number[]): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
+					parentBountyIndex_in: parentBountyIndices
+				})
+				.toPromise();
+
+			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+		} catch (error) {
+			console.error('Error fetching child bounties:', error);
+			return null;
+		}
+	}
+
+	static async getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(
+		network: ENetwork,
+		parentBountyIndices: number[]
+	): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
+				.toPromise();
+
+			return response as { data: { items: IBountyProposal[]; totalCount: number } };
+		} catch (error) {
+			console.error('Error fetching claimed child bounties payees and reward:', error);
+			return null;
+		}
+	}
+
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }): Promise<IGenericListingResponse<IOnChainPostInfo>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { parentBountyIndex_eq: index }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
+		}
+		return {
+			items: subsquidData.childBounties || [],
+			totalCount: subsquidData.totalChildBounties.totalCount || 0
 		};
 	}
 

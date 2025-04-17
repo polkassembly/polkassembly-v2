@@ -214,16 +214,20 @@ export class PolkadotApiService {
 		let freeBalance = BN_ZERO;
 		let lockedBalance = BN_ZERO;
 		let totalBalance = BN_ZERO;
+		let transferableBalance = BN_ZERO;
 
 		const responseObj = {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 
 		if (!address || !this.api?.derive?.balances?.all) {
 			return responseObj;
 		}
+
+		const existentialDeposit = this.api.consts?.balances?.existentialDeposit ? new BN(this.api.consts.balances.existentialDeposit.toString()) : BN_ZERO;
 
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		await this.api.derive.balances
@@ -240,8 +244,20 @@ export class PolkadotApiService {
 			.then((result: any) => {
 				const free = new BN(result?.data?.free) || BN_ZERO;
 				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
+				const frozen = new BN(result?.data?.frozen || result?.data?.feeFrozen || result?.data?.miscFrozen) || BN_ZERO;
+
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+
+				if (free.gt(frozen)) {
+					transferableBalance = free.sub(frozen);
+
+					if (transferableBalance.lt(existentialDeposit)) {
+						transferableBalance = BN_ZERO;
+					}
+				} else {
+					transferableBalance = BN_ZERO;
+				}
 			})
 			.catch(() => {
 				// TODO: show notification
@@ -250,7 +266,8 @@ export class PolkadotApiService {
 		return {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 	}
 
@@ -722,6 +739,19 @@ export class PolkadotApiService {
 		return this.api.derive.chain.bestNumber();
 	}
 
+	async getBountyAmount() {
+		const allBounties = await this.api?.derive.bounties?.bounties();
+		return allBounties.filter((item: any) => {
+			const { isFunded, isCuratorProposed, isActive } = item?.bounty?.status || {};
+			return isFunded || isCuratorProposed || isActive;
+		});
+	}
+
+	async getAccountData(address: string) {
+		const accountData = (await this.api.query.system.account(address)) as any;
+		return new BN(accountData?.data?.free.toString()).add(new BN(accountData?.data?.reserved.toString()));
+	}
+
 	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
 		if (!this.api) {
 			return null;
@@ -734,6 +764,62 @@ export class PolkadotApiService {
 		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
 		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
+	}
+
+	async delegate({
+		address,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api) return;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async undelegate({ address, trackId, onSuccess, onFailed }: { address: string; trackId: number; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api) return;
+
+		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async getDelegateTxFee({ address, tracks, conviction, balance }: { address: string; tracks: number[]; conviction: number; balance: BN }): Promise<BN> {
+		if (!this.api) return BN_ZERO;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, address, conviction, balance));
+		const fee = await this.getTxFee({ extrinsicFn: txs, address });
+		return fee || BN_ZERO;
 	}
 
 	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
