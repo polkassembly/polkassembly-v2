@@ -1083,3 +1083,40 @@ export enum EPeriodType {
 	DECISION = 'decision',
 	CONFIRM = 'confirm'
 }
+
+export interface IPureProxy {
+	address: string;
+	proxyType: string;
+}
+
+export interface IMultisig {
+	signatories: Array<string>;
+	address: string;
+	threshold: number;
+	pureProxy: Array<IPureProxy>;
+	name?: string;
+	email?: string;
+	github?: string;
+	twitter?: string;
+	matrix?: string;
+	discord?: string;
+}
+
+export interface IProxy {
+	address: string;
+	name?: string;
+	email?: string;
+	github?: string;
+	twitter?: string;
+	matrix?: string;
+	discord?: string;
+	proxyType: string;
+}
+
+export interface ILinkedAddress {
+	[key: string]: {
+		multisig: Array<IMultisig>;
+		proxy: Array<IProxy>;
+		proxied: Array<IProxy>;
+	};
+}

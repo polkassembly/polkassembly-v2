@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, ILinkedAddress } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -21,6 +21,8 @@ import { WalletClientService } from '../_client-services/wallet_service';
 import { walletAtom } from '../_atoms/wallet/walletAtom';
 import { assethubApiAtom } from '../_atoms/polkadotJsApi/assethubApiAtom';
 import { AssethubApiService } from '../_client-services/assethub_api_service';
+import { useLinkedAddress } from '../_atoms/linkedAddress/linkedAddressAtom';
+import { MultisigService } from '../_client-services/multisig_proxy_service';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
@@ -35,6 +37,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
 	const setIdentityApiAtom = useSetAtom(identityApiAtom);
 	const setAssethubApiAtom = useSetAtom(assethubApiAtom);
+
+	// init linked address
+	const { setLinkedAddress } = useLinkedAddress();
 
 	const setWalletServiceAtom = useSetAtom(walletAtom);
 
@@ -210,6 +215,31 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
+
+	useEffect(() => {
+		const fetchLinkedAddress = async () => {
+			const userAddress = user?.addresses;
+			if (!userAddress || !userAddress.length) {
+				console.log('user address not found');
+				return;
+			}
+
+			const userAddressWithProxy: ILinkedAddress = {};
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const address of userAddress) {
+				// eslint-disable-next-line no-continue
+				if (!address) continue;
+				// eslint-disable-next-line no-await-in-loop
+				userAddressWithProxy[address] = await MultisigService.fetchMultisigAndProxyAddresses(address);
+			}
+
+			console.log('userAddressWithProxy', userAddressWithProxy);
+
+			setLinkedAddress(userAddressWithProxy);
+		};
+		fetchLinkedAddress();
+	}, [setLinkedAddress, user]);
 
 	return null;
 }
