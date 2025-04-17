@@ -27,6 +27,8 @@ import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
 
+const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
+
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
 	return (
@@ -84,7 +86,7 @@ function TrendingDelegates() {
 		}
 
 		const updatedDelegates = data.sort((a: IDelegateDetails, b: IDelegateDetails) => {
-			const addressess = [getSubstrateAddress('13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t')];
+			const addressess = [getSubstrateAddress(PA_ADDRESS)];
 			const aIndex = addressess.indexOf(getSubstrateAddress(a.address));
 			const bIndex = addressess.indexOf(getSubstrateAddress(b.address));
 

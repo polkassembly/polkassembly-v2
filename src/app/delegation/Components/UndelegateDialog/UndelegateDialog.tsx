@@ -62,14 +62,12 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	);
 
 	const calculateTxFee = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || trackId === undefined) return;
+		if (!apiService || !user?.defaultAddress || !trackId) return;
 
 		try {
-			const fee = await apiService.getDelegateTxFee({
+			const fee = await apiService.getUndelegateTxFee({
 				address: user.defaultAddress,
-				tracks: trackId ? [trackId] : [],
-				conviction: 0,
-				balance: new BN(delegate.balance)
+				trackId
 			});
 			setTxFee(fee);
 		} catch (error) {

@@ -826,6 +826,13 @@ export class PolkadotApiService {
 		return this.getTxFee({ extrinsicFn: txs, address });
 	}
 
+	async getUndelegateTxFee({ address, trackId }: { address: string; trackId: number }) {
+		if (!this.api) return null;
+
+		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+		return this.getTxFee({ extrinsicFn: [tx], address });
+	}
+
 	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
 		const referendumInfoOf = await this.api?.query?.referenda?.referendumInfoFor(postIndex);
 		const parsedReferendumInfo: any = referendumInfoOf?.toJSON();
