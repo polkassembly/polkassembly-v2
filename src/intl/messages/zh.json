@@ -420,7 +420,19 @@
 		"commentSummary": "评论摘要",
 		"aiSummary": "AI 摘要",
 		"showLikelySpam": "显示疑似垃圾评论",
-		"hideLikelySpam": "隐藏疑似垃圾评论"
+		"hideLikelySpam": "隐藏疑似垃圾评论",
+		"votingPeriodList": {
+			"votingPeriodList1": "公投将持续投票，直到决定期完成或提案通过。",
+			"votingPeriodList2": "为了让公投进入确认阶段，支持和批准应该高于该轨道的阈值。",
+			"votingPeriodList3": "一旦提案进入确认阶段，其支持和批准必须保持在确认期内高于阈值，以便通过。",
+			"votingPeriodList4": "如果公投在决定期内没有进入确认阶段，则视为失败。"
+		},
+		"preparePeriodDesc": "准备期用于避免决策抢先投票。在公投进入投票之前进行。",
+		"afterVotingPeriod": "投票后的阶段",
+		"afterVotingPeriodList": {
+			"afterVotingPeriodList1": "公投在执行期结束后执行。",
+			"afterVotingPeriodList2": "对于国库公投，资金将在完成资金分配期后发放。"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",

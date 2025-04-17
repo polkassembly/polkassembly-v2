@@ -420,7 +420,19 @@
 		"commentSummary": "Resumen de Comentarios",
 		"aiSummary": "Resumen de IA",
 		"showLikelySpam": "Mostrar Comentarios de Spam",
-		"hideLikelySpam": "Ocultar Comentarios de Spam"
+		"hideLikelySpam": "Ocultar Comentarios de Spam",
+		"votingPeriodList": {
+			"votingPeriodList1": "Un referéndum estará en votación hasta que la periodo de decisión se complete o la propuesta sea aprobada.",
+			"votingPeriodList2": "Para que un referéndum entre en confirmación, el apoyo y la aprobación deben ser mayores que el umbral para la pista.",
+			"votingPeriodList3": "Una vez que la propuesta entre en confirmación, su apoyo y aprobación deben permanecer por encima del umbral durante la duración del periodo de confirmación para que pase.",
+			"votingPeriodList4": "Si el referéndum no entra en confirmación durante el periodo de decisión, se considera fallido."
+		},
+		"preparePeriodDesc": "El periodo de preparación se utiliza para evitar el sniping de decisiones. Ocurre antes de que un referéndum entre en votación.",
+		"afterVotingPeriod": "Después del periodo de votación",
+		"afterVotingPeriodList": {
+			"afterVotingPeriodList1": "Un referéndum se ejecuta después de completar el periodo de implementación.",
+			"afterVotingPeriodList2": "Para los referéndums del tesoro, los fondos se distribuirán después de completar el periodo de distribución de fondos."
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

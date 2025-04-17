@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/app/_shared-components/Dialog/Dialog';
 import { MdChecklist, MdOutlineExposurePlus1, MdOutlineFormatListBulleted } from 'react-icons/md';
 
@@ -11,6 +12,7 @@ interface PeriodDetailModalProps {
 }
 
 function PeriodDetailModal({ children }: PeriodDetailModalProps) {
+	const t = useTranslations('PostDetails');
 	return (
 		<Dialog>
 			<DialogTrigger asChild>{children}</DialogTrigger>
@@ -27,12 +29,12 @@ function PeriodDetailModal({ children }: PeriodDetailModalProps) {
 							<div className='ml-5'>
 								<div className='flex items-center space-x-2'>
 									<MdChecklist className='text-lg font-semibold text-bg_pink' />
-									<span className='text-base font-medium'>Prepare Period</span>
+									<span className='text-base font-medium'>{t('preparePeriod')}</span>
 								</div>
 							</div>
 						</div>
 						<div className='ml-[76px]'>
-							<p className='text-sm text-btn_secondary_text'>The prepare period is used to avoid decision sniping. It occurs before a referendum goes into voting.</p>
+							<p className='text-sm text-btn_secondary_text'>{t('preparePeriodDesc')}</p>
 						</div>
 					</div>
 
@@ -43,19 +45,16 @@ function PeriodDetailModal({ children }: PeriodDetailModalProps) {
 							<div className='ml-4'>
 								<div className='flex items-center space-x-2'>
 									<MdOutlineExposurePlus1 className='text-lg font-semibold text-bg_pink' />
-									<span className='text-base font-medium'>Voting Period</span>
+									<span className='text-base font-medium'>{t('votingPeriod')}</span>
 								</div>
 							</div>
 						</div>
 						<div className='ml-[60px]'>
 							<ul className='list-disc pl-4 text-sm text-btn_secondary_text'>
-								<li>A referendum will be in voting till the decision period is completed or the proposal is passed.</li>
-								<li>For a referendum to enter confirmation, the support and approval should be greater than the threshold for the track.</li>
-								<li>
-									Once the proposal enters confirmation, its support and approval should remain greater than the threshold for the duration of the confirmation period for it to
-									pass.
-								</li>
-								<li>If the referendum does not enter confirmation during the decision period, it is considered as failed.</li>
+								<li>{t('votingPeriodList.votingPeriodList1')}</li>
+								<li>{t('votingPeriodList.votingPeriodList2')}</li>
+								<li>{t('votingPeriodList.votingPeriodList3')}</li>
+								<li>{t('votingPeriodList.votingPeriodList4')}</li>
 							</ul>
 						</div>
 					</div>
@@ -67,14 +66,14 @@ function PeriodDetailModal({ children }: PeriodDetailModalProps) {
 							<div className='ml-4'>
 								<div className='flex items-center space-x-2'>
 									<MdOutlineFormatListBulleted className='text-lg font-semibold text-bg_pink' />
-									<span className='text-base font-medium'>After Voting Period</span>
+									<span className='text-base font-medium'>{t('afterVotingPeriod')}</span>
 								</div>
 							</div>
 						</div>
 						<div className='ml-[60px]'>
 							<ul className='list-disc pl-4 text-sm text-btn_secondary_text'>
-								<li>A referendum is executed after the completion of the enactment period.</li>
-								<li>For treasury referenda, the funds will be disbursed after completion of the funds disbursal period.</li>
+								<li>{t('afterVotingPeriodList.afterVotingPeriodList1')}</li>
+								<li>{t('afterVotingPeriodList.afterVotingPeriodList2')}</li>
 							</ul>
 						</div>
 					</div>

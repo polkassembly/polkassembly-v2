@@ -385,6 +385,7 @@
 		"votingStarted": "Voting has Started",
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
+		"afterVotingPeriod": "After Voting Period",
 		"summary": "Summary",
 		"aye": "Aye",
 		"nay": "Nay",
@@ -440,6 +441,17 @@
 			"grant": "Grant",
 			"community": "Community",
 			"technicalcommittee": "Technical Committee"
+		},
+		"votingPeriodList": {
+			"votingPeriodList1": "A referendum will be in voting till the decision period is completed or the proposal is passed.",
+			"votingPeriodList2": "For a referendum to enter confirmation, the support and approval should be greater than the threshold for the track.",
+			"votingPeriodList3": "Once the proposal enters confirmation, its support and approval should remain greater than the threshold for the duration of the confirmation period for it to pass.",
+			"votingPeriodList4": "If the referendum does not enter confirmation during the decision period, it is considered as failed."
+		},
+		"preparePeriodDesc": "The prepare period is used to avoid decision sniping. It occurs before a referendum goes into voting.",
+		"afterVotingPeriodList": {
+			"afterVotingPeriodList1": "A referendum is executed after the completion of the enactment period.",
+			"afterVotingPeriodList2": "For treasury referenda, the funds will be disbursed after completion of the funds disbursal period."
 		}
 	},
 	"ListingPage_Status": {

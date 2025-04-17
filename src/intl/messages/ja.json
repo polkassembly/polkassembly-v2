@@ -420,7 +420,19 @@
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
 		"showLikelySpam": "疑わしいスパムを表示",
-		"hideLikelySpam": "疑わしいスパムを非表示"
+		"hideLikelySpam": "疑わしいスパムを非表示",
+		"votingPeriodList": {
+			"votingPeriodList1": "決定期間が完了するか、提案が通過するまで、国民投票は投票中です。",
+			"votingPeriodList2": "国民投票が確認に進むためには、サポートと承認がトラックの閾値を上回る必要があります。",
+			"votingPeriodList3": "提案が確認に入ると、そのサポートと承認は確認期間の間、閾値を超えて維持する必要があります。",
+			"votingPeriodList4": "国民投票が決定期間中に確認に入らない場合、それは失敗と見なされます。"
+		},
+		"preparePeriodDesc": "準備期間は決定スナイピングを避けるために使用されます。これは、国民投票が投票に入る前に行われます。",
+		"afterVotingPeriod": "投票後の期間",
+		"afterVotingPeriodList": {
+			"afterVotingPeriodList1": "国民投票は、実施期間の完了後に実行されます。",
+			"afterVotingPeriodList2": "財政投票の場合、資金は資金分配期間の完了後に支給されます。"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",

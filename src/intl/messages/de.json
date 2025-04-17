@@ -420,7 +420,19 @@
 		"commentSummary": "Kommentarzusammenfassung",
 		"aiSummary": "KI-Zusammenfassung",
 		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
-		"hideLikelySpam": "Wahrscheinliche Spam ausblenden"
+		"hideLikelySpam": "Wahrscheinliche Spam ausblenden",
+		"votingPeriodList": {
+			"votingPeriodList1": "Ein Referendum bleibt zur Abstimmung, bis die Entscheidungsperiode abgeschlossen oder der Vorschlag angenommen wurde.",
+			"votingPeriodList2": "Für ein Referendum, um in die Bestätigung zu gehen, müssen die Unterstützung und Genehmigung über dem Schwellenwert für die Strecke liegen.",
+			"votingPeriodList3": "Sobald der Vorschlag in die Bestätigung übergeht, muss die Unterstützung und Genehmigung für die Dauer der Bestätigungsperiode über dem Schwellenwert bleiben, damit er besteht.",
+			"votingPeriodList4": "Wenn das Referendum während der Entscheidungsperiode nicht in die Bestätigung übergeht, gilt es als gescheitert."
+		},
+		"preparePeriodDesc": "Die Vorbereitungsphase dient dazu, Entscheidungssniping zu vermeiden. Sie findet statt, bevor ein Referendum zur Abstimmung kommt.",
+		"afterVotingPeriod": "Nach der Abstimmungsphase",
+		"afterVotingPeriodList": {
+			"afterVotingPeriodList1": "Ein Referendum wird nach Abschluss der Umsetzung durchgeführt.",
+			"afterVotingPeriodList2": "Für Schatzamt-Referenden werden die Mittel nach Abschluss der Mittelverteilungsperiode ausgezahlt."
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
