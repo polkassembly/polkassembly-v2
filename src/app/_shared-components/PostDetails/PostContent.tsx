@@ -29,6 +29,7 @@ function PostContent({
 				indexOrHash={String(postData?.index ?? postData?.hash)}
 				proposalType={postData.proposalType}
 				summaryType='content'
+				initialData={(postData as IPost)?.contentSummary}
 			/>
 
 			<MarkdownViewer

@@ -24,13 +24,17 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
-	const [showSpamModal, setShowSpamModal] = useState(false);
+	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const onEditPostSuccess = (title: string, content: string) => {
 		setPost((prev) => ({ ...prev, title, content }));
 	};
 
-	const { data: aiSummary } = useAISummary({ proposalType: post.proposalType, indexOrHash: post.index?.toString() || '' });
+	const { data: aiSummary } = useAISummary({
+		initialData: post.contentSummary,
+		proposalType: post.proposalType,
+		indexOrHash: String(post.index ?? post.hash)
+	});
 
 	useEffect(() => {
 		if (aiSummary?.isSpam) {
@@ -86,6 +90,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
+								contentSummary={post.contentSummary}
 							/>
 						</div>
 					</div>
