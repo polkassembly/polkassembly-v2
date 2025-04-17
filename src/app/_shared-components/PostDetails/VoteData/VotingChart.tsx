@@ -94,7 +94,7 @@ function VotingChart({ voteCurveData }: Props): React.ReactElement {
 	};
 
 	return (
-		<div className='mt-6 h-96'>
+		<div className='mt-6 h-80'>
 			<Line
 				height={300}
 				data={chartData}

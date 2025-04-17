@@ -11,11 +11,11 @@
 }
 
 .footer {
-	@apply mt-1 flex items-center justify-between;
+	@apply flex items-center justify-between;
 }
 
 .footerText {
-	@apply text-text_secondary text-xs;
+	@apply text-xs text-secondary;
 }
 
 .errorText {
