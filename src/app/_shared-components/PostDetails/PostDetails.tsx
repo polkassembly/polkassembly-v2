@@ -21,6 +21,7 @@ import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
 import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
+import VoteData from './VoteData/VoteData';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
@@ -108,6 +109,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
+							/>
+							<VoteData
+								proposalType={post.proposalType}
+								index={index}
 							/>
 						</div>
 					)}
