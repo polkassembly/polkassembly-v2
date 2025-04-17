@@ -1,0 +1,39 @@
+.titleContainer {
+	@apply flex items-center gap-2 text-btn_secondary_text;
+}
+
+.convictionContainer {
+	@apply flex flex-col gap-2 rounded-lg bg-page_background p-4;
+}
+
+.tooltipContent {
+	@apply max-h-[200px] overflow-auto rounded-lg border border-border_grey bg-bg_modal p-4;
+}
+
+.track {
+	@apply flex items-center gap-1 rounded-full bg-grey_bg px-3 py-1 text-xs;
+}
+
+.convictionItem {
+	@apply flex items-center justify-between gap-2;
+}
+
+.convictionItemLabel {
+	@apply text-sm text-wallet_btn_text;
+}
+
+.balanceError {
+	@apply text-sm text-toast_error_text;
+}
+
+.selectedTracksContainer {
+	@apply flex items-center justify-between gap-2 px-2;
+}
+
+.tooltipContentData {
+	@apply flex items-center gap-2 rounded-md px-2 py-1 transition-colors;
+}
+
+.checkbox {
+	@apply h-5 w-5 rounded-md border border-border_grey data-[state=checked]:border-text_pink data-[state=checked]:bg-text_pink data-[state=checked]:text-white;
+}

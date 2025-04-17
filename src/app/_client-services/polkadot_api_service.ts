@@ -214,16 +214,20 @@ export class PolkadotApiService {
 		let freeBalance = BN_ZERO;
 		let lockedBalance = BN_ZERO;
 		let totalBalance = BN_ZERO;
+		let transferableBalance = BN_ZERO;
 
 		const responseObj = {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 
 		if (!address || !this.api?.derive?.balances?.all) {
 			return responseObj;
 		}
+
+		const existentialDeposit = this.api.consts?.balances?.existentialDeposit ? new BN(this.api.consts.balances.existentialDeposit.toString()) : BN_ZERO;
 
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		await this.api.derive.balances
@@ -240,8 +244,20 @@ export class PolkadotApiService {
 			.then((result: any) => {
 				const free = new BN(result?.data?.free) || BN_ZERO;
 				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
+				const frozen = new BN(result?.data?.frozen || result?.data?.feeFrozen || result?.data?.miscFrozen) || BN_ZERO;
+
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+
+				if (free.gt(frozen)) {
+					transferableBalance = free.sub(frozen);
+
+					if (transferableBalance.lt(existentialDeposit)) {
+						transferableBalance = BN_ZERO;
+					}
+				} else {
+					transferableBalance = BN_ZERO;
+				}
 			})
 			.catch(() => {
 				// TODO: show notification
@@ -250,7 +266,8 @@ export class PolkadotApiService {
 		return {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 	}
 
@@ -722,6 +739,24 @@ export class PolkadotApiService {
 		return this.api.derive.chain.bestNumber();
 	}
 
+	async getTotalActiveIssuance() {
+		if (!this.api) return null;
+		try {
+			const totalIssuance = await this.api.query.balances.totalIssuance();
+			const inactiveIssuance = await this.api.query.balances.inactiveIssuance();
+
+			if (!totalIssuance || !inactiveIssuance) {
+				console.error('Failed to fetch issuance values');
+				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Failed to fetch issuance values');
+			}
+
+			return new BN(totalIssuance.toString()).sub(new BN(inactiveIssuance.toString()));
+		} catch (error) {
+			console.error('Error in getTotalActiveIssuance:', error);
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Failed to retrieve total active issuance');
+		}
+	}
+
 	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
 		if (!this.api) {
 			return null;
@@ -734,6 +769,61 @@ export class PolkadotApiService {
 		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
 		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
+	}
+
+	async delegate({
+		address,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api) return;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async undelegate({ address, trackId, onSuccess, onFailed }: { address: string; trackId: number; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api) return;
+
+		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async getDelegateTxFee({ address, tracks, conviction, balance }: { address: string; tracks: number[]; conviction: number; balance: BN }) {
+		if (!this.api) return null;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, address, conviction, balance));
+		return this.getTxFee({ extrinsicFn: txs, address });
 	}
 
 	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
