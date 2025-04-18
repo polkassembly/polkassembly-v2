@@ -1,3 +1,4 @@
+
 {
 	"HomePage": {
 		"title": "欢迎来到主页"
@@ -484,7 +485,10 @@
 		"started": "已开始",
 		"passed": "已通过",
 		"proposed": "已提议",
-		"created": "已创建"
+		"created": "已创建",
+		"curatorassigned": "已分配 curator",
+		"curatorunassigned": "未分配 curator",
+		"curatorproposed": "已提议 curator"
 	},
 	"Pagination": {
 		"next": "下一页",
@@ -638,6 +642,25 @@
 		"twitterPlaceholder": "@您的Twitter名称",
 		"riotPlaceholder": "@您的名称.matrix.org",
 		"setIdentity": "设置身份",
+		"onChainIdentity": "链上身份"
+	},
+	"Bounties": {
+		"onchainBounties": "链上赏金",
+		"createBountyProposal": "创建赏金提案",
+		"loadingChildBounties": "加载子赏金...",
+		"noChildBountiesFound": "未找到子赏金",
+		"curator": "赏金者",
+		"title": "标题",
+		"amount": "金额",
+		"date": "日期",
+		"status": "状态",
+		"categories": "类别",
+		"all": "全部",
+		"active": "活跃",
+		"proposed": "提议",
+		"claimed": "认领",
+		"cancelled": "取消",
+		"rejected": "拒绝",
 		"onChainIdentity": "链上身份",
 		"identityDescription1": "Polkadot通过指定的注册商提供链上身份验证用户凭证，从而建立更大的信任和支持。",
 		"identityDescription2": "成功验证后，用户将获得一个绿色勾号，象征其可信状态。这个已验证的状态符号在申请国库资金或参与讨论和提案时提高了可信度。",

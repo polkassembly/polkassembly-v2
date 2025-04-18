@@ -7,6 +7,7 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { TypeDef } from '@polkadot/types/types';
 import { StatusCodes } from 'http-status-codes';
+import { BN } from '@polkadot/util';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
@@ -505,7 +506,6 @@ export interface IPost extends IOffChainPost {
 	publicUser?: IPublicUser;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
-	contentSummary?: IContentSummary;
 }
 
 export interface IOnChainPostListing {
@@ -924,6 +924,37 @@ export enum ENotificationStatus {
 	ERROR = 'error',
 	WARNING = 'warning',
 	INFO = 'info'
+}
+
+export interface IBountyStats {
+	availableBountyPool: BN;
+	activeBounties: number;
+	peopleEarned: number;
+	totalRewarded: BN;
+	totalBountyPool: BN;
+}
+
+export enum EBountyStatus {
+	ALL = 'All',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: EBountyStatus;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: number;
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: string }>;
 }
 
 // generic types are for insignificant tokens if we decide to add later

@@ -484,7 +484,10 @@
 		"started": "Iniciado",
 		"passed": "Aprobado",
 		"proposed": "Propuesto",
-		"created": "Creado"
+		"created": "Creado",
+		"curatorassigned": "Curador Asignado",
+		"curatorunassigned": "Curador No Asignado",
+		"curatorproposed": "Curador Propuesto"
 	},
 	"Pagination": {
 		"next": "Siguiente",
@@ -906,5 +909,23 @@
 			"invalidData": "Datos inválidos",
 			"fetchError": "Error al obtener los datos"
 		}
+	},
+	"Bounties": {
+		"onchainBounties": "Recompensas en Cadena",
+		"createBountyProposal": "Crear propuesta de recompensa",
+		"loadingChildBounties": "Cargando recompensas infantiles...",
+		"noChildBountiesFound": "No se encontraron recompensas infantiles",
+		"curator": "Curador",
+		"title": "Título",
+		"amount": "Cantidad",
+		"date": "Fecha",
+		"status": "Estado",
+		"categories": "Categorías",
+		"all": "Todos",
+		"active": "Activo",
+		"proposed": "Propuesto",
+		"claimed": "Reclamado",
+		"cancelled": "Cancelado",
+		"rejected": "Rechazado"
 	}
 }
