@@ -2,11 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useTranslations } from 'next-intl';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IoPersonAdd } from 'react-icons/io5';
-import { EDelegateSource, ENetwork, IDelegateDetails } from '@/_shared/types';
-import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
+import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/_shared-components/Dialog/Dialog';
@@ -14,13 +13,10 @@ import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { Button } from '@/app/_shared-components/Button';
 import DelegateVotingPower from '@/app/_shared-components/DelegateVotingPower/DelegateVotingPower';
+import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PlatformLogos from '../PlatformLogos/PlatformLogos';
 import styles from './DelegateCard.module.scss';
-
-interface DelegateCardProps {
-	delegate: IDelegateDetails;
-	network: ENetwork;
-}
 
 const getPlatformStyles = (platforms: EDelegateSource[]) => {
 	if (!Array.isArray(platforms) || platforms.length === 0) {
@@ -48,10 +44,46 @@ const getPlatformStyles = (platforms: EDelegateSource[]) => {
 	}
 };
 
-const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
+function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
+	const t = useTranslations('Delegation');
+	const network = getCurrentNetwork();
+
+	return (
+		<div className={styles.delegationCardStats}>
+			<div className={styles.delegationCardStatsItem}>
+				<div>
+					<div className='text-sm text-btn_secondary_text'>
+						<span className='text-2xl font-semibold'>
+							{' '}
+							{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+						</span>{' '}
+					</div>
+					<span className={styles.delegationCardStatsItemText}>{t('votingPower')}</span>
+				</div>
+			</div>
+			<div className={styles.delegationCardStatsItem}>
+				<div>
+					<div className='text-2xl font-semibold'>{delegate?.last30DaysVotedProposalsCount}</div>
+					<span className={styles.delegationCardStatsItemText}>{t('votedProposals')}</span>
+					<span className={styles.delegationCardStatsItemTextPast30Days}>({t('past30Days')})</span>
+				</div>
+			</div>
+			<div className='p-5 text-center'>
+				<div>
+					<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
+					<span className={styles.delegationCardStatsItemText}>{t('receivedDelegations')}</span>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 	const t = useTranslations('Delegation');
 
 	const { user } = useUser();
+
+	const [openModal, setOpenModal] = useState(false);
 
 	return (
 		<div className={styles.delegationCard}>
@@ -93,73 +125,40 @@ const DelegateCard = memo(({ delegate, network }: DelegateCardProps) => {
 					)}
 				</div>
 			</div>
-			<div className='h-24 px-5'>
-				<div className='text-sm text-text_primary'>
-					{delegate?.manifesto && delegate?.manifesto.length > 0 ? (
-						delegate?.manifesto?.includes('<') ? (
-							<>
-								<div className={styles.delegationBioContent}>
-									<MarkdownEditor
-										markdown={delegate.manifesto}
-										readOnly
-									/>
-								</div>
-								{delegate?.manifesto?.length > 100 && (
-									<button
-										className={styles.readMoreBtn}
-										type='button'
-									>
-										{t('readMore')}
-									</button>
-								)}
-							</>
-						) : (
-							<div className='bio-content'>
-								<span>{delegate?.manifesto?.slice(0, 100)}</span>
-								{delegate?.manifesto?.length > 100 && (
-									<>
-										<span>... </span>
-										<button
-											className={styles.readMoreBtn}
-											type='button'
-										>
-											{t('readMore')}
-										</button>
-									</>
-								)}
-							</div>
-						)
-					) : (
-						<span>{t('noBio')}</span>
+
+			<div className='px-4 py-2'>
+				{delegate?.manifesto && delegate?.manifesto.length > 0 ? (
+					<MarkdownViewer
+						markdown={delegate.manifesto}
+						truncate
+						onShowMore={() => setOpenModal(true)}
+					/>
+				) : (
+					<span>{t('noBio')}</span>
+				)}
+			</div>
+
+			<DelegateStats delegate={delegate} />
+
+			<Dialog
+				open={openModal}
+				onOpenChange={setOpenModal}
+			>
+				<DialogContent className='max-w-xl p-6'>
+					<DialogHeader>
+						<DialogTitle>
+							<Address address={delegate.address} />
+						</DialogTitle>
+					</DialogHeader>
+					{delegate?.manifesto && delegate?.manifesto.length > 0 && (
+						<MarkdownViewer
+							className='max-h-[70vh] overflow-y-auto'
+							markdown={delegate.manifesto}
+						/>
 					)}
-				</div>
-			</div>
-			<div className={styles.delegationCardStats}>
-				<div className={styles.delegationCardStatsItem}>
-					<div>
-						<div className='text-sm text-btn_secondary_text'>
-							<span className='text-2xl font-semibold'>
-								{' '}
-								{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
-							</span>{' '}
-						</div>
-						<span className={styles.delegationCardStatsItemText}>{t('votingPower')}</span>
-					</div>
-				</div>
-				<div className={styles.delegationCardStatsItem}>
-					<div>
-						<div className='text-2xl font-semibold'>{delegate?.last30DaysVotedProposalsCount}</div>
-						<span className={styles.delegationCardStatsItemText}>{t('votedProposals')}</span>
-						<span className={styles.delegationCardStatsItemTextPast30Days}>({t('past30Days')})</span>
-					</div>
-				</div>
-				<div className='p-5 text-center'>
-					<div>
-						<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
-						<span className={styles.delegationCardStatsItemText}>{t('receivedDelegations')}</span>
-					</div>
-				</div>
-			</div>
+					<DelegateStats delegate={delegate} />
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 });

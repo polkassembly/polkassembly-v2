@@ -6,7 +6,6 @@ import { Input } from '@/app/_shared-components/Input';
 import { Search } from 'lucide-react';
 import { memo, useCallback, ChangeEvent, KeyboardEvent, RefObject } from 'react';
 import { useTranslations } from 'next-intl';
-import styles from './DelegateSearchInput.module.scss';
 
 interface SearchInputProps {
 	searchInputRef: RefObject<HTMLInputElement>;
@@ -27,14 +26,17 @@ function DelegateSearchInput({ searchInputRef, searchTerm, handleSearchChange }:
 	);
 
 	return (
-		<div className={styles.searchInputContainer}>
-			<Search className={styles.searchIcon} />
+		<div className='flex w-full items-center rounded-lg border border-border_grey bg-transparent px-2'>
+			<Search
+				size={20}
+				className='text-text_grey'
+			/>
 			<Input
 				ref={searchInputRef}
 				placeholder={t('enterUsernameOrAddressToDelegateVote')}
 				defaultValue={searchTerm}
 				onChange={handleInputChange}
-				className='pl-10'
+				className='border-none shadow-none sm:py-2'
 				onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
 					e.stopPropagation();
 				}}

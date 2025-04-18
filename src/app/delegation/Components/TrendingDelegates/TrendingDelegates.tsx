@@ -5,7 +5,6 @@
 import { memo, RefObject, useRef } from 'react';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { Label } from '@/app/_shared-components/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
@@ -75,7 +74,6 @@ function TrendingDelegates() {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
-	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
 
 	const fetchDelegates = async () => {
@@ -175,7 +173,6 @@ function TrendingDelegates() {
 									<DelegateCard
 										key={delegate.address}
 										delegate={delegate}
-										network={network}
 									/>
 								))}
 							</div>
