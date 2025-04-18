@@ -1,12 +1,12 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions, ChartData } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
 import { IVoteCurve } from '@/_shared/types';
+import { Skeleton } from '../../Skeleton';
 
-// Registering the necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface Props {
@@ -14,52 +14,52 @@ interface Props {
 }
 
 function VotingChart({ voteCurveData }: Props): React.ReactElement {
-	const chartData: ChartData<'line'> = {
-		labels: voteCurveData ? voteCurveData.map((item) => item.timestamp.slice(0, 10)) : [], // Extracting the date
-		datasets: [
-			{
-				label: 'Approval',
-				data: voteCurveData ? voteCurveData.map((item) => item.approvalPercent) : [],
-				fill: false,
-				borderColor: 'rgb(75, 192, 192)', // Teal color
-				tension: 0.4,
-				borderWidth: 2,
-				pointRadius: 5, // Circle markers
-				pointBackgroundColor: 'rgb(75, 192, 192)',
-				pointBorderColor: 'white',
-				pointBorderWidth: 2
-			},
-			{
-				label: 'Support',
-				data: voteCurveData ? voteCurveData.map((item) => item.supportPercent) : [],
-				fill: false,
-				borderColor: 'rgb(255, 99, 132)', // Red color
-				tension: 0.4,
-				borderWidth: 2,
-				pointRadius: 5, // Circle markers
-				pointBackgroundColor: 'rgb(255, 99, 132)',
-				pointBorderColor: 'white',
-				pointBorderWidth: 2
-			},
-			{
-				label: 'Threshold',
-				data: new Array(voteCurveData ? voteCurveData.length : 0).fill(99.0), // Constant threshold line at 99%
-				fill: false,
-				borderColor: 'rgb(0, 255, 0)', // Green color for threshold
-				borderDash: [5, 5], // Dotted line style
-				borderWidth: 1
-			}
-		]
-	};
+	const today = new Date();
+	const [shiftedData, setShiftedData] = useState(null);
+
+	useEffect(() => {
+		const startDate = new Date(voteCurveData[0].timestamp);
+
+		const daysDifference = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+
+		const shiftedLabels = voteCurveData.slice(daysDifference).map((_, index) => `${index + 1}`);
+		const shiftedApprovalData = voteCurveData.slice(daysDifference).map((item) => item.approvalPercent);
+		const shiftedSupportData = voteCurveData.slice(daysDifference).map((item) => item.supportPercent);
+
+		setShiftedData({
+			labels: shiftedLabels,
+			datasets: [
+				{
+					label: 'Approval',
+					data: shiftedApprovalData,
+					fill: false,
+					borderColor: '#68D183',
+					tension: 0.4,
+					borderWidth: 2,
+					pointRadius: 0
+				},
+				{
+					label: 'Support',
+					data: shiftedSupportData,
+					fill: false,
+					borderColor: '#E5007A',
+					tension: 0.4,
+					borderWidth: 2,
+					pointRadius: 0
+				}
+			]
+		});
+	}, [voteCurveData, today]);
+
+	if (!shiftedData) {
+		return <Skeleton className='h-20 w-full' />;
+	}
 
 	const chartOptions: ChartOptions<'line'> = {
 		responsive: true,
 		plugins: {
-			title: {
-				display: true,
-				text: 'Voting Data'
-			},
 			legend: {
+				display: false,
 				position: 'top' as const,
 				labels: {
 					font: {
@@ -72,11 +72,15 @@ function VotingChart({ voteCurveData }: Props): React.ReactElement {
 			x: {
 				title: {
 					display: true,
-					text: 'Date'
+					text: 'Days'
 				},
 				ticks: {
-					maxRotation: 45,
-					minRotation: 45
+					maxRotation: 0,
+					minRotation: 0,
+					align: 'center'
+				},
+				grid: {
+					display: false // Disable grid lines on the x-axis
 				}
 			},
 			y: {
@@ -88,16 +92,19 @@ function VotingChart({ voteCurveData }: Props): React.ReactElement {
 					beginAtZero: true,
 					max: 100,
 					stepSize: 20
+				},
+				grid: {
+					display: false
 				}
 			}
 		}
 	};
 
 	return (
-		<div className='mt-6 h-80'>
+		<div className='mt-1 h-72 w-full'>
 			<Line
 				height={300}
-				data={chartData}
+				data={shiftedData}
 				options={chartOptions}
 			/>
 		</div>

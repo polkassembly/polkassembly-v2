@@ -9,6 +9,7 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useQuery } from '@tanstack/react-query';
 import VotingChart from './VotingChart';
 import styles from './VoteData.module.scss'; // Import the SCSS module
+import { Skeleton } from '../../Skeleton';
 
 interface Props {
 	proposalType: EProposalType;
@@ -40,7 +41,7 @@ function VoteData({ proposalType, index }: Props) {
 	const latestSupport = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : null;
 
 	if (isFetching) {
-		return <p>Loading data...</p>;
+		return <Skeleton className='h-80 w-full' />;
 	}
 
 	return (
