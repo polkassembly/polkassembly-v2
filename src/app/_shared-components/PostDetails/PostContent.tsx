@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { IPost, IPostListing } from '@/_shared/types';
+import { IPostListing } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
@@ -31,7 +31,7 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 			/>
 
 			<Separator className='my-4 bg-border_grey' />
-			<PostActions postData={postData as IPost} />
+			<PostActions postData={postData} />
 			<div className='flex items-center justify-between'>
 				<div />
 				<div>

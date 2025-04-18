@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EReaction, IPost } from '@/_shared/types';
+import { EReaction, IPost, IPostListing } from '@/_shared/types';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { useUser } from '@/hooks/useUser';
 import { Share2 } from 'lucide-react';
@@ -12,9 +12,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
 import { useMemo, useCallback } from 'react';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import styles from './PostActions.module.scss';
 
-function PostActions({ postData }: { postData: IPost }) {
+function PostActions({ postData }: { postData: IPost | IPostListing }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -23,7 +24,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
-		indexOrHash: postData?.index?.toString() || postData?.hash,
+		indexOrHash: ValidatorService.isValidNumber(postData?.index) ? postData?.index?.toString() : postData?.hash,
 		isSubscribed: !!postData.userSubscriptionId
 	});
 
