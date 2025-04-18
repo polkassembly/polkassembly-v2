@@ -88,7 +88,7 @@ function CreateBounty() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
-				window.location.href = `/bounty/${postId}?created=true`;
+				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {
 				toast({
