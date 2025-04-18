@@ -515,7 +515,8 @@
 	},
 	"BalanceInput": {
 		"enterAmount": "Enter Amount",
-		"treasuryBalance": "Treasury Balance"
+		"treasuryBalance": "Treasury Balance",
+		"balance": "Balance"
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "Choose your Vote",
