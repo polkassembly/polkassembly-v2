@@ -490,6 +490,15 @@ export class PolkadotApiService {
 		return Number(status.value?.len);
 	}
 
+	// create proposal calls
+
+	getBatchCallTx(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>[] | null) {
+		if (!this.api || !extrinsicFn) {
+			return null;
+		}
+		return this.api.tx.utility.batchAll(extrinsicFn);
+	}
+
 	getNotePreimageTx({ extrinsicFn }: { extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult> | null }) {
 		if (!this.api || !extrinsicFn) {
 			return null;
@@ -676,20 +685,55 @@ export class PolkadotApiService {
 		return this.api.tx.referenda.kill(referendumId);
 	}
 
+	getProposeBountyTx({ bountyAmount }: { bountyAmount: BN }) {
+		if (!this.api) return null;
+		const title = 'PA';
+		return this.api.tx.bounties.proposeBounty(bountyAmount, title);
+	}
+
+	async proposeBounty({ bountyAmount, address, onSuccess, onFailed }: { bountyAmount: BN; address: string; onSuccess?: (bountyId: number) => void; onFailed?: () => void }) {
+		if (!this.api || !address || !bountyAmount) return;
+
+		const bountyId = Number(await this.api.query.bounties.bountyCount());
+
+		const tx = this.getProposeBountyTx({ bountyAmount });
+
+		if (!tx) {
+			onFailed?.();
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to propose bounty',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.(bountyId);
+			},
+			onFailed: () => {
+				onFailed?.();
+			}
+		});
+	}
+
+	getApproveBountyTx({ bountyId }: { bountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.bounties.approveBounty(bountyId);
+	}
+
 	async createProposal({
 		address,
+		extrinsicFn,
 		track,
-		preimageHash,
-		preimageLength,
 		enactment,
 		enactmentValue,
 		onSuccess,
 		onFailed
 	}: {
 		address: string;
+		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		track: EPostOrigin;
-		preimageHash: string;
-		preimageLength: number;
 		enactment: EEnactment;
 		enactmentValue: BN;
 		onSuccess?: (postId: number) => void;
@@ -702,12 +746,30 @@ export class PolkadotApiService {
 			return;
 		}
 
-		if (!preimageHash || !preimageLength || !address) {
+		const preimageDetails = this.getPreimageTxDetails({ extrinsicFn });
+
+		if (!preimageDetails || !address) {
 			onFailed?.();
 			return;
 		}
 
-		const tx = this.getSubmitProposalTx({ track, preimageHash, preimageLength, enactment, enactmentValue });
+		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn });
+		const submitProposalTx = this.getSubmitProposalTx({
+			track,
+			preimageHash: preimageDetails.preimageHash,
+			preimageLength: preimageDetails.preimageLength,
+			enactment,
+			enactmentValue
+		});
+
+		if (!submitProposalTx || !notePreimageTx) {
+			onFailed?.();
+			return;
+		}
+
+		const preimageExists = await this.getPreimageLengthFromPreimageHash({ preimageHash: preimageDetails.preimageHash });
+		const tx = preimageExists ? submitProposalTx : this.getBatchCallTx([notePreimageTx, submitProposalTx]);
+
 		if (!tx) {
 			onFailed?.();
 			return;

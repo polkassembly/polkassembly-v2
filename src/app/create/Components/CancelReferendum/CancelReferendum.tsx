@@ -88,17 +88,22 @@ function CancelReferendum() {
 		[apiService, preimageDetails, selectedEnactment, advancedDetails]
 	);
 
-	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
-		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength) {
-			setLoading(false);
+	const batchCallTx = useMemo(
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchCallTx([notePreimageTx, submitProposalTx]),
+		[apiService, notePreimageTx, submitProposalTx]
+	);
+
+	const createProposal = async () => {
+		if (!apiService || !userPreferences.address?.address || !tx) {
 			return;
 		}
+
+		setLoading(true);
 
 		apiService.createProposal({
 			address: userPreferences.address.address,
 			track: EPostOrigin.REFERENDUM_CANCELLER,
-			preimageHash,
-			preimageLength,
+			extrinsicFn: tx,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -113,42 +118,6 @@ function CancelReferendum() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreationFailed'),
 					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
-					status: ENotificationStatus.ERROR
-				});
-				setLoading(false);
-			}
-		});
-	};
-
-	const createPreimage = async () => {
-		if (
-			!tx ||
-			!apiService ||
-			!userPreferences.address?.address ||
-			!data ||
-			!ValidatorService.isValidNumber(data.index) ||
-			!canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ||
-			!preimageDetails
-		)
-			return;
-
-		setLoading(true);
-
-		await apiService.notePreimage({
-			address: userPreferences.address.address,
-			extrinsicFn: tx,
-			onSuccess: () => {
-				toast({
-					title: t('CreateTreasuryProposal.preimageNotedSuccessfully'),
-					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
-					status: ENotificationStatus.SUCCESS
-				});
-				createProposal({ preimageHash: preimageDetails.preimageHash, preimageLength: preimageDetails.preimageLength });
-			},
-			onFailed: () => {
-				toast({
-					title: t('CreateTreasuryProposal.preimageNoteFailed'),
-					description: t('CreateTreasuryProposal.preimageNoteFailedDescription'),
 					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
@@ -223,14 +192,15 @@ function CancelReferendum() {
 
 			<div className='flex justify-end'>
 				<Button
-					onClick={createPreimage}
+					onClick={createProposal}
 					isLoading={loading}
 					disabled={
 						!userPreferences.address?.address ||
 						!selectedEnactment ||
 						!data ||
 						!ValidatorService.isValidNumber(data.index) ||
-						!canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt)
+						!canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ||
+						!batchCallTx
 					}
 				>
 					{t('CreateTreasuryProposal.createProposal')}

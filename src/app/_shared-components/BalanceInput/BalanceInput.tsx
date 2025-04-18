@@ -148,7 +148,7 @@ function BalanceInput({
 						<DropdownMenu>
 							<DropdownMenuTrigger
 								disabled={disabled}
-								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white'
+								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white sm:px-2 sm:py-1'
 							>
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>
