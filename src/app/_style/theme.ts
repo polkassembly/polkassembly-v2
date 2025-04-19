@@ -104,6 +104,8 @@ export const THEME_COLORS = {
 		received_delegation_bg: '#E7DCFF',
 		delegated_delegation_bg: '#FFFBD8',
 		undelegated_delegation_bg: '#FFDAD8',
+		bounty_table_bg: '#f9fcfb',
+		bounty_table_child_bg: '#fcebf5',
 		address_tooltip_bg: '#FFF',
 		address_tooltip_text: '#9aa7b9',
 		social_link: '#EDEFF3',
@@ -133,7 +135,8 @@ export const THEME_COLORS = {
 		info_card_bg: '#e7f4ff',
 		not_voted_bg: '#fff0f3',
 		voted_bg: '#fff6ee',
-		bg_code: '#fbfbfd'
+		bg_code: '#fbfbfd',
+		create_bounty_btn: '#FF50AD'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -234,6 +237,8 @@ export const THEME_COLORS = {
 		received_delegation_bg: '#6C2CF8',
 		delegated_delegation_bg: '#69600B',
 		undelegated_delegation_bg: '#EF6158',
+		bounty_table_bg: '#272727',
+		bounty_table_child_bg: '#280b19',
 		address_tooltip_bg: '#1C1D1F',
 		address_tooltip_text: '#595959',
 		social_link: '#EDEFF3',
@@ -263,6 +268,7 @@ export const THEME_COLORS = {
 		info_card_bg: '#28333c',
 		not_voted_bg: '#1e160d',
 		voted_bg: '#1e1113',
-		bg_code: '#222222'
+		bg_code: '#222222',
+		create_bounty_btn: '#FF50AD'
 	}
 };
