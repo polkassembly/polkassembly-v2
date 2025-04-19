@@ -689,29 +689,31 @@
 	},
 	"CreateProposal": {
 		"create": "Crear",
-		"quickActions": "Acciones Rápidas",
-		"submitProposal": "Enviar Propuesta",
-		"createDiscussion": "Publicación de Discusión",
-		"createPreimage": "Nueva Preimage",
-		"existingPreimage": "Ya tengo una Preimage",
+		"quickActions": "Acciones rápidas",
+		"submitProposal": "Enviar propuesta",
+		"createDiscussion": "Publicación de discusión",
+		"createPreimage": "Nuevo preimage",
+		"existingPreimage": "Ya tengo un preimage",
 		"spend": "Gastar",
-		"from": "de",
+		"from": "desde",
 		"Treasury": "Tesorería",
-		"usdxProposal": "Gastar Activos de AssetHub (USDx, DOT, etc.)",
-		"cancelReferendum": "Cancelar un Referéndum",
-		"killReferendum": "Terminar un Referéndum",
-		"createDiscussionDescription": "Inicia una conversación y reúne comentarios.",
-		"createPreimageDescription": "Envía una propuesta con un nuevo hash de preimage.",
-		"existingPreimageDescription": "Usa un hash de preimage existente para el envío.",
-		"createTreasuryProposalDescription": "Proponer gasto de tesorería en",
-		"usdxProposalDescription": "Solicitar financiamiento de AssetHub (USDx, DOT, etc.).",
+		"usdxProposal": "Gastar activos de AssetHub (USDx, DOT, etc.)",
+		"cancelReferendum": "Cancelar un referéndum",
+		"killReferendum": "Terminar un referéndum",
+		"createBounty": "Crear recompensa",
+		"createDiscussionDescription": "Inicie una conversación y recopile comentarios.",
+		"createPreimageDescription": "Envíe una propuesta con un nuevo hash de preimage.",
+		"existingPreimageDescription": "Use un hash de preimage existente para el envío.",
+		"createTreasuryProposalDescription": "Proponer gastos de tesorería en",
+		"usdxProposalDescription": "Solicitar fondos de AssetHub (USDx, DOT, etc.).",
 		"cancelReferendumDescription": "Proponer cancelar un referéndum activo.",
-		"killReferendumDescription": "Terminar un referéndum antes de que pase.",
+		"killReferendumDescription": "Terminar un referéndum antes de que se apruebe.",
+		"createBountyDescription": "Proponer una recompensa para una tarea o proyecto específico.",
 		"goBack": "Volver",
-		"preimageHash": "Hash de Preimage",
+		"preimageHash": "Hash de preimage",
 		"preimageLength": "Longitud",
-		"preimageHashDescription": "Ingresar Hash",
-		"viewPreimage": "Ver Preimage"
+		"preimageHashDescription": "Ingresar hash",
+		"viewPreimage": "Ver preimage"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
@@ -906,5 +908,13 @@
 			"invalidData": "Datos inválidos",
 			"fetchError": "Error al obtener los datos"
 		}
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "Recompensa propuesta con éxito",
+		"bountyProposedSuccessfullyDescription": "La recompensa ha sido propuesta con éxito",
+		"bountyProposalFailed": "Error al proponer la recompensa",
+		"bountyProposalFailedDescription": "Hubo un error al proponer la recompensa",
+		"bountyAmount": "Cantidad de la recompensa",
+		"proposeBounty": "Proponer recompensa"
 	}
 }

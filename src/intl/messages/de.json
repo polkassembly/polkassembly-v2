@@ -695,18 +695,20 @@
 		"createPreimage": "Neues Preimage",
 		"existingPreimage": "Ich habe bereits ein Preimage",
 		"spend": "Ausgeben",
-		"from": "von",
+		"from": "aus",
 		"Treasury": "Treasury",
 		"usdxProposal": "Assets von AssetHub ausgeben (USDx, DOT, etc.)",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
-		"createDiscussionDescription": "Starten Sie eine Konversation und sammeln Sie Feedback.",
+		"createBounty": "Kopfgeld erstellen",
+		"createDiscussionDescription": "Starten Sie eine Diskussion und sammeln Sie Feedback.",
 		"createPreimageDescription": "Reichen Sie einen Vorschlag mit einem neuen Preimage-Hash ein.",
-		"existingPreimageDescription": "Verwenden Sie einen existierenden Preimage-Hash zur Einreichung.",
+		"existingPreimageDescription": "Verwenden Sie einen bestehenden Preimage-Hash für die Einreichung.",
 		"createTreasuryProposalDescription": "Treasury-Ausgaben vorschlagen in",
-		"usdxProposalDescription": "Finanzierung von AssetHub beantragen (USDx, DOT, etc.).",
-		"cancelReferendumDescription": "Vorschlag zum Abbruch eines aktiven Referendums.",
+		"usdxProposalDescription": "Finanzierung von AssetHub anfordern (USDx, DOT, etc.).",
+		"cancelReferendumDescription": "Vorschlagen, ein aktives Referendum abzubrechen.",
 		"killReferendumDescription": "Beenden Sie ein Referendum, bevor es angenommen wird.",
+		"createBountyDescription": "Schlagen Sie ein Kopfgeld für eine bestimmte Aufgabe oder ein Projekt vor.",
 		"goBack": "Zurück",
 		"preimageHash": "Preimage-Hash",
 		"preimageLength": "Länge",
@@ -907,5 +909,13 @@
 			"invalidData": "Ungültige Daten",
 			"fetchError": "Fehler beim Abrufen der Daten"
 		}
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "Kopfgeld erfolgreich vorgeschlagen",
+		"bountyProposedSuccessfullyDescription": "Das Kopfgeld wurde erfolgreich vorgeschlagen",
+		"bountyProposalFailed": "Kopfgeld-Vorschlag fehlgeschlagen",
+		"bountyProposalFailedDescription": "Beim Vorschlagen des Kopfgeldes ist ein Fehler aufgetreten",
+		"bountyAmount": "Kopfgeld-Betrag",
+		"proposeBounty": "Kopfgeld vorschlagen"
 	}
 }

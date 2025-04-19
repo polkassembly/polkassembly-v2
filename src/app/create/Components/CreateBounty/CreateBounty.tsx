@@ -2,16 +2,14 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus } from '@/_shared/types';
+import { EEnactment, EPostOrigin, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import MultipleBeneficiaryForm from '@/app/_shared-components/Create/MultipleBeneficiaryForm/MultipleBeneficiaryForm';
 import SelectTrack from '@/app/_shared-components/Create/SelectTrack/SelectTrack';
 import EnactmentForm from '@/app/_shared-components/Create/EnactmentForm/EnactmentForm';
 import PreimageDetailsView from '@/app/_shared-components/Create/PreimageDetailsView/PreimageDetailsView';
@@ -19,19 +17,17 @@ import { Separator } from '@/app/_shared-components/Separator';
 import TxFeesDetailsView from '@/app/_shared-components/Create/TxFeesDetailsView/TxFeesDetailsView';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
+import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 
-function TreasuryProposalLocal() {
+function CreateBounty() {
 	const t = useTranslations();
-	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
-	const [totalAmount, setTotalAmount] = useState<BN>(BN_ZERO);
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
+	const [bountyAmount, setBountyAmount] = useState<BN>(BN_ZERO);
+
 	const [selectedTrack, setSelectedTrack] = useState<{ name: EPostOrigin; trackId: number }>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
@@ -39,11 +35,15 @@ function TreasuryProposalLocal() {
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
-	const tx = useMemo(() => {
-		if (!apiService) return null;
+	const [bountyId, setBountyId] = useState<number>();
 
-		return apiService.getTreasurySpendLocalExtrinsic({ beneficiaries });
-	}, [apiService, beneficiaries]);
+	const tx = useMemo(() => {
+		if (!apiService || !bountyId) return null;
+
+		return apiService.getApproveBountyTx({ bountyId });
+	}, [apiService, bountyId]);
+
+	const proposeBountyTx = useMemo(() => apiService && apiService.getProposeBountyTx({ bountyAmount }), [apiService, bountyAmount]);
 
 	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
 
@@ -69,10 +69,6 @@ function TreasuryProposalLocal() {
 		[apiService, notePreimageTx, submitProposalTx]
 	);
 
-	useEffect(() => {
-		setTotalAmount(beneficiaries.reduce((acc, curr) => acc.add(new BN(curr.amount)), BN_ZERO));
-	}, [beneficiaries]);
-
 	const createProposal = async () => {
 		if (!apiService || !userPreferences.address?.address || !tx || !selectedTrack) {
 			return;
@@ -80,10 +76,10 @@ function TreasuryProposalLocal() {
 
 		setLoading(true);
 
-		await apiService.createProposal({
+		apiService.createProposal({
 			address: userPreferences.address.address,
-			extrinsicFn: tx,
 			track: selectedTrack.name,
+			extrinsicFn: tx,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -105,26 +101,52 @@ function TreasuryProposalLocal() {
 		});
 	};
 
+	const proposeBounty = async () => {
+		if (!apiService || bountyAmount.isZero() || !userPreferences.address?.address) {
+			setLoading(false);
+			return;
+		}
+
+		setLoading(true);
+
+		await apiService.proposeBounty({
+			address: userPreferences.address.address,
+			bountyAmount,
+			onSuccess: (id) => {
+				setBountyId(id);
+				toast({
+					title: t('CreateBounty.bountyProposedSuccessfully'),
+					description: t('CreateBounty.bountyProposedSuccessfullyDescription'),
+					status: ENotificationStatus.SUCCESS
+				});
+				createProposal();
+			},
+			onFailed: () => {
+				toast({
+					title: t('CreateBounty.bountyProposalFailed'),
+					description: t('CreateBounty.bountyProposalFailedDescription'),
+					status: ENotificationStatus.ERROR
+				});
+				setLoading(false);
+			}
+		});
+	};
+
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress />
-				<MultipleBeneficiaryForm
-					beneficiaries={beneficiaries}
-					onChange={(value) => setBeneficiaries(value)}
+				<BalanceInput
+					defaultValue={bountyAmount}
+					onChange={({ value }) => setBountyAmount(value)}
+					label={t('CreateBounty.bountyAmount')}
 				/>
-				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-2 font-medium text-text_primary max-sm:text-sm sm:p-4'>
-					<span>Requested Amount</span>
-					<span>
-						{formatter.format(Number(formatBnBalance(totalAmount, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-					</span>
-				</div>
 
 				<SelectTrack
 					selectedTrack={selectedTrack}
 					onChange={setSelectedTrack}
 					isTreasury
-					requestedAmount={totalAmount}
+					requestedAmount={bountyAmount}
 				/>
 
 				<EnactmentForm
@@ -142,9 +164,9 @@ function TreasuryProposalLocal() {
 				/>
 			)}
 
-			{batchCallTx && (
+			{proposeBountyTx && (
 				<TxFeesDetailsView
-					extrinsicFn={[batchCallTx]}
+					extrinsicFn={bountyId ? (batchCallTx ? [batchCallTx] : []) : [proposeBountyTx]}
 					extraFees={[
 						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
 						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
@@ -156,23 +178,15 @@ function TreasuryProposalLocal() {
 
 			<div className='flex justify-end'>
 				<Button
-					onClick={createProposal}
+					onClick={proposeBounty}
 					isLoading={loading}
-					disabled={
-						totalAmount.isZero() ||
-						!beneficiaries.length ||
-						beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
-						!userPreferences.address?.address ||
-						!selectedTrack ||
-						!selectedEnactment ||
-						!batchCallTx
-					}
+					disabled={!userPreferences.address?.address || !selectedTrack || !selectedEnactment || !proposeBountyTx}
 				>
-					{t('CreateTreasuryProposal.createProposal')}
+					{t('CreateBounty.proposeBounty')}
 				</Button>
 			</div>
 		</div>
 	);
 }
 
-export default TreasuryProposalLocal;
+export default CreateBounty;
