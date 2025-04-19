@@ -78,7 +78,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 						value={statusValue}
 					>
 						{initialData?.totalCount ? (
-							<BountyTable filteredItems={initialData?.items} />
+							<BountyTable filteredItems={initialData?.items || []} />
 						) : (
 							<p className={styles.no_data}>
 								<Image
