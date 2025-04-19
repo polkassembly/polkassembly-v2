@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-undef */
+/* eslint-disable react/no-unstable-nested-components */
 
 'use client';
 
@@ -27,10 +29,21 @@ import {
 	diffSourcePlugin,
 	imagePlugin,
 	directivesPlugin,
-	KitchenSinkToolbar,
-	SandpackConfig,
+	StrikeThroughSupSubToggles,
 	AdmonitionDirectiveDescriptor,
-	sandpackPlugin
+	BoldItalicUnderlineToggles,
+	Separator,
+	ChangeCodeMirrorLanguage,
+	DiffSourceToggleWrapper,
+	ConditionalContents,
+	CodeToggle,
+	ListsToggle,
+	BlockTypeSelect,
+	InsertImage,
+	InsertCodeBlock,
+	InsertTable,
+	CreateLink,
+	InsertThematicBreak
 } from '@mdxeditor/editor';
 
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
@@ -38,17 +51,6 @@ import './MardownEditor.scss';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
-
-const defaultSnippetContent = `
-export default function App() {
-  return (
-    <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-    </div>
-  );
-}
-`.trim();
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
@@ -116,7 +118,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 	const { theme } = useTheme();
 
-	const processedMarkdown = preprocessMarkdown(props.markdown || '');
+	const processedMarkdown = props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown;
 
 	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
@@ -171,32 +173,6 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		}
 	};
 
-	const virtuosoSampleSandpackConfig: SandpackConfig = {
-		defaultPreset: 'react',
-		presets: [
-			{
-				label: 'React',
-				name: 'react',
-				meta: 'live react',
-				sandpackTemplate: 'react',
-				sandpackTheme: 'light',
-				snippetFileName: '/App.js',
-				snippetLanguage: 'jsx',
-				initialSnippetContent: defaultSnippetContent
-			},
-			{
-				label: 'React',
-				name: 'react',
-				meta: 'live',
-				sandpackTemplate: 'react',
-				sandpackTheme: 'light',
-				snippetFileName: '/App.js',
-				snippetLanguage: 'jsx',
-				initialSnippetContent: defaultSnippetContent
-			}
-		]
-	};
-
 	const plugins = [
 		listsPlugin(),
 		quotePlugin(),
@@ -210,16 +186,61 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		thematicBreakPlugin(),
 		frontmatterPlugin(),
 		codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-		sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
 		codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'Plain Text', tsx: 'TypeScript' } }),
 		directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
 		diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
 		markdownShortcutPlugin()
 	];
 
+	const toolbarContents = () => {
+		if (props.readOnly) {
+			return null;
+		}
+		return (
+			<DiffSourceToggleWrapper>
+				<ConditionalContents
+					options={[
+						{ when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
+						{
+							fallback: () => (
+								<>
+									<BoldItalicUnderlineToggles />
+									<CodeToggle />
+
+									<Separator />
+
+									<ListsToggle />
+
+									<Separator />
+
+									<BlockTypeSelect />
+
+									<Separator />
+
+									<CreateLink />
+									<InsertImage />
+
+									<Separator />
+
+									<StrikeThroughSupSubToggles />
+
+									<Separator />
+
+									<InsertTable />
+									<InsertThematicBreak />
+									<InsertCodeBlock />
+								</>
+							)
+						}
+					]}
+				/>
+			</DiffSourceToggleWrapper>
+		);
+	};
+
 	if (!props.readOnly) {
 		// eslint-disable-next-line react/no-unstable-nested-components
-		plugins.push(toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar />, toolbarClassName: 'relative' }));
+		plugins.push(toolbarPlugin({ toolbarContents, toolbarClassName: 'relative' }));
 	}
 
 	return (
