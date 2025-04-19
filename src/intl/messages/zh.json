@@ -420,7 +420,11 @@
 		"commentSummary": "评论摘要",
 		"aiSummary": "AI 摘要",
 		"showLikelySpam": "显示疑似垃圾评论",
-		"hideLikelySpam": "隐藏疑似垃圾评论"
+		"hideLikelySpam": "隐藏疑似垃圾评论",
+		"ProposalPeriods": {
+			"decisionPeriodPopover": "提案可能需要的时间才能被批准。如果提案在决策期结束时未获批准，将被拒绝。",
+			"confirmationPeriodPopover": "国民投票必须在决策期内同时满足最小批准和支助标准，才能通过"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",

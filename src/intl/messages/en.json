@@ -440,6 +440,10 @@
 			"grant": "Grant",
 			"community": "Community",
 			"technicalcommittee": "Technical Committee"
+		},
+		"ProposalPeriods": {
+			"decisionPeriodPopover": "Amount of time a proposal may take to be approved. If the proposal is not approved by the end of the decision period, it gets rejected.",
+			"confirmationPeriodPopover": "Total time the referenda must meet both the min approval and support criteria during the decision period in order to pass"
 		}
 	},
 	"ListingPage_Status": {

@@ -420,7 +420,11 @@
 		"commentSummary": "Kommentarzusammenfassung",
 		"aiSummary": "KI-Zusammenfassung",
 		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
-		"hideLikelySpam": "Wahrscheinliche Spam ausblenden"
+		"hideLikelySpam": "Wahrscheinliche Spam ausblenden",
+		"ProposalPeriods": {
+			"decisionPeriodPopover": "Zeit, die ein Vorschlag benötigt, um genehmigt zu werden. Wenn der Vorschlag nicht innerhalb des Entscheidungszeitraums genehmigt wird, wird er abgelehnt.",
+			"confirmationPeriodPopover": "Gesamte Zeit, die die Referenden beide die Mindestgenehmigung und die Unterstützungskriterien während des Entscheidungszeitraums erfüllen müssen, um zu bestehen"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",

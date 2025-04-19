@@ -420,7 +420,11 @@
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
 		"showLikelySpam": "疑わしいスパムを表示",
-		"hideLikelySpam": "疑わしいスパムを非表示"
+		"hideLikelySpam": "疑わしいスパムを非表示",
+		"ProposalPeriods": {
+			"decisionPeriodPopover": "提案が承認されるまでの時間。提案が決定期間の終了時に承認されない場合、拒否されます。",
+			"confirmationPeriodPopover": "決定期間中に両方の最小承認と支持基準を満たす必要がある、国民投票の総時間"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",

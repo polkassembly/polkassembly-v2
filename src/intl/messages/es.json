@@ -420,7 +420,11 @@
 		"commentSummary": "Resumen de Comentarios",
 		"aiSummary": "Resumen de IA",
 		"showLikelySpam": "Mostrar Comentarios de Spam",
-		"hideLikelySpam": "Ocultar Comentarios de Spam"
+		"hideLikelySpam": "Ocultar Comentarios de Spam",
+		"ProposalPeriods": {
+			"decisionPeriodPopover": "Cantidad de tiempo que una propuesta puede tomar para ser aprobada. Si la propuesta no es aprobada al final del período de decisión, se rechaza.",
+			"confirmationPeriodPopover": "Tiempo total que las referendas deben cumplir ambos criterios de aprobación mínima y apoyo durante el período de decisión para pasar"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
