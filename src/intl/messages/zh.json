@@ -424,6 +424,25 @@
 		"ProposalPeriods": {
 			"decisionPeriodPopover": "提案可能需要的时间才能被批准。如果提案在决策期结束时未获批准，将被拒绝。",
 			"confirmationPeriodPopover": "国民投票必须在决策期内同时满足最小批准和支助标准，才能通过"
+		},
+		"VoteSummaryInfo": {
+			"howAreVotesCalculated": "如何计算投票",
+			"howAreVotesCalculatedDescription": "投票是通过将投票数乘以确信度来计算的。",
+			"chooseYourVote": "选择您的投票",
+			"userWantToVote": "用户想要投票",
+			"setsA": "设置一个",
+			"period": "时期",
+			"userCastTheirVote": "用户投了票",
+			"conviction": "确信度",
+			"here": "这里",
+			"voter": "投票者",
+			"voteAmount": "投票数量",
+			"voteType": "投票类型",
+			"theVoteWillBeCalculatedByMultiplying": "投票将通过将投票数乘以确信度来计算。",
+			"note": "注意: 只有当公投在这里通过时，代币才会被锁定。",
+			"gotIt": "明白了！",
+			"amount": "数量",
+			"toGetTheFinalVote": "以获得最终投票。"
 		}
 	},
 	"ListingPage_Status": {

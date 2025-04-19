@@ -23,6 +23,7 @@ import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 import { Skeleton } from '../../Skeleton';
+import VoteSummaryInfo from './VoteSummaryInfo/VoteSummaryInfo';
 
 const NONE_CHART_VALUE = 0;
 
@@ -32,6 +33,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
+	const [isDialogOpen, setIsDialogOpen] = useState(true);
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
@@ -88,7 +90,13 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 
 	return (
 		<div className={classes.voteSummaryWrapper}>
-			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
+			<div className='flex items-center justify-between'>
+				<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
+				<VoteSummaryInfo
+					isDialogOpen={isDialogOpen}
+					setIsDialogOpen={setIsDialogOpen}
+				/>
+			</div>
 			{loading ? (
 				<Skeleton className='h-[220px] w-full' />
 			) : tally?.aye && tally?.nay && tally?.support ? (

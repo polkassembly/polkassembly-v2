@@ -424,6 +424,25 @@
 		"ProposalPeriods": {
 			"decisionPeriodPopover": "Cantidad de tiempo que una propuesta puede tomar para ser aprobada. Si la propuesta no es aprobada al final del período de decisión, se rechaza.",
 			"confirmationPeriodPopover": "Tiempo total que las referendas deben cumplir ambos criterios de aprobación mínima y apoyo durante el período de decisión para pasar"
+		},
+		"VoteSummaryInfo": {
+			"howAreVotesCalculated": "Cómo se calculan los votos",
+			"howAreVotesCalculatedDescription": "Los votos se calculan multiplicando los votos emitidos por el período de convicción.",
+			"chooseYourVote": "Elija su Voto",
+			"userWantToVote": "El usuario quiere votar",
+			"setsA": "Establece una",
+			"period": "Período",
+			"userCastTheirVote": "El usuario ha emitido su voto",
+			"conviction": "Convicción",
+			"here": "Aquí",
+			"voter": "Votante",
+			"voteAmount": "Cantidad de Votos",
+			"voteType": "Tipo de Voto",
+			"theVoteWillBeCalculatedByMultiplying": "Los votos se calcularán multiplicando",
+			"note": "Nota: Los tokens se bloquearán solo si una referéndum pasa aquí",
+			"gotIt": "¡Entendido!",
+			"amount": "Cantidad",
+			"toGetTheFinalVote": "para obtener el voto final."
 		}
 	},
 	"ListingPage_Status": {

@@ -424,6 +424,25 @@
 		"ProposalPeriods": {
 			"decisionPeriodPopover": "Zeit, die ein Vorschlag benötigt, um genehmigt zu werden. Wenn der Vorschlag nicht innerhalb des Entscheidungszeitraums genehmigt wird, wird er abgelehnt.",
 			"confirmationPeriodPopover": "Gesamte Zeit, die die Referenden beide die Mindestgenehmigung und die Unterstützungskriterien während des Entscheidungszeitraums erfüllen müssen, um zu bestehen"
+		},
+		"VoteSummaryInfo": {
+			"howAreVotesCalculated": "Wie werden Stimmen berechnet",
+			"howAreVotesCalculatedDescription": "Stimmen werden durch Multiplikation der abgegebenen Stimmen mit der Überzeugungsdauer berechnet.",
+			"chooseYourVote": "Wählen Sie Ihre Stimme",
+			"userWantToVote": "Der Benutzer möchte abstimmen",
+			"setsA": "Setzt eine",
+			"period": "Periode",
+			"userCastTheirVote": "Der Benutzer hat seine Stimme abgegeben",
+			"conviction": "Überzeugung",
+			"here": "Hier",
+			"voter": "Abstimmer",
+			"voteAmount": "Stimmenbetrag",
+			"voteType": "Stimmentyp",
+			"theVoteWillBeCalculatedByMultiplying": "Die Stimmen werden durch Multiplikation der abgegebenen Stimmen mit der Überzeugungsdauer berechnet.",
+			"note": "Hinweis: Token werden nur gesperrt, wenn eine Referendum besteht",
+			"gotIt": "Verstanden!",
+			"amount": "Betrag",
+			"toGetTheFinalVote": "um die endgültige Stimme zu erhalten."
 		}
 	},
 	"ListingPage_Status": {

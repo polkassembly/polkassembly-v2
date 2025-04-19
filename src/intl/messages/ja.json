@@ -424,6 +424,25 @@
 		"ProposalPeriods": {
 			"decisionPeriodPopover": "提案が承認されるまでの時間。提案が決定期間の終了時に承認されない場合、拒否されます。",
 			"confirmationPeriodPopover": "決定期間中に両方の最小承認と支持基準を満たす必要がある、国民投票の総時間"
+		},
+		"VoteSummaryInfo": {
+			"howAreVotesCalculated": "投票の計算方法",
+			"howAreVotesCalculatedDescription": "投票は、投票数に確信度を掛けて計算されます。",
+			"chooseYourVote": "投票を選択",
+			"userWantToVote": "ユーザーが投票したい",
+			"setsA": "設定する",
+			"period": "期間",
+			"userCastTheirVote": "ユーザーが投票した",
+			"conviction": "確信度",
+			"here": "ここ",
+			"voter": "投票者",
+			"voteAmount": "投票数",
+			"voteType": "投票タイプ",
+			"theVoteWillBeCalculatedByMultiplying": "投票は、投票数に確信度を掛けて計算されます。",
+			"note": "注意: 国民投票がここで通過する場合にのみトークンがロックされます。",
+			"gotIt": "理解しました！",
+			"amount": "量",
+			"toGetTheFinalVote": "最終投票を取得するには"
 		}
 	},
 	"ListingPage_Status": {

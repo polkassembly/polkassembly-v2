@@ -444,6 +444,25 @@
 		"ProposalPeriods": {
 			"decisionPeriodPopover": "Amount of time a proposal may take to be approved. If the proposal is not approved by the end of the decision period, it gets rejected.",
 			"confirmationPeriodPopover": "Total time the referenda must meet both the min approval and support criteria during the decision period in order to pass"
+		},
+		"VoteSummaryInfo": {
+			"howAreVotesCalculated": "How are votes calculated",
+			"howAreVotesCalculatedDescription": "Votes are calculated by multiplying the votes casted by a user with the conviction period.",
+			"chooseYourVote": "Chooses vote amount and type (Aye/Nay)",
+			"userWantToVote": "User wants to vote",
+			"setsA": "Sets a",
+			"period": "period",
+			"userCastTheirVote": "User casts their vote",
+			"conviction": "conviction",
+			"here": "Here",
+			"voter": "Voter",
+			"voteAmount": "Vote Amount",
+			"voteType": "Vote Type",
+			"theVoteWillBeCalculatedByMultiplying": "The vote will be calculated by multiplying",
+			"note": "NOTE: Tokens get locked only if a referendum passes here",
+			"gotIt": "Got it!",
+			"amount": "amount",
+			"toGetTheFinalVote": "to get the final vote."
 		}
 	},
 	"ListingPage_Status": {
