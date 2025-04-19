@@ -9,7 +9,7 @@ import Image from 'next/image';
 import ProposalIcon from '@assets/icons/proposal.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
@@ -17,12 +17,8 @@ import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import BountyTable from './BountyTable';
 import styles from './Bounties.module.scss';
 
-function BountiesListingPage({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
-	const searchParams = useSearchParams();
+function BountiesListingPage({ initialData, status, page }: { initialData: IGenericListingResponse<IPostListing>; status: EBountyStatus; page: number }) {
 	const router = useRouter();
-	const pageParam = searchParams.get('page')?.split('?')[0];
-	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
-	const status = searchParams.get('status') ? JSON.parse(decodeURIComponent(searchParams.get('status') || '')) : EBountyStatus.ALL;
 	const t = useTranslations();
 	const statusValues = Object.values(EBountyStatus);
 
@@ -34,7 +30,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 		params.set('page', '1');
 
 		if (value !== EBountyStatus.ALL) {
-			params.set('status', encodeURIComponent(JSON.stringify(value)));
+			params.set('status', value);
 		}
 		router.push(`/bounties-listing?${params.toString()}`);
 	};

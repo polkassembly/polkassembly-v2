@@ -34,7 +34,6 @@ function ChildBountiesRow({ parentIndex }: { parentIndex: number }) {
 		enabled: !!parentIndex
 	});
 
-	console.log({ childBounties, error, isLoading });
 	if (isLoading) {
 		return (
 			<TableRow className={styles.childBountyRow}>

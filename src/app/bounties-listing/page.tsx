@@ -6,21 +6,26 @@ import { EBountyStatus, EProposalStatus, EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { z } from 'zod';
 import BountiesListingPage from './Components/BountiesListingPage';
 
-const convertStatusToStatusesArray = (status: string): EProposalStatus[] => {
+const zodQuerySchema = z.object({
+	page: z.coerce.number().min(1).optional().default(1),
+	status: z.nativeEnum(EBountyStatus).optional().default(EBountyStatus.ALL)
+});
+
+const convertStatusToStatusesArray = (status: EBountyStatus): EProposalStatus[] => {
 	switch (status) {
-		case EProposalStatus.Active:
+		case EBountyStatus.ACTIVE:
 			return [EProposalStatus.Active, EProposalStatus.Extended];
-		case EProposalStatus.Closed:
-			return [EProposalStatus.Closed];
-		case EProposalStatus.Cancelled:
+		case EBountyStatus.CLAIMED:
+			return [EProposalStatus.Claimed];
+		case EBountyStatus.CANCELLED:
 			return [EProposalStatus.Cancelled];
-		case EProposalStatus.Rejected:
+		case EBountyStatus.REJECTED:
 			return [EProposalStatus.Rejected];
-		case EProposalStatus.Awarded:
-			return [EProposalStatus.Awarded, EProposalStatus.Claimed];
+		case EBountyStatus.PROPOSED:
+			return [EProposalStatus.Proposed];
 		default:
 			return [];
 	}
@@ -28,13 +33,9 @@ const convertStatusToStatusesArray = (status: string): EProposalStatus[] => {
 
 async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
 	const searchParamsValue = await searchParams;
-	const pageParam = searchParamsValue.page?.split('?')[0];
-	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
-	const { status: paramStatus } = searchParamsValue;
-	const [urlStatus] = searchParamsValue.page?.includes('status=') ? searchParamsValue.page.split('status=') : [];
-	const status = paramStatus || urlStatus ? JSON.parse(decodeURIComponent(paramStatus || urlStatus)) : EBountyStatus.ALL;
+	const { page, status } = zodQuerySchema.parse(searchParamsValue);
 
-	let statuses: string[] = [];
+	let statuses: EProposalStatus[] = [];
 
 	statuses = convertStatusToStatusesArray(status);
 
@@ -46,7 +47,11 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 
 	return (
 		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
-			<BountiesListingPage initialData={data || { items: [], totalCount: 0 }} />
+			<BountiesListingPage
+				initialData={data || { items: [], totalCount: 0 }}
+				status={status as EBountyStatus}
+				page={page}
+			/>
 		</div>
 	);
 }
