@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
@@ -54,6 +54,8 @@ function ReactionBar({
 	const { user } = useUser();
 	const t = useTranslations();
 
+	const isCurrentlySubscribed = useMemo(() => postData?.userSubscriptionId || isSubscribed, [postData?.userSubscriptionId, isSubscribed]);
+
 	const handleAuthenticatedAction = (action: () => void) => {
 		if (!user?.id) {
 			router.push('/login');
@@ -80,7 +82,7 @@ function ReactionBar({
 			setIsDialogOpen(true);
 		}
 	};
-	const isCurrentlySubscribed = postData?.userSubscriptionId || isSubscribed;
+
 	return (
 		<div className='mb-1.5 flex items-center justify-between text-xs text-navbar_border'>
 			<div className='flex space-x-3 md:space-x-5'>
