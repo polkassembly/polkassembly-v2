@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EProposalType, IPost } from '@/_shared/types';
 import React from 'react';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { TableCell, TableRow } from '@/app/_shared-components/Table';
@@ -16,23 +16,26 @@ import Address from '@ui/Profile/Address/Address';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'nextjs-toploader/app';
 import ChildBountiesLevelZeroIcon from '@assets/bounties/bountieslistingchildlevelzero.svg';
+import { useQuery } from '@tanstack/react-query';
 import styles from './Bounties.module.scss';
 
-function ChildBountiesRow({
-	parentIndex,
-	loading,
-	errors,
-	childBounties
-}: {
-	parentIndex: number;
-	loading: Record<number, boolean>;
-	errors: string | string[];
-	childBounties: IGenericListingResponse<IPostListing>;
-}) {
+function ChildBountiesRow({ parentIndex }: { parentIndex: number }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const router = useRouter();
-	if (loading[parentIndex as number]) {
+
+	const {
+		data: childBounties,
+		isLoading,
+		error
+	} = useQuery({
+		queryKey: ['childBounties', parentIndex],
+		queryFn: () => fetch(`/api/v2/${EProposalType.BOUNTY}/${parentIndex}/child-bounties`).then((res) => res.json()),
+		enabled: !!parentIndex
+	});
+
+	console.log({ childBounties, error, isLoading });
+	if (isLoading) {
 		return (
 			<TableRow className={styles.childBountyRow}>
 				<TableCell
@@ -48,14 +51,14 @@ function ChildBountiesRow({
 		);
 	}
 
-	if (errors[parentIndex as number]) {
+	if (error) {
 		return (
 			<TableRow className={styles.childBountyRow}>
 				<TableCell
 					colSpan={7}
 					className='p-4 text-center text-red-500'
 				>
-					{errors[parentIndex as number]}
+					{error.message}
 				</TableCell>
 			</TableRow>
 		);
@@ -73,7 +76,7 @@ function ChildBountiesRow({
 			</TableRow>
 		);
 	}
-	return childBounties.items.map((childBounty, index) => (
+	return childBounties.items.map((childBounty: IPost, index: number) => (
 		<TableRow
 			key={childBounty.index}
 			className={`${styles.tableBodyRow} ${styles.childBountyRow}`}

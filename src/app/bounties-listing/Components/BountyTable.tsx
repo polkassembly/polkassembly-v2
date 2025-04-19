@@ -13,15 +13,22 @@ import { useTranslations } from 'next-intl';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useRouter } from 'nextjs-toploader/app';
-import { useChildBounties } from '@/hooks/useChildBounties';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { useState } from 'react';
 import styles from './Bounties.module.scss';
 import ChildBountiesRow from './ChildBountiesRow';
 
 function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
-	const { expandedRows, childBounties, loading, errors, toggleRow } = useChildBounties();
 	const network = getCurrentNetwork();
 	const router = useRouter();
 	const t = useTranslations();
+	const [expandChildBounties, setExpandChildBounties] = useState<{ parentIndex: number | null; isExpanded: boolean }>({ parentIndex: null, isExpanded: false });
+
+	const handleExpandChildBounties = (parentIndex?: number | null) => {
+		if (!ValidatorService.isValidNumber(parentIndex)) return;
+		setExpandChildBounties((prev) => ({ ...prev, parentIndex: parentIndex || null, isExpanded: prev.parentIndex === parentIndex ? !prev.isExpanded : true }));
+	};
+
 	return (
 		<Table className={styles.table}>
 			<TableHeader>
@@ -52,12 +59,16 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 													type='button'
 													onClick={(e) => {
 														e.stopPropagation();
-														toggleRow(item.index ?? 0);
+														handleExpandChildBounties(item.index);
 													}}
 													className='rounded p-1 transition-colors'
-													title={`${expandedRows.includes(item.index ?? 0) ? 'Hide' : 'Show'} child bounties`}
+													title={`${expandChildBounties.parentIndex === item.index && expandChildBounties.isExpanded ? 'Hide' : 'Show'} child bounties`}
 												>
-													{expandedRows.includes(item.index ?? 0) ? <FaCaretUp className='h-4 w-4 text-navbar_border' /> : <FaCaretDown className='h-4 w-4' />}
+													{expandChildBounties.isExpanded && expandChildBounties.parentIndex === item.index ? (
+														<FaCaretUp className='h-4 w-4 text-navbar_border' />
+													) : (
+														<FaCaretDown className='h-4 w-4' />
+													)}
 												</button>
 											</div>
 											<div className='pl-8'>
@@ -92,14 +103,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 							</TableCell>
 							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? item.tags.join(', ') : 'N/A'}</TableCell>
 						</TableRow>
-						{expandedRows.includes(item.index ?? 0) && (
-							<ChildBountiesRow
-								parentIndex={item.index ?? 0}
-								loading={loading}
-								errors={errors[item.index ?? 0] || []}
-								childBounties={childBounties[item.index ?? 0] || []}
-							/>
-						)}
+						{expandChildBounties.isExpanded && expandChildBounties.parentIndex === item.index && <ChildBountiesRow parentIndex={expandChildBounties.parentIndex} />}
 					</>
 				))}
 			</TableBody>

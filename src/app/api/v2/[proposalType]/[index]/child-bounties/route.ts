@@ -13,16 +13,15 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const zodParamsSchema = z.object({
 		proposalType: z.literal(EProposalType.BOUNTY),
-		index: z.string()
+		index: z.coerce.number()
 	});
 
 	const { index, proposalType } = zodParamsSchema.parse(await params);
 	const network = await getNetworkFromHeaders();
-	const parsedIndex = Number(index);
 
 	const onchainChildBountiesInfo: IGenericListingResponse<IOnChainPostInfo> = await OnChainDbService.GetChildBountiesByParentBountyIndex({
 		network,
-		index: parsedIndex
+		index
 	});
 
 	if (!onchainChildBountiesInfo?.totalCount) {

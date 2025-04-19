@@ -49,3 +49,11 @@
 .tableCell_ChildBountyCreatedAt {
 	@apply mt-2 flex items-center gap-1 whitespace-nowrap p-6 text-wallet_btn_text;
 }
+
+.create_bounty_btn {
+	@apply flex w-full cursor-pointer items-center justify-center gap-[6px] rounded-[14px] border-none bg-gradient-to-b from-create_bounty_btn via-navbar_border to-navbar_border px-[22px] py-[11px] md:w-auto md:justify-normal;
+}
+
+.tabs_trigger {
+	@apply m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal;
+}

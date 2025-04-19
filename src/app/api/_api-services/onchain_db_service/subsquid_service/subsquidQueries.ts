@@ -705,29 +705,42 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
-	query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $curator_eq: String, $status_eq: ProposalStatus ) {
-	totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
-    totalCount
-  }  
-	childBounties:proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty, curator_eq: $curator_eq, status_eq: $status_eq}) {
-    description
-    index
-    status
-    reward
-    createdAt
-    curator
-    payee
-    proposer
-    origin   
-  }
-}`;
+		query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!) {
+			totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
+				totalCount
+			}  
+			childBounties: proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
+				description
+				index
+				status
+				reward
+				createdAt
+				statusHistory {
+					status
+					timestamp
+					block
+				}
+				curator
+				payee
+				proposer
+				hash
+				origin   
+				preimage {
+					proposedCall {
+						args
+					}
+				}
+			}
+		}
+	`;
 
-	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES = `
-	query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!) {
- totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
-    totalCount
-}  
-}`;
+	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES = `
+		query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!) {
+			totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
+				totalCount
+			}  
+		}
+	`;
 
 	protected static GET_CONVICTION_VOTING_DELEGATION_STATS = `
 		query GetConvictionVotingDelegationStats {

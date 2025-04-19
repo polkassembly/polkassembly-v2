@@ -234,7 +234,7 @@ export class SubsquidService extends SubsquidUtils {
 
 				// child bounties count
 				if (proposalType === EProposalType.BOUNTY) {
-					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES;
+					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES;
 
 					const { data } = await gqlClient
 						.query(childBountiesCountGQL, {
@@ -248,13 +248,13 @@ export class SubsquidService extends SubsquidUtils {
 
 				return {
 					createdAt: new Date(proposal.createdAt),
-					childBountiesCount: childBountiesCount || 0,
-					curator: proposal.curator,
+					...(proposalType === EProposalType.BOUNTY ? { childBountiesCount: childBountiesCount || 0 } : {}),
+					...(proposal.curator && { curator: proposal.curator }),
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
-					reward: proposal.reward || '',
+					...(proposal.reward && { reward: proposal.reward }),
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
@@ -501,8 +501,34 @@ export class SubsquidService extends SubsquidUtils {
 			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
 		}
+		const childBounties: IOnChainPostInfo[] = subsquidData.childBounties.map(
+			(childBounty: {
+				createdAt: string;
+				curator: string;
+				proposer: string;
+				status: EProposalStatus;
+				index: number;
+				hash: string;
+				origin: EPostOrigin;
+				description: string;
+				statusHistory: IStatusHistoryItem[];
+				preimage: { proposedCall: { args: Record<string, unknown> } };
+			}) => ({
+				createdAt: childBounty.createdAt,
+				curator: childBounty.curator || '',
+				proposer: childBounty.proposer || '',
+				status: childBounty.status,
+				index: childBounty.index,
+				hash: childBounty.hash,
+				origin: childBounty.origin,
+				description: childBounty.description || '',
+				timeline: childBounty.statusHistory as IStatusHistoryItem[],
+				preimageArgs: childBounty.preimage?.proposedCall?.args
+			})
+		);
+
 		return {
-			items: subsquidData.childBounties || [],
+			items: childBounties,
 			totalCount: subsquidData.totalChildBounties.totalCount || 0
 		};
 	}

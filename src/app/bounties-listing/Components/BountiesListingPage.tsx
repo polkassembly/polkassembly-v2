@@ -24,16 +24,6 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
 	const status = searchParams.get('status') ? JSON.parse(decodeURIComponent(searchParams.get('status') || '')) : EBountyStatus.ALL;
 	const t = useTranslations();
-
-	const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
-		[EBountyStatus.ALL]: t('Bounties.all'),
-		[EBountyStatus.ACTIVE]: t('Bounties.active'),
-		[EBountyStatus.PROPOSED]: t('Bounties.proposed'),
-		[EBountyStatus.CLAIMED]: t('Bounties.claimed'),
-		[EBountyStatus.CANCELLED]: t('Bounties.cancelled'),
-		[EBountyStatus.REJECTED]: t('Bounties.rejected')
-	};
-
 	const statusValues = Object.values(EBountyStatus);
 
 	const handleTabChange = (value: string) => {
@@ -56,7 +46,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 				<div className='flex gap-2'>
 					<button
 						type='button'
-						className='flex w-full cursor-pointer items-center justify-center gap-[6px] rounded-[14px] border-none bg-gradient-to-b from-create_bounty_btn via-navbar_border to-navbar_border px-[22px] py-[11px] md:w-auto md:justify-normal'
+						className={styles.create_bounty_btn}
 					>
 						<Image
 							src={ProposalIcon}
@@ -81,7 +71,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
 							value={statusValue}
 						>
-							{STATUS_DISPLAY_NAMES[statusValue as EBountyStatus]}
+							{t(`Bounties.${(statusValue as EBountyStatus)?.toLowerCase()}`)}
 						</TabsTrigger>
 					))}
 				</TabsList>
