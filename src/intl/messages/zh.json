@@ -712,24 +712,26 @@
 	},
 	"CreateProposal": {
 		"create": "创建",
-		"quickActions": "快速操作",
+		"quickActions": "快捷操作",
 		"submitProposal": "提交提案",
-		"createDiscussion": "讨论帖",
+		"createDiscussion": "讨论帖子",
 		"createPreimage": "新建预映像",
 		"existingPreimage": "我已有预映像",
 		"spend": "支出",
 		"from": "从",
 		"Treasury": "国库",
-		"usdxProposal": "从资产中心支出资产（USDx、DOT等）",
+		"usdxProposal": "从AssetHub支出资产 (USDx, DOT, 等)",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
+		"createBounty": "创建赏金",
 		"createDiscussionDescription": "开始对话并收集反馈。",
-		"createPreimageDescription": "提交带有新预映像哈希的提案。",
-		"existingPreimageDescription": "使用现有预映像哈希进行提交。",
+		"createPreimageDescription": "使用新的预映像哈希提交提案。",
+		"existingPreimageDescription": "使用现有的预映像哈希进行提交。",
 		"createTreasuryProposalDescription": "提议国库支出",
-		"usdxProposalDescription": "从资产中心申请资金（USDx、DOT等）。",
+		"usdxProposalDescription": "从AssetHub请求资金 (USDx, DOT, 等)。",
 		"cancelReferendumDescription": "提议取消活跃的公投。",
-		"killReferendumDescription": "在通过前终止公投。",
+		"killReferendumDescription": "在公投通过前终止它。",
+		"createBountyDescription": "为特定任务或项目提议赏金。",
 		"goBack": "返回",
 		"preimageHash": "预映像哈希",
 		"preimageLength": "长度",
@@ -929,5 +931,13 @@
 			"invalidData": "无效数据",
 			"fetchError": "获取数据错误"
 		}
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "赏金提案成功",
+		"bountyProposedSuccessfullyDescription": "赏金已成功提案",
+		"bountyProposalFailed": "赏金提案失败",
+		"bountyProposalFailedDescription": "赏金提案过程中出现错误",
+		"bountyAmount": "赏金金额",
+		"proposeBounty": "提案赏金"
 	}
 }

@@ -742,6 +742,7 @@
 		"usdxProposal": "Spend Assets from AssetHub (USDx, DOT, etc.)",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
+		"createBounty": "Create Bounty",
 		"createDiscussionDescription": "Start a conversation and gather feedback.",
 		"createPreimageDescription": "Submit a proposal with a new preimage hash.",
 		"existingPreimageDescription": "Use an existing preimage hash for submission.",
@@ -749,6 +750,7 @@
 		"usdxProposalDescription": "Request funding from AssetHub (USDx, DOT, etc.).",
 		"cancelReferendumDescription": "Propose to cancel an active referendum.",
 		"killReferendumDescription": "Terminate a referendum before it passes.",
+		"createBountyDescription": "Propose a bounty for a specific task or project.",
 		"goBack": "Go Back",
 		"preimageHash": "Preimage Hash",
 		"preimageLength": "Length",
@@ -791,6 +793,14 @@
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
 		"on": "on"
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "Bounty proposed successfully",
+		"bountyProposedSuccessfullyDescription": "The bounty has been proposed successfully",
+		"bountyProposalFailed": "Failed to propose bounty",
+		"bountyProposalFailedDescription": "There was an error while proposing the bounty",
+		"bountyAmount": "Bounty Amount",
+		"proposeBounty": "Propose Bounty"
 	},
 	"KillCancelReferendum": {
 		"referendumId": "Enter Referendum Index",

@@ -115,8 +115,8 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			<Link
 				href={
 					!user?.id
-						? `/login?nextUrl=create/${proposalType === EProposalType.DISCUSSION ? 'discussion' : 'proposal'}`
-						: `/create/${proposalType === EProposalType.DISCUSSION ? 'discussion' : 'proposal'}`
+						? `/login?nextUrl=create${proposalType === EProposalType.DISCUSSION ? '/discussion' : ''}`
+						: `/create${proposalType === EProposalType.DISCUSSION ? '/discussion' : ''}`
 				}
 				className={styles.button}
 			>
