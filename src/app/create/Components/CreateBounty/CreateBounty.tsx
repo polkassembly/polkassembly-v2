@@ -65,7 +65,7 @@ function CreateBounty() {
 	);
 
 	const batchCallTx = useMemo(
-		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchCallTx([notePreimageTx, submitProposalTx]),
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx]),
 		[apiService, notePreimageTx, submitProposalTx]
 	);
 
@@ -180,7 +180,7 @@ function CreateBounty() {
 				<Button
 					onClick={proposeBounty}
 					isLoading={loading}
-					disabled={bountyAmount.isZero() || !userPreferences.address?.address || !selectedTrack || !selectedEnactment || !batchCallTx}
+					disabled={!userPreferences.address?.address || !selectedTrack || !selectedEnactment || !proposeBountyTx}
 				>
 					{t('CreateBounty.proposeBounty')}
 				</Button>

@@ -65,7 +65,7 @@ function TreasuryProposalLocal() {
 	);
 
 	const batchCallTx = useMemo(
-		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchCallTx([notePreimageTx, submitProposalTx]),
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx]),
 		[apiService, notePreimageTx, submitProposalTx]
 	);
 

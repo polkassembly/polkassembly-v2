@@ -492,8 +492,8 @@ export class PolkadotApiService {
 
 	// create proposal calls
 
-	getBatchCallTx(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>[] | null) {
-		if (!this.api || !extrinsicFn) {
+	getBatchAllTx(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>[] | null) {
+		if (!this.api || !extrinsicFn?.length) {
 			return null;
 		}
 		return this.api.tx.utility.batchAll(extrinsicFn);
@@ -687,7 +687,7 @@ export class PolkadotApiService {
 
 	getProposeBountyTx({ bountyAmount }: { bountyAmount: BN }) {
 		if (!this.api) return null;
-		const title = 'PA';
+		const title = 'Bounty';
 		return this.api.tx.bounties.proposeBounty(bountyAmount, title);
 	}
 
@@ -768,7 +768,7 @@ export class PolkadotApiService {
 		}
 
 		const preimageExists = await this.getPreimageLengthFromPreimageHash({ preimageHash: preimageDetails.preimageHash });
-		const tx = preimageExists ? submitProposalTx : this.getBatchCallTx([notePreimageTx, submitProposalTx]);
+		const tx = preimageExists ? submitProposalTx : this.getBatchAllTx([notePreimageTx, submitProposalTx]);
 
 		if (!tx) {
 			onFailed?.();
