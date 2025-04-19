@@ -125,17 +125,17 @@ export const usePostReactions = (postData: IPostData) => {
 			setSubscriptionKey((prev) => prev + 1);
 
 			if (newSubscriptionState) {
-				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 				toast({
 					title: 'Subscribed to the post',
 					status: ENotificationStatus.SUCCESS
 				});
+				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			} else {
-				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 				toast({
 					title: 'Unsubscribed from the post',
 					status: ENotificationStatus.INFO
 				});
+				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			}
 
 			return {

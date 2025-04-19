@@ -54,7 +54,7 @@ function ReactionBar({
 	const { user } = useUser();
 	const t = useTranslations();
 
-	const isCurrentlySubscribed = useMemo(() => postData?.userSubscriptionId || isSubscribed, [postData?.userSubscriptionId, isSubscribed]);
+	const isCurrentlySubscribed = useMemo(() => !!isSubscribed, [isSubscribed]);
 
 	const handleAuthenticatedAction = (action: () => void) => {
 		if (!user?.id) {
