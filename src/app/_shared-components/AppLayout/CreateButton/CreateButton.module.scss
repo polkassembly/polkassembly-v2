@@ -1,5 +1,5 @@
 .card {
-	@apply relative z-10 mt-4 p-[2px] rounded-[11.5px] bg-[var(--sidebar-background)] text-center;
+	@apply relative z-10 mt-4 rounded-[11.5px] bg-[var(--sidebar-background)] p-[2px] text-center;
 }
 
 @property --angle {
@@ -27,9 +27,8 @@
 	}
 }
 
-
 .trigger {
-	@apply flex cursor-pointer items-center h-9 justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
+	@apply flex h-9 cursor-pointer items-center justify-center gap-[6px] rounded-[10.5px] bg-[var(--sidebar-primary-foreground)] transition-colors duration-200 ease-in-out;
 }
 
 .triggerCollapsed {
@@ -41,7 +40,10 @@
 }
 
 .triggerText {
-	@apply text-lg font-medium leading-4 text-sidebar_foreground;
+	@apply text-base font-medium leading-4;
+	background: linear-gradient(180deg, #acceff 0%, #00429b 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
 
 .triggerIcon {
@@ -49,7 +51,7 @@
 }
 
 .popoverContent {
-	@apply w-52 rounded-xl border-none text-text_primary bg-[var(--sidebar-primary-foreground)] p-1.5 shadow-md dark:bg-[var(--sidebar-accent-foreground)];
+	@apply w-52 rounded-xl border-none bg-[var(--sidebar-primary-foreground)] p-1.5 text-text_primary shadow-md dark:bg-[var(--sidebar-accent-foreground)];
 }
 
 .menuList {
@@ -81,5 +83,5 @@
 }
 
 .menuItemIcon {
-	@apply h-6 w-6
+	@apply h-6 w-6;
 }
