@@ -64,12 +64,16 @@ function AddressSwitchModal({
 	const toggleMultisigExpand = (address: string) => {
 		setExpandedMultisigs((prev) => ({
 			...prev,
-			[address]: !prev[address]
+			[address]: !prev[address as keyof typeof prev]
 		}));
 	};
 
 	const fetchMultisigAndProxyData = useCallback(async () => {
 		if (!userPreferences?.address?.address) return;
+
+		if (userPreferences.address.accountType !== undefined && userPreferences.address.accountType !== EAccountType.REGULAR) {
+			return;
+		}
 
 		try {
 			if (linkedAddress && linkedAddress[userPreferences.address.address]) {
@@ -81,13 +85,18 @@ function AddressSwitchModal({
 		} catch {
 			setMultisigProxyData({ multisig: [], proxy: [], proxied: [] });
 		}
-	}, [userPreferences?.address?.address, linkedAddress]);
+	}, [userPreferences?.address?.address, userPreferences?.address?.accountType, linkedAddress]);
 
 	useEffect(() => {
 		if (switchModalOpen) {
 			fetchMultisigAndProxyData();
 		}
 	}, [fetchMultisigAndProxyData, switchModalOpen]);
+
+	const handleNestedAccountChange = (account: ISelectedAccount) => {
+		setUserPreferences({ ...userPreferences, address: account });
+		onChange?.(account);
+	};
 
 	const renderAccountItem = (account: ISelectedAccount, isSelected: boolean) => (
 		<div className='mr-2'>
@@ -228,7 +237,7 @@ function AddressSwitchModal({
 																<button
 																	key={proxy.address}
 																	type='button'
-																	onClick={() => onAccountChange(proxyAccount)}
+																	onClick={() => handleNestedAccountChange(proxyAccount)}
 																	className={isProxySelected ? classes.selectedAccountBtn : classes.accountBtn}
 																>
 																	{renderAccountItem(proxyAccount, isProxySelected)}
@@ -268,7 +277,7 @@ function AddressSwitchModal({
 							<button
 								key={proxied.address}
 								type='button'
-								onClick={() => onAccountChange(proxiedAccount)}
+								onClick={() => handleNestedAccountChange(proxiedAccount)}
 								className={isSelected ? classes.selectedAccountBtn : classes.accountBtn}
 							>
 								{renderAccountItem(proxiedAccount, isSelected)}
