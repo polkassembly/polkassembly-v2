@@ -410,7 +410,14 @@
 			"description": "Descripción",
 			"section": "Sección",
 			"name": "Nombre",
-			"value": "Valor"
+			"value": "Valor",
+			"deposit": "Depósito",
+			"curatorDeposit": "Depósito del Curador",
+			"reward": "Recompensa",
+			"fee": "Gastos",
+			"parentBountyIndex": "Índice de recompensa principal",
+			"payee": "Beneficiario",
+			"curator": "Curador"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Estás seguro de que quieres eliminar este comentario?",
@@ -929,6 +936,10 @@
 		"claimed": "Reclamado",
 		"cancelled": "Cancelado",
 		"rejected": "Rechazado"
+	},
+	"ChildBounties": {
+		"childBounties": "Recompensas infantiles",
+		"parentBounty": "Recompensa principal"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Recompensa propuesta con éxito",

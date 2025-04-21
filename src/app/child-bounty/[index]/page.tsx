@@ -6,9 +6,9 @@ import { EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 
-async function Bounty({ params }: { params: Promise<{ index: string }> }) {
+async function ChildBounty({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
-	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.BOUNTY, indexOrHash: index });
+	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
 
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
@@ -22,4 +22,4 @@ async function Bounty({ params }: { params: Promise<{ index: string }> }) {
 	);
 }
 
-export default Bounty;
+export default ChildBounty;

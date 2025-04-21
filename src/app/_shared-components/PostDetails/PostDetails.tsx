@@ -21,6 +21,8 @@ import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
 import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
+import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
+import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
@@ -109,6 +111,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 							/>
+						</div>
+					)}
+					{post.proposalType === EProposalType.BOUNTY && (
+						<div className={classes.rightWrapper}>
+							<ChildBountiesCard parentIndex={index} />
+						</div>
+					)}
+					{post.proposalType === EProposalType.CHILD_BOUNTY && post.onChainInfo?.parentBountyIndex && ValidatorService.isValidNumber(post.onChainInfo?.parentBountyIndex) && (
+						<div className={classes.rightWrapper}>
+							<div className={classes.parentBountyCardWrapper}>
+								<ParentBountyCard parentBountyIndex={post.onChainInfo?.parentBountyIndex} />
+							</div>
 						</div>
 					)}
 				</div>

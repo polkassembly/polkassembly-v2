@@ -411,7 +411,14 @@
 			"description": "説明",
 			"section": "セクション",
 			"name": "名前",
-			"value": "値"
+			"value": "値",
+			"deposit": "デポジット",
+			"curatorDeposit": "クレジットデポジット",
+			"reward": "リワード",
+			"fee": "料金",
+			"parentBountyIndex": "親報奨金インデックス",
+			"payee": "受益者",
+			"curator": "クレジット"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -930,6 +937,10 @@
 		"claimed": "請求済み",
 		"cancelled": "キャンセル済み",
 		"rejected": "否決"
+	},
+	"ChildBounties": {
+		"childBounties": "子供の報奨金",
+		"parentBounty": "親報奨金"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "バウンティの提案が成功しました",

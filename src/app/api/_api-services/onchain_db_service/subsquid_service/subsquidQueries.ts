@@ -15,6 +15,12 @@ export class SubsquidQueries {
 				createdAt
 				proposer
 				status
+				reward
+				fee
+				deposit
+				curatorDeposit
+				parentBountyIndex
+				payee
 				curator
 				description
 				origin,
@@ -705,11 +711,11 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
-		query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!) {
+		query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $limit:Int,$offset:Int ) {
 			totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
 				totalCount
 			}  
-			childBounties: proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
+			childBounties: proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty},limit: $limit, offset: $offset) {
 				description
 				index
 				status

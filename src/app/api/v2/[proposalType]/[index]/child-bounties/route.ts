@@ -16,12 +16,21 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		index: z.coerce.number()
 	});
 
+	const zodQuerySchema = z.object({
+		page: z.coerce.number().optional(),
+		limit: z.coerce.number().optional()
+	});
+
 	const { index, proposalType } = zodParamsSchema.parse(await params);
+	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+
 	const network = await getNetworkFromHeaders();
 
 	const onchainChildBountiesInfo: IGenericListingResponse<IOnChainPostInfo> = await OnChainDbService.GetChildBountiesByParentBountyIndex({
 		network,
-		index
+		index,
+		page,
+		limit
 	});
 
 	if (!onchainChildBountiesInfo?.totalCount) {
