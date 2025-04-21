@@ -98,7 +98,6 @@ export class SubsquidService extends SubsquidUtils {
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
-		console.log('subsquidData', subsquidErr);
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post info from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post info from Subsquid');
@@ -505,22 +504,20 @@ export class SubsquidService extends SubsquidUtils {
 	}: {
 		network: ENetwork;
 		index: number;
-		page?: number;
-		limit?: number;
+		page: number;
+		limit: number;
 	}): Promise<IGenericListingResponse<IOnChainPostInfo>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
 
-		const variables: { parentBountyIndex_eq: number; limit?: number; offset?: number } = {
-			parentBountyIndex_eq: index
-		};
-		if (ValidatorService.isValidNumber(page) && ValidatorService.isValidNumber(limit)) {
-			variables.limit = Number(limit);
-			variables.offset = (Number(page) - 1) * Number(limit);
-		}
-
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, {
+				parentBountyIndex_eq: index,
+				limit: Number(limit),
+				offset: (Number(page) - 1) * Number(limit)
+			})
+			.toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);

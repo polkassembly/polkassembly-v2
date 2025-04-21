@@ -696,7 +696,8 @@
 	},
 	"ChildBounties": {
 		"childBounties": "子赏金",
-		"parentBounty": "父赏金"
+		"parentBounty": "父赏金",
+		"viewAllChildBounties": "查看全部"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

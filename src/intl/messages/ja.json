@@ -940,7 +940,8 @@
 	},
 	"ChildBounties": {
 		"childBounties": "子供の報奨金",
-		"parentBounty": "親報奨金"
+		"parentBounty": "親報奨金",
+		"viewAllChildBounties": "すべて表示"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "バウンティの提案が成功しました",

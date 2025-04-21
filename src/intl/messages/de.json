@@ -696,7 +696,8 @@
 	},
 	"ChildBounties": {
 		"childBounties": "Kinderprämien",
-		"parentBounty": "Elterntreffen"
+		"parentBounty": "Elterntreffen",
+		"viewAllChildBounties": "Alle anzeigen"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

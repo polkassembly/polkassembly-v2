@@ -9,6 +9,7 @@ import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
 	const zodParamsSchema = z.object({
@@ -17,8 +18,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	});
 
 	const zodQuerySchema = z.object({
-		page: z.coerce.number().optional(),
-		limit: z.coerce.number().optional()
+		page: z.coerce.number().optional().default(1),
+		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
 	const { index, proposalType } = zodParamsSchema.parse(await params);

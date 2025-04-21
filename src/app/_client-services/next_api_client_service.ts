@@ -828,11 +828,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
 	}
 
-	static async fetchChildBountiesApi({ bountyIndex, limit, page }: { bountyIndex: string; limit?: string; page?: string }) {
-		const queryParams = new URLSearchParams();
-
-		if (limit) queryParams.set('limit', limit);
-		if (page) queryParams.set('page', page);
+	static async fetchChildBountiesApi({ bountyIndex, limit, page }: { bountyIndex: string; limit: string; page: string }) {
+		const queryParams = new URLSearchParams({
+			limit,
+			page
+		});
 
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.FETCH_CHILD_BOUNTIES,

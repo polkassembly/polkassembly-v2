@@ -715,7 +715,8 @@
 	},
 	"ChildBounties": {
 		"childBounties": "Child Bounties",
-		"parentBounty": "Parent Bounty"
+		"parentBounty": "Parent Bounty",
+		"viewAllChildBounties": "View All"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",

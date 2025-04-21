@@ -939,7 +939,8 @@
 	},
 	"ChildBounties": {
 		"childBounties": "Recompensas infantiles",
-		"parentBounty": "Recompensa principal"
+		"parentBounty": "Recompensa principal",
+		"viewAllChildBounties": "Ver todas"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Recompensa propuesta con éxito",
