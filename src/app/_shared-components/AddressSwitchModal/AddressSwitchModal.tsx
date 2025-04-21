@@ -35,37 +35,27 @@ function AddressSwitchModal({
 		proxied: Array<IProxy>;
 	}>({ multisig: [], proxy: [], proxied: [] });
 
-	const createSelectedAccount = (address: string, name: string, accountType: EAccountType, parent?: ISelectedAccount, proxyType?: string): ISelectedAccount => ({
-		address,
-		name,
-		type: undefined,
-		accountType,
-		wallet: userPreferences?.wallet,
-		parent,
-		proxyType
-	});
+	const createSelectedAccount = (address: string, name: string, accountType: EAccountType, parent?: ISelectedAccount, proxyType?: string): ISelectedAccount => {
+		// For proxies and multisigs, use empty name to display the actual address
+		let displayName = name;
+		if (accountType !== EAccountType.REGULAR) {
+			displayName = '';
+		}
+
+		return {
+			address,
+			name: displayName,
+			type: undefined,
+			accountType,
+			wallet: userPreferences?.wallet,
+			parent,
+			proxyType
+		};
+	};
 
 	const onAccountChange = (a: ISelectedAccount) => {
 		setUserPreferences({ ...userPreferences, address: a });
 		onChange?.(a);
-	};
-
-	const getAccountTypeTag = (account: ISelectedAccount | undefined) => {
-		if (!account || !('accountType' in account)) return null;
-
-		if (account.accountType === EAccountType.MULTISIG) {
-			return <span className='ml-2 rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-800'>Multisig Address</span>;
-		}
-		if (account.accountType === EAccountType.PROXY) {
-			if (account.proxyType?.toLowerCase().includes('any')) {
-				return <span className='ml-2 rounded-md bg-pink-100 px-2 py-1 text-xs text-pink-800'>ANY</span>;
-			}
-			if (account.name?.includes('Pure')) {
-				return <span className='ml-2 rounded-md bg-blue-100 px-2 py-1 text-xs text-blue-800'>PURE PROXY</span>;
-			}
-			return <span className='ml-2 rounded-md bg-blue-100 px-2 py-1 text-xs text-blue-800'>{account.proxyType}</span>;
-		}
-		return null;
 	};
 
 	const fetchMultisigAndProxyData = useCallback(async () => {
@@ -120,13 +110,21 @@ function AddressSwitchModal({
 						{userPreferences?.address && (
 							<Address
 								address={userPreferences.address.address}
-								walletAddressName={userPreferences.address.name}
+								walletAddressName={userPreferences.address.name || ''}
 								disableTooltip
 								iconSize={25}
 								redirectToProfile={false}
 							/>
 						)}
-						{userPreferences?.address && 'accountType' in userPreferences.address && getAccountTypeTag(userPreferences.address as ISelectedAccount)}
+						{userPreferences?.address && 'accountType' in userPreferences.address && userPreferences.address.accountType !== EAccountType.REGULAR && (
+							<span className='ml-2 text-xs text-slate-500'>
+								{userPreferences.address.accountType === EAccountType.MULTISIG
+									? '(Multisig)'
+									: userPreferences.address.proxyType
+										? `(${userPreferences.address.proxyType})`
+										: '(Proxy)'}
+							</span>
+						)}
 					</div>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-4xl max-h-60 overflow-auto'>
@@ -181,7 +179,7 @@ function AddressSwitchModal({
 									{renderAccountItem(multisigAccount, isSelected)}
 									<Address
 										address={multisig.address}
-										walletAddressName='Multisig'
+										walletAddressName=''
 										iconSize={25}
 										redirectToProfile={false}
 									/>
@@ -206,6 +204,7 @@ function AddressSwitchModal({
 														{renderAccountItem(proxyAccount, isProxySelected)}
 														<Address
 															address={proxy.address}
+															walletAddressName=''
 															iconSize={25}
 															redirectToProfile={false}
 														/>
@@ -242,6 +241,7 @@ function AddressSwitchModal({
 								{renderAccountItem(proxyAccount, isSelected)}
 								<Address
 									address={proxy.address}
+									walletAddressName=''
 									iconSize={25}
 									redirectToProfile={false}
 								/>
@@ -271,6 +271,7 @@ function AddressSwitchModal({
 								{renderAccountItem(proxiedAccount, isSelected)}
 								<Address
 									address={proxied.address}
+									walletAddressName=''
 									iconSize={25}
 									redirectToProfile={false}
 								/>

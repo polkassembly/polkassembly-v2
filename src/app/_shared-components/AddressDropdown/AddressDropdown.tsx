@@ -86,26 +86,16 @@ function AddressDropdown({
 	}, [getAccounts]);
 
 	const onAccountChange = (a: ISelectedAccount) => {
-		setUserPreferences({ ...userPreferences, address: a });
-		onChange?.(a);
-	};
-
-	const getAccountTypeTag = (account: ISelectedAccount | undefined) => {
-		if (!account || !('accountType' in account)) return null;
-
-		if (account.accountType === EAccountType.MULTISIG) {
-			return <span className='ml-2 rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-800'>Multisig Address</span>;
+		let selectedAccount = a;
+		if (a.accountType !== EAccountType.REGULAR) {
+			selectedAccount = {
+				...a,
+				name: ''
+			};
 		}
-		if (account.accountType === EAccountType.PROXY) {
-			if (account.proxyType?.toLowerCase().includes('any')) {
-				return <span className='ml-2 rounded-md bg-pink-100 px-2 py-1 text-xs text-pink-800'>ANY</span>;
-			}
-			if (account.name?.includes('Pure')) {
-				return <span className='ml-2 rounded-md bg-blue-100 px-2 py-1 text-xs text-blue-800'>PURE PROXY</span>;
-			}
-			return <span className='ml-2 rounded-md bg-blue-100 px-2 py-1 text-xs text-blue-800'>{account.proxyType}</span>;
-		}
-		return null;
+
+		setUserPreferences({ ...userPreferences, address: selectedAccount });
+		onChange?.(selectedAccount);
 	};
 
 	const isMultisigAccount = userPreferences?.address && 'accountType' in userPreferences.address && userPreferences.address.accountType === EAccountType.MULTISIG;
@@ -205,7 +195,11 @@ function AddressDropdown({
 							redirectToProfile={false}
 							disableTooltip
 						/>
-						{userPreferences?.address && 'accountType' in userPreferences.address && getAccountTypeTag(userPreferences.address as ISelectedAccount)}
+						{userPreferences?.address && 'accountType' in userPreferences.address && userPreferences.address.accountType !== EAccountType.REGULAR && (
+							<span className='ml-2 text-xs text-slate-500'>
+								({userPreferences.address.accountType === EAccountType.MULTISIG ? 'Multisig' : userPreferences.address.proxyType ? userPreferences.address.proxyType : 'Proxy'})
+							</span>
+						)}
 					</div>
 					<Button
 						className={classes.switchButton}

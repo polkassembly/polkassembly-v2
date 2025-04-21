@@ -7,7 +7,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useWalletService } from '@/hooks/useWalletService';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { EWallet } from '@/_shared/types';
+import { EWallet, EAccountType } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { X } from 'lucide-react';
@@ -47,7 +47,11 @@ export default function AddressInput({ placeholder, onChange, className, disable
 		setAccounts(injectedAccounts);
 		setUserPreferences({
 			...userPreferences,
-			address: injectedAccounts[0]
+			address: {
+				...injectedAccounts[0],
+				wallet: chosenWallet,
+				accountType: EAccountType.REGULAR
+			}
 		});
 	};
 
