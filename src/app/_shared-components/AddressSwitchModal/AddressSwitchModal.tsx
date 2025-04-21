@@ -11,6 +11,7 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useLinkedAddress } from '@/app/_atoms/linkedAddress/linkedAddressAtom';
 import { useTranslations } from 'next-intl';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import Balance from '../Balance';
 import Address from '../Profile/Address/Address';
 import classes from './AddressSwitchModal.module.scss';
@@ -30,6 +31,7 @@ function AddressSwitchModal({
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const { linkedAddress } = useLinkedAddress();
 	const t = useTranslations('AddressDropdown');
+	const [expandedMultisigs, setExpandedMultisigs] = useState<Record<string, boolean>>({});
 
 	const [multisigProxyData, setMultisigProxyData] = useState<{
 		multisig: Array<IMultisig>;
@@ -57,6 +59,13 @@ function AddressSwitchModal({
 	const onAccountChange = (a: ISelectedAccount) => {
 		setUserPreferences({ ...userPreferences, address: a });
 		onChange?.(a);
+	};
+
+	const toggleMultisigExpand = (address: string) => {
+		setExpandedMultisigs((prev) => ({
+			...prev,
+			[address]: !prev[address]
+		}));
 	};
 
 	const fetchMultisigAndProxyData = useCallback(async () => {
@@ -164,6 +173,8 @@ function AddressSwitchModal({
 					{multisigProxyData.multisig.map((multisig) => {
 						const multisigAccount = createSelectedAccount(multisig.address, 'Multisig', EAccountType.MULTISIG);
 						const isSelected = multisig.address === userPreferences?.address?.address;
+						const hasProxies = multisig.pureProxy && multisig.pureProxy.length > 0;
+						const isExpanded = expandedMultisigs[multisig.address];
 
 						return (
 							<div
@@ -185,66 +196,53 @@ function AddressSwitchModal({
 									<span className={classes.multisigBg}>{t('multisigAddress')}</span>
 								</button>
 
-								{multisig.pureProxy && multisig.pureProxy.length > 0 && (
-									<div className='ml-6 mt-2 border-l border-border_grey pl-4'>
-										<div className='mb-1 text-xs font-medium'>{t('proxyaddresses')}</div>
-										<div className='max-h-[120px] space-y-2 overflow-y-auto'>
-											{multisig.pureProxy.map((proxy) => {
-												const proxyAccount = createSelectedAccount(proxy.address, `${proxy.proxyType} Proxy`, EAccountType.PROXY, multisigAccount, proxy.proxyType);
-												const isProxySelected = proxy.address === userPreferences?.address?.address;
-
-												return (
-													<button
-														key={proxy.address}
-														type='button'
-														onClick={() => onAccountChange(proxyAccount)}
-														className={isProxySelected ? classes.selectedAccountBtn : classes.accountBtn}
-													>
-														{renderAccountItem(proxyAccount, isProxySelected)}
-														<Address
-															address={proxy.address}
-															walletAddressName=''
-															iconSize={25}
-															redirectToProfile={false}
-														/>
-														<span className={classes.pureProxyBg}>{t('pureProxy')}</span>
-													</button>
-												);
-											})}
+								{hasProxies && (
+									<div className='ml-6 mt-2'>
+										<div className='flex items-center'>
+											<button
+												type='button'
+												onClick={(e) => {
+													e.stopPropagation();
+													toggleMultisigExpand(multisig.address);
+												}}
+												className='flex items-center text-xs font-medium hover:text-text_pink'
+											>
+												{isExpanded ? <FiChevronUp className='mr-1' /> : <FiChevronDown className='mr-1' />}
+												{t('proxyaddresses')} ({multisig.pureProxy.length})
+											</button>
 										</div>
+
+										{isExpanded && (
+											<div className='mt-1 border-l border-border_grey pl-4'>
+												<div className='max-h-[120px] space-y-2 overflow-y-auto'>
+													{multisig.pureProxy.map((proxy) => {
+														const proxyAccount = createSelectedAccount(proxy.address, `${proxy.proxyType} Proxy`, EAccountType.PROXY, multisigAccount, proxy.proxyType);
+														const isProxySelected = proxy.address === userPreferences?.address?.address;
+
+														return (
+															<button
+																key={proxy.address}
+																type='button'
+																onClick={() => onAccountChange(proxyAccount)}
+																className={isProxySelected ? classes.selectedAccountBtn : classes.accountBtn}
+															>
+																{renderAccountItem(proxyAccount, isProxySelected)}
+																<Address
+																	address={proxy.address}
+																	walletAddressName=''
+																	iconSize={25}
+																	redirectToProfile={false}
+																/>
+																<span className={classes.pureProxyBg}>{t('pureProxy')}</span>
+															</button>
+														);
+													})}
+												</div>
+											</div>
+										)}
 									</div>
 								)}
 							</div>
-						);
-					})}
-				</div>
-			</div>
-		);
-
-	const renderProxySection = () =>
-		multisigProxyData.proxy.length > 0 && (
-			<div className='mb-4'>
-				<div className='mb-2 border-b border-border_grey pb-1 text-sm font-medium'>{t('proxyaddresses')}</div>
-				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
-					{multisigProxyData.proxy.map((proxy) => {
-						const proxyAccount = createSelectedAccount(proxy.address, proxy.proxyType, EAccountType.PROXY, undefined, proxy.proxyType);
-						const isSelected = proxy.address === userPreferences?.address?.address;
-
-						return (
-							<button
-								key={proxy.address}
-								type='button'
-								onClick={() => onAccountChange(proxyAccount)}
-								className={isSelected ? classes.selectedAccountBtn : classes.accountBtn}
-							>
-								{renderAccountItem(proxyAccount, isSelected)}
-								<Address
-									address={proxy.address}
-									walletAddressName=''
-									iconSize={25}
-									redirectToProfile={false}
-								/>
-							</button>
 						);
 					})}
 				</div>
@@ -304,7 +302,6 @@ function AddressSwitchModal({
 
 					{renderRegularAccounts()}
 					{renderMultisigSection()}
-					{renderProxySection()}
 					{renderProxiedSection()}
 				</div>
 
