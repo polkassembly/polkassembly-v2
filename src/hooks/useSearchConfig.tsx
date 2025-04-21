@@ -3,20 +3,19 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useMemo } from 'react';
-import { allowedNetwork } from '@/_shared/_constants/searchConstants';
 import { ESearchType } from '@/_shared/types';
 
-export const useSearchConfig = (isSuperSearch: boolean, network: string, activeIndex: ESearchType | null) => {
-	const networkFilter = useMemo(() => {
-		if (activeIndex === ESearchType.USERS) return '';
+export const useSearchConfig = ({ network, activeIndex }: { network: string; activeIndex: ESearchType | null }) => {
+	const networkFilterQuery = useMemo(() => {
+		if (!activeIndex || activeIndex === ESearchType.USERS) return '';
 
-		return isSuperSearch ? allowedNetwork.map((Network) => `network:${Network}`).join(' OR ') : `network:${network}`;
-	}, [isSuperSearch, network, activeIndex]);
+		return `network:${network}`;
+	}, [network, activeIndex]);
 
-	const getPostTypeFilter = useMemo(() => {
-		if (activeIndex === ESearchType.USERS) return '';
+	const postFilterQuery = useMemo(() => {
+		if (!activeIndex || activeIndex === ESearchType.USERS) return '';
 
-		const baseFilter = networkFilter ? ' AND ' : '';
+		const baseFilter = networkFilterQuery ? ' AND ' : '';
 
 		switch (activeIndex) {
 			case ESearchType.POSTS:
@@ -26,11 +25,17 @@ export const useSearchConfig = (isSuperSearch: boolean, network: string, activeI
 			default:
 				return '';
 		}
-	}, [activeIndex, networkFilter]);
+	}, [activeIndex, networkFilterQuery]);
+
+	const indexName = useMemo(() => {
+		if (activeIndex === ESearchType.USERS) return 'polkassembly_users';
+
+		return 'polkassembly_posts';
+	}, [activeIndex]);
 
 	return {
-		networkFilter,
-		getPostTypeFilter,
-		indexName: activeIndex === ESearchType.USERS ? 'polkassembly_users' : 'polkassembly_posts'
+		networkFilterQuery,
+		postFilterQuery,
+		indexName
 	};
 };

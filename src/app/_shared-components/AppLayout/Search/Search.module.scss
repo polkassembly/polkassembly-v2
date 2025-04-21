@@ -1,96 +1,95 @@
 .search_input {
-    @apply border-bg_pink pr-10 placeholder:text-text_primary;
+	@apply relative border-bg_pink pr-10 placeholder:text-text_primary;
 }
 
 .search_button {
-    @apply absolute right-0 top-1/2 h-10 -translate-y-1/2 cursor-pointer rounded-r-md bg-bg_pink p-2 transition-colors hover:bg-bg_pink/90;
+	@apply absolute right-0 top-1/2 h-full -translate-y-1/2 cursor-pointer rounded-r-md bg-bg_pink px-4 transition-colors hover:bg-bg_pink/90;
 }
 
 .search_suggestions_wrapper {
-    @apply absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg;
+	@apply absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg;
 }
 
 .search_dialog_title {
-    @apply flex items-baseline gap-2 text-xl font-bold text-btn_secondary_text;
+	@apply flex items-baseline gap-2 text-xl font-bold text-btn_secondary_text;
 }
 
 .tags_wrapper {
-    @apply flex flex-wrap gap-1 text-xs text-btn_secondary_text;
+	@apply flex flex-wrap gap-1 text-xs text-btn_secondary_text;
 }
 
 .tag {
-    @apply rounded-full border border-border_grey px-2 py-0.5;
+	@apply rounded-full border border-border_grey px-2 py-0.5;
 }
 
 .search_suggestions_wrapper1 {
-    @apply absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg;
+	@apply absolute top-full z-50 mt-1 w-full rounded-md border border-border_grey bg-bg_modal shadow-lg;
 }
 
 .search_suggestions_list {
-    @apply max-h-60 w-full overflow-auto p-2;
+	@apply max-h-60 w-full overflow-auto p-2;
 }
 
 .search_suggestions_item {
-    @apply w-full cursor-pointer rounded-md p-2 text-start;
+	@apply w-full cursor-pointer rounded-md p-2 text-start;
 }
 
 .search_filter_label {
-    @apply flex items-center gap-1 text-xs text-text_primary;
+	@apply flex items-center gap-x-1 text-xs text-text_primary;
 }
 
 .clear_date_filter {
-    @apply flex items-center gap-1 rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text;
+	@apply flex items-center gap-1 rounded-full bg-toast_info_bg px-2 py-1 text-xs text-toast_info_text;
 }
 
 .dropdown_menu_content {
-    @apply max-h-[250px] w-40 overflow-auto p-3;
+	@apply max-h-[250px] w-40 overflow-auto p-3;
 }
 
 .radio_label {
-    @apply flex cursor-pointer flex-row items-center gap-1;
+	@apply flex cursor-pointer flex-row items-center gap-1;
 }
 
 .radio_label_active {
-    @apply rounded-full bg-progress_pink_bg p-2;
+	@apply rounded-full bg-progress_pink_bg p-2;
 }
 
-
 .date_filter_label {
-    @apply w-full rounded px-2 py-1 text-left text-xs
+	@apply w-full rounded px-2 py-1 text-left text-xs;
 }
 
 .search_results_wrapper {
-    @apply p-4 text-btn_secondary_text hover:border-y hover:border-bg_pink;
+	@apply rounded-lg p-4 text-btn_secondary_text transition-all duration-200 ease-in;
 }
 
 .post_content {
-    @apply my-3 flex max-h-40 w-full overflow-hidden border-none
+	@apply my-3 flex max-h-40 w-full overflow-hidden border-none;
 }
 
 .topic_tag {
-    @apply rounded bg-topic_tag_bg px-2 py-1 text-xs text-topic_tag_text;
+	@apply rounded bg-topic_tag_bg px-2 py-1 text-xs text-topic_tag_text;
 }
 
 .post_type {
-    @apply rounded bg-progress_pink_bg px-2 py-1 text-xs text-text_pink
+	@apply rounded bg-progress_pink_bg px-2 py-1 text-xs text-text_pink;
 }
 
 .user_name {
-    @apply text-lg font-medium text-btn_secondary_text;
+	@apply text-lg font-medium text-btn_secondary_text;
 }
 
 .post_context {
-    @apply flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text;
+	@apply flex h-full flex-col items-center justify-center text-sm font-medium text-btn_secondary_text;
 }
 
 .pagination {
-    @apply my-5 flex flex-col items-center justify-center gap-4
+	@apply my-5 flex flex-col items-center justify-center gap-4;
 }
 
 .pa_logo {
-    @apply mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em]
+	@apply mt-2 flex items-center gap-1 text-xs font-medium tracking-[0.01em];
 }
 
 .search {
-    @apply flex items-center gap-2 text-sm text-text_primary
+	@apply flex items-center gap-2 text-sm text-text_primary;
 }

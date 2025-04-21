@@ -1,25 +1,25 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/DropdownMenu';
-import { RefinementList, useInstantSearch, Configure } from 'react-instantsearch';
-import { allowedNetwork, POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
-import { IoIosArrowDown } from 'react-icons/io';
+import { useInstantSearch, Configure, useRefinementList, useClearRefinements } from 'react-instantsearch';
+import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { cn } from '@/lib/utils';
-import { RxCross2 } from 'react-icons/rx';
+import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { ESearchType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import styles from './Search.module.scss';
+import { Checkbox } from '../../Checkbox';
+import { Button } from '../../Button';
 
 interface FiltersProps {
-	activeIndex: ESearchType | null;
-	onChange: (index: ESearchType | null) => void;
-	isSuperSearch?: boolean;
+	activeIndex: ESearchType;
+	onChange: (index: ESearchType) => void;
 }
 
 interface RefinementItem {
@@ -35,12 +35,22 @@ interface DateRange {
 	end: number;
 }
 
-type DropdownType = 'networks' | 'date' | 'tracks' | 'topics' | 'tags' | null;
-
-export default function Filters({ activeIndex, onChange, isSuperSearch = false }: FiltersProps) {
+export default function Filters({ activeIndex, onChange }: FiltersProps) {
 	const t = useTranslations('Search');
+	const { items: topicItems, refine: refineTopic } = useRefinementList({
+		attribute: 'topic'
+	});
+	const { items: tagItems, refine: refineTag } = useRefinementList({
+		attribute: 'tags'
+	});
+
+	const { items: trackItems, refine: refineTrack } = useRefinementList({
+		attribute: 'track_number'
+	});
+
+	const { refine: clearRefinements } = useClearRefinements();
+
 	const { results, refresh } = useInstantSearch();
-	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
 	const network = getCurrentNetwork();
 
@@ -50,8 +60,25 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		{ value: ESearchType.DISCUSSIONS, label: t('discussions') }
 	];
 
-	const transformTopicItems = useCallback((items: RefinementItem[]) => {
-		return items.map((item: RefinementItem) => {
+	const trackItemsList = useMemo(() => {
+		return trackItems.map((item: RefinementItem) => {
+			const trackDetails = NETWORKS_DETAILS[`${network}`]?.trackDetails;
+			const trackInfo = Object.values(trackDetails || {}).find((track) => track.trackId?.toString() === item.value);
+			const trackName = trackInfo?.name || item.label;
+			const formattedTrackName = trackName
+				.replace(/_/g, ' ')
+				.toLowerCase()
+				.replace(/^\w/, (c) => c.toUpperCase());
+
+			return {
+				...item,
+				label: `${formattedTrackName} (${item.count})`
+			};
+		});
+	}, [network, trackItems]);
+
+	const topicItemsList = useMemo(() => {
+		return topicItems.map((item: RefinementItem) => {
 			const topicName = Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === Number(item.value));
 			return {
 				...item,
@@ -65,23 +92,19 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 				} (${item.count})`
 			};
 		});
-	}, []);
+	}, [topicItems]);
 
-	const transformTagItems = useCallback((items: RefinementItem[]) => {
-		return items.map((item: RefinementItem) => ({
+	const tagItemsList = useMemo(() => {
+		return tagItems.map((item: RefinementItem) => ({
 			...item,
 			label: `${item.label} (${item.count})`
 		}));
-	}, []);
+	}, [tagItems]);
 
 	const clearDateFilter = useCallback(() => {
 		setSelectedDateRange(null);
 		refresh();
 	}, [refresh]);
-
-	const handleDropdownOpen = useCallback((dropdown: DropdownType) => {
-		setOpenDropdown(dropdown);
-	}, []);
 
 	const handleDateSelection = useCallback(
 		(range: DateRange | null) => {
@@ -142,42 +165,25 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 		[handleDateSelection]
 	);
 
-	useMemo(() => {
-		if (results.query.length > 2 && activeIndex === null) {
-			onChange(ESearchType.POSTS);
-		}
-		if (results.query.length === 0 && activeIndex !== null) {
-			onChange(null);
-		}
-	}, [results.query.length, activeIndex, onChange]);
+	const refinedTrackItems = useMemo(() => {
+		return trackItemsList.filter((item) => item.isRefined);
+	}, [trackItemsList]);
 
-	const transformTrackItems = useCallback(
-		(items: RefinementItem[]) => {
-			return items.map((item: RefinementItem) => {
-				const trackDetails = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.trackDetails;
-				const trackInfo = Object.values(trackDetails || {}).find((track) => track.trackId?.toString() === item.value);
-				const trackName = trackInfo?.name || item.label;
-				const formattedTrackName = trackName
-					.replace(/_/g, ' ')
-					.toLowerCase()
-					.replace(/^\w/, (c) => c.toUpperCase());
+	const refinedTopicItems = useMemo(() => {
+		return topicItemsList.filter((item) => item.isRefined);
+	}, [topicItemsList]);
 
-				return {
-					...item,
-					label: `${formattedTrackName} (${item.count})`
-				};
-			});
-		},
-		[network]
-	);
+	const refinedTagItems = useMemo(() => {
+		return tagItemsList.filter((item) => item.isRefined);
+	}, [tagItemsList]);
 
 	return (
 		<div>
 			<div className='mt-3 flex justify-between gap-6'>
 				<div>
 					<RadioGroup
-						value={activeIndex || (results.query.length > 2 ? ESearchType.POSTS : undefined)}
-						onValueChange={(e) => onChange(e as ESearchType | null)}
+						value={activeIndex || ESearchType.POSTS}
+						onValueChange={(e) => onChange(e as ESearchType)}
 						className='flex flex-row gap-3'
 						disabled={results.query.length < 3}
 					>
@@ -200,48 +206,11 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 					</RadioGroup>
 				</div>
 				<div>
-					{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && (
-						<div className='flex gap-4'>
-							{isSuperSearch && (
-								<DropdownMenu
-									open={openDropdown === 'networks'}
-									onOpenChange={(open) => handleDropdownOpen(open ? 'networks' : null)}
-								>
-									<DropdownMenuTrigger asChild>
-										<button
-											type='button'
-											className={styles.search_filter_label}
-										>
-											{t('networks')} <IoIosArrowDown />
-										</button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
-										<RefinementList
-											attribute='network'
-											classNames={{
-												list: 'space-y-2',
-												label: styles.search_filter_label,
-												labelText: styles.search_filter_label,
-												count: 'hidden'
-											}}
-											transformItems={(items: RefinementItem[]) => items.filter((item) => allowedNetwork.includes(item.value))}
-										/>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							)}
-							<DropdownMenu
-								open={openDropdown === 'date'}
-								onOpenChange={(open) => handleDropdownOpen(open ? 'date' : null)}
-							>
-								<DropdownMenuTrigger asChild>
-									<button
-										type='button'
-										className={styles.search_filter_label}
-									>
-										{selectedDateRange ? selectedDateRange.label : 'Date'} <IoIosArrowDown />
-									</button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
+					{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && results.nbHits > 0 && (
+						<div className='flex items-center gap-x-4'>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>{selectedDateRange ? selectedDateRange.label : 'Date'}</DropdownMenuTrigger>
+								<DropdownMenuContent>
 									{selectedDateRange && (
 										<Configure
 											filters={`created_at >= ${selectedDateRange.start} AND created_at <= ${selectedDateRange.end}`}
@@ -253,7 +222,7 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 											<button
 												key={label}
 												type='button'
-												className={`${styles.date_filter_label} ${selectedDateRange?.label === label ? styles.radio_label_active : 'hover:bg-topic_tag_bg'}`}
+												className={cn(styles.date_filter_label, selectedDateRange?.label === label ? styles.radio_label_active : 'whitespace-nowrap hover:bg-topic_tag_bg')}
 												onClick={() => handleDateClick(label)}
 											>
 												{label}
@@ -262,102 +231,155 @@ export default function Filters({ activeIndex, onChange, isSuperSearch = false }
 									</div>
 								</DropdownMenuContent>
 							</DropdownMenu>
-							{activeIndex === ESearchType.POSTS && (
-								<DropdownMenu
-									open={openDropdown === 'tracks'}
-									onOpenChange={(open) => handleDropdownOpen(open ? 'tracks' : null)}
-								>
-									<DropdownMenuTrigger asChild>
-										<button
-											type='button'
-											className={styles.search_filter_label}
-										>
-											{t('tracks')} <IoIosArrowDown />
-										</button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
-										<RefinementList
-											attribute='track_number'
-											classNames={{
-												list: 'space-y-2',
-												label: styles.search_filter_label,
-												labelText: styles.search_filter_label,
-												count: 'hidden'
-											}}
-											transformItems={transformTrackItems}
-											limit={15}
-											showMore={false}
-										/>
+							{activeIndex === ESearchType.POSTS && trackItems.length > 0 && (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>{t('tracks')}</DropdownMenuTrigger>
+									<DropdownMenuContent className='p-2'>
+										{trackItemsList.map((item) => (
+											<div
+												key={item.value}
+												className='mb-2 flex flex-nowrap items-center gap-x-2'
+											>
+												<Checkbox
+													key={item.value}
+													id={item.value}
+													checked={item.isRefined}
+													onCheckedChange={(checked) => !!checked && refineTrack(item.value)}
+												/>
+												<label
+													htmlFor={item.value}
+													className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
+												>
+													{item.label}
+												</label>
+											</div>
+										))}
 									</DropdownMenuContent>
 								</DropdownMenu>
 							)}
-							<DropdownMenu
-								open={openDropdown === 'topics'}
-								onOpenChange={(open) => handleDropdownOpen(open ? 'topics' : null)}
-							>
-								<DropdownMenuTrigger asChild>
-									<button
-										type='button'
-										className={styles.search_filter_label}
-									>
-										{t('topics')} <IoIosArrowDown />
-									</button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
-									<RefinementList
-										attribute='topic'
-										classNames={{
-											list: 'space-y-2',
-											label: styles.search_filter_label,
-											labelText: styles.search_filter_label,
-											count: 'hidden'
-										}}
-										transformItems={transformTopicItems}
-										limit={15}
-										showMore={false}
-									/>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>{t('topics')}</DropdownMenuTrigger>
+								<DropdownMenuContent className='p-2'>
+									{topicItemsList.map((item) => (
+										<div
+											key={item.value}
+											className='mb-2 flex flex-nowrap items-center gap-x-2'
+										>
+											<Checkbox
+												key={item.value}
+												id={item.value}
+												checked={item.isRefined}
+												onCheckedChange={(checked) => !!checked && refineTopic(item.value)}
+											/>
+											<label
+												htmlFor={item.value}
+												className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
+											>
+												{item.label}
+											</label>
+										</div>
+									))}
 								</DropdownMenuContent>
 							</DropdownMenu>
 
-							<DropdownMenu
-								open={openDropdown === 'tags'}
-								onOpenChange={(open) => handleDropdownOpen(open ? 'tags' : null)}
-							>
-								<DropdownMenuTrigger asChild>
-									<button
-										type='button'
-										className={styles.search_filter_label}
-									>
-										{t('tags')} <IoIosArrowDown />
-									</button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className={cn(styles.dropdown_menu_content, 'w-40 p-3')}>
-									<RefinementList
-										attribute='tags'
-										classNames={{
-											list: 'space-y-2',
-											label: styles.search_filter_label,
-											labelText: styles.search_filter_label,
-											count: 'hidden'
-										}}
-										transformItems={transformTagItems}
-									/>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>{t('tags')}</DropdownMenuTrigger>
+								<DropdownMenuContent className='p-2'>
+									{tagItemsList.map((item) => (
+										<div
+											key={item.value}
+											className='mb-2 flex flex-nowrap items-center gap-x-2'
+										>
+											<Checkbox
+												key={item.value}
+												id={item.value}
+												checked={item.isRefined}
+												onCheckedChange={(checked) => !!checked && refineTag(item.value)}
+											/>
+											<label
+												htmlFor={item.value}
+												className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
+											>
+												{item.label}
+											</label>
+										</div>
+									))}
 								</DropdownMenuContent>
 							</DropdownMenu>
 						</div>
 					)}
 				</div>
 			</div>
-			<div className='mt-3 flex justify-start'>
-				{' '}
-				{selectedDateRange && results.query.length > 2 && (
-					<button
-						type='button'
-						onClick={clearDateFilter}
-						className={styles.clear_date_filter}
+			<div className='mt-3 flex items-center gap-x-4'>
+				<div>
+					{selectedDateRange && results.query.length > 2 && (
+						<button
+							type='button'
+							onClick={clearDateFilter}
+							className={styles.clear_date_filter}
+						>
+							<X className='text-xs' /> <span>{t('date_filter')}</span>
+						</button>
+					)}
+				</div>
+				{refinedTrackItems?.length > 0 && (
+					<div className='flex items-center gap-x-1 text-xs text-wallet_btn_text'>
+						<span className='text-text_pink'>{t('tracks')}:</span>
+						<div className='flex'>
+							{refinedTrackItems
+								.filter((item) => item.isRefined)
+								.map((item, index) => (
+									<span key={item.value}>
+										{index !== 0 ? ', ' : ''}
+										{item.label}
+									</span>
+								))}
+						</div>
+					</div>
+				)}
+				{refinedTopicItems?.length > 0 && (
+					<div className='flex items-center gap-x-1 text-xs text-wallet_btn_text'>
+						<span className='text-text_pink'>{t('topics')}:</span>
+						<div className='flex'>
+							{refinedTopicItems
+								.filter((item) => item.isRefined)
+								.map((item, index) => (
+									<span key={item.value}>
+										{index !== 0 ? ', ' : ''}
+										{item.label}
+									</span>
+								))}
+						</div>
+					</div>
+				)}
+				{refinedTagItems?.length > 0 && (
+					<div className='flex items-center gap-x-1 text-xs text-wallet_btn_text'>
+						<span className='text-text_pink'>{t('tags')}:</span>
+						<div className='flex'>
+							{refinedTagItems
+								.filter((item) => item.isRefined)
+								.map((item, index) => (
+									<span key={item.value}>
+										{index !== 0 ? ', ' : ''}
+										{item.label}
+									</span>
+								))}
+						</div>
+					</div>
+				)}
+				<div className='flex-1' />
+				{(refinedTrackItems?.length > 0 || refinedTopicItems?.length > 0 || refinedTagItems?.length > 0) && (
+					<Button
+						variant='ghost'
+						className='text-text_pink'
+						size='sm'
+						onClick={() => {
+							clearRefinements();
+							clearDateFilter();
+						}}
 					>
-						<RxCross2 className='text-xs' /> <span>{t('date_filter')}</span>
-					</button>
+						{t('clearFilters')}
+					</Button>
 				)}
 			</div>
 		</div>

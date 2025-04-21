@@ -1,6 +1,8 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+/* eslint-disable no-underscore-dangle */
+
 import Image from 'next/image';
 import searchGif from '@assets/search/search.gif';
 import searchLoader from '@assets/search/search-loader.gif';
@@ -11,7 +13,6 @@ import Link from 'next/link';
 import { ESearchDiscussionType, ESearchType } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
-import { FaMagic } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
@@ -19,7 +20,6 @@ import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
 import CreatedAtTime from '../../CreatedAtTime/CreatedAtTime';
-import { Button } from '../../Button';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import Tags from './Tags';
 import styles from './Search.module.scss';
@@ -60,22 +60,22 @@ interface User {
 
 function PostHit({ hit }: { hit: Post }) {
 	const t = useTranslations();
-	// eslint-disable-next-line
 	const position = hit.__position;
 	const topic = hit.topic_id ? Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === hit.topic_id) : null;
-	const backgroundColor = position ? (position % 2 === 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay') : '';
+	const backgroundColor = position ? (position % 2 !== 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay') : '';
 
 	return (
 		<Link
 			href={hit.post_type !== ESearchDiscussionType.DISCUSSIONS ? `/referenda/${hit.id}` : `/post/${hit.id}`}
 			target='_blank'
 		>
-			<div className={`${styles.search_results_wrapper} ${backgroundColor}`}>
+			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
 				<div className='flex'>
 					{hit.proposer_address && (
 						<Address
 							address={hit.proposer_address}
 							className='text-lg font-medium'
+							iconSize={24}
 						/>
 					)}
 				</div>
@@ -85,7 +85,7 @@ function PostHit({ hit }: { hit: Post }) {
 					</p>
 				</h2>
 				<div className={styles.post_content}>
-					<p className='text-sm text-text_primary'>{hit.parsed_content?.slice(0, 350)}...</p>
+					<p className='line-clamp-4 text-sm text-text_primary'>{hit.parsed_content}</p>
 				</div>
 				<div className='mt-2 flex flex-wrap gap-2 text-sm'>
 					<div className='flex items-center gap-2'>
@@ -158,38 +158,41 @@ function PostHit({ hit }: { hit: Post }) {
 }
 function UserHit({ hit }: { hit: User }) {
 	const t = useTranslations();
+
 	return (
 		<Link
 			href={hit.username && `/user/username/${hit.username}`}
-			className='flex cursor-pointer gap-2 rounded-lg p-4'
 			target='_blank'
 		>
-			<Image
-				src={userIcon}
-				alt={hit.username}
-				width={60}
-				height={60}
-				className='rounded-full'
-			/>
-			<div>
-				<h2 className={styles.user_name}>{hit.username}</h2>
-				<p className='mt-2 text-sm text-text_primary'>{hit.profile?.bio || t('Search.noBio')}</p>
+			<div className='flex gap-2 rounded-lg p-4 hover:bg-bg_pink/10'>
+				<Image
+					src={userIcon}
+					alt={hit.username}
+					width={60}
+					height={60}
+					className='rounded-full'
+				/>
+				<div>
+					<h2 className={styles.user_name}>{hit.username}</h2>
+					<p className='mt-2 text-sm text-text_primary'>{hit.profile?.bio || t('Search.noBio')}</p>
+				</div>
 			</div>
 		</Link>
 	);
 }
 
-function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIndex: ESearchType | null; onSuperSearch: () => void; isSuperSearch: boolean }) {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
 	const t = useTranslations();
-	const isLoading = status === 'loading';
+	const isLoading = results?.nbHits === 0 && (status === 'loading' || status === 'stalled');
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
 
 	return (
 		<div>
-			<div className='h-[350px] overflow-hidden'>
+			<div className='h-[60vh] overflow-hidden'>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
@@ -219,7 +222,7 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 							<span className={styles.search}>
 								{t('Search.see')}
 								<Link
-									href='https://polkadot.polkassembly.io/opengov'
+									href='/'
 									className='text-text_pink underline'
 								>
 									{t('Search.latestActivity')}
@@ -241,14 +244,6 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 									priority
 								/>
 								<p className='mb-2 text-sm text-text_primary'>{t('Search.noSearchResultsFound')}</p>
-								{!isSuperSearch && (
-									<Button
-										className='mt-4 flex items-center gap-2'
-										onClick={onSuperSearch}
-									>
-										<FaMagic /> {t('Search.useSuperSearch')}
-									</Button>
-								)}
 								<div className='mt-4 flex items-center gap-2'>
 									<span className='text-text_secondary text-sm'>{t('Search.or')}</span>
 								</div>
@@ -256,7 +251,7 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 									<span className={styles.search}>
 										{t('Search.see')}
 										<Link
-											href='https://polkadot.polkassembly.io/opengov'
+											href='/'
 											className='text-text_pink underline'
 										>
 											{t('Search.latestActivity')}
@@ -318,17 +313,6 @@ function SearchResults({ activeIndex, onSuperSearch, isSuperSearch }: { activeIn
 						totalCount={results?.nbHits || 0}
 						onPageChange={(newPage) => refine(newPage - 1)}
 					/>
-					{!isSuperSearch && (
-						<>
-							<p className='text-text_secondary text-sm'>{t('Search.didntFindWhatYouWereLookingFor')}</p>
-							<Button
-								className='mt-4 flex items-center gap-2'
-								onClick={onSuperSearch}
-							>
-								<FaMagic /> {t('Search.useSuperSearch')}
-							</Button>
-						</>
-					)}
 				</div>
 			)}
 		</div>

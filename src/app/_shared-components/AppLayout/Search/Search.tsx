@@ -1,6 +1,9 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { IoIosSearch } from 'react-icons/io';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
@@ -19,18 +22,40 @@ import styles from './Search.module.scss';
 
 const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY } = getSharedEnvVars();
 
-const searchClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
+const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
+
+// To prevent initial load of all data
+const searchClient = {
+	...algoliaClient,
+	search(requests: any) {
+		if (requests.every(({ params }: any) => !params.query)) {
+			return Promise.resolve({
+				results: requests.map(() => ({
+					hits: [],
+					nbHits: 0,
+					nbPages: 0,
+					page: 0,
+					processingTimeMS: 0,
+					hitsPerPage: 0,
+					exhaustiveNbHits: false,
+					query: '',
+					params: ''
+				}))
+			});
+		}
+
+		return algoliaClient.search(requests);
+	}
+};
 
 function Search() {
-	const [activeIndex, setActiveIndex] = useState<ESearchType | null>(null);
+	const [activeIndex, setActiveIndex] = useState<ESearchType>(ESearchType.POSTS);
 	const [searchContext, setSearchContext] = useState<string | null>(null);
-	const [isSuperSearch, setIsSuperSearch] = useState(false);
 	const network = getCurrentNetwork();
 
-	const { networkFilter, getPostTypeFilter, indexName } = useSearchConfig(isSuperSearch, network, activeIndex);
+	const { networkFilterQuery, postFilterQuery, indexName } = useSearchConfig({ network, activeIndex: searchContext && searchContext.length > 2 ? activeIndex : null });
 
-	const handleTypeChange = (type: ESearchType | null) => setActiveIndex(type);
-	const handleSuperSearch = () => setIsSuperSearch(true);
+	const handleTypeChange = (type: ESearchType) => setActiveIndex(type);
 	const t = useTranslations('Search');
 	return (
 		<Dialog>
@@ -40,7 +65,7 @@ function Search() {
 			<DialogContent className={`${allowedNetwork.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
 					<DialogTitle className={styles.search_dialog_title}>
-						{isSuperSearch ? t('superSearch') : t('search')}
+						{t('search')}
 						{searchContext && (
 							<span>
 								{t('resultsFor')}: &quot;{searchContext.slice(0, 30)}&quot;
@@ -58,27 +83,19 @@ function Search() {
 						<Configure
 							hitsPerPage={10}
 							distinct
-							filters={`${networkFilter}${getPostTypeFilter}`.trim()}
+							filters={`${networkFilterQuery}${postFilterQuery}`.trim()}
 						/>
 
 						<div>
-							<CustomSearchBox
-								onSearch={setSearchContext}
-								onTypeChange={handleTypeChange}
-							/>
+							<CustomSearchBox onSearch={setSearchContext} />
 							<Filters
 								activeIndex={activeIndex}
 								onChange={handleTypeChange}
-								isSuperSearch={isSuperSearch}
 							/>
 						</div>
 
 						<div className='w-full'>
-							<SearchResults
-								activeIndex={activeIndex}
-								onSuperSearch={handleSuperSearch}
-								isSuperSearch={isSuperSearch}
-							/>
+							<SearchResults activeIndex={activeIndex} />
 						</div>
 					</InstantSearch>
 				) : (
