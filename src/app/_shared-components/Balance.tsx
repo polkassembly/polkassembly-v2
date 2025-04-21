@@ -49,8 +49,10 @@ function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBala
 
 	return (
 		<div className={cn('flex items-center gap-x-1 text-xs', classname)}>
-			<span className='text-placeholder'>{t('Balance.voteBalance')}: </span>
-			<span className='text-text_pink'>{loading ? <Skeleton className='h-4 w-[20px]' /> : formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</span>
+			<span className={cn('text-placeholder', classname)}>{t('Balance.voteBalance')}: </span>
+			<span className={cn('text-text_pink', classname)}>
+				{loading ? <Skeleton className='h-4 w-[20px]' /> : formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}
+			</span>
 		</div>
 	);
 }

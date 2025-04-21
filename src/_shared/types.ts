@@ -255,12 +255,24 @@ export enum ECookieNames {
 	THEME = 'theme',
 	LOCALE = 'locale'
 }
+export enum EAccountType {
+	MULTISIG = 'multisig',
+	PROXY = 'proxy',
+	REGULAR = 'regular'
+}
+
+export interface ISelectedAccount extends InjectedAccount {
+	wallet?: EWallet;
+	accountType: EAccountType;
+	parent?: ISelectedAccount;
+	proxyType?: string;
+}
 
 export interface IUserPreferences {
 	theme: ETheme;
 	locale: ELocales;
 	wallet?: EWallet;
-	address?: InjectedAccount;
+	address?: ISelectedAccount;
 	rpcIndex?: number;
 }
 
