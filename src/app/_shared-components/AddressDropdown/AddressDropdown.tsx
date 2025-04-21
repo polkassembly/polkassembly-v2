@@ -4,6 +4,7 @@
 
 'use client';
 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
@@ -20,7 +21,17 @@ import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import AddressSwitchModal from '../AddressSwitchModal/AddressSwitchModal';
 
-function AddressDropdown({ onChange, withBalance }: { onChange?: (account: ISelectedAccount) => void; withBalance?: boolean }) {
+function AddressDropdown({
+	onChange,
+	withBalance,
+	disabled,
+	multiswitch = false
+}: {
+	onChange?: (account: ISelectedAccount) => void;
+	withBalance?: boolean;
+	disabled?: boolean;
+	multiswitch?: boolean;
+}) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
 	const walletService = useWalletService();
@@ -28,43 +39,42 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: ISele
 	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
 	const [accountsLoading, setAccountsLoading] = useState(true);
 	const [switchModalOpen, setSwitchModalOpen] = useState(false);
+
 	const getAccounts = useCallback(async () => {
 		if (!walletService || !userPreferences?.wallet) return;
+
 		setAccountsLoading(true);
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
 
-		if (injectedAccounts.length === 0) {
-			setAccounts([]);
-			return;
-		}
+		setAccounts(injectedAccounts || []);
 
-		setAccounts(injectedAccounts);
+		if (injectedAccounts?.length > 0) {
+			if (!userPreferences.address) {
+				const defaultAccount: ISelectedAccount = {
+					...injectedAccounts[0],
+					wallet: userPreferences.wallet,
+					accountType: EAccountType.REGULAR
+				};
 
-		if (!userPreferences.address) {
-			const defaultAccount: ISelectedAccount = {
-				...injectedAccounts[0],
-				wallet: userPreferences.wallet,
-				accountType: EAccountType.REGULAR
-			};
+				setUserPreferences({
+					...userPreferences,
+					address: defaultAccount
+				});
+			} else if (userPreferences.address && !('accountType' in userPreferences.address)) {
+				const address = userPreferences.address as InjectedAccount;
+				const defaultAccount: ISelectedAccount = {
+					address: address.address,
+					name: address.name,
+					type: address.type,
+					wallet: userPreferences.wallet,
+					accountType: EAccountType.REGULAR
+				};
 
-			setUserPreferences({
-				...userPreferences,
-				address: defaultAccount
-			});
-		} else if (userPreferences.address && !('accountType' in userPreferences.address)) {
-			const address = userPreferences.address as InjectedAccount;
-			const defaultAccount: ISelectedAccount = {
-				address: address.address,
-				name: address.name,
-				type: address.type,
-				wallet: userPreferences.wallet,
-				accountType: EAccountType.REGULAR
-			};
-
-			setUserPreferences({
-				...userPreferences,
-				address: defaultAccount
-			});
+				setUserPreferences({
+					...userPreferences,
+					address: defaultAccount
+				});
+			}
 		}
 
 		setAccountsLoading(false);
@@ -74,6 +84,11 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: ISele
 	useEffect(() => {
 		getAccounts();
 	}, [getAccounts]);
+
+	const onAccountChange = (a: ISelectedAccount) => {
+		setUserPreferences({ ...userPreferences, address: a });
+		onChange?.(a);
+	};
 
 	const getAccountTypeTag = (account: ISelectedAccount | undefined) => {
 		if (!account || !('accountType' in account)) return null;
@@ -96,30 +111,85 @@ function AddressDropdown({ onChange, withBalance }: { onChange?: (account: ISele
 	const isMultisigAccount = userPreferences?.address && 'accountType' in userPreferences.address && userPreferences.address.accountType === EAccountType.MULTISIG;
 
 	if (!userPreferences.wallet) return <div className={classes.fallbackText}>{t('AddressDropdown.fallbackText')}</div>;
-
-	if (accountsLoading)
+	if (accountsLoading) {
 		return (
 			<div className='flex flex-col gap-y-2'>
 				<Skeleton className='h-8 w-full' />
 				<Skeleton className='h-5 w-1/2' />
 			</div>
 		);
+	}
 
-	return !accounts || accounts.length === 0 ? (
-		<Alert
-			variant='info'
-			className='flex items-center gap-x-3'
-		>
-			<AlertCircle className='h-4 w-4' />
-			<AlertDescription className=''>
-				<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.noAccountsFound')}</h2>
-				<ul className='list-disc pl-4'>
-					<li>{t('AddressDropdown.pleaseConnectWallet')}</li>
-					<li>{t('AddressDropdown.pleaseCheckConnectedAccounts')}</li>
-				</ul>
-			</AlertDescription>
-		</Alert>
-	) : (
+	if (!accounts || accounts.length === 0) {
+		return (
+			<Alert
+				variant='info'
+				className='flex items-center gap-x-3'
+			>
+				<AlertCircle className='h-4 w-4' />
+				<AlertDescription className=''>
+					<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.noAccountsFound')}</h2>
+					<ul className='list-disc pl-4'>
+						<li>{t('AddressDropdown.pleaseConnectWallet')}</li>
+						<li>{t('AddressDropdown.pleaseCheckConnectedAccounts')}</li>
+					</ul>
+				</AlertDescription>
+			</Alert>
+		);
+	}
+
+	if (!multiswitch) {
+		return (
+			<DropdownMenu>
+				<div>
+					<div className='mb-1 flex items-center justify-between gap-x-12'>
+						<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('AddressDropdown.chooseLinkedAccount')}</p>
+						{withBalance && <Balance address={userPreferences?.address?.address || ''} />}
+					</div>
+					<DropdownMenuTrigger
+						disabled={disabled}
+						className='normal-case'
+					>
+						<Address
+							address={userPreferences?.address?.address || ''}
+							walletAddressName={userPreferences?.address?.name || ''}
+							iconSize={25}
+							redirectToProfile={false}
+							disableTooltip
+						/>
+					</DropdownMenuTrigger>
+				</div>
+				<DropdownMenuContent className='max-h-[300px] overflow-y-auto border-0'>
+					{accounts.map((item) => {
+						const selectedAccount: ISelectedAccount = {
+							...item,
+							accountType: EAccountType.REGULAR,
+							wallet: userPreferences?.wallet
+						};
+						return (
+							<DropdownMenuItem key={item.address}>
+								<button
+									type='button'
+									onClick={() => onAccountChange(selectedAccount)}
+									className={classes.dropdownOption}
+								>
+									<Address
+										address={item.address}
+										walletAddressName={item.name}
+										iconSize={25}
+										redirectToProfile={false}
+										disableTooltip
+									/>
+								</button>
+							</DropdownMenuItem>
+						);
+					})}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	}
+
+	return (
 		<div className='w-full'>
 			<div className='mb-1 flex items-center justify-between gap-x-12'>
 				<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('AddressDropdown.chooseLinkedAccount')}</p>

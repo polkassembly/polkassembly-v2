@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, ILinkedAddress } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, ILinkedAddress, EAccountType } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -196,7 +196,11 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			...(accessTokenPayload?.loginAddress
 				? {
 						address: {
-							address: accessTokenPayload.loginAddress
+							address: accessTokenPayload.loginAddress,
+							accountType: EAccountType.REGULAR,
+							name: '',
+							type: undefined,
+							wallet: accessTokenPayload?.loginWallet
 						}
 					}
 				: {}),

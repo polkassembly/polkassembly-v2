@@ -87,6 +87,7 @@ function VoteReferendum({ index }: { index: string }) {
 			/>
 			<AddressDropdown
 				withBalance
+				multiswitch
 				onChange={(a) => setUserPreferences({ ...userPreferences, address: a })}
 			/>
 			<div>
