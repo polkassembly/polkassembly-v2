@@ -85,7 +85,7 @@ function PostHit({ hit }: { hit: Post }) {
 					</p>
 				</h2>
 				<div className={styles.post_content}>
-					<p className='line-clamp-4 text-sm text-text_primary'>{hit.parsed_content}</p>
+					<p className='line-clamp-4 break-all text-sm text-text_primary'>{hit.parsed_content}</p>
 				</div>
 				<div className='mt-2 flex flex-wrap gap-2 text-sm'>
 					<div className='flex items-center gap-2'>
