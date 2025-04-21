@@ -208,35 +208,36 @@ function AddressSwitchModal({
 												className='flex items-center text-xs font-medium hover:text-text_pink'
 											>
 												{isExpanded ? <FiChevronUp className='mr-1' /> : <FiChevronDown className='mr-1' />}
-												{t('proxyaddresses')} ({multisig.pureProxy.length})
+												{t('proxyaddresses')} ({multisig.pureProxy?.length || 0})
 											</button>
 										</div>
 
 										{isExpanded && (
 											<div className='mt-1 border-l border-border_grey pl-4'>
 												<div className='max-h-[120px] space-y-2 overflow-y-auto'>
-													{multisig.pureProxy.map((proxy) => {
-														const proxyAccount = createSelectedAccount(proxy.address, `${proxy.proxyType} Proxy`, EAccountType.PROXY, multisigAccount, proxy.proxyType);
-														const isProxySelected = proxy.address === userPreferences?.address?.address;
+													{multisig.pureProxy &&
+														multisig.pureProxy.map((proxy) => {
+															const proxyAccount = createSelectedAccount(proxy.address, `${proxy.proxyType} Proxy`, EAccountType.PROXY, multisigAccount, proxy.proxyType);
+															const isProxySelected = proxy.address === userPreferences?.address?.address;
 
-														return (
-															<button
-																key={proxy.address}
-																type='button'
-																onClick={() => onAccountChange(proxyAccount)}
-																className={isProxySelected ? classes.selectedAccountBtn : classes.accountBtn}
-															>
-																{renderAccountItem(proxyAccount, isProxySelected)}
-																<Address
-																	address={proxy.address}
-																	walletAddressName=''
-																	iconSize={25}
-																	redirectToProfile={false}
-																/>
-																<span className={classes.pureProxyBg}>{t('pureProxy')}</span>
-															</button>
-														);
-													})}
+															return (
+																<button
+																	key={proxy.address}
+																	type='button'
+																	onClick={() => onAccountChange(proxyAccount)}
+																	className={isProxySelected ? classes.selectedAccountBtn : classes.accountBtn}
+																>
+																	{renderAccountItem(proxyAccount, isProxySelected)}
+																	<Address
+																		address={proxy.address}
+																		walletAddressName=''
+																		iconSize={25}
+																		redirectToProfile={false}
+																	/>
+																	<span className={classes.pureProxyBg}>{t('pureProxy')}</span>
+																</button>
+															);
+														})}
 												</div>
 											</div>
 										)}
