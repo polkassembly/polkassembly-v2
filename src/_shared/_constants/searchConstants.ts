@@ -2,22 +2,20 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { EOffChainPostTopic } from '../types';
+
 export const allowedNetwork = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
 
-export const POST_TOPIC_MAP = {
-	AUCTION_ADMIN: 8,
-	COMMUNITY_PIPS: 14,
-	COUNCIL: 2,
-	DEMOCRACY: 1,
-	FELLOWSHIP: 10,
-	GENERAL: 5,
-	GENERAL_ADMIN: 15,
-	GOVERNANCE: 9,
-	ROOT: 6,
-	STAKING_ADMIN: 7,
-	TECHNICAL_COMMITTEE: 3,
-	TECHNICAL_PIPS: 12,
-	TREASURY: 4,
-	UPGRADE_PIPS: 13,
-	WHITELIST: 11
+export const POST_TOPIC_MAP: Record<EOffChainPostTopic, number> = {
+	[EOffChainPostTopic.AUCTION_ADMIN]: 8,
+	[EOffChainPostTopic.COUNCIL]: 2,
+	[EOffChainPostTopic.DEMOCRACY]: 1,
+	[EOffChainPostTopic.FELLOWSHIP]: 10,
+	[EOffChainPostTopic.GENERAL]: 5,
+	[EOffChainPostTopic.GENERAL_ADMIN]: 15,
+	[EOffChainPostTopic.GOVERNANCE]: 9,
+	[EOffChainPostTopic.ROOT]: 6,
+	[EOffChainPostTopic.STAKING_ADMIN]: 7,
+	[EOffChainPostTopic.TREASURY]: 4,
+	[EOffChainPostTopic.WHITELIST]: 11
 };

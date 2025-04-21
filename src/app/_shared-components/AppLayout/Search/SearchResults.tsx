@@ -61,7 +61,7 @@ interface User {
 function PostHit({ hit }: { hit: Post }) {
 	const t = useTranslations();
 	const position = hit.__position;
-	const topic = hit.topic_id ? Object.keys(POST_TOPIC_MAP).find((key) => POST_TOPIC_MAP[key as keyof typeof POST_TOPIC_MAP] === hit.topic_id) : null;
+	const topic = hit.topic_id ? Object.entries(POST_TOPIC_MAP).find(([, value]) => value === hit.topic_id)?.[0] : null;
 	const backgroundColor = position ? (position % 2 !== 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay') : '';
 
 	return (

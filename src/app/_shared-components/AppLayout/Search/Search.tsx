@@ -16,7 +16,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import CustomSearchBox from './CustomSearchBox';
-import Filters from './Filters';
+import SearchFilters from './SearchFilters';
 import SearchResults from './SearchResults';
 import styles from './Search.module.scss';
 
@@ -88,7 +88,7 @@ function Search() {
 
 						<div>
 							<CustomSearchBox onSearch={setSearchContext} />
-							<Filters
+							<SearchFilters
 								activeIndex={activeIndex}
 								onChange={handleTypeChange}
 							/>

@@ -913,7 +913,7 @@
 		}
 	},
 	"Search": {
-		"placeholder": "Escriba aquí para buscar algo",
+		"placeholder": "Escriba aquí para buscar",
 		"superSearch": "Super Búsqueda",
 		"search": "Buscar",
 		"resultsFor": "Resultados para",
@@ -925,7 +925,7 @@
 		"last_30_days": "Últimos 30 días",
 		"last_3_months": "Últimos 3 meses",
 		"all_time": "Todo el tiempo",
-		"date_filter": "Filtro de fecha",
+		"date": "Fecha",
 		"networks": "Redes",
 		"tracks": "Tracks",
 		"topics": "Temas",
@@ -945,7 +945,7 @@
 		"useSuperSearchButton": "Usar Super Búsqueda",
 		"poweredByPolkassembly": "Desarrollado por Polkassembly.",
 		"enableSearchAndSuperSearch": "Si desea habilitar la búsqueda y super búsqueda para su cadena, contáctenos en",
-		"clearFilters": "Borrar filtros"
+		"clearFilters": "Limpiar filtros"
 	},
 	"Bounties": {
 		"onchainBounties": "Recompensas en Cadena",
