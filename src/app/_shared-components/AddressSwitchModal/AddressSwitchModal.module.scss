@@ -38,3 +38,31 @@
 .selectedRadio {
 	@apply flex h-5 w-5 items-center justify-center rounded-full bg-text_pink;
 }
+
+.balanceInput {
+	@apply flex items-center rounded-t-md bg-text_pink px-3 py-1 text-xs font-medium text-btn_primary_text;
+}
+
+.dropdownTrigger {
+	@apply flex w-full cursor-pointer items-center justify-between rounded-md border p-3;
+}
+
+.multisigBg {
+	@apply ml-2 rounded-md border border-multisig_text bg-multisig_bg px-2 py-1 text-xs text-multisig_text;
+}
+
+.pureProxyBg {
+	@apply ml-2 rounded-md border border-pure_proxy_text bg-pure_proxy_bg px-2 py-1 text-xs text-pure_proxy_text;
+}
+
+.anyProxyBg {
+	@apply ml-2 rounded-md border border-any_proxy_text bg-any_proxy_bg px-2 py-1 text-xs text-any_proxy_text;
+}
+
+.nonTransferrableBg {
+	@apply ml-2 rounded-md border border-non_transferrable_text bg-non_transferrable_bg px-2 py-1 text-xs text-non_transferrable_text;
+}
+
+.proxyTypeBg {
+	@apply ml-2 rounded-md border border-proxy_type_text bg-proxy_type_bg px-2 py-1 text-xs text-proxy_type_text;
+}

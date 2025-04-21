@@ -98,8 +98,6 @@ function AddressDropdown({
 		onChange?.(selectedAccount);
 	};
 
-	const isMultisigAccount = userPreferences?.address && 'accountType' in userPreferences.address && userPreferences.address.accountType === EAccountType.MULTISIG;
-
 	if (!userPreferences.wallet) return <div className={classes.fallbackText}>{t('AddressDropdown.fallbackText')}</div>;
 	if (accountsLoading) {
 		return (
@@ -205,7 +203,7 @@ function AddressDropdown({
 						className={classes.switchButton}
 						onClick={() => setSwitchModalOpen(true)}
 					>
-						Switch <MdOutlineSync />
+						{t('AddressDropdown.switch')} <MdOutlineSync />
 					</Button>
 				</div>
 				<AddressSwitchModal
@@ -214,11 +212,6 @@ function AddressDropdown({
 					onChange={onChange}
 					accounts={accounts}
 				/>
-				{isMultisigAccount && (
-					<div className='mb-1 border-t border-border_grey bg-amber-50 px-4 py-1.5 text-xs text-amber-800'>
-						<span className='font-medium'>Vote Balance:</span> <span className='font-bold text-text_pink'>1.7 DOT</span>
-					</div>
-				)}
 			</div>
 		</div>
 	);
