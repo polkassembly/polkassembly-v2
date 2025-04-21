@@ -40,7 +40,10 @@
 }
 
 .triggerText {
-	@apply text-lg font-medium leading-4 text-sidebar_foreground;
+	@apply text-base font-medium leading-4;
+	background: linear-gradient(180deg, #acceff 0%, #00429b 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
 
 .triggerIcon {
