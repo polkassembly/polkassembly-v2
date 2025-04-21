@@ -40,7 +40,7 @@ function AddressSwitchModal({
 	}>({ multisig: [], proxy: [], proxied: [] });
 
 	const createSelectedAccount = (address: string, name: string, accountType: EAccountType, parent?: ISelectedAccount, proxyType?: string): ISelectedAccount => {
-		let displayName = name;
+		let displayName = name || '';
 		if (accountType !== EAccountType.REGULAR) {
 			displayName = '';
 		}
@@ -115,7 +115,7 @@ function AddressSwitchModal({
 								<div className='h-2 w-2 rounded-full bg-bg_modal' />
 							</div>
 						</div>
-						{userPreferences?.address && (
+						{userPreferences?.address?.address && (
 							<Address
 								address={userPreferences.address.address}
 								walletAddressName={userPreferences.address.name || ''}
@@ -136,7 +136,8 @@ function AddressSwitchModal({
 					</div>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-4xl max-h-60 overflow-auto'>
-					{accounts.map((account) => {
+					{accounts?.map((account) => {
+						if (!account?.address) return null;
 						const selectedAccount: ISelectedAccount = {
 							...account,
 							accountType: EAccountType.REGULAR,
@@ -153,7 +154,7 @@ function AddressSwitchModal({
 								{renderAccountItem(selectedAccount, isSelected)}
 								<Address
 									address={account.address}
-									walletAddressName={account.name}
+									walletAddressName={account.name || ''}
 									iconSize={25}
 									redirectToProfile={false}
 								/>
@@ -166,14 +167,15 @@ function AddressSwitchModal({
 	);
 
 	const renderMultisigSection = () =>
-		multisigProxyData.multisig.length > 0 && (
+		multisigProxyData?.multisig?.length > 0 && (
 			<div className='mb-4'>
 				<div className='mb-2 border-b border-border_grey pb-1 text-sm font-medium'>{t('multisig')}</div>
 				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
 					{multisigProxyData.multisig.map((multisig) => {
+						if (!multisig?.address) return null;
 						const multisigAccount = createSelectedAccount(multisig.address, 'Multisig', EAccountType.MULTISIG);
 						const isSelected = multisig.address === userPreferences?.address?.address;
-						const hasProxies = multisig.pureProxy && multisig.pureProxy.length > 0;
+						const hasProxies = multisig.pureProxy && Array.isArray(multisig.pureProxy) && multisig.pureProxy.length > 0;
 						const isExpanded = expandedMultisigs[multisig.address];
 
 						return (
@@ -216,8 +218,10 @@ function AddressSwitchModal({
 											<div className='mt-1 border-l border-border_grey pl-4'>
 												<div className='max-h-[120px] space-y-2 overflow-y-auto'>
 													{multisig.pureProxy &&
+														Array.isArray(multisig.pureProxy) &&
 														multisig.pureProxy.map((proxy) => {
-															const proxyAccount = createSelectedAccount(proxy.address, `${proxy.proxyType} Proxy`, EAccountType.PROXY, multisigAccount, proxy.proxyType);
+															if (!proxy?.address) return null;
+															const proxyAccount = createSelectedAccount(proxy.address, `${proxy.proxyType || ''} Proxy`, EAccountType.PROXY, multisigAccount, proxy.proxyType);
 															const isProxySelected = proxy.address === userPreferences?.address?.address;
 
 															return (
@@ -251,12 +255,13 @@ function AddressSwitchModal({
 		);
 
 	const renderProxiedSection = () =>
-		multisigProxyData.proxied.length > 0 && (
+		multisigProxyData?.proxied?.length > 0 && (
 			<div>
 				<div className='mb-2 border-b border-border_grey pb-1 text-sm font-medium'>{t('proxiedaccounts')}</div>
 				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
 					{multisigProxyData.proxied.map((proxied) => {
-						const proxiedAccount = createSelectedAccount(proxied.address, proxied.proxyType, EAccountType.PROXY, undefined, proxied.proxyType);
+						if (!proxied?.address) return null;
+						const proxiedAccount = createSelectedAccount(proxied.address, proxied.proxyType || '', EAccountType.PROXY, undefined, proxied.proxyType);
 						const isSelected = proxied.address === userPreferences?.address?.address;
 
 						return (
@@ -274,7 +279,7 @@ function AddressSwitchModal({
 									redirectToProfile={false}
 								/>
 								<span className={proxied.proxyType === 'Any' ? classes.anyProxyBg : proxied.proxyType === 'Non-Transferrable' ? classes.nonTransferrableBg : classes.proxyTypeBg}>
-									{proxied.proxyType.toUpperCase()}
+									{(proxied.proxyType || '').toUpperCase()}
 								</span>
 							</button>
 						);
