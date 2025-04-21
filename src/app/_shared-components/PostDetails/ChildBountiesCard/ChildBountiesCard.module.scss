@@ -1,0 +1,11 @@
+.childBountiesCardWrapper {
+	@apply flex flex-col rounded-xl bg-bg_modal p-6 shadow-lg;
+}
+
+.childBountiesCardItem {
+	@apply flex items-center justify-between rounded-xl border border-border_grey p-4 text-sm shadow-sm;
+}
+
+.childBountiesCardItemWrapper {
+	@apply my-6 flex flex-col gap-4;
+}

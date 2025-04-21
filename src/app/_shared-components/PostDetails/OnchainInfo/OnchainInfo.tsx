@@ -9,12 +9,18 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import Link from 'next/link';
 import { Skeleton } from '../../Skeleton';
 import ArgumentsTableJSONView from './ArgumentsTableJSONView';
 import classes from './OnchainInfo.module.scss';
+import Address from '../../Profile/Address/Address';
 
 function OnchainInfo({ proposalType, index, onchainInfo }: { proposalType: EProposalType; index: string; onchainInfo?: IOnChainPostInfo }) {
 	const t = useTranslations();
+	const network = getCurrentNetwork();
 	const fetchPreimage = async () => {
 		const { data, error } = await NextApiClientService.getPreimageForPost(proposalType, index);
 		if (error) {
@@ -37,29 +43,89 @@ function OnchainInfo({ proposalType, index, onchainInfo }: { proposalType: EProp
 				<Skeleton className='h-4' />
 			) : (
 				<div className={classes.infoContainer}>
-					<div className={classes.infoRow}>
-						<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.origin')}</p>
-						<p className={classes.infoRowValue}>{onchainInfo?.origin}</p>
-					</div>
-					<div className={classes.infoRow}>
-						<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.method')}</p>
-						<p className={classes.infoRowValue}>{data?.method}</p>
-					</div>
-					<div className={classes.infoRow}>
-						<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.proposalHash')}</p>
-						<p className={cn(classes.infoRowValue, 'break-words')}>{data?.hash}</p>
-					</div>
-					<div className={classes.infoRow}>
-						<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.section')}</p>
-						<p className={classes.infoRowValue}>{data?.section}</p>
-					</div>
-					<div className={classes.infoRow}>
-						<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.description')}</p>
-						<p className={classes.infoRowValue}>{data?.proposedCall?.description}</p>
-					</div>
-					<div>
-						<ArgumentsTableJSONView postArguments={data?.proposedCall?.args || {}} />
-					</div>
+					{onchainInfo?.origin && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.origin')}</p>
+							<p className={classes.infoRowValue}>{onchainInfo?.origin}</p>
+						</div>
+					)}
+					{data?.method && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.method')}</p>
+							<p className={classes.infoRowValue}>{data?.method}</p>
+						</div>
+					)}
+					{data?.hash && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.proposalHash')}</p>
+							<p className={cn(classes.infoRowValue, 'break-words')}>{data?.hash}</p>
+						</div>
+					)}
+					{data?.section && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.section')}</p>
+							<p className={classes.infoRowValue}>{data?.section}</p>
+						</div>
+					)}
+					{data?.proposedCall?.description && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.description')}</p>
+							<p className={classes.infoRowValue}>{data?.proposedCall?.description}</p>
+						</div>
+					)}
+					{data?.proposedCall?.args && (
+						<div>
+							<ArgumentsTableJSONView postArguments={data?.proposedCall?.args} />
+						</div>
+					)}
+					{/* Bounty Onchain Info */}
+					{ValidatorService.isValidNumber(onchainInfo?.parentBountyIndex) && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.parentBountyIndex')}</p>
+							<Link
+								href={`/bounty/${onchainInfo?.parentBountyIndex}`}
+								className={cn(classes.infoRowValue, 'text-text_pink')}
+							>
+								#{onchainInfo?.parentBountyIndex}
+							</Link>
+						</div>
+					)}
+					{onchainInfo?.deposit && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.deposit')}</p>
+							<p className={classes.infoRowValue}>{formatBnBalance(onchainInfo?.deposit, { withUnit: true, numberAfterComma: 2 }, network)}</p>
+						</div>
+					)}
+					{onchainInfo?.reward && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.reward')}</p>
+							<p className={classes.infoRowValue}>{formatBnBalance(onchainInfo?.reward, { withUnit: true, numberAfterComma: 2 }, network)}</p>
+						</div>
+					)}
+					{onchainInfo?.curatorDeposit && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.curatorDeposit')}</p>
+							<p className={classes.infoRowValue}>{formatBnBalance(onchainInfo?.curatorDeposit, { withUnit: true, numberAfterComma: 2 }, network)}</p>
+						</div>
+					)}
+					{onchainInfo?.fee && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.fee')}</p>
+							<p className={classes.infoRowValue}>{formatBnBalance(onchainInfo?.fee, { withUnit: true, numberAfterComma: 2 }, network)}</p>
+						</div>
+					)}
+					{onchainInfo?.payee && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.payee')}</p>
+							<Address address={onchainInfo?.payee} />
+						</div>
+					)}
+					{onchainInfo?.curator && (
+						<div className={classes.infoRow}>
+							<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.curator')}</p>
+							<Address address={onchainInfo?.curator} />
+						</div>
+					)}
 				</div>
 			)}
 		</div>

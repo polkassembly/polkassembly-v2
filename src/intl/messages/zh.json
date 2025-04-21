@@ -410,7 +410,14 @@
 			"description": "描述",
 			"section": "部分",
 			"name": "名称",
-			"value": "值"
+			"value": "值",
+			"deposit": "存款",
+			"curatorDeposit": " curator 存款",
+			"reward": "奖励",
+			"fee": "费用",
+			"parentBountyIndex": "父赏金索引",
+			"payee": "受益者",
+			"curator": " curator"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -686,6 +693,11 @@
 		"verificationSuccessful": "验证成功",
 		"verificationFailed": "验证失败",
 		"goToHome": "返回首页"
+	},
+	"ChildBounties": {
+		"childBounties": "子赏金",
+		"parentBounty": "父赏金",
+		"viewAllChildBounties": "查看全部"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

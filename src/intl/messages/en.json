@@ -419,7 +419,14 @@
 			"description": "Description",
 			"section": "Section",
 			"name": "Name",
-			"value": "Value"
+			"value": "Value",
+			"deposit": "Deposit",
+			"curatorDeposit": "Curator Deposit",
+			"reward": "Reward",
+			"fee": "Fee",
+			"parentBountyIndex": "Parent Bounty Index",
+			"payee": "Payee",
+			"curator": "Curator"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",
@@ -705,6 +712,11 @@
 		"verificationSuccessful": "Verification successful",
 		"verificationFailed": "Verification failed",
 		"goToHome": "Go to home"
+	},
+	"ChildBounties": {
+		"childBounties": "Child Bounties",
+		"parentBounty": "Parent Bounty",
+		"viewAllChildBounties": "View All"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",

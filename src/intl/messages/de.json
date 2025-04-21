@@ -411,7 +411,14 @@
 			"description": "Beschreibung",
 			"section": "Abschnitt",
 			"name": "Name",
-			"value": "Wert"
+			"value": "Wert",
+			"deposit": "Einzahlung",
+			"curatorDeposit": "Curator-Einzahlung",
+			"reward": "Belohnung",
+			"fee": "Gebühr",
+			"parentBountyIndex": "Elterntreffen-Index",
+			"payee": "Begünstigter",
+			"curator": "Curator"
 		},
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?",
@@ -686,6 +693,11 @@
 		"verificationSuccessful": "Verifizierung erfolgreich",
 		"verificationFailed": "Verifizierung fehlgeschlagen",
 		"goToHome": "Zur Startseite"
+	},
+	"ChildBounties": {
+		"childBounties": "Kinderprämien",
+		"parentBounty": "Elterntreffen",
+		"viewAllChildBounties": "Alle anzeigen"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",
