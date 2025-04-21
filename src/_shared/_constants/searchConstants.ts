@@ -4,7 +4,7 @@
 
 import { EOffChainPostTopic } from '../types';
 
-export const allowedNetwork = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
+export const searchEnabledNetworks = ['KUSAMA', 'POLKADOT', 'POLKADEX', 'CERE', 'MOONBEAM', 'MOONRIVER', 'MOONBASE'];
 
 export const POST_TOPIC_MAP: Record<EOffChainPostTopic, number> = {
 	[EOffChainPostTopic.AUCTION_ADMIN]: 8,

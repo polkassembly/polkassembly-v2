@@ -10,7 +10,7 @@ import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
 import { useState, memo } from 'react';
 import { ESearchType } from '@/_shared/types';
-import { allowedNetwork } from '@/_shared/_constants/searchConstants';
+import { searchEnabledNetworks } from '@/_shared/_constants/searchConstants';
 import { useSearchConfig } from '@/hooks/useSearchConfig';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
@@ -62,7 +62,7 @@ function Search() {
 			<DialogTrigger asChild>
 				<IoIosSearch className='cursor-pointer text-2xl text-text_primary' />
 			</DialogTrigger>
-			<DialogContent className={`${allowedNetwork.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
+			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
 					<DialogTitle className={styles.search_dialog_title}>
 						{t('search')}
@@ -74,7 +74,7 @@ function Search() {
 					</DialogTitle>
 				</DialogHeader>
 
-				{allowedNetwork.includes(network.toUpperCase()) ? (
+				{searchEnabledNetworks.includes(network.toUpperCase()) ? (
 					<InstantSearch
 						searchClient={searchClient}
 						indexName={indexName}
