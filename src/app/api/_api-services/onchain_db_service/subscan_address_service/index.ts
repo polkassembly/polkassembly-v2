@@ -32,7 +32,7 @@ export class SubscanAddressService {
 			return {};
 		}
 
-		const info = ['name', 'email', 'github', 'twitter', 'matrix', 'discord'].map((key) => data.data?.account?.[key]);
+		const info = ['name', 'email', 'github', 'twitter', 'matrix', 'discord'].map((key) => data.data?.account?.[key]).filter(Boolean);
 
 		return {
 			...info
@@ -69,17 +69,17 @@ export class SubscanAddressService {
 			};
 		}
 
-		const proxyAddresses =
+		const proxyAddresses: Array<IProxy> =
 			data.data?.account?.proxy?.proxy_account?.map((proxy: { account_display: { address: string }; proxy_type: string }) => ({
 				address: proxy.account_display.address,
 				proxyType: proxy.proxy_type
 			})) || [];
-		const realAccount =
+		const realAccount: Array<IProxy> =
 			data.data?.account?.proxy?.real_account?.map((proxy: { account_display: { address: string }; proxy_type: string }) => ({
 				address: proxy.account_display.address,
 				proxyType: proxy.proxy_type
 			})) || [];
-		const multisigAddress = data.data?.account?.multisig?.multi_account?.map((multisig: { address: string }) => multisig.address) || [];
+		const multisigAddress: Array<string> = data.data?.account?.multisig?.multi_account?.map((multisig: { address: string }) => multisig.address) || [];
 
 		// fetch for multisig addresses
 		for (const multisig of multisigAddress) {
@@ -91,7 +91,7 @@ export class SubscanAddressService {
 				proxyType: proxy.proxy_type
 			}));
 			const threshold = data.data?.account?.multisig?.multi_account_threshold;
-			const info = ['name', 'email', 'github', 'twitter', 'matrix', 'discord'].map((key) => data.data?.account?.[key]);
+			const info = ['name', 'email', 'github', 'twitter', 'matrix', 'discord'].map((key) => data.data?.account?.[key]).filter(Boolean);
 
 			const multisigData: IMultisig = {
 				address: multisig,
