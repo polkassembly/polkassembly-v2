@@ -1104,3 +1104,15 @@ export enum EPeriodType {
 	DECISION = 'decision',
 	CONFIRM = 'confirm'
 }
+
+export enum ESearchType {
+	POSTS = 'posts',
+	DISCUSSIONS = 'discussions',
+	USERS = 'users'
+}
+
+export enum ESearchDiscussionType {
+	DISCUSSIONS = 'discussions',
+	GRANTS = 'grants',
+	REFERENDUMS_V2 = 'referendums_v2'
+}

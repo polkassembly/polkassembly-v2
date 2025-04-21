@@ -1,4 +1,3 @@
-
 {
 	"HomePage": {
 		"title": "欢迎来到主页"
@@ -948,6 +947,41 @@
 			"invalidData": "无效数据",
 			"fetchError": "获取数据错误"
 		}
+	},
+	"Search": {
+		"placeholder": "在此输入以搜索",
+		"superSearch": "超级搜索",
+		"search": "搜索",
+		"resultsFor": "搜索结果",
+		"referenda": "公投",
+		"users": "用户",
+		"discussions": "讨论",
+		"today": "今天",
+		"last_7_days": "最近7天",
+		"last_30_days": "最近30天",
+		"last_3_months": "最近3个月",
+		"all_time": "所有时间",
+		"date": "日期",
+		"networks": "网络",
+		"tracks": "轨道",
+		"topics": "主题",
+		"tags": "标签",
+		"in": "在",
+		"noBio": "无简介",
+		"pleaseEnterAtLeast3Characters": "请输入至少3个字符以继续。",
+		"or": "或",
+		"see": "查看",
+		"poweredBy": "由",
+		"welcomeToTheAllNewSuperchargedSearch": "欢迎使用全新升级的搜索功能！",
+		"latestActivity": "最新活动",
+		"onPolkassembly": "在Polkassembly上。",
+		"noSearchResultsFound": "未找到搜索结果。您可以尝试使用不同的关键词。",
+		"useSuperSearch": "使用超级搜索",
+		"didntFindWhatYouWereLookingFor": "没有找到您要的内容？",
+		"useSuperSearchButton": "使用超级搜索",
+		"poweredByPolkassembly": "由Polkassembly提供。",
+		"enableSearchAndSuperSearch": "如果您想为您的链启用搜索和超级搜索功能，请联系我们",
+		"clearFilters": "清除筛选"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "赏金提案成功",

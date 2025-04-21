@@ -1,4 +1,3 @@
-
 {
 	"HomePage": {
 		"title": "ホームへようこそ"
@@ -924,6 +923,41 @@
 			"invalidData": "無効なデータ",
 			"fetchError": "データの取得エラー"
 		}
+	},
+	"Search": {
+		"placeholder": "検索するにはここに入力",
+		"superSearch": "スーパー検索",
+		"search": "検索",
+		"resultsFor": "検索結果",
+		"referenda": "レファレンダム",
+		"users": "ユーザー",
+		"discussions": "ディスカッション",
+		"today": "今日",
+		"last_7_days": "過去7日間",
+		"last_30_days": "過去30日間",
+		"last_3_months": "過去3ヶ月",
+		"all_time": "全期間",
+		"date": "日付",
+		"networks": "ネットワーク",
+		"tracks": "トラック",
+		"topics": "トピック",
+		"tags": "タグ",
+		"in": "で",
+		"noBio": "自己紹介なし",
+		"pleaseEnterAtLeast3Characters": "続行するには少なくとも3文字を入力してください。",
+		"or": "または",
+		"see": "参照",
+		"poweredBy": "提供",
+		"welcomeToTheAllNewSuperchargedSearch": "新しくパワーアップした検索機能へようこそ！",
+		"latestActivity": "最新のアクティビティ",
+		"onPolkassembly": "Polkassemblyで。",
+		"noSearchResultsFound": "検索結果が見つかりません。別のキーワードをお試しください。",
+		"useSuperSearch": "スーパー検索を使用",
+		"didntFindWhatYouWereLookingFor": "お探しのものが見つかりませんでしたか？",
+		"useSuperSearchButton": "スーパー検索を使用",
+		"poweredByPolkassembly": "Polkassembly提供。",
+		"enableSearchAndSuperSearch": "チェーンの検索とスーパー検索を有効にしたい場合は、こちらまでご連絡ください",
+		"clearFilters": "フィルターをクリア"
 	},
 	"Bounties": {
 		"onchainBounties": "オンチェーン報奨金",
