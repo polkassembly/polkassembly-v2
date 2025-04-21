@@ -9,7 +9,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React, { useEffect, useState } from 'react';
 
-export default function PollForProposal({ index, referer }: { index: string; referer: string | null }) {
+export default function PollForProposal({ index, referer, proposalType = EProposalType.REFERENDUM_V2 }: { index: string; referer: string | null; proposalType?: EProposalType }) {
 	const [data, setData] = useState<IPost>();
 	const [error, setError] = useState<string>();
 	const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ export default function PollForProposal({ index, referer }: { index: string; ref
 			}
 			try {
 				const { data: postData } = await NextApiClientService.fetchProposalDetails({
-					proposalType: EProposalType.REFERENDUM_V2,
+					proposalType,
 					indexOrHash: index
 				});
 
@@ -55,7 +55,7 @@ export default function PollForProposal({ index, referer }: { index: string; ref
 			isMounted = false;
 			if (intervalId) clearInterval(intervalId);
 		};
-	}, [index, referer]);
+	}, [index, referer, proposalType]);
 
 	if (error) {
 		return <div className='text-center text-text_primary'>{error}</div>;

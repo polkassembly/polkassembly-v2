@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable lines-between-class-members */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
@@ -31,6 +31,10 @@ import {
 	EOffChainPostTopic,
 	IVoteCartItem,
 	EConvictionAmount,
+	IDelegationStats,
+	IDelegateDetails,
+	ITrackDelegationStats,
+	ITrackDelegationDetails,
 	IContentSummary,
 	ISocialHandle,
 	IVoteHistoryData,
@@ -48,6 +52,8 @@ import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
+
+const DELEGATE_API_PATH = '/delegation/delegates';
 
 enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
@@ -88,6 +94,7 @@ enum EApiRoute {
 	FETCH_ALL_TAGS = 'FETCH_ALL_TAGS',
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
+	FETCH_CHILD_BOUNTIES = 'FETCH_CHILD_BOUNTIES',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
@@ -96,6 +103,10 @@ enum EApiRoute {
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
 	ADD_POST_SUBSCRIPTION = 'ADD_POST_SUBSCRIPTION',
 	DELETE_POST_SUBSCRIPTION = 'DELETE_POST_SUBSCRIPTION',
+	GET_DELEGATE_STATS = 'GET_DELEGATE_STATS',
+	FETCH_DELEGATES = 'FETCH_DELEGATES',
+	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
+	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
@@ -171,12 +182,19 @@ export class NextApiClientService {
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
+			case EApiRoute.GET_DELEGATE_STATS:
+				path = '/delegation/stats';
+				break;
+			case EApiRoute.FETCH_DELEGATES:
+				path = DELEGATE_API_PATH;
+				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
+			case EApiRoute.FETCH_CHILD_BOUNTIES:
 				break;
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -226,6 +244,10 @@ export class NextApiClientService {
 				path = '/users/id';
 				method = 'POST';
 				break;
+			case EApiRoute.CREATE_PA_DELEGATE:
+				path = DELEGATE_API_PATH;
+				method = 'POST';
+				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
@@ -241,6 +263,10 @@ export class NextApiClientService {
 			case EApiRoute.EDIT_USER_PROFILE:
 			case EApiRoute.EDIT_BATCH_VOTE_CART_ITEM:
 				path = '/users/id';
+				method = 'PATCH';
+				break;
+			case EApiRoute.UPDATE_PA_DELEGATE:
+				path = DELEGATE_API_PATH;
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
@@ -701,6 +727,7 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
+
 	static async fetchAllTags() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
 		return this.nextApiClientFetch<IGenericListingResponse<ITag>>({ url, method });
@@ -735,6 +762,7 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
 		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
 	}
+
 	static async fetchLeaderboardApi({ page, limit }: { page: number; limit?: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString() || '1',
@@ -753,6 +781,36 @@ export class NextApiClientService {
 	static async deletePostSubscription(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getDelegateStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_STATS });
+		return this.nextApiClientFetch<IDelegationStats>({ url, method });
+	}
+
+	static async fetchDelegates() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_DELEGATES });
+		return this.nextApiClientFetch<IDelegateDetails[]>({ url, method });
+	}
+
+	static async createPADelegate({ address, manifesto }: { address: string; manifesto: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_PA_DELEGATE });
+		return this.nextApiClientFetch<{ id: string }>({ url, method, data: { address, manifesto } });
+	}
+
+	static async updatePADelegate({ address, manifesto }: { address: string; manifesto: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_PA_DELEGATE, routeSegments: [address] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
+	}
+
+	static async getDelegateTracks({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
+		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
+	}
+
+	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
+		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
 	}
 
 	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
@@ -775,6 +833,14 @@ export class NextApiClientService {
 			routeSegments: [proposalType, indexOrHash, 'content-summary']
 		});
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
+	}
+
+	static async fetchChildBountiesApi({ bountyIndex }: { bountyIndex: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_CHILD_BOUNTIES,
+			routeSegments: [EProposalType.BOUNTY, bountyIndex.toString(), 'child-bounties']
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
 	static async fetchUserSocialHandles({ userId, address }: { userId: number; address: string }) {

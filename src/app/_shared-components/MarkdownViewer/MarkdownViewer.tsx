@@ -5,7 +5,7 @@
 'use client';
 
 import './MarkdownViewer.scss';
-import { useState, forwardRef, useRef, ReactNode } from 'react';
+import { useState, useRef, ReactNode, useLayoutEffect } from 'react';
 import ReactMarkdownLib from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -15,6 +15,7 @@ import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '../Button';
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -266,41 +267,66 @@ interface ReactMarkdownProps {
 	className?: string;
 	truncate?: boolean;
 	maxLines?: number;
+	onShowMore?: () => void;
 }
 
-export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((props, ref) => {
-	const { markdown, className, truncate = false, maxLines = 4 } = props;
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [showMore, setShowMore] = useState(!truncate);
-	const [contentExceedsMaxLines, setContentExceedsMaxLines] = useState(false);
+export function MarkdownViewer(props: ReactMarkdownProps) {
+	const { markdown, className, truncate = false, maxLines = 4, onShowMore } = props;
+	const [showMore, setShowMore] = useState(false);
+	const [isTruncated, setIsTruncated] = useState(false);
+	const editorRef = useRef<HTMLDivElement>(null);
 
-	const setRefs = (node: HTMLDivElement | null) => {
-		containerRef.current = node;
+	useLayoutEffect(() => {
+		const element = editorRef.current;
 
-		if (node && truncate) {
-			const style = window.getComputedStyle(node);
-			const lineHeight = parseInt(style.lineHeight, 10) || 20;
-			const containerHeight = node.scrollHeight;
-			const lines = Math.floor(containerHeight / lineHeight);
-			setContentExceedsMaxLines(lines > maxLines);
+		const handleResize = () => {
+			if (!truncate || !element) return;
+			const { scrollHeight, offsetHeight } = element;
+
+			if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
+				setIsTruncated(true);
+			} else {
+				setIsTruncated(false);
+			}
+		};
+
+		handleResize();
+
+		window.addEventListener('resize', handleResize);
+
+		const resizeObserver = new ResizeObserver(() => {
+			handleResize();
+		});
+
+		if (editorRef.current) {
+			resizeObserver.observe(editorRef.current);
 		}
 
-		if (typeof ref === 'function') {
-			ref(node);
-		} else if (ref) {
-			// eslint-disable-next-line no-param-reassign
-			ref.current = node;
+		// Remove event listener on cleanup
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			if (element) {
+				resizeObserver.unobserve(element);
+			}
+		};
+	}, [truncate]);
+
+	const handleShowMore = () => {
+		if (onShowMore) {
+			onShowMore();
+			return;
 		}
+		setShowMore(true);
 	};
 
-	const toggleShowMore = () => {
-		setShowMore(!showMore);
+	const handleShowLess = () => {
+		setShowMore(false);
 	};
 
 	return (
 		<div className='w-full'>
 			<div
-				ref={setRefs}
+				ref={editorRef}
 				className={cn('markdown-body', truncate && !showMore ? `line-clamp-${maxLines}` : 'line-clamp-none', 'w-full', className)}
 			>
 				<ReactMarkdownLib
@@ -311,15 +337,26 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, ReactMarkdownProps>((pr
 					{markdown || ''}
 				</ReactMarkdownLib>
 			</div>
-			{truncate && contentExceedsMaxLines && (
-				<button
-					type='button'
-					onClick={toggleShowMore}
-					className='mt-2 cursor-pointer text-sm font-medium text-text_pink hover:underline'
-				>
-					{showMore ? 'Show Less' : 'Show More'}
-				</button>
-			)}
+			{truncate &&
+				(showMore ? (
+					<Button
+						onClick={handleShowLess}
+						variant='ghost'
+						size='sm'
+						className='px-0 text-text_pink'
+					>
+						Show Less
+					</Button>
+				) : isTruncated ? (
+					<Button
+						onClick={handleShowMore}
+						variant='ghost'
+						className='px-0 text-text_pink'
+						size='sm'
+					>
+						Show More
+					</Button>
+				) : null)}
 		</div>
 	);
-});
+}

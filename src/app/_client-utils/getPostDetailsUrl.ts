@@ -27,6 +27,8 @@ export const getPostDetailsUrl = ({ proposalType, proposalId, network }: PostDet
 			return `https://${network}.polkassembly.io/tech/${proposalId}`;
 		case EProposalType.DISCUSSION:
 			return `/post/${proposalId}`;
+		case EProposalType.BOUNTY:
+			return `/bounty/${proposalId}`;
 		default:
 			return `/referenda/${proposalId}`;
 	}

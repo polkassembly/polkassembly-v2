@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin } from '@/_shared/types';
+import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -94,7 +94,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							/>
 						</div>
 					</div>
-					{!isModalOpen && !isOffchainPost && (
+					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
 							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}
 							<ProposalPeriods
