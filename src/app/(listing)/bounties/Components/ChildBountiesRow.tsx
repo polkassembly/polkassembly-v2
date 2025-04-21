@@ -99,7 +99,7 @@ function ChildBountiesRow({ parentIndex }: { parentIndex: number }) {
 					<TableRow
 						key={childBounty.index}
 						className={`${styles.tableBodyRow} ${styles.childBountyRow}`}
-						onClick={() => router.push(`/child_bounty/${childBounty.index}`)}
+						onClick={() => router.push(`/child-bounty/${childBounty.index}`)}
 					>
 						<TableCell className='p-6'>
 							<div className='flex h-6 items-center justify-start space-x-4 pl-2 pt-1'>
