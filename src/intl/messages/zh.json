@@ -1,3 +1,4 @@
+
 {
 	"HomePage": {
 		"title": "欢迎来到主页"
@@ -484,7 +485,10 @@
 		"started": "已开始",
 		"passed": "已通过",
 		"proposed": "已提议",
-		"created": "已创建"
+		"created": "已创建",
+		"curatorassigned": "已分配 curator",
+		"curatorunassigned": "未分配 curator",
+		"curatorproposed": "已提议 curator"
 	},
 	"Pagination": {
 		"next": "下一页",
@@ -638,6 +642,25 @@
 		"twitterPlaceholder": "@您的Twitter名称",
 		"riotPlaceholder": "@您的名称.matrix.org",
 		"setIdentity": "设置身份",
+		"onChainIdentity": "链上身份"
+	},
+	"Bounties": {
+		"onchainBounties": "链上赏金",
+		"createBountyProposal": "创建赏金提案",
+		"loadingChildBounties": "加载子赏金...",
+		"noChildBountiesFound": "未找到子赏金",
+		"curator": "赏金者",
+		"title": "标题",
+		"amount": "金额",
+		"date": "日期",
+		"status": "状态",
+		"categories": "类别",
+		"all": "全部",
+		"active": "活跃",
+		"proposed": "提议",
+		"claimed": "认领",
+		"cancelled": "取消",
+		"rejected": "拒绝",
 		"onChainIdentity": "链上身份",
 		"identityDescription1": "Polkadot通过指定的注册商提供链上身份验证用户凭证，从而建立更大的信任和支持。",
 		"identityDescription2": "成功验证后，用户将获得一个绿色勾号，象征其可信状态。这个已验证的状态符号在申请国库资金或参与讨论和提案时提高了可信度。",
@@ -689,15 +712,15 @@
 	},
 	"CreateProposal": {
 		"create": "创建",
-		"quickActions": "快速操作",
+		"quickActions": "快捷操作",
 		"submitProposal": "提交提案",
-		"createDiscussion": "讨论帖",
+		"createDiscussion": "讨论帖子",
 		"createPreimage": "新建预映像",
 		"existingPreimage": "我已有预映像",
 		"spend": "支出",
 		"from": "从",
 		"Treasury": "国库",
-		"usdxProposal": "从资产中心支出资产（USDx、DOT等）",
+		"usdxProposal": "从AssetHub支出资产 (USDx, DOT, 等)",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
 		"createPreimageDescription": "从头创建一个提案。",
@@ -716,7 +739,9 @@
 		"stepDescriptionCancelReferendum": "提议取消一个正在进行的公投。",
 		"stepDescriptionTreasuryProposal": "提议以 形式进行国库支出。",
 		"stepDescriptionUsdxProposal": "创建一个预映像和支出提案。支出需由用户主动领取。",
-		"stepDescriptionCreatePreimage": "预映像是与提案相关的编码调用数据（如运行时升级或国库支出）。"
+		"stepDescriptionCreatePreimage": "预映像是与提案相关的编码调用数据（如运行时升级或国库支出）。",
+		"createBounty": "创建赏金",
+		"createBountyDescription": "为特定任务或项目提议赏金。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -911,5 +936,13 @@
 			"invalidData": "无效数据",
 			"fetchError": "获取数据错误"
 		}
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "赏金提案成功",
+		"bountyProposedSuccessfullyDescription": "赏金已成功提案",
+		"bountyProposalFailed": "赏金提案失败",
+		"bountyProposalFailedDescription": "赏金提案过程中出现错误",
+		"bountyAmount": "赏金金额",
+		"proposeBounty": "提案赏金"
 	}
 }

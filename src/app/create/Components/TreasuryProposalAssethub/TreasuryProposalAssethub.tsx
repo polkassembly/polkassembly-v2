@@ -61,17 +61,22 @@ function TreasuryProposalAssethub() {
 		[apiService, selectedTrack, preimageDetails, selectedEnactment, advancedDetails]
 	);
 
-	const createProposal = async ({ preimageHash, preimageLength }: { preimageHash: string; preimageLength: number }) => {
-		if (!apiService || !userPreferences.address?.address || !preimageHash || !preimageLength || !selectedTrack) {
-			setLoading(false);
+	const batchCallTx = useMemo(
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx]),
+		[apiService, notePreimageTx, submitProposalTx]
+	);
+
+	const createProposal = async () => {
+		if (!apiService || !userPreferences.address?.address || !tx || !selectedTrack) {
 			return;
 		}
 
-		apiService.createProposal({
+		setLoading(true);
+
+		await apiService.createProposal({
 			address: userPreferences.address.address,
+			extrinsicFn: tx,
 			track: selectedTrack.name,
-			preimageHash,
-			preimageLength,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -86,41 +91,6 @@ function TreasuryProposalAssethub() {
 				toast({
 					title: t('CreateTreasuryProposal.proposalCreationFailed'),
 					description: t('CreateTreasuryProposal.proposalCreationFailedDescription'),
-					status: ENotificationStatus.ERROR
-				});
-				setLoading(false);
-			}
-		});
-	};
-
-	const createPreimage = async () => {
-		if (
-			!tx ||
-			!apiService ||
-			!beneficiaries.length ||
-			beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount) || b.isInvalid) ||
-			!userPreferences.address?.address ||
-			!preimageDetails
-		)
-			return;
-
-		setLoading(true);
-
-		await apiService.notePreimage({
-			address: userPreferences.address.address,
-			extrinsicFn: tx,
-			onSuccess: () => {
-				toast({
-					title: t('CreateTreasuryProposal.preimageNotedSuccessfully'),
-					description: t('CreateTreasuryProposal.preimageNotedSuccessfullyDescription'),
-					status: ENotificationStatus.SUCCESS
-				});
-				createProposal({ preimageHash: preimageDetails.preimageHash, preimageLength: preimageDetails.preimageLength });
-			},
-			onFailed: () => {
-				toast({
-					title: t('CreateTreasuryProposal.preimageNoteFailed'),
-					description: t('CreateTreasuryProposal.preimageNoteFailedDescription'),
 					status: ENotificationStatus.ERROR
 				});
 				setLoading(false);
@@ -159,9 +129,9 @@ function TreasuryProposalAssethub() {
 				/>
 			)}
 
-			{notePreimageTx && submitProposalTx && (
+			{batchCallTx && (
 				<TxFeesDetailsView
-					extrinsicFn={[notePreimageTx, submitProposalTx]}
+					extrinsicFn={[batchCallTx]}
 					extraFees={[
 						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
 						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }
@@ -173,14 +143,15 @@ function TreasuryProposalAssethub() {
 
 			<div className='flex justify-end'>
 				<Button
-					onClick={createPreimage}
+					onClick={createProposal}
 					isLoading={loading}
 					disabled={
 						!beneficiaries.length ||
 						beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount) || b.isInvalid) ||
 						!userPreferences.address?.address ||
 						!selectedTrack ||
-						!selectedEnactment
+						!selectedEnactment ||
+						!batchCallTx
 					}
 				>
 					{t('CreateTreasuryProposal.createProposal')}

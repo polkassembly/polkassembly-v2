@@ -35,6 +35,7 @@ import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposa
 import CancelReferendum from './CancelReferendum/CancelReferendum';
 import KillReferendum from './KillReferendum/KillReferendum';
 import ExistingPreimage from './ExistingPreimage/ExistingPreimage';
+import CreateBounty from './CreateBounty/CreateBounty';
 
 export interface CreateRef {
 	setStep: (step?: EProposalStep) => void;
@@ -117,7 +118,8 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 		[EProposalStep.CREATE_TREASURY_PROPOSAL]: `${t('CreateProposal.spend')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.from')} ${NETWORKS_DETAILS[network as ENetwork]?.name} ${t('CreateProposal.Treasury')}`,
 		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
 		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
-		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum')
+		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum'),
+		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty')
 	};
 
 	const stepDescriptions: Partial<Record<EProposalStep, string>> = {
@@ -199,6 +201,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						{step === EProposalStep.CREATE_USDX_PROPOSAL && <TreasuryProposalAssethub />}
 						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum />}
 						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum />}
+						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty />}
 						{!step && (
 							<div className='flex flex-col gap-y-4'>
 								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.trendingNow')}</p>
@@ -224,6 +227,13 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 									description={`${t('CreateProposal.createTreasuryProposalDescription')} ${NETWORKS_DETAILS[network as ENetwork]?.name}`}
 									icon={TreasuryProposalIcon}
 									iconClassName='bg-create_treasury_bg/10'
+								/>
+								<CreateOption
+									label={titles[EProposalStep.CREATE_BOUNTY]}
+									onClick={() => setStep(EProposalStep.CREATE_BOUNTY)}
+									description={t('CreateProposal.createBountyDescription')}
+									icon={UsdxProposalIcon}
+									iconClassName='bg-create_usdx_bg/10'
 								/>
 								<CreateOption
 									label={titles[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]}

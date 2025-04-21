@@ -504,7 +504,10 @@
 		"started": "Started",
 		"passed": "Passed",
 		"proposed": "Proposed",
-		"created": "Created"
+		"created": "Created",
+		"curatorassigned": "Curator Assigned",
+		"curatorunassigned": "Curator Unassigned",
+		"curatorproposed": "Curator Proposed"
 	},
 	"Pagination": {
 		"next": "Next",
@@ -658,6 +661,25 @@
 		"twitterPlaceholder": "@YourTwitterName",
 		"riotPlaceholder": "@Yourname.matrix.org",
 		"setIdentity": "Set Identity",
+		"onChainIdentity": "On-chain Identity"
+	},
+	"Bounties": {
+		"onchainBounties": "On-chain Bounties",
+		"createBountyProposal": "Create Bounty Proposal",
+		"loadingChildBounties": "Loading child bounties...",
+		"noChildBountiesFound": "No child bounties found",
+		"curator": "Curator",
+		"title": "Title",
+		"amount": "Amount",
+		"date": "Date",
+		"status": "Status",
+		"categories": "Categories",
+		"all": "All",
+		"active": "Active",
+		"proposed": "Proposed",
+		"claimed": "Claimed",
+		"cancelled": "Cancelled",
+		"rejected": "Rejected",
 		"onChainIdentity": "On-chain Identity",
 		"identityDescription1": "Polkadot offers on-chain identities that verify users' credentials through appointed registrars, instilling greater trust and support.",
 		"identityDescription2": "Once successfully verified, users receive a green checkmark, symbolising their trusted status. This verified status symbol enhances trustworthiness when requesting funds from the treasury or participating in discussions and proposals.",
@@ -721,6 +743,7 @@
 		"usdxProposal": "Create a USDX  Proposal",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
+		"createBounty": "Create Bounty",
 		"createDiscussionDescription": "Start a conversation and gather feedback.",
 		"createPreimageDescription": "Create a proposal from scratch.",
 		"existingPreimageDescription": "Select from existing preimages to create proposal.",
@@ -728,6 +751,7 @@
 		"usdxProposalDescription": "Propose a spend from AssetHub, schedule payments, and include multiple beneficiaries.",
 		"cancelReferendumDescription": "Propose to cancel an active referendum.",
 		"killReferendumDescription": "Terminate a referendum before it passes.",
+		"createBountyDescription": "Propose a bounty for a specific task or project.",
 		"goBack": "Go Back",
 		"preimageHash": "Preimage Hash",
 		"preimageLength": "Length",
@@ -775,6 +799,14 @@
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
 		"on": "on"
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "Bounty proposed successfully",
+		"bountyProposedSuccessfullyDescription": "The bounty has been proposed successfully",
+		"bountyProposalFailed": "Failed to propose bounty",
+		"bountyProposalFailedDescription": "There was an error while proposing the bounty",
+		"bountyAmount": "Bounty Amount",
+		"proposeBounty": "Propose Bounty"
 	},
 	"KillCancelReferendum": {
 		"referendumId": "Enter Referendum Index",

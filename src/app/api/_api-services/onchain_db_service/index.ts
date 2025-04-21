@@ -154,6 +154,10 @@ export class OnChainDbService {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
 	}
 
+	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
+		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
+	}
+
 	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
 	}

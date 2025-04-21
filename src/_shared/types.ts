@@ -483,6 +483,7 @@ export interface IStatusHistoryItem {
 }
 
 export interface IOnChainPostInfo {
+	reward?: string;
 	proposer: string;
 	status: EProposalStatus;
 	createdAt?: Date;
@@ -497,6 +498,7 @@ export interface IOnChainPostInfo {
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
+	curator?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -510,6 +512,7 @@ export interface IPost extends IOffChainPost {
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
+	childBountiesCount?: number;
 	index?: number;
 	origin: EPostOrigin;
 	proposer: string;
@@ -518,6 +521,8 @@ export interface IOnChainPostListing {
 	hash?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	curator?: string;
+	reward?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
 }
@@ -922,6 +927,15 @@ export enum ENotificationStatus {
 	INFO = 'info'
 }
 
+export enum EBountyStatus {
+	ALL = 'All',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
+}
+
 // generic types are for insignificant tokens if we decide to add later
 export interface ITreasuryStats {
 	network: ENetwork;
@@ -980,7 +994,8 @@ export enum EProposalStep {
 	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
 	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
 	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
-	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL',
+	CREATE_BOUNTY = 'CREATE_BOUNTY'
 }
 
 export interface IDelegationStats {

@@ -12,6 +12,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
 import { useMemo, useCallback } from 'react';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import styles from './PostActions.module.scss';
 
 function PostActions({ postData }: { postData: IPost }) {
@@ -23,7 +24,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, handleSubscribe } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
-		indexOrHash: postData?.index?.toString() || postData?.hash,
+		indexOrHash: ValidatorService.isValidNumber(postData?.index) ? postData?.index?.toString() : postData?.hash,
 		isSubscribed: !!postData.userSubscriptionId
 	});
 

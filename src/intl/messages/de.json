@@ -1,3 +1,4 @@
+
 {
 	"HomePage": {
 		"title": "Willkommen zu Hause"
@@ -484,7 +485,10 @@
 		"started": "Gestartet",
 		"passed": "Bestanden",
 		"proposed": "Vorgeschlagen",
-		"created": "Erstellt"
+		"created": "Erstellt",
+		"curatorassigned": "Curator zugewiesen",
+		"curatorunassigned": "Curator nicht zugewiesen",
+		"curatorproposed": "Curator vorgeschlagen"
 	},
 	"Pagination": {
 		"next": "Weiter",
@@ -638,6 +642,25 @@
 		"twitterPlaceholder": "@IhrTwitterName",
 		"riotPlaceholder": "@IhrName.matrix.org",
 		"setIdentity": "Identität festlegen",
+		"onChainIdentity": "On-Chain-Identität"
+	},
+	"Bounties": {
+		"onchainBounties": "Onchain-Prämien",
+		"createBountyProposal": "Prämie erstellen",
+		"loadingChildBounties": "Kinderprämien laden...",
+		"noChildBountiesFound": "Keine Kinderprämien gefunden",
+		"curator": "Curator",
+		"title": "Titel",
+		"amount": "Betrag",
+		"date": "Datum",
+		"status": "Status",
+		"categories": "Kategorien",
+		"all": "Alle",
+		"active": "Aktiv",
+		"proposed": "Vorgeschlagen",
+		"claimed": "Beansprucht",
+		"cancelled": "Abgebrochen",
+		"rejected": "Abgelehnt",
 		"onChainIdentity": "On-Chain-Identität",
 		"identityDescription1": "Polkadot bietet On-Chain-Identitäten, die die Anmeldedaten der Benutzer durch ernannte Registrare überprüfen und so mehr Vertrauen und Unterstützung schaffen.",
 		"identityDescription2": "Nach erfolgreicher Überprüfung erhalten Benutzer ein grünes Häkchen, das ihren vertrauenswürdigen Status symbolisiert. Dieses verifizierte Statussymbol erhöht die Glaubwürdigkeit bei der Beantragung von Mitteln aus dem Treasury oder bei der Teilnahme an Diskussionen und Vorschlägen.",
@@ -696,11 +719,13 @@
 		"createPreimage": "Preimage erstellen",
 		"existingPreimage": "Ich habe bereits ein Preimage",
 		"spend": "Ausgeben",
-		"from": "von",
+		"from": "aus",
 		"Treasury": "Treasury",
 		"usdxProposal": "USDX-Vorschlag erstellen",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
+		"createBounty": "Kopfgeld erstellen",
+		"createBountyDescription": "Schlagen Sie ein Kopfgeld für eine bestimmte Aufgabe oder ein Projekt vor.",
 		"createPreimageDescription": "Erstellen Sie einen Vorschlag von Grund auf.",
 		"existingPreimageDescription": "Wählen Sie aus vorhandenen Preimages, um einen Vorschlag zu erstellen.",
 		"createTreasuryProposalDescription": "Erstellen Sie einen Treasury-Vorschlag zur Zuteilung von Mitteln in ",
@@ -912,6 +937,17 @@
 		"errors": {
 			"invalidData": "Ungültige Daten",
 			"fetchError": "Fehler beim Abrufen der Daten"
+		}
+	},
+	"CreateBounty": {
+		"bountyProposedSuccessfully": "Kopfgeld erfolgreich vorgeschlagen",
+		"bountyProposedSuccessfullyDescription": "Das Kopfgeld wurde erfolgreich vorgeschlagen",
+		"bountyProposalFailed": "Kopfgeld-Vorschlag fehlgeschlagen",
+		"bountyProposalFailedDescription": "Beim Vorschlagen des Kopfgeldes ist ein Fehler aufgetreten",
+		"bountyAmount": "Kopfgeld-Betrag",
+		"proposeBounty": "Kopfgeld vorschlagen"
+	}
+}"Error fetching data"
 		}
 	}
 }
