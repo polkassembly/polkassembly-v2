@@ -33,7 +33,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
-	const [isDialogOpen, setIsDialogOpen] = useState(true);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
