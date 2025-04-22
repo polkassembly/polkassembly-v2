@@ -29,6 +29,8 @@ export const getPostDetailsUrl = ({ proposalType, proposalId, network }: PostDet
 			return `/post/${proposalId}`;
 		case EProposalType.BOUNTY:
 			return `/bounty/${proposalId}`;
+		case EProposalType.CHILD_BOUNTY:
+			return `/child-bounty/${proposalId}`;
 		default:
 			return `/referenda/${proposalId}`;
 	}

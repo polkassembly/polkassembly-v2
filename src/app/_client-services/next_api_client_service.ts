@@ -290,7 +290,28 @@ export class NextApiClientService {
 
 		const url = new URL(`${baseURL}${path}${segments}`);
 		if (queryParams) {
-			queryParams.forEach((value, key) => url.searchParams.set(key, value));
+			// Get all keys in the URLSearchParams
+			const keys = Array.from(new Set(Array.from(queryParams.keys())));
+
+			// For each unique key
+			keys.forEach((key) => {
+				// Get all values for this key
+				const values = queryParams.getAll(key);
+
+				// If there's only one value, use set
+				if (values.length === 1) {
+					url.searchParams.set(key, values[0]);
+				}
+				// If there are multiple values, use append for each
+				else if (values.length > 1) {
+					// First clear any existing values for this key
+					url.searchParams.delete(key);
+					// Then append each value
+					values.forEach((value) => {
+						url.searchParams.append(key, value);
+					});
+				}
+			});
 		}
 
 		return { url, method };
@@ -418,7 +439,7 @@ export class NextApiClientService {
 		});
 
 		if (limit) {
-			queryParams.append('limit', limit.toString());
+			queryParams.set('limit', limit.toString());
 		}
 
 		if (statuses?.length) {
@@ -434,6 +455,7 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
+
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 

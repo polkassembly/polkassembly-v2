@@ -260,6 +260,8 @@
 		"BigTipperDescription": "Origin able to spend up to 1000 DOT from the treasury at onceShow.",
 		"Bounty": "Onchain Bounty",
 		"BountyDescription": "A space to share insights, provide feedback, and collaborate on ideas that impact the network.",
+		"ChildBounty": "Onchain Child Bounty",
+		"ChildBountyDescription": "This is the place to discuss on-chain child bounties. Child Bounty posts are automatically generated as soon as they are created on-chain. Only the proposer is able to edit them.",
 		"Discussion": "Discussions",
 		"DiscussionDescription": "A space to share insights, provide feedback, and collaborate on ideas that impact the network.",
 		"FellowshipAdmin": "Fellowship Admin",
@@ -316,6 +318,7 @@
 		"techCommProposals": "Tech Comm Proposals",
 		"main": "Main",
 		"bounty": "Bounty",
+		"childBounties": "Child Bounties",
 		"bountyDashboard": "Bounty Dashboard",
 		"batchVoting": "Batch Voting",
 		"tracks": "TRACKS",
@@ -462,7 +465,13 @@
 		"Submitted": "Submitted",
 		"TimedOut": "Timed Out",
 		"Pending": "Pending",
-		"Unknown": "Unknown"
+		"Unknown": "Unknown",
+		"Claimed": "Claimed",
+		"Added": "Added",
+		"Awarded": "Awarded",
+		"CuratorProposed": "Curator Proposed",
+		"CuratorUnassigned": "Curator Unassigned",
+		"CuratorAssigned": "Curator Assigned"
 	},
 	"ListingPage_Tags": {
 		"bounty": "Bounty",

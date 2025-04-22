@@ -29,29 +29,47 @@ interface ListingPageProps {
 	proposalType: EProposalType;
 	origin?: EPostOrigin;
 	initialData: IGenericListingResponse<IPostListing>;
+	statuses: EProposalStatus[];
+	page: number;
 }
 
-function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
+const getStatuses = (proposalType: EProposalType) => {
+	switch (proposalType) {
+		case EProposalType.CHILD_BOUNTY:
+			return [
+				EProposalStatus.Awarded,
+				EProposalStatus.Claimed,
+				EProposalStatus.Cancelled,
+				EProposalStatus.CuratorProposed,
+				EProposalStatus.CuratorUnassigned,
+				EProposalStatus.CuratorAssigned
+			];
+		case EProposalType.DISCUSSION:
+			return [];
+		default:
+			return [
+				EProposalStatus.Cancelled,
+				EProposalStatus.Confirmed,
+				EProposalStatus.ConfirmAborted,
+				EProposalStatus.ConfirmStarted,
+				EProposalStatus.Deciding,
+				EProposalStatus.Executed,
+				EProposalStatus.ExecutionFailed,
+				EProposalStatus.Killed,
+				EProposalStatus.Rejected,
+				EProposalStatus.Submitted,
+				EProposalStatus.TimedOut
+			];
+	}
+};
+
+function ListingPage({ proposalType, origin, initialData, statuses, page }: ListingPageProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
-	const initialPage = parseInt(searchParams?.get('page') || '1', 10);
-	const initialTrackStatus = searchParams?.get('trackStatus') || 'all';
 	const { user } = useUser();
 
-	const STATUSES = [
-		t('ListingPage_Status.Cancelled'),
-		t('ListingPage_Status.Confirmed'),
-		t('ListingPage_Status.ConfirmAborted'),
-		t('ListingPage_Status.ConfirmStarted'),
-		t('ListingPage_Status.Deciding'),
-		t('ListingPage_Status.Executed'),
-		t('ListingPage_Status.ExecutionFailed'),
-		t('ListingPage_Status.Killed'),
-		t('ListingPage_Status.Rejected'),
-		t('ListingPage_Status.Submitted'),
-		t('ListingPage_Status.TimedOut')
-	];
+	const STATUSES = getStatuses(proposalType)?.map((status) => t(`ListingPage_Status.${status}`));
 
 	// TODO: get tags from backend
 	const TAGS = [
@@ -67,17 +85,19 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	const [state, setState] = useState({
 		activeTab: EListingTabState.INTERNAL_PROPOSALS,
-		currentPage: initialPage,
+		currentPage: page,
 		filterActive: false,
-		selectedStatuses: initialTrackStatus === 'all' ? [] : (initialTrackStatus.split(',') as EProposalStatus[]),
+		selectedStatuses: statuses,
 		tagSearchTerm: '',
 		selectedTags: [] as string[]
 	});
 
 	const tabNames =
-		proposalType === EProposalType.DISCUSSION
-			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
-			: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
+		proposalType === EProposalType.CHILD_BOUNTY
+			? {}
+			: proposalType === EProposalType.DISCUSSION
+				? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
+				: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
@@ -87,7 +107,17 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
 			const params = new URLSearchParams(searchParams?.toString() || '');
-			params.set('trackStatus', newStatuses.length > 0 ? newStatuses.join(',') : 'all');
+
+			params.delete('status');
+
+			if (newStatuses.length > 0) {
+				newStatuses.forEach((newStatus: EProposalStatus) => {
+					params.append('status', newStatus);
+				});
+			} else {
+				params.delete('status');
+			}
+
 			router.push(`?${params.toString()}`, { scroll: false });
 
 			return {
@@ -98,10 +128,24 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	};
 
 	const handleTagToggle = (tag: string) => {
-		setState((prev) => ({
-			...prev,
-			selectedTags: prev.selectedTags.includes(tag) ? prev.selectedTags.filter((tags) => tags !== tag) : [...prev.selectedTags, tag]
-		}));
+		setState((prev) => {
+			const newTags = prev.selectedTags.includes(tag) ? prev.selectedTags.filter((tags) => tags !== tag) : [...prev.selectedTags, tag];
+
+			const params = new URLSearchParams(searchParams?.toString() || '');
+
+			params.delete('tags');
+
+			newTags.forEach((newTag) => {
+				params.append('tags', newTag);
+			});
+
+			router.push(`?${params.toString()}`, { scroll: false });
+
+			return {
+				...prev,
+				selectedTags: newTags
+			};
+		});
 	};
 
 	const renderHeader = () => (
