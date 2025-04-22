@@ -13,15 +13,8 @@ import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
-interface IActiveBounty {
+interface IActiveBounties {
 	index: { toJSON: () => number };
-	bounty: {
-		status: {
-			isFunded: boolean;
-			isCuratorProposed: boolean;
-			isActive: boolean;
-		};
-	};
 }
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
@@ -34,7 +27,7 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const activeBounties = await api.getActiveBounties();
 
 	const balances = await Promise.all(
-		activeBounties.map(async (bounty: IActiveBounty) => {
+		activeBounties.map(async (bounty: IActiveBounties) => {
 			const id = bounty?.index?.toJSON();
 			if (!id) return new BN(0);
 
