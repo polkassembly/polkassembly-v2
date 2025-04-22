@@ -266,6 +266,8 @@ export interface ISelectedAccount extends InjectedAccount {
 	accountType: EAccountType;
 	parent?: ISelectedAccount;
 	proxyType?: string;
+	threshold?: number;
+	signatories?: Array<string>;
 }
 
 export interface IUserPreferences {

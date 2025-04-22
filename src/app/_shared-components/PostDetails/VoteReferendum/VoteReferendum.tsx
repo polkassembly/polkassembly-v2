@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, ISelectedAccount } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -46,9 +46,17 @@ function VoteReferendum({ index }: { index: string }) {
 		if (isInvalidAmount) return;
 
 		try {
+			console.log('userPreferences.address', userPreferences.address);
+			const getRegularAddress = (selectedAccount: ISelectedAccount) => {
+				if (selectedAccount.parent) {
+					return getRegularAddress(selectedAccount.parent);
+				}
+				return selectedAccount.address;
+			};
 			setIsLoading(true);
 			await apiService.voteReferendum({
-				address: userPreferences.address,
+				selectedAccount: userPreferences.address,
+				address: getRegularAddress(userPreferences.address),
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -88,6 +96,7 @@ function VoteReferendum({ index }: { index: string }) {
 			<AddressDropdown
 				withBalance
 				onChange={(a) => setUserPreferences({ ...userPreferences, address: a })}
+				multiswitch
 			/>
 			<div>
 				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>

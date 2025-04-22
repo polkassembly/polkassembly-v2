@@ -51,7 +51,6 @@ export class PolkadotApiService {
 	private async executeTx({
 		tx,
 		address,
-		proxyAddress,
 		params = {},
 		errorMessageFallback,
 		onSuccess,
@@ -59,7 +58,8 @@ export class PolkadotApiService {
 		onBroadcast,
 		setStatus,
 		setIsTxFinalized,
-		waitTillFinalizedHash = false
+		waitTillFinalizedHash = false,
+		selectedAccount
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
@@ -72,11 +72,35 @@ export class PolkadotApiService {
 		setStatus?: (pre: string) => void;
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		let isFailed = false;
 		if (!this.api || !tx) return;
 
-		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
+		let mainTx = tx;
+		const getRegularAddress = (selectedAccount?: ISelectedAccount) => {
+			if (!selectedAccount) return false;
+			if (selectedAccount.accountType === EAccountType.MULTISIG) {
+				return true;
+			}
+			if (selectedAccount.parent) {
+				return getRegularAddress(selectedAccount.parent);
+			}
+			return false;
+		};
+		const isMultisig = getRegularAddress(selectedAccount);
+
+		if (isMultisig || selectedAccount?.accountType === EAccountType.MULTISIG) {
+			const signatories = selectedAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
+			const { weight } = await mainTx.paymentInfo(address);
+			mainTx = this.api.tx.multisig.asMulti(selectedAccount?.threshold, signatories, null, mainTx, weight);
+		}
+
+		if (selectedAccount?.accountType === EAccountType.PROXY) {
+			mainTx = this.api.tx.proxy.proxy(selectedAccount.address, null, mainTx);
+		}
+
+		const extrinsic = mainTx;
 
 		const signerOptions = {
 			...params,
@@ -85,7 +109,7 @@ export class PolkadotApiService {
 
 		extrinsic
 			// eslint-disable-next-line sonarjs/cognitive-complexity
-			.signAndSend(proxyAddress || address, signerOptions, async ({ status, events, txHash }) => {
+			.signAndSend(address, signerOptions, async ({ status, events, txHash }) => {
 				if (status.isInvalid) {
 					console.log('Transaction invalid');
 					setStatus?.('Transaction invalid');
@@ -281,9 +305,10 @@ export class PolkadotApiService {
 		conviction,
 		ayeVoteValue,
 		nayVoteValue,
-		abstainVoteValue
+		abstainVoteValue,
+		selectedAccount
 	}: {
-		address: ISelectedAccount;
+		address: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		referendumId: number;
@@ -293,6 +318,7 @@ export class PolkadotApiService {
 		ayeVoteValue?: BN;
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
@@ -306,22 +332,15 @@ export class PolkadotApiService {
 			});
 		}
 
-		if (address.accountType === EAccountType.MULTISIG) {
-			voteTx = this.api.tx.multisig.asMulti(address.address, null, voteTx);
-		}
-
-		if (address.accountType === EAccountType.PROXY) {
-			voteTx = this.api.tx.proxy.proxy(address.address, null, voteTx);
-		}
-
 		if (voteTx) {
 			await this.executeTx({
 				tx: voteTx,
-				address: address.parent?.address || address.address,
+				address,
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
-				onFailed
+				onFailed,
+				selectedAccount
 			});
 		}
 	}
