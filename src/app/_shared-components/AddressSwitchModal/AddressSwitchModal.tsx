@@ -39,7 +39,14 @@ function AddressSwitchModal({
 		proxied: Array<IProxy>;
 	}>({ multisig: [], proxy: [], proxied: [] });
 
-	const createSelectedAccount = (address: string, name: string, accountType: EAccountType, parent?: ISelectedAccount, proxyType?: string): ISelectedAccount => {
+	const createSelectedAccount = (
+		address: string,
+		name: string,
+		accountType: EAccountType,
+		parent?: ISelectedAccount,
+		proxyType?: string,
+		multisigData?: { threshold?: number; signatories?: string[] }
+	): ISelectedAccount => {
 		let displayName = name || '';
 		if (accountType !== EAccountType.REGULAR) {
 			displayName = '';
@@ -52,7 +59,11 @@ function AddressSwitchModal({
 			accountType,
 			wallet: userPreferences?.wallet,
 			parent,
-			proxyType
+			proxyType,
+			...(multisigData && {
+				threshold: multisigData.threshold,
+				signatories: multisigData.signatories
+			})
 		};
 	};
 
@@ -182,7 +193,11 @@ function AddressSwitchModal({
 				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
 					{multisigProxyData.multisig.map((multisig) => {
 						if (!multisig?.address) return null;
-						const multisigAccount = createSelectedAccount(multisig.address, 'Multisig', EAccountType.MULTISIG);
+						const parentAccount: ISelectedAccount | undefined = userPreferences?.address?.accountType === EAccountType.REGULAR ? userPreferences.address : undefined;
+						const multisigAccount = createSelectedAccount(multisig.address, 'Multisig', EAccountType.MULTISIG, parentAccount, undefined, {
+							threshold: multisig.threshold,
+							signatories: multisig.signatories
+						});
 						const isSelected = multisig.address === userPreferences?.address?.address;
 						const hasProxies = multisig.pureProxy && Array.isArray(multisig.pureProxy) && multisig.pureProxy.length > 0;
 						const isExpanded = expandedMultisigs[multisig.address];
