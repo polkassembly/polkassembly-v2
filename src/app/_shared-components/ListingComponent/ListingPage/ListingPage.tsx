@@ -94,7 +94,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 
 	const tabNames =
 		proposalType === EProposalType.CHILD_BOUNTY
-			? []
+			? {}
 			: proposalType === EProposalType.DISCUSSION
 				? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
 				: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
