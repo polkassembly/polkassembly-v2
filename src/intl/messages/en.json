@@ -464,7 +464,13 @@
 		"Submitted": "Submitted",
 		"TimedOut": "Timed Out",
 		"Pending": "Pending",
-		"Unknown": "Unknown"
+		"Unknown": "Unknown",
+		"Claimed": "Claimed",
+		"Added": "Added",
+		"Awarded": "Awarded",
+		"CuratorProposed": "Curator Proposed",
+		"CuratorUnassigned": "Curator Unassigned",
+		"CuratorAssigned": "Curator Assigned"
 	},
 	"ListingPage_Tags": {
 		"bounty": "Bounty",

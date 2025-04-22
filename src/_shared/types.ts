@@ -941,7 +941,15 @@ export enum EBountyStatus {
 	REJECTED = 'Rejected'
 }
 
-// generic types are for insignificant tokens if we decide to add later
+export enum EChildBountyStatus {
+	ALL = 'All',
+	AWARDED = 'Awarded',
+	CLAIMED = 'Claimed',
+	CURATOR_PROPOSED = 'CuratorProposed',
+	CURATOR_UNASSIGNED = 'CuratorUnassigned',
+	CURATOR_ASSIGNED = 'CuratorAssigned',
+	CANCELLED = 'Cancelled'
+}
 export interface ITreasuryStats {
 	network: ENetwork;
 	createdAt: Date;
