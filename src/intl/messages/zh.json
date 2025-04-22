@@ -318,6 +318,7 @@
 		"techCommProposals": "技术委员会提案",
 		"main": "主要",
 		"bounty": "赏金",
+		"childBounties": "链上子赏金",
 		"bountyDashboard": "赏金仪表板",
 		"batchVoting": "批量投票",
 		"tracks": "轨道",

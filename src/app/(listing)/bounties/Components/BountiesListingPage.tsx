@@ -74,7 +74,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 
 				{statusValues.map((statusValue) => (
 					<TabsContent
-						key={statusValue}
+						key={`tab-content-${statusValue}`}
 						value={statusValue}
 					>
 						{initialData?.totalCount ? (
