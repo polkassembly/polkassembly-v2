@@ -2,25 +2,23 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EPostOrigin, EProposalStatus, EProposalType } from '@/_shared/types';
+import { EProposalStatus, EProposalType } from '@/_shared/types';
 import ListingPage from '@ui/ListingComponent/ListingPage/ListingPage';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { z } from 'zod';
 
-const origin = EPostOrigin.SMALL_TIPPER;
-
 const zodQuerySchema = z.object({
 	page: z.coerce.number().min(1).optional().default(1),
 	status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional()
 });
 
-async function SmallTipperPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
+async function ChildBountiesPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const { page, status: statuses } = zodQuerySchema.parse(searchParamsValue);
 
-	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.REFERENDUM_V2, page, statuses, origins: [origin] });
+	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.CHILD_BOUNTY, page, statuses });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -29,8 +27,7 @@ async function SmallTipperPage({ searchParams }: { searchParams: Promise<{ page?
 	return (
 		<div>
 			<ListingPage
-				proposalType={EProposalType.REFERENDUM_V2}
-				origin={origin}
+				proposalType={EProposalType.CHILD_BOUNTY}
 				initialData={data || { items: [], totalCount: 0 }}
 				statuses={statuses || []}
 				page={page}
@@ -39,4 +36,4 @@ async function SmallTipperPage({ searchParams }: { searchParams: Promise<{ page?
 	);
 }
 
-export default SmallTipperPage;
+export default ChildBountiesPage;

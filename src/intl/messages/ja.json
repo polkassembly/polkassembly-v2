@@ -260,6 +260,8 @@
 		"BigTipperDescription": "財務から一度に1000 DOTまで支出できる起点。",
 		"Bounty": "オンチェーン報奨金",
 		"BountyDescription": "ネットワークに影響を与えるアイデアについて洞察を共有し、フィードバックを提供し、協力する場。",
+		"ChildBounty": "オンチェーン子報奨金",
+		"ChildBountyDescription": "ここはオンチェーン子報奨金を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
 		"Discussion": "議論",
 		"DiscussionDescription": "ネットワークに影響を与えるアイデアについて洞察を共有し、フィードバックを提供し、協力する場。",
 		"FellowshipAdmin": "フェローシップ管理者",

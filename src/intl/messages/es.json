@@ -260,6 +260,8 @@
 		"BigTipperDescription": "Origen capaz de gastar hasta 1000 DOT de la tesorería de una vez.",
 		"Bounty": "Recompensa en Cadena",
 		"BountyDescription": "Un espacio para compartir ideas, proporcionar retroalimentación y colaborar en ideas que impactan la red.",
+		"ChildBounty": "Recompensa en Cadena",
+		"ChildBountyDescription": "Este es el lugar para discutir recompensas en cadena. Las publicaciones en cadena se generan automáticamente tan pronto como se crean en la cadena. Solo el proponente puede editarlas.",
 		"Discussion": "Discusiones",
 		"DiscussionDescription": "Un espacio para compartir ideas, proporcionar retroalimentación y colaborar en ideas que impactan la red.",
 		"FellowshipAdmin": "Administrador de Fellowship",
