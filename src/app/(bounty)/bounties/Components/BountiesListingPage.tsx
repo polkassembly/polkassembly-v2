@@ -4,44 +4,22 @@
 
 'use client';
 
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EBountyStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import ProposalIcon from '@assets/icons/proposal.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
+import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import BountyTable from './BountyTable';
 import styles from './Bounties.module.scss';
 
-enum EBountyStatus {
-	ALL = 'all',
-	ACTIVE = 'Active',
-	PROPOSED = 'Proposed',
-	CLAIMED = 'Claimed',
-	CANCELLED = 'Cancelled',
-	REJECTED = 'Rejected'
-}
-
-function BountiesListingPage({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
-	const searchParams = useSearchParams();
+function BountiesListingPage({ initialData, status, page }: { initialData: IGenericListingResponse<IPostListing>; status: EBountyStatus; page: number }) {
 	const router = useRouter();
-	const pageParam = searchParams.get('page')?.split('?')[0];
-	const page = parseInt(pageParam || '1', DEFAULT_LISTING_LIMIT);
-	const status = searchParams.get('status') || 'all';
 	const t = useTranslations();
-
-	const STATUS_DISPLAY_NAMES: Record<EBountyStatus, string> = {
-		[EBountyStatus.ALL]: t('Bounties.all'),
-		[EBountyStatus.ACTIVE]: t('Bounties.active'),
-		[EBountyStatus.PROPOSED]: t('Bounties.proposed'),
-		[EBountyStatus.CLAIMED]: t('Bounties.claimed'),
-		[EBountyStatus.CANCELLED]: t('Bounties.cancelled'),
-		[EBountyStatus.REJECTED]: t('Bounties.rejected')
-	};
-
 	const statusValues = Object.values(EBountyStatus);
 
 	const handleTabChange = (value: string) => {
@@ -50,8 +28,11 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 		}
 		const params = new URLSearchParams();
 		params.set('page', '1');
-		params.set('status', value);
-		router.push(`/bounties-listing?${params.toString()}`);
+
+		if (value !== EBountyStatus.ALL) {
+			params.set('status', value);
+		}
+		router.push(`/bounties?${params.toString()}`);
 	};
 
 	return (
@@ -61,7 +42,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 				<div className='flex gap-2'>
 					<button
 						type='button'
-						className='flex w-full cursor-pointer items-center justify-center gap-[6px] rounded-[14px] border-none bg-gradient-to-b from-create_bounty_btn via-navbar_border to-navbar_border px-[22px] py-[11px] md:w-auto md:justify-normal'
+						className={styles.create_bounty_btn}
 					>
 						<Image
 							src={ProposalIcon}
@@ -86,7 +67,7 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 							className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
 							value={statusValue}
 						>
-							{STATUS_DISPLAY_NAMES[statusValue as EBountyStatus]}
+							{t(`Bounties.${(statusValue as EBountyStatus)?.toLowerCase()}`)}
 						</TabsTrigger>
 					))}
 				</TabsList>
@@ -96,7 +77,19 @@ function BountiesListingPage({ initialData }: { initialData: IGenericListingResp
 						key={statusValue}
 						value={statusValue}
 					>
-						{initialData.totalCount > 1 ? <BountyTable filteredItems={initialData?.items} /> : <p className={styles.no_data}>{t('CreateProposalDropdownButton.noData')}</p>}
+						{initialData?.totalCount ? (
+							<BountyTable filteredItems={initialData?.items || []} />
+						) : (
+							<p className={styles.no_data}>
+								<Image
+									src={NoActivity}
+									alt='no data'
+									width={300}
+									height={300}
+								/>
+								{t('CreateProposalDropdownButton.noData')}
+							</p>
+						)}
 					</TabsContent>
 				))}
 

@@ -2,33 +2,34 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
-import React, { Suspense } from 'react';
-import { headers } from 'next/headers';
-import PollForProposal from '@ui/PollForProposal';
+import { Metadata } from 'next';
 
-async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
-	const { created } = await searchParams;
+	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.BOUNTY, indexOrHash: index });
 
-	const headersList = await headers();
-	const referer = headersList.get('referer');
+	// Default description and title
+	let { description, title } = OPENGRAPH_METADATA;
 
-	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
-
-	// If created=true and no data, we'll poll on the client side
-	if (created && created === 'true' && (!data || error)) {
-		return (
-			<Suspense fallback={<div className='flex h-screen items-center justify-center'>Loading...</div>}>
-				<PollForProposal
-					index={index}
-					referer={referer}
-				/>
-			</Suspense>
-		);
+	// Use post title in description if available
+	if (data) {
+		title = `Polkassembly - Child Bounty #${index}`;
+		description = `Child Bounty #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
 	}
+
+	return {
+		title,
+		description
+	};
+}
+
+async function ChildBounty({ params }: { params: Promise<{ index: string }> }) {
+	const { index } = await params;
+	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
 
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
@@ -42,4 +43,4 @@ async function Referenda({ params, searchParams }: { params: Promise<{ index: st
 	);
 }
 
-export default Referenda;
+export default ChildBounty;
