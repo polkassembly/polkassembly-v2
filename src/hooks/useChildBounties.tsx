@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { EProposalStatus, IGenericListingResponse, IPostListing, EPostOrigin } from '@/_shared/types';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 export function useChildBounties() {
 	const [expandedRows, setExpandedRows] = useState<number[]>([]);
@@ -17,7 +18,7 @@ export function useChildBounties() {
 			setLoading((prev) => ({ ...prev, [index]: true }));
 			setErrors((prev) => ({ ...prev, [index]: '' }));
 
-			const response = await NextApiClientService.fetchChildBountiesApi({ bountyIndex: index });
+			const response = await NextApiClientService.fetchChildBountiesApi({ bountyIndex: index.toString(), limit: DEFAULT_LISTING_LIMIT.toString(), page: '1' });
 
 			if (response.error) {
 				throw new Error(response.error.message || 'Failed to fetch child bounties');

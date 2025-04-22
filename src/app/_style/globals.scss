@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+	font-family: 'Pixeboy';
+	src: url('./fonts/Pixeboy.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
 :root {
 	--font_default: 'Poppins';
 	--radius: 8px;
