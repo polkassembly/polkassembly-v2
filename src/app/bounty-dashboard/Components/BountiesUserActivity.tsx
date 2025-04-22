@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import BountyPoster from '@assets/bounties/bounty-poster.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
-import { ENetwork, IBountyUserActivity } from '@/_shared/types';
+import { IBountyUserActivity } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
@@ -18,7 +18,7 @@ import styles from './Bounty.module.scss';
 
 function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: IBountyUserActivity[]; tokenPrice: number }) {
 	const network = getCurrentNetwork();
-	const unit = NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
+	const unit = NETWORKS_DETAILS[network].tokenSymbol;
 	const [api, setApi] = useState<CarouselApi>();
 	const t = useTranslations('Bounty');
 

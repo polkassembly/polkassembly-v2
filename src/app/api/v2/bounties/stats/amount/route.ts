@@ -26,11 +26,11 @@ interface IActiveBounty {
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
-	if (!network || !Object.values(ENetwork).includes(network as ENetwork)) {
+	if (!network || !Object.values(ENetwork).includes(network)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
 	}
 
-	const api = await PolkadotApiService.Init(network as ENetwork);
+	const api = await PolkadotApiService.Init(network);
 	const activeBounties = await api.getActiveBounties();
 
 	const balances = await Promise.all(
@@ -38,7 +38,7 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 			const id = bounty?.index?.toJSON();
 			if (!id) return new BN(0);
 
-			const bountyData = await OnChainDbService.GetBountyData(network as ENetwork, id.toString());
+			const bountyData = await OnChainDbService.GetBountyData(network, id.toString());
 			const address = bountyData?.address;
 
 			if (!address) {

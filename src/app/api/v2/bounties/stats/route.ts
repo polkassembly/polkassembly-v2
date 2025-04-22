@@ -13,11 +13,11 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
-	if (!network || !Object.values(ENetwork).includes(network as ENetwork)) {
+	if (!network || !Object.values(ENetwork).includes(network)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
 	}
 
-	const stats = await OnChainDbService.getBountyStats(network as ENetwork);
+	const stats = await OnChainDbService.getBountyStats(network);
 
 	return NextResponse.json({
 		...stats,

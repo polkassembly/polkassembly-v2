@@ -15,7 +15,7 @@ import BountyCreateMbWhiteIcon from '@assets/bounties/create-mb-white.svg';
 import BountyBarcodeMbWhiteIcon from '@assets/bounties/barcode-mb-white.svg';
 import DashedLineIcon from '@assets/bounties/dashed-line.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
-import { ENetwork, IBountyStats } from '@/_shared/types';
+import { IBountyStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -96,19 +96,13 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						/>
 						<StatItem
 							label={t('totalRewarded')}
-							value={
-								bountiesStats.totalRewarded
-									? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
-									: undefined
-							}
+							value={bountiesStats.totalRewarded ? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : undefined}
 							isLoading={isLoading}
 						/>
 						<StatItem
 							label={t('totalBountyPool')}
 							value={
-								bountiesStats.totalBountyPool
-									? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
-									: undefined
+								bountiesStats.totalBountyPool ? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : undefined
 							}
 							isLoading={isLoading}
 						/>
@@ -184,19 +178,13 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 							/>
 							<StatItem
 								label={t('totalRewarded')}
-								value={
-									bountiesStats.totalRewarded
-										? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
-										: undefined
-								}
+								value={bountiesStats.totalRewarded ? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : undefined}
 								isLoading={isLoading}
 							/>
 							<StatItem
 								label={t('totalBountyPool')}
 								value={
-									bountiesStats.totalBountyPool
-										? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
-										: undefined
+									bountiesStats.totalBountyPool ? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : undefined
 								}
 								isLoading={isLoading}
 							/>
