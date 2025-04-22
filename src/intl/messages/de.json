@@ -708,7 +708,8 @@
 		"activeBounties": "Aktive Prämien",
 		"claimants": "Beanspruchte",
 		"totalRewarded": "Gesamtbelohnung",
-		"totalBountyPool": "Gesamtprämie-Pool"
+		"totalBountyPool": "Gesamtprämie-Pool",
+		"comingSoon": "Coming Soon"
 	},
 	"ChildBounties": {
 		"childBounties": "Kinderprämien",

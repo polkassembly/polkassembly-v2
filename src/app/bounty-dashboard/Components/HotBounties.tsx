@@ -48,7 +48,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 					{t('hotBounties')} <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
 				</h3>
 				<Link
-					href='/bounties-listing'
+					href='/bounties'
 					className={`${spaceGroteskFont.className} text-2xl font-bold text-navbar_border`}
 				>
 					{t('viewAll')}

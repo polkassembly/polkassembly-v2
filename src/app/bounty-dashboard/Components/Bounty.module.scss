@@ -141,3 +141,7 @@
 .bounty_stats_label {
 	@apply font-pixelify text-[18px] font-semibold text-bounty_pool_text;
 }
+
+.coming_soon_text {
+	@apply whitespace-nowrap text-center text-xs font-bold text-btn_secondary_text md:text-sm lg:text-lg;
+}

@@ -734,7 +734,8 @@
 		"activeBounties": "Active Bounties",
 		"claimants": "Claimants",
 		"totalRewarded": "Total Rewarded",
-		"totalBountyPool": "Total Bounty Pool"
+		"totalBountyPool": "Total Bounty Pool",
+		"comingSoon": "Coming Soon"
 	},
 	"ChildBounties": {
 		"childBounties": "Child Bounties",

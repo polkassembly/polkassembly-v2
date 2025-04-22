@@ -689,7 +689,8 @@
 		"activeBounties": "アクティブな報奨金",
 		"claimants": "受益者",
 		"totalRewarded": "総報奨金",
-		"totalBountyPool": "総報奨金プール"
+		"totalBountyPool": "総報奨金プール",
+		"comingSoon": "Coming Soon"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",

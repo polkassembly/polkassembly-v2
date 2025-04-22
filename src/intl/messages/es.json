@@ -689,7 +689,8 @@
 		"activeBounties": "Prémios Activos",
 		"claimants": "Reclamantes",
 		"totalRewarded": "Total Recompensado",
-		"totalBountyPool": "Total Piscina de Prémios"
+		"totalBountyPool": "Total Piscina de Prémios",
+		"comingSoon": "Próximamente"
 	},
 	"BatchVote": {
 		"batchVoting": "Votación por lotes",

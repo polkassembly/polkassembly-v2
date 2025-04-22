@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import BountyPoster from '@assets/bounties/bounty-poster.svg';
 import { spaceGroteskFont } from '@/app/_style/fonts';
-import { ArrowUpRight } from 'lucide-react';
 import { ENetwork, IBountyUserActivity } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
@@ -54,13 +53,7 @@ function BountiesUserActivity({ userActivities, tokenPrice }: { userActivities: 
 							background: 'linear-gradient(266deg, #301DA7 15.23%, #57F 75.34%)'
 						}}
 					>
-						<div className='flex items-center gap-[2px]'>
-							{t('viewAll')}
-							<ArrowUpRight
-								className='text-btn_primary_text'
-								size={20}
-							/>
-						</div>
+						<div className={styles.coming_soon_text}>{t('comingSoon')}</div>
 					</div>
 				</div>
 

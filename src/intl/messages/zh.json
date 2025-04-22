@@ -708,7 +708,8 @@
 		"activeBounties": "活跃赏金",
 		"claimants": "认领者",
 		"totalRewarded": "总奖励",
-		"totalBountyPool": "总赏金池"
+		"totalBountyPool": "总赏金池",
+		"comingSoon": "Coming Soon"
 	},
 	"ChildBounties": {
 		"childBounties": "子赏金",
