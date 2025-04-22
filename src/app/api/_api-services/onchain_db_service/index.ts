@@ -202,7 +202,7 @@ export class OnChainDbService {
 		return {
 			activeBounties: Number(activeBounties),
 			availableBountyPool: totalBountyPool,
-			peopleEarned: childBountiesResponse.data.items.length,
+			peopleEarned: childBountiesResponse.data.totalCount,
 			totalBountyPool,
 			totalRewarded
 		};

@@ -18,5 +18,11 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	}
 
 	const stats = await OnChainDbService.getBountyStats(network as ENetwork);
-	return NextResponse.json(stats);
+
+	return NextResponse.json({
+		...stats,
+		availableBountyPool: stats.availableBountyPool.toString(),
+		totalBountyPool: stats.totalBountyPool.toString(),
+		totalRewarded: stats.totalRewarded.toString()
+	});
 });
