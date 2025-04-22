@@ -260,6 +260,8 @@
 		"BigTipperDescription": "可以一次性从国库支出最多1000 DOT的来源。",
 		"Bounty": "链上赏金",
 		"BountyDescription": "分享见解、提供反馈并就影响网络的想法进行协作的空间。",
+		"ChildBounty": "链上子赏金",
+		"ChildBountyDescription": "这是讨论链上子赏金的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
 		"Discussion": "讨论",
 		"DiscussionDescription": "分享见解、提供反馈并就影响网络的想法进行协作的空间。",
 		"FellowshipAdmin": "研究员管理员",
