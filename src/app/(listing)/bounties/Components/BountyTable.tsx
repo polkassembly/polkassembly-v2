@@ -14,7 +14,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useRouter } from 'nextjs-toploader/app';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styles from './Bounties.module.scss';
 import ChildBountiesRow from './ChildBountiesRow';
 
@@ -44,10 +44,9 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 			</TableHeader>
 			<TableBody>
 				{filteredItems?.map((item) => (
-					<>
+					<React.Fragment key={item?.index}>
 						<TableRow
 							className={styles.tableBodyRow}
-							key={item?.index}
 							onClick={() => router.push(`/bounty/${item.index}`)}
 						>
 							<TableCell className='p-6'>
@@ -104,7 +103,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? item.tags.join(', ') : 'N/A'}</TableCell>
 						</TableRow>
 						{expandChildBounties.isExpanded && expandChildBounties.parentIndex === item.index && <ChildBountiesRow parentIndex={expandChildBounties.parentIndex} />}
-					</>
+					</React.Fragment>
 				))}
 			</TableBody>
 		</Table>
