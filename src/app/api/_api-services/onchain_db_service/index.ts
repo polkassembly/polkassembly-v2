@@ -238,8 +238,8 @@ export class OnChainDbService {
 		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index, page, limit });
 	}
 
-	static async GetBountyAmount(network: ENetwork, bountyId: string) {
-		return SubsquareOnChainService.GetBountyAmount(network, bountyId);
+	static async GetBountyData(network: ENetwork, bountyId: string) {
+		return SubsquareOnChainService.GetBountyData(network, bountyId);
 	}
 
 	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {

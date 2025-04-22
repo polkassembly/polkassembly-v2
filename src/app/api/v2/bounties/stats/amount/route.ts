@@ -31,14 +31,14 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	}
 
 	const api = await PolkadotApiService.Init(network as ENetwork);
-	const activePjsBounties = await api.getBountyAmount();
+	const activeBounties = await api.getActiveBounties();
 
 	const balances = await Promise.all(
-		activePjsBounties.map(async (bounty: Bounty) => {
+		activeBounties.map(async (bounty: Bounty) => {
 			const id = bounty?.index?.toJSON();
 			if (!id) return new BN(0);
 
-			const bountyData = await OnChainDbService.GetBountyAmount(network as ENetwork, id.toString());
+			const bountyData = await OnChainDbService.GetBountyData(network as ENetwork, id.toString());
 			const address = bountyData?.address;
 
 			if (!address) {

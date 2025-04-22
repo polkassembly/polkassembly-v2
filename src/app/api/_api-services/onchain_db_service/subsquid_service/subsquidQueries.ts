@@ -72,9 +72,10 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status,
+				curator,
 				hash,
-				reward,
 				preimage {
 					proposedCall {
 						args
@@ -102,8 +103,9 @@ export class SubsquidQueries {
 				origin
 				proposer
 				status,
+				reward
 				hash,
-				reward,
+				curator
 				preimage {
 					proposedCall {
 						args
@@ -185,9 +187,10 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					reward
+					curator
 					status,
 					hash,
-					reward,
 					preimage {
 							proposedCall {
 									args
@@ -222,9 +225,10 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status
 				hash,
-				reward,
+				curator
 				preimage {
 					proposedCall {
 						args
@@ -251,9 +255,10 @@ export class SubsquidQueries {
 				index
 				origin
 				proposer
+				reward
 				status
+				curator
 				hash,
-				reward,
 				preimage {
 					proposedCall {
 						args

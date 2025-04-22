@@ -406,13 +406,12 @@ export class PolkadotApiService {
 			});
 	}
 
-	async getBountyAmount() {
-		let activePjsBounties = await this.api?.derive.bounties?.bounties();
-		activePjsBounties = activePjsBounties.filter((item: any) => {
+	async getActiveBounties() {
+		const activeBounties = await this.api?.derive.bounties?.bounties();
+		return activeBounties?.filter((item: any) => {
 			const { isFunded, isCuratorProposed, isActive } = item?.bounty?.status || {};
 			return isFunded || isCuratorProposed || isActive;
 		});
-		return activePjsBounties;
 	}
 
 	async getAccountData(address: string) {
