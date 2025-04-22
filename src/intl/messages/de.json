@@ -649,7 +649,11 @@
 		"actions": "Aktionen",
 		"leaderboard": "Bestenliste",
 		"findYourRank": "Finde deinen Rang in der Ökosystem",
-		"searchUsername": "Benutzername suchen"
+		"searchUsername": "Benutzername suchen",
+		"learnMore": "Mehr erfahren",
+		"theMorePointsYouEarnTheHigherYourRankInTheLeaderboard": "Je mehr Punkte du erhältst, desto höher ist dein Rang in der Bestenliste!",
+		"medal": "Medaille",
+		"scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity": "Ein Punktesystem basierend auf der Zusammenfassung von Offline- und Onchain-Aktivität und Profilaktivität."
 	},
 	"SetIdentity": {
 		"displayName": "Anzeigename",

@@ -649,7 +649,11 @@
 		"actions": "アクション",
 		"leaderboard": "リーダーボード",
 		"findYourRank": "生態系でのランクを見つける",
-		"searchUsername": "ユーザー名を検索"
+		"searchUsername": "ユーザー名を検索",
+		"learnMore": "もっと学ぶ",
+		"theMorePointsYouEarnTheHigherYourRankInTheLeaderboard": "もっとポイントを獲得するほど、リーダーボードでのランクが高くなります！",
+		"medal": "メダル",
+		"scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity": "オフチェーン、オンチェーンのアクティビティとプロフィールアクティビティの集計に基づくスコアシステム。"
 	},
 	"SetIdentity": {
 		"displayName": "表示名",

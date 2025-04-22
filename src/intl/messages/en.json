@@ -669,7 +669,11 @@
 		"actions": "Actions",
 		"leaderboard": "Leaderboard",
 		"findYourRank": "Find your rank in the ecosystem",
-		"searchUsername": "Enter username to search"
+		"searchUsername": "Enter username to search",
+		"learnMore": "Learn more",
+		"theMorePointsYouEarnTheHigherYourRankInTheLeaderboard": "The more points you earn, the higher your rank in the leaderboard!",
+		"medal": "Medal",
+		"scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity": "A score system based on the aggregate of off-chain, on-chain activity and profile activity."
 	},
 	"SetIdentity": {
 		"displayName": "Display Name",

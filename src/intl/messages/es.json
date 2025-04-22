@@ -649,7 +649,11 @@
 		"actions": "Acciones",
 		"leaderboard": "Tabla de Clasificación",
 		"findYourRank": "Encuentra tu rango en el ecosistema",
-		"searchUsername": "Buscar nombre de usuario"
+		"searchUsername": "Buscar nombre de usuario",
+		"learnMore": "Aprender más",
+		"theMorePointsYouEarnTheHigherYourRankInTheLeaderboard": "Cuantos más puntos ganes, más alto será tu rango en la tabla de clasificación!",
+		"medal": "Medalla",
+		"scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity": "Un sistema de puntuación basado en la agregación de actividades fuera de la cadena y en la cadena, así como en la actividad del perfil."
 	},
 	"SetIdentity": {
 		"displayName": "Nombre para mostrar",

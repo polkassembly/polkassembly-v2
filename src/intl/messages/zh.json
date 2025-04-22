@@ -649,7 +649,11 @@
 		"actions": "操作",
 		"leaderboard": "排行榜",
 		"findYourRank": "在生态系统中找到你的排名",
-		"searchUsername": "搜索用户名"
+		"searchUsername": "搜索用户名",
+		"learnMore": "了解更多",
+		"theMorePointsYouEarnTheHigherYourRankInTheLeaderboard": "您获得的积分越多，您的排名就越高！",
+		"medal": "奖牌",
+		"scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity": "一个基于离线、链上活动和用户活动总和的评分系统。"
 	},
 	"SetIdentity": {
 		"displayName": "显示名称",
