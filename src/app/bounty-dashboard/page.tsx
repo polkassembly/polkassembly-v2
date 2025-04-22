@@ -6,12 +6,11 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { EProposalStatus, EProposalType } from '@/_shared/types';
 import BountyDashboard from './Components';
 
-async function page() {
+async function BountyDashboardPage() {
 	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
-
 	const to = new Date();
 	const from = new Date();
-	from.setFullYear(to.getFullYear() - 1);
+	from.setHours(to.getHours() - 2);
 	const { data: treasuryStats } = await NextApiClientService.getTreasuryStats({ from, to });
 	const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
 
@@ -35,4 +34,4 @@ async function page() {
 	);
 }
 
-export default page;
+export default BountyDashboardPage;
