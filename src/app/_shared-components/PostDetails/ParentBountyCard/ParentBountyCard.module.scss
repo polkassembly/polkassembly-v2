@@ -1,0 +1,7 @@
+.parentBountyCardWrapper {
+	@apply flex flex-col rounded-xl bg-bg_modal p-6 shadow-lg;
+}
+
+.parentBountyCardItem {
+	@apply flex items-center justify-between rounded-xl border border-border_grey p-4 text-sm shadow-sm;
+}

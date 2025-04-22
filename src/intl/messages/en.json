@@ -431,7 +431,14 @@
 			"description": "Description",
 			"section": "Section",
 			"name": "Name",
-			"value": "Value"
+			"value": "Value",
+			"deposit": "Deposit",
+			"curatorDeposit": "Curator Deposit",
+			"reward": "Reward",
+			"fee": "Fee",
+			"parentBountyIndex": "Parent Bounty Index",
+			"payee": "Payee",
+			"curator": "Curator"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",
@@ -718,6 +725,11 @@
 		"verificationFailed": "Verification failed",
 		"goToHome": "Go to home"
 	},
+	"ChildBounties": {
+		"childBounties": "Child Bounties",
+		"parentBounty": "Parent Bounty",
+		"viewAllChildBounties": "View All"
+	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
 		"please": "Please",
@@ -744,22 +756,23 @@
 	"CreateProposal": {
 		"create": "Create",
 		"quickActions": "Quick Actions",
+		"trendingNow": "Trending Now",
 		"submitProposal": "Submit Proposal",
-		"createDiscussion": "Discussion Post",
-		"createPreimage": "New Preimage",
+		"createDiscussion": "Create a Discussion Post",
+		"createPreimage": "Create Preimage",
 		"existingPreimage": "I already have a Preimage",
 		"spend": "Spend",
 		"from": "from",
 		"Treasury": "Treasury",
-		"usdxProposal": "Spend Assets from AssetHub (USDx, DOT, etc.)",
+		"usdxProposal": "Create a USDX  Proposal",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
 		"createBounty": "Create Bounty",
 		"createDiscussionDescription": "Start a conversation and gather feedback.",
-		"createPreimageDescription": "Submit a proposal with a new preimage hash.",
-		"existingPreimageDescription": "Use an existing preimage hash for submission.",
-		"createTreasuryProposalDescription": "Propose treasury spending in",
-		"usdxProposalDescription": "Request funding from AssetHub (USDx, DOT, etc.).",
+		"createPreimageDescription": "Create a proposal from scratch.",
+		"existingPreimageDescription": "Select from existing preimages to create proposal.",
+		"createTreasuryProposalDescription": "Create a treasury proposal to allocate funds in ",
+		"usdxProposalDescription": "Propose a spend from AssetHub, schedule payments, and include multiple beneficiaries.",
 		"cancelReferendumDescription": "Propose to cancel an active referendum.",
 		"killReferendumDescription": "Terminate a referendum before it passes.",
 		"createBountyDescription": "Propose a bounty for a specific task or project.",
@@ -767,7 +780,12 @@
 		"preimageHash": "Preimage Hash",
 		"preimageLength": "Length",
 		"preimageHashDescription": "Enter Hash",
-		"viewPreimage": "View Preimage"
+		"viewPreimage": "View Preimage",
+		"stepDescriptionKillReferendum": "This will create a preimage and a proposal to spend assets from Assethub, the spend will need to be claimed.",
+		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
+		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
+		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -970,5 +988,40 @@
 			"invalidData": "Invalid data",
 			"fetchError": "Error fetching data"
 		}
+	},
+	"Search": {
+		"placeholder": "Type here to search for something",
+		"superSearch": "Super Search",
+		"search": "Search",
+		"resultsFor": "Results for",
+		"referenda": "Referenda",
+		"users": "Users",
+		"discussions": "Discussions",
+		"today": "Today",
+		"last_7_days": "Last 7 days",
+		"last_30_days": "Last 30 days",
+		"last_3_months": "Last 3 months",
+		"all_time": "All time",
+		"date": "Date",
+		"networks": "Networks",
+		"tracks": "Tracks",
+		"topics": "Topics",
+		"tags": "Tags",
+		"in": "in",
+		"noBio": "No bio",
+		"pleaseEnterAtLeast3Characters": "Please enter at least 3 characters to proceed.",
+		"or": "OR",
+		"see": "See",
+		"poweredBy": "Powered by",
+		"welcomeToTheAllNewSuperchargedSearch": "Welcome to the all new & supercharged search!",
+		"latestActivity": "Latest Activity",
+		"onPolkassembly": "on Polkassembly.",
+		"noSearchResultsFound": "No search results found. You may want to try using different keywords.",
+		"useSuperSearch": "Use Super Search",
+		"didntFindWhatYouWereLookingFor": "Didn't find what you were looking for?",
+		"useSuperSearchButton": "Use Super Search",
+		"poweredByPolkassembly": "Powered by Polkassembly.",
+		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
+		"clearFilters": "Clear Filters"
 	}
 }

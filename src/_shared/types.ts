@@ -498,6 +498,11 @@ export interface IStatusHistoryItem {
 
 export interface IOnChainPostInfo {
 	reward?: string;
+	fee?: string;
+	deposit?: string;
+	curatorDeposit?: string;
+	parentBountyIndex?: number;
+	payee?: string;
 	proposer: string;
 	status: EProposalStatus;
 	createdAt?: Date;
@@ -1149,4 +1154,16 @@ export interface ILinkedAddress {
 		proxy: Array<IProxy>;
 		proxied: Array<IProxy>;
 	};
+}
+
+export enum ESearchType {
+	POSTS = 'posts',
+	DISCUSSIONS = 'discussions',
+	USERS = 'users'
+}
+
+export enum ESearchDiscussionType {
+	DISCUSSIONS = 'discussions',
+	GRANTS = 'grants',
+	REFERENDUMS_V2 = 'referendums_v2'
 }

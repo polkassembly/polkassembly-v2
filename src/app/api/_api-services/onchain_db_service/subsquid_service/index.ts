@@ -114,7 +114,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			createdAt: proposal.createdAt,
-			curator: proposal.curator || '',
+			...(proposal.curator && { curator: proposal.curator }),
+			...(proposalType === EProposalType.CHILD_BOUNTY ? { parentBountyIndex: proposal.parentBountyIndex } : {}),
+			...(proposalType === EProposalType.CHILD_BOUNTY ? { payee: proposal.payee } : {}),
 			proposer: proposal.proposer || '',
 			status: proposal.status,
 			index: proposal.index,
@@ -122,6 +124,10 @@ export class SubsquidService extends SubsquidUtils {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
+			...(proposal.reward && { reward: proposal.reward }),
+			...(proposal.fee && { fee: proposal.fee }),
+			...(proposal.deposit && { deposit: proposal.deposit }),
+			...(proposal.curatorDeposit && { curatorDeposit: proposal.curatorDeposit }),
 			beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
@@ -490,12 +496,28 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }): Promise<IGenericListingResponse<IOnChainPostInfo>> {
+	static async GetChildBountiesByParentBountyIndex({
+		network,
+		index,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		index: number;
+		page: number;
+		limit: number;
+	}): Promise<IGenericListingResponse<IOnChainPostInfo>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { parentBountyIndex_eq: index }).toPromise();
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, {
+				parentBountyIndex_eq: index,
+				limit: Number(limit),
+				offset: (Number(page) - 1) * Number(limit)
+			})
+			.toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
