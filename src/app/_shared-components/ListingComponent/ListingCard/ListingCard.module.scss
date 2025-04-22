@@ -1,63 +1,63 @@
 .listingCard {
-    @apply flex flex-col-reverse gap-1 items-start w-full justify-between p-3 md:p-6 md:flex-row md:items-center;
+	@apply flex w-full flex-col-reverse items-start justify-between gap-1 p-3 md:flex-row md:items-center md:p-6;
 }
 
 .indexText {
-    @apply pl-2 md:pl-5 text-sidebar_text;
+	@apply pl-2 text-sidebar_text md:pl-5;
 }
 
 .titleText {
-    @apply font-medium pl-2 lg:pl-0 text-sm text-left text-btn_secondary_text;
+	@apply pl-2 text-left text-sm font-medium text-btn_secondary_text lg:pl-0;
 }
 
 .infoContainer {
-    @apply flex lg:items-center pl-2 lg:pl-0 gap-1 md:gap-2.5 flex-col lg:flex-row align-middle text-sm text-gray-500;
+	@apply flex flex-col gap-1 pl-2 align-middle text-sm text-gray-500 md:gap-2.5 lg:flex-row lg:items-center lg:pl-0;
 }
 
 .infoItem {
-    @apply flex items-center text-text_primary gap-1 text-xs;
+	@apply flex items-center gap-1 text-xs text-text_primary;
 }
 
 .originStyle {
-    @apply rounded-md px-1.5 py-1 text-xs;
+	@apply rounded-md px-1.5 py-1 text-xs;
 }
 
 .infoIcon {
-    @apply h-3 w-3 md:h-3.5 md:w-3.5;
+	@apply h-3 w-3 md:h-3.5 md:w-3.5;
 }
 
 .infoTimer {
-    @apply whitespace-nowrap text-[10px] md:text-xs
+	@apply whitespace-nowrap text-[10px] md:text-xs;
 }
 
 .progressBarContainer {
-    @apply flex bg-voting_bar_bg text-white p-3 w-48 rounded-md flex-col;
+	@apply flex w-48 flex-col rounded-md bg-voting_bar_bg p-3 text-white;
 }
 
 .commentContainer {
-    @apply flex items-center gap-1;
+	@apply flex items-center gap-1;
 }
 
 .timeBarContainer {
-    @apply flex bg-voting_bar_bg text-white p-3 w-60 rounded-md flex-col;
+	@apply flex w-60 flex-col rounded-md bg-voting_bar_bg p-3 text-white;
 }
 
 .requestedAmount {
-    @apply font-medium text-text_primary text-base flex items-center gap-1
+	@apply flex items-center gap-1 text-base font-medium text-text_primary;
 }
 
 .listedAmount {
-    @apply font-medium text-text_primary text-base flex items-center -space-x-2 flex-wrap
+	@apply flex flex-wrap items-center -space-x-2 text-base font-medium text-text_primary;
 }
 
 .assetContainer {
-    @apply flex bg-voting_bar_bg text-white p-3 w-32 rounded-md flex-col;
+	@apply flex w-32 flex-col rounded-md bg-voting_bar_bg p-3 text-white;
 }
 
 .tagContainer {
-    @apply flex flex-row-reverse items-end gap-1 lg:flex-col
+	@apply flex flex-row items-center gap-2 lg:flex-col lg:items-end;
 }
 
 .beneficiaryContainer {
-    @apply flex flex-wrap items-center gap-x-2
+	@apply flex flex-wrap items-center gap-x-2;
 }

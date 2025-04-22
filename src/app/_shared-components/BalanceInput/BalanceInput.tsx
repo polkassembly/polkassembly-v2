@@ -17,7 +17,6 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
-import { Skeleton } from '../Skeleton';
 
 function BalanceInput({
 	label,
@@ -29,7 +28,7 @@ function BalanceInput({
 	multiAsset,
 	className,
 	showTreasuryBalance,
-	showBalance = false,
+	showUserBalance = false,
 	defaultAssetId
 }: {
 	label?: string;
@@ -42,13 +41,12 @@ function BalanceInput({
 	multiAsset?: boolean;
 	className?: string;
 	showTreasuryBalance?: boolean;
-	showBalance?: boolean;
+	showUserBalance?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const [error, setError] = useState('');
 	const { userPreferences } = useUserPreferences();
-	const [userBalance, setUserBalance] = useState<string | null>(null);
 
 	const { apiService } = usePolkadotApiService();
 	const { assethubApiService } = useAssethubApiService();
@@ -59,6 +57,9 @@ function BalanceInput({
 	const { supportedAssets } = networkDetails;
 
 	const [assetId, setAssetId] = useState<string | null>(null);
+
+	const [userBalance, setUserBalance] = useState<string | null>(null);
+
 	const [treasuryBalance, setTreasuryBalance] = useState<{ [key: string]: BN } | null>(null);
 	const [nativeTreasuryBalance, setNativeTreasuryBalance] = useState<BN | null>(null);
 
@@ -68,13 +69,6 @@ function BalanceInput({
 	}));
 
 	const [valueString, setValueString] = useState('');
-
-	const getBalance = async (address: string) => {
-		if (!apiService) return;
-
-		const { totalBalance } = await apiService.getUserBalances({ address });
-		setUserBalance(totalBalance.toString());
-	};
 
 	const onBalanceChange = (value: string | null, id?: string | null): void => {
 		const { bnValue, isValid } = inputToBn(value || '', network, false, id || assetId);
@@ -97,9 +91,14 @@ function BalanceInput({
 	}, [network]);
 
 	useEffect(() => {
-		if (userPreferences?.address?.address) getBalance(userPreferences.address.address);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userPreferences?.address]);
+		const getBalance = async () => {
+			if (!showUserBalance || !apiService || !userPreferences?.address?.address) return;
+
+			const { totalBalance } = await apiService.getUserBalances({ address: userPreferences.address.address });
+			setUserBalance(totalBalance.toString());
+		};
+		getBalance();
+	}, [apiService, userPreferences?.address?.address, showUserBalance]);
 
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
@@ -113,22 +112,19 @@ function BalanceInput({
 	useEffect(() => {
 		const fetchNativeTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !apiService || multiAsset) return;
-			const userBalance = await apiService?.getNativeTreasuryBalance();
-			setNativeTreasuryBalance(userBalance);
+			const balance = await apiService?.getNativeTreasuryBalance();
+			setNativeTreasuryBalance(balance);
 		};
 		fetchNativeTreasuryBalance();
 	}, [showTreasuryBalance, multiAsset, apiService]);
 
 	return (
 		<div className='min-w-[200px]'>
-			<div className='flex justify-between'>
+			<div className='mb-1 flex justify-between'>
 				{label && <p className={classes.label}>{label}</p>}
-				{showBalance && (
+				{showUserBalance && userBalance && (
 					<p className='text-xs text-text_primary'>
-						Balance:{' '}
-						<span className='text-text_pink'>
-							{userBalance ? `${formatBnBalance(userBalance, { withUnit: true, numberAfterComma: 2 }, network)}` : <Skeleton className='h-4' />}
-						</span>
+						{t('BalanceInput.balance')}: <span className='text-text_pink'>{`${formatBnBalance(userBalance, { withUnit: true, numberAfterComma: 2 }, network)}`}</span>
 					</p>
 				)}
 			</div>
@@ -152,7 +148,7 @@ function BalanceInput({
 						<DropdownMenu>
 							<DropdownMenuTrigger
 								disabled={disabled}
-								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white'
+								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white sm:px-2 sm:py-1'
 							>
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>

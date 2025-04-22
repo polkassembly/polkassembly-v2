@@ -290,7 +290,7 @@ export class FirestoreService extends FirestoreUtils {
 		return {
 			...postData,
 			content: postData.content || '',
-			tags: postData.tags?.map((tag: string) => ({ value: tag, lastUsedAt: postData.createdAt?.toDate() || new Date(), network })) || [],
+			tags: postData.tags?.map((tag: ITag) => ({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })) || [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
@@ -319,6 +319,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		postsQuery = postsQuery
 			.where('isDeleted', '==', false)
+			.orderBy('createdAt', 'desc')
 			.limit(limit)
 			.offset((page - 1) * limit);
 
@@ -530,8 +531,8 @@ export class FirestoreService extends FirestoreUtils {
 		return postsQuerySnapshot.docs?.[0]?.data?.()?.index || 0;
 	}
 
-	static async GetUserActivitiesByUserId(id: number): Promise<IUserActivity[]> {
-		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', id);
+	static async GetUserActivitiesByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IUserActivity[]> {
+		const userActivityQuery = this.userActivityCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const userActivityQuerySnapshot = await userActivityQuery.get();
 		return userActivityQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();
@@ -618,8 +619,8 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetVoteCart(userId: number): Promise<IVoteCartItem[]> {
-		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId);
+	static async GetVoteCart({ userId, network }: { userId: number; network: ENetwork }): Promise<IVoteCartItem[]> {
+		const voteCartQuery = this.voteCartItemsCollectionRef().where('userId', '==', userId).where('network', '==', network);
 		const voteCartQuerySnapshot = await voteCartQuery.get();
 		return voteCartQuerySnapshot.docs.map((doc) => {
 			const data = doc.data();

@@ -76,7 +76,8 @@ function ExistingPreimage() {
 			!selectedTrack ||
 			!selectedEnactment ||
 			!isValidPreimageHash ||
-			!ValidatorService.isValidPreimageHash(preimageHash)
+			!ValidatorService.isValidPreimageHash(preimageHash) ||
+			!submitProposalTx
 		) {
 			return;
 		}
@@ -86,8 +87,7 @@ function ExistingPreimage() {
 		apiService.createProposal({
 			address: userPreferences.address.address,
 			track: selectedTrack.name,
-			preimageHash: debouncedPreimageHash,
-			preimageLength,
+			extrinsicFn: submitProposalTx,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {

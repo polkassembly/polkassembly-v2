@@ -13,6 +13,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DiscussionIcon from '@assets/icons/create-discussion.svg';
+import QuickActionsIcon from '@assets/icons/quick-actions-icon.svg';
 import PreimageIcon from '@assets/icons/create-preimage.svg';
 import ExistingPreimageIcon from '@assets/icons/create-existing.svg';
 import TreasuryProposalIcon from '@assets/icons/create-treasury.svg';
@@ -23,11 +24,18 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/app/_shared-components/Separator';
 import { ENetwork, EProposalStep } from '@/_shared/types';
+import NewPreimageIcon from '@assets/icons/new-preimage-icon.svg';
+import AlreadyPreimageExistIcon from '@assets/icons/already-preimage-exist-icon.svg';
+import SpendAssethubIcon from '@assets/icons/spend-assethub-icon.svg';
+import CreateTreasuryIcon from '@assets/icons/create-treasury-icon.svg';
+import KillReferendaIcon from '@assets/icons/kill-referenda-icon.svg';
+import CancelReferendaIcon from '@assets/icons/cancel-referenda-icon.svg';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
 import KillReferendum from './KillReferendum/KillReferendum';
 import ExistingPreimage from './ExistingPreimage/ExistingPreimage';
+import CreateBounty from './CreateBounty/CreateBounty';
 
 export interface CreateRef {
 	setStep: (step?: EProposalStep) => void;
@@ -63,7 +71,7 @@ function CreateOption({
 	const buttonComponent = (
 		<button
 			type='button'
-			className='flex flex-1 items-center gap-x-2 rounded-lg bg-create_option_bg px-4 py-2 text-text_primary transition-all duration-200 ease-in hover:bg-bg_pink/10 hover:text-text_pink'
+			className='flex flex-1 items-center gap-x-2 rounded-lg bg-create_option_bg px-2 py-1 text-text_primary transition-all duration-200 ease-in hover:bg-bg_pink/10 hover:text-text_pink sm:px-4 sm:py-2'
 			onClick={onClick}
 			disabled={disabled}
 		>
@@ -87,7 +95,7 @@ function CreateOption({
 	);
 
 	return (
-		<div className='flex items-center gap-x-4'>
+		<div className='flex items-center gap-x-2 sm:gap-x-4'>
 			{iconComponent}
 			{component}
 		</div>
@@ -104,13 +112,31 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 	const isAssetHubEnabled = Object.keys(NETWORKS_DETAILS[`${network}`]?.supportedAssets).length > 0;
 
 	const titles = {
-		create: t('CreateProposal.create'),
+		create: t('CreateProposal.quickActions'),
 		[EProposalStep.CREATE_PREIMAGE]: t('CreateProposal.createPreimage'),
 		[EProposalStep.EXISTING_PREIMAGE]: t('CreateProposal.existingPreimage'),
 		[EProposalStep.CREATE_TREASURY_PROPOSAL]: `${t('CreateProposal.spend')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.from')} ${NETWORKS_DETAILS[network as ENetwork]?.name} ${t('CreateProposal.Treasury')}`,
 		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
 		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
-		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum')
+		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum'),
+		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty')
+	};
+
+	const stepDescriptions: Partial<Record<EProposalStep, string>> = {
+		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.stepDescriptionKillReferendum'),
+		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.stepDescriptionCancelReferendum'),
+		[EProposalStep.CREATE_TREASURY_PROPOSAL]: t('CreateProposal.stepDescriptionTreasuryProposal'),
+		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.stepDescriptionUsdxProposal'),
+		[EProposalStep.CREATE_PREIMAGE]: t('CreateProposal.stepDescriptionCreatePreimage')
+	};
+
+	const stepIcons: Partial<Record<EProposalStep, string>> = {
+		[EProposalStep.CREATE_PREIMAGE]: NewPreimageIcon,
+		[EProposalStep.EXISTING_PREIMAGE]: AlreadyPreimageExistIcon,
+		[EProposalStep.CREATE_USDX_PROPOSAL]: SpendAssethubIcon,
+		[EProposalStep.CREATE_TREASURY_PROPOSAL]: CreateTreasuryIcon,
+		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: KillReferendaIcon,
+		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: CancelReferendaIcon
 	};
 
 	// Expose setStep through the ref
@@ -137,7 +163,20 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 								<ChevronLeft />
 							</button>
 						)}
-						{titles[step || 'create']}
+						<div>
+							<div className='flex items-center gap-x-[6px]'>
+								<Image
+									className='dark:darkIcon'
+									alt={`${titles[step || 'create']} Icon`}
+									src={stepIcons[step as EProposalStep] || QuickActionsIcon}
+									width={24}
+									height={24}
+								/>
+								{titles[step || 'create']}
+							</div>
+
+							{step && stepDescriptions[step] && <span className='text-sm font-medium'>{stepDescriptions[step]}</span>}
+						</div>
 					</div>
 					<Separator className='my-4' />
 				</>
@@ -162,9 +201,10 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						{step === EProposalStep.CREATE_USDX_PROPOSAL && <TreasuryProposalAssethub />}
 						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum />}
 						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum />}
+						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty />}
 						{!step && (
 							<div className='flex flex-col gap-y-4'>
-								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.quickActions')}</p>
+								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.trendingNow')}</p>
 								<CreateOption
 									href='/create/discussion'
 									label={t('CreateProposal.createDiscussion')}
@@ -189,6 +229,13 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 									iconClassName='bg-create_treasury_bg/10'
 								/>
 								<CreateOption
+									label={titles[EProposalStep.CREATE_BOUNTY]}
+									onClick={() => setStep(EProposalStep.CREATE_BOUNTY)}
+									description={t('CreateProposal.createBountyDescription')}
+									icon={UsdxProposalIcon}
+									iconClassName='bg-create_usdx_bg/10'
+								/>
+								<CreateOption
 									label={titles[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]}
 									onClick={() => setStep(EProposalStep.CREATE_CANCEL_REF_PROPOSAL)}
 									description={t('CreateProposal.cancelReferendumDescription')}
@@ -203,7 +250,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 									iconClassName='bg-create_kill_bg/10'
 								/>
 								<Separator />
-								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.submitProposal')}</p>
+								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateTreasuryProposal.createProposal')}</p>
 								<CreateOption
 									label={titles[EProposalStep.CREATE_PREIMAGE]}
 									onClick={() => setStep(EProposalStep.CREATE_PREIMAGE)}

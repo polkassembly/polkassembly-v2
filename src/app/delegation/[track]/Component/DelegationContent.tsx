@@ -21,7 +21,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-component
 import { useTranslations } from 'next-intl';
 import { useAtom } from 'jotai';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
-import DelegateDialog from '../../Components/DelegateDialog/DelegateDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/_shared-components/Dialog/Dialog';
+import { Button } from '@/app/_shared-components/Button';
+import DelegateVotingPower from '@/app/_shared-components/DelegateVotingPower/DelegateVotingPower';
 import UndelegateDialog from '../../Components/UndelegateDialog/UndelegateDialog';
 import styles from './DelegationTrack/DelegationTrack.module.scss';
 
@@ -58,7 +60,6 @@ interface DelegationContentProps {
 export function DelegationContent({ isReceived, delegateTrackResponse, trackId, trackName }: DelegationContentProps) {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
-	const [openDelegate, setOpenDelegate] = useState(false);
 	const [openUndelegateAddresses, setOpenUndelegateAddresses] = useState<Record<string, boolean>>({});
 	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [trackData, setTrackData] = useState<ITrackDelegationDetails | null>(delegateTrackResponse);
@@ -174,20 +175,29 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 				/>
 				<p className={styles.undelegatedMessage}>
 					{t('votingPowerForThisTrackHasNotBeenDelegatedYet')}
-					<DelegateDialog
-						open={openDelegate}
-						setOpen={setOpenDelegate}
-						delegate={{ address: '' }}
-						trackId={trackId}
-					>
-						<button
-							type='button'
-							className={styles.delegateButton}
-						>
-							<IoPersonAdd />
-							<span>{t('delegate')}</span>
-						</button>
-					</DelegateDialog>
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button
+								variant='ghost'
+								className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
+							>
+								<IoPersonAdd />
+								<span>{t('delegate')}</span>
+							</Button>
+						</DialogTrigger>
+						<DialogContent className='max-w-screen-md p-6'>
+							<DialogHeader>
+								<DialogTitle className='flex items-center gap-x-2'>
+									<IoPersonAdd />
+									<span>{t('delegate')}</span>
+								</DialogTitle>
+							</DialogHeader>
+							<DelegateVotingPower
+								delegate={{ address: '' }}
+								trackId={trackId}
+							/>
+						</DialogContent>
+					</Dialog>
 				</p>
 			</div>
 		);

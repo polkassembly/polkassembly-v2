@@ -70,17 +70,22 @@ export class AIService {
     Check for:
     - Irrelevant promotional content
     - Off-topic discussions
-    - Duplicate proposals
     - Malicious links
     - Impersonation attempts
     - Low-quality or automated content
     - Cryptocurrency scams or unauthorized token promotions
     - Phishing attempts
     - Excessive cross-posting
-    - Unrelated commercial advertising
-
+    - Unrelated commercial advertising especially if it's not related to Polkadot governance or funding
+		- Crypto recovery advertising
+		- Gambling
+		- Pornography
+		- Illegal content
+		- known spoof/fake/scam news websites
+		- Known fake/scam news social media accounts
+		
     STRICT RULES:
-    - Consider the technical nature of governance discussions when evaluating.
+    - Consider the technical nature of governance and funding discussions when evaluating.
     - A post being controversial or having strong opinions does not make it spam.
     - Return ONLY ONE WORD, either 'true' or 'false' without ANY additional text or explanation.
 		`,
@@ -263,7 +268,7 @@ export class AIService {
 		}
 
 		if (mdContent) {
-			fullPrompt += `\n\n### User Provided Description:\n${mdContent}\n\n`;
+			fullPrompt += `\n\n### User Provided Content:\n${mdContent}\n\n`;
 		}
 
 		const response = await this.getAIResponse(fullPrompt);

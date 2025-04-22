@@ -32,7 +32,8 @@ function CreateModal() {
 		[EProposalStep.CREATE_TREASURY_PROPOSAL]: `${t('CreateProposal.spend')} ${NETWORKS_DETAILS[network as ENetwork]?.tokenSymbol} ${t('CreateProposal.from')} ${NETWORKS_DETAILS[network as ENetwork]?.name} ${t('CreateProposal.Treasury')}`,
 		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
 		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
-		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum')
+		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum'),
+		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty')
 	};
 
 	const goBack = () => {
@@ -45,7 +46,7 @@ function CreateModal() {
 			open
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className='max-w-screen-md p-6'>
+			<DialogContent className='max-w-screen-md p-4 sm:p-6'>
 				<DialogHeader>
 					<DialogTitle className='flex items-center gap-x-2'>
 						{step && (
@@ -60,7 +61,7 @@ function CreateModal() {
 						{titles[step || 'create']}
 					</DialogTitle>
 				</DialogHeader>
-				<div className='flex max-h-[80vh] w-full flex-col overflow-hidden px-4'>
+				<div className='flex max-h-[80vh] w-full flex-col overflow-y-auto sm:px-4'>
 					<CreateComponent
 						ref={createRef}
 						isModal

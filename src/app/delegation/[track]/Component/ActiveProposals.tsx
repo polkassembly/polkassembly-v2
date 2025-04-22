@@ -5,7 +5,6 @@
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EVoteDecision, IPostWithDelegateVote } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
@@ -15,6 +14,7 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { useTranslations } from 'next-intl';
 import { IoIosInformationCircleOutline } from 'react-icons/io';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import styles from './DelegationTrack/DelegationTrack.module.scss';
 
 interface ActiveProposalsProps {
@@ -24,10 +24,12 @@ interface ActiveProposalsProps {
 export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
-	const [isActiveProposalOpen, setIsActiveProposalOpen] = useState(false);
 
 	const getTimeRemaining = (endDate: string) => {
 		const timeLeft = new Date(endDate).getTime() - new Date().getTime();
+		if (timeLeft <= 0) {
+			return null;
+		}
 		const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
 		const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 		const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
@@ -47,7 +49,7 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 						<span className={styles.proposalLabel}>{dayjs(proposal.onChainInfo?.createdAt).fromNow()}</span>
 					</div>
 				)}
-				{proposal.onChainInfo?.decisionPeriodEndsAt && (
+				{proposal.onChainInfo?.decisionPeriodEndsAt && getTimeRemaining(proposal.onChainInfo.decisionPeriodEndsAt.toString()) && (
 					<div className='flex items-center gap-1.5 whitespace-nowrap text-text_primary'>
 						<Separator
 							orientation='vertical'
@@ -62,28 +64,27 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 	};
 
 	return (
-		<div className={cn(styles.proposalsContainer, !isActiveProposalOpen && 'h-auto')}>
-			<div className={styles.proposalsHeader}>
+		<Collapsible
+			defaultOpen
+			className={cn(styles.proposalsContainer)}
+		>
+			<CollapsibleTrigger className={styles.proposalsHeader}>
 				<div className={styles.proposalsTitle}>
 					<p className={styles.delegationTrackName}>{t('activeProposals')}</p>
 					<span className={styles.proposalsCount}>{activeProposals.length}</span>
 				</div>
-				<button
-					type='button'
-					className={styles.expandButton}
-					onClick={() => setIsActiveProposalOpen(!isActiveProposalOpen)}
-				>
-					<ChevronDown className={cn('h-6 w-6', isActiveProposalOpen && 'rotate-180')} />
-				</button>
-			</div>
 
-			{isActiveProposalOpen && (
-				<div>
-					<div className={styles.proposalsList}>
-						{activeProposals.length > 0 ? (
-							activeProposals.map((proposal: IPostWithDelegateVote) => (
-								<div
-									key={proposal.index}
+				<ChevronDown className={cn('h-6 w-6')} />
+			</CollapsibleTrigger>
+
+			<CollapsibleContent>
+				<div className={styles.proposalsList}>
+					{activeProposals.length > 0 ? (
+						activeProposals
+							.sort((a, b) => (b.index ?? 0) - (a.index ?? 0))
+							.map((proposal: IPostWithDelegateVote) => (
+								<Link
+									href={`/referenda/${proposal.index}`}
 									className={styles.proposalCard}
 								>
 									<div className={styles.proposalDetails}>
@@ -103,12 +104,9 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 										</div>
 										<div className='flex justify-between'>
 											<div>
-												<Link
-													href={`/referenda/${proposal.index}`}
-													className={styles.proposalTitle}
-												>
+												<p className={styles.proposalTitle}>
 													#{proposal.index} {proposal.title}
-												</Link>
+												</p>
 											</div>
 										</div>
 										<div className={styles.proposalInfo}>
@@ -152,14 +150,13 @@ export function ActiveProposals({ activeProposals }: ActiveProposalsProps) {
 										</span>
 										{!proposal?.delegateVote?.decision && <IoIosInformationCircleOutline className='text-lg text-warning' />}
 									</div>
-								</div>
+								</Link>
 							))
-						) : (
-							<div className={styles.noProposalsMessage}>{t('noActiveProposalsFoundForThisTrack')}</div>
-						)}
-					</div>
+					) : (
+						<div className={styles.noProposalsMessage}>{t('noActiveProposalsFoundForThisTrack')}</div>
+					)}
 				</div>
-			)}
-		</div>
+			</CollapsibleContent>
+		</Collapsible>
 	);
 }

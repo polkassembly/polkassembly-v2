@@ -25,9 +25,9 @@ async function DelegationTrackPage({ params }: Props) {
 	}
 
 	const trackNameSnakeCase = track.replace(/-/g, '_');
-	const trackOriginEntry = Object.entries(NETWORKS_DETAILS[network].trackDetails).find(([, details]) => details?.name === trackNameSnakeCase);
+	const trackOriginEntry = Object.entries(NETWORKS_DETAILS[`${network}`].trackDetails).find(([, details]) => details?.name === trackNameSnakeCase);
 	const trackOrigin = trackOriginEntry ? (trackOriginEntry[0] as EPostOrigin) : undefined;
-	const trackDetails = trackOrigin ? NETWORKS_DETAILS[network].trackDetails[trackOrigin] : undefined;
+	const trackDetails = trackOrigin ? NETWORKS_DETAILS[`${network}`].trackDetails[`${trackOrigin}`] : undefined;
 	const trackId = trackDetails?.trackId;
 
 	if (!user?.id) {

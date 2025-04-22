@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { MdInfoOutline } from 'react-icons/md';
 import Image from 'next/image';
-import styles from '../Delegation.module.scss';
+import styles from './DelegationPopupCard.module.scss';
 import BecomeDelegateDialog from '../BecomeDelegateDialog/BecomeDelegateDialog';
 
 function DelegationPopupCard() {

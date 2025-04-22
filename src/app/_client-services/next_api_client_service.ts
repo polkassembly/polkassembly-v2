@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable lines-between-class-members */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 import { DEFAULT_LISTING_LIMIT, PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
@@ -748,6 +748,7 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
+
 	static async fetchAllTags() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_ALL_TAGS });
 		return this.nextApiClientFetch<IGenericListingResponse<ITag>>({ url, method });
@@ -782,6 +783,7 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
 		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
 	}
+
 	static async fetchLeaderboardApi({ page, limit }: { page: number; limit?: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString() || '1',
@@ -846,6 +848,7 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
 	}
+
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
@@ -873,10 +876,16 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IContentSummary>({ url, method });
 	}
 
-	static async fetchChildBountiesApi({ bountyIndex }: { bountyIndex: number }) {
+	static async fetchChildBountiesApi({ bountyIndex, limit, page }: { bountyIndex: string; limit: string; page: string }) {
+		const queryParams = new URLSearchParams({
+			limit,
+			page
+		});
+
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.FETCH_CHILD_BOUNTIES,
-			routeSegments: [EProposalType.BOUNTY, bountyIndex.toString(), 'child-bounties']
+			routeSegments: [EProposalType.BOUNTY, bountyIndex.toString(), 'child-bounties'],
+			queryParams
 		});
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}

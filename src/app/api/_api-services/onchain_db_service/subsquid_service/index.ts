@@ -28,6 +28,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { BN, BN_ZERO } from '@polkadot/util';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -114,7 +115,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			createdAt: proposal.createdAt,
-			curator: proposal.curator || '',
+			...(proposal.curator && { curator: proposal.curator }),
+			...(proposalType === EProposalType.CHILD_BOUNTY ? { parentBountyIndex: proposal.parentBountyIndex } : {}),
+			...(proposalType === EProposalType.CHILD_BOUNTY ? { payee: proposal.payee } : {}),
 			proposer: proposal.proposer || '',
 			status: proposal.status,
 			index: proposal.index,
@@ -122,6 +125,10 @@ export class SubsquidService extends SubsquidUtils {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
+			...(proposal.reward && { reward: proposal.reward }),
+			...(proposal.fee && { fee: proposal.fee }),
+			...(proposal.deposit && { deposit: proposal.deposit }),
+			...(proposal.curatorDeposit && { curatorDeposit: proposal.curatorDeposit }),
 			beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
@@ -250,7 +257,7 @@ export class SubsquidService extends SubsquidUtils {
 				let childBountiesCount = 0;
 
 				if (proposalType === EProposalType.BOUNTY) {
-					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDEXES;
+					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES;
 
 					const { data } = await gqlClient
 						.query(childBountiesCountGQL, {
@@ -263,13 +270,13 @@ export class SubsquidService extends SubsquidUtils {
 				}
 				posts.push({
 					createdAt: new Date(proposal.createdAt),
-					childBountiesCount: childBountiesCount || 0,
-					curator: proposal.curator,
+					...(proposalType === EProposalType.BOUNTY ? { childBountiesCount: childBountiesCount || 0 } : {}),
+					...(proposal.curator && { curator: proposal.curator }),
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
-					reward: proposal.reward || '',
+					...(proposal.reward && { reward: proposal.reward }),
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
@@ -295,13 +302,16 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	// FIXME: refactor this function
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	static async GetPostVoteData({
 		network,
 		proposalType,
 		indexOrHash,
 		page,
 		limit,
-		decision
+		decision,
+		voterAddress: address
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -309,7 +319,10 @@ export class SubsquidService extends SubsquidUtils {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
+		voterAddress?: string;
 	}) {
+		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
+
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
@@ -318,19 +331,25 @@ export class SubsquidService extends SubsquidUtils {
 		const query =
 			proposalType === EProposalType.TIP
 				? subsquidDecision
-					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION
-					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH
+					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
+					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
 				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
 					? subsquidDecision
-						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
-						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX
+						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
+						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
 					: subsquidDecision
-						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION
-						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX;
+						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
+						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
 
 		const variables =
 			proposalType === EProposalType.TIP
-				? { hash_eq: indexOrHash, type_eq: proposalType, limit, offset: (page - 1) * limit, ...(subsquidDecision && { decision_in: subsquidDecisionIn }) }
+				? {
+						hash_eq: indexOrHash,
+						type_eq: proposalType,
+						limit,
+						offset: (page - 1) * limit,
+						...(subsquidDecision && { decision_in: subsquidDecisionIn })
+					}
 				: {
 						index_eq: Number(indexOrHash),
 						type_eq: proposalType,
@@ -597,19 +616,61 @@ export class SubsquidService extends SubsquidUtils {
 		}
 	}
 
-	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }): Promise<IGenericListingResponse<IOnChainPostInfo>> {
+	static async GetChildBountiesByParentBountyIndex({
+		network,
+		index,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		index: number;
+		page: number;
+		limit: number;
+	}): Promise<IGenericListingResponse<IOnChainPostInfo>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { parentBountyIndex_eq: index }).toPromise();
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, {
+				parentBountyIndex_eq: index,
+				limit: Number(limit),
+				offset: (Number(page) - 1) * Number(limit)
+			})
+			.toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
 		}
+		const childBounties: IOnChainPostInfo[] = subsquidData.childBounties.map(
+			(childBounty: {
+				createdAt: string;
+				curator: string;
+				proposer: string;
+				status: EProposalStatus;
+				index: number;
+				hash: string;
+				origin: EPostOrigin;
+				description: string;
+				statusHistory: IStatusHistoryItem[];
+				preimage: { proposedCall: { args: Record<string, unknown> } };
+			}) => ({
+				createdAt: childBounty.createdAt,
+				curator: childBounty.curator || '',
+				proposer: childBounty.proposer || '',
+				status: childBounty.status,
+				index: childBounty.index,
+				hash: childBounty.hash,
+				origin: childBounty.origin,
+				description: childBounty.description || '',
+				timeline: childBounty.statusHistory as IStatusHistoryItem[],
+				preimageArgs: childBounty.preimage?.proposedCall?.args
+			})
+		);
+
 		return {
-			items: subsquidData.childBounties || [],
+			items: childBounties,
 			totalCount: subsquidData.totalChildBounties.totalCount || 0
 		};
 	}

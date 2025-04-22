@@ -101,7 +101,8 @@ export class OnChainDbService {
 		indexOrHash,
 		page,
 		limit,
-		decision
+		decision,
+		voterAddress
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -109,8 +110,9 @@ export class OnChainDbService {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
+		voterAddress?: string;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress });
 		if (postVoteData) return postVoteData;
 
 		return {
@@ -232,8 +234,8 @@ export class OnChainDbService {
 		});
 	}
 
-	static async GetChildBountiesByParentBountyIndex({ network, index }: { network: ENetwork; index: number }) {
-		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index });
+	static async GetChildBountiesByParentBountyIndex({ network, index, page, limit }: { network: ENetwork; index: number; page: number; limit: number }) {
+		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index, page, limit });
 	}
 
 	static async GetBountyAmount(network: ENetwork, bountyId: string) {

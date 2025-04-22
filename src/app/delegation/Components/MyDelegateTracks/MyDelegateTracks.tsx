@@ -10,7 +10,7 @@ import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/app/_shared-components/RadioGroup/RadioGroup';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { Label } from '@/app/_shared-components/Label';
@@ -19,6 +19,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useRouter } from 'nextjs-toploader/app';
 import { useAtom } from 'jotai';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
+import { Separator } from '@/app/_shared-components/Separator';
 import styles from '../Delegation.module.scss';
 
 function MyDelegateTracks() {
@@ -27,7 +28,7 @@ function MyDelegateTracks() {
 	const t = useTranslations('Delegation');
 	const router = useRouter();
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
-	const [activeFilter, setActiveFilter] = useState<EDelegationStatus | 'all'>(EDelegationStatus.ALL);
+	const [activeFilter, setActiveFilter] = useState<EDelegationStatus>(EDelegationStatus.ALL);
 
 	const fetchDelegationStats = async () => {
 		if (!user?.defaultAddress) return { delegationStats: [] };
@@ -37,18 +38,11 @@ function MyDelegateTracks() {
 		return response.data;
 	};
 
-	const { isLoading, refetch } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
+	const { isLoading } = useQuery<{ delegationStats: ITrackDelegationStats[] }, Error>({
 		queryKey: ['address', user?.defaultAddress],
 		queryFn: fetchDelegationStats,
 		enabled: !!user?.defaultAddress
 	});
-
-	useEffect(() => {
-		const hasUndelegatedTracks = delegateUserTracks?.some((track) => track.status === EDelegationStatus.UNDELEGATED);
-		if (hasUndelegatedTracks) {
-			refetch();
-		}
-	}, [delegateUserTracks, refetch]);
 
 	const FILTER_OPTIONS = [
 		{ value: EDelegationStatus.ALL, label: t('all') },
@@ -144,7 +138,7 @@ function MyDelegateTracks() {
 					</RadioGroup>
 				</div>
 			</div>
-			<hr className='my-4 border-border_grey' />
+			<Separator className='my-4' />
 			{isLoading ? (
 				<div className='flex h-full items-center justify-center'>
 					<LoadingSpinner />

@@ -44,7 +44,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	const { toast } = useToast();
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [loading, setLoading] = useState(false);
-	const [txFee, setTxFee] = useState<string>('');
+	const [txFee, setTxFee] = useState<BN | null>(null);
 
 	const handleOpenChange = useCallback(
 		(isOpen: boolean) => {
@@ -62,19 +62,18 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	);
 
 	const calculateTxFee = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || trackId === undefined) return;
+		if (!apiService || !user?.defaultAddress || !trackId) return;
 
 		try {
-			const fee = await apiService.getDelegateTxFee({
+			const fee = await apiService.getUndelegateTxFee({
 				address: user.defaultAddress,
-				tracks: trackId ? [trackId] : [],
-				conviction: 0,
-				balance: new BN(delegate.balance)
+				trackId
 			});
-			setTxFee(fee.toString());
+			setTxFee(fee);
 		} catch (error) {
 			console.error('Failed to calculate transaction fee:', error);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService, user?.defaultAddress, trackId]);
 
 	const handleSubmit = useCallback(async () => {
@@ -163,7 +162,6 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 					/>
 
 					<BalanceInput
-						showBalance
 						label={t('balance')}
 						defaultValue={new BN(delegate.balance || '0')}
 						disabled

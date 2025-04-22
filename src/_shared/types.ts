@@ -484,6 +484,12 @@ export interface IStatusHistoryItem {
 }
 
 export interface IOnChainPostInfo {
+	reward?: string;
+	fee?: string;
+	deposit?: string;
+	curatorDeposit?: string;
+	parentBountyIndex?: number;
+	payee?: string;
 	proposer: string;
 	status: EProposalStatus;
 	createdAt?: Date;
@@ -506,6 +512,7 @@ export interface IPost extends IOffChainPost {
 	publicUser?: IPublicUser;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
+	contentSummary?: IContentSummary;
 }
 
 export interface IOnChainPostListing {
@@ -766,6 +773,10 @@ export interface IActivityMetadata {
 
 	// for follow/unfollow
 	userId?: number;
+
+	// for posts
+	title?: string;
+	content?: string;
 }
 
 export interface IUserActivity {
@@ -937,7 +948,7 @@ export interface IBountyStats {
 }
 
 export enum EBountyStatus {
-	ALL = 'all',
+	ALL = 'All',
 	ACTIVE = 'Active',
 	PROPOSED = 'Proposed',
 	CLAIMED = 'Claimed',
@@ -1017,7 +1028,8 @@ export enum EProposalStep {
 	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
 	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
 	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
-	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL',
+	CREATE_BOUNTY = 'CREATE_BOUNTY'
 }
 
 export interface IDelegationStats {
@@ -1120,4 +1132,16 @@ export enum EPeriodType {
 	PREPARE = 'prepare',
 	DECISION = 'decision',
 	CONFIRM = 'confirm'
+}
+
+export enum ESearchType {
+	POSTS = 'posts',
+	DISCUSSIONS = 'discussions',
+	USERS = 'users'
+}
+
+export enum ESearchDiscussionType {
+	DISCUSSIONS = 'discussions',
+	GRANTS = 'grants',
+	REFERENDUMS_V2 = 'referendums_v2'
 }

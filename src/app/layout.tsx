@@ -4,12 +4,13 @@
 
 import '@app/_style/globals.scss';
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { ReactNode } from 'react';
 import { DM_Sans as dmSans } from 'next/font/google';
 import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { Providers } from './_shared-components/Providers';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
@@ -17,8 +18,16 @@ import { CookieService } from '../_shared/_services/cookie_service';
 import { THEME_COLORS } from './_style/theme';
 
 export const metadata: Metadata = {
-	title: 'Polkassembly',
-	description: 'Polkassembly but so much better'
+	title: OPENGRAPH_METADATA.title,
+	description: OPENGRAPH_METADATA.description
+};
+
+export const viewport: Viewport = {
+	width: 'device-width',
+	initialScale: 1,
+	maximumScale: 1,
+	minimumScale: 1,
+	userScalable: false
 };
 
 const fontDmSans = dmSans({
@@ -52,13 +61,7 @@ export default async function RootLayout({
 			className={userPreferences.theme}
 			suppressHydrationWarning
 		>
-			<head>
-				<link
-					href='https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap'
-					rel='stylesheet'
-				/>
-			</head>
-			<body className={`${fontDmSans.variable} ${fontDmSans.className}`}>
+			<body className={`${fontDmSans.variable} ${fontDmSans.className} antialiased`}>
 				<NextTopLoader
 					color={THEME_COLORS.light.navbar_border}
 					initialPosition={0.55}

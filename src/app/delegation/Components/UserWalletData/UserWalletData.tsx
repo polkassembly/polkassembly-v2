@@ -6,12 +6,11 @@ import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PolkadotIcon from '@assets/delegation/polkadot-logo.svg';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { IoMdLock } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
@@ -21,12 +20,15 @@ function UserWalletData() {
 	const { user } = useUser();
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	const pathname = usePathname();
 	const t = useTranslations('Delegation');
+
+	const getUserBalances = useCallback(async () => {
+		return apiService?.getUserBalances({ address: user?.loginAddress || '' });
+	}, [apiService, user?.loginAddress]);
 
 	const { data: userBalances } = useQuery({
 		queryKey: ['userBalances', user?.id],
-		queryFn: () => apiService?.getUserBalances({ address: user?.loginAddress || '' }),
+		queryFn: getUserBalances,
 		enabled: !!user?.id && !!user?.loginAddress
 	});
 
@@ -46,7 +48,7 @@ function UserWalletData() {
 					<div className={styles.walletInfoBoard}>
 						<span className='text-sm font-medium text-white'>{t('toGetStartedWithDelegationOnPolkadot')}</span>
 						<Link
-							href={`/login?nextUrl=${pathname}`}
+							href='/login'
 							className='rounded-md bg-border_blue p-2 text-sm font-semibold text-white'
 						>
 							{t('connectWallet')}

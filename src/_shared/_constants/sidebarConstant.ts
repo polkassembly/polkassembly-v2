@@ -134,7 +134,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 									url: '/bounty-dashboard',
 									count: trackCounts.bounty_dashboard || 0
 								},
-								{ title: t('Sidebar.onChainBounties'), url: '/bounties-listing' }
+								{ title: t('Sidebar.onChainBounties'), url: '/bounties' }
 							]
 						},
 						{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }

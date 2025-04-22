@@ -5,13 +5,14 @@
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { useCallback, useMemo, useState } from 'react';
+import { useDebounce } from './useDebounce';
 
 type SortOption = 'VOTING_POWER' | 'VOTED_PROPOSALS' | 'RECEIVED_DELEGATIONS';
 
 const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
-	const [searchQuery, setSearchQuery] = useState('');
+	const { debouncedValue: searchQuery, setValue: setSearchQuery, value: searchQueryValue } = useDebounce('');
 	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>(Object.values(EDelegateSource));
-	const [sortBy, setSortBy] = useState<SortOption>('VOTING_POWER');
+	const [sortBy, setSortBy] = useState<SortOption | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
 
@@ -32,6 +33,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 
 	const sortDelegates = useCallback(
 		(a: IDelegateDetails, b: IDelegateDetails) => {
+			if (!sortBy) return 0;
 			switch (sortBy) {
 				case 'VOTING_POWER':
 					return Number(BigInt(b.votingPower || '0') - BigInt(a.votingPower || '0'));
@@ -52,7 +54,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 		return sourceFiltered.sort(sortDelegates);
 	}, [searchQuery, filterBySource, sortDelegates, searchDelegate, delegates]);
 
-	const paginatedDelegates = useMemo(() => {
+	const filteredDelegates = useMemo(() => {
 		const start = (currentPage - 1) * itemsPerPage;
 		return filteredAndSortedDelegates.slice(start, start + itemsPerPage);
 	}, [filteredAndSortedDelegates, currentPage, itemsPerPage]);
@@ -64,6 +66,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const handleSearchChange = useCallback((value: string) => {
 		setSearchQuery(value);
 		setCurrentPage(1);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleSourceChange = useCallback((sources: EDelegateSource[]) => {
@@ -77,9 +80,9 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	}, []);
 
 	return {
-		paginatedDelegates,
+		filteredDelegates,
 		totalDelegates: filteredAndSortedDelegates.length,
-		searchQuery,
+		searchQuery: searchQueryValue,
 		handleSearchChange,
 		selectedSources,
 		handleSourceChange,

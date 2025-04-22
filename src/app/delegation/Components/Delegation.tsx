@@ -10,10 +10,10 @@ import { IDelegationStats } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import styles from './Delegation.module.scss';
 import DelegationPopupCard from './DelegationPopupCard/DelegationPopupCard';
-import DelegationSupplyData from './DelegationSupplyData/DelegationSupplyData';
+import DelegationStats from './DelegationStats/DelegationStats';
 import MyDelegation from './MyDelegation/MyDelegation';
 import UserWalletData from './UserWalletData/UserWalletData';
-import DelegationDetailsCard from './DelegationDetailsCard/DelegationDetailsCard';
+import TrendingDelegates from './TrendingDelegates/TrendingDelegates';
 
 enum EDelegationTab {
 	DASHBOARD = 'Dashboard',
@@ -30,8 +30,8 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 				<UserWalletData />
 				<div className='grid grid-cols-1 gap-5 p-5 sm:mt-16 sm:p-10'>
 					<DelegationPopupCard />
-					<DelegationSupplyData delegationStats={delegationStats} />
-					<DelegationDetailsCard />
+					<DelegationStats delegationStats={delegationStats} />
+					<TrendingDelegates />
 				</div>
 			</div>
 		);
@@ -42,7 +42,7 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 			<UserWalletData />
 			<div className='grid grid-cols-1 gap-5 p-5 sm:mt-16 sm:p-10'>
 				<div className={styles.delegation}>
-					<Tabs defaultValue={EDelegationTab.MY_DELEGATION}>
+					<Tabs defaultValue={EDelegationTab.DASHBOARD}>
 						<TabsList className='mb-4 flex w-full justify-start border-border_grey dark:border-b'>
 							<TabsTrigger
 								className='m-0 p-2 px-4 text-input_text data-[state=active]:rounded-t-lg data-[state=active]:dark:bg-bg_modal'
@@ -59,8 +59,8 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 						</TabsList>
 						<TabsContent value={EDelegationTab.DASHBOARD}>
 							<DelegationPopupCard />
-							<DelegationSupplyData delegationStats={delegationStats} />
-							<DelegationDetailsCard />
+							<DelegationStats delegationStats={delegationStats} />
+							<TrendingDelegates />
 						</TabsContent>
 						<TabsContent value={EDelegationTab.MY_DELEGATION}>
 							<MyDelegation />
