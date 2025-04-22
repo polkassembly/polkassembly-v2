@@ -78,7 +78,7 @@ export class PolkadotApiService {
 		if (!this.api || !tx) return;
 
 		let mainTx = tx;
-		const getRegularAddress = (selectedAccount?: ISelectedAccount) => {
+		const getRegularAddress = (selectedAccount?: ISelectedAccount): boolean => {
 			if (!selectedAccount) return false;
 			if (selectedAccount.accountType === EAccountType.MULTISIG) {
 				return true;

@@ -47,7 +47,7 @@ function VoteReferendum({ index }: { index: string }) {
 
 		try {
 			console.log('userPreferences.address', userPreferences.address);
-			const getRegularAddress = (selectedAccount: ISelectedAccount) => {
+			const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
 				if (selectedAccount.parent) {
 					return getRegularAddress(selectedAccount.parent);
 				}
