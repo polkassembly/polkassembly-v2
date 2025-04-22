@@ -19,7 +19,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, ISelectedAccount, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -283,7 +283,7 @@ export class PolkadotApiService {
 		nayVoteValue,
 		abstainVoteValue
 	}: {
-		address: string;
+		address: ISelectedAccount;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		referendumId: number;
@@ -306,10 +306,18 @@ export class PolkadotApiService {
 			});
 		}
 
+		if (address.accountType === EAccountType.MULTISIG) {
+			voteTx = this.api.tx.multisig.asMulti(address.address, null, voteTx);
+		}
+
+		if (address.accountType === EAccountType.PROXY) {
+			voteTx = this.api.tx.proxy.proxy(address.address, null, voteTx);
+		}
+
 		if (voteTx) {
 			await this.executeTx({
 				tx: voteTx,
-				address,
+				address: address.parent?.address || address.address,
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,

@@ -83,14 +83,14 @@ export class SubscanAddressService {
 
 		// fetch for multisig addresses
 		for (const multisig of multisigAddress) {
-			const data = await fetchSubscanData(this.subscanUrl(network), network, { key: address }, 'POST');
+			const data = await fetchSubscanData(this.subscanUrl(network), network, { key: multisig }, 'POST');
 
 			const multisigMembers = data.data?.account?.multisig?.multi_account_member?.map((member: { address: string }) => member.address);
 			const pureProxy = data.data?.account?.proxy?.real_account?.map((proxy: { account_display: { address: string }; proxy_type: string }) => ({
 				address: proxy.account_display.address,
 				proxyType: proxy.proxy_type
 			}));
-			const threshold = data.data?.account?.multisig?.multi_account_threshold;
+			const threshold = data.data?.account?.multisig?.threshold;
 			const info = ['name', 'email', 'github', 'twitter', 'matrix', 'discord'].map((key) => data.data?.account?.[key]).filter(Boolean);
 
 			const multisigData: IMultisig = {

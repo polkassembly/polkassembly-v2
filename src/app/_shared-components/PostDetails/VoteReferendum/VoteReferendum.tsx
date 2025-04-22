@@ -48,7 +48,7 @@ function VoteReferendum({ index }: { index: string }) {
 		try {
 			setIsLoading(true);
 			await apiService.voteReferendum({
-				address: userPreferences.address?.address ?? '',
+				address: userPreferences.address,
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -87,7 +87,6 @@ function VoteReferendum({ index }: { index: string }) {
 			/>
 			<AddressDropdown
 				withBalance
-				multiswitch
 				onChange={(a) => setUserPreferences({ ...userPreferences, address: a })}
 			/>
 			<div>
