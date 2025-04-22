@@ -260,6 +260,8 @@
 		"BigTipperDescription": "Origin able to spend up to 1000 DOT from the treasury at onceShow.",
 		"Bounty": "Onchain Bounty",
 		"BountyDescription": "A space to share insights, provide feedback, and collaborate on ideas that impact the network.",
+		"ChildBounty": "Onchain Child Bounty",
+		"ChildBountyDescription": "This is the place to discuss on-chain child bounties. Child Bounty posts are automatically generated as soon as they are created on-chain. Only the proposer is able to edit them.",
 		"Discussion": "Discussions",
 		"DiscussionDescription": "A space to share insights, provide feedback, and collaborate on ideas that impact the network.",
 		"FellowshipAdmin": "Fellowship Admin",

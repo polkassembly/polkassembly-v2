@@ -75,9 +75,11 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	});
 
 	const tabNames =
-		proposalType === EProposalType.DISCUSSION
-			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
-			: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
+		proposalType === EProposalType.CHILD_BOUNTY
+			? []
+			: proposalType === EProposalType.DISCUSSION
+				? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
+				: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 

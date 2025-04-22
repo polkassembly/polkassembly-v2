@@ -260,6 +260,8 @@
 		"BigTipperDescription": "Ursprung, der bis zu 1000 DOT aus der Finanzverwaltung auf einmal ausgeben kann.",
 		"Bounty": "Onchain-Prämie",
 		"BountyDescription": "Ein Raum zum Austausch von Erkenntnissen, Feedback und zur Zusammenarbeit an Ideen, die das Netzwerk beeinflussen.",
+		"ChildBounty": "Onchain-Untergeordnete Prämie",
+		"ChildBountyDescription": "Hier werden On-Chain-Untergeordnete Prämien diskutiert. On-Chain-Beiträge werden automatisch generiert, sobald sie in der Chain erstellt werden. Nur der Vorschlagende kann sie bearbeiten.",
 		"Discussion": "Diskussionen",
 		"DiscussionDescription": "Ein Raum zum Austausch von Erkenntnissen, Feedback und zur Zusammenarbeit an Ideen, die das Netzwerk beeinflussen.",
 		"FellowshipAdmin": "Fellowship-Administrator",
