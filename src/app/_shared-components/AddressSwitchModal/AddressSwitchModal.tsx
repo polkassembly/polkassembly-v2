@@ -39,6 +39,8 @@ function AddressSwitchModal({
 		proxied: Array<IProxy>;
 	}>({ multisig: [], proxy: [], proxied: [] });
 
+	const [regularAddressForMultisig, setRegularAddressForMultisig] = useState<ISelectedAccount | null>(null);
+
 	const createSelectedAccount = (
 		address: string,
 		name: string,
@@ -87,6 +89,14 @@ function AddressSwitchModal({
 		}
 
 		try {
+			setRegularAddressForMultisig({
+				address: userPreferences.address.address,
+				name: userPreferences.address.name || '',
+				type: undefined,
+				accountType: EAccountType.REGULAR,
+				wallet: userPreferences?.wallet
+			});
+
 			if (linkedAddress && linkedAddress[userPreferences.address.address]) {
 				setMultisigProxyData(linkedAddress[userPreferences.address.address]);
 			} else {
@@ -193,7 +203,7 @@ function AddressSwitchModal({
 				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
 					{multisigProxyData.multisig.map((multisig) => {
 						if (!multisig?.address) return null;
-						const parentAccount: ISelectedAccount | undefined = userPreferences?.address?.accountType === EAccountType.REGULAR ? userPreferences.address : undefined;
+						const parentAccount: ISelectedAccount | undefined = regularAddressForMultisig || undefined;
 						const multisigAccount = createSelectedAccount(multisig.address, 'Multisig', EAccountType.MULTISIG, parentAccount, undefined, {
 							threshold: multisig.threshold,
 							signatories: multisig.signatories
