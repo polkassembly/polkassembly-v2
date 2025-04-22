@@ -24,7 +24,6 @@ import { useTranslations } from 'next-intl';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import styles from './Bounty.module.scss';
 
 function StatItem({ label, value, isLoading = false }: { label: string; value: string | undefined; isLoading?: boolean }) {
@@ -48,7 +47,6 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 		enabled: !!network
 	});
 	const availableBounty = tokenPrice && !isNaN(tokenPrice) ? formatUSDWithUnits(String(Number(bountyAmount) * Number(tokenPrice)), 2) : '0.00';
-
 	return (
 		<div className='mt-4 rounded-3xl bg-bg_modal p-5 md:p-6'>
 			<div className='flex'>
@@ -100,12 +98,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 							label='Total Rewarded'
 							value={
 								bountiesStats.totalRewarded
-									? formatBnBalance(
-											String(bountiesStats.totalRewarded),
-											{ numberAfterComma: 1, withThousandDelimitor: false },
-											network,
-											NETWORKS_DETAILS[network as ENetwork].tokenSymbol
-										)
+									? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
 									: undefined
 							}
 							isLoading={isLoading}
@@ -114,12 +107,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 							label='Total Bounty Pool'
 							value={
 								bountiesStats.totalBountyPool
-									? formatBnBalance(
-											String(bountiesStats.totalBountyPool),
-											{ numberAfterComma: 1, withThousandDelimitor: false },
-											network,
-											NETWORKS_DETAILS[network as ENetwork].tokenSymbol
-										)
+									? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
 									: undefined
 							}
 							isLoading={isLoading}
