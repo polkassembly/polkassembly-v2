@@ -703,7 +703,12 @@
 		"childBounties": "Kinderprämien",
 		"bountyProposal": "Prämie-Vorschlag",
 		"vote": "Abstimmen",
-		"bountyDashboard": "Prämie-Dashboard"
+		"bountyDashboard": "Prämie-Dashboard",
+		"hotBounties": "Beliebte Prämien",
+		"activeBounties": "Aktive Prämien",
+		"claimants": "Beanspruchte",
+		"totalRewarded": "Gesamtbelohnung",
+		"totalBountyPool": "Gesamtprämie-Pool"
 	},
 	"ChildBounties": {
 		"childBounties": "Kinderprämien",

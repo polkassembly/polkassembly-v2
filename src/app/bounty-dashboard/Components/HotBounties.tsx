@@ -45,7 +45,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 		<div>
 			<div className='my-5 flex items-center justify-between'>
 				<h3 className='font-pixelify text-3xl font-bold text-btn_secondary_text'>
-					🔥 Hot Bounties <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
+					{t('hotBounties')} <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
 				</h3>
 				<Link
 					href='/bounties-listing'

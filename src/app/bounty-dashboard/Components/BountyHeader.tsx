@@ -85,17 +85,17 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 					</div>
 					<div className='grid grid-cols-2 gap-x-24 py-7'>
 						<StatItem
-							label='Active Bounties'
+							label={t('activeBounties')}
 							value={bountiesStats.activeBounties ? String(bountiesStats.activeBounties) : undefined}
 							isLoading={isLoading}
 						/>
 						<StatItem
-							label='Claimants'
+							label={t('claimants')}
 							value={bountiesStats.peopleEarned ? String(bountiesStats.peopleEarned) : undefined}
 							isLoading={isLoading}
 						/>
 						<StatItem
-							label='Total Rewarded'
+							label={t('totalRewarded')}
 							value={
 								bountiesStats.totalRewarded
 									? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
@@ -104,7 +104,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 							isLoading={isLoading}
 						/>
 						<StatItem
-							label='Total Bounty Pool'
+							label={t('totalBountyPool')}
 							value={
 								bountiesStats.totalBountyPool
 									? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
@@ -173,17 +173,17 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 						</div>
 						<div className='grid grid-cols-2 gap-y-8 py-7 pr-4'>
 							<StatItem
-								label='Active Bounties'
+								label={t('activeBounties')}
 								value={bountiesStats.activeBounties ? String(bountiesStats.activeBounties) : undefined}
 								isLoading={isLoading}
 							/>
 							<StatItem
-								label='No. of People Earned'
+								label={t('claimants')}
 								value={bountiesStats.peopleEarned ? String(bountiesStats.peopleEarned) : undefined}
 								isLoading={isLoading}
 							/>
 							<StatItem
-								label='Total Rewarded'
+								label={t('totalRewarded')}
 								value={
 									bountiesStats.totalRewarded
 										? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)
@@ -192,7 +192,7 @@ function BountyHeader({ bountiesStats, tokenPrice }: { bountiesStats: IBountySta
 								isLoading={isLoading}
 							/>
 							<StatItem
-								label='Total Bounty Pool'
+								label={t('totalBountyPool')}
 								value={
 									bountiesStats.totalBountyPool
 										? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[network as ENetwork].tokenSymbol)

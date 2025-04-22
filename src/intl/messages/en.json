@@ -729,7 +729,12 @@
 		"bounty": "Bounty",
 		"vote": "Vote",
 		"bountyProposal": "Bounty Proposal",
-		"childBounties": "Child Bounties"
+		"childBounties": "Child Bounties",
+		"hotBounties": "Hot Bounties",
+		"activeBounties": "Active Bounties",
+		"claimants": "Claimants",
+		"totalRewarded": "Total Rewarded",
+		"totalBountyPool": "Total Bounty Pool"
 	},
 	"ChildBounties": {
 		"childBounties": "Child Bounties",

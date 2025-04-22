@@ -684,7 +684,12 @@
 		"childBounties": "子供の報奨金",
 		"bountyProposal": "報奨金提案",
 		"vote": "投票",
-		"bountyDashboard": "報奨金ダッシュボード"
+		"bountyDashboard": "報奨金ダッシュボード",
+		"hotBounties": "人気の報奨金",
+		"activeBounties": "アクティブな報奨金",
+		"claimants": "受益者",
+		"totalRewarded": "総報奨金",
+		"totalBountyPool": "総報奨金プール"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",
