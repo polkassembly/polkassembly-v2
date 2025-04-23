@@ -60,70 +60,71 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 					setApi={setApi}
 				>
 					<CarouselContent className='-ml-6'>
-						{bountyProposals.items.map((bounty) => (
-							<CarouselItem
-								key={bounty.index}
-								className='pl-6 md:basis-1/2 lg:basis-1/3'
-							>
-								<div className={styles.bounty_proposal_wrapper}>
-									<div className='flex w-full'>
-										<div className={styles.bounty_proposal_wrapper_text}>
-											<div className='flex items-baseline gap-x-2'>
-												<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
-													{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, tokenPrice)}
-												</h2>
+						{bountyProposals.items &&
+							bountyProposals.items.map((bounty) => (
+								<CarouselItem
+									key={bounty.index}
+									className='pl-6 md:basis-1/2 lg:basis-1/3'
+								>
+									<div className={styles.bounty_proposal_wrapper}>
+										<div className='flex w-full'>
+											<div className={styles.bounty_proposal_wrapper_text}>
+												<div className='flex items-baseline gap-x-2'>
+													<h2 className='mt-4 font-pixeboy text-[35px] font-normal text-navbar_border'>
+														{formatTokenValue(String(bounty.onChainInfo?.reward ?? 0), network, tokenPrice)}
+													</h2>
+												</div>
+												<div className={styles.bounty_proposal_div}>
+													<span className={styles.bounty_proposal_div_span} />
+												</div>
 											</div>
-											<div className={styles.bounty_proposal_div}>
-												<span className={styles.bounty_proposal_div_span} />
+											<div className='z-10 ml-8 flex items-center -space-x-0.5'>
+												<button
+													type='button'
+													className='rounded-full bg-arrow_bg_color p-3'
+												>
+													<ArrowUpRight
+														size={20}
+														className='text-bg_modal'
+													/>
+												</button>
+												<span className={styles.bounty_proposal_span_line} />
+												<button
+													type='button'
+													className={`${spaceGroteskFont.className} ${styles.bounty_proposal_button}`}
+												>
+													{t('vote')}
+												</button>
 											</div>
 										</div>
-										<div className='z-10 ml-8 flex items-center -space-x-0.5'>
-											<button
-												type='button'
-												className='rounded-full bg-arrow_bg_color p-3'
-											>
-												<ArrowUpRight
-													size={20}
-													className='text-bg_modal'
-												/>
-											</button>
-											<span className={styles.bounty_proposal_span_line} />
-											<button
-												type='button'
-												className={`${spaceGroteskFont.className} ${styles.bounty_proposal_button}`}
-											>
-												{t('vote')}
-											</button>
-										</div>
-									</div>
-									<div className={styles.bounty_proposal_wrapper_img}>
-										<Image
-											src={BountyCard}
-											alt='Bounty'
-											className='my-3 h-32 w-full rounded-md object-cover'
-											width={100}
-											height={100}
-										/>
-										<h4 className={`${spaceGroteskFont.className} font-medium`}>
-											<span className='text-[17px] text-wallet_btn_text'>#{bounty.index}</span>{' '}
-											<span className='text-[18px] text-btn_secondary_text'>{bounty.title?.slice(0, 28)}</span>
-										</h4>
-										<div className={styles.bounty_proposal_wrapper_img_text}>
-											<MarkdownViewer markdown={bounty.content} />
-										</div>
-										<div className='mb-2 mt-5 flex items-center justify-between text-sm'>
-											<Address
-												address={bounty.onChainInfo?.proposer || ''}
-												className='text-sm text-text_primary'
+										<div className={styles.bounty_proposal_wrapper_img}>
+											<Image
+												src={BountyCard}
+												alt='Bounty'
+												className='my-3 h-32 w-full rounded-md object-cover'
+												width={100}
+												height={100}
 											/>
-											<span className={`${getSpanStyle(bounty.onChainInfo?.origin || '', 1)} rounded-md px-1.5 py-1 text-xs`}>
-												{bounty.onChainInfo?.origin.replace(/([A-Z])/g, ' $1').trim() || ''}
-											</span>
+											<h4 className={`${spaceGroteskFont.className} font-medium`}>
+												<span className='text-[17px] text-wallet_btn_text'>#{bounty.index}</span>{' '}
+												<span className='text-[18px] text-btn_secondary_text'>{bounty.title?.slice(0, 28)}</span>
+											</h4>
+											<div className={styles.bounty_proposal_wrapper_img_text}>
+												<MarkdownViewer markdown={bounty.content} />
+											</div>
+											<div className='mb-2 mt-5 flex items-center justify-between text-sm'>
+												<Address
+													address={bounty.onChainInfo?.proposer || ''}
+													className='text-sm text-text_primary'
+												/>
+												<span className={`${getSpanStyle(bounty.onChainInfo?.origin || '', 1)} rounded-md px-1.5 py-1 text-xs`}>
+													{bounty.onChainInfo?.origin.replace(/([A-Z])/g, ' $1').trim() || ''}
+												</span>
+											</div>
 										</div>
 									</div>
-								</div>
-							</CarouselItem>
-						))}
+								</CarouselItem>
+							))}
 					</CarouselContent>
 
 					{current > 0 && (

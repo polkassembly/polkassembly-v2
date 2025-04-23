@@ -41,7 +41,7 @@ function BountyDashboard({
 					tokenPrice={tokenPrice ?? 0}
 				/>
 			)}
-			{userActivities && userActivities.length > 0 && (
+			{userActivities && Array.isArray(userActivities) && userActivities.length > 0 && (
 				<BountiesUserActivity
 					userActivities={userActivities}
 					tokenPrice={tokenPrice ?? 0}

@@ -150,7 +150,7 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 							/>
 						</button>
 					)}
-					{current < hotBounties.items.length - 3 && (
+					{current < hotBounties.items.length - 3 && hotBounties.items.length > 3 && (
 						<button
 							type='button'
 							className={styles.carouselRightArrow}
