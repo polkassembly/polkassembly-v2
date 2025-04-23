@@ -406,19 +406,6 @@ export class PolkadotApiService {
 			});
 	}
 
-	async getActiveBounties() {
-		const activeBounties = await this.api?.derive.bounties?.bounties();
-		return activeBounties?.filter((item: any) => {
-			const { isFunded, isCuratorProposed, isActive } = item?.bounty?.status || {};
-			return isFunded || isCuratorProposed || isActive;
-		});
-	}
-
-	async getAccountData(address: string) {
-		const accountData = (await this.api.query.system.account(address)) as any;
-		return new BN(accountData?.data?.free.toString()).add(new BN(accountData?.data?.reserved.toString()));
-	}
-
 	getPreimageParams({ sectionName, methodName }: { sectionName: string; methodName: string }) {
 		if (!this.api) {
 			return [];
