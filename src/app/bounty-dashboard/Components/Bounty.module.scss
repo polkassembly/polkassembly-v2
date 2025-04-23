@@ -1,3 +1,10 @@
+@font-face {
+	font-family: 'Pixeboy';
+	src: url('../../_style/fonts/Pixeboy.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
 .bounty_User_Activity_Container {
 	@apply mt-10 flex flex-col-reverse items-center gap-8 overflow-hidden md:flex-row;
 }
