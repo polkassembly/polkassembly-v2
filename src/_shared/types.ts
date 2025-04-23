@@ -939,6 +939,7 @@ export interface IBountyStats {
 	peopleEarned: number;
 	totalRewarded: BN;
 	totalBountyPool: BN;
+	bountyAmount: BN;
 }
 
 export enum EBountyStatus {
