@@ -554,7 +554,7 @@ export class SubsquidService extends SubsquidUtils {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient
-				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
+				.query(this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX, {
 					parentBountyIndex_in: parentBountyIndices
 				})
 				.toPromise();
@@ -571,32 +571,6 @@ export class SubsquidService extends SubsquidUtils {
 			};
 		} catch (error) {
 			console.error('Error fetching child bounties:', error);
-			return null;
-		}
-	}
-
-	static async getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(
-		network: ENetwork,
-		parentBountyIndices: number[]
-	): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
-		try {
-			const gqlClient = this.subsquidGqlClient(network);
-			const response = await gqlClient
-				.query(this.GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES, { parentBountyIndex_in: parentBountyIndices })
-				.toPromise();
-
-			if (!response?.data) {
-				return { data: { items: [], totalCount: 0 } };
-			}
-
-			return {
-				data: {
-					items: response.data.proposals || [],
-					totalCount: response.data.proposalsConnection?.totalCount || 0
-				}
-			};
-		} catch (error) {
-			console.error('Error fetching claimed child bounties payees and reward:', error);
 			return null;
 		}
 	}

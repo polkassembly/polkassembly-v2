@@ -218,7 +218,7 @@ export class OnChainDbService {
 
 		const activeBountyIndices = activeBountiesResponse.data.items.map(({ index }: IBountyProposal) => index);
 
-		const claimedChildBounties = await SubsquidService.getClaimedChildBountiesPayeesAndRewardForParentBountyIndices(network, activeBountyIndices);
+		const claimedChildBounties = await SubsquidService.getChildBountiesRewards(network, activeBountyIndices);
 
 		if (!claimedChildBounties?.data?.totalCount) {
 			return [];

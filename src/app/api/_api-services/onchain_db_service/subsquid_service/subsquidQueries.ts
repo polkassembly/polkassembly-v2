@@ -812,21 +812,6 @@ export class SubsquidQueries {
         }
     `;
 
-	protected static GET_CLAIMED_CHILD_BOUNTIES_PAYEES_AND_REWARD_FOR_PARENT_BOUNTY_INDICES = `
-		query ClaimedChildBountiesForParentBountyIndices($parentBountyIndex_in: [Int!]) {
-			proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in, statusHistory_some: {status_eq: Claimed}}, orderBy: id_DESC, limit: 25) {
-				payee
-				reward
-				statusHistory(where: {status_eq: Claimed}) {
-					timestamp
-				}
-			}
-			proposalsConnection(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in, statusHistory_some: {status_eq: Claimed}}, orderBy: id_DESC) {
-				totalCount
-			}
-		}
-	`;
-
 	protected static GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS = `
 		query GetLast30DaysConvictionVoteCountByAddress($address_eq: String!, $createdAt_gte: DateTime!){
 			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
