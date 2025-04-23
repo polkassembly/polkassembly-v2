@@ -37,6 +37,7 @@ const getStatuses = (proposalType: EProposalType) => {
 	switch (proposalType) {
 		case EProposalType.CHILD_BOUNTY:
 			return [
+				EProposalStatus.Added,
 				EProposalStatus.Awarded,
 				EProposalStatus.Claimed,
 				EProposalStatus.Cancelled,
