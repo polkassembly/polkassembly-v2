@@ -204,7 +204,7 @@ function ListingCard({
 				<div className={styles.tagContainer}>
 					{data.onChainInfo?.beneficiaries && data.onChainInfo?.beneficiaries.length > 0 && groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries, network) && (
 						<div className={styles.beneficiaryContainer}>
-							{data.onChainInfo?.beneficiaries.length > 1 ? (
+							{Object.keys(groupedByAsset).length > 1 ? (
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<div className='flex items-center gap-1'>
@@ -250,7 +250,7 @@ function ListingCard({
 									</TooltipContent>
 								</Tooltip>
 							) : (
-								Object.entries(groupedByAsset).map(([assetId, amount], i) => (
+								Object.entries(groupedByAsset).map(([assetId, amount]) => (
 									<div
 										className={styles.requestedAmount}
 										key={assetId}
@@ -265,7 +265,6 @@ function ListingCard({
 												)
 											)}
 										</span>
-										{i < Object.entries(groupedByAsset).length - 1 && <span className='text-text_primary'>&</span>}
 										<span className='block lg:hidden'>|</span>
 									</div>
 								))
