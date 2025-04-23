@@ -426,8 +426,7 @@ export class NextApiClientService {
 		statuses,
 		origins = [],
 		tags = [],
-		limit = DEFAULT_LISTING_LIMIT,
-		preimageSection
+		limit = DEFAULT_LISTING_LIMIT
 	}: {
 		proposalType: string;
 		page: number;
@@ -435,7 +434,6 @@ export class NextApiClientService {
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
-		preimageSection?: string;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
 		if (this.isServerSide()) {
@@ -448,8 +446,7 @@ export class NextApiClientService {
 				limit,
 				statuses,
 				origins,
-				tags,
-				preimageSection
+				tags
 			});
 
 			if (cachedData) {
@@ -476,10 +473,6 @@ export class NextApiClientService {
 
 		if (origins?.length) {
 			origins.forEach((origin) => queryParams.append('origin', origin));
-		}
-
-		if (preimageSection?.length) {
-			queryParams.append('preimageSection', preimageSection);
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
