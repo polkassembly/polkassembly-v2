@@ -764,18 +764,6 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX_RANGE = `
-		query RewardsByIndexRange($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_gte: Int!, $index_lte: Int!) {
-			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_gte: $index_gte, index_lte: $index_lte}) {
-				index
-				reward
-			}
-			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in, index_gte: $index_gte, index_lte: $index_lte}) {
-				totalCount
-			}
-		}
-	`;
-
 	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES = `
 		query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!) {
 			totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
