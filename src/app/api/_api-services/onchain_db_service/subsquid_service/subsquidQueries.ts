@@ -710,17 +710,25 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS = `
-		query Rewards($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!) {
-			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in}) {
+	protected static GET_CHILD_BOUNTIES_REWARDS = `
+        query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
+            proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+                reward
+				payee
 				index
-				reward
-			}
-			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_not_in: $status_not_in}) {
-				totalCount
-			}
-		}
-	`;
+				status
+				createdAt
+				parentBountyIndex
+                statusHistory {
+                    status
+                    timestamp
+                }
+            }
+            proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+                totalCount
+            }
+        }
+    `;
 
 	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
 		query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $limit:Int!, $offset:Int! ) {
@@ -785,26 +793,6 @@ export class SubsquidQueries {
 			}
 		}
 	`;
-
-	protected static GET_CHILD_BOUNTIES_REWARDS = `
-        query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
-            proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
-                reward
-				payee
-				index
-				status
-				createdAt
-				parentBountyIndex
-                statusHistory {
-                    status
-                    timestamp
-                }
-            }
-            proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
-                totalCount
-            }
-        }
-    `;
 
 	protected static GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS = `
 		query GetLast30DaysConvictionVoteCountByAddress($address_eq: String!, $createdAt_gte: DateTime!){
