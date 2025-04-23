@@ -8,7 +8,7 @@ import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';
-import { EActivityFeedTab, IPostListing } from '@/_shared/types';
+import { EActivityFeedTab, ENotificationStatus, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -23,7 +23,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { usePostReactions, type SubscriptionResult } from '@/hooks/usePostReactions';
+import { usePostReactions } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
 import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
@@ -32,6 +32,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/useToast';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -53,6 +54,7 @@ function ActivityFeedPostItem({
 }) {
 	const { user } = useUser();
 	const router = useRouter();
+	const { toast } = useToast();
 	const searchParams = useSearchParams();
 	const isInSubscriptionTab = useMemo(() => {
 		return searchParams?.get('tab') === EActivityFeedTab.SUBSCRIBED;
@@ -62,7 +64,7 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe } = usePostReactions({
+	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
@@ -85,14 +87,17 @@ function ActivityFeedPostItem({
 				throw new ClientError(ERROR_CODES.INVALID_PARAMS_ERROR, 'Post index or hash is undefined');
 			}
 
-			const result = (await handleSubscribe()) as SubscriptionResult;
+			const result = await handleSubscribe();
 
-			if (isInSubscriptionTab && result.wasUnsubscribed && !result.error) {
-				onUnsubscribe?.((postData?.index ?? postData?.hash)!);
+			if (isInSubscriptionTab && result.wasUnsubscribed && !result.error && onUnsubscribe) {
+				onUnsubscribe((postData?.index ?? postData?.hash)!);
 			}
 		} catch (error) {
 			console.error('Error handling subscription:', error);
-			// TODO: add toast instead of console.error
+			toast({
+				title: 'Failed to update subscription',
+				status: ENotificationStatus.ERROR
+			});
 		}
 	};
 
@@ -266,6 +271,7 @@ function ActivityFeedPostItem({
 						handleReaction={handleReaction}
 						isSubscribed={isSubscribed}
 						handleSubscribe={handleSubscribeClick}
+						key={`reaction-bar-${subscriptionKey}`}
 					/>
 
 					<CommentInput
