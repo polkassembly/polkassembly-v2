@@ -96,11 +96,4 @@ export class SubsquareOnChainService {
 
 		return onChainPostInfo;
 	}
-
-	static async GetBountyData(network: ENetwork, bountyId: string) {
-		const url = this.postDetailsUrlMap[EProposalType.BOUNTY](bountyId, network);
-
-		const data = await fetchWithTimeout(new URL(url)).then((res) => res.json());
-		return data?.onchainData;
-	}
 }

@@ -8,14 +8,9 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ENetwork } from '@shared/types';
-import { PolkadotApiService } from '@/app/_client-services/polkadot_api_service';
-import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
-
-interface IActiveBounties {
-	index: { toJSON: () => number };
-}
+import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
@@ -23,33 +18,21 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
 	}
 
-	const api = await PolkadotApiService.Init(network);
-	const activeBounties = await api.getActiveBounties();
+	// Get active bounties with rewards from Subsquare via Subsquid
+	const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
 
-	const balances = await Promise.all(
-		activeBounties.map(async (bounty: IActiveBounties) => {
-			const id = bounty?.index?.toJSON();
-			if (!id) return new BN(0);
+	if (!activeBountiesResponse) {
+		return NextResponse.json({ bountyAmount: '0' });
+	}
 
-			const bountyData = await OnChainDbService.GetBountyData(network, id.toString());
-			const address = bountyData?.address;
+	const activeProposals = activeBountiesResponse.data.items || [];
 
-			if (!address) {
-				const metadataValue = bountyData?.meta?.value || 0;
-				return new BN(metadataValue);
-			}
+	// Sum up all bounty rewards
+	const total = activeProposals.reduce((acc: BN, { reward }) => {
+		return acc.add(new BN(reward || '0'));
+	}, BN_ZERO);
 
-			try {
-				return await api.getAccountData(address);
-			} catch (accountError) {
-				console.error(`Error fetching account data for bounty ${id}: ${accountError}`);
-				return new BN(0);
-			}
-		})
-	);
-
-	await api.disconnect();
-	const total = balances.reduce((acc: BN, curr: BN) => acc.add(curr), BN_ZERO);
+	// Format the amount appropriately
 	const bountyAmount = total.div(new BN(10).pow(new BN(10))).toString();
 
 	return NextResponse.json({ bountyAmount });
