@@ -103,8 +103,8 @@ export class SubscanAddressService {
 			responseData.multisig.push(multisigData);
 		}
 
-		responseData.proxy = await this.GetProxyAddresses({ addresses: realAccount, network });
-		responseData.proxied = await this.GetProxyAddresses({ addresses: proxyAddresses, network });
+		responseData.proxied = await this.GetProxyAddresses({ addresses: realAccount, network });
+		responseData.proxy = await this.GetProxyAddresses({ addresses: proxyAddresses, network });
 
 		return responseData;
 	}

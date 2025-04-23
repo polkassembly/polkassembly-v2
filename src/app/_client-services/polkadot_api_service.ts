@@ -78,26 +78,26 @@ export class PolkadotApiService {
 		if (!this.api || !tx) return;
 
 		let mainTx = tx;
-		const getRegularAddress = (selectedAccount?: ISelectedAccount): boolean => {
-			if (!selectedAccount) return false;
+		const getRegularAddress = (selectedAccount?: ISelectedAccount): ISelectedAccount | null => {
+			if (!selectedAccount) return null;
 			if (selectedAccount.accountType === EAccountType.MULTISIG) {
-				return true;
+				return selectedAccount;
 			}
 			if (selectedAccount.parent) {
 				return getRegularAddress(selectedAccount.parent);
 			}
-			return false;
+			return null;
 		};
-		const isMultisig = getRegularAddress(selectedAccount);
-
-		if (isMultisig || selectedAccount?.accountType === EAccountType.MULTISIG) {
-			const signatories = selectedAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
-			const { weight } = await mainTx.paymentInfo(address);
-			mainTx = this.api.tx.multisig.asMulti(selectedAccount?.threshold, signatories, null, mainTx, weight);
-		}
+		const multisigAccount = getRegularAddress(selectedAccount);
 
 		if (selectedAccount?.accountType === EAccountType.PROXY) {
 			mainTx = this.api.tx.proxy.proxy(selectedAccount.address, null, mainTx);
+		}
+
+		if (multisigAccount) {
+			const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
+			const { weight } = await mainTx.paymentInfo(address);
+			mainTx = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, mainTx, weight);
 		}
 
 		const extrinsic = mainTx;

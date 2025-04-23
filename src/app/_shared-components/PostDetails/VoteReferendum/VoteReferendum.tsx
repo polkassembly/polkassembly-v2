@@ -46,7 +46,6 @@ function VoteReferendum({ index }: { index: string }) {
 		if (isInvalidAmount) return;
 
 		try {
-			console.log('userPreferences.address', userPreferences.address);
 			const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
 				if (selectedAccount.parent) {
 					return getRegularAddress(selectedAccount.parent);

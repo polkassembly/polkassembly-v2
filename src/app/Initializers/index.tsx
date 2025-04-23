@@ -238,8 +238,6 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				userAddressWithProxy[address] = await MultisigService.fetchMultisigAndProxyAddresses(address);
 			}
 
-			console.log('userAddressWithProxy', userAddressWithProxy);
-
 			setLinkedAddress(userAddressWithProxy);
 		};
 		fetchLinkedAddress();
