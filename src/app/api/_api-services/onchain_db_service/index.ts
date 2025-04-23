@@ -175,14 +175,11 @@ export class OnChainDbService {
 			return acc.add(new BN(reward || '0'));
 		}, BN_ZERO);
 
-		const bountyAmount = Number(total.div(new BN(10).pow(new BN(10))).toString());
 		const activeBounties = activeBountiesResponse?.data?.totalCount || 0;
 
 		if (!activeBounties) {
 			return defaultStats;
 		}
-
-		let totalBountyPool = activeProposals.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
 
 		const activeBountyIndices = activeProposals.map(({ index }: IBountyProposal) => index);
 
@@ -192,15 +189,15 @@ export class OnChainDbService {
 			return {
 				...defaultStats,
 				activeBounties: Number(activeBounties),
-				totalBountyPool
+				totalBountyPool: total
 			};
 		}
 
-		totalBountyPool = childBountiesResponse.data.items.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
+		const totalBountyPool = childBountiesResponse.data.items.reduce((totalValue: BN, { reward }: IBountyProposal) => totalValue.add(new BN(reward)), BN_ZERO);
 
 		const awardedChildBounties = childBountiesResponse.data.items.filter((bounty: IBountyProposal) => bounty.statusHistory?.some((item) => item?.status === 'Awarded'));
 
-		const totalRewarded = awardedChildBounties.reduce((total: BN, { reward }: IBountyProposal) => total.add(new BN(reward)), BN_ZERO);
+		const totalRewarded = awardedChildBounties.reduce((totalValue: BN, { reward }: IBountyProposal) => totalValue.add(new BN(reward)), BN_ZERO);
 
 		return {
 			activeBounties: Number(activeBounties),
@@ -208,7 +205,7 @@ export class OnChainDbService {
 			peopleEarned: childBountiesResponse.data.totalCount,
 			totalBountyPool,
 			totalRewarded,
-			bountyAmount
+			bountyAmount: Number(total.div(new BN(10).pow(new BN(10))).toString())
 		};
 	}
 
