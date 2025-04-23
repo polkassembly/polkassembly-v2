@@ -802,8 +802,14 @@ export class SubsquidQueries {
         query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
             proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
                 reward
+				payee
+				index
+				status
+				createdAt
+				parentBountyIndex
                 statusHistory {
                     status
+                    timestamp
                 }
             }
             proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
