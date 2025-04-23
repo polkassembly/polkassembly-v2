@@ -753,7 +753,7 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX = `
-		query RewardsByIndex($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_eq: Int!) {
+		query RewardsByIndex($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_eq: Int) {
 			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}) {
 				index
 				reward

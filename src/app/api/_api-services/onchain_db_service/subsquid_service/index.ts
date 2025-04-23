@@ -497,33 +497,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getActiveBountiesWithRewards(network: ENetwork): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
-		try {
-			const gqlClient = this.subsquidGqlClient(network);
-			const response = await gqlClient
-				.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS, {
-					type_eq: EProposalType.BOUNTY,
-					status_not_in: [EProposalStatus.Cancelled, EProposalStatus.Rejected, EProposalStatus.Approved, EProposalStatus.Claimed]
-				})
-				.toPromise();
-
-			if (!response?.data) {
-				return { data: { items: [], totalCount: 0 } };
-			}
-
-			return {
-				data: {
-					items: response.data.proposals || [],
-					totalCount: response.data.proposalsConnection?.totalCount || 0
-				}
-			};
-		} catch (error) {
-			console.error('Error fetching active bounties:', error);
-			return null;
-		}
-	}
-
-	static async getActiveBountiesWithRewardsByIndex(network: ENetwork, index: number): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+	static async getActiveBountiesWithRewardsByIndex(network: ENetwork, index?: number): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient

@@ -160,7 +160,7 @@ export class OnChainDbService {
 	}
 
 	static async getBountyStats(network: ENetwork): Promise<IBountyStats> {
-		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
+		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewardsByIndex(network);
 		const defaultStats: IBountyStats = {
 			activeBounties: 0,
 			availableBountyPool: BN_ZERO,
@@ -212,7 +212,7 @@ export class OnChainDbService {
 	}
 
 	static async getBountyUserActivity(network: ENetwork): Promise<IBountyUserActivity[]> {
-		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
+		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewardsByIndex(network);
 
 		if (!activeBountiesResponse?.data?.totalCount) {
 			return [];
