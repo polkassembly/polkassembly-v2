@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextResponse } from 'next/server';
-import { BN, BN_ZERO } from '@polkadot/util';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
@@ -11,7 +10,6 @@ import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { ENetwork } from '@shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
-import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
@@ -21,24 +19,11 @@ export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 
 	const stats = await OnChainDbService.getBountyStats(network);
 
-	const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewards(network);
-	let bountyAmount = '0';
-
-	if (activeBountiesResponse) {
-		const activeProposals = activeBountiesResponse.data.items || [];
-
-		const total = activeProposals.reduce((acc: BN, { reward }) => {
-			return acc.add(new BN(reward || '0'));
-		}, BN_ZERO);
-
-		bountyAmount = total.div(new BN(10).pow(new BN(10))).toString();
-	}
-
 	return NextResponse.json({
 		...stats,
 		availableBountyPool: stats.availableBountyPool.toString(),
 		totalBountyPool: stats.totalBountyPool.toString(),
 		totalRewarded: stats.totalRewarded.toString(),
-		bountyAmount
+		bountyAmount: stats.bountyAmount
 	});
 });

@@ -166,10 +166,16 @@ export class OnChainDbService {
 			availableBountyPool: BN_ZERO,
 			peopleEarned: 0,
 			totalBountyPool: BN_ZERO,
-			totalRewarded: BN_ZERO
+			totalRewarded: BN_ZERO,
+			bountyAmount: 0
 		};
 
 		const activeProposals = activeBountiesResponse?.data?.items || [];
+		const total = activeProposals.reduce((acc: BN, { reward }) => {
+			return acc.add(new BN(reward || '0'));
+		}, BN_ZERO);
+
+		const bountyAmount = Number(total.div(new BN(10).pow(new BN(10))).toString());
 		const activeBounties = activeBountiesResponse?.data?.totalCount || 0;
 
 		if (!activeBounties) {
@@ -201,7 +207,8 @@ export class OnChainDbService {
 			availableBountyPool: totalBountyPool,
 			peopleEarned: childBountiesResponse.data.totalCount,
 			totalBountyPool,
-			totalRewarded
+			totalRewarded,
+			bountyAmount
 		};
 	}
 
