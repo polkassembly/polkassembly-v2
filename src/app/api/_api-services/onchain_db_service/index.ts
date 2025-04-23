@@ -195,7 +195,9 @@ export class OnChainDbService {
 
 		const totalBountyPool = childBountiesResponse.data.items.reduce((totalValue: BN, { reward }: IBountyProposal) => totalValue.add(new BN(reward)), BN_ZERO);
 
-		const awardedChildBounties = childBountiesResponse.data.items.filter((bounty: IBountyProposal) => bounty.statusHistory?.some((item) => item?.status === 'Awarded'));
+		const awardedChildBounties = childBountiesResponse.data.items.filter((bounty: IBountyProposal) =>
+			bounty.statusHistory?.some((item) => item?.status === EProposalStatus.Awarded)
+		);
 
 		const totalRewarded = awardedChildBounties.reduce((totalValue: BN, { reward }: IBountyProposal) => totalValue.add(new BN(reward)), BN_ZERO);
 

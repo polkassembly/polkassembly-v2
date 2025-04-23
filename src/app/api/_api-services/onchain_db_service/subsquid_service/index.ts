@@ -554,7 +554,7 @@ export class SubsquidService extends SubsquidUtils {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient
-				.query(this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX, {
+				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
 					parentBountyIndex_in: parentBountyIndices
 				})
 				.toPromise();
