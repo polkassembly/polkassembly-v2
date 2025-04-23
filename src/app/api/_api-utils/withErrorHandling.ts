@@ -18,7 +18,7 @@ export const withErrorHandling = (handler: { (req: NextRequest, context?: any): 
 	return async (req: NextRequest, context?: any) => {
 		try {
 			// check if network header is valid, throws error if not
-			Promise.all([getNetworkFromHeaders(), storeApiKeyUsage(req)]);
+			await Promise.all([getNetworkFromHeaders(), storeApiKeyUsage(req)]);
 			return await handler(req, context);
 		} catch (error) {
 			console.log('Error in API call : ', req.nextUrl.href);
