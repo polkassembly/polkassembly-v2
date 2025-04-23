@@ -80,7 +80,6 @@ export class SubsquidQueries {
 					proposedCall {
 						args
 					}
-					section
 				}
 				statusHistory {
 					status
@@ -110,7 +109,6 @@ export class SubsquidQueries {
 					proposedCall {
 						args
 					}
-					section
 				}
 				statusHistory {
 					status
@@ -141,14 +139,14 @@ export class SubsquidQueries {
 					index
 					origin
 					proposer
+					reward
+					curator
 					status,
 					hash,
-					reward,
 					preimage {
 							proposedCall {
 									args
 							}
-							section
 					}
 					statusHistory {
 							status
@@ -195,7 +193,6 @@ export class SubsquidQueries {
 							proposedCall {
 									args
 							}
-							section
 					}
 					statusHistory {
 							status
@@ -233,7 +230,6 @@ export class SubsquidQueries {
 					proposedCall {
 						args
 					}
-					section
 				}
 				statusHistory {
 					status
@@ -263,7 +259,6 @@ export class SubsquidQueries {
 					proposedCall {
 						args
 					}
-					section
 				}
 				statusHistory {
 					status
