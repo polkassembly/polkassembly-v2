@@ -60,7 +60,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
-				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-screen-2xl')}>
+				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-screen-xl')}>
 					<div className={classes.leftWrapper}>
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
