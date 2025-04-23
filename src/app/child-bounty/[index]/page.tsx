@@ -10,14 +10,14 @@ import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
-	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.BOUNTY, indexOrHash: index });
+	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
 
 	// Default description and title
 	let { description, title } = OPENGRAPH_METADATA;
 
 	// Use post title in description if available
 	if (data) {
-		title = `Polkassembly - Bounty #${index}`;
+		title = `Polkassembly - Child Bounty #${index}`;
 		description = `Bounty #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
 	}
 
@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	};
 }
 
-async function Bounty({ params }: { params: Promise<{ index: string }> }) {
+async function ChildBounty({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
-	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.BOUNTY, indexOrHash: index });
+	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
 
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
@@ -43,4 +43,4 @@ async function Bounty({ params }: { params: Promise<{ index: string }> }) {
 	);
 }
 
-export default Bounty;
+export default ChildBounty;

@@ -260,6 +260,8 @@
 		"BigTipperDescription": "Origin able to spend up to 1000 DOT from the treasury at onceShow.",
 		"Bounty": "Onchain Bounty",
 		"BountyDescription": "A space to share insights, provide feedback, and collaborate on ideas that impact the network.",
+		"ChildBounty": "Onchain Child Bounty",
+		"ChildBountyDescription": "This is the place to discuss on-chain child bounties. Child Bounty posts are automatically generated as soon as they are created on-chain. Only the proposer is able to edit them.",
 		"Discussion": "Discussions",
 		"DiscussionDescription": "A space to share insights, provide feedback, and collaborate on ideas that impact the network.",
 		"FellowshipAdmin": "Fellowship Admin",
@@ -316,6 +318,7 @@
 		"techCommProposals": "Tech Comm Proposals",
 		"main": "Main",
 		"bounty": "Bounty",
+		"childBounties": "Child Bounties",
 		"bountyDashboard": "Bounty Dashboard",
 		"batchVoting": "Batch Voting",
 		"tracks": "TRACKS",
@@ -419,7 +422,14 @@
 			"description": "Description",
 			"section": "Section",
 			"name": "Name",
-			"value": "Value"
+			"value": "Value",
+			"deposit": "Deposit",
+			"curatorDeposit": "Curator Deposit",
+			"reward": "Reward",
+			"fee": "Fee",
+			"parentBountyIndex": "Parent Bounty Index",
+			"payee": "Payee",
+			"curator": "Curator"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",
@@ -455,7 +465,13 @@
 		"Submitted": "Submitted",
 		"TimedOut": "Timed Out",
 		"Pending": "Pending",
-		"Unknown": "Unknown"
+		"Unknown": "Unknown",
+		"Claimed": "Claimed",
+		"Added": "Added",
+		"Awarded": "Awarded",
+		"CuratorProposed": "Curator Proposed",
+		"CuratorUnassigned": "Curator Unassigned",
+		"CuratorAssigned": "Curator Assigned"
 	},
 	"ListingPage_Tags": {
 		"bounty": "Bounty",
@@ -705,6 +721,11 @@
 		"cancelled": "Cancelled",
 		"rejected": "Rejected"
 	},
+	"ChildBounties": {
+		"childBounties": "Child Bounties",
+		"parentBounty": "Parent Bounty",
+		"viewAllChildBounties": "View All"
+	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
 		"please": "Please",
@@ -731,22 +752,23 @@
 	"CreateProposal": {
 		"create": "Create",
 		"quickActions": "Quick Actions",
+		"trendingNow": "Trending Now",
 		"submitProposal": "Submit Proposal",
-		"createDiscussion": "Discussion Post",
-		"createPreimage": "New Preimage",
+		"createDiscussion": "Create a Discussion Post",
+		"createPreimage": "Create Preimage",
 		"existingPreimage": "I already have a Preimage",
 		"spend": "Spend",
 		"from": "from",
 		"Treasury": "Treasury",
-		"usdxProposal": "Spend Assets from AssetHub (USDx, DOT, etc.)",
+		"usdxProposal": "Create a USDX  Proposal",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
 		"createBounty": "Create Bounty",
 		"createDiscussionDescription": "Start a conversation and gather feedback.",
-		"createPreimageDescription": "Submit a proposal with a new preimage hash.",
-		"existingPreimageDescription": "Use an existing preimage hash for submission.",
-		"createTreasuryProposalDescription": "Propose treasury spending in",
-		"usdxProposalDescription": "Request funding from AssetHub (USDx, DOT, etc.).",
+		"createPreimageDescription": "Create a proposal from scratch.",
+		"existingPreimageDescription": "Select from existing preimages to create proposal.",
+		"createTreasuryProposalDescription": "Create a treasury proposal to allocate funds in ",
+		"usdxProposalDescription": "Propose a spend from AssetHub, schedule payments, and include multiple beneficiaries.",
 		"cancelReferendumDescription": "Propose to cancel an active referendum.",
 		"killReferendumDescription": "Terminate a referendum before it passes.",
 		"createBountyDescription": "Propose a bounty for a specific task or project.",
@@ -754,7 +776,12 @@
 		"preimageHash": "Preimage Hash",
 		"preimageLength": "Length",
 		"preimageHashDescription": "Enter Hash",
-		"viewPreimage": "View Preimage"
+		"viewPreimage": "View Preimage",
+		"stepDescriptionKillReferendum": "This will create a preimage and a proposal to spend assets from Assethub, the spend will need to be claimed.",
+		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
+		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
+		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",

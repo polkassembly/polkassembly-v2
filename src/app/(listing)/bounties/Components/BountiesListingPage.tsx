@@ -32,7 +32,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 		if (value !== EBountyStatus.ALL) {
 			params.set('status', value);
 		}
-		router.push(`/bounties-listing?${params.toString()}`);
+		router.push(`/bounties?${params.toString()}`);
 	};
 
 	return (
@@ -74,7 +74,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 
 				{statusValues.map((statusValue) => (
 					<TabsContent
-						key={statusValue}
+						key={`tab-content-${statusValue}`}
 						value={statusValue}
 					>
 						{initialData?.totalCount ? (

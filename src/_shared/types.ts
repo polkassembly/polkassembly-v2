@@ -484,6 +484,11 @@ export interface IStatusHistoryItem {
 
 export interface IOnChainPostInfo {
 	reward?: string;
+	fee?: string;
+	deposit?: string;
+	curatorDeposit?: string;
+	parentBountyIndex?: number;
+	payee?: string;
 	proposer: string;
 	status: EProposalStatus;
 	createdAt?: Date;
