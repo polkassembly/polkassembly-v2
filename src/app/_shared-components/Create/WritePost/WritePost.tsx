@@ -179,25 +179,27 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 								className={classes.radioGroup}
 								onValueChange={(e) => field.onChange(e)}
 							>
-								{allowedCommentorsOptions?.map((option) => {
-									return (
-										<div
-											key={option.value}
-											className='flex items-center space-x-2'
-										>
-											<RadioGroupItem
-												value={option.value}
-												id={option.value}
-											/>
-											<Label
-												htmlFor={option.value}
-												className={classes.radioGroupItem}
+								<div className='flex flex-row gap-2'>
+									{allowedCommentorsOptions?.map((option) => {
+										return (
+											<div
+												key={option.value}
+												className='flex items-center space-x-2'
 											>
-												{option.label}
-											</Label>
-										</div>
-									);
-								})}
+												<RadioGroupItem
+													value={option.value}
+													id={option.value}
+												/>
+												<Label
+													htmlFor={option.value}
+													className={classes.radioGroupItem}
+												>
+													{option.label}
+												</Label>
+											</div>
+										);
+									})}
+								</div>
 							</RadioGroup>
 						</FormControl>
 
