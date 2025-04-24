@@ -737,7 +737,9 @@
 		"spendPeriodRemainingInfo": "Von der Finanzverwaltung angeforderte Mittel werden am Ende der Ausgabenperiode periodisch verteilt.",
 		"days": "Tage",
 		"hours": "Std.",
-		"switchToActivityFeed": "Zum Aktivitätsfeed wechseln"
+		"switchToActivityFeed": "Zum Aktivitätsfeed wechseln",
+		"topic": "Thema",
+		"creator": "Ersteller"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

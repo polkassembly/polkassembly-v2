@@ -21,7 +21,7 @@ import AddressDisplay from './AddressDisplay';
 import { Skeleton } from '../../Skeleton';
 
 interface AddressTooltipContentProps {
-	address: string;
+	address?: string;
 	userProfileUrl?: string;
 	displayText: string;
 	identity?: IOnChainIdentity;
@@ -147,13 +147,15 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 						{isUserDataLoading ? (
 							<Skeleton className='mb-1 h-6 w-40' />
 						) : (
-							<AddressDisplay
-								address={address}
-								identity={identity}
-								displayText={displayText}
-								userProfileUrl={userProfileUrl}
-								onCopy={copyToClipboard}
-							/>
+							address && (
+								<AddressDisplay
+									address={address}
+									identity={identity}
+									displayText={displayText}
+									userProfileUrl={userProfileUrl}
+									onCopy={copyToClipboard}
+								/>
+							)
 						)}
 
 						{isUserDataLoading ? (

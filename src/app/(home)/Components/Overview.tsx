@@ -6,7 +6,6 @@ import { Suspense } from 'react';
 import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import styles from './Overview.module.scss';
-import SpendPeriod from './SpendPeriod/SpendPeriod';
 import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
@@ -27,11 +26,6 @@ function Overview({
 			{/* About Section */}
 			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 				<AboutSection />
-			</div>
-
-			<div className='mt-6 grid gap-4 lg:grid-cols-2'>
-				{/* Treasury Stats goes here */}
-				<SpendPeriod />
 			</div>
 
 			{/* Latest Activity */}

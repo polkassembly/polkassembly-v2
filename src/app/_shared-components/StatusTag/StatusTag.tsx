@@ -9,7 +9,7 @@ import styles from './StatusTag.module.scss';
 
 interface Props {
 	className?: string;
-	status: string | undefined;
+	status?: string;
 	colorInverted?: boolean;
 }
 

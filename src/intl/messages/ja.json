@@ -714,7 +714,9 @@
 		"spendPeriodRemainingInfo": "財務から要求された資金は、支出期間の終わりに定期的に分配されます。",
 		"days": "日",
 		"hours": "時間",
-		"switchToActivityFeed": "アクティビティフィードに切り替え"
+		"switchToActivityFeed": "アクティビティフィードに切り替え",
+		"topic": "トピック",
+		"creator": "作成者"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",

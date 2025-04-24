@@ -763,7 +763,9 @@
 		"spendPeriodRemainingInfo": "Funds requested from the treasury are periodically distributed at the end of the spend period.",
 		"days": "days",
 		"hours": "hrs",
-		"switchToActivityFeed": "Switch to Activity Feed"
+		"switchToActivityFeed": "Switch to Activity Feed",
+		"topic": "Topic",
+		"creator": "Creator"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",

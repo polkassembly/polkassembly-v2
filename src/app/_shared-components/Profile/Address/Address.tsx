@@ -18,8 +18,9 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../
 import AddressTooltipContent from './AddressTooltipContent';
 
 interface AddressProps {
+	userId?: number;
 	className?: string;
-	address: string;
+	address?: string;
 	truncateCharLen?: number;
 	iconSize?: number;
 	showIdenticon?: boolean;
@@ -30,6 +31,7 @@ interface AddressProps {
 }
 
 function Address({
+	userId,
 	className,
 	address,
 	truncateCharLen = 5,
@@ -53,24 +55,34 @@ function Address({
 	const { data: userData, isLoading: isUserDataLoading } = useQuery<IPublicUser | null>({
 		queryKey: ['userData', address],
 		queryFn: async () => {
-			const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
-			return data ?? null;
+			if (!address && !userId) return null;
+			if (address) {
+				const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
+				return data ?? null;
+			}
+			if (userId) {
+				const { data } = await UserProfileClientService.fetchPublicUserById({ userId });
+				return data ?? null;
+			}
+			return null;
 		},
 		...queryOptions
 	});
-	const encodedAddress = useMemo(() => getEncodedAddress(address, network) || address, [address, network]);
+
+	const encodedAddress = useMemo(() => (address && getEncodedAddress(address, network)) || address, [address, network]);
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || '');
 	const [identity, setIdentity] = useState<IOnChainIdentity | undefined>();
 
 	const userProfileUrl = useMemo(() => {
 		if (!network || isUserDataLoading) return undefined;
 		const username = userData?.username;
-		return username && username.length > 0 ? `/user/username/${username}` : address.length > 0 ? `/user/address/${address}` : undefined;
+		return username && username.length > 0 ? `/user/username/${username}` : address && address.length > 0 ? `/user/address/${address}` : userId ? `/user/id/${userId}` : undefined;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [network, address, userData]);
+	}, [network, address, userData, userId]);
 
 	useEffect(() => {
 		const initializeIdentity = async () => {
+			if (!encodedAddress) return;
 			setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
 			try {
@@ -95,7 +107,7 @@ function Address({
 				className={className}
 				address={encodedAddress}
 				onChainIdentity={identity}
-				addressDisplayText={displayText}
+				addressDisplayText={displayText || userData?.username}
 				userProfileUrl={userProfileUrl}
 				iconSize={iconSize}
 				showIdenticon={showIdenticon}
@@ -107,7 +119,7 @@ function Address({
 
 	return (
 		<div className={classes.tooltipWrapper}>
-			<TooltipProvider delayDuration={0}>
+			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div className='relative cursor-pointer'>
@@ -116,7 +128,7 @@ function Address({
 								address={encodedAddress}
 								onChainIdentity={identity}
 								userProfileUrl={userProfileUrl}
-								addressDisplayText={displayText}
+								addressDisplayText={displayText || userData?.username}
 								iconSize={iconSize}
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}

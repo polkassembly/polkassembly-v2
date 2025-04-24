@@ -6,7 +6,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EProposalStatus, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useTranslations } from 'next-intl';
@@ -15,8 +15,8 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 
-import { useRouter } from 'next/navigation';
-import styles from '../Overview.module.scss';
+import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
+import { useRouter } from 'nextjs-toploader/app';
 
 enum EOverviewTabs {
 	All = 'all',
@@ -39,18 +39,11 @@ function LatestActivity({
 
 	const DATE_FORMAT = "Do MMM 'YY";
 
-	const parseCamelCase = (str: string) => {
-		return str
-			.replace(/([A-Z])/g, ' $1')
-			.replace(/^./, (s) => s.toUpperCase())
-			.trim();
-	};
-
 	return (
-		<div>
-			<h2 className={styles.latest_activity_title}>{t('latestActivity')}</h2>
+		<div className='whitespace-nowrap'>
+			<h2 className='text-xl font-semibold leading-8 tracking-tight text-btn_secondary_text'>{t('latestActivity')}</h2>
 			<Tabs defaultValue={EOverviewTabs.All}>
-				<TabsList className='hide_scrollbar flex w-full justify-start overflow-x-auto'>
+				<TabsList className='hide_scrollbar mb-4 flex w-full justify-start overflow-x-auto'>
 					<TabsTrigger
 						showBorder
 						className='text-xm border-b border-b-border_grey font-medium text-text_primary data-[state=active]:border-b-0'
@@ -78,15 +71,15 @@ function LatestActivity({
 				</TabsList>
 				{/* "All" Tab */}
 				<TabsContent value={EOverviewTabs.All}>
-					<Table className='mt-4'>
+					<Table className='text_text_primary text-sm'>
 						<TableHeader>
-							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>#</TableHead>
-								<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('created')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('origin')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
+							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+								<TableHead className='py-4'>#</TableHead>
+								<TableHead className='py-4'>{t('title')}</TableHead>
+								<TableHead className='py-4'>{t('postedBy')}</TableHead>
+								<TableHead className='py-4'>{t('created')}</TableHead>
+								<TableHead className='py-4'>{t('origin')}</TableHead>
+								<TableHead className='py-4 text-right'>{t('status')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -97,15 +90,15 @@ function LatestActivity({
 										onClick={() => router.push(`/referenda/${row.index}`)}
 										key={row.index}
 									>
-										<TableCell className={styles.tableCell}>{row.index}</TableCell>
-										<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.origin && parseCamelCase(row.onChainInfo?.origin)}</TableCell>
-										<TableCell className={styles.tableCell_status}>
+										<TableCell className='py-4'>{row.index}</TableCell>
+										<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
+										<TableCell className='truncate py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
+										<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
+										<TableCell className='py-4'>{row.onChainInfo?.origin && parseCamelCase(row.onChainInfo?.origin)}</TableCell>
+										<TableCell className='flex justify-end py-4'>
 											<StatusTag
-												className='text-center'
-												status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+												className='w-max'
+												status={row.onChainInfo?.status}
 											/>
 										</TableCell>
 									</TableRow>
@@ -126,14 +119,14 @@ function LatestActivity({
 
 				{/* "Discussion" Tab */}
 				<TabsContent value={EOverviewTabs.Discussion}>
-					<Table className='mt-4'>
+					<Table className='text_text_primary text-sm'>
 						<TableHeader>
-							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>#</TableHead>
-								<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('created')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
+							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+								<TableHead className='py-4'>#</TableHead>
+								<TableHead className='py-4'>{t('title')}</TableHead>
+								<TableHead className='py-4'>{t('topic')}</TableHead>
+								<TableHead className='py-4'>{t('creator')}</TableHead>
+								<TableHead className='py-4'>{t('created')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -144,16 +137,16 @@ function LatestActivity({
 										onClick={() => router.push(`/post/${row.index}`)}
 										key={row.index}
 									>
-										<TableCell className={styles.tableCell}>{row.index}</TableCell>
-										<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-										<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-										<TableCell className={styles.tableCell_status}>
-											<StatusTag
-												className='text-center'
-												status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+										<TableCell className='py-4'>{row.index}</TableCell>
+										<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
+										<TableCell className='py-4'>{row.topic && parseCamelCase(row.topic)}</TableCell>
+										<TableCell className='py-4'>
+											<Address
+												userId={row.publicUser?.id}
+												address={row.publicUser?.addresses?.[0]}
 											/>
 										</TableCell>
+										<TableCell className='py-4'>{row.createdAt && dayjs(row.createdAt).format(DATE_FORMAT)}</TableCell>
 									</TableRow>
 								))
 							) : (
@@ -176,14 +169,14 @@ function LatestActivity({
 						key={track.trackName}
 						value={track.trackName}
 					>
-						<Table className='mt-4'>
+						<Table className='text_text_primary text-sm'>
 							<TableHeader>
-								<TableRow className={styles.tableRow}>
-									<TableHead className={styles.tableCell_1}>#</TableHead>
-									<TableHead className={styles.tableCell_2}>{t('title')}</TableHead>
-									<TableHead className={styles.tableCell}>{t('postedBy')}</TableHead>
-									<TableHead className={styles.tableCell}>{t('created')}</TableHead>
-									<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
+								<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+									<TableHead className='py-4'>#</TableHead>
+									<TableHead className='py-4'>{t('title')}</TableHead>
+									<TableHead className='py-4'>{t('postedBy')}</TableHead>
+									<TableHead className='py-4'>{t('created')}</TableHead>
+									<TableHead className='py-4 text-right'>{t('status')}</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -194,14 +187,14 @@ function LatestActivity({
 											key={row.index}
 											onClick={() => router.push(`/referenda/${row.index}`)}
 										>
-											<TableCell className={styles.tableCell}>{row.index}</TableCell>
-											<TableCell className={styles.tableCell_title}>{row.title}</TableCell>
-											<TableCell className={styles.tableCell}>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-											<TableCell className={styles.tableCell}>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-											<TableCell className={styles.tableCell_status}>
+											<TableCell className='py-4'>{row.index}</TableCell>
+											<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
+											<TableCell className='py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
+											<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
+											<TableCell className='flex justify-end py-4'>
 												<StatusTag
-													className='text-center'
-													status={row.onChainInfo?.status === EProposalStatus.DecisionDepositPlaced ? 'Deciding' : row.onChainInfo?.status}
+													className='w-max'
+													status={row.onChainInfo?.status}
 												/>
 											</TableCell>
 										</TableRow>
