@@ -740,6 +740,25 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_CALENDAR_EVENTS_BY_BLOCK = `
+		query GetCalendarEventsByBlock($block_gte: Int!, $block_lt: Int!) {
+			proposals(where: {statusHistory_some: {block_gte: $block_gte, block_lt: $block_lt}}, orderBy: createdAt_DESC) {
+				index
+				status
+				createdAt
+				trackNumber
+				parentBountyIndex
+				type
+				proposer
+				statusHistory {
+					status
+					block
+					timestamp
+				}
+			}
+		}
+	`;
+
 	protected static GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES = `
 		query GetChildBountiesCountByParentBountyIndexes($parentBountyIndex_eq: Int!) {
 			totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {

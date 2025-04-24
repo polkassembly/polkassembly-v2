@@ -894,6 +894,21 @@ export interface IPostSubscription {
 	userId: number;
 }
 
+export interface ICalendarEvent {
+	createdAt: Date;
+	index: number;
+	proposalType: EProposalType;
+	type?: EProposalType;
+	parentBountyIndex?: number;
+	proposer: string;
+	source: EDataSource;
+	status: string;
+	statusHistory: { status: string; timestamp: Date; block: number }[];
+	title: string;
+	trackNo?: number;
+	blockNo?: number;
+}
+
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart'
 }

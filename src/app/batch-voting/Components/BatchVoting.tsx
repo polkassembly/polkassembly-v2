@@ -5,8 +5,7 @@
 'use client';
 
 import { EConvictionAmount, EVoteDecision, IPostListing } from '@/_shared/types';
-import { TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { Tabs } from '@/app/_shared-components/Tabs/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

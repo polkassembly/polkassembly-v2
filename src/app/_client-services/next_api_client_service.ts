@@ -29,15 +29,17 @@ import {
 	ITag,
 	EAllowedCommentor,
 	EOffChainPostTopic,
+	ICalendarEvent,
 	IVoteCartItem,
 	EConvictionAmount,
 	IDelegationStats,
 	IDelegateDetails,
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
-	IContentSummary,
 	ISocialHandle,
-	IVoteHistoryData
+	IVoteHistoryData,
+	ITreasuryStats,
+	IContentSummary
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -50,8 +52,6 @@ import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
-
-const DELEGATE_API_PATH = '/delegation/delegates';
 
 enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
@@ -93,6 +93,7 @@ enum EApiRoute {
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
 	FETCH_CHILD_BOUNTIES = 'FETCH_CHILD_BOUNTIES',
+	GET_CALENDAR_EVENTS = 'GET_CALENDAR_EVENTS',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
@@ -105,11 +106,12 @@ enum EApiRoute {
 	FETCH_DELEGATES = 'FETCH_DELEGATES',
 	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
 	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
-	JUDGEMENT_CALL = 'JUDGEMENT_CALL'
+	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
 }
 
 export class NextApiClientService {
@@ -183,7 +185,10 @@ export class NextApiClientService {
 				path = '/delegation/stats';
 				break;
 			case EApiRoute.FETCH_DELEGATES:
-				path = DELEGATE_API_PATH;
+				path = '/delegation/delegates';
+				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -242,7 +247,7 @@ export class NextApiClientService {
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_PA_DELEGATE:
-				path = DELEGATE_API_PATH;
+				path = '/delegation/delegates';
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
@@ -255,6 +260,9 @@ export class NextApiClientService {
 				path = '/identity/judgement-call';
 				method = 'POST';
 				break;
+			case EApiRoute.GET_CALENDAR_EVENTS:
+				path = '/calendar';
+				break;
 
 			// patch routes
 			case EApiRoute.EDIT_USER_PROFILE:
@@ -263,7 +271,7 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.UPDATE_PA_DELEGATE:
-				path = DELEGATE_API_PATH;
+				path = '/delegation/delegates';
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
@@ -788,6 +796,18 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 
+	static async getCalendarEvents({ startBlockNo, endBlockNo }: { startBlockNo: number; endBlockNo: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_CALENDAR_EVENTS
+		});
+
+		return this.nextApiClientFetch<ICalendarEvent[]>({
+			url,
+			method,
+			data: { startBlockNo, endBlockNo }
+		});
+	}
+
 	static async addPostSubscription(proposalType: EProposalType, index: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POST_SUBSCRIPTION, routeSegments: [proposalType, index, 'subscription'] });
 		return this.nextApiClientFetch<{ message: string; id: string }>({ url, method });
@@ -826,6 +846,15 @@ export class NextApiClientService {
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 
 	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {

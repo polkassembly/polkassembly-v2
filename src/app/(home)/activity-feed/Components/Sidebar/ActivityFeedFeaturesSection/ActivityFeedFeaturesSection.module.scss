@@ -1,0 +1,19 @@
+.featuresContainerOpen {
+	@apply rounded-xl border-[0.6px] border-solid border-border_grey bg-bg_modal p-5 text-text_primary xl:mt-5 2xl:mt-8;
+}
+
+.featuresContainerClosed {
+	@apply rounded-xl border-[0.6px] border-solid border-border_grey bg-bg_modal p-5 text-text_primary xl:mt-8 2xl:mt-12;
+}
+
+.featuresContainerNotLogin {
+	@apply mt-0 rounded-xl border-[0.6px] border-solid border-border_grey bg-bg_modal p-5 text-text_primary;
+}
+
+.featuresTitle {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.featuresLive {
+	@apply mt-1 rounded-full bg-navbar_border px-2 py-0.5 text-[10px] font-bold text-bg_modal;
+}

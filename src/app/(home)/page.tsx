@@ -2,46 +2,80 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Suspense } from 'react';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { EActivityFeedTab } from '@/_shared/types';
-import { CookieService } from '@/_shared/_services/cookie_service';
-import { z } from 'zod';
-import ActivityFeed from './Components/ActivityFeed';
-import { ClientError } from '../_client-utils/clientError';
-import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
-import { redirectFromServer } from '../_client-utils/redirectFromServer';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { EPostOrigin, EProposalType } from '@/_shared/types';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
+import Overview from './Components/Overview';
 
-const zodParamsSchema = z.object({
-	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.EXPLORE)
-});
+async function OverviewPage() {
+	const network = getCurrentNetwork();
+	const fetchTrackDetails = async () => {
+		try {
+			const tracks = NETWORKS_DETAILS[`${network}`]?.trackDetails || {};
+			const { data: allData, error: allError } = await NextApiClientService.fetchListingData({
+				proposalType: EProposalType.REFERENDUM_V2,
+				limit: DEFAULT_LISTING_LIMIT,
+				page: 1
+			});
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ activeTab?: string }> }) {
-	const { tab } = zodParamsSchema.parse(await searchParams);
+			if (allError) {
+				console.error('Error fetching referendum data:', allError);
+			}
 
-	const user = await CookieService.getUserFromCookie();
+			const { data: discussionData, error: discussionError } = await NextApiClientService.fetchListingData({
+				proposalType: EProposalType.DISCUSSION,
+				limit: DEFAULT_LISTING_LIMIT,
+				page: 1
+			});
 
-	if (!user?.id && tab === EActivityFeedTab.SUBSCRIBED) {
-		return redirectFromServer(`/login?nextUrl=/?tab=${tab}`);
-	}
+			if (discussionError) {
+				console.error('Error fetching discussion data:', discussionError);
+			}
 
-	const { data, error } =
-		tab === EActivityFeedTab.SUBSCRIBED && user?.id
-			? await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id })
-			: await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
+			const trackData = await Promise.all(
+				Object.entries(tracks).map(async ([trackName]) => {
+					try {
+						const { data, error } = await NextApiClientService.fetchListingData({
+							proposalType: EProposalType.REFERENDUM_V2,
+							origins: [trackName as EPostOrigin],
+							limit: DEFAULT_LISTING_LIMIT,
+							page: 1
+						});
 
-	if (error || !data) {
-		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
-	}
+						if (error) {
+							console.error(`Error fetching track data for ${trackName}:`, error);
+						}
+
+						return { trackName, data: data || null };
+					} catch (err) {
+						console.error(`Error processing track ${trackName}:`, err);
+						return { trackName, data: null };
+					}
+				})
+			);
+
+			return {
+				all: allData || null,
+				discussion: discussionData || null,
+				tracks: trackData
+			};
+		} catch (err) {
+			console.error('Error in fetchTrackDetails:', err);
+			return {
+				all: null,
+				discussion: null,
+				tracks: []
+			};
+		}
+	};
+	const trackDetails = await fetchTrackDetails();
 
 	return (
-		<Suspense fallback={<LoadingSpinner />}>
-			<ActivityFeed
-				initialData={data}
-				activeTab={tab}
-			/>
-		</Suspense>
+		<div className='grid grid-cols-1 gap-5 p-5 sm:p-8'>
+			<Overview trackDetails={trackDetails || { all: null, discussion: null, tracks: [] }} />
+		</div>
 	);
 }
+export default OverviewPage;
