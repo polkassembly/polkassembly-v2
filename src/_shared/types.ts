@@ -1119,9 +1119,18 @@ export enum EPeriodType {
 	CONFIRM = 'confirm'
 }
 
+export enum EProxyType {
+	ANY = 'Any',
+	NON_TRANSFER = 'NonTransfer',
+	GOVERNANCE = 'Governance',
+	STAKING = 'Staking',
+	IDENTITY_JUDGEMENT = 'IdentityJudgement',
+	AUCTION = 'Auction'
+}
+
 export interface IPureProxy {
 	address: string;
-	proxyType: string;
+	proxyType: EProxyType;
 }
 
 export interface IMultisig {
@@ -1139,13 +1148,7 @@ export interface IMultisig {
 
 export interface IProxy {
 	address: string;
-	name?: string;
-	email?: string;
-	github?: string;
-	twitter?: string;
-	matrix?: string;
-	discord?: string;
-	proxyType: string;
+	proxyType: EProxyType;
 }
 
 export interface ILinkedAddress {
