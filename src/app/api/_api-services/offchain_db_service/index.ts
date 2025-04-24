@@ -342,10 +342,6 @@ export class OffChainDbService {
 		return FirestoreService.GetPostSubscriptionCountByUserId({ userId, network });
 	}
 
-	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
-		return FirestoreService.GetTreasuryStats({ network, from, to, limit, page });
-	}
-
 	static async GetPolkassemblyDelegates(network: ENetwork): Promise<IDelegate[]> {
 		return FirestoreService.GetPolkassemblyDelegates(network);
 	}
