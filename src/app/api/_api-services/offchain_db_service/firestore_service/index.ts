@@ -690,6 +690,38 @@ export class FirestoreService extends FirestoreUtils {
 		return postSubscriptionsQuerySnapshot.data().count || 0;
 	}
 
+	static async GetTreasuryStats({ network, from, to, limit, page }: { network: ENetwork; from?: Date; to?: Date; limit: number; page: number }): Promise<ITreasuryStats[]> {
+		let treasuryStatsQuery = this.treasuryStatsCollectionRef().where('network', '==', network);
+
+		if (from) {
+			treasuryStatsQuery = treasuryStatsQuery.where('createdAt', '>=', from);
+		}
+
+		if (to) {
+			treasuryStatsQuery = treasuryStatsQuery.where('createdAt', '<=', to);
+		}
+
+		treasuryStatsQuery = treasuryStatsQuery
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset(limit * (page - 1));
+
+		const treasuryStatsQuerySnapshot = await treasuryStatsQuery.get();
+
+		if (treasuryStatsQuerySnapshot.empty) {
+			return [];
+		}
+
+		return treasuryStatsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt.toDate(),
+				updatedAt: data.updatedAt.toDate()
+			} as ITreasuryStats;
+		});
+	}
+
 	static async SaveTreasuryStats({ treasuryStats }: { treasuryStats: ITreasuryStats }) {
 		await this.treasuryStatsCollectionRef().add(treasuryStats);
 	}

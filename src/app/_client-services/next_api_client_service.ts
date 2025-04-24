@@ -37,6 +37,7 @@ import {
 	ITrackDelegationDetails,
 	ISocialHandle,
 	IVoteHistoryData,
+	ITreasuryStats,
 	IContentSummary
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -107,6 +108,7 @@ enum EApiRoute {
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
 }
 
@@ -182,6 +184,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_DELEGATES:
 				path = '/delegation/delegates';
+				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -824,6 +829,15 @@ export class NextApiClientService {
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 
 	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
