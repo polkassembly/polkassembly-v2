@@ -29,7 +29,6 @@ import {
 	ITag,
 	EAllowedCommentor,
 	EOffChainPostTopic,
-	ICalendarEvent,
 	IVoteCartItem,
 	EConvictionAmount,
 	IDelegationStats,
@@ -93,7 +92,6 @@ enum EApiRoute {
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
 	FETCH_CHILD_BOUNTIES = 'FETCH_CHILD_BOUNTIES',
-	GET_CALENDAR_EVENTS = 'GET_CALENDAR_EVENTS',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
@@ -259,9 +257,6 @@ export class NextApiClientService {
 			case EApiRoute.JUDGEMENT_CALL:
 				path = '/identity/judgement-call';
 				method = 'POST';
-				break;
-			case EApiRoute.GET_CALENDAR_EVENTS:
-				path = '/calendar';
 				break;
 
 			// patch routes
@@ -794,18 +789,6 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
-	}
-
-	static async getCalendarEvents({ startBlockNo, endBlockNo }: { startBlockNo: number; endBlockNo: number }) {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_CALENDAR_EVENTS
-		});
-
-		return this.nextApiClientFetch<ICalendarEvent[]>({
-			url,
-			method,
-			data: { startBlockNo, endBlockNo }
-		});
 	}
 
 	static async addPostSubscription(proposalType: EProposalType, index: string) {

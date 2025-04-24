@@ -7,7 +7,6 @@ import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import styles from './Overview.module.scss';
 import SpendPeriod from './SpendPeriod/SpendPeriod';
-import CalendarEvents from './CalendarEvents/CalendarEvents';
 import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
@@ -46,11 +45,6 @@ function Overview({
 				>
 					<LatestActivity trackDetails={trackDetails} />
 				</Suspense>
-			</div>
-			<div className='mt-6 flex flex-col gap-4 xl:flex-row'>
-				<div className='w-full'>
-					<CalendarEvents />
-				</div>
 			</div>
 		</div>
 	);

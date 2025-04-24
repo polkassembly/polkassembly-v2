@@ -158,13 +158,6 @@ export class OnChainDbService {
 		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index, page, limit });
 	}
 
-	static async GetCalendarEvents({ network, startBlock, endBlock }: { network: ENetwork; startBlock: number; endBlock: number }) {
-		const calendarEvents = await SubsquidService.GetCalendarEvents({ network, startBlock, endBlock });
-		if (calendarEvents) return calendarEvents;
-
-		return [];
-	}
-
 	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
 	}
