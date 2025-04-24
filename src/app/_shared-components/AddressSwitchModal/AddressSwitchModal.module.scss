@@ -20,7 +20,7 @@
 }
 
 .selectedAccountItem {
-	@apply flex w-full cursor-pointer items-center bg-grey_bg p-3 text-left;
+	@apply flex w-full cursor-pointer items-center border border-bg_pink bg-bg_light_pink p-3 text-left;
 }
 
 .accountBtn {
@@ -28,7 +28,7 @@
 }
 
 .selectedAccountBtn {
-	@apply flex w-full cursor-pointer items-center rounded-md bg-grey_bg p-3 text-left;
+	@apply flex w-full cursor-pointer items-center rounded-md border border-bg_pink bg-bg_light_pink p-3 text-left;
 }
 
 .accountRadio {
@@ -65,4 +65,32 @@
 
 .proxyTypeBg {
 	@apply ml-2 rounded-md border border-proxy_type_text bg-proxy_type_bg px-2 py-1 text-xs text-proxy_type_text;
+}
+
+.proxyContainer {
+	@apply mt-2 overflow-hidden rounded-md border border-border_grey bg-page_background;
+}
+
+.proxyList {
+	@apply divide-y divide-border_grey;
+}
+
+.selectedMultisigItem {
+	@apply mb-2 flex w-full items-center rounded-md border border-bg_pink bg-bg_light_pink p-3 text-left;
+}
+
+.multisigItem {
+	@apply mb-2 flex w-full items-center rounded-md p-3 text-left hover:bg-grey_bg;
+}
+
+.selectedProxyBtn {
+	@apply flex w-full cursor-pointer items-center border border-bg_pink bg-bg_light_pink p-3 text-left;
+}
+
+.expandedDropdown {
+	@apply max-h-[300px] overflow-auto rounded-md border border-border_grey bg-page_background shadow-md;
+}
+
+.proxyAddressesTitle {
+	@apply flex items-center px-3 py-2 text-xs font-medium;
 }

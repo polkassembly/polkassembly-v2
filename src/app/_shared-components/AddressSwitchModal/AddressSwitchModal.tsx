@@ -31,6 +31,7 @@ function AddressSwitchModal({
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const { linkedAddress } = useLinkedAddress();
 	const t = useTranslations('AddressDropdown');
+	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [expandedMultisigs, setExpandedMultisigs] = useState<Record<string, boolean>>({});
 
 	const [multisigProxyData, setMultisigProxyData] = useState<{
@@ -72,6 +73,7 @@ function AddressSwitchModal({
 	const onAccountChange = (a: ISelectedAccount) => {
 		setUserPreferences({ ...userPreferences, address: a });
 		onChange?.(a);
+		setDropdownOpen(false);
 	};
 
 	const toggleMultisigExpand = (address: string) => {
@@ -137,8 +139,11 @@ function AddressSwitchModal({
 					)}
 				</div>
 			</div>
-			<DropdownMenu>
-				<DropdownMenuTrigger className={classes.dropdownTrigger}>
+			<DropdownMenu
+				open={dropdownOpen}
+				onOpenChange={setDropdownOpen}
+			>
+				<DropdownMenuTrigger className={`${classes.dropdownTrigger} ${dropdownOpen ? 'border-bg_pink' : ''}`}>
 					<div className='flex items-center'>
 						<div className='mr-2'>
 							<div className='flex h-5 w-5 items-center justify-center rounded-full bg-text_pink'>
@@ -198,9 +203,9 @@ function AddressSwitchModal({
 
 	const renderMultisigSection = () =>
 		multisigProxyData?.multisig?.length > 0 && (
-			<div className='mb-4'>
+			<div className='mb-6'>
 				<div className='mb-2 border-b border-border_grey pb-1 text-sm font-medium'>{t('multisig')}</div>
-				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
+				<div className='space-y-0 overflow-y-auto'>
 					{multisigProxyData.multisig.map((multisig) => {
 						if (!multisig?.address) return null;
 						const parentAccount: ISelectedAccount | undefined = regularAddressForMultisig || undefined;
@@ -220,7 +225,7 @@ function AddressSwitchModal({
 								<button
 									type='button'
 									onClick={() => onAccountChange(multisigAccount)}
-									className={isSelected ? classes.selectedAccountBtn : classes.accountBtn}
+									className={isSelected ? classes.selectedMultisigItem : classes.multisigItem}
 								>
 									{renderAccountItem(multisigAccount, isSelected)}
 									<Address
@@ -230,6 +235,12 @@ function AddressSwitchModal({
 										redirectToProfile={false}
 									/>
 									<span className={classes.multisigBg}>{t('multisigAddress')}</span>
+									<div className='ml-auto'>
+										<Balance
+											address={multisig.address}
+											classname='text-sm font-medium'
+										/>
+									</div>
 								</button>
 
 								{hasProxies && (
@@ -249,8 +260,8 @@ function AddressSwitchModal({
 										</div>
 
 										{isExpanded && (
-											<div className='mt-1 border-l border-border_grey pl-4'>
-												<div className='max-h-[120px] space-y-2 overflow-y-auto'>
+											<div className={classes.proxyContainer}>
+												<div className={classes.proxyList}>
 													{multisig.pureProxy &&
 														Array.isArray(multisig.pureProxy) &&
 														multisig.pureProxy.map((proxy) => {
@@ -263,7 +274,7 @@ function AddressSwitchModal({
 																	key={proxy.address}
 																	type='button'
 																	onClick={() => handleNestedAccountChange(proxyAccount)}
-																	className={isProxySelected ? classes.selectedAccountBtn : classes.accountBtn}
+																	className={isProxySelected ? classes.selectedProxyBtn : classes.accountBtn}
 																>
 																	{renderAccountItem(proxyAccount, isProxySelected)}
 																	<Address
@@ -273,6 +284,12 @@ function AddressSwitchModal({
 																		redirectToProfile={false}
 																	/>
 																	<span className={classes.pureProxyBg}>{t('pureProxy')}</span>
+																	<div className='ml-auto'>
+																		<Balance
+																			address={proxy.address}
+																			classname='text-sm font-medium'
+																		/>
+																	</div>
 																</button>
 															);
 														})}
@@ -292,7 +309,7 @@ function AddressSwitchModal({
 		multisigProxyData?.proxied?.length > 0 && (
 			<div>
 				<div className='mb-2 border-b border-border_grey pb-1 text-sm font-medium'>{t('proxiedaccounts')}</div>
-				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
+				<div className='space-y-2'>
 					{multisigProxyData.proxied.map((proxied) => {
 						if (!proxied?.address) return null;
 						const parentAccount: ISelectedAccount | undefined = regularAddressForMultisig || undefined;
@@ -304,7 +321,7 @@ function AddressSwitchModal({
 								key={proxied.address}
 								type='button'
 								onClick={() => handleNestedAccountChange(proxiedAccount)}
-								className={isSelected ? classes.selectedAccountBtn : classes.accountBtn}
+								className={isSelected ? classes.selectedProxyBtn : classes.accountBtn}
 							>
 								{renderAccountItem(proxiedAccount, isSelected)}
 								<Address
@@ -320,6 +337,12 @@ function AddressSwitchModal({
 								>
 									{(proxied.proxyType || '').toUpperCase()}
 								</span>
+								<div className='ml-auto'>
+									<Balance
+										address={proxied.address}
+										classname='text-sm font-medium'
+									/>
+								</div>
 							</button>
 						);
 					})}
