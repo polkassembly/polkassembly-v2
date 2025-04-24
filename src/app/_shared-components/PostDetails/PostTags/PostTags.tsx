@@ -4,13 +4,12 @@
 import { ITag } from '@/_shared/types';
 import classes from './PostTags.module.scss';
 
-function getTagValue(tag: ITag | string): string {
-	if (typeof tag === 'string') return tag;
+function getTagValue(tag: ITag): string {
 	const firstProp = Object.values(tag)[0];
 	return typeof firstProp === 'string' ? firstProp : '';
 }
 
-function PostTags({ tags }: { tags: ITag[] | string[] }) {
+function PostTags({ tags }: { tags: ITag[] }) {
 	const totalTags = tags.length;
 	const maxVisible = 2;
 
