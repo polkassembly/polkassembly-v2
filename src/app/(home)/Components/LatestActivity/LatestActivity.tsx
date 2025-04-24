@@ -10,18 +10,24 @@ import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useState } from 'react';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
 import { useRouter } from 'nextjs-toploader/app';
+import Link from 'next/link';
 
 enum EOverviewTabs {
 	All = 'all',
 	Discussion = 'discussion'
 }
+
+const parseTabnameforUrl = (tab: string) => {
+	// Convert camelCase to kebab-case
+	return tab.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+};
 
 function LatestActivity({
 	trackDetails
@@ -39,10 +45,23 @@ function LatestActivity({
 
 	const DATE_FORMAT = "Do MMM 'YY";
 
+	const [selectedTab, setSelectedTab] = useState<string>(EOverviewTabs.All);
+
 	return (
 		<div className='whitespace-nowrap'>
-			<h2 className='text-xl font-semibold leading-8 tracking-tight text-btn_secondary_text'>{t('latestActivity')}</h2>
-			<Tabs defaultValue={EOverviewTabs.All}>
+			<div className='mb-4 flex items-center justify-between gap-x-2'>
+				<h2 className='text-xl font-semibold tracking-tight text-btn_secondary_text'>{t('latestActivity')}</h2>
+				<Link
+					href={`/${parseTabnameforUrl(selectedTab)}`}
+					className='text-medium text-sm text-text_pink'
+				>
+					{t('viewAll')}
+				</Link>
+			</div>
+			<Tabs
+				value={selectedTab}
+				onValueChange={setSelectedTab}
+			>
 				<TabsList className='hide_scrollbar mb-4 flex w-full justify-start overflow-x-auto'>
 					<TabsTrigger
 						showBorder

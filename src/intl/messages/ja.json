@@ -704,7 +704,7 @@
 		"created": "作成日",
 		"origin": "発信元",
 		"status": "ステータス",
-		"noactivity": "アクティビティデータが見つかりません",
+		"noactivity": "アクティビティが見つかりません",
 		"nodiscussionposts": "ディスカッション投稿が見つかりません",
 		"spendPeriodRemaining": "残りの支出期間",
 		"nextBurn": "次のバーン",
@@ -716,7 +716,8 @@
 		"hours": "時間",
 		"switchToActivityFeed": "アクティビティフィードに切り替え",
 		"topic": "トピック",
-		"creator": "作成者"
+		"creator": "作成者",
+		"viewAll": "すべて表示"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",

@@ -696,15 +696,15 @@
 		"minimizeGallery": "Minimizar galería",
 		"comingSoon": "Próximamente..",
 		"treasury": "Tesorería",
-		"latestActivity": "Actividad más reciente",
-		"all": "Todo",
+		"latestActivity": "Última actividad",
+		"all": "Todos",
 		"discussion": "Discusión",
 		"title": "Título",
 		"postedBy": "Publicado por",
 		"created": "Creado",
 		"origin": "Origen",
 		"status": "Estado",
-		"noactivity": "No se encontraron datos de actividad",
+		"noactivity": "No se encontró actividad",
 		"nodiscussionposts": "No se encontraron publicaciones de discusión",
 		"spendPeriodRemaining": "Período de gasto restante",
 		"nextBurn": "Próxima quema",
@@ -716,7 +716,8 @@
 		"hours": "horas",
 		"switchToActivityFeed": "Cambiar a feed de actividad",
 		"topic": "Tema",
-		"creator": "Creador"
+		"creator": "Creador",
+		"viewAll": "Ver todo"
 	},
 	"BatchVote": {
 		"batchVoting": "Votación por lotes",

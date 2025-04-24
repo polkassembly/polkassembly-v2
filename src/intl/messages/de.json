@@ -739,7 +739,8 @@
 		"hours": "Std.",
 		"switchToActivityFeed": "Zum Aktivitätsfeed wechseln",
 		"topic": "Thema",
-		"creator": "Ersteller"
+		"creator": "Ersteller",
+		"viewAll": "Alle anzeigen"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

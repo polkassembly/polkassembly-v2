@@ -739,7 +739,8 @@
 		"hours": "小时",
 		"switchToActivityFeed": "切换到活动动态",
 		"topic": "主题",
-		"creator": "创建者"
+		"creator": "创建者",
+		"viewAll": "查看全部"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

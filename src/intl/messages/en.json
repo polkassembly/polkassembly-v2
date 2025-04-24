@@ -765,7 +765,8 @@
 		"hours": "hrs",
 		"switchToActivityFeed": "Switch to Activity Feed",
 		"topic": "Topic",
-		"creator": "Creator"
+		"creator": "Creator",
+		"viewAll": "View All"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
