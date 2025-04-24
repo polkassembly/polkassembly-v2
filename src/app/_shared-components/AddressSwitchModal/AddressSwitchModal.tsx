@@ -295,7 +295,8 @@ function AddressSwitchModal({
 				<div className='max-h-[180px] space-y-2 overflow-y-auto pr-1'>
 					{multisigProxyData.proxied.map((proxied) => {
 						if (!proxied?.address) return null;
-						const proxiedAccount = createSelectedAccount(proxied.address, proxied.proxyType || '', EAccountType.PROXY, undefined, proxied.proxyType);
+						const parentAccount: ISelectedAccount | undefined = regularAddressForMultisig || undefined;
+						const proxiedAccount = createSelectedAccount(proxied.address, proxied.proxyType || '', EAccountType.PROXY, parentAccount, proxied.proxyType);
 						const isSelected = proxied.address === userPreferences?.address?.address;
 
 						return (
