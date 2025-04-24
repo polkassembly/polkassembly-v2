@@ -1125,7 +1125,11 @@ export enum EProxyType {
 	GOVERNANCE = 'Governance',
 	STAKING = 'Staking',
 	IDENTITY_JUDGEMENT = 'IdentityJudgement',
-	AUCTION = 'Auction'
+	AUCTION = 'Auction',
+	CANCEL_PROXY = 'CancelProxy',
+	PARAREGISTRATION = 'ParaRegistration',
+	NOMINATION_POOLS = 'NominationPools',
+	SUDO_BALANCES = 'SudoBalances'
 }
 
 export interface IPureProxy {

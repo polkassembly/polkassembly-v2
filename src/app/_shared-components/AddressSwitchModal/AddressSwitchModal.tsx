@@ -4,7 +4,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/DropdownMenu';
 import { Dialog, DialogContent, DialogTitle } from '@ui/Dialog/Dialog';
 import { MdOutlineSync } from 'react-icons/md';
-import { EAccountType, IMultisig, IProxy, ISelectedAccount } from '@/_shared/types';
+import { EAccountType, EProxyType, IMultisig, IProxy, ISelectedAccount } from '@/_shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { MultisigService } from '@/app/_client-services/multisig_proxy_service';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
@@ -313,7 +313,11 @@ function AddressSwitchModal({
 									iconSize={25}
 									redirectToProfile={false}
 								/>
-								<span className={proxied.proxyType === 'Any' ? classes.anyProxyBg : proxied.proxyType === 'Non-Transferrable' ? classes.nonTransferrableBg : classes.proxyTypeBg}>
+								<span
+									className={
+										proxied.proxyType === EProxyType.ANY ? classes.anyProxyBg : proxied.proxyType === EProxyType.NON_TRANSFER ? classes.nonTransferrableBg : classes.proxyTypeBg
+									}
+								>
 									{(proxied.proxyType || '').toUpperCase()}
 								</span>
 							</button>
