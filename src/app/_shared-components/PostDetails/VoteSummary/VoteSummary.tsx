@@ -6,7 +6,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EProposalType, EVoteDecision, IVoteMetrics } from '@/_shared/types';
+import { EPostOrigin, EProposalType, EVoteDecision, IStatusHistoryItem, IVoteMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { PieChart } from 'react-minimal-pie-chart';
@@ -19,6 +19,11 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { THEME_COLORS } from '@/app/_style/theme';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { dayjs } from '@shared/_utils/dayjsInit';
+import { blockToTime } from '@/_shared/_utils/blockToTime';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { calculateThresholdValue, processGraphPoint } from '@/app/_client-utils/calculateThresholdValue';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
@@ -26,18 +31,82 @@ import { Skeleton } from '../../Skeleton';
 
 const NONE_CHART_VALUE = 0;
 
-function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
+interface IProgress {
+	approval: number;
+	approvalThreshold: number;
+	support: number;
+	supportThreshold: number;
+}
+
+function VoteSummary({
+	voteMetrics,
+	proposalType,
+	index,
+	statusHistory,
+	createdAt,
+	trackName
+}: {
+	voteMetrics?: IVoteMetrics;
+	proposalType: EProposalType;
+	index: string;
+	statusHistory: IStatusHistoryItem[];
+	createdAt?: Date;
+	trackName?: EPostOrigin;
+}) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
+	const [progress, setProgress] = useState<IProgress>({
+		approval: 0,
+		approvalThreshold: 0,
+		support: 0,
+		supportThreshold: 0
+	});
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
 		nay: null,
 		support: null
 	});
+
+	const getVoteCurves = useCallback(async () => {
+		if (!trackName) return [];
+
+		const voteCurves = await NextApiClientService.getVoteCurves({ proposalType, index });
+		const graphPoints = voteCurves?.data || [];
+		if (graphPoints.length === 0) return [];
+
+		const decisionPeriod = NETWORKS_DETAILS[network]?.trackDetails?.[trackName]?.decisionPeriod;
+		const statusBlock = statusHistory?.find((s) => s?.status === 'Deciding');
+		const { seconds } = blockToTime(decisionPeriod || 0, network);
+		const decisionPeriodHrs = Math.ceil(dayjs.duration(seconds, 'seconds').asHours());
+
+		const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt);
+		const lastGraphPoint = graphPoints[graphPoints.length - 1];
+		const decisionPeriodMinutes = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
+
+		const currentData = graphPoints.map((point) => processGraphPoint(point, proposalCreatedAt, decisionPeriodMinutes, decisionPeriodHrs, network, trackName));
+
+		const currentApproval = currentData[currentData.length - 1]?.approval;
+		const currentSupport = currentData[currentData.length - 1]?.support;
+
+		const progressData: IProgress = {
+			approval: Number(currentApproval?.y?.toFixed(1) || 0),
+			approvalThreshold: calculateThresholdValue(trackName, network, currentApproval, decisionPeriodHrs),
+			support: Number(currentSupport?.y?.toFixed(1) || 0),
+			supportThreshold: calculateThresholdValue(trackName, network, currentSupport, decisionPeriodHrs)
+		};
+
+		setProgress(progressData);
+		return graphPoints;
+	}, [proposalType, index, trackName, network, statusHistory, createdAt]);
+
+	useEffect(() => {
+		getVoteCurves();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const getOngoingTally = useCallback(async () => {
 		if (!apiService) return;
@@ -98,19 +167,47 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
-						<PieChart
-							className='w-[47%] xl:w-[49%]'
-							center={[50, 75]}
-							startAngle={-180}
-							lengthAngle={180}
-							rounded
-							lineWidth={15}
-							data={[
-								{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-								{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
-							]}
-						/>
-
+						<div className='relative'>
+							<PieChart
+								className='w-full'
+								center={[50, 75]}
+								startAngle={-180}
+								lengthAngle={180}
+								rounded
+								lineWidth={15}
+								data={[
+									{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+									{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
+								]}
+								segmentsStyle={{ transition: 'stroke .3s' }}
+							/>
+							<div className='absolute inset-0'>
+								{progress.approvalThreshold > 0 && !isNaN(progress.approvalThreshold) && (
+									<div className='absolute left-1/2 top-1/2 h-0 w-0'>
+										<div
+											className='absolute mt-[38px] h-[2px] w-[15px] origin-left bg-wallet_btn_text'
+											style={{
+												transform: `
+													rotate(${-180 + (180 * progress.approvalThreshold) / 100}deg)
+													translateX(${67.5 + 7.5}px)
+												`
+											}}
+										/>
+										<div
+											className='absolute whitespace-nowrap text-xs font-medium'
+											style={{
+												transform: `
+													rotate(${-180 + (180 * progress.approvalThreshold) / 100}deg)
+													translateX(${67.5 + 15}px)
+												`
+											}}
+										>
+											{progress.approvalThreshold.toFixed(1)}%
+										</div>
+									</div>
+								)}
+							</div>
+						</div>
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{NAY_TITLE}</p>
