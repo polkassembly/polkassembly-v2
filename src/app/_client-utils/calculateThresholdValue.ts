@@ -104,21 +104,21 @@ export const calculateThresholdValue = (trackName: EPostOrigin | undefined, netw
 export const processGraphPoint = (
 	graphPoint: IGraphPoint,
 	proposalCreatedAt: dayjs.Dayjs,
-	decisionPeriodMinutes: number,
+	elapsedHours: number,
 	decisionPeriodHrs: number,
 	network: ENetwork,
 	trackName?: EPostOrigin
 ) => {
 	const hour = dayjs(graphPoint.timestamp).diff(proposalCreatedAt, 'hour');
 	const newGraphPoint = { ...graphPoint, hour };
-	const percentage = hour / decisionPeriodMinutes;
+	const percentage = hour / elapsedHours;
 
 	const result = {
 		approval: { x: hour, y: newGraphPoint.approvalPercent },
 		support: { x: hour, y: newGraphPoint.supportPercent }
 	};
 
-	if (decisionPeriodMinutes > decisionPeriodHrs && trackName) {
+	if (elapsedHours > decisionPeriodHrs && trackName) {
 		const thresholds = calculateTrackThresholds(trackName, network, percentage);
 		result.approval.y = thresholds.approval * 100;
 		result.support.y = thresholds.support * 100;
