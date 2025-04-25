@@ -1,51 +1,51 @@
 .container {
-    @apply lg:mx-auto bg-section_dark_overlay px-5 lg:px-10 pt-8;
+	@apply mx-auto max-w-7xl bg-section_dark_overlay px-5 pt-8 lg:px-10;
 }
 
 .header {
-    @apply flex items-center gap-5 md:gap-0 justify-between;
+	@apply flex items-center justify-between gap-5 md:gap-0;
 }
 
 .title {
-    @apply lg:text-2xl text-lg font-bold text-btn_secondary_text;
+	@apply text-lg font-bold text-btn_secondary_text lg:text-2xl;
 }
 
 .subtitle {
-    @apply text-sm text-gray-600 pt-5 text-btn_secondary_text;
+	@apply pt-5 text-sm text-btn_secondary_text text-gray-600;
 }
 
 .button {
-    @apply items-center hidden lg:flex gap-1.5 rounded-full bg-btn_primary_background px-3 py-1.5 lg:px-6 lg:py-2 text-white shadow;
+	@apply hidden items-center gap-1.5 rounded-full bg-btn_primary_background px-3 py-1.5 text-white shadow lg:flex lg:px-6 lg:py-2;
 }
 
 .tabs {
-    @apply mt-5 flex items-center justify-between;
+	@apply mt-5 flex items-center justify-between;
 }
 
 .tab-button {
-    @apply pb-3 text-text_primary;
+	@apply pb-3 text-text_primary;
 }
 
 .tab-button-active {
-    @apply border-b-2 border-pink-500 text-pink-500;
+	@apply border-b-2 border-pink-500 text-pink-500;
 }
 
 .filter {
-    @apply flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200;
+	@apply flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200;
 }
 
 .content {
-    @apply min-w-full bg-page_background min-h-[600px] px-10 py-5;
+	@apply mx-auto min-h-[600px] max-w-7xl bg-page_background px-10 py-5;
 }
 
 .popoverContent {
-    @apply w-56 border border-primary_border bg-[var(--sidebar-primary-foreground)] p-2;
+	@apply w-56 border border-primary_border bg-[var(--sidebar-primary-foreground)] p-2;
 }
 
 .selectedicon {
-    filter: 'brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%)'
+	filter: 'brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(321deg) brightness(90%) contrast(101%)';
 }
 
 .searchbar {
-    @apply bg-search_bg text-filter_dropdown w-full rounded border border-primary_border bg-opacity-[20%] px-2 py-1 pr-10;
+	@apply w-full rounded border border-primary_border bg-search_bg bg-opacity-[20%] px-2 py-1 pr-10 text-filter_dropdown;
 }

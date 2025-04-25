@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function TermsOfWebsitePage() {
 	return (
-		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
+		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:px-10'>
 			<div className='rounded-md bg-bg_modal p-8 shadow'>
 				<MarkdownViewer markdown={termsOfWebsiteContent} />
 			</div>

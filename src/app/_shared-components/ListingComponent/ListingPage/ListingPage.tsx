@@ -226,45 +226,47 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 
 	return (
 		<div>
-			<div className={styles.container}>
-				{renderHeader()}
-				<div className={styles.tabs}>
-					<div className='flex space-x-6'>
-						{Object.entries(tabNames).map(([key, value]) => (
-							<button
-								key={key}
-								type='button'
-								className={`${styles['tab-button']} uppercase ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
-								onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
-							>
-								{value}
-							</button>
-						))}
-					</div>
-					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
-						<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
-							<PopoverTrigger asChild>
-								<div
-									className={`${styles.filter} ${state.filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
-									role='button'
-									tabIndex={0}
+			<div className='bg-section_dark_overlay'>
+				<div className={styles.container}>
+					{renderHeader()}
+					<div className={styles.tabs}>
+						<div className='flex space-x-6'>
+							{Object.entries(tabNames).map(([key, value]) => (
+								<button
+									key={key}
+									type='button'
+									className={`${styles['tab-button']} uppercase ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
+									onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
 								>
-									<span className={state.filterActive ? styles.selectedicon : ''}>
-										<FaFilter className='text-sm text-text_primary' />
-									</span>
-									<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
-								</div>
-							</PopoverTrigger>
-							<PopoverContent
-								sideOffset={5}
-								className={styles.popoverContent}
-							>
-								{renderFilterContent()}
-							</PopoverContent>
-						</Popover>
-						<p className={styles.filter}>
-							<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort className='text-text_primary' />
-						</p>
+									{value}
+								</button>
+							))}
+						</div>
+						<div className='flex gap-4 pb-3 text-sm text-gray-700'>
+							<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
+								<PopoverTrigger asChild>
+									<div
+										className={`${styles.filter} ${state.filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
+										role='button'
+										tabIndex={0}
+									>
+										<span className={state.filterActive ? styles.selectedicon : ''}>
+											<FaFilter className='text-sm text-text_primary' />
+										</span>
+										<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
+									</div>
+								</PopoverTrigger>
+								<PopoverContent
+									sideOffset={5}
+									className={styles.popoverContent}
+								>
+									{renderFilterContent()}
+								</PopoverContent>
+							</Popover>
+							<p className={styles.filter}>
+								<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort className='text-text_primary' />
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -34,7 +34,7 @@ async function Bounty({ params }: { params: Promise<{ index: string }> }) {
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
 	return (
-		<div className='h-full w-full bg-page_background'>
+		<div className='mx-auto h-full w-full max-w-7xl'>
 			<PostDetails
 				index={index}
 				postData={data}

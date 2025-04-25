@@ -24,8 +24,8 @@ function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericLis
 	const router = useRouter();
 
 	return (
-		<div className={cn('min-h-screen bg-page_background pt-5', state === ESidebarState.EXPANDED ? 'px-5 lg:px-16' : 'px-5 lg:px-10')}>
-			<div className='container mx-auto grid grid-cols-12 gap-4'>
+		<div className={cn('mx-auto min-h-screen max-w-7xl bg-page_background pt-5', state === ESidebarState.EXPANDED ? 'px-5 lg:px-16' : 'px-5 lg:px-10')}>
+			<div className='container grid grid-cols-12 gap-4'>
 				<div className='col-span-12'>
 					<div className={styles.activityFeedContainer}>
 						<div className={styles.activityFeedToggleButton}>
