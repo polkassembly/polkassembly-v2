@@ -7,31 +7,48 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType } from '@/_shared/types';
+import { EAccountType, IMultisigAddress, IProxyAddress } from '@/_shared/types';
+import { useUser } from '@/hooks/useUser';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
 
-interface IAddressRelationSelectorProps {
+interface IAddressRadioGroupProps {
 	title: string;
+	addresses: IMultisigAddress[] | IProxyAddress[];
 }
 
-function AddressRelationSelector({ title }: IAddressRelationSelectorProps) {
+function AddressRadioGroup({ title, addresses }: IAddressRadioGroupProps) {
+	if (!addresses.length) return null;
+
 	return (
-		<section>
-			<h6 className='text-text_secondary text-sm'>{title}</h6>
-			<div>
-				<p>Multisig 1</p>
-				<p>Multisig 2</p>
-				<p>Multisig 3</p>
-			</div>
-		</section>
+		<>
+			<hr className='my-3' />
+
+			<section>
+				<h6 className='text-text_secondary text-sm'>{title}</h6>
+				<div>
+					{addresses.map((address) => (
+						<>
+							<p key={address.address}>{address.address}</p>
+							{'pureProxies' in address && address.pureProxies.map((pureProxyAddress) => <p className='ml-2'>{pureProxyAddress.address}</p>)}
+						</>
+					))}
+				</div>
+			</section>
+		</>
 	);
 }
 
 function AddressSwitchButton() {
+	const { user } = useUser();
+	const { userPreferences } = useUserPreferences();
+
+	const selectedAddress = userPreferences?.selectedAccount?.address;
+	const relationsForSelectedAddress = user?.addressRelations?.find((relations) => relations.address === selectedAddress);
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -47,7 +64,14 @@ function AddressSwitchButton() {
 					<DialogTitle>Switch Wallet</DialogTitle>
 				</DialogHeader>
 				<SwitchWalletOrAddress small />
-				<AddressRelationSelector title='Multisigs' />
+				<AddressRadioGroup
+					title='Multisigs'
+					addresses={relationsForSelectedAddress?.multisigAddresses || []}
+				/>
+				<AddressRadioGroup
+					title='Proxies'
+					addresses={relationsForSelectedAddress?.proxyAddresses || []}
+				/>
 			</DialogContent>
 		</Dialog>
 	);
