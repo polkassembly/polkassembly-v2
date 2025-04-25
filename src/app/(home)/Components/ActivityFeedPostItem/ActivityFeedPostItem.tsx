@@ -4,7 +4,7 @@
 
 import { RefObject, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { FaRegClock } from 'react-icons/fa6';
+import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import VoteIcon from '@assets/activityfeed/vote.svg';

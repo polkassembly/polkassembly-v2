@@ -7,7 +7,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Link from 'next/link';
 import { ENetwork } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { MdOpenInNew } from 'react-icons/md';
+import { MdOpenInNew } from '@react-icons/all-files/md/MdOpenInNew';
 import { networkSocialLinks } from '@/_shared/_constants/socialNetwork';
 import styles from './ActivityFeedAbout.module.scss';
 

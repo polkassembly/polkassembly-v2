@@ -12,7 +12,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PolkadotIcon from '@assets/delegation/polkadot-logo.svg';
 import Image from 'next/image';
 import { FaCircleCheck } from 'react-icons/fa6';
-import { IoMdLock } from '@react-icons/all-files/io/IoMdLock';
+import { IoMdLock } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
 import styles from './UserWalletData.module.scss';
 
