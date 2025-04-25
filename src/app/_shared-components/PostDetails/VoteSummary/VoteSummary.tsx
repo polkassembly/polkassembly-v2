@@ -72,35 +72,42 @@ function VoteSummary({
 	});
 
 	const getVoteCurves = useCallback(async () => {
-		if (!trackName) return [];
+		try {
+			if (!trackName) return [];
 
-		const voteCurves = await NextApiClientService.getVoteCurves({ proposalType, index });
-		const graphPoints = voteCurves?.data || [];
-		if (graphPoints.length === 0) return [];
+			const voteCurves = await NextApiClientService.getVoteCurves({ proposalType, index });
+			const graphPoints = voteCurves?.data || [];
+			if (graphPoints.length === 0) return [];
 
-		const decisionPeriod = NETWORKS_DETAILS[network]?.trackDetails?.[trackName]?.decisionPeriod;
-		const statusBlock = statusHistory?.find((s) => s?.status === 'Deciding');
-		const { seconds } = blockToTime(decisionPeriod || 0, network);
-		const decisionPeriodHrs = Math.ceil(dayjs.duration(seconds, 'seconds').asHours());
+			const decisionPeriod = NETWORKS_DETAILS[network]?.trackDetails?.[trackName]?.decisionPeriod;
+			const statusBlock = statusHistory?.find((s) => s?.status === 'Deciding');
+			const { seconds } = blockToTime(decisionPeriod || 0, network);
+			const decisionPeriodHrs = Math.ceil(dayjs.duration(seconds, 'seconds').asHours());
 
-		const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt);
-		const lastGraphPoint = graphPoints[graphPoints.length - 1];
-		const decisionPeriodMinutes = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
+			const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt);
+			const lastGraphPoint = graphPoints[graphPoints.length - 1];
+			if (!lastGraphPoint) return [];
 
-		const currentData = graphPoints.map((point) => processGraphPoint(point, proposalCreatedAt, decisionPeriodMinutes, decisionPeriodHrs, network, trackName));
+			const elapsedHours = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
 
-		const currentApproval = currentData[currentData.length - 1]?.approval;
-		const currentSupport = currentData[currentData.length - 1]?.support;
+			const currentData = graphPoints.map((point) => processGraphPoint(point, proposalCreatedAt, elapsedHours, decisionPeriodHrs, network, trackName));
 
-		const progressData: IProgress = {
-			approval: Number(currentApproval?.y?.toFixed(1) || 0),
-			approvalThreshold: calculateThresholdValue(trackName, network, currentApproval, decisionPeriodHrs),
-			support: Number(currentSupport?.y?.toFixed(1) || 0),
-			supportThreshold: calculateThresholdValue(trackName, network, currentSupport, decisionPeriodHrs)
-		};
+			const currentApproval = currentData[currentData.length - 1]?.approval;
+			const currentSupport = currentData[currentData.length - 1]?.support;
 
-		setProgress(progressData);
-		return graphPoints;
+			const progressData: IProgress = {
+				approval: Number(currentApproval?.y?.toFixed(1) || 0),
+				approvalThreshold: calculateThresholdValue(trackName, network, currentApproval, decisionPeriodHrs),
+				support: Number(currentSupport?.y?.toFixed(1) || 0),
+				supportThreshold: calculateThresholdValue(trackName, network, currentSupport, decisionPeriodHrs)
+			};
+
+			setProgress(progressData);
+			return graphPoints;
+		} catch (error) {
+			console.error('Error fetching vote curves:', error);
+			return [];
+		}
 	}, [proposalType, index, trackName, network, statusHistory, createdAt]);
 
 	useEffect(() => {
