@@ -124,6 +124,7 @@ function ExistingPreimage() {
 						onChange={setPreimageHash}
 						placeholder={t('CreateProposal.preimageHashDescription')}
 						value={preimageHash}
+						className='h-10'
 					/>
 					{preimageHash && isValidPreimageHash && (
 						<div className='flex w-full items-center justify-end'>

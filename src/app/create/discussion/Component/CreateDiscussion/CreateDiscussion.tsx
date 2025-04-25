@@ -60,7 +60,7 @@ function CreateDiscussion() {
 			<div className={classes.header}>
 				<HeaderLabel />
 			</div>
-			<div className='px-4 py-4 sm:px-12'>
+			<div className='px-4 py-4 sm:px-6'>
 				<div className='relative flex flex-col gap-y-4'>
 					{!user ? (
 						<p className='flex items-center gap-x-1 text-center text-sm text-text_primary'>

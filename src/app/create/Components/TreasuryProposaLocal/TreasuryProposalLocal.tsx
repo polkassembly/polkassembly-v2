@@ -113,9 +113,9 @@ function TreasuryProposalLocal() {
 					beneficiaries={beneficiaries}
 					onChange={(value) => setBeneficiaries(value)}
 				/>
-				<div className='flex items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-2 font-medium text-text_primary max-sm:text-sm sm:p-4'>
-					<span>Requested Amount</span>
-					<span>
+				<div className='flex h-10 items-center justify-between gap-x-2 rounded-lg border border-border_grey bg-page_background p-2 font-medium max-sm:text-sm sm:px-4'>
+					<span className='text-sm text-text_primary'>Requested Amount</span>
+					<span className='text-sm text-btn_secondary_text'>
 						{formatter.format(Number(formatBnBalance(totalAmount, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 					</span>
 				</div>

@@ -47,7 +47,7 @@ function EnactmentForm({
 		<Collapsible
 			ref={ref}
 			onOpenChange={(open) => open && ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-			className='rounded-lg border border-border_grey bg-page_background p-2 max-sm:text-sm sm:p-4'
+			className='flex h-10 items-center rounded-lg border border-border_grey bg-page_background p-2 text-sm sm:px-4'
 		>
 			<CollapsibleTrigger className='w-full'>
 				<div className='flex w-full items-center justify-between gap-x-2'>

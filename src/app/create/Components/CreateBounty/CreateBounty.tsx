@@ -140,6 +140,7 @@ function CreateBounty() {
 					defaultValue={bountyAmount}
 					onChange={({ value }) => setBountyAmount(value)}
 					label={t('CreateBounty.bountyAmount')}
+					className='h-10'
 				/>
 
 				<SelectTrack

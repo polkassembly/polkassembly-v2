@@ -87,7 +87,7 @@ function SelectTrack({
 		<div className='flex flex-col gap-y-1'>
 			<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>{formatTrackName}</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='h-10 px-2 text-sm font-medium text-text_primary sm:px-4'>{formatTrackName}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{sortedTracks.map((tr) => (
 						<DropdownMenuItem

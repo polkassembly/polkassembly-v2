@@ -170,7 +170,7 @@ export const THEME_COLORS = {
 		text_primary: '#9E9E9E',
 		rank_card_text: '#243A57',
 		text_pink: '#E5007A',
-		placeholder: '#576D8BCC',
+		placeholder: '#909090',
 		success: '#2ED47A',
 		success_vote_bg: '#F0FCF6',
 		lock: '#FFC451',

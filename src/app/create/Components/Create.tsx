@@ -76,7 +76,7 @@ function CreateOption({
 			disabled={disabled}
 		>
 			<div className='flex flex-1 flex-col gap-y-1 text-left'>
-				<p className='text-sm font-semibold'>{label}</p>
+				<p className='text-sm font-semibold text-btn_secondary_text'>{label}</p>
 				<p className='text-xs font-medium text-wallet_btn_text'>{description}</p>
 			</div>
 			<ChevronRight className='h-5 w-5 font-semibold text-text_primary' />
@@ -164,7 +164,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 							</button>
 						)}
 						<div>
-							<div className='flex items-center gap-x-[6px]'>
+							<div className='flex items-center gap-x-[6px] text-btn_secondary_text'>
 								<Image
 									className='dark:darkIcon'
 									alt={`${titles[step || 'create']} Icon`}

@@ -147,7 +147,7 @@ function BeneficiaryInputs({
 					onChange={(value) => onBeneficiaryChange({ beneficiary: value })}
 				/>
 				<div className='relative flex w-full items-start gap-x-2 pl-12'>
-					<div className='absolute left-0 left-4 top-0 h-[23px] w-8 rounded-bl-lg border-b-2 border-l-2 border-dashed border-border_grey'>
+					<div className='absolute left-4 top-[6px] h-[23px] w-8 rounded-bl-lg border-b-2 border-l-2 border-dashed border-border_grey'>
 						<div className='absolute -bottom-1.5 -right-1.5 z-20 h-3 w-3 rounded-full bg-border_grey' />
 					</div>
 					<div className={stagedPayment ? 'w-1/2' : 'w-full'}>

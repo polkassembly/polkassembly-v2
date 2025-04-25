@@ -45,7 +45,7 @@ function TxFeesDetailsView({ extrinsicFn, extraFees }: { extrinsicFn: (Submittab
 	}, [apiService, extrinsicFnDebouncedValue, userPreferences.address?.address]);
 
 	return (
-		<Collapsible className='rounded-lg border border-border_grey bg-page_background p-4'>
+		<Collapsible className='flex h-10 items-center rounded-lg border border-border_grey bg-page_background p-2 text-sm sm:px-4'>
 			<CollapsibleTrigger className='w-full'>
 				<div className='flex w-full items-center justify-between gap-x-2'>
 					<p className='font-medium text-text_primary'>Transaction Fee</p>
