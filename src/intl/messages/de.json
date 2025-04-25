@@ -701,6 +701,22 @@
 		"cancelled": "Abgebrochen",
 		"rejected": "Abgelehnt"
 	},
+	"Bounty": {
+		"availableBountyPool": "Verfügbare Prämie-Pool",
+		"viewAll": "Alle anzeigen",
+		"dot": "DOT",
+		"claimed": "Beansprucht",
+		"childBounties": "Kinderprämien",
+		"bountyProposal": "Prämie-Vorschlag",
+		"vote": "Abstimmen",
+		"bountyDashboard": "Prämie-Dashboard",
+		"hotBounties": "Beliebte Prämien",
+		"activeBounties": "Aktive Prämien",
+		"claimants": "Beanspruchte",
+		"totalRewarded": "Gesamtbelohnung",
+		"totalBountyPool": "Gesamtprämie-Pool",
+		"comingSoon": "Coming Soon"
+	},
 	"ChildBounties": {
 		"childBounties": "Kinderprämien",
 		"parentBounty": "Elterntreffen",

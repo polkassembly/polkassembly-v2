@@ -701,6 +701,22 @@
 		"cancelled": "取消",
 		"rejected": "拒绝"
 	},
+	"Bounty": {
+		"availableBountyPool": "可用赏金池",
+		"viewAll": "查看全部",
+		"dot": "DOT",
+		"claimed": "已认领",
+		"childBounties": "子赏金",
+		"bountyProposal": "赏金提案",
+		"vote": "投票",
+		"bountyDashboard": "赏金仪表盘",
+		"hotBounties": "热门赏金",
+		"activeBounties": "活跃赏金",
+		"claimants": "认领者",
+		"totalRewarded": "总奖励",
+		"totalBountyPool": "总赏金池",
+		"comingSoon": "Coming Soon"
+	},
 	"ChildBounties": {
 		"childBounties": "子赏金",
 		"parentBounty": "父赏金",

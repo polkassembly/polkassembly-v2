@@ -727,6 +727,23 @@
 		"cancelled": "Cancelled",
 		"rejected": "Rejected"
 	},
+	"Bounty": {
+		"dashboard": "Dashboard",
+		"availableBountyPool": "Available Bounty Pool",
+		"viewAll": "View All",
+		"dot": "DOT",
+		"claimed": "Claimed",
+		"bounty": "Bounty",
+		"vote": "Vote",
+		"bountyProposal": "Bounty Proposal",
+		"childBounties": "Child Bounties",
+		"hotBounties": "Hot Bounties",
+		"activeBounties": "Active Bounties",
+		"claimants": "Claimants",
+		"totalRewarded": "Total Rewarded",
+		"totalBountyPool": "Total Bounty Pool",
+		"comingSoon": "Coming Soon"
+	},
 	"ChildBounties": {
 		"childBounties": "Child Bounties",
 		"parentBounty": "Parent Bounty",
