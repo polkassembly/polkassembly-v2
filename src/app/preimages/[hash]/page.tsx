@@ -14,7 +14,7 @@ async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
 	const hashData = await NextApiClientService.fetchPreimageByHash({ hash });
 
 	return (
-		<div className='grid grid-cols-1 gap-5 p-5 sm:px-10'>
+		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:px-10'>
 			<Header data={hashData?.data as unknown as IGenericListingResponse<IPreimage>} />
 			<ListingTable data={hashData?.data as unknown as IGenericListingResponse<IPreimage>} />
 		</div>

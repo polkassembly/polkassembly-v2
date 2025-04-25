@@ -36,7 +36,7 @@ async function DiscussionPost({ params }: { params: Promise<{ index: string }> }
 	if (error || !data) throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 
 	return (
-		<div className='mx-auto h-full w-full max-w-7xl'>
+		<div className='h-full w-full'>
 			<PostDetails
 				index={index}
 				postData={data}

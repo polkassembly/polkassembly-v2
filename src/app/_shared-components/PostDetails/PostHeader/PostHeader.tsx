@@ -52,7 +52,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	return (
-		<div className='mx-auto max-w-screen-xl'>
+		<div className='mx-auto max-w-7xl'>
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
 					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (
