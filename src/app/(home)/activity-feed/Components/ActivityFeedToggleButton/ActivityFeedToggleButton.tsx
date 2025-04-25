@@ -4,7 +4,6 @@
 
 import { EActivityFeedTab } from '@/_shared/types';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import styles from './ActivityFeedToggleButton.module.scss';
 
@@ -13,19 +12,18 @@ interface IToggleButtonProps {
 }
 
 function ActivityFeedToggleButton({ activeTab }: IToggleButtonProps) {
-	const pathname = usePathname();
 	const t = useTranslations();
 
 	return (
 		<div className={styles.container}>
 			<Link
-				href='/'
+				href={`/activity-feed?tab=${EActivityFeedTab.EXPLORE}`}
 				className={`${styles.button} ${activeTab === EActivityFeedTab.EXPLORE ? 'bg-section_dark_overlay font-semibold text-navbar_border' : 'font-medium text-sidebar_text'}`}
 			>
 				{t('ActivityFeed.ExploreTab')}
 			</Link>
 			<Link
-				href={`${pathname}?tab=${EActivityFeedTab.SUBSCRIBED}`}
+				href={`/activity-feed?tab=${EActivityFeedTab.SUBSCRIBED}`}
 				className={`${styles.button} ${activeTab === EActivityFeedTab.SUBSCRIBED ? 'bg-section_dark_overlay font-semibold text-navbar_border' : 'font-medium text-sidebar_text'}`}
 			>
 				{t('ActivityFeed.SubscribedTab')}

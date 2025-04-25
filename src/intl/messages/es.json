@@ -30,6 +30,9 @@
 		"loading": "Cargando...",
 		"subscribe": "Suscribirse",
 		"unsubscribe": "Desuscribirse",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toView": "para ver tus publicaciones suscritas",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",

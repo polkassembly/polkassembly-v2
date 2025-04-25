@@ -6,7 +6,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EPostOrigin, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useTranslations } from 'next-intl';
@@ -17,6 +17,8 @@ import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
 import Link from 'next/link';
+import DiscussionsTab from './DiscussionsTab';
+import TrackTabs from './TrackTabs';
 
 enum EOverviewTabs {
 	All = 'all',
@@ -28,21 +30,15 @@ const parseTabnameforUrl = (tab: string) => {
 	return tab.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 };
 
-function LatestActivity({
-	trackDetails
-}: {
-	trackDetails: {
-		all: IGenericListingResponse<IPostListing> | null;
-		discussion: IGenericListingResponse<IPostListing> | null;
-		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
-	};
-}) {
+function LatestActivity({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> | null }) {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 
 	const DATE_FORMAT = "Do MMM 'YY";
 
 	const [selectedTab, setSelectedTab] = useState<string>(EOverviewTabs.All);
+
+	const tracks = NETWORKS_DETAILS[`${network}`]?.trackDetails || {};
 
 	return (
 		<div className='whitespace-nowrap'>
@@ -65,14 +61,14 @@ function LatestActivity({
 						className='text-xm border-b border-b-border_grey font-medium text-text_primary data-[state=active]:border-b-0'
 						value={EOverviewTabs.All}
 					>
-						{t('all')} <span className='ml-1 text-xs'>({trackDetails?.all?.totalCount || 0})</span>
+						{t('all')} <span className='ml-1 text-xs'>({allTracksData?.totalCount || 0})</span>
 					</TabsTrigger>
 					<TabsTrigger
 						showBorder
 						className='text-xm border-b border-b-border_grey font-medium text-text_primary data-[state=active]:border-b-0'
 						value={EOverviewTabs.Discussion}
 					>
-						{t('discussion')} <span className='ml-1 text-xs'>({trackDetails?.discussion?.totalCount || 0})</span>
+						{t('discussion')}
 					</TabsTrigger>
 					{Object.keys(NETWORKS_DETAILS[`${network}`]?.trackDetails || {}).map((key) => (
 						<TabsTrigger
@@ -81,7 +77,7 @@ function LatestActivity({
 							value={key}
 							key={key}
 						>
-							{parseCamelCase(key)} <span className='ml-1 text-xs'>({trackDetails?.tracks?.find((track) => track.trackName === key)?.data?.totalCount || 0})</span>
+							{parseCamelCase(key)}
 						</TabsTrigger>
 					))}
 				</TabsList>
@@ -99,8 +95,8 @@ function LatestActivity({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{trackDetails?.all?.items && trackDetails.all.items.length > 0 ? (
-								trackDetails.all.items.map((row) => (
+							{allTracksData?.items && allTracksData.items.length > 0 ? (
+								allTracksData.items.map((row) => (
 									<Link
 										href={`/referenda/${row.index}`}
 										key={row.index}
@@ -137,97 +133,16 @@ function LatestActivity({
 
 				{/* "Discussion" Tab */}
 				<TabsContent value={EOverviewTabs.Discussion}>
-					<Table className='text_text_primary text-sm'>
-						<TableHeader>
-							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
-								<TableHead className='py-4'>#</TableHead>
-								<TableHead className='py-4'>{t('title')}</TableHead>
-								<TableHead className='py-4'>{t('topic')}</TableHead>
-								<TableHead className='py-4'>{t('creator')}</TableHead>
-								<TableHead className='py-4'>{t('created')}</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{trackDetails?.discussion?.items && trackDetails.discussion.items.length > 0 ? (
-								trackDetails.discussion.items.map((row) => (
-									<Link
-										href={`/post/${row.index}`}
-										key={row.index}
-										className='contents'
-									>
-										<TableRow key={row.index}>
-											<TableCell className='py-4'>{row.index}</TableCell>
-											<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-											<TableCell className='py-4'>{row.topic && parseCamelCase(row.topic)}</TableCell>
-											<TableCell className='py-4'>{row.publicUser?.addresses?.[0] && <Address address={row.publicUser?.addresses?.[0]} />}</TableCell>
-											<TableCell className='py-4'>{row.createdAt && dayjs(row.createdAt).format(DATE_FORMAT)}</TableCell>
-										</TableRow>
-									</Link>
-								))
-							) : (
-								<TableRow>
-									<TableCell
-										colSpan={6}
-										className='text-center'
-									>
-										{t('nodiscussionposts')}
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
+					<DiscussionsTab />
 				</TabsContent>
 
 				{/* Individual Track Tabs */}
-				{trackDetails?.tracks?.map((track) => (
+				{Object.keys(tracks).map((track) => (
 					<TabsContent
-						key={track.trackName}
-						value={track.trackName}
+						key={track}
+						value={track}
 					>
-						<Table className='text_text_primary text-sm'>
-							<TableHeader>
-								<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
-									<TableHead className='py-4'>#</TableHead>
-									<TableHead className='py-4'>{t('title')}</TableHead>
-									<TableHead className='py-4'>{t('postedBy')}</TableHead>
-									<TableHead className='py-4'>{t('created')}</TableHead>
-									<TableHead className='py-4 text-right'>{t('status')}</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{track?.data?.items && track.data.items.length > 0 ? (
-									track.data.items.map((row) => (
-										<Link
-											href={`/referenda/${row.index}`}
-											className='contents'
-											key={row.index}
-										>
-											<TableRow key={row.index}>
-												<TableCell className='py-4'>{row.index}</TableCell>
-												<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-												<TableCell className='py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-												<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-												<TableCell className='flex justify-end py-4'>
-													<StatusTag
-														className='w-max'
-														status={row.onChainInfo?.status}
-													/>
-												</TableCell>
-											</TableRow>
-										</Link>
-									))
-								) : (
-									<TableRow>
-										<TableCell
-											colSpan={6}
-											className='text-center'
-										>
-											{t('no')} {track.trackName} {t('activityfound')}
-										</TableCell>
-									</TableRow>
-								)}
-							</TableBody>
-						</Table>
+						<TrackTabs trackName={track as EPostOrigin} />
 					</TabsContent>
 				))}
 			</Tabs>

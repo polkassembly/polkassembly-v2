@@ -30,6 +30,9 @@
 		"loading": "Wird geladen...",
 		"subscribe": "Abonnieren",
 		"unsubscribe": "Entfernen",
+		"please": "Bitte",
+		"login": "Anmelden",
+		"toView": "um Ihre abonnierten Beiträge anzuzeigen",
 		"Navbar": {
 			"All": "Alle",
 			"Root": "Root",
