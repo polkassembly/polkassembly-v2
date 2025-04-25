@@ -13,8 +13,8 @@ import SecondPlaceDark from '@assets/leaderboard/SecondPlaceDark.svg';
 import { useSidebar } from '@ui/Sidebar/Sidebar';
 import ThirdPlaceDark from '@assets/leaderboard/ThirdPlaceDark.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
-import { IoPersonAdd } from 'react-icons/io5';
-import { HiMiniCurrencyDollar } from 'react-icons/hi2';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
+import { AiFillDollarCircle } from '@react-icons/all-files/ai/AiFillDollarCircle';
 import Link from 'next/link';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
@@ -95,7 +95,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 							</Link>
 							<div className='flex items-center gap-x-1 sm:gap-x-2'>
 								<IoPersonAdd className='text-base text-text_primary sm:text-lg' />
-								<HiMiniCurrencyDollar className='text-xl text-text_primary sm:text-2xl' />
+								<AiFillDollarCircle className='text-xl text-text_primary sm:text-2xl' />
 							</div>
 						</span>
 

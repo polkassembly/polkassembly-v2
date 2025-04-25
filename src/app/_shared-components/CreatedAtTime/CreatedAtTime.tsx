@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { FaRegClock } from 'react-icons/fa6';
+import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import classes from './CreatedAtTime.module.scss';
 
