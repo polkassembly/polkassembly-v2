@@ -10,9 +10,32 @@ import { useWalletService } from '@/hooks/useWalletService';
 import { EAccountType } from '@/_shared/types';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
-import AddressRelationsPickerBtn from './AddressRelationsPickerBtn';
+import { Button } from '../Button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
+import SwitchWalletOrAddress from './SwitchWalletOrAddress';
 
 function AddressSwitchButton() {
+	return (
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button
+					size='sm'
+					className='ml-auto'
+				>
+					Switch
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='max-w-xl p-3 sm:p-6'>
+				<DialogHeader className='text-xl font-semibold text-text_primary'>
+					<DialogTitle>Switch Wallet</DialogTitle>
+				</DialogHeader>
+				<SwitchWalletOrAddress small />
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+function AddressRelationsPicker() {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 
@@ -56,9 +79,9 @@ function AddressSwitchButton() {
 			) : (
 				<Skeleton className='h-6 w-32' />
 			)}
-			<AddressRelationsPickerBtn />
+			<AddressSwitchButton />
 		</div>
 	);
 }
 
-export default AddressSwitchButton;
+export default AddressRelationsPicker;

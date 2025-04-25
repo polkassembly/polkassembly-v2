@@ -16,7 +16,7 @@ import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
 import ConvictionSelector from './ConvictionSelector/ConvictionSelector';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
-import AddressSwitchButton from '../../SwitchWalletOrAddress/AddressSwitchButton';
+import AddressRelationsPicker from '../../SwitchWalletOrAddress/AddressRelationsPicker';
 
 function VoteReferendum({ index }: { index: string }) {
 	const { userPreferences } = useUserPreferences();
@@ -90,7 +90,7 @@ function VoteReferendum({ index }: { index: string }) {
 		<div className='flex flex-col gap-y-6'>
 			<SwitchWalletOrAddress
 				small
-				customAddressSelector={<AddressSwitchButton />}
+				customAddressSelector={<AddressRelationsPicker />}
 			/>
 			<div>
 				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
