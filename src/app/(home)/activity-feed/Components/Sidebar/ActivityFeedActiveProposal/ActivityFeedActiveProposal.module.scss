@@ -1,0 +1,23 @@
+.activeProposalContainer {
+	@apply flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary;
+}
+
+.activeProposalTitle {
+	@apply flex items-center justify-between;
+}
+
+.activeProposalTitleText {
+	@apply flex items-center gap-1 text-sm font-semibold;
+}
+
+.activeProposalTitleDate {
+	@apply rounded-full bg-activity_feed_active_proposal_bg px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%];
+}
+
+.activeProposalTitleDateNumber {
+	@apply text-text_primary;
+}
+
+.activeProposalTitleDateText {
+	@apply text-text_primary;
+}

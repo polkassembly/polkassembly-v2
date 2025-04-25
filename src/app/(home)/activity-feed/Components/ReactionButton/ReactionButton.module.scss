@@ -1,0 +1,31 @@
+.activity_icons {
+	@apply block h-5 w-5;
+}
+
+.likeGifContainer {
+	@apply absolute left-1/2 top-[-19px] z-10 flex h-10 w-10 -translate-x-1/2 transform animate-[popAnimation_0.5s_ease-in-out_1] items-center justify-center;
+}
+
+.dislikeGifContainer {
+	@apply absolute left-1/2 top-[-21px] z-10 flex h-10 w-10 items-center justify-center;
+	transform: translateX(-50%) rotate(180deg);
+	animation: popAnimation 1.5s ease-out;
+}
+
+@keyframes popAnimation {
+	0% {
+		@apply -translate-x-1/2 scale-0 opacity-0;
+	}
+
+	20% {
+		@apply -translate-x-1/2 scale-[1.2] opacity-100;
+	}
+
+	80% {
+		@apply -translate-x-1/2 scale-100 opacity-100;
+	}
+
+	100% {
+		@apply -translate-x-1/2 scale-100 opacity-0;
+	}
+}

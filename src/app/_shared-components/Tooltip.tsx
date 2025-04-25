@@ -11,7 +11,15 @@ import { cn } from '@/lib/utils';
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
-const Tooltip = TooltipPrimitive.Root;
+const Tooltip = React.forwardRef<React.ElementRef<typeof TooltipPrimitive.Root>, React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> & { delayDuration?: number }>(
+	({ delayDuration = 0, ...props }) => (
+		<TooltipPrimitive.Root
+			delayDuration={delayDuration}
+			{...props}
+		/>
+	)
+);
+Tooltip.displayName = TooltipPrimitive.Root.displayName;
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
 

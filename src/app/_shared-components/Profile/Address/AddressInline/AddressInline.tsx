@@ -42,7 +42,7 @@ function AddressInline({
 			data-tip
 			data-for={`tooltip-${address}`}
 		>
-			{showIdenticon && (
+			{showIdenticon && address && (
 				<Identicon
 					className='image identicon'
 					value={address}

@@ -10,7 +10,7 @@ import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import ReactionButton from '@/app/(home)/Components/ReactionButton/ReactionButton';
+import ReactionButton from '@/app/(home)/activity-feed/Components/ReactionButton/ReactionButton';
 import { useMemo, useCallback } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import styles from './PostActions.module.scss';

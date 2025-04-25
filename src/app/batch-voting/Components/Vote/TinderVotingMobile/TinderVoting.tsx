@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { EProposalType, EVoteDecision, IPostListing, IVoteCartItem } from '@/_shared/types';
-import ActivityFeedPostItem from '@/app/(home)/Components/ActivityFeedPostItem/ActivityFeedPostItem';
+import ActivityFeedPostItem from '@/app/(home)/activity-feed/Components/ActivityFeedPostItem/ActivityFeedPostItem';
 import { Button } from '@/app/_shared-components/Button';
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/app/_shared-components/Drawer';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
