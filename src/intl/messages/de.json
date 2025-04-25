@@ -715,7 +715,8 @@
 		"claimants": "Beanspruchte",
 		"totalRewarded": "Gesamtbelohnung",
 		"totalBountyPool": "Gesamtprämie-Pool",
-		"comingSoon": "Coming Soon"
+		"comingSoon": "Coming Soon",
+		"dashboard": "Dashboard"
 	},
 	"ChildBounties": {
 		"childBounties": "Kinderprämien",

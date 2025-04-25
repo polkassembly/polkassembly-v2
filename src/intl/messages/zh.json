@@ -715,7 +715,8 @@
 		"claimants": "认领者",
 		"totalRewarded": "总奖励",
 		"totalBountyPool": "总赏金池",
-		"comingSoon": "Coming Soon"
+		"comingSoon": "Coming Soon",
+		"dashboard": "仪表板"
 	},
 	"ChildBounties": {
 		"childBounties": "子赏金",

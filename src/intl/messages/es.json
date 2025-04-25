@@ -736,7 +736,8 @@
 		"claimants": "Reclamantes",
 		"totalRewarded": "Total Recompensado",
 		"totalBountyPool": "Total Piscina de Prémios",
-		"comingSoon": "Próximamente"
+		"comingSoon": "Próximamente",
+		"dashboard": "Panel de control"
 	},
 	"BatchVote": {
 		"batchVoting": "Votación por lotes",
