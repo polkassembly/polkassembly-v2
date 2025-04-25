@@ -6,8 +6,9 @@ import { useToast } from '@/hooks/useToast';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
 import { ENotificationStatus } from '@/_shared/types';
 import { FaCircleCheck } from 'react-icons/fa6';
-import { IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io';
-import { MdInfoOutline } from 'react-icons/md';
+import { IoIosCloseCircle } from '@react-icons/all-files/io/IoIosCloseCircle';
+import { IoIosInformationCircle } from '@react-icons/all-files/io/IoIosInformationCircle';
+import { MdInfoOutline } from '@react-icons/all-files/md/MdInfoOutline';
 import styles from './Toaster.module.scss';
 
 const ICON_MAP = {

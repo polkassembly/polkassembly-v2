@@ -10,7 +10,7 @@ import { IPublicUser } from '@/_shared/types';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { cn } from '@/lib/utils';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
-import { IoPersonAdd } from 'react-icons/io5';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import { TableRow, TableCell } from '@ui/Table';
 import styles from './Leaderboard.module.scss';

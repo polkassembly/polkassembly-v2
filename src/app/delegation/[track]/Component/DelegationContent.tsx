@@ -5,7 +5,8 @@
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ITrackDelegationDetails, EDelegationStatus } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { IoPersonAdd, IoPersonRemove } from 'react-icons/io5';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
+import { IoPersonRemove } from '@react-icons/all-files/io5/IoPersonRemove';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import UndelegatedTrack from '@assets/delegation/undelegated.svg';

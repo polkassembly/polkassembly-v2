@@ -2,8 +2,11 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { TiHome } from 'react-icons/ti';
-import { FaTwitter, FaTelegramPlane, FaYoutube, FaDiscord } from 'react-icons/fa';
+import { TiHome } from '@react-icons/all-files/ti/TiHome';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
+import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
 import { PiRedditLogoFill } from 'react-icons/pi';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 import { RiBox3Line } from 'react-icons/ri';

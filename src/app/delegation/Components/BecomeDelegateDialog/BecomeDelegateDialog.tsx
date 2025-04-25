@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
 import { useToast } from '@/hooks/useToast';
 import { ENotificationStatus, ENetwork, IDelegateDetails, EDelegateSource } from '@/_shared/types';
-import { AiOutlineInfoCircle } from 'react-icons/ai';
+import { AiOutlineInfoCircle } from '@react-icons/all-files/ai/AiOutlineInfoCircle';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';

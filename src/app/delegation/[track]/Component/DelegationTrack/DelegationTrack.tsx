@@ -5,7 +5,7 @@
 'use client';
 
 import { EDelegationStatus, ITrackDelegationDetails } from '@/_shared/types';
-import { MdKeyboardArrowRight } from 'react-icons/md';
+import { MdKeyboardArrowRight } from '@react-icons/all-files/md/MdKeyboardArrowRight';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import styles from './DelegationTrack.module.scss';

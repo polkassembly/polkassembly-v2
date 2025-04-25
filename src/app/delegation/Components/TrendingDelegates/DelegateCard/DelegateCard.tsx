@@ -4,7 +4,7 @@
 import { useTranslations } from 'next-intl';
 import { memo, useState } from 'react';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { IoPersonAdd } from 'react-icons/io5';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';

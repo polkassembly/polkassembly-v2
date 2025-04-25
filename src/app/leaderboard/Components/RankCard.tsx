@@ -13,7 +13,7 @@ import SecondPlaceDark from '@assets/leaderboard/SecondPlaceDark.svg';
 import { useSidebar } from '@ui/Sidebar/Sidebar';
 import ThirdPlaceDark from '@assets/leaderboard/ThirdPlaceDark.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
-import { IoPersonAdd } from 'react-icons/io5';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
 import { HiMiniCurrencyDollar } from 'react-icons/hi2';
 import Link from 'next/link';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
