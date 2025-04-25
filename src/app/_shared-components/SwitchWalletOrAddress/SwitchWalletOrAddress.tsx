@@ -14,18 +14,21 @@ interface Props {
 	onAddressChange?: ((account: InjectedAccount) => void) | undefined;
 	small?: boolean;
 	withBalance?: boolean;
+	disabled?: boolean;
 }
 
-function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange }: Props) {
+function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange, disabled = false }: Props) {
 	return (
 		<>
 			<WalletButtons
 				small={small}
 				onWalletChange={onWalletChange}
+				disabled={disabled}
 			/>
 			<AddressDropdown
 				withBalance={withBalance}
 				onChange={onAddressChange}
+				disabled={disabled}
 			/>
 		</>
 	);

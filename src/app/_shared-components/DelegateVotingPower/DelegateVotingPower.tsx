@@ -24,8 +24,7 @@ import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import styles from './DelegateVotingPower.module.scss';
-import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
-import AddressDropdown from '../AddressDropdown/AddressDropdown';
+import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 interface DelegateDialogProps {
 	delegate: { address: string };
@@ -243,8 +242,10 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex max-h-[75vh] flex-col gap-4 overflow-y-auto'>
-				<WalletButtons small />
-				<AddressDropdown withBalance />
+				<SwitchWalletOrAddress
+					small
+					withBalance
+				/>
 
 				<div>
 					<p className='mb-1 text-sm text-wallet_btn_text'>{t('delegateTo')}</p>

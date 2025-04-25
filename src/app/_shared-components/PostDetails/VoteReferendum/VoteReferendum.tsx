@@ -4,22 +4,21 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount, EAccountType } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, ISelectedAccount } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
-import AddressDropdown from '../../AddressDropdown/AddressDropdown';
-import WalletButtons from '../../WalletsUI/WalletButtons/WalletButtons';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
 import ConvictionSelector from './ConvictionSelector/ConvictionSelector';
+import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 function VoteReferendum({ index }: { index: string }) {
-	const { setUserPreferences, userPreferences } = useUserPreferences();
+	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
 	const [balance, setBalance] = useState<BN>(BN_ZERO);
@@ -88,22 +87,7 @@ function VoteReferendum({ index }: { index: string }) {
 
 	return (
 		<div className='flex flex-col gap-y-6'>
-			<WalletButtons
-				small
-				onWalletChange={(wallet) => setUserPreferences({ ...userPreferences, wallet: wallet ?? undefined })}
-			/>
-			<AddressDropdown
-				withBalance
-				onChange={(a) =>
-					setUserPreferences({
-						...userPreferences,
-						selectedAccount: {
-							...a,
-							accountType: EAccountType.REGULAR
-						}
-					})
-				}
-			/>
+			<SwitchWalletOrAddress small />
 			<div>
 				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
 				<div className='flex flex-col gap-y-3'>

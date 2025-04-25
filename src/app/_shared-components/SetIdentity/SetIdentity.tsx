@@ -24,14 +24,13 @@ import RiotIcon from '@assets/icons/riot-icon.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
-import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
 import SocialVerifications from './SocialVerifications/SocialVerifications';
 import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen';
+import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -193,8 +192,8 @@ function SetIdentity() {
 				onSubmit={formData.handleSubmit(handleSetIdentity)}
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<WalletButtons small />
-					<AddressDropdown
+					<SwitchWalletOrAddress
+						small
 						withBalance
 						disabled={identityLoading}
 					/>

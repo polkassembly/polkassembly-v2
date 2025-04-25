@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/app/_shared-components/Button';
 import { useUser } from '@/hooks/useUser';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useEffect, useRef } from 'react';
 import identityIcon from '@assets/delegation/identity.svg';
@@ -20,9 +19,9 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import { MDXEditorMethods } from '@mdxeditor/editor';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import styles from './BecomeDelegateDialog.module.scss';
 
 const ERROR_UNKNOWN = 'An unknown error occurred';
@@ -142,8 +141,10 @@ export default function BecomeDelegateDialog() {
 
 				<div className='flex flex-col gap-y-4'>
 					<div className='flex max-h-[75vh] flex-col gap-y-4 overflow-y-auto'>
-						<WalletButtons small />
-						<AddressDropdown withBalance />
+						<SwitchWalletOrAddress
+							small
+							withBalance
+						/>
 						<div className='flex flex-col gap-y-2'>
 							<p className='text-sm text-wallet_btn_text'>
 								{t('delegationManifesto')} <span className='text-text_pink'>*</span>
