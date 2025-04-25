@@ -76,7 +76,12 @@ function AddressSwitchButton() {
 						/>
 					</>
 				) : (
-					<Skeleton className='h-6 w-full' />
+					<>
+						<Skeleton className='my-3 h-6 w-full' />
+						<Skeleton className='my-3 h-6 w-full' />
+						<Skeleton className='my-3 h-6 w-full' />
+						<Skeleton className='my-3 h-6 w-full' />
+					</>
 				)}
 			</DialogContent>
 		</Dialog>
