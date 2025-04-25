@@ -203,9 +203,15 @@ function VoteSummary({
 										<div
 											className='absolute whitespace-nowrap text-xs font-medium'
 											style={{
+												position: 'absolute',
+												left: '50%',
+												top: '50%',
 												transform: `
 													rotate(${-180 + (180 * progress.approvalThreshold) / 100}deg)
-													translateX(${67.5 + 15}px)
+													translateX(${67.5 + 7.5}px)
+													translateY(20px)
+													rotate(${-(-180 + (180 * progress.approvalThreshold) / 100)}deg)
+													translate(-50%, -100%)
 												`
 											}}
 										>
