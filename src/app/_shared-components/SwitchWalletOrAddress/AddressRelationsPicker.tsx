@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
 import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
+import { Label } from '../Label';
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;
@@ -115,37 +116,41 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 								value={address.address}
 								id={address.address}
 							/>
-
-							<span id={address.address}>
+							<Label
+								htmlFor={address.address}
+								className='flex cursor-pointer items-center gap-2'
+							>
 								<Address
 									address={address.address}
 									iconSize={25}
 									redirectToProfile={false}
 									disableTooltip
 								/>
+							</Label>
 
-								{'pureProxies' in address &&
-									address.pureProxies.map((pureProxyAddress) => (
-										<div
-											key={pureProxyAddress.address}
-											className='flex items-center gap-2'
+							{'pureProxies' in address &&
+								address.pureProxies.map((pureProxyAddress) => (
+									<div
+										key={pureProxyAddress.address}
+										className='ml-6 flex items-center gap-2'
+									>
+										<RadioGroupItem
+											value={pureProxyAddress.address}
+											id={pureProxyAddress.address}
+										/>
+										<Label
+											htmlFor={pureProxyAddress.address}
+											className='flex cursor-pointer items-center gap-2'
 										>
-											<RadioGroupItem
-												value={pureProxyAddress.address}
-												id={pureProxyAddress.address}
+											<Address
+												address={pureProxyAddress.address}
+												iconSize={25}
+												redirectToProfile={false}
+												disableTooltip
 											/>
-
-											<span id={pureProxyAddress.address}>
-												<Address
-													address={pureProxyAddress.address}
-													iconSize={25}
-													redirectToProfile={false}
-													disableTooltip
-												/>
-											</span>
-										</div>
-									))}
-							</span>
+										</Label>
+									</div>
+								))}
 						</div>
 					))}
 				</RadioGroup>
