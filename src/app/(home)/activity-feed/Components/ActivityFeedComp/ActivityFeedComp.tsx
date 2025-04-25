@@ -4,11 +4,10 @@
 
 'use client';
 
-import { EActivityFeedTab, IGenericListingResponse, IPostListing, ESidebarState } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent } from '@ui/Tabs';
-import { useSidebar } from '@ui/Sidebar/Sidebar';
 import { Button } from '@/app/_shared-components/Button';
 import { RefreshCw } from 'lucide-react';
 import { useRouter } from 'nextjs-toploader/app';
@@ -20,11 +19,10 @@ import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 
 function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericListingResponse<IPostListing>; activeTab: EActivityFeedTab }) {
 	const t = useTranslations();
-	const { state } = useSidebar();
 	const router = useRouter();
 
 	return (
-		<div className={cn('mx-auto min-h-screen max-w-7xl bg-page_background pt-5', state === ESidebarState.EXPANDED ? 'px-5 lg:px-16' : 'px-5 lg:px-10')}>
+		<div className={cn('mx-auto min-h-screen max-w-7xl bg-page_background px-4 pt-5 lg:px-16')}>
 			<div className='container grid grid-cols-12 gap-4'>
 				<div className='col-span-12'>
 					<div className={styles.activityFeedContainer}>

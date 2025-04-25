@@ -73,7 +73,7 @@ async function OverviewPage() {
 	const trackDetails = await fetchTrackDetails();
 
 	return (
-		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:p-8'>
+		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 			<Overview trackDetails={trackDetails || { all: null, discussion: null, tracks: [] }} />
 		</div>
 	);

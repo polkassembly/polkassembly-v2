@@ -40,7 +40,7 @@ function Delegation({ delegationStats }: { delegationStats: IDelegationStats }) 
 	return (
 		<div>
 			<UserWalletData />
-			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:mt-16 sm:p-10'>
+			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 				<div className={styles.delegation}>
 					<Tabs defaultValue={EDelegationTab.DASHBOARD}>
 						<TabsList className='mb-4 flex w-full justify-start border-border_grey dark:border-b'>

@@ -1,5 +1,5 @@
 .container {
-	@apply mx-auto max-w-7xl bg-section_dark_overlay px-5 pt-8 lg:px-10;
+	@apply mx-auto max-w-7xl bg-section_dark_overlay px-4 pt-8 lg:px-16;
 }
 
 .header {
@@ -11,7 +11,7 @@
 }
 
 .subtitle {
-	@apply pt-5 text-sm text-btn_secondary_text text-gray-600;
+	@apply pt-5 text-sm text-gray-600;
 }
 
 .button {
@@ -35,7 +35,7 @@
 }
 
 .content {
-	@apply mx-auto min-h-[600px] max-w-7xl bg-page_background px-10 py-5;
+	@apply mx-auto min-h-[600px] max-w-7xl bg-page_background px-4 py-5 lg:px-16;
 }
 
 .popoverContent {
