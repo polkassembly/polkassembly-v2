@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType, IMultisigAddress, IProxyAddress } from '@/_shared/types';
+import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { ChevronDown } from 'lucide-react';
 import Address from '../Profile/Address/Address';
@@ -16,38 +16,139 @@ import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
+import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 
 interface IAddressRadioGroupProps {
-	groupName: string;
+	accountType: EAccountType;
 	addresses: IMultisigAddress[] | IProxyAddress[];
 	defaultOpen?: boolean;
+	closeDialog?: () => void;
 }
 
-function AddressRadioGroup({ groupName, addresses, defaultOpen = false }: IAddressRadioGroupProps) {
+function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeDialog }: IAddressRadioGroupProps) {
+	const [selectedAddress, setSelectedAddress] = useState<string>('');
+	const { userPreferences, setUserPreferences } = useUserPreferences();
+
+	const handleAddressChange = (address: string) => {
+		setSelectedAddress(address);
+
+		// First check if it's a regular address in the provided addresses array
+		const regularAddress = addresses.find((addr) => addr.address === address);
+
+		if (regularAddress) {
+			// Handle regular address selection
+			const newSelectedAccount: ISelectedAccount = {
+				address: regularAddress.address,
+				accountType,
+				parent: userPreferences?.selectedAccount,
+				...('signatories' in regularAddress && { signatories: regularAddress.signatories }),
+				...('threshold' in regularAddress && { threshold: regularAddress.threshold })
+			};
+
+			setUserPreferences({
+				...userPreferences,
+				selectedAccount: newSelectedAccount
+			});
+		} else {
+			// Handle pure proxy selection
+			// eslint-disable-next-line no-restricted-syntax
+			for (const addr of addresses) {
+				if ('pureProxies' in addr) {
+					const pureProxy = addr.pureProxies.find((proxy) => proxy.address === address);
+					if (pureProxy) {
+						// Create parent account for the pure proxy
+						const parentAccount: ISelectedAccount = {
+							address: addr.address,
+							accountType: EAccountType.MULTISIG,
+							signatories: addr.signatories,
+							threshold: addr.threshold,
+							parent: userPreferences?.selectedAccount
+						};
+
+						// Create pure proxy account
+						const newSelectedAccount: ISelectedAccount = {
+							address: pureProxy.address,
+							accountType: EAccountType.PROXY,
+							parent: parentAccount
+						};
+
+						setUserPreferences({
+							...userPreferences,
+							selectedAccount: newSelectedAccount
+						});
+						break;
+					}
+				}
+			}
+		}
+
+		closeDialog?.();
+	};
+
 	return (
 		<Collapsible
 			defaultOpen={defaultOpen}
 			className='rounded-lg border border-border_grey bg-page_background p-4'
 		>
 			<CollapsibleTrigger asChild>
-				<div className='flex items-center justify-between'>
-					<h6 className='text-text_secondary text-sm capitalize'>{groupName}</h6>
+				<div className='flex cursor-pointer items-center justify-between'>
+					<h6 className='text-text_secondary text-sm capitalize'>{accountType}</h6>
 					<ChevronDown className='h-4 w-4' />
 				</div>
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				<hr className='my-2 border-primary_border' />
 
-				{!addresses.length && <p className='text-text_secondary text-sm'>No {groupName} found</p>}
+				{!addresses.length && <p className='text-text_secondary text-sm'>No {accountType} found</p>}
 
-				<div>
+				<RadioGroup
+					value={selectedAddress}
+					onValueChange={handleAddressChange}
+					className='flex flex-col justify-center gap-3'
+				>
 					{addresses.map((address) => (
-						<>
-							<p key={address.address}>{address.address}</p>
-							{'pureProxies' in address && address.pureProxies.map((pureProxyAddress) => <p className='ml-2'>{pureProxyAddress.address}</p>)}
-						</>
+						<div
+							key={address.address}
+							className='flex items-center gap-2'
+						>
+							<RadioGroupItem
+								value={address.address}
+								id={address.address}
+							/>
+
+							<span id={address.address}>
+								<Address
+									address={address.address}
+									iconSize={25}
+									redirectToProfile={false}
+									disableTooltip
+								/>
+
+								{'pureProxies' in address &&
+									address.pureProxies.map((pureProxyAddress) => (
+										<div
+											key={pureProxyAddress.address}
+											className='flex items-center gap-2'
+										>
+											<RadioGroupItem
+												value={pureProxyAddress.address}
+												id={pureProxyAddress.address}
+											/>
+
+											<span id={pureProxyAddress.address}>
+												<Address
+													address={pureProxyAddress.address}
+													iconSize={25}
+													redirectToProfile={false}
+													disableTooltip
+												/>
+											</span>
+										</div>
+									))}
+							</span>
+						</div>
 					))}
-				</div>
+				</RadioGroup>
 			</CollapsibleContent>
 		</Collapsible>
 	);
@@ -56,12 +157,20 @@ function AddressRadioGroup({ groupName, addresses, defaultOpen = false }: IAddre
 function AddressSwitchButton() {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
+	const [isOpen, setisOpen] = useState(false);
 
 	const selectedAddress = userPreferences?.selectedAccount?.address;
 	const relationsForSelectedAddress = user?.addressRelations?.find((relations) => relations.address === selectedAddress);
 
+	const closeDialog = () => {
+		setisOpen(false);
+	};
+
 	return (
-		<Dialog>
+		<Dialog
+			open={isOpen}
+			onOpenChange={setisOpen}
+		>
 			<DialogTrigger asChild>
 				<Button
 					size='sm'
@@ -79,21 +188,23 @@ function AddressSwitchButton() {
 				{relationsForSelectedAddress ? (
 					<>
 						<AddressRadioGroup
-							groupName='multisigs'
+							accountType={EAccountType.MULTISIG}
 							addresses={relationsForSelectedAddress?.multisigAddresses || []}
 							defaultOpen
+							closeDialog={closeDialog}
 						/>
 						<AddressRadioGroup
-							groupName='proxies'
+							accountType={EAccountType.PROXY}
 							addresses={relationsForSelectedAddress?.proxyAddresses || []}
+							closeDialog={closeDialog}
 						/>
 					</>
 				) : (
 					<>
 						<Skeleton className='my-1 h-6 w-full' />
-						<Skeleton className='my-1 h-6 w-full' />
-						<Skeleton className='my-1 h-6 w-full' />
-						<Skeleton className='my-1 h-6 w-full' />
+						<Skeleton className='mb-1 h-6 w-full' />
+						<Skeleton className='mb-1 h-6 w-full' />
+						<Skeleton className='mb-1 h-6 w-full' />
 					</>
 				)}
 			</DialogContent>
