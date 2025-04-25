@@ -34,10 +34,17 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 
 		if (injectedAccounts.length === 0) {
 			setAccounts([]);
+			setAccountsLoading(false);
 			return;
 		}
 
 		setAccounts(injectedAccounts);
+
+		if (userPreferences?.selectedAccount?.address) {
+			setAccountsLoading(false);
+			return;
+		}
+
 		setUserPreferences({
 			...userPreferences,
 			selectedAccount: {
@@ -45,6 +52,7 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 				accountType: EAccountType.REGULAR
 			}
 		});
+
 		setAccountsLoading(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userPreferences?.wallet, walletService]);

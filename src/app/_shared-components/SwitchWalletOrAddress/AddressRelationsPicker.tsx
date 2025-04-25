@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
 import { EAccountType } from '@/_shared/types';
@@ -13,6 +13,23 @@ import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
+
+interface IAddressRelationSelectorProps {
+	title: string;
+}
+
+function AddressRelationSelector({ title }: IAddressRelationSelectorProps) {
+	return (
+		<section>
+			<h6 className='text-text_secondary text-sm'>{title}</h6>
+			<div>
+				<p>Multisig 1</p>
+				<p>Multisig 2</p>
+				<p>Multisig 3</p>
+			</div>
+		</section>
+	);
+}
 
 function AddressSwitchButton() {
 	return (
@@ -30,14 +47,16 @@ function AddressSwitchButton() {
 					<DialogTitle>Switch Wallet</DialogTitle>
 				</DialogHeader>
 				<SwitchWalletOrAddress small />
+				<AddressRelationSelector title='Multisigs' />
 			</DialogContent>
 		</Dialog>
 	);
 }
 
-function AddressRelationsPicker() {
+export default function AddressRelationsPicker() {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
+	const [accountsLoading, setAccountsLoading] = useState(true);
 
 	const getAccounts = useCallback(async () => {
 		if (!walletService || !userPreferences?.wallet) return;
@@ -45,6 +64,12 @@ function AddressRelationsPicker() {
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
 
 		if (injectedAccounts.length === 0) {
+			setAccountsLoading(false);
+			return;
+		}
+
+		if (userPreferences?.selectedAccount?.address) {
+			setAccountsLoading(false);
 			return;
 		}
 
@@ -55,6 +80,8 @@ function AddressRelationsPicker() {
 				accountType: EAccountType.REGULAR
 			}
 		});
+
+		setAccountsLoading(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userPreferences?.wallet, walletService]);
 
@@ -67,7 +94,9 @@ function AddressRelationsPicker() {
 
 	return (
 		<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
-			{selectedAddress ? (
+			{accountsLoading || !selectedAddress ? (
+				<Skeleton className='h-6 w-32' />
+			) : (
 				<Address
 					address={selectedAddress}
 					walletAddressName={walletAddressName}
@@ -76,12 +105,8 @@ function AddressRelationsPicker() {
 					disableTooltip
 					className='w-full px-2'
 				/>
-			) : (
-				<Skeleton className='h-6 w-32' />
 			)}
 			<AddressSwitchButton />
 		</div>
 	);
 }
-
-export default AddressRelationsPicker;
