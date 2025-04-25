@@ -10,7 +10,7 @@ import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
 
-function Overview({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> | null }) {
+function Overview({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> }) {
 	return (
 		<div className={styles.overview_container}>
 			<OverviewHeading />
