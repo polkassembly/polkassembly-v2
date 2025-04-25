@@ -6,6 +6,7 @@
 
 import { EWallet } from '@/_shared/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { ReactNode } from 'react';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 
@@ -15,10 +16,10 @@ interface Props {
 	small?: boolean;
 	withBalance?: boolean;
 	disabled?: boolean;
-	withSwitchButton?: boolean;
+	customAddressSelector?: ReactNode; // this pattern is to avoid cyclic dependencies
 }
 
-function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange, disabled = false, withSwitchButton = false }: Props) {
+function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange, disabled = false, customAddressSelector }: Props) {
 	return (
 		<>
 			<WalletButtons
@@ -26,12 +27,13 @@ function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletCha
 				onWalletChange={onWalletChange}
 				disabled={disabled}
 			/>
-			<AddressDropdown
-				withBalance={withBalance}
-				onChange={onAddressChange}
-				disabled={disabled}
-				withSwitchButton={withSwitchButton}
-			/>
+			{customAddressSelector || (
+				<AddressDropdown
+					withBalance={withBalance}
+					onChange={onAddressChange}
+					disabled={disabled}
+				/>
+			)}
 		</>
 	);
 }
