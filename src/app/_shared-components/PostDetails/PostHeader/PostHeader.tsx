@@ -17,7 +17,7 @@ import { BN } from '@polkadot/util';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-import VotingProgress from '@/app/(home)/Components/VotingProgress/VotingProgress';
+import VotingProgress from '@/app/(home)/activity-feed/Components/VotingProgress/VotingProgress';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Address from '@ui/Profile/Address/Address';
