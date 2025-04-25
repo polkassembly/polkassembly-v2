@@ -5,6 +5,7 @@
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { getFormattedAddress } from '@/_shared/_utils/getFormattedAddress';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { snakeToPascalCase } from '@/_shared/_utils/snakeToPascalCase';
 import { ENetwork, EProposalStatus, EProposalType, EProxyType, IAddressRelations, IMultisigAddress, IOnChainPostInfo, IProxyAddress } from '@/_shared/types';
@@ -134,8 +135,6 @@ export class SubscanOnChainService {
 	}
 
 	static async GetAccountRelations({ address, network }: { address: string; network: ENetwork }): Promise<IAddressRelations> {
-		const getFormattedAddress = (addr: string) => (ValidatorService.isValidSubstrateAddress(addr) ? getSubstrateAddress(addr)! : addr);
-
 		let addressRelationsResponse: IAddressRelations = {
 			address: getFormattedAddress(address),
 			multisigAddresses: [],

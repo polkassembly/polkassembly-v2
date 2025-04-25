@@ -16,19 +16,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
 
 interface IAddressRadioGroupProps {
-	title: string;
+	groupName: string;
 	addresses: IMultisigAddress[] | IProxyAddress[];
 }
 
-function AddressRadioGroup({ title, addresses }: IAddressRadioGroupProps) {
-	if (!addresses.length) return null;
-
+function AddressRadioGroup({ groupName, addresses }: IAddressRadioGroupProps) {
 	return (
 		<>
 			<hr className='my-3' />
 
 			<section>
-				<h6 className='text-text_secondary text-sm'>{title}</h6>
+				<h6 className='text-text_secondary capitalize'>{groupName}</h6>
+				{!addresses.length && <p className='text-text_secondary text-sm'>No {groupName} found</p>}
 				<div>
 					{addresses.map((address) => (
 						<>
@@ -64,14 +63,21 @@ function AddressSwitchButton() {
 					<DialogTitle>Switch Wallet</DialogTitle>
 				</DialogHeader>
 				<SwitchWalletOrAddress small />
-				<AddressRadioGroup
-					title='Multisigs'
-					addresses={relationsForSelectedAddress?.multisigAddresses || []}
-				/>
-				<AddressRadioGroup
-					title='Proxies'
-					addresses={relationsForSelectedAddress?.proxyAddresses || []}
-				/>
+
+				{relationsForSelectedAddress ? (
+					<>
+						<AddressRadioGroup
+							groupName='multisigs'
+							addresses={relationsForSelectedAddress?.multisigAddresses || []}
+						/>
+						<AddressRadioGroup
+							groupName='proxies'
+							addresses={relationsForSelectedAddress?.proxyAddresses || []}
+						/>
+					</>
+				) : (
+					<Skeleton className='h-6 w-full' />
+				)}
 			</DialogContent>
 		</Dialog>
 	);
