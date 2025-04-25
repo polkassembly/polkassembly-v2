@@ -7,14 +7,14 @@ import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
-import { SiElement } from 'react-icons/si';
+import RiotIcon from '@assets/icons/riot_icon.svg';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: IoMdMail,
 	[ESocial.TWITTER]: FaTwitter,
 	[ESocial.TELEGRAM]: FaTelegramPlane,
 	[ESocial.DISCORD]: FaDiscord,
-	[ESocial.RIOT]: SiElement
+	[ESocial.RIOT]: RiotIcon
 };
 
 function SocialLinks({ socialLinks = [], identity }: { socialLinks?: IUserSocialDetails[]; identity?: IOnChainIdentity }) {

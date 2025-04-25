@@ -11,7 +11,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PolkadotIcon from '@assets/delegation/polkadot-logo.svg';
 import Image from 'next/image';
-import { FaCircleCheck } from 'react-icons/fa6';
+import { FaCheckCircle } from '@react-icons/all-files/fa/FaCheckCircle';
 import { IoMdLock } from '@react-icons/all-files/io/IoMdLock';
 import { useTranslations } from 'next-intl';
 import styles from './UserWalletData.module.scss';
@@ -72,7 +72,7 @@ function UserWalletData() {
 							<div className='flex flex-col items-center'>
 								<span className='text-2xl font-medium'>{balances.transferableBalance}</span>
 								<span className='flex items-center gap-x-2 text-sm font-medium'>
-									<FaCircleCheck className='text-base text-success' />
+									<FaCheckCircle className='text-base text-success' />
 									{t('transferable')}
 								</span>
 							</div>

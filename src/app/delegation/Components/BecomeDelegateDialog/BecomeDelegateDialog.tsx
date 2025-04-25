@@ -15,7 +15,7 @@ import { AiOutlineInfoCircle } from '@react-icons/all-files/ai/AiOutlineInfoCirc
 import Image from 'next/image';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
-import { TfiPencil } from 'react-icons/tfi';
+import { BiPencil } from '@react-icons/all-files/bi/BiPencil';
 import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -127,7 +127,7 @@ export default function BecomeDelegateDialog() {
 				>
 					{isCurrentAddressDelegate ? (
 						<>
-							<TfiPencil />
+							<BiPencil />
 							{t('edit')}
 						</>
 					) : (

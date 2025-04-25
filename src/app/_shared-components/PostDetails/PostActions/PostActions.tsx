@@ -6,7 +6,8 @@ import { EReaction, IPost } from '@/_shared/types';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { useUser } from '@/hooks/useUser';
 import { Share2 } from 'lucide-react';
-import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
+import { IoBookmark } from '@react-icons/all-files/io5/IoBookmark';
+import { IoBookmarkOutline } from '@react-icons/all-files/io5/IoBookmarkOutline';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -88,7 +89,7 @@ function PostActions({ postData }: { postData: IPost }) {
 					onClick={() => handleAuthenticatedAction(() => handleSubscribe())}
 					className={subscribeButtonClasses}
 				>
-					{isSubscribed ? <RiBookmarkFill className='h-4 w-4' /> : <RiBookmarkLine className='h-4 w-4' />}
+					{isSubscribed ? <IoBookmark className='h-4 w-4' /> : <IoBookmarkOutline className='h-4 w-4' />}
 					<span className='text-xs font-medium'>{buttonText}</span>
 				</button>
 				<button

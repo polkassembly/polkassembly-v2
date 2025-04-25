@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { IoLogoDiscord } from '@react-icons/all-files/io5/IoLogoDiscord';
-import { TbWorld } from 'react-icons/tb';
+import { BiWorld } from '@react-icons/all-files/bi/BiWorld';
 import { BsArrowUpRight } from '@react-icons/all-files/bs/BsArrowUpRight';
 import styles from './Footer.module.scss';
 import PaLogo from '../PaLogo';
@@ -70,7 +70,7 @@ function Footer() {
 									target='_blank'
 									rel='noreferrer'
 								>
-									<TbWorld className={styles.footer_logo_link_icon} />
+									<BiWorld className={styles.footer_logo_link_icon} />
 								</a>
 							</div>
 						</div>
@@ -208,7 +208,7 @@ function Footer() {
 								target='_blank'
 								rel='noreferrer'
 							>
-								<TbWorld className={styles.footer_logo_link_icon} />
+								<BiWorld className={styles.footer_logo_link_icon} />
 							</a>
 						</div>
 					</div>

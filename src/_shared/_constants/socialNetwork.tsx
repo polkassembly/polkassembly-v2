@@ -7,9 +7,9 @@ import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
 import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
-import { PiRedditLogoFill } from 'react-icons/pi';
-import { TbBrandGithubFilled } from 'react-icons/tb';
-import { RiBox3Line } from 'react-icons/ri';
+import { FaRedditAlien } from '@react-icons/all-files/fa/FaRedditAlien';
+import { SiGithub } from '@react-icons/all-files/si/SiGithub';
+import { BiCube } from '@react-icons/all-files/bi/BiCube';
 import { ReactElement } from 'react';
 import { ENetwork } from '../types';
 
@@ -24,13 +24,13 @@ const HOVER_SCALE_CLASS = 'transition-transform hover:scale-110';
 
 const SocialIcons = {
 	Discord: <FaDiscord className={HOVER_SCALE_CLASS} />,
-	Github: <TbBrandGithubFilled className={HOVER_SCALE_CLASS} />,
+	Github: <SiGithub className={HOVER_SCALE_CLASS} />,
 	Home: <TiHome className={HOVER_SCALE_CLASS} />,
-	Reddit: <PiRedditLogoFill className={HOVER_SCALE_CLASS} />,
+	Reddit: <FaRedditAlien className={HOVER_SCALE_CLASS} />,
 	Telegram: <FaTelegramPlane className={HOVER_SCALE_CLASS} />,
 	Twitter: <FaTwitter className={HOVER_SCALE_CLASS} />,
 	Youtube: <FaYoutube className={HOVER_SCALE_CLASS} />,
-	Subscan: <RiBox3Line className={HOVER_SCALE_CLASS} />
+	Subscan: <BiCube className={HOVER_SCALE_CLASS} />
 } as const;
 
 export const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
