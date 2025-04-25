@@ -110,23 +110,25 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 					{addresses.map((address) => (
 						<div
 							key={address.address}
-							className='flex items-center gap-2'
+							className='flex flex-col items-center gap-2'
 						>
-							<RadioGroupItem
-								value={address.address}
-								id={address.address}
-							/>
-							<Label
-								htmlFor={address.address}
-								className='flex cursor-pointer items-center gap-2'
-							>
-								<Address
-									address={address.address}
-									iconSize={25}
-									redirectToProfile={false}
-									disableTooltip
+							<div className='flex items-center gap-2'>
+								<RadioGroupItem
+									value={address.address}
+									id={address.address}
 								/>
-							</Label>
+								<Label
+									htmlFor={address.address}
+									className='flex cursor-pointer items-center gap-2'
+								>
+									<Address
+										address={address.address}
+										iconSize={25}
+										redirectToProfile={false}
+										disableTooltip
+									/>
+								</Label>
+							</div>
 
 							{'pureProxies' in address &&
 								address.pureProxies.map((pureProxyAddress) => (
