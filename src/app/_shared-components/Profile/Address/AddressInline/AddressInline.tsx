@@ -13,7 +13,7 @@ import IdentityBadge from '../IdentityBadge';
 import styles from './AddressInline.module.scss';
 
 interface Props {
-	address?: string;
+	address: string;
 	className?: string;
 	onChainIdentity?: IOnChainIdentity;
 	addressDisplayText?: string;

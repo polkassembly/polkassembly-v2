@@ -21,7 +21,7 @@ import AddressDisplay from './AddressDisplay';
 import { Skeleton } from '../../Skeleton';
 
 interface AddressTooltipContentProps {
-	address?: string;
+	address: string;
 	userProfileUrl?: string;
 	displayText: string;
 	identity?: IOnChainIdentity;

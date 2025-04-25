@@ -159,12 +159,7 @@ function LatestActivity({
 										<TableCell className='py-4'>{row.index}</TableCell>
 										<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
 										<TableCell className='py-4'>{row.topic && parseCamelCase(row.topic)}</TableCell>
-										<TableCell className='py-4'>
-											<Address
-												userId={row.publicUser?.id}
-												address={row.publicUser?.addresses?.[0]}
-											/>
-										</TableCell>
+										<TableCell className='py-4'>{row.publicUser?.addresses?.[0] && <Address address={row.publicUser?.addresses?.[0]} />}</TableCell>
 										<TableCell className='py-4'>{row.createdAt && dayjs(row.createdAt).format(DATE_FORMAT)}</TableCell>
 									</TableRow>
 								))

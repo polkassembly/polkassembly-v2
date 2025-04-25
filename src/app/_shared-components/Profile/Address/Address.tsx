@@ -18,9 +18,8 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../
 import AddressTooltipContent from './AddressTooltipContent';
 
 interface AddressProps {
-	userId?: number;
 	className?: string;
-	address?: string;
+	address: string;
 	truncateCharLen?: number;
 	iconSize?: number;
 	showIdenticon?: boolean;
@@ -31,7 +30,6 @@ interface AddressProps {
 }
 
 function Address({
-	userId,
 	className,
 	address,
 	truncateCharLen = 5,
@@ -55,16 +53,8 @@ function Address({
 	const { data: userData, isLoading: isUserDataLoading } = useQuery<IPublicUser | null>({
 		queryKey: ['userData', address],
 		queryFn: async () => {
-			if (!address && !userId) return null;
-			if (address) {
-				const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
-				return data ?? null;
-			}
-			if (userId) {
-				const { data } = await UserProfileClientService.fetchPublicUserById({ userId });
-				return data ?? null;
-			}
-			return null;
+			const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
+			return data ?? null;
 		},
 		...queryOptions
 	});
@@ -76,9 +66,9 @@ function Address({
 	const userProfileUrl = useMemo(() => {
 		if (!network || isUserDataLoading) return undefined;
 		const username = userData?.username;
-		return username && username.length > 0 ? `/user/username/${username}` : address && address.length > 0 ? `/user/address/${address}` : userId ? `/user/id/${userId}` : undefined;
+		return username && username.length > 0 ? `/user/username/${username}` : address && address.length > 0 ? `/user/address/${address}` : undefined;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [network, address, userData, userId]);
+	}, [network, address, userData]);
 
 	useEffect(() => {
 		const initializeIdentity = async () => {
@@ -107,7 +97,7 @@ function Address({
 				className={className}
 				address={encodedAddress}
 				onChainIdentity={identity}
-				addressDisplayText={displayText || userData?.username}
+				addressDisplayText={displayText}
 				userProfileUrl={userProfileUrl}
 				iconSize={iconSize}
 				showIdenticon={showIdenticon}
@@ -128,7 +118,7 @@ function Address({
 								address={encodedAddress}
 								onChainIdentity={identity}
 								userProfileUrl={userProfileUrl}
-								addressDisplayText={displayText || userData?.username}
+								addressDisplayText={displayText}
 								iconSize={iconSize}
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}
