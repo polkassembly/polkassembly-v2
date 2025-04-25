@@ -9,25 +9,37 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
 import { EAccountType, IMultisigAddress, IProxyAddress } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
+import { ChevronDown } from 'lucide-react';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
 
 interface IAddressRadioGroupProps {
 	groupName: string;
 	addresses: IMultisigAddress[] | IProxyAddress[];
+	defaultOpen?: boolean;
 }
 
-function AddressRadioGroup({ groupName, addresses }: IAddressRadioGroupProps) {
+function AddressRadioGroup({ groupName, addresses, defaultOpen = false }: IAddressRadioGroupProps) {
 	return (
-		<>
-			<hr className='my-3' />
+		<Collapsible
+			defaultOpen={defaultOpen}
+			className='rounded-lg border border-border_grey bg-page_background p-4'
+		>
+			<CollapsibleTrigger asChild>
+				<div className='flex items-center justify-between'>
+					<h6 className='text-text_secondary text-sm capitalize'>{groupName}</h6>
+					<ChevronDown className='h-4 w-4' />
+				</div>
+			</CollapsibleTrigger>
+			<CollapsibleContent>
+				<hr className='my-2 border-primary_border' />
 
-			<section>
-				<h6 className='text-text_secondary capitalize'>{groupName}</h6>
 				{!addresses.length && <p className='text-text_secondary text-sm'>No {groupName} found</p>}
+
 				<div>
 					{addresses.map((address) => (
 						<>
@@ -36,8 +48,8 @@ function AddressRadioGroup({ groupName, addresses }: IAddressRadioGroupProps) {
 						</>
 					))}
 				</div>
-			</section>
-		</>
+			</CollapsibleContent>
+		</Collapsible>
 	);
 }
 
@@ -69,6 +81,7 @@ function AddressSwitchButton() {
 						<AddressRadioGroup
 							groupName='multisigs'
 							addresses={relationsForSelectedAddress?.multisigAddresses || []}
+							defaultOpen
 						/>
 						<AddressRadioGroup
 							groupName='proxies'
@@ -77,10 +90,10 @@ function AddressSwitchButton() {
 					</>
 				) : (
 					<>
-						<Skeleton className='my-3 h-6 w-full' />
-						<Skeleton className='my-3 h-6 w-full' />
-						<Skeleton className='my-3 h-6 w-full' />
-						<Skeleton className='my-3 h-6 w-full' />
+						<Skeleton className='my-1 h-6 w-full' />
+						<Skeleton className='my-1 h-6 w-full' />
+						<Skeleton className='my-1 h-6 w-full' />
+						<Skeleton className='my-1 h-6 w-full' />
 					</>
 				)}
 			</DialogContent>
