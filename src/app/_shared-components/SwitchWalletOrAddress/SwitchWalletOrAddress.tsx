@@ -4,14 +4,29 @@
 
 'use client';
 
+import { EWallet } from '@/_shared/types';
+import { InjectedAccount } from '@polkadot/extension-inject/types';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 
-function SwitchWalletOrAddress() {
+interface Props {
+	onWalletChange?: (wallet: EWallet | null) => void;
+	onAddressChange?: ((account: InjectedAccount) => void) | undefined;
+	small?: boolean;
+	withBalance?: boolean;
+}
+
+function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange }: Props) {
 	return (
 		<>
-			<WalletButtons small />
-			<AddressDropdown withBalance />
+			<WalletButtons
+				small={small}
+				onWalletChange={onWalletChange}
+			/>
+			<AddressDropdown
+				withBalance={withBalance}
+				onChange={onAddressChange}
+			/>
 		</>
 	);
 }
