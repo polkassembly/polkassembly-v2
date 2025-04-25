@@ -181,8 +181,46 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
+export enum EProxyType {
+	ANY = 'Any',
+	NON_TRANSFER = 'NonTransfer',
+	GOVERNANCE = 'Governance',
+	STAKING = 'Staking',
+	IDENTITY_JUDGEMENT = 'IdentityJudgement',
+	AUCTION = 'Auction',
+	CANCEL_PROXY = 'CancelProxy',
+	PARAREGISTRATION = 'ParaRegistration',
+	NOMINATION_POOLS = 'NominationPools',
+	SUDO_BALANCES = 'SudoBalances'
+}
+
+export interface IPureProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IMultisigAddress {
+	signatories: Array<string>;
+	address: string;
+	threshold: number;
+	pureProxies: Array<IPureProxyAddress>;
+}
+
+export interface IProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IAddressRelations {
+	address: string;
+	multisigAddresses: Array<IMultisigAddress>;
+	proxyAddresses: Array<IProxyAddress>;
+	proxiedAddresses: Array<IProxyAddress>;
+}
+
 export interface IUserClientData extends IAccessTokenPayload {
 	publicUser?: IPublicUser;
+	addressRelations?: IAddressRelations[];
 }
 
 export interface IAddressProxyForEntry {
@@ -265,7 +303,7 @@ export interface ISelectedAccount extends InjectedAccount {
 	wallet?: EWallet;
 	accountType: EAccountType;
 	parent?: ISelectedAccount;
-	proxyType?: string;
+	proxyType?: EProxyType;
 	threshold?: number;
 	signatories?: Array<string>;
 }
@@ -274,7 +312,7 @@ export interface IUserPreferences {
 	theme: ETheme;
 	locale: ELocales;
 	wallet?: EWallet;
-	address?: ISelectedAccount;
+	selectedAccount?: ISelectedAccount;
 	rpcIndex?: number;
 }
 
@@ -1117,50 +1155,6 @@ export enum EPeriodType {
 	PREPARE = 'prepare',
 	DECISION = 'decision',
 	CONFIRM = 'confirm'
-}
-
-export enum EProxyType {
-	ANY = 'Any',
-	NON_TRANSFER = 'NonTransfer',
-	GOVERNANCE = 'Governance',
-	STAKING = 'Staking',
-	IDENTITY_JUDGEMENT = 'IdentityJudgement',
-	AUCTION = 'Auction',
-	CANCEL_PROXY = 'CancelProxy',
-	PARAREGISTRATION = 'ParaRegistration',
-	NOMINATION_POOLS = 'NominationPools',
-	SUDO_BALANCES = 'SudoBalances'
-}
-
-export interface IPureProxy {
-	address: string;
-	proxyType: EProxyType;
-}
-
-export interface IMultisig {
-	signatories: Array<string>;
-	address: string;
-	threshold: number;
-	pureProxy: Array<IPureProxy>;
-	name?: string;
-	email?: string;
-	github?: string;
-	twitter?: string;
-	matrix?: string;
-	discord?: string;
-}
-
-export interface IProxy {
-	address: string;
-	proxyType: EProxyType;
-}
-
-export interface ILinkedAddress {
-	[key: string]: {
-		multisig: Array<IMultisig>;
-		proxy: Array<IProxy>;
-		proxied: Array<IProxy>;
-	};
 }
 
 export enum ESearchType {

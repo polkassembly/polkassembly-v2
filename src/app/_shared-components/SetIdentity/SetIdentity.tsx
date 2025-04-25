@@ -90,7 +90,7 @@ function SetIdentity() {
 	};
 
 	const { data: registrarFee } = useQuery({
-		queryKey: ['socials', user?.id, userPreferences.address?.address],
+		queryKey: ['socials', user?.id, userPreferences.selectedAccount?.address],
 		queryFn: () => fetchRegistrarFees(),
 		placeholderData: (previousData) => previousData,
 		staleTime: FIVE_MIN_IN_MILLI,
@@ -101,10 +101,10 @@ function SetIdentity() {
 
 	useEffect(() => {
 		const setDefaultIdentityValues = async () => {
-			if (!identityService || !network || !userPreferences.address?.address) return;
+			if (!identityService || !network || !userPreferences.selectedAccount?.address) return;
 
 			setIdentityLoading(true);
-			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
+			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
 
 			setIdentityValues(identityInfo);
 			formData.setValue('displayName', identityInfo.display);
@@ -116,16 +116,16 @@ function SetIdentity() {
 			setIdentityLoading(false);
 		};
 		setDefaultIdentityValues();
-	}, [formData, identityService, network, userPreferences.address?.address]);
+	}, [formData, identityService, network, userPreferences.selectedAccount?.address]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
-		if (!userPreferences.wallet || !userPreferences.address?.address || !identityService) return;
+		if (!userPreferences.wallet || !userPreferences.selectedAccount?.address || !identityService) return;
 
 		const { displayName, legalName, email, twitter, matrix } = values;
 		setLoading(true);
 
 		await identityService.setOnChainIdentity({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			displayName,
 			email,
 			legalName,
@@ -174,9 +174,9 @@ function SetIdentity() {
 			disabledRequestJudgement={!identityValues?.display || !identityValues?.email || !identityValues?.hash}
 			registrarFee={registrarFee || BN_ZERO}
 		/>
-	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.address?.address ? (
+	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.selectedAccount?.address ? (
 		<IdentitySuccessScreen
-			address={userPreferences.address.address}
+			address={userPreferences.selectedAccount.address}
 			email={formData.getValues('email')}
 			displayName={formData.getValues('displayName')}
 			legalName={formData.getValues('legalName')}

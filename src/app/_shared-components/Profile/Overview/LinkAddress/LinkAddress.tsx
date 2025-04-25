@@ -19,7 +19,7 @@ function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
 	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
 	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(userPreferences?.wallet || EWallet.POLKADOT);
-	const [selectedAccount, setSelectedAccount] = useState<InjectedAccount | null>(userPreferences?.address || null);
+	const [selectedAccount, setSelectedAccount] = useState<InjectedAccount | null>(userPreferences?.selectedAccount || null);
 	const [loading, setLoading] = useState(false);
 	const walletService = useWalletService();
 

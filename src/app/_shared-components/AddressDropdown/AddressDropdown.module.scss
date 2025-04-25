@@ -9,32 +9,3 @@
 .fallbackText {
 	@apply text-center text-text_primary;
 }
-
-.switchButton {
-	@apply flex items-center gap-x-1 rounded-lg px-2 py-1 text-btn_primary_text shadow-lg;
-	background: linear-gradient(0deg, #3c74e1, #3c74e1), radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
-}
-
-.accountItem {
-	@apply flex w-full cursor-pointer items-center p-3 text-left hover:bg-grey_bg;
-}
-
-.selectedAccountItem {
-	@apply flex w-full cursor-pointer items-center bg-grey_bg p-3 text-left;
-}
-
-.accountBtn {
-	@apply flex w-full cursor-pointer items-center rounded-md p-3 text-left hover:bg-grey_bg;
-}
-
-.selectedAccountBtn {
-	@apply flex w-full cursor-pointer items-center rounded-md bg-grey_bg p-3 text-left;
-}
-
-.accountRadio {
-	@apply flex h-5 w-5 items-center justify-center rounded-full border border-border_grey;
-}
-
-.selectedRadio {
-	@apply flex h-5 w-5 items-center justify-center rounded-full bg-text_pink;
-}

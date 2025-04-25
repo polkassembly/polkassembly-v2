@@ -74,14 +74,14 @@ function TreasuryProposalLocal() {
 	}, [beneficiaries]);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.address?.address || !tx || !selectedTrack) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !selectedTrack) {
 			return;
 		}
 
 		setLoading(true);
 
 		await apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			extrinsicFn: tx,
 			track: selectedTrack.name,
 			enactment: selectedEnactment,
@@ -162,7 +162,7 @@ function TreasuryProposalLocal() {
 						totalAmount.isZero() ||
 						!beneficiaries.length ||
 						beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount)) ||
-						!userPreferences.address?.address ||
+						!userPreferences.selectedAccount?.address ||
 						!selectedTrack ||
 						!selectedEnactment ||
 						!batchCallTx

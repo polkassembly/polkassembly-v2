@@ -70,7 +70,7 @@ function ExistingPreimage() {
 	const createProposal = async () => {
 		if (
 			!apiService ||
-			!userPreferences.address?.address ||
+			!userPreferences.selectedAccount?.address ||
 			!debouncedPreimageHash ||
 			!preimageLength ||
 			!selectedTrack ||
@@ -85,7 +85,7 @@ function ExistingPreimage() {
 		setLoading(true);
 
 		apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			track: selectedTrack.name,
 			extrinsicFn: submitProposalTx,
 			enactment: selectedEnactment,
@@ -164,7 +164,7 @@ function ExistingPreimage() {
 					onClick={createProposal}
 					isLoading={loading}
 					disabled={
-						!userPreferences.address?.address ||
+						!userPreferences.selectedAccount?.address ||
 						!selectedTrack ||
 						!selectedEnactment ||
 						!preimageLength ||

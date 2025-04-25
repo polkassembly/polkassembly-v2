@@ -44,23 +44,23 @@ export default function BecomeDelegateDialog() {
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
-		if (!userPreferences?.address?.address) return;
+		if (!userPreferences?.selectedAccount?.address) return;
 
-		const existingDelegate = delegates.find((delegate) => delegate.address === userPreferences?.address?.address);
+		const existingDelegate = delegates.find((delegate) => delegate.address === userPreferences?.selectedAccount?.address);
 		setIsCurrentAddressDelegate(!!existingDelegate);
 		if (existingDelegate) {
 			setManifesto(existingDelegate.manifesto || '');
 		} else {
 			setManifesto('');
 		}
-	}, [user, delegates, userPreferences?.address?.address]);
+	}, [user, delegates, userPreferences?.selectedAccount?.address]);
 
 	const createDelegate = async () => {
-		if (!userPreferences?.address?.address) return;
+		if (!userPreferences?.selectedAccount?.address) return;
 		setLoading(true);
 		try {
 			const optimisticDelegate: IDelegateDetails = {
-				address: userPreferences.address.address,
+				address: userPreferences.selectedAccount.address,
 				manifesto,
 				sources: [EDelegateSource.POLKASSEMBLY],
 				votingPower: '0',
@@ -70,7 +70,7 @@ export default function BecomeDelegateDialog() {
 			};
 
 			setDelegates((prev) => [...prev, optimisticDelegate]);
-			await NextApiClientService.createPADelegate({ address: userPreferences.address.address, manifesto });
+			await NextApiClientService.createPADelegate({ address: userPreferences.selectedAccount.address, manifesto });
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
 				title: t('delegateCreatedSuccessfully'),
@@ -78,7 +78,7 @@ export default function BecomeDelegateDialog() {
 			});
 			setDialogOpen(false);
 		} catch (error) {
-			setDelegates((prev) => prev.filter((d) => d.address !== userPreferences?.address?.address));
+			setDelegates((prev) => prev.filter((d) => d.address !== userPreferences?.selectedAccount?.address));
 			toast({
 				title: t('errorCreatingDelegate'),
 				status: ENotificationStatus.ERROR,
@@ -90,11 +90,11 @@ export default function BecomeDelegateDialog() {
 	};
 
 	const updateDelegate = async () => {
-		if (!userPreferences?.address?.address) return;
+		if (!userPreferences?.selectedAccount?.address) return;
 		setLoading(true);
 		try {
-			setDelegates((prev) => prev.map((d) => (d.address === userPreferences?.address?.address ? { ...d, manifesto } : d)));
-			await NextApiClientService.updatePADelegate({ address: userPreferences.address.address, manifesto });
+			setDelegates((prev) => prev.map((d) => (d.address === userPreferences?.selectedAccount?.address ? { ...d, manifesto } : d)));
+			await NextApiClientService.updatePADelegate({ address: userPreferences.selectedAccount.address, manifesto });
 			queryClient.invalidateQueries({ queryKey: ['delegates'] });
 			toast({
 				title: t('delegateUpdatedSuccessfully'),
@@ -182,7 +182,7 @@ export default function BecomeDelegateDialog() {
 
 					<Button
 						size='lg'
-						disabled={!user || !manifesto || !userPreferences?.address?.address}
+						disabled={!user || !manifesto || !userPreferences?.selectedAccount?.address}
 						isLoading={loading}
 						className='w-full'
 						onClick={isCurrentAddressDelegate ? updateDelegate : createDelegate}

@@ -47,7 +47,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 		setAccounts(injectedAccounts);
 		setUserPreferences({
 			...userPreferences,
-			address: {
+			selectedAccount: {
 				...injectedAccounts[0],
 				wallet: chosenWallet,
 				accountType: EAccountType.REGULAR

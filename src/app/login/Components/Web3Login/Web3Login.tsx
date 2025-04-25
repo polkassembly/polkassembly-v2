@@ -42,8 +42,8 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 	const handleLogin = async () => {
 		try {
-			if (!userPreferences.wallet || !userPreferences?.address?.address || !walletService) return;
-			const { address } = userPreferences.address;
+			if (!userPreferences.wallet || !userPreferences?.selectedAccount?.address || !walletService) return;
+			const { address } = userPreferences.selectedAccount;
 
 			setLoading(true);
 
@@ -118,7 +118,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						isLoading={loading}
 						onClick={handleLogin}
 						size='lg'
-						disabled={!userPreferences?.address?.address || !userPreferences.wallet}
+						disabled={!userPreferences?.selectedAccount?.address || !userPreferences.wallet}
 						className={classes.loginButton}
 					>
 						{t('Profile.login')}

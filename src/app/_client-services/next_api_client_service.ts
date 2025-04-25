@@ -38,8 +38,7 @@ import {
 	IContentSummary,
 	ISocialHandle,
 	IVoteHistoryData,
-	IProxy,
-	IMultisig
+	IAddressRelations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -112,7 +111,7 @@ enum EApiRoute {
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
-	FETCH_MULTISIG_AND_PROXY_ADDRESSES = 'FETCH_MULTISIG_AND_PROXY_ADDRESSES'
+	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS'
 }
 
 export class NextApiClientService {
@@ -176,6 +175,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_USER_SOCIAL_HANDLES:
 				path = '/users/id';
 				break;
+			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 				path = '/users/address';
 				break;
@@ -196,6 +196,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 				break;
+
 			// post routes
 			case EApiRoute.LOGOUT:
 				path = '/auth/logout';
@@ -285,10 +286,6 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 			case EApiRoute.DELETE_COMMENT:
 				method = 'DELETE';
-				break;
-			case EApiRoute.FETCH_MULTISIG_AND_PROXY_ADDRESSES:
-				path = '/multisig';
-				method = 'POST';
 				break;
 
 			default:
@@ -876,8 +873,8 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { userAddress, identityHash } });
 	}
 
-	static async fetchMultisigAndProxyAddresses(address: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_MULTISIG_AND_PROXY_ADDRESSES });
-		return this.nextApiClientFetch<{ multisig: Array<IMultisig>; proxy: Array<IProxy>; proxied: Array<IProxy> }>({ url, method, data: { address } });
+	static async fetchAddressRelations(address: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ADDRESS_RELATIONS, routeSegments: [address, 'relations'] });
+		return this.nextApiClientFetch<IAddressRelations>({ url, method });
 	}
 }
