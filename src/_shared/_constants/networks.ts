@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN } from '@polkadot/util';
-import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets, IReciprocal, ILinearDecreasing } from '@shared/types';
 
 const VIA_PARITY = 'via Parity';
 const VIA_DWELLIR = 'via Dwellir';
@@ -27,18 +27,6 @@ interface INetworkTreasuryAssets extends ITreasuryAsset {
 interface IRpcEndpoint {
 	name: string;
 	url: string;
-}
-
-interface IReciprocal {
-	factor: number;
-	xOffset: number;
-	yOffset: number;
-}
-
-interface ILinearDecreasing {
-	length: number;
-	floor: number;
-	ceil: number;
 }
 
 interface IMinApproval {

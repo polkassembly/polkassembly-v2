@@ -110,6 +110,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
+								statusHistory={postData?.onChainInfo?.timeline || []}
+								createdAt={postData?.createdAt}
+								trackName={postData?.onChainInfo?.origin}
 							/>
 						</div>
 					)}

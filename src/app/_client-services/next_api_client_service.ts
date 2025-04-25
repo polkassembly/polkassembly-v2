@@ -37,7 +37,8 @@ import {
 	ITrackDelegationDetails,
 	IContentSummary,
 	ISocialHandle,
-	IVoteHistoryData
+	IVoteHistoryData,
+	IVoteCurve
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -109,7 +110,8 @@ enum EApiRoute {
 	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
-	JUDGEMENT_CALL = 'JUDGEMENT_CALL'
+	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
+	GET_VOTE_CURVES = 'GET_VOTE_CURVES'
 }
 
 export class NextApiClientService {
@@ -192,6 +194,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
+			case EApiRoute.GET_VOTE_CURVES:
 				break;
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -889,5 +892,10 @@ export class NextApiClientService {
 	static async judgementCall({ userAddress, identityHash }: { userAddress: string; identityHash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.JUDGEMENT_CALL });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { userAddress, identityHash } });
+	}
+
+	static async getVoteCurves({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTE_CURVES, routeSegments: [proposalType, index, 'vote-curves'] });
+		return this.nextApiClientFetch<IVoteCurve[]>({ url, method });
 	}
 }

@@ -1116,3 +1116,15 @@ export enum ESearchDiscussionType {
 	GRANTS = 'grants',
 	REFERENDUMS_V2 = 'referendums_v2'
 }
+
+export interface IReciprocal {
+	factor: number;
+	xOffset: number;
+	yOffset: number;
+}
+
+export interface ILinearDecreasing {
+	length: number;
+	floor: number;
+	ceil: number;
+}
