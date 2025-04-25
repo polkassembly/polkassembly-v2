@@ -9,8 +9,8 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { IoShareSocialOutline } from '@react-icons/all-files/io5/IoShareSocialOutline';
 import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
-import { RiBookMarkFill } from '@react-icons/all-files/ri/RiBookmarkFill';
-import { RiBookMarkLine } from '@react-icons/all-files/ri/RiBookmarkLine';
+import { IoBookmark } from '@react-icons/all-files/io5/IoBookmark';
+import { IoBookmarkOutline } from '@react-icons/all-files/io5/IoBookmarkOutline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { EReaction, IPostListing } from '@/_shared/types';
@@ -131,7 +131,7 @@ function ReactionBar({
 								className='cursor-pointer'
 								onClick={() => handleAuthenticatedAction(handleSubscribe)}
 							>
-								{isCurrentlySubscribed ? <RiBookMarkFill className='mr-2 text-bg_pink' /> : <RiBookMarkLine className='mr-2 text-basic_text' />}
+								{isCurrentlySubscribed ? <IoBookmark className='mr-2 text-bg_pink' /> : <IoBookmarkOutline className='mr-2 text-basic_text' />}
 								<span className={`${isCurrentlySubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>
 									{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}
 								</span>
