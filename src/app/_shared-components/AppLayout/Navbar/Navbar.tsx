@@ -99,7 +99,7 @@ function Navbar() {
 							width={24}
 							height={24}
 						/>
-						<span className='absolute -left-1 bottom-0 rounded-md bg-bg_pink px-1 text-[8px] font-extrabold uppercase leading-[1px] text-white'>{userPreferences.locale}</span>
+						<span className='absolute -bottom-1 -left-1 z-50 rounded-md bg-bg_pink px-1 text-[8px] font-extrabold uppercase leading-3 text-white'>{userPreferences.locale}</span>
 					</SelectTrigger>
 					<SelectContent className='border-border_grey'>
 						{Object.entries(LANGUAGES).map(([locale, label]) => (
