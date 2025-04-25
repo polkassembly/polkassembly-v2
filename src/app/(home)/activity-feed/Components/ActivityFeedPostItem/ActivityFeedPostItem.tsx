@@ -3,11 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { RefObject, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
 import { FaRegClock } from 'react-icons/fa6';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import VoteIcon from '@assets/activityfeed/vote.svg';
 import { EActivityFeedTab, ENotificationStatus, IPostListing } from '@/_shared/types';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -25,14 +23,12 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { canVote } from '@/_shared/_utils/canVote';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '@ui/Dialog/Dialog';
-import VoteReferendum from '@ui/PostDetails/VoteReferendum/VoteReferendum';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
-import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/useToast';
+import VoteReferendumButton from '@/app/_shared-components/PostDetails/VoteReferendumButton';
 import VotingProgress from '../VotingProgress/VotingProgress';
 import CommentInput from '../CommentInput/CommentInput';
 import styles from './ActivityFeedPostItem.module.scss';
@@ -148,42 +144,10 @@ function ActivityFeedPostItem({
 				<div className='hidden lg:block'>
 					{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
 						<div className='relative z-50'>
-							{user?.id ? (
-								<Dialog>
-									<DialogTrigger asChild>
-										<span className={styles.castVoteButton}>
-											<Image
-												src={VoteIcon}
-												alt=''
-												width={20}
-												height={20}
-											/>
-											<span>{t('PostDetails.castVote')}</span>
-										</span>
-									</DialogTrigger>
-									<DialogTitle>
-										<DialogContent className='max-w-xl p-6'>
-											<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-											<VoteReferendum index={postData?.index?.toString() || ''} />
-										</DialogContent>
-									</DialogTitle>
-								</Dialog>
-							) : (
-								<Link
-									href='/login'
-									className='relative z-50'
-								>
-									<span className={styles.castVoteButton}>
-										<Image
-											src={VoteIcon}
-											alt=''
-											width={20}
-											height={20}
-										/>
-										<span>{t('PostDetails.loginToVote')}</span>
-									</span>
-								</Link>
-							)}
+							<VoteReferendumButton
+								index={postData?.index?.toString() || ''}
+								btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink'
+							/>
 						</div>
 					)}
 				</div>
@@ -284,42 +248,10 @@ function ActivityFeedPostItem({
 			<div className='block lg:hidden'>
 				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
 					<div className='relative z-50 pt-5'>
-						{user?.id ? (
-							<Dialog>
-								<DialogTrigger asChild>
-									<span className={cn(styles.castVoteButton, 'justify-center py-1.5')}>
-										<Image
-											src={VoteIcon}
-											alt=''
-											width={20}
-											height={20}
-										/>
-										<span>{t('PostDetails.castVote')}</span>
-									</span>
-								</DialogTrigger>
-								<DialogTitle>
-									<DialogContent className='max-w-xl p-6'>
-										<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-										<VoteReferendum index={postData?.index?.toString() || ''} />
-									</DialogContent>
-								</DialogTitle>
-							</Dialog>
-						) : (
-							<Link
-								href='/login'
-								className='relative z-50'
-							>
-								<span className={cn(styles.castVoteButton, 'justify-center py-1.5')}>
-									<Image
-										src={VoteIcon}
-										alt=''
-										width={20}
-										height={20}
-									/>
-									<span>{t('PostDetails.loginToVote')}</span>
-								</span>
-							</Link>
-						)}
+						<VoteReferendumButton
+							index={postData?.index?.toString() || ''}
+							btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink'
+						/>
 					</div>
 				)}
 			</div>

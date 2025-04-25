@@ -86,7 +86,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</TabsContent>
 						</div>
 						{isModalOpen && !isOffchainPost && (
-							<div className='pt-5'>{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}</div>
+							<div className='pt-5'>
+								{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
+									<VoteReferendumButton
+										iconClassName='hidden'
+										index={index}
+									/>
+								)}
+							</div>
 						)}
 						<div className={classes.commentsBox}>
 							<PostComments
@@ -98,7 +105,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
-							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}
+							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
+								<VoteReferendumButton
+									iconClassName='hidden'
+									index={index}
+								/>
+							)}
 							<ProposalPeriods
 								confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 								decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}

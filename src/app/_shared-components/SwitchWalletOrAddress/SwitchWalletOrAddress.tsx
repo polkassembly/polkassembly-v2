@@ -15,9 +15,10 @@ interface Props {
 	small?: boolean;
 	withBalance?: boolean;
 	disabled?: boolean;
+	withSwitchButton?: boolean;
 }
 
-function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange, disabled = false }: Props) {
+function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange, disabled = false, withSwitchButton = false }: Props) {
 	return (
 		<>
 			<WalletButtons
@@ -29,6 +30,7 @@ function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletCha
 				withBalance={withBalance}
 				onChange={onAddressChange}
 				disabled={disabled}
+				withSwitchButton={withSwitchButton}
 			/>
 		</>
 	);

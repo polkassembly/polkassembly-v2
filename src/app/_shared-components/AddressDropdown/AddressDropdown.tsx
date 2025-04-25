@@ -18,7 +18,18 @@ import Balance from '../Balance';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 
-function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (account: InjectedAccount) => void; withBalance?: boolean; disabled?: boolean }) {
+function AddressDropdown({
+	onChange,
+	withBalance,
+	disabled,
+	withSwitchButton
+}: {
+	onChange?: (account: InjectedAccount) => void;
+	withBalance?: boolean;
+	disabled?: boolean;
+	withSwitchButton?: boolean;
+}) {
+	console.log('withSwitchButton', withSwitchButton);
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
 	const walletService = useWalletService();
