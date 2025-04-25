@@ -35,9 +35,10 @@ import {
 	IDelegateDetails,
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
-	IContentSummary,
 	ISocialHandle,
 	IVoteHistoryData,
+	ITreasuryStats,
+	IContentSummary,
 	IAddressRelations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -51,8 +52,6 @@ import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
-
-const DELEGATE_API_PATH = '/delegation/delegates';
 
 enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
@@ -106,11 +105,12 @@ enum EApiRoute {
 	FETCH_DELEGATES = 'FETCH_DELEGATES',
 	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
 	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
+	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS'
 }
 
@@ -186,7 +186,10 @@ export class NextApiClientService {
 				path = '/delegation/stats';
 				break;
 			case EApiRoute.FETCH_DELEGATES:
-				path = DELEGATE_API_PATH;
+				path = '/delegation/delegates';
+				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
@@ -246,7 +249,7 @@ export class NextApiClientService {
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_PA_DELEGATE:
-				path = DELEGATE_API_PATH;
+				path = '/delegation/delegates';
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_OFFCHAIN_POST:
@@ -267,7 +270,7 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.UPDATE_PA_DELEGATE:
-				path = DELEGATE_API_PATH;
+				path = '/delegation/delegates';
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
@@ -294,7 +297,28 @@ export class NextApiClientService {
 
 		const url = new URL(`${baseURL}${path}${segments}`);
 		if (queryParams) {
-			queryParams.forEach((value, key) => url.searchParams.set(key, value));
+			// Get all keys in the URLSearchParams
+			const keys = Array.from(new Set(Array.from(queryParams.keys())));
+
+			// For each unique key
+			keys.forEach((key) => {
+				// Get all values for this key
+				const values = queryParams.getAll(key);
+
+				// If there's only one value, use set
+				if (values.length === 1) {
+					url.searchParams.set(key, values[0]);
+				}
+				// If there are multiple values, use append for each
+				else if (values.length > 1) {
+					// First clear any existing values for this key
+					url.searchParams.delete(key);
+					// Then append each value
+					values.forEach((value) => {
+						url.searchParams.append(key, value);
+					});
+				}
+			});
 		}
 
 		return { url, method };
@@ -422,7 +446,7 @@ export class NextApiClientService {
 		});
 
 		if (limit) {
-			queryParams.append('limit', limit.toString());
+			queryParams.set('limit', limit.toString());
 		}
 
 		if (statuses?.length) {
@@ -438,6 +462,7 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
+
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
 	}
 
@@ -808,6 +833,15 @@ export class NextApiClientService {
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 
 	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {

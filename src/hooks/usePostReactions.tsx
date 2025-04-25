@@ -27,6 +27,12 @@ export const usePostReactions = (postData: IPostData) => {
 	const { toast } = useToastLib();
 
 	const [isSubscribed, setIsSubscribed] = useState(!!postData?.isSubscribed);
+	const [subscriptionKey, setSubscriptionKey] = useState(0);
+
+	useEffect(() => {
+		setIsSubscribed(!!postData?.isSubscribed);
+	}, [postData?.isSubscribed]);
+
 	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
 		const reactionsArray = postData?.reactions || [];
 
@@ -54,11 +60,6 @@ export const usePostReactions = (postData: IPostData) => {
 	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
-
-	// TODO: Remove this useEffect and make Optimistic update
-	useEffect(() => {
-		setIsSubscribed(!!postData?.isSubscribed);
-	}, [postData?.isSubscribed]);
 
 	useEffect(() => {
 		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount });
@@ -117,33 +118,43 @@ export const usePostReactions = (postData: IPostData) => {
 			throw new ClientError('Index or hash is required');
 		}
 
-		setIsSubscribed((prevIsSubscribed) => !prevIsSubscribed);
-
-		toast({
-			title: !isSubscribed ? 'Subscribed to the post' : 'Unsubscribed from the post',
-			status: !isSubscribed ? ENotificationStatus.SUCCESS : ENotificationStatus.INFO
-		});
-
 		try {
-			if (!isSubscribed) {
+			const newSubscriptionState = !isSubscribed;
+
+			setIsSubscribed(newSubscriptionState);
+			setSubscriptionKey((prev) => prev + 1);
+
+			if (newSubscriptionState) {
+				toast({
+					title: 'Subscribed to the post',
+					status: ENotificationStatus.SUCCESS
+				});
 				await NextApiClientService.addPostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			} else {
+				toast({
+					title: 'Unsubscribed from the post',
+					status: ENotificationStatus.INFO
+				});
 				await NextApiClientService.deletePostSubscription(subscriptionParams.proposalType, subscriptionParams.postIndex);
 			}
+
 			return {
-				isSubscribed: !isSubscribed,
-				wasUnsubscribed: isSubscribed
+				isSubscribed: newSubscriptionState,
+				wasUnsubscribed: !newSubscriptionState
 			};
 		} catch (error) {
-			setIsSubscribed(isSubscribed);
+			setIsSubscribed(!isSubscribed);
+			setSubscriptionKey((prev) => prev + 1);
+
 			toast({
 				title: 'Failed to update subscription',
 				status: ENotificationStatus.ERROR
 			});
 			console.error('Failed to update subscription:', error);
+
 			return {
-				isSubscribed,
-				wasUnsubscribed: false,
+				isSubscribed: !isSubscribed,
+				wasUnsubscribed: isSubscribed,
 				error: true
 			};
 		}
@@ -155,6 +166,7 @@ export const usePostReactions = (postData: IPostData) => {
 		showDislikeGif,
 		handleReaction,
 		isSubscribed,
-		handleSubscribe
+		handleSubscribe,
+		subscriptionKey
 	};
 };

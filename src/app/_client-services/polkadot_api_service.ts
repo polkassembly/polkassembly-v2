@@ -12,13 +12,12 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { getTypeDef } from '@polkadot/types';
-import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
+import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-
 import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, ISelectedAccount, IVoteCartItem } from '@shared/types';
 
 // Usage:
@@ -63,7 +62,6 @@ export class PolkadotApiService {
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
-		proxyAddress?: string;
 		params?: Record<string, unknown>;
 		errorMessageFallback: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -77,30 +75,33 @@ export class PolkadotApiService {
 		let isFailed = false;
 		if (!this.api || !tx) return;
 
-		let mainTx = tx;
-		const getRegularAddress = (selectedAccount?: ISelectedAccount): ISelectedAccount | null => {
-			if (!selectedAccount) return null;
-			if (selectedAccount.accountType === EAccountType.MULTISIG) {
-				return selectedAccount;
+		let extrinsic = tx;
+
+		// for pure proxy accounts, we need to get the multisig account
+		const getMultisigAccount = (account?: ISelectedAccount): ISelectedAccount | null => {
+			if (!account) return null;
+			if (account.accountType === EAccountType.MULTISIG) {
+				return account;
 			}
-			if (selectedAccount.parent) {
-				return getRegularAddress(selectedAccount.parent);
+
+			if (account.parent) {
+				return getMultisigAccount(account.parent);
 			}
+
 			return null;
 		};
-		const multisigAccount = getRegularAddress(selectedAccount);
+
+		const multisigAccount = getMultisigAccount(selectedAccount);
 
 		if (selectedAccount?.accountType === EAccountType.PROXY) {
-			mainTx = this.api.tx.proxy.proxy(selectedAccount.address, null, mainTx);
+			extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
 		}
 
 		if (multisigAccount) {
 			const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
-			const { weight } = await mainTx.paymentInfo(address);
-			mainTx = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, mainTx, weight);
+			const { weight } = await extrinsic.paymentInfo(address);
+			extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
 		}
-
-		const extrinsic = mainTx;
 
 		const signerOptions = {
 			...params,

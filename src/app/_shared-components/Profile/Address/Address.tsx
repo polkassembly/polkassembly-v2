@@ -58,19 +58,21 @@ function Address({
 		},
 		...queryOptions
 	});
-	const encodedAddress = useMemo(() => getEncodedAddress(address, network) || address, [address, network]);
+
+	const encodedAddress = useMemo(() => (address && getEncodedAddress(address, network)) || address, [address, network]);
 	const [displayText, setDisplayText] = useState<string>(walletAddressName || '');
 	const [identity, setIdentity] = useState<IOnChainIdentity | undefined>();
 
 	const userProfileUrl = useMemo(() => {
 		if (!network || isUserDataLoading) return undefined;
 		const username = userData?.username;
-		return username && username.length > 0 ? `/user/username/${username}` : address.length > 0 ? `/user/address/${address}` : undefined;
+		return username && username.length > 0 ? `/user/username/${username}` : address && address.length > 0 ? `/user/address/${address}` : undefined;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, address, userData]);
 
 	useEffect(() => {
 		const initializeIdentity = async () => {
+			if (!encodedAddress) return;
 			setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
 			try {
@@ -107,7 +109,7 @@ function Address({
 
 	return (
 		<div className={classes.tooltipWrapper}>
-			<TooltipProvider delayDuration={0}>
+			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div className='relative cursor-pointer'>
