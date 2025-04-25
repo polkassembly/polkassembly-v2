@@ -16,7 +16,6 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
-import { useRouter } from 'nextjs-toploader/app';
 import Link from 'next/link';
 
 enum EOverviewTabs {
@@ -40,8 +39,6 @@ function LatestActivity({
 }) {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
-
-	const router = useRouter();
 
 	const DATE_FORMAT = "Do MMM 'YY";
 
@@ -104,23 +101,25 @@ function LatestActivity({
 						<TableBody>
 							{trackDetails?.all?.items && trackDetails.all.items.length > 0 ? (
 								trackDetails.all.items.map((row) => (
-									<TableRow
-										className='cursor-pointer'
-										onClick={() => router.push(`/referenda/${row.index}`)}
+									<Link
+										href={`/referenda/${row.index}`}
 										key={row.index}
+										className='contents'
 									>
-										<TableCell className='py-4'>{row.index}</TableCell>
-										<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-										<TableCell className='truncate py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-										<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-										<TableCell className='py-4'>{row.onChainInfo?.origin && parseCamelCase(row.onChainInfo?.origin)}</TableCell>
-										<TableCell className='flex justify-end py-4'>
-											<StatusTag
-												className='w-max'
-												status={row.onChainInfo?.status}
-											/>
-										</TableCell>
-									</TableRow>
+										<TableRow key={row.index}>
+											<TableCell className='py-4'>{row.index}</TableCell>
+											<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
+											<TableCell className='truncate py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
+											<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
+											<TableCell className='py-4'>{row.onChainInfo?.origin && parseCamelCase(row.onChainInfo?.origin)}</TableCell>
+											<TableCell className='flex justify-end py-4'>
+												<StatusTag
+													className='w-max'
+													status={row.onChainInfo?.status}
+												/>
+											</TableCell>
+										</TableRow>
+									</Link>
 								))
 							) : (
 								<TableRow>
@@ -151,17 +150,19 @@ function LatestActivity({
 						<TableBody>
 							{trackDetails?.discussion?.items && trackDetails.discussion.items.length > 0 ? (
 								trackDetails.discussion.items.map((row) => (
-									<TableRow
-										className='cursor-pointer'
-										onClick={() => router.push(`/post/${row.index}`)}
+									<Link
+										href={`/post/${row.index}`}
 										key={row.index}
+										className='contents'
 									>
-										<TableCell className='py-4'>{row.index}</TableCell>
-										<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-										<TableCell className='py-4'>{row.topic && parseCamelCase(row.topic)}</TableCell>
-										<TableCell className='py-4'>{row.publicUser?.addresses?.[0] && <Address address={row.publicUser?.addresses?.[0]} />}</TableCell>
-										<TableCell className='py-4'>{row.createdAt && dayjs(row.createdAt).format(DATE_FORMAT)}</TableCell>
-									</TableRow>
+										<TableRow key={row.index}>
+											<TableCell className='py-4'>{row.index}</TableCell>
+											<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
+											<TableCell className='py-4'>{row.topic && parseCamelCase(row.topic)}</TableCell>
+											<TableCell className='py-4'>{row.publicUser?.addresses?.[0] && <Address address={row.publicUser?.addresses?.[0]} />}</TableCell>
+											<TableCell className='py-4'>{row.createdAt && dayjs(row.createdAt).format(DATE_FORMAT)}</TableCell>
+										</TableRow>
+									</Link>
 								))
 							) : (
 								<TableRow>
@@ -196,22 +197,24 @@ function LatestActivity({
 							<TableBody>
 								{track?.data?.items && track.data.items.length > 0 ? (
 									track.data.items.map((row) => (
-										<TableRow
-											className='cursor-pointer'
+										<Link
+											href={`/referenda/${row.index}`}
+											className='contents'
 											key={row.index}
-											onClick={() => router.push(`/referenda/${row.index}`)}
 										>
-											<TableCell className='py-4'>{row.index}</TableCell>
-											<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-											<TableCell className='py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-											<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-											<TableCell className='flex justify-end py-4'>
-												<StatusTag
-													className='w-max'
-													status={row.onChainInfo?.status}
-												/>
-											</TableCell>
-										</TableRow>
+											<TableRow key={row.index}>
+												<TableCell className='py-4'>{row.index}</TableCell>
+												<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
+												<TableCell className='py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
+												<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
+												<TableCell className='flex justify-end py-4'>
+													<StatusTag
+														className='w-max'
+														status={row.onChainInfo?.status}
+													/>
+												</TableCell>
+											</TableRow>
+										</Link>
 									))
 								) : (
 									<TableRow>
