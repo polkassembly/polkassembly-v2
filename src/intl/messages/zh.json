@@ -30,6 +30,9 @@
 		"loading": "加载中...",
 		"subscribe": "订阅",
 		"unsubscribe": "取消订阅",
+		"please": "请",
+		"login": "登录",
+		"toView": "查看您订阅的帖子",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",

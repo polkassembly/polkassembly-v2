@@ -4,7 +4,6 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { IoIosSearch } from 'react-icons/io';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
@@ -15,6 +14,7 @@ import { useSearchConfig } from '@/hooks/useSearchConfig';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { Search as SearchIcon } from 'lucide-react';
 import CustomSearchBox from './CustomSearchBox';
 import SearchFilters from './SearchFilters';
 import SearchResults from './SearchResults';
@@ -59,8 +59,11 @@ function Search() {
 	const t = useTranslations('Search');
 	return (
 		<Dialog>
-			<DialogTrigger asChild>
-				<IoIosSearch className='cursor-pointer text-2xl text-text_primary' />
+			<DialogTrigger
+				className='text-text_primary'
+				asChild
+			>
+				<SearchIcon className='h-6 w-6 cursor-pointer text-text_primary' />
 			</DialogTrigger>
 			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
