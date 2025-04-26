@@ -167,7 +167,7 @@ function VoteSummary({
 			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
 			{loading ? (
 				<Skeleton className='h-[220px] w-full' />
-			) : tally?.aye && tally?.nay && tally?.support ? (
+			) : tally?.aye && tally?.nay && tally?.support && progress.approvalThreshold > 0 ? (
 				<>
 					<div className={classes.voteSummaryPieChart}>
 						<div className={classes.voteSummaryPieChartAyeNay}>
@@ -191,7 +191,7 @@ function VoteSummary({
 							<div className='absolute inset-0'>
 								{(() => {
 									const centerX = 75;
-									const centerY = 110;
+									const centerY = 103;
 									const arcRadius = 65;
 									const labelRadius = arcRadius + 18;
 									const angle = -180 + (180 * progress.approvalThreshold) / 100;
