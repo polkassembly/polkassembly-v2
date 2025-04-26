@@ -1,0 +1,150 @@
+@font-face {
+	font-family: 'Pixeboy';
+	src: url('../../_style/fonts/Pixeboy.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.bounty_User_Activity_Container_Skeleton {
+	@apply h-[22px] w-[100px];
+}
+
+.bounty_User_Activity_Container_Skeleton_Wrapper {
+	@apply absolute right-0 top-0 z-50 flex h-6 w-[86px] items-center justify-center gap-x-1 rounded-[50px] px-2 text-[10px] font-bold text-btn_primary_text sm:h-10 sm:w-[130px] sm:px-6 sm:text-base xl:h-[48px] xl:w-[160px] xl:px-[36px] xl:text-xl;
+}
+
+.bounty_User_Activity_Carousel {
+	@apply my-1 flex h-[50px] items-center gap-1 rounded-[14px] bg-bg_modal px-3 py-2;
+}
+
+.bounty_User_Activity_Carousel_Token_Amount {
+	@apply whitespace-nowrap font-pixeboy text-sm font-normal text-text_pink md:text-[20px];
+}
+
+.bounty_User_Activity_Carousel_Date {
+	@apply rounded-full text-xs text-wallet_btn_text;
+}
+
+.bounty_User_Activity_Carousel_Content {
+	@apply text-sm font-normal text-text_primary;
+}
+
+.bounty_User_Activity_Carousel_Span {
+	@apply mx-2 h-[5px] w-[5px] rounded-full bg-basic_text;
+}
+
+.bounty_dash_available_bounty_pool {
+	@apply font-pixelify text-[18px] font-semibold text-bounty_pool_text;
+}
+
+.bounty_dash_available_bounty_pool_left_bg {
+	@apply -mb-6 -ml-6 mt-4 flex h-[185px] w-[360px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background xl:w-[380px] 2xl:w-[380px];
+}
+
+.bounty_dash_available_bounty_pool_right_bg_line {
+	@apply absolute -top-6 left-1/2 h-10 w-20 rotate-180 rounded-t-full bg-bounty_dash_bg shadow-none;
+}
+
+.bounty_dash_available_bounty_pool_right_bg_line_2 {
+	@apply absolute left-1/2 top-[237px] h-10 w-20 rounded-t-full bg-bounty_dash_bg shadow-none;
+}
+
+.bounty_dash_available_bounty_pool_right_bg {
+	@apply relative hidden h-full flex-col justify-between lg:flex;
+}
+
+.bounty_dash_available_bounty_pool_right_bg_line_3 {
+	@apply -mb-6 -ml-6 mt-4 flex h-[185px] items-end rounded-bl-3xl rounded-tr-[125px] bg-btn_primary_background;
+}
+
+.bounty_dash_available_bounty_pool_right_bg_line_3_line {
+	@apply relative -ml-6 flex items-center justify-between;
+}
+
+.bounty_dash_available_bounty_pool_right_bg_line_3_line_line {
+	@apply absolute left-1/2 top-[237px] h-10 w-20 rounded-t-full bg-bounty_dash_bg shadow-none;
+}
+
+.mobileImagesWrapper {
+	@apply right-0 h-20 w-10 rounded-l-full bg-bounty_dash_bg shadow-none;
+}
+
+.carouselRightArrow {
+	@apply absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg;
+}
+
+.carouselLeftArrow {
+	@apply absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 shadow-lg;
+}
+
+.hotbounties_wrapper {
+	@apply relative flex h-[56px] w-[85%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5;
+}
+
+.hotbounties_wrapper_text {
+	@apply font-pixeboy text-[35px] font-normal text-navbar_border;
+}
+
+.hotbounties_wrapper_text_mobile {
+	@apply absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey bg-page_background;
+}
+
+.hotbounties_div {
+	@apply absolute bottom-0 right-[-30px] h-[30px] w-[30px] overflow-hidden bg-bg_modal;
+}
+
+.hotbounties_wrapper_img {
+	@apply h-[310px] rounded-tr-2xl border-b border-l border-r border-t-0 border-solid border-border_grey bg-bg_modal px-3 py-1;
+}
+
+.hotbounties_wrapper_editor_text {
+	@apply line-clamp-2 overflow-hidden text-ellipsis text-sm text-btn_secondary_text;
+}
+
+.hotbounties_wrapper_img_text {
+	@apply flex items-center justify-between rounded-b-3xl bg-child_bounties_bg p-4;
+}
+
+.bounty_proposal_text {
+	@apply flex items-center gap-x-2 font-pixelify text-3xl font-bold text-btn_secondary_text;
+}
+
+.bounty_proposal_wrapper {
+	@apply relative mx-auto max-w-[363px] overflow-hidden xl:max-w-[420px];
+}
+
+.bounty_proposal_wrapper_text {
+	@apply relative flex h-[56px] w-[90%] items-center gap-x-3 rounded-t-3xl border-b-0 border-l border-r border-t border-solid border-border_grey bg-bg_modal px-3 pt-5;
+}
+
+.bounty_proposal_span_line {
+	@apply relative h-2 w-[10px] bg-arrow_bg_color before:absolute before:bottom-[-13px] before:right-[-1px] before:h-3 before:w-3 before:rounded-full before:shadow-[0_-4px_0_0_black] after:absolute after:bottom-[8px] after:right-[-1px] after:h-3 after:w-3 after:rounded-full after:shadow-[0_4px_0_0_black] dark:before:shadow-[0_-4px_0_0_white] dark:after:shadow-[0_4px_0_0_white];
+}
+
+.bounty_proposal_wrapper_img {
+	@apply h-[300px] rounded-b-3xl rounded-tr-2xl border-b border-l border-r border-t-0 border-solid border-border_grey bg-bg_modal px-3 py-1;
+}
+
+.bounty_proposal_button {
+	@apply h-[36px] w-[75px] cursor-pointer rounded-3xl border-none bg-arrow_bg_color text-base font-bold text-bg_modal md:h-[44px] md:w-[100px] md:text-lg;
+}
+
+.bounty_proposal_div {
+	@apply absolute bottom-0 right-[-30px] h-[30px] w-[30px] overflow-hidden bg-bg_modal;
+}
+
+.bounty_proposal_div_span {
+	@apply absolute bottom-0 left-0 h-[30px] w-[30px] rounded-bl-[100%] border-b border-l border-border_grey bg-page_background;
+}
+
+.bounty_proposal_wrapper_img_text {
+	@apply line-clamp-2 overflow-hidden text-ellipsis text-sm text-btn_secondary_text;
+}
+
+.bounty_stats_label {
+	@apply font-pixelify text-[18px] font-semibold text-bounty_pool_text;
+}
+
+.coming_soon_text {
+	@apply whitespace-nowrap text-center text-xs font-bold text-btn_primary_text md:text-sm lg:text-lg;
+}
