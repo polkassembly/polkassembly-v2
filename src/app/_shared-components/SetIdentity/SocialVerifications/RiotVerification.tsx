@@ -32,12 +32,12 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 	}, [matrixSocialHandle, identityMatrix]);
 
 	const verifyRiot = async () => {
-		if (!user || !identityMatrix || !userPreferences.address?.address) return;
+		if (!user || !identityMatrix || !userPreferences.selectedAccount?.address) return;
 
 		setLoading(true);
 		const { data, error } = await NextApiClientService.initSocialVerification({
 			userId: user.id,
-			address: userPreferences.address?.address,
+			address: userPreferences.selectedAccount.address,
 			social: ESocial.RIOT,
 			handle: identityMatrix
 		});
@@ -48,14 +48,14 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 			return;
 		}
 
-		queryClient.setQueryData(['socials', user.id, userPreferences.address.address], (old: Record<ESocial, ISocialHandle>) => ({
+		queryClient.setQueryData(['socials', user.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,
 			[ESocial.RIOT]: {
 				social: ESocial.RIOT,
 				handle: identityMatrix,
 				status: data.status || ESocialVerificationStatus.PENDING,
 				userId: user.id,
-				address: userPreferences.address?.address
+				address: userPreferences.selectedAccount?.address
 			}
 		}));
 

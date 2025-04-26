@@ -38,7 +38,8 @@ import {
 	ISocialHandle,
 	IVoteHistoryData,
 	ITreasuryStats,
-	IContentSummary
+	IContentSummary,
+	IAddressRelations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -109,7 +110,8 @@ enum EApiRoute {
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY'
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS'
 }
 
 export class NextApiClientService {
@@ -173,6 +175,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_USER_SOCIAL_HANDLES:
 				path = '/users/id';
 				break;
+			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 				path = '/users/address';
 				break;
@@ -196,6 +199,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 				break;
+
 			// post routes
 			case EApiRoute.LOGOUT:
 				path = '/auth/logout';
@@ -901,5 +905,10 @@ export class NextApiClientService {
 	static async judgementCall({ userAddress, identityHash }: { userAddress: string; identityHash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.JUDGEMENT_CALL });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { userAddress, identityHash } });
+	}
+
+	static async fetchAddressRelations(address: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ADDRESS_RELATIONS, routeSegments: [address, 'relations'] });
+		return this.nextApiClientFetch<IAddressRelations>({ url, method });
 	}
 }

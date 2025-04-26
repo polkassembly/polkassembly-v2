@@ -94,14 +94,14 @@ function CancelReferendum() {
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.address?.address || !tx) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !tx) {
 			return;
 		}
 
 		setLoading(true);
 
 		apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			track: EPostOrigin.REFERENDUM_CANCELLER,
 			extrinsicFn: tx,
 			enactment: selectedEnactment,
@@ -195,7 +195,7 @@ function CancelReferendum() {
 					onClick={createProposal}
 					isLoading={loading}
 					disabled={
-						!userPreferences.address?.address ||
+						!userPreferences.selectedAccount?.address ||
 						!selectedEnactment ||
 						!data ||
 						!ValidatorService.isValidNumber(data.index) ||

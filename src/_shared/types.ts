@@ -181,8 +181,46 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
+export enum EProxyType {
+	ANY = 'Any',
+	NON_TRANSFER = 'NonTransfer',
+	GOVERNANCE = 'Governance',
+	STAKING = 'Staking',
+	IDENTITY_JUDGEMENT = 'IdentityJudgement',
+	AUCTION = 'Auction',
+	CANCEL_PROXY = 'CancelProxy',
+	PARAREGISTRATION = 'ParaRegistration',
+	NOMINATION_POOLS = 'NominationPools',
+	SUDO_BALANCES = 'SudoBalances'
+}
+
+export interface IPureProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IMultisigAddress {
+	signatories: Array<string>;
+	address: string;
+	threshold: number;
+	pureProxies: Array<IPureProxyAddress>;
+}
+
+export interface IProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IAddressRelations {
+	address: string;
+	multisigAddresses: Array<IMultisigAddress>;
+	proxyAddresses: Array<IProxyAddress>;
+	proxiedAddresses: Array<IProxyAddress>;
+}
+
 export interface IUserClientData extends IAccessTokenPayload {
 	publicUser?: IPublicUser;
+	addressRelations?: IAddressRelations[];
 }
 
 export interface IAddressProxyForEntry {
@@ -255,12 +293,26 @@ export enum ECookieNames {
 	THEME = 'theme',
 	LOCALE = 'locale'
 }
+export enum EAccountType {
+	MULTISIG = 'multisig',
+	PROXY = 'proxy',
+	REGULAR = 'regular'
+}
+
+export interface ISelectedAccount extends InjectedAccount {
+	wallet?: EWallet;
+	accountType: EAccountType;
+	parent?: ISelectedAccount;
+	proxyType?: EProxyType;
+	threshold?: number;
+	signatories?: Array<string>;
+}
 
 export interface IUserPreferences {
 	theme: ETheme;
 	locale: ELocales;
 	wallet?: EWallet;
-	address?: InjectedAccount;
+	selectedAccount?: ISelectedAccount;
 	rpcIndex?: number;
 }
 

@@ -12,6 +12,18 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { cn } from '@/lib/utils';
 import classes from './WalletButton.module.scss';
 
+// Type for the Nova wallet extension
+interface NovaWalletExtension {
+	isNovaWallet?: boolean;
+}
+
+// Extend window with the wallet extension
+declare global {
+	interface Window {
+		walletExtension?: NovaWalletExtension;
+	}
+}
+
 function WalletButton({
 	wallet,
 	onClick,
@@ -38,8 +50,15 @@ function WalletButton({
 		onClick?.(selectedWallet);
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	if (wallet === EWallet.NOVAWALLET && !(window as any).walletExtension?.isNovaWallet) return null;
+	// If we're server-side rendering or this is a Nova wallet but the extension isn't available, don't render
+	const isBrowser = typeof window !== 'undefined';
+	if (!isBrowser) {
+		// Skip the check during SSR
+		// Return the component but it will re-render properly on the client
+	} else if (wallet === EWallet.NOVAWALLET && !window.walletExtension?.isNovaWallet) {
+		// Only check for Nova wallet if we're in the browser
+		return null;
+	}
 
 	return small ? (
 		<Button

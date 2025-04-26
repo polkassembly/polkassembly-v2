@@ -10,16 +10,15 @@ import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '@/app/_shared-components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
-import WalletButtons from '@ui/WalletsUI/WalletButtons/WalletButtons';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { useWalletService } from '@/hooks/useWalletService';
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {
@@ -42,8 +41,8 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 	const handleLogin = async () => {
 		try {
-			if (!userPreferences.wallet || !userPreferences?.address?.address || !walletService) return;
-			const { address } = userPreferences.address;
+			if (!userPreferences.wallet || !userPreferences?.selectedAccount?.address || !walletService) return;
+			const { address } = userPreferences.selectedAccount;
 
 			setLoading(true);
 
@@ -104,11 +103,10 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	return (
 		<div className='w-full'>
 			<div className='flex flex-col gap-y-4'>
-				<WalletButtons
+				<SwitchWalletOrAddress
 					small
 					disabled={loading}
 				/>
-				<AddressDropdown disabled={loading} />
 			</div>
 
 			{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
@@ -118,7 +116,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						isLoading={loading}
 						onClick={handleLogin}
 						size='lg'
-						disabled={!userPreferences?.address?.address || !userPreferences.wallet}
+						disabled={!userPreferences?.selectedAccount?.address || !userPreferences.wallet}
 						className={classes.loginButton}
 					>
 						{t('Profile.login')}

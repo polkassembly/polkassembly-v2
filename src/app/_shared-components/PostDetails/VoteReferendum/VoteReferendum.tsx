@@ -4,22 +4,22 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, ISelectedAccount } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
-import AddressDropdown from '../../AddressDropdown/AddressDropdown';
-import WalletButtons from '../../WalletsUI/WalletButtons/WalletButtons';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
 import ConvictionSelector from './ConvictionSelector/ConvictionSelector';
+import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
+import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 
 function VoteReferendum({ index }: { index: string }) {
-	const { setUserPreferences, userPreferences } = useUserPreferences();
+	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
 	const [balance, setBalance] = useState<BN>(BN_ZERO);
@@ -41,14 +41,21 @@ function VoteReferendum({ index }: { index: string }) {
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
 
 	const onVoteConfirm = async () => {
-		if (!apiService || !userPreferences.address?.address) return;
+		if (!apiService || !userPreferences.selectedAccount?.address) return;
 
 		if (isInvalidAmount) return;
 
 		try {
+			const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
+				if (selectedAccount.parent) {
+					return getRegularAddress(selectedAccount.parent);
+				}
+				return selectedAccount.address;
+			};
 			setIsLoading(true);
 			await apiService.voteReferendum({
-				address: userPreferences.address?.address ?? '',
+				selectedAccount: userPreferences.selectedAccount,
+				address: getRegularAddress(userPreferences.selectedAccount),
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -81,13 +88,9 @@ function VoteReferendum({ index }: { index: string }) {
 
 	return (
 		<div className='flex flex-col gap-y-6'>
-			<WalletButtons
+			<SwitchWalletOrAddress
 				small
-				onWalletChange={(wallet) => setUserPreferences({ ...userPreferences, wallet: wallet ?? undefined })}
-			/>
-			<AddressDropdown
-				withBalance
-				onChange={(a) => setUserPreferences({ ...userPreferences, address: a })}
+				customAddressSelector={<AddressRelationsPicker withBalance />}
 			/>
 			<div>
 				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>

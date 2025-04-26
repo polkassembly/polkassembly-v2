@@ -7,19 +7,35 @@
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import VoteIcon from '@assets/activityfeed/vote.svg';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
 
-function VoteReferendumButton({ index }: { index: string }) {
+interface VoteReferendumButtonProps {
+	index: string;
+	btnClassName?: string;
+	iconClassName?: string;
+}
+
+function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	return !user ? (
 		<Link href='/login'>
 			<Button
-				className='w-full'
+				className={cn('w-full', btnClassName)}
 				size='lg'
 			>
+				<Image
+					src={VoteIcon}
+					alt='Vote Icon'
+					width={20}
+					height={20}
+					className={iconClassName}
+				/>
 				{t('PostDetails.loginToVote')}
 			</Button>
 		</Link>
@@ -27,9 +43,16 @@ function VoteReferendumButton({ index }: { index: string }) {
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button
-					className='w-full'
+					className={cn('w-full', btnClassName)}
 					size='lg'
 				>
+					<Image
+						src={VoteIcon}
+						alt='Vote Icon'
+						width={20}
+						height={20}
+						className={iconClassName}
+					/>
 					{t('PostDetails.castVote')}
 				</Button>
 			</DialogTrigger>

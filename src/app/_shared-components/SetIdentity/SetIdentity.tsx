@@ -24,14 +24,13 @@ import RiotIcon from '@assets/icons/riot-icon.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
-import AddressDropdown from '../AddressDropdown/AddressDropdown';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
 import SocialVerifications from './SocialVerifications/SocialVerifications';
 import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen';
+import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -90,7 +89,7 @@ function SetIdentity() {
 	};
 
 	const { data: registrarFee } = useQuery({
-		queryKey: ['socials', user?.id, userPreferences.address?.address],
+		queryKey: ['socials', user?.id, userPreferences.selectedAccount?.address],
 		queryFn: () => fetchRegistrarFees(),
 		placeholderData: (previousData) => previousData,
 		staleTime: FIVE_MIN_IN_MILLI,
@@ -101,10 +100,10 @@ function SetIdentity() {
 
 	useEffect(() => {
 		const setDefaultIdentityValues = async () => {
-			if (!identityService || !network || !userPreferences.address?.address) return;
+			if (!identityService || !network || !userPreferences.selectedAccount?.address) return;
 
 			setIdentityLoading(true);
-			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
+			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
 
 			setIdentityValues(identityInfo);
 			formData.setValue('displayName', identityInfo.display);
@@ -116,16 +115,16 @@ function SetIdentity() {
 			setIdentityLoading(false);
 		};
 		setDefaultIdentityValues();
-	}, [formData, identityService, network, userPreferences.address?.address]);
+	}, [formData, identityService, network, userPreferences.selectedAccount?.address]);
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
-		if (!userPreferences.wallet || !userPreferences.address?.address || !identityService) return;
+		if (!userPreferences.wallet || !userPreferences.selectedAccount?.address || !identityService) return;
 
 		const { displayName, legalName, email, twitter, matrix } = values;
 		setLoading(true);
 
 		await identityService.setOnChainIdentity({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			displayName,
 			email,
 			legalName,
@@ -174,9 +173,9 @@ function SetIdentity() {
 			disabledRequestJudgement={!identityValues?.display || !identityValues?.email || !identityValues?.hash}
 			registrarFee={registrarFee || BN_ZERO}
 		/>
-	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.address?.address ? (
+	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.selectedAccount?.address ? (
 		<IdentitySuccessScreen
-			address={userPreferences.address.address}
+			address={userPreferences.selectedAccount.address}
 			email={formData.getValues('email')}
 			displayName={formData.getValues('displayName')}
 			legalName={formData.getValues('legalName')}
@@ -193,8 +192,8 @@ function SetIdentity() {
 				onSubmit={formData.handleSubmit(handleSetIdentity)}
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<WalletButtons small />
-					<AddressDropdown
+					<SwitchWalletOrAddress
+						small
 						withBalance
 						disabled={identityLoading}
 					/>
