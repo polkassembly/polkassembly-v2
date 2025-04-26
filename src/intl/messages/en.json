@@ -2,6 +2,14 @@
 	"HomePage": {
 		"title": "Welcome to Home"
 	},
+	"TreasuryStats": {
+		"tooltip": "Funds collected through a portion of block production rewards, transaction fees, slashing, staking inefficiencies, etc.",
+		"treasury": "Treasury",
+		"price": "Price",
+		"total": "Total",
+		"treasuryDistribution": "Treasury Distribution",
+		"details": "Details"
+	},
 	"ActivityFeed": {
 		"please": "Please",
 		"login": "Login",

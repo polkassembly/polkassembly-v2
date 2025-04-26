@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { useUser } from '@/hooks/useUser';
+import TreasuryStats from '@/app/_shared-components/TreasuryStats/TreasuryStats';
 import ActivityFeedAbout from './Sidebar/ActivityFeedAbout/ActivityFeedAbout';
 import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal/ActivityFeedActiveProposal';
 import ActivityFeedRankCard from './Sidebar/ActivityFeedRankCard';
@@ -16,6 +17,7 @@ function ActivityFeedSidebar() {
 		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
 			{user?.id && <ActivityFeedActiveProposal />}
+			<TreasuryStats isActivityFeed />
 			<ActivityFeedRankCard />
 			<ActivityFeedFeaturesSection />
 		</div>

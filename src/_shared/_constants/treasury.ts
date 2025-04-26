@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { BN } from '@polkadot/util';
 import { ENetwork } from '../types';
 
 interface NetworkTreasuryConfig {
@@ -21,6 +22,7 @@ interface NetworkTreasuryConfig {
 	hydrationDotAssetId: number;
 	hydrationUsdcAssetId: number;
 	hydrationUsdtAssetId: number;
+	burnPercentage: BN;
 	loanAmounts: {
 		dot: string;
 		usdc: string;
@@ -46,6 +48,7 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		hydrationDotAssetId: 5,
 		hydrationUsdcAssetId: 22,
 		hydrationUsdtAssetId: 10,
+		burnPercentage: new BN(2).div(new BN(10)),
 		loanAmounts: {
 			dot: '15500000000000000',
 			usdc: '1500000000000'

@@ -5,7 +5,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN, BN_MILLION, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { APIError } from './apiError';
 
@@ -51,7 +51,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			network,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			relayChain: { dot: '' },
+			relayChain: { dot: '', nextBurn: '' },
 			ambassador: { usdt: '' },
 			assetHub: { dot: '', usdc: '', usdt: '', myth: '' },
 			hydration: { dot: '', usdc: '', usdt: '' },
@@ -105,15 +105,18 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		// Fetch relay chain data
 		const relayChainTasks = [
 			// Treasury balance
-			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
+			(async () => {
+				const accountInfo = await relayChainApi.query.system.account(config.treasuryAccount);
+				const freeBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
 				treasuryStats = {
 					...treasuryStats,
 					relayChain: {
 						...treasuryStats.relayChain,
-						dot: (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
+						nextBurn: new BN(freeBalance).mul(new BN(config.burnPercentage)).div(BN_MILLION).toString(),
+						dot: freeBalance
 					}
 				};
-			}),
+			})(),
 
 			// Bounties data
 			(async () => {
