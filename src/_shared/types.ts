@@ -1024,7 +1024,9 @@ export interface ITreasuryStats {
 	relayChain: {
 		dot?: string;
 		myth?: string;
-		[key: string]: string | undefined;
+		nextBurn?: string;
+		nextSpendAt?: Date;
+		[key: string]: unknown | undefined;
 	};
 	ambassador?: {
 		usdt?: string;
