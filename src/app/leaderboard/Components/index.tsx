@@ -5,7 +5,7 @@
 'use client';
 
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Trophy from '@assets/leaderboard/Trophy.png';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -14,6 +14,11 @@ import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { PaginationWithLinks } from '@ui/PaginationWithLinks';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
+import { InfoIcon, ExternalLink } from 'lucide-react';
+import MedalIcon from '@/_assets/icons/medal-icon.svg';
+import AstralIcon from '@/_assets/icons/astral-star-icon.svg';
+import Link from 'next/link';
 import RankCard from './RankCard';
 import styles from './Leaderboard.module.scss';
 import LeadboardRow from './LeadboardTable';
@@ -28,6 +33,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	const page = parseInt(searchParams?.get('page') ?? '1', DEFAULT_LISTING_LIMIT);
 	const t = useTranslations();
 	const { user } = useUser();
+	const [isAstralsPopoverOpen, setIsAstralsPopoverOpen] = useState(false);
 
 	const calculateRankRange = (currentPage: number): RankRange => {
 		if (currentPage === 1) {
@@ -143,7 +149,58 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 						<TableRow className={styles.tableRow}>
 							<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
 							<TableHead className={styles.tableCell_2}>{t('Leaderboard.username')}</TableHead>
-							<TableHead className={styles.tableCell}>{t('Leaderboard.astrals')}</TableHead>
+							<TableHead className={styles.tableCell}>
+								<div className='flex items-center gap-1'>
+									{t('Leaderboard.astrals')}
+									<Popover
+										open={isAstralsPopoverOpen}
+										onOpenChange={setIsAstralsPopoverOpen}
+									>
+										<PopoverTrigger asChild>
+											<InfoIcon
+												className='h-4 w-4 cursor-pointer'
+												onMouseEnter={() => setIsAstralsPopoverOpen(true)}
+												onMouseLeave={() => setIsAstralsPopoverOpen(false)}
+											/>
+										</PopoverTrigger>
+										<PopoverContent
+											className='w-72 border-border_grey p-4'
+											onMouseEnter={() => setIsAstralsPopoverOpen(true)}
+											onMouseLeave={() => setIsAstralsPopoverOpen(false)}
+										>
+											<div className='space-y-2'>
+												<div className='flex items-center gap-1'>
+													<Image
+														src={AstralIcon}
+														alt='Astral icon'
+														height={16}
+														width={16}
+													/>
+													<p className='text-sm'>{t('Leaderboard.astrals')}</p>
+												</div>
+												<p className='text-text_secondary text-xs'>{t('Leaderboard.scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity')}</p>
+												<p>
+													<Link
+														href='https://polkadot.polkassembly.io/astral-scoring'
+														className='flex items-center gap-1 text-xs text-text_pink hover:underline'
+													>
+														{t('Leaderboard.learnMore')} <ExternalLink className='h-3 w-3' />
+													</Link>
+												</p>
+												<p className='text-text_secondary flex items-center gap-2 text-xs'>
+													{t('Leaderboard.theMorePointsYouEarnTheHigherYourRankInTheLeaderboard')}
+													<Image
+														src={MedalIcon}
+														alt='Medal icon'
+														height={16}
+														width={16}
+													/>
+												</p>
+											</div>
+										</PopoverContent>
+									</Popover>
+								</div>
+							</TableHead>
 							<TableHead className={styles.tableCell}>{t('Leaderboard.userSince')}</TableHead>
 							<TableHead className={styles.tableCell_last}>{t('Leaderboard.actions')}</TableHead>
 						</TableRow>

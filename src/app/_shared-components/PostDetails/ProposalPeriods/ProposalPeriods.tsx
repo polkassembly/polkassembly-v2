@@ -54,12 +54,14 @@ function ProposalPeriods({
 						periodName={t('PostDetails.decisionPeriod')}
 						trackName={trackName}
 						periodType={EPeriodType.DECISION}
+						popoverContent={t('PostDetails.ProposalPeriods.decisionPeriodPopover')}
 					/>
 					<PeriodProgress
 						periodEndsAt={confirmationPeriodEndsAt}
 						periodName={t('PostDetails.confirmationPeriod')}
 						trackName={trackName}
 						periodType={EPeriodType.CONFIRM}
+						popoverContent={t('PostDetails.ProposalPeriods.confirmationPeriodPopover')}
 					/>
 				</div>
 			) : (

@@ -447,7 +447,30 @@
 		"commentSummary": "Kommentarzusammenfassung",
 		"aiSummary": "KI-Zusammenfassung",
 		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
-		"hideLikelySpam": "Wahrscheinliche Spam ausblenden"
+		"hideLikelySpam": "Wahrscheinliche Spam ausblenden",
+		"ProposalPeriods": {
+			"decisionPeriodPopover": "Zeit, die ein Vorschlag benötigt, um genehmigt zu werden. Wenn der Vorschlag nicht innerhalb des Entscheidungszeitraums genehmigt wird, wird er abgelehnt.",
+			"confirmationPeriodPopover": "Gesamte Zeit, die die Referenden beide die Mindestgenehmigung und die Unterstützungskriterien während des Entscheidungszeitraums erfüllen müssen, um zu bestehen"
+		},
+		"VoteSummaryInfo": {
+			"howAreVotesCalculated": "Wie werden Stimmen berechnet",
+			"howAreVotesCalculatedDescription": "Stimmen werden durch Multiplikation der abgegebenen Stimmen mit der Überzeugungsdauer berechnet.",
+			"chooseYourVote": "Wählen Sie Ihre Stimme",
+			"userWantToVote": "Der Benutzer möchte abstimmen",
+			"setsA": "Setzt eine",
+			"period": "Periode",
+			"userCastTheirVote": "Der Benutzer hat seine Stimme abgegeben",
+			"conviction": "Überzeugung",
+			"here": "Hier",
+			"voter": "Abstimmer",
+			"voteAmount": "Stimmenbetrag",
+			"voteType": "Stimmentyp",
+			"theVoteWillBeCalculatedByMultiplying": "Die Stimmen werden durch Multiplikation der abgegebenen Stimmen mit der Überzeugungsdauer berechnet.",
+			"note": "Hinweis: Token werden nur gesperrt, wenn eine Referendum besteht",
+			"gotIt": "Verstanden!",
+			"amount": "Betrag",
+			"toGetTheFinalVote": "um die endgültige Stimme zu erhalten."
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -657,7 +680,11 @@
 		"actions": "Aktionen",
 		"leaderboard": "Bestenliste",
 		"findYourRank": "Finde deinen Rang in der Ökosystem",
-		"searchUsername": "Benutzername suchen"
+		"searchUsername": "Benutzername suchen",
+		"learnMore": "Mehr erfahren",
+		"theMorePointsYouEarnTheHigherYourRankInTheLeaderboard": "Je mehr Punkte du erhältst, desto höher ist dein Rang in der Bestenliste!",
+		"medal": "Medaille",
+		"scoreSystemBasedOnTheAggregateOfOffChainOnChainActivityAndProfileActivity": "Ein Punktesystem basierend auf der Zusammenfassung von Offline- und Onchain-Aktivität und Profilaktivität."
 	},
 	"SetIdentity": {
 		"displayName": "Anzeigename",
