@@ -67,14 +67,14 @@ function TreasuryProposalAssethub() {
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.address?.address || !tx || !selectedTrack) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !selectedTrack) {
 			return;
 		}
 
 		setLoading(true);
 
 		await apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount?.address,
 			extrinsicFn: tx,
 			track: selectedTrack.name,
 			enactment: selectedEnactment,
@@ -148,7 +148,7 @@ function TreasuryProposalAssethub() {
 					disabled={
 						!beneficiaries.length ||
 						beneficiaries.some((b) => !ValidatorService.isValidSubstrateAddress(b.address) || !ValidatorService.isValidAmount(b.amount) || b.isInvalid) ||
-						!userPreferences.address?.address ||
+						!userPreferences.selectedAccount?.address ||
 						!selectedTrack ||
 						!selectedEnactment ||
 						!batchCallTx

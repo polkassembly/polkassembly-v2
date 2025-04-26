@@ -1,0 +1,23 @@
+.aboutContainer {
+	@apply flex flex-col gap-3 rounded-xl border-[1px] border-primary_border bg-bg_modal p-5 text-text_primary;
+}
+
+.aboutTitle {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.aboutDescription {
+	@apply text-sm text-text_primary;
+}
+
+.aboutSocialLink {
+	@apply text-xl text-wallet_btn_text;
+}
+
+.aboutSocialContainer {
+	@apply flex flex-wrap gap-5 text-xl;
+}
+
+.knowMoreLink {
+	@apply flex cursor-pointer items-center gap-0.5 text-sm font-medium text-text_pink;
+}

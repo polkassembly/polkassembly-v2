@@ -16,6 +16,8 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { FaBars } from '@react-icons/all-files/fa/FaBars';
 import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
+import TranslateIcon from '@assets/icons/translate.svg';
+import Image from 'next/image';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -87,8 +89,17 @@ function Navbar() {
 					value={userPreferences.locale}
 					onValueChange={handleLocaleChange}
 				>
-					<SelectTrigger className='w-[180px] border-border_grey bg-network_dropdown_bg'>
-						<SelectValue placeholder='Select Language' />
+					<SelectTrigger
+						className='relative h-8 w-8 border-0 p-0 shadow-none'
+						hideChevron
+					>
+						<Image
+							src={TranslateIcon}
+							alt='translate'
+							width={24}
+							height={24}
+						/>
+						<span className='absolute -bottom-1 -left-1 z-50 rounded-md bg-bg_pink px-1 text-[8px] font-extrabold uppercase leading-3 text-white'>{userPreferences.locale}</span>
 					</SelectTrigger>
 					<SelectContent className='border-border_grey'>
 						{Object.entries(LANGUAGES).map(([locale, label]) => (

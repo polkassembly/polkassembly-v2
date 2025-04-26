@@ -12,14 +12,13 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { getTypeDef } from '@polkadot/types';
-import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
+import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, ISelectedAccount, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -51,7 +50,6 @@ export class PolkadotApiService {
 	private async executeTx({
 		tx,
 		address,
-		proxyAddress,
 		params = {},
 		errorMessageFallback,
 		onSuccess,
@@ -59,11 +57,11 @@ export class PolkadotApiService {
 		onBroadcast,
 		setStatus,
 		setIsTxFinalized,
-		waitTillFinalizedHash = false
+		waitTillFinalizedHash = false,
+		selectedAccount
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
-		proxyAddress?: string;
 		params?: Record<string, unknown>;
 		errorMessageFallback: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -72,11 +70,38 @@ export class PolkadotApiService {
 		setStatus?: (pre: string) => void;
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		let isFailed = false;
 		if (!this.api || !tx) return;
 
-		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
+		let extrinsic = tx;
+
+		// for pure proxy accounts, we need to get the multisig account
+		const getMultisigAccount = (account?: ISelectedAccount): ISelectedAccount | null => {
+			if (!account) return null;
+			if (account.accountType === EAccountType.MULTISIG) {
+				return account;
+			}
+
+			if (account.parent) {
+				return getMultisigAccount(account.parent);
+			}
+
+			return null;
+		};
+
+		const multisigAccount = getMultisigAccount(selectedAccount);
+
+		if (selectedAccount?.accountType === EAccountType.PROXY) {
+			extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
+		}
+
+		if (multisigAccount) {
+			const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
+			const { weight } = await extrinsic.paymentInfo(address);
+			extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
+		}
 
 		const signerOptions = {
 			...params,
@@ -85,7 +110,7 @@ export class PolkadotApiService {
 
 		extrinsic
 			// eslint-disable-next-line sonarjs/cognitive-complexity
-			.signAndSend(proxyAddress || address, signerOptions, async ({ status, events, txHash }) => {
+			.signAndSend(address, signerOptions, async ({ status, events, txHash }) => {
 				if (status.isInvalid) {
 					console.log('Transaction invalid');
 					setStatus?.('Transaction invalid');
@@ -281,7 +306,8 @@ export class PolkadotApiService {
 		conviction,
 		ayeVoteValue,
 		nayVoteValue,
-		abstainVoteValue
+		abstainVoteValue,
+		selectedAccount
 	}: {
 		address: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -293,6 +319,7 @@ export class PolkadotApiService {
 		ayeVoteValue?: BN;
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
@@ -313,7 +340,8 @@ export class PolkadotApiService {
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
-				onFailed
+				onFailed,
+				selectedAccount
 			});
 		}
 	}

@@ -3,7 +3,11 @@
 		"title": "Welcome to Home"
 	},
 	"ActivityFeed": {
+		"please": "Please",
+		"login": "Login",
+		"toView": "to view your subscribed posts",
 		"title": "Activity Feed",
+		"switchToOverview": "Switch to Overview",
 		"ExploreTab": "Explore",
 		"SubscribedTab": "Subscribed",
 		"About": "About",
@@ -76,6 +80,13 @@
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
+	},
+	"AddressRelationsPicker": {
+		"Switch": "Switch",
+		"switchWallet": "Switch Wallet",
+		"noData": "No",
+		"found": "found",
+		"confirm": "Confirm"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",
@@ -311,6 +322,7 @@
 		"delegation": "Delegation",
 		"profile": "Profile",
 		"home": "Home",
+		"overview": "Overview",
 		"discussions": "Discussions",
 		"preimages": "Preimages",
 		"councilMotion": "Council Motion",
@@ -523,7 +535,8 @@
 		"created": "Created",
 		"curatorassigned": "Curator Assigned",
 		"curatorunassigned": "Curator Unassigned",
-		"curatorproposed": "Curator Proposed"
+		"curatorproposed": "Curator Proposed",
+		"undefined": "Undefined"
 	},
 	"Pagination": {
 		"next": "Next",
@@ -721,10 +734,66 @@
 		"cancelled": "Cancelled",
 		"rejected": "Rejected"
 	},
+	"Bounty": {
+		"dashboard": "Dashboard",
+		"availableBountyPool": "Available Bounty Pool",
+		"viewAll": "View All",
+		"dot": "DOT",
+		"claimed": "Claimed",
+		"bounty": "Bounty",
+		"vote": "Vote",
+		"bountyProposal": "Bounty Proposal",
+		"childBounties": "Child Bounties",
+		"hotBounties": "Hot Bounties",
+		"activeBounties": "Active Bounties",
+		"claimants": "Claimants",
+		"totalRewarded": "Total Rewarded",
+		"totalBountyPool": "Total Bounty Pool",
+		"comingSoon": "Coming Soon"
+	},
 	"ChildBounties": {
 		"childBounties": "Child Bounties",
 		"parentBounty": "Parent Bounty",
 		"viewAllChildBounties": "View All"
+	},
+	"Overview": {
+		"month": "Month",
+		"year": "Year",
+		"events": "Events",
+		"*DateTimeinUTC": "*DateTime in UTC",
+		"noEventsForThisDate": "No events for this date",
+		"news": "News",
+		"overview": "Overview",
+		"about": "About",
+		"activityfound": "activity found",
+		"no": "No",
+		"joinCommunity": "Join our Community to discuss, contribute and get regular updates from us!",
+		"viewGallery": "View Gallery",
+		"minimizeGallery": "Minimize Gallery",
+		"comingSoon": "Coming Soon..",
+		"treasury": "Treasury",
+		"latestActivity": "Latest Activity",
+		"all": "All",
+		"discussion": "Discussion",
+		"title": "Title",
+		"postedBy": "Posted by",
+		"created": "Created",
+		"origin": "Origin",
+		"status": "Status",
+		"noactivity": "No activity data found",
+		"nodiscussionposts": "No discussion posts found",
+		"spendPeriodRemaining": "Spend Period Remaining",
+		"nextBurn": "Next Burn",
+		"nextBurnInfo": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.",
+		"unavailable": "Unavailable",
+		"blockDataUnavailable": "Block data unavailable",
+		"spendPeriodRemainingInfo": "Funds requested from the treasury are periodically distributed at the end of the spend period.",
+		"days": "days",
+		"hours": "hrs",
+		"switchToActivityFeed": "Switch to Activity Feed",
+		"topic": "Topic",
+		"creator": "Creator",
+		"viewAll": "View All"
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",

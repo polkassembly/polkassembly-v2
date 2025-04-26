@@ -181,8 +181,46 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
+export enum EProxyType {
+	ANY = 'Any',
+	NON_TRANSFER = 'NonTransfer',
+	GOVERNANCE = 'Governance',
+	STAKING = 'Staking',
+	IDENTITY_JUDGEMENT = 'IdentityJudgement',
+	AUCTION = 'Auction',
+	CANCEL_PROXY = 'CancelProxy',
+	PARAREGISTRATION = 'ParaRegistration',
+	NOMINATION_POOLS = 'NominationPools',
+	SUDO_BALANCES = 'SudoBalances'
+}
+
+export interface IPureProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IMultisigAddress {
+	signatories: Array<string>;
+	address: string;
+	threshold: number;
+	pureProxies: Array<IPureProxyAddress>;
+}
+
+export interface IProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IAddressRelations {
+	address: string;
+	multisigAddresses: Array<IMultisigAddress>;
+	proxyAddresses: Array<IProxyAddress>;
+	proxiedAddresses: Array<IProxyAddress>;
+}
+
 export interface IUserClientData extends IAccessTokenPayload {
 	publicUser?: IPublicUser;
+	addressRelations?: IAddressRelations[];
 }
 
 export interface IAddressProxyForEntry {
@@ -255,12 +293,26 @@ export enum ECookieNames {
 	THEME = 'theme',
 	LOCALE = 'locale'
 }
+export enum EAccountType {
+	MULTISIG = 'multisig',
+	PROXY = 'proxy',
+	REGULAR = 'regular'
+}
+
+export interface ISelectedAccount extends InjectedAccount {
+	wallet?: EWallet;
+	accountType: EAccountType;
+	parent?: ISelectedAccount;
+	proxyType?: EProxyType;
+	threshold?: number;
+	signatories?: Array<string>;
+}
 
 export interface IUserPreferences {
 	theme: ETheme;
 	locale: ELocales;
 	wallet?: EWallet;
-	address?: InjectedAccount;
+	selectedAccount?: ISelectedAccount;
 	rpcIndex?: number;
 }
 
@@ -932,6 +984,15 @@ export enum ENotificationStatus {
 	INFO = 'info'
 }
 
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: number;
+	peopleEarned: number;
+	totalRewarded: string;
+	totalBountyPool: string;
+	bountyAmount: string;
+}
+
 export enum EBountyStatus {
 	ALL = 'All',
 	ACTIVE = 'Active',
@@ -939,6 +1000,20 @@ export enum EBountyStatus {
 	CLAIMED = 'Claimed',
 	CANCELLED = 'Cancelled',
 	REJECTED = 'Rejected'
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: EBountyStatus;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: number;
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: Date }>;
 }
 
 // generic types are for insignificant tokens if we decide to add later
@@ -949,7 +1024,9 @@ export interface ITreasuryStats {
 	relayChain: {
 		dot?: string;
 		myth?: string;
-		[key: string]: string | undefined;
+		nextBurn?: string;
+		nextSpendAt?: Date;
+		[key: string]: unknown | undefined;
 	};
 	ambassador?: {
 		usdt?: string;

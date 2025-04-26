@@ -4,6 +4,7 @@
 	},
 	"ActivityFeed": {
 		"title": "动态信息",
+		"switchToOverview": "切换到概览",
 		"ExploreTab": "探索",
 		"SubscribedTab": "已订阅",
 		"About": "关于",
@@ -29,6 +30,9 @@
 		"loading": "加载中...",
 		"subscribe": "订阅",
 		"unsubscribe": "取消订阅",
+		"please": "请",
+		"login": "登录",
+		"toView": "查看您订阅的帖子",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",
@@ -76,6 +80,13 @@
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
 		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
+	},
+	"AddressRelationsPicker": {
+		"Switch": "切换",
+		"switchWallet": "切换钱包",
+		"noData": "没有数据",
+		"found": "找到",
+		"confirm": "确认"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
@@ -311,6 +322,7 @@
 		"delegation": "委托",
 		"profile": "个人资料",
 		"home": "主页",
+		"overview": "概览",
 		"discussions": "讨论",
 		"preimages": "预映像",
 		"councilMotion": "理事会动议",
@@ -497,7 +509,8 @@
 		"created": "已创建",
 		"curatorassigned": "已分配 curator",
 		"curatorunassigned": "未分配 curator",
-		"curatorproposed": "已提议 curator"
+		"curatorproposed": "已提议 curator",
+		"undefined": "未定义"
 	},
 	"Pagination": {
 		"next": "下一页",
@@ -695,10 +708,66 @@
 		"cancelled": "取消",
 		"rejected": "拒绝"
 	},
+	"Bounty": {
+		"availableBountyPool": "可用赏金池",
+		"viewAll": "查看全部",
+		"dot": "DOT",
+		"claimed": "已认领",
+		"childBounties": "子赏金",
+		"bountyProposal": "赏金提案",
+		"vote": "投票",
+		"bountyDashboard": "赏金仪表盘",
+		"hotBounties": "热门赏金",
+		"activeBounties": "活跃赏金",
+		"claimants": "认领者",
+		"totalRewarded": "总奖励",
+		"totalBountyPool": "总赏金池",
+		"comingSoon": "Coming Soon",
+		"dashboard": "仪表板"
+	},
 	"ChildBounties": {
 		"childBounties": "子赏金",
 		"parentBounty": "父赏金",
 		"viewAllChildBounties": "查看全部"
+	},
+	"Overview": {
+		"month": "月",
+		"year": "年",
+		"events": "活动",
+		"*DateTimeinUTC": "*UTC日期和时间",
+		"noEventsForThisDate": "此日期没有活动",
+		"news": "新闻",
+		"overview": "概述",
+		"about": "关于",
+		"activityfound": "找到活动",
+		"no": "无",
+		"joinCommunity": "加入我们的社区，参与讨论、贡献并获得定期更新！",
+		"viewGallery": "查看图库",
+		"minimizeGallery": "最小化图库",
+		"comingSoon": "即将推出..",
+		"treasury": "财政部",
+		"latestActivity": "最新活动",
+		"all": "全部",
+		"discussion": "讨论",
+		"title": "标题",
+		"postedBy": "发布者",
+		"created": "创建时间",
+		"origin": "来源",
+		"status": "状态",
+		"noactivity": "未找到活动数据",
+		"nodiscussionposts": "未找到讨论帖子",
+		"spendPeriodRemaining": "剩余支出期",
+		"nextBurn": "下次销毁",
+		"nextBurnInfo": "如果财政部在支出期结束时没有用完所有资金，将销毁一定比例的资金。",
+		"unavailable": "不可用",
+		"blockDataUnavailable": "区块数据不可用",
+		"spendPeriodRemainingInfo": "财政部请求的资金在支出期结束时定期分配。",
+		"days": "天",
+		"hours": "小时",
+		"switchToActivityFeed": "切换到活动动态",
+		"topic": "主题",
+		"creator": "创建者",
+		"viewAll": "查看全部"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

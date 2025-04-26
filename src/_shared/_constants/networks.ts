@@ -4,6 +4,22 @@
 
 import { BN } from '@polkadot/util';
 import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
+import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
+import { SiGithub } from '@react-icons/all-files/si/SiGithub';
+import { TiHome } from '@react-icons/all-files/ti/TiHome';
+import { GrReddit } from '@react-icons/all-files/gr/GrReddit';
+import { BiCube } from '@react-icons/all-files/bi/BiCube';
+import { IconType } from '@react-icons/all-files/lib';
+
+interface ISocialLink {
+	id: string;
+	icon: IconType;
+	href: string;
+	label: string;
+}
 
 const VIA_PARITY = 'via Parity';
 const VIA_DWELLIR = 'via Dwellir';
@@ -95,9 +111,21 @@ interface INetworkDetails {
 	peopleChainDetails: IPeopleChainDetails;
 	assethubDetails?: IAssethubDetails;
 	trackDetails: Partial<Record<EPostOrigin, ITrackInfo>>;
+	socialLinks?: ISocialLink[];
 	palletInstance?: string;
 	parachain?: string;
 	convictionVotingPeriodInBlocks: BN;
+}
+
+enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -1470,6 +1498,85 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 	}
 } as const;
 
+const SocialIcons = {
+	Discord: FaDiscord,
+	Github: SiGithub,
+	Home: TiHome,
+	Reddit: GrReddit,
+	Telegram: FaTelegramPlane,
+	Twitter: FaTwitter,
+	Youtube: FaYoutube,
+	Subscan: BiCube
+} as const;
+
+const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
+	[ENetwork.POLKADOT]: [
+		{
+			id: ENetworkSocial.HOME,
+			icon: SocialIcons.Home,
+			href: 'https://polkadot.network/',
+			label: 'Polkadot Homepage'
+		},
+		{
+			id: ENetworkSocial.TWITTER,
+			icon: SocialIcons.Twitter,
+			href: 'https://twitter.com/polkadot',
+			label: 'Twitter'
+		},
+		{
+			id: ENetworkSocial.DISCORD,
+			icon: SocialIcons.Discord,
+			href: 'https://discord.gg/polkadot',
+			label: 'Discord'
+		},
+		{
+			id: ENetworkSocial.GITHUB,
+			icon: SocialIcons.Github,
+			href: 'https://github.com/polkadot-js',
+			label: 'GitHub'
+		},
+		{
+			id: ENetworkSocial.YOUTUBE,
+			icon: SocialIcons.Youtube,
+			href: 'https://www.youtube.com/channel/UCB7PbjuZLEba_znc7mEGNgw',
+			label: 'YouTube'
+		},
+		{
+			id: ENetworkSocial.REDDIT,
+			icon: SocialIcons.Reddit,
+			href: 'https://www.reddit.com/r/polkadot',
+			label: 'Reddit'
+		},
+		{
+			id: ENetworkSocial.TELEGRAM,
+			icon: SocialIcons.Telegram,
+			href: 'https://t.me/PolkadotOfficial',
+			label: 'Telegram'
+		},
+		{
+			id: ENetworkSocial.SUBSCAN,
+			icon: SocialIcons.Subscan,
+			href: 'https://polkadot.subscan.io/',
+			label: 'Subscan'
+		}
+	],
+	[ENetwork.KUSAMA]: [
+		{
+			id: ENetworkSocial.HOME,
+			icon: SocialIcons.Home,
+			href: 'https://kusama.network/',
+			label: 'Kusama Homepage'
+		},
+		{
+			id: ENetworkSocial.TWITTER,
+			icon: SocialIcons.Twitter,
+			href: 'https://twitter.com/kusamanetwork',
+			label: 'Twitter'
+		}
+	],
+	[ENetwork.WESTEND]: []
+} as const;
+
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
@@ -1542,8 +1649,9 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		},
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.POLKADOT],
-		assethubDetails: ASSETHUB_DETAILS[ENetwork.POLKADOT],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.POLKADOT],
+		socialLinks: networkSocialLinks[ENetwork.POLKADOT],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.POLKADOT],
 		convictionVotingPeriodInBlocks: new BN('100800')
 	},
 	[ENetwork.KUSAMA]: {
@@ -1597,6 +1705,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
+		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800')
 	},
 	[ENetwork.WESTEND]: {

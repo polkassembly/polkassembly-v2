@@ -64,10 +64,10 @@ function Login({ isModal }: { isModal?: boolean }) {
 				</div>
 			)}
 			<div className={!isModal ? 'px-4 py-4 sm:px-12' : ''}>
-				{isTFAEnabled && userPreferences.address && userPreferences.wallet ? (
+				{isTFAEnabled && userPreferences.selectedAccount && userPreferences.wallet ? (
 					<TwoFactorAuth
 						tfaToken={tfaToken}
-						loginAddress={userPreferences.address.address}
+						loginAddress={userPreferences.selectedAccount.address}
 						loginWallet={userPreferences.wallet}
 						goBack={() => {
 							setTfaToken('');

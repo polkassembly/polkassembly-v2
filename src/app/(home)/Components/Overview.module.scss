@@ -1,0 +1,51 @@
+.tabList {
+	@apply w-full justify-start overflow-x-auto border-b border-border_grey;
+}
+
+.tabTrigger {
+	@apply px-4 py-2 text-btn_secondary_text;
+}
+
+.latest_activity_title {
+	@apply mb-4 text-lg font-semibold text-btn_secondary_text;
+}
+
+.overview_container {
+	@apply flex flex-col gap-4;
+}
+
+.news_section_container {
+	@apply mt-6 max-h-[480px] rounded-xl bg-bg_modal p-6 shadow-lg;
+}
+
+.news_section_title {
+	@apply text-xl font-semibold leading-8 tracking-tight text-btn_secondary_text;
+}
+
+.about_social_links_container {
+	@apply flex items-center gap-4 text-lg text-wallet_btn_text sm:gap-6;
+}
+
+.about_social_links_icon {
+	@apply h-4 w-4 cursor-pointer hover:text-bg_pink sm:h-5 sm:w-5;
+}
+
+.event_list_container {
+	@apply flex flex-col gap-2 overflow-y-auto overflow-x-hidden xl:max-h-[385px] xl:max-w-[320px];
+}
+
+.event_list_link {
+	@apply capitalize hover:underline;
+}
+
+.calendar_event_tooltip_trigger {
+	@apply flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-center;
+}
+
+.calendar_event_container {
+	@apply flex w-full flex-col justify-between gap-4 rounded-xl bg-bg_modal p-6 shadow-lg lg:mt-6 xl:flex-row;
+}
+
+.calendar_event_title {
+	@apply text-lg font-semibold text-btn_secondary_text xl:mb-4;
+}

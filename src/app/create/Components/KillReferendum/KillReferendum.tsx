@@ -93,14 +93,14 @@ function KillReferendum() {
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.address?.address || !tx) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !tx) {
 			return;
 		}
 
 		setLoading(true);
 
 		apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			track: EPostOrigin.REFERENDUM_KILLER,
 			extrinsicFn: tx,
 			enactment: selectedEnactment,
@@ -194,7 +194,7 @@ function KillReferendum() {
 					onClick={createProposal}
 					isLoading={loading}
 					disabled={
-						!userPreferences.address?.address ||
+						!userPreferences.selectedAccount?.address ||
 						!selectedEnactment ||
 						!data ||
 						!ValidatorService.isValidNumber(data.index) ||

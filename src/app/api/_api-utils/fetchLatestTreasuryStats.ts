@@ -7,6 +7,7 @@ import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { blockNumberToDate } from '@/_shared/_utils/blockNumberToDate';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
@@ -51,7 +52,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			network,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			relayChain: { dot: '' },
+			relayChain: { dot: '', nextBurn: '' },
 			ambassador: { usdt: '' },
 			assetHub: { dot: '', usdc: '', usdt: '', myth: '' },
 			hydration: { dot: '', usdc: '', usdt: '' },
@@ -106,11 +107,35 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const relayChainTasks = [
 			// Treasury balance
 			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
+				const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
 				treasuryStats = {
 					...treasuryStats,
 					relayChain: {
 						...treasuryStats.relayChain,
-						dot: (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
+						dot: treasuryBalance,
+						nextBurn: new BN(treasuryBalance).mul(config.burnPercentage).toString()
+					}
+				};
+			}),
+
+			// next spend at - calculate when the current spend period ends
+			relayChainApi.rpc.chain.getHeader().then((header) => {
+				const currentBlock = new BN(header.number.toString());
+				const spendPeriod = config.spendPeriodInBlocks;
+
+				// Calculate remaining blocks until next spend
+				const goneBlocks = currentBlock.mod(spendPeriod);
+				const remainingBlocks = spendPeriod.sub(goneBlocks);
+
+				// Calculate the block number when the next spend occurs
+				const nextBurnBlock = currentBlock.add(remainingBlocks);
+				const nextSpendAt = blockNumberToDate({ currentBlockNumber: currentBlock, targetBlockNumber: nextBurnBlock, network });
+
+				treasuryStats = {
+					...treasuryStats,
+					relayChain: {
+						...treasuryStats.relayChain,
+						nextSpendAt
 					}
 				};
 			}),

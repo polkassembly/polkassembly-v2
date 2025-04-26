@@ -24,8 +24,7 @@ import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import styles from './DelegateVotingPower.module.scss';
-import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
-import AddressDropdown from '../AddressDropdown/AddressDropdown';
+import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 interface DelegateDialogProps {
 	delegate: { address: string };
@@ -129,12 +128,12 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 	}, [apiService, balance, selectedTrackIds, conviction, delegateAddress]);
 
 	const handleSubmit = useCallback(async () => {
-		if (!apiService || !balance || !userPreferences?.address?.address || selectedTrackIds?.length === 0) return;
+		if (!apiService || !balance || !userPreferences?.selectedAccount?.address || selectedTrackIds?.length === 0) return;
 
 		try {
 			setLoading(true);
 			await apiService.delegate({
-				address: userPreferences.address.address,
+				address: userPreferences.selectedAccount.address,
 				delegateAddress,
 				balance,
 				conviction,
@@ -201,11 +200,11 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 			setLoading(false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [apiService, userPreferences?.address?.address, selectedTrackIds, delegateAddress, balance, conviction]);
+	}, [apiService, userPreferences?.selectedAccount?.address, selectedTrackIds, delegateAddress, balance, conviction]);
 
 	useEffect(() => {
-		if (userPreferences?.address?.address) getBalance(userPreferences.address.address);
-	}, [userPreferences?.address?.address, getBalance]);
+		if (userPreferences?.selectedAccount?.address) getBalance(userPreferences.selectedAccount.address);
+	}, [userPreferences?.selectedAccount?.address, getBalance]);
 
 	useEffect(() => {
 		calculateTxFee();
@@ -243,8 +242,10 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex max-h-[75vh] flex-col gap-4 overflow-y-auto'>
-				<WalletButtons small />
-				<AddressDropdown withBalance />
+				<SwitchWalletOrAddress
+					small
+					withBalance
+				/>
 
 				<div>
 					<p className='mb-1 text-sm text-wallet_btn_text'>{t('delegateTo')}</p>
@@ -256,7 +257,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 					/>
 				</div>
 
-				{delegateAddress && userPreferences?.address?.address === delegateAddress && <p className='text-sm text-toast_error_text'>{t('youCannotDelegateToYourself')}</p>}
+				{delegateAddress && userPreferences?.selectedAccount?.address === delegateAddress && <p className='text-sm text-toast_error_text'>{t('youCannotDelegateToYourself')}</p>}
 
 				<BalanceInput
 					label={t('balance')}
@@ -367,7 +368,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				<Button
 					className='btn-delegate'
 					isLoading={loading}
-					disabled={!isBalanceValid || !selectedTrackIds?.length || !delegateAddress || userPreferences?.address?.address === delegateAddress}
+					disabled={!isBalanceValid || !selectedTrackIds?.length || !delegateAddress || userPreferences?.selectedAccount?.address === delegateAddress}
 					onClick={handleSubmit}
 				>
 					{t('delegate')}
