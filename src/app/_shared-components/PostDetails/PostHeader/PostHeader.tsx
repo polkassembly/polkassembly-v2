@@ -17,7 +17,7 @@ import { BN } from '@polkadot/util';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-import VotingProgress from '@/app/(home)/Components/VotingProgress/VotingProgress';
+import VotingProgress from '@/app/(home)/activity-feed/Components/VotingProgress/VotingProgress';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Address from '@ui/Profile/Address/Address';
@@ -52,7 +52,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	return (
-		<div>
+		<div className='mx-auto max-w-7xl'>
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
 					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (

@@ -2,46 +2,27 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Suspense } from 'react';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { EActivityFeedTab } from '@/_shared/types';
-import { CookieService } from '@/_shared/_services/cookie_service';
-import { z } from 'zod';
-import ActivityFeed from './Components/ActivityFeed';
+import { EProposalType } from '@/_shared/types';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
+import Overview from './Components/Overview';
 import { ClientError } from '../_client-utils/clientError';
-import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
-import { redirectFromServer } from '../_client-utils/redirectFromServer';
 
-const zodParamsSchema = z.object({
-	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.EXPLORE)
-});
+async function OverviewPage() {
+	const { data: allTracksData, error: allTracksError } = await NextApiClientService.fetchListingData({
+		proposalType: EProposalType.REFERENDUM_V2,
+		limit: DEFAULT_LISTING_LIMIT,
+		page: 1
+	});
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ activeTab?: string }> }) {
-	const { tab } = zodParamsSchema.parse(await searchParams);
-
-	const user = await CookieService.getUserFromCookie();
-
-	if (!user?.id && tab === EActivityFeedTab.SUBSCRIBED) {
-		return redirectFromServer(`/login?nextUrl=/?tab=${tab}`);
-	}
-
-	const { data, error } =
-		tab === EActivityFeedTab.SUBSCRIBED && user?.id
-			? await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id })
-			: await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
-
-	if (error || !data) {
-		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	if (allTracksError || !allTracksData) {
+		throw new ClientError(allTracksError?.message || 'Failed to fetch data');
 	}
 
 	return (
-		<Suspense fallback={<LoadingSpinner />}>
-			<ActivityFeed
-				initialData={data}
-				activeTab={tab}
-			/>
-		</Suspense>
+		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+			<Overview allTracksData={allTracksData} />
+		</div>
 	);
 }
+export default OverviewPage;

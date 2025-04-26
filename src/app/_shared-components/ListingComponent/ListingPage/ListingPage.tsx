@@ -29,29 +29,48 @@ interface ListingPageProps {
 	proposalType: EProposalType;
 	origin?: EPostOrigin;
 	initialData: IGenericListingResponse<IPostListing>;
+	statuses: EProposalStatus[];
+	page: number;
 }
 
-function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
+const getStatuses = (proposalType: EProposalType) => {
+	switch (proposalType) {
+		case EProposalType.CHILD_BOUNTY:
+			return [
+				EProposalStatus.Added,
+				EProposalStatus.Awarded,
+				EProposalStatus.Claimed,
+				EProposalStatus.Cancelled,
+				EProposalStatus.CuratorProposed,
+				EProposalStatus.CuratorUnassigned,
+				EProposalStatus.CuratorAssigned
+			];
+		case EProposalType.DISCUSSION:
+			return [];
+		default:
+			return [
+				EProposalStatus.Cancelled,
+				EProposalStatus.Confirmed,
+				EProposalStatus.ConfirmAborted,
+				EProposalStatus.ConfirmStarted,
+				EProposalStatus.Deciding,
+				EProposalStatus.Executed,
+				EProposalStatus.ExecutionFailed,
+				EProposalStatus.Killed,
+				EProposalStatus.Rejected,
+				EProposalStatus.Submitted,
+				EProposalStatus.TimedOut
+			];
+	}
+};
+
+function ListingPage({ proposalType, origin, initialData, statuses, page }: ListingPageProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
-	const initialPage = parseInt(searchParams?.get('page') || '1', 10);
-	const initialTrackStatus = searchParams?.get('trackStatus') || 'all';
 	const { user } = useUser();
 
-	const STATUSES = [
-		t('ListingPage_Status.Cancelled'),
-		t('ListingPage_Status.Confirmed'),
-		t('ListingPage_Status.ConfirmAborted'),
-		t('ListingPage_Status.ConfirmStarted'),
-		t('ListingPage_Status.Deciding'),
-		t('ListingPage_Status.Executed'),
-		t('ListingPage_Status.ExecutionFailed'),
-		t('ListingPage_Status.Killed'),
-		t('ListingPage_Status.Rejected'),
-		t('ListingPage_Status.Submitted'),
-		t('ListingPage_Status.TimedOut')
-	];
+	const STATUSES = getStatuses(proposalType)?.map((status) => t(`ListingPage_Status.${status}`));
 
 	// TODO: get tags from backend
 	const TAGS = [
@@ -67,17 +86,19 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	const [state, setState] = useState({
 		activeTab: EListingTabState.INTERNAL_PROPOSALS,
-		currentPage: initialPage,
+		currentPage: page,
 		filterActive: false,
-		selectedStatuses: initialTrackStatus === 'all' ? [] : (initialTrackStatus.split(',') as EProposalStatus[]),
+		selectedStatuses: statuses,
 		tagSearchTerm: '',
 		selectedTags: [] as string[]
 	});
 
 	const tabNames =
-		proposalType === EProposalType.DISCUSSION
-			? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
-			: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
+		proposalType === EProposalType.CHILD_BOUNTY
+			? {}
+			: proposalType === EProposalType.DISCUSSION
+				? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
+				: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
@@ -87,7 +108,17 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
 
 			const params = new URLSearchParams(searchParams?.toString() || '');
-			params.set('trackStatus', newStatuses.length > 0 ? newStatuses.join(',') : 'all');
+
+			params.delete('status');
+
+			if (newStatuses.length > 0) {
+				newStatuses.forEach((newStatus: EProposalStatus) => {
+					params.append('status', newStatus);
+				});
+			} else {
+				params.delete('status');
+			}
+
 			router.push(`?${params.toString()}`, { scroll: false });
 
 			return {
@@ -98,10 +129,24 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 	};
 
 	const handleTagToggle = (tag: string) => {
-		setState((prev) => ({
-			...prev,
-			selectedTags: prev.selectedTags.includes(tag) ? prev.selectedTags.filter((tags) => tags !== tag) : [...prev.selectedTags, tag]
-		}));
+		setState((prev) => {
+			const newTags = prev.selectedTags.includes(tag) ? prev.selectedTags.filter((tags) => tags !== tag) : [...prev.selectedTags, tag];
+
+			const params = new URLSearchParams(searchParams?.toString() || '');
+
+			params.delete('tags');
+
+			newTags.forEach((newTag) => {
+				params.append('tags', newTag);
+			});
+
+			router.push(`?${params.toString()}`, { scroll: false });
+
+			return {
+				...prev,
+				selectedTags: newTags
+			};
+		});
 	};
 
 	const renderHeader = () => (
@@ -115,8 +160,8 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 			<Link
 				href={
 					!user?.id
-						? `/login?nextUrl=create/${proposalType === EProposalType.DISCUSSION ? 'discussion' : 'proposal'}`
-						: `/create/${proposalType === EProposalType.DISCUSSION ? 'discussion' : 'proposal'}`
+						? `/login?nextUrl=create${proposalType === EProposalType.DISCUSSION ? '/discussion' : ''}`
+						: `/create${proposalType === EProposalType.DISCUSSION ? '/discussion' : ''}`
 				}
 				className={styles.button}
 			>
@@ -181,45 +226,47 @@ function ListingPage({ proposalType, origin, initialData }: ListingPageProps) {
 
 	return (
 		<div>
-			<div className={styles.container}>
-				{renderHeader()}
-				<div className={styles.tabs}>
-					<div className='flex space-x-6'>
-						{Object.entries(tabNames).map(([key, value]) => (
-							<button
-								key={key}
-								type='button'
-								className={`${styles['tab-button']} uppercase ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
-								onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
-							>
-								{value}
-							</button>
-						))}
-					</div>
-					<div className='flex gap-4 pb-3 text-sm text-gray-700'>
-						<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
-							<PopoverTrigger asChild>
-								<div
-									className={`${styles.filter} ${state.filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
-									role='button'
-									tabIndex={0}
+			<div className='bg-section_dark_overlay'>
+				<div className={styles.container}>
+					{renderHeader()}
+					<div className={styles.tabs}>
+						<div className='flex space-x-6'>
+							{Object.entries(tabNames).map(([key, value]) => (
+								<button
+									key={key}
+									type='button'
+									className={`${styles['tab-button']} uppercase ${state.activeTab === key ? styles['tab-button-active'] : ''}`}
+									onClick={() => setState((prev) => ({ ...prev, activeTab: key as EListingTabState }))}
 								>
-									<span className={state.filterActive ? styles.selectedicon : ''}>
-										<FaFilter className='text-sm text-text_primary' />
-									</span>
-									<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
-								</div>
-							</PopoverTrigger>
-							<PopoverContent
-								sideOffset={5}
-								className={styles.popoverContent}
-							>
-								{renderFilterContent()}
-							</PopoverContent>
-						</Popover>
-						<p className={styles.filter}>
-							<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort className='text-text_primary' />
-						</p>
+									{value}
+								</button>
+							))}
+						</div>
+						<div className='flex gap-4 pb-3 text-sm text-gray-700'>
+							<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
+								<PopoverTrigger asChild>
+									<div
+										className={`${styles.filter} ${state.filterActive ? 'bg-gray-200 text-navbar_border' : ''}`}
+										role='button'
+										tabIndex={0}
+									>
+										<span className={state.filterActive ? styles.selectedicon : ''}>
+											<FaFilter className='text-sm text-text_primary' />
+										</span>
+										<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.filter')}</span>
+									</div>
+								</PopoverTrigger>
+								<PopoverContent
+									sideOffset={5}
+									className={styles.popoverContent}
+								>
+									{renderFilterContent()}
+								</PopoverContent>
+							</Popover>
+							<p className={styles.filter}>
+								<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort className='text-text_primary' />
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

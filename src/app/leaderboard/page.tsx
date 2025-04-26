@@ -19,7 +19,7 @@ async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
 	return (
-		<div className='grid grid-cols-1 gap-5 p-5 sm:p-10'>
+		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:p-10'>
 			<Leaderboard
 				data={data}
 				top3RankData={top3RankData}

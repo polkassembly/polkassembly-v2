@@ -11,7 +11,17 @@ import { cn } from '@/lib/utils';
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
-const Tooltip = TooltipPrimitive.Root;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const Tooltip = React.forwardRef<React.ElementRef<typeof TooltipPrimitive.Root>, React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> & { delayDuration?: number }>(
+	// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+	({ delayDuration = 0, ...props }, ref) => (
+		<TooltipPrimitive.Root
+			delayDuration={delayDuration}
+			{...props}
+		/>
+	)
+);
+Tooltip.displayName = TooltipPrimitive.Root.displayName;
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
 

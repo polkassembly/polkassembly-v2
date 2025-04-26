@@ -36,13 +36,13 @@ function TxFeesDetailsView({ extrinsicFn, extraFees }: { extrinsicFn: (Submittab
 
 	useEffect(() => {
 		const fetchFee = async () => {
-			if (extrinsicFnDebouncedValue && userPreferences.address?.address && apiService) {
-				const fee = await apiService.getTxFee({ extrinsicFn: extrinsicFnDebouncedValue, address: userPreferences.address.address });
+			if (extrinsicFnDebouncedValue && userPreferences.selectedAccount?.address && apiService) {
+				const fee = await apiService.getTxFee({ extrinsicFn: extrinsicFnDebouncedValue, address: userPreferences.selectedAccount.address });
 				setGasFee(fee);
 			}
 		};
 		fetchFee();
-	}, [apiService, extrinsicFnDebouncedValue, userPreferences.address?.address]);
+	}, [apiService, extrinsicFnDebouncedValue, userPreferences.selectedAccount?.address]);
 
 	return (
 		<Collapsible className='rounded-lg border border-border_grey bg-page_background p-4'>

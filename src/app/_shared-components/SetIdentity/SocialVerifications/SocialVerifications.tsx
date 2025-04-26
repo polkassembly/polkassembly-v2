@@ -32,9 +32,9 @@ function SocialVerifications() {
 	const [loading, setLoading] = useState(false);
 
 	const fetchUserSocialHandles = async () => {
-		if (!user || !userPreferences.address?.address) return null;
+		if (!user || !userPreferences.selectedAccount?.address) return null;
 
-		const { data, error } = await NextApiClientService.fetchUserSocialHandles({ userId: user.id, address: userPreferences.address.address });
+		const { data, error } = await NextApiClientService.fetchUserSocialHandles({ userId: user.id, address: userPreferences.selectedAccount.address });
 
 		if (error || !data) {
 			throw new Error(error?.message || 'Failed to fetch data');
@@ -42,28 +42,28 @@ function SocialVerifications() {
 		return data.socialHandles;
 	};
 	const { data: socialHandles, isFetching } = useQuery({
-		queryKey: ['socials', user?.id, userPreferences.address?.address],
+		queryKey: ['socials', user?.id, userPreferences.selectedAccount?.address],
 		queryFn: () => fetchUserSocialHandles(),
 		placeholderData: (previousData) => previousData
 	});
 
 	useEffect(() => {
 		const setDefaultIdentityValues = async () => {
-			if (!identityService || !userPreferences.address?.address) return;
+			if (!identityService || !userPreferences.selectedAccount?.address) return;
 
-			const identityInfo = await identityService.getOnChainIdentity(userPreferences.address.address);
+			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
 
 			setIdentityValues(identityInfo);
 		};
 		setDefaultIdentityValues();
-	}, [identityService, userPreferences.address?.address]);
+	}, [identityService, userPreferences.selectedAccount?.address]);
 
 	const proceedForJudgement = async () => {
-		if (!user || !userPreferences.address?.address || !identityValues?.hash) return;
+		if (!user || !userPreferences.selectedAccount?.address || !identityValues?.hash) return;
 
 		setLoading(true);
 
-		const { data, error } = await NextApiClientService.judgementCall({ userAddress: userPreferences.address.address, identityHash: identityValues.hash });
+		const { data, error } = await NextApiClientService.judgementCall({ userAddress: userPreferences.selectedAccount.address, identityHash: identityValues.hash });
 
 		if (error || !data) {
 			toast({
