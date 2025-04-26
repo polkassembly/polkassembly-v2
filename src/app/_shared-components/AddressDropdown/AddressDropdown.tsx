@@ -19,6 +19,7 @@ import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 import { Label } from '../Label';
+import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 
 function AddressDropdown({
 	onChange,
@@ -142,27 +143,18 @@ function AddressDropdown({
 						disabled={disabled}
 						className='normal-case'
 					>
-						<div className='flex w-full items-center gap-2'>
-							<RadioGroupItem
-								value={userPreferences?.selectedAccount?.address || ''}
-								id={`trigger-radio-${userPreferences?.selectedAccount?.address}`}
-								onClick={(e) => {
-									e.stopPropagation();
-								}}
+						<div className='flex items-center gap-2'>
+							<Address
+								address={userPreferences?.selectedAccount?.address || ''}
+								walletAddressName={userPreferences?.selectedAccount?.name || ''}
+								iconSize={25}
+								redirectToProfile={false}
+								disableTooltip
 							/>
-							<Label
-								htmlFor={`trigger-radio-${userPreferences?.selectedAccount?.address}`}
-								className='flex w-full cursor-pointer items-center gap-2'
-							>
-								<Address
-									address={userPreferences?.selectedAccount?.address || ''}
-									walletAddressName={userPreferences?.selectedAccount?.name || ''}
-									iconSize={25}
-									redirectToProfile={false}
-									disableTooltip
-									className='w-full'
-								/>
-							</Label>
+							<div className='flex items-center gap-1'>
+								<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
+								{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
+							</div>
 						</div>
 					</DropdownMenuTrigger>
 				</div>
@@ -178,14 +170,18 @@ function AddressDropdown({
 									htmlFor={`radio-${item.address}`}
 									className='flex w-full cursor-pointer items-center gap-2'
 								>
-									<Address
-										address={item.address}
-										walletAddressName={item.name}
-										iconSize={25}
-										redirectToProfile={false}
-										disableTooltip
-										className='w-full'
-									/>
+									<div className='flex items-center gap-2'>
+										<Address
+											address={item.address}
+											walletAddressName={item.name}
+											iconSize={25}
+											redirectToProfile={false}
+											disableTooltip
+										/>
+										<div className='flex items-center gap-1'>
+											<AccountTypeBadge accountType={EAccountType.REGULAR} />
+										</div>
+									</div>
 								</Label>
 							</div>
 						</DropdownMenuItem>
@@ -204,13 +200,19 @@ function AddressDropdown({
 					disabled={disabled}
 					className='normal-case'
 				>
-					<Address
-						address={userPreferences?.selectedAccount?.address || ''}
-						walletAddressName={userPreferences?.selectedAccount?.name || ''}
-						iconSize={25}
-						redirectToProfile={false}
-						disableTooltip
-					/>
+					<div className='flex items-center gap-2'>
+						<Address
+							address={userPreferences?.selectedAccount?.address || ''}
+							walletAddressName={userPreferences?.selectedAccount?.name || ''}
+							iconSize={25}
+							redirectToProfile={false}
+							disableTooltip
+						/>
+						<div className='flex items-center gap-1'>
+							<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
+							{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
+						</div>
+					</div>
 				</DropdownMenuTrigger>
 			</div>
 			<DropdownMenuContent className='max-h-[300px] overflow-y-auto border-0'>
@@ -221,13 +223,18 @@ function AddressDropdown({
 							onClick={() => onAccountChange(item)}
 							className={classes.dropdownOption}
 						>
-							<Address
-								address={item.address}
-								walletAddressName={item.name}
-								iconSize={25}
-								redirectToProfile={false}
-								disableTooltip
-							/>
+							<div className='flex items-center gap-2'>
+								<Address
+									address={item.address}
+									walletAddressName={item.name}
+									iconSize={25}
+									redirectToProfile={false}
+									disableTooltip
+								/>
+								<div className='flex items-center gap-1'>
+									<AccountTypeBadge accountType={EAccountType.REGULAR} />
+								</div>
+							</div>
 						</button>
 					</DropdownMenuItem>
 				))}

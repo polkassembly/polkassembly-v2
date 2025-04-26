@@ -16,7 +16,7 @@ import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
 import ConvictionSelector from './ConvictionSelector/ConvictionSelector';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
-import AddressRelationsPicker from '../../SwitchWalletOrAddress/AddressRelationsPicker';
+import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 
 function VoteReferendum({ index }: { index: string }) {
 	const { userPreferences } = useUserPreferences();

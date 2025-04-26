@@ -10,14 +10,16 @@ import { useWalletService } from '@/hooks/useWalletService';
 import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { ChevronDown } from 'lucide-react';
+import { MdOutlineSync } from 'react-icons/md';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
-import SwitchWalletOrAddress from './SwitchWalletOrAddress';
+import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
 import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 import { Label } from '../Label';
+import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;
@@ -150,9 +152,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 												redirectToProfile={false}
 												disableTooltip
 											/>
-											<span className='inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10'>
-												Proxy
-											</span>
+											<AccountTypeBadge accountType={EAccountType.PROXY} />
 										</Label>
 									</div>
 								))}
@@ -184,9 +184,9 @@ function AddressSwitchButton() {
 			<DialogTrigger asChild>
 				<Button
 					size='sm'
-					className='ml-auto'
+					className='ml-auto flex items-center gap-1 text-xs'
 				>
-					Switch
+					<MdOutlineSync /> Switch
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
@@ -278,14 +278,20 @@ export default function AddressRelationsPicker() {
 			{accountsLoading || !selectedAddress ? (
 				<Skeleton className='h-6 w-32' />
 			) : (
-				<Address
-					address={selectedAddress}
-					walletAddressName={walletAddressName}
-					iconSize={25}
-					redirectToProfile={false}
-					disableTooltip
-					className='w-full px-2'
-				/>
+				<div className='flex items-center justify-between gap-2'>
+					<Address
+						address={selectedAddress}
+						walletAddressName={walletAddressName}
+						iconSize={25}
+						redirectToProfile={false}
+						disableTooltip
+						className='w-full px-2'
+					/>
+					<span>
+						<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
+						{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
+					</span>
+				</div>
 			)}
 			<AddressSwitchButton />
 		</div>
