@@ -4,14 +4,49 @@
 
 'use client';
 
+import { EWallet } from '@/_shared/types';
+import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { ReactNode } from 'react';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
 
-function SwitchWalletOrAddress() {
+interface Props {
+	onWalletChange?: (wallet: EWallet | null) => void;
+	onAddressChange?: ((account: InjectedAccount) => void) | undefined;
+	small?: boolean;
+	withBalance?: boolean;
+	disabled?: boolean;
+	customAddressSelector?: ReactNode; // this pattern is to avoid cyclic dependencies
+	withRadioSelect?: boolean;
+	onRadioSelect?: (address: string) => void;
+}
+
+function SwitchWalletOrAddress({
+	small = false,
+	withBalance = false,
+	onWalletChange,
+	onAddressChange,
+	disabled = false,
+	customAddressSelector,
+	withRadioSelect,
+	onRadioSelect
+}: Props) {
 	return (
 		<>
-			<WalletButtons small />
-			<AddressDropdown withBalance />
+			<WalletButtons
+				small={small}
+				onWalletChange={onWalletChange}
+				disabled={disabled}
+			/>
+			{customAddressSelector || (
+				<AddressDropdown
+					withBalance={withBalance}
+					onChange={onAddressChange}
+					disabled={disabled}
+					withRadioSelect={withRadioSelect}
+					onRadioSelect={onRadioSelect}
+				/>
+			)}
 		</>
 	);
 }

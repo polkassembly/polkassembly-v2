@@ -70,14 +70,14 @@ function CreateBounty() {
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.address?.address || !tx || !selectedTrack) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !selectedTrack) {
 			return;
 		}
 
 		setLoading(true);
 
 		apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			track: selectedTrack.name,
 			extrinsicFn: tx,
 			enactment: selectedEnactment,
@@ -102,7 +102,7 @@ function CreateBounty() {
 	};
 
 	const proposeBounty = async () => {
-		if (!apiService || bountyAmount.isZero() || !userPreferences.address?.address) {
+		if (!apiService || bountyAmount.isZero() || !userPreferences.selectedAccount?.address) {
 			setLoading(false);
 			return;
 		}
@@ -110,7 +110,7 @@ function CreateBounty() {
 		setLoading(true);
 
 		await apiService.proposeBounty({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			bountyAmount,
 			onSuccess: (id) => {
 				setBountyId(id);
@@ -180,7 +180,7 @@ function CreateBounty() {
 				<Button
 					onClick={proposeBounty}
 					isLoading={loading}
-					disabled={!userPreferences.address?.address || !selectedTrack || !selectedEnactment || !proposeBountyTx}
+					disabled={!userPreferences.selectedAccount?.address || !selectedTrack || !selectedEnactment || !proposeBountyTx}
 				>
 					{t('CreateBounty.proposeBounty')}
 				</Button>

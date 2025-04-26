@@ -18,10 +18,6 @@
 	@apply flex items-center gap-1 break-words text-base font-medium text-text_primary;
 }
 
-.castVoteButton {
-	@apply flex cursor-pointer gap-1 whitespace-normal rounded-md border-[1px] border-solid border-navbar_border text-sm font-medium text-navbar_border hover:bg-progress_pink_bg lg:px-3 lg:py-1.5;
-}
-
 .beneficiaryContainer {
 	@apply flex flex-wrap items-center gap-2 break-all text-base font-semibold text-wallet_btn_text lg:text-xl;
 }

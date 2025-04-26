@@ -144,7 +144,18 @@ export const THEME_COLORS = {
 		not_voted_bg: '#fff0f3',
 		voted_bg: '#fff6ee',
 		bg_code: '#fbfbfd',
-		create_bounty_btn: '#FF50AD'
+		create_bounty_btn: '#FF50AD',
+		multisig_bg: '#FFF6EC',
+		pure_proxy_bg: '#edf2fe',
+		any_proxy_bg: '#f8edf3',
+		non_transferrable_bg: '#f0f4ec',
+		multisig_text: '#F4970B',
+		pure_proxy_text: '#2060EB',
+		any_proxy_text: '#B8216F',
+		non_transferrable_text: '#317A06',
+		proxy_type_bg: '#f0f4ec',
+		proxy_type_text: '#317A06',
+		bg_light_pink: '#fef0f7'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -285,6 +296,17 @@ export const THEME_COLORS = {
 		not_voted_bg: '#1e160d',
 		voted_bg: '#1e1113',
 		bg_code: '#222222',
-		create_bounty_btn: '#FF50AD'
+		create_bounty_btn: '#FF50AD',
+		multisig_bg: '#FFF6EC',
+		pure_proxy_bg: '#edf2fe',
+		any_proxy_bg: '#f8edf3',
+		non_transferrable_bg: '#f0f4ec',
+		multisig_text: '#F4970B',
+		pure_proxy_text: '#2060EB',
+		any_proxy_text: '#B8216F',
+		non_transferrable_text: '#317A06',
+		proxy_type_bg: '#f0f4ec',
+		proxy_type_text: '#317A06',
+		bg_light_pink: '#fef0f7'
 	}
 };

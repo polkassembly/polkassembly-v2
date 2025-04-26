@@ -30,12 +30,12 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 	}, [twitterSocialHandle, identityTwitter]);
 
 	const verifyTwitter = async () => {
-		if (!user || !identityTwitter || !userPreferences.address?.address) return;
+		if (!user || !identityTwitter || !userPreferences.selectedAccount?.address) return;
 
 		setLoading(true);
 		const { data, error } = await NextApiClientService.initSocialVerification({
 			userId: user.id,
-			address: userPreferences.address?.address,
+			address: userPreferences.selectedAccount.address,
 			social: ESocial.TWITTER,
 			handle: identityTwitter
 		});
@@ -50,14 +50,14 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 			window.open(`https://api.twitter.com/oauth/authenticate?oauth_token=${data.verificationToken.token}`, '_blank');
 		}
 
-		queryClient.setQueryData(['socials', user?.id, userPreferences.address?.address], (old: Record<ESocial, ISocialHandle>) => ({
+		queryClient.setQueryData(['socials', user?.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,
 			[ESocial.TWITTER]: {
 				social: ESocial.TWITTER,
 				handle: identityTwitter,
 				status: ESocialVerificationStatus.PENDING,
 				userId: user.id,
-				address: userPreferences.address?.address
+				address: userPreferences.selectedAccount?.address
 			}
 		}));
 

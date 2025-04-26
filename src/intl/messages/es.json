@@ -81,6 +81,13 @@
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
 	},
+	"AddressRelationsPicker": {
+		"Switch": "Cambiar",
+		"switchWallet": "Cambiar billetera",
+		"noData": "No",
+		"found": "encontrado",
+		"confirm": "Confirmar"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
 		"proposal": "Propuesta",

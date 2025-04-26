@@ -81,6 +81,13 @@
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
 		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
 	},
+	"AddressRelationsPicker": {
+		"Switch": "切换",
+		"switchWallet": "切换钱包",
+		"noData": "没有数据",
+		"found": "找到",
+		"confirm": "确认"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
 		"proposal": "提案",

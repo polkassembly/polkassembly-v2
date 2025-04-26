@@ -81,6 +81,13 @@
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
 	},
+	"AddressRelationsPicker": {
+		"Switch": "Switch",
+		"switchWallet": "Switch Wallet",
+		"noData": "No",
+		"found": "found",
+		"confirm": "Confirm"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",
 		"proposal": "Proposal",

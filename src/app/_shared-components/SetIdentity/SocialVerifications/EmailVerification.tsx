@@ -32,14 +32,14 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 	}, [emailSocialHandle, identityEmail]);
 
 	const verifyEmail = async () => {
-		if (!user || !identityEmail || !userPreferences.address?.address) return;
+		if (!user || !identityEmail || !userPreferences.selectedAccount?.address) return;
 
 		setLoading(true);
 		const { data, error } = await NextApiClientService.initSocialVerification({
 			userId: user.id,
 			social: ESocial.EMAIL,
 			handle: identityEmail,
-			address: userPreferences.address?.address
+			address: userPreferences.selectedAccount.address
 		});
 
 		if (error || !data) {
@@ -48,14 +48,14 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 			return;
 		}
 
-		queryClient.setQueryData(['socials', user.id, userPreferences.address?.address], (old: Record<ESocial, ISocialHandle>) => ({
+		queryClient.setQueryData(['socials', user.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,
 			[ESocial.EMAIL]: {
 				social: ESocial.EMAIL,
 				handle: identityEmail,
 				status: ESocialVerificationStatus.PENDING,
 				userId: user.id,
-				address: userPreferences.address?.address
+				address: userPreferences?.selectedAccount?.address
 			}
 		}));
 

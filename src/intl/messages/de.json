@@ -81,6 +81,13 @@
 		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung."
 	},
+	"AddressRelationsPicker": {
+		"Switch": "Wechseln",
+		"switchWallet": "Wallet wechseln",
+		"noData": "Keine",
+		"found": "gefunden",
+		"confirm": "Bestätigen"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Finanzvorschlag",
 		"proposal": "Vorschlag",

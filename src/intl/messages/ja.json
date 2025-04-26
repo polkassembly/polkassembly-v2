@@ -81,6 +81,13 @@
 		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
 		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。"
 	},
+	"AddressRelationsPicker": {
+		"Switch": "切り替え",
+		"switchWallet": "ウォレットを切り替え",
+		"noData": "データがありません",
+		"found": "見つかりました",
+		"confirm": "確認"
+	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",
 		"proposal": "提案",
