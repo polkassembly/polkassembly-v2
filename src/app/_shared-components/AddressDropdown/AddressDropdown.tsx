@@ -11,14 +11,28 @@ import { useWalletService } from '@/hooks/useWalletService';
 import { useCallback, useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { AlertCircle } from 'lucide-react';
-import { EAccountType } from '@/_shared/types';
+import { EAccountType, ISelectedAccount } from '@/_shared/types';
 import classes from './AddressDropdown.module.scss';
 import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
+import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
+import { Label } from '../Label';
 
-function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (account: InjectedAccount) => void; withBalance?: boolean; disabled?: boolean }) {
+function AddressDropdown({
+	onChange,
+	withBalance,
+	disabled,
+	withRadioSelect,
+	onRadioSelect
+}: {
+	onChange?: (account: InjectedAccount) => void;
+	withBalance?: boolean;
+	disabled?: boolean;
+	withRadioSelect?: boolean;
+	onRadioSelect?: (address: string) => void;
+}) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
 	const walletService = useWalletService();
@@ -72,6 +86,22 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 		onChange?.(a);
 	};
 
+	const handleRadioChange = (address: string) => {
+		const newSelectedAccount: ISelectedAccount = {
+			address,
+			accountType: EAccountType.REGULAR,
+			wallet: userPreferences?.wallet,
+			name: accounts.find((account) => account.address === address)?.name || ''
+		};
+
+		setUserPreferences({
+			...userPreferences,
+			selectedAccount: newSelectedAccount
+		});
+
+		onRadioSelect?.(address);
+	};
+
 	if (!userPreferences.wallet) return <div className={classes.fallbackText}>{t('AddressDropdown.fallbackText')}</div>;
 
 	if (accountsLoading)
@@ -96,6 +126,71 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 				</ul>
 			</AlertDescription>
 		</Alert>
+	) : withRadioSelect ? (
+		<RadioGroup
+			value={userPreferences?.selectedAccount?.address || ''}
+			onValueChange={handleRadioChange}
+			className='w-full'
+		>
+			<DropdownMenu>
+				<div>
+					<div className='mb-1 flex items-center justify-between gap-x-12'>
+						<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('AddressDropdown.chooseLinkedAccount')}</p>
+						{withBalance && <Balance address={userPreferences?.selectedAccount?.address || ''} />}
+					</div>
+					<DropdownMenuTrigger
+						disabled={disabled}
+						className='normal-case'
+					>
+						<div className='flex items-center gap-2'>
+							<RadioGroupItem
+								value={userPreferences?.selectedAccount?.address || ''}
+								id={`trigger-radio-${userPreferences?.selectedAccount?.address}`}
+								onClick={(e) => {
+									e.stopPropagation();
+								}}
+							/>
+							<Label
+								htmlFor={`trigger-radio-${userPreferences?.selectedAccount?.address}`}
+								className='flex cursor-pointer items-center gap-2'
+							>
+								<Address
+									address={userPreferences?.selectedAccount?.address || ''}
+									walletAddressName={userPreferences?.selectedAccount?.name || ''}
+									iconSize={25}
+									redirectToProfile={false}
+									disableTooltip
+								/>
+							</Label>
+						</div>
+					</DropdownMenuTrigger>
+				</div>
+				<DropdownMenuContent className='max-h-[300px] overflow-y-auto border-0'>
+					{accounts.map((item) => (
+						<DropdownMenuItem key={item.address}>
+							<div className='flex items-center gap-2'>
+								<RadioGroupItem
+									value={item.address}
+									id={`radio-${item.address}`}
+								/>
+								<Label
+									htmlFor={`radio-${item.address}`}
+									className='flex cursor-pointer items-center gap-2'
+								>
+									<Address
+										address={item.address}
+										walletAddressName={item.name}
+										iconSize={25}
+										redirectToProfile={false}
+										disableTooltip
+									/>
+								</Label>
+							</div>
+						</DropdownMenuItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</RadioGroup>
 	) : (
 		<DropdownMenu>
 			<div>
@@ -120,7 +215,6 @@ function AddressDropdown({ onChange, withBalance, disabled }: { onChange?: (acco
 				{accounts.map((item) => (
 					<DropdownMenuItem key={item.address}>
 						<button
-							key={`${item.address}`}
 							type='button'
 							onClick={() => onAccountChange(item)}
 							className={classes.dropdownOption}

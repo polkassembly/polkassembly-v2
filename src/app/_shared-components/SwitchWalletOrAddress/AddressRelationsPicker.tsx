@@ -13,7 +13,7 @@ import { ChevronDown } from 'lucide-react';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from './SwitchWalletOrAddress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible';
 import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
@@ -193,7 +193,11 @@ function AddressSwitchButton() {
 				<DialogHeader className='text-xl font-semibold text-text_primary'>
 					<DialogTitle>Switch Wallet</DialogTitle>
 				</DialogHeader>
-				<SwitchWalletOrAddress small />
+
+				<SwitchWalletOrAddress
+					small
+					withRadioSelect
+				/>
 
 				{relationsForSelectedAddress ? (
 					<>
@@ -217,6 +221,14 @@ function AddressSwitchButton() {
 						<Skeleton className='mb-1 h-6 w-full' />
 					</>
 				)}
+				<DialogFooter className='mt-6'>
+					<Button
+						onClick={closeDialog}
+						variant='default'
+					>
+						Confirm
+					</Button>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);

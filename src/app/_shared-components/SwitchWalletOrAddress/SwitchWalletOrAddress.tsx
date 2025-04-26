@@ -17,9 +17,20 @@ interface Props {
 	withBalance?: boolean;
 	disabled?: boolean;
 	customAddressSelector?: ReactNode; // this pattern is to avoid cyclic dependencies
+	withRadioSelect?: boolean;
+	onRadioSelect?: (address: string) => void;
 }
 
-function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletChange, onAddressChange, disabled = false, customAddressSelector }: Props) {
+function SwitchWalletOrAddress({
+	small = false,
+	withBalance = false,
+	onWalletChange,
+	onAddressChange,
+	disabled = false,
+	customAddressSelector,
+	withRadioSelect,
+	onRadioSelect
+}: Props) {
 	return (
 		<>
 			<WalletButtons
@@ -32,6 +43,8 @@ function SwitchWalletOrAddress({ small = false, withBalance = false, onWalletCha
 					withBalance={withBalance}
 					onChange={onAddressChange}
 					disabled={disabled}
+					withRadioSelect={withRadioSelect}
+					onRadioSelect={onRadioSelect}
 				/>
 			)}
 		</>
