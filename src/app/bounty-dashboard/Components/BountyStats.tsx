@@ -82,15 +82,11 @@ function BountyStats({ bountiesStats, tokenPrice, totalBountyPool }: { bountiesS
 						/>
 						<StatItem
 							label={t('totalRewarded')}
-							value={
-								bountiesStats.totalRewarded ? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined
-							}
+							value={bountiesStats.totalRewarded ? formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined}
 						/>
 						<StatItem
 							label={t('totalBountyPool')}
-							value={
-								bountiesStats.totalBountyPool ? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined
-							}
+							value={bountiesStats.totalBountyPool ? formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined}
 						/>
 					</div>
 				</div>
@@ -159,17 +155,11 @@ function BountyStats({ bountiesStats, tokenPrice, totalBountyPool }: { bountiesS
 							/>
 							<StatItem
 								label={t('totalRewarded')}
-								value={
-									bountiesStats.totalRewarded ? formatTokenValue(String(bountiesStats.totalRewarded), network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined
-								}
+								value={bountiesStats.totalRewarded ? formatTokenValue(bountiesStats.totalRewarded, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined}
 							/>
 							<StatItem
 								label={t('totalBountyPool')}
-								value={
-									bountiesStats.totalBountyPool
-										? formatTokenValue(String(bountiesStats.totalBountyPool), network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol)
-										: undefined
-								}
+								value={bountiesStats.totalBountyPool ? formatTokenValue(bountiesStats.totalBountyPool, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined}
 							/>
 						</div>
 						<div className='relative -ml-6 flex items-center justify-between'>

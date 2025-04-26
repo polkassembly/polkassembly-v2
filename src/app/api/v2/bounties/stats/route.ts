@@ -3,27 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextResponse } from 'next/server';
-import { APIError } from '@/app/api/_api-utils/apiError';
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { StatusCodes } from 'http-status-codes';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-import { ENetwork } from '@shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
-	if (!network || !Object.values(ENetwork).includes(network)) {
-		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network in request header');
-	}
 
 	const stats = await OnChainDbService.getBountyStats(network);
 
-	return NextResponse.json({
-		...stats,
-		availableBountyPool: stats.availableBountyPool.toString(),
-		totalBountyPool: stats.totalBountyPool.toString(),
-		totalRewarded: stats.totalRewarded.toString(),
-		bountyAmount: stats.bountyAmount
-	});
+	return NextResponse.json(stats);
 });

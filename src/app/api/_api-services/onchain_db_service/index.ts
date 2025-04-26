@@ -163,11 +163,11 @@ export class OnChainDbService {
 		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewardsByIndex(network);
 		const defaultStats: IBountyStats = {
 			activeBounties: 0,
-			availableBountyPool: BN_ZERO,
+			availableBountyPool: '',
 			peopleEarned: 0,
-			totalBountyPool: BN_ZERO,
-			totalRewarded: BN_ZERO,
-			bountyAmount: 0
+			totalBountyPool: '',
+			totalRewarded: '',
+			bountyAmount: ''
 		};
 
 		const activeProposals = activeBountiesResponse?.data?.items || [];
@@ -189,7 +189,7 @@ export class OnChainDbService {
 			return {
 				...defaultStats,
 				activeBounties: Number(activeBounties),
-				totalBountyPool: total
+				totalBountyPool: total.toString()
 			};
 		}
 
@@ -203,11 +203,11 @@ export class OnChainDbService {
 
 		return {
 			activeBounties: Number(activeBounties),
-			availableBountyPool: totalBountyPool,
+			availableBountyPool: totalBountyPool.toString(),
 			peopleEarned: childBountiesResponse.data.totalCount,
-			totalBountyPool,
-			totalRewarded,
-			bountyAmount: Number(total.div(new BN(10).pow(new BN(10))).toString())
+			totalBountyPool: totalBountyPool.toString(),
+			totalRewarded: totalRewarded.toString(),
+			bountyAmount: total.div(new BN(10).pow(new BN(10))).toString()
 		};
 	}
 
