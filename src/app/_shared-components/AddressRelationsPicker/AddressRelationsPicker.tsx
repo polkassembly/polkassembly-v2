@@ -122,13 +122,17 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 								/>
 								<Label
 									htmlFor={address.address}
-									className='flex cursor-pointer items-center gap-2'
+									className='flex w-full cursor-pointer items-center gap-2'
 								>
 									<Address
 										address={address.address}
 										iconSize={25}
 										redirectToProfile={false}
 										disableTooltip
+									/>
+									<Balance
+										address={address.address}
+										classname='ml-auto'
 									/>
 								</Label>
 							</div>
@@ -137,7 +141,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 								address.pureProxies.map((pureProxyAddress) => (
 									<div
 										key={pureProxyAddress.address}
-										className='ml-6 flex items-center gap-2'
+										className='flex items-center gap-2 pl-6'
 									>
 										<RadioGroupItem
 											value={pureProxyAddress.address}
@@ -145,13 +149,17 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 										/>
 										<Label
 											htmlFor={pureProxyAddress.address}
-											className='flex cursor-pointer items-center gap-2'
+											className='flex w-full cursor-pointer items-center gap-2'
 										>
 											<Address
 												address={pureProxyAddress.address}
 												iconSize={25}
 												redirectToProfile={false}
 												disableTooltip
+											/>
+											<Balance
+												address={pureProxyAddress.address}
+												classname='ml-auto'
 											/>
 											<AccountTypeBadge accountType={EAccountType.PROXY} />
 										</Label>
