@@ -142,7 +142,7 @@ function AddressDropdown({
 						disabled={disabled}
 						className='normal-case'
 					>
-						<div className='flex items-center gap-2'>
+						<div className='flex w-full items-center gap-2'>
 							<RadioGroupItem
 								value={userPreferences?.selectedAccount?.address || ''}
 								id={`trigger-radio-${userPreferences?.selectedAccount?.address}`}
@@ -152,7 +152,7 @@ function AddressDropdown({
 							/>
 							<Label
 								htmlFor={`trigger-radio-${userPreferences?.selectedAccount?.address}`}
-								className='flex cursor-pointer items-center gap-2'
+								className='flex w-full cursor-pointer items-center gap-2'
 							>
 								<Address
 									address={userPreferences?.selectedAccount?.address || ''}
@@ -160,6 +160,7 @@ function AddressDropdown({
 									iconSize={25}
 									redirectToProfile={false}
 									disableTooltip
+									className='w-full'
 								/>
 							</Label>
 						</div>
@@ -168,14 +169,14 @@ function AddressDropdown({
 				<DropdownMenuContent className='max-h-[300px] overflow-y-auto border-0'>
 					{accounts.map((item) => (
 						<DropdownMenuItem key={item.address}>
-							<div className='flex items-center gap-2'>
+							<div className='flex w-full items-center gap-2'>
 								<RadioGroupItem
 									value={item.address}
 									id={`radio-${item.address}`}
 								/>
 								<Label
 									htmlFor={`radio-${item.address}`}
-									className='flex cursor-pointer items-center gap-2'
+									className='flex w-full cursor-pointer items-center gap-2'
 								>
 									<Address
 										address={item.address}
@@ -183,6 +184,7 @@ function AddressDropdown({
 										iconSize={25}
 										redirectToProfile={false}
 										disableTooltip
+										className='w-full'
 									/>
 								</Label>
 							</div>
