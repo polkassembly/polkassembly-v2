@@ -2,23 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IBountyStats, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { IBountyStats } from '@/_shared/types';
 import BountiesUserActivity from './BountiesUserActivity';
 import BountyStats from './BountyStats';
 import HotBounties from './HotBounties';
 import DashboardHeader from './DashboardHeader';
 
-function BountyDashboard({
-	tokenPrice,
-	bountiesStats,
-	hotBounties,
-	totalBountyPool
-}: {
-	tokenPrice?: number;
-	bountiesStats?: IBountyStats | null;
-	hotBounties?: IGenericListingResponse<IPostListing> | null;
-	totalBountyPool?: string;
-}) {
+function BountyDashboard({ tokenPrice, bountiesStats, totalBountyPool }: { tokenPrice?: number; bountiesStats?: IBountyStats | null; totalBountyPool?: string }) {
 	return (
 		<div>
 			<DashboardHeader />
@@ -29,12 +19,7 @@ function BountyDashboard({
 					totalBountyPool={totalBountyPool}
 				/>
 			)}
-			{hotBounties && (
-				<HotBounties
-					hotBounties={hotBounties}
-					tokenPrice={tokenPrice ?? 0}
-				/>
-			)}
+			<HotBounties tokenPrice={tokenPrice ?? 0} />
 			<BountiesUserActivity tokenPrice={tokenPrice ?? 0} />
 		</div>
 	);
