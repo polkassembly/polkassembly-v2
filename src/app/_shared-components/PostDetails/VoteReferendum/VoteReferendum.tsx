@@ -90,7 +90,7 @@ function VoteReferendum({ index }: { index: string }) {
 		<div className='flex flex-col gap-y-6'>
 			<SwitchWalletOrAddress
 				small
-				customAddressSelector={<AddressRelationsPicker />}
+				customAddressSelector={<AddressRelationsPicker withBalance />}
 			/>
 			<div>
 				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>

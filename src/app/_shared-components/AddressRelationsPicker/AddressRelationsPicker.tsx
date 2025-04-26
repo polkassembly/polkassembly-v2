@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsi
 import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 import { Label } from '../Label';
 import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
+import Balance from '../Balance';
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;
@@ -197,10 +198,11 @@ function AddressSwitchButton() {
 				<SwitchWalletOrAddress
 					small
 					withRadioSelect
+					withBalance
 				/>
 
 				{relationsForSelectedAddress ? (
-					<>
+					<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
 						<AddressRadioGroup
 							accountType={EAccountType.MULTISIG}
 							addresses={relationsForSelectedAddress?.multisigAddresses || []}
@@ -212,7 +214,7 @@ function AddressSwitchButton() {
 							addresses={relationsForSelectedAddress?.proxyAddresses || []}
 							closeDialog={closeDialog}
 						/>
-					</>
+					</div>
 				) : (
 					<>
 						<Skeleton className='my-1 h-6 w-full' />
@@ -234,7 +236,7 @@ function AddressSwitchButton() {
 	);
 }
 
-export default function AddressRelationsPicker() {
+export default function AddressRelationsPicker({ withBalance = false }: { withBalance?: boolean }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 	const [accountsLoading, setAccountsLoading] = useState(true);
@@ -274,26 +276,35 @@ export default function AddressRelationsPicker() {
 	const walletAddressName = userPreferences?.selectedAccount?.name;
 
 	return (
-		<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
-			{accountsLoading || !selectedAddress ? (
-				<Skeleton className='h-6 w-32' />
-			) : (
-				<div className='flex items-center justify-between gap-2'>
-					<Address
-						address={selectedAddress}
-						walletAddressName={walletAddressName}
-						iconSize={25}
-						redirectToProfile={false}
-						disableTooltip
-						className='w-full px-2'
-					/>
-					<span>
-						<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
-						{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
-					</span>
-				</div>
+		<div className='flex flex-col gap-1'>
+			{withBalance && (
+				<Balance
+					address={userPreferences?.selectedAccount?.address || ''}
+					classname='ml-auto'
+				/>
 			)}
-			<AddressSwitchButton />
+
+			<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
+				{accountsLoading || !selectedAddress ? (
+					<Skeleton className='h-6 w-32' />
+				) : (
+					<div className='flex items-center justify-between gap-2'>
+						<Address
+							address={selectedAddress}
+							walletAddressName={walletAddressName}
+							iconSize={25}
+							redirectToProfile={false}
+							disableTooltip
+							className='w-full px-2'
+						/>
+						<span>
+							<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
+							{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
+						</span>
+					</div>
+				)}
+				<AddressSwitchButton />
+			</div>
 		</div>
 	);
 }
