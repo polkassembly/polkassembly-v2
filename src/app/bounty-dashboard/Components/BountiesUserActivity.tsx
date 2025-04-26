@@ -101,7 +101,7 @@ function BountiesUserActivity({ tokenPrice }: { tokenPrice: number }) {
 								{userActivities &&
 									userActivities.map((activity) => (
 										<CarouselItem
-											key={`${activity.address}-${Math.random()}`}
+											key={`${activity.address}-${activity.amount}-${activity.created_at.toString()}`}
 											className='!h-[50px] !pt-0'
 											style={{
 												marginTop: '0',
