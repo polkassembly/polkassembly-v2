@@ -79,19 +79,14 @@
 		"hidePassword": "Ocultar contraseña",
 		"showPassword": "Mostrar contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
-		"switch": "Cambiar",
-		"switchAddress": "Cambiar dirección",
-		"account": "Cuenta",
-		"multisig": "Multisig",
-		"multisigAddress": "Dirección Multisig",
-		"proxy": "Proxy",
-		"proxied": "Proxied",
-		"pureProxy": "Proxy Puro",
-		"proxyaddresses": "Direcciones Proxy",
-		"proxiedaccounts": "Cuentas Proxied",
-		"confirm": "Confirmar",
-		"cancel": "Cancelar"
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
+	},
+	"AddressRelationsPicker": {
+		"Switch": "Cambiar",
+		"switchWallet": "Cambiar billetera",
+		"noData": "No",
+		"found": "encontrado",
+		"confirm": "Confirmar"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
