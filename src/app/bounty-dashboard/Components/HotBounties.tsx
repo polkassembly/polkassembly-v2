@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EProposalStatus, EProposalType } from '@/_shared/types';
 import { ArrowUpRight } from 'lucide-react';
 import BountyCard from '@assets/bounties/bounty-card.svg';
 import Image from 'next/image';
@@ -12,42 +12,77 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import ChildBounties from '@assets/bounties/child_bounties.svg';
 import { FaAngleRight } from 'react-icons/fa6';
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@ui/Carousel';
-import { useCallback, useEffect, useState } from 'react';
-import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@ui/Carousel';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import Link from 'next/link';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import styles from './Bounty.module.scss';
 
-export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: IGenericListingResponse<IPostListing>; tokenPrice: number }) {
-	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-	const [current, setCurrent] = useState(0);
+function LoadingState() {
+	return (
+		<div className='my-5 grid w-full grid-cols-3 gap-4'>
+			<div className='col-span-1 flex h-64 flex-col gap-y-2 rounded-xl bg-bg_modal p-6'>
+				<Skeleton className='mb-4 h-10 w-full' />
+				<Skeleton className='h-8 w-full' />
+				<Skeleton className='h-8 w-full' />
+			</div>
+			<div className='col-span-1 flex h-64 flex-col gap-y-2 rounded-xl bg-bg_modal p-6'>
+				<Skeleton className='mb-4 h-10 w-full' />
+				<Skeleton className='h-8 w-full' />
+				<Skeleton className='h-8 w-full' />
+			</div>
+			<div className='col-span-1 flex h-64 flex-col gap-y-2 rounded-xl bg-bg_modal p-6'>
+				<Skeleton className='mb-4 h-10 w-full' />
+				<Skeleton className='h-8 w-full' />
+				<Skeleton className='h-8 w-full' />
+			</div>
+		</div>
+	);
+}
+
+export default function HotBounties({ tokenPrice }: { tokenPrice: number }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Bounty');
 
-	const onSelect = useCallback(() => {
-		if (!carouselApi) return;
-		setCurrent(carouselApi.selectedScrollSnap());
-	}, [carouselApi]);
+	const fetchHotBounties = async () => {
+		const { data: hotBounties, error } = await NextApiClientService.fetchListingData({
+			proposalType: EProposalType.BOUNTY,
+			page: 1,
+			statuses: [EProposalStatus.Active, EProposalStatus.Extended]
+		});
 
-	useEffect(() => {
-		if (!carouselApi) {
-			return () => {};
+		if (error || !hotBounties) {
+			throw new ClientError(error?.message ?? 'Failed to fetch hot bounties');
 		}
-		carouselApi.on('select', onSelect);
-		return () => {
-			carouselApi.off('select', onSelect);
-		};
-	}, [carouselApi, onSelect]);
+
+		return hotBounties;
+	};
+
+	const { data: hotBounties, isFetching } = useQuery({
+		queryKey: ['hotBounties'],
+		queryFn: fetchHotBounties,
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
+	});
+
+	if (isFetching) {
+		return <LoadingState />;
+	}
 
 	return (
 		<div>
 			<div className='my-5 flex items-center justify-between'>
 				<h3 className='font-pixelify text-3xl font-bold text-btn_secondary_text'>
-					{t('hotBounties')} <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties.totalCount})</span>
+					{t('hotBounties')} <span className={`text-2xl font-medium ${spaceGroteskFont.className}`}>({hotBounties?.totalCount})</span>
 				</h3>
 				<Link
 					href='/bounties'
@@ -63,10 +98,9 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 						loop: false
 					}}
 					className='w-full'
-					setApi={setCarouselApi}
 				>
 					<CarouselContent className='-ml-6'>
-						{hotBounties.items.map((bounty) => (
+						{hotBounties?.items.map((bounty) => (
 							<CarouselItem
 								key={bounty.index}
 								className='pl-6 md:basis-1/2 lg:basis-1/3'
@@ -140,30 +174,14 @@ export default function HotBounties({ hotBounties, tokenPrice }: { hotBounties: 
 						))}
 					</CarouselContent>
 
-					{current > 0 && (
-						<button
-							type='button'
-							className={styles.carouselLeftArrow}
-							onClick={() => carouselApi?.scrollPrev()}
-						>
-							<SlArrowLeft
-								size={24}
-								className='font-bold text-bg_modal'
-							/>
-						</button>
-					)}
-					{current < hotBounties.items.length - 3 && hotBounties.items.length > 3 && (
-						<button
-							type='button'
-							className={styles.carouselRightArrow}
-							onClick={() => carouselApi?.scrollNext()}
-						>
-							<SlArrowRight
-								size={24}
-								className='font-bold text-bg_modal'
-							/>
-						</button>
-					)}
+					<CarouselPrevious
+						iconClassName='h-6 w-6 text-white'
+						className='-left-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 text-white shadow-lg hover:bg-arrow_bg_color'
+					/>
+					<CarouselNext
+						iconClassName='h-6 w-6 text-white'
+						className='-right-6 top-1/2 -translate-y-1/2 rounded-full bg-arrow_bg_color p-4 text-white shadow-lg hover:bg-arrow_bg_color'
+					/>
 				</Carousel>
 			</div>
 		</div>
