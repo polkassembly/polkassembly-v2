@@ -962,7 +962,7 @@ export interface IBountyProposal {
 	index: number;
 	payee: string;
 	reward: string;
-	statusHistory: Array<{ status: EProposalStatus; timestamp: string }>;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: Date }>;
 }
 
 // generic types are for insignificant tokens if we decide to add later
