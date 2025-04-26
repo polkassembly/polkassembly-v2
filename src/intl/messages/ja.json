@@ -2,6 +2,15 @@
 	"HomePage": {
 		"title": "ホームへようこそ"
 	},
+	"TreasuryStats": {
+		"tooltip": "ブロック生成報酬、取引手数料、罰金、ステーキング効率などの一部から収集された資金。",
+		"treasury": "財務",
+		"price": "価格",
+		"total": "合計",
+		"treasuryDistribution": "財務分配",
+		"details": "詳細"
+	},
+
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
 		"switchToOverview": "概要に切り替え",

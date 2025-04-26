@@ -2,6 +2,15 @@
 	"HomePage": {
 		"title": "Bienvenido a Inicio"
 	},
+	"TreasuryStats": {
+		"tooltip": "Fondos recopilados a través de una parte de las recompensas de producción de bloques, tarifas de transacción, sanciones, eficiencia de staking, etc.",
+		"treasury": "Tesorería",
+		"price": "Precio",
+		"total": "Total",
+		"treasuryDistribution": "Distribución de Tesorería",
+		"details": "Detalles"
+	},
+
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
 		"switchToOverview": "Cambiar a Resumen",

@@ -2,6 +2,15 @@
 	"HomePage": {
 		"title": "Willkommen zu Hause"
 	},
+	"TreasuryStats": {
+		"tooltip": "Geld gesammelt durch einen Teil der Blockproduktionsbelohnungen, Transaktionsgebühren, Strafen, Staking-Effizienz, etc.",
+		"treasury": "Finanzverwaltung",
+		"price": "Preis",
+		"total": "Gesamt",
+		"treasuryDistribution": "Finanzverwaltungsdistribution",
+		"details": "Details"
+	},
+
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
 		"switchToOverview": "Zur Übersicht wechseln",

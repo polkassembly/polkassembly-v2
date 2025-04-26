@@ -2,6 +2,15 @@
 	"HomePage": {
 		"title": "欢迎来到主页"
 	},
+	"TreasuryStats": {
+		"tooltip": "通过部分区块生产奖励、交易费用、罚款、staking效率等收集的资金。",
+		"treasury": "国库",
+		"price": "价格",
+		"total": "总计",
+		"treasuryDistribution": "国库分配",
+		"details": "详情"
+	},
+
 	"ActivityFeed": {
 		"title": "动态信息",
 		"switchToOverview": "切换到概览",
