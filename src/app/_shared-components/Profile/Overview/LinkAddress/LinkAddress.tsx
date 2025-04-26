@@ -4,22 +4,21 @@
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { EWallet } from '@/_shared/types';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import AddressDropdown from '@/app/_shared-components/AddressDropdown/AddressDropdown';
 import { Button } from '@/app/_shared-components/Button';
 import { Separator } from '@/app/_shared-components/Separator';
-import WalletButtons from '@/app/_shared-components/WalletsUI/WalletButtons/WalletButtons';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import classes from './LinkAddress.module.scss';
 
 function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
 	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
 	const [selectedWallet, setSelectedWallet] = useState<EWallet | null>(userPreferences?.wallet || EWallet.POLKADOT);
-	const [selectedAccount, setSelectedAccount] = useState<InjectedAccount | null>(userPreferences?.address || null);
+	const [selectedAccount, setSelectedAccount] = useState<InjectedAccount | null>(userPreferences?.selectedAccount || null);
 	const [loading, setLoading] = useState(false);
 	const walletService = useWalletService();
 
@@ -58,11 +57,11 @@ function LinkAddress({ onSuccess }: { onSuccess?: (address: string) => void }) {
 
 	return (
 		<div className={classes.wrapper}>
-			<WalletButtons
+			<SwitchWalletOrAddress
 				small
 				onWalletChange={(wallet) => setSelectedWallet(wallet)}
+				onAddressChange={(account) => setSelectedAccount(account)}
 			/>
-			<AddressDropdown onChange={(account) => setSelectedAccount(account)} />
 			<Separator />
 			<div className={classes.footer}>
 				<Button

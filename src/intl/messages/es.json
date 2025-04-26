@@ -30,6 +30,9 @@
 		"loading": "Cargando...",
 		"subscribe": "Suscribirse",
 		"unsubscribe": "Desuscribirse",
+		"please": "Por favor",
+		"login": "Iniciar sesión",
+		"toView": "para ver tus publicaciones suscritas",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",
@@ -76,7 +79,19 @@
 		"hidePassword": "Ocultar contraseña",
 		"showPassword": "Mostrar contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
+		"switch": "Cambiar",
+		"switchAddress": "Cambiar dirección",
+		"account": "Cuenta",
+		"multisig": "Multisig",
+		"multisigAddress": "Dirección Multisig",
+		"proxy": "Proxy",
+		"proxied": "Proxied",
+		"pureProxy": "Proxy Puro",
+		"proxyaddresses": "Direcciones Proxy",
+		"proxiedaccounts": "Cuentas Proxied",
+		"confirm": "Confirmar",
+		"cancel": "Cancelar"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",

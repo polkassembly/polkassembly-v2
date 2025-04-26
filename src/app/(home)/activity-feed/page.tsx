@@ -11,7 +11,6 @@ import { CookieService } from '@/_shared/_services/cookie_service';
 import { z } from 'zod';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
-import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import ActivityFeed from './Components/ActivityFeed';
 
 const zodParamsSchema = z.object({
@@ -22,10 +21,6 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 	const { tab } = zodParamsSchema.parse(await searchParams);
 
 	const user = await CookieService.getUserFromCookie();
-
-	if (!user?.id && tab === EActivityFeedTab.SUBSCRIBED) {
-		return redirectFromServer(`/login?nextUrl=/?tab=${tab}`);
-	}
 
 	const { data, error } =
 		tab === EActivityFeedTab.SUBSCRIBED && user?.id

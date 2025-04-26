@@ -5,9 +5,10 @@
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { getFormattedAddress } from '@/_shared/_utils/getFormattedAddress';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { snakeToPascalCase } from '@/_shared/_utils/snakeToPascalCase';
-import { ENetwork, EProposalStatus, EProposalType, IOnChainPostInfo } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, EProxyType, IAddressRelations, IMultisigAddress, IOnChainPostInfo, IProxyAddress } from '@/_shared/types';
 import { SUBSCAN_API_KEY } from '@/app/api/_api-constants/apiEnvVars';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { fetchSubscanData } from '@/app/api/_api-utils/fetchSubscanData';
@@ -83,6 +84,13 @@ export class SubscanOnChainService {
 		})
 	};
 
+	private static accountByAddressRequest = ({ network, address }: { network: ENetwork; address: string }) => ({
+		url: new URL(`https://${network}.api.subscan.io/api/v2/scan/search`),
+		body: {
+			key: address
+		}
+	});
+
 	static async GetOnChainPostInfo({
 		network,
 		indexOrHash,
@@ -102,7 +110,7 @@ export class SubscanOnChainService {
 			return null;
 		}
 
-		const data = await fetchSubscanData(new URL(mappedRequestObject.url), network, mappedRequestObject.body, 'POST');
+		const data = await fetchSubscanData({ url: new URL(mappedRequestObject.url), network, body: mappedRequestObject.body, method: 'POST' });
 
 		if (data?.message !== 'Success') {
 			return null;
@@ -124,5 +132,82 @@ export class SubscanOnChainService {
 					block: item.block
 				})) || undefined
 		} as IOnChainPostInfo;
+	}
+
+	static async GetAccountRelations({ address, network }: { address: string; network: ENetwork }): Promise<IAddressRelations> {
+		let addressRelationsResponse: IAddressRelations = {
+			address: getFormattedAddress(address),
+			multisigAddresses: [],
+			proxyAddresses: [],
+			proxiedAddresses: []
+		};
+
+		const addressRequest = this.accountByAddressRequest({ network, address: getFormattedAddress(address) });
+
+		const subscanResponse = await fetchSubscanData({ url: addressRequest.url, network, body: addressRequest.body, method: 'POST' });
+
+		if (!subscanResponse?.data?.account) {
+			return addressRelationsResponse;
+		}
+
+		// user has keys for these addresses
+		const proxyAddresses: Array<IProxyAddress> =
+			subscanResponse.data?.account?.proxy?.proxy_account?.map((proxy: { account_display: { address: string }; proxy_type: string }) => ({
+				address: getFormattedAddress(proxy.account_display.address),
+				proxyType: proxy.proxy_type as EProxyType
+			})) || [];
+
+		// user does not have keys for these addresses
+		const proxiedAddresses: Array<IProxyAddress> =
+			subscanResponse.data?.account?.proxy?.real_account?.map((proxy: { account_display: { address: string }; proxy_type: string }) => ({
+				address: getFormattedAddress(proxy.account_display.address),
+				proxyType: proxy.proxy_type as EProxyType
+			})) || [];
+
+		const multisigAddresses: Array<string> =
+			subscanResponse.data?.account?.multisig?.multi_account?.map((multisig: { address: string }) => getFormattedAddress(multisig.address)) || [];
+
+		// fetch for multisig details
+		// eslint-disable-next-line no-restricted-syntax
+		for (const multisig of multisigAddresses) {
+			const multisigRequest = this.accountByAddressRequest({ network, address: multisig });
+			// eslint-disable-next-line no-await-in-loop
+			const data = await fetchSubscanData({ url: multisigRequest.url, network, body: multisigRequest.body, method: 'POST' });
+
+			const multisigSignatories: Array<string> =
+				data.data?.account?.multisig?.multi_account_member?.map((member: { address: string }) => getFormattedAddress(member.address)) || [];
+
+			const pureProxies: Array<IProxyAddress> =
+				data.data?.account?.proxy?.real_account?.map((proxy: { account_display: { address: string }; proxy_type: string }) => ({
+					address: getFormattedAddress(proxy.account_display.address),
+					proxyType: proxy.proxy_type as EProxyType
+				})) || [];
+
+			const threshold = data.data?.account?.multisig?.threshold;
+
+			if (!ValidatorService.isValidNumber(threshold)) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, `No threshold found for multisig ${multisig}`);
+			}
+
+			const multisigData: IMultisigAddress = {
+				address: multisig,
+				pureProxies,
+				signatories: multisigSignatories,
+				threshold: Number(threshold)
+			};
+
+			addressRelationsResponse = {
+				...addressRelationsResponse,
+				multisigAddresses: [...addressRelationsResponse.multisigAddresses, multisigData]
+			};
+		}
+
+		addressRelationsResponse = {
+			...addressRelationsResponse,
+			proxiedAddresses,
+			proxyAddresses
+		};
+
+		return addressRelationsResponse;
 	}
 }

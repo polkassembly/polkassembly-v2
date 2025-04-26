@@ -92,13 +92,13 @@ function BalanceInput({
 
 	useEffect(() => {
 		const getBalance = async () => {
-			if (!showUserBalance || !apiService || !userPreferences?.address?.address) return;
+			if (!showUserBalance || !apiService || !userPreferences?.selectedAccount?.address) return;
 
-			const { totalBalance } = await apiService.getUserBalances({ address: userPreferences.address.address });
+			const { totalBalance } = await apiService.getUserBalances({ address: userPreferences.selectedAccount.address });
 			setUserBalance(totalBalance.toString());
 		};
 		getBalance();
-	}, [apiService, userPreferences?.address?.address, showUserBalance]);
+	}, [apiService, userPreferences?.selectedAccount?.address, showUserBalance]);
 
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {

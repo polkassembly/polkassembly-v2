@@ -30,6 +30,9 @@
 		"loading": "読み込み中...",
 		"subscribe": "購読",
 		"unsubscribe": "購読解除",
+		"please": "お願い",
+		"login": "ログイン",
+		"toView": "購読している投稿を表示するには",
 		"Navbar": {
 			"All": "すべて",
 			"Root": "ルート",
@@ -76,7 +79,19 @@
 		"hidePassword": "パスワードを隠す",
 		"showPassword": "パスワードを表示",
 		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。"
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。",
+		"switch": "切り替え",
+		"switchAddress": "アドレスを切り替え",
+		"account": "アカウント",
+		"multisig": "マルチシグ",
+		"multisigAddress": "マルチシグアドレス",
+		"proxy": "プロキシ",
+		"proxied": "プロキシされた",
+		"pureProxy": "純粋なプロキシ",
+		"proxyaddresses": "プロキシアドレス",
+		"proxiedaccounts": "プロキシアカウント",
+		"confirm": "確認",
+		"cancel": "キャンセル"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",

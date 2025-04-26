@@ -37,14 +37,14 @@ function ManualExtrinsic() {
 	const notePreimageTx = useMemo(() => apiService?.getNotePreimageTx({ extrinsicFn }), [apiService, extrinsicFn]);
 
 	const notePreimage = useCallback(async () => {
-		if (!userPreferences.address?.address || !extrinsicFn) {
+		if (!userPreferences.selectedAccount?.address || !extrinsicFn) {
 			return;
 		}
 
 		setIsLoading(true);
 
 		await apiService?.notePreimage({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			extrinsicFn,
 			onSuccess: () => {
 				setIsLoading(false);
@@ -64,7 +64,7 @@ function ManualExtrinsic() {
 			}
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [apiService, extrinsicFn, userPreferences.address?.address]);
+	}, [apiService, extrinsicFn, userPreferences.selectedAccount?.address]);
 
 	return (
 		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>

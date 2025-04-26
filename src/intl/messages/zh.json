@@ -30,6 +30,9 @@
 		"loading": "加载中...",
 		"subscribe": "订阅",
 		"unsubscribe": "取消订阅",
+		"please": "请",
+		"login": "登录",
+		"toView": "查看您订阅的帖子",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",
@@ -76,7 +79,19 @@
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
-		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
+		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。",
+		"switch": "切换",
+		"switchAddress": "切换地址",
+		"account": "账户",
+		"multisig": "多重签名",
+		"multisigAddress": "多重签名地址",
+		"proxy": "代理",
+		"proxied": "代理的",
+		"pureProxy": "纯代理",
+		"proxyaddresses": "代理地址",
+		"proxiedaccounts": "代理账户",
+		"confirm": "确认",
+		"cancel": "取消"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",

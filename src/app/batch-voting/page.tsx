@@ -15,7 +15,7 @@ async function BatchVotingPage() {
 	}
 
 	return (
-		<div className='h-full w-full bg-page_background px-4 py-6 md:px-8 lg:px-12'>
+		<div className='mx-auto h-full w-full max-w-7xl px-4 py-6 md:px-8 lg:px-16'>
 			<BatchVoting proposals={activityFeedData.items || []} />
 		</div>
 	);

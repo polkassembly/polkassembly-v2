@@ -10,15 +10,7 @@ import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
 
-function Overview({
-	trackDetails
-}: {
-	trackDetails: {
-		all: IGenericListingResponse<IPostListing> | null;
-		discussion: IGenericListingResponse<IPostListing> | null;
-		tracks: { trackName: string; data: IGenericListingResponse<IPostListing> | null }[];
-	};
-}) {
+function Overview({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> }) {
 	return (
 		<div className={styles.overview_container}>
 			<OverviewHeading />
@@ -37,7 +29,7 @@ function Overview({
 						</div>
 					}
 				>
-					<LatestActivity trackDetails={trackDetails} />
+					<LatestActivity allTracksData={allTracksData} />
 				</Suspense>
 			</div>
 		</div>

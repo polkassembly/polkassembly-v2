@@ -5,7 +5,7 @@
 import { useAtom } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useCallback, useMemo } from 'react';
-import { IAccessTokenPayload, IUserClientData } from '@/_shared/types';
+import { IAccessTokenPayload, IAddressRelations, IUserClientData } from '@/_shared/types';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
@@ -47,7 +47,18 @@ export const useUser = () => {
 		[setUser]
 	);
 
+	const setUserAddressRelations = useCallback(
+		(addressRelations: IAddressRelations[]) => {
+			if (!user) {
+				return;
+			}
+
+			setUser({ ...user, addressRelations });
+		},
+		[setUser, user]
+	);
+
 	return useMemo(() => {
-		return { user, setUser: setUserWithPublicData };
-	}, [user, setUserWithPublicData]);
+		return { user, setUser: setUserWithPublicData, setUserAddressRelations };
+	}, [user, setUserWithPublicData, setUserAddressRelations]);
 };

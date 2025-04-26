@@ -8,11 +8,11 @@ import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_LISTING_LIMIT, STALE_TIME } from '@/_shared/_constants/listingLimit';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { useTranslations } from 'next-intl';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 
@@ -35,10 +35,6 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	const { user } = useUser();
 
 	const userId = user?.id;
-
-	if (!userId) {
-		throw new ClientError('User not found');
-	}
 
 	const handleUnsubscribe = (postId: string | number) => {
 		setLocalPosts((prevPosts) =>
@@ -63,6 +59,9 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	};
 
 	const getSubscribedActivityFeed = async ({ pageParam = 1 }: { pageParam: number }) => {
+		if (!userId) {
+			return null;
+		}
 		const { data, error } = await NextApiClientService.getSubscribedActivityFeed({ page: pageParam, limit: DEFAULT_LISTING_LIMIT, userId });
 		if (!data) {
 			return null;
@@ -133,6 +132,21 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 				<div className='flex h-full items-center justify-center'>
 					<LoadingSpinner />
 				</div>
+			</div>
+		);
+	}
+
+	if (!userId) {
+		return (
+			<div className='flex items-center justify-center gap-x-1 rounded-2xl bg-bg_modal p-4 text-text_primary'>
+				{t('ActivityFeed.please')}{' '}
+				<Link
+					href='/login'
+					className='text-text_pink'
+				>
+					{t('ActivityFeed.login')}
+				</Link>{' '}
+				{t('ActivityFeed.toView')}
 			</div>
 		);
 	}

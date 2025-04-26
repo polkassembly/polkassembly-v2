@@ -1,18 +1,23 @@
-.container{
-    @apply relative flex flex-col gap-4;
+.container {
+	@apply relative flex flex-col gap-4;
 }
-.form{
-    @apply flex flex-col gap-4;
+
+.form {
+	@apply flex flex-col gap-4;
 }
-.radioGroup{
-    @apply flex gap-2;
+
+.radioGroup {
+	@apply flex flex-row gap-2;
 }
-.radioGroupItem{
-    @apply text-allowed_commentor_text text-sm;
+
+.radioGroupItem {
+	@apply text-sm text-allowed_commentor_text;
 }
+
 .titleInput {
- @apply text-input_text;
+	@apply text-input_text;
 }
-.editor{
-    @apply text-sm;
+
+.editor {
+	@apply text-sm;
 }

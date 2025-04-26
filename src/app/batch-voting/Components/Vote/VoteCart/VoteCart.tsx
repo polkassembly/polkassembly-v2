@@ -42,11 +42,11 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	};
 
 	const confirmBatchVoting = async () => {
-		if (!userPreferences.address?.address || voteCart.length === 0) return;
+		if (!userPreferences.selectedAccount?.address || voteCart.length === 0) return;
 
 		setLoading(true);
 		await apiService?.batchVoteReferendum({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			voteCartItems: voteCart,
 			onSuccess: () => {
 				setLoading(false);

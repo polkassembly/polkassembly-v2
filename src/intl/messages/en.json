@@ -3,6 +3,9 @@
 		"title": "Welcome to Home"
 	},
 	"ActivityFeed": {
+		"please": "Please",
+		"login": "Login",
+		"toView": "to view your subscribed posts",
 		"title": "Activity Feed",
 		"switchToOverview": "Switch to Overview",
 		"ExploreTab": "Explore",
@@ -76,7 +79,19 @@
 		"hidePassword": "Hide Password",
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
+		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
+		"switch": "Switch",
+		"switchAddress": "Switch Address",
+		"account": "Account",
+		"multisig": "Multisig",
+		"multisigAddress": "Multisig Address",
+		"proxy": "Proxy",
+		"proxied": "Proxied",
+		"pureProxy": "Pure Proxy",
+		"proxyaddresses": "Proxy addresses",
+		"proxiedaccounts": "Proxied accounts",
+		"confirm": "Confirm",
+		"cancel": "Cancel"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",
