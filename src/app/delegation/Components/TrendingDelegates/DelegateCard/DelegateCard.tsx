@@ -52,8 +52,8 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 		<div className={styles.delegationCardStats}>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='text-sm text-btn_secondary_text'>
-						<span className='text-2xl font-semibold'>
+					<div className='text-base text-btn_secondary_text'>
+						<span className='text-sm font-semibold sm:text-2xl'>
 							{' '}
 							{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>{' '}
@@ -63,14 +63,14 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 			</div>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='text-2xl font-semibold'>{delegate?.last30DaysVotedProposalsCount}</div>
+					<div className='text-base font-semibold sm:text-2xl'>{delegate?.last30DaysVotedProposalsCount}</div>
 					<span className={styles.delegationCardStatsItemText}>{t('votedProposals')}</span>
 					<span className={styles.delegationCardStatsItemTextPast30Days}>({t('past30Days')})</span>
 				</div>
 			</div>
 			<div className='p-5 text-center'>
 				<div>
-					<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
+					<div className='text-base font-semibold sm:text-2xl'>{delegate?.receivedDelegationsCount}</div>
 					<span className={styles.delegationCardStatsItemText}>{t('receivedDelegations')}</span>
 				</div>
 			</div>
@@ -90,7 +90,7 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 			<div className={`flex gap-2 rounded-t-md border py-1 ${getPlatformStyles(delegate.sources)}`}>
 				<PlatformLogos platforms={delegate.sources} />
 			</div>
-			<div className='p-4'>
+			<div className='p-3 sm:p-4'>
 				<div className={styles.delegationDialog}>
 					<Address address={delegate.address} />
 					{user?.id ? (
@@ -117,7 +117,7 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 					) : (
 						<Link
 							href='/login'
-							className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
+							className='flex items-center gap-x-1 text-xs font-medium text-text_pink sm:gap-x-2 sm:text-sm'
 						>
 							<IoPersonAdd />
 							<span>{t('delegate')}</span>

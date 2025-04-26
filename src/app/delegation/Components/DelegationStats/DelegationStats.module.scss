@@ -3,7 +3,7 @@
 }
 
 .topRow {
-	@apply grid grid-cols-3 items-center gap-1.5 border-b border-border_grey pb-4 md:contents;
+	@apply grid grid-cols-3 gap-1.5 border-b border-border_grey pb-4 sm:items-center md:contents;
 }
 
 .bottomRow {

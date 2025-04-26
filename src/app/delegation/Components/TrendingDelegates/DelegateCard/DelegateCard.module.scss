@@ -27,7 +27,7 @@
 }
 
 .delegationDialog {
-	@apply flex items-center justify-between gap-2 whitespace-nowrap;
+	@apply flex flex-wrap items-center justify-between gap-2 sm:whitespace-nowrap;
 }
 
 .delegationDialogButton {
@@ -39,7 +39,7 @@
 }
 
 .delegationCardStats {
-	@apply mt-auto grid grid-cols-3 items-center border-t border-border_grey;
+	@apply mt-auto grid grid-cols-3 items-start border-t border-border_grey sm:items-center;
 }
 
 .delegationCardStatsItem {
