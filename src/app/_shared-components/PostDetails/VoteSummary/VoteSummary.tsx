@@ -189,36 +189,41 @@ function VoteSummary({
 								segmentsStyle={{ transition: 'stroke .3s' }}
 							/>
 							<div className='absolute inset-0'>
-								{progress.approvalThreshold > 0 && !isNaN(progress.approvalThreshold) && (
-									<div className='absolute left-1/2 top-1/2 h-0 w-0'>
-										<div
-											className='absolute mt-[38px] h-[2px] w-[15px] origin-left bg-wallet_btn_text'
-											style={{
-												transform: `
-													rotate(${-180 + (180 * progress.approvalThreshold) / 100}deg)
-													translateX(${67.5 + 7.5}px)
-												`
-											}}
-										/>
-										<div
-											className='absolute whitespace-nowrap text-xs font-medium'
-											style={{
-												position: 'absolute',
-												left: '50%',
-												top: '50%',
-												transform: `
-													rotate(${-180 + (180 * progress.approvalThreshold) / 100}deg)
-													translateX(${67.5 + 7.5}px)
-													translateY(20px)
-													rotate(${-(-180 + (180 * progress.approvalThreshold) / 100)}deg)
-													translate(-50%, -100%)
-												`
-											}}
-										>
-											{progress.approvalThreshold.toFixed(1)}%
-										</div>
-									</div>
-								)}
+								{(() => {
+									const centerX = 75;
+									const centerY = 110;
+									const arcRadius = 65;
+									const labelRadius = arcRadius + 18;
+									const angle = -180 + (180 * progress.approvalThreshold) / 100;
+									const radians = (angle * Math.PI) / 180;
+
+									const labelX = centerX + labelRadius * Math.cos(radians);
+									const labelY = centerY + labelRadius * Math.sin(radians);
+
+									return (
+										<>
+											<div
+												className='absolute h-[2px] w-[15px] bg-wallet_btn_text'
+												style={{
+													left: `${centerX}px`,
+													top: `${centerY}px`,
+													transform: `rotate(${angle}deg) translateX(${arcRadius}px)`,
+													transformOrigin: 'left center'
+												}}
+											/>
+											<div
+												className='absolute whitespace-nowrap text-xs font-medium'
+												style={{
+													left: `${labelX}px`,
+													top: `${labelY}px`,
+													transform: 'translate(-50%, -100%)'
+												}}
+											>
+												{progress.approvalThreshold.toFixed(1)}%
+											</div>
+										</>
+									);
+								})()}
 							</div>
 						</div>
 						<div className={classes.voteSummaryPieChartAyeNay}>
