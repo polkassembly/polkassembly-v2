@@ -69,6 +69,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });
 	post = { ...post, reactions };
 
+	// fetch and add content summary to post
+	const contentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
+	if (contentSummary) {
+		post = { ...post, contentSummary };
+	}
+
 	// fetch and add user subscription to post
 
 	if (isUserAuthenticated && userId) {

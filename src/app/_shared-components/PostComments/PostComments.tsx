@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType } from '@/_shared/types';
+import { EProposalType, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +14,7 @@ import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
-function PostComments({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+function PostComments({ proposalType, index, contentSummary }: { proposalType: EProposalType; index: string; contentSummary?: IContentSummary }) {
 	const t = useTranslations();
 
 	const fetchComments = async () => {
@@ -25,6 +25,7 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 		}
 		return data;
 	};
+
 	const { data, isFetching } = useQuery({
 		queryKey: ['comments', proposalType, index],
 		queryFn: () => fetchComments(),
@@ -38,7 +39,7 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 	return (
 		<div>
 			<p className={classes.title}>
-				{t('PostDetails.comments')} <span className='text-base font-normal'>({data?.length})</span>
+				{t('PostDetails.comments')} <span className='text-base font-normal'>{data ? `(${data?.length})` : ''}</span>
 			</p>
 
 			<div className={classes.summaryComponent}>
@@ -46,11 +47,16 @@ function PostComments({ proposalType, index }: { proposalType: EProposalType; in
 					indexOrHash={index}
 					proposalType={proposalType}
 					summaryType='allComments'
+					initialData={contentSummary}
 				/>
 			</div>
 
 			{isFetching ? (
-				<Skeleton className='h-4' />
+				<div className='flex flex-col gap-2 px-8'>
+					<Skeleton className='h-8' />
+					<Skeleton className='h-8' />
+					<Skeleton className='h-8' />
+				</div>
 			) : (
 				<Comments
 					proposalType={proposalType}

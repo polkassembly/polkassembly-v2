@@ -64,7 +64,7 @@ export class AIService {
 		- Format the response in markdown and maintain objectivity in the analysis.
     `,
 		CONTENT_SPAM_CHECK: `
-    You are a helpful assistant that evaluates Polkadot governance content for spam.
+    You are a helpful assistant that evaluates Polkadot governance content for spam and scam.
     Return only 'true' if the content matches any spam criteria, or 'false' if it's legitimate content.
 
     Check for:
@@ -413,10 +413,15 @@ export class AIService {
 			}
 		});
 
-		const isSpam = await this.getContentSpamCheck({
-			mdContent: offChainPostData.content,
-			title: offChainPostData.title
-		});
+		// only check for spam if post is off-chain
+		let isSpam = null;
+
+		if (!ValidatorService.isValidOnChainProposalType(proposalType)) {
+			isSpam = await this.getContentSpamCheck({
+				mdContent: offChainPostData.content,
+				title: offChainPostData.title
+			});
+		}
 
 		const crossValidationResult = onChainPostInfo
 			? await this.validatePostContent({

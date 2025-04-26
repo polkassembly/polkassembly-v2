@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences } from '@/_shared/types';
+import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
 import { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -21,11 +21,12 @@ import { WalletClientService } from '../_client-services/wallet_service';
 import { walletAtom } from '../_atoms/wallet/walletAtom';
 import { assethubApiAtom } from '../_atoms/polkadotJsApi/assethubApiAtom';
 import { AssethubApiService } from '../_client-services/assethub_api_service';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
 
-	const { user, setUser } = useUser();
+	const { user, setUser, setUserAddressRelations } = useUser();
 	const { setUserPreferences } = useUserPreferences();
 
 	const polkadotApi = useAtomValue(polkadotApiAtom);
@@ -77,6 +78,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		}
 	};
 
+	// restablish connections
 	useEffect(() => {
 		document.addEventListener('visibilitychange', restablishConnections);
 
@@ -191,7 +193,11 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			...(accessTokenPayload?.loginAddress
 				? {
 						address: {
-							address: accessTokenPayload.loginAddress
+							address: accessTokenPayload.loginAddress,
+							accountType: EAccountType.REGULAR,
+							name: '',
+							type: undefined,
+							wallet: accessTokenPayload?.loginWallet
 						}
 					}
 				: {}),
@@ -208,6 +214,33 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		}
 
 		setUser(userData);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userData]);
+
+	// set address relations
+	useEffect(() => {
+		const fetchAddressRelations = async () => {
+			const userAddresses = userData?.addresses;
+			if (!userAddresses?.length) return;
+
+			const addressRelations: IAddressRelations[] = [];
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const address of userAddresses) {
+				// eslint-disable-next-line no-continue
+				if (!address) continue;
+
+				// eslint-disable-next-line no-await-in-loop
+				const { data, error } = await NextApiClientService.fetchAddressRelations(address);
+				if (!error && data) {
+					addressRelations.push(data);
+				}
+			}
+
+			setUserAddressRelations(addressRelations);
+		};
+
+		fetchAddressRelations();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
 

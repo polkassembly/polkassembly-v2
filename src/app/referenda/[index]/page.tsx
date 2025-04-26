@@ -7,7 +7,28 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React, { Suspense } from 'react';
 import { headers } from 'next/headers';
-import PollForProposal from './PollForProposal';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import PollForProposal from '@/app/_shared-components/PollForProposal';
+
+export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
+	const { index } = await params;
+	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: index });
+
+	// Default description and title
+	let { description, title } = OPENGRAPH_METADATA;
+
+	// Use post title in description if available
+	if (data) {
+		title = `Polkassembly - Referendum #${index}`;
+		description = `Referendum #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+	}
+
+	return {
+		title,
+		description
+	};
+}
 
 async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {
 	const { index } = await params;
@@ -25,6 +46,7 @@ async function Referenda({ params, searchParams }: { params: Promise<{ index: st
 				<PollForProposal
 					index={index}
 					referer={referer}
+					proposalType={EProposalType.REFERENDUM_V2}
 				/>
 			</Suspense>
 		);
@@ -33,7 +55,7 @@ async function Referenda({ params, searchParams }: { params: Promise<{ index: st
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
 	return (
-		<div className='h-full w-full bg-page_background'>
+		<div className='h-full w-full'>
 			<PostDetails
 				index={index}
 				postData={data}

@@ -6,6 +6,8 @@ import { SUBSCAN_API_KEY } from '@/app/api/_api-constants/apiEnvVars';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { deepParseJson } from 'deep-parse-json';
 
+// TODO: add a feature flag
+
 if (!SUBSCAN_API_KEY) {
 	throw new Error('SUBSCAN_API_KEY env variable is not set');
 }
@@ -16,7 +18,7 @@ const SUBSCAN_API_HEADERS = {
 	'X-API-Key': SUBSCAN_API_KEY
 };
 
-export const fetchSubscanData = async (url: string | URL, network: string, body?: Record<string, unknown>, method?: 'POST' | 'GET') => {
+export const fetchSubscanData = async ({ url, network, body, method }: { url: string | URL; network: string; body?: Record<string, unknown>; method?: 'POST' | 'GET' }) => {
 	try {
 		const redisData = await RedisService.GetSubscanData({ network, url: url.toString() });
 

@@ -1,0 +1,19 @@
+.activityFeedContainer {
+	@apply flex w-full max-w-full flex-wrap justify-between gap-2 overflow-x-hidden xl:items-center;
+}
+
+.activityFeedTitle {
+	@apply text-xl font-semibold leading-9 text-navbar_title lg:text-2xl;
+}
+
+.activityFeedToggleButton {
+	@apply flex flex-row flex-wrap items-center gap-4;
+}
+
+.activityFeedTabs {
+	@apply col-span-12 w-full max-w-full overflow-x-hidden xl:col-span-9;
+}
+
+.activityFeedTabsContent {
+	@apply w-full max-w-full overflow-x-hidden xl:max-w-5xl xl:flex-grow 2xl:max-w-full;
+}

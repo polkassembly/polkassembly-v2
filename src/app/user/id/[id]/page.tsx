@@ -12,7 +12,7 @@ async function UserProfile({ params }: { params: Promise<{ id: string }> }) {
 		return <div>User not found</div>;
 	}
 	return (
-		<div className='h-full w-full bg-page_background'>
+		<div className='mx-auto h-full w-full max-w-7xl'>
 			<Profile profileData={data} />
 		</div>
 	);

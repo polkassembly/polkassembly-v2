@@ -12,14 +12,13 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { getTypeDef } from '@polkadot/types';
-import { ISubmittableResult, Signer, TypeDef } from '@polkadot/types/types';
+import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-
-import { EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, ISelectedAccount, IVoteCartItem } from '@shared/types';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -51,7 +50,6 @@ export class PolkadotApiService {
 	private async executeTx({
 		tx,
 		address,
-		proxyAddress,
 		params = {},
 		errorMessageFallback,
 		onSuccess,
@@ -59,11 +57,11 @@ export class PolkadotApiService {
 		onBroadcast,
 		setStatus,
 		setIsTxFinalized,
-		waitTillFinalizedHash = false
+		waitTillFinalizedHash = false,
+		selectedAccount
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
-		proxyAddress?: string;
 		params?: Record<string, unknown>;
 		errorMessageFallback: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -72,11 +70,38 @@ export class PolkadotApiService {
 		setStatus?: (pre: string) => void;
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		let isFailed = false;
 		if (!this.api || !tx) return;
 
-		const extrinsic = proxyAddress ? this.api.tx.proxy.proxy(address, null, tx) : tx;
+		let extrinsic = tx;
+
+		// for pure proxy accounts, we need to get the multisig account
+		const getMultisigAccount = (account?: ISelectedAccount): ISelectedAccount | null => {
+			if (!account) return null;
+			if (account.accountType === EAccountType.MULTISIG) {
+				return account;
+			}
+
+			if (account.parent) {
+				return getMultisigAccount(account.parent);
+			}
+
+			return null;
+		};
+
+		const multisigAccount = getMultisigAccount(selectedAccount);
+
+		if (selectedAccount?.accountType === EAccountType.PROXY) {
+			extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
+		}
+
+		if (multisigAccount) {
+			const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
+			const { weight } = await extrinsic.paymentInfo(address);
+			extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
+		}
 
 		const signerOptions = {
 			...params,
@@ -85,7 +110,7 @@ export class PolkadotApiService {
 
 		extrinsic
 			// eslint-disable-next-line sonarjs/cognitive-complexity
-			.signAndSend(proxyAddress || address, signerOptions, async ({ status, events, txHash }) => {
+			.signAndSend(address, signerOptions, async ({ status, events, txHash }) => {
 				if (status.isInvalid) {
 					console.log('Transaction invalid');
 					setStatus?.('Transaction invalid');
@@ -214,16 +239,20 @@ export class PolkadotApiService {
 		let freeBalance = BN_ZERO;
 		let lockedBalance = BN_ZERO;
 		let totalBalance = BN_ZERO;
+		let transferableBalance = BN_ZERO;
 
 		const responseObj = {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 
 		if (!address || !this.api?.derive?.balances?.all) {
 			return responseObj;
 		}
+
+		const existentialDeposit = this.api.consts?.balances?.existentialDeposit ? new BN(this.api.consts.balances.existentialDeposit.toString()) : BN_ZERO;
 
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		await this.api.derive.balances
@@ -240,8 +269,20 @@ export class PolkadotApiService {
 			.then((result: any) => {
 				const free = new BN(result?.data?.free) || BN_ZERO;
 				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
+				const frozen = new BN(result?.data?.frozen || result?.data?.feeFrozen || result?.data?.miscFrozen) || BN_ZERO;
+
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+
+				if (free.gt(frozen)) {
+					transferableBalance = free.sub(frozen);
+
+					if (transferableBalance.lt(existentialDeposit)) {
+						transferableBalance = BN_ZERO;
+					}
+				} else {
+					transferableBalance = BN_ZERO;
+				}
 			})
 			.catch(() => {
 				// TODO: show notification
@@ -250,7 +291,8 @@ export class PolkadotApiService {
 		return {
 			freeBalance,
 			lockedBalance,
-			totalBalance
+			totalBalance,
+			transferableBalance
 		};
 	}
 
@@ -264,7 +306,8 @@ export class PolkadotApiService {
 		conviction,
 		ayeVoteValue,
 		nayVoteValue,
-		abstainVoteValue
+		abstainVoteValue,
+		selectedAccount
 	}: {
 		address: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -276,6 +319,7 @@ export class PolkadotApiService {
 		ayeVoteValue?: BN;
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
@@ -296,7 +340,8 @@ export class PolkadotApiService {
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
-				onFailed
+				onFailed,
+				selectedAccount
 			});
 		}
 	}
@@ -471,6 +516,15 @@ export class PolkadotApiService {
 
 		if (!status) return null;
 		return Number(status.value?.len);
+	}
+
+	// create proposal calls
+
+	getBatchAllTx(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>[] | null) {
+		if (!this.api || !extrinsicFn?.length) {
+			return null;
+		}
+		return this.api.tx.utility.batchAll(extrinsicFn);
 	}
 
 	getNotePreimageTx({ extrinsicFn }: { extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult> | null }) {
@@ -659,20 +713,55 @@ export class PolkadotApiService {
 		return this.api.tx.referenda.kill(referendumId);
 	}
 
+	getProposeBountyTx({ bountyAmount }: { bountyAmount: BN }) {
+		if (!this.api) return null;
+		const title = 'Bounty';
+		return this.api.tx.bounties.proposeBounty(bountyAmount, title);
+	}
+
+	async proposeBounty({ bountyAmount, address, onSuccess, onFailed }: { bountyAmount: BN; address: string; onSuccess?: (bountyId: number) => void; onFailed?: () => void }) {
+		if (!this.api || !address || !bountyAmount) return;
+
+		const bountyId = Number(await this.api.query.bounties.bountyCount());
+
+		const tx = this.getProposeBountyTx({ bountyAmount });
+
+		if (!tx) {
+			onFailed?.();
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to propose bounty',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.(bountyId);
+			},
+			onFailed: () => {
+				onFailed?.();
+			}
+		});
+	}
+
+	getApproveBountyTx({ bountyId }: { bountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.bounties.approveBounty(bountyId);
+	}
+
 	async createProposal({
 		address,
+		extrinsicFn,
 		track,
-		preimageHash,
-		preimageLength,
 		enactment,
 		enactmentValue,
 		onSuccess,
 		onFailed
 	}: {
 		address: string;
+		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		track: EPostOrigin;
-		preimageHash: string;
-		preimageLength: number;
 		enactment: EEnactment;
 		enactmentValue: BN;
 		onSuccess?: (postId: number) => void;
@@ -685,12 +774,30 @@ export class PolkadotApiService {
 			return;
 		}
 
-		if (!preimageHash || !preimageLength || !address) {
+		const preimageDetails = this.getPreimageTxDetails({ extrinsicFn });
+
+		if (!preimageDetails || !address) {
 			onFailed?.();
 			return;
 		}
 
-		const tx = this.getSubmitProposalTx({ track, preimageHash, preimageLength, enactment, enactmentValue });
+		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn });
+		const submitProposalTx = this.getSubmitProposalTx({
+			track,
+			preimageHash: preimageDetails.preimageHash,
+			preimageLength: preimageDetails.preimageLength,
+			enactment,
+			enactmentValue
+		});
+
+		if (!submitProposalTx || !notePreimageTx) {
+			onFailed?.();
+			return;
+		}
+
+		const preimageExists = await this.getPreimageLengthFromPreimageHash({ preimageHash: preimageDetails.preimageHash });
+		const tx = preimageExists ? submitProposalTx : this.getBatchAllTx([notePreimageTx, submitProposalTx]);
+
 		if (!tx) {
 			onFailed?.();
 			return;
@@ -722,6 +829,24 @@ export class PolkadotApiService {
 		return this.api.derive.chain.bestNumber();
 	}
 
+	async getTotalActiveIssuance() {
+		if (!this.api) return null;
+		try {
+			const totalIssuance = await this.api.query.balances.totalIssuance();
+			const inactiveIssuance = await this.api.query.balances.inactiveIssuance();
+
+			if (!totalIssuance || !inactiveIssuance) {
+				console.error('Failed to fetch issuance values');
+				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Failed to fetch issuance values');
+			}
+
+			return new BN(totalIssuance.toString()).sub(new BN(inactiveIssuance.toString()));
+		} catch (error) {
+			console.error('Error in getTotalActiveIssuance:', error);
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Failed to retrieve total active issuance');
+		}
+	}
+
 	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
 		if (!this.api) {
 			return null;
@@ -734,6 +859,68 @@ export class PolkadotApiService {
 		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
 		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
 		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
+	}
+
+	async delegate({
+		address,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api) return;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async undelegate({ address, trackId, onSuccess, onFailed }: { address: string; trackId: number; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api) return;
+
+		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async getDelegateTxFee({ address, tracks, conviction, balance }: { address: string; tracks: number[]; conviction: number; balance: BN }) {
+		if (!this.api) return null;
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, address, conviction, balance));
+		return this.getTxFee({ extrinsicFn: txs, address });
+	}
+
+	async getUndelegateTxFee({ address, trackId }: { address: string; trackId: number }) {
+		if (!this.api) return null;
+
+		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+		return this.getTxFee({ extrinsicFn: [tx], address });
 	}
 
 	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {

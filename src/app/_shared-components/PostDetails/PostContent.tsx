@@ -4,7 +4,8 @@
 
 'use client';
 
-import { IPost, IPostListing } from '@/_shared/types';
+import React from 'react';
+import { IPost } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
@@ -12,15 +13,7 @@ import PostActions from './PostActions/PostActions';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 
-function PostContent({
-	postData,
-	isModalOpen,
-	onEditPostSuccess
-}: {
-	postData: IPostListing | IPost;
-	isModalOpen: boolean;
-	onEditPostSuccess: (title: string, content: string) => void;
-}) {
+function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPost; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
 
 	return (
@@ -29,6 +22,7 @@ function PostContent({
 				indexOrHash={String(postData?.index ?? postData?.hash)}
 				proposalType={postData.proposalType}
 				summaryType='content'
+				initialData={(postData as IPost)?.contentSummary}
 			/>
 
 			<MarkdownViewer

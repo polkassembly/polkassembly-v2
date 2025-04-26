@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin } from '@/_shared/types';
+import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -21,16 +21,22 @@ import VoteReferendumButton from './VoteReferendumButton';
 import PostContent from './PostContent';
 import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
+import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
+import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
-	const [showSpamModal, setShowSpamModal] = useState(false);
+	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const onEditPostSuccess = (title: string, content: string) => {
 		setPost((prev) => ({ ...prev, title, content }));
 	};
 
-	const { data: aiSummary } = useAISummary({ proposalType: post.proposalType, indexOrHash: post.index?.toString() || '' });
+	const { data: aiSummary } = useAISummary({
+		initialData: post.contentSummary,
+		proposalType: post.proposalType,
+		indexOrHash: String(post.index ?? post.hash)
+	});
 
 	useEffect(() => {
 		if (aiSummary?.isSpam) {
@@ -54,7 +60,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
-				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3')}>
+				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
 					<div className={classes.leftWrapper}>
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
@@ -80,18 +86,31 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</TabsContent>
 						</div>
 						{isModalOpen && !isOffchainPost && (
-							<div className='pt-5'>{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}</div>
+							<div className='pt-5'>
+								{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
+									<VoteReferendumButton
+										iconClassName='hidden'
+										index={index}
+									/>
+								)}
+							</div>
 						)}
 						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
+								contentSummary={post.contentSummary}
 							/>
 						</div>
 					</div>
-					{!isModalOpen && !isOffchainPost && (
+					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
-							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && <VoteReferendumButton index={index} />}
+							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
+								<VoteReferendumButton
+									iconClassName='hidden'
+									index={index}
+								/>
+							)}
 							<ProposalPeriods
 								confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 								decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
@@ -104,6 +123,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 							/>
+						</div>
+					)}
+					{post.proposalType === EProposalType.BOUNTY && (
+						<div className={classes.rightWrapper}>
+							<ChildBountiesCard parentIndex={index} />
+						</div>
+					)}
+					{post.proposalType === EProposalType.CHILD_BOUNTY && post.onChainInfo?.parentBountyIndex && ValidatorService.isValidNumber(post.onChainInfo?.parentBountyIndex) && (
+						<div className={classes.rightWrapper}>
+							<div className={classes.parentBountyCardWrapper}>
+								<ParentBountyCard parentBountyIndex={post.onChainInfo?.parentBountyIndex} />
+							</div>
 						</div>
 					)}
 				</div>

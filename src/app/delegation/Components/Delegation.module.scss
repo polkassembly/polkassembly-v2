@@ -1,0 +1,73 @@
+.delegation_title {
+	@apply text-2xl font-semibold text-btn_secondary_text;
+}
+
+.tooltipContent {
+	@apply relative rounded-md bg-tooltip_background px-2 py-1 shadow-lg;
+}
+
+.selectTrigger {
+	@apply m-0 w-5 border-border_grey p-0;
+}
+
+.selectContent {
+	@apply border-border_grey px-3 py-2;
+}
+
+.tableRow {
+	@apply overflow-hidden bg-page_background px-6 text-wallet_btn_text;
+}
+
+.tableCell_1 {
+	@apply p-4 first:rounded-tl-lg last:rounded-tr-lg;
+}
+
+.tableCell_last {
+	@apply p-4 last:rounded-tr-lg;
+}
+
+.tableCell_3 {
+	@apply px-6 py-5;
+}
+
+.tableCell_2 {
+	@apply w-1/4 px-6 py-5;
+}
+
+.tableCell {
+	@apply whitespace-nowrap p-4;
+}
+
+.activeTab {
+	@apply bg-sidebar_menu_active;
+}
+
+.activeTabText {
+	@apply rounded-full px-4 py-2 text-sm text-btn_secondary_text;
+}
+
+.radioButton {
+	@apply inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border-2 border-border_grey;
+
+	&[data-state='checked'] {
+		&::after {
+			@apply block h-2 w-2 rounded-full bg-btn_primary_text content-[''];
+		}
+	}
+}
+
+.radioLabel {
+	@apply cursor-pointer text-sm text-btn_secondary_text;
+}
+
+.radioGroup {
+	@apply flex flex-wrap gap-4;
+}
+
+.radioWrapper {
+	@apply flex items-center rounded-full border border-border_grey px-4 py-2 transition-all duration-200;
+
+	&[data-state='checked'] {
+		@apply bg-btn_primary_text;
+	}
+}

@@ -1,0 +1,56 @@
+.container {
+	@apply relative flex w-full items-center gap-2 overflow-x-auto rounded-md border border-border_grey bg-bg_modal p-3 text-text_primary;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+
+	@media (max-width: 768px) {
+		@apply gap-1 p-2;
+	}
+
+	&::-webkit-scrollbar {
+		@apply hidden;
+	}
+}
+
+.popoverTrigger {
+	@apply flex h-9 min-w-fit items-center justify-between whitespace-nowrap rounded-lg border-none px-3 text-sm transition-all duration-200 ease-in-out hover:bg-activity_selected_tab;
+}
+
+.activeTab {
+	@apply bg-activity_selected_tab font-medium;
+}
+
+.popoverContent {
+	@apply transform-gpu rounded-lg border-primary_border bg-[var(--sidebar-primary-foreground)] p-2 shadow-lg !important;
+	animation: dropdownIn 0.2s ease-out;
+}
+
+@keyframes dropdownIn {
+	from {
+		@apply scale-95 opacity-0;
+	}
+
+	to {
+		@apply scale-100 opacity-100;
+	}
+}
+
+.trackName {
+	@apply min-w-fit cursor-pointer rounded-lg px-3 py-2 text-start text-sm text-basic_text transition-all duration-200 ease-in-out;
+
+	&:hover {
+		@apply bg-activity_selected_tab;
+	}
+}
+
+.darkIcon {
+	@apply h-5 w-5 filter-none transition-transform duration-200;
+}
+
+:global(.dark) .darkIcon {
+	filter: brightness(101%) contrast(93%) saturate(15%) hue-rotate(141deg) invert(56%) sepia(0);
+}
+
+.navItem {
+	@apply flex min-w-fit items-center justify-between gap-2;
+}

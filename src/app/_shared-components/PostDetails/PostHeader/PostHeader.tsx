@@ -17,7 +17,7 @@ import { BN } from '@polkadot/util';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
-import VotingProgress from '@/app/(home)/Components/VotingProgress/VotingProgress';
+import VotingProgress from '@/app/(home)/activity-feed/Components/VotingProgress/VotingProgress';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Address from '@ui/Profile/Address/Address';
@@ -25,6 +25,7 @@ import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import PostTags from '@ui/PostDetails/PostTags/PostTags';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
+import Link from 'next/link';
 import classes from './PostHeader.module.scss';
 
 function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost; isModalOpen: boolean }) {
@@ -51,7 +52,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	return (
-		<div>
+		<div className='mx-auto max-w-7xl'>
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
 					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (
@@ -86,16 +87,29 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
-						{postData?.onChainInfo?.proposer && <Address address={postData.onChainInfo?.proposer} />}
-						{postData?.createdAt && (
+						{postData?.onChainInfo?.proposer ? (
 							<>
+								<Address address={postData.onChainInfo?.proposer} />
 								<Separator
 									orientation='vertical'
 									className='h-3'
 								/>
-								<CreatedAtTime createdAt={postData.createdAt} />
 							</>
-						)}
+						) : postData.publicUser?.username ? (
+							<>
+								<Link
+									href={`/user/${postData.publicUser?.username}`}
+									className='text-text_secondary text-xs'
+								>
+									{postData.publicUser?.username}
+								</Link>
+								<Separator
+									orientation='vertical'
+									className='h-3'
+								/>
+							</>
+						) : null}
+						{postData?.createdAt && <CreatedAtTime createdAt={postData.createdAt} />}
 						{postData.tags && postData.tags.length > 0 && (
 							<>
 								<Separator

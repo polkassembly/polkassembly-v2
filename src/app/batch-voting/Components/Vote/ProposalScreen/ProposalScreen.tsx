@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EProposalType, EVoteDecision, IPostListing } from '@/_shared/types';
-import ActivityFeedPostItem from '@/app/(home)/Components/ActivityFeedPostItem/ActivityFeedPostItem';
+import ActivityFeedPostItem from '@/app/(home)/activity-feed/Components/ActivityFeedPostItem/ActivityFeedPostItem';
 import { Button } from '@/app/_shared-components/Button';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';

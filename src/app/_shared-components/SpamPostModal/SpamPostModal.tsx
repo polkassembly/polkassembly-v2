@@ -14,6 +14,14 @@ import { Button } from '../Button';
 function SpamPostModal({ open, setOpen, proposalType }: { open: boolean; setOpen: (open: boolean) => void; proposalType: EProposalType }) {
 	const router = useRouter();
 
+	const handleGoBack = () => {
+		if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+			router.back();
+		} else {
+			router.push('/');
+		}
+	};
+
 	return (
 		<Dialog
 			open={open}
@@ -34,7 +42,7 @@ function SpamPostModal({ open, setOpen, proposalType }: { open: boolean; setOpen
 					<div className={classes.buttonContainer}>
 						<Button
 							variant='secondary'
-							onClick={() => router.back()}
+							onClick={handleGoBack}
 						>
 							Go Back
 						</Button>

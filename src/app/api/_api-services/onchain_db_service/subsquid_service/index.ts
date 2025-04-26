@@ -114,6 +114,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		return {
 			createdAt: proposal.createdAt,
+			...(proposal.curator && { curator: proposal.curator }),
+			...(proposalType === EProposalType.CHILD_BOUNTY ? { parentBountyIndex: proposal.parentBountyIndex } : {}),
+			...(proposalType === EProposalType.CHILD_BOUNTY ? { payee: proposal.payee } : {}),
 			proposer: proposal.proposer || '',
 			status: proposal.status,
 			index: proposal.index,
@@ -121,6 +124,10 @@ export class SubsquidService extends SubsquidUtils {
 			origin: proposal.origin,
 			description: proposal.description || '',
 			voteMetrics,
+			...(proposal.reward && { reward: proposal.reward }),
+			...(proposal.fee && { fee: proposal.fee }),
+			...(proposal.deposit && { deposit: proposal.deposit }),
+			...(proposal.curatorDeposit && { curatorDeposit: proposal.curatorDeposit }),
 			beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 			preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
 			decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
@@ -196,22 +203,24 @@ export class SubsquidService extends SubsquidUtils {
 				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
 			}
 
-			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
+			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: (ValidatorService.isValidNumber(proposal.index) ? String(proposal.index) : proposal.hash) as string });
 		});
 
 		const voteMetrics = await Promise.all(voteMetricsPromises);
 
 		const posts: IOnChainPostListing[] = [];
 
-		subsquidData.proposals.forEach(
-			(
+		const postsPromises = subsquidData.proposals.map(
+			async (
 				proposal: {
 					createdAt: string;
 					description?: string | null;
 					index: number;
 					origin: EPostOrigin;
 					proposer?: string;
+					curator?: string;
 					status?: EProposalStatus;
+					reward?: string;
 					hash?: string;
 					preimage?: {
 						proposedCall?: {
@@ -227,13 +236,31 @@ export class SubsquidService extends SubsquidUtils {
 			) => {
 				const allPeriodEnds =
 					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+				let childBountiesCount = 0;
 
-				posts.push({
+				// child bounties count
+				if (proposalType === EProposalType.BOUNTY) {
+					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES;
+
+					const { data } = await gqlClient
+						.query(childBountiesCountGQL, {
+							parentBountyIndex_eq: proposal.index
+						})
+						.toPromise();
+					if (data) {
+						childBountiesCount = data?.totalChildBounties?.totalCount || 0;
+					}
+				}
+
+				return {
 					createdAt: new Date(proposal.createdAt),
+					...(proposalType === EProposalType.BOUNTY ? { childBountiesCount: childBountiesCount || 0 } : {}),
+					...(proposal.curator && { curator: proposal.curator }),
 					description: proposal.description || '',
 					index: proposal.index,
 					origin: proposal.origin,
 					proposer: proposal.proposer || '',
+					...(proposal.reward && { reward: proposal.reward }),
 					status: proposal.status || EProposalStatus.Unknown,
 					type: proposalType,
 					hash: proposal.hash || '',
@@ -241,9 +268,17 @@ export class SubsquidService extends SubsquidUtils {
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
-				});
+				};
 			}
 		);
+
+		const resolvedPosts = await Promise.allSettled(postsPromises);
+
+		resolvedPosts?.forEach((result) => {
+			if (result.status === 'fulfilled' && result?.value) {
+				posts.push(result.value);
+			}
+		});
 
 		return {
 			items: posts,
@@ -458,6 +493,65 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
+		};
+	}
+
+	static async GetChildBountiesByParentBountyIndex({
+		network,
+		index,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		index: number;
+		page: number;
+		limit: number;
+	}): Promise<IGenericListingResponse<IOnChainPostInfo>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, {
+				parentBountyIndex_eq: index,
+				limit: Number(limit),
+				offset: (Number(page) - 1) * Number(limit)
+			})
+			.toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain child bounties for bounty from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain child bounties for bounty from Subsquid');
+		}
+		const childBounties: IOnChainPostInfo[] = subsquidData.childBounties.map(
+			(childBounty: {
+				createdAt: string;
+				curator: string;
+				proposer: string;
+				status: EProposalStatus;
+				index: number;
+				hash: string;
+				origin: EPostOrigin;
+				description: string;
+				statusHistory: IStatusHistoryItem[];
+				preimage: { proposedCall: { args: Record<string, unknown> } };
+			}) => ({
+				createdAt: childBounty.createdAt,
+				curator: childBounty.curator || '',
+				proposer: childBounty.proposer || '',
+				status: childBounty.status,
+				index: childBounty.index,
+				hash: childBounty.hash,
+				origin: childBounty.origin,
+				description: childBounty.description || '',
+				timeline: childBounty.statusHistory as IStatusHistoryItem[],
+				preimageArgs: childBounty.preimage?.proposedCall?.args
+			})
+		);
+
+		return {
+			items: childBounties,
+			totalCount: subsquidData.totalChildBounties.totalCount || 0
 		};
 	}
 

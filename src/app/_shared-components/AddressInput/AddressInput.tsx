@@ -7,7 +7,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useWalletService } from '@/hooks/useWalletService';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { EWallet } from '@/_shared/types';
+import { EWallet, EAccountType } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { X } from 'lucide-react';
@@ -20,12 +20,14 @@ interface AddressInputProps {
 	placeholder?: string;
 	onChange?: (value: string) => void;
 	className?: string;
+	disabled?: boolean;
+	value?: string;
 }
 
-export default function AddressInput({ placeholder, onChange, className }: AddressInputProps) {
+export default function AddressInput({ placeholder, onChange, className, disabled, value }: AddressInputProps) {
 	const t = useTranslations();
 	const [isOpen, setIsOpen] = useState(false);
-	const [searchValue, setSearchValue] = useState('');
+	const [searchValue, setSearchValue] = useState(value || '');
 	const inputRef = useRef<HTMLInputElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState('');
@@ -45,7 +47,11 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 		setAccounts(injectedAccounts);
 		setUserPreferences({
 			...userPreferences,
-			address: injectedAccounts[0]
+			selectedAccount: {
+				...injectedAccounts[0],
+				wallet: chosenWallet,
+				accountType: EAccountType.REGULAR
+			}
 		});
 	};
 
@@ -109,6 +115,7 @@ export default function AddressInput({ placeholder, onChange, className }: Addre
 				<Input
 					ref={inputRef}
 					type='text'
+					disabled={disabled}
 					value={searchValue}
 					onChange={(e) => {
 						onAccountChange({ address: e.target.value, name: '' });

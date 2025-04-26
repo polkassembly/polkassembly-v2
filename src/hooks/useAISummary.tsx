@@ -8,15 +8,17 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 
-interface UseAISummaryProps {
+interface Props {
+	initialData?: IContentSummary;
 	proposalType: EProposalType;
 	indexOrHash: string;
 }
 
-export const useAISummary = ({ proposalType, indexOrHash }: UseAISummaryProps) => {
+export const useAISummary = ({ initialData, proposalType, indexOrHash }: Props) => {
 	return useQuery<IContentSummary, Error>({
 		queryKey: ['ai-summary', proposalType, indexOrHash],
 		enabled: Boolean(proposalType) && ValidatorService.isValidIndexOrHash(indexOrHash),
+		initialData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchContentSummary({ proposalType, indexOrHash });
 

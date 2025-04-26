@@ -181,8 +181,46 @@ export interface IAccessTokenPayload {
 	exp?: number;
 }
 
+export enum EProxyType {
+	ANY = 'Any',
+	NON_TRANSFER = 'NonTransfer',
+	GOVERNANCE = 'Governance',
+	STAKING = 'Staking',
+	IDENTITY_JUDGEMENT = 'IdentityJudgement',
+	AUCTION = 'Auction',
+	CANCEL_PROXY = 'CancelProxy',
+	PARAREGISTRATION = 'ParaRegistration',
+	NOMINATION_POOLS = 'NominationPools',
+	SUDO_BALANCES = 'SudoBalances'
+}
+
+export interface IPureProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IMultisigAddress {
+	signatories: Array<string>;
+	address: string;
+	threshold: number;
+	pureProxies: Array<IPureProxyAddress>;
+}
+
+export interface IProxyAddress {
+	address: string;
+	proxyType: EProxyType;
+}
+
+export interface IAddressRelations {
+	address: string;
+	multisigAddresses: Array<IMultisigAddress>;
+	proxyAddresses: Array<IProxyAddress>;
+	proxiedAddresses: Array<IProxyAddress>;
+}
+
 export interface IUserClientData extends IAccessTokenPayload {
 	publicUser?: IPublicUser;
+	addressRelations?: IAddressRelations[];
 }
 
 export interface IAddressProxyForEntry {
@@ -255,12 +293,26 @@ export enum ECookieNames {
 	THEME = 'theme',
 	LOCALE = 'locale'
 }
+export enum EAccountType {
+	MULTISIG = 'multisig',
+	PROXY = 'proxy',
+	REGULAR = 'regular'
+}
+
+export interface ISelectedAccount extends InjectedAccount {
+	wallet?: EWallet;
+	accountType: EAccountType;
+	parent?: ISelectedAccount;
+	proxyType?: EProxyType;
+	threshold?: number;
+	signatories?: Array<string>;
+}
 
 export interface IUserPreferences {
 	theme: ETheme;
 	locale: ELocales;
 	wallet?: EWallet;
-	address?: InjectedAccount;
+	selectedAccount?: ISelectedAccount;
 	rpcIndex?: number;
 }
 
@@ -483,6 +535,12 @@ export interface IStatusHistoryItem {
 }
 
 export interface IOnChainPostInfo {
+	reward?: string;
+	fee?: string;
+	deposit?: string;
+	curatorDeposit?: string;
+	parentBountyIndex?: number;
+	payee?: string;
 	proposer: string;
 	status: EProposalStatus;
 	createdAt?: Date;
@@ -497,6 +555,7 @@ export interface IOnChainPostInfo {
 	confirmationPeriodEndsAt?: Date;
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
+	curator?: string;
 }
 
 export interface IPost extends IOffChainPost {
@@ -504,11 +563,13 @@ export interface IPost extends IOffChainPost {
 	publicUser?: IPublicUser;
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
+	contentSummary?: IContentSummary;
 }
 
 export interface IOnChainPostListing {
 	createdAt: Date;
 	description: string;
+	childBountiesCount?: number;
 	index?: number;
 	origin: EPostOrigin;
 	proposer: string;
@@ -517,6 +578,8 @@ export interface IOnChainPostListing {
 	hash?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	curator?: string;
+	reward?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
 }
@@ -921,6 +984,15 @@ export enum ENotificationStatus {
 	INFO = 'info'
 }
 
+export enum EBountyStatus {
+	ALL = 'All',
+	ACTIVE = 'Active',
+	PROPOSED = 'Proposed',
+	CLAIMED = 'Claimed',
+	CANCELLED = 'Cancelled',
+	REJECTED = 'Rejected'
+}
+
 // generic types are for insignificant tokens if we decide to add later
 export interface ITreasuryStats {
 	network: ENetwork;
@@ -979,7 +1051,8 @@ export enum EProposalStep {
 	CREATE_TREASURY_PROPOSAL = 'CREATE_TREASURY_PROPOSAL',
 	CREATE_USDX_PROPOSAL = 'CREATE_USDX_PROPOSAL',
 	CREATE_CANCEL_REF_PROPOSAL = 'CREATE_CANCEL_REF_PROPOSAL',
-	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL'
+	CREATE_KILL_REF_PROPOSAL = 'CREATE_KILL_REF_PROPOSAL',
+	CREATE_BOUNTY = 'CREATE_BOUNTY'
 }
 
 export interface IDelegationStats {
@@ -1017,6 +1090,7 @@ export interface IDelegateDetails extends IDelegate {
 }
 
 export enum EDelegationStatus {
+	ALL = 'all',
 	RECEIVED = 'received',
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated'
@@ -1081,4 +1155,16 @@ export enum EPeriodType {
 	PREPARE = 'prepare',
 	DECISION = 'decision',
 	CONFIRM = 'confirm'
+}
+
+export enum ESearchType {
+	POSTS = 'posts',
+	DISCUSSIONS = 'discussions',
+	USERS = 'users'
+}
+
+export enum ESearchDiscussionType {
+	DISCUSSIONS = 'discussions',
+	GRANTS = 'grants',
+	REFERENDUMS_V2 = 'referendums_v2'
 }

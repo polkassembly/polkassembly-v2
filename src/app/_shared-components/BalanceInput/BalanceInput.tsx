@@ -13,6 +13,7 @@ import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -27,6 +28,7 @@ function BalanceInput({
 	multiAsset,
 	className,
 	showTreasuryBalance,
+	showUserBalance = false,
 	defaultAssetId
 }: {
 	label?: string;
@@ -39,10 +41,12 @@ function BalanceInput({
 	multiAsset?: boolean;
 	className?: string;
 	showTreasuryBalance?: boolean;
+	showUserBalance?: boolean;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const [error, setError] = useState('');
+	const { userPreferences } = useUserPreferences();
 
 	const { apiService } = usePolkadotApiService();
 	const { assethubApiService } = useAssethubApiService();
@@ -53,6 +57,9 @@ function BalanceInput({
 	const { supportedAssets } = networkDetails;
 
 	const [assetId, setAssetId] = useState<string | null>(null);
+
+	const [userBalance, setUserBalance] = useState<string | null>(null);
+
 	const [treasuryBalance, setTreasuryBalance] = useState<{ [key: string]: BN } | null>(null);
 	const [nativeTreasuryBalance, setNativeTreasuryBalance] = useState<BN | null>(null);
 
@@ -84,6 +91,16 @@ function BalanceInput({
 	}, [network]);
 
 	useEffect(() => {
+		const getBalance = async () => {
+			if (!showUserBalance || !apiService || !userPreferences?.selectedAccount?.address) return;
+
+			const { totalBalance } = await apiService.getUserBalances({ address: userPreferences.selectedAccount.address });
+			setUserBalance(totalBalance.toString());
+		};
+		getBalance();
+	}, [apiService, userPreferences?.selectedAccount?.address, showUserBalance]);
+
+	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
 			const balances = await assethubApiService?.getAssethubTreasuryAssetsBalance();
@@ -103,7 +120,14 @@ function BalanceInput({
 
 	return (
 		<div className='min-w-[200px]'>
-			{label && <p className={classes.label}>{label}</p>}
+			<div className='mb-1 flex justify-between'>
+				{label && <p className={classes.label}>{label}</p>}
+				{showUserBalance && userBalance && (
+					<p className='text-xs text-text_primary'>
+						{t('BalanceInput.balance')}: <span className='text-text_pink'>{`${formatBnBalance(userBalance, { withUnit: true, numberAfterComma: 2 }, network)}`}</span>
+					</p>
+				)}
+			</div>
 			<div className='relative'>
 				<Input
 					className={cn('w-full', className)}
@@ -124,7 +148,7 @@ function BalanceInput({
 						<DropdownMenu>
 							<DropdownMenuTrigger
 								disabled={disabled}
-								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white'
+								className='absolute right-4 top-1/2 flex w-auto -translate-y-1/2 items-center justify-center gap-x-2 rounded-md border-none bg-bg_pink px-2 py-1 text-xs font-medium text-white sm:px-2 sm:py-1'
 							>
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>

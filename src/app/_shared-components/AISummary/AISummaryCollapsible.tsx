@@ -7,7 +7,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAISummary } from '@/hooks/useAISummary';
-import { EProposalType } from '@/_shared/types';
+import { EProposalType, IContentSummary } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -17,15 +17,16 @@ import styles from './AISummaryCollapsible.module.scss';
 import { Skeleton } from '../Skeleton';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 
-interface AISummaryCollapsibleProps {
+interface Props {
 	proposalType: EProposalType;
 	indexOrHash: string;
 	summaryType: 'content' | 'allComments';
+	initialData?: IContentSummary;
 }
 
-function AISummaryCollapsible({ proposalType, indexOrHash, summaryType }: AISummaryCollapsibleProps) {
+function AISummaryCollapsible({ proposalType, indexOrHash, summaryType, initialData }: Props) {
 	const t = useTranslations('PostDetails');
-	const { data, isLoading, error } = useAISummary({ proposalType, indexOrHash });
+	const { data, isLoading, error } = useAISummary({ proposalType, indexOrHash, initialData });
 
 	if (isLoading) {
 		return <Skeleton />;

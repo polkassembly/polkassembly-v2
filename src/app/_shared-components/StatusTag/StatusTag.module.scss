@@ -1,31 +1,33 @@
 .base {
-    @apply h-min whitespace-nowrap rounded-full lg:px-4 lg:py-1.5 py-1 px-3 text-xs font-medium tracking-tight text-white border-2;
+	@apply h-min whitespace-nowrap rounded-full border-2 px-3 py-1 text-xs font-medium tracking-tight text-white lg:px-4 lg:py-1.5;
 }
 
 .inverted {
-    @apply bg-white text-gray-600 dark:bg-section_dark_overlay;
+	@apply bg-white text-gray-600 dark:bg-section_dark_overlay;
 }
 
 .light {
-    @apply border text-white border-solid;
+	@apply border border-solid text-white;
 }
 
 .dark {
-    @apply text-white border-none;
+	@apply border-none text-white;
 }
 
 .deciding,
 .active,
 .extended,
-.decisiondepositplaced {
-    @apply bg-orange-500 border-orange-500 dark:bg-orange-700 dark:border-orange-700;
+.decisiondepositplaced,
+.curatorproposed {
+	@apply border-orange-500 bg-orange-500 dark:border-orange-700 dark:bg-orange-700;
 }
 
 .created,
 .submitted,
 .proposed,
-.confirmstarted {
-    @apply bg-blue-500 border-blue-500 dark:bg-blue-700 dark:border-blue-700;
+.confirmstarted,
+.added {
+	@apply border-blue-500 bg-blue-500 dark:border-blue-700 dark:bg-blue-700;
 }
 
 .killed,
@@ -34,15 +36,16 @@
 .timedout,
 .executionfailed,
 .confirmaborted {
-    @apply bg-red-500 border-red-500 dark:bg-red-700 dark:border-red-700;
+	@apply border-red-500 bg-red-500 dark:border-red-700 dark:bg-red-700;
 }
 
 .confirmed,
 .claimed,
-.executed {
-    @apply bg-green-500 border-green-500 dark:bg-green-700 dark:border-green-700;
+.executed,
+.curatorassigned {
+	@apply border-green-500 bg-green-500 dark:border-green-700 dark:bg-green-700;
 }
 
 .curatorunassigned {
-    @apply bg-[#666666] border-[#666666];
+	@apply border-[#666666] bg-[#666666];
 }

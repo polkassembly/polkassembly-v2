@@ -70,13 +70,14 @@ function ExistingPreimage() {
 	const createProposal = async () => {
 		if (
 			!apiService ||
-			!userPreferences.address?.address ||
+			!userPreferences.selectedAccount?.address ||
 			!debouncedPreimageHash ||
 			!preimageLength ||
 			!selectedTrack ||
 			!selectedEnactment ||
 			!isValidPreimageHash ||
-			!ValidatorService.isValidPreimageHash(preimageHash)
+			!ValidatorService.isValidPreimageHash(preimageHash) ||
+			!submitProposalTx
 		) {
 			return;
 		}
@@ -84,10 +85,9 @@ function ExistingPreimage() {
 		setLoading(true);
 
 		apiService.createProposal({
-			address: userPreferences.address.address,
+			address: userPreferences.selectedAccount.address,
 			track: selectedTrack.name,
-			preimageHash: debouncedPreimageHash,
-			preimageLength,
+			extrinsicFn: submitProposalTx,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -164,7 +164,7 @@ function ExistingPreimage() {
 					onClick={createProposal}
 					isLoading={loading}
 					disabled={
-						!userPreferences.address?.address ||
+						!userPreferences.selectedAccount?.address ||
 						!selectedTrack ||
 						!selectedEnactment ||
 						!preimageLength ||
