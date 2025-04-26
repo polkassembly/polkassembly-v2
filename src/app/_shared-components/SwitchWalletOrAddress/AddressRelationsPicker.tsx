@@ -110,7 +110,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 					{addresses.map((address) => (
 						<div
 							key={address.address}
-							className='flex flex-col items-center gap-2'
+							className='flex flex-col gap-2'
 						>
 							<div className='flex items-center gap-2'>
 								<RadioGroupItem
@@ -150,6 +150,9 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 												redirectToProfile={false}
 												disableTooltip
 											/>
+											<span className='inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10'>
+												Proxy
+											</span>
 										</Label>
 									</div>
 								))}
