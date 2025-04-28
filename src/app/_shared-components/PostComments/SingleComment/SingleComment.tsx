@@ -171,7 +171,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-			{voteData && voteData.length > 0 && (
+			{voteData && voteData?.length > 0 && (
 				<VoteCommentsDialog
 					voteInfo={voteData[0]}
 					showVoteDetails={showVoteDetails}
