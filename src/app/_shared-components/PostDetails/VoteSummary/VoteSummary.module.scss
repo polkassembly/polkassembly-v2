@@ -7,7 +7,7 @@
 }
 
 .voteSummaryPieChart {
-	@apply mb-6 flex items-end justify-between;
+	@apply mb-6 flex items-end justify-center gap-x-4;
 }
 
 .voteSummaryTable {
@@ -32,8 +32,4 @@
 
 .voteSummaryTableNoActivity {
 	@apply flex flex-col items-center justify-center gap-y-2;
-}
-
-.PieChartWrapper {
-	@apply relative flex h-[150px] w-[220px] items-center justify-center;
 }

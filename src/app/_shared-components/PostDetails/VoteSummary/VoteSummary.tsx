@@ -102,6 +102,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 						</div>
 						<PieChart
 							className='w-[47%] xl:w-[49%]'
+							viewBoxSize={[108, 90]}
 							center={[50, 75]}
 							startAngle={-180}
 							lengthAngle={180}
@@ -135,7 +136,6 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 
 									return (
 										<>
-											{/* SVG line */}
 											<line
 												x1={lineStartX}
 												y1={lineStartY}
@@ -144,12 +144,11 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 												stroke='black'
 												strokeWidth='1'
 											/>
-											{/* SVG label */}
 											<text
 												x={labelX}
 												y={labelY}
 												textAnchor='middle'
-												fontSize='6'
+												fontSize='7'
 												fill='black'
 											>
 												{progress.approvalThreshold.toFixed(1)}%
