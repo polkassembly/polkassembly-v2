@@ -16,8 +16,7 @@ import {
 	IStatusHistoryItem,
 	IVoteCurve,
 	IVoteData,
-	IVoteMetrics,
-	IVoteProgress
+	IVoteMetrics
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -29,9 +28,6 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
-import { blockToTime } from '@/_shared/_utils/blockToTime';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { calculateThresholdValue, processGraphPoint } from '@/app/_client-utils/calculateThresholdValue';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -47,53 +43,6 @@ export class SubsquidService extends SubsquidUtils {
 			exchanges: [cacheExchange, fetchExchange]
 		});
 	};
-
-	private static async calculateVoteMetricsAndProgress({
-		network,
-		proposal,
-		voteMetrics
-	}: {
-		network: ENetwork;
-		proposal: {
-			origin: EPostOrigin;
-			statusHistory?: Array<{ status: string; timestamp: string }>;
-			createdAt: string;
-		};
-		voteMetrics: IVoteMetrics;
-	}): Promise<IVoteMetrics> {
-		const trackName = proposal.origin;
-		const graphPoints = voteMetrics?.curveData || [];
-		if (!graphPoints.length) {
-			return voteMetrics;
-		}
-
-		const { statusHistory, createdAt } = proposal;
-		const decisionPeriod = NETWORKS_DETAILS[network]?.trackDetails?.[trackName as EPostOrigin]?.decisionPeriod;
-		const statusBlock = statusHistory?.find((s: { status: string }) => s?.status === 'Deciding');
-		const { seconds } = blockToTime(decisionPeriod || 0, network);
-		const decisionPeriodHrs = Math.ceil(dayjs.duration(seconds, 'seconds').asHours());
-
-		const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt);
-		const lastGraphPoint = graphPoints[graphPoints.length - 1];
-		const elapsedHours = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
-
-		const currentData = graphPoints.map((point: IVoteCurve) => processGraphPoint({ graphPoint: point, proposalCreatedAt, elapsedHours, decisionPeriodHrs, network, trackName }));
-
-		const currentApproval = currentData[currentData.length - 1]?.approval;
-		const currentSupport = currentData[currentData.length - 1]?.support;
-
-		const progressData: IVoteProgress = {
-			approval: Number(currentApproval?.y?.toFixed(1) || 0),
-			approvalThreshold: calculateThresholdValue({ trackName, network, currentPoint: currentApproval, decisionPeriodHrs }),
-			support: Number(currentSupport?.y?.toFixed(1) || 0),
-			supportThreshold: calculateThresholdValue({ trackName, network, currentPoint: currentSupport, decisionPeriodHrs })
-		};
-
-		return {
-			...voteMetrics,
-			voteProgress: progressData
-		};
-	}
 
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
 		const gqlClient = this.subsquidGqlClient(network);
