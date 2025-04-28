@@ -159,8 +159,8 @@ export class OnChainDbService {
 		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
 	}
 
-	static async getBountyStats(network: ENetwork): Promise<IBountyStats> {
-		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewardsByIndex(network);
+	static async GetBountyStats(network: ENetwork): Promise<IBountyStats> {
+		const activeBountiesResponse = await SubsquidService.GetActiveBountiesWithRewardsByIndex({ network });
 		const defaultStats: IBountyStats = {
 			activeBounties: 0,
 			availableBountyPool: '',
@@ -183,7 +183,7 @@ export class OnChainDbService {
 
 		const activeBountyIndices = activeProposals.map(({ index }: IBountyProposal) => index);
 
-		const childBountiesResponse = await SubsquidService.getChildBountiesRewards(network, activeBountyIndices);
+		const childBountiesResponse = await SubsquidService.GetChildBountiesRewards({ network, parentBountyIndices: activeBountyIndices });
 
 		if (!childBountiesResponse?.data?.totalCount) {
 			return {
@@ -211,8 +211,8 @@ export class OnChainDbService {
 		};
 	}
 
-	static async getBountyUserActivity(network: ENetwork): Promise<IBountyUserActivity[]> {
-		const activeBountiesResponse = await SubsquidService.getActiveBountiesWithRewardsByIndex(network);
+	static async GetBountyUserActivity(network: ENetwork, limit?: number): Promise<IBountyUserActivity[]> {
+		const activeBountiesResponse = await SubsquidService.GetActiveBountiesWithRewardsByIndex({ network, limit });
 
 		if (!activeBountiesResponse?.data?.totalCount) {
 			return [];
@@ -220,7 +220,7 @@ export class OnChainDbService {
 
 		const activeBountyIndices = activeBountiesResponse.data.items.map(({ index }: IBountyProposal) => index);
 
-		const claimedChildBounties = await SubsquidService.getChildBountiesRewards(network, activeBountyIndices);
+		const claimedChildBounties = await SubsquidService.GetChildBountiesRewards({ network, parentBountyIndices: activeBountyIndices, limit });
 
 		if (!claimedChildBounties?.data?.totalCount) {
 			return [];
