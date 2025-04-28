@@ -19,7 +19,15 @@
 		"nextBurnTooltip": "財務が支出期間を終了するときにすべての資金を使用しない場合、一定の割合の資金が燃焼されます。",
 		"viewDetails": "詳細を見る",
 		"tokenPrice": "トークン価格",
-		"salary": "給与"
+		"salary": "給与",
+		"relayChain": "リレーチェーン",
+		"assetHub": "アセットハブ",
+		"fellowship": "フェローシップ",
+		"hydration": "水素化",
+		"bounties": "報奨金",
+		"ambassador": "アンバサダー",
+		"loans": "ローン",
+		"address": "アドレス"
 	},
 
 	"ActivityFeed": {

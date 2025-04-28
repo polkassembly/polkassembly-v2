@@ -4,15 +4,15 @@
 
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
 import { StaticImageData } from 'next/image';
-import { networkData } from './getNetworkData';
+import { NETWORKS_DISPLAY_DATA } from '@/_shared/_constants/networksDisplayData';
 
 const defaultLogo = WestendLogo;
 
 export const getNetworkLogo = (networkKey: string): StaticImageData => {
 	const lowerNetworkKey = networkKey.toLowerCase();
 	return (
-		Object.values(networkData)
-			.flatMap((category) => Object.entries(category))
+		Object.values(NETWORKS_DISPLAY_DATA)
+			.flatMap((category) => Object.entries(category) as [string, StaticImageData][])
 			.find(([key]) => key.toLowerCase() === lowerNetworkKey)?.[1] || defaultLogo
 	);
 };

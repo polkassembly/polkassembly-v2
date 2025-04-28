@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
-import { getNetworkLogo } from '@/_shared/_utils/getNetworkLogo';
-import { networkData } from '@/_shared/_utils/getNetworkData';
+import { NETWORKS_DISPLAY_DATA } from '@/_shared/_constants/networksDisplayData';
+import { getNetworkLogo } from '@/app/_client-utils/getNetworkLogo';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 import RenderNetworkSection from './RenderNetworkSection';
 import styles from './NetworkDropdown.module.scss';
@@ -20,7 +20,7 @@ import NetworkInput from './NetworkInput';
 const getNetworkDisplayName = (networkKey: string): string => {
 	const lowerNetworkKey = networkKey.toLowerCase();
 	return (
-		Object.values(networkData)
+		Object.values(NETWORKS_DISPLAY_DATA)
 			.flatMap((category) => Object.keys(category))
 			.find((key) => key.toLowerCase() === lowerNetworkKey) || networkKey
 	);
@@ -76,7 +76,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 					handleSearchChange={handleSearchChange}
 				/>
 				<div className='overflow-y-auto p-2'>
-					{Object.entries(networkData).map(([category, networks]) => (
+					{Object.entries(NETWORKS_DISPLAY_DATA).map(([category, networks]) => (
 						<RenderNetworkSection
 							key={category}
 							title={categoryDisplayNames[category as keyof typeof categoryDisplayNames] || category}

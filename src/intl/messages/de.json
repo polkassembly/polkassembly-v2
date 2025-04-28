@@ -19,7 +19,15 @@
 		"nextBurnTooltip": "Wenn die Finanzverwaltung eine Ausgabephase ohne alle ihre Mittel ausgibt, erleidet sie einen Verlust von einem Prozent ihrer Mittel.",
 		"viewDetails": "Details anzeigen",
 		"tokenPrice": "Token-Preis",
-		"salary": "Gehalt"
+		"salary": "Gehalt",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"fellowship": "Fellowship",
+		"hydration": "Hydration",
+		"bounties": "Bounties",
+		"ambassador": "Ambassador",
+		"loans": "Loans",
+		"address": "Adresse"
 	},
 
 	"ActivityFeed": {

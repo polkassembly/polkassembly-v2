@@ -19,7 +19,15 @@
 		"nextBurnTooltip": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.",
 		"viewDetails": "View Details",
 		"tokenPrice": "Token Price",
-		"salary": "Salary"
+		"salary": "Salary",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"fellowship": "Fellowship",
+		"hydration": "Hydration",
+		"bounties": "Bounties",
+		"ambassador": "Ambassador",
+		"loans": "Loans",
+		"address": "Address"
 	},
 	"ActivityFeed": {
 		"please": "Please",

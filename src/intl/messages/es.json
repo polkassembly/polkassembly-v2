@@ -19,7 +19,15 @@
 		"nextBurnTooltip": "Si la tesorería termina un período de gastos sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos.",
 		"viewDetails": "Ver Detalles",
 		"tokenPrice": "Precio del Token",
-		"salary": "Salario"
+		"salary": "Salario",
+		"relayChain": "Cadena de Relay",
+		"assetHub": "Centro de Activos",
+		"fellowship": "Fellowship",
+		"hydration": "Hidratación",
+		"bounties": "Recompensas",
+		"ambassador": "Embajador",
+		"loans": "Préstamos",
+		"address": "Dirección"
 	},
 
 	"ActivityFeed": {

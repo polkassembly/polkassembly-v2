@@ -7,7 +7,6 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { TypeDef } from '@polkadot/types/types';
 import { StatusCodes } from 'http-status-codes';
-import { StaticImageData } from 'next/image';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
@@ -1188,10 +1187,4 @@ export enum ESearchDiscussionType {
 	DISCUSSIONS = 'discussions',
 	GRANTS = 'grants',
 	REFERENDUMS_V2 = 'referendums_v2'
-}
-
-export interface NetworkDataType {
-	[key: string]: {
-		[key: string]: StaticImageData;
-	};
 }

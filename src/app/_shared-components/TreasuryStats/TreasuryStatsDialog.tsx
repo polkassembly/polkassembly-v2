@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
-import React, { ReactElement, ReactNode, forwardRef } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ITreasuryStats, EAssets, ENetwork } from '@/_shared/types';
 import Image from 'next/image';
@@ -12,7 +12,6 @@ import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getNetworkLogo } from '@/_shared/_utils/getNetworkLogo';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -20,51 +19,8 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
+import { getNetworkLogo } from '@/app/_client-utils/getNetworkLogo';
 import { Separator } from '../Separator';
-
-const getAssetIcon = ({ network, asset }: { network: ENetwork; asset?: EAssets | null }) => {
-	if (!asset)
-		return (
-			<Image
-				src={getNetworkLogo(network)}
-				alt='USDC'
-				width={20}
-				height={20}
-				className='rounded-full'
-			/>
-		);
-	switch (asset) {
-		case EAssets.USDC:
-			return (
-				<Image
-					src={USDCIcon}
-					alt='USDC'
-					width={20}
-					height={20}
-				/>
-			);
-		case EAssets.USDT:
-			return (
-				<Image
-					src={USDTIcon}
-					alt='USDT'
-					width={20}
-					height={20}
-				/>
-			);
-		case EAssets.MYTH:
-			return (
-				<Image
-					src={MYTHIcon}
-					alt='MYTH'
-					width={20}
-					height={20}
-				/>
-			);
-		default:
-			return null;
-	}
-};
 
 // Component for displaying a single asset row
 type AssetRowProps = {
@@ -104,52 +60,55 @@ const formatedAmountWithUSD = ({
 	return formatUSDWithUnits(totalUSD.toString(), 2);
 };
 
-const AssetRow = forwardRef<HTMLDivElement, AssetRowProps>(({ amount, asset, prefix, network }, ref) => {
+function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
+	const ICONS = {
+		usdc: USDCIcon,
+		usdt: USDTIcon,
+		myth: MYTHIcon
+	};
 	return (
-		<div
-			className='flex items-center justify-between dark:text-white'
-			ref={ref}
-		>
-			<div className='flex items-center gap-1 text-sm font-medium'>
-				{getAssetIcon({ network, asset })}
-				{asset === EAssets.MYTH ? (
-					<span className='font-medium text-muted-foreground'>
-						{formatUSDWithUnits(new BN(amount)?.div(new BN(10).pow(new BN(treasuryAssetsData[EAssets.MYTH]?.tokenDecimal)))?.toString(), 2)}{' '}
-						{treasuryAssetsData[EAssets.MYTH]?.symbol}
-					</span>
-				) : (
-					<span className='font-medium text-muted-foreground'>
-						{prefix || ''}
-						{formatBnBalance(
-							amount,
-							{ withUnit: true, numberAfterComma: 2, compactNotation: true },
-							network,
-							Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === asset)?.index
-						)}
-					</span>
-				)}
-			</div>
+		<div className='flex items-center gap-1 text-sm font-medium dark:text-white max-md:text-xs'>
+			<Image
+				src={ICONS[asset?.toLowerCase() as keyof typeof ICONS] || getNetworkLogo(network)}
+				alt={asset || network}
+				width={20}
+				height={20}
+				className='rounded-full'
+			/>
+			{asset === EAssets.MYTH ? (
+				<span className='font-medium text-muted-foreground'>
+					{formatUSDWithUnits(new BN(amount)?.div(new BN(10).pow(new BN(treasuryAssetsData[EAssets.MYTH]?.tokenDecimal)))?.toString(), 2)}{' '}
+					{treasuryAssetsData[EAssets.MYTH]?.symbol}
+				</span>
+			) : (
+				<span className='font-medium text-muted-foreground'>
+					{prefix || ''}
+					{formatBnBalance(
+						amount,
+						{ withUnit: true, numberAfterComma: 2, compactNotation: true },
+						network,
+						Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === asset)?.index
+					)}
+				</span>
+			)}
 		</div>
 	);
-});
+}
 
 // Component for a category section
 type CategorySectionProps = {
-	title?: string;
+	title: string;
 	children: ReactNode;
 };
 
-const CategorySection = forwardRef<HTMLDivElement, CategorySectionProps>(({ title, children }, ref) => {
+function CategorySection({ title, children }: CategorySectionProps) {
 	return (
-		<div
-			className='my-4 flex'
-			ref={ref}
-		>
-			{title && <h3 className='w-[120px] text-base font-medium text-muted-foreground'>{title}</h3>}
+		<div className='my-2 flex'>
+			<h3 className='w-[120px] text-base font-medium text-muted-foreground max-md:text-sm'>{title}</h3>
 			<div className='flex flex-col gap-1'>{children}</div>
 		</div>
 	);
-});
+}
 
 // Component for displaying the treasury details
 export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boolean; onClose: () => void; data: ITreasuryStats }): ReactElement {
@@ -167,11 +126,11 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					<DialogTitle className='text-lg font-semibold text-muted-foreground'>{t('treasuryDistribution')}</DialogTitle>
 				</DialogHeader>
 
-				<div className='mt-4 max-h-[70vh] overflow-y-auto'>
+				<div className='max-h-[70vh] overflow-y-auto'>
 					{/* Relay Chain */}
-					<CategorySection title='Relay Chain'>
+					<CategorySection title={t('relayChain')}>
 						<div className='flex flex-col gap-1'>
-							<span className='text-base font-bold text-muted-foreground'>
+							<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 								~ $
 								{formatedAmountWithUSD({
 									amountsDetails: [{ amount: data.relayChain?.dot || null, asset: null }],
@@ -189,8 +148,8 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					</CategorySection>
 
 					{/* Asset Hub */}
-					<CategorySection title='Asset Hub'>
-						<span className='text-base font-bold text-muted-foreground'>
+					<CategorySection title={t('assetHub')}>
+						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 							~ $
 							{formatedAmountWithUSD({
 								amountsDetails: [
@@ -202,14 +161,13 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								network
 							})}
 						</span>
-						<div className='flex gap-2'>
+						<div className='flex flex-wrap gap-2'>
 							{data.assetHub?.dot && (
 								<AssetRow
 									amount={data.assetHub.dot}
 									network={network}
 								/>
 							)}
-							<Separator orientation='vertical' />
 							{data.assetHub?.usdc && (
 								<AssetRow
 									amount={data.assetHub.usdc}
@@ -217,7 +175,6 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 									network={network}
 								/>
 							)}
-							<Separator orientation='vertical' />
 
 							{data.assetHub?.usdt && (
 								<AssetRow
@@ -236,8 +193,8 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					</CategorySection>
 
 					{/* Hydration */}
-					<CategorySection title='Hydration'>
-						<span className='text-base font-bold text-muted-foreground'>
+					<CategorySection title={t('hydration')}>
+						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 							~ $
 							{formatedAmountWithUSD({
 								amountsDetails: [
@@ -249,14 +206,13 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								network
 							})}
 						</span>
-						<div className='flex gap-2'>
+						<div className='flex flex-wrap gap-2'>
 							{data.hydration?.dot && (
 								<AssetRow
 									amount={data.hydration.dot}
 									network={network}
 								/>
 							)}
-							<Separator orientation='vertical' />
 
 							{data.hydration?.usdc && (
 								<AssetRow
@@ -265,7 +221,6 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 									network={network}
 								/>
 							)}
-							<Separator orientation='vertical' />
 
 							{data.hydration?.usdt && (
 								<AssetRow
@@ -278,14 +233,14 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
 								className='flex items-center gap-1 text-xs text-text_pink'
 							>
-								Address #1
+								{t('address')} #1
 								<ExternalLink className='h-4 w-4' />
 							</Link>
 							<Link
 								href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
 								className='flex items-center gap-1 text-xs text-text_pink'
 							>
-								Address #2
+								{t('address')} #2
 								<ExternalLink className='h-4 w-4' />
 							</Link>
 						</div>
@@ -297,8 +252,8 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					/>
 
 					{/* Bounties */}
-					<CategorySection title='Bounties'>
-						<span className='text-base font-bold text-muted-foreground'>
+					<CategorySection title={t('bounties')}>
+						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 							~ $
 							{formatedAmountWithUSD({
 								amountsDetails: [{ amount: data.bounties?.dot || null, asset: null }],
@@ -306,7 +261,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								network
 							})}
 						</span>
-						<div className='flex gap-2'>
+						<div className='flex flex-wrap gap-2'>
 							{data.bounties?.dot && (
 								<AssetRow
 									amount={data.bounties.dot}
@@ -323,8 +278,8 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					</CategorySection>
 
 					{/* Ambassador */}
-					<CategorySection title='Ambassador'>
-						<span className='text-base font-bold text-muted-foreground'>
+					<CategorySection title={t('ambassador')}>
+						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 							~ $
 							{formatedAmountWithUSD({
 								amountsDetails: [{ amount: data.ambassador?.usdt || null, asset: EAssets.USDT }],
@@ -332,7 +287,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								network
 							})}
 						</span>
-						<div className='flex gap-2'>
+						<div className='flex flex-wrap gap-2'>
 							{data.ambassador?.usdt && (
 								<AssetRow
 									amount={data.ambassador.usdt}
@@ -350,8 +305,8 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					</CategorySection>
 
 					{/* Fellowship */}
-					<CategorySection title='Fellowship'>
-						<span className='text-base font-bold text-muted-foreground'>
+					<CategorySection title={t('fellowship')}>
+						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 							~ $
 							{formatedAmountWithUSD({
 								amountsDetails: [
@@ -362,7 +317,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								network
 							})}
 						</span>
-						<div className='flex gap-2'>
+						<div className='flex flex-wrap gap-2'>
 							<Link
 								href='https://assethub-polkadot.subscan.io/account/16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos'
 								className='flex items-center gap-1 text-xs text-text_pink'
@@ -375,8 +330,6 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 									network={network}
 								/>
 							)}
-
-							<Separator orientation='vertical' />
 
 							<Link
 								href='https://assethub-polkadot.subscan.io/account/13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS'
@@ -395,8 +348,8 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 					</CategorySection>
 
 					{/* Loans */}
-					<CategorySection title='Loans'>
-						<span className='text-base font-bold text-muted-foreground'>
+					<CategorySection title={t('loans')}>
+						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 							~ $
 							{formatedAmountWithUSD({
 								amountsDetails: [
@@ -410,12 +363,12 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 							})}
 						</span>
 						<div className='flex flex-wrap gap-2'>
-							<div className='flex gap-2'>
+							<div className='flex flex-wrap gap-2'>
 								<Link
 									href='https://polkadot.polkassembly.io/referenda/432'
 									className='flex items-center gap-1 text-xs text-text_pink'
 								>
-									{t('salary')} <ExternalLink className='h-4 w-4' />
+									Bifrost <ExternalLink className='h-4 w-4' />
 								</Link>
 								{loanAmounts?.bifrost?.dot && (
 									<AssetRow
@@ -424,14 +377,13 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 									/>
 								)}
 							</div>
-							<Separator orientation='vertical' />
 
-							<div className='flex gap-2'>
+							<div className='flex flex-wrap gap-2'>
 								<Link
 									href='https://polkadot.polkassembly.io/referenda/1122'
 									className='flex items-center gap-1 text-xs text-text_pink'
 								>
-									{t('salary')} <ExternalLink className='h-4 w-4' />
+									Centrifuge <ExternalLink className='h-4 w-4' />
 								</Link>
 								{loanAmounts?.centrifuge?.usdc && (
 									<AssetRow
@@ -441,13 +393,12 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 									/>
 								)}
 							</div>
-							<Separator orientation='vertical' />
 							<div className='flex gap-2'>
 								<Link
 									href='https://polkadot.polkassembly.io/referenda/748'
 									className='flex items-center gap-1 text-xs text-text_pink'
 								>
-									{t('salary')} <ExternalLink className='h-4 w-4' />
+									Pendulum <ExternalLink className='h-4 w-4' />
 								</Link>
 
 								{loanAmounts?.pendulum?.dot && (
@@ -457,13 +408,12 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 									/>
 								)}
 							</div>
-							<Separator orientation='vertical' />
 							<div className='flex gap-2'>
 								<Link
 									href='https://polkadot.polkassembly.io/referenda/560'
 									className='flex items-center gap-1 text-xs text-text_pink'
 								>
-									{t('salary')} <ExternalLink className='h-4 w-4' />
+									Hydration <ExternalLink className='h-4 w-4' />
 								</Link>
 
 								{loanAmounts?.hydration?.dot && (

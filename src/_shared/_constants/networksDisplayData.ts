@@ -57,9 +57,24 @@ import PhykenLogo from '@assets/parachain-logos/phyken-logo.png';
 import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
-import { NetworkDataType } from '../types';
+import { StaticImageData } from 'next/image';
 
-export const networkData: NetworkDataType = {
+export interface INetworkDisplayData {
+	polkadot: {
+		[key: string]: StaticImageData;
+	};
+	kusama: {
+		[key: string]: StaticImageData;
+	};
+	soloChains: {
+		[key: string]: StaticImageData;
+	};
+	testChains: {
+		[key: string]: StaticImageData;
+	};
+}
+
+export const NETWORKS_DISPLAY_DATA: INetworkDisplayData = {
 	polkadot: {
 		Polkadot: PolkadotLogo,
 		Astar: AstarLogo,

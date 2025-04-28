@@ -16,9 +16,9 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
-import { getNetworkLogo } from '@/_shared/_utils/getNetworkLogo';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { getNetworkLogo } from '@/app/_client-utils/getNetworkLogo';
 import styles from './TreasuryStats.module.scss';
 import { TooltipContent, TooltipTrigger, Tooltip } from '../Tooltip';
 import { Separator } from '../Separator';
@@ -56,17 +56,17 @@ interface AssetDisplayProps {
 	alt: string;
 	value: string;
 	showSeparator?: boolean;
+	inActivityFeed?: boolean;
 }
-
-function AssetDisplay({ icon, alt, value, showSeparator = true }: AssetDisplayProps) {
+function AssetDisplay({ icon, alt, value, showSeparator = true, inActivityFeed = false }: AssetDisplayProps) {
 	return (
 		<>
 			<div className='flex items-center font-medium'>
 				<Image
 					src={icon}
 					alt={alt}
-					width={20}
-					height={20}
+					width={inActivityFeed ? 16 : 20}
+					height={inActivityFeed ? 16 : 20}
 					className='mr-2 rounded-full'
 				/>
 				<span className='font-medium'>{value}</span>
@@ -173,7 +173,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 
 	return (
 		<div className='flex w-full gap-x-4 max-md:flex-col'>
-			<div className={styles.treasuryStatsContainer}>
+			<div className={cn(styles.treasuryStatsContainer, !isActivityFeed ? 'w-1/2 max-md:w-full' : 'w-full')}>
 				<TreasuryHeader
 					isActivityFeed={isActivityFeed}
 					tokenSymbol={tokenSymbol}
@@ -188,38 +188,35 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 				<div className='mt-2'>
 					<h1 className='text-lg font-bold text-muted-foreground dark:text-white'>~${treasuryData.totalInUsd}</h1>
 
-					{/* {!isActivityFeed && (
-						<Separator
-							orientation='horizontal'
-							className='mt-4 w-full'
-						/>
-					)} */}
-
-					<div className={cn('mt-4 flex flex-wrap items-center gap-2 font-semibold', isActivityFeed ? 'text-xs' : 'text-base')}>
-						<div className='flex items-center gap-6'>
+					<div className={cn('mt-2 flex flex-wrap items-center gap-2 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
+						<div className={cn('flex items-center max-md:gap-x-2', isActivityFeed ? 'gap-x-1' : 'gap-x-6')}>
 							<AssetDisplay
 								icon={getNetworkLogo(network)}
 								alt={network}
 								value={treasuryData.dotBalance}
+								inActivityFeed={isActivityFeed}
 							/>
 							<AssetDisplay
 								icon={USDCIcon}
 								alt='USDC'
 								value={treasuryData.usdcBalance}
 								showSeparator={false}
+								inActivityFeed={isActivityFeed}
 							/>
 						</div>
-						<div className='flex items-center gap-6'>
+						<div className={cn('flex items-center max-md:gap-2', isActivityFeed ? 'gap-2' : 'gap-6')}>
 							<AssetDisplay
 								icon={USDTIcon}
 								alt='USDT'
 								value={treasuryData.usdtBalance}
+								inActivityFeed={isActivityFeed}
 							/>
 							<AssetDisplay
 								icon={MYTHIcon}
 								alt='MYTH'
 								value={`${treasuryData.mythBalance} ${treasuryAssetsData[EAssets.MYTH]?.symbol}`}
 								showSeparator={false}
+								inActivityFeed={isActivityFeed}
 							/>
 						</div>
 					</div>
@@ -254,10 +251,12 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 			</div>
 
 			{!isActivityFeed && (
-				<SpendPeriodStats
-					nextSpendAt={data?.[0]?.relayChain?.nextSpendAt}
-					nextBurn={data?.[0]?.relayChain?.nextBurn}
-				/>
+				<div className='w-1/2 max-md:w-full'>
+					<SpendPeriodStats
+						nextSpendAt={data?.[0]?.relayChain?.nextSpendAt}
+						nextBurn={data?.[0]?.relayChain?.nextBurn}
+					/>
+				</div>
 			)}
 		</div>
 	);
