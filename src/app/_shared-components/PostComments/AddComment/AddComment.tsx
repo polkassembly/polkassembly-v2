@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback, memo } from 'react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { EProposalType, IComment, IPublicUser } from '@/_shared/types';
 import { useAtomValue } from 'jotai';
@@ -17,19 +17,15 @@ import { MDXEditorMethods } from '@mdxeditor/editor';
 import classes from './AddComment.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
-function AddComment({
-	proposalType,
-	proposalIndex,
-	parentCommentId,
-	onConfirm,
-	onCancel
-}: {
+interface AddCommentProps {
 	proposalType: EProposalType;
 	proposalIndex: string;
 	parentCommentId?: string;
 	onConfirm?: (newComment: IComment, user: Omit<IPublicUser, 'rank'>) => void;
 	onCancel?: () => void;
-}) {
+}
+
+function AddComment({ proposalType, proposalIndex, parentCommentId, onConfirm, onCancel }: AddCommentProps) {
 	const t = useTranslations();
 	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, parentCommentId });
 	const [content, setContent] = useState<string | null>(savedContent);
@@ -39,7 +35,15 @@ function AddComment({
 
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
-	const addComment = async () => {
+	const handleContentChange = useCallback(
+		(data: string) => {
+			setContent(data);
+			LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
+		},
+		[parentCommentId, proposalIndex]
+	);
+
+	const addComment = useCallback(async () => {
 		if (!content?.trim() || !user) return;
 		try {
 			setLoading(true);
@@ -76,17 +80,14 @@ function AddComment({
 			setLoading(false);
 			// TODO: show notification
 		}
-	};
+	}, [content, onConfirm, parentCommentId, proposalIndex, proposalType, user]);
 
 	return (
 		<div>
 			<div className='mb-2'>
 				<MarkdownEditor
 					markdown={content || ''}
-					onChange={(data) => {
-						setContent(data);
-						LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
-					}}
+					onChange={handleContentChange}
 					ref={markdownEditorRef}
 				/>
 			</div>
@@ -114,4 +115,4 @@ function AddComment({
 	);
 }
 
-export default AddComment;
+export default memo(AddComment);

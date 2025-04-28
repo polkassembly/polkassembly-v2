@@ -8,17 +8,16 @@ import { EVoteDecision } from '@/_shared/types';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import SplitImg from '@assets/icons/split-yellow-icon.svg';
 import SplitAbstainImg from '@assets/icons/abstainGray.svg';
+import { memo } from 'react';
 import { Separator } from '../../Separator';
 
-function VoteDetailsButton({
-	userVoteType,
-	votedText,
-	setShowVoteDetails
-}: {
+interface VoteDetailsButtonProps {
 	userVoteType: EVoteDecision | null;
 	votedText: string;
 	setShowVoteDetails: (show: boolean) => void;
-}) {
+}
+
+function VoteDetailsButton({ userVoteType, votedText, setShowVoteDetails }: VoteDetailsButtonProps) {
 	const t = useTranslations();
 	if (!userVoteType) return null;
 
@@ -92,4 +91,4 @@ function VoteDetailsButton({
 	);
 }
 
-export default VoteDetailsButton;
+export default memo(VoteDetailsButton);

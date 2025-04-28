@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@ui/Dialog/Dialog';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IVoteData } from '@/_shared/types';
@@ -15,18 +15,18 @@ import { Collapsible, CollapsibleContent } from '../../Collapsible';
 import { Separator } from '../../Separator';
 import styles from './VoteCommentsDialog.module.scss';
 
-function VoteCommentsDialog({
-	voteInfo,
-	showVoteDetails,
-	setShowVoteDetails
-}: {
+interface VoteCommentsDialogProps {
 	voteInfo: IVoteData;
 	showVoteDetails: boolean;
 	setShowVoteDetails: (showVoteDetails: boolean) => void;
-}) {
+}
+
+function VoteCommentsDialog({ voteInfo, showVoteDetails, setShowVoteDetails }: VoteCommentsDialogProps) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const [expanded, setExpanded] = useState(false);
+
+	const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
 
 	const getConvictionText = (lockPeriod: number) => {
 		if (lockPeriod === 0) return '0.1x/d';
@@ -35,6 +35,12 @@ function VoteCommentsDialog({
 
 	const convictionText = t('PostDetails.conviction');
 	const votingPowerText = t('PostDetails.votingPower');
+
+	const formatBalanceOptions = {
+		withUnit: true,
+		numberAfterComma: 2,
+		compactNotation: true
+	};
 
 	return (
 		<Dialog
@@ -62,18 +68,16 @@ function VoteCommentsDialog({
 							<TableBody className={`bg-page_background ${expanded ? 'border-t-2 border-text_pink' : 'border-b border-border_grey'}`}>
 								<TableRow
 									className='cursor-pointer'
-									onClick={() => setExpanded(!expanded)}
+									onClick={toggleExpanded}
 								>
 									<TableCell>
 										<div className='flex items-center gap-2'>
 											<Address address={voteInfo.voterAddress} />
 										</div>
 									</TableCell>
-									<TableCell>{formatBnBalance(voteInfo.balanceValue, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}</TableCell>
+									<TableCell>{formatBnBalance(voteInfo.balanceValue, formatBalanceOptions, network)}</TableCell>
 									<TableCell>{getConvictionText(voteInfo.lockPeriod)}</TableCell>
-									<TableCell>
-										{voteInfo.totalVotingPower && formatBnBalance(voteInfo.totalVotingPower?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-									</TableCell>
+									<TableCell>{voteInfo.totalVotingPower && formatBnBalance(voteInfo.totalVotingPower?.toString(), formatBalanceOptions, network)}</TableCell>
 									<TableCell>
 										<button
 											type='button'
@@ -108,9 +112,7 @@ function VoteCommentsDialog({
 												<div className={styles.postvotetext}>
 													<span>{votingPowerText}</span>
 													{voteInfo.selfVotingPower && (
-														<span className={styles.valuelabel}>
-															{formatBnBalance(voteInfo.selfVotingPower?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-														</span>
+														<span className={styles.valuelabel}>{formatBnBalance(voteInfo.selfVotingPower?.toString(), formatBalanceOptions, network)}</span>
 													)}
 												</div>
 												<div className={styles.postvotetext}>
@@ -119,11 +121,7 @@ function VoteCommentsDialog({
 												</div>
 												<div className={styles.postvotetext}>
 													<span>{t('PostDetails.capital')}</span>
-													{voteInfo.balanceValue && (
-														<span className={styles.valuelabel}>
-															{formatBnBalance(voteInfo.balanceValue?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-														</span>
-													)}
+													{voteInfo.balanceValue && <span className={styles.valuelabel}>{formatBnBalance(voteInfo.balanceValue?.toString(), formatBalanceOptions, network)}</span>}
 												</div>
 											</div>
 
@@ -133,9 +131,7 @@ function VoteCommentsDialog({
 													<div className={styles.postvotetext}>
 														<span>{votingPowerText}</span>
 														{voteInfo.delegatedVotingPower && (
-															<span className={styles.valuelabel}>
-																{formatBnBalance(voteInfo.delegatedVotingPower?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-															</span>
+															<span className={styles.valuelabel}>{formatBnBalance(voteInfo.delegatedVotingPower?.toString(), formatBalanceOptions, network)}</span>
 														)}
 													</div>
 													<div className={styles.postvotetext}>
@@ -146,11 +142,7 @@ function VoteCommentsDialog({
 														<span>{t('PostDetails.capital')}</span>
 														{voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0) && (
 															<span className={styles.valuelabel}>
-																{formatBnBalance(
-																	voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0).toString(),
-																	{ withUnit: true, numberAfterComma: 2, compactNotation: true },
-																	network
-																)}
+																{formatBnBalance(voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0).toString(), formatBalanceOptions, network)}
 															</span>
 														)}
 													</div>
@@ -182,14 +174,10 @@ function VoteCommentsDialog({
 																		<Address address={delegatedVote.voterAddress} />
 																	</div>
 																</TableCell>
-																<TableCell>
-																	{delegatedVote.balanceValue &&
-																		formatBnBalance(delegatedVote.balanceValue?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-																</TableCell>
+																<TableCell>{delegatedVote.balanceValue && formatBnBalance(delegatedVote.balanceValue?.toString(), formatBalanceOptions, network)}</TableCell>
 																<TableCell>{getConvictionText(delegatedVote.lockPeriod)}</TableCell>
 																<TableCell>
-																	{delegatedVote.totalVotingPower &&
-																		formatBnBalance(delegatedVote.totalVotingPower?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
+																	{delegatedVote.totalVotingPower && formatBnBalance(delegatedVote.totalVotingPower?.toString(), formatBalanceOptions, network)}
 																</TableCell>
 															</TableRow>
 														))}
@@ -208,4 +196,4 @@ function VoteCommentsDialog({
 	);
 }
 
-export default VoteCommentsDialog;
+export default memo(VoteCommentsDialog);
