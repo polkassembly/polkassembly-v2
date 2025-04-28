@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Suspense } from 'react';
-import { IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing, ITreasuryStats, IErrorResponse } from '@/_shared/types';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import TreasuryStats from '@/app/_shared-components/TreasuryStats/TreasuryStats';
 import styles from './Overview.module.scss';
@@ -11,7 +11,13 @@ import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
 
-function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData: ITreasuryStats[] }) {
+function Overview({
+	allTracksData,
+	treasuryStatsData
+}: {
+	allTracksData: IGenericListingResponse<IPostListing>;
+	treasuryStatsData: { data: ITreasuryStats[]; error: IErrorResponse | null };
+}) {
 	return (
 		<div className={styles.overview_container}>
 			<OverviewHeading />
@@ -23,7 +29,10 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 
 			{/* Treasury Stats */}
 			<div>
-				<TreasuryStats data={treasuryStatsData} />
+				<TreasuryStats
+					data={treasuryStatsData.data}
+					error={treasuryStatsData.error}
+				/>
 			</div>
 
 			{/* Latest Activity */}

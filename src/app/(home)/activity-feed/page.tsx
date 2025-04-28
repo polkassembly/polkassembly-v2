@@ -28,8 +28,8 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 			? await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id })
 			: await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
 
-	const { data: treasuryStatsData } = await NextApiClientService.getTreasuryStats({
-		from: dayjs().subtract(1, 'year').toDate(),
+	const { data: treasuryStatsData, error: treasuryStatsError } = await NextApiClientService.getTreasuryStats({
+		from: dayjs().subtract(1, 'hour').toDate(),
 		to: dayjs().toDate()
 	});
 
@@ -42,7 +42,7 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 			<ActivityFeed
 				initialData={data}
 				activeTab={tab}
-				treasuryStatsData={treasuryStatsData || []}
+				treasuryStatsData={{ data: treasuryStatsData || [], error: treasuryStatsError || null }}
 			/>
 		</Suspense>
 	);

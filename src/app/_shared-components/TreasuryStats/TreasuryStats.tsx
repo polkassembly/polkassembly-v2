@@ -6,7 +6,7 @@
 
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EAssets, ITreasuryStats } from '@/_shared/types';
+import { EAssets, IErrorResponse, ITreasuryStats } from '@/_shared/types';
 import { Info } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import USDCIcon from '@/_assets/icons/usdc.svg';
@@ -18,7 +18,6 @@ import { useTranslations } from 'next-intl';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getNetworkLogo } from '@/app/_client-utils/getNetworkLogo';
 import styles from './TreasuryStats.module.scss';
 import { TooltipContent, TooltipTrigger, Tooltip } from '../Tooltip';
 import { Separator } from '../Separator';
@@ -26,6 +25,7 @@ import { Button } from '../Button';
 import { TreasuryDetailsDialog } from './TreasuryStatsDialog';
 import { Skeleton } from '../Skeleton';
 import SpendPeriodStats from './SpendPeriodStats';
+import ErrorMessage from '../ErrorMessage';
 
 interface PriceDisplayProps {
 	tokenSymbol: string;
@@ -154,7 +154,7 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 	};
 };
 
-function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: boolean; data: ITreasuryStats[] }) {
+function TreasuryStats({ isActivityFeed = false, data, error }: { isActivityFeed?: boolean; data: ITreasuryStats[]; error: IErrorResponse | null }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const tokenSymbol = NETWORKS_DETAILS?.[`${network}`]?.tokenSymbol;
@@ -167,7 +167,10 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 
 	const treasuryData = useTreasuryData(data);
 
-	if (!data?.length) {
+	if (error || !data?.length) {
+		return <ErrorMessage errorMessage={error?.message || t('TreasuryStats.error')} />;
+	}
+	if (!data?.length && !error) {
 		return <Skeleton className='h-full w-full' />;
 	}
 
@@ -191,7 +194,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 					<div className={cn('mt-2 flex flex-wrap items-center gap-2 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
 						<div className={cn('flex items-center max-md:gap-x-2', isActivityFeed ? 'gap-x-1' : 'gap-x-6')}>
 							<AssetDisplay
-								icon={getNetworkLogo(network)}
+								icon={NETWORKS_DETAILS[`${network}`].logo}
 								alt={network}
 								value={treasuryData.dotBalance}
 								inActivityFeed={isActivityFeed}

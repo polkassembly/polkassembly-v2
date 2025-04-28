@@ -10,6 +10,10 @@ import { TiHome } from 'react-icons/ti';
 import { PiRedditLogoFill } from 'react-icons/pi';
 import { RiBox3Line } from 'react-icons/ri';
 import { IconType } from 'react-icons/lib';
+import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
+import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
+import { StaticImageData } from 'next/image';
 
 interface ISocialLink {
 	id: string;
@@ -93,6 +97,7 @@ interface IAssethubDetails {
 
 interface INetworkDetails {
 	key: ENetwork;
+	logo: StaticImageData;
 	preimageBaseDeposit?: BN;
 	submissionDeposit?: BN;
 	name: string;
@@ -1577,6 +1582,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
+		logo: PolkadotLogo,
 		preimageBaseDeposit: new BN('400000000000'),
 		submissionDeposit: new BN('10000000000'),
 		name: 'Polkadot',
@@ -1653,6 +1659,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
+		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
 		govtype: EGovType.OPENGOV,
 		parachain: '1000',
@@ -1707,6 +1714,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.WESTEND]: {
 		key: ENetwork.WESTEND,
+		logo: WestendLogo,
 		submissionDeposit: new BN('30000000000'),
 		name: 'Westend',
 		govtype: EGovType.OPENGOV,

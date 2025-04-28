@@ -5,13 +5,13 @@
 import React from 'react';
 import { useUser } from '@/hooks/useUser';
 import TreasuryStats from '@/app/_shared-components/TreasuryStats/TreasuryStats';
-import { ITreasuryStats } from '@/_shared/types';
+import { ITreasuryStats, IErrorResponse } from '@/_shared/types';
 import ActivityFeedAbout from './Sidebar/ActivityFeedAbout/ActivityFeedAbout';
 import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal/ActivityFeedActiveProposal';
 import ActivityFeedRankCard from './Sidebar/ActivityFeedRankCard';
 import ActivityFeedFeaturesSection from './Sidebar/ActivityFeedFeaturesSection/ActivityFeedFeaturesSection';
 
-function ActivityFeedSidebar({ treasuryStatsData }: { treasuryStatsData: ITreasuryStats[] }) {
+function ActivityFeedSidebar({ treasuryStatsData }: { treasuryStatsData: { data: ITreasuryStats[]; error: IErrorResponse | null } }) {
 	const { user } = useUser();
 
 	return (
@@ -20,7 +20,8 @@ function ActivityFeedSidebar({ treasuryStatsData }: { treasuryStatsData: ITreasu
 			{user?.id && <ActivityFeedActiveProposal />}
 			<TreasuryStats
 				isActivityFeed
-				data={treasuryStatsData}
+				data={treasuryStatsData.data}
+				error={treasuryStatsData.error}
 			/>
 			<ActivityFeedRankCard />
 			<ActivityFeedFeaturesSection />

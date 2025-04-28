@@ -19,7 +19,6 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
-import { getNetworkLogo } from '@/app/_client-utils/getNetworkLogo';
 import { Separator } from '../Separator';
 
 // Component for displaying a single asset row
@@ -42,6 +41,7 @@ const formatedAmountWithUSD = ({
 }) => {
 	let totalUSD = BN_ZERO;
 	const nativeTokenPriceBN = decimalToBN(currentTokenPrice);
+
 	amountsDetails?.forEach(({ amount, asset }) => {
 		if (amount) {
 			if (!asset) {
@@ -66,10 +66,11 @@ function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
 		usdt: USDTIcon,
 		myth: MYTHIcon
 	};
+
 	return (
 		<div className='flex items-center gap-1 text-sm font-medium dark:text-white max-md:text-xs'>
 			<Image
-				src={ICONS[asset?.toLowerCase() as keyof typeof ICONS] || getNetworkLogo(network)}
+				src={ICONS[asset?.toLowerCase() as keyof typeof ICONS] || NETWORKS_DETAILS[`${network}`].logo}
 				alt={asset || network}
 				width={20}
 				height={20}

@@ -16,7 +16,7 @@ import { Progress } from '../Progress/Progress';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../Tooltip';
 import { Separator } from '../Separator';
 
-export const calculateSpendPeriodProgress = (spendPeriodEndsAt: Date | string | null, durationInDays: number) => {
+const calculateSpendPeriodProgress = (spendPeriodEndsAt: Date | string | null, durationInDays: number) => {
 	if (!spendPeriodEndsAt || !durationInDays) return 0;
 	const now = dayjs();
 	const endDate = dayjs(spendPeriodEndsAt);

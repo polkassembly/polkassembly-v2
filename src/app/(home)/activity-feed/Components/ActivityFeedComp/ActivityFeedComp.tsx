@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EActivityFeedTab, IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IPostListing, ITreasuryStats, IErrorResponse } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent } from '@ui/Tabs';
@@ -24,7 +24,7 @@ function ActivityFeedComp({
 }: {
 	initialData: IGenericListingResponse<IPostListing>;
 	activeTab: EActivityFeedTab;
-	treasuryStatsData: ITreasuryStats[];
+	treasuryStatsData: { data: ITreasuryStats[]; error: IErrorResponse | null };
 }) {
 	const t = useTranslations();
 	const router = useRouter();

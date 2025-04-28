@@ -15,8 +15,8 @@ async function OverviewPage() {
 		limit: DEFAULT_LISTING_LIMIT,
 		page: 1
 	});
-	const { data: treasuryStatsData } = await NextApiClientService.getTreasuryStats({
-		from: dayjs().subtract(1, 'year').toDate(),
+	const { data: treasuryStatsData, error: treasuryStatsError } = await NextApiClientService.getTreasuryStats({
+		from: dayjs().subtract(1, 'hour').toDate(),
 		to: dayjs().toDate()
 	});
 
@@ -28,7 +28,7 @@ async function OverviewPage() {
 		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 			<Overview
 				allTracksData={allTracksData}
-				treasuryStatsData={treasuryStatsData || []}
+				treasuryStatsData={{ data: treasuryStatsData || [], error: treasuryStatsError || null }}
 			/>
 		</div>
 	);
