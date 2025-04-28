@@ -89,7 +89,6 @@ export class SubsquidService extends SubsquidUtils {
 			supportThreshold: calculateThresholdValue({ trackName, network, currentPoint: currentSupport, decisionPeriodHrs })
 		};
 
-		console.log('Debug - Progress data calculated:', progressData);
 		return {
 			...voteMetrics,
 			voteProgress: progressData

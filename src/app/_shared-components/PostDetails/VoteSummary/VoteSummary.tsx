@@ -9,7 +9,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, EVoteDecision, IVoteMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
-import { PieChart } from 'react-minimal-pie-chart';
+import { PieChart, Pie, Cell } from 'recharts';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
@@ -24,7 +24,57 @@ import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 import { Skeleton } from '../../Skeleton';
 
+const RADIAN = Math.PI / 180;
 const NONE_CHART_VALUE = 0;
+
+const needle = (value: number, cx: number, cy: number, length: number) => {
+	const ang = 180.0 * (1 - value / 100);
+	const sin = Math.sin(-RADIAN * ang);
+	const cos = Math.cos(-RADIAN * ang);
+	const r = 5;
+	const x0 = cx;
+	const y0 = cy;
+	const xba = x0 + r * sin;
+	const yba = y0 - r * cos;
+	const xbb = x0 - r * sin;
+	const ybb = y0 + r * cos;
+	const xp = x0 + length * cos;
+	const yp = y0 + length * sin;
+
+	const textDistance = 25;
+	const textX = xp + textDistance * cos;
+	const textY = yp + textDistance * sin;
+
+	return [
+		<circle
+			key='needle-circle'
+			cx={x0}
+			cy={y0}
+			r={r}
+			fill='currentColor'
+			stroke='none'
+		/>,
+		<path
+			key='needle-path'
+			d={`M${xba} ${yba}L${xbb} ${ybb} L${xp} ${yp} L${xba} ${yba}`}
+			stroke='none'
+			fill='currentColor'
+		/>,
+		<text
+			key='needle-text'
+			x={textX}
+			y={textY}
+			textAnchor='middle'
+			dominantBaseline='middle'
+			transform={`rotate(${90 - ang}, ${textX}, ${textY})`}
+			fill='currentColor'
+			fontSize='14'
+			fontWeight='bold'
+		>
+			{`${value}%`}
+		</text>
+	];
+};
 
 function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
@@ -87,6 +137,12 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	const NAY_TITLE = t('PostDetails.nay');
 
 	const progress = voteMetrics?.voteProgress;
+
+	const chartData = [
+		{ id: 'aye', name: 'Aye', value: isAyeNaN ? NONE_CHART_VALUE : ayePercent, color: THEME_COLORS.light.aye_color },
+		{ id: 'nay', name: 'Nay', value: isNayNaN ? NONE_CHART_VALUE : nayPercent, color: THEME_COLORS.light.nay_color }
+	];
+
 	return (
 		<div className={classes.voteSummaryWrapper}>
 			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
@@ -99,57 +155,35 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
-						<div className='relative'>
+						<div className='relative flex h-[150px] w-[220px] items-center justify-center'>
 							<PieChart
-								className='w-full'
-								center={[50, 75]}
-								startAngle={-180}
-								lengthAngle={180}
-								rounded
-								lineWidth={15}
-								data={[
-									{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-									{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
-								]}
-								segmentsStyle={{ transition: 'stroke .3s' }}
-							/>
-							<div className='absolute inset-0'>
-								{(() => {
-									const centerX = 75;
-									const centerY = 103;
-									const arcRadius = 65;
-									const labelRadius = arcRadius + 18;
-									const angle = -180 + (180 * progress.approvalThreshold) / 100;
-									const radians = (angle * Math.PI) / 180;
-
-									const labelX = centerX + labelRadius * Math.cos(radians);
-									const labelY = centerY + labelRadius * Math.sin(radians);
-
-									return (
-										<>
-											<div
-												className='absolute h-[2px] w-[15px] bg-wallet_btn_text'
-												style={{
-													left: `${centerX}px`,
-													top: `${centerY}px`,
-													transform: `rotate(${angle}deg) translateX(${arcRadius}px)`,
-													transformOrigin: 'left center'
-												}}
-											/>
-											<div
-												className='absolute whitespace-nowrap text-xs font-medium'
-												style={{
-													left: `${labelX}px`,
-													top: `${labelY}px`,
-													transform: 'translate(-50%, -100%)'
-												}}
-											>
-												{progress.approvalThreshold.toFixed(1)}%
-											</div>
-										</>
-									);
-								})()}
-							</div>
+								width={220}
+								height={200}
+								className='absolute left-1/2 -translate-x-1/2'
+							>
+								<Pie
+									data={chartData}
+									cx={100}
+									cy={150}
+									innerRadius={65}
+									outerRadius={75}
+									dataKey='value'
+									startAngle={180}
+									endAngle={0}
+									paddingAngle={-10}
+									cornerRadius={15}
+									stroke='none'
+								>
+									{chartData.map((entry) => (
+										<Cell
+											key={`cell-${entry.id}`}
+											fill={entry.color}
+											stroke='none'
+										/>
+									))}
+								</Pie>
+								{progress?.approvalThreshold && <g className='text-text_primary'>{needle(progress.approvalThreshold, 100, 150, 60)}</g>}
+							</PieChart>
 						</div>
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
