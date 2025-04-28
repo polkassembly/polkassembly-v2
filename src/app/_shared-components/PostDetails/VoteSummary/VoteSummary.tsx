@@ -113,44 +113,52 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 									{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
 								]}
 								segmentsStyle={{ transition: 'stroke .3s' }}
-							/>
-							<div className='absolute inset-0'>
-								{(() => {
-									const centerX = 75;
-									const centerY = 103;
-									const arcRadius = 65;
-									const labelRadius = arcRadius + 18;
-									const angle = -180 + (180 * progress.approvalThreshold) / 100;
-									const radians = (angle * Math.PI) / 180;
+							>
+								{progress?.approvalThreshold &&
+									(() => {
+										const centerX = 50; // SVG uses relative 0-100
+										const centerY = 75;
+										const arcRadius = 46; // middle of the arc
+										const lineWidth = 8;
+										const labelRadius = arcRadius + 10;
+										const angle = -180 + (180 * progress.approvalThreshold) / 100;
+										const radians = (angle * Math.PI) / 180;
 
-									const labelX = centerX + labelRadius * Math.cos(radians);
-									const labelY = centerY + labelRadius * Math.sin(radians);
+										const innerRadius = arcRadius - lineWidth / 2;
+										const outerRadius = arcRadius + lineWidth / 2;
+										const lineStartX = centerX + innerRadius * Math.cos(radians);
+										const lineStartY = centerY + innerRadius * Math.sin(radians);
+										const lineEndX = centerX + outerRadius * Math.cos(radians);
+										const lineEndY = centerY + outerRadius * Math.sin(radians);
 
-									return (
-										<>
-											<div
-												className='absolute h-[2px] w-[15px] bg-wallet_btn_text'
-												style={{
-													left: `${centerX}px`,
-													top: `${centerY}px`,
-													transform: `rotate(${angle}deg) translateX(${arcRadius}px)`,
-													transformOrigin: 'left center'
-												}}
-											/>
-											<div
-												className='absolute whitespace-nowrap text-xs font-medium'
-												style={{
-													left: `${labelX}px`,
-													top: `${labelY}px`,
-													transform: 'translate(-50%, -100%)'
-												}}
-											>
-												{progress.approvalThreshold.toFixed(1)}%
-											</div>
-										</>
-									);
-								})()}
-							</div>
+										const labelX = centerX + labelRadius * Math.cos(radians);
+										const labelY = centerY + labelRadius * Math.sin(radians);
+
+										return (
+											<>
+												{/* SVG line */}
+												<line
+													x1={lineStartX}
+													y1={lineStartY}
+													x2={lineEndX}
+													y2={lineEndY}
+													stroke='black'
+													strokeWidth='1'
+												/>
+												{/* SVG label */}
+												<text
+													x={labelX}
+													y={labelY}
+													textAnchor='middle'
+													fontSize='6'
+													fill='black'
+												>
+													{progress.approvalThreshold.toFixed(1)}%
+												</text>
+											</>
+										);
+									})()}
+							</PieChart>
 						</div>
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
