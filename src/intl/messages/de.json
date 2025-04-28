@@ -442,7 +442,13 @@
 		"commentSummary": "Kommentarzusammenfassung",
 		"aiSummary": "KI-Zusammenfassung",
 		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
-		"hideLikelySpam": "Wahrscheinliche Spam ausblenden"
+		"hideLikelySpam": "Wahrscheinliche Spam ausblenden",
+		"VoteCurves": {
+			"approval": "Zustimmung",
+			"support": "Unterstützung",
+			"threshold": "Schwellenwert",
+			"votingData": "Abstimmungsdaten"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",

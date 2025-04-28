@@ -23,6 +23,7 @@ import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
+import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
@@ -123,6 +124,15 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 							/>
+							{postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.Deciding) && (
+								<VoteCurvesData
+									proposalType={post.proposalType}
+									index={index}
+									createdAt={postData?.createdAt}
+									trackName={postData?.onChainInfo?.origin || EPostOrigin.ROOT}
+									timeline={postData?.onChainInfo?.timeline}
+								/>
+							)}
 						</div>
 					)}
 					{post.proposalType === EProposalType.BOUNTY && (

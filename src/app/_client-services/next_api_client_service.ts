@@ -41,7 +41,8 @@ import {
 	IVoteHistoryData,
 	ITreasuryStats,
 	IContentSummary,
-	IAddressRelations
+	IAddressRelations,
+	IVoteCurve
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -116,7 +117,8 @@ enum EApiRoute {
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
-	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS'
+	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
+	GET_VOTE_CURVES = 'GET_VOTE_CURVES'
 }
 
 export class NextApiClientService {
@@ -210,6 +212,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
+			case EApiRoute.GET_VOTE_CURVES:
 				break;
 
 			// post routes
@@ -937,5 +940,10 @@ export class NextApiClientService {
 	static async fetchAddressRelations(address: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ADDRESS_RELATIONS, routeSegments: [address, 'relations'] });
 		return this.nextApiClientFetch<IAddressRelations>({ url, method });
+	}
+
+	static async getVoteCurves({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTE_CURVES, routeSegments: [proposalType, indexOrHash, 'vote-curves'] });
+		return this.nextApiClientFetch<IVoteCurve[]>({ url, method });
 	}
 }
