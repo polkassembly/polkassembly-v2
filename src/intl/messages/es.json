@@ -8,7 +8,15 @@
 		"price": "Precio",
 		"total": "Total",
 		"treasuryDistribution": "Distribución de Tesorería",
-		"details": "Detalles"
+		"details": "Detalles",
+		"spendPeriodRemaining": "Período de Gastos Restante",
+		"nextBurn": "Próxima Quema",
+		"days": "días",
+		"hours": "horas",
+		"minutes": "minutos",
+		"seconds": "segundos",
+		"spendPeriodTooltip": "Los fondos solicitados de la tesorería se distribuyen periódicamente al final del período de gastos.",
+		"nextBurnTooltip": "Si la tesorería termina un período de gastos sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos."
 	},
 
 	"ActivityFeed": {

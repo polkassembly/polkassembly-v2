@@ -8,7 +8,15 @@
 		"price": "Price",
 		"total": "Total",
 		"treasuryDistribution": "Treasury Distribution",
-		"details": "Details"
+		"details": "Details",
+		"spendPeriodRemaining": "Spend Period Remaining",
+		"nextBurn": "Next Burn",
+		"days": "days",
+		"hours": "hours",
+		"minutes": "minutes",
+		"seconds": "seconds",
+		"spendPeriodTooltip": "Funds requested from the treasury are periodically distributed at the end of the spend period.",
+		"nextBurnTooltip": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds."
 	},
 	"ActivityFeed": {
 		"please": "Please",

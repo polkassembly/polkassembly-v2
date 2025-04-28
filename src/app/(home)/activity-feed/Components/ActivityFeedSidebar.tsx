@@ -5,19 +5,23 @@
 import React from 'react';
 import { useUser } from '@/hooks/useUser';
 import TreasuryStats from '@/app/_shared-components/TreasuryStats/TreasuryStats';
+import { ITreasuryStats } from '@/_shared/types';
 import ActivityFeedAbout from './Sidebar/ActivityFeedAbout/ActivityFeedAbout';
 import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal/ActivityFeedActiveProposal';
 import ActivityFeedRankCard from './Sidebar/ActivityFeedRankCard';
 import ActivityFeedFeaturesSection from './Sidebar/ActivityFeedFeaturesSection/ActivityFeedFeaturesSection';
 
-function ActivityFeedSidebar() {
+function ActivityFeedSidebar({ treasuryStatsData }: { treasuryStatsData: ITreasuryStats[] }) {
 	const { user } = useUser();
 
 	return (
 		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
 			{user?.id && <ActivityFeedActiveProposal />}
-			<TreasuryStats isActivityFeed />
+			<TreasuryStats
+				isActivityFeed
+				data={treasuryStatsData}
+			/>
 			<ActivityFeedRankCard />
 			<ActivityFeedFeaturesSection />
 		</div>

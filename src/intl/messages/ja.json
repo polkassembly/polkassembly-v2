@@ -8,7 +8,15 @@
 		"price": "価格",
 		"total": "合計",
 		"treasuryDistribution": "財務分配",
-		"details": "詳細"
+		"details": "詳細",
+		"spendPeriodRemaining": "支出期間残り",
+		"nextBurn": "次の燃焼",
+		"days": "日",
+		"hours": "時間",
+		"minutes": "分",
+		"seconds": "秒",
+		"spendPeriodTooltip": "財務から要求された資金は、支出期間の終了時に定期的に分配されます。",
+		"nextBurnTooltip": "財務が支出期間を終了するときにすべての資金を使用しない場合、一定の割合の資金が燃焼されます。"
 	},
 
 	"ActivityFeed": {
