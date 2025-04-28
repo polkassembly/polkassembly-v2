@@ -428,6 +428,7 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"threshold": "Threshold",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",

@@ -32,6 +32,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
+	const [showThresholdPercentage, setShowThresholdPercentage] = useState(false);
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
@@ -81,7 +82,6 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 		const centerY = 75;
 		const arcRadius = 46;
 		const lineWidth = 8;
-		const labelRadius = arcRadius + 10;
 		const angle = -180 + (180 * progress.approvalThreshold) / 100;
 		const radians = (angle * Math.PI) / 180;
 
@@ -92,31 +92,20 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 		const lineEndX = centerX + outerRadius * Math.cos(radians);
 		const lineEndY = centerY + outerRadius * Math.sin(radians);
 
-		const labelX = centerX + labelRadius * Math.cos(radians);
-		const labelY = centerY + labelRadius * Math.sin(radians);
-
 		return (
-			<>
-				<line
-					x1={lineStartX}
-					y1={lineStartY}
-					x2={lineEndX}
-					y2={lineEndY}
-					stroke='black'
-					strokeWidth='1'
-				/>
-				<text
-					x={labelX}
-					y={labelY}
-					textAnchor='middle'
-					fontSize='7'
-					fill='black'
-				>
-					{progress.approvalThreshold.toFixed(1)}%
-				</text>
-			</>
+			<line
+				x1={lineStartX}
+				y1={lineStartY}
+				x2={lineEndX}
+				y2={lineEndY}
+				strokeWidth='1.5'
+				onMouseEnter={() => setShowThresholdPercentage(true)}
+				onMouseLeave={() => setShowThresholdPercentage(false)}
+				className='cursor-pointer stroke-btn_secondary_text'
+			/>
 		);
-	}, [progress?.approvalThreshold]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [progress?.approvalThreshold, showThresholdPercentage]);
 
 	if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return null;
 
@@ -144,22 +133,28 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
-						<PieChart
-							className='w-[47%] xl:w-[49%]'
-							viewBoxSize={[108, 90]}
-							center={[50, 75]}
-							startAngle={-180}
-							lengthAngle={180}
-							rounded
-							lineWidth={15}
-							data={[
-								{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-								{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
-							]}
-							segmentsStyle={{ transition: 'stroke .3s' }}
-						>
-							{thresholdElements}
-						</PieChart>
+						<div className='relative flex flex-col items-center justify-center'>
+							<p className={classes.thresholdPercentage}>
+								{t('PostDetails.threshold')}
+								{showThresholdPercentage && `: ${progress.approvalThreshold.toFixed(1)}%`}
+							</p>
+							<div className='flex w-full items-center justify-center'>
+								<PieChart
+									className='w-full'
+									center={[50, 75]}
+									startAngle={-180}
+									lengthAngle={180}
+									rounded
+									lineWidth={15}
+									data={[
+										{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+										{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
+									]}
+								>
+									{thresholdElements}
+								</PieChart>
+							</div>
+						</div>
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{NAY_TITLE}</p>

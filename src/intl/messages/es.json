@@ -447,7 +447,8 @@
 		"commentSummary": "Resumen de Comentarios",
 		"aiSummary": "Resumen de IA",
 		"showLikelySpam": "Mostrar Comentarios de Spam",
-		"hideLikelySpam": "Ocultar Comentarios de Spam"
+		"hideLikelySpam": "Ocultar Comentarios de Spam",
+		"threshold": "Umbral"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

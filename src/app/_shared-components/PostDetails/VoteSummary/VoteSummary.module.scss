@@ -33,3 +33,7 @@
 .voteSummaryTableNoActivity {
 	@apply flex flex-col items-center justify-center gap-y-2;
 }
+
+.thresholdPercentage {
+	@apply absolute top-3 text-center text-xs font-medium text-wallet_btn_text;
+}

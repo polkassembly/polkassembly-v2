@@ -447,7 +447,8 @@
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
 		"showLikelySpam": "疑わしいスパムを表示",
-		"hideLikelySpam": "疑わしいスパムを非表示"
+		"hideLikelySpam": "疑わしいスパムを非表示",
+		"threshold": "閾値"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
