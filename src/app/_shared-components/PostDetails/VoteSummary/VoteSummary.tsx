@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EProposalType, EVoteDecision, IVoteMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -72,6 +72,52 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 		getOngoingTally();
 	}, [getOngoingTally, getIssuance, voteMetrics]);
 
+	const progress = voteMetrics?.voteProgress;
+
+	const thresholdElements = useMemo(() => {
+		if (!progress?.approvalThreshold) return null;
+
+		const centerX = 50;
+		const centerY = 75;
+		const arcRadius = 46;
+		const lineWidth = 8;
+		const labelRadius = arcRadius + 10;
+		const angle = -180 + (180 * progress.approvalThreshold) / 100;
+		const radians = (angle * Math.PI) / 180;
+
+		const innerRadius = arcRadius - lineWidth / 2;
+		const outerRadius = arcRadius + lineWidth / 2;
+		const lineStartX = centerX + innerRadius * Math.cos(radians);
+		const lineStartY = centerY + innerRadius * Math.sin(radians);
+		const lineEndX = centerX + outerRadius * Math.cos(radians);
+		const lineEndY = centerY + outerRadius * Math.sin(radians);
+
+		const labelX = centerX + labelRadius * Math.cos(radians);
+		const labelY = centerY + labelRadius * Math.sin(radians);
+
+		return (
+			<>
+				<line
+					x1={lineStartX}
+					y1={lineStartY}
+					x2={lineEndX}
+					y2={lineEndY}
+					stroke='black'
+					strokeWidth='1'
+				/>
+				<text
+					x={labelX}
+					y={labelY}
+					textAnchor='middle'
+					fontSize='7'
+					fill='black'
+				>
+					{progress.approvalThreshold.toFixed(1)}%
+				</text>
+			</>
+		);
+	}, [progress?.approvalThreshold]);
+
 	if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return null;
 
 	const ayeVotesNumber = Number(formatBnBalance(tally.aye || BN_ZERO.toString(), { numberAfterComma: 6, withThousandDelimitor: false }, network));
@@ -85,8 +131,6 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	const isNayNaN = !ValidatorService.isValidNumber(nayPercent);
 	const AYE_TITLE = t('PostDetails.aye');
 	const NAY_TITLE = t('PostDetails.nay');
-
-	const progress = voteMetrics?.voteProgress;
 
 	return (
 		<div className={classes.voteSummaryWrapper}>
@@ -114,48 +158,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							]}
 							segmentsStyle={{ transition: 'stroke .3s' }}
 						>
-							{progress?.approvalThreshold &&
-								(() => {
-									const centerX = 50;
-									const centerY = 75;
-									const arcRadius = 46;
-									const lineWidth = 8;
-									const labelRadius = arcRadius + 10;
-									const angle = -180 + (180 * progress.approvalThreshold) / 100;
-									const radians = (angle * Math.PI) / 180;
-
-									const innerRadius = arcRadius - lineWidth / 2;
-									const outerRadius = arcRadius + lineWidth / 2;
-									const lineStartX = centerX + innerRadius * Math.cos(radians);
-									const lineStartY = centerY + innerRadius * Math.sin(radians);
-									const lineEndX = centerX + outerRadius * Math.cos(radians);
-									const lineEndY = centerY + outerRadius * Math.sin(radians);
-
-									const labelX = centerX + labelRadius * Math.cos(radians);
-									const labelY = centerY + labelRadius * Math.sin(radians);
-
-									return (
-										<>
-											<line
-												x1={lineStartX}
-												y1={lineStartY}
-												x2={lineEndX}
-												y2={lineEndY}
-												stroke='black'
-												strokeWidth='1'
-											/>
-											<text
-												x={labelX}
-												y={labelY}
-												textAnchor='middle'
-												fontSize='7'
-												fill='black'
-											>
-												{progress.approvalThreshold.toFixed(1)}%
-											</text>
-										</>
-									);
-								})()}
+							{thresholdElements}
 						</PieChart>
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
