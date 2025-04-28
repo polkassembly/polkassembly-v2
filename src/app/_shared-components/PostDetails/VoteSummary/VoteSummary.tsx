@@ -100,66 +100,64 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
-						<div className='relative'>
-							<PieChart
-								className='w-full'
-								center={[50, 75]}
-								startAngle={-180}
-								lengthAngle={180}
-								rounded
-								lineWidth={15}
-								data={[
-									{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-									{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
-								]}
-								segmentsStyle={{ transition: 'stroke .3s' }}
-							>
-								{progress?.approvalThreshold &&
-									(() => {
-										const centerX = 50; // SVG uses relative 0-100
-										const centerY = 75;
-										const arcRadius = 46; // middle of the arc
-										const lineWidth = 8;
-										const labelRadius = arcRadius + 10;
-										const angle = -180 + (180 * progress.approvalThreshold) / 100;
-										const radians = (angle * Math.PI) / 180;
+						<PieChart
+							className='w-[47%] xl:w-[49%]'
+							center={[50, 75]}
+							startAngle={-180}
+							lengthAngle={180}
+							rounded
+							lineWidth={15}
+							data={[
+								{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+								{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
+							]}
+							segmentsStyle={{ transition: 'stroke .3s' }}
+						>
+							{progress?.approvalThreshold &&
+								(() => {
+									const centerX = 50;
+									const centerY = 75;
+									const arcRadius = 46;
+									const lineWidth = 8;
+									const labelRadius = arcRadius + 10;
+									const angle = -180 + (180 * progress.approvalThreshold) / 100;
+									const radians = (angle * Math.PI) / 180;
 
-										const innerRadius = arcRadius - lineWidth / 2;
-										const outerRadius = arcRadius + lineWidth / 2;
-										const lineStartX = centerX + innerRadius * Math.cos(radians);
-										const lineStartY = centerY + innerRadius * Math.sin(radians);
-										const lineEndX = centerX + outerRadius * Math.cos(radians);
-										const lineEndY = centerY + outerRadius * Math.sin(radians);
+									const innerRadius = arcRadius - lineWidth / 2;
+									const outerRadius = arcRadius + lineWidth / 2;
+									const lineStartX = centerX + innerRadius * Math.cos(radians);
+									const lineStartY = centerY + innerRadius * Math.sin(radians);
+									const lineEndX = centerX + outerRadius * Math.cos(radians);
+									const lineEndY = centerY + outerRadius * Math.sin(radians);
 
-										const labelX = centerX + labelRadius * Math.cos(radians);
-										const labelY = centerY + labelRadius * Math.sin(radians);
+									const labelX = centerX + labelRadius * Math.cos(radians);
+									const labelY = centerY + labelRadius * Math.sin(radians);
 
-										return (
-											<>
-												{/* SVG line */}
-												<line
-													x1={lineStartX}
-													y1={lineStartY}
-													x2={lineEndX}
-													y2={lineEndY}
-													stroke='black'
-													strokeWidth='1'
-												/>
-												{/* SVG label */}
-												<text
-													x={labelX}
-													y={labelY}
-													textAnchor='middle'
-													fontSize='6'
-													fill='black'
-												>
-													{progress.approvalThreshold.toFixed(1)}%
-												</text>
-											</>
-										);
-									})()}
-							</PieChart>
-						</div>
+									return (
+										<>
+											{/* SVG line */}
+											<line
+												x1={lineStartX}
+												y1={lineStartY}
+												x2={lineEndX}
+												y2={lineEndY}
+												stroke='black'
+												strokeWidth='1'
+											/>
+											{/* SVG label */}
+											<text
+												x={labelX}
+												y={labelY}
+												textAnchor='middle'
+												fontSize='6'
+												fill='black'
+											>
+												{progress.approvalThreshold.toFixed(1)}%
+											</text>
+										</>
+									);
+								})()}
+						</PieChart>
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{NAY_TITLE}</p>
