@@ -711,24 +711,24 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_CHILD_BOUNTIES_REWARDS = `
-        query AwardedChildBounties($parentBountyIndex_in: [Int!]) {
-            proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
-                reward
+		query AwardedChildBounties($parentBountyIndex_in: [Int!], $limit: Int) {
+			proposals(where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}, limit: $limit) {
+				reward
 				payee
 				index
 				status
 				createdAt
 				parentBountyIndex
-                statusHistory {
-                    status
-                    timestamp
-                }
-            }
-            proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
-                totalCount
-            }
-        }
-    `;
+				statusHistory {
+					status
+					timestamp
+				}
+			}
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: ChildBounty, parentBountyIndex_in: $parentBountyIndex_in}) {
+				totalCount
+			}
+		}
+	`;
 
 	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
 		query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $limit:Int!, $offset:Int! ) {
@@ -761,8 +761,8 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX = `
-		query RewardsByIndex($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_eq: Int) {
-			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}) {
+		query RewardsByIndex($type_eq: ProposalType!, $status_not_in: [ProposalStatus!]!, $index_eq: Int, $limit: Int) {
+			proposals(where: {type_eq: $type_eq, status_not_in: $status_not_in, index_eq: $index_eq}, limit: $limit) {
 				index
 				reward
 			}
