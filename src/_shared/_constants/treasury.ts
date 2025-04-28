@@ -27,7 +27,10 @@ interface NetworkTreasuryConfig {
 		usdc: string;
 		[key: string]: string;
 	};
-	burnPercentage: BN;
+	burnPercentage: {
+		numerator: BN;
+		denominator: BN;
+	};
 	spendPeriodInBlocks: BN;
 }
 
@@ -53,7 +56,10 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			dot: '15500000000000000',
 			usdc: '1500000000000'
 		},
-		burnPercentage: new BN(1).div(new BN(100)), // 1% of the treasury balance
+		burnPercentage: {
+			numerator: new BN(1),
+			denominator: new BN(100)
+		}, // 1% of the treasury balance
 		spendPeriodInBlocks: new BN(345600)
 	},
 	[ENetwork.KUSAMA]: undefined, // Add Kusama specific configuration when needed

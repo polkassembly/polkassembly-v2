@@ -105,15 +105,17 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Fetch relay chain data
 		const relayChainTasks = [
-			// Treasury balance
+			// Treasury balance and next burn
 			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
 				const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+				const nextBurn = new BN(treasuryBalance).mul(config.burnPercentage.numerator).div(config.burnPercentage.denominator).toString();
+
 				treasuryStats = {
 					...treasuryStats,
 					relayChain: {
 						...treasuryStats.relayChain,
 						dot: treasuryBalance,
-						nextBurn: new BN(treasuryBalance).mul(config.burnPercentage).toString()
+						nextBurn
 					}
 				};
 			}),
