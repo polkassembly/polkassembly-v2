@@ -140,9 +140,9 @@ function VoteCommentsDialog({ voteInfo, showVoteDetails, setShowVoteDetails }: V
 													</div>
 													<div className={styles.postvotetext}>
 														<span>{t('PostDetails.capital')}</span>
-														{voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0) && (
+														{voteInfo.delegatedVotes?.reduce((sum, vote) => sum + Number(vote?.balanceValue), 0) && (
 															<span className={styles.valuelabel}>
-																{formatBnBalance(voteInfo.delegatedVotes.reduce((sum, vote) => sum + Number(vote.balanceValue || 0), 0).toString(), formatBalanceOptions, network)}
+																{formatBnBalance(voteInfo.delegatedVotes?.reduce((sum, vote) => sum + Number(vote?.balanceValue), 0).toString(), formatBalanceOptions, network)}
 															</span>
 														)}
 													</div>
