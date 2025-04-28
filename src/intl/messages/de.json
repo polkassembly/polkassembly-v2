@@ -16,7 +16,10 @@
 		"minutes": "Minuten",
 		"seconds": "Sekunden",
 		"spendPeriodTooltip": "Geld aus der Finanzverwaltung wird in regelmäßigen Abständen am Ende der Ausgabephase verteilt.",
-		"nextBurnTooltip": "Wenn die Finanzverwaltung eine Ausgabephase ohne alle ihre Mittel ausgibt, erleidet sie einen Verlust von einem Prozent ihrer Mittel."
+		"nextBurnTooltip": "Wenn die Finanzverwaltung eine Ausgabephase ohne alle ihre Mittel ausgibt, erleidet sie einen Verlust von einem Prozent ihrer Mittel.",
+		"viewDetails": "Details anzeigen",
+		"tokenPrice": "Token-Preis",
+		"salary": "Gehalt"
 	},
 
 	"ActivityFeed": {

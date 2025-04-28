@@ -16,7 +16,10 @@
 		"minutes": "minutos",
 		"seconds": "segundos",
 		"spendPeriodTooltip": "Los fondos solicitados de la tesorería se distribuyen periódicamente al final del período de gastos.",
-		"nextBurnTooltip": "Si la tesorería termina un período de gastos sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos."
+		"nextBurnTooltip": "Si la tesorería termina un período de gastos sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos.",
+		"viewDetails": "Ver Detalles",
+		"tokenPrice": "Precio del Token",
+		"salary": "Salario"
 	},
 
 	"ActivityFeed": {

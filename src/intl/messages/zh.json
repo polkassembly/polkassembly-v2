@@ -16,7 +16,10 @@
 		"minutes": "分钟",
 		"seconds": "秒",
 		"spendPeriodTooltip": "国库请求的资金在支出期结束时定期分配。",
-		"nextBurnTooltip": "如果国库在支出期结束时没有花费所有资金，它会遭受一定比例资金的损失。"
+		"nextBurnTooltip": "如果国库在支出期结束时没有花费所有资金，它会遭受一定比例资金的损失。",
+		"viewDetails": "查看详情",
+		"tokenPrice": "代币价格",
+		"salary": "工资"
 	},
 
 	"ActivityFeed": {
