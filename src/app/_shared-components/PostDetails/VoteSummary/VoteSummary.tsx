@@ -32,7 +32,6 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
-	const [showThresholdPercentage, setShowThresholdPercentage] = useState(false);
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
@@ -99,13 +98,11 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 				x2={lineEndX}
 				y2={lineEndY}
 				strokeWidth='1.5'
-				onMouseEnter={() => setShowThresholdPercentage(true)}
-				onMouseLeave={() => setShowThresholdPercentage(false)}
 				className='cursor-pointer stroke-btn_secondary_text'
 			/>
 		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [progress?.approvalThreshold, showThresholdPercentage]);
+	}, [progress?.approvalThreshold]);
 
 	if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return null;
 
@@ -136,7 +133,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 						<div className='relative flex flex-col items-center justify-center'>
 							<p className={classes.thresholdPercentage}>
 								{t('PostDetails.threshold')}
-								{showThresholdPercentage && `: ${progress.approvalThreshold.toFixed(1)}%`}
+								{`: ${progress.approvalThreshold.toFixed(1)}%`}
 							</p>
 							<div className='flex w-full items-center justify-center'>
 								<PieChart
