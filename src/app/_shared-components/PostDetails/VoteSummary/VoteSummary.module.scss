@@ -33,3 +33,7 @@
 .voteSummaryTableNoActivity {
 	@apply flex flex-col items-center justify-center gap-y-2;
 }
+
+.PieChartWrapper {
+	@apply relative flex h-[150px] w-[220px] items-center justify-center;
+}

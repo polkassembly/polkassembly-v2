@@ -155,7 +155,7 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
-						<div className='relative flex h-[150px] w-[220px] items-center justify-center'>
+						<div className={classes.PieChartWrapper}>
 							<PieChart
 								width={220}
 								height={200}
