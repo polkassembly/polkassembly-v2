@@ -10,6 +10,6 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 export const GET = withErrorHandling(async (): Promise<NextResponse> => {
 	const network = await getNetworkFromHeaders();
 
-	const stats = await OnChainDbService.GetBountyUserActivity(network, 10);
+	const stats = await OnChainDbService.GetBountyUserActivity(network, 20);
 	return NextResponse.json(stats);
 });
