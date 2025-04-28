@@ -275,7 +275,7 @@ export class SubsquidQueries {
 	// vote metrics queries
 
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH = `
-		query GetVoteMetricsByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!) {
+		query GetVoteMetricsByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!, $limit: Int = 1000, $block_gte: Int) {
 			noCount: votesConnection(where: {decision_eq: no, proposal: {hash_eq: $hash_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
 				totalCount
 			}
@@ -299,11 +299,19 @@ export class SubsquidQueries {
 					support
 				}
 			}
+			curveData(limit: $limit, where: {hash_eq: $hash_eq, type_eq: $type_eq, block_gte: $block_gte}, orderBy: block_ASC) {
+				approvalPercent
+				block
+				id
+				index
+				supportPercent
+				timestamp
+			}
 		}
 	`;
 
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
-		query GetVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
+		query GetVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $block_gte: Int, $limit: Int = 1000) {
 			noCount: votesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}}, orderBy: id_ASC) {
 				totalCount
 			}
@@ -327,11 +335,19 @@ export class SubsquidQueries {
 					support
 				}
 			}
+			curveData(limit: $limit, where: {index_eq: $index_eq, block_gte: $block_gte}, orderBy: block_ASC) {
+				approvalPercent
+				block
+				id
+				index
+				supportPercent
+				timestamp
+			}
 		}
 	`;
 
 	protected static GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
-		query GetConvictionVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
+		query GetConvictionVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $block_gte: Int, $limit: Int = 1000) {
 			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
 				totalCount
 			}
@@ -354,6 +370,14 @@ export class SubsquidQueries {
 					nays
 					support
 				}
+			}
+			curveData(limit: $limit, where: {index_eq: $index_eq, block_gte: $block_gte}, orderBy: block_ASC) {
+				approvalPercent
+				block
+				id
+				index
+				supportPercent
+				timestamp
 			}
 		}
 	`;

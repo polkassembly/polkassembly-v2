@@ -6,7 +6,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EPostOrigin, EProposalType, EVoteDecision, IStatusHistoryItem, IVoteMetrics } from '@/_shared/types';
+import { EProposalType, EVoteDecision, IVoteMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { PieChart } from 'react-minimal-pie-chart';
@@ -19,11 +19,6 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { THEME_COLORS } from '@/app/_style/theme';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { dayjs } from '@shared/_utils/dayjsInit';
-import { blockToTime } from '@/_shared/_utils/blockToTime';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { calculateThresholdValue, processGraphPoint } from '@/app/_client-utils/calculateThresholdValue';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
@@ -31,89 +26,18 @@ import { Skeleton } from '../../Skeleton';
 
 const NONE_CHART_VALUE = 0;
 
-interface IProgress {
-	approval: number;
-	approvalThreshold: number;
-	support: number;
-	supportThreshold: number;
-}
-
-function VoteSummary({
-	voteMetrics,
-	proposalType,
-	index,
-	statusHistory,
-	createdAt,
-	trackName
-}: {
-	voteMetrics?: IVoteMetrics;
-	proposalType: EProposalType;
-	index: string;
-	statusHistory: IStatusHistoryItem[];
-	createdAt?: Date;
-	trackName?: EPostOrigin;
-}) {
+function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
-	const [progress, setProgress] = useState<IProgress>({
-		approval: 0,
-		approvalThreshold: 0,
-		support: 0,
-		supportThreshold: 0
-	});
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
 		nay: null,
 		support: null
 	});
-
-	const getVoteCurves = useCallback(async () => {
-		try {
-			if (!trackName) return [];
-
-			const voteCurves = await NextApiClientService.getVoteCurves({ proposalType, index });
-			const graphPoints = voteCurves?.data || [];
-			if (graphPoints.length === 0) return [];
-
-			const decisionPeriod = NETWORKS_DETAILS[network]?.trackDetails?.[trackName]?.decisionPeriod;
-			const statusBlock = statusHistory?.find((s) => s?.status === 'Deciding');
-			const { seconds } = blockToTime(decisionPeriod || 0, network);
-			const decisionPeriodHrs = Math.ceil(dayjs.duration(seconds, 'seconds').asHours());
-
-			const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt);
-			const lastGraphPoint = graphPoints[graphPoints.length - 1];
-			if (!lastGraphPoint) return [];
-
-			const elapsedHours = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
-
-			const currentData = graphPoints.map((point) => processGraphPoint(point, proposalCreatedAt, elapsedHours, decisionPeriodHrs, network, trackName));
-
-			const currentApproval = currentData[currentData.length - 1]?.approval;
-			const currentSupport = currentData[currentData.length - 1]?.support;
-
-			const progressData: IProgress = {
-				approval: Number(currentApproval?.y?.toFixed(1) || 0),
-				approvalThreshold: calculateThresholdValue(trackName, network, currentApproval, decisionPeriodHrs),
-				support: Number(currentSupport?.y?.toFixed(1) || 0),
-				supportThreshold: calculateThresholdValue(trackName, network, currentSupport, decisionPeriodHrs)
-			};
-
-			setProgress(progressData);
-			return graphPoints;
-		} catch (error) {
-			console.error('Error fetching vote curves:', error);
-			return [];
-		}
-	}, [proposalType, index, trackName, network, statusHistory, createdAt]);
-
-	useEffect(() => {
-		getVoteCurves();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	const getOngoingTally = useCallback(async () => {
 		if (!apiService) return;
@@ -162,12 +86,13 @@ function VoteSummary({
 	const AYE_TITLE = t('PostDetails.aye');
 	const NAY_TITLE = t('PostDetails.nay');
 
+	const progress = voteMetrics?.voteProgress;
 	return (
 		<div className={classes.voteSummaryWrapper}>
 			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
 			{loading ? (
 				<Skeleton className='h-[220px] w-full' />
-			) : tally?.aye && tally?.nay && tally?.support && progress.approvalThreshold > 0 ? (
+			) : tally?.aye && tally?.nay && tally?.support && progress?.approvalThreshold && progress?.approvalThreshold > 0 ? (
 				<>
 					<div className={classes.voteSummaryPieChart}>
 						<div className={classes.voteSummaryPieChartAyeNay}>

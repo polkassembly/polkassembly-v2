@@ -509,11 +509,29 @@ export enum EVoteDecision {
 	SPLIT_ABSTAIN = 'splitAbstain'
 }
 
+export interface IVoteCurve {
+	id: string;
+	index: number;
+	block: number;
+	timestamp: string;
+	approvalPercent: number;
+	supportPercent: number;
+}
+
+export interface IVoteProgress {
+	approval: number;
+	approvalThreshold: number;
+	support: number;
+	supportThreshold: number;
+}
+
 export interface IVoteMetrics {
 	[EVoteDecision.AYE]: { count: number; value: string };
 	[EVoteDecision.NAY]: { count: number; value: string };
 	support: { value: string };
 	bareAyes: { value: string };
+	curveData?: IVoteCurve[];
+	voteProgress?: IVoteProgress;
 }
 
 export interface IBeneficiary {
@@ -844,15 +862,6 @@ export interface IUserActivity {
 	createdAt: Date;
 	updatedAt: Date;
 	message?: string;
-}
-
-export interface IVoteCurve {
-	id: string;
-	index: number;
-	block: number;
-	timestamp: string;
-	approvalPercent: number;
-	supportPercent: number;
 }
 
 export enum EProfileTabs {
