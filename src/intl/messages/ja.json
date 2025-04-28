@@ -88,19 +88,14 @@
 		"hidePassword": "パスワードを隠す",
 		"showPassword": "パスワードを表示",
 		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。",
-		"switch": "切り替え",
-		"switchAddress": "アドレスを切り替え",
-		"account": "アカウント",
-		"multisig": "マルチシグ",
-		"multisigAddress": "マルチシグアドレス",
-		"proxy": "プロキシ",
-		"proxied": "プロキシされた",
-		"pureProxy": "純粋なプロキシ",
-		"proxyaddresses": "プロキシアドレス",
-		"proxiedaccounts": "プロキシアカウント",
-		"confirm": "確認",
-		"cancel": "キャンセル"
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。"
+	},
+	"AddressRelationsPicker": {
+		"Switch": "切り替え",
+		"switchWallet": "ウォレットを切り替え",
+		"noData": "データがありません",
+		"found": "見つかりました",
+		"confirm": "確認"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",
@@ -742,6 +737,23 @@
 		"topic": "トピック",
 		"creator": "作成者",
 		"viewAll": "すべて表示"
+	},
+	"Bounty": {
+		"availableBountyPool": "利用可能な報奨金プール",
+		"viewAll": "すべて表示",
+		"dot": "DOT",
+		"claimed": "クレーム済み",
+		"childBounties": "子供の報奨金",
+		"bountyProposal": "報奨金提案",
+		"vote": "投票",
+		"bountyDashboard": "報奨金ダッシュボード",
+		"hotBounties": "人気の報奨金",
+		"activeBounties": "アクティブな報奨金",
+		"claimants": "受益者",
+		"totalRewarded": "総報奨金",
+		"totalBountyPool": "総報奨金プール",
+		"comingSoon": "Coming Soon",
+		"dashboard": "ダッシュボード"
 	},
 	"BatchVote": {
 		"batchVoting": "一括投票",

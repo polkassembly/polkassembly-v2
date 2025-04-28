@@ -985,6 +985,15 @@ export enum ENotificationStatus {
 	INFO = 'info'
 }
 
+export interface IBountyStats {
+	availableBountyPool: string;
+	activeBounties: number;
+	peopleEarned: number;
+	totalRewarded: string;
+	totalBountyPool: string;
+	bountyAmount: string;
+}
+
 export enum EBountyStatus {
 	ALL = 'All',
 	ACTIVE = 'Active',
@@ -992,6 +1001,20 @@ export enum EBountyStatus {
 	CLAIMED = 'Claimed',
 	CANCELLED = 'Cancelled',
 	REJECTED = 'Rejected'
+}
+
+export interface IBountyUserActivity {
+	amount: string;
+	activity: EBountyStatus;
+	address: string;
+	created_at: Date;
+}
+
+export interface IBountyProposal {
+	index: number;
+	payee: string;
+	reward: string;
+	statusHistory: Array<{ status: EProposalStatus; timestamp: Date }>;
 }
 
 // generic types are for insignificant tokens if we decide to add later
@@ -1003,7 +1026,8 @@ export interface ITreasuryStats {
 		dot?: string;
 		myth?: string;
 		nextBurn?: string;
-		[key: string]: string | undefined;
+		nextSpendAt?: Date;
+		[key: string]: unknown | undefined;
 	};
 	ambassador?: {
 		usdt?: string;

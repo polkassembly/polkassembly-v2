@@ -87,19 +87,14 @@
 		"hidePassword": "Hide Password",
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
-		"switch": "Switch",
-		"switchAddress": "Switch Address",
-		"account": "Account",
-		"multisig": "Multisig",
-		"multisigAddress": "Multisig Address",
-		"proxy": "Proxy",
-		"proxied": "Proxied",
-		"pureProxy": "Pure Proxy",
-		"proxyaddresses": "Proxy addresses",
-		"proxiedaccounts": "Proxied accounts",
-		"confirm": "Confirm",
-		"cancel": "Cancel"
+		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
+	},
+	"AddressRelationsPicker": {
+		"Switch": "Switch",
+		"switchWallet": "Switch Wallet",
+		"noData": "No",
+		"found": "found",
+		"confirm": "Confirm"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",
@@ -746,6 +741,23 @@
 		"claimed": "Claimed",
 		"cancelled": "Cancelled",
 		"rejected": "Rejected"
+	},
+	"Bounty": {
+		"dashboard": "Dashboard",
+		"availableBountyPool": "Available Bounty Pool",
+		"viewAll": "View All",
+		"dot": "DOT",
+		"claimed": "Claimed",
+		"bounty": "Bounty",
+		"vote": "Vote",
+		"bountyProposal": "Bounty Proposal",
+		"childBounties": "Child Bounties",
+		"hotBounties": "Hot Bounties",
+		"activeBounties": "Active Bounties",
+		"claimants": "Claimants",
+		"totalRewarded": "Total Rewarded",
+		"totalBountyPool": "Total Bounty Pool",
+		"comingSoon": "Coming Soon"
 	},
 	"ChildBounties": {
 		"childBounties": "Child Bounties",

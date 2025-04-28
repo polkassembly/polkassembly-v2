@@ -88,19 +88,14 @@
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
-		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。",
-		"switch": "切换",
-		"switchAddress": "切换地址",
-		"account": "账户",
-		"multisig": "多重签名",
-		"multisigAddress": "多重签名地址",
-		"proxy": "代理",
-		"proxied": "代理的",
-		"pureProxy": "纯代理",
-		"proxyaddresses": "代理地址",
-		"proxiedaccounts": "代理账户",
-		"confirm": "确认",
-		"cancel": "取消"
+		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
+	},
+	"AddressRelationsPicker": {
+		"Switch": "切换",
+		"switchWallet": "切换钱包",
+		"noData": "没有数据",
+		"found": "找到",
+		"confirm": "确认"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
@@ -721,6 +716,23 @@
 		"claimed": "认领",
 		"cancelled": "取消",
 		"rejected": "拒绝"
+	},
+	"Bounty": {
+		"availableBountyPool": "可用赏金池",
+		"viewAll": "查看全部",
+		"dot": "DOT",
+		"claimed": "已认领",
+		"childBounties": "子赏金",
+		"bountyProposal": "赏金提案",
+		"vote": "投票",
+		"bountyDashboard": "赏金仪表盘",
+		"hotBounties": "热门赏金",
+		"activeBounties": "活跃赏金",
+		"claimants": "认领者",
+		"totalRewarded": "总奖励",
+		"totalBountyPool": "总赏金池",
+		"comingSoon": "Coming Soon",
+		"dashboard": "仪表板"
 	},
 	"ChildBounties": {
 		"childBounties": "子赏金",

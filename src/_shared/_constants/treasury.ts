@@ -22,12 +22,13 @@ interface NetworkTreasuryConfig {
 	hydrationDotAssetId: number;
 	hydrationUsdcAssetId: number;
 	hydrationUsdtAssetId: number;
-	burnPercentage: BN;
 	loanAmounts: {
 		dot: string;
 		usdc: string;
 		[key: string]: string;
 	};
+	burnPercentage: BN;
+	spendPeriodInBlocks: BN;
 }
 
 export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | undefined> = {
@@ -48,11 +49,12 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		hydrationDotAssetId: 5,
 		hydrationUsdcAssetId: 22,
 		hydrationUsdtAssetId: 10,
-		burnPercentage: new BN(2).div(new BN(10)),
 		loanAmounts: {
 			dot: '15500000000000000',
 			usdc: '1500000000000'
-		}
+		},
+		burnPercentage: new BN(1).div(new BN(100)), // 1% of the treasury balance
+		spendPeriodInBlocks: new BN(345600)
 	},
 	[ENetwork.KUSAMA]: undefined, // Add Kusama specific configuration when needed
 	[ENetwork.WESTEND]: undefined // Add Westend specific configuration when needed

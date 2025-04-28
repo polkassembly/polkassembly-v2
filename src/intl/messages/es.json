@@ -88,19 +88,14 @@
 		"hidePassword": "Ocultar contraseña",
 		"showPassword": "Mostrar contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
-		"switch": "Cambiar",
-		"switchAddress": "Cambiar dirección",
-		"account": "Cuenta",
-		"multisig": "Multisig",
-		"multisigAddress": "Dirección Multisig",
-		"proxy": "Proxy",
-		"proxied": "Proxied",
-		"pureProxy": "Proxy Puro",
-		"proxyaddresses": "Direcciones Proxy",
-		"proxiedaccounts": "Cuentas Proxied",
-		"confirm": "Confirmar",
-		"cancel": "Cancelar"
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
+	},
+	"AddressRelationsPicker": {
+		"Switch": "Cambiar",
+		"switchWallet": "Cambiar billetera",
+		"noData": "No",
+		"found": "encontrado",
+		"confirm": "Confirmar"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
@@ -742,6 +737,23 @@
 		"topic": "Tema",
 		"creator": "Creador",
 		"viewAll": "Ver todo"
+	},
+	"Bounty": {
+		"availableBountyPool": "Piscina de Prémios Disponibles",
+		"viewAll": "Ver Todo",
+		"dot": "DOT",
+		"claimed": "Reclamado",
+		"childBounties": "Subprémios",
+		"bountyProposal": "Propuesta de Prémio",
+		"vote": "Votar",
+		"bountyDashboard": "Panel de Prémios",
+		"hotBounties": "Prémios Calientes",
+		"activeBounties": "Prémios Activos",
+		"claimants": "Reclamantes",
+		"totalRewarded": "Total Recompensado",
+		"totalBountyPool": "Total Piscina de Prémios",
+		"comingSoon": "Próximamente",
+		"dashboard": "Panel de control"
 	},
 	"BatchVote": {
 		"batchVoting": "Votación por lotes",

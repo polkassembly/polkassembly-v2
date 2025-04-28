@@ -29,6 +29,8 @@ import {
 	ITag,
 	EAllowedCommentor,
 	EOffChainPostTopic,
+	IBountyStats,
+	IBountyUserActivity,
 	IVoteCartItem,
 	EConvictionAmount,
 	IDelegationStats,
@@ -93,6 +95,9 @@ enum EApiRoute {
 	CREATE_TAGS = 'CREATE_TAGS',
 	CREATE_OFFCHAIN_POST = 'CREATE_OFFCHAIN_POST',
 	FETCH_CHILD_BOUNTIES = 'FETCH_CHILD_BOUNTIES',
+	FETCH_BOUNTIES_STATS = 'FETCH_BOUNTIES_STATS',
+	FETCH_BOUNTIES_USER_ACTIVITY = 'FETCH_BOUNTIES_USER_ACTIVITY',
+	GET_CHILD_BOUNTIES = 'GET_CHILD_BOUNTIES',
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
@@ -191,6 +196,13 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_DELEGATES:
 				path = '/delegation/delegates';
 				break;
+			case EApiRoute.FETCH_BOUNTIES_STATS:
+				path = '/bounties/stats';
+				break;
+			case EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY:
+				path = '/bounties/user-activity';
+				break;
+			case EApiRoute.GET_CHILD_BOUNTIES:
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
 			case EApiRoute.GET_PREIMAGE_FOR_POST:
@@ -793,6 +805,21 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+	}
+
+	static async fetchBountiesStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_STATS });
+		return this.nextApiClientFetch<IBountyStats>({ url, method });
+	}
+
+	static async fetchBountiesUserActivity() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_BOUNTIES_USER_ACTIVITY });
+		return this.nextApiClientFetch<IBountyUserActivity[]>({ url, method });
+	}
+
+	static async getChildBounties(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CHILD_BOUNTIES, routeSegments: [proposalType, index, 'child-bounties'] });
+		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
 	static async addPostSubscription(proposalType: EProposalType, index: string) {

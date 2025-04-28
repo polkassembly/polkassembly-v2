@@ -5,8 +5,9 @@
 import { StatusCodes } from 'http-status-codes';
 import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { BN, BN_MILLION, BN_ZERO } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { blockNumberToDate } from '@/_shared/_utils/blockNumberToDate';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
@@ -105,18 +106,39 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		// Fetch relay chain data
 		const relayChainTasks = [
 			// Treasury balance
-			(async () => {
-				const accountInfo = await relayChainApi.query.system.account(config.treasuryAccount);
-				const freeBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
+				const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
 				treasuryStats = {
 					...treasuryStats,
 					relayChain: {
 						...treasuryStats.relayChain,
-						nextBurn: new BN(freeBalance).mul(new BN(config.burnPercentage)).div(BN_MILLION).toString(),
-						dot: freeBalance
+						dot: treasuryBalance,
+						nextBurn: new BN(treasuryBalance).mul(config.burnPercentage).toString()
 					}
 				};
-			})(),
+			}),
+
+			// next spend at - calculate when the current spend period ends
+			relayChainApi.rpc.chain.getHeader().then((header) => {
+				const currentBlock = new BN(header.number.toString());
+				const spendPeriod = config.spendPeriodInBlocks;
+
+				// Calculate remaining blocks until next spend
+				const goneBlocks = currentBlock.mod(spendPeriod);
+				const remainingBlocks = spendPeriod.sub(goneBlocks);
+
+				// Calculate the block number when the next spend occurs
+				const nextBurnBlock = currentBlock.add(remainingBlocks);
+				const nextSpendAt = blockNumberToDate({ currentBlockNumber: currentBlock, targetBlockNumber: nextBurnBlock, network });
+
+				treasuryStats = {
+					...treasuryStats,
+					relayChain: {
+						...treasuryStats.relayChain,
+						nextSpendAt
+					}
+				};
+			}),
 
 			// Bounties data
 			(async () => {
