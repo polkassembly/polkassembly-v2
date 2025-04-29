@@ -7,7 +7,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Home from '@assets/activityfeed/All.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
@@ -21,6 +21,7 @@ import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
 import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { BsThreeDots } from 'react-icons/bs';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -29,6 +30,8 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { state: sidebarState } = useSidebar();
+	const [showLeftArrow, setShowLeftArrow] = useState(false);
+	const [showRightArrow, setShowRightArrow] = useState(false);
 
 	const CATEGORIES = useMemo(
 		() => ({
@@ -161,9 +164,55 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		}
 	};
 
+	const checkScroll = useCallback(() => {
+		if (containerRef.current) {
+			const container = containerRef.current;
+			const { scrollLeft, scrollWidth, clientWidth } = container;
+
+			setShowLeftArrow(scrollLeft > 10);
+			setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+		}
+	}, []);
+
+	const handleScroll = (direction: 'left' | 'right') => {
+		if (containerRef.current) {
+			const container = containerRef.current;
+			const scrollAmount = container.clientWidth * 0.6;
+			const targetScroll = direction === 'left' ? container.scrollLeft - scrollAmount : container.scrollLeft + scrollAmount;
+
+			container.scrollTo({
+				left: targetScroll,
+				behavior: 'smooth'
+			});
+		}
+	};
+
 	useEffect(() => {
 		scrollToActiveTab();
-	}, [currentTab]);
+		const currentRef = containerRef.current;
+
+		if (currentRef) {
+			checkScroll();
+			currentRef.addEventListener('scroll', checkScroll);
+		}
+
+		return () => {
+			if (currentRef) {
+				currentRef.removeEventListener('scroll', checkScroll);
+			}
+		};
+	}, [currentTab, checkScroll]);
+
+	useEffect(() => {
+		const handleResize = () => {
+			checkScroll();
+		};
+
+		window.addEventListener('resize', handleResize);
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, [checkScroll]);
 
 	const getMoreMenuText = () => {
 		if (overflowTabs.length === 0) return <BsThreeDots className='text-bg_pink' />;
@@ -277,18 +326,42 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 
 	return (
 		<div className='mb-5 w-full'>
-			<div
-				className={cn(styles.container, 'lg:hidden')}
-				ref={containerRef}
-			>
-				{Object.entries(categoryStructure).map(([category, tracks]) => (
-					<div
-						key={category}
-						className={styles.navItem}
+			<div className='relative'>
+				<div
+					className={cn(styles.container, 'lg:hidden')}
+					ref={containerRef}
+				>
+					{Object.entries(categoryStructure).map(([category, tracks]) => (
+						<div
+							key={category}
+							className={styles.navItem}
+						>
+							{renderCategoryTab(category, tracks)}
+						</div>
+					))}
+				</div>
+
+				{showLeftArrow && (
+					<button
+						type='button'
+						className={cn(styles.scrollArrow, styles.left, 'lg:hidden')}
+						onClick={() => handleScroll('left')}
+						aria-label='Scroll left'
 					>
-						{renderCategoryTab(category, tracks)}
-					</div>
-				))}
+						<FaChevronLeft className='text-bg_pink' />
+					</button>
+				)}
+
+				{showRightArrow && (
+					<button
+						type='button'
+						className={cn(styles.scrollArrow, styles.right, 'lg:hidden')}
+						onClick={() => handleScroll('right')}
+						aria-label='Scroll right'
+					>
+						<FaChevronRight className='text-bg_pink' />
+					</button>
+				)}
 			</div>
 
 			<div className={cn(styles.container, 'hidden lg:flex lg:overflow-visible')}>
