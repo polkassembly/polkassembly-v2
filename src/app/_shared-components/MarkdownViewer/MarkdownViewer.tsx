@@ -10,12 +10,12 @@ import ReactMarkdownLib from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import { HiOutlineArrowDownCircle, HiOutlineArrowUpCircle } from 'react-icons/hi2';
 import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '../Button';
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -339,23 +339,25 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 			</div>
 			{truncate &&
 				(showMore ? (
-					<Button
-						onClick={handleShowLess}
-						variant='ghost'
-						size='sm'
-						className='px-0 text-text_pink'
-					>
-						Show Less
-					</Button>
+					<div className='flex justify-center pt-2'>
+						<span
+							onClick={handleShowLess}
+							className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
+							aria-hidden='true'
+						>
+							Show Less <HiOutlineArrowUpCircle className='text-lg' />
+						</span>
+					</div>
 				) : isTruncated ? (
-					<Button
-						onClick={handleShowMore}
-						variant='ghost'
-						className='px-0 text-text_pink'
-						size='sm'
-					>
-						Show More
-					</Button>
+					<div className='flex justify-center pt-2'>
+						<span
+							onClick={handleShowMore}
+							className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
+							aria-hidden='true'
+						>
+							Show More <HiOutlineArrowDownCircle className='text-lg' />
+						</span>
+					</div>
 				) : null)}
 		</div>
 	);

@@ -23,5 +23,21 @@
 }
 
 .container {
-	@apply relative z-10 mx-auto w-full max-w-[1200px] overflow-x-hidden rounded-xl border border-border_grey bg-bg_modal p-5 hover:shadow-lg;
+	@apply relative z-10 mx-auto w-full max-w-[1200px] overflow-x-hidden rounded-xl border border-border_grey bg-bg_modal p-5 pt-4 hover:shadow-lg;
+}
+
+.proposalTitle {
+	@apply text-base font-semibold text-btn_secondary_text;
+}
+
+.reactionButtons {
+	@apply flex items-center gap-6;
+
+	button {
+		@apply transition-colors hover:text-text_pink;
+	}
+}
+
+.metricsContainer {
+	@apply flex items-center justify-end gap-2 text-xs text-text_primary;
 }

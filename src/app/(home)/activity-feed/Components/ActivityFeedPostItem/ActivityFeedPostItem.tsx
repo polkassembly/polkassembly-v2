@@ -123,7 +123,7 @@ function ActivityFeedPostItem({
 			{/* Header Section */}
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center text-wallet_btn_text'>
-					<span className='text-xl font-bold'>
+					<span className='text-xl font-semibold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
 							<div className={`${styles.beneficiaryContainer} mr-2`}>
 								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network))
@@ -146,7 +146,8 @@ function ActivityFeedPostItem({
 						<div className='relative z-50'>
 							<VoteReferendumButton
 								index={postData?.index?.toString() || ''}
-								btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink'
+								btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
+								size='sm'
 							/>
 						</div>
 					)}
@@ -171,19 +172,21 @@ function ActivityFeedPostItem({
 						</>
 					)}
 				</div>
-				<VotingProgress
-					timeRemaining={timeRemaining}
-					decisionPeriodPercentage={decisionPeriodPercentage}
-					formattedTime={formattedTime}
-					ayePercent={ayePercent}
-					nayPercent={nayPercent}
-					postData={postData}
-				/>
+				<div className='relative z-50 cursor-pointer'>
+					<VotingProgress
+						timeRemaining={timeRemaining}
+						decisionPeriodPercentage={decisionPeriodPercentage}
+						formattedTime={formattedTime}
+						ayePercent={ayePercent}
+						nayPercent={nayPercent}
+						postData={postData}
+					/>
+				</div>
 			</div>
 
 			{/* Post Content Section */}
 			<div>
-				<h3 className='mb-2 text-sm font-medium text-btn_secondary_text'>{`#${postData.index} ${postData.title}`}</h3>
+				<h3 className={styles.proposalTitle}>{`#${postData.index} ${postData.title}`}</h3>
 				<div className='mb-4 text-sm text-btn_secondary_text'>
 					<div className='flex w-full overflow-hidden border-none'>
 						<MarkdownViewer
@@ -195,27 +198,28 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			{(likeCount || dislikeCount || commentCount !== null) && (
-				<div className='flex items-center justify-end'>
-					<div className='flex items-center gap-2 text-xs text-text_primary'>
-						<span>
-							{likeCount} {t('ActivityFeed.PostItem.likes')}
-						</span>
-						<span>|</span>
+			<div className={styles.metricsContainer}>
+				<div className='flex items-center gap-2'>
+					<span>
+						{likeCount} {t('ActivityFeed.PostItem.likes')}
+					</span>
+					<span>|</span>
 
-						<span>
-							{dislikeCount} {t('ActivityFeed.PostItem.dislikes')}
-						</span>
-						<span>|</span>
-
-						<span>
-							{commentCount} {t('ActivityFeed.PostItem.comments')}
-						</span>
-					</div>
+					<span>
+						{dislikeCount} {t('ActivityFeed.PostItem.dislikes')}
+					</span>
+					{commentCount !== null && (
+						<>
+							<span>|</span>
+							<span>
+								{commentCount} {t('ActivityFeed.PostItem.comments')}
+							</span>
+						</>
+					)}
 				</div>
-			)}
+			</div>
 
-			<hr className='mb-1 mt-3.5 border-[0.7px] border-primary_border' />
+			<hr className='mb-[0.6px] mt-3.5 border-[0.6px] border-primary_border' />
 
 			{/* Reaction Buttons Section */}
 			{commentBox && (
@@ -250,7 +254,8 @@ function ActivityFeedPostItem({
 					<div className='relative z-50 pt-5'>
 						<VoteReferendumButton
 							index={postData?.index?.toString() || ''}
-							btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink'
+							btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
+							size='sm'
 						/>
 					</div>
 				)}
