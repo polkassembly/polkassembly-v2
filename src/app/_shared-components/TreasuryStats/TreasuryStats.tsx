@@ -6,7 +6,7 @@
 
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EAssets, IErrorResponse, ITreasuryStats } from '@/_shared/types';
+import { EAssets, ITreasuryStats } from '@/_shared/types';
 import { Info } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -20,9 +20,7 @@ import { TooltipContent, TooltipTrigger, Tooltip } from '../Tooltip';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { TreasuryDetailsDialog } from './TreasuryStatsDialog';
-import { Skeleton } from '../Skeleton';
 import SpendPeriodStats from './SpendPeriodStats';
-import ErrorMessage from '../ErrorMessage';
 
 interface PriceDisplayProps {
 	tokenSymbol: string;
@@ -151,7 +149,7 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 	};
 };
 
-function TreasuryStats({ isActivityFeed = false, data, error }: { isActivityFeed?: boolean; data: ITreasuryStats[]; error: IErrorResponse | null }) {
+function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: boolean; data?: ITreasuryStats[] }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const tokenSymbol = NETWORKS_DETAILS?.[`${network}`]?.tokenSymbol;
@@ -162,13 +160,10 @@ function TreasuryStats({ isActivityFeed = false, data, error }: { isActivityFeed
 	const priceChangeText = isPriceUp ? `+${Number(priceChange).toFixed(2)}%` : `${Number(priceChange).toFixed(2)}%`;
 	const priceChangeColor = isPriceUp ? 'text-success' : 'text-destructive';
 
-	const treasuryData = useTreasuryData(data);
+	const treasuryData = useTreasuryData(data || []);
 
-	if (error || !data?.length) {
-		return <ErrorMessage errorMessage={error?.message || t('TreasuryStats.error')} />;
-	}
-	if (!data?.length && !error) {
-		return <Skeleton className='h-full w-full' />;
+	if (!data || !data?.length) {
+		return null;
 	}
 
 	return (

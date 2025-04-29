@@ -42,7 +42,7 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 			<ActivityFeed
 				initialData={data}
 				activeTab={tab}
-				treasuryStatsData={{ data: treasuryStatsData || [], error: treasuryStatsError || null }}
+				treasuryStatsData={treasuryStatsError ? [] : treasuryStatsData || []}
 			/>
 		</Suspense>
 	);
