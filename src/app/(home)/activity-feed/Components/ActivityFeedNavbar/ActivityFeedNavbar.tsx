@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils';
 import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
+import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
+import { BsThreeDots } from 'react-icons/bs';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -26,56 +28,59 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 	const t = useTranslations();
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 	const containerRef = useRef<HTMLDivElement>(null);
+	const { state: sidebarState } = useSidebar();
 
-	const ADMIN_CATEGORY = t('ActivityFeed.Navbar.Admin');
-	const ALL_CATEGORY = t('ActivityFeed.Navbar.All');
-	const ROOT_CATEGORY = t('ActivityFeed.Navbar.Root');
-	const WISH_FOR_CHANGE_CATEGORY = t('ActivityFeed.Navbar.Wish For Change');
-	const GOVERNANCE_CATEGORY = t('ActivityFeed.Navbar.Governance');
-	const TREASURY_CATEGORY = t('ActivityFeed.Navbar.Treasury');
-	const WHITELIST_CATEGORY = t('ActivityFeed.Navbar.Whitelist');
-
-	const categoryIconPaths = useMemo(
+	const CATEGORIES = useMemo(
 		() => ({
-			[ALL_CATEGORY]: Home,
-			[ROOT_CATEGORY]: RootIcon,
-			[WISH_FOR_CHANGE_CATEGORY]: WishForChangeIcon,
-			[ADMIN_CATEGORY]: AdminIcon,
-			[GOVERNANCE_CATEGORY]: GovernanceIcon,
-			[TREASURY_CATEGORY]: TreasuryIcon,
-			[WHITELIST_CATEGORY]: WhitelistedCallerIcon
+			ALL: t('ActivityFeed.Navbar.All'),
+			ROOT: t('ActivityFeed.Navbar.Root'),
+			WISH_FOR_CHANGE: t('ActivityFeed.Navbar.Wish For Change'),
+			ADMIN: t('ActivityFeed.Navbar.Admin'),
+			GOVERNANCE: t('ActivityFeed.Navbar.Governance'),
+			TREASURY: t('ActivityFeed.Navbar.Treasury'),
+			WHITELIST: t('ActivityFeed.Navbar.Whitelist')
 		}),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[t]
 	);
 
+	const categoryIconMap = useMemo(
+		() => ({
+			[CATEGORIES.ALL]: Home,
+			[CATEGORIES.ROOT]: RootIcon,
+			[CATEGORIES.WISH_FOR_CHANGE]: WishForChangeIcon,
+			[CATEGORIES.ADMIN]: AdminIcon,
+			[CATEGORIES.GOVERNANCE]: GovernanceIcon,
+			[CATEGORIES.TREASURY]: TreasuryIcon,
+			[CATEGORIES.WHITELIST]: WhitelistedCallerIcon
+		}),
+		[CATEGORIES]
+	);
+
 	const categoryStructure = useMemo(() => {
-		const structure: Record<string, EPostOrigin[]> = {
-			[ALL_CATEGORY]: [],
-			[ROOT_CATEGORY]: [],
-			[WISH_FOR_CHANGE_CATEGORY]: [],
-			[ADMIN_CATEGORY]: [],
-			[GOVERNANCE_CATEGORY]: [],
-			[TREASURY_CATEGORY]: [],
-			[WHITELIST_CATEGORY]: []
-		};
+		const structure: Record<string, EPostOrigin[]> = Object.values(CATEGORIES).reduce(
+			(acc, category) => ({
+				...acc,
+				[category]: []
+			}),
+			{}
+		);
 
 		Object.entries(trackInfo).forEach(([key]) => {
 			const origin = key as EPostOrigin;
 
 			if (origin === EPostOrigin.ROOT) {
-				structure[ROOT_CATEGORY as string].push(origin);
+				structure[CATEGORIES.ROOT].push(origin);
 			} else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
-				structure[WISH_FOR_CHANGE_CATEGORY as string].push(origin);
+				structure[CATEGORIES.WISH_FOR_CHANGE].push(origin);
 			} else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
-				structure[ADMIN_CATEGORY as string].push(origin);
+				structure[CATEGORIES.ADMIN].push(origin);
 			} else if (
 				origin.includes(EPostOrigin.LEASE_ADMIN) ||
 				origin.includes(EPostOrigin.GENERAL_ADMIN) ||
 				origin.includes(EPostOrigin.REFERENDUM_CANCELLER) ||
 				origin.includes(EPostOrigin.REFERENDUM_KILLER)
 			) {
-				structure[GOVERNANCE_CATEGORY as string].push(origin);
+				structure[CATEGORIES.GOVERNANCE].push(origin);
 			} else if (
 				origin.includes(EPostOrigin.BIG_SPENDER) ||
 				origin.includes(EPostOrigin.MEDIUM_SPENDER) ||
@@ -84,25 +89,53 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 				origin.includes(EPostOrigin.SMALL_TIPPER) ||
 				origin.includes(EPostOrigin.TREASURER)
 			) {
-				structure[TREASURY_CATEGORY as string].push(origin);
+				structure[CATEGORIES.TREASURY].push(origin);
 			} else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
-				structure[WHITELIST_CATEGORY as string].push(origin);
+				structure[CATEGORIES.WHITELIST].push(origin);
 			}
 		});
 
-		return Object.fromEntries(Object.entries(structure).filter(([_, tracks]) => tracks.length > 0 || _ === ALL_CATEGORY));
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [trackInfo, t, ALL_CATEGORY]);
+		return Object.fromEntries(Object.entries(structure).filter(([category, tracks]) => tracks.length > 0 || category === CATEGORIES.ALL));
+	}, [trackInfo, CATEGORIES]);
+
+	const { visibleTabs, overflowTabs } = useMemo(() => {
+		const categoryEntries = Object.entries(categoryStructure);
+		const totalCategories = categoryEntries.length;
+		const maxVisibleTabs = sidebarState === 'expanded' ? 6 : 7;
+		if (totalCategories <= maxVisibleTabs) {
+			return {
+				visibleTabs: categoryEntries,
+				overflowTabs: []
+			};
+		}
+
+		const activeTabIndex = categoryEntries.findIndex(([category, tracks]) => currentTab === category || tracks.includes(currentTab as EPostOrigin));
+		const visibleEntries = categoryEntries.slice(0, maxVisibleTabs);
+		let overflowEntries = categoryEntries.slice(maxVisibleTabs);
+
+		if (activeTabIndex >= maxVisibleTabs) {
+			const activeEntry = categoryEntries[activeTabIndex];
+			const lastVisible = visibleEntries.pop();
+			if (lastVisible) overflowEntries.unshift(lastVisible);
+			visibleEntries.push(activeEntry);
+			overflowEntries = overflowEntries.filter(([category]) => category !== activeEntry[0]);
+		}
+
+		return {
+			visibleTabs: visibleEntries,
+			overflowTabs: overflowEntries
+		};
+	}, [categoryStructure, currentTab, sidebarState]);
 
 	const formatTrackName = (name: string) => {
 		return name.replace(/([A-Z])/g, ' $1').trim();
 	};
 
 	const handleCategoryClick = (category: string) => {
-		if (category === ALL_CATEGORY) {
+		if (category === CATEGORIES.ALL) {
 			setCurrentTab('All');
-		} else if ([ROOT_CATEGORY, WISH_FOR_CHANGE_CATEGORY].includes(category)) {
-			setCurrentTab(category as EPostOrigin);
+		} else if ([CATEGORIES.ROOT, CATEGORIES.WISH_FOR_CHANGE].includes(category)) {
+			setCurrentTab(CATEGORIES.ROOT === category ? EPostOrigin.ROOT : EPostOrigin.WISH_FOR_CHANGE);
 		}
 	};
 
@@ -119,7 +152,6 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 			if (activeElement) {
 				const containerRect = container.getBoundingClientRect();
 				const activeRect = activeElement.getBoundingClientRect();
-
 				const scrollLeft = activeRect.left - containerRect.left - (containerRect.width - activeRect.width) / 2;
 				container.scrollTo({
 					left: container.scrollLeft + scrollLeft,
@@ -133,10 +165,120 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		scrollToActiveTab();
 	}, [currentTab]);
 
+	const getMoreMenuText = () => {
+		if (overflowTabs.length === 0) return <BsThreeDots className='text-bg_pink' />;
+
+		if (overflowTabs.length === 1) {
+			const category = overflowTabs[0][0];
+			return (
+				<div className='flex items-center gap-2'>
+					<Image
+						src={categoryIconMap[category]}
+						alt={category}
+						width={18}
+						height={18}
+						className={cn(styles.darkIcon)}
+						priority
+					/>
+					<span className='text-sm text-basic_text'>{category.substring(0, 3)}</span>
+					<BsThreeDots className='text-bg_pink' />
+				</div>
+			);
+		}
+
+		const firstCategory = overflowTabs[0][0];
+		const initials = overflowTabs
+			.slice(0, 3)
+			.map(([category]) => category.charAt(0))
+			.join('');
+
+		return (
+			<div className='flex items-center gap-2'>
+				<Image
+					src={categoryIconMap[firstCategory]}
+					alt={firstCategory}
+					width={18}
+					height={18}
+					className={cn(styles.darkIcon)}
+					priority
+				/>
+				<span className='text-sm text-basic_text'>{initials}</span>
+				<BsThreeDots className='text-bg_pink' />
+			</div>
+		);
+	};
+
+	const renderCategoryTab = (category: string, tracks: EPostOrigin[], isOverflow = false) => {
+		const isSimpleCategory = tracks.length === 0 || category === CATEGORIES.ROOT || category === CATEGORIES.WISH_FOR_CHANGE;
+		const baseClassName = isOverflow ? styles.overflowCategory : styles.popoverTrigger;
+		const activeClass = isActiveCategory(category, tracks) ? styles.activeTab : '';
+
+		if (isSimpleCategory) {
+			return (
+				<button
+					type='button'
+					className={cn(baseClassName, activeClass)}
+					onClick={() => handleCategoryClick(category)}
+				>
+					<span className='flex items-center gap-2'>
+						<Image
+							src={categoryIconMap[category]}
+							alt={category}
+							width={20}
+							height={20}
+							className={cn(styles.darkIcon)}
+							priority
+						/>
+						<span className='text-sm'>{category}</span>
+					</span>
+				</button>
+			);
+		}
+
+		return (
+			<DropdownMenu modal={false}>
+				<DropdownMenuTrigger
+					className={cn(baseClassName, activeClass)}
+					ArrowPosition={isOverflow ? 'right' : 'down'}
+					noArrow={!isOverflow}
+				>
+					<span className='flex items-center gap-2'>
+						<Image
+							src={categoryIconMap[category]}
+							alt={category}
+							width={20}
+							height={20}
+							className={cn(styles.darkIcon)}
+							priority
+						/>
+						<span className='text-sm text-basic_text'>{category}</span>
+					</span>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent
+					align={isOverflow ? 'end' : 'start'}
+					side={isOverflow ? 'right' : 'bottom'}
+					sideOffset={4}
+					className={styles.popoverContent}
+					avoidCollisions
+				>
+					{tracks.map((track) => (
+						<DropdownMenuItem
+							key={track}
+							className={cn(styles.trackName, currentTab === track && styles.activeTab)}
+							onSelect={() => setCurrentTab(track)}
+						>
+							{formatTrackName(track)}
+						</DropdownMenuItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	};
+
 	return (
 		<div className='mb-5 w-full'>
 			<div
-				className={styles.container}
+				className={cn(styles.container, 'lg:hidden')}
 				ref={containerRef}
 			>
 				{Object.entries(categoryStructure).map(([category, tracks]) => (
@@ -144,60 +286,51 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 						key={category}
 						className={styles.navItem}
 					>
-						{tracks && tracks.length > 0 && category !== ROOT_CATEGORY && category !== WISH_FOR_CHANGE_CATEGORY ? (
-							<DropdownMenu modal={false}>
-								<DropdownMenuTrigger className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && styles.activeTab)}>
-									<span className='flex items-center gap-2'>
-										<Image
-											src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
-											alt={category}
-											width={20}
-											height={20}
-											className={cn(styles.darkIcon)}
-											priority
-										/>
-										<span className='text-sm text-basic_text'>{category}</span>
-									</span>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent
-									align='start'
-									side='bottom'
-									sideOffset={4}
-									className={styles.popoverContent}
-									avoidCollisions
-								>
-									{tracks.map((track) => (
-										<DropdownMenuItem
-											key={track}
-											className={cn(styles.trackName, currentTab === track && styles.activeTab)}
-											onSelect={() => setCurrentTab(track)}
-										>
-											{formatTrackName(track)}
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						) : (
-							<button
-								type='button'
-								className={cn(styles.popoverTrigger, isActiveCategory(category, tracks) && styles.activeTab)}
-								onClick={() => handleCategoryClick(category)}
-							>
-								<span className='flex items-center gap-2'>
-									<Image
-										src={categoryIconPaths[category as keyof typeof categoryIconPaths]}
-										alt={category}
-										width={20}
-										height={20}
-										className={cn(styles.darkIcon)}
-										priority
-									/>
-									<span className='text-sm'>{category}</span>
-								</span>
-							</button>
-						)}
+						{renderCategoryTab(category, tracks)}
 					</div>
 				))}
+			</div>
+
+			<div className={cn(styles.container, 'hidden lg:flex lg:overflow-visible')}>
+				{visibleTabs.map(([category, tracks]) => (
+					<div
+						key={category}
+						className={styles.navItem}
+					>
+						{renderCategoryTab(category, tracks)}
+					</div>
+				))}
+
+				{overflowTabs.length > 0 && (
+					<div className={styles.navItem}>
+						<DropdownMenu modal={false}>
+							<DropdownMenuTrigger
+								noArrow
+								className={cn(styles.popoverTrigger, styles.moreMenu)}
+							>
+								<span className='flex items-center gap-2'>
+									<span className='text-sm font-medium'>{getMoreMenuText()}</span>
+								</span>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent
+								align='start'
+								side='bottom'
+								sideOffset={4}
+								className={styles.popoverContent}
+								avoidCollisions
+							>
+								{overflowTabs.map(([category, tracks]) => (
+									<div
+										key={category}
+										className='mb-1'
+									>
+										{renderCategoryTab(category, tracks, true)}
+									</div>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				)}
 			</div>
 		</div>
 	);
