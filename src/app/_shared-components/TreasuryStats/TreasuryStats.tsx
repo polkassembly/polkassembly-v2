@@ -149,7 +149,7 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 	};
 };
 
-function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: boolean; data?: ITreasuryStats[] }) {
+function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: boolean; data: ITreasuryStats[] }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const tokenSymbol = NETWORKS_DETAILS?.[`${network}`]?.tokenSymbol;

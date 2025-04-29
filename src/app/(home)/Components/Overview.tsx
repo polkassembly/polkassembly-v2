@@ -11,7 +11,7 @@ import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
 
-function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData?: ITreasuryStats[] }) {
+function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData: ITreasuryStats[] }) {
 	return (
 		<div className={styles.overview_container}>
 			<OverviewHeading />
