@@ -27,6 +27,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
 import classes from './PostHeader.module.scss';
+import { getSpanStyle } from '../../TopicTag/TopicTag';
 
 function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
@@ -52,7 +53,9 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
-
+	const formatOriginText = (text: string): string => {
+		return text.replace(/([A-Z])/g, ' $1').trim();
+	};
 	return (
 		<div className='mx-auto max-w-7xl'>
 			<div className='mb-4'>
@@ -90,27 +93,25 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				<div className={classes.proposerWrapper}>
 					<div className='flex items-center gap-x-2'>
 						{postData?.onChainInfo?.proposer ? (
-							<>
-								<Address address={postData.onChainInfo?.proposer} />
-								<Separator
-									orientation='vertical'
-									className='h-3'
-								/>
-							</>
+							<Address address={postData.onChainInfo?.proposer} />
 						) : postData.publicUser?.username ? (
+							<Link
+								href={`/user/${postData.publicUser?.username}`}
+								className='text-text_secondary text-xs'
+							>
+								{postData.publicUser?.username}
+							</Link>
+						) : null}
+						{postData.onChainInfo?.origin && (
 							<>
-								<Link
-									href={`/user/${postData.publicUser?.username}`}
-									className='text-text_secondary text-xs'
-								>
-									{postData.publicUser?.username}
-								</Link>
+								<span className='text-xs text-wallet_btn_text'>{t('Search.in')}</span>
+								<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${classes.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
 								<Separator
 									orientation='vertical'
 									className='h-3'
 								/>
 							</>
-						) : null}
+						)}
 						{createdAt && <CreatedAtTime createdAt={createdAt} />}
 						{postData.tags && postData.tags.length > 0 && (
 							<>
