@@ -85,8 +85,15 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							</TabsContent>
 						</div>
+						<div className={classes.commentsBox}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+							/>
+						</div>
 						{isModalOpen && !isOffchainPost && (
-							<div className='sticky bottom-0 border-t border-border_grey bg-bg_modal p-4'>
+							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
 									<VoteReferendumButton
 										iconClassName='hidden'
@@ -95,13 +102,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-							/>
-						</div>
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
