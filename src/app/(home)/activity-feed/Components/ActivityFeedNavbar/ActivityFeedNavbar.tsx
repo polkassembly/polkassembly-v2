@@ -214,49 +214,6 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 		};
 	}, [checkScroll]);
 
-	const getMoreMenuText = () => {
-		if (overflowTabs.length === 0) return <BsThreeDots className='text-bg_pink' />;
-
-		if (overflowTabs.length === 1) {
-			const category = overflowTabs[0][0];
-			return (
-				<div className='flex items-center gap-2'>
-					<Image
-						src={categoryIconMap[category]}
-						alt={category}
-						width={18}
-						height={18}
-						className={cn(styles.darkIcon)}
-						priority
-					/>
-					<span className='text-sm text-basic_text'>{category.substring(0, 3)}</span>
-					<BsThreeDots className='text-bg_pink' />
-				</div>
-			);
-		}
-
-		const firstCategory = overflowTabs[0][0];
-		const initials = overflowTabs
-			.slice(0, 3)
-			.map(([category]) => category.charAt(0))
-			.join('');
-
-		return (
-			<div className='flex items-center gap-2'>
-				<Image
-					src={categoryIconMap[firstCategory]}
-					alt={firstCategory}
-					width={18}
-					height={18}
-					className={cn(styles.darkIcon)}
-					priority
-				/>
-				<span className='text-sm text-basic_text'>{initials}</span>
-				<BsThreeDots className='text-bg_pink' />
-			</div>
-		);
-	};
-
 	const renderCategoryTab = (category: string, tracks: EPostOrigin[], isOverflow = false) => {
 		const isSimpleCategory = tracks.length === 0 || category === CATEGORIES.ROOT || category === CATEGORIES.WISH_FOR_CHANGE;
 		const baseClassName = isOverflow ? styles.overflowCategory : styles.popoverTrigger;
@@ -382,7 +339,9 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 								className={cn(styles.popoverTrigger, styles.moreMenu)}
 							>
 								<span className='flex items-center gap-2'>
-									<span className='text-sm font-medium'>{getMoreMenuText()}</span>
+									<span className='text-sm font-medium'>
+										<BsThreeDots className='text-bg_pink' />
+									</span>
 								</span>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent

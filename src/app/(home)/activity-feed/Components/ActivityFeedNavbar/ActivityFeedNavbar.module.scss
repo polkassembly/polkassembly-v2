@@ -1,5 +1,5 @@
 .container {
-	@apply relative flex w-full items-center gap-0.5 overflow-x-auto rounded-md border border-border_grey bg-bg_modal p-3 text-text_primary;
+	@apply relative flex w-full items-center justify-between gap-0.5 overflow-x-auto rounded-md border border-border_grey bg-bg_modal p-3 text-text_primary;
 	-ms-overflow-style: none;
 	scrollbar-width: none;
 
