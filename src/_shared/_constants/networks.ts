@@ -14,6 +14,10 @@ import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
 import { StaticImageData } from 'next/image';
+import USDCIcon from '@/_assets/icons/usdc.svg';
+import USDTIcon from '@/_assets/icons/usdt.svg';
+import MYTHIcon from '@/_assets/icons/myth.svg';
+import DEDIcon from '@/_assets/icons/ded.png';
 
 interface ISocialLink {
 	id: string;
@@ -35,6 +39,7 @@ interface ITreasuryAsset {
 	name: string;
 	tokenDecimal: number;
 	symbol: string;
+	icon: StaticImageData;
 }
 
 interface INetworkTreasuryAssets extends ITreasuryAsset {
@@ -131,10 +136,10 @@ enum ENetworkSocial {
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
-	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
-	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT' },
-	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' },
-	[EAssets.MYTH]: { name: 'mythos', tokenDecimal: 18, symbol: 'MYTH' }
+	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED', icon: DEDIcon },
+	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT', icon: USDTIcon },
+	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC', icon: USDCIcon },
+	[EAssets.MYTH]: { name: 'mythos', tokenDecimal: 18, symbol: 'MYTH', icon: MYTHIcon }
 } as const;
 
 const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {

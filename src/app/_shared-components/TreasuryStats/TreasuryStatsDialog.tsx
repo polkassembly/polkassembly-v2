@@ -7,9 +7,6 @@ import React, { ReactElement, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ITreasuryStats, EAssets, ENetwork } from '@/_shared/types';
 import Image from 'next/image';
-import USDCIcon from '@/_assets/icons/usdc.svg';
-import USDTIcon from '@/_assets/icons/usdt.svg';
-import MYTHIcon from '@/_assets/icons/myth.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
@@ -61,16 +58,10 @@ const formatedAmountWithUSD = ({
 };
 
 function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
-	const ICONS = {
-		usdc: USDCIcon,
-		usdt: USDTIcon,
-		myth: MYTHIcon
-	};
-
 	return (
 		<div className='flex items-center gap-1 text-sm font-medium dark:text-white max-md:text-xs'>
 			<Image
-				src={ICONS[asset?.toLowerCase() as keyof typeof ICONS] || NETWORKS_DETAILS[`${network}`].logo}
+				src={treasuryAssetsData[asset as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo}
 				alt={asset || network}
 				width={20}
 				height={20}

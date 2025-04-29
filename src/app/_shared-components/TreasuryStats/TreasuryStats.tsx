@@ -9,9 +9,6 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EAssets, IErrorResponse, ITreasuryStats } from '@/_shared/types';
 import { Info } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
-import USDCIcon from '@/_assets/icons/usdc.svg';
-import USDTIcon from '@/_assets/icons/usdt.svg';
-import MYTHIcon from '@/_assets/icons/myth.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
@@ -200,8 +197,8 @@ function TreasuryStats({ isActivityFeed = false, data, error }: { isActivityFeed
 								inActivityFeed={isActivityFeed}
 							/>
 							<AssetDisplay
-								icon={USDCIcon}
-								alt='USDC'
+								icon={treasuryAssetsData[EAssets.USDC]?.icon}
+								alt={EAssets.USDC}
 								value={treasuryData.usdcBalance}
 								showSeparator={false}
 								inActivityFeed={isActivityFeed}
@@ -209,14 +206,14 @@ function TreasuryStats({ isActivityFeed = false, data, error }: { isActivityFeed
 						</div>
 						<div className={cn('flex items-center max-md:gap-2', isActivityFeed ? 'gap-2' : 'gap-6')}>
 							<AssetDisplay
-								icon={USDTIcon}
-								alt='USDT'
+								icon={treasuryAssetsData[EAssets.USDT]?.icon}
+								alt={EAssets.USDT}
 								value={treasuryData.usdtBalance}
 								inActivityFeed={isActivityFeed}
 							/>
 							<AssetDisplay
-								icon={MYTHIcon}
-								alt='MYTH'
+								icon={treasuryAssetsData[EAssets.MYTH]?.icon}
+								alt={EAssets.MYTH}
 								value={`${treasuryData.mythBalance} ${treasuryAssetsData[EAssets.MYTH]?.symbol}`}
 								showSeparator={false}
 								inActivityFeed={isActivityFeed}
