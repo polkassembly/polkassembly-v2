@@ -63,7 +63,7 @@ function Search() {
 				className='text-text_primary'
 				asChild
 			>
-				<SearchIcon className='h-6 w-6 cursor-pointer text-text_primary' />
+				<SearchIcon className='h-6 w-6 cursor-pointer hover:text-text_pink' />
 			</DialogTrigger>
 			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
