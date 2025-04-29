@@ -21,7 +21,7 @@ interface VoteReferendumButtonProps {
 	size?: 'sm' | 'lg';
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'sm' }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg' }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	return !user ? (

@@ -147,6 +147,7 @@ function ActivityFeedPostItem({
 							<VoteReferendumButton
 								index={postData?.index?.toString() || ''}
 								btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
+								size='sm'
 							/>
 						</div>
 					)}
@@ -254,6 +255,7 @@ function ActivityFeedPostItem({
 						<VoteReferendumButton
 							index={postData?.index?.toString() || ''}
 							btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
+							size='sm'
 						/>
 					</div>
 				)}

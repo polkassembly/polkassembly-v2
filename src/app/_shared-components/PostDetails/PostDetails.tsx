@@ -91,7 +91,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									<VoteReferendumButton
 										iconClassName='hidden'
 										index={index}
-										size='lg'
 									/>
 								)}
 							</div>
