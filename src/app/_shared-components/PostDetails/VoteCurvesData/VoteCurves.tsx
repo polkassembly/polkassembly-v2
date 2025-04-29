@@ -22,6 +22,21 @@ interface Props {
 	setThresholdValues?: (values: { approvalThreshold: number; supportThreshold: number }) => void;
 }
 
+function formatHoursAndDays(num: number, unit: 'day' | 'hr') {
+	if (num === 1) {
+		return `${num}${unit}`;
+	}
+	return `${num}${unit}s`;
+}
+
+function convertGraphPoint(value?: number) {
+	if (!value) {
+		return '--';
+	}
+
+	return `${Number(value).toFixed(2)}%`;
+}
+
 function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThresholdValues }: Props) {
 	const network = getCurrentNetwork();
 
@@ -148,7 +163,7 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 					borderColor: '#5BC044',
 					borderWidth: 2,
 					data: approvalThresholdData,
-					label: 'Approval',
+					label: 'Approval Threshold',
 					pointHitRadius: 10,
 					pointHoverRadius: 5,
 					pointRadius: 0,
@@ -159,7 +174,7 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 					borderColor: '#E5007A',
 					borderWidth: 2,
 					data: supportThresholdData,
-					label: 'Support',
+					label: 'Support Threshold',
 					pointHitRadius: 10,
 					pointHoverRadius: 5,
 					pointRadius: 0,
@@ -189,10 +204,51 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 	}, [chartData]);
 
 	const chartOptions: ChartOptions<'line'> = {
+		animation: {
+			duration: 0
+		},
+		clip: false,
 		plugins: {
 			legend: {
 				display: false,
 				position: 'bottom'
+			},
+			tooltip: {
+				callbacks: {
+					label(tooltipItem) {
+						const { dataIndex, parsed, dataset } = tooltipItem;
+						if (dataset.label === 'Support Threshold') {
+							const threshold = Number(parsed.y).toFixed(2);
+							const data = chartData.datasets.find((d) => d.label === 'Support');
+
+							const currSupport = data?.data.find((d) => (d as Point).x > dataIndex) as Point;
+							return `Support: ${convertGraphPoint(currSupport?.y)} / ${threshold}%`;
+						}
+						if (dataset.label === 'Approval Threshold') {
+							const threshold = Number(parsed.y).toFixed(2);
+							const data = chartData.datasets.find((d) => d.label === 'Approval');
+
+							const currApproval = data?.data.find((d) => (d as Point).x > dataIndex) as Point;
+							return `Approval: ${convertGraphPoint(currApproval?.y)} / ${threshold}%`;
+						}
+
+						return '';
+					},
+					title(values) {
+						const { label } = values[0];
+						const hours = Number(label);
+						const days = Math.floor(hours / 24);
+						const resultHours = hours - days * 24;
+						let result = `Time: ${formatHoursAndDays(hours, 'hr')}`;
+						if (days > 0) {
+							result += ` (${formatHoursAndDays(days, 'day')} ${resultHours > 0 ? formatHoursAndDays(resultHours, 'hr') : ''})`;
+						}
+						return result;
+					}
+				},
+				displayColors: false,
+				intersect: false,
+				mode: 'index'
 			}
 		},
 		scales: {
