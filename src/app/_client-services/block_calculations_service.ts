@@ -8,18 +8,20 @@ import { BN } from '@polkadot/util';
 import { dayjs } from '@shared/_utils/dayjsInit';
 
 export class BlockCalculationsService {
+	// Returns the number of blocks per day for the given network
 	static getBlocksPerDay(network: ENetwork) {
 		return (24 * 60 * 60 * 1000) / NETWORKS_DETAILS[`${network}`].blockTime;
 	}
 
-	static getBlocksFromTime({ network, time, blockHeight }: { network: ENetwork; time: Date; blockHeight?: BN }) {
+	// Returns the block height for the given date
+	static getBlockHeightForDateTime({ network, time, blockHeight }: { network: ENetwork; time: Date; blockHeight: BN }) {
 		const blocksPerDay = this.getBlocksPerDay(network);
 		const diffInBlocks = dayjs(time).diff(dayjs(), 'day') * blocksPerDay;
 		return blockHeight ? blockHeight.add(new BN(diffInBlocks || 100)) : undefined;
 	}
 
-	// Returns the time in seconds from the block number and formats it into days, hours and minutes for display
-	static getTimeFromBlocks({ network, blocks }: { network: ENetwork; blocks: BN | number }) {
+	// Returns the time in seconds required for the number of blocks passed. example: 100 blocks = 100 * 6 seconds = 600 seconds
+	static getTimeForBlocks({ network, blocks }: { network: ENetwork; blocks: BN | number }) {
 		const { blockTime } = NETWORKS_DETAILS[`${network}`];
 		const blockTimeInSeconds = blockTime / 1000;
 
@@ -27,15 +29,10 @@ export class BlockCalculationsService {
 
 		const totalSeconds = blockNumber * blockTimeInSeconds;
 
-		const formattedDays = Math.floor(totalSeconds / (3600 * 24));
-		const formattedHours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-		const formattedMinutes = totalSeconds < 60 ? 1 : Math.floor((totalSeconds % 3600) / 60);
-
 		return {
-			totalSeconds,
-			formattedDays,
-			formattedHours,
-			formattedMinutes
+			totalSeconds
 		};
 	}
+
+	// TODO: Add a function to get the date for the given block number
 }

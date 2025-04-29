@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions, ChartData, Point } from 'chart.js';
 import { EPostOrigin, EProposalStatus, IStatusHistoryItem, IVoteCurve } from '@/_shared/types';
@@ -19,7 +19,7 @@ interface Props {
 	trackName: EPostOrigin;
 	timeline?: IStatusHistoryItem[];
 	createdAt?: Date;
-	setThresholdValues: (values: { approvalThreshold: number; supportThreshold: number }) => void;
+	setThresholdValues?: (values: { approvalThreshold: number; supportThreshold: number }) => void;
 }
 
 function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThresholdValues }: Props) {
@@ -43,38 +43,39 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 			};
 		}
 
-		const { decisionPeriod } = trackInfo;
-		const { formattedDays, formattedHours } = BlockCalculationsService.getTimeFromBlocks({ network, blocks: decisionPeriod });
-		const decisionPeriodHrs = formattedHours + formattedDays * 24;
-
 		const labels: number[] = [];
 		const supportData: { x: number; y: number }[] = [];
 		const approvalData: { x: number; y: number }[] = [];
 
-		const approvalThreshold: { x: number; y: number }[] = [];
-		const supportThreshold: { x: number; y: number }[] = [];
+		const approvalThresholdData: { x: number; y: number }[] = [];
+		const supportThresholdData: { x: number; y: number }[] = [];
 
 		const statusBlock = timeline?.find((s) => s?.status === EProposalStatus.Deciding);
 
 		const lastGraphPoint = voteCurveData[voteCurveData.length - 1];
 		const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt || voteCurveData[0].timestamp);
-		const decisionPeriodMinutes = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
 
-		if (decisionPeriodMinutes < decisionPeriodHrs) {
-			for (let i = 0; i < decisionPeriodHrs; i += 1) {
+		const { decisionPeriod } = trackInfo;
+
+		const { totalSeconds } = BlockCalculationsService.getTimeForBlocks({ network, blocks: decisionPeriod });
+		const decisionPeriodInHrs = Math.floor(dayjs.duration(totalSeconds, 'seconds').asHours());
+		const decisionPeriodFromTimelineInHrs = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
+
+		if (decisionPeriodFromTimelineInHrs < decisionPeriodInHrs) {
+			for (let i = 0; i < decisionPeriodInHrs; i += 1) {
 				labels.push(i);
 
 				if (approvalCalc) {
-					approvalThreshold.push({
+					approvalThresholdData.push({
 						x: i,
-						y: approvalCalc(i / decisionPeriodHrs) * 100
+						y: approvalCalc(i / decisionPeriodInHrs) * 100
 					});
 				}
 
 				if (supportCalc) {
-					supportThreshold.push({
+					supportThresholdData.push({
 						x: i,
-						y: supportCalc(i / decisionPeriodHrs) * 100
+						y: supportCalc(i / decisionPeriodInHrs) * 100
 					});
 				}
 			}
@@ -85,17 +86,17 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 			const hour = dayjs(point.timestamp).diff(proposalCreatedAt, 'hour');
 			labels.push(hour);
 
-			if (decisionPeriodMinutes > decisionPeriodHrs) {
+			if (decisionPeriodFromTimelineInHrs > decisionPeriodInHrs) {
 				if (approvalCalc) {
-					approvalThreshold.push({
+					approvalThresholdData.push({
 						x: hour,
-						y: approvalCalc(hour / decisionPeriodMinutes) * 100
+						y: approvalCalc(hour / decisionPeriodFromTimelineInHrs) * 100
 					});
 				}
 				if (supportCalc) {
-					supportThreshold.push({
+					supportThresholdData.push({
 						x: hour,
-						y: supportCalc(hour / decisionPeriodMinutes) * 100
+						y: supportCalc(hour / decisionPeriodFromTimelineInHrs) * 100
 					});
 				}
 			}
@@ -114,14 +115,6 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 					y: point.approvalPercent
 				});
 			}
-		});
-
-		const currentApproval = approvalData[approvalData.length - 1];
-		const currentSupport = supportData[supportData.length - 1];
-
-		setThresholdValues({
-			approvalThreshold: approvalThreshold.find((data) => data && data?.x >= currentApproval?.x)?.y || 0,
-			supportThreshold: supportThreshold.find((data) => data && data?.x >= currentSupport?.x)?.y || 0
 		});
 
 		return {
@@ -154,7 +147,7 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 					backgroundColor: 'transparent',
 					borderColor: '#5BC044',
 					borderWidth: 2,
-					data: approvalThreshold,
+					data: approvalThresholdData,
 					label: 'Approval',
 					pointHitRadius: 10,
 					pointHoverRadius: 5,
@@ -165,7 +158,7 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 					backgroundColor: 'transparent',
 					borderColor: '#E5007A',
 					borderWidth: 2,
-					data: supportThreshold,
+					data: supportThresholdData,
 					label: 'Support',
 					pointHitRadius: 10,
 					pointHoverRadius: 5,
@@ -178,6 +171,23 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [voteCurveData]);
 
+	useEffect(() => {
+		if (!chartData || !chartData.datasets || chartData.datasets.length < 4) {
+			return;
+		}
+
+		const approvalThresholdData = chartData.datasets[2].data as Point[];
+		const supportThresholdData = chartData.datasets[3].data as Point[];
+		const currentApproval = chartData.datasets[0].data[chartData.datasets[0].data.length - 1] as Point;
+		const currentSupport = chartData.datasets[1].data[chartData.datasets[1].data.length - 1] as Point;
+
+		setThresholdValues?.({
+			approvalThreshold: approvalThresholdData.find((data) => data && data?.x >= currentApproval?.x)?.y || 0,
+			supportThreshold: supportThresholdData.find((data) => data && data?.x >= currentSupport?.x)?.y || 0
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [chartData]);
+
 	const chartOptions: ChartOptions<'line'> = {
 		plugins: {
 			legend: {
@@ -187,6 +197,7 @@ function VoteCurves({ voteCurveData, trackName, timeline, createdAt, setThreshol
 		},
 		scales: {
 			x: {
+				min: 0,
 				title: {
 					display: true,
 					text: 'Days'

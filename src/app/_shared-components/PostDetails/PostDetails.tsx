@@ -124,12 +124,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 							/>
-							{postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.Deciding) && (
+							{postData?.onChainInfo?.origin && postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.Deciding) && (
 								<VoteCurvesData
 									proposalType={post.proposalType}
 									index={index}
 									createdAt={postData?.createdAt}
-									trackName={postData?.onChainInfo?.origin || EPostOrigin.ROOT}
+									trackName={postData?.onChainInfo?.origin}
 									timeline={postData?.onChainInfo?.timeline}
 								/>
 							)}

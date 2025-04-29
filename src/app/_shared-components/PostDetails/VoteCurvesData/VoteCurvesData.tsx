@@ -21,7 +21,7 @@ interface Props {
 }
 
 function VoteCurvesData({ proposalType, index, trackName, createdAt, timeline }: Props) {
-	const t = useTranslations('VoteCurves');
+	const t = useTranslations('PostDetails.VoteCurves');
 	const [{ approvalThreshold, supportThreshold }, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
 
 	const fetchVoteCurves = async () => {
