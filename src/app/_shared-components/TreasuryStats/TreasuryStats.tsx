@@ -29,18 +29,13 @@ interface PriceDisplayProps {
 }
 
 function PriceDisplay({ tokenSymbol, price, priceChange, priceChangeColor }: PriceDisplayProps) {
-	const t = useTranslations();
 	return (
 		<div className='flex items-center gap-2'>
 			<div className='flex items-center'>
-				<span className='mr-2 flex text-sm font-medium capitalize text-muted-foreground'>
-					{tokenSymbol} {t('TreasuryStats.price')}:
-				</span>
+				<span className='mr-2 flex text-sm font-medium capitalize text-muted-foreground'>{tokenSymbol}:</span>
 				<span className={cn('text-base font-bold text-muted-foreground dark:text-white', priceChangeColor)}>${price}</span>
 			</div>
-			<span className={cn('mt-0.5 flex items-center gap-1 text-sm', priceChangeColor)}>
-				{priceChange} {priceChange.startsWith('+') ? '▲' : '▼'}
-			</span>
+			<span className={cn('mt-0.5 hidden items-center gap-1 text-xs lg:flex', priceChangeColor)}>{priceChange}</span>
 		</div>
 	);
 }
@@ -147,9 +142,10 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 					onDetailsClick={() => setIsOpen(true)}
 				/>
 
-				<div className='my-1'>
-					<div className='flex justify-between'>
+				<div className={cn('my-1', !isActivityFeed ? 'px-0 lg:px-4' : '')}>
+					<div className={cn('mt-3 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
 						<h1 className='text-lg font-bold text-muted-foreground dark:text-white'>~${treasuryData.totalInUsd}</h1>
+
 						{!isActivityFeed && (
 							<PriceDisplay
 								tokenSymbol={tokenSymbol}
