@@ -131,7 +131,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							items: [
 								{
 									title: t('Sidebar.bountyDashboard'),
-									url: '#',
+									url: '/bounty-dashboard',
 									count: trackCounts.bounty_dashboard || 0
 								},
 								{ title: t('Sidebar.onChainBounties'), url: '/bounties' },

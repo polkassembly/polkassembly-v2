@@ -79,19 +79,14 @@
 		"hidePassword": "Passwort verbergen",
 		"showPassword": "Passwort anzeigen",
 		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung.",
-		"switch": "Wechseln",
-		"switchAddress": "Adresse wechseln",
-		"account": "Konto",
-		"multisig": "Multisig",
-		"multisigAddress": "Multisig-Adresse",
-		"proxy": "Proxy",
-		"proxied": "Proxied",
-		"pureProxy": "Reiner Proxy",
-		"proxyaddresses": "Proxy-Adressen",
-		"proxiedaccounts": "Proxied-Konten",
-		"confirm": "Bestätigen",
-		"cancel": "Stornieren"
+		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung."
+	},
+	"AddressRelationsPicker": {
+		"Switch": "Wechseln",
+		"switchWallet": "Wallet wechseln",
+		"noData": "Keine",
+		"found": "gefunden",
+		"confirm": "Bestätigen"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Finanzvorschlag",
@@ -723,6 +718,23 @@
 		"claimed": "Beansprucht",
 		"cancelled": "Abgebrochen",
 		"rejected": "Abgelehnt"
+	},
+	"Bounty": {
+		"availableBountyPool": "Verfügbare Prämie-Pool",
+		"viewAll": "Alle anzeigen",
+		"dot": "DOT",
+		"claimed": "Beansprucht",
+		"childBounties": "Kinderprämien",
+		"bountyProposal": "Prämie-Vorschlag",
+		"vote": "Abstimmen",
+		"bountyDashboard": "Prämie-Dashboard",
+		"hotBounties": "Beliebte Prämien",
+		"activeBounties": "Aktive Prämien",
+		"claimants": "Beanspruchte",
+		"totalRewarded": "Gesamtbelohnung",
+		"totalBountyPool": "Gesamtprämie-Pool",
+		"comingSoon": "Coming Soon",
+		"dashboard": "Dashboard"
 	},
 	"ChildBounties": {
 		"childBounties": "Kinderprämien",

@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	IBountyProposal,
 	IDelegationStats,
 	IGenericListingResponse,
 	IOnChainPostInfo,
@@ -494,6 +495,76 @@ export class SubsquidService extends SubsquidUtils {
 			activeProposalsCount: subsquidData.activeProposalsCount.totalCount || 0,
 			votedProposalsCount: subsquidData.votedProposalsCount.totalCount || 0
 		};
+	}
+
+	static async GetActiveBountiesWithRewardsByIndex({
+		network,
+		index,
+		limit
+	}: {
+		network: ENetwork;
+		index?: number;
+		limit?: number;
+	}): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX, {
+					type_eq: EProposalType.BOUNTY,
+					status_not_in: [EProposalStatus.Cancelled, EProposalStatus.Rejected, EProposalStatus.Approved, EProposalStatus.Claimed],
+					index_eq: index,
+					limit
+				})
+				.toPromise();
+
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
+		} catch (error) {
+			console.error('Error fetching active bounties by index:', error);
+			return null;
+		}
+	}
+
+	static async GetChildBountiesRewards({
+		network,
+		parentBountyIndices,
+		limit
+	}: {
+		network: ENetwork;
+		parentBountyIndices: number[];
+		limit?: number;
+	}): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const response = await gqlClient
+				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
+					parentBountyIndex_in: parentBountyIndices,
+					limit
+				})
+				.toPromise();
+
+			if (!response?.data) {
+				return { data: { items: [], totalCount: 0 } };
+			}
+
+			return {
+				data: {
+					items: response.data.proposals || [],
+					totalCount: response.data.proposalsConnection?.totalCount || 0
+				}
+			};
+		} catch (error) {
+			console.error('Error fetching child bounties:', error);
+			return null;
+		}
 	}
 
 	static async GetChildBountiesByParentBountyIndex({

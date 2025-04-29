@@ -11,6 +11,7 @@ import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from 
 import { useUser } from '@/hooks/useUser';
 import { ChevronDown } from 'lucide-react';
 import { MdOutlineSync } from 'react-icons/md';
+import { useTranslations } from 'next-intl';
 import Address from '../Profile/Address/Address';
 import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
@@ -32,7 +33,7 @@ interface IAddressRadioGroupProps {
 function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeDialog }: IAddressRadioGroupProps) {
 	const [selectedAddress, setSelectedAddress] = useState<string>('');
 	const { userPreferences, setUserPreferences } = useUserPreferences();
-
+	const t = useTranslations('AddressRelationsPicker');
 	const handleAddressChange = (address: string) => {
 		setSelectedAddress(address);
 
@@ -103,7 +104,11 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 			<CollapsibleContent>
 				<hr className='my-2 border-primary_border' />
 
-				{!addresses.length && <p className='text-text_secondary text-sm'>No {accountType} found</p>}
+				{!addresses.length && (
+					<p className='text-text_secondary text-sm'>
+						{t('noData')} {accountType} {t('found')}
+					</p>
+				)}
 
 				<RadioGroup
 					value={selectedAddress}
@@ -180,7 +185,7 @@ function AddressSwitchButton() {
 
 	const selectedAddress = userPreferences?.selectedAccount?.address;
 	const relationsForSelectedAddress = user?.addressRelations?.find((relations) => relations.address === selectedAddress);
-
+	const t = useTranslations('AddressRelationsPicker');
 	const closeDialog = () => {
 		setisOpen(false);
 	};
@@ -195,12 +200,12 @@ function AddressSwitchButton() {
 					size='sm'
 					className='ml-auto flex items-center gap-1 text-xs'
 				>
-					<MdOutlineSync /> Switch
+					<MdOutlineSync /> {t('Switch')}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
 				<DialogHeader className='text-xl font-semibold text-text_primary'>
-					<DialogTitle>Switch Wallet</DialogTitle>
+					<DialogTitle>{t('switchWallet')}</DialogTitle>
 				</DialogHeader>
 
 				<SwitchWalletOrAddress
@@ -236,7 +241,7 @@ function AddressSwitchButton() {
 						onClick={closeDialog}
 						variant='default'
 					>
-						Confirm
+						{t('confirm')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

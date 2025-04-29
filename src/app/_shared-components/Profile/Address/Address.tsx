@@ -12,6 +12,7 @@ import { IOnChainIdentity, IPublicUser } from '@/_shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useIdentityService } from '@/hooks/useIdentityService';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import AddressInline from './AddressInline/AddressInline';
 import classes from './AddressInline/AddressInline.module.scss';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../Tooltip';
@@ -43,20 +44,17 @@ function Address({
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
 
-	const queryOptions = useMemo(
-		() => ({
-			staleTime: 5 * 60 * 1000,
-			enabled: true
-		}),
-		[]
-	);
 	const { data: userData, isLoading: isUserDataLoading } = useQuery<IPublicUser | null>({
 		queryKey: ['userData', address],
 		queryFn: async () => {
 			const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address });
 			return data ?? null;
 		},
-		...queryOptions
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!address,
+		retry: false,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false
 	});
 
 	const encodedAddress = useMemo(() => (address && getEncodedAddress(address, network)) || address, [address, network]);

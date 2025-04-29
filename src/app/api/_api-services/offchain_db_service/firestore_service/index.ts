@@ -716,8 +716,12 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			return {
 				...data,
-				createdAt: data.createdAt.toDate(),
-				updatedAt: data.updatedAt.toDate()
+				relayChain: {
+					...data.relayChain,
+					nextSpendAt: data.relayChain?.nextSpendAt?.toDate()
+				},
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
 			} as ITreasuryStats;
 		});
 	}
