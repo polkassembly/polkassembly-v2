@@ -18,16 +18,17 @@ interface VoteReferendumButtonProps {
 	index: string;
 	btnClassName?: string;
 	iconClassName?: string;
+	size?: 'sm' | 'lg';
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'sm' }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	return !user ? (
 		<Link href='/login'>
 			<Button
 				className={cn('w-full', btnClassName)}
-				size='sm'
+				size={size}
 			>
 				<div className='flex items-center gap-1.5'>
 					<Image
@@ -46,8 +47,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteRefere
 			<DialogTrigger asChild>
 				<Button
 					className={cn('w-full', btnClassName)}
-					size='sm'
-					variant='secondary'
+					size={size}
 				>
 					<div className='flex items-center gap-1'>
 						<Image
