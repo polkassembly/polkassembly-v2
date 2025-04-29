@@ -2,6 +2,34 @@
 	"HomePage": {
 		"title": "Bienvenido a Inicio"
 	},
+	"TreasuryStats": {
+		"tooltip": "Fondos recopilados a través de una parte de las recompensas de producción de bloques, tarifas de transacción, sanciones, eficiencia de staking, etc.",
+		"treasury": "Tesorería",
+		"price": "Precio",
+		"total": "Total",
+		"treasuryDistribution": "Distribución de Tesorería",
+		"details": "Detalles",
+		"spendPeriodRemaining": "Período de Gastos Restante",
+		"nextBurn": "Próxima Quema",
+		"days": "días",
+		"hours": "horas",
+		"minutes": "minutos",
+		"seconds": "segundos",
+		"spendPeriodTooltip": "Los fondos solicitados de la tesorería se distribuyen periódicamente al final del período de gastos.",
+		"nextBurnTooltip": "Si la tesorería termina un período de gastos sin gastar todos sus fondos, sufre una quema de un porcentaje de sus fondos.",
+		"viewDetails": "Ver Detalles",
+		"tokenPrice": "Precio del Token",
+		"salary": "Salario",
+		"relayChain": "Cadena de Relay",
+		"assetHub": "Centro de Activos",
+		"fellowship": "Fellowship",
+		"hydration": "Hidratación",
+		"bounties": "Recompensas",
+		"ambassador": "Embajador",
+		"loans": "Préstamos",
+		"address": "Dirección"
+	},
+
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
 		"switchToOverview": "Cambiar a Resumen",

@@ -155,7 +155,8 @@ export const THEME_COLORS = {
 		non_transferrable_text: '#317A06',
 		proxy_type_bg: '#f0f4ec',
 		proxy_type_text: '#317A06',
-		bg_light_pink: '#fef0f7'
+		bg_light_pink: '#fef0f7',
+		progress_pink_indicator: '#ededed'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -307,6 +308,7 @@ export const THEME_COLORS = {
 		non_transferrable_text: '#317A06',
 		proxy_type_bg: '#f0f4ec',
 		proxy_type_text: '#317A06',
-		bg_light_pink: '#fef0f7'
+		bg_light_pink: '#fef0f7',
+		progress_pink_indicator: '#343744'
 	}
 };

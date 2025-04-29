@@ -2,6 +2,34 @@
 	"HomePage": {
 		"title": "Willkommen zu Hause"
 	},
+	"TreasuryStats": {
+		"tooltip": "Geld gesammelt durch einen Teil der Blockproduktionsbelohnungen, Transaktionsgebühren, Strafen, Staking-Effizienz, etc.",
+		"treasury": "Finanzverwaltung",
+		"price": "Preis",
+		"total": "Gesamt",
+		"treasuryDistribution": "Finanzverwaltungsdistribution",
+		"details": "Details",
+		"spendPeriodRemaining": "Verbleibende Ausgabephase",
+		"nextBurn": "Nächste Verbrennung",
+		"days": "Tage",
+		"hours": "Stunden",
+		"minutes": "Minuten",
+		"seconds": "Sekunden",
+		"spendPeriodTooltip": "Geld aus der Finanzverwaltung wird in regelmäßigen Abständen am Ende der Ausgabephase verteilt.",
+		"nextBurnTooltip": "Wenn die Finanzverwaltung eine Ausgabephase ohne alle ihre Mittel ausgibt, erleidet sie einen Verlust von einem Prozent ihrer Mittel.",
+		"viewDetails": "Details anzeigen",
+		"tokenPrice": "Token-Preis",
+		"salary": "Gehalt",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"fellowship": "Fellowship",
+		"hydration": "Hydration",
+		"bounties": "Bounties",
+		"ambassador": "Ambassador",
+		"loans": "Loans",
+		"address": "Adresse"
+	},
+
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
 		"switchToOverview": "Zur Übersicht wechseln",

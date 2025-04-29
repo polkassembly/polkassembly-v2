@@ -1024,7 +1024,9 @@ export interface ITreasuryStats {
 	relayChain: {
 		dot?: string;
 		myth?: string;
-		[key: string]: string | undefined;
+		nextBurn?: string;
+		nextSpendAt?: Date;
+		[key: string]: unknown | undefined;
 	};
 	ambassador?: {
 		usdt?: string;
@@ -1056,11 +1058,6 @@ export interface ITreasuryStats {
 		totalUsdc?: string;
 		totalUsdt?: string;
 		totalMyth?: string;
-		[key: string]: string | undefined;
-	};
-	loans?: {
-		dot?: string;
-		usdc?: string;
 		[key: string]: string | undefined;
 	};
 	nativeTokenUsdPrice?: string;

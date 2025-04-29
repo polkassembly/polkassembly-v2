@@ -2,6 +2,33 @@
 	"HomePage": {
 		"title": "Welcome to Home"
 	},
+	"TreasuryStats": {
+		"tooltip": "Funds collected through a portion of block production rewards, transaction fees, slashing, staking inefficiencies, etc.",
+		"treasury": "Treasury",
+		"price": "Price",
+		"total": "Total",
+		"treasuryDistribution": "Treasury Distribution",
+		"details": "Details",
+		"spendPeriodRemaining": "Spend Period Remaining",
+		"nextBurn": "Next Burn",
+		"days": "days",
+		"hours": "hours",
+		"minutes": "minutes",
+		"seconds": "seconds",
+		"spendPeriodTooltip": "Funds requested from the treasury are periodically distributed at the end of the spend period.",
+		"nextBurnTooltip": "If the Treasury ends a spend period without spending all of its funds, it suffers a burn of a percentage of its funds.",
+		"viewDetails": "View Details",
+		"tokenPrice": "Token Price",
+		"salary": "Salary",
+		"relayChain": "Relay Chain",
+		"assetHub": "Asset Hub",
+		"fellowship": "Fellowship",
+		"hydration": "Hydration",
+		"bounties": "Bounties",
+		"ambassador": "Ambassador",
+		"loans": "Loans",
+		"address": "Address"
+	},
 	"ActivityFeed": {
 		"please": "Please",
 		"login": "Login",

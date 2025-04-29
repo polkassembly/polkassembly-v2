@@ -13,7 +13,7 @@ import styles from './ActivityFeedAbout.module.scss';
 function ActivityFeedAbout() {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const { socialLinks } = NETWORKS_DETAILS[network];
+	const { socialLinks } = NETWORKS_DETAILS[`${network}`];
 
 	return (
 		<div className={styles.aboutContainer}>
