@@ -47,6 +47,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteRefere
 				<Button
 					className={cn('w-full', btnClassName)}
 					size='sm'
+					variant='secondary'
 				>
 					<div className='flex items-center gap-1'>
 						<Image

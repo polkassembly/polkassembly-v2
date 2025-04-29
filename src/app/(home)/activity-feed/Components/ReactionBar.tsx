@@ -85,7 +85,7 @@ function ReactionBar({
 
 	return (
 		<div className='mb-1.5 flex items-center justify-between text-xs text-navbar_border'>
-			<div className='flex space-x-3 md:space-x-5'>
+			<div className='flex space-x-3 md:space-x-7'>
 				<ReactionButton
 					type={EReaction.like}
 					isActive={isLiked}
