@@ -17,7 +17,6 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import styles from './TreasuryStats.module.scss';
 import { TooltipContent, TooltipTrigger, Tooltip } from '../Tooltip';
-import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { TreasuryDetailsDialog } from './TreasuryStatsDialog';
 import SpendPeriodStats from './SpendPeriodStats';
@@ -30,18 +29,13 @@ interface PriceDisplayProps {
 }
 
 function PriceDisplay({ tokenSymbol, price, priceChange, priceChangeColor }: PriceDisplayProps) {
-	const t = useTranslations();
 	return (
 		<div className='flex items-center gap-2'>
 			<div className='flex items-center'>
-				<span className='mr-2 flex text-sm font-medium capitalize text-muted-foreground'>
-					{tokenSymbol} {t('TreasuryStats.price')}:
-				</span>
+				<span className='mr-2 flex text-sm font-medium capitalize text-muted-foreground'>{tokenSymbol}:</span>
 				<span className={cn('text-base font-bold text-muted-foreground dark:text-white', priceChangeColor)}>${price}</span>
 			</div>
-			<span className={cn('mt-0.5 flex items-center gap-1 text-sm', priceChangeColor)}>
-				{priceChange} {priceChange.startsWith('+') ? '▲' : '▼'}
-			</span>
+			<span className={cn('mt-0.5 hidden items-center gap-1 text-xs lg:flex', priceChangeColor)}>{priceChange}</span>
 		</div>
 	);
 }
@@ -50,44 +44,30 @@ interface AssetDisplayProps {
 	icon: string | StaticImageData;
 	alt: string;
 	value: string;
-	showSeparator?: boolean;
 	inActivityFeed?: boolean;
 }
-function AssetDisplay({ icon, alt, value, showSeparator = true, inActivityFeed = false }: AssetDisplayProps) {
+
+function AssetDisplay({ icon, alt, value, inActivityFeed = false }: AssetDisplayProps) {
 	return (
-		<>
-			<div className='flex items-center font-medium'>
-				<Image
-					src={icon}
-					alt={alt}
-					width={inActivityFeed ? 16 : 20}
-					height={inActivityFeed ? 16 : 20}
-					className='mr-2 rounded-full'
-				/>
-				<span className='font-medium'>{value}</span>
-			</div>
-			{showSeparator && (
-				<Separator
-					orientation='vertical'
-					className='hidden h-3 lg:block'
-				/>
-			)}
-		</>
+		<div className='flex items-center font-medium'>
+			<Image
+				src={icon}
+				alt={alt}
+				width={inActivityFeed ? 16 : 20}
+				height={inActivityFeed ? 16 : 20}
+				className='mr-2 rounded-full'
+			/>
+			<span className='font-medium'>{value}</span>
+		</div>
 	);
 }
 
 interface TreasuryHeaderProps {
 	isActivityFeed: boolean;
-	tokenSymbol: string;
-	priceData: {
-		price: string;
-		priceChange: string;
-		priceChangeColor: string;
-	};
 	onDetailsClick: () => void;
 }
 
-function TreasuryHeader({ isActivityFeed, tokenSymbol, priceData, onDetailsClick }: TreasuryHeaderProps) {
+function TreasuryHeader({ isActivityFeed, onDetailsClick }: TreasuryHeaderProps) {
 	const t = useTranslations();
 	return (
 		<div className='flex items-center justify-between'>
@@ -102,25 +82,14 @@ function TreasuryHeader({ isActivityFeed, tokenSymbol, priceData, onDetailsClick
 					</TooltipContent>
 				</Tooltip>
 			</div>
-			{!isActivityFeed ? (
-				<div className='mt-2 flex items-center justify-between text-xs'>
-					<PriceDisplay
-						tokenSymbol={tokenSymbol}
-						price={priceData.price}
-						priceChange={priceData.priceChange}
-						priceChangeColor={priceData.priceChangeColor}
-					/>
-				</div>
-			) : (
-				<Button
-					variant='link'
-					size='sm'
-					onClick={onDetailsClick}
-					className='border-none p-0 text-xs font-medium text-text_pink'
-				>
-					{t('TreasuryStats.details')}
-				</Button>
-			)}
+			<Button
+				variant='link'
+				size='sm'
+				onClick={onDetailsClick}
+				className='border-none p-0 text-xs font-medium text-text_pink'
+			>
+				{t('TreasuryStats.details')}
+			</Button>
 		</div>
 	);
 }
@@ -151,7 +120,6 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 
 function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: boolean; data: ITreasuryStats[] }) {
 	const network = getCurrentNetwork();
-	const t = useTranslations();
 	const tokenSymbol = NETWORKS_DETAILS?.[`${network}`]?.tokenSymbol;
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -171,60 +139,57 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 			<div className={cn(styles.treasuryStatsContainer, !isActivityFeed ? 'w-1/2 max-md:w-full' : 'w-full')}>
 				<TreasuryHeader
 					isActivityFeed={isActivityFeed}
-					tokenSymbol={tokenSymbol}
-					priceData={{
-						price: formatUSDWithUnits(data?.[0]?.nativeTokenUsdPrice || BN_ZERO?.toString(), 2),
-						priceChange: priceChangeText,
-						priceChangeColor
-					}}
 					onDetailsClick={() => setIsOpen(true)}
 				/>
 
-				<div className='mt-2'>
-					<h1 className='text-lg font-bold text-muted-foreground dark:text-white'>~${treasuryData.totalInUsd}</h1>
+				<div className={cn('my-1', !isActivityFeed ? 'px-0 lg:px-4' : '')}>
+					<div className={cn('mt-3 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
+						<h1 className='text-lg font-bold text-muted-foreground dark:text-white'>~${treasuryData.totalInUsd}</h1>
 
-					<div className={cn('mt-2 flex flex-wrap items-center gap-2 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
-						<div className={cn('flex items-center max-md:gap-x-2', isActivityFeed ? 'gap-x-1' : 'gap-x-6')}>
+						{!isActivityFeed && (
+							<PriceDisplay
+								tokenSymbol={tokenSymbol}
+								price={formatUSDWithUnits(data?.[0]?.nativeTokenUsdPrice || BN_ZERO?.toString(), 2)}
+								priceChange={priceChangeText}
+								priceChangeColor={priceChangeColor}
+							/>
+						)}
+					</div>
+
+					<div className={cn('mt-4 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
+						<div>
 							<AssetDisplay
 								icon={NETWORKS_DETAILS[`${network}`].logo}
 								alt={network}
 								value={treasuryData.dotBalance}
 								inActivityFeed={isActivityFeed}
 							/>
+						</div>
+						<div>
 							<AssetDisplay
 								icon={treasuryAssetsData[EAssets.USDC]?.icon}
 								alt={EAssets.USDC}
 								value={treasuryData.usdcBalance}
-								showSeparator={false}
 								inActivityFeed={isActivityFeed}
 							/>
 						</div>
-						<div className={cn('flex items-center max-md:gap-2', isActivityFeed ? 'gap-2' : 'gap-6')}>
+						<div>
 							<AssetDisplay
 								icon={treasuryAssetsData[EAssets.USDT]?.icon}
 								alt={EAssets.USDT}
 								value={treasuryData.usdtBalance}
 								inActivityFeed={isActivityFeed}
 							/>
+						</div>
+						<div>
 							<AssetDisplay
 								icon={treasuryAssetsData[EAssets.MYTH]?.icon}
 								alt={EAssets.MYTH}
 								value={`${treasuryData.mythBalance} ${treasuryAssetsData[EAssets.MYTH]?.symbol}`}
-								showSeparator={false}
 								inActivityFeed={isActivityFeed}
 							/>
 						</div>
 					</div>
-					{!isActivityFeed && (
-						<Button
-							variant='link'
-							size='sm'
-							onClick={() => setIsOpen(true)}
-							className='border-none p-0 text-sm font-medium text-text_pink underline'
-						>
-							{t('TreasuryStats.viewDetails')}
-						</Button>
-					)}
 				</div>
 
 				{isActivityFeed && (
