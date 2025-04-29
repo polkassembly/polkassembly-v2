@@ -70,7 +70,7 @@ import styles from './NetworkDropdown.module.scss';
 import RenderNetworkSection from './RenderNetworkSection';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 
-export interface INetworkDisplayData {
+interface INetworkDisplayData {
 	polkadot: {
 		[key: string]: StaticImageData;
 	};
@@ -85,7 +85,7 @@ export interface INetworkDisplayData {
 	};
 }
 
-export const NETWORKS_DISPLAY_DATA: INetworkDisplayData = {
+const NETWORKS_DISPLAY_DATA: INetworkDisplayData = {
 	polkadot: {
 		Polkadot: PolkadotLogo,
 		Astar: AstarLogo,
