@@ -66,7 +66,7 @@ function BeneficiaryInputs({
 	useEffect(() => {
 		if (!payoutDate || !blockHeight) return;
 
-		const blocksFromPayoutDate = BlockCalculationsService.getBlockHeightForDateTime({ network, time: payoutDate, blockHeight });
+		const blocksFromPayoutDate = BlockCalculationsService.getBlockHeightForDateTime({ network, time: payoutDate, currentBlockHeight: blockHeight });
 		onValidFromChange({ validFrom: blocksFromPayoutDate, isInvalid: !blocksFromPayoutDate });
 		setValidFrom(blocksFromPayoutDate);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

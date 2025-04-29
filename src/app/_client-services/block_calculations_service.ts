@@ -14,10 +14,11 @@ export class BlockCalculationsService {
 	}
 
 	// Returns the block height for the given date
-	static getBlockHeightForDateTime({ network, time, blockHeight }: { network: ENetwork; time: Date; blockHeight: BN }) {
+	static getBlockHeightForDateTime({ network, time, currentBlockHeight }: { network: ENetwork; time: Date; currentBlockHeight: BN }) {
 		const blocksPerDay = this.getBlocksPerDay(network);
 		const diffInBlocks = dayjs(time).diff(dayjs(), 'day') * blocksPerDay;
-		return blockHeight ? blockHeight.add(new BN(diffInBlocks || 100)) : undefined;
+		// TODO: calculate using genesis block so that block height is not required
+		return currentBlockHeight ? currentBlockHeight.add(new BN(diffInBlocks || 100)) : undefined;
 	}
 
 	// Returns the time in seconds required for the number of blocks passed. example: 100 blocks = 100 * 6 seconds = 600 seconds
