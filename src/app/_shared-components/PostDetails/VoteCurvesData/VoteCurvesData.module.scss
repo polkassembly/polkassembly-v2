@@ -1,0 +1,15 @@
+.voteDataContainer {
+	@apply flex flex-col rounded-xl bg-bg_modal p-3 shadow-lg sm:p-6;
+}
+
+.heading {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.footerText {
+	@apply text-xs text-secondary;
+}
+
+.errorText {
+	@apply mt-2 text-red-500;
+}

@@ -489,6 +489,12 @@
 			"grant": "Grant",
 			"community": "Community",
 			"technicalcommittee": "Technical Committee"
+		},
+		"VoteCurves": {
+			"approval": "Approval",
+			"support": "Support",
+			"threshold": "Threshold",
+			"votingData": "Voting Data"
 		}
 	},
 	"ListingPage_Status": {

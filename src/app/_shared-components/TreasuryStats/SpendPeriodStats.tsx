@@ -10,7 +10,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN, BN_ZERO } from '@polkadot/util';
-import { getBlocksPerDay } from '@/app/_client-utils/getBlocksPerDay';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import styles from './TreasuryStats.module.scss';
 import { Progress } from '../Progress/Progress';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../Tooltip';
@@ -32,7 +32,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 	const spendPeriodInDays = useMemo(() => {
 		const spendPeriodInBlocks = TREASURY_NETWORK_CONFIG?.[`${network}`]?.spendPeriodInBlocks;
 		if (!spendPeriodInBlocks) return 0;
-		const blocksPerDay = getBlocksPerDay(network);
+		const blocksPerDay = BlockCalculationsService.getBlocksPerDay(network);
 		return spendPeriodInBlocks.div(new BN(blocksPerDay)).toNumber();
 	}, [network]);
 

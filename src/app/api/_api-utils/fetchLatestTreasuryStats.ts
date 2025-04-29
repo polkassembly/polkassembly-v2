@@ -7,8 +7,8 @@ import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { blockNumberToDate } from '@/_shared/_utils/blockNumberToDate';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
@@ -108,7 +108,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 				// Calculate the block number when the next spend occurs
 				const nextBurnBlock = currentBlock.add(remainingBlocks);
-				const nextSpendAt = blockNumberToDate({ currentBlockNumber: currentBlock, targetBlockNumber: nextBurnBlock, network });
+				const nextSpendAt = BlockCalculationsService.getDateFromBlockNumber({ currentBlockNumber: currentBlock, targetBlockNumber: nextBurnBlock, network });
 
 				treasuryStats = {
 					...treasuryStats,

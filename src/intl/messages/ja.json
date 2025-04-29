@@ -470,7 +470,13 @@
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
 		"showLikelySpam": "疑わしいスパムを表示",
-		"hideLikelySpam": "疑わしいスパムを非表示"
+		"hideLikelySpam": "疑わしいスパムを非表示",
+		"VoteCurves": {
+			"approval": "承認",
+			"support": "サポート",
+			"threshold": "閾値",
+			"votingData": "投票データ"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
