@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EActivityFeedTab, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EActivityFeedTab, IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent } from '@ui/Tabs';
@@ -17,7 +17,15 @@ import styles from './ActivityFeedComp.module.scss';
 import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
 
-function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericListingResponse<IPostListing>; activeTab: EActivityFeedTab }) {
+function ActivityFeedComp({
+	initialData,
+	activeTab,
+	treasuryStatsData
+}: {
+	initialData: IGenericListingResponse<IPostListing>;
+	activeTab: EActivityFeedTab;
+	treasuryStatsData: ITreasuryStats[];
+}) {
 	const t = useTranslations();
 	const router = useRouter();
 
@@ -62,7 +70,7 @@ function ActivityFeedComp({ initialData, activeTab }: { initialData: IGenericLis
 				</div>
 
 				<div className='hidden xl:col-span-3 xl:block'>
-					<ActivityFeedSidebar />
+					<ActivityFeedSidebar treasuryStatsData={treasuryStatsData} />
 				</div>
 			</div>
 		</div>

@@ -172,6 +172,9 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_ALL_TAGS:
 				path = '/meta/tags';
 				break;
+			case EApiRoute.GET_TREASURY_STATS:
+				path = '/meta/treasury-stats';
+				break;
 			case EApiRoute.PUBLIC_USER_DATA_BY_ID:
 			case EApiRoute.FETCH_USER_ACTIVITY:
 			case EApiRoute.GET_FOLLOWING:
@@ -192,9 +195,6 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_DELEGATES:
 				path = '/delegation/delegates';
-				break;
-			case EApiRoute.GET_TREASURY_STATS:
-				path = '/meta/treasury-stats';
 				break;
 			case EApiRoute.FETCH_BOUNTIES_STATS:
 				path = '/bounties/stats';
@@ -862,15 +862,6 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
 	}
 
-	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
-		const queryParams = new URLSearchParams({
-			from: params?.from?.toISOString() || '',
-			to: params?.to?.toISOString() || ''
-		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
-		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
-	}
-
 	static async fetchContentSummary({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
 		if (this.isServerSide()) {
 			const currentNetwork = await this.getCurrentNetwork();
@@ -937,5 +928,14 @@ export class NextApiClientService {
 	static async fetchAddressRelations(address: string) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ADDRESS_RELATIONS, routeSegments: [address, 'relations'] });
 		return this.nextApiClientFetch<IAddressRelations>({ url, method });
+	}
+
+	static async getTreasuryStats(params?: { from?: Date; to?: Date }) {
+		const queryParams = new URLSearchParams({
+			from: params?.from?.toISOString() || '',
+			to: params?.to?.toISOString() || ''
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
+		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
 	}
 }

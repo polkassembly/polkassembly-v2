@@ -8,33 +8,11 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { blockNumberToDate } from '@/_shared/_utils/blockNumberToDate';
+import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
 	[network: string]: { usd: number; usd_24h_change: number };
-}
-
-function decimalToBN(priceStr: string | number): {
-	value: BN;
-	decimals: number;
-} {
-	const CONVERSION_DECIMALS = 18; // Using 18 decimals for price precision
-
-	if (!priceStr) return { value: new BN(0), decimals: CONVERSION_DECIMALS };
-
-	// Convert to string and remove any commas
-	const cleanPrice = priceStr.toString().replace(/,/g, '');
-	// Split on decimal point
-	const [whole, decimal = ''] = cleanPrice.split('.');
-	// Combine whole and decimal, padding decimal with zeros
-	const paddedDecimal = decimal.padEnd(CONVERSION_DECIMALS, '0');
-	// Remove any leading zeros from whole number and combine with padded decimal
-	const combinedStr = whole.replace(/^0+/, '') + paddedDecimal;
-	// Convert to BN directly without division
-	return {
-		value: new BN(combinedStr),
-		decimals: CONVERSION_DECIMALS
-	};
 }
 
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
@@ -58,8 +36,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			hydration: { dot: '', usdc: '', usdt: '' },
 			bounties: { dot: '' },
 			fellowship: { dot: '', usdt: '' },
-			total: { totalDot: '', totalUsdc: '', totalUsdt: '', totalMyth: '' },
-			loans: config.loanAmounts
+			total: { totalDot: '', totalUsdc: '', totalUsdt: '', totalMyth: '' }
 		};
 
 		// Helper function to safely extract balance from results
