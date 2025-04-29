@@ -39,13 +39,5 @@
 }
 
 .metricsContainer {
-	@apply flex items-center gap-2 text-xs text-text_primary;
-
-	&.left {
-		@apply justify-start;
-	}
-
-	&.right {
-		@apply justify-end;
-	}
+	@apply flex items-center justify-end gap-2 text-xs text-text_primary;
 }

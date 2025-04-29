@@ -198,7 +198,7 @@ function ActivityFeedPostItem({
 			</div>
 
 			{/* Metrics Section */}
-			<div className={`${styles.metricsContainer} ${likeCount || dislikeCount ? styles.right : styles.left}`}>
+			<div className={styles.metricsContainer}>
 				<div className='flex items-center gap-2'>
 					<span>
 						{likeCount} {t('ActivityFeed.PostItem.likes')}

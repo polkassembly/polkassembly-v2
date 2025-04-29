@@ -95,15 +95,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						{!isModalOpen && (
-							<div className={classes.commentsBox}>
-								<PostComments
-									proposalType={post.proposalType}
-									index={index}
-									contentSummary={post.contentSummary}
-								/>
-							</div>
-						)}
+						<div className={classes.commentsBox}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+							/>
+						</div>
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
