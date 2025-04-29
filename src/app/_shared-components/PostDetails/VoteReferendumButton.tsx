@@ -27,25 +27,9 @@ function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteRefere
 		<Link href='/login'>
 			<Button
 				className={cn('w-full', btnClassName)}
-				size='lg'
+				size='sm'
 			>
-				<Image
-					src={VoteIcon}
-					alt='Vote Icon'
-					width={20}
-					height={20}
-					className={iconClassName}
-				/>
-				{t('PostDetails.loginToVote')}
-			</Button>
-		</Link>
-	) : (
-		<Dialog>
-			<DialogTrigger asChild>
-				<Button
-					className={cn('w-full', btnClassName)}
-					size='lg'
-				>
+				<div className='flex items-center gap-1.5'>
 					<Image
 						src={VoteIcon}
 						alt='Vote Icon'
@@ -53,7 +37,27 @@ function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteRefere
 						height={20}
 						className={iconClassName}
 					/>
-					{t('PostDetails.castVote')}
+					<span>{t('PostDetails.loginToVote')}</span>
+				</div>
+			</Button>
+		</Link>
+	) : (
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button
+					className={cn('w-full', btnClassName)}
+					size='sm'
+				>
+					<div className='flex items-center gap-1'>
+						<Image
+							src={VoteIcon}
+							alt='Vote Icon'
+							width={20}
+							height={20}
+							className={iconClassName}
+						/>
+						{t('PostDetails.castVote')}
+					</div>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
