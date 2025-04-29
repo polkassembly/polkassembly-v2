@@ -35,5 +35,21 @@ export class BlockCalculationsService {
 		};
 	}
 
-	// TODO: Add a function to get the date for the given block number
+	// Returns the date for the given block number
+	static getDateFromBlockNumber({ currentBlockNumber, targetBlockNumber, network }: { currentBlockNumber: BN; targetBlockNumber: BN; network: ENetwork }) {
+		// Get current date/time
+		const now = new Date();
+
+		// Get block time in milliseconds for this network
+		const blockTimeMs = NETWORKS_DETAILS[network as ENetwork].blockTime;
+
+		// Calculate block difference
+		const blockDiff = targetBlockNumber.sub(currentBlockNumber);
+
+		// Calculate time difference in milliseconds
+		const timeDiffMs = blockDiff.muln(blockTimeMs).toNumber();
+
+		// Add time difference to current time to get target date
+		return dayjs(now).add(timeDiffMs, 'milliseconds').toDate();
+	}
 }
