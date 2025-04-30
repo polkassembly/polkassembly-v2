@@ -9,7 +9,11 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
-import { HiOutlineArrowDownCircle, HiOutlineArrowUpCircle, HiOutlineChevronDown, HiOutlineChevronUp } from 'react-icons/hi2';
+import { FiArrowDownCircle } from '@react-icons/all-files/fi/FiArrowDownCircle';
+import { FiArrowUpCircle } from '@react-icons/all-files/fi/FiArrowUpCircle';
+import { FaChevronDown } from '@react-icons/all-files/fa/FaChevronDown';
+import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
+
 import { useTranslations } from 'next-intl';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
@@ -52,7 +56,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							className={classes.loadMoreComments}
 							aria-hidden='true'
 						>
-							{t('ActivityFeed.PostItem.showLessComments')} <HiOutlineArrowUpCircle className='text-lg' />
+							{t('ActivityFeed.PostItem.showLessComments')} <FiArrowUpCircle className='text-lg' />
 						</span>
 					</div>
 				) : !showMore && regularComments?.length > 2 ? (
@@ -62,7 +66,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							className={classes.loadMoreComments}
 							aria-hidden='true'
 						>
-							{t('ActivityFeed.PostItem.loadMoreComments')} <HiOutlineArrowDownCircle className='text-lg' />
+							{t('ActivityFeed.PostItem.loadMoreComments')} <FiArrowDownCircle className='text-lg' />
 						</span>
 					</div>
 				) : null}
@@ -78,7 +82,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						>
 							{showSpam ? t('PostDetails.hideLikelySpam') : t('PostDetails.showLikelySpam')}
 							<span className='text-pink-500'>({spamComments.length})</span>
-							{showSpam ? <HiOutlineChevronUp className='text-base' /> : <HiOutlineChevronDown className='text-base' />}
+							{showSpam ? <FaChevronUp className='text-base' /> : <FaChevronDown className='text-base' />}
 						</button>
 						{showSpam && (
 							<div className='mt-4 flex flex-col gap-y-4'>

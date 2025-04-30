@@ -4,13 +4,13 @@
 import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
-import { IoMdClose } from 'react-icons/io';
+import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import PolkaAsset from '@assets/delegation/Track.svg';
 import PolkaBadge from '@assets/delegation/badge.svg';
 import Reverse from '@assets/delegation/reverse.svg';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { MdInfoOutline } from 'react-icons/md';
+import { MdInfoOutline } from '@react-icons/all-files/md/MdInfoOutline';
 import Image from 'next/image';
 import styles from './DelegationPopupCard.module.scss';
 import BecomeDelegateDialog from '../BecomeDelegateDialog/BecomeDelegateDialog';

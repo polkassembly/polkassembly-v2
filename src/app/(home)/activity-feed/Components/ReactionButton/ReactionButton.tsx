@@ -3,7 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
+import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
+import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
+import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
+import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { EReaction } from '@/_shared/types';

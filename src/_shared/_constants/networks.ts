@@ -4,12 +4,15 @@
 
 import { BN } from '@polkadot/util';
 import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
-import { FaDiscord, FaTelegramPlane, FaTwitter, FaYoutube } from 'react-icons/fa';
-import { TbBrandGithubFilled } from 'react-icons/tb';
-import { TiHome } from 'react-icons/ti';
-import { PiRedditLogoFill } from 'react-icons/pi';
-import { RiBox3Line } from 'react-icons/ri';
-import { IconType } from 'react-icons/lib';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
+import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
+import { SiGithub } from '@react-icons/all-files/si/SiGithub';
+import { TiHome } from '@react-icons/all-files/ti/TiHome';
+import { GrReddit } from '@react-icons/all-files/gr/GrReddit';
+import { BiCube } from '@react-icons/all-files/bi/BiCube';
+import { IconType } from '@react-icons/all-files/lib';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
@@ -1507,13 +1510,13 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 
 const SocialIcons = {
 	Discord: FaDiscord,
-	Github: TbBrandGithubFilled,
+	Github: SiGithub,
 	Home: TiHome,
-	Reddit: PiRedditLogoFill,
+	Reddit: GrReddit,
 	Telegram: FaTelegramPlane,
 	Twitter: FaTwitter,
 	Youtube: FaYoutube,
-	Subscan: RiBox3Line
+	Subscan: BiCube
 } as const;
 
 const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {

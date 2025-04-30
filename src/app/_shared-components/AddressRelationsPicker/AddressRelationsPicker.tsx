@@ -10,7 +10,7 @@ import { useWalletService } from '@/hooks/useWalletService';
 import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { ChevronDown } from 'lucide-react';
-import { MdOutlineSync } from 'react-icons/md';
+import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import Address from '../Profile/Address/Address';
@@ -209,7 +209,7 @@ function AddressSwitchButton() {
 					size='sm'
 					className='ml-auto flex items-center gap-1 text-xs'
 				>
-					<MdOutlineSync /> {t('Switch')}
+					<IoMdSync /> {t('Switch')}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>

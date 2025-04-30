@@ -3,16 +3,16 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { memo, RefObject, useRef } from 'react';
-import { IoMdTrendingUp } from 'react-icons/io';
+import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { Label } from '@/app/_shared-components/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { Button } from '@/app/_shared-components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/app/_shared-components/Select/Select';
-import { FaFilter } from 'react-icons/fa';
+import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { useTranslations } from 'next-intl';
-import { MdSort } from 'react-icons/md';
+import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import useDelegateFiltering from '@/hooks/useDelegateFiltering';
