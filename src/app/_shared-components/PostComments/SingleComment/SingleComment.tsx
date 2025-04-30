@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse } from '@/_shared/types';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { EProposalType, ICommentResponse, IComment, IPublicUser } from '@/_shared/types';
+import { Dispatch, SetStateAction, useCallback, memo, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -25,21 +25,18 @@ import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
+import VoteComments from '../VoteComments/VoteComments';
 
-function SingleComment({
-	commentData,
-	proposalType,
-	index,
-	setParentComment
-}: {
+interface SingleCommentProps {
 	commentData: ICommentResponse;
 	proposalType: EProposalType;
 	index: string;
 	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
-}) {
+}
+
+function SingleComment({ commentData, proposalType, index, setParentComment }: SingleCommentProps) {
 	const [reply, setReply] = useState<boolean>(false);
 	const t = useTranslations();
-
 	const [comment, setComment] = useState<ICommentResponse | null>(commentData);
 	const [showReplies, setShowReplies] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -47,7 +44,7 @@ function SingleComment({
 
 	const user = useAtomValue(userAtom);
 
-	const handleDeleteComment = async () => {
+	const handleDeleteComment = useCallback(async () => {
 		if (!user || !comment || user.id !== comment.user.id) {
 			throw new ClientError('You are not the owner of this comment');
 		}
@@ -78,7 +75,32 @@ function SingleComment({
 		} else {
 			setComment(null);
 		}
-	};
+	}, [comment, index, proposalType, setParentComment, user]);
+
+	const handleCloseDeleteModal = useCallback(() => setOpenDeleteModal(false), []);
+	const handleOpenDeleteModal = useCallback(() => setOpenDeleteModal(true), []);
+	const handleToggleReply = useCallback(() => setReply(true), []);
+	const handleToggleShowReplies = useCallback(() => setShowReplies((prev) => !prev), []);
+
+	const handleCancelReply = useCallback(() => setReply(false), []);
+
+	const handleConfirmReply = useCallback((newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
+		setComment((prev) => {
+			if (!prev) return null;
+			return {
+				...prev,
+				children: [
+					...(prev.children || []),
+					{
+						...newComment,
+						user: publicUser
+					}
+				]
+			};
+		});
+		setReply(false);
+		setShowReplies(true);
+	}, []);
 
 	if (!comment) {
 		return null;
@@ -98,7 +120,7 @@ function SingleComment({
 					<DialogFooter>
 						<Button
 							variant='outline'
-							onClick={() => setOpenDeleteModal(false)}
+							onClick={handleCloseDeleteModal}
 						>
 							{t('PostDetails.cancel')}
 						</Button>
@@ -153,6 +175,15 @@ function SingleComment({
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
+					{comment.voteData && comment.voteData.length > 0 && (
+						<>
+							<Separator
+								orientation='vertical'
+								className='h-3'
+							/>
+							<VoteComments voteInfo={comment.voteData[0]} />
+						</>
+					)}
 				</div>
 				<MarkdownViewer
 					markdown={comment.content}
@@ -164,7 +195,7 @@ function SingleComment({
 						<Button
 							variant='ghost'
 							className={classes.replyButton}
-							onClick={() => setReply(true)}
+							onClick={handleToggleReply}
 							size='sm'
 							leftIcon={
 								<Image
@@ -194,7 +225,7 @@ function SingleComment({
 												variant='ghost'
 												className='p-0 text-sm text-text_primary'
 												disabled={comment.userId !== user.id}
-												onClick={() => setOpenDeleteModal(true)}
+												onClick={handleOpenDeleteModal}
 												size='sm'
 												isLoading={loading}
 											>
@@ -213,24 +244,8 @@ function SingleComment({
 						proposalIndex={index}
 						proposalType={proposalType}
 						parentCommentId={comment.id}
-						onCancel={() => setReply(false)}
-						onConfirm={(newComment, publicUser) => {
-							setComment((prev) => {
-								if (!prev) return null;
-								return {
-									...prev,
-									children: [
-										...(prev.children || []),
-										{
-											...newComment,
-											user: publicUser
-										}
-									]
-								};
-							});
-							setReply(false);
-							setShowReplies(true);
-						}}
+						onCancel={handleCancelReply}
+						onConfirm={handleConfirmReply}
 					/>
 				)}
 
@@ -239,7 +254,7 @@ function SingleComment({
 						<div className={classes.viewReplies}>
 							<Separator className='w-[20px]' />
 							<Button
-								onClick={() => setShowReplies((prev) => !prev)}
+								onClick={handleToggleShowReplies}
 								className={classes.viewBtn}
 								variant='ghost'
 								size='sm'
@@ -264,4 +279,4 @@ function SingleComment({
 	);
 }
 
-export default SingleComment;
+export default memo(SingleComment);

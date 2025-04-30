@@ -490,6 +490,17 @@
 			"community": "Community",
 			"technicalcommittee": "Technical Committee"
 		},
+		"voted": "Voted",
+		"votes": "Votes",
+		"vote": "Vote",
+		"amount": "Amount",
+		"conviction": "Conviction",
+		"voteBreakdown": "Vote Breakdown",
+		"selfVotes": "Self Votes",
+		"delegators": "Delegators",
+		"delegatedVotes": "Delegated Votes",
+		"delegatedVotingPower": "Delegated Voting Power",
+		"delegationList": "Delegation list",
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",

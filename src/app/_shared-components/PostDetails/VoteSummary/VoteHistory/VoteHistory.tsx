@@ -95,11 +95,11 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 					/>
 				</TabsContent>
 			</Tabs>
-			{!!data?.totalCounts?.[tab as EVoteDecision] && (
+			{!!data?.totalCounts?.[`${tab}`] && (
 				<PaginationWithLinks
 					page={page}
 					pageSize={DEFAULT_LISTING_LIMIT}
-					totalCount={data?.totalCounts?.[tab as EVoteDecision] || 0}
+					totalCount={data?.totalCounts?.[`${tab}`] || 0}
 					onPageChange={(newPage) => setPage(newPage)}
 				/>
 			)}
