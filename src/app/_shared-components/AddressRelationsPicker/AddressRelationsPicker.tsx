@@ -267,11 +267,6 @@ export default function AddressRelationsPicker({ withBalance = false }: { withBa
 			return;
 		}
 
-		if (userPreferences?.selectedAccount?.address) {
-			setAccountsLoading(false);
-			return;
-		}
-
 		setUserPreferences({
 			...userPreferences,
 			selectedAccount: {
