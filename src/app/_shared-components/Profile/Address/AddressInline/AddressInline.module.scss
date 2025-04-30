@@ -1,27 +1,27 @@
 .container {
-    @apply flex flex-row items-center gap-1.5;
+	@apply flex min-w-0 flex-row items-center gap-1.5;
 }
 
 .displaytext {
-    @apply text-btn_secondary_text truncate inline-block align-middle;
+	@apply max-w-full truncate text-btn_secondary_text;
 }
 
 .tooltipContent {
-    @apply relative rounded-md bg-address_tooltip_bg w-[340px] p-0 m-0 py-2 text-text_primary shadow-lg mt-5 z-50;
+	@apply relative z-50 m-0 mt-5 w-[340px] rounded-md bg-address_tooltip_bg p-0 py-2 text-text_primary shadow-lg;
 }
 
 .profileImageContainer {
-    @apply absolute top-[-53px] left-[22%] transform -translate-x-1/2 z-50 w-24 h-24 bg-transparent pointer-events-none;
+	@apply pointer-events-none absolute left-[22%] top-[-53px] z-50 h-24 w-24 -translate-x-1/2 transform bg-transparent;
 }
 
 .tooltipWrapper {
-    @apply relative z-10;
+	@apply relative z-10;
 }
 
 .profileImage {
-    @apply absolute z-50 border-2 border-white rounded-full bg-white w-24 h-24 object-cover shadow-sm;
+	@apply absolute z-50 h-24 w-24 rounded-full border-2 border-white bg-white object-cover shadow-sm;
 }
 
 .tooltipContentWrapper {
-    @apply pt-12 w-full;
+	@apply w-full pt-12;
 }
