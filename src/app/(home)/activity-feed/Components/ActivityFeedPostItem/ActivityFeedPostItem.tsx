@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { RefObject, useMemo, useRef, useState } from 'react';
-import { FaRegClock } from 'react-icons/fa6';
+import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { EActivityFeedTab, ENotificationStatus, IPostListing } from '@/_shared/types';

@@ -6,7 +6,8 @@
 
 import { IPreimage } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { MdContentCopy, MdListAlt } from 'react-icons/md';
+import { MdContentCopy } from '@react-icons/all-files/md/MdContentCopy';
+import { FaRegListAlt } from '@react-icons/all-files/fa/FaRegListAlt';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import SubscanIcon from '@assets/icons/profile-subscan.svg';
@@ -72,7 +73,7 @@ function PreimageRow({ preimage, handleDialogOpen }: { preimage: IPreimage; hand
 			</TableCell>
 			<TableCell className={styles.table_content_cell_2}>
 				<span className={styles.table_content_cell_2_content}>{preimage?.section && preimage?.method ? `${preimage.section}.${preimage.method.slice(0, 5)}...` : '-'}</span>
-				<MdListAlt
+				<FaRegListAlt
 					onClick={handleDialogOpen}
 					className={styles.mdlisticon}
 				/>

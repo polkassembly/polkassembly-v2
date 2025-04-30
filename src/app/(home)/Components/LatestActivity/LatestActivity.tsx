@@ -17,7 +17,7 @@ import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
-import { BsThreeDots } from 'react-icons/bs';
+import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 import DiscussionsTab from './DiscussionsTab';
 import TrackTabs from './TrackTabs';
 

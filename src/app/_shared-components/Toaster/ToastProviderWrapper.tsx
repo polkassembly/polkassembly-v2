@@ -5,13 +5,14 @@
 import { useToast } from '@/hooks/useToast';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/app/_shared-components/Toaster/Toast';
 import { ENotificationStatus } from '@/_shared/types';
-import { FaCircleCheck } from 'react-icons/fa6';
-import { IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io';
-import { MdInfoOutline } from 'react-icons/md';
+import { FaCheckCircle } from '@react-icons/all-files/fa/FaCheckCircle';
+import { IoIosCloseCircle } from '@react-icons/all-files/io/IoIosCloseCircle';
+import { IoIosInformationCircle } from '@react-icons/all-files/io/IoIosInformationCircle';
+import { MdInfoOutline } from '@react-icons/all-files/md/MdInfoOutline';
 import styles from './Toaster.module.scss';
 
 const ICON_MAP = {
-	[ENotificationStatus.SUCCESS]: <FaCircleCheck className={styles.toast_success_icon} />,
+	[ENotificationStatus.SUCCESS]: <FaCheckCircle className={styles.toast_success_icon} />,
 	[ENotificationStatus.ERROR]: <IoIosCloseCircle className={styles.toast_error_icon} />,
 	[ENotificationStatus.WARNING]: <IoIosInformationCircle className={styles.toast_warning_icon} />,
 	[ENotificationStatus.INFO]: <MdInfoOutline className={styles.toast_info_icon} />

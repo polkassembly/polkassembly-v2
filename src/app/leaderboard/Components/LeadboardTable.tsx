@@ -10,8 +10,8 @@ import { IPublicUser } from '@/_shared/types';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { cn } from '@/lib/utils';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
-import { IoPersonAdd } from 'react-icons/io5';
-import { HiMiniCurrencyDollar } from 'react-icons/hi2';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
+import { AiFillDollarCircle } from '@react-icons/all-files/ai/AiFillDollarCircle';
 import { TableRow, TableCell } from '@ui/Table';
 import styles from './Leaderboard.module.scss';
 
@@ -69,7 +69,7 @@ function LeadboardRow({ user, isCurrentUser, isBottom = false }: TableRowProps) 
 				{!isCurrentUser && (
 					<div className='flex items-center gap-1'>
 						<IoPersonAdd className='text-lg text-text_primary' />
-						<HiMiniCurrencyDollar className='text-2xl text-text_primary' />
+						<AiFillDollarCircle className='text-2xl text-text_primary' />
 					</div>
 				)}
 			</TableCell>

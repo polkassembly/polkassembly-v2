@@ -6,9 +6,10 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import { IoShareSocialOutline } from 'react-icons/io5';
-import { BsThreeDots } from 'react-icons/bs';
-import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
+import { IoShareSocialOutline } from '@react-icons/all-files/io5/IoShareSocialOutline';
+import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
+import { IoBookmark } from '@react-icons/all-files/io5/IoBookmark';
+import { IoBookmarkOutline } from '@react-icons/all-files/io5/IoBookmarkOutline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import { EReaction, IPostListing } from '@/_shared/types';
 import ReactionButton from './ReactionButton/ReactionButton';
@@ -79,7 +80,7 @@ function ReactionBar({
 						className='flex cursor-pointer items-center text-bg_pink transition-all duration-300 hover:scale-110'
 						onClick={() => handleAuthenticatedAction(handleSubscribe)}
 					>
-						{isCurrentlySubscribed ? <RiBookmarkFill className='mr-2 h-4 w-4 text-bg_pink' /> : <RiBookmarkLine className='mr-2 h-4 w-4 text-text_pink' />}
+						{isCurrentlySubscribed ? <IoBookmark className='mr-2 h-4 w-4 text-bg_pink' /> : <IoBookmarkOutline className='mr-2 h-4 w-4 text-text_pink' />}
 						<span className='text-bg_pink'>{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
 					</button>
 				)}

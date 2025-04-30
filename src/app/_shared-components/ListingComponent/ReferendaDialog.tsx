@@ -8,7 +8,7 @@ import { IPost } from '@/_shared/types';
 import { Dialog, DialogContent } from '@ui/Dialog/Dialog';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { useRouter } from 'next/navigation';
-import { MdFullscreen } from 'react-icons/md';
+import { MdFullscreen } from '@react-icons/all-files/md/MdFullscreen';
 import { MouseEvent } from 'react';
 import { DialogTitle } from '@radix-ui/react-dialog';
 
