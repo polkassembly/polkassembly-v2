@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { FaRegClock } from 'react-icons/fa6';
+import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { EAssets, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';

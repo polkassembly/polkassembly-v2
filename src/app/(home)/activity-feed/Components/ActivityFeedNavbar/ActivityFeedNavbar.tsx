@@ -20,8 +20,9 @@ import AdminIcon from '@assets/activityfeed/admin.svg';
 import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
 import Image from 'next/image';
 import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
-import { BsThreeDots } from 'react-icons/bs';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
+import { FaChevronLeft } from '@react-icons/all-files/fa/FaChevronLeft';
+import { FaChevronRight } from '@react-icons/all-files/fa/FaChevronRight';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {

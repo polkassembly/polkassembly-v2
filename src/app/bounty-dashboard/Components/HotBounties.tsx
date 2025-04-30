@@ -11,7 +11,7 @@ import Image from 'next/image';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import ChildBounties from '@assets/bounties/child_bounties.svg';
-import { FaAngleRight } from 'react-icons/fa6';
+import { FaAngleRight } from '@react-icons/all-files/fa/FaAngleRight';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@ui/Carousel';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';

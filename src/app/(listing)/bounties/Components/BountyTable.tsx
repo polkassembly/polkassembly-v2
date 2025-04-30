@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@ui/Profile/Address/Address';
 import StatusTag from '@ui/StatusTag/StatusTag';
-import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
+import { FaCaretDown } from '@react-icons/all-files/fa/FaCaretDown';
+import { FaCaretUp } from '@react-icons/all-files/fa/FaCaretUp';
 import { Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';

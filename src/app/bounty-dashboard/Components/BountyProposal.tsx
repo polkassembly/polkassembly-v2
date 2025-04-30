@@ -14,7 +14,8 @@ import { Carousel, type CarouselApi, CarouselContent, CarouselItem } from '@ui/C
 import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
-import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { FaChevronLeft } from '@react-icons/all-files/fa/FaChevronLeft';
+import { FaChevronRight } from '@react-icons/all-files/fa/FaChevronRight';
 import { useTranslations } from 'next-intl';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import styles from './Bounty.module.scss';
@@ -133,7 +134,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 							className={styles.carouselLeftArrow}
 							onClick={() => api?.scrollPrev()}
 						>
-							<SlArrowLeft
+							<FaChevronLeft
 								size={24}
 								className='font-bold text-bg_modal'
 							/>
@@ -146,7 +147,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 								className={styles.carouselRightArrow}
 								onClick={() => api?.scrollNext()}
 							>
-								<SlArrowRight
+								<FaChevronRight
 									size={24}
 									className='font-bold text-bg_modal'
 								/>

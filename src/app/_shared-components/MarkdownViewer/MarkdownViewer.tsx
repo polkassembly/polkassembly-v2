@@ -10,7 +10,8 @@ import ReactMarkdownLib from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import { HiOutlineArrowDownCircle, HiOutlineArrowUpCircle } from 'react-icons/hi2';
+import { FiArrowDownCircle } from '@react-icons/all-files/fi/FiArrowDownCircle';
+import { FiArrowUpCircle } from '@react-icons/all-files/fi/FiArrowUpCircle';
 import { cn } from '@/lib/utils';
 import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -345,7 +346,7 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 							className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
 							aria-hidden='true'
 						>
-							Show Less <HiOutlineArrowUpCircle className='text-lg' />
+							Show Less <FiArrowUpCircle className='text-lg' />
 						</span>
 					</div>
 				) : isTruncated ? (
@@ -355,7 +356,7 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 							className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
 							aria-hidden='true'
 						>
-							Show More <HiOutlineArrowDownCircle className='text-lg' />
+							Show More <FiArrowDownCircle className='text-lg' />
 						</span>
 					</div>
 				) : null)}
