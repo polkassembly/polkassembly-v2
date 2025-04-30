@@ -10,6 +10,7 @@ import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import SplitImg from '@assets/icons/split-yellow-icon.svg';
 import SplitAbstainImg from '@assets/icons/abstainGray.svg';
 import { memo } from 'react';
+import { Button } from '@/app/_shared-components/Button';
 
 interface VoteDetailsButtonProps {
 	userVoteDecision: EVoteDecision | null;
@@ -81,13 +82,14 @@ function VoteDetailsButton({ userVoteDecision, onClick }: VoteDetailsButtonProps
 	if (!userVoteDecision) return null;
 
 	return (
-		<button
-			type='button'
+		<Button
+			variant='ghost'
 			onClick={onClick}
-			className='flex items-center gap-x-1 text-xs'
+			size='sm'
+			className='m-0 flex items-center gap-x-1 p-0 text-xs'
 		>
 			<VoteDecisionDisplay userVoteDecision={userVoteDecision} />
-		</button>
+		</Button>
 	);
 }
 
