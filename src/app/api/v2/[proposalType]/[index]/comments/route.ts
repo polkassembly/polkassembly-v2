@@ -30,7 +30,19 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	// Fetch user addresses and vote data for each comment
 	const commentsWithVoteData = await Promise.all(
 		comments.map(async (comment) => {
-			const userAddresses = await OffChainDbService.GetAddressesForUserId(comment.userId);
+			let userAddresses = await OffChainDbService.GetAddressesForUserId(comment.userId);
+
+			if (comment.user.addresses.length > 0 && !userAddresses.some((address) => comment.user.addresses.includes(address.address))) {
+				userAddresses = [
+					...userAddresses,
+					{
+						address: comment.user.addresses[0],
+						network,
+						userId: comment.userId,
+						default: true
+					}
+				];
+			}
 
 			const voteData = await Promise.all(
 				userAddresses.map(async (address) => {
