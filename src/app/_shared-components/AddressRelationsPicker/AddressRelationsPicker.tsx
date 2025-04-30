@@ -12,8 +12,8 @@ import { useUser } from '@/hooks/useUser';
 import { ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import Address from '../Profile/Address/Address';
-import { Skeleton } from '../Skeleton';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
@@ -28,9 +28,10 @@ interface IAddressRadioGroupProps {
 	addresses: IMultisigAddress[] | IProxyAddress[];
 	defaultOpen?: boolean;
 	closeDialog?: () => void;
+	isLoading?: boolean;
 }
 
-function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeDialog }: IAddressRadioGroupProps) {
+function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeDialog, isLoading = true }: IAddressRadioGroupProps) {
 	const [selectedAddress, setSelectedAddress] = useState<string>('');
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations('AddressRelationsPicker');
@@ -104,10 +105,18 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 			<CollapsibleContent>
 				<hr className='my-2 border-primary_border' />
 
-				{!addresses.length && (
-					<p className='text-text_secondary text-sm'>
-						{t('noData')} {accountType} {t('found')}
-					</p>
+				{isLoading ? (
+					<div className='flex flex-col gap-2'>
+						<Skeleton className='h-6 w-full light:bg-slate-300 dark:bg-gray-700' />
+						<Skeleton className='h-6 w-full light:bg-slate-300 dark:bg-gray-700' />
+						<Skeleton className='h-6 w-full light:bg-slate-300 dark:bg-gray-700' />
+					</div>
+				) : (
+					!addresses.length && (
+						<p className='text-text_secondary text-sm'>
+							{t('noData')} {accountType} {t('found')}
+						</p>
+					)
 				)}
 
 				<RadioGroup
@@ -214,28 +223,22 @@ function AddressSwitchButton() {
 					withBalance
 				/>
 
-				{relationsForSelectedAddress ? (
-					<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
-						<AddressRadioGroup
-							accountType={EAccountType.MULTISIG}
-							addresses={relationsForSelectedAddress?.multisigAddresses || []}
-							defaultOpen
-							closeDialog={closeDialog}
-						/>
-						<AddressRadioGroup
-							accountType={EAccountType.PROXY}
-							addresses={relationsForSelectedAddress?.proxyAddresses || []}
-							closeDialog={closeDialog}
-						/>
-					</div>
-				) : (
-					<>
-						<Skeleton className='my-1 h-6 w-full' />
-						<Skeleton className='mb-1 h-6 w-full' />
-						<Skeleton className='mb-1 h-6 w-full' />
-						<Skeleton className='mb-1 h-6 w-full' />
-					</>
-				)}
+				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
+					<AddressRadioGroup
+						accountType={EAccountType.MULTISIG}
+						isLoading={!relationsForSelectedAddress}
+						addresses={relationsForSelectedAddress?.multisigAddresses || []}
+						defaultOpen
+						closeDialog={closeDialog}
+					/>
+					<AddressRadioGroup
+						accountType={EAccountType.PROXY}
+						isLoading={!relationsForSelectedAddress}
+						addresses={relationsForSelectedAddress?.proxyAddresses || []}
+						closeDialog={closeDialog}
+					/>
+				</div>
+
 				<DialogFooter className='mt-6'>
 					<Button
 						onClick={closeDialog}

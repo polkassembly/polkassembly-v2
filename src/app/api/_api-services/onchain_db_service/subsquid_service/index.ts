@@ -497,14 +497,23 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getActiveBountiesWithRewardsByIndex(network: ENetwork, index?: number): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+	static async GetActiveBountiesWithRewardsByIndex({
+		network,
+		index,
+		limit
+	}: {
+		network: ENetwork;
+		index?: number;
+		limit?: number;
+	}): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient
 				.query(this.GET_ACTIVE_BOUNTIES_WITH_REWARDS_BY_INDEX, {
 					type_eq: EProposalType.BOUNTY,
 					status_not_in: [EProposalStatus.Cancelled, EProposalStatus.Rejected, EProposalStatus.Approved, EProposalStatus.Claimed],
-					index_eq: index
+					index_eq: index,
+					limit
 				})
 				.toPromise();
 
@@ -524,12 +533,21 @@ export class SubsquidService extends SubsquidUtils {
 		}
 	}
 
-	static async getChildBountiesRewards(network: ENetwork, parentBountyIndices: number[]): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
+	static async GetChildBountiesRewards({
+		network,
+		parentBountyIndices,
+		limit
+	}: {
+		network: ENetwork;
+		parentBountyIndices: number[];
+		limit?: number;
+	}): Promise<{ data: { items: IBountyProposal[]; totalCount: number } } | null> {
 		try {
 			const gqlClient = this.subsquidGqlClient(network);
 			const response = await gqlClient
 				.query(this.GET_CHILD_BOUNTIES_REWARDS, {
-					parentBountyIndex_in: parentBountyIndices
+					parentBountyIndex_in: parentBountyIndices,
+					limit
 				})
 				.toPromise();
 

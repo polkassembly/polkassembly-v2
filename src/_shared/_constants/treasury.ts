@@ -23,11 +23,23 @@ interface NetworkTreasuryConfig {
 	hydrationUsdcAssetId: number;
 	hydrationUsdtAssetId: number;
 	loanAmounts: {
-		dot: string;
-		usdc: string;
-		[key: string]: string;
+		centrifuge: {
+			usdc: string;
+		};
+		bifrost: {
+			dot: string;
+		};
+		pendulum: {
+			dot: string;
+		};
+		hydration: {
+			dot: string;
+		};
 	};
-	burnPercentage: BN;
+	burnPercentage: {
+		numerator: BN;
+		denominator: BN;
+	};
 	spendPeriodInBlocks: BN;
 }
 
@@ -50,10 +62,23 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		hydrationUsdcAssetId: 22,
 		hydrationUsdtAssetId: 10,
 		loanAmounts: {
-			dot: '15500000000000000',
-			usdc: '1500000000000'
+			bifrost: {
+				dot: '5000000000000000'
+			},
+			pendulum: {
+				dot: '500000000000000'
+			},
+			hydration: {
+				dot: '10000000000000000'
+			},
+			centrifuge: {
+				usdc: '1500000000000'
+			}
 		},
-		burnPercentage: new BN(1).div(new BN(100)), // 1% of the treasury balance
+		burnPercentage: {
+			numerator: new BN(1),
+			denominator: new BN(100)
+		}, // 1% of the treasury balance
 		spendPeriodInBlocks: new BN(345600)
 	},
 	[ENetwork.KUSAMA]: undefined, // Add Kusama specific configuration when needed

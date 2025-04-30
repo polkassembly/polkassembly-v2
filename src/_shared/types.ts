@@ -1060,11 +1060,6 @@ export interface ITreasuryStats {
 		totalMyth?: string;
 		[key: string]: string | undefined;
 	};
-	loans?: {
-		dot?: string;
-		usdc?: string;
-		[key: string]: string | undefined;
-	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;

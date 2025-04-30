@@ -4,13 +4,13 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
-import { EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EAssets, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import CommentIcon from '@assets/icons/Comment.svg';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import Address from '@ui/Profile/Address/Address';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
@@ -20,10 +20,7 @@ import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecision
 import { Progress } from '@/app/_shared-components/Progress/Progress';
 import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
-import USDTIcon from '@assets/icons/usdt.svg';
-import USDCIcon from '@assets/icons/usdc.svg';
 import { BN } from '@polkadot/util';
-import DOTIcon from '@assets/icons/dot.png';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import Link from 'next/link';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
@@ -57,11 +54,6 @@ function ListingCard({
 	const totalValue = ayeValue.add(nayValue);
 	const ayePercent = calculatePercentage(ayeValue.toString(), totalValue);
 	const nayPercent = calculatePercentage(nayValue.toString(), totalValue);
-	const ICONS = {
-		usdc: USDCIcon,
-		usdt: USDTIcon,
-		dot: DOTIcon
-	};
 	const decisionPeriodPercentage = data.onChainInfo?.decisionPeriodEndsAt ? calculateDecisionProgress(data.onChainInfo?.decisionPeriodEndsAt) : 0;
 
 	const timeRemaining = data.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(data.onChainInfo?.decisionPeriodEndsAt) : null;
@@ -211,10 +203,11 @@ function ListingCard({
 											<div className='flex items-center -space-x-1.5'>
 												{Object.entries(groupedByAsset).map(([assetId]) => {
 													const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-													const icon = ICONS[unit.toLowerCase() as keyof typeof ICONS] || DOTIcon;
+													const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
 													return (
 														<Image
 															key={assetId}
+															className='rounded-full'
 															src={icon}
 															alt={unit}
 															width={18}

@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import styles from './DelegateVotingPower.module.scss';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
+import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
 
 interface DelegateDialogProps {
 	delegate: { address: string };
@@ -245,6 +246,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				<SwitchWalletOrAddress
 					small
 					withBalance
+					customAddressSelector={<AddressRelationsPicker withBalance />}
 				/>
 
 				<div>

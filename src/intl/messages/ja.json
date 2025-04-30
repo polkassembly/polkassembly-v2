@@ -2,6 +2,34 @@
 	"HomePage": {
 		"title": "ホームへようこそ"
 	},
+	"TreasuryStats": {
+		"tooltip": "ブロック生成報酬、取引手数料、罰金、ステーキング効率などの一部から収集された資金。",
+		"treasury": "財務",
+		"price": "価格",
+		"total": "合計",
+		"treasuryDistribution": "財務分配",
+		"details": "詳細",
+		"spendPeriodRemaining": "支出期間残り",
+		"nextBurn": "次の燃焼",
+		"days": "日",
+		"hours": "時間",
+		"minutes": "分",
+		"seconds": "秒",
+		"spendPeriodTooltip": "財務から要求された資金は、支出期間の終了時に定期的に分配されます。",
+		"nextBurnTooltip": "財務が支出期間を終了するときにすべての資金を使用しない場合、一定の割合の資金が燃焼されます。",
+		"viewDetails": "詳細を見る",
+		"tokenPrice": "トークン価格",
+		"salary": "給与",
+		"relayChain": "リレーチェーン",
+		"assetHub": "アセットハブ",
+		"fellowship": "フェローシップ",
+		"hydration": "水素化",
+		"bounties": "報奨金",
+		"ambassador": "アンバサダー",
+		"loans": "ローン",
+		"address": "アドレス"
+	},
+
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
 		"switchToOverview": "概要に切り替え",
@@ -442,7 +470,13 @@
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
 		"showLikelySpam": "疑わしいスパムを表示",
-		"hideLikelySpam": "疑わしいスパムを非表示"
+		"hideLikelySpam": "疑わしいスパムを非表示",
+		"VoteCurves": {
+			"approval": "承認",
+			"support": "サポート",
+			"threshold": "閾値",
+			"votingData": "投票データ"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
