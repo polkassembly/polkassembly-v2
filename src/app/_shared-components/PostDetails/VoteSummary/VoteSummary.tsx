@@ -23,10 +23,63 @@ import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 import { Skeleton } from '../../Skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../Tooltip';
 
 const NONE_CHART_VALUE = 0;
 
-function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVoteMetrics; proposalType: EProposalType; index: string }) {
+function ThresholdPoint({ approvalThreshold }: { approvalThreshold: number }) {
+	const t = useTranslations();
+
+	const centerX = 50;
+	const centerY = 75;
+	const arcRadius = 46;
+	const lineWidth = 8;
+	const angle = -180 + (180 * approvalThreshold) / 100;
+	const radians = (angle * Math.PI) / 180;
+
+	const innerRadius = arcRadius - lineWidth / 2;
+	const outerRadius = arcRadius + lineWidth / 2;
+	const lineStartX = centerX + innerRadius * Math.cos(radians);
+	const lineStartY = centerY + innerRadius * Math.sin(radians);
+	const lineEndX = centerX + outerRadius * Math.cos(radians);
+	const lineEndY = centerY + outerRadius * Math.sin(radians);
+
+	return (
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<line
+						x1={lineStartX}
+						y1={lineStartY}
+						x2={lineEndX}
+						y2={lineEndY}
+						strokeWidth='1'
+						strokeLinecap='round'
+						className='stroke-wallet_btn_text'
+					/>
+				</TooltipTrigger>
+				<TooltipContent className='relative rounded-md bg-gray-800 px-2 py-1 shadow-lg'>
+					<p className='whitespace-nowrap text-xs font-medium text-white'>
+						{t('PostDetails.threshold')}
+						{`: ${approvalThreshold?.toFixed(1)}%`}
+					</p>
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	);
+}
+
+function VoteSummary({
+	voteMetrics,
+	proposalType,
+	index,
+	approvalThreshold
+}: {
+	voteMetrics?: IVoteMetrics;
+	proposalType: EProposalType;
+	index: string;
+	approvalThreshold?: number;
+}) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -98,18 +151,30 @@ function VoteSummary({ voteMetrics, proposalType, index }: { voteMetrics?: IVote
 							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
 							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 						</div>
-						<PieChart
-							className='w-[47%] xl:w-[49%]'
-							center={[50, 75]}
-							startAngle={-180}
-							lengthAngle={180}
-							rounded
-							lineWidth={15}
-							data={[
-								{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-								{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
-							]}
-						/>
+						<div className='relative flex flex-col items-center justify-center'>
+							{!!approvalThreshold && (
+								<p className={classes.thresholdPercentage}>
+									{t('PostDetails.threshold')}
+									{`: ${approvalThreshold?.toFixed(1)}%`}
+								</p>
+							)}
+							<div className='flex w-full items-center justify-center'>
+								<PieChart
+									className='w-full'
+									center={[50, 75]}
+									startAngle={-180}
+									lengthAngle={180}
+									rounded
+									lineWidth={15}
+									data={[
+										{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+										{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
+									]}
+								>
+									{!!approvalThreshold && <ThresholdPoint approvalThreshold={approvalThreshold} />}
+								</PieChart>
+							</div>
+						</div>
 
 						<div className={classes.voteSummaryPieChartAyeNay}>
 							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>

@@ -29,7 +29,6 @@
 		"loans": "Préstamos",
 		"address": "Dirección"
 	},
-
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
 		"switchToOverview": "Cambiar a Resumen",
@@ -487,7 +486,8 @@
 			"support": "Apoyo",
 			"threshold": "Umbral",
 			"votingData": "Datos de Votación"
-		}
+		},
+		"threshold": "Umbral"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

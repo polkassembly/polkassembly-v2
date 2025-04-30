@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React, { useState } from 'react';
+
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { EPostOrigin, EProposalType, IStatusHistoryItem } from '@/_shared/types';
 import { ClientError } from '@/app/_client-utils/clientError';
@@ -18,11 +18,12 @@ interface Props {
 	trackName: EPostOrigin;
 	createdAt?: Date;
 	timeline?: IStatusHistoryItem[];
+	setThresholdValues?: (values: { approvalThreshold: number; supportThreshold: number }) => void;
+	thresholdValues?: { approvalThreshold: number; supportThreshold: number };
 }
 
-function VoteCurvesData({ proposalType, index, trackName, createdAt, timeline }: Props) {
+function VoteCurvesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: Props) {
 	const t = useTranslations('PostDetails.VoteCurves');
-	const [{ approvalThreshold, supportThreshold }, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
 
 	const fetchVoteCurves = async () => {
 		const { data, error } = await NextApiClientService.getVoteCurves({
@@ -85,14 +86,14 @@ function VoteCurvesData({ proposalType, index, trackName, createdAt, timeline }:
 								<span className='h-4 rotate-45 border-l-2 border-success' />
 								{t('threshold')}
 							</span>
-							<span className='font-medium text-text_primary'>{approvalThreshold?.toFixed(2)}%</span>
+							<span className='font-medium text-text_primary'>{thresholdValues?.approvalThreshold?.toFixed(2)}%</span>
 						</p>
 						<p className='flex w-1/2 items-center justify-between'>
 							<span className='flex items-center gap-x-2'>
 								<span className='h-4 rotate-45 border-l-2 border-navbar_border' />
 								{t('threshold')}
 							</span>
-							<span className='font-medium text-text_primary'>{supportThreshold?.toFixed(2)}%</span>
+							<span className='font-medium text-text_primary'>{thresholdValues?.supportThreshold?.toFixed(2)}%</span>
 						</p>
 					</div>
 				</div>

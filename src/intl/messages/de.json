@@ -29,7 +29,6 @@
 		"loans": "Loans",
 		"address": "Adresse"
 	},
-
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
 		"switchToOverview": "Zur Übersicht wechseln",
@@ -487,7 +486,8 @@
 			"support": "Unterstützung",
 			"threshold": "Schwellenwert",
 			"votingData": "Abstimmungsdaten"
-		}
+		},
+		"threshold": "Schwelle"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",

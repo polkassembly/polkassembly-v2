@@ -29,7 +29,6 @@
 		"loans": "ローン",
 		"address": "アドレス"
 	},
-
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
 		"switchToOverview": "概要に切り替え",
@@ -487,7 +486,8 @@
 			"support": "サポート",
 			"threshold": "閾値",
 			"votingData": "投票データ"
-		}
+		},
+		"threshold": "しきい値"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
