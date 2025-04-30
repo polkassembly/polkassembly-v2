@@ -644,7 +644,7 @@
 		"descriptionRequired": "请提供有效的描述。",
 		"please": "请",
 		"login": "登录",
-		"toCreate": "以创建讨论"
+		"toCreate": "以创建提案"
 	},
 	"ProposalType": {
 		"discussion": "讨论",

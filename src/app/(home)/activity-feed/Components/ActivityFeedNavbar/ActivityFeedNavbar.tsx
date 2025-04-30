@@ -306,7 +306,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 						onClick={() => handleScroll('left')}
 						aria-label='Scroll left'
 					>
-						<FaChevronLeft className='text-bg_pink' />
+						<FaChevronLeft className='text-wallet_btn_text' />
 					</button>
 				)}
 
@@ -317,7 +317,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 						onClick={() => handleScroll('right')}
 						aria-label='Scroll right'
 					>
-						<FaChevronRight className='text-bg_pink' />
+						<FaChevronRight className='text-wallet_btn_text' />
 					</button>
 				)}
 			</div>
