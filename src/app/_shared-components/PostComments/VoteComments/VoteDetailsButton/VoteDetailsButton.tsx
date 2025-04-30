@@ -9,24 +9,24 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import SplitImg from '@assets/icons/split-yellow-icon.svg';
 import SplitAbstainImg from '@assets/icons/abstainGray.svg';
 import { memo } from 'react';
-import { Separator } from '../../Separator';
 
 interface VoteDetailsButtonProps {
 	userVoteType: EVoteDecision | null;
-	votedText: string;
-	setShowVoteDetails: (show: boolean) => void;
+	onClick?: () => void;
 }
 
-function VoteDetailsButton({ userVoteType, votedText, setShowVoteDetails }: VoteDetailsButtonProps) {
+function VoteDetailsButton({ userVoteType, onClick }: VoteDetailsButtonProps) {
 	const t = useTranslations();
 	if (!userVoteType) return null;
+
+	const votedText = t('PostDetails.voted');
 
 	const voteTypeDisplay = () => {
 		switch (userVoteType) {
 			case EVoteDecision.AYE:
 				return (
 					<div className='flex items-center gap-x-1'>
-						<AiFillLike className='text-success' />
+						<AiFillLike className='text-base text-success' />
 						<span className='font-medium text-success'>
 							{votedText} {t('PostDetails.aye')}
 						</span>
@@ -35,7 +35,7 @@ function VoteDetailsButton({ userVoteType, votedText, setShowVoteDetails }: Vote
 			case EVoteDecision.NAY:
 				return (
 					<div className='flex items-center gap-x-1'>
-						<AiFillDislike className='text-failure' />
+						<AiFillDislike className='text-base text-failure' />
 						<span className='font-medium text-failure'>
 							{votedText} {t('PostDetails.nay')}
 						</span>
@@ -47,8 +47,8 @@ function VoteDetailsButton({ userVoteType, votedText, setShowVoteDetails }: Vote
 						<Image
 							src={SplitImg}
 							alt='split'
-							width={14}
-							height={14}
+							width={16}
+							height={16}
 						/>
 						<span className='font-medium text-toast_warning_text'>
 							{votedText} {t('PostDetails.split')}
@@ -61,8 +61,8 @@ function VoteDetailsButton({ userVoteType, votedText, setShowVoteDetails }: Vote
 						<Image
 							src={SplitAbstainImg}
 							alt='split abstain'
-							width={14}
-							height={14}
+							width={16}
+							height={16}
 						/>
 						<span className='font-medium text-toast_warning_text'>
 							{votedText} {t('PostDetails.abstain')}
@@ -70,24 +70,22 @@ function VoteDetailsButton({ userVoteType, votedText, setShowVoteDetails }: Vote
 					</div>
 				);
 			default:
-				return <span>{userVoteType}</span>;
+				return (
+					<span className='font-medium text-text_primary'>
+						{votedText} {userVoteType}
+					</span>
+				);
 		}
 	};
 
 	return (
-		<>
-			<Separator
-				orientation='vertical'
-				className='h-3'
-			/>
-			<button
-				type='button'
-				onClick={() => setShowVoteDetails(true)}
-				className='flex items-center gap-x-1 text-xs hover:underline'
-			>
-				{voteTypeDisplay()}
-			</button>
-		</>
+		<button
+			type='button'
+			onClick={onClick}
+			className='flex items-center gap-x-1 text-xs'
+		>
+			{voteTypeDisplay()}
+		</button>
 	);
 }
 

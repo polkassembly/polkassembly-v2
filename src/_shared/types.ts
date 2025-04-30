@@ -651,6 +651,18 @@ export enum ECommentSentiment {
 	FOR = 'for'
 }
 
+export interface IVoteData {
+	balanceValue: string;
+	decision: EVoteDecision;
+	lockPeriod: number;
+	createdAt: Date;
+	voterAddress: string;
+	selfVotingPower?: string;
+	totalVotingPower?: string;
+	delegatedVotingPower?: string;
+	delegatedVotes?: IVoteData[];
+}
+
 export interface IComment {
 	id: string;
 	createdAt: Date;
@@ -673,6 +685,7 @@ export interface ICommentResponse extends IComment {
 	user: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
 	reactions?: IReaction[];
+	voteData?: IVoteData[];
 }
 
 export interface IOnChainIdentity {
@@ -694,18 +707,6 @@ export interface IOnChainIdentity {
 	parentProxyTitle: string | null;
 	parentProxyAddress: string;
 	hash?: string;
-}
-
-export interface IVoteData {
-	balanceValue: string;
-	decision: EVoteDecision;
-	lockPeriod: number;
-	createdAt: Date;
-	voterAddress: string;
-	selfVotingPower?: string;
-	totalVotingPower?: string;
-	delegatedVotingPower?: string;
-	delegatedVotes?: IVoteData[];
 }
 
 export enum EAssets {

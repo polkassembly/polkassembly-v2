@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IVoteData, IComment, IPublicUser } from '@/_shared/types';
+import { EProposalType, ICommentResponse, IComment, IPublicUser } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
@@ -21,15 +21,11 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery } from '@tanstack/react-query';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
-import { Skeleton } from '../../Skeleton';
-import VoteCommentsDialog from '../VoteCommentsDialog/VoteCommentsDialog';
-import VoteDetailsButton from '../VoteDetailsButton/VoteDetailsButton';
+import VoteComments from '../VoteComments/VoteComments';
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
@@ -45,8 +41,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const [showReplies, setShowReplies] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
-	const [voteData, setVoteData] = useState<IVoteData[] | null>(null);
-	const [showVoteDetails, setShowVoteDetails] = useState<boolean>(false);
 
 	const user = useAtomValue(userAtom);
 
@@ -87,7 +81,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const handleOpenDeleteModal = useCallback(() => setOpenDeleteModal(true), []);
 	const handleToggleReply = useCallback(() => setReply(true), []);
 	const handleToggleShowReplies = useCallback(() => setShowReplies((prev) => !prev), []);
-	const handleSetShowVoteDetails = useCallback((value: boolean) => setShowVoteDetails(value), []);
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
@@ -108,37 +101,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		setReply(false);
 		setShowReplies(true);
 	}, []);
-
-	const { isLoading: isLoadingVotes } = useQuery({
-		queryKey: ['userCommentVotes', comment?.userId, proposalType, index],
-		queryFn: async () => {
-			if (!comment) return null;
-
-			const { data, error } = await NextApiClientService.userCommentVotes({
-				userId: comment.userId,
-				page: 1,
-				limit: 10,
-				proposalType,
-				indexOrHash: index
-			});
-
-			if (data && !error) {
-				if (Array.isArray(data) && data.length > 0) {
-					const responseData = data[0];
-					setVoteData(responseData.votes);
-				} else if (data.votes) {
-					setVoteData(data.votes);
-				} else {
-					setVoteData([]);
-				}
-				return data;
-			}
-			return null;
-		},
-		enabled: !!comment
-	});
-
-	const votedText = t('PostDetails.voted');
 
 	if (!comment) {
 		return null;
@@ -171,13 +133,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-			{voteData && voteData?.length > 0 && (
-				<VoteCommentsDialog
-					voteInfo={voteData[0]}
-					showVoteDetails={showVoteDetails}
-					setShowVoteDetails={handleSetShowVoteDetails}
-				/>
-			)}
 			<div>
 				{comment.user.addresses[0] ? (
 					<Identicon
@@ -220,17 +175,14 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.createdAt} />
-					{isLoadingVotes ? (
-						<Skeleton className='h-3 w-3' />
-					) : (
-						voteData &&
-						voteData.length > 0 && (
-							<VoteDetailsButton
-								userVoteType={voteData[0]?.decision}
-								votedText={votedText}
-								setShowVoteDetails={handleSetShowVoteDetails}
+					{comment.voteData && comment.voteData.length > 0 && (
+						<>
+							<Separator
+								orientation='vertical'
+								className='h-3'
 							/>
-						)
+							<VoteComments voteInfo={comment.voteData[0]} />
+						</>
 					)}
 				</div>
 				<MarkdownViewer

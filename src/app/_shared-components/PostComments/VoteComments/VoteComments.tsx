@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { useState, memo, useCallback } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@ui/Dialog/Dialog';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IVoteData } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
@@ -13,15 +13,10 @@ import Address from '../../Profile/Address/Address';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
 import { Collapsible, CollapsibleContent } from '../../Collapsible';
 import { Separator } from '../../Separator';
-import styles from './VoteCommentsDialog.module.scss';
+import styles from './VoteComments.module.scss';
+import VoteDetailsButton from './VoteDetailsButton/VoteDetailsButton';
 
-interface VoteCommentsDialogProps {
-	voteInfo: IVoteData;
-	showVoteDetails: boolean;
-	setShowVoteDetails: (showVoteDetails: boolean) => void;
-}
-
-function VoteCommentsDialog({ voteInfo, showVoteDetails, setShowVoteDetails }: VoteCommentsDialogProps) {
+function VoteComments({ voteInfo }: { voteInfo: IVoteData }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const [expanded, setExpanded] = useState(false);
@@ -29,7 +24,7 @@ function VoteCommentsDialog({ voteInfo, showVoteDetails, setShowVoteDetails }: V
 	const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
 
 	const getConvictionText = (lockPeriod: number) => {
-		if (lockPeriod === 0) return '0.1x/d';
+		if (!lockPeriod || lockPeriod === 0) return '0.1x/d';
 		return `${lockPeriod}x`;
 	};
 
@@ -43,10 +38,10 @@ function VoteCommentsDialog({ voteInfo, showVoteDetails, setShowVoteDetails }: V
 	};
 
 	return (
-		<Dialog
-			open={showVoteDetails}
-			onOpenChange={setShowVoteDetails}
-		>
+		<Dialog>
+			<DialogTrigger asChild>
+				<VoteDetailsButton userVoteType={voteInfo.decision} />
+			</DialogTrigger>
 			<DialogContent className='max-h-[550px] max-w-2xl overflow-y-auto p-4'>
 				<DialogTitle>
 					<h2 className='text-xl font-semibold text-text_primary'>{t('PostDetails.votes')}</h2>
@@ -196,4 +191,4 @@ function VoteCommentsDialog({ voteInfo, showVoteDetails, setShowVoteDetails }: V
 	);
 }
 
-export default memo(VoteCommentsDialog);
+export default memo(VoteComments);

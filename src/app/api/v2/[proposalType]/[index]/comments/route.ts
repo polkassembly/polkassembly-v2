@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECommentSentiment, EProposalType, IComment } from '@/_shared/types';
+import { ECommentSentiment, EProposalType, IComment, ICommentResponse } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -12,6 +12,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -25,7 +27,32 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const comments = await OffChainDbService.GetPostComments({ network, indexOrHash: index, proposalType: proposalType as EProposalType });
 
-	return NextResponse.json(comments);
+	// Fetch user addresses and vote data for each comment
+	const commentsWithVoteData = await Promise.all(
+		comments.map(async (comment) => {
+			const userAddresses = await OffChainDbService.GetAddressesForUserId(comment.userId);
+
+			const voteData = await Promise.all(
+				userAddresses.map(async (address) => {
+					return OnChainDbService.GetPostVoteData({
+						network,
+						proposalType,
+						indexOrHash: index,
+						voterAddress: address.address,
+						page: 1,
+						limit: DEFAULT_LISTING_LIMIT
+					});
+				})
+			);
+
+			return {
+				...comment,
+				voteData: voteData.map((vote) => vote.votes).flat()
+			} as ICommentResponse;
+		})
+	);
+
+	return NextResponse.json(commentsWithVoteData);
 });
 
 // add comment
