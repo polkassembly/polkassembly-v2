@@ -112,6 +112,14 @@ export const W3F_DELEGATES: IDelegate[] = [
 		name: 'Polkadot Hungary DAO',
 		network: ENetwork.POLKADOT,
 		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: '15ubZj6T7NUYyQw6j4XBkEMJ2vew5w9kqKEcN1QG7Z1weKDV',
+		image: 'https://i.ibb.co/G4bzZ0pN/permanence-Dao.jpg',
+		name: 'PERMANENCE DAO/HQ',
+		network: ENetwork.POLKADOT,
+		sources: [EDelegateSource.W3F],
+		manifesto: 'A global multi-disciplinary collective of incorporated and individual contributors committed to the growth of Polkadot.'
 	}
 ];
 
