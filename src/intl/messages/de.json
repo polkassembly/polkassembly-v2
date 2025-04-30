@@ -655,7 +655,7 @@
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an.",
 		"please": "Bitte",
 		"login": "Anmelden",
-		"toCreate": "um eine Diskussion zu erstellen"
+		"toCreate": "um eine Vorschlag zu erstellen"
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",

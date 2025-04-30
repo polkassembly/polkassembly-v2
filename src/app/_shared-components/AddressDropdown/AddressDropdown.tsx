@@ -55,11 +55,6 @@ function AddressDropdown({
 
 		setAccounts(injectedAccounts);
 
-		if (userPreferences?.selectedAccount?.address) {
-			setAccountsLoading(false);
-			return;
-		}
-
 		setUserPreferences({
 			...userPreferences,
 			selectedAccount: {

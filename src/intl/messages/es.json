@@ -655,7 +655,7 @@
 		"descriptionRequired": "Por favor, proporcione una descripción válida.",
 		"please": "Por favor",
 		"login": "Iniciar sesión",
-		"toCreate": "para crear una discusión"
+		"toCreate": "para crear una propuesta"
 	},
 	"ProposalType": {
 		"discussion": "Discusión",

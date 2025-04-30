@@ -1,36 +1,35 @@
 .postTitle {
-    @apply mb-2 text-xl font-semibold text-text_primary
+	@apply mb-2 text-xl font-semibold text-text_primary;
 }
 
 .requestedWrapper {
-    @apply mb-2 flex flex-col items-start gap-2 lg:flex-row lg:items-center
+	@apply mb-2 flex flex-col items-start gap-2 lg:flex-row lg:items-center;
 }
 
 .requestedText {
-    @apply text-base text-listing_page_btn lg:text-lg
+	@apply text-base text-listing_page_btn lg:text-lg;
 }
 
 .requestedAmount {
-    @apply text-base font-semibold text-text_pink lg:text-lg flex items-center gap-x-1 flex-wrap
+	@apply flex flex-wrap items-center gap-x-1 text-base font-semibold text-text_pink lg:text-lg;
 }
 
 .proposerWrapper {
-    @apply flex flex-col flex-wrap gap-2 lg:flex-row lg:items-center
+	@apply flex flex-col flex-wrap gap-2 lg:flex-row lg:items-center;
 }
 
 .beneficiaryWrapper {
-    @apply flex flex-wrap items-center gap-x-2
+	@apply flex flex-wrap items-center gap-x-2;
 }
 
 .beneficiaryText {
-    @apply text-xs text-wallet_btn_text
+	@apply text-xs text-wallet_btn_text;
 }
 
 .beneficiaryTooltipContent {
-    @apply flex flex-col gap-y-2 bg-bg_modal shadow-lg
+	@apply flex flex-col gap-y-2 bg-bg_modal shadow-lg;
 }
 
-
-
-
-
+.originStyle {
+	@apply whitespace-normal break-words rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
+}
