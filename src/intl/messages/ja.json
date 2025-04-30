@@ -611,6 +611,7 @@
 		"createDiscussionTitle": "ディスカッションを作成",
 		"title": "タイトル",
 		"description": "説明",
+		"addTagsPlaceholder": "タグを追加 (Enterまたはカンマを押して追加)",
 		"create": "作成",
 		"createTag": "タグを作成",
 		"addTags": "タグを追加",

@@ -611,6 +611,7 @@
 		"createDiscussionTitle": "Diskussion erstellen",
 		"title": "Titel",
 		"description": "Beschreibung",
+		"addTagsPlaceholder": "Tags hinzufügen (Enter oder Komma drücken)",
 		"create": "Erstellen",
 		"createTag": "Tag erstellen",
 		"addTags": "Tags hinzufügen",

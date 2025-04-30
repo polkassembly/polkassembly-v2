@@ -2,29 +2,72 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { X, ChevronsUpDown, PlusIcon } from 'lucide-react';
-import { Button } from '@/app/_shared-components/Button';
-import { useTranslations } from 'next-intl';
+import React, { useState, useRef, ChangeEvent, useCallback } from 'react';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
-import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
-import { useRef, useState } from 'react';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { useTranslations } from 'next-intl';
 import { ITag } from '@/_shared/types';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import classes from './AddTags.module.scss';
+import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
+import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
+import { Skeleton } from '../../Skeleton';
 import { Input } from '../../Input';
+import { Button } from '../../Button';
 
-export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) => void; disabled?: boolean }) {
-	const t = useTranslations();
-	const [open, setOpen] = useState(false);
-	const [selectedValues, setSelectedValues] = useState<ITag[]>([]);
-	const [pressedAddTag, setPressedAddTag] = useState(false);
-	const addTagInputRef = useRef<HTMLInputElement>(null);
+interface AddTagsProps {
+	className?: string;
+	disabled?: boolean;
+	onChange?: (tags: ITag[]) => void;
+}
+
+const TAG_MAX_LENGTH = 20;
+
+// Custom hook for managing tags
+const useTagManagement = (onChange?: (tags: ITag[]) => void) => {
+	const [tags, setTags] = useState<ITag[]>([]);
 	const network = getCurrentNetwork();
 
+	const addTag = useCallback(
+		(tag: string) => {
+			const trimmedTag = tag.trim().replace(/,/g, '');
+
+			if (!ValidatorService.isValidTag(trimmedTag)) {
+				return false;
+			}
+
+			if (trimmedTag && !tags.some(({ value }) => value === trimmedTag)) {
+				if (tags.length >= MAX_POST_TAGS) {
+					return false;
+				}
+
+				const newTags = [...tags, { value: trimmedTag, lastUsedAt: new Date(), network }];
+				setTags(newTags);
+				onChange?.(newTags);
+				return true;
+			}
+			return false;
+		},
+		[tags, network, onChange]
+	);
+
+	const removeTag = useCallback(
+		(index: number) => {
+			const newTags = tags.filter((_, i) => i !== index);
+			setTags(newTags);
+			onChange?.(newTags);
+		},
+		[tags, onChange]
+	);
+
+	return { tags, addTag, removeTag };
+};
+
+// Custom hook for tag suggestions
+const useTagSuggestions = (disabled?: boolean) => {
 	const fetchAllTags = async () => {
 		const { data, error } = await NextApiClientService.fetchAllTags();
 		if (error) {
@@ -33,128 +76,168 @@ export function AddTags({ onChange, disabled }: { onChange: (options: ITag[]) =>
 		return data?.items;
 	};
 
-	const { data: allTags = [], isFetching } = useQuery({
+	return useQuery({
 		queryKey: ['tags'],
 		queryFn: fetchAllTags,
-		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI
+		enabled: !disabled
 	});
+};
 
-	const handleSelect = (option: ITag) => {
-		if (selectedValues?.length >= MAX_POST_TAGS) return;
-		const newTags = selectedValues?.find((item) => item.value === option.value) ? selectedValues : [...selectedValues, option];
-		setSelectedValues(newTags);
-		onChange(newTags);
-	};
+// Tag item component
+const TagItem = React.memo(({ tag, onRemove }: { tag: ITag; onRemove: () => void }) => (
+	<div className='flex items-center gap-1 rounded-lg bg-tag_input_bg px-2 py-1.5 text-text_primary shadow-sm'>
+		<span>{tag.value}</span>
+		<Button
+			variant='ghost'
+			onClick={(e) => {
+				e.stopPropagation();
+				onRemove();
+			}}
+			className='h-5 px-1 py-0 text-text_primary'
+		>
+			<X size={16} />
+		</Button>
+	</div>
+));
 
-	const handleRemove = (optionToRemove: ITag) => {
-		const newTags = selectedValues.filter((item) => item.value !== optionToRemove.value);
-		setSelectedValues(newTags);
-		onChange(newTags);
-	};
+TagItem.displayName = 'TagItem';
+
+// Suggestions list component
+const SuggestionsList = React.memo(({ suggestions, onSelect, loading }: { suggestions: ITag[]; onSelect: (value: string) => void; loading: boolean }) => {
+	const t = useTranslations();
+
+	if (loading) {
+		return <Skeleton className='h-[50px] w-full' />;
+	}
 
 	return (
-		<div className={classes.container}>
+		<div>
+			{!suggestions.length && <div>{t('Create.noTagsFound')}</div>}
 			<div>
-				{pressedAddTag ? (
-					<Input
-						disabled={disabled}
-						ref={addTagInputRef}
-						className={classes.addTagInput}
-						autoFocus
-						placeholder={t('Create.addTags')}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								handleSelect({ value: e.currentTarget.value, lastUsedAt: new Date(), network });
-								setPressedAddTag(false);
-							}
-						}}
-					/>
-				) : (
+				{suggestions.map((suggestion) => (
 					<Button
-						className={classes.addTagButton}
-						disabled={disabled}
-						onClick={() => {
-							setPressedAddTag(true);
-							addTagInputRef.current?.focus();
-						}}
+						key={`suggestion-${suggestion.value}`}
+						className='w-full cursor-pointer justify-start bg-transparent py-1 text-sm font-medium text-text_primary shadow-none hover:bg-transparent'
+						onClick={() => onSelect(suggestion.value)}
 					>
-						<PlusIcon className='h-4 w-4' />
-						{t('Create.createTag')}
+						{suggestion.value}
 					</Button>
-				)}
+				))}
 			</div>
+		</div>
+	);
+});
 
-			<Popover onOpenChange={setOpen}>
-				<PopoverTrigger
-					className='w-full'
-					asChild
-					disabled={disabled}
-					onClick={(e) => {
-						if ((e.target as HTMLElement).closest('button')?.classList.contains('p-0')) {
-							return;
-						}
-						e.stopPropagation();
-						e.preventDefault();
-						setOpen(!open);
-					}}
-				>
-					<div
-						role='combobox'
-						aria-controls='tags-listbox'
-						aria-expanded={open}
-						className={classes.popoverTrigger}
+SuggestionsList.displayName = 'SuggestionsList';
+
+export function AddTags({ className, onChange, disabled }: AddTagsProps) {
+	const t = useTranslations();
+	const inputRef = useRef<HTMLInputElement>(null);
+	const triggerRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLButtonElement>(null);
+	const [open, setOpen] = useState(false);
+	const [inputValue, setInputValue] = useState('');
+
+	const { tags, addTag, removeTag } = useTagManagement(onChange);
+	const { data: suggestions = [], isFetching } = useTagSuggestions(disabled);
+
+	const handleInputChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const { value } = e.target;
+			setOpen(
+				Boolean(
+					value.length > 0 && suggestions.some((suggestion) => suggestion.value.toLowerCase().includes(value.toLowerCase()) && !tags?.some((tag) => tag.value === suggestion.value))
+				)
+			);
+			setInputValue(value);
+			inputRef.current?.focus();
+		},
+		[suggestions, tags]
+	);
+
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent<HTMLInputElement>) => {
+			if (['Enter', ','].includes(e.key) && inputValue.trim()) {
+				e.preventDefault();
+				if (addTag(inputValue)) {
+					setInputValue('');
+					setOpen(false);
+				}
+				return;
+			}
+
+			if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
+				removeTag(tags.length - 1);
+			}
+		},
+		[inputValue, tags.length, addTag, removeTag]
+	);
+
+	const handleSuggestionSelect = useCallback(
+		(value: string) => {
+			if (addTag(value)) {
+				setInputValue('');
+				setOpen(false);
+			}
+			inputRef.current?.focus();
+		},
+		[addTag]
+	);
+
+	return (
+		<div className='space-y-2'>
+			<Popover
+				open={open && suggestions.length > 0}
+				onOpenChange={setOpen}
+			>
+				<PopoverTrigger asChild>
+					<Button
+						ref={containerRef}
+						className={cn(
+							'flex min-h-12 w-full flex-wrap items-center gap-2 rounded-lg border-[1px] border-solid border-border_grey bg-transparent p-0 shadow-none hover:bg-transparent',
+							className
+						)}
+						onClick={() => inputRef.current?.focus()}
 					>
-						<div className='flex flex-wrap'>
-							{selectedValues?.length ? (
-								selectedValues?.map((option) => (
-									<div
-										key={option.value}
-										className={classes.tagLabel}
-									>
-										{option.value}
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											className='p-0'
-											disabled={disabled}
-											onClick={(e) => {
-												e.stopPropagation();
-												e.preventDefault();
-												handleRemove(option);
-												setOpen(false);
-											}}
-										>
-											<X />
-										</Button>
-									</div>
-								))
-							) : (
-								<span className={classes.selectTagsText}>{t('Create.selectTags')}</span>
-							)}
+						{!!tags.length && (
+							<div className='flex flex-wrap gap-2 px-3'>
+								{tags.map((tag, index) => (
+									<TagItem
+										key={`tag-${tag.value}`}
+										tag={tag}
+										onRemove={() => removeTag(index)}
+									/>
+								))}
+							</div>
+						)}
+						<div
+							className='flex-1'
+							ref={triggerRef}
+						>
+							<Input
+								ref={inputRef}
+								type='text'
+								value={inputValue}
+								onChange={handleInputChange}
+								onKeyDown={handleKeyDown}
+								className='w-full border-none bg-transparent p-0 text-input_text shadow-none placeholder:text-placeholder'
+								placeholder={tags.length === 0 ? t('Create.addTagsPlaceholder') : ''}
+								disabled={tags.length >= MAX_POST_TAGS}
+								maxLength={TAG_MAX_LENGTH}
+							/>
 						</div>
-						<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-					</div>
+					</Button>
 				</PopoverTrigger>
 				<PopoverContent
+					className='max-h-[300px] w-[var(--radix-popover-trigger-width)] overflow-y-auto border-none bg-bg_modal p-4'
 					align='start'
-					className='min-w-[300px]'
+					sideOffset={5}
 				>
-					{isFetching ? (
-						<div className={classes.noTagFoundText}>Loading....</div>
-					) : allTags && allTags.length > 0 ? (
-						allTags.map((tag) => (
-							<button
-								type='button'
-								onClick={() => handleSelect({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })}
-							>
-								{tag.value}
-							</button>
-						))
-					) : (
-						<div className={classes.noTagFoundText}>{t('Create.noTagsFound')}.</div>
-					)}
+					<SuggestionsList
+						suggestions={suggestions}
+						onSelect={handleSuggestionSelect}
+						loading={isFetching}
+					/>
 				</PopoverContent>
 			</Popover>
 		</div>
