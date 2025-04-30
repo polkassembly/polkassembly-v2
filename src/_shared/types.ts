@@ -506,6 +506,7 @@ export enum EVoteDecision {
 	AYE = 'aye',
 	NAY = 'nay',
 	SPLIT = 'split',
+	ABSTAIN = 'abstain',
 	SPLIT_ABSTAIN = 'splitAbstain'
 }
 

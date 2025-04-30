@@ -40,7 +40,7 @@ function VoteComments({ voteInfo }: { voteInfo: IVoteData }) {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<VoteDetailsButton userVoteType={voteInfo.decision} />
+				<VoteDetailsButton userVoteDecision={voteInfo.decision} />
 			</DialogTrigger>
 			<DialogContent className='max-h-[550px] max-w-2xl overflow-y-auto p-4'>
 				<DialogTitle>
