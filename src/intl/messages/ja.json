@@ -644,7 +644,7 @@
 		"descriptionRequired": "有効な説明を入力してください。",
 		"please": "お願いします",
 		"login": "ログイン",
-		"toCreate": "ディスカッションを作成するには"
+		"toCreate": "提案を作成するには"
 	},
 	"ProposalType": {
 		"discussion": "ディスカッション",

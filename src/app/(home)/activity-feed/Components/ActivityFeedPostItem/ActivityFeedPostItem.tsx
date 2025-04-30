@@ -231,7 +231,6 @@ function ActivityFeedPostItem({
 				>
 					<ReactionBar
 						postData={postData}
-						setIsDialogOpen={setIsDialogOpen}
 						isLiked={reactionState.isLiked}
 						isDisliked={reactionState.isDisliked}
 						showLikeGif={showLikeGif}

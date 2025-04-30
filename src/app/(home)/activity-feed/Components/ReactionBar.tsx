@@ -6,31 +6,15 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import { IoShareSocialOutline } from 'react-icons/io5';
 import { BsThreeDots } from 'react-icons/bs';
 import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
-import CommentIcon from '@assets/activityfeed/commentdark.svg';
 import { EReaction, IPostListing } from '@/_shared/types';
 import ReactionButton from './ReactionButton/ReactionButton';
 
-function ActionButton({ icon: Icon, text, onClick, className }: { icon: React.ReactNode; text?: string; onClick: () => void; className?: string }) {
-	return (
-		<button
-			type='button'
-			className={`flex cursor-pointer items-center text-bg_pink transition-all duration-300 hover:scale-110 ${className || ''}`}
-			onClick={onClick}
-		>
-			{Icon}
-			{text && <span>{text}</span>}
-		</button>
-	);
-}
-
 function ReactionBar({
 	postData,
-	setIsDialogOpen,
 	isLiked,
 	isDisliked,
 	showLikeGif,
@@ -40,8 +24,6 @@ function ReactionBar({
 	handleSubscribe
 }: {
 	postData: IPostListing;
-	setIsDialogOpen: (value: boolean) => void;
-
 	isLiked: boolean;
 	isDisliked: boolean;
 	showLikeGif: boolean;
@@ -75,14 +57,6 @@ function ReactionBar({
 	const handleLike = () => handleAuthenticatedAction(() => handleReaction(EReaction.like));
 	const handleDislike = () => handleAuthenticatedAction(() => handleReaction(EReaction.dislike));
 
-	const handleCommentClick = () => {
-		if (!user?.id) {
-			router.push('/login');
-		} else {
-			setIsDialogOpen(true);
-		}
-	};
-
 	return (
 		<div className='mb-1.5 flex items-center justify-between text-xs text-navbar_border'>
 			<div className='flex space-x-3 md:space-x-7'>
@@ -99,19 +73,16 @@ function ReactionBar({
 					onClick={handleDislike}
 				/>
 
-				<ActionButton
-					icon={
-						<Image
-							src={CommentIcon}
-							className='mr-2'
-							alt='Comment'
-							width={16}
-							height={16}
-						/>
-					}
-					text={t('ActivityFeed.PostItem.comment')}
-					onClick={handleCommentClick}
-				/>
+				{handleSubscribe && (
+					<button
+						type='button'
+						className='flex cursor-pointer items-center text-bg_pink transition-all duration-300 hover:scale-110'
+						onClick={() => handleAuthenticatedAction(handleSubscribe)}
+					>
+						{isCurrentlySubscribed ? <RiBookmarkFill className='mr-2 h-4 w-4 text-bg_pink' /> : <RiBookmarkLine className='mr-2 h-4 w-4 text-text_pink' />}
+						<span className='text-bg_pink'>{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
+					</button>
+				)}
 
 				<DropdownMenu>
 					<DropdownMenuTrigger
@@ -125,17 +96,6 @@ function ReactionBar({
 						align='start'
 						className='w-40 bg-bg_modal'
 					>
-						{handleSubscribe && (
-							<DropdownMenuItem
-								className='cursor-pointer'
-								onClick={() => handleAuthenticatedAction(handleSubscribe)}
-							>
-								{isCurrentlySubscribed ? <RiBookmarkFill className='mr-2 text-bg_pink' /> : <RiBookmarkLine className='mr-2 text-basic_text' />}
-								<span className={`${isCurrentlySubscribed ? 'text-bg_pink' : 'text-basic_text'}`}>
-									{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}
-								</span>
-							</DropdownMenuItem>
-						)}
 						<DropdownMenuItem
 							className='cursor-pointer'
 							onClick={handleShare}

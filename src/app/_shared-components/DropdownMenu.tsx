@@ -44,7 +44,7 @@ DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayNam
 const DropdownMenuTrigger = React.forwardRef<
 	React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
 	React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger> & { noArrow?: boolean; ArrowPosition?: 'right' | 'down' }
->(({ className, children, noArrow, ArrowPosition = 'right', ...props }, ref) => (
+>(({ className, children, noArrow, ArrowPosition = 'down', ...props }, ref) => (
 	<DropdownMenuPrimitive.Trigger
 		ref={ref}
 		className={cn('w-full cursor-pointer gap-x-2 rounded-lg border border-border_grey px-2 py-2 text-sm font-medium capitalize text-placeholder', className)}
@@ -52,7 +52,7 @@ const DropdownMenuTrigger = React.forwardRef<
 	>
 		<div className='flex w-full items-center justify-between gap-x-2'>
 			{children}
-			{!noArrow && ArrowPosition === 'right' ? <ChevronRight className='h-4 w-4' /> : ArrowPosition === 'down' ? <ChevronDown className='h-4 w-4' /> : null}
+			{!noArrow && ArrowPosition === 'right' ? <ChevronRight className='h-4 w-4' /> : !noArrow && ArrowPosition === 'down' ? <ChevronDown className='h-4 w-4' /> : null}
 		</div>
 	</DropdownMenuPrimitive.Trigger>
 ));
