@@ -23,6 +23,12 @@ function VoteComments({ voteInfo }: { voteInfo: IVoteData }) {
 
 	const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
 
+	const handleOpenChange = useCallback((open: boolean) => {
+		if (!open) {
+			setExpanded(false);
+		}
+	}, []);
+
 	const getConvictionText = (lockPeriod: number) => {
 		if (!lockPeriod || lockPeriod === 0) return '0.1x/d';
 		return `${lockPeriod}x`;
@@ -38,9 +44,12 @@ function VoteComments({ voteInfo }: { voteInfo: IVoteData }) {
 	};
 
 	return (
-		<Dialog>
+		<Dialog onOpenChange={handleOpenChange}>
 			<DialogTrigger asChild>
-				<VoteDetailsButton userVoteType={voteInfo.decision} />
+				<VoteDetailsButton
+					userVoteType={voteInfo.decision}
+					onClick={toggleExpanded}
+				/>
 			</DialogTrigger>
 			<DialogContent className='max-h-[550px] max-w-2xl overflow-y-auto p-4'>
 				<DialogTitle>

@@ -39,7 +39,6 @@ import {
 	ITrackDelegationDetails,
 	ISocialHandle,
 	IVoteHistoryData,
-	IVoteData,
 	ITreasuryStats,
 	IContentSummary,
 	IAddressRelations,
@@ -116,7 +115,6 @@ enum EApiRoute {
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
-	USER_COMMENT_VOTES = 'USER_COMMENT_VOTES',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
@@ -213,7 +211,6 @@ export class NextApiClientService {
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
-			case EApiRoute.USER_COMMENT_VOTES:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
 				break;
@@ -929,31 +926,6 @@ export class NextApiClientService {
 	static async judgementCall({ userAddress, identityHash }: { userAddress: string; identityHash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.JUDGEMENT_CALL });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { userAddress, identityHash } });
-	}
-
-	static async userCommentVotes({
-		userId,
-		page,
-		limit,
-		proposalType,
-		indexOrHash
-	}: {
-		userId: number;
-		page: number;
-		limit: number;
-		proposalType: EProposalType;
-		indexOrHash: string;
-	}) {
-		const queryParams = new URLSearchParams({
-			page: page.toString(),
-			limit: limit.toString()
-		});
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.USER_COMMENT_VOTES,
-			routeSegments: [proposalType, indexOrHash, 'votes', 'user', 'id', userId.toString()],
-			queryParams
-		});
-		return this.nextApiClientFetch<{ votes: IVoteData[]; totalCounts: number }>({ url, method });
 	}
 
 	static async fetchAddressRelations(address: string) {

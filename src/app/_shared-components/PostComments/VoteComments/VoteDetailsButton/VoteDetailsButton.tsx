@@ -10,6 +10,7 @@ import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import SplitImg from '@assets/icons/split-yellow-icon.svg';
 import SplitAbstainImg from '@assets/icons/abstainGray.svg';
 import { memo } from 'react';
+import { Button } from '@/app/_shared-components/Button';
 
 interface VoteDetailsButtonProps {
 	userVoteType: EVoteDecision | null;
@@ -18,75 +19,78 @@ interface VoteDetailsButtonProps {
 
 function VoteDetailsButton({ userVoteType, onClick }: VoteDetailsButtonProps) {
 	const t = useTranslations();
-	if (!userVoteType) return null;
-
 	const votedText = t('PostDetails.voted');
 
-	const voteTypeDisplay = () => {
-		switch (userVoteType) {
-			case EVoteDecision.AYE:
-				return (
-					<div className='flex items-center gap-x-1'>
-						<AiFillLike className='text-base text-success' />
-						<span className='font-medium text-success'>
-							{votedText} {t('PostDetails.aye')}
-						</span>
-					</div>
-				);
-			case EVoteDecision.NAY:
-				return (
-					<div className='flex items-center gap-x-1'>
-						<AiFillDislike className='text-base text-failure' />
-						<span className='font-medium text-failure'>
-							{votedText} {t('PostDetails.nay')}
-						</span>
-					</div>
-				);
-			case EVoteDecision.SPLIT:
-				return (
-					<div className='flex items-center gap-x-1'>
-						<Image
-							src={SplitImg}
-							alt='split'
-							width={16}
-							height={16}
-						/>
-						<span className='font-medium text-toast_warning_text'>
-							{votedText} {t('PostDetails.split')}
-						</span>
-					</div>
-				);
-			case EVoteDecision.SPLIT_ABSTAIN:
-				return (
-					<div className='flex items-center gap-x-1'>
-						<Image
-							src={SplitAbstainImg}
-							alt='split abstain'
-							width={16}
-							height={16}
-						/>
-						<span className='font-medium text-toast_warning_text'>
-							{votedText} {t('PostDetails.abstain')}
-						</span>
-					</div>
-				);
-			default:
-				return (
-					<span className='font-medium text-text_primary'>
-						{votedText} {userVoteType}
+	if (!userVoteType) return null;
+
+	let content;
+	switch (userVoteType) {
+		case EVoteDecision.AYE:
+			content = (
+				<div className='flex items-center gap-x-1'>
+					<AiFillLike className='text-base text-success' />
+					<span className='font-medium text-success hover:underline'>
+						{votedText} {t('PostDetails.aye')}
 					</span>
-				);
-		}
-	};
+				</div>
+			);
+			break;
+		case EVoteDecision.NAY:
+			content = (
+				<div className='flex items-center gap-x-1'>
+					<AiFillDislike className='text-base text-failure' />
+					<span className='font-medium text-failure hover:underline'>
+						{votedText} {t('PostDetails.nay')}
+					</span>
+				</div>
+			);
+			break;
+		case EVoteDecision.SPLIT:
+			content = (
+				<div className='flex items-center gap-x-1'>
+					<Image
+						src={SplitImg}
+						alt='split'
+						width={16}
+						height={16}
+					/>
+					<span className='font-medium text-toast_warning_text hover:underline'>
+						{votedText} {t('PostDetails.split')}
+					</span>
+				</div>
+			);
+			break;
+		case EVoteDecision.SPLIT_ABSTAIN:
+			content = (
+				<div className='flex items-center gap-x-1'>
+					<Image
+						src={SplitAbstainImg}
+						alt='split abstain'
+						width={16}
+						height={16}
+					/>
+					<span className='font-medium text-toast_warning_text hover:underline'>
+						{votedText} {t('PostDetails.abstain')}
+					</span>
+				</div>
+			);
+			break;
+		default:
+			content = (
+				<span className='font-medium text-text_primary hover:underline'>
+					{votedText} {userVoteType}
+				</span>
+			);
+	}
 
 	return (
-		<button
-			type='button'
+		<Button
+			variant='ghost'
 			onClick={onClick}
-			className='flex items-center gap-x-1 text-xs'
+			className='m-0 flex items-center gap-x-1 p-0 text-xs'
 		>
-			{voteTypeDisplay()}
-		</button>
+			{content}
+		</Button>
 	);
 }
 
