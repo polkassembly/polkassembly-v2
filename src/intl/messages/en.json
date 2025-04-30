@@ -501,6 +501,7 @@
 		"delegatedVotes": "Delegated Votes",
 		"delegatedVotingPower": "Delegated Voting Power",
 		"delegationList": "Delegation list",
+		"threshold": "Threshold",
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",

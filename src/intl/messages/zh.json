@@ -29,7 +29,6 @@
 		"loans": "贷款",
 		"address": "地址"
 	},
-
 	"ActivityFeed": {
 		"title": "动态信息",
 		"switchToOverview": "切换到概览",
@@ -487,7 +486,8 @@
 			"support": "支持",
 			"threshold": "阈值",
 			"votingData": "投票数据"
-		}
+		},
+		"threshold": "阈值"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",

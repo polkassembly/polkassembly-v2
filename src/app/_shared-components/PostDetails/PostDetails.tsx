@@ -29,6 +29,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const [post, setPost] = useState<IPost>(postData);
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
+	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
+
 	const onEditPostSuccess = (title: string, content: string) => {
 		setPost((prev) => ({ ...prev, title, content }));
 	};
@@ -123,6 +125,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
+								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
 							{postData?.onChainInfo?.origin && postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.Deciding) && (
 								<VoteCurvesData
@@ -131,6 +134,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									createdAt={postData?.createdAt}
 									trackName={postData?.onChainInfo?.origin}
 									timeline={postData?.onChainInfo?.timeline}
+									setThresholdValues={setThresholdValues}
+									thresholdValues={thresholdValues}
 								/>
 							)}
 						</div>
