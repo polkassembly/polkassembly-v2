@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { memo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { EVoteDecision } from '@/_shared/types';
@@ -9,7 +10,6 @@ import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import SplitImg from '@assets/icons/split-yellow-icon.svg';
 import SplitAbstainImg from '@assets/icons/abstainGray.svg';
-import { memo } from 'react';
 import { Button } from '@/app/_shared-components/Button';
 
 interface VoteDetailsButtonProps {
@@ -23,30 +23,29 @@ function VoteDetailsButton({ userVoteType, onClick }: VoteDetailsButtonProps) {
 
 	if (!userVoteType) return null;
 
-	let content;
-	switch (userVoteType) {
-		case EVoteDecision.AYE:
-			content = (
+	return (
+		<Button
+			variant='ghost'
+			onClick={onClick}
+			className='m-0 flex items-center gap-x-1 p-0 text-xs'
+		>
+			{userVoteType === EVoteDecision.AYE && (
 				<div className='flex items-center gap-x-1'>
 					<AiFillLike className='text-base text-success' />
 					<span className='font-medium text-success hover:underline'>
 						{votedText} {t('PostDetails.aye')}
 					</span>
 				</div>
-			);
-			break;
-		case EVoteDecision.NAY:
-			content = (
+			)}
+			{userVoteType === EVoteDecision.NAY && (
 				<div className='flex items-center gap-x-1'>
 					<AiFillDislike className='text-base text-failure' />
 					<span className='font-medium text-failure hover:underline'>
 						{votedText} {t('PostDetails.nay')}
 					</span>
 				</div>
-			);
-			break;
-		case EVoteDecision.SPLIT:
-			content = (
+			)}
+			{userVoteType === EVoteDecision.SPLIT && (
 				<div className='flex items-center gap-x-1'>
 					<Image
 						src={SplitImg}
@@ -58,10 +57,8 @@ function VoteDetailsButton({ userVoteType, onClick }: VoteDetailsButtonProps) {
 						{votedText} {t('PostDetails.split')}
 					</span>
 				</div>
-			);
-			break;
-		case EVoteDecision.SPLIT_ABSTAIN:
-			content = (
+			)}
+			{userVoteType === EVoteDecision.SPLIT_ABSTAIN && (
 				<div className='flex items-center gap-x-1'>
 					<Image
 						src={SplitAbstainImg}
@@ -73,23 +70,12 @@ function VoteDetailsButton({ userVoteType, onClick }: VoteDetailsButtonProps) {
 						{votedText} {t('PostDetails.abstain')}
 					</span>
 				</div>
-			);
-			break;
-		default:
-			content = (
+			)}
+			{![EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.SPLIT, EVoteDecision.SPLIT_ABSTAIN].includes(userVoteType) && (
 				<span className='font-medium text-text_primary hover:underline'>
 					{votedText} {userVoteType}
 				</span>
-			);
-	}
-
-	return (
-		<Button
-			variant='ghost'
-			onClick={onClick}
-			className='m-0 flex items-center gap-x-1 p-0 text-xs'
-		>
-			{content}
+			)}
 		</Button>
 	);
 }
