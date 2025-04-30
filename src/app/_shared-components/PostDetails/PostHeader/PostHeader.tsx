@@ -51,6 +51,8 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
+	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
+
 	return (
 		<div className='mx-auto max-w-7xl'>
 			<div className='mb-4'>
@@ -109,7 +111,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 								/>
 							</>
 						) : null}
-						{postData?.createdAt && <CreatedAtTime createdAt={postData.createdAt} />}
+						{createdAt && <CreatedAtTime createdAt={createdAt} />}
 						{postData.tags && postData.tags.length > 0 && (
 							<>
 								<Separator

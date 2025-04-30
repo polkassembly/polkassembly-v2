@@ -3,17 +3,18 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ESocial, IOnChainIdentity, IUserSocialDetails } from '@/_shared/types';
-import { IoMdMail } from 'react-icons/io';
-import { FaTwitter, FaTelegramPlane } from 'react-icons/fa';
-import { FaDiscord } from 'react-icons/fa6';
-import { SiElement } from 'react-icons/si';
+import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
+import RiotIcon from '@assets/icons/riot_icon.svg';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: IoMdMail,
 	[ESocial.TWITTER]: FaTwitter,
 	[ESocial.TELEGRAM]: FaTelegramPlane,
 	[ESocial.DISCORD]: FaDiscord,
-	[ESocial.RIOT]: SiElement
+	[ESocial.RIOT]: RiotIcon
 };
 
 function SocialLinks({ socialLinks = [], identity }: { socialLinks?: IUserSocialDetails[]; identity?: IOnChainIdentity }) {

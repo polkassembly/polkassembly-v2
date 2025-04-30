@@ -13,8 +13,8 @@ import SecondPlaceDark from '@assets/leaderboard/SecondPlaceDark.svg';
 import { useSidebar } from '@ui/Sidebar/Sidebar';
 import ThirdPlaceDark from '@assets/leaderboard/ThirdPlaceDark.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
-import { IoPersonAdd } from 'react-icons/io5';
-import { HiMiniCurrencyDollar } from 'react-icons/hi2';
+import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
+import { AiFillDollarCircle } from '@react-icons/all-files/ai/AiFillDollarCircle';
 import Link from 'next/link';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
@@ -59,9 +59,9 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 				/>
 
 				{/* Content overlay with flex layout to separate top and bottom content */}
-				<div className='absolute left-0 top-0 flex h-full w-full flex-col justify-between pb-5'>
+				<div className='absolute left-0 top-0 flex h-full w-full flex-col justify-between px-1 pb-5 sm:px-0'>
 					{/* Top Section - Rank and Score */}
-					<div className={`${state === 'collapsed' ? 'pt-0 xl:pt-2 2xl:pt-1' : 'pt-0 xl:pt-3 2xl:pt-1'} flex flex-col items-center`}>
+					<div className={`${state === 'collapsed' ? 'pt-2 xl:pt-2 2xl:pt-1' : 'pt-1.5 xl:pt-3 2xl:pt-1'} flex flex-col items-center`}>
 						<p className={`${styles.rankCardText} text-xs sm:text-sm`}>
 							{t('Profile.rank')} 0{place}
 						</p>
@@ -95,7 +95,7 @@ function RankCard({ place, className, item }: { place: number; className?: strin
 							</Link>
 							<div className='flex items-center gap-x-1 sm:gap-x-2'>
 								<IoPersonAdd className='text-base text-text_primary sm:text-lg' />
-								<HiMiniCurrencyDollar className='text-xl text-text_primary sm:text-2xl' />
+								<AiFillDollarCircle className='text-xl text-text_primary sm:text-2xl' />
 							</div>
 						</span>
 

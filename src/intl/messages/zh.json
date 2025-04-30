@@ -2,6 +2,34 @@
 	"HomePage": {
 		"title": "欢迎来到主页"
 	},
+	"TreasuryStats": {
+		"tooltip": "通过部分区块生产奖励、交易费用、罚款、staking效率等收集的资金。",
+		"treasury": "国库",
+		"price": "价格",
+		"total": "总计",
+		"treasuryDistribution": "国库分配",
+		"details": "详情",
+		"spendPeriodRemaining": "支出期剩余",
+		"nextBurn": "下次燃烧",
+		"days": "天",
+		"hours": "小时",
+		"minutes": "分钟",
+		"seconds": "秒",
+		"spendPeriodTooltip": "国库请求的资金在支出期结束时定期分配。",
+		"nextBurnTooltip": "如果国库在支出期结束时没有花费所有资金，它会遭受一定比例资金的损失。",
+		"viewDetails": "查看详情",
+		"tokenPrice": "代币价格",
+		"salary": "工资",
+		"relayChain": "中继链",
+		"assetHub": "资产中心",
+		"fellowship": "研究员",
+		"hydration": "水合作用",
+		"bounties": "赏金",
+		"ambassador": "大使",
+		"loans": "贷款",
+		"address": "地址"
+	},
+
 	"ActivityFeed": {
 		"title": "动态信息",
 		"switchToOverview": "切换到概览",
@@ -453,7 +481,13 @@
 		"delegators": "委托者",
 		"delegatedVotes": "委托投票",
 		"delegatedVotingPower": "委托投票权重",
-		"delegationList": "委托列表"
+		"delegationList": "委托列表",
+		"VoteCurves": {
+			"approval": "批准",
+			"support": "支持",
+			"threshold": "阈值",
+			"votingData": "投票数据"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",

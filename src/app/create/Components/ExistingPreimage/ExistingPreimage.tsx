@@ -22,6 +22,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import Link from 'next/link';
 import { SquareArrowOutUpRight } from 'lucide-react';
+import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
 function ExistingPreimage() {
 	const t = useTranslations();
@@ -112,7 +113,10 @@ function ExistingPreimage() {
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-				<SwitchWalletOrAddress />
+				<SwitchWalletOrAddress
+					small
+					customAddressSelector={<AddressRelationsPicker withBalance />}
+				/>
 				<div className='flex flex-col gap-y-1'>
 					<p className='flex items-center justify-between text-sm text-wallet_btn_text'>
 						{t('CreateProposal.preimageHash')}

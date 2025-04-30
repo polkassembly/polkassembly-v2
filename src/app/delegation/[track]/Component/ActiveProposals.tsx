@@ -9,11 +9,11 @@ import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { FaRegClock } from 'react-icons/fa';
+import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { Separator } from '@/app/_shared-components/Separator';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { useTranslations } from 'next-intl';
-import { IoIosInformationCircleOutline } from 'react-icons/io';
+import { IoIosInformationCircleOutline } from '@react-icons/all-files/io/IoIosInformationCircleOutline';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import styles from './DelegationTrack/DelegationTrack.module.scss';
 

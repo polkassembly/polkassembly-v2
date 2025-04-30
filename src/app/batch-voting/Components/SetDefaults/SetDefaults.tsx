@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EConvictionAmount, EVoteDecision } from '@/_shared/types';
+import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { Button } from '@/app/_shared-components/Button';
 import ChooseVote from '@/app/_shared-components/PostDetails/VoteReferendum/ChooseVote/ChooseVote';
@@ -41,6 +42,7 @@ function SetDefaults({
 				<SwitchWalletOrAddress
 					small
 					withBalance
+					customAddressSelector={<AddressRelationsPicker withBalance />}
 				/>
 
 				<div className='w-full'>

@@ -3,14 +3,15 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Suspense } from 'react';
-import { IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
+import TreasuryStats from '@/app/_shared-components/TreasuryStats/TreasuryStats';
 import styles from './Overview.module.scss';
 import LatestActivity from './LatestActivity/LatestActivity';
 import AboutSection from './AboutSection/AboutSection';
 import OverviewHeading from './OverviewHeading';
 
-function Overview({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> }) {
+function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData: ITreasuryStats[] }) {
 	return (
 		<div className={styles.overview_container}>
 			<OverviewHeading />
@@ -18,6 +19,11 @@ function Overview({ allTracksData }: { allTracksData: IGenericListingResponse<IP
 			{/* About Section */}
 			<div className='rounded-lg border-none bg-bg_modal p-4 shadow-lg'>
 				<AboutSection />
+			</div>
+
+			{/* Treasury Stats */}
+			<div>
+				<TreasuryStats data={treasuryStatsData} />
 			</div>
 
 			{/* Latest Activity */}

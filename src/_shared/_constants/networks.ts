@@ -4,12 +4,23 @@
 
 import { BN } from '@polkadot/util';
 import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
-import { FaDiscord, FaTelegramPlane, FaTwitter, FaYoutube } from 'react-icons/fa';
-import { TbBrandGithubFilled } from 'react-icons/tb';
-import { TiHome } from 'react-icons/ti';
-import { PiRedditLogoFill } from 'react-icons/pi';
-import { RiBox3Line } from 'react-icons/ri';
-import { IconType } from 'react-icons/lib';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
+import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
+import { SiGithub } from '@react-icons/all-files/si/SiGithub';
+import { TiHome } from '@react-icons/all-files/ti/TiHome';
+import { GrReddit } from '@react-icons/all-files/gr/GrReddit';
+import { BiCube } from '@react-icons/all-files/bi/BiCube';
+import { IconType } from '@react-icons/all-files/lib';
+import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
+import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
+import { StaticImageData } from 'next/image';
+import USDCIcon from '@/_assets/icons/usdc.svg';
+import USDTIcon from '@/_assets/icons/usdt.svg';
+import MYTHIcon from '@/_assets/icons/myth.svg';
+import DEDIcon from '@/_assets/icons/ded.png';
 
 interface ISocialLink {
 	id: string;
@@ -31,6 +42,7 @@ interface ITreasuryAsset {
 	name: string;
 	tokenDecimal: number;
 	symbol: string;
+	icon: StaticImageData;
 }
 
 interface INetworkTreasuryAssets extends ITreasuryAsset {
@@ -93,6 +105,7 @@ interface IAssethubDetails {
 
 interface INetworkDetails {
 	key: ENetwork;
+	logo: StaticImageData;
 	preimageBaseDeposit?: BN;
 	submissionDeposit?: BN;
 	name: string;
@@ -126,10 +139,10 @@ enum ENetworkSocial {
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
-	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED' },
-	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT' },
-	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC' },
-	[EAssets.MYTH]: { name: 'mythos', tokenDecimal: 18, symbol: 'MYTH' }
+	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED', icon: DEDIcon },
+	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT', icon: USDTIcon },
+	[EAssets.USDC]: { name: 'usdc', tokenDecimal: 6, symbol: 'USDC', icon: USDCIcon },
+	[EAssets.MYTH]: { name: 'mythos', tokenDecimal: 18, symbol: 'MYTH', icon: MYTHIcon }
 } as const;
 
 const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
@@ -1497,13 +1510,13 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 
 const SocialIcons = {
 	Discord: FaDiscord,
-	Github: TbBrandGithubFilled,
+	Github: SiGithub,
 	Home: TiHome,
-	Reddit: PiRedditLogoFill,
+	Reddit: GrReddit,
 	Telegram: FaTelegramPlane,
 	Twitter: FaTwitter,
 	Youtube: FaYoutube,
-	Subscan: RiBox3Line
+	Subscan: BiCube
 } as const;
 
 const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
@@ -1577,6 +1590,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
+		logo: PolkadotLogo,
 		preimageBaseDeposit: new BN('400000000000'),
 		submissionDeposit: new BN('10000000000'),
 		name: 'Polkadot',
@@ -1653,6 +1667,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
+		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
 		govtype: EGovType.OPENGOV,
 		parachain: '1000',
@@ -1707,6 +1722,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.WESTEND]: {
 		key: ENetwork.WESTEND,
+		logo: WestendLogo,
 		submissionDeposit: new BN('30000000000'),
 		name: 'Westend',
 		govtype: EGovType.OPENGOV,

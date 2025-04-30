@@ -4,7 +4,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EPostOrigin } from '@shared/types';
-import { getBlocksPerDay } from './getBlocksPerDay';
+import { BlockCalculationsService } from '../_client-services/block_calculations_service';
 
 interface TrackPeriodOutput {
 	prepareDays?: number;
@@ -21,7 +21,7 @@ export function getTrackDays(trackName: EPostOrigin): TrackPeriodOutput {
 		return {};
 	}
 
-	const toDays = (blocks: number) => blocks / getBlocksPerDay(network);
+	const toDays = (blocks: number) => blocks / BlockCalculationsService.getBlocksPerDay(network);
 
 	return {
 		prepareDays: toDays(track.preparePeriod),

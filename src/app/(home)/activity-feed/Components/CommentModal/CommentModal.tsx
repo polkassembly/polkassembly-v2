@@ -13,7 +13,7 @@ import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { EProposalType, IPostListing } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import Address from '@ui/Profile/Address/Address';
-import { FaRegClock } from 'react-icons/fa';
+import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { Button } from '@ui/Button';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';

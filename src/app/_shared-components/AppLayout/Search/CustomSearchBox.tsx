@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Input } from '@ui/Input';
-import { IoIosSearch } from 'react-icons/io';
+import { IoIosSearch } from '@react-icons/all-files/io/IoIosSearch';
 import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch';
 import { KeyboardEvent, useRef, useCallback, memo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';

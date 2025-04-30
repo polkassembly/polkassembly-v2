@@ -36,6 +36,7 @@ export const THEME_COLORS = {
 		sidebar_text: '#666666',
 		sidebar_menu_text: '#ff0080',
 		sidebar_menu_bg: '#FDE7F0',
+		sidebar_menu_hover: '#FDE7F0',
 		sidebar_menu_active: '#FFF2F9',
 		sidebar_menu_active_text: '#E5007A',
 		create_proposal_btn_create: '#0A3EAF',
@@ -155,7 +156,8 @@ export const THEME_COLORS = {
 		non_transferrable_text: '#317A06',
 		proxy_type_bg: '#f0f4ec',
 		proxy_type_text: '#317A06',
-		bg_light_pink: '#fef0f7'
+		bg_light_pink: '#fef0f7',
+		progress_pink_indicator: '#ededed'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -174,6 +176,7 @@ export const THEME_COLORS = {
 		btn_secondary_text: '#FFFFFF',
 		border_grey: '#3F3F46',
 		sidebar_menu_bg: '#FDE7F0',
+		sidebar_menu_hover: '#E5007A',
 		sidebar_menu_active_text: '#FF45A8',
 		sidebar_menu_active: '#540E33',
 		dark_auction_bg: '#302234',
@@ -307,6 +310,7 @@ export const THEME_COLORS = {
 		non_transferrable_text: '#317A06',
 		proxy_type_bg: '#f0f4ec',
 		proxy_type_text: '#317A06',
-		bg_light_pink: '#fef0f7'
+		bg_light_pink: '#fef0f7',
+		progress_pink_indicator: '#343744'
 	}
 };

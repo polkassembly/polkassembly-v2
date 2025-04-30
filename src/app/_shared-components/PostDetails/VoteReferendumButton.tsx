@@ -18,34 +18,19 @@ interface VoteReferendumButtonProps {
 	index: string;
 	btnClassName?: string;
 	iconClassName?: string;
+	size?: 'sm' | 'lg';
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg' }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	return !user ? (
 		<Link href='/login'>
 			<Button
 				className={cn('w-full', btnClassName)}
-				size='lg'
+				size={size}
 			>
-				<Image
-					src={VoteIcon}
-					alt='Vote Icon'
-					width={20}
-					height={20}
-					className={iconClassName}
-				/>
-				{t('PostDetails.loginToVote')}
-			</Button>
-		</Link>
-	) : (
-		<Dialog>
-			<DialogTrigger asChild>
-				<Button
-					className={cn('w-full', btnClassName)}
-					size='lg'
-				>
+				<div className='flex items-center gap-1.5'>
 					<Image
 						src={VoteIcon}
 						alt='Vote Icon'
@@ -53,7 +38,27 @@ function VoteReferendumButton({ index, btnClassName, iconClassName }: VoteRefere
 						height={20}
 						className={iconClassName}
 					/>
-					{t('PostDetails.castVote')}
+					<span>{t('PostDetails.loginToVote')}</span>
+				</div>
+			</Button>
+		</Link>
+	) : (
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button
+					className={cn('w-full', btnClassName)}
+					size={size}
+				>
+					<div className='flex items-center gap-1'>
+						<Image
+							src={VoteIcon}
+							alt='Vote Icon'
+							width={20}
+							height={20}
+							className={iconClassName}
+						/>
+						{t('PostDetails.castVote')}
+					</div>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>

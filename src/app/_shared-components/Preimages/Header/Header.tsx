@@ -6,7 +6,7 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { MdOutlineSearch } from 'react-icons/md';
+import { MdSearch } from '@react-icons/all-files/md/MdSearch';
 import { useTranslations } from 'next-intl';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
@@ -42,7 +42,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 						onChange={(e) => setInputValue(e.target.value)}
 						placeholder={t('Preimages.searchByHash')}
 					/>
-					<MdOutlineSearch
+					<MdSearch
 						onClick={() => {
 							if (pathname === preImagePath) {
 								router.push(`${preImagePath}/${inputValue}`);

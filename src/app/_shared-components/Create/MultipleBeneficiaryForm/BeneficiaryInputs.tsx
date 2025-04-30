@@ -9,10 +9,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { IBeneficiaryInput } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@shared/_utils/dayjsInit';
-import { getBlocksPerDay } from '@/app/_client-utils/getBlocksPerDay';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import AddressInput from '../../AddressInput/AddressInput';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import { Button } from '../../Button';
@@ -64,13 +64,11 @@ function BeneficiaryInputs({
 	}, [apiService]);
 
 	useEffect(() => {
-		if (!payoutDate) return;
+		if (!payoutDate || !blockHeight) return;
 
-		const blocksPerDay = getBlocksPerDay(network);
-		const diffInBlocks = dayjs(payoutDate).diff(dayjs(), 'day') * blocksPerDay;
-		const blocks = blockHeight ? blockHeight.add(new BN(diffInBlocks || 100)) : undefined;
-		onValidFromChange({ validFrom: blocks, isInvalid: !blocks });
-		setValidFrom(blocks);
+		const blocksFromPayoutDate = BlockCalculationsService.getBlockHeightForDateTime({ network, time: payoutDate, currentBlockHeight: blockHeight });
+		onValidFromChange({ validFrom: blocksFromPayoutDate, isInvalid: !blocksFromPayoutDate });
+		setValidFrom(blocksFromPayoutDate);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [payoutDate, blockHeight, network]);
 
@@ -147,7 +145,7 @@ function BeneficiaryInputs({
 					onChange={(value) => onBeneficiaryChange({ beneficiary: value })}
 				/>
 				<div className='relative flex w-full items-start gap-x-2 pl-12'>
-					<div className='absolute left-0 left-4 top-0 h-[23px] w-8 rounded-bl-lg border-b-2 border-l-2 border-dashed border-border_grey'>
+					<div className='absolute left-4 top-0 h-[23px] w-8 rounded-bl-lg border-b-2 border-l-2 border-dashed border-border_grey'>
 						<div className='absolute -bottom-1.5 -right-1.5 z-20 h-3 w-3 rounded-full bg-border_grey' />
 					</div>
 					<div className={stagedPayment ? 'w-1/2' : 'w-full'}>
