@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { FaUser } from 'react-icons/fa';
+import { FaUser } from '@react-icons/all-files/fa/FaUser';
 import PALOGO from '@assets/delegation/pa-logo-small-delegate.svg';
 import ParityLogo from '@assets/delegation/polkadot-logo.svg';
 import NovaLogo from '@assets/delegation/nova-wallet.svg';

@@ -11,6 +11,7 @@ import { CookieService } from '@/_shared/_services/cookie_service';
 import { z } from 'zod';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import ActivityFeed from './Components/ActivityFeed';
 
 const zodParamsSchema = z.object({
@@ -27,6 +28,11 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 			? await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id })
 			: await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
 
+	const { data: treasuryStatsData, error: treasuryStatsError } = await NextApiClientService.getTreasuryStats({
+		from: dayjs().subtract(1, 'hour').toDate(),
+		to: dayjs().toDate()
+	});
+
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
@@ -36,6 +42,7 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 			<ActivityFeed
 				initialData={data}
 				activeTab={tab}
+				treasuryStatsData={treasuryStatsError ? [] : treasuryStatsData || []}
 			/>
 		</Suspense>
 	);

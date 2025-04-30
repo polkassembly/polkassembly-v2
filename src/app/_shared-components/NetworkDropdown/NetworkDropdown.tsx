@@ -5,6 +5,11 @@
 'use client';
 
 import { ChangeEvent, RefObject, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import Image, { StaticImageData } from 'next/image';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import AstarLogo from '@assets/parachain-logos/astar-logo.png';
 import AcalaLogo from '@assets/parachain-logos/acala-logo.jpg';
@@ -60,22 +65,27 @@ import PhykenLogo from '@assets/parachain-logos/phyken-logo.png';
 import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import XXLogo from '@assets/parachain-logos/xxcoin-logo.png';
 import MandalaLogo from '@assets/parachain-logos/mandala-logo.png';
-import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import Image, { StaticImageData } from 'next/image';
-import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
-import RenderNetworkSection from './RenderNetworkSection';
-import styles from './NetworkDropdown.module.scss';
 import NetworkInput from './NetworkInput';
+import styles from './NetworkDropdown.module.scss';
+import RenderNetworkSection from './RenderNetworkSection';
+import { Select, SelectContent, SelectTrigger, SelectValue } from '../Select/Select';
 
-interface NetworkDataType {
-	[key: string]: {
+interface INetworkDisplayData {
+	polkadot: {
+		[key: string]: StaticImageData;
+	};
+	kusama: {
+		[key: string]: StaticImageData;
+	};
+	soloChains: {
+		[key: string]: StaticImageData;
+	};
+	testChains: {
 		[key: string]: StaticImageData;
 	};
 }
 
-const networkData: NetworkDataType = {
+const NETWORKS_DISPLAY_DATA: INetworkDisplayData = {
 	polkadot: {
 		Polkadot: PolkadotLogo,
 		Astar: AstarLogo,
@@ -152,20 +162,9 @@ const networkData: NetworkDataType = {
 const getNetworkDisplayName = (networkKey: string): string => {
 	const lowerNetworkKey = networkKey.toLowerCase();
 	return (
-		Object.values(networkData)
+		Object.values(NETWORKS_DISPLAY_DATA)
 			.flatMap((category) => Object.keys(category))
 			.find((key) => key.toLowerCase() === lowerNetworkKey) || networkKey
-	);
-};
-
-const defaultLogo = WestendLogo;
-
-const getNetworkLogo = (networkKey: string): StaticImageData => {
-	const lowerNetworkKey = networkKey.toLowerCase();
-	return (
-		Object.values(networkData)
-			.flatMap((category) => Object.entries(category))
-			.find(([key]) => key.toLowerCase() === lowerNetworkKey)?.[1] || defaultLogo
 	);
 };
 
@@ -201,7 +200,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 					<div className={styles.selectValueContainer}>
 						<div className={styles.selectValue}>
 							<Image
-								src={getNetworkLogo(network) || WestendLogo}
+								src={NETWORKS_DETAILS[`${network}`].logo}
 								alt={getNetworkDisplayName(network)}
 								width={24}
 								height={24}
@@ -219,7 +218,7 @@ function NetworkDropdown({ className }: { className?: string }) {
 					handleSearchChange={handleSearchChange}
 				/>
 				<div className='overflow-y-auto p-2'>
-					{Object.entries(networkData).map(([category, networks]) => (
+					{Object.entries(NETWORKS_DISPLAY_DATA).map(([category, networks]) => (
 						<RenderNetworkSection
 							key={category}
 							title={categoryDisplayNames[category as keyof typeof categoryDisplayNames] || category}

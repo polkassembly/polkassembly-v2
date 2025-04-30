@@ -5,7 +5,7 @@
 import { Dialog, DialogTrigger, DialogContent, DialogFooter, DialogTitle, DialogHeader } from '@ui/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import AddressInput from '@/app/_shared-components/AddressInput/AddressInput';
-import { IoPersonRemove } from 'react-icons/io5';
+import { IoPersonRemove } from '@react-icons/all-files/io5/IoPersonRemove';
 import { Label } from '@/app/_shared-components/Label';
 import { Separator } from '@/app/_shared-components/Separator';
 import { useUser } from '@/hooks/useUser';

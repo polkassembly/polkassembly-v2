@@ -19,6 +19,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
+import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
 function CreateBounty() {
 	const t = useTranslations();
@@ -135,7 +136,10 @@ function CreateBounty() {
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
-				<SwitchWalletOrAddress />
+				<SwitchWalletOrAddress
+					small
+					customAddressSelector={<AddressRelationsPicker withBalance />}
+				/>
 				<BalanceInput
 					defaultValue={bountyAmount}
 					onChange={({ value }) => setBountyAmount(value)}

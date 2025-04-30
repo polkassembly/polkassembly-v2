@@ -23,6 +23,7 @@ import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
+import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
@@ -85,8 +86,15 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							</TabsContent>
 						</div>
+						<div className={classes.commentsBox}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+							/>
+						</div>
 						{isModalOpen && !isOffchainPost && (
-							<div className='pt-5'>
+							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
 									<VoteReferendumButton
 										iconClassName='hidden'
@@ -95,13 +103,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-							/>
-						</div>
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
@@ -123,6 +124,15 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								index={index}
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 							/>
+							{postData?.onChainInfo?.origin && postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.Deciding) && (
+								<VoteCurvesData
+									proposalType={post.proposalType}
+									index={index}
+									createdAt={postData?.createdAt}
+									trackName={postData?.onChainInfo?.origin}
+									timeline={postData?.onChainInfo?.timeline}
+								/>
+							)}
 						</div>
 					)}
 					{post.proposalType === EProposalType.BOUNTY && (

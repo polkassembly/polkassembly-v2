@@ -13,8 +13,8 @@ import { ELocales } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { FaBars } from 'react-icons/fa';
-import { IoMdClose } from 'react-icons/io';
+import { FaBars } from '@react-icons/all-files/fa/FaBars';
+import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
 import Image from 'next/image';
@@ -98,17 +98,20 @@ function Navbar() {
 							alt='translate'
 							width={24}
 							height={24}
+							className={classes.translateIcon}
 						/>
-						<span className='absolute -bottom-1 -left-1 z-50 rounded-md bg-bg_pink px-1 text-[8px] font-extrabold uppercase leading-3 text-white'>{userPreferences.locale}</span>
+						<span className={classes.translateIconLocale}>{userPreferences.locale}</span>
 					</SelectTrigger>
-					<SelectContent className='border-border_grey'>
+					<SelectContent className='w-20 border-border_grey'>
 						{Object.entries(LANGUAGES).map(([locale, label]) => (
 							<SelectItem
 								key={locale}
 								value={locale}
-								className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
 							>
-								{label}
+								<div className={classes.languageItem}>
+									<span>{label}</span>
+									<span className={classes.localeText}>{locale}</span>
+								</div>
 							</SelectItem>
 						))}
 					</SelectContent>
@@ -134,7 +137,7 @@ function Navbar() {
 								)}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
-								<DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Link
 										className='w-full'
 										href={`/user/id/${user.id}`}
@@ -142,7 +145,7 @@ function Navbar() {
 										{t('Profile.profile')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Link
 										className='w-full'
 										href='/set-identity'
@@ -150,7 +153,7 @@ function Navbar() {
 										{t('SetIdentity.setIdentity')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Button
 										variant='ghost'
 										className='flex w-full justify-start p-0 text-sm'
@@ -212,9 +215,12 @@ function Navbar() {
 										<SelectItem
 											key={locale}
 											value={locale}
-											className='cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+											className={classes.languageItem}
 										>
-											{label}
+											<div className='flex w-full items-center gap-2'>
+												<span className={classes.languageText}>{label}</span>
+												<span className={classes.languageCode}>{locale}</span>
+											</div>
 										</SelectItem>
 									))}
 								</SelectContent>

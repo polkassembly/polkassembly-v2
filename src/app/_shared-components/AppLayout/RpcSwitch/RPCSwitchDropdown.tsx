@@ -5,7 +5,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MdOutlineSignalCellularAlt } from 'react-icons/md';
+import { AiFillSignal } from '@react-icons/all-files/ai/AiFillSignal';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -48,14 +48,14 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 					disabled={isLoading}
 					noArrow
 				>
-					{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <MdOutlineSignalCellularAlt className='text-xl text-bg_pink' />}
+					{isLoading ? <Loader2 className='animate-spin text-xl text-bg_pink' /> : <AiFillSignal className='text-xl text-bg_pink' />}
 					<span className='block text-xs font-semibold text-text_primary md:hidden'>{currentEndpoint.name}</span>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className='w-96 border-border_grey sm:w-60'>
+				<DropdownMenuContent className='w-96 border-border_grey sm:w-52'>
 					{rpcEndpoints.map((endpoint, index) => (
 						<DropdownMenuItem
 							key={endpoint?.url}
-							className={`cursor-pointer ${currentEndpoint.name === endpoint.name ? 'bg-sidebar_menu_bg text-bg_pink' : ''}`}
+							className={`cursor-pointer hover:bg-sidebar_menu_hover ${currentEndpoint.name === endpoint.name ? 'bg-sidebar_menu_bg text-bg_pink' : ''}`}
 							onClick={() => handleRpcSwitch(index)}
 							disabled={isLoading}
 						>

@@ -5,7 +5,8 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { EVoteDecision } from '@/_shared/types';
-import { AiFillLike, AiFillDislike } from 'react-icons/ai';
+import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
+import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import SplitImg from '@assets/icons/split-yellow-icon.svg';
 import SplitAbstainImg from '@assets/icons/abstainGray.svg';
 import { memo } from 'react';

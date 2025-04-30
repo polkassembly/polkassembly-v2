@@ -2,9 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { MdPlayCircleFilled } from 'react-icons/md';
-import { SlScreenDesktop } from 'react-icons/sl';
-import { FaRegFileAlt } from 'react-icons/fa';
+import { MdPlayCircleFilled } from '@react-icons/all-files/md/MdPlayCircleFilled';
+import { IoIosDesktop } from '@react-icons/all-files/io/IoIosDesktop';
+import { FaRegFileAlt } from '@react-icons/all-files/fa/FaRegFileAlt';
 import Image from 'next/image';
 import GavinKeynote from '@assets/gallery/gavin-keynote.png';
 import Gov2InfoBg2 from '@assets/gallery/gov2-info-bg-2.png';
@@ -24,7 +24,7 @@ const GalleryData = [
 		id: 2,
 		bgImage: Gov2InfoBg2,
 		className: 'mr-12 lg:mr-9',
-		icon: <SlScreenDesktop className='text-xl text-white' />,
+		icon: <IoIosDesktop className='text-xl text-white' />,
 		link: 'https://medium.com/polkadot-network/gov2-polkadots-next-generation-of-decentralised-governance-4d9ef657d11b',
 		subText: '17 min read',
 		text: "Gavin's blog on Medium"

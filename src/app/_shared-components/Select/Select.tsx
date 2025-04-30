@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import styles from './Select.module.scss';
 
@@ -93,12 +93,7 @@ const SelectItem = React.forwardRef<React.ElementRef<typeof SelectPrimitive.Item
 			className={cn(styles.item, className)}
 			{...props}
 		>
-			<span className={styles.itemIndicator}>
-				<SelectPrimitive.ItemIndicator>
-					<Check className='h-4 w-4' />
-				</SelectPrimitive.ItemIndicator>
-			</span>
-			<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+			<SelectPrimitive.ItemText className={styles.itemText}>{children}</SelectPrimitive.ItemText>
 		</SelectPrimitive.Item>
 	)
 );

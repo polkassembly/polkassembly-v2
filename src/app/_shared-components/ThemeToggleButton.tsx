@@ -3,8 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React from 'react';
-import { FiMoon } from 'react-icons/fi';
-import { IoSunnyOutline } from 'react-icons/io5';
+import { FiMoon } from '@react-icons/all-files/fi/FiMoon';
+import { IoSunnyOutline } from '@react-icons/all-files/io5/IoSunnyOutline';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTranslations } from 'next-intl';

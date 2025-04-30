@@ -9,17 +9,19 @@ import { ENetwork, EProposalStatus, EProposalType, EVoteDecision, IOnChainPostIn
 import { hexToString } from '@polkadot/util';
 
 export class SubsquareOnChainService {
+	private static GetBaseUrl = (network: ENetwork) => `https://${network}-api.subsquare.io`;
+
 	private static postDetailsUrlMap = {
-		[EProposalType.BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/bounties/${id}`,
-		[EProposalType.CHILD_BOUNTY]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/child-bounties/${id}`,
-		[EProposalType.COUNCIL_MOTION]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/motions/${id}`,
-		[EProposalType.DEMOCRACY_PROPOSAL]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/democracy/proposals/${id}`,
-		[EProposalType.FELLOWSHIP_REFERENDUM]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/fellowship/referenda/${id}`,
-		[EProposalType.REFERENDUM]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/democracy/referendums/${id}`,
-		[EProposalType.REFERENDUM_V2]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/gov2/referendums/${id}`,
-		[EProposalType.TECH_COMMITTEE_PROPOSAL]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/tech-comm/motions/${id}`,
-		[EProposalType.TIP]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/tips/${id}`,
-		[EProposalType.TREASURY_PROPOSAL]: (id: string, network: ENetwork) => `https://${network}.subsquare.io/api/treasury/proposals/${id}`
+		[EProposalType.BOUNTY]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/bounties/${id}`,
+		[EProposalType.CHILD_BOUNTY]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/child-bounties/${id}`,
+		[EProposalType.COUNCIL_MOTION]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/motions/${id}`,
+		[EProposalType.DEMOCRACY_PROPOSAL]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/democracy/proposals/${id}`,
+		[EProposalType.FELLOWSHIP_REFERENDUM]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/fellowship/referenda/${id}`,
+		[EProposalType.REFERENDUM]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/democracy/referendums/${id}`,
+		[EProposalType.REFERENDUM_V2]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/gov2/referendums/${id}`,
+		[EProposalType.TECH_COMMITTEE_PROPOSAL]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/tech-comm/motions/${id}`,
+		[EProposalType.TIP]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/tips/${id}`,
+		[EProposalType.TREASURY_PROPOSAL]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/proposals/${id}`
 	};
 
 	static async GetOnChainPostInfo({
