@@ -115,7 +115,7 @@ export const W3F_DELEGATES: IDelegate[] = [
 	},
 	{
 		address: '15ubZj6T7NUYyQw6j4XBkEMJ2vew5w9kqKEcN1QG7Z1weKDV',
-		image: 'https://i.ibb.co/7NYxpxWs/mdx-Editor-khushy1234-k-1745921355318.jpg',
+		image: 'https://i.ibb.co/G4bzZ0pN/permanence-Dao.jpg',
 		name: 'PERMANENCE DAO/HQ',
 		network: ENetwork.POLKADOT,
 		sources: [EDelegateSource.W3F],
