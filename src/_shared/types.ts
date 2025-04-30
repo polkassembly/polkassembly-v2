@@ -1170,6 +1170,7 @@ export interface IVoteHistoryData {
 		[EVoteDecision.NAY]?: number;
 		[EVoteDecision.SPLIT_ABSTAIN]?: number;
 		[EVoteDecision.SPLIT]?: number;
+		[EVoteDecision.ABSTAIN]?: number;
 	};
 }
 
