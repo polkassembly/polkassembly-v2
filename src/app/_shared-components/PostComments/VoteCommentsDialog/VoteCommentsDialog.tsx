@@ -8,7 +8,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IVoteData } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { IoCalendarOutline } from 'react-icons/io5';
+import { IoCalendarOutline } from '@react-icons/all-files/io5/IoCalendarOutline';
 import Address from '../../Profile/Address/Address';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
 import { Collapsible, CollapsibleContent } from '../../Collapsible';
