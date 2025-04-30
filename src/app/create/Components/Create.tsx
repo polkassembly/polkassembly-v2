@@ -175,7 +175,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 								{titles[step || 'create']}
 							</div>
 
-							{step && stepDescriptions[step] && <span className='text-sm font-medium'>{stepDescriptions[step]}</span>}
+							{step && stepDescriptions[step as EProposalStep] && <span className='text-sm font-medium'>{stepDescriptions[step as EProposalStep]}</span>}
 						</div>
 					</div>
 					<Separator className='my-4' />

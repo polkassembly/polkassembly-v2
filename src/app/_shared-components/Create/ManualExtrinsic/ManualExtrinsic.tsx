@@ -20,6 +20,7 @@ import PreimageDetailsView from '../PreimageDetailsView/PreimageDetailsView';
 import { Separator } from '../../Separator';
 import TxFeesDetailsView from '../TxFeesDetailsView/TxFeesDetailsView';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
+import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 
 function ManualExtrinsic() {
 	const t = useTranslations();
@@ -69,7 +70,10 @@ function ManualExtrinsic() {
 	return (
 		<div className='flex flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-				<SwitchWalletOrAddress />
+				<SwitchWalletOrAddress
+					small
+					customAddressSelector={<AddressRelationsPicker withBalance />}
+				/>
 				<Extrinsic onChange={setExtrinsicFn} />
 			</div>
 			{extrinsicDetails && (

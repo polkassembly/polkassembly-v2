@@ -22,6 +22,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
+import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
 function TreasuryProposalLocal() {
 	const t = useTranslations();
@@ -108,7 +109,10 @@ function TreasuryProposalLocal() {
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
-				<SwitchWalletOrAddress />
+				<SwitchWalletOrAddress
+					small
+					customAddressSelector={<AddressRelationsPicker withBalance />}
+				/>
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}
 					onChange={(value) => setBeneficiaries(value)}
