@@ -52,7 +52,7 @@ const DropdownMenuTrigger = React.forwardRef<
 	>
 		<div className='flex w-full items-center justify-between gap-x-2'>
 			{children}
-			{!noArrow && ArrowPosition === 'right' ? <ChevronRight className='h-4 w-4' /> : !noArrow && ArrowPosition === 'down' ? <ChevronDown className='h-4 w-4' /> : null}
+			{noArrow ? null : ArrowPosition === 'right' ? <ChevronRight className='h-4 w-4' /> : <ChevronDown className='h-4 w-4' />}
 		</div>
 	</DropdownMenuPrimitive.Trigger>
 ));
