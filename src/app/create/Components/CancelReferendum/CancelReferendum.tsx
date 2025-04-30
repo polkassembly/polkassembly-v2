@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { SquareArrowOutUpRight, TriangleAlert } from 'lucide-react';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
 function CancelReferendum() {
 	const t = useTranslations();
@@ -128,7 +129,10 @@ function CancelReferendum() {
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-				<SwitchWalletOrAddress />
+				<SwitchWalletOrAddress
+					small
+					customAddressSelector={<AddressRelationsPicker withBalance />}
+				/>
 				<div className='flex flex-col gap-y-2'>
 					<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>
 					<InputNumber
