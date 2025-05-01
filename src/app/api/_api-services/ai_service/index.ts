@@ -151,8 +151,30 @@ export class AIService {
 				response: aiResponse
 			});
 
-			// remove anything in <think></think> tags
-			return aiResponse.replace(/<think>.*?<\/think>/, '');
+			// Clean the response based on which prompt was used
+			let cleanedResponse = aiResponse;
+
+			// Remove thinking tags
+			cleanedResponse = cleanedResponse.replace(/<think>[\s\S]*?<\/think>/g, '');
+
+			// Remove any explanatory text that doesn't match expected format
+			if (prompt.includes(this.BASE_PROMPTS.POST_SUMMARY)) {
+				// Keep only markdown bullet points
+				cleanedResponse = cleanedResponse
+					.split('\n')
+					.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
+					.join('\n');
+			} else if (prompt.includes(this.BASE_PROMPTS.CONTENT_SPAM_CHECK) || prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
+				// Extract just the single word response
+				const match = cleanedResponse.match(/\b(true|false|against|slightly_against|neutral|slightly_for|for)\b/i);
+				cleanedResponse = match ? match[0].toLowerCase() : '';
+			} else if (prompt.includes(this.BASE_PROMPTS.POST_CONTENT_EXTRACTION)) {
+				// Extract just the JSON object
+				const jsonMatch = cleanedResponse.match(/{[\s\S]*?}/);
+				cleanedResponse = jsonMatch ? jsonMatch[0] : '';
+			}
+
+			return cleanedResponse;
 		} catch (error) {
 			console.error('Error in generating AI response', error);
 			return null;
