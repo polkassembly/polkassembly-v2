@@ -26,7 +26,8 @@ enum EWebhookEvent {
 	REMOVED_VOTE = 'removed_vote',
 	TIPPED = 'tipped',
 	DELEGATED = 'delegated',
-	UNDELEGATED = 'undelegated'
+	UNDELEGATED = 'undelegated',
+	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -70,6 +71,10 @@ export class WebhookService {
 		}),
 		[EWebhookEvent.UNDELEGATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH)
+		}),
+		[EWebhookEvent.PROPOSAL_STATUS_UPDATED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
+			proposalType: z.nativeEnum(EProposalType)
 		})
 	} as const;
 
@@ -80,13 +85,14 @@ export class WebhookService {
 		switch (webhookEvent) {
 			case EWebhookEvent.PROPOSAL_CREATED:
 			case EWebhookEvent.PROPOSAL_ENDED:
-				return this.handleProposalStatusChanged({
-					network,
-					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>
-				});
-			case EWebhookEvent.VOTED:
 			case EWebhookEvent.BOUNTY_CLAIMED:
 			case EWebhookEvent.DECISION_DEPOSIT_PLACED:
+			case EWebhookEvent.PROPOSAL_STATUS_UPDATED:
+				return this.handleProposalStatusChanged({
+					network,
+					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>
+				});
+			case EWebhookEvent.VOTED:
 			case EWebhookEvent.REMOVED_VOTE:
 			case EWebhookEvent.TIPPED:
 			case EWebhookEvent.DELEGATED:
@@ -102,7 +108,7 @@ export class WebhookService {
 		params
 	}: {
 		network: ENetwork;
-		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>;
 	}) {
 		const { indexOrHash, proposalType } = params;
 
