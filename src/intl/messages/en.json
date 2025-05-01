@@ -651,6 +651,8 @@
 		"create": "Create",
 		"createTag": "Create Tag",
 		"addTags": "Add Tags",
+		"addTagsPlaceholder": "Add tags (press Enter or comma to add)",
+		"remainingTagsPlaceholder": "{remaining} tags remaining",
 		"searchTags": "Search tags",
 		"noTagsFound": "No tags found.",
 		"selectTags": "Select tags",

@@ -622,6 +622,7 @@
 		"createDiscussionTitle": "Crear discusión",
 		"title": "Título",
 		"description": "Descripción",
+		"addTagsPlaceholder": "Agregar etiquetas (presione Enter o coma para agregar)",
 		"create": "Crear",
 		"createTag": "Crear etiqueta",
 		"addTags": "Agregar etiquetas",

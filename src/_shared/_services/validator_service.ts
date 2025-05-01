@@ -15,6 +15,8 @@ import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes
 import { BN, isHex } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '../_constants/networks';
 
+const TAG_MAX_LENGTH = 20;
+const TAG_MIN_LENGTH = 1;
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
 		return validator.isEmail(email);
@@ -228,7 +230,7 @@ export class ValidatorService {
 	}
 
 	static isValidTag(tag: string): boolean {
-		return tag.length > 0 && typeof tag === 'string';
+		return tag.length <= TAG_MAX_LENGTH && tag.length >= TAG_MIN_LENGTH && typeof tag === 'string';
 	}
 
 	static isValidOffChainPostTopic(topic: string): boolean {
