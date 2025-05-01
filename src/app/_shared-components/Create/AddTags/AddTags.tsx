@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { useState, useRef, ChangeEvent, useCallback, RefObject } from 'react';
+import React, { useState, useRef, ChangeEvent, useCallback, RefObject, useLayoutEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -28,7 +28,15 @@ interface AddTagsProps {
 const TAG_MAX_LENGTH = 20;
 
 // Custom hook for managing tags
-const useTagManagement = (onChange?: (tags: ITag[]) => void) => {
+const useTagManagement = ({
+	onChange,
+	setFilteredSuggestions,
+	suggestions
+}: {
+	onChange?: (tags: ITag[]) => void;
+	setFilteredSuggestions?: (suggestions: ITag[]) => void;
+	suggestions?: ITag[];
+}) => {
 	const [tags, setTags] = useState<ITag[]>([]);
 	const network = getCurrentNetwork();
 
@@ -48,11 +56,12 @@ const useTagManagement = (onChange?: (tags: ITag[]) => void) => {
 				const newTags = [...tags, { value: trimmedTag, lastUsedAt: new Date(), network }];
 				setTags(newTags);
 				onChange?.(newTags);
+				setFilteredSuggestions?.(suggestions?.filter((suggestion) => !newTags?.some(({ value }) => value === suggestion.value)) || []);
 				return true;
 			}
 			return false;
 		},
-		[tags, network, onChange]
+		[tags, network, onChange, setFilteredSuggestions, suggestions]
 	);
 
 	const removeTag = useCallback(
@@ -60,8 +69,9 @@ const useTagManagement = (onChange?: (tags: ITag[]) => void) => {
 			const newTags = tags.filter((_, i) => i !== index);
 			setTags(newTags);
 			onChange?.(newTags);
+			setFilteredSuggestions?.(suggestions?.filter((suggestion) => !newTags?.some((tag) => tag.value === suggestion.value)) || []);
 		},
-		[tags, onChange]
+		[tags, onChange, setFilteredSuggestions, suggestions]
 	);
 
 	return { tags, addTag, removeTag };
@@ -113,7 +123,7 @@ const SuggestionsList = React.memo(({ suggestions, onSelect, loading }: { sugges
 
 	return (
 		<div>
-			{!suggestions.length && <div>{t('Create.noTagsFound')}</div>}
+			{!suggestions.length && <div className='text-text_secondary'>{t('Create.noTagsFound')}</div>}
 			<div className={styles.suggestionsContainer}>
 				{suggestions.map((suggestion) => (
 					<Button
@@ -140,9 +150,36 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 	const containerRef = useRef<HTMLButtonElement>(null);
 	const [open, setOpen] = useState(false);
 	const [inputValue, setInputValue] = useState('');
-
-	const { tags, addTag, removeTag } = useTagManagement(onChange);
+	const popoverOpenRef = useRef(false);
 	const { data: suggestions = [], isFetching } = useTagSuggestions(disabled);
+	const [filteredSuggestions, setFilteredSuggestions] = useState<ITag[]>(suggestions || []);
+	const { tags, addTag, removeTag } = useTagManagement({ onChange, setFilteredSuggestions, suggestions });
+
+	// Keep track of popover state
+	useLayoutEffect(() => {
+		popoverOpenRef.current = open;
+	}, [open]);
+
+	// Ensure input focus after DOM updates
+	useLayoutEffect(() => {
+		if (popoverOpenRef.current && inputRef.current) {
+			// Use RAF to ensure focus after browser paint
+			requestAnimationFrame(() => {
+				inputRef.current?.focus();
+			});
+		}
+	}, [filteredSuggestions, open]);
+
+	// Handle popover state changes
+	const onOpenChange = useCallback((isOpen: boolean) => {
+		setOpen(isOpen);
+		if (isOpen) {
+			// Focus input when popover opens
+			requestAnimationFrame(() => {
+				inputRef.current?.focus();
+			});
+		}
+	}, []);
 
 	const handleInputChange = useCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -153,6 +190,9 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 				)
 			);
 			setInputValue(value);
+			setFilteredSuggestions(
+				suggestions.filter((suggestion) => suggestion.value.toLowerCase().includes(value.toLowerCase()) && !tags?.some((tag) => tag.value === suggestion.value))
+			);
 			inputRef.current?.focus();
 		},
 		[suggestions, tags]
@@ -179,7 +219,7 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 				removeTag(tags.length - 1);
 			}
 		},
-		[inputValue, tags.length, addTag, removeTag]
+		[inputValue, addTag, removeTag, tags?.length]
 	);
 
 	const handleSuggestionSelect = useCallback(
@@ -188,7 +228,10 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 				setInputValue('');
 				setOpen(false);
 			}
-			inputRef.current?.focus();
+			// Use requestAnimationFrame for consistent focus handling
+			requestAnimationFrame(() => {
+				inputRef.current?.focus();
+			});
 		},
 		[addTag]
 	);
@@ -197,7 +240,7 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 		<div className='space-y-2'>
 			<Popover
 				open={open && suggestions.length > 0}
-				onOpenChange={setOpen}
+				onOpenChange={onOpenChange}
 			>
 				<PopoverTrigger asChild>
 					<div
@@ -239,7 +282,7 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 					sideOffset={5}
 				>
 					<SuggestionsList
-						suggestions={suggestions}
+						suggestions={!inputValue && !tags.length ? suggestions : filteredSuggestions}
 						onSelect={handleSuggestionSelect}
 						loading={isFetching}
 					/>
