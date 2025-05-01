@@ -94,7 +94,7 @@ const TagItem = React.memo(({ tag, onRemove }: { tag: ITag; onRemove: () => void
 				e.stopPropagation();
 				onRemove();
 			}}
-			className='h-5 px-1 py-0 text-text_primary'
+			className='h-5 bg-transparent px-1 py-0 text-text_primary'
 		>
 			<X size={16} />
 		</Button>
@@ -114,14 +114,16 @@ const SuggestionsList = React.memo(({ suggestions, onSelect, loading }: { sugges
 	return (
 		<div>
 			{!suggestions.length && <div>{t('Create.noTagsFound')}</div>}
-			<div>
+			<div className={styles.suggestionsContainer}>
 				{suggestions.map((suggestion) => (
 					<Button
+						type='button'
+						variant='ghost'
 						key={`suggestion-${suggestion.value}`}
 						className={styles.suggestionButton}
 						onClick={() => onSelect(suggestion.value)}
 					>
-						{suggestion.value}
+						<div className={styles.suggestionText}>{suggestion.value}</div>
 					</Button>
 				))}
 			</div>

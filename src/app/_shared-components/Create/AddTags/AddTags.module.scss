@@ -2,7 +2,7 @@
 	@apply flex items-center gap-1 rounded-lg bg-tag_input_bg px-2 py-1.5 text-sm text-text_primary shadow-sm;
 }
 .suggestionButton {
-	@apply w-full cursor-pointer justify-start bg-transparent py-1 text-sm font-medium text-text_primary shadow-none hover:bg-transparent;
+	@apply w-full cursor-pointer items-start justify-start bg-transparent py-0 text-left text-sm font-medium text-text_primary shadow-none hover:bg-transparent;
 }
 .container {
 	@apply flex min-h-12 w-full flex-wrap items-center gap-2 rounded-lg border-[1px] border-solid border-border_grey bg-transparent p-0 shadow-none hover:bg-transparent;
@@ -15,5 +15,12 @@
 	@apply w-full border-none bg-transparent p-0 text-input_text shadow-none placeholder:text-placeholder;
 }
 .popoverContent {
-	@apply max-h-[300px] w-[var(--radix-popover-trigger-width)] overflow-y-auto border-none bg-bg_modal p-4;
+	@apply max-h-[300px] w-[var(--radix-popover-trigger-width)] justify-start overflow-y-auto border-none bg-bg_modal p-4;
+}
+
+.suggestionsContainer {
+	@apply flex flex-col items-center justify-start gap-0;
+}
+.suggestionText {
+	@apply w-full text-left;
 }
