@@ -39,12 +39,13 @@ export class AIService {
     - Key stakeholders or beneficiaries (if any)
 
     STRICT RULES:
-    - Return ONLY bullet points in markdown format
-    - Each bullet point must be 1-2 lines maximum
-    - No introductory text or commentary
-    - Use technical/blockchain terminology appropriately
-    - Keep information factual and objective
-		- Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries
+    - Your entire response must ONLY consist of markdown bullet points. DO NOT include any other text.
+    - NEVER include any explanatory text, thinking, or commentary before or after the bullet points.
+    - Start your response with the first bullet point immediately.
+    - Each bullet point must be 1-2 lines maximum.
+    - Use technical/blockchain terminology appropriately.
+    - Keep information factual and objective.
+    - Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries.
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
