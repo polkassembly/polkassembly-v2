@@ -14,6 +14,7 @@ import { Info } from 'lucide-react';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
 import { useRef } from 'react';
 import { MDXEditorMethods } from '@mdxeditor/editor';
+import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
@@ -88,6 +89,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 						<FormLabel>{t('Create.description')}*</FormLabel>
 						<FormControl>
 							<MarkdownEditor
+								contentEditableClassName='min-h-[200px]'
 								markdown={field.value || ''}
 								onChange={(data) => {
 									field.onChange(data);
@@ -110,7 +112,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					<FormItem>
 						<FormLabel className='flex items-center justify-between'>
 							<span>{t('Create.addTags')}</span>
-							<span className='text-xs text-basic_text'>
+							<span className={cn('text-xs text-basic_text', { 'text-toast_error_text': field.value.length >= MAX_POST_TAGS })}>
 								{MAX_POST_TAGS - (formData.getValues('tags')?.length || 0)} {t('Create.tagsLeftText')}
 							</span>
 						</FormLabel>
@@ -159,7 +161,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 				defaultValue={EAllowedCommentor.ALL}
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel className='flex items-center gap-1'>
+						<FormLabel className='mt-2 flex items-center gap-1'>
 							<span>{t('Create.AllowedCommentors.title')} </span>
 							<TooltipProvider>
 								<Tooltip>

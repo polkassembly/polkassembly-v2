@@ -157,7 +157,8 @@ export const THEME_COLORS = {
 		proxy_type_bg: '#f0f4ec',
 		proxy_type_text: '#317A06',
 		bg_light_pink: '#fef0f7',
-		progress_pink_indicator: '#ededed'
+		progress_pink_indicator: '#ededed',
+		tag_input_bg: '#f4f6f8'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -311,6 +312,7 @@ export const THEME_COLORS = {
 		proxy_type_bg: '#f0f4ec',
 		proxy_type_text: '#317A06',
 		bg_light_pink: '#fef0f7',
-		progress_pink_indicator: '#343744'
+		progress_pink_indicator: '#343744',
+		tag_input_bg: '#222222'
 	}
 };

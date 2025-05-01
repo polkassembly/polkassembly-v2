@@ -1,46 +1,26 @@
-.container{
-    @apply flex gap-2 w-full;
+.tagItem {
+	@apply flex items-center gap-1 rounded-lg bg-tag_input_bg px-2 py-1.5 text-sm text-text_primary shadow-sm;
+}
+.suggestionButton {
+	@apply w-full cursor-pointer items-start justify-start bg-transparent py-0 text-left text-sm font-medium text-text_primary shadow-none hover:bg-transparent;
+}
+.container {
+	@apply flex min-h-12 w-full flex-wrap items-center gap-2 rounded-lg border-[1px] border-solid border-border_grey bg-transparent p-0 shadow-none hover:bg-transparent;
+}
+.tagsContainer {
+	@apply flex flex-wrap gap-2 px-3;
 }
 
-.noTagFoundText{
-    @apply text-basic_text text-sm flex items-center justify-center py-6;
+.inputBox {
+	@apply w-full border-none bg-transparent p-0 text-input_text shadow-none placeholder:text-placeholder;
 }
-
-.commandInput{
-    div{
-        @apply border-none text-text_grey text-sm border-pink-500;
-    }
-}
-
-.command {
-    @apply border-white;
-
-    div {
-        @apply text-basic_text text-sm border-basic_text;
-    }
-}
-
 .popoverContent {
-    @apply w-56 border border-gray-300 bg-[var(--sidebar-primary-foreground)] p-2 border-none shadow-md z-50 ;
+	@apply max-h-[300px] w-[var(--radix-popover-trigger-width)] justify-start overflow-y-auto border-none bg-bg_modal p-4;
 }
-.addTagInput{
-    @apply text-muted-foreground text-input_text;
+
+.suggestionsContainer {
+	@apply flex flex-col items-center justify-start gap-0;
 }
-.addTagButton{
-    @apply flex gap-1;
-}
-.popoverTrigger{
-    @apply w-full justify-between hover:bg-transparent h-auto border-post_btn_bg border-solid border-[1px] flex items-center text-sm py-1 min-h-9 rounded-md px-2 ;
-}
-.tagLabel{
-    @apply inline-flex cursor-pointer items-center gap-1 rounded-md bg-secondary px-2 text-sm text-secondary-foreground;
-}
-.tagRemoveButton{
-    @apply rounded-sm bg-btn_primary_background h-4 w-3 hover:bg-transparent bg-transparent px-1;
-}
-.selectTagsText{
-    @apply text-muted-foreground text-basic_text;
-}
-.commandItem{
-    @apply cursor-pointer;
+.suggestionText {
+	@apply w-full text-left;
 }

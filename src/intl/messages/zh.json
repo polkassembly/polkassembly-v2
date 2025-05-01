@@ -622,6 +622,7 @@
 		"createDiscussionTitle": "创建讨论",
 		"title": "标题",
 		"description": "描述",
+		"addTagsPlaceholder": "添加标签 (按 Enter 或逗号添加)",
 		"create": "创建",
 		"createTag": "创建标签",
 		"addTags": "添加标签",
