@@ -140,7 +140,8 @@ export class AIService {
 				response: aiResponse
 			});
 
-			return aiResponse;
+			// remove anything in <think></think> tags
+			return aiResponse.replace(/<think>.*?<\/think>/, '');
 		} catch (error) {
 			console.error('Error in generating AI response', error);
 			return null;
