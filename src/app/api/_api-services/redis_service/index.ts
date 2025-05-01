@@ -35,7 +35,22 @@ enum ERedisKeys {
 }
 
 export class RedisService {
-	private static readonly client: Redis = new Redis(REDIS_URL);
+	private static readonly client: Redis = (() => {
+		const client = new Redis(REDIS_URL, {
+			connectTimeout: 20000, // Increase connection timeout to 20 seconds
+			maxRetriesPerRequest: 3,
+			retryStrategy: (times) => {
+				return Math.min(times * 50, 2000);
+			},
+			reconnectOnError: (err) => err.message.includes('READONLY')
+		});
+
+		client.on('error', (err) => {
+			console.error('Redis Client Error:', err);
+		});
+
+		return client;
+	})();
 
 	private static readonly redisKeysMap = {
 		[ERedisKeys.PASSWORD_RESET_TOKEN]: (token: string): string => `${ERedisKeys.PASSWORD_RESET_TOKEN}-${token}`,
