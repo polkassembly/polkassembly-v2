@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { useState, useRef, ChangeEvent, useCallback } from 'react';
+import React, { useState, useRef, ChangeEvent, useCallback, RefObject } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -17,6 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import { Skeleton } from '../../Skeleton';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
+import styles from './AddTags.module.scss';
 
 interface AddTagsProps {
 	className?: string;
@@ -85,7 +86,7 @@ const useTagSuggestions = (disabled?: boolean) => {
 
 // Tag item component
 const TagItem = React.memo(({ tag, onRemove }: { tag: ITag; onRemove: () => void }) => (
-	<div className='flex items-center gap-1 rounded-lg bg-tag_input_bg px-2 py-1.5 text-text_primary shadow-sm'>
+	<div className={styles.tagItem}>
 		<span>{tag.value}</span>
 		<Button
 			variant='ghost'
@@ -117,7 +118,7 @@ const SuggestionsList = React.memo(({ suggestions, onSelect, loading }: { sugges
 				{suggestions.map((suggestion) => (
 					<Button
 						key={`suggestion-${suggestion.value}`}
-						className='w-full cursor-pointer justify-start bg-transparent py-1 text-sm font-medium text-text_primary shadow-none hover:bg-transparent'
+						className={styles.suggestionButton}
 						onClick={() => onSelect(suggestion.value)}
 					>
 						{suggestion.value}
@@ -157,11 +158,17 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent<HTMLInputElement>) => {
-			if (['Enter', ','].includes(e.key) && inputValue.trim()) {
-				e.preventDefault();
-				if (addTag(inputValue)) {
-					setInputValue('');
-					setOpen(false);
+			if (['Enter', ','].includes(e.key)) {
+				// Only process Enter or comma if there's actual input
+				if (inputValue.trim()) {
+					e.preventDefault();
+					if (addTag(inputValue)) {
+						setInputValue('');
+						setOpen(false);
+					}
+				} else if (e.key === 'Enter') {
+					// Prevent any action when pressing Enter with empty input
+					e.preventDefault();
 				}
 				return;
 			}
@@ -191,16 +198,12 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 				onOpenChange={setOpen}
 			>
 				<PopoverTrigger asChild>
-					<Button
-						ref={containerRef}
-						className={cn(
-							'flex min-h-12 w-full flex-wrap items-center gap-2 rounded-lg border-[1px] border-solid border-border_grey bg-transparent p-0 shadow-none hover:bg-transparent',
-							className
-						)}
-						onClick={() => inputRef.current?.focus()}
+					<div
+						ref={containerRef as unknown as RefObject<HTMLDivElement>}
+						className={cn(styles.container, className)}
 					>
 						{!!tags.length && (
-							<div className='flex flex-wrap gap-2 px-3'>
+							<div className={styles.tagsContainer}>
 								{tags.map((tag, index) => (
 									<TagItem
 										key={`tag-${tag.value}`}
@@ -220,16 +223,16 @@ export function AddTags({ className, onChange, disabled }: AddTagsProps) {
 								value={inputValue}
 								onChange={handleInputChange}
 								onKeyDown={handleKeyDown}
-								className='w-full border-none bg-transparent p-0 text-input_text shadow-none placeholder:text-placeholder'
+								className={styles.inputBox}
 								placeholder={tags.length === 0 ? t('Create.addTagsPlaceholder') : ''}
 								disabled={tags.length >= MAX_POST_TAGS}
 								maxLength={TAG_MAX_LENGTH}
 							/>
 						</div>
-					</Button>
+					</div>
 				</PopoverTrigger>
 				<PopoverContent
-					className='max-h-[300px] w-[var(--radix-popover-trigger-width)] overflow-y-auto border-none bg-bg_modal p-4'
+					className={styles.popoverContent}
 					align='start'
 					sideOffset={5}
 				>
