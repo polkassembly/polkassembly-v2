@@ -42,7 +42,8 @@ export class RedisService {
 			retryStrategy: (times) => {
 				return Math.min(times * 50, 2000);
 			},
-			reconnectOnError: (err) => err.message.includes('READONLY')
+			reconnectOnError: (err) => err.message.includes('READONLY'),
+			keepAlive: 8000
 		});
 
 		client.on('error', (err) => {
