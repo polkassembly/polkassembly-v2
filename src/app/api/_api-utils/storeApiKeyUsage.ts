@@ -10,8 +10,6 @@ import { NextRequest } from 'next/server';
 
 /**
  * Stores api key usage into db
- * Use without await keyword as 'fire-and-forget'
- * See: https://github.com/vercel/next.js/discussions/12573#discussioncomment-2799468
  * @export
  * @param {NextRequest} req
  */
