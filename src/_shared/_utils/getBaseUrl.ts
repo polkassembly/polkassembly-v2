@@ -11,7 +11,7 @@ export async function getBaseUrl(): Promise<string> {
 
 	const headersList = await headers();
 	const domain = headersList.get('host') || '';
-	const protocol = headersList.get('x-forwarded-proto') || '';
+	const protocol = headersList.get('x-forwarded-proto') || 'https';
 
 	return `${protocol}://${domain}/api/v2`;
 }

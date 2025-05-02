@@ -6,10 +6,14 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ENetwork, EProposalType } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
+import { OnChainDbService } from '../onchain_db_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -127,7 +131,61 @@ export class WebhookService {
 
 	// refreshes caches for common endpoints and active proposals
 	private static async handleCacheRefresh({ network }: { network: ENetwork }) {
-		console.log('TODO: add handling for cache refresh', { network });
+		// 1. refresh cache for active proposals
+		const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
+			network,
+			proposalType: EProposalType.REFERENDUM_V2,
+			limit: 100,
+			page: 1,
+			statuses: ACTIVE_PROPOSAL_STATUSES
+		});
+
+		const baseUrl = await getBaseUrl();
+
+		const headers = {
+			'x-network': network
+		};
+
+		const postDetailsPromises = activeProposals.map((proposal) => {
+			return fetch(`${baseUrl}/${EProposalType.REFERENDUM_V2}/${proposal.index || proposal.hash}`, {
+				headers
+			});
+		});
+
+		// 2. refresh cache for all other listing pages
+		const allListingPagePromise = fetch(`${baseUrl}/${EProposalType.REFERENDUM_V2}`, {
+			headers
+		});
+
+		const discussionsListingPagePromise = fetch(`${baseUrl}/${EProposalType.DISCUSSION}`, {
+			headers
+		});
+
+		const bountiesListingPagePromise = fetch(`${baseUrl}/${EProposalType.BOUNTY}`, {
+			headers
+		});
+
+		const childBountiesListingPagePromise = fetch(`${baseUrl}/${EProposalType.CHILD_BOUNTY}`, {
+			headers
+		});
+
+		// 3. refresh cache for all listing pages for all tracks
+		const trackListingPagePromises = Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails).map((origin) => {
+			return fetch(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}`, {
+				headers
+			});
+		});
+
+		await Promise.all([
+			postDetailsPromises,
+			allListingPagePromise,
+			discussionsListingPagePromise,
+			bountiesListingPagePromise,
+			childBountiesListingPagePromise,
+			...trackListingPagePromises
+		]);
+
+		console.log(`Cache refreshed for ${activeProposals.length} active proposals, all listing pages and all track listing pages`);
 	}
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
