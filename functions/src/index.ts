@@ -58,10 +58,10 @@ export const callTreasuryStatsFetch = onRequest(async (request, response) => {
 	}
 });
 
-// renew caches every 30 minutes
+// renew caches every 15 minutes
 export const scheduledCacheRefresh = onSchedule(
 	{
-		schedule: 'every 30 minutes',
+		schedule: 'every 15 minutes',
 		timeZone: 'UTC',
 		retryCount: 3,
 		timeoutSeconds: 300 // 5 minutes
