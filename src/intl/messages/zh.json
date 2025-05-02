@@ -848,7 +848,7 @@
 		"spend": "支出",
 		"from": "从",
 		"Treasury": "国库",
-		"usdxProposal": "从AssetHub支出资产 (USDx, DOT, 等)",
+		"usdxProposal": "从AssetHub支出资产 (USDC/USDT, DOT, 等)",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
 		"createPreimageDescription": "从头创建一个提案。",

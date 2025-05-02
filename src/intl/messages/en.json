@@ -876,7 +876,7 @@
 		"spend": "Spend",
 		"from": "from",
 		"Treasury": "Treasury",
-		"usdxProposal": "Create a USDX  Proposal",
+		"usdxProposal": "Create a USDC/USDT Proposal",
 		"cancelReferendum": "Cancel a Referendum",
 		"killReferendum": "Kill a Referendum",
 		"createBounty": "Create Bounty",
