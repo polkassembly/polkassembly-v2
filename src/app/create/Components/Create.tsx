@@ -191,7 +191,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						>
 							{t('Create.login')}
 						</Link>{' '}
-						{t('Create.toCreate')}
+						{t('Create.toCreateProposal')}
 					</p>
 				) : (
 					<>
