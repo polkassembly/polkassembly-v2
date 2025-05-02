@@ -129,45 +129,53 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						return isFunded || isCuratorProposed || isActive;
 					});
 
-					// Process active bounties
-					const balances = await Promise.all(
-						activeBounties.map(async (bounty) => {
-							const bountyData = bounty as { index?: { toJSON: () => string } };
-							const id = bountyData?.index?.toJSON();
-							if (!id) return new BN(0);
+					// Process active bounties with controlled concurrency
+					// Use sequential processing with reduce to avoid race conditions and interleaved logs
+					const totalBalance = await activeBounties.reduce<Promise<BN>>(async (accPromise, bounty) => {
+						const acc = await accPromise;
+						const bountyData = bounty as { index?: { toJSON: () => string } };
+						const id = bountyData?.index?.toJSON();
+						if (!id) return acc;
+
+						try {
+							const response = await fetch(`https://${network}-api.subsquare.io/treasury/bounties/${id}`);
+							if (!response.ok) {
+								console.error(`Failed to fetch bounty ${id}: ${response.status}`);
+								return acc;
+							}
+
+							const result = await response.json();
+							const address = result?.onchainData?.address;
+
+							if (!address) {
+								const metadataValue = result?.onchainData?.meta?.value || 0;
+								return acc.add(new BN(metadataValue));
+							}
 
 							try {
-								const response = await fetch(`https://${network}.subsquare.io/api/treasury/bounties/${id}`);
-								if (!response.ok) return new BN(0);
-
-								const result = await response.json();
-								const address = result?.onchainData?.address;
-
-								if (!address) {
-									const metadataValue = result?.onchainData?.meta?.value || 0;
-									return new BN(metadataValue);
-								}
-
-								try {
-									const accountData = await relayChainApi.query.system.account(address);
-									const accountInfo = accountData as unknown as {
-										data: { free: { toString: () => string }; reserved: { toString: () => string } };
-									};
-									return new BN(accountInfo.data.free.toString()).add(new BN(accountInfo.data.reserved.toString()));
-								} catch {
-									return new BN(0);
-								}
-							} catch {
-								return new BN(0);
+								const accountData = await relayChainApi.query.system.account(address);
+								const accountInfo = accountData as unknown as {
+									data: { free: { toString: () => string }; reserved: { toString: () => string } };
+								};
+								const free = new BN(accountInfo.data.free.toString());
+								const reserved = new BN(accountInfo.data.reserved.toString());
+								const balance = free.add(reserved);
+								return acc.add(balance);
+							} catch (err) {
+								console.error(`Error getting account data for bounty ${id}: ${err}`);
+								return acc;
 							}
-						})
-					);
+						} catch (err) {
+							console.error(`Error processing bounty ${id}: ${err}`);
+							return acc;
+						}
+					}, Promise.resolve(BN_ZERO));
 
 					treasuryStats = {
 						...treasuryStats,
 						bounties: {
 							...treasuryStats.bounties,
-							dot: balances.reduce((acc, curr) => acc.add(curr), new BN(0)).toString()
+							dot: totalBalance.toString()
 						}
 					};
 				} catch (error) {
