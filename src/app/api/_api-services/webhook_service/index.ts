@@ -161,7 +161,13 @@ export class WebhookService {
 
 			// Add active proposal detail pages
 			activeProposals.forEach((proposal) => {
-				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}/${proposal.index || proposal.hash}`);
+				const indexOrHash = proposal.index || proposal.hash;
+				const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
+
+				// proposal detail page
+				fetchUrls.push(proposalUrl);
+				// TODO: comments and content summary for the proposal
+				fetchUrls.push(`${proposalUrl}/content-summary`);
 			});
 
 			// 3. Create an array of fetch promises with individual 15-second timeouts
