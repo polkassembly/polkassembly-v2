@@ -683,7 +683,8 @@
 		},
 		"please": "Please",
 		"login": "Login",
-		"toCreate": "to create a Proposal"
+		"toCreateProposal": "to create a Proposal",
+		"toCreateDiscussion": "to create a Discussion"
 	},
 	"ProposalType": {
 		"discussion": "Discussion",

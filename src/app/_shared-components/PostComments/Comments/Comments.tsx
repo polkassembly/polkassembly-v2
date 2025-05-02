@@ -101,7 +101,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 			</div>
 
 			{user ? (
-				<div className='w-full px-6 py-6 shadow-2xl'>
+				<div className='w-full px-6 py-6'>
 					<AddComment
 						proposalType={proposalType}
 						proposalIndex={index}
