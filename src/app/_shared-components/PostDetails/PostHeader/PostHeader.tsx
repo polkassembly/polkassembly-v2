@@ -26,6 +26,7 @@ import PostTags from '@ui/PostDetails/PostTags/PostTags';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -53,9 +54,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
 
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
-	const formatOriginText = (text: string): string => {
-		return text.replace(/([A-Z])/g, ' $1').trim();
-	};
+
 	return (
 		<div className='mx-auto max-w-7xl'>
 			<div className='mb-4'>
@@ -105,7 +104,9 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 						{postData.onChainInfo?.origin && (
 							<>
 								<span className='text-xs text-wallet_btn_text'>{t('Search.in')}</span>
-								<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${classes.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
+								<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${classes.originStyle}`}>
+									{convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}
+								</span>
 								<Separator
 									orientation='vertical'
 									className='h-3'

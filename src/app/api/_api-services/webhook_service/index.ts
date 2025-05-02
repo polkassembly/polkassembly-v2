@@ -6,22 +6,18 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAllowedCommentor, ENetwork, EOffChainPostTopic, EProposalType, ITag } from '@/_shared/types';
+import { ENetwork, EProposalType } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
-import { updatePostServer } from '../../_api-utils/updatePostServer';
 import { RedisService } from '../redis_service';
-import { OffChainDbService } from '../offchain_db_service';
-import { FirestoreService } from '../offchain_db_service/firestore_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
 }
 
+// TODO: add hooks for user creation and settings update
+
 enum EWebhookEvent {
-	OFF_CHAIN_POST_CREATED = 'off_chain_post_created',
-	POST_EDITED = 'post_edited',
-	POST_DELETED = 'post_deleted',
 	PROPOSAL_CREATED = 'proposal_created',
 	PROPOSAL_ENDED = 'proposal_ended',
 	VOTED = 'voted',
@@ -30,7 +26,8 @@ enum EWebhookEvent {
 	REMOVED_VOTE = 'removed_vote',
 	TIPPED = 'tipped',
 	DELEGATED = 'delegated',
-	UNDELEGATED = 'undelegated'
+	UNDELEGATED = 'undelegated',
+	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -41,40 +38,6 @@ export class WebhookService {
 	});
 
 	private static readonly zodEventBodySchemas = {
-		[EWebhookEvent.OFF_CHAIN_POST_CREATED]: z.object({
-			index: z.number().min(0, 'Index is required'),
-			title: z.string().min(1, 'Title is required'),
-			content: z.string().min(1, 'Content is required'),
-			authorId: z.number().refine((authorId) => ValidatorService.isValidUserId(authorId), 'Not a valid author ID'),
-			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
-			topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL),
-			tags: z.array(z.string().min(1, 'Tag is required')).optional(),
-			linkedPost: z
-				.object({
-					indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-					proposalType: z.nativeEnum(EProposalType)
-				})
-				.optional()
-		}),
-		[EWebhookEvent.POST_EDITED]: z.object({
-			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType),
-			title: z.string().min(1, 'Title is required'),
-			content: z.string().min(1, 'Content is required'),
-			authorId: z.number().refine((authorId) => ValidatorService.isValidUserId(authorId), 'Not a valid author ID'),
-			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
-			tags: z.array(z.string().min(1, 'Tag is required')).optional(),
-			linkedPost: z
-				.object({
-					indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-					proposalType: z.nativeEnum(EProposalType)
-				})
-				.optional()
-		}),
-		[EWebhookEvent.POST_DELETED]: z.object({
-			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
-		}),
 		[EWebhookEvent.PROPOSAL_CREATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
@@ -104,10 +67,12 @@ export class WebhookService {
 			proposalType: z.nativeEnum(EProposalType)
 		}),
 		[EWebhookEvent.DELEGATED]: z.object({
-			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH)
 		}),
 		[EWebhookEvent.UNDELEGATED]: z.object({
+			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH)
+		}),
+		[EWebhookEvent.PROPOSAL_STATUS_UPDATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		})
@@ -118,21 +83,16 @@ export class WebhookService {
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
 		switch (webhookEvent) {
-			case EWebhookEvent.OFF_CHAIN_POST_CREATED:
-				return this.handleOffChainPostCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.OFF_CHAIN_POST_CREATED]> });
-			case EWebhookEvent.POST_EDITED:
-				return this.handlePostEdited({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> });
-			case EWebhookEvent.POST_DELETED:
-				return this.handlePostDeleted({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_DELETED]> });
 			case EWebhookEvent.PROPOSAL_CREATED:
 			case EWebhookEvent.PROPOSAL_ENDED:
-				return this.handleProposalStatusChanged({
-					network,
-					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>
-				});
-			case EWebhookEvent.VOTED:
 			case EWebhookEvent.BOUNTY_CLAIMED:
 			case EWebhookEvent.DECISION_DEPOSIT_PLACED:
+			case EWebhookEvent.PROPOSAL_STATUS_UPDATED:
+				return this.handleProposalStatusChanged({
+					network,
+					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>
+				});
+			case EWebhookEvent.VOTED:
 			case EWebhookEvent.REMOVED_VOTE:
 			case EWebhookEvent.TIPPED:
 			case EWebhookEvent.DELEGATED:
@@ -143,72 +103,22 @@ export class WebhookService {
 		}
 	}
 
-	private static async handleOffChainPostCreated({
-		network,
-		params
-	}: {
-		network: ENetwork;
-		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.OFF_CHAIN_POST_CREATED]>;
-	}) {
-		const { index, title, content, authorId, allowedCommentor, topic, tags, linkedPost } = params;
-
-		const processedTags: ITag[] = tags?.filter((tag) => ValidatorService.isValidTag(tag)).map((tag) => ({ value: tag, network, lastUsedAt: new Date() })) ?? [];
-
-		await Promise.all([
-			processedTags.length > 0 ? OffChainDbService.CreateTags(processedTags) : Promise.resolve(),
-			FirestoreService.CreatePost({
-				network,
-				proposalType: EProposalType.DISCUSSION,
-				userId: authorId,
-				content,
-				title,
-				allowedCommentor,
-				tags: processedTags,
-				topic,
-				indexOrHash: index.toString(),
-				linkedPost
-			})
-		]);
-	}
-
-	private static async handlePostEdited({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_EDITED]> }) {
-		const { indexOrHash, content, authorId, proposalType, title, allowedCommentor, tags, linkedPost } = params;
-
-		const processedTags: ITag[] = tags?.filter((tag) => ValidatorService.isValidTag(tag)).map((tag) => ({ value: tag, network, lastUsedAt: new Date() })) ?? [];
-
-		await Promise.all([
-			processedTags.length > 0 ? OffChainDbService.CreateTags(processedTags) : Promise.resolve(),
-			updatePostServer({ network, proposalType, indexOrHash, content, title, allowedCommentor, userId: authorId, linkedPost })
-		]);
-	}
-
-	private static async handlePostDeleted({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.POST_DELETED]> }) {
-		const { indexOrHash, proposalType } = params;
-
-		await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash });
-
-		// Invalidate caches
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash });
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network });
-		await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
-	}
-
 	private static async handleProposalStatusChanged({
 		network,
 		params
 	}: {
 		network: ENetwork;
-		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED | EWebhookEvent.PROPOSAL_ENDED]>;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>;
 	}) {
 		const { indexOrHash, proposalType } = params;
 
 		// Invalidate caches
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash });
-		await RedisService.DeletePostsListing({ network, proposalType });
-		await RedisService.DeleteActivityFeed({ network });
-		await RedisService.DeleteAllSubscriptionFeedsForNetwork(network);
-		await RedisService.DeleteDelegationStats(network);
+		await Promise.all([
+			RedisService.DeletePostData({ network, proposalType, indexOrHash }),
+			RedisService.DeletePostsListing({ network, proposalType }),
+			RedisService.DeleteActivityFeed({ network }),
+			RedisService.DeleteAllSubscriptionFeedsForNetwork(network)
+		]);
 	}
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {

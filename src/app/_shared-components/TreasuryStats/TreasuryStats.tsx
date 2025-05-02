@@ -70,7 +70,7 @@ interface TreasuryHeaderProps {
 function TreasuryHeader({ isActivityFeed, onDetailsClick }: TreasuryHeaderProps) {
 	const t = useTranslations();
 	return (
-		<div className='flex items-center justify-between'>
+		<div className='flex items-center gap-2'>
 			<div className='flex items-center gap-1'>
 				<h2 className={cn('text-muted-foreground', isActivityFeed ? 'text-lg font-bold' : 'text-sm font-normal')}>{t('TreasuryStats.treasury')}</h2>
 				<Tooltip>
@@ -83,7 +83,7 @@ function TreasuryHeader({ isActivityFeed, onDetailsClick }: TreasuryHeaderProps)
 				</Tooltip>
 			</div>
 			<Button
-				variant='link'
+				variant='ghost'
 				size='sm'
 				onClick={onDetailsClick}
 				className='border-none p-0 text-xs font-medium text-text_pink'
@@ -126,7 +126,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 	const priceChange = data?.[0]?.nativeTokenUsdPrice24hChange;
 	const isPriceUp = priceChange && parseFloat(priceChange) >= 0;
 	const priceChangeText = isPriceUp ? `+${Number(priceChange).toFixed(2)}%` : `${Number(priceChange).toFixed(2)}%`;
-	const priceChangeColor = isPriceUp ? 'text-success' : 'text-destructive';
+	const priceChangeColor = isPriceUp ? 'text-green-400' : 'text-red-400';
 
 	const treasuryData = useTreasuryData(data || []);
 
@@ -142,8 +142,8 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 					onDetailsClick={() => setIsOpen(true)}
 				/>
 
-				<div className={cn('my-1', !isActivityFeed ? 'px-0 lg:px-4' : '')}>
-					<div className={cn('mt-3 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
+				<div className={cn('my-1 flex flex-col justify-between', !isActivityFeed ? 'px-0 lg:px-4' : '')}>
+					<div className={cn('flex w-full items-center justify-center gap-4 py-1 font-semibold', isActivityFeed ? 'text-xs' : 'rounded-md bg-bg_code text-sm')}>
 						<h1 className='text-lg font-bold text-muted-foreground dark:text-white'>~${treasuryData.totalInUsd}</h1>
 
 						{!isActivityFeed && (
@@ -156,7 +156,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 						)}
 					</div>
 
-					<div className={cn('mt-4 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-sm')}>
+					<div className={cn('mt-4 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-xs lg:text-sm xl:ml-9 2xl:ml-12')}>
 						<div>
 							<AssetDisplay
 								icon={NETWORKS_DETAILS[`${network}`].logo}

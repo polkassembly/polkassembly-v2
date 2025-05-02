@@ -39,16 +39,17 @@ export class AIService {
     - Key stakeholders or beneficiaries (if any)
 
     STRICT RULES:
-    - Return ONLY bullet points in markdown format
-    - Each bullet point must be 1-2 lines maximum
-    - No introductory text or commentary
-    - Use technical/blockchain terminology appropriately
-    - Keep information factual and objective
-		- Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries
+    - Your entire response must ONLY consist of markdown bullet points. DO NOT include any other text.
+    - NEVER include any explanatory text, thinking, or commentary before or after the bullet points.
+    - Start your response with the first bullet point immediately.
+    - Each bullet point must be 1-2 lines maximum.
+    - Use technical/blockchain terminology appropriately.
+    - Keep information factual and objective.
+    - Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries.
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
-    Analyze the sentiment and provide a breakdown in the following format:
+    Analyze the sentiment and provide a breakdown in EXACTLY this format:
 
     ### Users feeling optimistic say: [Summarize main positive points if any]
 
@@ -60,12 +61,15 @@ export class AIService {
     - [List main questions]
 
     STRICT RULES: 
-		- Respond ONLY with the markdown formatted analysis. Do not include any introductory text, acknowledgments, or additional commentary.
-		- Format the response in markdown and maintain objectivity in the analysis.
+		- Your ENTIRE response must follow ONLY this markdown format with these exact section headers.
+		- DO NOT include any introductory text, thinking, acknowledgments, or commentary before or after the analysis.
+		- DO NOT explain your reasoning or include any meta-commentary about the analysis.
+		- Begin your response directly with the first heading.
+		- If a section has no content, include the heading but leave the content empty or write "None identified."
     `,
 		CONTENT_SPAM_CHECK: `
     You are a helpful assistant that evaluates Polkadot governance content for spam and scam.
-    Return only 'true' if the content matches any spam criteria, or 'false' if it's legitimate content.
+    Return ONLY the word 'true' if the content matches any spam criteria, or ONLY the word 'false' if it's legitimate content.
 
     Check for:
     - Irrelevant promotional content
@@ -87,25 +91,32 @@ export class AIService {
     STRICT RULES:
     - Consider the technical nature of governance and funding discussions when evaluating.
     - A post being controversial or having strong opinions does not make it spam.
-    - Return ONLY ONE WORD, either 'true' or 'false' without ANY additional text or explanation.
+    - Your ENTIRE response must be EXACTLY one word: either 'true' or 'false'.
+    - DO NOT include ANY explanations, reasoning, or additional words in your response.
 		`,
 		COMMENT_SENTIMENT_ANALYSIS: `
 		You are a helpful assistant that analyzes the sentiment of given comment on a post on the Polkadot governance forum Polkassembly.
-		Return the sentiment as either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+		Return the sentiment as ONLY one of these exact values: 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
 
 		STRICT RULES:
-		- Return ONLY ONE WORD either 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+		- Your ENTIRE response must be EXACTLY ONE WORD from the following list: 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
+		- DO NOT include any explanations, reasoning, or additional text in your response.
+		- DO NOT use quotation marks or any other characters around your response.
 		`,
 		POST_CONTENT_EXTRACTION: `
 		You are a helpful assistant that extracts the content of a given post on the Polkadot governance forum Polkassembly.
-		Return the following in a JSON format:
+		Return ONLY the following in a valid JSON format:
 		{
 			"beneficiaries": [address1, address2, ...],
-			"proposer": "proposer address",
+			"proposer": "proposer address"
 		}
 
 		STRICT RULES:
-		- Return ONLY the JSON format.
+		- Your ENTIRE response must be ONLY the JSON object with no additional text.
+		- DO NOT include any explanations, comments, or markdown formatting.
+		- DO NOT include code fences or JSON syntax indicators.
+		- Ensure the JSON is properly formatted and valid.
+		- If you cannot extract a field, use an empty array for beneficiaries or empty string for proposer.
 		`
 	} as const;
 
@@ -140,7 +151,30 @@ export class AIService {
 				response: aiResponse
 			});
 
-			return aiResponse;
+			// Clean the response based on which prompt was used
+			let cleanedResponse = aiResponse;
+
+			// Remove thinking tags
+			cleanedResponse = cleanedResponse.replace(/<think>[\s\S]*?<\/think>/g, '');
+
+			// Remove any explanatory text that doesn't match expected format
+			if (prompt.includes(this.BASE_PROMPTS.POST_SUMMARY)) {
+				// Keep only markdown bullet points
+				cleanedResponse = cleanedResponse
+					.split('\n')
+					.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
+					.join('\n');
+			} else if (prompt.includes(this.BASE_PROMPTS.CONTENT_SPAM_CHECK) || prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
+				// Extract just the single word response
+				const match = cleanedResponse.match(/\b(true|false|against|slightly_against|neutral|slightly_for|for)\b/i);
+				cleanedResponse = match ? match[0].toLowerCase() : '';
+			} else if (prompt.includes(this.BASE_PROMPTS.POST_CONTENT_EXTRACTION)) {
+				// Extract just the JSON object
+				const jsonMatch = cleanedResponse.match(/{[\s\S]*?}/);
+				cleanedResponse = jsonMatch ? jsonMatch[0] : '';
+			}
+
+			return cleanedResponse;
 		} catch (error) {
 			console.error('Error in generating AI response', error);
 			return null;
