@@ -218,3 +218,12 @@
 		color: var(--baseText);
 	}
 }
+
+.mdxeditor-toolbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.mdxeditor-toolbar::-webkit-scrollbar {
+	@apply hidden;
+}
