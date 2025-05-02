@@ -6,3 +6,7 @@ export enum ENetwork {
 	POLKADOT = 'polkadot',
 	KUSAMA = 'kusama'
 }
+
+export enum EWebhookEvent {
+	CACHE_REFRESH = 'cache_refresh'
+}

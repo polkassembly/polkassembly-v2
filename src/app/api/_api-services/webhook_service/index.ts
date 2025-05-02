@@ -27,7 +27,8 @@ enum EWebhookEvent {
 	TIPPED = 'tipped',
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated',
-	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated'
+	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated',
+	CACHE_REFRESH = 'cache_refresh'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -75,7 +76,8 @@ export class WebhookService {
 		[EWebhookEvent.PROPOSAL_STATUS_UPDATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
-		})
+		}),
+		[EWebhookEvent.CACHE_REFRESH]: z.object({})
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
@@ -98,6 +100,8 @@ export class WebhookService {
 			case EWebhookEvent.DELEGATED:
 			case EWebhookEvent.UNDELEGATED:
 				return this.handleOtherEvent({ network, params });
+			case EWebhookEvent.CACHE_REFRESH:
+				return this.handleCacheRefresh({ network });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -119,6 +123,11 @@ export class WebhookService {
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network)
 		]);
+	}
+
+	// refreshes caches for common endpoints and active proposals
+	private static async handleCacheRefresh({ network }: { network: ENetwork }) {
+		console.log('TODO: add handling for cache refresh', { network });
 	}
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {

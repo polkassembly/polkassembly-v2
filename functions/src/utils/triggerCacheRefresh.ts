@@ -4,6 +4,7 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
+import { EWebhookEvent } from '../types';
 import { CACHE_REFRESH_NETWORKS } from '../constants';
 
 export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase: string }) {
@@ -12,9 +13,9 @@ export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase
 			try {
 				logger.info(`Triggering cache refresh for network: ${network}`);
 
-				// TODO: `https://${network}.polkassembly.io/api/v2/webhook/cache-refresh`,
+				// TODO: `https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 				const response = await axios.post(
-					'https://test.polkassembly.io/api/v2/webhook/cache-refresh',
+					`https://test.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 					{}, // Empty body
 					{
 						headers: {
