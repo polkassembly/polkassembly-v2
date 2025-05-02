@@ -20,6 +20,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import { useAtom } from 'jotai';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { Separator } from '@/app/_shared-components/Separator';
+import { formatTrackName } from '@/_shared/_utils/formatTrackName';
 import styles from '../Delegation.module.scss';
 
 function MyDelegateTracks() {
@@ -168,7 +169,7 @@ function MyDelegateTracks() {
 										className='cursor-pointer'
 									>
 										<TableCell className='p-6'>{index + 1}</TableCell>
-										<TableCell className={styles.tableCell_2}>{trackDetails?.name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</TableCell>
+										<TableCell className={styles.tableCell_2}>{trackDetails?.name ? formatTrackName(trackDetails.name) : '-'}</TableCell>
 										<TableCell className={styles.tableCell_3}>{trackDetails?.description || '-'}</TableCell>
 										<TableCell className={styles.tableCell_3}>{track.activeProposalsCount}</TableCell>
 										<TableCell className={styles.tableCell_3}>

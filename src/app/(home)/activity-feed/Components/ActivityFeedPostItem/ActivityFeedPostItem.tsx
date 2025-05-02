@@ -19,6 +19,7 @@ import Address from '@ui/Profile/Address/Address';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
+import { formatTrackName } from '@/_shared/_utils/formatTrackName';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
@@ -108,9 +109,6 @@ function ActivityFeedPostItem({
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 	const likeCount = reactionState.isLiked !== undefined || null ? reactionState.likesCount : 0;
 	const dislikeCount = reactionState.isDisliked !== undefined || null ? reactionState.dislikesCount : 0;
-	const formatOriginText = (text: string): string => {
-		return text.replace(/([A-Z])/g, ' $1').trim();
-	};
 
 	return (
 		<div className={styles.container}>
@@ -161,7 +159,7 @@ function ActivityFeedPostItem({
 						<Address address={postData.onChainInfo?.proposer || ''} />
 					</span>
 					<span>in</span>
-					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatOriginText(postData.onChainInfo?.origin || '')}</span>
+					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatTrackName(postData.onChainInfo?.origin || '')}</span>
 					{postData.onChainInfo?.createdAt && (
 						<>
 							<span>|</span>
