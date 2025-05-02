@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import { EListingTab, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BiSort } from '@react-icons/all-files/bi/BiSort';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { MdSearch } from '@react-icons/all-files/md/MdSearch';
 import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
@@ -263,9 +262,6 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 									{renderFilterContent()}
 								</PopoverContent>
 							</Popover>
-							<p className={styles.filter}>
-								<span className='hidden text-text_primary lg:block'>{t('CreateProposalDropdownButton.sortBy')}</span> <BiSort className='text-text_primary' />
-							</p>
 						</div>
 					</div>
 				</div>

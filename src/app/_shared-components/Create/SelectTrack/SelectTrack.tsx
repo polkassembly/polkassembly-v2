@@ -7,6 +7,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import React, { useMemo } from 'react';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 const getMaxSpend = (network: ENetwork, trackName: EPostOrigin) => {
@@ -76,25 +77,25 @@ function SelectTrack({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, requestedAmount, sortedTracks]);
 
-	const formatTrackName = useMemo(() => {
+	const formatTrackDisplay = useMemo(() => {
 		if (!appropriateTrack) {
 			return t('CreateTreasuryProposal.selectTrack');
 		}
-		return `[${appropriateTrack.trackId}] ${appropriateTrack.name.split(/(?=[A-Z])/).join(' ')}`;
+		return `[${appropriateTrack.trackId}] ${convertCamelCaseToTitleCase(appropriateTrack.name)}`;
 	}, [appropriateTrack, t]);
 
 	return (
 		<div className='flex flex-col gap-y-1'>
 			<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>{formatTrackName}</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>{formatTrackDisplay}</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{sortedTracks.map((tr) => (
 						<DropdownMenuItem
 							key={tr.trackId}
 							onClick={() => onChange(tr)}
 						>
-							[{tr.trackId}] {tr.name.split(/(?=[A-Z])/).join(' ')}
+							[{tr.trackId}] {convertCamelCaseToTitleCase(tr.name)}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>

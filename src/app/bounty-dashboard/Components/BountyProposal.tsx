@@ -7,6 +7,7 @@ import { IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { spaceGroteskFont } from '@/app/_style/fonts';
 import BountyCard from '@assets/bounties/bounty-card.svg';
 import DollarIcon from '@assets/bounties/Dollar.svg';
@@ -119,7 +120,7 @@ function BountyProposal({ bountyProposals, tokenPrice }: { bountyProposals: IGen
 													className='text-sm text-text_primary'
 												/>
 												<span className={`${getSpanStyle(bounty.onChainInfo?.origin || '', 1)} rounded-md px-1.5 py-1 text-xs`}>
-													{bounty.onChainInfo?.origin.replace(/([A-Z])/g, ' $1').trim() || ''}
+													{convertCamelCaseToTitleCase(bounty.onChainInfo?.origin || '')}
 												</span>
 											</div>
 										</div>
