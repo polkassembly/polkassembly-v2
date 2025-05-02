@@ -131,61 +131,66 @@ export class WebhookService {
 
 	// refreshes caches for common endpoints and active proposals
 	private static async handleCacheRefresh({ network }: { network: ENetwork }) {
-		// 1. refresh cache for active proposals
-		const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
-			network,
-			proposalType: EProposalType.REFERENDUM_V2,
-			limit: 100,
-			page: 1,
-			statuses: ACTIVE_PROPOSAL_STATUSES
-		});
+		try {
+			console.log(`Starting cache refresh for network: ${network}`);
+			const baseUrl = await getBaseUrl();
+			const headers = { 'x-network': network };
 
-		const baseUrl = await getBaseUrl();
-
-		const headers = {
-			'x-network': network
-		};
-
-		const postDetailsPromises = activeProposals.map((proposal) => {
-			return fetch(`${baseUrl}/${EProposalType.REFERENDUM_V2}/${proposal.index || proposal.hash}`, {
-				headers
+			// 1. Fetch active proposals
+			const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
+				network,
+				proposalType: EProposalType.REFERENDUM_V2,
+				limit: 100,
+				page: 1,
+				statuses: ACTIVE_PROPOSAL_STATUSES
 			});
-		});
 
-		// 2. refresh cache for all other listing pages
-		const allListingPagePromise = fetch(`${baseUrl}/${EProposalType.REFERENDUM_V2}`, {
-			headers
-		});
+			// 2. Prepare all URLs that need to be fetched
+			const fetchUrls: string[] = [];
 
-		const discussionsListingPagePromise = fetch(`${baseUrl}/${EProposalType.DISCUSSION}`, {
-			headers
-		});
+			// Add primary listing pages
+			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.DISCUSSION}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.BOUNTY}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.CHILD_BOUNTY}`);
 
-		const bountiesListingPagePromise = fetch(`${baseUrl}/${EProposalType.BOUNTY}`, {
-			headers
-		});
-
-		const childBountiesListingPagePromise = fetch(`${baseUrl}/${EProposalType.CHILD_BOUNTY}`, {
-			headers
-		});
-
-		// 3. refresh cache for all listing pages for all tracks
-		const trackListingPagePromises = Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails).map((origin) => {
-			return fetch(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}`, {
-				headers
+			// Add track listing pages
+			Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails).forEach((origin) => {
+				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}`);
 			});
-		});
 
-		await Promise.all([
-			postDetailsPromises,
-			allListingPagePromise,
-			discussionsListingPagePromise,
-			bountiesListingPagePromise,
-			childBountiesListingPagePromise,
-			...trackListingPagePromises
-		]);
+			// Add active proposal detail pages
+			activeProposals.forEach((proposal) => {
+				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}/${proposal.index || proposal.hash}`);
+			});
 
-		console.log(`Cache refreshed for ${activeProposals.length} active proposals, all listing pages and all track listing pages`);
+			// 3. Create an array of fetch promises with individual 15-second timeouts
+			const fetchPromises = fetchUrls.map((url) => {
+				// Create a timeout promise that rejects after 15 seconds
+				const timeoutPromise = new Promise<Response>((_, reject) => {
+					setTimeout(() => reject(new Error(`Request to ${url} timed out after 15 seconds`)), 15000);
+				});
+
+				// Create the fetch promise
+				const fetchPromise = fetch(url, { headers }).catch((error) => {
+					console.warn(`Failed to refresh cache for ${url}:`, error);
+					return null;
+				});
+
+				// Race between the fetch and the timeout
+				return Promise.race([fetchPromise, timeoutPromise]).catch((error) => {
+					console.warn(`Request failed for ${url}:`, error);
+					return null;
+				});
+			});
+
+			// 4. Execute all in parallel and ignore individual failures
+			await Promise.allSettled(fetchPromises);
+
+			console.log(`Cache refreshed for ${activeProposals.length} active proposals, all listing pages and track listing pages`);
+		} catch (error) {
+			console.error(`Error refreshing cache for network ${network}:`, error);
+		}
 	}
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
