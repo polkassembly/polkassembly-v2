@@ -36,6 +36,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			hydration: { dot: '', usdc: '', usdt: '' },
 			bounties: { dot: '' },
 			fellowship: { dot: '', usdt: '' },
+			loans: config.loanAmounts,
 			total: { totalDot: '', totalUsdc: '', totalUsdt: '', totalMyth: '' }
 		};
 
@@ -357,11 +358,25 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const calculateTotal = (propertyName: 'dot' | 'usdc' | 'usdt' | 'myth'): string => {
 			let total = new BN(0);
 
-			Object.values(treasuryStats).forEach((section) => {
-				if (section && typeof section === 'object' && propertyName in section) {
-					const value = (section as Record<string, string>)[propertyName as keyof typeof section];
-					if (value && value !== '') {
-						total = total.add(new BN(value));
+			Object.entries(treasuryStats).forEach(([sectionKey, section]) => {
+				if (section && typeof section === 'object') {
+					if (sectionKey === 'loans') {
+						// Handle the nested loan structure
+						const loans = section as Record<string, Record<string, string>>;
+						Object.values(loans).forEach((loanProvider) => {
+							if (loanProvider && typeof loanProvider === 'object' && propertyName in loanProvider) {
+								const value = loanProvider[String(propertyName)];
+								if (value && value !== '') {
+									total = total.add(new BN(value));
+								}
+							}
+						});
+					} else if (propertyName in section) {
+						// Handle regular sections
+						const value = (section as Record<string, string>)[String(propertyName)];
+						if (value && value !== '') {
+							total = total.add(new BN(value));
+						}
 					}
 				}
 			});
