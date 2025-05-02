@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
+import { EAppEnv } from '@/_shared/types';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
@@ -15,15 +17,17 @@ import { NextRequest } from 'next/server';
  */
 export async function storeApiKeyUsage(req: NextRequest) {
 	try {
-		const apiKey = (await headers()).get('x-api-key') || 'unknown';
+		const apiKey = (await headers()).get('x-api-key') || null;
 		const apiRoute = req.url?.split('?')[0] || 'unknown';
 
-		// do not call for localhost
-		if (req.nextUrl.hostname === 'localhost') {
+		const { NEXT_PUBLIC_APP_ENV } = getSharedEnvVars();
+
+		// do not store api key usage for development or null api keys
+		if (NEXT_PUBLIC_APP_ENV !== EAppEnv.PRODUCTION || !apiKey) {
 			return;
 		}
-		// do not await this as it is fire-and-forget
-		OffChainDbService.UpdateApiKeyUsage(apiKey, apiRoute);
+
+		await OffChainDbService.UpdateApiKeyUsage(apiKey, apiRoute);
 	} catch (e) {
 		console.error('Error in storeApiKeyUsage : ', e);
 	}
