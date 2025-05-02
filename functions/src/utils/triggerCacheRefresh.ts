@@ -4,17 +4,17 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
-import { TREASURY_STATS_NETWORKS } from '../constants';
+import { CACHE_REFRESH_NETWORKS } from '../constants';
 
-export async function fetchLatestTreasuryStats({ toolsPassphrase }: { toolsPassphrase: string }) {
+export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase: string }) {
 	return Promise.all(
-		TREASURY_STATS_NETWORKS.map(async (network) => {
+		CACHE_REFRESH_NETWORKS.map(async (network) => {
 			try {
-				logger.info(`Fetching treasury stats for network: ${network}`);
+				logger.info(`Triggering cache refresh for network: ${network}`);
 
-				// TODO: `https://${network}.polkassembly.io/api/v2/meta/treasury-stats`,
+				// TODO: `https://${network}.polkassembly.io/api/v2/webhook/cache-refresh`,
 				const response = await axios.post(
-					'https://test.polkassembly.io/api/v2/meta/treasury-stats',
+					'https://test.polkassembly.io/api/v2/webhook/cache-refresh',
 					{}, // Empty body
 					{
 						headers: {
@@ -24,11 +24,11 @@ export async function fetchLatestTreasuryStats({ toolsPassphrase }: { toolsPassp
 					}
 				);
 
-				logger.info(`Treasury stats fetched successfully for ${network}`, response.data);
+				logger.info(`Cache refresh triggered successfully for ${network}`, response.data);
 				return response.data;
 			} catch (error) {
 				// Log error for this network but continue with others
-				logger.error(`Error fetching treasury stats for ${network}:`, error);
+				logger.error(`Error triggering cache refresh for ${network}:`, error);
 				return null;
 			}
 		})

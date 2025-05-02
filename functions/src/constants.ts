@@ -5,6 +5,7 @@
 import { ENetwork } from './types';
 
 export const TREASURY_STATS_NETWORKS = [ENetwork.POLKADOT];
+export const CACHE_REFRESH_NETWORKS = [ENetwork.POLKADOT];
 
 export const ERROR_MESSAGES = {
 	TOOLS_PASSPHRASE_NOT_DEFINED: 'TOOLS_PASSPHRASE is not defined in environment variables',
