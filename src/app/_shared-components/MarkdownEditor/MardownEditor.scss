@@ -222,6 +222,17 @@
 .mdxeditor-toolbar {
 	-ms-overflow-style: none;
 	scrollbar-width: none;
+
+	@apply h-9;
+	/* Add styling for toolbar buttons */
+	button {
+		@apply flex cursor-pointer items-center justify-center;
+
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
 }
 
 .mdxeditor-toolbar > div:nth-child(2) {
