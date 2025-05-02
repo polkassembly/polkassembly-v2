@@ -7,7 +7,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import React, { useMemo } from 'react';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
-import { formatTrackName } from '@/_shared/_utils/formatTrackName';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 const getMaxSpend = (network: ENetwork, trackName: EPostOrigin) => {
@@ -81,7 +81,7 @@ function SelectTrack({
 		if (!appropriateTrack) {
 			return t('CreateTreasuryProposal.selectTrack');
 		}
-		return `[${appropriateTrack.trackId}] ${formatTrackName(appropriateTrack.name)}`;
+		return `[${appropriateTrack.trackId}] ${convertCamelCaseToTitleCase(appropriateTrack.name)}`;
 	}, [appropriateTrack, t]);
 
 	return (
@@ -95,7 +95,7 @@ function SelectTrack({
 							key={tr.trackId}
 							onClick={() => onChange(tr)}
 						>
-							[{tr.trackId}] {formatTrackName(tr.name)}
+							[{tr.trackId}] {convertCamelCaseToTitleCase(tr.name)}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>

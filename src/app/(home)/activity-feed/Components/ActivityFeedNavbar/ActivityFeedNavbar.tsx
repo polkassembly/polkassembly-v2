@@ -23,6 +23,7 @@ import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 import { FaChevronLeft } from '@react-icons/all-files/fa/FaChevronLeft';
 import { FaChevronRight } from '@react-icons/all-files/fa/FaChevronRight';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {
@@ -130,10 +131,6 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 			overflowTabs: overflowEntries
 		};
 	}, [categoryStructure, currentTab, sidebarState]);
-
-	const formatTrackName = (name: string) => {
-		return name.replace(/([A-Z])/g, ' $1').trim();
-	};
 
 	const handleCategoryClick = (category: string) => {
 		if (category === CATEGORIES.ALL) {
@@ -274,7 +271,7 @@ function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOr
 							className={cn(styles.trackName, currentTab === track && styles.activeTab)}
 							onSelect={() => setCurrentTab(track)}
 						>
-							{formatTrackName(track)}
+							{convertCamelCaseToTitleCase(track)}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>

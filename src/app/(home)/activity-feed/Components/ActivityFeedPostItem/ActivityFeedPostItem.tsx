@@ -19,7 +19,7 @@ import Address from '@ui/Profile/Address/Address';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
-import { formatTrackName } from '@/_shared/_utils/formatTrackName';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';
@@ -159,7 +159,7 @@ function ActivityFeedPostItem({
 						<Address address={postData.onChainInfo?.proposer || ''} />
 					</span>
 					<span>in</span>
-					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatTrackName(postData.onChainInfo?.origin || '')}</span>
+					<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}</span>
 					{postData.onChainInfo?.createdAt && (
 						<>
 							<span>|</span>

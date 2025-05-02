@@ -26,7 +26,7 @@ import PostTags from '@ui/PostDetails/PostTags/PostTags';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
-import { formatTrackName } from '@/_shared/_utils/formatTrackName';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -104,7 +104,9 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 						{postData.onChainInfo?.origin && (
 							<>
 								<span className='text-xs text-wallet_btn_text'>{t('Search.in')}</span>
-								<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${classes.originStyle}`}>{formatTrackName(postData.onChainInfo?.origin || '')}</span>
+								<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${classes.originStyle}`}>
+									{convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}
+								</span>
 								<Separator
 									orientation='vertical'
 									className='h-3'

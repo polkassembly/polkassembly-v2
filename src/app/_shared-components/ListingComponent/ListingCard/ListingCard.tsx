@@ -14,7 +14,7 @@ import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/netwo
 import Address from '@ui/Profile/Address/Address';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
-import { formatTrackName } from '@/_shared/_utils/formatTrackName';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
@@ -109,7 +109,9 @@ function ListingCard({
 								{ValidatorService.isValidOnChainProposalType(proposalType) && data.onChainInfo?.origin && (
 									<>
 										<span>|</span>
-										<span className={`${getSpanStyle(data.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>{formatTrackName(data.onChainInfo?.origin || '')}</span>
+										<span className={`${getSpanStyle(data.onChainInfo?.origin || '', 1)} ${styles.originStyle}`}>
+											{convertCamelCaseToTitleCase(data.onChainInfo?.origin || '')}
+										</span>
 									</>
 								)}
 							</div>
