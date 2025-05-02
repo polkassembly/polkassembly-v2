@@ -224,6 +224,10 @@
 	scrollbar-width: none;
 }
 
+.mdxeditor-toolbar > div:nth-child(2) {
+	background-color: var(--baseBg) !important;
+}
+
 .mdxeditor-toolbar::-webkit-scrollbar {
 	@apply hidden;
 }
