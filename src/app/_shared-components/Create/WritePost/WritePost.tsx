@@ -89,7 +89,6 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 						<FormLabel>{t('Create.description')}*</FormLabel>
 						<FormControl>
 							<MarkdownEditor
-								contentEditableClassName='min-h-[200px]'
 								markdown={field.value || ''}
 								onChange={(data) => {
 									field.onChange(data);

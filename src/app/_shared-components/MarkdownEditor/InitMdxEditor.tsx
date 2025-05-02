@@ -25,25 +25,22 @@ import {
 	linkDialogPlugin,
 	frontmatterPlugin,
 	codeBlockPlugin,
-	codeMirrorPlugin,
 	diffSourcePlugin,
 	imagePlugin,
 	directivesPlugin,
-	StrikeThroughSupSubToggles,
 	AdmonitionDirectiveDescriptor,
 	BoldItalicUnderlineToggles,
 	Separator,
-	ChangeCodeMirrorLanguage,
 	DiffSourceToggleWrapper,
 	ConditionalContents,
 	CodeToggle,
 	ListsToggle,
 	BlockTypeSelect,
 	InsertImage,
-	InsertCodeBlock,
 	InsertTable,
 	CreateLink,
-	InsertThematicBreak
+	InsertThematicBreak,
+	StrikeThroughSupSubToggles
 } from '@mdxeditor/editor';
 
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
@@ -186,7 +183,6 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		thematicBreakPlugin(),
 		frontmatterPlugin(),
 		codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-		codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'Plain Text', tsx: 'TypeScript' } }),
 		directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
 		diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
 		markdownShortcutPlugin()
@@ -200,16 +196,16 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 			<DiffSourceToggleWrapper>
 				<ConditionalContents
 					options={[
-						{ when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
 						{
 							fallback: () => (
 								<>
 									<BoldItalicUnderlineToggles />
+									<StrikeThroughSupSubToggles options={['Strikethrough']} />
 									<CodeToggle />
 
 									<Separator />
 
-									<ListsToggle />
+									<ListsToggle options={['number', 'bullet']} />
 
 									<Separator />
 
@@ -222,13 +218,8 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 									<Separator />
 
-									<StrikeThroughSupSubToggles />
-
-									<Separator />
-
 									<InsertTable />
 									<InsertThematicBreak />
-									<InsertCodeBlock />
 								</>
 							)
 						}

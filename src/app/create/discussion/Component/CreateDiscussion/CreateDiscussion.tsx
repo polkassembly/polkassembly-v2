@@ -71,7 +71,7 @@ function CreateDiscussion() {
 							>
 								{t('Create.login')}
 							</Link>{' '}
-							{t('Create.toCreate')}
+							{t('Create.toCreateDiscussion')}
 						</p>
 					) : (
 						<>
