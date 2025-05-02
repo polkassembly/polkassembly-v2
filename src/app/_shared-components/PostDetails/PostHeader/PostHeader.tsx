@@ -26,7 +26,7 @@ import PostTags from '@ui/PostDetails/PostTags/PostTags';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 

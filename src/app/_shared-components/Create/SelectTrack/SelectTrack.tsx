@@ -7,7 +7,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import React, { useMemo } from 'react';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 
 const getMaxSpend = (network: ENetwork, trackName: EPostOrigin) => {

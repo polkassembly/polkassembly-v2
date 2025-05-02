@@ -19,7 +19,7 @@ import Address from '@ui/Profile/Address/Address';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePostReactions } from '@/hooks/usePostReactions';

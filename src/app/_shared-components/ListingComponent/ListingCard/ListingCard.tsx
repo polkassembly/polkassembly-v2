@@ -14,7 +14,7 @@ import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/netwo
 import Address from '@ui/Profile/Address/Address';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';

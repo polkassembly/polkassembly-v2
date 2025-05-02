@@ -23,7 +23,7 @@ import { useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 import { FaChevronLeft } from '@react-icons/all-files/fa/FaChevronLeft';
 import { FaChevronRight } from '@react-icons/all-files/fa/FaChevronRight';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import styles from './ActivityFeedNavbar.module.scss';
 
 function ActivityFeedNavbar({ currentTab, setCurrentTab }: { currentTab: EPostOrigin | 'All'; setCurrentTab: (tab: EPostOrigin | 'All') => void }) {

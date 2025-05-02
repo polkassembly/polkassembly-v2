@@ -20,7 +20,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import { useAtom } from 'jotai';
 import { delegateUserTracksAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { Separator } from '@/app/_shared-components/Separator';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/camelCaseToTitleCase';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import styles from '../Delegation.module.scss';
 
 function MyDelegateTracks() {
