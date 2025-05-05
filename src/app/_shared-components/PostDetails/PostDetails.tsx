@@ -6,7 +6,7 @@
 
 import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
@@ -24,6 +24,7 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
+import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
@@ -48,6 +49,11 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	}, [aiSummary]);
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post.proposalType);
+
+	const canPlaceDecisionDeposit = useMemo(
+		() => post.proposalType === EProposalType.REFERENDUM_V2 && post?.onChainInfo?.status === EProposalStatus.Submitted,
+		[post.proposalType, post?.onChainInfo?.status]
+	);
 
 	return (
 		<>
@@ -108,6 +114,25 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
+							{canPlaceDecisionDeposit && post?.index && post?.onChainInfo?.origin && post?.onChainInfo?.status && (
+								<PlaceDecisionDeposit
+									postId={post?.index}
+									track={post?.onChainInfo?.origin}
+									status={post?.onChainInfo?.status}
+									onSuccess={() => {
+										setPost((prev: IPost) => {
+											if (!prev.onChainInfo) return prev;
+											return {
+												...prev,
+												onChainInfo: {
+													...prev.onChainInfo,
+													status: EProposalStatus.DecisionDepositPlaced
+												}
+											};
+										});
+									}}
+								/>
+							)}
 							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
 								<VoteReferendumButton
 									iconClassName='hidden'

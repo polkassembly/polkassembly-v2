@@ -434,9 +434,9 @@
 		"bareAyes": "Síes Simples",
 		"issuance": "Emisión",
 		"viewVoteHistory": "Ver Historial de Votos",
-		"voteHistory": "Historial de Votos",
+		"voteHistory": "Historial de votos",
 		"delegated": "Delegado",
-		"votingPower": "Poder de Voto",
+		"votingPower": "Poder de voto",
 		"capital": "Capital",
 		"account": "Cuenta",
 		"abstain": "Abstención",
@@ -462,14 +462,14 @@
 			"curator": "Curador"
 		},
 		"deleteComment": "Eliminar comentario",
-		"deleteCommentConfirmation": "¿Estás seguro de que quieres eliminar este comentario?",
+		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
 		"delete": "Eliminar",
 		"hideReplies": "Ocultar respuestas",
 		"viewReplies": "Ver respuestas",
-		"commentSummary": "Resumen de Comentarios",
+		"commentSummary": "Resumen del comentario",
 		"aiSummary": "Resumen de IA",
-		"showLikelySpam": "Mostrar Comentarios de Spam",
-		"hideLikelySpam": "Ocultar Comentarios de Spam",
+		"showLikelySpam": "Mostrar spam probable",
+		"hideLikelySpam": "Ocultar spam probable",
 		"voted": "Votado",
 		"votes": "Votos",
 		"vote": "Voto",
@@ -487,7 +487,15 @@
 			"threshold": "Umbral",
 			"votingData": "Datos de Votación"
 		},
-		"threshold": "Umbral"
+		"threshold": "Umbral",
+		"DecisionDeposit": {
+			"description": "Deposite una garantía reembolsable dentro de 14 días para evitar que la propuesta expire.",
+			"details": "Detalles",
+			"add": "Agregar",
+			"decisionDeposit": "Depósito de decisión",
+			"payDecisionDeposit": "Pagar depósito de decisión",
+			"continue": "Continuar"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -580,7 +588,8 @@
 		"voteFailedTitle": "Voto fallido"
 	},
 	"Balance": {
-		"voteBalance": "Saldo de Votación"
+		"voteBalance": "Balance de Votos",
+		"Balance": "Balance"
 	},
 	"EditPost": {
 		"edit": "Editar",
@@ -830,13 +839,13 @@
 		"usdxProposal": "USDC/USDT-Vorschlag erstellen",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
-		"createPreimageDescription": "Crea una propuesta desde cero.",
-		"existingPreimageDescription": "Selecciona desde preimágenes existentes para crear una propuesta.",
-		"createTreasuryProposalDescription": "Crea una propuesta del tesoro para asignar fondos en ",
-		"usdxProposalDescription": "Propón un gasto desde AssetHub, programa pagos e incluye múltiples beneficiarios.",
-		"cancelReferendumDescription": "Propón cancelar un referéndum activo.",
-		"killReferendumDescription": "Termina un referéndum antes de que sea aprobado.",
-		"createDiscussionDescription": "Inicia una conversación y recoge opiniones.",
+		"createPreimageDescription": "Crea eine propuesta von Grund auf.",
+		"existingPreimageDescription": "Wähle aus vorhandenen Preimages, um eine propuesta zu erstellen.",
+		"createTreasuryProposalDescription": "Crea eine propuesta des Treasuries, um Gelder in ",
+		"usdxProposalDescription": "Propón einen Ausgabenauftrag von AssetHub, Zahlungsprogramm und mehreren Empfängern einschließlich.",
+		"cancelReferendumDescription": "Propón das Abbrechen eines aktiven Referendums.",
+		"killReferendumDescription": "Beendet ein Referendum, bevor es genehmigt wird.",
+		"createDiscussionDescription": "Startet eine Unterhaltung und sammelt Meinungen.",
 		"goBack": "Zurück",
 		"preimageHash": "Preimage-Hash",
 		"preimageLength": "Länge",

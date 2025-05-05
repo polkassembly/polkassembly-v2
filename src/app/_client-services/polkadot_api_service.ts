@@ -961,4 +961,18 @@ export class PolkadotApiService {
 		}
 		return this.api.query.balances.totalIssuance();
 	}
+
+	async submitDecisionDeposit({ postId, address, onSuccess, onFailed }: { postId: number; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api) return;
+
+		const tx = this.api.tx.referenda.placeDecisionDeposit(postId);
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to submit decision deposit',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
 }

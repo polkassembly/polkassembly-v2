@@ -507,6 +507,14 @@
 			"support": "Support",
 			"threshold": "Threshold",
 			"votingData": "Voting Data"
+		},
+		"DecisionDeposit": {
+			"description": "Place refundable deposit within 14 days to prevent proposal from timing out.",
+			"details": "Details",
+			"add": "Add",
+			"decisionDeposit": "Decision Deposit",
+			"payDecisionDeposit": "Pay Decision Deposit",
+			"continue": "Continue"
 		}
 	},
 	"ListingPage_Status": {
@@ -606,7 +614,8 @@
 		"voteFailedTitle": "Vote Failed"
 	},
 	"Balance": {
-		"voteBalance": "Vote Balance"
+		"voteBalance": "Vote Balance",
+		"Balance": "Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
