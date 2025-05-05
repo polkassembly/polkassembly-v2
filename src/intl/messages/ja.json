@@ -656,7 +656,8 @@
 		"descriptionRequired": "有効な説明を入力してください。",
 		"please": "お願いします",
 		"login": "ログイン",
-		"toCreate": "提案を作成するには"
+		"toCreateProposal": "提案を作成するために",
+		"toCreateDiscussion": "ディスカッションを作成するために"
 	},
 	"ProposalType": {
 		"discussion": "ディスカッション",
@@ -825,7 +826,7 @@
 		"spend": "支出",
 		"from": "から",
 		"Treasury": "トレジャリー",
-		"usdxProposal": "AssetHubから資産を支出 (USDx, DOT, etc.)",
+		"usdxProposal": "AssetHubから資産を支出 (USDC/USDT, DOT, etc.)",
 		"cancelReferendum": "レファレンダムをキャンセル",
 		"killReferendum": "レファレンダムを終了",
 		"createPreimageDescription": "提案を一から作成します。",

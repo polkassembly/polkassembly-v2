@@ -57,7 +57,11 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		usdcIndex: '1337',
 		mythosParachainId: '3369',
 		hydrationRpc: 'wss://hydradx-rpc.dwellir.com',
-		hydrationAddresses: ['7KCp4eenFS4CowF9SpQE5BBCj5MtoBA3K811tNyRmhLfH1aV', '7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'],
+		hydrationAddresses: [
+			'7KCp4eenFS4CowF9SpQE5BBCj5MtoBA3K811tNyRmhLfH1aV',
+			'7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY',
+			'7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
+		],
 		hydrationDotAssetId: 5,
 		hydrationUsdcAssetId: 22,
 		hydrationUsdtAssetId: 10,

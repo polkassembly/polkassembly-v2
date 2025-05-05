@@ -75,17 +75,16 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		post = { ...post, contentSummary };
 	}
 
-	// fetch and add user subscription to post
+	// Cache the post data without user specific data
+	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
+	// fetch and add user subscription to post
 	if (isUserAuthenticated && userId) {
 		const userSubscription = await OffChainDbService.GetPostSubscriptionByPostAndUserId({ network, proposalType, indexOrHash: index, userId });
 		if (userSubscription) {
 			post = { ...post, userSubscriptionId: userSubscription.id };
 		}
 	}
-
-	// Cache the post data
-	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
 	const response = NextResponse.json(post);
 

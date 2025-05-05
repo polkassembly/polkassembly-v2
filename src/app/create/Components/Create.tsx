@@ -17,7 +17,7 @@ import QuickActionsIcon from '@assets/icons/quick-actions-icon.svg';
 import PreimageIcon from '@assets/icons/create-preimage.svg';
 import ExistingPreimageIcon from '@assets/icons/create-existing.svg';
 import TreasuryProposalIcon from '@assets/icons/create-treasury.svg';
-import UsdxProposalIcon from '@assets/icons/create-assethub.svg';
+import UsdcUsdtProposalIcon from '@assets/icons/create-assethub.svg';
 import CancelReferendumIcon from '@assets/icons/create-cancel.svg';
 import KillReferendumIcon from '@assets/icons/create-kill.svg';
 import Image from 'next/image';
@@ -191,7 +191,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						>
 							{t('Create.login')}
 						</Link>{' '}
-						{t('Create.toCreate')}
+						{t('Create.toCreateProposal')}
 					</p>
 				) : (
 					<>
@@ -217,7 +217,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 										label={titles[EProposalStep.CREATE_USDX_PROPOSAL]}
 										onClick={() => setStep(EProposalStep.CREATE_USDX_PROPOSAL)}
 										description={t('CreateProposal.usdxProposalDescription')}
-										icon={UsdxProposalIcon}
+										icon={UsdcUsdtProposalIcon}
 										iconClassName='bg-create_usdx_bg/10'
 									/>
 								)}
@@ -232,7 +232,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 									label={titles[EProposalStep.CREATE_BOUNTY]}
 									onClick={() => setStep(EProposalStep.CREATE_BOUNTY)}
 									description={t('CreateProposal.createBountyDescription')}
-									icon={UsdxProposalIcon}
+									icon={UsdcUsdtProposalIcon}
 									iconClassName='bg-create_usdx_bg/10'
 								/>
 								<CreateOption

@@ -6,7 +6,7 @@ import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
 import { TREASURY_STATS_NETWORKS } from '../constants';
 
-export async function fetchLatestTreasuryStats({ toolsPassphrase }: { toolsPassphrase: string }) {
+export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { toolsPassphrase: string }) {
 	return Promise.all(
 		TREASURY_STATS_NETWORKS.map(async (network) => {
 			try {

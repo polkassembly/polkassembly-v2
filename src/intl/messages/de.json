@@ -656,7 +656,8 @@
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an.",
 		"please": "Bitte",
 		"login": "Anmelden",
-		"toCreate": "um eine Vorschlag zu erstellen"
+		"toCreateProposal": "um einen Vorschlag zu erstellen",
+		"toCreateDiscussion": "um eine Diskussion zu erstellen"
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",
@@ -849,7 +850,7 @@
 		"spend": "Ausgeben",
 		"from": "aus",
 		"Treasury": "Treasury",
-		"usdxProposal": "USDX-Vorschlag erstellen",
+		"usdxProposal": "USDC/USDT-Vorschlag erstellen",
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
 		"createBounty": "Kopfgeld erstellen",

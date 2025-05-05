@@ -13,6 +13,8 @@ import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const maxDuration = 300; // 5 minutes
+
 // Handle Indexer Events
 export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ webhookEvent: string }> }): Promise<NextResponse> => {
 	const { webhookEvent = '' } = await params;

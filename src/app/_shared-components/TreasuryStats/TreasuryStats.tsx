@@ -156,7 +156,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 						)}
 					</div>
 
-					<div className={cn('mt-4 grid w-full grid-cols-2 gap-4 font-semibold xl:ml-9 2xl:ml-12', isActivityFeed ? 'text-xs' : 'text-xs lg:text-sm')}>
+					<div className={cn('mt-4 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-xs lg:text-sm xl:ml-9 2xl:ml-12')}>
 						<div>
 							<AssetDisplay
 								icon={NETWORKS_DETAILS[`${network}`].logo}

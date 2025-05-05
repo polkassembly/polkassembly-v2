@@ -198,43 +198,55 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 								network
 							})}
 						</span>
-						<div className='flex flex-wrap gap-2'>
-							{data.hydration?.dot && (
-								<AssetRow
-									amount={data.hydration.dot}
-									network={network}
-								/>
-							)}
+						<div className='flex flex-col gap-2'>
+							<div className='flex flex-wrap gap-2'>
+								{data.hydration?.dot && (
+									<AssetRow
+										amount={data.hydration.dot}
+										network={network}
+									/>
+								)}
 
-							{data.hydration?.usdc && (
-								<AssetRow
-									amount={data.hydration.usdc}
-									asset={EAssets.USDC}
-									network={network}
-								/>
-							)}
+								{data.hydration?.usdc && (
+									<AssetRow
+										amount={data.hydration.usdc}
+										asset={EAssets.USDC}
+										network={network}
+									/>
+								)}
 
-							{data.hydration?.usdt && (
-								<AssetRow
-									amount={data.hydration.usdt}
-									asset={EAssets.USDT}
-									network={network}
-								/>
-							)}
-							<Link
-								href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								{t('address')} #1
-								<ExternalLink className='h-4 w-4' />
-							</Link>
-							<Link
-								href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								{t('address')} #2
-								<ExternalLink className='h-4 w-4' />
-							</Link>
+								{data.hydration?.usdt && (
+									<AssetRow
+										amount={data.hydration.usdt}
+										asset={EAssets.USDT}
+										network={network}
+									/>
+								)}
+							</div>
+
+							<div className='flex gap-2'>
+								<Link
+									href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
+									className='flex items-center gap-1 text-xs text-text_pink'
+								>
+									{t('address')} #1
+									<ExternalLink className='h-4 w-4' />
+								</Link>
+								<Link
+									href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
+									className='flex items-center gap-1 text-xs text-text_pink'
+								>
+									{t('address')} #2
+									<ExternalLink className='h-4 w-4' />
+								</Link>
+								<Link
+									href='https://hydration.subscan.io/account/7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
+									className='flex items-center gap-1 text-xs text-text_pink'
+								>
+									{t('address')} #3
+									<ExternalLink className='h-4 w-4' />
+								</Link>
+							</div>
 						</div>
 					</CategorySection>
 

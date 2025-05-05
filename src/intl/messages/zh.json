@@ -656,7 +656,8 @@
 		"descriptionRequired": "请提供有效的描述。",
 		"please": "请",
 		"login": "登录",
-		"toCreate": "以创建提案"
+		"toCreateProposal": "创建提案",
+		"toCreateDiscussion": "创建讨论"
 	},
 	"ProposalType": {
 		"discussion": "讨论",
@@ -848,7 +849,7 @@
 		"spend": "支出",
 		"from": "从",
 		"Treasury": "国库",
-		"usdxProposal": "从AssetHub支出资产 (USDx, DOT, 等)",
+		"usdxProposal": "从AssetHub支出资产 (USDC/USDT, DOT, 等)",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
 		"createPreimageDescription": "从头创建一个提案。",

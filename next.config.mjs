@@ -37,9 +37,6 @@ const nextConfig = {
 				pathname: '/**'
 			}
 		]
-	},
-	compiler: {
-		removeConsole: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? { exclude: ['error'] } : false
 	}
 };
 
