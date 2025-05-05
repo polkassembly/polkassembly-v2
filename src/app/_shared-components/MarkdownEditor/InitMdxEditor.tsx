@@ -188,9 +188,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 						popover.style.border = `1px solid ${currentTheme === 'dark' ? 'var(--separatorDark)' : '#D2D8E0'}`;
 						popover.style.borderRadius = '4px';
 						popover.style.fontSize = '14px';
-						popover.style.maxHeight = '150px';
 						popover.style.fontWeight = '500';
-						popover.style.overflowY = 'auto';
 						popover.style.zIndex = '1000';
 						popover.style.width = '250px';
 						popover.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
