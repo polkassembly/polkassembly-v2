@@ -191,11 +191,13 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 						popover.style.fontWeight = '500';
 						popover.style.zIndex = '1000';
 						popover.style.width = '250px';
+						popover.style.maxHeight = '200px';
+						popover.style.overflowY = 'auto';
 						popover.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
 
 						suggestions.forEach((suggestion) => {
 							const item = document.createElement('div');
-							item.className = 'mention-item';
+							item.className = 'mention-item truncate';
 							item.style.padding = '8px 12px';
 							item.style.cursor = 'pointer';
 							item.style.color = currentTheme === 'dark' ? '#ffffff' : 'var(--lightBlue)';
