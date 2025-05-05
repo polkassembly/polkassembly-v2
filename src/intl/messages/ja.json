@@ -487,7 +487,15 @@
 			"threshold": "閾値",
 			"votingData": "投票データ"
 		},
-		"threshold": "しきい値"
+		"threshold": "しきい値",
+		"DecisionDeposit": {
+			"description": "提案がタイムアウトするのを防ぐため、14日以内に返金可能なデポジットを配置してください。",
+			"details": "詳細",
+			"add": "追加",
+			"decisionDeposit": "決定デポジット",
+			"payDecisionDeposit": "決定デポジットを支払う",
+			"continue": "続行"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -580,7 +588,8 @@
 		"voteFailedTitle": "投票失敗"
 	},
 	"Balance": {
-		"voteBalance": "投票残高"
+		"voteBalance": "投票残高",
+		"Balance": "残高"
 	},
 	"EditPost": {
 		"edit": "編集",

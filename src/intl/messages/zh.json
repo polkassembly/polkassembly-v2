@@ -487,7 +487,15 @@
 			"threshold": "阈值",
 			"votingData": "投票数据"
 		},
-		"threshold": "阈值"
+		"threshold": "阈值",
+		"DecisionDeposit": {
+			"description": "在14天内存入可退还的保证金，以防止提案超时。",
+			"details": "详情",
+			"add": "添加",
+			"decisionDeposit": "决策保证金",
+			"payDecisionDeposit": "支付决策保证金",
+			"continue": "继续"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -580,7 +588,8 @@
 		"voteFailedTitle": "投票失败"
 	},
 	"Balance": {
-		"voteBalance": "投票余额"
+		"voteBalance": "投票余额",
+		"Balance": "余额"
 	},
 	"EditPost": {
 		"edit": "编辑",

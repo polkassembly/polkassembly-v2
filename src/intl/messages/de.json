@@ -462,14 +462,14 @@
 			"curator": "Curator"
 		},
 		"deleteComment": "Kommentar löschen",
-		"deleteCommentConfirmation": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?",
+		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
 		"delete": "Löschen",
 		"hideReplies": "Antworten ausblenden",
 		"viewReplies": "Antworten anzeigen",
-		"commentSummary": "Kommentarzusammenfassung",
-		"aiSummary": "KI-Zusammenfassung",
-		"showLikelySpam": "Wahrscheinliche Spam anzeigen",
-		"hideLikelySpam": "Wahrscheinliche Spam ausblenden",
+		"commentSummary": "Kommentar Zusammenfassung",
+		"aiSummary": "KI Zusammenfassung",
+		"showLikelySpam": "Wahrscheinlichen Spam anzeigen",
+		"hideLikelySpam": "Wahrscheinlichen Spam ausblenden",
 		"voted": "Abgestimmt",
 		"votes": "Abstimmungen",
 		"vote": "Abstimmung",
@@ -487,7 +487,15 @@
 			"threshold": "Schwellenwert",
 			"votingData": "Abstimmungsdaten"
 		},
-		"threshold": "Schwelle"
+		"threshold": "Schwelle",
+		"DecisionDeposit": {
+			"description": "Hinterlegen Sie innerhalb von 14 Tagen eine erstattungsfähige Kaution, um zu verhindern, dass der Vorschlag ausläuft.",
+			"details": "Details",
+			"add": "Hinzufügen",
+			"decisionDeposit": "Entscheidungskaution",
+			"payDecisionDeposit": "Entscheidungskaution zahlen",
+			"continue": "Weiter"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -580,7 +588,8 @@
 		"voteFailedTitle": "Abstimmung fehlgeschlagen"
 	},
 	"Balance": {
-		"voteBalance": "Abstimmungsguthaben"
+		"voteBalance": "Abstimmungsguthaben",
+		"Balance": "Guthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
