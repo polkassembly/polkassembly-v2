@@ -16,7 +16,7 @@ export const useIdentityService = () => {
 
 	const getCachedIdentity = async (address: string) => {
 		if (!address) return null;
-		const formattedAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : address;
+		const formattedAddress = !address.startsWith('0x') ? getSubstrateAddress(address) : '';
 
 		if (!formattedAddress) return null;
 

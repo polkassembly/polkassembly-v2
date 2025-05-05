@@ -246,6 +246,8 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						parentCommentId={comment.id}
 						onCancel={handleCancelReply}
 						onConfirm={handleConfirmReply}
+						isReply
+						replyTo={comment?.user}
 					/>
 				)}
 
