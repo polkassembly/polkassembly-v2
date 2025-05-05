@@ -42,8 +42,8 @@ function UserWalletData() {
 	);
 
 	return (
-		<div className='px-10'>
-			<div className='relative'>
+		<div className='w-full'>
+			<div className='relative w-full'>
 				{!user?.id || !user.loginAddress ? (
 					<div className={styles.walletInfoBoard}>
 						<span className='text-sm font-medium text-white'>{t('toGetStartedWithDelegationOnPolkadot')}</span>

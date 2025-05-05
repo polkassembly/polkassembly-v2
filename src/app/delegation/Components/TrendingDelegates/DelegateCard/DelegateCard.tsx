@@ -52,7 +52,7 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 		<div className={styles.delegationCardStats}>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='text-sm text-btn_secondary_text'>
+					<div className='text-sm text-btn_secondary_text lg:whitespace-nowrap'>
 						<span className='text-2xl font-semibold'>
 							{' '}
 							{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
@@ -126,12 +126,13 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 				</div>
 			</div>
 
-			<div className='px-4 py-2'>
+			<div className='px-4 pb-2'>
 				{delegate?.manifesto && delegate?.manifesto.length > 0 ? (
 					<MarkdownViewer
 						markdown={delegate.manifesto}
 						truncate
 						onShowMore={() => setOpenModal(true)}
+						className='line-clamp-2'
 					/>
 				) : (
 					<span>{t('noBio')}</span>
