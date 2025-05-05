@@ -1,15 +1,15 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-undef */
 /* eslint-disable react/no-unstable-nested-components */
 
 'use client';
 
 import '@mdxeditor/editor/style.css';
 
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, RefObject } from 'react';
 import {
 	tablePlugin,
 	headingsPlugin,
@@ -53,13 +53,12 @@ import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
 
-const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY } = getSharedEnvVars();
+const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY, NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
 const MAX_MENTION_SUGGESTIONS = 5;
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
-	const ref = editorRef as React.RefObject<MDXEditorMethods>;
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	const preprocessMarkdown = (markdown: string): string => {
 		let inCode = false;
@@ -277,7 +276,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 	const handleChange = (newMarkdown: string) => {
 		props?.onChange?.(newMarkdown, false);
 
-		const editor = ref.current;
+		const editor = (editorRef as RefObject<MDXEditorMethods>)?.current;
 		if (!editor) return;
 
 		// Get the current selection from the editor
@@ -300,8 +299,6 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 	};
 
 	const processedMarkdown = props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown;
-
-	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 
 	const imageUploadHandler = async (file: File) => {
 		const form = new FormData();
