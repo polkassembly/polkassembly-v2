@@ -1,15 +1,15 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-undef */
 /* eslint-disable react/no-unstable-nested-components */
 
 'use client';
 
 import '@mdxeditor/editor/style.css';
 
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, RefObject } from 'react';
 import {
 	tablePlugin,
 	headingsPlugin,
@@ -42,12 +42,17 @@ import {
 	InsertThematicBreak,
 	StrikeThroughSupSubToggles
 } from '@mdxeditor/editor';
+import { liteClient as algoliasearch } from 'algoliasearch/lite';
 
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import './MardownEditor.scss';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
+
+const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY, NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
+const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
+const MAX_MENTION_SUGGESTIONS = 5;
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
@@ -115,9 +120,182 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 	const { theme } = useTheme();
 
-	const processedMarkdown = props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown;
+	const handleMentionSuggestions = (editor: MDXEditorMethods, textContent: string, cursorPosition: number, currentTheme: string) => {
+		const textBeforeCursor = textContent.substring(0, cursorPosition);
+		const lastAtSymbol = textBeforeCursor.lastIndexOf('@');
 
-	const { NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
+		// Remove any existing suggestion popover
+		const existingPopover = document.querySelectorAll('.mention-suggestions');
+		existingPopover.forEach((popover) => {
+			if (popover) {
+				popover.remove();
+			}
+		});
+
+		// Remove any existing mention items
+		const existingMentionItems = document.querySelectorAll('.mention-item');
+		existingMentionItems.forEach((item) => {
+			const popover = item.closest('.mention-suggestions');
+			if (popover) {
+				popover.remove();
+			}
+		});
+
+		if (lastAtSymbol !== -1) {
+			const searchText = textBeforeCursor.substring(lastAtSymbol + 1);
+			if (searchText.length > 0) {
+				const queries = [
+					{
+						indexName: 'polkassembly_users',
+						params: {
+							hitsPerPage: MAX_MENTION_SUGGESTIONS,
+							restrictSearchableAttributes: ['username']
+						},
+						query: searchText
+					},
+					{
+						indexName: 'polkassembly_addresses',
+						params: {
+							hitsPerPage: MAX_MENTION_SUGGESTIONS,
+							restrictSearchableAttributes: ['address']
+						},
+						query: searchText
+					}
+				];
+
+				// Using any type for algolia response as the types don't match the actual structure
+				algoliaClient.search(queries as any).then((response: any) => {
+					const usernameHits = response.results[0]?.hits || [];
+					const addressHits = response.results[1]?.hits || [];
+
+					const usernameResults = usernameHits.map((user: Record<string, any>) => ({
+						text: `@${user.username}`,
+						value: `[@${user.username}](${typeof window !== 'undefined' ? window.location.origin : ''}/user/${user.username})&nbsp;`
+					}));
+
+					const addressResults = addressHits.map((user: Record<string, any>) => ({
+						text: `@${user.address}`,
+						value: `[@${user.address}](${typeof window !== 'undefined' ? window.location.origin : ''}/user/address/${user.address})&nbsp;`
+					}));
+
+					const suggestions = [...usernameResults, ...addressResults];
+					if (suggestions.length > 0) {
+						// Show suggestions in a popover
+						const popover = document.createElement('div');
+						popover.className = 'mention-suggestions';
+						popover.style.position = 'absolute';
+						popover.style.backgroundColor = currentTheme === 'dark' ? '#1C1D1F' : '#F5F6F8';
+						popover.style.border = `1px solid ${currentTheme === 'dark' ? 'var(--separatorDark)' : '#D2D8E0'}`;
+						popover.style.borderRadius = '4px';
+						popover.style.fontSize = '14px';
+						popover.style.fontWeight = '500';
+						popover.style.zIndex = '1000';
+						popover.style.width = '250px';
+						popover.style.maxHeight = '200px';
+						popover.style.overflowY = 'auto';
+						popover.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+
+						suggestions.forEach((suggestion) => {
+							const item = document.createElement('div');
+							item.className = 'mention-item truncate';
+							item.style.padding = '8px 12px';
+							item.style.cursor = 'pointer';
+							item.style.color = currentTheme === 'dark' ? '#ffffff' : 'var(--lightBlue)';
+							item.style.transition = 'background-color 0.2s';
+							item.textContent = suggestion.text;
+
+							item.addEventListener('mouseover', () => {
+								item.style.backgroundColor = currentTheme === 'dark' ? '#2a2a2a' : '#f3f4f6';
+							});
+
+							item.addEventListener('mouseout', () => {
+								item.style.backgroundColor = 'transparent';
+							});
+
+							item.onclick = () => {
+								// Get the current markdown content
+								const currentContent = editor.getMarkdown();
+
+								// Find the last @ symbol in the content
+								const lastIndex = currentContent.lastIndexOf('@');
+								if (lastIndex === -1) return;
+
+								// Find the end of the @ mention (space or end of string)
+								const endIndex = currentContent.indexOf(' ', lastIndex);
+								const mentionEnd = endIndex === -1 ? currentContent.length : endIndex;
+
+								// Add a space after the suggestion if there isn't one already
+								const needsSpace = mentionEnd < currentContent.length && currentContent[`${mentionEnd}`] !== ' ';
+								const spaceToAdd = needsSpace ? ' ' : '';
+
+								// Replace the @mention with the suggestion
+								const newContent = currentContent.substring(0, lastIndex) + suggestion.value + spaceToAdd + currentContent.substring(mentionEnd);
+
+								// Update the editor content
+								editor.setMarkdown(newContent);
+								editor.focus();
+								if (props?.onChange) {
+									props.onChange(newContent, false);
+								}
+
+								// Remove the popover
+								popover.remove();
+							};
+							popover.appendChild(item);
+						});
+
+						// Position the popover relative to the cursor
+						const selection = window.getSelection();
+						if (selection && selection.rangeCount > 0) {
+							const range = selection.getRangeAt(0);
+							const rect = range.getBoundingClientRect();
+							popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
+							popover.style.left = `${rect.left + window.scrollX}px`;
+
+							// Add click outside handler
+							const handleClickOutside = (e: MouseEvent) => {
+								if (!popover.contains(e.target as Node)) {
+									popover.remove();
+									document.removeEventListener('click', handleClickOutside);
+								}
+							};
+
+							document.addEventListener('click', handleClickOutside);
+							document.body.appendChild(popover);
+						}
+					}
+				});
+			}
+		}
+	};
+
+	// Add autocomplete functionality
+	const handleChange = (newMarkdown: string) => {
+		props?.onChange?.(newMarkdown, false);
+
+		const editor = (editorRef as RefObject<MDXEditorMethods>)?.current;
+		if (!editor) return;
+
+		// Get the current selection from the editor
+		const editorElement = document.querySelector('.mdxeditor');
+		if (!editorElement) return;
+
+		const selection = window.getSelection();
+		if (!selection || !selection.rangeCount) return;
+
+		const range = selection.getRangeAt(0);
+		const container = range.startContainer;
+
+		// Only process if we're in a text node
+		if (container.nodeType !== Node.TEXT_NODE) return;
+
+		const textContent = container.textContent || '';
+		const cursorPosition = range.startOffset;
+
+		handleMentionSuggestions(editor, textContent, cursorPosition, theme as string);
+	};
+
+	const processedMarkdown = props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown;
 
 	const imageUploadHandler = async (file: File) => {
 		const form = new FormData();
@@ -242,6 +420,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 				markdown={processedMarkdown}
 				className={cn(theme === ETheme.DARK ? 'dark-theme' : '', props.readOnly && 'p-0', props.className)}
 				ref={editorRef}
+				onChange={handleChange}
 				onError={(error) => {
 					console.error(error);
 				}}

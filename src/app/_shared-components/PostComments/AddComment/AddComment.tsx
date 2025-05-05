@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { EProposalType, IComment, IPublicUser } from '@/_shared/types';
 import { useAtomValue } from 'jotai';
@@ -14,6 +14,9 @@ import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { MDXEditorMethods } from '@mdxeditor/editor';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './AddComment.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
@@ -22,22 +25,53 @@ function AddComment({
 	proposalIndex,
 	parentCommentId,
 	onConfirm,
-	onCancel
+	onCancel,
+	isReply,
+	replyTo
 }: {
 	proposalType: EProposalType;
 	proposalIndex: string;
 	parentCommentId?: string;
 	onConfirm?: (newComment: IComment, user: Omit<IPublicUser, 'rank'>) => void;
 	onCancel?: () => void;
+	isReply?: boolean;
+	replyTo?: Omit<IPublicUser, 'rank'>;
 }) {
 	const t = useTranslations();
+	const network = getCurrentNetwork();
 	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, parentCommentId });
 	const [content, setContent] = useState<string | null>(savedContent);
 	const [loading, setLoading] = useState<boolean>(false);
+	const { getOnChainIdentity } = useIdentityService();
 
 	const user = useAtomValue(userAtom);
 
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
+
+	const handleReplyMention = useCallback(async () => {
+		if (!isReply || !replyTo) return;
+
+		const proposer = replyTo?.addresses?.[0];
+		const encodedProposer = getEncodedAddress(proposer, network);
+		let mentionContent = '';
+
+		if (proposer) {
+			const onChainInfo = await getOnChainIdentity(encodedProposer || '');
+			const displayName = onChainInfo?.display || onChainInfo?.nickname || onChainInfo?.legal || onChainInfo?.email || onChainInfo?.displayParent;
+
+			const userLink = `${global.window.location.origin}/user/address/${encodedProposer}`;
+			mentionContent = displayName ? `[@${displayName}](${userLink})` : `[@${encodedProposer}](${userLink})`;
+		} else {
+			mentionContent = `[@${replyTo.username}](${global.window.location.origin}/user/${replyTo.username})`;
+		}
+
+		markdownEditorRef.current?.setMarkdown(`${mentionContent}&nbsp;`);
+	}, [isReply, replyTo, network, getOnChainIdentity]);
+
+	useEffect(() => {
+		if (!isReply || !replyTo) return;
+		handleReplyMention();
+	}, [isReply, handleReplyMention, replyTo]);
 
 	const addComment = async () => {
 		if (!content?.trim() || !user) return;
