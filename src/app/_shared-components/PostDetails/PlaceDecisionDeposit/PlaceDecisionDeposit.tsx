@@ -73,7 +73,7 @@ function PlaceDecisionDeposit({ postId, track, status, onSuccess }: { postId: nu
 					className='h-[60px] w-[60px]'
 				/>
 				<div className='flex flex-col gap-y-2 text-white'>
-					<p className='text-base font-semibold'>{t('PostDetails.DecisionDeposit.title')}</p>
+					<p className='text-base font-semibold'>{t('PostDetails.DecisionDeposit.decisionDeposit')}</p>
 					<div className='flex flex-wrap gap-x-1 text-xs'>
 						{t('PostDetails.DecisionDeposit.description')}
 						<Link
