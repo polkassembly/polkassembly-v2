@@ -53,7 +53,7 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 			<div className={styles.delegationCardStatsItem}>
 				<div>
 					<div className='text-sm text-btn_secondary_text lg:whitespace-nowrap'>
-						<span className='text-2xl font-semibold'>
+						<span className='font-semibold md:text-2xl'>
 							{' '}
 							{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>{' '}
@@ -63,14 +63,14 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 			</div>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='text-2xl font-semibold'>{delegate?.last30DaysVotedProposalsCount}</div>
+					<div className='font-semibold md:text-2xl'>{delegate?.last30DaysVotedProposalsCount}</div>
 					<span className={styles.delegationCardStatsItemText}>{t('votedProposals')}</span>
 					<span className={styles.delegationCardStatsItemTextPast30Days}>({t('past30Days')})</span>
 				</div>
 			</div>
 			<div className='p-5 text-center'>
 				<div>
-					<div className='text-2xl font-semibold'>{delegate?.receivedDelegationsCount}</div>
+					<div className='font-semibold md:text-2xl'>{delegate?.receivedDelegationsCount}</div>
 					<span className={styles.delegationCardStatsItemText}>{t('receivedDelegations')}</span>
 				</div>
 			</div>
@@ -92,7 +92,9 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 			</div>
 			<div className='p-4'>
 				<div className={styles.delegationDialog}>
-					<Address address={delegate.address} />
+					<div className='min-w-32'>
+						<Address address={delegate.address} />
+					</div>
 					{user?.id ? (
 						<Dialog>
 							<DialogTrigger asChild>
