@@ -861,7 +861,9 @@ export enum EProfileTabs {
 	OVERVIEW = 'overview',
 	ACTIVITY = 'activity',
 	ACCOUNTS = 'accounts',
-	SETTINGS = 'settings'
+	SETTINGS = 'settings',
+	VOTES = 'votes',
+	POSTS = 'posts'
 }
 
 export interface IPreimage {
@@ -1118,12 +1120,6 @@ export enum EDelegationStatus {
 	UNDELEGATED = 'undelegated'
 }
 
-export interface ITrackDelegationStats {
-	trackId: number;
-	status: EDelegationStatus;
-	activeProposalsCount: number;
-}
-
 export interface IPostWithDelegateVote extends IPostListing {
 	delegateVote?: IVoteData;
 }
@@ -1136,6 +1132,12 @@ interface ITrackDelegation {
 	endsAt: Date;
 }
 
+export interface ITrackDelegationStats {
+	trackId: number;
+	status: EDelegationStatus;
+	activeProposalsCount: number;
+	delegations?: ITrackDelegation[];
+}
 export interface ITrackDelegationDetails {
 	receivedDelegations?: ITrackDelegation[];
 	delegatedTo?: ITrackDelegation[];

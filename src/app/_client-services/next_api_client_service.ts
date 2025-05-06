@@ -111,6 +111,7 @@ enum EApiRoute {
 	FETCH_DELEGATES = 'FETCH_DELEGATES',
 	CREATE_PA_DELEGATE = 'CREATE_PA_DELEGATE',
 	UPDATE_PA_DELEGATE = 'UPDATE_PA_DELEGATE',
+	GET_PA_DELEGATE_MANIFESTO = 'GET_PA_DELEGATE_MANIFESTO',
 	GET_USER_SOCIAL_HANDLES = 'GET_USER_SOCIAL_HANDLES',
 	INIT_SOCIAL_VERIFICATION = 'INIT_SOCIAL_VERIFICATION',
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
@@ -287,6 +288,10 @@ export class NextApiClientService {
 			case EApiRoute.UPDATE_PA_DELEGATE:
 				path = '/delegation/delegates';
 				method = 'PATCH';
+				break;
+			case EApiRoute.GET_PA_DELEGATE_MANIFESTO:
+				path = '/delegation/delegates';
+				method = 'GET';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
 				method = 'PATCH';
@@ -853,6 +858,11 @@ export class NextApiClientService {
 	static async updatePADelegate({ address, manifesto }: { address: string; manifesto: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_PA_DELEGATE, routeSegments: [address] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
+	}
+
+	static async getPADelegateManifesto({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PA_DELEGATE_MANIFESTO, routeSegments: [address] });
+		return this.nextApiClientFetch<{ manifesto: string }>({ url, method });
 	}
 
 	static async getDelegateTracks({ address }: { address: string }) {
