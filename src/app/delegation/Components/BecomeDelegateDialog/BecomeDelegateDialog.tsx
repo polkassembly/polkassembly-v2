@@ -112,6 +112,8 @@ export default function BecomeDelegateDialog() {
 		}
 	};
 
+	if (!user) return null;
+
 	return (
 		<Dialog
 			open={dialogOpen}
@@ -121,8 +123,8 @@ export default function BecomeDelegateDialog() {
 		>
 			<DialogTrigger asChild>
 				<Button
-					disabled={!user || delegates.length === 0}
-					className={`${!user || delegates.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+					disabled={delegates.length === 0}
+					className={`${delegates.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
 				>
 					{isCurrentAddressDelegate ? (
 						<>

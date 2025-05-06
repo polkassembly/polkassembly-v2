@@ -48,7 +48,7 @@ async function DelegationTrackPage({ params }: Props) {
 	}
 
 	return (
-		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:p-10'>
+		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 p-5 sm:p-10'>
 			<DelegationTrack
 				trackDetails={trackDetails}
 				delegateTrackResponse={delegateTrackResponse}

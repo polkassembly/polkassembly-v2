@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useState } from 'react';
-import { useUser } from '@/hooks/useUser';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import PolkaAsset from '@assets/delegation/Track.svg';
 import PolkaBadge from '@assets/delegation/badge.svg';
@@ -16,7 +14,6 @@ import styles from './DelegationPopupCard.module.scss';
 import BecomeDelegateDialog from '../BecomeDelegateDialog/BecomeDelegateDialog';
 
 function DelegationPopupCard() {
-	const { user } = useUser();
 	const [showDelegationInfo, setShowDelegationInfo] = useState(true);
 	const t = useTranslations('Delegation');
 	return (
@@ -26,20 +23,7 @@ function DelegationPopupCard() {
 					<div className='flex items-center justify-between px-6'>
 						<p className='text-xl font-semibold text-btn_secondary_text'>{t('howToDelegateOnPolkassembly')}</p>
 						<div className='flex items-center gap-4'>
-							<Tooltip delayDuration={0}>
-								<TooltipTrigger asChild>
-									<BecomeDelegateDialog />
-								</TooltipTrigger>
-								{!user && (
-									<TooltipContent
-										className={styles.tooltipContent}
-										side='top'
-										sideOffset={5}
-									>
-										<p className='text-sm'>{t('pleaseLoginToContinue')}</p>
-									</TooltipContent>
-								)}
-							</Tooltip>
+							<BecomeDelegateDialog />
 							<IoMdClose
 								onClick={() => setShowDelegationInfo(false)}
 								className='cursor-pointer text-2xl text-wallet_btn_text'

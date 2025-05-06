@@ -33,7 +33,7 @@ function MyDelegation() {
 					height={100}
 				/>
 				<div className={styles.myDelegationContainerDiv}>
-					<div>
+					<div className='flex flex-col gap-2'>
 						<Address
 							address={user.defaultAddress}
 							walletAddressName={user?.username}

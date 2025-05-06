@@ -33,8 +33,11 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button variant='outline'>
-					<FaFilter className='text-text_pink' />
+				<Button
+					variant='outline'
+					className='flex h-10 w-10 items-center justify-center'
+				>
+					<FaFilter className='text-lg text-text_pink' />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className='w-[200px] border-border_grey p-4'>
@@ -141,7 +144,7 @@ function TrendingDelegates() {
 					selectedSources={selectedSources}
 					setSelectedSources={handleSourceChange}
 				/>
-				<div className='flex items-center gap-2'>
+				<div className='flex items-center'>
 					<Select
 						value={sortBy ?? ''}
 						onValueChange={handleSortChange}
@@ -150,7 +153,7 @@ function TrendingDelegates() {
 							hideChevron
 							className={styles.selectTrigger}
 						>
-							<MdSort className='text-3xl text-text_pink' />
+							<MdSort className='text-xl text-text_pink' />
 						</SelectTrigger>
 						<SelectContent className={styles.selectContent}>
 							<SelectItem value='VOTING_POWER'>{t('votingPower')}</SelectItem>
