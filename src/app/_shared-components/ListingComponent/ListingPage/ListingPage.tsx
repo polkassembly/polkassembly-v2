@@ -17,6 +17,7 @@ import Link from 'next/link';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
+import TrackAnalytics from '../TrackAnalytics/TrackAnalytics';
 
 // Constants
 enum EListingTabState {
@@ -97,7 +98,9 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 			? {}
 			: proposalType === EProposalType.DISCUSSION
 				? { INTERNAL_PROPOSALS: EListingTab.POLKASSEMBLY, EXTERNAL_PROPOSALS: t('ListingTab.External') }
-				: { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') };
+				: proposalType === EProposalType.REFERENDUM_V2
+					? { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') }
+					: { INTERNAL_PROPOSALS: t('ListingTab.Referenda') };
 
 	const filteredTags = TAGS.filter((tag) => tag.toLowerCase().includes(state.tagSearchTerm.toLowerCase()));
 
@@ -229,7 +232,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 				<div className={styles.container}>
 					{renderHeader()}
 					<div className={styles.tabs}>
-						<div className='flex space-x-6'>
+						<div className='flex gap-x-2'>
 							{Object.entries(tabNames).map(([key, value]) => (
 								<button
 									key={key}
@@ -241,7 +244,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 								</button>
 							))}
 						</div>
-						<div className='flex gap-4 pb-3 text-sm text-gray-700'>
+						<div className='flex gap-4 text-sm text-gray-700'>
 							<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
 								<PopoverTrigger asChild>
 									<div
@@ -274,6 +277,8 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 							totalCount={initialData?.totalCount || 0}
 							currentPage={state.currentPage}
 						/>
+					) : proposalType === EProposalType.REFERENDUM_V2 ? (
+						<TrackAnalytics origin={origin} />
 					) : (
 						<ExternalTab />
 					)}

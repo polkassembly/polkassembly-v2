@@ -1117,5 +1117,23 @@
 		"bountyProposalFailedDescription": "バウンティの提案中にエラーが発生しました",
 		"bountyAmount": "バウンティ金額",
 		"proposeBounty": "バウンティを提案"
+	},
+	"TrackAnalytics": {
+		"proposalsCreated": "作成された提案",
+		"activeProposals": "アクティブな提案",
+		"thisWeek": "今週",
+		"delegatee": "受任者",
+		"delegator": "委任者",
+		"totalCapital": "総資本",
+		"totalVotes": "総投票数",
+		"delegation": "委任",
+		"noDelegateesFound": "受任者が見つかりません",
+		"noDelegatorsFound": "委任者が見つかりません",
+		"address": "アドレス",
+		"count": "数",
+		"capital": "資本",
+		"votes": "投票",
+		"voteDetails": "投票詳細",
+		"target": "ターゲット"
 	}
 }

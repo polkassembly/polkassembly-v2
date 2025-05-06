@@ -1191,3 +1191,31 @@ export enum ESearchDiscussionType {
 	GRANTS = 'grants',
 	REFERENDUMS_V2 = 'referendums_v2'
 }
+
+export interface ITrackAnalyticsStats {
+	totalActiveProposals: number;
+	totalProposalCount: number;
+	changeInActiveProposals: number;
+}
+
+export interface ITrackAnalyticsDelegationsList {
+	[key: string]: {
+		count: number;
+		data: {
+			to: string;
+			from: string;
+			capital: string;
+			lockedPeriod: number;
+			votingPower: string;
+		}[];
+	};
+}
+
+export interface ITrackAnalyticsDelegations {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+	delegateesData: ITrackAnalyticsDelegationsList;
+	delegatorsData: ITrackAnalyticsDelegationsList;
+}

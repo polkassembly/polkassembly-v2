@@ -1145,5 +1145,23 @@
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
 		"clearFilters": "Clear Filters"
+	},
+	"TrackAnalytics": {
+		"proposalsCreated": "Proposals Created",
+		"activeProposals": "Active Proposals",
+		"thisWeek": "This Week",
+		"delegatee": "Delegatee",
+		"delegator": "Delegator",
+		"totalCapital": "Total Capital",
+		"totalVotes": "Total Votes",
+		"delegation": "Delegation",
+		"noDelegateesFound": "No delegatees found",
+		"noDelegatorsFound": "No delegators found",
+		"address": "Address",
+		"count": "Count",
+		"capital": "Capital",
+		"votes": "Votes",
+		"voteDetails": "Vote Details",
+		"target": "Target"
 	}
 }

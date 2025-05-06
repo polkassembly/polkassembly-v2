@@ -1117,5 +1117,23 @@
 		"bountyProposalFailedDescription": "赏金提案过程中出现错误",
 		"bountyAmount": "赏金金额",
 		"proposeBounty": "提案赏金"
+	},
+	"TrackAnalytics": {
+		"proposalsCreated": "已创建提案",
+		"activeProposals": "活跃提案",
+		"thisWeek": "本周",
+		"delegatee": "受托人",
+		"delegator": "委托人",
+		"totalCapital": "总资本",
+		"totalVotes": "总票数",
+		"delegation": "委托",
+		"noDelegateesFound": "未找到受托人",
+		"noDelegatorsFound": "未找到委托人",
+		"address": "地址",
+		"count": "数量",
+		"capital": "资本",
+		"votes": "投票",
+		"voteDetails": "投票详情",
+		"target": "目标"
 	}
 }

@@ -1119,5 +1119,23 @@
 		"bountyProposalFailedDescription": "Beim Vorschlagen des Kopfgeldes ist ein Fehler aufgetreten",
 		"bountyAmount": "Kopfgeld-Betrag",
 		"proposeBounty": "Kopfgeld vorschlagen"
+	},
+	"TrackAnalytics": {
+		"proposalsCreated": "Erstellte Vorschläge",
+		"activeProposals": "Aktive Vorschläge",
+		"thisWeek": "Diese Woche",
+		"delegatee": "Bevollmächtigter",
+		"delegator": "Delegierer",
+		"totalCapital": "Gesamtkapital",
+		"totalVotes": "Gesamtstimmen",
+		"delegation": "Delegation",
+		"noDelegateesFound": "Keine Bevollmächtigten gefunden",
+		"noDelegatorsFound": "Keine Delegierer gefunden",
+		"address": "Adresse",
+		"count": "Anzahl",
+		"capital": "Kapital",
+		"votes": "Stimmen",
+		"voteDetails": "Abstimmungsdetails",
+		"target": "Ziel"
 	}
 }

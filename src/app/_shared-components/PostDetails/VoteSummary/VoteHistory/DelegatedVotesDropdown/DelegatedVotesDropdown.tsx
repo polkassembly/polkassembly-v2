@@ -44,7 +44,7 @@ function DelegatedVotesDropdown({ voteData, voterDelegations }: { voteData: IVot
 		<div className='mb-2 px-2'>
 			<div className='mb-3 mt-2 flex items-center justify-between'>
 				<span className='text-sm font-medium text-basic_text dark:text-btn_primary_text'>{t('voteDetails.title')}</span>
-				<span className='text-xs text-text_primary'>{dayjs(voteData.createdAt ?? '').format("Do MMM 'YY")}</span>
+				{voteData.createdAt && <span className='text-xs text-text_primary'>{dayjs(voteData.createdAt).format("Do MMM 'YY")}</span>}
 			</div>
 
 			<div className='flex justify-between'>
