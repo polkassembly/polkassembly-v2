@@ -134,7 +134,7 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 						markdown={delegate.manifesto}
 						truncate
 						onShowMore={() => setOpenModal(true)}
-						maxLines={2}
+						className='line-clamp-2'
 					/>
 				) : (
 					<span>{t('noBio')}</span>
