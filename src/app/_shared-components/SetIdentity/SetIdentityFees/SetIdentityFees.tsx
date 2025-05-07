@@ -25,7 +25,6 @@ function SetIdentityFees({
 	disabledRequestJudgement: boolean;
 	registrarFee: BN;
 }) {
-	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
@@ -49,9 +48,7 @@ function SetIdentityFees({
 						<span className='text-sm'>{t('SetIdentity.totalAmountRequired')}</span>
 						<div className={classes.collapsibleTriggerContentInner}>
 							<p className={classes.collapsibleTriggerContentInnerText}>
-								<span className='font-semibold'>
-									{formatter.format(Number(formatBnBalance(minDeposit.add(registrarFee), { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-								</span>
+								<span className='font-semibold'>{formatBnBalance(minDeposit.add(registrarFee), { compactNotation: true, withUnit: true, numberAfterComma: 1 }, network)} </span>
 								<span className='text-[10px] text-wallet_btn_text'>{t('SetIdentity.viewAmountBreakup')}</span>
 							</p>
 							<ChevronDown className='font-semibold text-text_primary' />
@@ -63,15 +60,11 @@ function SetIdentityFees({
 					<div className={classes.feeWrapper}>
 						<div className={classes.feeItem}>
 							<p className={classes.feeItemText}>{t('SetIdentity.minimumDeposit')}</p>
-							<p className={classes.feeItemValue}>
-								{formatter.format(Number(formatBnBalance(minDeposit, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</p>
+							<p className={classes.feeItemValue}>{formatBnBalance(minDeposit, { compactNotation: true, withUnit: true, numberAfterComma: 1 }, network)}</p>
 						</div>
 						<div className={classes.feeItem}>
 							<p className={classes.feeItemText}>{t('SetIdentity.registrarFees')}</p>
-							<p className={classes.feeItemValue}>
-								{formatter.format(Number(formatBnBalance(registrarFee, { withThousandDelimitor: false }, network)))} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-							</p>
+							<p className={classes.feeItemValue}>{formatBnBalance(registrarFee, { compactNotation: true, withUnit: true, numberAfterComma: 1 }, network)}</p>
 						</div>
 					</div>
 				</CollapsibleContent>
