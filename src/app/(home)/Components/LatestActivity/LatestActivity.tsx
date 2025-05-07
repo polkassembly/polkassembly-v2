@@ -35,6 +35,8 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 	const tabsListRef = useRef<HTMLDivElement>(null);
+	const TAB_TRIGGER_CLASS = 'text-xm border-b border-b-border_grey font-medium text-text_primary data-[state=active]:border-b-0';
+
 	const ACTIVE_DROPDOWN_ITEM_CLASS = 'bg-sidebar_menu_bg text-text_pink';
 
 	const DATE_FORMAT = "Do MMM 'YY";
@@ -88,6 +90,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 					>
 						<TabsTrigger
 							showBorder
+							className={TAB_TRIGGER_CLASS}
 							value={EOverviewTabs.All}
 							data-value={EOverviewTabs.All}
 						>
@@ -95,6 +98,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
+							className={TAB_TRIGGER_CLASS}
 							value={EOverviewTabs.Discussion}
 							data-value={EOverviewTabs.Discussion}
 						>
@@ -103,6 +107,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 						{trackKeys.map((key) => (
 							<TabsTrigger
 								showBorder
+								className={TAB_TRIGGER_CLASS}
 								value={key}
 								key={key}
 								data-value={key}
