@@ -17,6 +17,7 @@ import DelegatedIcon from '@assets/delegation/delegated.svg';
 import DelegateIcon from '@assets/delegation/delegatedTo.svg';
 import CapitalIcon from '@assets/delegation/capital.svg';
 import VotingPowerIcon from '@assets/delegation/votingPower.svg';
+import { useState } from 'react';
 import classes from './Delegations.module.scss';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import Address from '../Address/Address';
@@ -46,6 +47,7 @@ function DelegationStatusCollaps({
 }) {
 	const t = useTranslations('Profile');
 	const network = getCurrentNetwork();
+	const [open, setOpen] = useState(false);
 	const TRANSLATION_KEYS = {
 		DELEGATED_BY: t('Delegations.delegatedBy'),
 		DELEGATED_TO: t('Delegations.delegatedTo'),
@@ -54,8 +56,12 @@ function DelegationStatusCollaps({
 		INDEX: t('Delegations.index')
 	};
 	return (
-		<Collapsible className={classes.collapsible}>
-			<CollapsibleTrigger className={classes.collapsibleTrigger}>
+		<Collapsible
+			className={classes.collapsible}
+			open={open && !!ValidatorService.isValidNumber(data?.count) && data?.count > 0}
+			onOpenChange={setOpen}
+		>
+			<CollapsibleTrigger className={cn(classes.collapsibleTrigger, open ? 'rounded-t-lg' : 'rounded-lg')}>
 				<div className={classes.collapsibleTriggerContent}>
 					<span className='flex items-center gap-2 text-xs uppercase'>
 						<Image
@@ -69,14 +75,14 @@ function DelegationStatusCollaps({
 							{ValidatorService.isValidNumber(data?.count) && <span className='text-text_secondary'>{data?.count}</span>}
 						</div>
 					</span>
-					{ValidatorService.isValidNumber(data?.count) && (
+					{!!ValidatorService.isValidNumber(data?.count) && data?.count > 0 && (
 						<div className={classes.collapsibleTriggerContentInner}>
 							<ChevronDown className='text-sm font-semibold text-text_primary' />
 						</div>
 					)}
 				</div>
 			</CollapsibleTrigger>
-			{ValidatorService.isValidNumber(data?.count) && (
+			{!!ValidatorService.isValidNumber(data?.count) && data?.count > 0 && (
 				<CollapsibleContent className={classes.collapsibleContent}>
 					<div className='my-4 grid grid-cols-4 gap-2 px-4 text-sm'>
 						<div className='col-span-1'>
@@ -184,27 +190,37 @@ function DelegationStatusCollaps({
 														{delegationItems?.map((item) => {
 															const trackName = getTrackName({ trackId: item.trackId, network });
 															return (
-																<div className='flex flex-wrap gap-1 text-xs'>
-																	<span className='capitalize'>{trackName}</span>(
-																	{!allSameVotingPowerAndLockPeriod && (
-																		<div className='flex items-center gap-1'>
-																			<div className='flex gap-1'>
-																				<span>{t('Delegations.VP')}:</span>
-																				<span>
-																					{formatBnBalance(new BN(item.votingPower || '0'), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 1 }, network)}
-																				</span>
+																<div
+																	className='flex flex-wrap gap-1 text-xs'
+																	key={item.trackId}
+																>
+																	<span className='capitalize'>{trackName}</span>
+																	{!allSameVotingPowerAndLockPeriod ? (
+																		<span className='flex'>
+																			(
+																			<div className='flex items-center gap-1'>
+																				<div className='flex gap-1'>
+																					<span>{t('Delegations.VP')}:</span>
+																					<span>
+																						{formatBnBalance(new BN(item.votingPower || '0'), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 1 }, network)}
+																					</span>
+																				</div>
+																				<div className='flex gap-1'>
+																					<span>{t('Delegations.CA')}:</span>
+																					<span>
+																						{formatBnBalance(new BN(item.capital || '0'), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 1 }, network)}
+																					</span>
+																				</div>
+																				<div className='flex gap-1'>
+																					<span>{t('Delegations.CO')}:</span>
+																					<span>{item.lockPeriod ? item.lockPeriod : '0.1'}x</span>
+																				</div>
 																			</div>
-																			<div className='flex gap-1'>
-																				<span>{t('Delegations.CA')}:</span>
-																				<span>{formatBnBalance(new BN(item.capital || '0'), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 1 }, network)}</span>
-																			</div>
-																			<div className='flex gap-1'>
-																				<span>{t('Delegations.CO')}:</span>
-																				<span>{item.lockPeriod ? item.lockPeriod : '0.1'}x</span>
-																			</div>
-																		</div>
+																			)
+																		</span>
+																	) : (
+																		''
 																	)}
-																	)
 																</div>
 															);
 														})}
