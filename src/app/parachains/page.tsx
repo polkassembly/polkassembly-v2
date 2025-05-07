@@ -16,6 +16,8 @@ import auctionIcon from '@assets/parachains/auction.png';
 import liveIcon from '@assets/parachains/chain-link.png';
 import testingIcon from '@assets/parachains/testing.png';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
+import { useTranslations } from 'next-intl';
+import { ENetwork } from '@/_shared/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../_shared-components/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../_shared-components/Tabs';
 import ParachainsInfoCard from './Components/ParachainsInfoCard';
@@ -42,6 +44,7 @@ interface IParachain {
 
 function ParachainsPage() {
 	const [parachainsData, setParachainsData] = useState<IParachain[]>([]);
+	const t = useTranslations('Parachains');
 
 	useEffect(() => {
 		fetch('/parachains.json')
@@ -50,6 +53,9 @@ function ParachainsPage() {
 				setParachainsData(data);
 			});
 	}, []);
+
+	const polkadotParachainsDataLength = parachainsData.filter((parachain) => parachain.chain === ENetwork.POLKADOT).length;
+	const kusamaParachainsDataLength = parachainsData.filter((parachain) => parachain.chain === ENetwork.KUSAMA).length;
 
 	const grantTooltip = (parachain: IParachain) => {
 		let content = '';
@@ -69,44 +75,47 @@ function ParachainsPage() {
 
 	return (
 		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-			<ParachainsInfoCard />
+			<ParachainsInfoCard
+				polkadotParachainsDataLength={polkadotParachainsDataLength}
+				kusamaParachainsDataLength={kusamaParachainsDataLength}
+			/>
 			<div className='rounded-lg bg-bg_modal p-5 shadow-md'>
-				<p className='text-xl font-medium text-btn_secondary_text'>Projects</p>
+				<p className='text-xl font-medium text-btn_secondary_text'>{t('projects')}</p>
 				<Tabs
-					defaultValue='polkadot'
+					defaultValue={ENetwork.POLKADOT}
 					className='my-5'
 				>
 					<TabsList>
 						<TabsTrigger
 							showBorder
-							value='polkadot'
+							value={ENetwork.POLKADOT}
 						>
 							Polkadot
 						</TabsTrigger>
 						<TabsTrigger
 							showBorder
-							value='kusama'
+							value={ENetwork.KUSAMA}
 						>
 							Kusama
 						</TabsTrigger>
 					</TabsList>
-					<TabsContent value='polkadot'>
+					<TabsContent value={ENetwork.POLKADOT}>
 						<div className='scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-transparent max-h-[500px] overflow-y-auto'>
 							<Table>
 								<TableHeader className='sticky top-0 z-10 bg-page_background'>
 									<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
-										<TableHead className='py-4'>Index</TableHead>
-										<TableHead className='py-4'>Projects</TableHead>
-										<TableHead className='py-4'>Status</TableHead>
-										<TableHead className='py-4'>Token</TableHead>
-										<TableHead className='py-4'>W3F</TableHead>
-										<TableHead className='py-4'>Investors</TableHead>
-										<TableHead className='py-4'>Github</TableHead>
+										<TableHead className='py-4'>{t('index')}</TableHead>
+										<TableHead className='py-4'>{t('projects')}</TableHead>
+										<TableHead className='py-4'>{t('status')}</TableHead>
+										<TableHead className='py-4'>{t('token')}</TableHead>
+										<TableHead className='py-4'>{t('w3f')}</TableHead>
+										<TableHead className='py-4'>{t('investors')}</TableHead>
+										<TableHead className='py-4'>{t('github')}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
 									{parachainsData
-										.filter((parachain) => parachain.chain === 'polkadot')
+										.filter((parachain) => parachain.chain === ENetwork.POLKADOT)
 										.map((parachain, index) => (
 											<TableRow key={parachain.id}>
 												<TableCell className='py-4'>#{index + 1}</TableCell>
@@ -138,7 +147,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Auction Icon'
 															/>{' '}
-															In Auction
+															{t('inAuction')}
 														</span>
 													) : parachain.status.search('Testing') !== -1 ? (
 														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
@@ -148,7 +157,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Testing Icon'
 															/>{' '}
-															Testing
+															{t('testing')}
 														</span>
 													) : parachain.status.search('announced') !== -1 ? (
 														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
@@ -158,7 +167,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Announced Icon'
 															/>{' '}
-															Announced
+															{t('announced')}
 														</span>
 													) : parachain.status.search('live') !== -1 ? (
 														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
@@ -168,7 +177,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Live Icon'
 															/>{' '}
-															Live
+															{t('live')}
 														</span>
 													) : null}
 												</TableCell>
@@ -213,23 +222,23 @@ function ParachainsPage() {
 							</Table>
 						</div>
 					</TabsContent>
-					<TabsContent value='kusama'>
+					<TabsContent value={ENetwork.KUSAMA}>
 						<div className='scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-transparent max-h-[500px] overflow-y-auto'>
 							<Table>
 								<TableHeader className='sticky top-0 z-10 bg-page_background'>
 									<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
-										<TableHead className='py-4'>Index</TableHead>
-										<TableHead className='py-4'>Projects</TableHead>
-										<TableHead className='py-4'>Status</TableHead>
-										<TableHead className='py-4'>Token</TableHead>
-										<TableHead className='py-4'>W3F</TableHead>
-										<TableHead className='py-4'>Investors</TableHead>
-										<TableHead className='py-4'>Github</TableHead>
+										<TableHead className='py-4'>{t('index')}</TableHead>
+										<TableHead className='py-4'>{t('projects')}</TableHead>
+										<TableHead className='py-4'>{t('status')}</TableHead>
+										<TableHead className='py-4'>{t('token')}</TableHead>
+										<TableHead className='py-4'>{t('w3f')}</TableHead>
+										<TableHead className='py-4'>{t('investors')}</TableHead>
+										<TableHead className='py-4'>{t('github')}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
 									{parachainsData
-										.filter((parachain) => parachain.chain === 'kusama')
+										.filter((parachain) => parachain.chain === ENetwork.KUSAMA)
 										.map((parachain, index) => (
 											<TableRow key={parachain.id}>
 												<TableCell className='py-4'>#{index + 1}</TableCell>
@@ -261,7 +270,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Auction Icon'
 															/>{' '}
-															In Auction
+															{t('inAuction')}
 														</span>
 													) : parachain.status.search('Testing') !== -1 ? (
 														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
@@ -271,7 +280,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Testing Icon'
 															/>{' '}
-															Testing
+															{t('testing')}
 														</span>
 													) : parachain.status.search('announced') !== -1 ? (
 														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
@@ -281,7 +290,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Announced Icon'
 															/>{' '}
-															Announced
+															{t('announced')}
 														</span>
 													) : parachain.status.search('live') !== -1 ? (
 														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
@@ -291,7 +300,7 @@ function ParachainsPage() {
 																width={16}
 																alt='Live Icon'
 															/>{' '}
-															Live
+															{t('live')}
 														</span>
 													) : null}
 												</TableCell>

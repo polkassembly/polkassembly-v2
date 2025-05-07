@@ -8,8 +8,10 @@ import { AiOutlineLink } from '@react-icons/all-files/ai/AiOutlineLink';
 import crowdloansIcon from '@assets/parachains/crowdloan.png';
 import projectsIcon from '@assets/parachains/projects.png';
 import auctionIcon from '@assets/parachains/auction.png';
+import { useTranslations } from 'next-intl';
 
-function ParachainsInfoCard() {
+function ParachainsInfoCard({ polkadotParachainsDataLength, kusamaParachainsDataLength }: { polkadotParachainsDataLength: number; kusamaParachainsDataLength: number }) {
+	const t = useTranslations('Parachains');
 	const metrics = [
 		{
 			title: 'Polkadot',
@@ -18,7 +20,7 @@ function ParachainsInfoCard() {
 			auction: '14th',
 			crowdloans: '5',
 			parachains: '14',
-			projects: '117'
+			projects: polkadotParachainsDataLength
 		},
 		{
 			title: 'Kusama',
@@ -27,13 +29,13 @@ function ParachainsInfoCard() {
 			auction: '31st',
 			crowdloans: '5',
 			parachains: '29',
-			projects: '51'
+			projects: kusamaParachainsDataLength
 		}
 	];
 	return (
 		<div>
 			<div className='flex flex-col gap-3 text-start'>
-				<p className='text-2xl font-bold text-btn_secondary_text'>Polkadot and Kusama ecosystem and directory</p>
+				<p className='text-2xl font-bold text-btn_secondary_text'>{t('parachainsDirectory')}</p>
 			</div>
 			<div className='grid grid-cols-1 gap-6 pt-4 md:grid-cols-2'>
 				{metrics.map((item) => (
@@ -51,7 +53,9 @@ function ParachainsInfoCard() {
 							/>
 							<div className='flex flex-col gap-3'>
 								<span className='text-xl font-semibold text-btn_secondary_text'>{item.title}</span>
-								<p className='text-sm text-text_primary'>{item.totalSupplyLocked} of Total Supply Locked in Parachains and Crowdloans</p>
+								<p className='text-sm text-text_primary'>
+									{item.totalSupplyLocked} {t('ofTotalSupplyLockedInParachainsAndCrowdloans')}
+								</p>
 							</div>
 						</div>
 						<hr className='my-2 border-gray-200' />
@@ -66,7 +70,7 @@ function ParachainsInfoCard() {
 									/>{' '}
 									{item.auction}
 								</p>
-								<p className='pt-2 text-sm text-text_primary'>Auction</p>
+								<p className='pt-2 text-sm text-text_primary'>{t('auction')}</p>
 							</div>
 							<div>
 								<p className='flex items-center justify-center gap-1.5 font-medium text-btn_secondary_text'>
@@ -78,13 +82,13 @@ function ParachainsInfoCard() {
 									/>{' '}
 									{item.crowdloans}
 								</p>
-								<p className='pt-2 text-sm text-text_primary'>Crowdloans</p>
+								<p className='pt-2 text-sm text-text_primary'>{t('crowdloans')}</p>
 							</div>
 							<div>
 								<p className='flex items-center justify-center gap-1.5 font-medium text-btn_secondary_text'>
 									<AiOutlineLink className='h-3 w-3 text-text_primary' /> {item.parachains}
 								</p>
-								<p className='pt-2 text-sm text-text_primary'>Parachains</p>
+								<p className='pt-2 text-sm text-text_primary'>{t('parachains')}</p>
 							</div>
 							<div>
 								<p className='flex items-center justify-center gap-1.5 font-medium text-btn_secondary_text'>
@@ -96,7 +100,7 @@ function ParachainsInfoCard() {
 									/>{' '}
 									{item.projects}
 								</p>
-								<p className='pt-2 text-sm text-text_primary'>Projects</p>
+								<p className='pt-2 text-sm text-text_primary'>{t('projects')}</p>
 							</div>
 						</div>
 					</div>

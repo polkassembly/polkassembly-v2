@@ -1145,5 +1145,23 @@
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
 		"clearFilters": "Clear Filters"
+	},
+	"Parachains": {
+		"projects": "Projects",
+		"index": "Index",
+		"status": "Status",
+		"token": "Token",
+		"w3f": "W3F",
+		"investors": "Investors",
+		"github": "Github",
+		"inAuction": "In Auction",
+		"testing": "Testing",
+		"announced": "Announced",
+		"live": "Live",
+		"parachainsDirectory": "Polkadot and Kusama ecosystem and directory",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "of Total Supply Locked in Parachains and Crowdloans",
+		"auction": "Auction",
+		"crowdloans": "Crowdloans",
+		"parachains": "Parachains"
 	}
 }
