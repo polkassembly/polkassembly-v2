@@ -1191,3 +1191,22 @@ export enum ESearchDiscussionType {
 	GRANTS = 'grants',
 	REFERENDUMS_V2 = 'referendums_v2'
 }
+
+export interface IParachain {
+	id: number;
+	name: string;
+	chain: string;
+	status: string;
+	badges: string[];
+	token: string;
+	logoURL: string;
+	w3fGrant: {
+		received: number;
+		completed: number;
+		milestoneText: string;
+		terminated: boolean;
+		terminationReason: string;
+	};
+	investorsCount: number;
+	githubURL: string;
+}
