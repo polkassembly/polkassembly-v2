@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '@/app/_shared-components/Button';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
@@ -19,6 +19,7 @@ import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
+import { useRouter } from 'nextjs-toploader/app';
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {

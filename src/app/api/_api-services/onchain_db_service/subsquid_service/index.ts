@@ -15,6 +15,9 @@ import {
 	IOnChainPostListing,
 	IPreimage,
 	IStatusHistoryItem,
+	ITrackAnalyticsDelegations,
+	ITrackAnalyticsDelegationsList,
+	ITrackAnalyticsStats,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -29,6 +32,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
 
 export class SubsquidService extends SubsquidUtils {
@@ -875,6 +879,99 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			items: posts,
 			totalCount: subsquidData.proposalsConnection.totalCount
+		};
+	}
+
+	static async GetTrackAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_TRACK_ANALYTICS_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { track_num: trackId, before: dayjs().subtract(7, 'days').toISOString() }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain track analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain track analytics stats from Subsquid');
+		}
+
+		const changeInActiveProposals =
+			subsquidData.totalActiveProposals.totalCount && subsquidData.diffActiveProposals.totalCount
+				? (subsquidData.diffActiveProposals.totalCount * 100) / subsquidData.totalActiveProposals.totalCount
+				: 0;
+		return {
+			totalActiveProposals: subsquidData.totalActiveProposals.totalCount,
+			totalProposalCount: subsquidData.totalProposalCount.totalCount,
+			changeInActiveProposals
+		};
+	}
+
+	static async GetTrackAnalyticsDelegations({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsDelegations> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_TRACK_ANALYTICS_DELEGATIONS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { track_num: trackId }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain track analytics delegations from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain track analytics delegations from Subsquid');
+		}
+
+		let totalCapital = BN_ZERO;
+		let totalVotesBalance = BN_ZERO;
+		const totalDelegatorsObj: ITrackAnalyticsDelegationsList = {};
+		const totalDelegateesObj: ITrackAnalyticsDelegationsList = {};
+
+		if (subsquidData?.votingDelegations?.length) {
+			subsquidData?.votingDelegations.forEach((delegation: { lockPeriod: number; balance: string; from: string; to: string }) => {
+				const bnBalance = new BN(delegation?.balance);
+				const bnConviction = new BN(delegation?.lockPeriod || 1);
+				const vote = delegation?.lockPeriod ? bnBalance.mul(bnConviction) : bnBalance.div(new BN('10'));
+
+				totalVotesBalance = totalVotesBalance.add(vote);
+
+				totalCapital = totalCapital.add(bnBalance);
+
+				if (totalDelegateesObj[delegation?.to] === undefined) {
+					totalDelegateesObj[delegation?.to] = {
+						count: 1,
+						data: [{ capital: delegation.balance, from: delegation?.from, lockedPeriod: delegation.lockPeriod || 0.1, to: delegation?.to, votingPower: vote.toString() }]
+					};
+				} else {
+					const existingCount = totalDelegateesObj[delegation?.to]?.count || 0;
+					totalDelegateesObj[delegation?.to] = {
+						count: existingCount + 1,
+						data: [
+							...(totalDelegateesObj[delegation?.to]?.data || []),
+							{ capital: delegation.balance, from: delegation?.from, lockedPeriod: delegation.lockPeriod || 0.1, to: delegation?.to, votingPower: vote.toString() }
+						]
+					};
+				}
+				if (totalDelegatorsObj[delegation?.from] === undefined) {
+					totalDelegatorsObj[delegation?.from] = {
+						count: 1,
+						data: [{ capital: delegation.balance, from: delegation?.from, lockedPeriod: delegation.lockPeriod || 0.1, to: delegation?.to, votingPower: vote.toString() }]
+					};
+				} else {
+					const existingCount = totalDelegatorsObj[delegation?.from]?.count || 0;
+					totalDelegatorsObj[delegation?.from] = {
+						count: existingCount + 1,
+						data: [
+							...(totalDelegatorsObj[delegation?.from]?.data || []),
+							{ capital: delegation.balance, from: delegation?.from, lockedPeriod: delegation.lockPeriod || 0.1, to: delegation.to, votingPower: vote.toString() }
+						]
+					};
+				}
+			});
+		}
+
+		return {
+			delegateesData: totalDelegateesObj,
+			delegatorsData: totalDelegatorsObj,
+			totalCapital: totalCapital.toString(),
+			totalDelegates: Object.keys(totalDelegateesObj)?.length,
+			totalDelegators: Object.keys(totalDelegatorsObj)?.length,
+			totalVotesBalance: totalVotesBalance.toString()
 		};
 	}
 }

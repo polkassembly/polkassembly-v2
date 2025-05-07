@@ -6,18 +6,21 @@ import { useMemo, useState } from 'react';
 import EmailIcon from '@assets/icons/email-icon-dark.svg';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import { ESocial, ESocialVerificationStatus, ISocialHandle } from '@/_shared/types';
+import { ENotificationStatus, ESocial, ESocialVerificationStatus, ISocialHandle } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
 import VerifiedCheckIcon from '@assets/icons/verified-check-green.svg';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useToast } from '@/hooks/useToast';
 import { Button } from '../../Button';
 
 function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail: string; emailSocialHandle?: ISocialHandle }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
+
+	const { toast } = useToast();
 
 	const [loading, setLoading] = useState(false);
 
@@ -44,6 +47,11 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 
 		if (error || !data) {
 			console.error(error);
+			toast({
+				status: ENotificationStatus.ERROR,
+				title: t('SetIdentity.emailNotSent'),
+				description: t('SetIdentity.emailNotSentDescription')
+			});
 			setLoading(false);
 			return;
 		}
@@ -58,6 +66,12 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 				address: userPreferences?.selectedAccount?.address
 			}
 		}));
+
+		toast({
+			status: ENotificationStatus.SUCCESS,
+			title: t('SetIdentity.verificationEmailSent'),
+			description: t('SetIdentity.verificationEmailSentDescription')
+		});
 
 		setLoading(false);
 	};

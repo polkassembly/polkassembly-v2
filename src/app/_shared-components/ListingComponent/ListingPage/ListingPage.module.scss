@@ -19,19 +19,19 @@
 }
 
 .tabs {
-	@apply mt-5 flex items-center justify-between;
+	@apply mt-5 flex justify-between;
 }
 
 .tab-button {
-	@apply pb-3 text-text_primary;
+	@apply px-4 py-3 text-sm font-medium text-wallet_btn_text;
 }
 
 .tab-button-active {
-	@apply border-b-2 border-pink-500 text-pink-500;
+	@apply border-b-2 border-text_pink font-semibold text-text_pink;
 }
 
 .filter {
-	@apply flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200;
+	@apply mb-1 flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 hover:bg-gray-200;
 }
 
 .content {

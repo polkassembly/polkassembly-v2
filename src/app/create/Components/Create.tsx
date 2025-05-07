@@ -30,6 +30,7 @@ import SpendAssethubIcon from '@assets/icons/spend-assethub-icon.svg';
 import CreateTreasuryIcon from '@assets/icons/create-treasury-icon.svg';
 import KillReferendaIcon from '@assets/icons/kill-referenda-icon.svg';
 import CancelReferendaIcon from '@assets/icons/cancel-referenda-icon.svg';
+import { useSearchParams } from 'next/navigation';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
@@ -103,7 +104,10 @@ function CreateOption({
 }
 
 const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?: EProposalStep) => void }>(({ isModal = false, onStepChange }, ref) => {
-	const [step, setStep] = useState<EProposalStep>();
+	const searchParams = useSearchParams();
+	const open = searchParams.get('open');
+
+	const [step, setStep] = useState<EProposalStep | undefined>(open && Object.values(EProposalStep).includes(open as EProposalStep) ? (open as EProposalStep) : undefined);
 	const { user } = useUser();
 	const t = useTranslations();
 
