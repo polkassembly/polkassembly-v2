@@ -282,4 +282,12 @@ export class OnChainDbService {
 
 		return SubsquidService.GetActiveProposalListingsWithVoteForAddressByTrackId({ network, trackId, voterAddress: formattedVoterAddress });
 	}
+
+	static async GetTrackAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }) {
+		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
+	}
+
+	static async GetTrackAnalyticsDelegations({ network, trackId }: { network: ENetwork; trackId?: number }) {
+		return SubsquidService.GetTrackAnalyticsDelegations({ network, trackId });
+	}
 }

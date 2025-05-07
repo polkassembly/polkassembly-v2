@@ -912,4 +912,34 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_TRACK_ANALYTICS_STATS = `
+		query getTrackLevelAnalyticsStats($track_num: Int, $before: DateTime = "2025-02-01T13:21:30.000000Z") {
+  diffActiveProposals: proposalsConnection(where: {trackNumber_eq: $track_num, status_not_in: [Cancelled, TimedOut, Confirmed, Approved, Rejected, Executed, Killed, ExecutionFailed], createdAt_gt: $before, type_eq: ReferendumV2}, orderBy: id_ASC) {
+    totalCount
+  }
+  diffProposalCount: proposalsConnection(where: {trackNumber_eq: $track_num, createdAt_gt: $before, type_eq: ReferendumV2}, orderBy: id_ASC) {
+    totalCount
+  }
+  totalActiveProposals: proposalsConnection(where: {trackNumber_eq: $track_num, status_not_in: [Cancelled, TimedOut, Confirmed, Approved, Rejected, Executed, Killed, ExecutionFailed], type_eq: ReferendumV2}, orderBy: id_ASC) {
+    totalCount
+  }
+  totalProposalCount: proposalsConnection(where: {trackNumber_eq: $track_num, type_eq: ReferendumV2}, orderBy: id_ASC) {
+    totalCount
+  }
+}
+
+	`;
+
+	protected static GET_TRACK_ANALYTICS_DELEGATIONS = `
+		query DelegationStats($track_num: Int) {
+  votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, track_eq: $track_num}) {
+    from
+    to
+    balance
+    lockPeriod
+  }
+}
+
+	`;
 }

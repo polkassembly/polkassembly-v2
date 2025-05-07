@@ -771,7 +771,11 @@
 		"verifying": "Verifying...",
 		"verificationSuccessful": "Verification successful",
 		"verificationFailed": "Verification failed",
-		"goToHome": "Go to home"
+		"goToHome": "Go to home",
+		"verificationEmailSent": "Verification email sent",
+		"verificationEmailSentDescription": "Please check your email for verification",
+		"emailNotSent": "Email not sent",
+		"emailNotSentDescription": "There was an error while sending the verification email"
 	},
 	"Bounties": {
 		"onchainBounties": "On-chain Bounties",
@@ -1163,5 +1167,23 @@
 		"auction": "Auction",
 		"crowdloans": "Crowdloans",
 		"parachains": "Parachains"
+	},
+	"TrackAnalytics": {
+		"proposalsCreated": "Proposals Created",
+		"activeProposals": "Active Proposals",
+		"thisWeek": "This Week",
+		"delegatee": "Delegatee",
+		"delegator": "Delegator",
+		"totalCapital": "Total Capital",
+		"totalVotes": "Total Votes",
+		"delegation": "Delegation",
+		"noDelegateesFound": "No delegatees found",
+		"noDelegatorsFound": "No delegators found",
+		"address": "Address",
+		"count": "Count",
+		"capital": "Capital",
+		"votes": "Votes",
+		"voteDetails": "Vote Details",
+		"target": "Target"
 	}
 }

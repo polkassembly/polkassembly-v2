@@ -46,7 +46,7 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 	}
 
 	return (
-		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+		<div>
 			<BountiesListingPage
 				initialData={data || { items: [], totalCount: 0 }}
 				status={status as EBountyStatus}
