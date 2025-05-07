@@ -1122,5 +1122,23 @@
 		"bountyProposalFailedDescription": "Hubo un error al proponer la recompensa",
 		"bountyAmount": "Cantidad de la recompensa",
 		"proposeBounty": "Proponer recompensa"
+	},
+	"TrackAnalytics": {
+		"proposalsCreated": "Propuestas Creadas",
+		"activeProposals": "Propuestas Activas",
+		"thisWeek": "Esta Semana",
+		"delegatee": "Delegado",
+		"delegator": "Delegador",
+		"totalCapital": "Capital Total",
+		"totalVotes": "Votos Totales",
+		"delegation": "Delegación",
+		"noDelegateesFound": "No se encontraron delegados",
+		"noDelegatorsFound": "No se encontraron delegadores",
+		"address": "Dirección",
+		"count": "Cantidad",
+		"capital": "Capital",
+		"votes": "Votos",
+		"voteDetails": "Detalles de Votación",
+		"target": "Objetivo"
 	}
 }
