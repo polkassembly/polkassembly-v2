@@ -95,7 +95,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 		refetchOnMount: false
 	});
 	const getManifesto = async () => {
-		const { data: manifestoData, error: manifestoError } = await NextApiClientService.getPADelegateManifesto({ address: addresses[1] });
+		const { data: manifestoData, error: manifestoError } = await NextApiClientService.getPADelegateManifesto({ address: addresses[0] });
 		if (manifestoError || !manifestoData) {
 			throw new ClientError(manifestoError?.message || 'Failed to fetch data');
 		}
