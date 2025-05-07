@@ -123,7 +123,7 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 											<Tooltip>
 												<TooltipTrigger asChild>
 													<Image
-														src={getIconForUndelegationTimeLeft(getDelegationProgress(delegation.createdAt, delegation?.endsAt))}
+														src={getIconForUndelegationTimeLeft(getDelegationProgress(delegation.createdAt, delegation.endsAt))}
 														alt='delegation-progress'
 														width={24}
 														height={24}
