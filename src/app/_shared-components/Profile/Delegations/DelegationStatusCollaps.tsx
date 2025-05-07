@@ -16,9 +16,8 @@ import { cn } from '@/lib/utils';
 import DelegatedIcon from '@assets/delegation/delegated.svg';
 import DelegateIcon from '@assets/delegation/delegatedTo.svg';
 import CapitalIcon from '@assets/delegation/capital.svg';
-import VotingPowerIcon from '@assets/delegation/votes.svg';
+import VotingPowerIcon from '@assets/delegation/votingPower.svg';
 import classes from './Delegations.module.scss';
-
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import Address from '../Address/Address';
 
