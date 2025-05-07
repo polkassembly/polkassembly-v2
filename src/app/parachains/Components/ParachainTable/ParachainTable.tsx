@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { ENetwork, IParachain } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
+import { cn } from '@/lib/utils';
 import styles from '../../parachains.module.scss';
 
 function ParachainTable({ parachainsData }: { parachainsData: IParachain[] }) {
@@ -151,7 +152,7 @@ function ParachainTable({ parachainsData }: { parachainsData: IParachain[] }) {
 																alt='W3F Logo'
 															/>
 														</TooltipTrigger>
-														<TooltipContent className={styles.tooltipContent}>
+														<TooltipContent className={cn(styles.tooltipContent, 'bg-address_tooltip_bg')}>
 															<p>{grantTooltip(parachain)}</p>
 														</TooltipContent>
 													</Tooltip>
@@ -264,12 +265,28 @@ function ParachainTable({ parachainsData }: { parachainsData: IParachain[] }) {
 											</TableCell>
 											<TableCell className='py-4'>{parachain.token}</TableCell>
 											<TableCell className='py-4'>
-												<Image
-													src={parachain.w3fGrant?.terminated ? w3fRedLogo : parachain.w3fGrant?.milestoneText ? w3fBlackLogo : w3fGreenLogo}
-													height={34}
-													width={34}
-													alt='W3F Logo'
-												/>
+												{grantTooltip(parachain) ? (
+													<Tooltip>
+														<TooltipTrigger>
+															<Image
+																src={parachain.w3fGrant?.terminated ? w3fRedLogo : parachain.w3fGrant?.milestoneText ? w3fBlackLogo : w3fGreenLogo}
+																height={34}
+																width={34}
+																alt='W3F Logo'
+															/>
+														</TooltipTrigger>
+														<TooltipContent className={cn(styles.tooltipContent, 'bg-address_tooltip_bg')}>
+															<p>{grantTooltip(parachain)}</p>
+														</TooltipContent>
+													</Tooltip>
+												) : (
+													<Image
+														src={parachain.w3fGrant?.terminated ? w3fRedLogo : parachain.w3fGrant?.milestoneText ? w3fBlackLogo : w3fGreenLogo}
+														height={34}
+														width={34}
+														alt='W3F Logo'
+													/>
+												)}
 											</TableCell>
 											<TableCell className='py-4'>{parachain.investorsCount}</TableCell>
 											<TableCell className='py-4'>
