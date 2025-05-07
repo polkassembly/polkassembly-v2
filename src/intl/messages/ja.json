@@ -1117,5 +1117,23 @@
 		"bountyProposalFailedDescription": "バウンティの提案中にエラーが発生しました",
 		"bountyAmount": "バウンティ金額",
 		"proposeBounty": "バウンティを提案"
+	},
+	"Parachains": {
+		"projects": "プロジェクト",
+		"index": "インデックス",
+		"status": "ステータス",
+		"token": "トークン",
+		"w3f": "W3F",
+		"investors": "インベスター",
+		"github": "GitHub",
+		"inAuction": "オークション中",
+		"testing": "テスト中",
+		"announced": "発表済み",
+		"live": "ライブ",
+		"parachainsDirectory": "PolkadotとKusamaのエコシステムとディレクトリ",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "ParachainsとCrowdloansでロックされた総供給量",
+		"auction": "オークション",
+		"crowdloans": "クラウドローン",
+		"parachains": "平行鎖"
 	}
 }
