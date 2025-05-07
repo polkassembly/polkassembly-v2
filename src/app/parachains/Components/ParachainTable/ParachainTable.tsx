@@ -45,18 +45,8 @@ function ParachainTable({ parachainsData }: { parachainsData: IParachain[] }) {
 				className='my-5'
 			>
 				<TabsList>
-					<TabsTrigger
-						showBorder
-						value={ENetwork.POLKADOT}
-					>
-						Polkadot
-					</TabsTrigger>
-					<TabsTrigger
-						showBorder
-						value={ENetwork.KUSAMA}
-					>
-						Kusama
-					</TabsTrigger>
+					<TabsTrigger value={ENetwork.POLKADOT}>Polkadot</TabsTrigger>
+					<TabsTrigger value={ENetwork.KUSAMA}>Kusama</TabsTrigger>
 				</TabsList>
 				<TabsContent value={ENetwork.POLKADOT}>
 					<div className={styles.parachainsTable}>
