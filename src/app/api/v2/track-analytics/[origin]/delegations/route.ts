@@ -5,6 +5,7 @@
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { EPostOrigin } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,9 +20,16 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	const network = await getNetworkFromHeaders();
 
+	const cachedTrackAnalyticsDelegation = await RedisService.GetTrackAnalyticsDelegation({ network, origin });
+	if (cachedTrackAnalyticsDelegation) {
+		return NextResponse.json(cachedTrackAnalyticsDelegation);
+	}
+
 	const trackId = origin === 'all' ? undefined : NETWORKS_DETAILS[`${network}`].trackDetails[`${origin}`]?.trackId;
 
 	const stats = await OnChainDbService.GetTrackAnalyticsDelegations({ network, trackId });
+
+	await RedisService.SetTrackAnalyticsDelegation({ network, origin, data: stats });
 
 	return NextResponse.json(stats);
 });

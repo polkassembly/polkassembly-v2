@@ -31,8 +31,9 @@ function Delegators({ delegatorsData }: { delegatorsData: ITrackAnalyticsDelegat
 					</TableRow>
 				</TableHeader>
 				<TableBody className='text-sm text-text_primary'>
-					{allDelegatorData.slice((page - 1) * DEFAULT_LISTING_LIMIT, page * DEFAULT_LISTING_LIMIT).map((delegator) => (
-						<TableRow key={delegator.from}>
+					{allDelegatorData.slice((page - 1) * DEFAULT_LISTING_LIMIT, page * DEFAULT_LISTING_LIMIT).map((delegator, index) => (
+						// eslint-disable-next-line react/no-array-index-key
+						<TableRow key={`${delegator.from}-${delegator.to}-${index}`}>
 							<TableCell className='p-2'>
 								<div className='flex items-center truncate'>
 									<Address address={delegator.from} />

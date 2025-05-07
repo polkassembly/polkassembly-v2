@@ -69,7 +69,7 @@ function TrackStats({ origin }: { origin?: EPostOrigin }) {
 					) : (
 						<div className='flex items-center gap-x-[2px] text-xs'>
 							<ArrowUp className='text-success' />
-							<span className='font-medium text-success'>{data?.changeInActiveProposals}%</span>
+							<span className='font-medium text-success'>{data?.changeInActiveProposals?.toFixed(0)}%</span>
 							<span className='text-wallet_btn_text'>{t('thisWeek')}</span>
 						</div>
 					)}
