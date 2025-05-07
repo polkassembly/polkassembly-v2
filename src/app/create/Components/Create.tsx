@@ -104,18 +104,12 @@ function CreateOption({
 }
 
 const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?: EProposalStep) => void }>(({ isModal = false, onStepChange }, ref) => {
-	const [step, setStep] = useState<EProposalStep>();
-	const { user } = useUser();
-	const t = useTranslations();
-
 	const searchParams = useSearchParams();
 	const open = searchParams.get('open');
 
-	useEffect(() => {
-		if (open && Object.values(EProposalStep).includes(open as EProposalStep)) {
-			setStep(open as EProposalStep);
-		}
-	}, [open]);
+	const [step, setStep] = useState<EProposalStep | undefined>(open && Object.values(EProposalStep).includes(open as EProposalStep) ? (open as EProposalStep) : undefined);
+	const { user } = useUser();
+	const t = useTranslations();
 
 	const network = getCurrentNetwork();
 
