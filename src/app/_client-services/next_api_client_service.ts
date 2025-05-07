@@ -42,7 +42,9 @@ import {
 	ITreasuryStats,
 	IContentSummary,
 	IAddressRelations,
-	IVoteCurve
+	IVoteCurve,
+	EGovType,
+	IUserVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -118,7 +120,8 @@ enum EApiRoute {
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
-	GET_VOTE_CURVES = 'GET_VOTE_CURVES'
+	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
+	GET_USER_VOTES = 'GET_USER_VOTES'
 }
 
 export class NextApiClientService {
@@ -187,8 +190,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+			case EApiRoute.GET_USER_VOTES:
 				path = '/users/address';
 				break;
+
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
@@ -945,5 +950,15 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
 		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
+	}
+
+	static async getUserVotes({ address, page, limit, govType }: { address: string; page: number; limit: number; govType: EGovType }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			govType
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_VOTES, routeSegments: [address, 'votes'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IUserVote>>({ url, method });
 	}
 }

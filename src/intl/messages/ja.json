@@ -161,6 +161,18 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "日時",
+		"Votes": {
+			"votes": "投票",
+			"proposal": "提案",
+			"vote": "投票",
+			"status": "ステータス",
+			"actions": "アクション",
+			"noVotes": "投票が見つかりません",
+			"viewSubscan": "Subscanで表示",
+			"viewVote": "投票を表示",
+			"openGov": "OpenGov",
+			"gov1": "Gov1"
+		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
 			"created_proposal": "提案を作成",

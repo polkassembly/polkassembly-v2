@@ -129,6 +129,7 @@
 		"noData": "暂无数据",
 		"contentWillBeAvailableSoon": "内容即将可用..."
 	},
+	
 	"Profile": {
 		"settings": "设置",
 		"login": "登录",
@@ -159,6 +160,18 @@
 		"balance": "余额",
 		"locked": "已锁定",
 		"on": "于",
+		"Votes": {
+			"votes": "投票",
+			"proposal": "提案",
+			"vote": "投票",
+			"status": "状态",
+			"actions": "操作",
+			"noVotes": "未找到投票",
+			"viewSubscan": "在Subscan中查看",
+			"viewVote": "查看投票",
+			"openGov": "OpenGov",
+			"gov1": "Gov1"
+		},
 		"Activity": {
 			"voted_on_proposal": "已投票",
 			"created_proposal": "创建提案",

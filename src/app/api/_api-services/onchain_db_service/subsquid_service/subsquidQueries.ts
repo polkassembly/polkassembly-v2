@@ -912,4 +912,94 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_USER_VOTES = `
+		query VotesHistoryByVoter(
+			$type_eq: VoteType!,
+			$voter_eq: String!, 
+			$limit: Int!,
+			$offset: Int!,
+			$orderBy: [FlattenedConvictionVotesOrderByInput!] = [proposalIndex_DESC]
+		) {
+			flattenedConvictionVotes(
+				where: {
+					type_eq: $type_eq, 
+					voter_eq: $voter_eq, 
+					removedAtBlock_isNull: true, 
+					proposal_isNull: false
+				}, 
+				limit: $limit, 
+				offset: $offset, 
+				orderBy: $orderBy
+			) {
+				type
+				voter
+				lockPeriod
+				decision
+				balance {
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				createdAt
+				createdAtBlock
+				proposal {
+					description
+					createdAt
+					origin
+					index
+					proposer
+					status
+					type
+					trackNumber
+					statusHistory {
+						id
+						status
+					}
+				}
+				proposalIndex
+				delegatedTo
+				isDelegated
+				parentVote {
+					extrinsicIndex
+					selfVotingPower
+					type
+					voter
+					lockPeriod
+					delegatedVotingPower
+					delegatedVotes(where: { removedAtBlock_isNull: true }) {
+						voter
+						balance {
+							... on StandardVoteBalance {
+								value
+							}
+							... on SplitVoteBalance {
+								aye
+								nay
+								abstain
+							}
+						}
+						lockPeriod
+						votingPower
+					}
+				}
+			}
+			flattenedConvictionVotesConnection(
+				orderBy: id_ASC, 
+				where: {
+					type_eq: $type_eq, 
+					voter_eq: $voter_eq, 
+					removedAtBlock_isNull: true, 
+					proposal_isNull: false
+				}
+			) {
+				totalCount
+			}
+		}
+	`;
 }

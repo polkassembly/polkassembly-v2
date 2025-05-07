@@ -159,6 +159,18 @@
 		"balance": "Guthaben",
 		"locked": "Gesperrt",
 		"on": "am",
+		"Votes": {
+			"votes": "Stimmen",
+			"proposal": "Vorschlag",
+			"vote": "Stimme",
+			"status": "Status",
+			"actions": "Aktionen",
+			"noVotes": "Keine Stimmen gefunden",
+			"viewSubscan": "Auf Subscan anzeigen",
+			"viewVote": "Stimme anzeigen",
+			"openGov": "OpenGov",
+			"gov1": "Gov1"
+		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
 			"created_proposal": "Vorschlag erstellt",

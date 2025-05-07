@@ -861,7 +861,8 @@ export enum EProfileTabs {
 	OVERVIEW = 'overview',
 	ACTIVITY = 'activity',
 	ACCOUNTS = 'accounts',
-	SETTINGS = 'settings'
+	SETTINGS = 'settings',
+	VOTES = 'votes'
 }
 
 export interface IPreimage {
@@ -1190,4 +1191,19 @@ export enum ESearchDiscussionType {
 	DISCUSSIONS = 'discussions',
 	GRANTS = 'grants',
 	REFERENDUMS_V2 = 'referendums_v2'
+}
+
+export interface IUserVote {
+	balance: { aye?: string; nay?: string; abstain?: string; value?: string };
+	decision: EVoteDecision;
+	delegatedTo: string;
+	delegatedVotingPower: string;
+	extrinsicIndex: number;
+	createdAt: Date;
+	isDelegatedVote: boolean;
+	lockPeriod: number;
+	selfVotingPower: string;
+	voter: string;
+	postDetails: IPostListing;
+	proposalIndex: number;
 }

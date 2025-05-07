@@ -159,6 +159,18 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
+		"Votes": {
+			"votes": "Votos",
+			"proposal": "Propuesta",
+			"vote": "Voto",
+			"status": "Estado",
+			"actions": "Acciones",
+			"noVotes": "No se encontraron votos",
+			"viewSubscan": "Ver en Subscan",
+			"viewVote": "Ver voto",
+			"openGov": "OpenGov",
+			"gov1": "Gov1"
+		},
 		"Activity": {
 			"voted_on_proposal": "Votó",
 			"created_proposal": "Creó propuesta",

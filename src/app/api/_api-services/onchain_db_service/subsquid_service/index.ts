@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import {
+	EGovType,
 	ENetwork,
 	EPostOrigin,
 	EProposalStatus,
@@ -13,8 +14,10 @@ import {
 	IGenericListingResponse,
 	IOnChainPostInfo,
 	IOnChainPostListing,
+	IPostListing,
 	IPreimage,
 	IStatusHistoryItem,
+	IUserVote,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -875,6 +878,93 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			items: posts,
 			totalCount: subsquidData.proposalsConnection.totalCount
+		};
+	}
+
+	static async GetUserVotes({ network, address, page, limit, govType }: { network: ENetwork; address: string; page: number; limit: number; govType: EGovType }) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_USER_VOTES;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, {
+				type_eq: govType === EGovType.GOV_1 ? EProposalType.REFERENDUM : EProposalType.REFERENDUM_V2,
+				voter_eq: getEncodedAddress(address, network),
+				limit: Number(limit),
+				offset: (Number(page) - 1) * Number(limit)
+			})
+			.toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain user votes from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain user votes from Subsquid');
+		}
+
+		const votesData = subsquidData?.flattenedConvictionVotes || [];
+
+		const votes: IUserVote[] = votesData.map(
+			(vote: {
+				balance: { aye?: string; nay?: string; abstain?: string; value?: string };
+				decision: string;
+				delegatedTo: string;
+				createdAt: string;
+				delegatedVotingPower: string;
+				extrinsicIndex: string;
+				isDelegated: boolean;
+				lockPeriod: number;
+				proposalIndex: number;
+				voter: string;
+				index: number;
+				parentVote: {
+					extrinsicIndex: string;
+					selfVotingPower: string;
+					type: string;
+					voter: string;
+					lockPeriod: number;
+					delegatedVotingPower: string;
+					delegatedVotes: {
+						voter: string;
+						balance: {
+							value: string;
+						};
+					}[];
+				};
+				proposal: { createdAt: string; index: number; proposer: string; type: EProposalType; status: EProposalStatus; origin: EPostOrigin; description: string };
+			}) => {
+				const { createdAt, index, proposer, type, status, origin, description } = vote.proposal;
+
+				const decision = this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote?.decision });
+
+				return {
+					balance: vote?.balance,
+					decision,
+					delegatedTo: vote?.delegatedTo || '',
+					createdAt: new Date(createdAt),
+					delegatedVotingPower: vote.parentVote?.delegatedVotingPower,
+					extrinsicIndex: vote?.parentVote?.extrinsicIndex,
+					isDelegatedVote: vote?.isDelegated,
+					lockPeriod: vote?.lockPeriod,
+					selfVotingPower: vote?.parentVote.selfVotingPower,
+					voter: vote?.voter,
+					proposalIndex: vote?.proposalIndex,
+					postDetails: {
+						onChainInfo: {
+							createdAt: new Date(createdAt),
+							proposer,
+							index,
+							status,
+							type,
+							origin,
+							description
+						}
+					} as IPostListing
+				};
+			}
+		);
+
+		return {
+			items: votes,
+			totalCount: subsquidData.flattenedConvictionVotesConnection.totalCount
 		};
 	}
 }

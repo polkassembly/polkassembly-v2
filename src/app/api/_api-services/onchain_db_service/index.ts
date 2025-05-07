@@ -16,7 +16,8 @@ import {
 	IBountyProposal,
 	IBountyUserActivity,
 	IDelegationStats,
-	EBountyStatus
+	EBountyStatus,
+	EGovType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -281,5 +282,9 @@ export class OnChainDbService {
 			: voterAddress;
 
 		return SubsquidService.GetActiveProposalListingsWithVoteForAddressByTrackId({ network, trackId, voterAddress: formattedVoterAddress });
+	}
+
+	static async GetUserVotes({ network, address, page, limit, govType }: { network: ENetwork; address: string; page: number; limit: number; govType: EGovType }) {
+		return SubsquidService.GetUserVotes({ network, address, page, limit, govType });
 	}
 }

@@ -163,6 +163,18 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
+		"Votes": {
+			"votes": "Votes",
+			"proposal": "Proposal",
+			"vote": "Vote",
+			"status": "Status",
+			"actions": "Actions",
+			"noVotes": "No Votes Found",
+			"viewSubscan": "View on Subscan",
+			"viewVote": "View Vote",
+			"openGov": "OpenGov",
+			"gov1": "Gov1"
+		},
 		"Activity": {
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
