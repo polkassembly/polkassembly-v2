@@ -22,6 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../_shared-components/Tabs';
 import ParachainsInfoCard from './Components/ParachainsInfoCard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../_shared-components/Tooltip';
+import styles from './parachains.module.scss';
 
 interface IParachain {
 	id: number;
@@ -74,7 +75,7 @@ function ParachainsPage() {
 	};
 
 	return (
-		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+		<div className={styles.parachainsPage}>
 			<ParachainsInfoCard
 				polkadotParachainsDataLength={polkadotParachainsDataLength}
 				kusamaParachainsDataLength={kusamaParachainsDataLength}
@@ -100,10 +101,10 @@ function ParachainsPage() {
 						</TabsTrigger>
 					</TabsList>
 					<TabsContent value={ENetwork.POLKADOT}>
-						<div className='scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-transparent max-h-[500px] overflow-y-auto'>
+						<div className={styles.parachainsTable}>
 							<Table>
 								<TableHeader className='sticky top-0 z-10 bg-page_background'>
-									<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+									<TableRow className='text-sm font-medium text-wallet_btn_text'>
 										<TableHead className='py-4'>{t('index')}</TableHead>
 										<TableHead className='py-4'>{t('projects')}</TableHead>
 										<TableHead className='py-4'>{t('status')}</TableHead>
@@ -130,7 +131,7 @@ function ParachainsPage() {
 													{parachain.badges.map((item: string) => (
 														<div
 															key={item}
-															className='bg-parachain_badge_bg text-[12px] text-white'
+															className={styles.parachainBadge}
 															style={{ borderRadius: '48px', marginRight: '10px', padding: '4px 10px' }}
 														>
 															{item}
@@ -140,7 +141,7 @@ function ParachainsPage() {
 												<TableCell>
 													{' '}
 													{parachain.status.search('auction') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={auctionIcon}
 																height={16}
@@ -150,7 +151,7 @@ function ParachainsPage() {
 															{t('inAuction')}
 														</span>
 													) : parachain.status.search('Testing') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={testingIcon}
 																height={16}
@@ -160,7 +161,7 @@ function ParachainsPage() {
 															{t('testing')}
 														</span>
 													) : parachain.status.search('announced') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={announcedIcon}
 																height={16}
@@ -170,7 +171,7 @@ function ParachainsPage() {
 															{t('announced')}
 														</span>
 													) : parachain.status.search('live') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={liveIcon}
 																height={16}
@@ -223,10 +224,10 @@ function ParachainsPage() {
 						</div>
 					</TabsContent>
 					<TabsContent value={ENetwork.KUSAMA}>
-						<div className='scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-transparent max-h-[500px] overflow-y-auto'>
+						<div className={styles.parachainsTable}>
 							<Table>
 								<TableHeader className='sticky top-0 z-10 bg-page_background'>
-									<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+									<TableRow className='text-sm font-medium text-wallet_btn_text'>
 										<TableHead className='py-4'>{t('index')}</TableHead>
 										<TableHead className='py-4'>{t('projects')}</TableHead>
 										<TableHead className='py-4'>{t('status')}</TableHead>
@@ -253,7 +254,7 @@ function ParachainsPage() {
 													{parachain.badges.map((item: string) => (
 														<div
 															key={item}
-															className='bg-parachain_badge_bg text-[12px] text-white'
+															className={styles.parachainBadge}
 															style={{ borderRadius: '48px', marginRight: '10px', padding: '4px 10px' }}
 														>
 															{item}
@@ -263,7 +264,7 @@ function ParachainsPage() {
 												<TableCell className='py-4'>
 													{' '}
 													{parachain.status.search('auction') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={auctionIcon}
 																height={16}
@@ -273,7 +274,7 @@ function ParachainsPage() {
 															{t('inAuction')}
 														</span>
 													) : parachain.status.search('Testing') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={testingIcon}
 																height={16}
@@ -283,7 +284,7 @@ function ParachainsPage() {
 															{t('testing')}
 														</span>
 													) : parachain.status.search('announced') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={announcedIcon}
 																height={16}
@@ -293,7 +294,7 @@ function ParachainsPage() {
 															{t('announced')}
 														</span>
 													) : parachain.status.search('live') !== -1 ? (
-														<span className='text-blue-light-high dark:text-blue-dark-high flex items-center gap-4'>
+														<span className={styles.parachainStatus}>
 															<Image
 																src={liveIcon}
 																height={16}
