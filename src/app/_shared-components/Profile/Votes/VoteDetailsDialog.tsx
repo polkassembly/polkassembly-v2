@@ -21,7 +21,7 @@ function VoteDetailsDialog({ isDialogOpen, setIsDialogOpen, voteData }: { isDial
 				<DialogTitle>
 					<DialogContent className={classes.voteDetailsDialogContent}>
 						<DialogHeader>
-							<DialogTitle className={classes.voteDetailsDialogTitle}>
+							<DialogTitle className='flex items-center justify-start gap-2 pl-6'>
 								{!!voteData?.postDetails?.title && (
 									<span className='text-base font-medium'>
 										{voteData?.postDetails?.title?.slice(0, 50)}

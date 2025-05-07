@@ -88,7 +88,7 @@ function VotesTable({ isFetching, votes }: { isFetching: boolean; votes: IUserVo
 
 	return (
 		<div>
-			<Table className={classes.votesTable}>
+			<Table className='text_text_primary relative text-sm'>
 				{isFetching && <LoadingLayover />}
 				<TableHeader>
 					<TableRow className={classes.votesTableHeaderRow}>
@@ -159,7 +159,7 @@ function VotesTable({ isFetching, votes }: { isFetching: boolean; votes: IUserVo
 												<TooltipContent
 													side='top'
 													align='center'
-													className={classes.tooltipContent}
+													className='bg-tooltip_background p-2 text-white'
 												>
 													{t('Votes.viewSubscan')}
 												</TooltipContent>
@@ -185,7 +185,7 @@ function VotesTable({ isFetching, votes }: { isFetching: boolean; votes: IUserVo
 												<TooltipContent
 													side='top'
 													align='center'
-													className={classes.tooltipContent}
+													className='bg-tooltip_background p-2 text-white'
 												>
 													{t('Votes.viewVote')}
 												</TooltipContent>

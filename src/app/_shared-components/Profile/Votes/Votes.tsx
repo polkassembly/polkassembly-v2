@@ -55,7 +55,7 @@ function Votes({ addresses }: { addresses: string[] }) {
 	return (
 		<div className={classes.votesContainer}>
 			<div className={classes.votesHeaderContainer}>
-				<div className={classes.votesHeader}>
+				<div className='flex items-center gap-x-2 px-6 text-text_primary'>
 					<Image
 						src={VotesIcon}
 						alt='votes'

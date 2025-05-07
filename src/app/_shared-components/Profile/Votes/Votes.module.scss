@@ -2,10 +2,6 @@
 	@apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal py-4 shadow-lg;
 }
 
-.votesHeader {
-	@apply flex items-center gap-x-2 px-6 text-text_primary;
-}
-
 .votesHeaderText {
 	@apply text-2xl font-semibold;
 }
@@ -25,16 +21,8 @@
 	@apply bg-page_background text-sm font-medium text-wallet_btn_text;
 }
 
-.votesTable {
-	@apply text_text_primary relative text-sm;
-}
-
 .votesTableLink {
 	@apply font-medium hover:text-text_pink hover:underline;
-}
-
-.tooltipContent {
-	@apply bg-tooltip_background p-2 text-white;
 }
 
 .voteDecisionDisplay {
