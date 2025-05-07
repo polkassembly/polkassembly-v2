@@ -42,8 +42,8 @@ function UserWalletData() {
 	);
 
 	return (
-		<div className='px-10'>
-			<div className='relative'>
+		<div className='w-full'>
+			<div className='relative w-full'>
 				{!user?.id || !user.loginAddress ? (
 					<div className={styles.walletInfoBoard}>
 						<span className='text-sm font-medium text-white'>{t('toGetStartedWithDelegationOnPolkadot')}</span>
@@ -56,10 +56,10 @@ function UserWalletData() {
 					</div>
 				) : (
 					<div className={styles.walletInfoBoard2}>
-						<div className='flex items-center gap-x-10 text-btn_primary_text'>
+						<div className='flex w-full items-center justify-center gap-2 gap-y-4 py-3 text-btn_primary_text sm:flex-row sm:justify-start sm:gap-x-10 sm:gap-y-0 sm:py-0'>
 							<div className='flex flex-col items-center'>
-								<span className='text-2xl font-medium'>{balances.balance}</span>
-								<span className='flex items-center gap-x-2 text-sm font-medium'>
+								<span className='text-base font-medium md:text-2xl'>{balances.balance}</span>
+								<span className='flex items-center gap-x-2 text-xs font-medium sm:text-sm'>
 									<Image
 										src={PolkadotIcon}
 										alt='polkadot-logo'
@@ -70,15 +70,15 @@ function UserWalletData() {
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
-								<span className='text-2xl font-medium'>{balances.transferableBalance}</span>
-								<span className='flex items-center gap-x-2 text-sm font-medium'>
+								<span className='text-base font-medium md:text-2xl'>{balances.transferableBalance}</span>
+								<span className='flex items-center gap-x-2 text-xs font-medium sm:text-sm'>
 									<FaCheckCircle className='text-base text-success' />
 									{t('transferable')}
 								</span>
 							</div>
 							<div className='flex flex-col items-center'>
-								<span className='text-2xl font-medium'>{balances.lockedBalance}</span>
-								<span className='flex items-center gap-x-2 text-sm font-medium'>
+								<span className='text-base font-medium md:text-2xl'>{balances.lockedBalance}</span>
+								<span className='flex items-center gap-x-2 text-xs font-medium sm:text-sm'>
 									<IoMdLock className='text-base text-lock' />
 									{t('totalLocked')}
 								</span>

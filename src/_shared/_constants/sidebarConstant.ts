@@ -9,10 +9,10 @@ import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
 import Bounty from '@assets/sidebar/bounty.svg';
 import BatchVoting from '@assets/sidebar/batch-voting.svg';
-import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
+// import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
-import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
-import CommunityIcon from '@assets/sidebar/community-icon.svg';
+// import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
+// import CommunityIcon from '@assets/sidebar/community-icon.svg';
 import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
 import ArchivedIcon from '@assets/sidebar/archived-icon.svg';
 import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
@@ -182,17 +182,17 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				),
 				endItems: ActiveItems(
 					[
-						{ title: t('Sidebar.govAnalytics'), url: '#', icon: GovAnalytics },
-						{ title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
-						{
-							title: t('Sidebar.community'),
-							url: '#',
-							icon: CommunityIcon,
-							items: [
-								{ title: t('Sidebar.members'), url: '#' },
-								{ title: t('Sidebar.ecosystemProjects'), url: '#' }
-							]
-						},
+						// { title: t('Sidebar.govAnalytics'), url: '#', icon: GovAnalytics },
+						// { title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
+						// {
+						// title: t('Sidebar.community'),
+						// url: '#',
+						// icon: CommunityIcon,
+						// items: [
+						// { title: t('Sidebar.members'), url: '#' },
+						// { title: t('Sidebar.ecosystemProjects'), url: '#' }
+						// ]
+						// },
 						{ title: t('Sidebar.parachains'), url: '#', icon: ParachainsIcon },
 						{
 							title: t('Sidebar.archived'),
