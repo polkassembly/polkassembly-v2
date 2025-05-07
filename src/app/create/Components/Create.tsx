@@ -30,6 +30,7 @@ import SpendAssethubIcon from '@assets/icons/spend-assethub-icon.svg';
 import CreateTreasuryIcon from '@assets/icons/create-treasury-icon.svg';
 import KillReferendaIcon from '@assets/icons/kill-referenda-icon.svg';
 import CancelReferendaIcon from '@assets/icons/cancel-referenda-icon.svg';
+import { useSearchParams } from 'next/navigation';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
@@ -106,6 +107,15 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 	const [step, setStep] = useState<EProposalStep>();
 	const { user } = useUser();
 	const t = useTranslations();
+
+	const searchParams = useSearchParams();
+	const open = searchParams.get('open');
+
+	useEffect(() => {
+		if (open && Object.values(EProposalStep).includes(open as EProposalStep)) {
+			setStep(open as EProposalStep);
+		}
+	}, [open]);
 
 	const network = getCurrentNetwork();
 
