@@ -163,6 +163,8 @@
 		"on": "el",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
+			"index": "Índice",
+			"delegation": "Delegación",
 			"delegations": "Delegaciones",
 			"receivedDelegations": "Delegaciones recibidas",
 			"delegatedDelegations": "Delegaciones delegadas",

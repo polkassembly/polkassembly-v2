@@ -165,7 +165,7 @@
 		"since": "日時",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
-			"delegations": "委任",
+			"delegation": "委任",
 			"receivedDelegations": "受け取った委任",
 			"delegatedDelegations": "委任した委任",
 			"delegatedBy": "委任した",

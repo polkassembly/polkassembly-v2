@@ -163,7 +163,7 @@
 		"on": "于",
 		"Delegations": {
 			"noDelegations": "未找到委托",
-			"delegations": "委托",
+			"delegation": "委托",
 			"receivedDelegations": "收到委托",
 			"delegatedDelegations": "委托委托",
 			"delegatedBy": "委托给",

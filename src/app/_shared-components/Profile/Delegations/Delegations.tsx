@@ -95,7 +95,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 		refetchOnMount: false
 	});
 	const getManifesto = async () => {
-		const { data: manifestoData, error: manifestoError } = await NextApiClientService.getPADelegateManifesto({ address: addresses[0] });
+		const { data: manifestoData, error: manifestoError } = await NextApiClientService.getPADelegateManifesto({ address: addresses[1] });
 		if (manifestoError || !manifestoData) {
 			throw new ClientError(manifestoError?.message || 'Failed to fetch data');
 		}
@@ -109,6 +109,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 		retry: false,
 		refetchOnMount: false
 	});
+
 	return (
 		<div className={classes.delegationsCard}>
 			{isFetching ? (
@@ -150,7 +151,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 					</div>
 
 					{isManifestoFetching ? (
-						<Skeleton className='mt-4 h-[20px] w-full' />
+						<Skeleton className='mt-4 h-[50px] w-full' />
 					) : (
 						!!manifestoData?.manifesto && (
 							<div className='mt-4 max-h-[100px] overflow-y-auto'>

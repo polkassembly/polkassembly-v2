@@ -163,7 +163,7 @@
 		"on": "am",
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
-			"delegations": "Delegationen",
+			"delegation": "Delegation",
 			"receivedDelegations": "Empfangene Delegationen",
 			"delegatedDelegations": "Delegierte Delegationen",
 			"delegatedBy": "Delegierte von",
