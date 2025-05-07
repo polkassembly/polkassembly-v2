@@ -2,12 +2,24 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+// TODO: change types for params eg: network, origin, etc.
+
 import { IS_CACHE_ENABLED, REDIS_URL } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
-import { ENetwork, IContentSummary, IDelegateDetails, IDelegationStats, IGenericListingResponse, IPost, IPostListing } from '@/_shared/types';
+import {
+	ENetwork,
+	IContentSummary,
+	IDelegateDetails,
+	IDelegationStats,
+	IGenericListingResponse,
+	IPost,
+	IPostListing,
+	ITrackAnalyticsDelegations,
+	ITrackAnalyticsStats
+} from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
@@ -31,7 +43,9 @@ enum ERedisKeys {
 	CONTENT_SUMMARY = 'CSM',
 	SUBSCRIPTION_FEED = 'SFD',
 	DELEGATION_STATS = 'DGS',
-	DELEGATE_DETAILS = 'DLD'
+	DELEGATE_DETAILS = 'DLD',
+	TRACK_ANALYTICS_DELEGATION = 'TAD',
+	TRACK_ANALYTICS_STATS = 'TAS'
 }
 
 export class RedisService {
@@ -80,7 +94,9 @@ export class RedisService {
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
 		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
-		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`
+		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
+		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
+		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`
 	} as const;
 
 	// helper methods
@@ -473,5 +489,37 @@ export class RedisService {
 
 	static async DeleteDelegateDetails(network: ENetwork): Promise<void> {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATE_DETAILS}-${network}` });
+	}
+
+	// Track analytics delegation caching methods
+	static async GetTrackAnalyticsDelegation({ network, origin }: { network: string; origin: string }): Promise<ITrackAnalyticsDelegations | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin) });
+		return data ? (deepParseJson(data) as ITrackAnalyticsDelegations) : null;
+	}
+
+	static async SetTrackAnalyticsDelegation({ network, origin, data }: { network: string; origin: string; data: ITrackAnalyticsDelegations }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY
+		});
+	}
+
+	static async DeleteTrackAnalyticsDelegation({ network, origin }: { network: string; origin: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin) });
+	}
+
+	// Track analytics stats caching methods
+	static async GetTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<ITrackAnalyticsStats | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
+		return data ? (deepParseJson(data) as ITrackAnalyticsStats) : null;
+	}
+
+	static async SetTrackAnalyticsStats({ network, origin, data }: { network: string; origin: string; data: ITrackAnalyticsStats }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+	}
+
+	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
 	}
 }

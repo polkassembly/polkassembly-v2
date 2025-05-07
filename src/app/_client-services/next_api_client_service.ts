@@ -44,7 +44,9 @@ import {
 	IAddressRelations,
 	IVoteCurve,
 	EGovType,
-	IUserVote
+	IUserVote,
+	ITrackAnalyticsDelegations,
+	ITrackAnalyticsStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -121,7 +123,8 @@ enum EApiRoute {
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
-	GET_USER_VOTES = 'GET_USER_VOTES'
+	GET_USER_VOTES = 'GET_USER_VOTES',
+	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS'
 }
 
 export class NextApiClientService {
@@ -218,6 +221,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
+				break;
+			case EApiRoute.GET_TRACK_ANALYTICS:
+				path = '/track-analytics';
 				break;
 
 			// post routes
@@ -960,5 +966,15 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_VOTES, routeSegments: [address, 'votes'], queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IUserVote>>({ url, method });
+	}
+
+	static async getTrackAnalyticsStats({ origin }: { origin: EPostOrigin | 'all' }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'stats'] });
+		return this.nextApiClientFetch<ITrackAnalyticsStats>({ url, method });
+	}
+
+	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
+		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
 	}
 }

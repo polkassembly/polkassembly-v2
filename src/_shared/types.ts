@@ -1207,3 +1207,30 @@ export interface IUserVote {
 	postDetails: IPostListing;
 	proposalIndex: number;
 }
+export interface ITrackAnalyticsStats {
+	totalActiveProposals: number;
+	totalProposalCount: number;
+	changeInActiveProposals: number;
+}
+
+export interface ITrackAnalyticsDelegationsList {
+	[key: string]: {
+		count: number;
+		data: {
+			to: string;
+			from: string;
+			capital: string;
+			lockedPeriod: number;
+			votingPower: string;
+		}[];
+	};
+}
+
+export interface ITrackAnalyticsDelegations {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+	delegateesData: ITrackAnalyticsDelegationsList;
+	delegatorsData: ITrackAnalyticsDelegationsList;
+}

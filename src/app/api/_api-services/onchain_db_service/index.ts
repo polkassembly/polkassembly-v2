@@ -287,4 +287,12 @@ export class OnChainDbService {
 	static async GetUserVotes({ network, address, page, limit, govType }: { network: ENetwork; address: string; page: number; limit: number; govType: EGovType }) {
 		return SubsquidService.GetUserVotes({ network, address, page, limit, govType });
 	}
+
+	static async GetTrackAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }) {
+		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
+	}
+
+	static async GetTrackAnalyticsDelegations({ network, trackId }: { network: ENetwork; trackId?: number }) {
+		return SubsquidService.GetTrackAnalyticsDelegations({ network, trackId });
+	}
 }

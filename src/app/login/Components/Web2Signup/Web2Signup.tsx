@@ -5,7 +5,7 @@ import { Input } from '@ui/Input';
 import { Button } from '@ui/Button';
 import React, { useState } from 'react';
 import { ESignupSteps, EWallet, ENotificationStatus } from '@/_shared/types';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { useForm } from 'react-hook-form';
@@ -17,6 +17,7 @@ import { CookieClientService } from '@/app/_client-services/cookie_client_servic
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
+import { useRouter } from 'nextjs-toploader/app';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
