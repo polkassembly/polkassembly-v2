@@ -1122,6 +1122,24 @@
 		"bountyAmount": "赏金金额",
 		"proposeBounty": "提案赏金"
 	},
+	"Parachains": {
+		"projects": "项目",
+		"index": "索引",
+		"status": "状态",
+		"token": "代币",
+		"w3f": "W3F",
+		"investors": "投资者",
+		"github": "Github",
+		"inAuction": "拍卖中",
+		"testing": "测试中",
+		"announced": "已宣布",
+		"live": "已上线",
+		"parachainsDirectory": "Polkadot和Kusama生态系统和目录",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "Parachains和Crowdloans中锁定的总供应量",
+		"auction": "拍卖",
+		"crowdloans": "众筹",
+		"parachains": "平行链"
+	},
 	"TrackAnalytics": {
 		"proposalsCreated": "已创建提案",
 		"activeProposals": "活跃提案",

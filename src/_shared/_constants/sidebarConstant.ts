@@ -193,7 +193,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 						// { title: t('Sidebar.ecosystemProjects'), url: '#' }
 						// ]
 						// },
-						{ title: t('Sidebar.parachains'), url: '#', icon: ParachainsIcon },
+						{ title: t('Sidebar.parachains'), url: '/parachains', icon: ParachainsIcon },
 						{
 							title: t('Sidebar.archived'),
 							url: '#',

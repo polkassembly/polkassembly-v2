@@ -1123,6 +1123,24 @@
 		"bountyAmount": "Cantidad de la recompensa",
 		"proposeBounty": "Proponer recompensa"
 	},
+	"Parachains": {
+		"projects": "Proyectos",
+		"index": "Índice",
+		"status": "Estado",
+		"token": "Token",
+		"w3f": "W3F",
+		"investors": "Inversionistas",
+		"github": "Github",
+		"inAuction": "En subasta",
+		"testing": "En pruebas",
+		"announced": "Anunciado",
+		"live": "En vivo",
+		"parachainsDirectory": "Ecosistema Polkadot y Kusama y directorio",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "de la totalidad del suministro bloqueado en Parachains y Crowdloans",
+		"auction": "Subasta",
+		"crowdloans": "Crowdloans",
+		"parachains": "Parachains"
+	},
 	"TrackAnalytics": {
 		"proposalsCreated": "Propuestas Creadas",
 		"activeProposals": "Propuestas Activas",
