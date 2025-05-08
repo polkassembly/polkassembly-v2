@@ -8,6 +8,7 @@ import Profile from '@/app/_shared-components/Profile/Profile';
 async function UserProfile({ params }: { params: Promise<{ address: string }> }) {
 	const { address } = await params;
 	const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address });
+
 	if (!data || error) {
 		return <div>User not found</div>;
 	}
