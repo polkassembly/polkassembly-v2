@@ -861,6 +861,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
 	}
 
+	static async getPADelegateManifesto({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_DELEGATES, routeSegments: [address] });
+		return this.nextApiClientFetch<IDelegateDetails>({ url, method });
+	}
+
 	static async getDelegateTracks({ address }: { address: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });

@@ -42,16 +42,26 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		const trackDelegationStats: ITrackDelegationStats = {
 			trackId: track.trackId,
 			status: EDelegationStatus.UNDELEGATED,
-			activeProposalsCount: activeProposalsCountByTrackIds[track.trackId]
+			activeProposalsCount: activeProposalsCountByTrackIds[track.trackId],
+			delegations: []
 		};
 
 		// Check delegations for the current track
 		const trackDelegations = allVoteDelegations.filter((delegation) => delegation.track === track.trackId);
 
 		if (trackDelegations.length > 0) {
-			const delegation = trackDelegations.find((d) => d.from === encodedAddress || d.to === encodedAddress);
-			if (delegation) {
-				trackDelegationStats.status = delegation.from === encodedAddress ? EDelegationStatus.DELEGATED : EDelegationStatus.RECEIVED;
+			const delegation = trackDelegations.filter((d) => d.from === encodedAddress || d.to === encodedAddress);
+			if (delegation?.length > 0) {
+				delegation.forEach((d) => {
+					trackDelegationStats.status = d.from === encodedAddress ? EDelegationStatus.DELEGATED : EDelegationStatus.RECEIVED;
+				});
+				trackDelegationStats.delegations = delegation?.map((d) => ({
+					address: d.from,
+					balance: d.balance,
+					createdAt: d.createdAt,
+					lockPeriod: d.lockPeriod,
+					endsAt: new Date() // update later
+				}));
 			}
 		}
 
