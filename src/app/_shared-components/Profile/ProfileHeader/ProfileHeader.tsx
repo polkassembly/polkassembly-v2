@@ -269,6 +269,12 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 				</TabsTrigger>
 				<TabsTrigger
 					className='uppercase'
+					value={EProfileTabs.VOTES}
+				>
+					{t('Profile.Votes.votes')}
+				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
 					value={EProfileTabs.ACTIVITY}
 				>
 					{t('Profile.activity')}
@@ -287,12 +293,6 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 						{t('Profile.settings')}
 					</TabsTrigger>
 				)}
-				<TabsTrigger
-					className='uppercase'
-					value={EProfileTabs.VOTES}
-				>
-					{t('Profile.Votes.votes')}
-				</TabsTrigger>
 			</TabsList>
 		</div>
 	);

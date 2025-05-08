@@ -6,7 +6,7 @@ import { ENetwork, EVoteDecision, IUserVote } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import ViewSubscanIcon from '@assets/icons/profile-subscan.svg';
-import ViewVoteIcon from '@assets/profile/view-vote.svg';
+import { Eye } from 'lucide-react';
 import Image from 'next/image';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
@@ -174,12 +174,7 @@ function VotesTable({ isFetching, votes }: { isFetching: boolean; votes: IUserVo
 															setIsDialogOpen({ row, isOpen: true });
 														}}
 													>
-														<Image
-															src={ViewVoteIcon}
-															alt='View Vote'
-															width={24}
-															height={24}
-														/>
+														<Eye className='h-6 w-6 text-2xl' />
 													</Button>
 												</TooltipTrigger>
 												<TooltipContent
