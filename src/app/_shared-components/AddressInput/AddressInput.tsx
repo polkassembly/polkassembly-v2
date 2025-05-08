@@ -134,7 +134,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 						filteredOptions.map((account) => (
 							<button
 								key={account.address}
-								className='cursor-pointer p-2 hover:bg-gray-100'
+								className='cursor-pointer rounded-lg p-2 hover:bg-border_grey'
 								onClick={() => {
 									onAccountChange(account);
 									setIsOpen(false);
