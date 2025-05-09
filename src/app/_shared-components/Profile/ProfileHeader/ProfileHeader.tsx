@@ -260,33 +260,35 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 					{userProfileData.profileDetails.bio && <p className='text-center text-text_primary sm:text-left'>{userProfileData.profileDetails.bio}</p>}
 				</div>
 			</div>
-			<TabsList className='flex w-full overflow-x-auto'>
-				<TabsTrigger
-					className='uppercase'
-					value={EProfileTabs.OVERVIEW}
-				>
-					{t('Profile.overview')}
-				</TabsTrigger>
-				<TabsTrigger
-					className='uppercase'
-					value={EProfileTabs.ACTIVITY}
-				>
-					{t('Profile.activity')}
-				</TabsTrigger>
-				<TabsTrigger
-					className='uppercase'
-					value={EProfileTabs.ACCOUNTS}
-				>
-					{t('Profile.accounts')}
-				</TabsTrigger>
-				{user?.id === userProfileData.id && (
+			<TabsList className='scrollbar-hide flex w-full overflow-x-auto'>
+				<div className='flex min-w-full justify-between sm:min-w-0 sm:flex-1'>
 					<TabsTrigger
-						className='uppercase'
-						value={EProfileTabs.SETTINGS}
+						className='flex-1 whitespace-nowrap px-2 uppercase sm:flex-none sm:px-5'
+						value={EProfileTabs.OVERVIEW}
 					>
-						{t('Profile.settings')}
+						{t('Profile.overview')}
 					</TabsTrigger>
-				)}
+					<TabsTrigger
+						className='flex-1 whitespace-nowrap px-2 uppercase sm:flex-none sm:px-5'
+						value={EProfileTabs.ACTIVITY}
+					>
+						{t('Profile.activity')}
+					</TabsTrigger>
+					<TabsTrigger
+						className='flex-1 whitespace-nowrap px-2 uppercase sm:flex-none sm:px-5'
+						value={EProfileTabs.ACCOUNTS}
+					>
+						{t('Profile.accounts')}
+					</TabsTrigger>
+					{user?.id === userProfileData.id && (
+						<TabsTrigger
+							className='flex-1 whitespace-nowrap px-2 uppercase sm:flex-none sm:px-5'
+							value={EProfileTabs.SETTINGS}
+						>
+							{t('Profile.settings')}
+						</TabsTrigger>
+					)}
+				</div>
 			</TabsList>
 		</div>
 	);
