@@ -648,24 +648,28 @@
 		"preimageNotFound": "Vorabbild nicht gefunden"
 	},
 	"Create": {
-		"createDiscussionTitle": "Crear discusión",
+		"createDiscussionTitle": "Crear Discusión",
 		"title": "Título",
 		"description": "Descripción",
-		"addTagsPlaceholder": "Agregar etiquetas (presione Enter o coma para agregar)",
 		"create": "Crear",
-		"createTag": "Crear etiqueta",
-		"addTags": "Agregar etiquetas",
+		"createTag": "Crear Etiqueta",
+		"addTags": "Añadir Etiquetas",
+		"addTagsPlaceholder": "Añadir etiquetas (presiona Enter o coma para añadir)",
+		"remainingTagsPlaceholder": "{remaining} etiquetas restantes",
 		"searchTags": "Buscar etiquetas",
 		"noTagsFound": "No se encontraron etiquetas.",
 		"selectTags": "Seleccionar etiquetas",
-		"selectTopic": "Seleccionar tema",
+		"selectTopic": "Seleccionar Tema",
 		"tagsLeftText": "Etiquetas restantes",
+		"titleTooShort": "Por favor proporciona un título válido.",
+		"titlePlaceholder": "Ingresa el título",
+		"descriptionRequired": "Por favor proporciona una descripción válida.",
 		"AllowedCommentors": {
 			"title": "¿Quién puede comentar?",
 			"all": "Todos",
 			"onchainVerified": "Verificado en cadena",
 			"none": "Ninguno",
-			"tooltip": "Elija quién puede comentar y responder a esta publicación"
+			"tooltip": "Elige quién puede comentar y responder a esta publicación"
 		},
 		"Topic": {
 			"general": "General",
@@ -678,15 +682,15 @@
 			"fellowship": "Fellowship",
 			"council": "Consejo",
 			"democracy": "Democracia",
-			"whitelist": "Lista Blanca"
+			"whitelist": "Lista blanca"
 		},
-		"titleTooShort": "Por favor, proporcione un título válido.",
-		"titlePlaceholder": "Ingrese título",
-		"descriptionRequired": "Por favor, proporcione una descripción válida.",
 		"please": "Por favor",
 		"login": "Iniciar sesión",
-		"toCreateProposal": "para crear una propuesta",
-		"toCreateDiscussion": "para crear una discusión"
+		"toCreateProposal": "para crear una Propuesta",
+		"toCreateDiscussion": "para crear una Discusión",
+		"discussionCreatedSuccessfully": "Discusión creada exitosamente",
+		"discussionCreationFailed": "Error al crear la discusión",
+		"discussionCreationFailedDescription": "Hubo un error al crear la discusión"
 	},
 	"ProposalType": {
 		"discussion": "Discusión",

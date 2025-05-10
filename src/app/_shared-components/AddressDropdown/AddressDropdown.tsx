@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { AlertCircle } from 'lucide-react';
 import { EAccountType, ISelectedAccount } from '@/_shared/types';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import classes from './AddressDropdown.module.scss';
 import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
@@ -55,10 +56,17 @@ function AddressDropdown({
 
 		setAccounts(injectedAccounts);
 
+		const prevPreferredAccount = userPreferences.selectedAccount;
+
+		const selectedAccount =
+			prevPreferredAccount?.address && injectedAccounts.some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address))
+				? prevPreferredAccount
+				: injectedAccounts[0];
+
 		setUserPreferences({
 			...userPreferences,
 			selectedAccount: {
-				...injectedAccounts[0],
+				...selectedAccount,
 				accountType: EAccountType.REGULAR
 			}
 		});

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
 import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
@@ -13,6 +13,7 @@ import { ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -192,8 +193,9 @@ function AddressSwitchButton() {
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
 
-	const selectedAddress = userPreferences?.selectedAccount?.address;
-	const relationsForSelectedAddress = user?.addressRelations?.find((relations) => relations.address === selectedAddress);
+	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
+	const relationsForSelectedAddress = useMemo(() => user?.addressRelations?.find((relations) => relations.address === selectedAddress), [user?.addressRelations, selectedAddress]);
+
 	const t = useTranslations('AddressRelationsPicker');
 	const closeDialog = () => {
 		setisOpen(false);
@@ -257,6 +259,9 @@ export default function AddressRelationsPicker({ withBalance = false }: { withBa
 	const walletService = useWalletService();
 	const [accountsLoading, setAccountsLoading] = useState(true);
 
+	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
+	const walletAddressName = useMemo(() => userPreferences?.selectedAccount?.name, [userPreferences?.selectedAccount?.name]);
+
 	const getAccounts = useCallback(async () => {
 		if (!walletService || !userPreferences?.wallet) return;
 
@@ -267,10 +272,17 @@ export default function AddressRelationsPicker({ withBalance = false }: { withBa
 			return;
 		}
 
+		const prevPreferredAccount = userPreferences.selectedAccount;
+
+		const selectedAccount =
+			prevPreferredAccount?.address && injectedAccounts.some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address))
+				? prevPreferredAccount
+				: injectedAccounts[0];
+
 		setUserPreferences({
 			...userPreferences,
 			selectedAccount: {
-				...injectedAccounts[0],
+				...selectedAccount,
 				accountType: EAccountType.REGULAR
 			}
 		});
@@ -282,9 +294,6 @@ export default function AddressRelationsPicker({ withBalance = false }: { withBa
 	useEffect(() => {
 		getAccounts();
 	}, [getAccounts]);
-
-	const selectedAddress = userPreferences?.selectedAccount?.address;
-	const walletAddressName = userPreferences?.selectedAccount?.name;
 
 	return (
 		<div className='flex flex-col gap-1'>
