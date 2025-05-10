@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import ShieldUser from '@assets/icons/shield-user.svg';
-import AccountPin from '@assets/icons/account-pin.svg';
 import DeleteIcon from '@assets/icons/delete-icon.svg';
 import Image from 'next/image';
 import { IPublicUser } from '@/_shared/types';
@@ -19,7 +18,6 @@ import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import ActivateTfa from './EnableTFA';
 import EditUsername from './EditUsername';
-import LinkAddress from '../Overview/LinkAddress/LinkAddress';
 import EditEmail from './EditEmail';
 import DeleteAccount from './DeleteAccount';
 
@@ -158,44 +156,6 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 					</CollapsibleContent>
 				</Collapsible>
 
-				<Collapsible className={classes.settingsCollapsible}>
-					<CollapsibleTrigger className='w-full'>
-						<div className={classes.collapsibleTrigger}>
-							<p className={classes.collapsibleTriggerText}>
-								<Image
-									src={AccountPin}
-									alt='account-pin'
-								/>
-								{t('Profile.Settings.accountSettings')}
-							</p>
-							<ChevronDown className={classes.collapsibleTriggerIcon} />
-						</div>
-					</CollapsibleTrigger>
-					<CollapsibleContent>
-						<Separator />
-						<div className={classes.collapsibleContent}>
-							<div className='flex items-center gap-x-2'>
-								<Dialog>
-									<DialogTrigger>
-										<Button
-											variant='ghost'
-											className='text-sm font-medium text-text_pink'
-										>
-											{t('Profile.Settings.linkAddress')}
-										</Button>
-									</DialogTrigger>
-									<DialogContent className='max-w-xl p-3 sm:p-6'>
-										<DialogHeader>
-											<DialogTitle>{t('Profile.Settings.linkAddress')}</DialogTitle>
-										</DialogHeader>
-										<LinkAddress />
-									</DialogContent>
-								</Dialog>
-								<p className='text-xs text-text_primary'>{t('Profile.Settings.linkAddressDescription')}</p>
-							</div>
-						</div>
-					</CollapsibleContent>
-				</Collapsible>
 				<Collapsible className={classes.settingsCollapsible}>
 					<CollapsibleTrigger className='w-full'>
 						<div className={classes.collapsibleTrigger}>

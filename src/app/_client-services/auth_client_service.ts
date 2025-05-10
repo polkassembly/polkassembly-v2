@@ -69,8 +69,4 @@ export class AuthClientService extends NextApiClientService {
 		CookieClientService.deleteRefreshToken();
 		LocalStorageClientService.logout();
 	}
-
-	static async linkAddress({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
-		return this.linkAddressApi({ address, signature, wallet });
-	}
 }

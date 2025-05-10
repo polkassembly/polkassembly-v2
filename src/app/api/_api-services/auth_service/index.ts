@@ -688,23 +688,6 @@ export class AuthService {
 		await RedisService.DeleteResetPasswordToken(token);
 	}
 
-	static async LinkAddress({ address, wallet, network, accessToken }: { address: string; wallet: EWallet; network: ENetwork; accessToken: string }) {
-		const accessTokenPayload = this.GetAccessTokenPayload(accessToken);
-		const user = await this.GetUserWithAccessToken(accessToken);
-
-		if (!user) {
-			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'User not found');
-		}
-
-		await OffChainDbService.AddNewAddress({ address, userId: user.id, isDefault: false, wallet, network });
-
-		return this.GetSignedAccessToken({
-			...user,
-			loginAddress: accessTokenPayload.loginAddress,
-			loginWallet: accessTokenPayload.loginWallet
-		});
-	}
-
 	static async DeleteUser(accessToken: string) {
 		const user = await this.GetUserWithAccessToken(accessToken);
 
