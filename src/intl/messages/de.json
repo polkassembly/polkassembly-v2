@@ -649,21 +649,25 @@
 		"createDiscussionTitle": "Diskussion erstellen",
 		"title": "Titel",
 		"description": "Beschreibung",
-		"addTagsPlaceholder": "Tags hinzufügen (Enter oder Komma drücken)",
 		"create": "Erstellen",
 		"createTag": "Tag erstellen",
 		"addTags": "Tags hinzufügen",
+		"addTagsPlaceholder": "Tags hinzufügen (Enter oder Komma drücken zum Hinzufügen)",
+		"remainingTagsPlaceholder": "{remaining} Tags übrig",
 		"searchTags": "Tags suchen",
 		"noTagsFound": "Keine Tags gefunden.",
 		"selectTags": "Tags auswählen",
 		"selectTopic": "Thema auswählen",
-		"tagsLeftText": "Verbleibende Tags",
+		"tagsLeftText": "Tags übrig",
+		"titleTooShort": "Bitte geben Sie einen gültigen Titel ein.",
+		"titlePlaceholder": "Titel eingeben",
+		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
 			"onchainVerified": "Onchain verifiziert",
-			"none": "Keine",
-			"tooltip": "Wählen Sie, wer kommentieren und auf diesen Beitrag antworten kann"
+			"none": "Niemand",
+			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten kann"
 		},
 		"Topic": {
 			"general": "Allgemein",
@@ -678,13 +682,13 @@
 			"democracy": "Demokratie",
 			"whitelist": "Whitelist"
 		},
-		"titleTooShort": "Bitte geben Sie einen gültigen Titel an.",
-		"titlePlaceholder": "Titel eingeben",
-		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an.",
 		"please": "Bitte",
 		"login": "Anmelden",
 		"toCreateProposal": "um einen Vorschlag zu erstellen",
-		"toCreateDiscussion": "um eine Diskussion zu erstellen"
+		"toCreateDiscussion": "um eine Diskussion zu erstellen",
+		"discussionCreatedSuccessfully": "Diskussion erfolgreich erstellt",
+		"discussionCreationFailed": "Diskussion konnte nicht erstellt werden",
+		"discussionCreationFailedDescription": "Beim Erstellen der Diskussion ist ein Fehler aufgetreten"
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",
