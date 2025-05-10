@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useAtom } from 'jotai';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { IUserPreferences } from '@/_shared/types';
 import { useTheme } from 'next-themes';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
@@ -18,6 +18,8 @@ export const useUserPreferences = () => {
 	const { user, setUserAddressRelations } = useUser();
 	const { setTheme } = useTheme();
 
+	const [fetchingAddressRelations, setFetchingAddressRelations] = useState(false);
+
 	const fetchAddressRelations = useCallback(
 		async (newPreferences: IUserPreferences) => {
 			// 1. check if new preferences have new selected account
@@ -31,8 +33,14 @@ export const useUserPreferences = () => {
 			if (newSelectedAccountAddressRelations?.multisigAddresses?.length || newSelectedAccountAddressRelations?.proxyAddresses?.length) return;
 
 			// 3. if it does not have address relations, fetch them
+			setFetchingAddressRelations(true);
 			const { data, error } = await NextApiClientService.fetchAddressRelations(newSelectedAccountAddress);
-			if (!data || error) return;
+			if (!data || error) {
+				setFetchingAddressRelations(false);
+				return;
+			}
+
+			setFetchingAddressRelations(false);
 
 			setUserAddressRelations([...(user?.addressRelations || []), data]);
 		},
@@ -52,6 +60,6 @@ export const useUserPreferences = () => {
 	);
 
 	return useMemo(() => {
-		return { userPreferences, setUserPreferences: setUserPreferencesWithDayjsLocale };
-	}, [userPreferences, setUserPreferencesWithDayjsLocale]);
+		return { userPreferences, setUserPreferences: setUserPreferencesWithDayjsLocale, fetchingAddressRelations };
+	}, [userPreferences, setUserPreferencesWithDayjsLocale, fetchingAddressRelations]);
 };

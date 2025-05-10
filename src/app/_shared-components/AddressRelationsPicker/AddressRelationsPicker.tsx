@@ -190,7 +190,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 
 function AddressSwitchButton() {
 	const { user } = useUser();
-	const { userPreferences } = useUserPreferences();
+	const { userPreferences, fetchingAddressRelations } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
 
 	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
@@ -228,14 +228,15 @@ function AddressSwitchButton() {
 				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
 					<AddressRadioGroup
 						accountType={EAccountType.MULTISIG}
-						isLoading={!relationsForSelectedAddress}
+						// isLoading={!relationsForSelectedAddress}
+						isLoading={fetchingAddressRelations}
 						addresses={relationsForSelectedAddress?.multisigAddresses || []}
 						defaultOpen
 						closeDialog={closeDialog}
 					/>
 					<AddressRadioGroup
 						accountType={EAccountType.PROXY}
-						isLoading={!relationsForSelectedAddress}
+						isLoading={fetchingAddressRelations}
 						addresses={relationsForSelectedAddress?.proxyAddresses || []}
 						closeDialog={closeDialog}
 					/>
