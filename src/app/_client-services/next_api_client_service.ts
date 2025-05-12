@@ -1007,7 +1007,7 @@ export class NextApiClientService {
 		]);
 
 		if (allTracksResponse.data && treasuryStatsResponse.data) {
-			redisServiceSSR('SetOverviewPageData', {
+			await redisServiceSSR('SetOverviewPageData', {
 				network: currentNetwork,
 				data: {
 					allTracks: allTracksResponse.data,
