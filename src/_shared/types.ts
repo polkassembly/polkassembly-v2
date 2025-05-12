@@ -1240,3 +1240,9 @@ export interface IParachain {
 	investorsCount: number;
 	githubURL: string;
 }
+
+export enum EHttpHeaderKey {
+	SKIP_CACHE = 'x-skip-cache',
+	TOOLS_PASSPHRASE = 'x-tools-passphrase',
+	NETWORK = 'x-network'
+}
