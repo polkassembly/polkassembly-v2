@@ -290,4 +290,20 @@ export class OnChainDbService {
 	static async GetTrackAnalyticsDelegations({ network, trackId }: { network: ENetwork; trackId?: number }) {
 		return SubsquidService.GetTrackAnalyticsDelegations({ network, trackId });
 	}
+
+	static async GetOnChainPostsByProposer({
+		network,
+		proposer,
+		page,
+		limit,
+		proposalType
+	}: {
+		network: ENetwork;
+		proposer: string;
+		page: number;
+		limit: number;
+		proposalType: EProposalType;
+	}) {
+		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
+	}
 }

@@ -236,6 +236,12 @@
 			"followed_user": "ユーザーをフォロー",
 			"unfollowed_user": "ユーザーをフォロー解除"
 		},
+		"Posts": {
+			"posts": "投稿",
+			"discussions": "議論",
+			"openGov": "OpenGov",
+			"noData": "投稿が見つかりません"
+		},
 		"overview": "概要",
 		"onchainIdentity": "オンチェーンID",
 		"linkAddress": "アドレスをリンク",

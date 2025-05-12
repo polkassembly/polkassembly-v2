@@ -942,4 +942,15 @@ export class SubsquidQueries {
 }
 
 	`;
+
+	protected static GET_POSTS_BY_PROPOSER = `
+		 query GetPostsByProposer($proposer_eq: String!, $limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
+			proposals(where: {type_eq: $type_eq, proposer_eq: $proposer_eq}, limit: $limit, offset: $offset){
+				index
+			}
+			proposalsConnection(where:{proposer_eq:$proposer_eq, type_eq: $type_eq}, orderBy: id_ASC) {
+				totalCount
+			}
+		}
+	`;
 }
