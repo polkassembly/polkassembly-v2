@@ -51,7 +51,6 @@
     "@react-icons/all-files": "^4.1.0",
     "@react-spring/web": "9.5.5",
     "@tanstack/react-query": "^5.62.8",
-    "@tanstack/react-query-devtools": "^5.62.8",
     "@tanstack/react-table": "^8.20.6",
     "@types/jsdom": "^21.1.7",
     "@types/marked": "^6.0.0",

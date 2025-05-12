@@ -5,7 +5,7 @@
 'use client';
 
 import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
@@ -43,7 +43,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(currentRefreshTokenPayload);
 
-	const refreshAccessToken = async () => {
+	const refreshAccessToken = useCallback(async () => {
 		const { data, error } = await AuthClientService.refreshAccessToken();
 
 		if (error && !data) {
@@ -59,9 +59,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		if (newRefreshTokenPayload) {
 			setRefreshTokenData(newRefreshTokenPayload);
 		}
-	};
+	}, [setUser]);
 
-	const restablishConnections = () => {
+	const restablishConnections = useCallback(() => {
 		if (document.visibilityState === 'hidden') return;
 
 		polkadotApi?.reconnect();
@@ -76,7 +76,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 			AuthClientService.logout(() => setUser(null));
 		}
-	};
+	}, [assethubApi, identityApi, polkadotApi, refreshAccessToken, refreshTokenData, user, setUser]);
 
 	// restablish connections
 	useEffect(() => {
@@ -85,8 +85,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		return () => {
 			document.removeEventListener('visibilitychange', restablishConnections);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user]);
+	}, [restablishConnections, user]);
 
 	// init identity api
 	useEffect(() => {
