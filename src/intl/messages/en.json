@@ -720,7 +720,10 @@
 		"please": "Please",
 		"login": "Login",
 		"toCreateProposal": "to create a Proposal",
-		"toCreateDiscussion": "to create a Discussion"
+		"toCreateDiscussion": "to create a Discussion",
+		"discussionCreatedSuccessfully": "Discussion created successfully",
+		"discussionCreationFailed": "Failed to create discussion",
+		"discussionCreationFailedDescription": "There was an error while creating the discussion"
 	},
 	"ProposalType": {
 		"discussion": "Discussion",

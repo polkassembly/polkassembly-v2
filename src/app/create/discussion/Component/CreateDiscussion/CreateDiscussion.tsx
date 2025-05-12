@@ -6,16 +6,17 @@
 
 import { useForm } from 'react-hook-form';
 import WritePost from '@/app/_shared-components/Create/WritePost/WritePost';
-import { EOffChainPostTopic, EProposalType, IWritePostFormFields } from '@/_shared/types';
+import { ENotificationStatus, EOffChainPostTopic, EProposalType, IWritePostFormFields } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useRouter } from 'next/navigation';
 import { Form } from '@/app/_shared-components/Form';
 import ErrorMessage from '@/app/_shared-components/ErrorMessage';
 import { Button } from '@/app/_shared-components/Button';
 import Link from 'next/link';
 import { useUser } from '@/hooks/useUser';
+import { useRouter } from 'nextjs-toploader/app';
+import { useToast } from '@/hooks/useToast';
 import HeaderLabel from '../HeaderLabel';
 import classes from './CreateDiscussion.module.scss';
 
@@ -28,6 +29,8 @@ function CreateDiscussion() {
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const router = useRouter();
+
+	const { toast } = useToast();
 
 	const handleCreateDiscussionPost = async (values: IWritePostFormFields) => {
 		const { title, description, tags, topic, allowedCommentor } = values;
@@ -46,11 +49,20 @@ function CreateDiscussion() {
 		if (error || !data || !data?.data?.index) {
 			setLoading(false);
 			setErrorMessage(error?.message || 'Failed to create discussion');
+			toast({
+				title: t('Create.discussionCreationFailed'),
+				description: error?.message || t('Create.discussionCreationFailedDescription'),
+				status: ENotificationStatus.ERROR
+			});
 			return;
 		}
 
 		formData.reset();
-		setLoading(false);
+		toast({
+			title: t('Create.discussionCreatedSuccessfully'),
+			status: ENotificationStatus.SUCCESS
+		});
+
 		// redirect to the discussion page
 		router.push(`/post/${data.data.index}`);
 	};
@@ -78,7 +90,10 @@ function CreateDiscussion() {
 							{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 							<Form {...formData}>
 								<form onSubmit={formData.handleSubmit(handleCreateDiscussionPost)}>
-									<WritePost formData={formData} />
+									<WritePost
+										disabled={loading}
+										formData={formData}
+									/>
 									<div className='mt-4 flex justify-end'>
 										<Button
 											size='lg'

@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -134,7 +134,7 @@ export class WebhookService {
 		try {
 			console.log(`Starting cache refresh for network: ${network}`);
 			const baseUrl = await getBaseUrl();
-			const headers = { 'x-network': network };
+			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
 
 			// 1. Fetch active proposals
 			const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({

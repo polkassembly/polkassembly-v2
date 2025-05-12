@@ -4,6 +4,7 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
+import { EHttpHeaderKey } from '../types';
 import { TREASURY_STATS_NETWORKS } from '../constants';
 
 export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { toolsPassphrase: string }) {
@@ -18,8 +19,8 @@ export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { too
 					{}, // Empty body
 					{
 						headers: {
-							'x-tools-passphrase': toolsPassphrase,
-							'x-network': network // Add network to headers
+							[EHttpHeaderKey.TOOLS_PASSPHRASE]: toolsPassphrase,
+							[EHttpHeaderKey.NETWORK]: network // Add network to headers
 						}
 					}
 				);
