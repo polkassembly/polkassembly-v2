@@ -1241,11 +1241,8 @@ export interface IParachain {
 	githubURL: string;
 }
 
-export type PostListingResponse = IGenericListingResponse<IPostListing>;
-
-export interface IUserPosts {
-	/** Posts created directly on Polkassembly (off-chain) */
-	offchainPostsResponse: PostListingResponse;
-	/** Posts related to on-chain proposals/referenda */
-	onchainPostsResponse: PostListingResponse;
+export enum EHttpHeaderKey {
+	SKIP_CACHE = 'x-skip-cache',
+	TOOLS_PASSPHRASE = 'x-tools-passphrase',
+	NETWORK = 'x-network'
 }

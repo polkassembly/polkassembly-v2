@@ -18,12 +18,21 @@ import {
 	IPost,
 	IPostListing,
 	ITrackAnalyticsDelegations,
-	ITrackAnalyticsStats
+	ITrackAnalyticsStats,
+	ITreasuryStats
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { FIVE_MIN, ONE_DAY, ONE_HOUR_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS, THREE_DAYS_IN_SECONDS } from '../../_api-constants/timeConstants';
+import {
+	FIVE_MIN,
+	HALF_HOUR_IN_SECONDS,
+	ONE_DAY,
+	ONE_HOUR_IN_SECONDS,
+	REFRESH_TOKEN_LIFE_IN_SECONDS,
+	SIX_HOURS_IN_SECONDS,
+	THREE_DAYS_IN_SECONDS
+} from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
@@ -45,7 +54,9 @@ enum ERedisKeys {
 	DELEGATION_STATS = 'DGS',
 	DELEGATE_DETAILS = 'DLD',
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
-	TRACK_ANALYTICS_STATS = 'TAS'
+	TRACK_ANALYTICS_STATS = 'TAS',
+	TREASURY_STATS = 'TRS',
+	OVERVIEW_PAGE_DATA = 'OPD'
 }
 
 export class RedisService {
@@ -96,7 +107,9 @@ export class RedisService {
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
-		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`
+		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
+		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
 	} as const;
 
 	// helper methods
@@ -521,5 +534,39 @@ export class RedisService {
 
 	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
+	}
+
+	// Treasury stats caching methods
+	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<ITreasuryStats[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
+		return data ? (deepParseJson(data) as ITreasuryStats[]) : null;
+	}
+
+	static async SetTreasuryStats({ network, from, to, data }: { network: ENetwork; from: string; to: string; data?: ITreasuryStats[] }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
+	}
+
+	// Overview page caching methods
+	static async GetOverviewPageData({ network }: { network: ENetwork }): Promise<{ allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+		return data ? (deepParseJson(data) as { allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] }) : null;
+	}
+
+	static async SetOverviewPageData({
+		network,
+		data
+	}: {
+		network: ENetwork;
+		data: { allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] };
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
 	}
 }

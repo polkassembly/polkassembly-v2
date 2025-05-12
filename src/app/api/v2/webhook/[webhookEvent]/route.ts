@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { EHttpHeaderKey } from '@/_shared/types';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { WebhookService } from '@/app/api/_api-services/webhook_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -22,7 +23,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const network = await getNetworkFromHeaders();
 
 	const readonlyHeaders = await headers();
-	const passphrase = readonlyHeaders.get('x-tools-passphrase');
+	const passphrase = readonlyHeaders.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
 	if (!passphrase?.trim() || passphrase !== TOOLS_PASSPHRASE) {
 		console.error('Unauthorized. received passphrase: ', passphrase);
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized.');
