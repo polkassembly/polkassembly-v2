@@ -48,7 +48,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 		queryKey: ['userPosts', selectedAddress, page],
 		queryFn: fetchUserPosts,
 		enabled: !!selectedAddress,
-		placeholderData: (previousData: IUserPosts) => previousData,
+		placeholderData: (previousData) => previousData,
 		staleTime: FIVE_MIN_IN_MILLI
 	});
 
@@ -95,6 +95,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 						variant={selectedPosts === EPostsType.OPEN_GOV ? 'default' : 'secondary'}
 						onClick={() => setSelectedPosts(EPostsType.OPEN_GOV)}
 						disabled={isFetching}
+						className='flex items-center gap-x-1'
 					>
 						{t('Posts.openGov')}
 						{ValidatorService.isValidNumber(userPostsData?.onchainPostsResponse?.totalCount) && (
@@ -105,6 +106,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 						variant={selectedPosts === EPostsType.DISCUSSIONS ? 'default' : 'secondary'}
 						onClick={() => setSelectedPosts(EPostsType.DISCUSSIONS)}
 						disabled={isFetching}
+						className='flex items-center gap-x-1'
 					>
 						{t('Posts.discussions')}
 						{ValidatorService.isValidNumber(userPostsData?.offchainPostsResponse?.totalCount) && (

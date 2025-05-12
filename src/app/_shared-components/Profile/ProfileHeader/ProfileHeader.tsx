@@ -279,13 +279,6 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 				>
 					{t('Profile.activity')}
 				</TabsTrigger>
-
-				<TabsTrigger
-					className='uppercase'
-					value={EProfileTabs.POSTS}
-				>
-					{t('Profile.Posts.posts')}
-				</TabsTrigger>
 				<TabsTrigger
 					className='uppercase'
 					value={EProfileTabs.ACCOUNTS}
