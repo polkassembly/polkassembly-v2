@@ -30,13 +30,13 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const network = await getNetworkFromHeaders();
 	const { from, to, limit, page } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
-	let treasuryStats = await RedisService.GetTreasuryStats(network);
+	let treasuryStats = await RedisService.GetTreasuryStats(network, from?.getHours()?.toString() || '', to?.getHours()?.toString() || '');
 	if (treasuryStats) {
 		return NextResponse.json(treasuryStats);
 	}
 
 	treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to, limit, page });
-	await RedisService.SetTreasuryStats(network, treasuryStats);
+	await RedisService.SetTreasuryStats(network, from?.getHours()?.toString() || '', to?.getHours()?.toString() || '', treasuryStats);
 
 	return NextResponse.json(treasuryStats);
 });
