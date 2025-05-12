@@ -106,7 +106,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 						onClick={() => setSelectedPosts(EPostsType.DISCUSSIONS)}
 						disabled={isFetching}
 					>
-						{t('Posts.discussions')}
+						<span>{t('Posts.discussions')}</span>
 						{ValidatorService.isValidNumber(userPostsData?.offchainPostsResponse?.totalCount) && (
 							<span className={classes.postsHeaderTextAddress}>({userPostsData?.offchainPostsResponse?.totalCount})</span>
 						)}
