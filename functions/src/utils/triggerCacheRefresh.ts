@@ -4,7 +4,7 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
-import { EWebhookEvent } from '../types';
+import { EHttpHeaderKey, EWebhookEvent } from '../types';
 import { CACHE_REFRESH_NETWORKS } from '../constants';
 
 export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase: string }) {
@@ -19,8 +19,8 @@ export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase
 					{}, // Empty body
 					{
 						headers: {
-							'x-tools-passphrase': toolsPassphrase,
-							'x-network': network // Add network to headers
+							[EHttpHeaderKey.TOOLS_PASSPHRASE]: toolsPassphrase,
+							[EHttpHeaderKey.NETWORK]: network // Add network to headers
 						}
 					}
 				);

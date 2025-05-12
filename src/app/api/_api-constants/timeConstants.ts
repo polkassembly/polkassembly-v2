@@ -12,6 +12,7 @@ export const CREATE_POST_TTL = 60 * 60; // 1 hour (expressed in seconds)
 export const ACCESS_TOKEN_LIFE_IN_SECONDS = 60 * 60 * 24 * 7 * 1; // 1 week
 export const REFRESH_TOKEN_LIFE_IN_SECONDS = 60 * 60 * 24 * 7 * 4; // 4 weeks
 export const TWELVE_HOURS_IN_SECONDS = 43200;
+export const HALF_HOUR_IN_SECONDS = 1800;
 export const ONE_HOUR_IN_SECONDS = 3600;
 export const SIX_HOURS_IN_SECONDS = 21600;
 export const THREE_DAYS_IN_SECONDS = 24 * 3 * 60 * 60;

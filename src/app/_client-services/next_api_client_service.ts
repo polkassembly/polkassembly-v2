@@ -43,9 +43,9 @@ import {
 	IAddressRelations,
 	IVoteCurve,
 	ITrackAnalyticsStats,
-	ITrackAnalyticsDelegations,
 	IVoteHistoryData,
-	IUserPosts
+	IUserPosts,
+	ITrackAnalyticsDelegations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -53,6 +53,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { getCookieHeadersServer } from '@/_shared/_utils/getCookieHeadersServer';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
@@ -970,6 +971,65 @@ export class NextApiClientService {
 	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
+	}
+
+	static async fetchOverviewData(): Promise<{
+		allTracks: { data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null };
+		treasuryStats: { data: ITreasuryStats[] | null; error: IErrorResponse | null };
+	}> {
+		const currentNetwork = await this.getCurrentNetwork();
+
+		if (this.isServerSide()) {
+			const cachedOverviewData = await redisServiceSSR('GetOverviewPageData', {
+				network: currentNetwork
+			});
+
+			if (cachedOverviewData) {
+				return {
+					allTracks: {
+						data: cachedOverviewData.allTracks,
+						error: null
+					},
+					treasuryStats: {
+						data: cachedOverviewData.treasuryStats,
+						error: null
+					}
+				};
+			}
+		}
+
+		const [allTracksResponse, treasuryStatsResponse] = await Promise.all([
+			this.fetchListingData({
+				proposalType: EProposalType.REFERENDUM_V2,
+				limit: DEFAULT_LISTING_LIMIT,
+				page: 1
+			}),
+			this.getTreasuryStats({
+				from: dayjs().subtract(1, 'hour').toDate(),
+				to: dayjs().toDate()
+			})
+		]);
+
+		if (allTracksResponse.data && treasuryStatsResponse.data) {
+			await redisServiceSSR('SetOverviewPageData', {
+				network: currentNetwork,
+				data: {
+					allTracks: allTracksResponse.data,
+					treasuryStats: treasuryStatsResponse.data
+				}
+			});
+		}
+
+		return {
+			allTracks: {
+				data: allTracksResponse.data,
+				error: allTracksResponse.error
+			},
+			treasuryStats: {
+				data: treasuryStatsResponse.data,
+				error: treasuryStatsResponse.error
+			}
+		};
 	}
 
 	static async getUserPosts({ address, page, limit }: { address: string; page: number; limit: number }) {

@@ -1241,6 +1241,12 @@ export interface IParachain {
 	githubURL: string;
 }
 
+export enum EHttpHeaderKey {
+	SKIP_CACHE = 'x-skip-cache',
+	TOOLS_PASSPHRASE = 'x-tools-passphrase',
+	NETWORK = 'x-network'
+}
+
 export type PostListingResponse = IGenericListingResponse<IPostListing>;
 
 export interface IUserPosts {

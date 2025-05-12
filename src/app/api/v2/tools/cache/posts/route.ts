@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { EHttpHeaderKey } from '@/_shared/types';
 import { RedisService } from '../../../../_api-services/redis_service';
 import { withErrorHandling } from '../../../../_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '../../../../_api-utils/getNetworkFromHeaders';
@@ -14,7 +15,7 @@ import { TOOLS_PASSPHRASE } from '../../../../_api-constants/apiEnvVars';
 
 export const DELETE = withErrorHandling(async (): Promise<NextResponse> => {
 	const readonlyHeaders = await headers();
-	const passphrase = readonlyHeaders.get('x-tools-passphrase');
+	const passphrase = readonlyHeaders.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
 
 	if (!passphrase?.trim() || passphrase !== TOOLS_PASSPHRASE) {
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
