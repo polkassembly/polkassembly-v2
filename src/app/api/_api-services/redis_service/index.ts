@@ -107,7 +107,7 @@ export class RedisService {
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
-		[ERedisKeys.TREASURY_STATS]: (network: string, from: string, to: string): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`
+		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`
 	} as const;
 
 	// helper methods
@@ -535,16 +535,16 @@ export class RedisService {
 	}
 
 	// Treasury stats caching methods
-	static async GetTreasuryStats(network: ENetwork, from: string, to: string): Promise<ITreasuryStats[] | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS](network, from, to) });
+	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<ITreasuryStats[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
 		return data ? (deepParseJson(data) as ITreasuryStats[]) : null;
 	}
 
-	static async SetTreasuryStats(network: ENetwork, from: string, to: string, data?: ITreasuryStats[]): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS](network, from, to), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	static async SetTreasuryStats({ network, from, to, data }: { network: ENetwork; from: string; to: string; data?: ITreasuryStats[] }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
 	}
 
-	static async DeleteTreasuryStats(network: ENetwork, from: string, to: string): Promise<void> {
-		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS](network, from, to) });
+	static async DeleteTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
 	}
 }
