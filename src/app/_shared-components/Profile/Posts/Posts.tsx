@@ -48,7 +48,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 		queryKey: ['userPosts', selectedAddress, page],
 		queryFn: fetchUserPosts,
 		enabled: !!selectedAddress,
-		placeholderData: (previousData) => previousData,
+		placeholderData: (previousData: IUserPosts) => previousData,
 		staleTime: FIVE_MIN_IN_MILLI
 	});
 

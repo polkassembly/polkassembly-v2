@@ -38,13 +38,13 @@ import {
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
 	ISocialHandle,
-	IVoteHistoryData,
 	ITreasuryStats,
 	IContentSummary,
 	IAddressRelations,
 	IVoteCurve,
 	ITrackAnalyticsStats,
 	ITrackAnalyticsDelegations,
+	IVoteHistoryData,
 	IUserPosts
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -119,9 +119,9 @@ enum EApiRoute {
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
 	GET_USER_POSTS = 'GET_USER_POSTS'
 }
@@ -195,6 +195,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_USER_POSTS:
 				path = '/users/address';
 				break;
+
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
