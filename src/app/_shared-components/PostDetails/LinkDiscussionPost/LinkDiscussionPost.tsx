@@ -70,8 +70,8 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 			}
 		}
 
-		if (userDiscussionPosts && userDiscussionPosts.length > 0 && userDiscussionPosts.some((post) => Number(post.id) === postId)) {
-			setSelectedDiscussionPost(userDiscussionPosts.find((post) => Number(post.id) === postId));
+		if (userDiscussionPosts && userDiscussionPosts.length > 0 && userDiscussionPosts.some((post) => post.index === postId)) {
+			setSelectedDiscussionPost(userDiscussionPosts.find((post) => post.index === postId));
 			return null;
 		}
 
@@ -174,11 +174,11 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 						<div className='flex flex-col gap-y-2'>
 							{userDiscussionPosts?.map((post) => (
 								<Button
-									key={post.id}
+									key={post.index}
 									variant='outline'
 									className={cn(
 										'justify-start gap-x-2 truncate text-sm font-medium text-text_primary',
-										selectedDiscussionPost && selectedDiscussionPost.id === post.id && 'border-text_pink'
+										selectedDiscussionPost && selectedDiscussionPost.index === post.index && 'border-text_pink'
 									)}
 									onClick={() => setSelectedDiscussionPost(post)}
 								>
