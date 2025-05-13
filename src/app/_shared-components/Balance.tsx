@@ -35,16 +35,27 @@ function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBala
 		if (!apiService || !address || showPeopleChainBalance) return;
 		setLoading(true);
 
-		(async () => {
-			const { freeBalance } = await apiService.getUserBalances({
-				address
-			});
+		if (showPeopleChainBalance) {
+			if (!identityService) return;
+			(async () => {
+				const { freeBalance } = await identityService.getUserBalances({ address });
+				setAvailableBalance?.(freeBalance.toString());
+				setBalance?.(freeBalance.toString());
+				onChange?.(freeBalance.toString());
+				setLoading(false);
+			})();
+		} else {
+			(async () => {
+				const { freeBalance } = await apiService.getUserBalances({
+					address
+				});
 
-			setAvailableBalance?.(freeBalance.toString());
-			setBalance?.(freeBalance.toString());
-			onChange?.(freeBalance.toString());
-			setLoading(false);
-		})();
+				setAvailableBalance?.(freeBalance.toString());
+				setBalance?.(freeBalance.toString());
+				onChange?.(freeBalance.toString());
+				setLoading(false);
+			})();
+		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [address, isBalanceUpdated]);
