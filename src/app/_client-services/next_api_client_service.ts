@@ -44,8 +44,7 @@ import {
 	IAddressRelations,
 	IVoteCurve,
 	ITrackAnalyticsStats,
-	ITrackAnalyticsDelegations,
-	IOffChainPost
+	ITrackAnalyticsDelegations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -123,8 +122,7 @@ enum EApiRoute {
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
-	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_DISCUSSION_POSTS_BY_USER = 'GET_DISCUSSION_POSTS_BY_USER'
+	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS'
 }
 
 export class NextApiClientService {
@@ -189,7 +187,6 @@ export class NextApiClientService {
 			case EApiRoute.GET_FOLLOWERS:
 			case EApiRoute.GET_BATCH_VOTE_CART:
 			case EApiRoute.GET_USER_SOCIAL_HANDLES:
-			case EApiRoute.GET_DISCUSSION_POSTS_BY_USER:
 				path = '/users/id';
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
@@ -437,7 +434,8 @@ export class NextApiClientService {
 		statuses,
 		origins = [],
 		tags = [],
-		limit = DEFAULT_LISTING_LIMIT
+		limit = DEFAULT_LISTING_LIMIT,
+		userId
 	}: {
 		proposalType: string;
 		page: number;
@@ -445,6 +443,7 @@ export class NextApiClientService {
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
+		userId?: number;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
 		if (this.isServerSide()) {
@@ -457,7 +456,8 @@ export class NextApiClientService {
 				limit,
 				statuses,
 				origins,
-				tags
+				tags,
+				userId
 			});
 
 			if (cachedData) {
@@ -469,6 +469,10 @@ export class NextApiClientService {
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
+
+		if (userId) {
+			queryParams.set('userId', userId.toString());
+		}
 
 		if (limit) {
 			queryParams.set('limit', limit.toString());
@@ -1029,10 +1033,5 @@ export class NextApiClientService {
 				error: treasuryStatsResponse.error
 			}
 		};
-	}
-
-	static async getDiscussionPostsByUserApi({ userId }: { userId: number }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DISCUSSION_POSTS_BY_USER, routeSegments: [userId.toString(), 'discussion-posts'] });
-		return this.nextApiClientFetch<IOffChainPost[]>({ url, method });
 	}
 }

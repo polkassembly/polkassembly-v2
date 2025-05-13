@@ -35,12 +35,12 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 	const fetchAllPostsByUser = async () => {
 		if (!user || !user.id) return null;
 
-		const { data, error } = await NextApiClientService.getDiscussionPostsByUserApi({ userId: user.id });
+		const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.DISCUSSION, page: 1, limit: 20, userId: user.id });
 		if (error || !data) {
 			throw new Error(t('LinkDiscussionPost.noDiscussionsFound'));
 		}
 
-		return data;
+		return data.items;
 	};
 
 	const { data: userDiscussionPosts, isFetching: isFetchingUserDiscussionPosts } = useQuery({

@@ -303,18 +303,24 @@ export class FirestoreService extends FirestoreUtils {
 		proposalType,
 		limit,
 		page,
-		tags
+		tags,
+		userId
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
 		tags?: string[];
+		userId?: number;
 	}): Promise<IOffChainPost[]> {
 		let postsQuery = this.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
 
 		if (tags?.length) {
 			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
+		}
+
+		if (userId) {
+			postsQuery = postsQuery.where('userId', '==', userId);
 		}
 
 		postsQuery = postsQuery
@@ -541,19 +547,6 @@ export class FirestoreService extends FirestoreUtils {
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate()
 			} as IUserActivity;
-		});
-	}
-
-	static async GetUserDiscussionPosts({ userId, network }: { userId: number; network: ENetwork }): Promise<IOffChainPost[]> {
-		const postsQuery = this.postsCollectionRef().where('userId', '==', userId).where('proposalType', '==', EProposalType.DISCUSSION).where('network', '==', network);
-		const postsQuerySnapshot = await postsQuery.get();
-		return postsQuerySnapshot.docs.map((doc) => {
-			const data = doc.data();
-			return {
-				...data,
-				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
-			} as IOffChainPost;
 		});
 	}
 

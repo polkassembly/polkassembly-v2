@@ -24,7 +24,8 @@ export enum ESocial {
 	RIOT = 'riot',
 	TWITTER = 'twitter',
 	TELEGRAM = 'telegram',
-	DISCORD = 'discord'
+	DISCORD = 'discord',
+	GITHUB = 'github'
 }
 
 export interface ITrackCounts {
@@ -39,12 +40,12 @@ export interface IUserSocialDetails {
 export enum EUserBadge {
 	DECENTRALISED_VOICE = 'decentralised_voice',
 	FELLOW = 'fellow',
-	COUNCIL = 'council',
+	COUNCIL = 'council_member',
 	ACTIVE_VOTER = 'active_voter',
-	WHALE = 'whale'
-	// STEADFAST_COMMENTOR = 'Steadfast Commentor',
-	// GM_VOTER = 'GM Voter',
-	// POPULAR_DELEGATE = 'Popular Delegate'
+	WHALE = 'whale',
+	STEADFAST_COMMENTOR = 'steadfast_commentor',
+	GM_VOTER = 'gm_voter',
+	POPULAR_DELEGATE = 'popular_delegate'
 }
 
 export interface IUserBadgeDetails {
