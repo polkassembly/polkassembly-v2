@@ -44,7 +44,8 @@ import {
 	IAddressRelations,
 	IVoteCurve,
 	ITrackAnalyticsStats,
-	ITrackAnalyticsDelegations
+	ITrackAnalyticsDelegations,
+	IOffChainPost
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -122,7 +123,8 @@ enum EApiRoute {
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
-	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS'
+	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
+	GET_DISCUSSION_POSTS_BY_USER = 'GET_DISCUSSION_POSTS_BY_USER'
 }
 
 export class NextApiClientService {
@@ -187,6 +189,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_FOLLOWERS:
 			case EApiRoute.GET_BATCH_VOTE_CART:
 			case EApiRoute.GET_USER_SOCIAL_HANDLES:
+			case EApiRoute.GET_DISCUSSION_POSTS_BY_USER:
 				path = '/users/id';
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
@@ -1026,5 +1029,10 @@ export class NextApiClientService {
 				error: treasuryStatsResponse.error
 			}
 		};
+	}
+
+	static async getDiscussionPostsByUserApi({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DISCUSSION_POSTS_BY_USER, routeSegments: [userId.toString(), 'discussion-posts'] });
+		return this.nextApiClientFetch<IOffChainPost[]>({ url, method });
 	}
 }

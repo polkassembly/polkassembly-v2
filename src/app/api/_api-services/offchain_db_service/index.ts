@@ -167,7 +167,8 @@ export class OffChainDbService {
 			network,
 			metrics: postMetrics,
 			allowedCommentor: EAllowedCommentor.ALL,
-			isDeleted: false
+			isDeleted: false,
+			isDefaultContent: getDefaultContent
 		} as IOffChainPost;
 	}
 
@@ -276,6 +277,10 @@ export class OffChainDbService {
 				return { ...activity, metadata: { ...activity.metadata, title: post?.title } };
 			})
 		);
+	}
+
+	static async GetUserDiscussionPosts({ userId, network }: { userId: number; network: ENetwork }): Promise<IOffChainPost[]> {
+		return FirestoreService.GetUserDiscussionPosts({ userId, network });
 	}
 
 	static async GetUserReactionForPost({

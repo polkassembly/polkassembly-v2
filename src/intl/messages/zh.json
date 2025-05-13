@@ -1180,5 +1180,18 @@
 		"votes": "投票",
 		"voteDetails": "投票详情",
 		"target": "目标"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "链接讨论",
+		"noDiscussionsFound": "我们找不到任何可链接的讨论！",
+		"noPostFound": "未找到帖子",
+		"notAuthorized": "您无权链接此帖子。",
+		"discussionPostLinkedSuccessfully": "讨论帖子链接成功",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "讨论帖子已链接到提案",
+		"errorLinkingDiscussionPost": "链接讨论帖子时出错",
+		"pleaseTryAgain": "请重试",
+		"pasteURLorEnterPostID": "粘贴URL或输入帖子ID",
+		"yourDiscussions": "您的讨论",
+		"confirm": "确认"
 	}
 }

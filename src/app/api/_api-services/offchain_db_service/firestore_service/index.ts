@@ -544,6 +544,19 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
+	static async GetUserDiscussionPosts({ userId, network }: { userId: number; network: ENetwork }): Promise<IOffChainPost[]> {
+		const postsQuery = this.postsCollectionRef().where('userId', '==', userId).where('proposalType', '==', EProposalType.DISCUSSION).where('network', '==', network);
+		const postsQuerySnapshot = await postsQuery.get();
+		return postsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate()
+			} as IOffChainPost;
+		});
+	}
+
 	static async GetUserReactionForPost({
 		network,
 		indexOrHash,

@@ -426,6 +426,7 @@ export interface IOffChainPost {
 	publicUser?: IPublicUser;
 	topic?: EOffChainPostTopic;
 	history?: IOffChainContentHistoryItem[];
+	isDefaultContent?: boolean;
 }
 
 export enum EProposalStatus {

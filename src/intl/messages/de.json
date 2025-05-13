@@ -1181,5 +1181,18 @@
 		"votes": "Stimmen",
 		"voteDetails": "Abstimmungsdetails",
 		"target": "Ziel"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Diskussion verlinken",
+		"noDiscussionsFound": "Wir konnten keine zu verlinkende Diskussion finden!",
+		"noPostFound": "Kein Beitrag gefunden",
+		"notAuthorized": "Sie sind nicht berechtigt, diesen Beitrag zu verlinken.",
+		"discussionPostLinkedSuccessfully": "Diskussionsbeitrag erfolgreich verlinkt",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "Der Diskussionsbeitrag wurde mit dem Vorschlag verlinkt",
+		"errorLinkingDiscussionPost": "Fehler beim Verlinken des Diskussionsbeitrags",
+		"pleaseTryAgain": "Bitte versuchen Sie es erneut",
+		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
+		"yourDiscussions": "Ihre Diskussionen",
+		"confirm": "Bestätigen"
 	}
 }

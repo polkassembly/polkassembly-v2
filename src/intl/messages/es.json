@@ -1182,5 +1182,18 @@
 		"votes": "Votos",
 		"voteDetails": "Detalles de Votación",
 		"target": "Objetivo"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Vincular Discusión",
+		"noDiscussionsFound": "¡No pudimos encontrar ninguna discusión para vincular!",
+		"noPostFound": "No se encontró ninguna publicación",
+		"notAuthorized": "No estás autorizado para vincular esta publicación.",
+		"discussionPostLinkedSuccessfully": "Publicación de discusión vinculada exitosamente",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "La publicación de discusión ha sido vinculada a la propuesta",
+		"errorLinkingDiscussionPost": "Error al vincular la publicación de discusión",
+		"pleaseTryAgain": "Por favor, inténtalo de nuevo",
+		"pasteURLorEnterPostID": "Pega la URL o ingresa el ID de la publicación",
+		"yourDiscussions": "Tus Discusiones",
+		"confirm": "Confirmar"
 	}
 }
