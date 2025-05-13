@@ -27,13 +27,15 @@ function AddressDropdown({
 	withBalance,
 	disabled,
 	withRadioSelect,
-	onRadioSelect
+	onRadioSelect,
+	usedInIdentityFlow
 }: {
 	onChange?: (account: InjectedAccount) => void;
 	withBalance?: boolean;
 	disabled?: boolean;
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
+	usedInIdentityFlow?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
@@ -140,7 +142,12 @@ function AddressDropdown({
 				<div>
 					<div className='mb-1 flex items-center justify-between gap-x-12'>
 						<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('AddressDropdown.chooseLinkedAccount')}</p>
-						{withBalance && <Balance address={userPreferences?.selectedAccount?.address || ''} />}
+						{withBalance && (
+							<Balance
+								address={userPreferences?.selectedAccount?.address || ''}
+								usedInIdentityFlow={usedInIdentityFlow}
+							/>
+						)}
 					</div>
 					<DropdownMenuTrigger
 						disabled={disabled}
@@ -197,7 +204,12 @@ function AddressDropdown({
 			<div>
 				<div className='mb-1 flex items-center justify-between gap-x-12'>
 					<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('AddressDropdown.chooseLinkedAccount')}</p>
-					{withBalance && <Balance address={userPreferences?.selectedAccount?.address || ''} />}
+					{withBalance && (
+						<Balance
+							address={userPreferences?.selectedAccount?.address || ''}
+							usedInIdentityFlow={usedInIdentityFlow}
+						/>
+					)}
 				</div>
 				<DropdownMenuTrigger
 					disabled={disabled}

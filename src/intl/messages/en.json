@@ -636,7 +636,7 @@
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
-		"Balance": "Balance"
+		"balance": "Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
@@ -778,6 +778,7 @@
 		"requestJudgement": "Request Judgement",
 		"minimumDeposit": "Minimum Deposit",
 		"registrarFee": "Registrar Fee",
+		"gasFee": "Gas Fee",
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
 		"registrarFees": "Registrar Fees",
