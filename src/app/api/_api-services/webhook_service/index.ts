@@ -186,7 +186,7 @@ export class WebhookService {
 			const fetchPromises = fetchUrls.map((url) => {
 				// Create a timeout promise that rejects after 15 seconds
 				const timeoutPromise = new Promise<Response>((_, reject) => {
-					setTimeout(() => reject(new Error(`Request to ${url} timed out after 15 seconds`)), 15000);
+					setTimeout(() => reject(new Error(`Request to ${url} timed out after 10 seconds`)), 10000);
 				});
 
 				// Create the fetch promise
