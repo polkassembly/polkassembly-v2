@@ -434,7 +434,8 @@ export class NextApiClientService {
 		statuses,
 		origins = [],
 		tags = [],
-		limit = DEFAULT_LISTING_LIMIT
+		limit = DEFAULT_LISTING_LIMIT,
+		userId
 	}: {
 		proposalType: string;
 		page: number;
@@ -442,6 +443,7 @@ export class NextApiClientService {
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
+		userId?: number;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
 		if (this.isServerSide()) {
@@ -454,7 +456,8 @@ export class NextApiClientService {
 				limit,
 				statuses,
 				origins,
-				tags
+				tags,
+				userId
 			});
 
 			if (cachedData) {
@@ -466,6 +469,10 @@ export class NextApiClientService {
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
+
+		if (userId) {
+			queryParams.set('userId', userId.toString());
+		}
 
 		if (limit) {
 			queryParams.set('limit', limit.toString());

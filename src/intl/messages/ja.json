@@ -1180,5 +1180,18 @@
 		"votes": "投票",
 		"voteDetails": "投票詳細",
 		"target": "ターゲット"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "ディスカッションをリンク",
+		"noDiscussionsFound": "リンクできるディスカッションが見つかりませんでした！",
+		"noPostFound": "投稿が見つかりません",
+		"notAuthorized": "この投稿をリンクする権限がありません。",
+		"discussionPostLinkedSuccessfully": "ディスカッション投稿が正常にリンクされました",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "ディスカッション投稿が提案にリンクされました",
+		"errorLinkingDiscussionPost": "ディスカッション投稿のリンクエラー",
+		"pleaseTryAgain": "もう一度お試しください",
+		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
+		"yourDiscussions": "あなたのディスカッション",
+		"confirm": "確認"
 	}
 }

@@ -32,7 +32,8 @@ const SocialIcons = {
 	[ESocial.TWITTER]: TwitterIcon,
 	[ESocial.TELEGRAM]: TelegramIcon,
 	[ESocial.DISCORD]: TelegramIcon,
-	[ESocial.RIOT]: TelegramIcon
+	[ESocial.RIOT]: TelegramIcon,
+	[ESocial.GITHUB]: TelegramIcon
 };
 
 function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userProfileData: IPublicUser; handleUserProfileDataChange: (data: IPublicUser) => void }) {

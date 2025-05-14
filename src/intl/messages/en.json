@@ -645,6 +645,19 @@
 		"save": "Save",
 		"editPostButton": "Edit"
 	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Link Discussion",
+		"noDiscussionsFound": "We couldn't find any discussion to be linked!",
+		"noPostFound": "No post found",
+		"notAuthorized": "You are not authorized to link this post.",
+		"discussionPostLinkedSuccessfully": "Discussion post linked successfully",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "The discussion post has been linked to the proposal",
+		"errorLinkingDiscussionPost": "Error linking discussion post",
+		"pleaseTryAgain": "Please try again",
+		"pasteURLorEnterPostID": "Paste URL or Enter Post ID",
+		"yourDiscussions": "Your Discussions",
+		"confirm": "Confirm"
+	},
 	"Footer": {
 		"helpCenter": "Help Center",
 		"reportAnIssue": "Report an Issue",

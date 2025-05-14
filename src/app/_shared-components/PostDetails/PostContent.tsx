@@ -7,14 +7,21 @@
 import React from 'react';
 import { IPost } from '@/_shared/types';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import NoContextGIF from '@assets/gifs/no-context.gif';
+import { useUser } from '@/hooks/useUser';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
+import LinkPostButton from './LinkDiscussionPost/LinkPostButton';
 
 function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPost; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
 	const { content } = postData;
+
+	const { user } = useUser();
 
 	return (
 		<div>
@@ -25,23 +32,51 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 				initialData={(postData as IPost)?.contentSummary}
 			/>
 
-			<MarkdownViewer
-				markdown={content}
-				className={cn(isModalOpen ? '' : 'max-h-full border-none')}
-				truncate
-			/>
-
-			<Separator className='my-4 bg-border_grey' />
-			<PostActions postData={postData} />
-			<div className='flex items-center justify-between'>
-				<div />
-				<div>
+			{user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '') && postData.isDefaultContent ? (
+				<div className='flex flex-col items-center justify-center gap-y-4'>
+					<Image
+						src={NoContextGIF}
+						alt='no-context'
+						width={150}
+						height={150}
+					/>
+					<p className='text-base font-semibold text-text_primary'>No context provided!</p>
 					<EditPostButton
 						postData={postData}
 						onEditPostSuccess={onEditPostSuccess}
+						className='h-10 w-64 bg-bg_pink text-sm font-medium text-white'
+					/>
+					<LinkPostButton
+						postData={postData}
+						onSuccess={onEditPostSuccess}
+						className='h-10 w-64 border border-navbar_border bg-bg_modal text-sm font-medium text-text_pink'
 					/>
 				</div>
-			</div>
+			) : (
+				<MarkdownViewer
+					markdown={content}
+					className={cn(isModalOpen ? '' : 'max-h-full border-none')}
+					truncate
+				/>
+			)}
+
+			<Separator className='my-4 bg-border_grey' />
+			<PostActions postData={postData} />
+			{!postData.isDefaultContent && (
+				<div className='mt-1 flex items-center justify-between'>
+					<div />
+					<div className='flex items-center gap-x-2'>
+						<EditPostButton
+							postData={postData}
+							onEditPostSuccess={onEditPostSuccess}
+						/>
+						<LinkPostButton
+							postData={postData}
+							onSuccess={onEditPostSuccess}
+						/>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

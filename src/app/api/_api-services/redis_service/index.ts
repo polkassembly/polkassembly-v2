@@ -86,8 +86,17 @@ export class RedisService {
 		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
 		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: string, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
-			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
+		[ERedisKeys.POSTS_LISTING]: (
+			network: string,
+			proposalType: string,
+			page: number,
+			limit: number,
+			statuses?: string[],
+			origins?: string[],
+			tags?: string[],
+			userId?: number
+		): string => {
+			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}-${userId}`;
 			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
@@ -303,7 +312,8 @@ export class RedisService {
 		limit,
 		statuses,
 		origins,
-		tags
+		tags,
+		userId
 	}: {
 		network: string;
 		proposalType: string;
@@ -312,8 +322,9 @@ export class RedisService {
 		statuses?: string[];
 		origins?: string[];
 		tags?: string[];
+		userId?: number;
 	}): Promise<IGenericListingResponse<IPostListing> | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags, userId) });
 		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 

@@ -3,24 +3,16 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useState } from 'react';
 import { IPost, IPostListing } from '@/_shared/types';
-import { Pencil } from 'lucide-react';
+import { Link } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
-import EditPost from './EditPost';
+import LinkDiscussionPost from './LinkDiscussionPost';
 
-function EditPostButton({
-	postData,
-	onEditPostSuccess,
-	className
-}: {
-	postData: IPostListing | IPost;
-	onEditPostSuccess: (title: string, content: string) => void;
-	className?: string;
-}) {
+function LinkPostButton({ postData, onSuccess, className }: { postData: IPostListing | IPost; onSuccess: (title: string, content: string) => void; className?: string }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +20,7 @@ function EditPostButton({
 	const canEdit = user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '');
 
 	if (!canEdit) return null;
+
 	return (
 		<Dialog
 			open={isOpen}
@@ -38,26 +31,24 @@ function EditPostButton({
 					variant='ghost'
 					size='sm'
 					className={cn('bg-grey_bg text-xs font-medium text-wallet_btn_text', className)}
-					leftIcon={<Pencil size={16} />}
+					leftIcon={<Link size={16} />}
 					disabled={!canEdit}
 				>
-					{t('EditPost.editPostButton')}
+					{t('LinkDiscussionPost.linkDiscussion')}
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='max-w-max p-3 sm:p-6'>
+			<DialogContent className='max-w-xl p-3 sm:p-6'>
 				<DialogHeader>
-					<DialogTitle>{t('EditPost.edit')}</DialogTitle>
+					<DialogTitle>{t('LinkDiscussionPost.linkDiscussion')}</DialogTitle>
 				</DialogHeader>
-				<div className='max-w-3xl'>
-					<EditPost
-						postData={postData}
-						onEditPostSuccess={onEditPostSuccess}
-						onClose={() => setIsOpen(false)}
-					/>
-				</div>
+				<LinkDiscussionPost
+					postData={postData}
+					onSuccess={onSuccess}
+					onClose={() => setIsOpen(false)}
+				/>
 			</DialogContent>
 		</Dialog>
 	);
 }
 
-export default EditPostButton;
+export default LinkPostButton;

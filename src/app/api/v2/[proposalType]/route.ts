@@ -47,12 +47,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
 		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional(),
-		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional() // max 30 tags because of firestore query limit
+		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional(),
+		userId: z.coerce.number().optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, status: statuses, origin: origins, tags } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, status: statuses, origin: origins, tags, userId } = zodQuerySchema.parse(searchParamsObject);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
 	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
@@ -60,7 +61,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// Only get from cache if not skipping cache
 	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
-		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
+		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags, userId });
 
 		if (cachedData) {
 			return NextResponse.json(cachedData);
@@ -149,7 +150,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 			proposalType,
 			limit,
 			page,
-			tags
+			tags,
+			userId
 		});
 
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
