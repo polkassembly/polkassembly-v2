@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import TurndownService from 'turndown';
-import { gfm } from 'turndown-plugin-gfm';
+import { gfm } from '@joplin/turndown-plugin-gfm';
 
 /**
  * Converts HTML to Markdown with support for tables and GitHub Flavored Markdown features
@@ -21,20 +21,7 @@ export function htmlToMarkdown(html: string): string {
 			strongDelimiter: '**'
 		});
 
-		// Use the GitHub Flavored Markdown plugin
 		turndownService.use(gfm);
-
-		// Custom rule for tables to ensure proper formatting
-		turndownService.addRule('tableCell', {
-			filter: ['th', 'td'],
-			replacement(content: string, node: TurndownService.Node) {
-				if (node.nodeType !== 1) return content;
-				const element = node as unknown as HTMLTableCellElement;
-				const index = element.cellIndex;
-				const prefix = index === 0 ? '| ' : '';
-				return `${prefix}${content.trim()} |`;
-			}
-		});
 
 		// Custom rule for video elements
 		turndownService.addRule('video', {
