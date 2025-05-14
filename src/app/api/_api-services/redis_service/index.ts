@@ -24,6 +24,9 @@ import {
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import dayjs from 'dayjs';
+import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import {
 	FIVE_MIN,
 	HALF_HOUR_IN_SECONDS,
@@ -294,10 +297,13 @@ export class RedisService {
 	}
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
+		const isActivePost = data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status);
+		const isActiveOffChainPost = ValidatorService.isValidOffChainProposalType(data.proposalType) && dayjs().diff(dayjs(data.createdAt), 'days') <= OFF_CHAIN_POST_ACTIVE_DAYS;
+
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status) ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost || isActiveOffChainPost ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
 		});
 	}
 

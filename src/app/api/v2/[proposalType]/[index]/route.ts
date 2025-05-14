@@ -158,6 +158,7 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
+	await RedisService.DeleteOverviewPageData({ network });
 
 	const response = NextResponse.json({ message: 'Post deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));

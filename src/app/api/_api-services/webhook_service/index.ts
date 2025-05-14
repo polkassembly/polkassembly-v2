@@ -10,10 +10,14 @@ import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType } from '@/_shared/
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import dayjs from 'dayjs';
+import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
+import { OffChainDbService } from '../offchain_db_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -125,7 +129,8 @@ export class WebhookService {
 			RedisService.DeletePostData({ network, proposalType, indexOrHash }),
 			RedisService.DeletePostsListing({ network, proposalType }),
 			RedisService.DeleteActivityFeed({ network }),
-			RedisService.DeleteAllSubscriptionFeedsForNetwork(network)
+			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
+			RedisService.DeleteOverviewPageData({ network })
 		]);
 	}
 
@@ -139,7 +144,10 @@ export class WebhookService {
 
 			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
 
-			// 1. Fetch active proposals
+			// 0. Prepare all URLs that need to be fetched
+			const fetchUrls: string[] = [];
+
+			// 1. Fetch and add active proposals details pages
 			const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
 				network,
 				proposalType: EProposalType.REFERENDUM_V2,
@@ -148,8 +156,38 @@ export class WebhookService {
 				statuses: ACTIVE_PROPOSAL_STATUSES
 			});
 
-			// 2. Prepare all URLs that need to be fetched
-			const fetchUrls: string[] = [];
+			activeProposals.forEach((proposal) => {
+				const indexOrHash = proposal.index || proposal.hash;
+				const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
+
+				// proposal detail page
+				fetchUrls.push(proposalUrl);
+				// TODO: comments
+				fetchUrls.push(`${proposalUrl}/content-summary`);
+			});
+
+			// 2. add all active off-chain posts details pages
+			const offChainPosts = await OffChainDbService.GetOffChainPostsListing({
+				network,
+				proposalType: EProposalType.REFERENDUM_V2,
+				limit: DEFAULT_LISTING_LIMIT * 2, // only refresh cache regularly for posts that are on the first 2 pages & are active (created in the last OFF_CHAIN_POST_ACTIVE_DAYS)
+				page: 1
+			});
+
+			// filter out posts that are not active
+			const activeOffChainPosts = offChainPosts.filter((post) => {
+				return dayjs().diff(dayjs(post.createdAt), 'days') <= OFF_CHAIN_POST_ACTIVE_DAYS;
+			});
+
+			activeOffChainPosts.forEach((post) => {
+				const indexOrHash = post.index || post.hash;
+				const proposalUrl = `${baseUrl}/${post.proposalType}/${indexOrHash}`;
+
+				// proposal detail page
+				fetchUrls.push(proposalUrl);
+				// TODO: comments
+				fetchUrls.push(`${proposalUrl}/content-summary`);
+			});
 
 			// Add primary listing pages
 			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}`);
@@ -160,17 +198,6 @@ export class WebhookService {
 			// Add track listing pages
 			Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails).forEach((origin) => {
 				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}`);
-			});
-
-			// Add active proposal detail pages
-			activeProposals.forEach((proposal) => {
-				const indexOrHash = proposal.index || proposal.hash;
-				const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
-
-				// proposal detail page
-				fetchUrls.push(proposalUrl);
-				// TODO: comments
-				fetchUrls.push(`${proposalUrl}/content-summary`);
 			});
 
 			// Add treasury stats api
