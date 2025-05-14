@@ -61,11 +61,13 @@ export class AIService {
     - [List main questions]
 
     STRICT RULES: 
-		- Your ENTIRE response must follow ONLY this markdown format with these exact section headers.
-		- DO NOT include any introductory text, thinking, acknowledgments, or commentary before or after the analysis.
-		- DO NOT explain your reasoning or include any meta-commentary about the analysis.
-		- Begin your response directly with the first heading.
+		- Try to keep each section short and concise, but do not leave out any important information.
+		- Try to keep it to a maximum of 2-3 sentences per section.
 		- If a section has no content, include the heading but leave the content empty or write "None identified."
+		- Your ENTIRE response must follow ONLY this markdown format with these exact section headers.
+		- STRICTLY DO NOT include any introductory text, thinking, acknowledgments, or commentary before or after the analysis.
+		- DO NOT explain your reasoning or include any meta-commentary about the analysis.
+		- Begin your response directly with the first heading "Users feeling optimistic say".
     `,
 		CONTENT_SPAM_CHECK: `
     You are a helpful assistant that evaluates Polkadot governance content for spam and scam.
@@ -172,6 +174,13 @@ export class AIService {
 				// Extract just the JSON object
 				const jsonMatch = cleanedResponse.match(/{[\s\S]*?}/);
 				cleanedResponse = jsonMatch ? jsonMatch[0] : '';
+			} else if (prompt.includes(this.BASE_PROMPTS.COMMENTS_SUMMARY)) {
+				// Extract only the structured summary part, starting with the first heading
+				const summaryStartMatch = cleanedResponse.match(/### Users feeling optimistic say:/);
+				if (summaryStartMatch) {
+					const startIndex = cleanedResponse.indexOf(summaryStartMatch[0]);
+					cleanedResponse = cleanedResponse.substring(startIndex);
+				}
 			}
 
 			return cleanedResponse;

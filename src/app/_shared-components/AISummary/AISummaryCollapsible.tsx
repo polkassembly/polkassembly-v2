@@ -54,7 +54,7 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType, initialD
 					<ChevronDown className={styles.chevronIcon} />
 				</CollapsibleTrigger>
 				<CollapsibleContent className={styles.collapsibleContent}>
-					<Separator className='m-0 p-0' />
+					<Separator className='mb-3 mt-0 p-0' />
 					<MarkdownViewer
 						markdown={summaryContent}
 						className={`${THEME_COLORS.light.btn_primary_text}`}
