@@ -470,6 +470,7 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
+		await this.DeleteOverviewPageData({ network });
 	}
 
 	// QR session caching methods
