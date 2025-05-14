@@ -29,6 +29,14 @@ const nextConfig = {
 			}
 		];
 	},
+	async rewrites() {
+		return [
+			{
+				source: '/api/v1/:path*',
+				destination: 'https://polkadot-old.polkassembly.io/api/v1/:path*'
+			}
+		];
+	},
 	images: {
 		remotePatterns: [
 			{
