@@ -40,7 +40,9 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	}
 
 	treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to, limit, page });
-	await RedisService.SetTreasuryStats({ network, from: fromFormatted, to: toFormatted, data: treasuryStats });
+	if (treasuryStats) {
+		await RedisService.SetTreasuryStats({ network, from: fromFormatted, to: toFormatted, data: treasuryStats });
+	}
 
 	return NextResponse.json(treasuryStats);
 });
