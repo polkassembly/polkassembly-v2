@@ -22,9 +22,10 @@ interface Props {
 	indexOrHash: string;
 	summaryType: 'content' | 'allComments';
 	initialData?: IContentSummary;
+	className?: string;
 }
 
-function AISummaryCollapsible({ proposalType, indexOrHash, summaryType, initialData }: Props) {
+function AISummaryCollapsible({ proposalType, indexOrHash, summaryType, initialData, className }: Props) {
 	const t = useTranslations('PostDetails');
 	const { data, isLoading, error } = useAISummary({ proposalType, indexOrHash, initialData });
 
@@ -47,7 +48,7 @@ function AISummaryCollapsible({ proposalType, indexOrHash, summaryType, initialD
 	}
 
 	return (
-		<Collapsible className={styles.collapsibleWrapper}>
+		<Collapsible className={`${styles.collapsibleWrapper} ${className}`}>
 			<div className={`${styles.collapsibleInner} ${summaryType === 'content' ? styles.postContentGradient : styles.commentContentGradient}`}>
 				<CollapsibleTrigger className={styles.collapsibleTrigger}>
 					<span>✨ {summaryType === 'content' ? t('aiSummary') : t('commentSummary')}</span>

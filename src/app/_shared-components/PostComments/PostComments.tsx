@@ -48,6 +48,7 @@ function PostComments({ proposalType, index, contentSummary }: { proposalType: E
 					proposalType={proposalType}
 					summaryType='allComments'
 					initialData={contentSummary}
+					className='mb-8'
 				/>
 			</div>
 

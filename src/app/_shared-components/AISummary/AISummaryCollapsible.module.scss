@@ -1,15 +1,15 @@
 .collapsibleWrapper {
 	position: relative;
 	width: 100%;
-	border-radius: 16px;
+	border-radius: 12px;
 	padding: 1px;
 	background: linear-gradient(135deg, #cf2dab, #40e8ff, #6a41dd, #b62e76);
 	overflow: hidden;
-	margin-bottom: 16px;
+	margin-bottom: 20px;
 }
 
 .collapsibleInner {
-	border-radius: 15px;
+	border-radius: 11px;
 	width: 100%;
 	transition: all 0.3s ease-in-out;
 }
@@ -33,12 +33,7 @@
 }
 
 .collapsibleTrigger {
-	padding: 16px 20px;
-	display: flex;
-	width: 100%;
-	align-items: center;
-	justify-content: space-between;
-	font-weight: 500;
+	@apply flex w-full items-center justify-between p-2 font-medium;
 	color: var(--listing_page_btn);
 }
 
