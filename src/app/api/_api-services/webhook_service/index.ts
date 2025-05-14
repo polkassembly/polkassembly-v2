@@ -134,6 +134,9 @@ export class WebhookService {
 		try {
 			console.log(`Starting cache refresh for network: ${network}`);
 			const baseUrl = await getBaseUrl();
+
+			console.log(`Clearing cache with baseUrl: ${baseUrl}`);
+
 			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
 
 			// 1. Fetch active proposals
@@ -166,9 +169,18 @@ export class WebhookService {
 
 				// proposal detail page
 				fetchUrls.push(proposalUrl);
-				// TODO: comments and content summary for the proposal
+				// TODO: comments
 				fetchUrls.push(`${proposalUrl}/content-summary`);
 			});
+
+			// Add treasury stats api
+			fetchUrls.push(`${baseUrl}/meta/treasury-stats`);
+
+			// Overview page refresh
+			await RedisService.DeleteOverviewPageData({ network });
+
+			// fetch overview page
+			fetchUrls.push(`${baseUrl.replace('/api/v2', '')}`);
 
 			// 3. Create an array of fetch promises with individual 15-second timeouts
 			const fetchPromises = fetchUrls.map((url) => {

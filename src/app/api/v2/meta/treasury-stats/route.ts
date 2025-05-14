@@ -21,21 +21,24 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 export const maxDuration = 300;
 
 const zodQuerySchema = z.object({
-	from: z.coerce.date().optional(),
-	to: z.coerce.date().optional(),
+	from: z.coerce.date().optional().default(dayjs().subtract(1, 'hour').toDate()),
+	to: z.coerce.date().optional().default(dayjs().toDate()),
 	limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 	page: z.coerce.number().optional().default(1)
 });
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse<ITreasuryStats[]>> => {
-	const network = await getNetworkFromHeaders();
+	const [network, readonlyHeaders] = await Promise.all([getNetworkFromHeaders(), headers()]);
 	const { from, to, limit, page } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 	const fromFormatted = dayjs(from).format('YYYY-MM-DD-HH');
 	const toFormatted = dayjs(to).format('YYYY-MM-DD-HH');
 
+	const skipCache = readonlyHeaders.get(EHttpHeaderKey.SKIP_CACHE);
+	const toolsPassphrase = readonlyHeaders.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+
 	let treasuryStats = await RedisService.GetTreasuryStats({ network, from: fromFormatted, to: toFormatted });
-	if (treasuryStats) {
+	if (treasuryStats && !(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
 		return NextResponse.json(treasuryStats);
 	}
 
