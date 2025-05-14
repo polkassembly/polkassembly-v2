@@ -6,14 +6,16 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType, EWallet, IUser } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
+import { OffChainDbService } from '../offchain_db_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -32,7 +34,8 @@ enum EWebhookEvent {
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated',
 	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated',
-	CACHE_REFRESH = 'cache_refresh'
+	CACHE_REFRESH = 'cache_refresh',
+	USER_CREATED = 'user_created'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -81,6 +84,16 @@ export class WebhookService {
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		}),
+		[EWebhookEvent.USER_CREATED]: z.object({
+			id: z.number(),
+			username: z.string(),
+			createdAt: z.date(),
+			email: z.string(),
+			address: z.string().optional(),
+			salt: z.string(),
+			isWeb3Signup: z.boolean(),
+			password: z.string()
+		}),
 		[EWebhookEvent.CACHE_REFRESH]: z.object({})
 	} as const;
 
@@ -106,6 +119,8 @@ export class WebhookService {
 				return this.handleOtherEvent({ network, params });
 			case EWebhookEvent.CACHE_REFRESH:
 				return this.handleCacheRefresh({ network });
+			case EWebhookEvent.USER_CREATED:
+				return this.handleUserCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -127,6 +142,36 @@ export class WebhookService {
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network)
 		]);
+	}
+
+	private static async handleUserCreated({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> }) {
+		const { id, username, email, salt, isWeb3Signup, address, password, createdAt } = params;
+
+		const newUser: IUser = {
+			createdAt,
+			email,
+			isEmailVerified: false,
+			id,
+			password,
+			profileDetails: DEFAULT_PROFILE_DETAILS,
+			profileScore: 0,
+			salt,
+			username,
+			isWeb3Signup,
+			primaryNetwork: network
+		};
+
+		await OffChainDbService.AddNewUser(newUser);
+
+		if (isWeb3Signup && address) {
+			await OffChainDbService.AddNewAddress({
+				address,
+				isDefault: true,
+				network,
+				userId: id,
+				wallet: EWallet.OTHER
+			});
+		}
 	}
 
 	// refreshes caches for common endpoints and active proposals
