@@ -94,6 +94,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 									field.onChange(data);
 								}}
 								ref={markdownEditorRef}
+								className='w-[300px] sm:w-full'
 							/>
 						</FormControl>
 
