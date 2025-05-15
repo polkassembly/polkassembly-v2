@@ -933,7 +933,9 @@
 		"validFrom": "生效时间",
 		"addValidFrom": "添加生效时间",
 		"invalidBlockHeight": "请输入有效的区块高度",
-		"enterFutureBlockHeight": "请输入未来的区块高度"
+		"enterFutureBlockHeight": "请输入未来的区块高度",
+		"invalidParameters": "无效的参数",
+		"invalidParametersDescription": "请检查参数并重试"
 	},
 	"CreatePreimage": {
 		"addItem": "添加受益人/支付",
@@ -1148,9 +1150,15 @@
 		"bountyProposedSuccessfully": "赏金提案成功",
 		"bountyProposedSuccessfullyDescription": "赏金已成功提案",
 		"bountyProposalFailed": "赏金提案失败",
-		"bountyProposalFailedDescription": "赏金提案过程中出现错误",
-		"bountyAmount": "赏金金额",
-		"proposeBounty": "提案赏金"
+		"bountyProposalFailedDescription": "提案赏金时出现错误",
+		"bountyAmount": "赏金数额",
+		"proposeBounty": "提案赏金",
+		"enterBountyId": "输入赏金ID",
+		"yes": "是",
+		"no": "否",
+		"createProposal": "创建提案",
+		"haveYouCreatedABountyAlready": "您是否已经创建了赏金？",
+		"yourAreNotTheProposer": "您不是此赏金的提案人"
 	},
 	"Parachains": {
 		"projects": "项目",

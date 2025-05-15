@@ -34,7 +34,7 @@ function InputNumber({ onChange, ...props }: InputNumberProps) {
 	const t = useTranslations();
 	const maxValueLength = getGlobalMaxValue(props.bitLength).toString().length;
 	const [error, setError] = useState<string>('');
-	const [valueString, setValueString] = useState<string>(props.defaultValue?.toString() || '');
+	const [valueString, setValueString] = useState<string>(props.defaultValue ? props.defaultValue.toString() : '');
 
 	const onKeyDown = useCallback(
 		(event: KeyboardEvent<Element>): void => {
