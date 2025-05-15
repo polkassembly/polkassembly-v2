@@ -465,6 +465,8 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"commentNotSent": "评论未发送",
+		"commentNotSentDescription": "请再试一次",
 		"OnchainInfo": {
 			"metadata": "元数据",
 			"table": "表格",

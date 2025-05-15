@@ -467,6 +467,8 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"commentNotSent": "Comentario no enviado",
+		"commentNotSentDescription": "Por favor, inténtelo de nuevo",
 		"OnchainInfo": {
 			"metadata": "Metadatos",
 			"table": "Tabla",

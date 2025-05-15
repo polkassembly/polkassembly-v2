@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IComment, IPublicUser } from '@/_shared/types';
+import { EProposalType, ICommentResponse, IComment, IPublicUser, ECommentActions } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
@@ -84,22 +84,34 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback((newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
-		setComment((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				children: [
-					...(prev.children || []),
-					{
-						...newComment,
-						user: publicUser
-					}
-				]
-			};
-		});
-		setReply(false);
-		setShowReplies(true);
+	const handleConfirmReply = useCallback(({ newComment, publicUser, action }: { newComment: IComment; publicUser: Omit<IPublicUser, 'rank'>; action: ECommentActions }) => {
+		if (action === ECommentActions.ADD) {
+			setComment((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					children: [
+						...(prev.children || []),
+						{
+							...newComment,
+							user: publicUser
+						}
+					]
+				};
+			});
+			setReply(false);
+			setShowReplies(true);
+		} else if (action === ECommentActions.DELETE) {
+			setComment((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					children: prev.children?.filter((child) => child.id !== newComment.id)
+				};
+			});
+			setReply(false);
+			setShowReplies(true);
+		}
 	}, []);
 
 	if (!comment) {

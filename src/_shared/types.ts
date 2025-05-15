@@ -1257,3 +1257,8 @@ export interface IUserPosts {
 	/** Posts related to on-chain proposals/referenda */
 	onchainPostsResponse: PostListingResponse;
 }
+
+export enum ECommentActions {
+	ADD = 'add',
+	DELETE = 'delete'
+}

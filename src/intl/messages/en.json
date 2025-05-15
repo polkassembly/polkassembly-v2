@@ -477,6 +477,8 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"commentNotSent": "Comment Not Sent",
+		"commentNotSentDescription": "Please try again",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",

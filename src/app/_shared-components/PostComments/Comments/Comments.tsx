@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse } from '@/_shared/types';
+import { ECommentActions, EProposalType, IComment, ICommentResponse, IPublicUser } from '@/_shared/types';
 import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -105,14 +105,18 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 					<AddComment
 						proposalType={proposalType}
 						proposalIndex={index}
-						onConfirm={(newComment, publicUser) => {
-							setAllComments((prev) => [
-								...prev,
-								{
-									...newComment,
-									user: publicUser
-								}
-							]);
+						onConfirm={({ newComment, publicUser, action }: { newComment: IComment; publicUser: Omit<IPublicUser, 'rank'>; action: ECommentActions }) => {
+							if (action === ECommentActions.ADD) {
+								setAllComments((prev) => [
+									...prev,
+									{
+										...newComment,
+										user: publicUser
+									}
+								]);
+							} else if (action === ECommentActions.DELETE) {
+								setAllComments((prev) => prev.filter((comment) => comment.id !== newComment.id));
+							}
 						}}
 					/>
 				</div>
