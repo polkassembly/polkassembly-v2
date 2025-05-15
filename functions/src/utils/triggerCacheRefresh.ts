@@ -13,9 +13,9 @@ export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase
 			try {
 				logger.info(`Triggering cache refresh for network: ${network}`);
 
-				// TODO: `https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
+				// Use the network variable in the URL
 				const response = await axios.post(
-					`https://poladot.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
+					`https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 					{}, // Empty body
 					{
 						headers: {
