@@ -29,6 +29,15 @@ const nextConfig = {
 			}
 		];
 	},
+	async redirects() {
+		return [
+			{
+				source: '/opengov',
+				destination: '/',
+				permanent: true
+			}
+		];
+	},
 	async rewrites() {
 		return [
 			{
