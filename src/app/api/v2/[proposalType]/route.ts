@@ -32,7 +32,6 @@ import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { RedisService } from '../../_api-services/redis_service';
-import { AIService } from '../../_api-services/ai_service';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
@@ -219,7 +218,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		allowedCommentor
 	});
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
+	// await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
