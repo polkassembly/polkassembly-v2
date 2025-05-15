@@ -205,27 +205,10 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				</div>
 			</div>
 
-			<TabsList className={`mx-auto max-w-full overflow-auto pl-4 ${classes.hideScrollbar}`}>
-				<TabsTrigger
-					className='capitalize'
-					value={EPostDetailsTab.DESCRIPTION}
-				>
-					{t('PostDetails.description')}
-				</TabsTrigger>
-				<TabsTrigger
-					className='capitalize'
-					value={EPostDetailsTab.TIMELINE}
-				>
-					{t('PostDetails.timeline')}
-				</TabsTrigger>
-				{!isOffchainPost && (
-					<TabsTrigger
-						className='capitalize'
-						value={EPostDetailsTab.ONCHAIN_INFO}
-					>
-						{t('PostDetails.onchainInfo')}
-					</TabsTrigger>
-				)}
+			<TabsList className={`mx-auto max-w-full overflow-auto pl-4 font-bold capitalize md:pl-0 ${classes.hideScrollbar}`}>
+				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
+				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
+				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
 			</TabsList>
 		</div>
 	);
