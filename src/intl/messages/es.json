@@ -235,6 +235,12 @@
 			"followed_user": "Seguido",
 			"unfollowed_user": "Dejó de seguir"
 		},
+		"Posts": {
+			"posts": "Publicaciones",
+			"discussions": "Discusiones",
+			"openGov": "OpenGov",
+			"noData": "No se encontraron publicaciones"
+		},
 		"overview": "Resumen",
 		"onchainIdentity": "Identidad en cadena",
 		"linkAddress": "Vincular dirección",

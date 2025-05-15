@@ -234,6 +234,12 @@
 			"followed_user": "关注用户",
 			"unfollowed_user": "取消关注用户"
 		},
+		"Posts": {
+			"posts": "帖子",
+			"discussions": "讨论",
+			"openGov": "链下帖子",
+			"noData": "未找到帖子"
+		},
 		"overview": "概览",
 		"onchainIdentity": "链上身份",
 		"linkAddress": "链接地址",

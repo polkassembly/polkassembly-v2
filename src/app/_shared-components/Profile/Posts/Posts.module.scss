@@ -1,0 +1,17 @@
+.postsWrapper {
+	@apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal px-6 py-4 shadow-lg;
+}
+
+.postsHeader {
+	@apply flex items-center justify-between gap-x-2 text-text_primary;
+}
+
+.postsHeaderText {
+	@apply text-2xl font-semibold;
+}
+.postsHeaderButtons {
+	@apply flex items-center gap-x-2;
+}
+.postsHeaderSkeleton {
+	@apply mt-4 h-[200px] w-full rounded-full;
+}

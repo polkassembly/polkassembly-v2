@@ -38,12 +38,13 @@ import {
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
 	ISocialHandle,
-	IVoteHistoryData,
 	ITreasuryStats,
 	IContentSummary,
 	IAddressRelations,
 	IVoteCurve,
 	ITrackAnalyticsStats,
+	IVoteHistoryData,
+	IUserPosts,
 	ITrackAnalyticsDelegations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -119,10 +120,11 @@ enum EApiRoute {
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
-	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS'
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
+	GET_USER_POSTS = 'GET_USER_POSTS'
 }
 
 export class NextApiClientService {
@@ -191,8 +193,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+			case EApiRoute.GET_USER_POSTS:
 				path = '/users/address';
 				break;
+
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
@@ -1033,5 +1037,14 @@ export class NextApiClientService {
 				error: treasuryStatsResponse.error
 			}
 		};
+	}
+
+	static async getUserPosts({ address, page, limit }: { address: string; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
+		return this.nextApiClientFetch<IUserPosts>({ url, method });
 	}
 }
