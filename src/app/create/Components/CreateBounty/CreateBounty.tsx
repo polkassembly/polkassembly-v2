@@ -199,6 +199,8 @@ function CreateBounty() {
 		});
 	};
 
+	const bountyReward = useMemo(() => new BN(existingBountyData?.onChainInfo?.reward || 0), [existingBountyData]);
+
 	return (
 		<div className='flex w-full flex-1 flex-col gap-y-4 overflow-hidden'>
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
@@ -262,7 +264,7 @@ function CreateBounty() {
 				)}
 
 				<BalanceInput
-					value={bountyOption === ECreateBountyOptions.BOUNTY_EXISTS ? new BN(existingBountyData?.onChainInfo?.reward || 0) : bountyAmount}
+					value={bountyOption === ECreateBountyOptions.BOUNTY_EXISTS ? bountyReward : bountyAmount}
 					onChange={({ value }) => setBountyAmount(value)}
 					label={t('CreateBounty.bountyAmount')}
 					disabled={bountyOption === ECreateBountyOptions.BOUNTY_EXISTS}
@@ -272,7 +274,7 @@ function CreateBounty() {
 					selectedTrack={selectedTrack}
 					onChange={setSelectedTrack}
 					isTreasury
-					requestedAmount={bountyOption === ECreateBountyOptions.BOUNTY_EXISTS ? new BN(existingBountyData?.onChainInfo?.reward || 0) : bountyAmount}
+					requestedAmount={bountyOption === ECreateBountyOptions.BOUNTY_EXISTS ? bountyReward : bountyAmount}
 				/>
 
 				<EnactmentForm
