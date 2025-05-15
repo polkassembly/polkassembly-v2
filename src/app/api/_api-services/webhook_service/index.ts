@@ -6,13 +6,14 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import dayjs from 'dayjs';
 import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
@@ -36,7 +37,8 @@ enum EWebhookEvent {
 	DELEGATED = 'delegated',
 	UNDELEGATED = 'undelegated',
 	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated',
-	CACHE_REFRESH = 'cache_refresh'
+	CACHE_REFRESH = 'cache_refresh',
+	USER_CREATED = 'user_created'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -85,7 +87,19 @@ export class WebhookService {
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		}),
-		[EWebhookEvent.CACHE_REFRESH]: z.object({})
+		[EWebhookEvent.CACHE_REFRESH]: z.object({}),
+		[EWebhookEvent.USER_CREATED]: z.object({
+			id: z.number().refine((id) => ValidatorService.isValidUserId(id), ERROR_MESSAGES.INVALID_USER_ID),
+			username: z.string().refine((username) => ValidatorService.isValidUsername(username), ERROR_MESSAGES.INVALID_USERNAME),
+			email: z.string().refine((email) => ValidatorService.isValidEmail(email), ERROR_MESSAGES.INVALID_EMAIL),
+			address: z
+				.string()
+				.refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
+				.optional(),
+			salt: z.string(),
+			isWeb3Signup: z.boolean(),
+			password: z.string()
+		})
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
@@ -110,6 +124,8 @@ export class WebhookService {
 				return this.handleOtherEvent({ network, params });
 			case EWebhookEvent.CACHE_REFRESH:
 				return this.handleCacheRefresh({ network });
+			case EWebhookEvent.USER_CREATED:
+				return this.handleUserCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -235,6 +251,38 @@ export class WebhookService {
 			console.log(`Cache refreshed for ${activeProposals.length} active proposals, all listing pages and track listing pages`);
 		} catch (error) {
 			console.error(`Error refreshing cache for network ${network}:`, error);
+		}
+	}
+
+	private static async handleUserCreated({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> }) {
+		const { id, username, email, salt, isWeb3Signup, address, password } = params;
+
+		const newUser: IUser = {
+			email,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			isEmailVerified: false,
+			id,
+			password,
+			profileDetails: DEFAULT_PROFILE_DETAILS,
+			profileScore: 0,
+			salt,
+			username,
+			isWeb3Signup,
+			primaryNetwork: network,
+			roles: [ERole.USER]
+		};
+
+		await OffChainDbService.AddNewUser(newUser);
+
+		if (isWeb3Signup && address) {
+			await OffChainDbService.AddNewAddress({
+				address,
+				isDefault: true,
+				network,
+				userId: id,
+				wallet: EWallet.OTHER
+			});
 		}
 	}
 
