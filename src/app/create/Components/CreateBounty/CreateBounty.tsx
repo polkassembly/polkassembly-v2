@@ -61,7 +61,7 @@ function CreateBounty() {
 		return apiService.getApproveBountyTx({ bountyId: debouncedBountyId });
 	}, [apiService, debouncedBountyId]);
 
-	const proposeBountyTx = useMemo(() => apiService && apiService.getProposeBountyTx({ bountyAmount }), [apiService, bountyAmount]);
+	const proposeBountyTx = useMemo(() => apiService && bountyAmount && !bountyAmount.isZero() && apiService.getProposeBountyTx({ bountyAmount }), [apiService, bountyAmount]);
 
 	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
 
