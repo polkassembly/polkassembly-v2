@@ -25,7 +25,7 @@ function EditPostButton({
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
 
-	const canEdit = user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '');
+	const canEdit = user && (user.id === postData.userId || user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || ''));
 
 	if (!canEdit) return null;
 	return (

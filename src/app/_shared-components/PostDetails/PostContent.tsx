@@ -11,6 +11,7 @@ import Image from 'next/image';
 import NoContextGIF from '@assets/gifs/no-context.gif';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
@@ -70,6 +71,7 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 							postData={postData}
 							onEditPostSuccess={onEditPostSuccess}
 						/>
+						{!OFF_CHAIN_PROPOSAL_TYPES.includes(postData.proposalType)}
 						<LinkPostButton
 							postData={postData}
 							onSuccess={onEditPostSuccess}
