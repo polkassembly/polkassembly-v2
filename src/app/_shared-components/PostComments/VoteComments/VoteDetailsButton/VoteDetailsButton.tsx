@@ -86,7 +86,7 @@ function VoteDetailsButton({ userVoteDecision, onClick }: VoteDetailsButtonProps
 			variant='ghost'
 			onClick={onClick}
 			size='sm'
-			className='m-0 flex items-center gap-x-1 p-0 text-xs'
+			className='m-0 flex items-center gap-x-1 p-0 text-xs hover:underline'
 		>
 			<VoteDecisionDisplay userVoteDecision={userVoteDecision} />
 		</Button>
