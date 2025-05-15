@@ -587,7 +587,8 @@
 		"created": "已创建",
 		"curatorassigned": "已分配 curator",
 		"curatorunassigned": "未分配 curator",
-		"curatorproposed": "已提议 curator",
+		"curatorproposed": "已提议策展人",
+		"tabled": "已提交",
 		"undefined": "未定义"
 	},
 	"Pagination": {

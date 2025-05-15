@@ -1,5 +1,5 @@
 .base {
-	@apply h-min whitespace-nowrap rounded-full border-2 px-3 py-1 text-xs font-medium tracking-tight text-white lg:px-4 lg:py-1.5;
+	@apply h-min whitespace-nowrap rounded-full border-2 border-blue-500 bg-blue-500 px-3 py-1 text-xs font-medium tracking-tight text-white dark:border-blue-700 dark:bg-blue-700 lg:px-4 lg:py-1.5;
 }
 
 .inverted {
@@ -34,6 +34,7 @@
 .rejected,
 .cancelled,
 .timedout,
+.closed,
 .executionfailed,
 .confirmaborted {
 	@apply border-red-500 bg-red-500 dark:border-red-700 dark:bg-red-700;
@@ -42,6 +43,7 @@
 .confirmed,
 .claimed,
 .executed,
+.tabled,
 .awarded,
 .curatorassigned {
 	@apply border-green-500 bg-green-500 dark:border-green-700 dark:bg-green-700;

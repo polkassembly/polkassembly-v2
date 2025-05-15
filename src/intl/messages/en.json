@@ -616,6 +616,7 @@
 		"curatorassigned": "Curator Assigned",
 		"curatorunassigned": "Curator Unassigned",
 		"curatorproposed": "Curator Proposed",
+		"tabled": "Tabled",
 		"undefined": "Undefined"
 	},
 	"Pagination": {

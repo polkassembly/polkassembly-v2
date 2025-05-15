@@ -586,7 +586,8 @@
 		"created": "Erstellt",
 		"curatorassigned": "Curator zugewiesen",
 		"curatorunassigned": "Curator nicht zugewiesen",
-		"curatorproposed": "Curator vorgeschlagen",
+		"curatorproposed": "Kurator vorgeschlagen",
+		"tabled": "Eingereicht",
 		"undefined": "Undefiniert"
 	},
 	"Pagination": {
