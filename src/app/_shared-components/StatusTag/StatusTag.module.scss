@@ -44,6 +44,7 @@
 .claimed,
 .executed,
 .tabled,
+.awarded,
 .curatorassigned {
 	@apply border-green-500 bg-green-500 dark:border-green-700 dark:bg-green-700;
 }

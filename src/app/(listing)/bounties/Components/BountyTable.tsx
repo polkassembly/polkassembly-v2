@@ -16,6 +16,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useRouter } from 'nextjs-toploader/app';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useState, Fragment } from 'react';
+import Tags from '@/app/_shared-components/AppLayout/Search/Tags';
 import styles from './Bounties.module.scss';
 import ChildBountiesRow from './ChildBountiesRow';
 
@@ -101,7 +102,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 									status={item.onChainInfo?.status}
 								/>
 							</TableCell>
-							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? item.tags.join(', ') : 'N/A'}</TableCell>
+							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? <Tags tags={item.tags.map((tag) => tag.value)} /> : ''}</TableCell>
 						</TableRow>
 						{expandChildBounties.isExpanded && expandChildBounties.parentIndex === item.index && <ChildBountiesRow parentIndex={expandChildBounties.parentIndex} />}
 					</Fragment>

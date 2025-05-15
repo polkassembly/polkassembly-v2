@@ -137,8 +137,8 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const zodQuerySchema = z.object({
 		postId: z.string(),
 		proposalType: z.nativeEnum(EV1ProposalType).transform(v1ToV2ProposalType),
-		noComments: z.boolean().optional().default(false),
-		includeSubsquareComments: z.boolean().optional().default(true)
+		noComments: z.coerce.boolean().optional().default(false),
+		includeSubsquareComments: z.coerce.boolean().optional().default(true)
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key, value]) => [key, value]));
