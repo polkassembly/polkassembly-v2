@@ -19,7 +19,7 @@
 }
 
 .beneficiaryWrapper {
-	@apply flex flex-wrap items-center gap-x-2;
+	@apply flex flex-wrap items-center gap-x-2 gap-y-2;
 }
 
 .beneficiaryText {
@@ -32,4 +32,13 @@
 
 .originStyle {
 	@apply whitespace-normal break-words rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
+}
+
+.hideScrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+	&::-webkit-scrollbar {
+		/* Chrome, Safari and Opera */
+		display: none;
+	}
 }
