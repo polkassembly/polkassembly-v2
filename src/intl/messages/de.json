@@ -933,7 +933,9 @@
 		"validFrom": "Gültig ab",
 		"addValidFrom": "Gültig ab hinzufügen",
 		"invalidBlockHeight": "Bitte geben Sie eine gültige Blockhöhe ein",
-		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
+		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein",
+		"invalidParameters": "Ungültige Parameter",
+		"invalidParametersDescription": "Bitte überprüfen Sie die Parameter und versuchen Sie es erneut"
 	},
 	"CreatePreimage": {
 		"addItem": "Begünstigten/Auszahlungen hinzufügen",
@@ -1151,7 +1153,13 @@
 		"bountyProposalFailed": "Kopfgeld-Vorschlag fehlgeschlagen",
 		"bountyProposalFailedDescription": "Beim Vorschlagen des Kopfgeldes ist ein Fehler aufgetreten",
 		"bountyAmount": "Kopfgeld-Betrag",
-		"proposeBounty": "Kopfgeld vorschlagen"
+		"proposeBounty": "Kopfgeld vorschlagen",
+		"enterBountyId": "Geben Sie die Kopfgeld-ID ein",
+		"yes": "Ja",
+		"no": "Nein",
+		"createProposal": "Vorschlag erstellen",
+		"haveYouCreatedABountyAlready": "Haben Sie bereits ein Kopfgeld erstellt?",
+		"yourAreNotTheProposer": "Sie sind nicht der Vorschlagende dieses Kopfgeldes"
 	},
 	"Parachains": {
 		"projects": "Projekte",
