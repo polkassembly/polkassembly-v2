@@ -182,6 +182,8 @@ export class WebhookService {
 				statuses: ACTIVE_BOUNTY_STATUSES
 			});
 
+			// TODO: child bounties
+
 			activeRefV2Proposals.forEach((proposal) => {
 				const indexOrHash = proposal.index || proposal.hash;
 				const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
@@ -243,33 +245,130 @@ export class WebhookService {
 			// fetch overview page
 			fetchUrls.push(`${baseUrl.replace('/api/v2', '')}`);
 
-			// 3. Create an array of fetch promises with individual 15-second timeouts
-			const fetchPromises = fetchUrls.map((url) => {
-				// Create a timeout promise that rejects after 15 seconds
-				const timeoutPromise = new Promise<Response>((_, reject) => {
-					setTimeout(() => reject(new Error(`Request to ${url} timed out after 15 seconds`)), 15000);
-				});
+			// 3. Process URLs in batches to avoid overwhelming the server
+			const batchSize = 5; // Process 5 URLs at a time
+			const timeout = 30000; // Extend timeout to 30 seconds
+			const maxRetries = 2; // Allow up to 2 retries for failed requests
 
-				// Create the fetch promise
-				const fetchPromise = fetch(url, { headers }).catch((error) => {
-					console.warn(`Failed to refresh cache for ${url}:`, error);
-					return null;
-				});
+			console.log(`Processing ${fetchUrls.length} URLs in batches of ${batchSize}`);
 
-				// Race between the fetch and the timeout
-				return Promise.race([fetchPromise, timeoutPromise]).catch((error) => {
-					console.warn(`Request failed for ${url}:`, error);
-					return null;
-				});
-			});
-
-			// 4. Execute all in parallel and ignore individual failures
-			await Promise.allSettled(fetchPromises);
-
-			console.log(`Cache refreshed for ${fetchUrls.length} proposals and listing pages.`);
+			const processResults = await this.processBatchesWithRetries(fetchUrls, headers, batchSize, timeout, maxRetries);
+			console.log(`Cache refresh completed. Success: ${processResults.successCount}, Failed: ${processResults.failCount}`);
 		} catch (error) {
 			console.error(`Error refreshing cache for network ${network}:`, error);
 		}
+	}
+
+	// Helper method to process batches with retries
+	private static async processBatchesWithRetries(
+		urls: string[],
+		headers: Record<string, string>,
+		batchSize: number,
+		timeout: number,
+		maxRetries: number
+	): Promise<{ successCount: number; failCount: number }> {
+		let successCount = 0;
+		let failCount = 0;
+
+		// Split URLs into batches
+		const batches: string[][] = [];
+		for (let i = 0; i < urls.length; i += batchSize) {
+			batches.push(urls.slice(i, i + batchSize));
+		}
+
+		// Process each batch
+		// eslint-disable-next-line no-plusplus
+		for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+			const batchUrls = batches[Number(batchIndex)];
+			console.log(`Processing batch ${batchIndex + 1}/${batches.length}`);
+
+			// Create fetch promises for this batch
+			const batchPromises = batchUrls.map((url) => this.fetchWithRetry(url, headers, timeout, maxRetries));
+
+			// Wait for all requests in this batch to complete
+			// eslint-disable-next-line no-await-in-loop
+			const results = await Promise.allSettled(batchPromises);
+
+			// Count successes and failures
+			// eslint-disable-next-line no-plusplus
+			for (let i = 0; i < results.length; i++) {
+				const result = results[Number(i)];
+				if (result.status === 'fulfilled' && result.value) {
+					successCount += 1;
+				} else {
+					failCount += 1;
+					console.warn(`Failed to refresh cache for ${batchUrls[Number(i)]} after retries.`);
+				}
+			}
+
+			// Add a small delay between batches to reduce server load
+			if (batchIndex < batches.length - 1) {
+				// eslint-disable-next-line no-await-in-loop
+				await this.delay(500);
+			}
+		}
+
+		return { successCount, failCount };
+	}
+
+	// Helper method to wait for a specific time
+	private static delay(ms: number): Promise<void> {
+		return new Promise((resolve) => {
+			setTimeout(resolve, ms);
+		});
+	}
+
+	// Helper method to fetch with retries
+	private static async fetchWithRetry(url: string, headers: Record<string, string>, timeout: number, maxRetries: number): Promise<Response | null> {
+		let currentRetry = 0;
+
+		while (currentRetry <= maxRetries) {
+			try {
+				const controller = new AbortController();
+				const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+				try {
+					// eslint-disable-next-line no-await-in-loop
+					const response = await fetch(url, {
+						headers,
+						signal: controller.signal
+					});
+
+					clearTimeout(timeoutId);
+
+					// If successful, return the response
+					if (response.ok) {
+						if (currentRetry > 0) {
+							console.log(`Successfully refreshed cache for ${url} after ${currentRetry} retries.`);
+						}
+						return response;
+					}
+
+					throw new Error(`Request to ${url} failed with status ${response.status}`);
+				} catch (fetchError) {
+					if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+						throw new Error(`Request to ${url} timed out after ${timeout / 1000} seconds`);
+					}
+					throw fetchError;
+				}
+			} catch (error) {
+				// If we've used all retries, give up
+				if (currentRetry === maxRetries) {
+					console.warn(`All retries failed for ${url}: ${error instanceof Error ? error.message : String(error)}`);
+					return null;
+				}
+
+				// Otherwise, wait and retry
+				currentRetry += 1;
+				console.log(`Retry ${currentRetry}/${maxRetries} for ${url}`);
+
+				// eslint-disable-next-line no-await-in-loop
+				await this.delay(1000 * currentRetry); // Exponential backoff
+			}
+		}
+
+		// Should never get here due to return in the catch block
+		return null;
 	}
 
 	private static async handleUserCreated({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> }) {
