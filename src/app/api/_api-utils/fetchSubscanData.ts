@@ -20,7 +20,7 @@ const SUBSCAN_API_HEADERS = {
 
 export const fetchSubscanData = async ({ url, network, body, method }: { url: string | URL; network: string; body?: Record<string, unknown>; method?: 'POST' | 'GET' }) => {
 	try {
-		const redisData = await RedisService.GetSubscanData({ network, url: url.toString() });
+		const redisData = await RedisService.GetSubscanData({ network, url: url.toString(), body });
 
 		if (redisData) {
 			return deepParseJson(redisData);

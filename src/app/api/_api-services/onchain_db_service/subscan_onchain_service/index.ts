@@ -186,7 +186,8 @@ export class SubscanOnChainService {
 			const threshold = data.data?.account?.multisig?.threshold;
 
 			if (!ValidatorService.isValidNumber(threshold)) {
-				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, `No threshold found for multisig ${multisig}`);
+				// eslint-disable-next-line no-continue
+				continue;
 			}
 
 			const multisigData: IMultisigAddress = {
