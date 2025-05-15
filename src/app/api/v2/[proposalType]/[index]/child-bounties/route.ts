@@ -22,7 +22,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
-	const { index, proposalType } = zodParamsSchema.parse(await params);
+	const { index } = zodParamsSchema.parse(await params);
 	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 	const network = await getNetworkFromHeaders();
@@ -46,7 +46,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		const offchainPost = await OffChainDbService.GetOffChainPostData({
 			network,
 			indexOrHash: onChainInfo.index?.toString() ?? '',
-			proposalType: proposalType || EProposalType.BOUNTY
+			proposalType: EProposalType.CHILD_BOUNTY
 		});
 
 		return {
