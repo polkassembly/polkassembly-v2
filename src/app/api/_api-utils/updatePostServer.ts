@@ -4,7 +4,6 @@
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EAllowedCommentor, ENetwork, EProposalType, IPostLink } from '@/_shared/types';
-import { AIService } from '../_api-services/ai_service';
 import { OffChainDbService } from '../_api-services/offchain_db_service';
 import { RedisService } from '../_api-services/redis_service';
 
@@ -51,7 +50,7 @@ export async function updatePostServer({
 		});
 	}
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
+	// await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash });
