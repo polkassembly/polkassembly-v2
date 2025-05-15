@@ -366,8 +366,10 @@ export class AIService {
 
 			await OffChainDbService.UpdateContentSummary(contentSummary);
 
-			// clear cache for the content summary
-			await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
+			// Invalidate caches
+			await RedisService.DeletePostsListing({ network, proposalType });
+			await RedisService.DeleteActivityFeed({ network });
+			await RedisService.DeleteOverviewPageData({ network });
 
 			return contentSummary;
 		}
