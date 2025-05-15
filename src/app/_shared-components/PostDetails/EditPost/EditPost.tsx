@@ -61,28 +61,30 @@ function EditPost({
 
 	return (
 		<div className='flex flex-col gap-y-4'>
-			<div>
-				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.title')}</p>
-				<Input
-					defaultValue={postData?.title}
-					value={title}
-					onChange={(e) => setTitle(e.target.value)}
-					placeholder='Title'
-				/>
-			</div>
+			<div className='flex max-h-[75vh] flex-col gap-y-4 overflow-y-auto'>
+				<div>
+					<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.title')}</p>
+					<Input
+						defaultValue={postData?.title}
+						value={title}
+						onChange={(e) => setTitle(e.target.value)}
+						placeholder='Title'
+					/>
+				</div>
 
-			<div className='w-full'>
-				<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.content')}</p>
-				<MarkdownEditor
-					markdown={postData?.content}
-					onChange={(data) => {
-						setContent(data);
-						if (postData.index) {
-							LocalStorageClientService.setEditPostData({ postId: postData.index.toString(), data });
-						}
-					}}
-					ref={markdownEditorRef}
-				/>
+				<div className='w-full'>
+					<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.content')}</p>
+					<MarkdownEditor
+						markdown={postData?.content}
+						onChange={(data) => {
+							setContent(data);
+							if (postData.index) {
+								LocalStorageClientService.setEditPostData({ postId: postData.index.toString(), data });
+							}
+						}}
+						ref={markdownEditorRef}
+					/>
+				</div>
 			</div>
 			<div className='flex justify-end'>
 				<Button
