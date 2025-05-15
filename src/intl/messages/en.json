@@ -975,7 +975,9 @@
 		"validFrom": "Valid From",
 		"addValidFrom": "Add Valid From",
 		"invalidBlockHeight": "Please enter a valid block height",
-		"enterFutureBlockHeight": "Please enter a future block height"
+		"enterFutureBlockHeight": "Please enter a future block height",
+		"invalidParameters": "Invalid parameters",
+		"invalidParametersDescription": "Please check the parameters and try again"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Beneficiary/Payouts",
@@ -1000,7 +1002,13 @@
 		"bountyProposalFailed": "Failed to propose bounty",
 		"bountyProposalFailedDescription": "There was an error while proposing the bounty",
 		"bountyAmount": "Bounty Amount",
-		"proposeBounty": "Propose Bounty"
+		"proposeBounty": "Propose Bounty",
+		"enterBountyId": "Enter the bounty ID",
+		"yes": "Yes",
+		"no": "No",
+		"createProposal": "Create Proposal",
+		"haveYouCreatedABountyAlready": "Have you created a bounty already?",
+		"yourAreNotTheProposer": "You are not the proposer of this bounty"
 	},
 	"KillCancelReferendum": {
 		"referendumId": "Enter Referendum Index",

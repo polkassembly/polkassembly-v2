@@ -907,10 +907,12 @@
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
 		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
 		"selectTrack": "トラックを選択",
-		"validFrom": "有効開始",
-		"addValidFrom": "有効開始を追加",
+		"validFrom": "有効開始日",
+		"addValidFrom": "有効開始日を追加",
 		"invalidBlockHeight": "有効なブロック高を入力してください",
-		"enterFutureBlockHeight": "将来のブロック高を入力してください"
+		"enterFutureBlockHeight": "将来のブロック高を入力してください",
+		"invalidParameters": "無効なパラメータ",
+		"invalidParametersDescription": "パラメータを確認して再試行してください"
 	},
 	"CreatePreimage": {
 		"addItem": "受取人/支払いを追加",
@@ -1145,12 +1147,18 @@
 		"viewAllChildBounties": "すべて表示"
 	},
 	"CreateBounty": {
-		"bountyProposedSuccessfully": "バウンティの提案が成功しました",
-		"bountyProposedSuccessfullyDescription": "バウンティが正常に提案されました",
-		"bountyProposalFailed": "バウンティの提案に失敗しました",
-		"bountyProposalFailedDescription": "バウンティの提案中にエラーが発生しました",
-		"bountyAmount": "バウンティ金額",
-		"proposeBounty": "バウンティを提案"
+		"bountyProposedSuccessfully": "報奨金が正常に提案されました",
+		"bountyProposedSuccessfullyDescription": "報奨金が正常に提案されました",
+		"bountyProposalFailed": "報奨金の提案に失敗しました",
+		"bountyProposalFailedDescription": "報奨金の提案中にエラーが発生しました",
+		"bountyAmount": "報奨金額",
+		"proposeBounty": "報奨金を提案",
+		"enterBountyId": "報奨金IDを入力してください",
+		"yes": "はい",
+		"no": "いいえ",
+		"createProposal": "提案を作成",
+		"haveYouCreatedABountyAlready": "すでに報奨金を作成していますか？",
+		"yourAreNotTheProposer": "あなたはこの報奨金の提案者ではありません"
 	},
 	"Parachains": {
 		"projects": "プロジェクト",
