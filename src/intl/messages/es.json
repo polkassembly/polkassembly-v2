@@ -588,7 +588,8 @@
 		"created": "Creado",
 		"curatorassigned": "Curador Asignado",
 		"curatorunassigned": "Curador No Asignado",
-		"curatorproposed": "Curador Propuesto",
+		"curatorproposed": "Curador propuesto",
+		"tabled": "Presentado",
 		"undefined": "Indefinido"
 	},
 	"Pagination": {
