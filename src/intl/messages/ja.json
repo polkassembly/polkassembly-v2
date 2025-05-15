@@ -587,7 +587,8 @@
 		"created": "作成済み",
 		"curatorassigned": "クレジットアサイン済み",
 		"curatorunassigned": "クレジット未アサイン",
-		"curatorproposed": "クレジット提案済み",
+		"curatorproposed": "キュレーター提案済み",
+		"tabled": "提出済み",
 		"undefined": "未定義"
 	},
 	"Pagination": {
