@@ -359,13 +359,6 @@ export interface IPostLink {
 	indexOrHash: string;
 	proposalType: EProposalType;
 }
-
-// stores the reason for invalidity or "Valid" if valid
-export interface ICrossValidationResult {
-	beneficiaries: string | 'Valid';
-	proposer: string | 'Valid';
-}
-
 export interface IContentSummary {
 	id: string;
 	network: ENetwork;
@@ -376,7 +369,6 @@ export interface IContentSummary {
 	isSpam?: boolean;
 	createdAt: Date;
 	updatedAt: Date;
-	crossValidationResult?: ICrossValidationResult;
 }
 
 export enum EOffChainPostTopic {

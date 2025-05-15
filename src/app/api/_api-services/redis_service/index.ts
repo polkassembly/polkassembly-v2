@@ -372,7 +372,7 @@ export class RedisService {
 		proposalType: string;
 		data: IContentSummary;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {

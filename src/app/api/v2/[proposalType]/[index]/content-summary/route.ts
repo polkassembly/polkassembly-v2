@@ -17,6 +17,8 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+export const maxDuration = 300;
+
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
 	index: z.string()

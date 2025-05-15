@@ -2,11 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo, ICrossValidationResult } from '@/_shared/types';
+import { ECommentSentiment, ENetwork, EProposalType, IBeneficiary, IComment, ICommentResponse, IContentSummary, IOnChainPostInfo } from '@/_shared/types';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
@@ -104,21 +103,6 @@ export class AIService {
 		- Your ENTIRE response must be EXACTLY ONE WORD from the following list: 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
 		- DO NOT include any explanations, reasoning, or additional text in your response.
 		- DO NOT use quotation marks or any other characters around your response.
-		`,
-		POST_CONTENT_EXTRACTION: `
-		You are a helpful assistant that extracts the content of a given post on the Polkadot governance forum Polkassembly.
-		Return ONLY the following in a valid JSON format:
-		{
-			"beneficiaries": [address1, address2, ...],
-			"proposer": "proposer address"
-		}
-
-		STRICT RULES:
-		- Your ENTIRE response must be ONLY the JSON object with no additional text.
-		- DO NOT include any explanations, comments, or markdown formatting.
-		- DO NOT include code fences or JSON syntax indicators.
-		- Ensure the JSON is properly formatted and valid.
-		- If you cannot extract a field, use an empty array for beneficiaries or empty string for proposer.
 		`
 	} as const;
 
@@ -166,14 +150,10 @@ export class AIService {
 					.split('\n')
 					.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
 					.join('\n');
-			} else if (prompt.includes(this.BASE_PROMPTS.CONTENT_SPAM_CHECK) || prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
+			} else if (prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
 				// Extract just the single word response
-				const match = cleanedResponse.match(/\b(true|false|against|slightly_against|neutral|slightly_for|for)\b/i);
+				const match = cleanedResponse.match(/\b(against|slightly_against|neutral|slightly_for|for)\b/i);
 				cleanedResponse = match ? match[0].toLowerCase() : '';
-			} else if (prompt.includes(this.BASE_PROMPTS.POST_CONTENT_EXTRACTION)) {
-				// Extract just the JSON object
-				const jsonMatch = cleanedResponse.match(/{[\s\S]*?}/);
-				cleanedResponse = jsonMatch ? jsonMatch[0] : '';
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENTS_SUMMARY)) {
 				// Extract only the structured summary part, starting with the first heading
 				const summaryStartMatch = cleanedResponse.match(/### Users feeling optimistic say:/);
@@ -349,89 +329,6 @@ export class AIService {
 		return sentiment as ECommentSentiment;
 	}
 
-	/**
-	 * Validates the content of a post against the on-chain post info.
-	 * Returns the validation result or null if validation process fails
-	 */
-	private static async validatePostContent({ mdContent, onChainPostInfo }: { mdContent?: string; onChainPostInfo?: IOnChainPostInfo }): Promise<ICrossValidationResult | null> {
-		if (!mdContent || !onChainPostInfo) {
-			return null;
-		}
-
-		let fullPrompt = `${this.BASE_PROMPTS.POST_CONTENT_EXTRACTION}\n\n`;
-
-		fullPrompt += `\n\nExtract from the following content:\n${mdContent}\n\n`;
-
-		const response = await this.getAIResponse(fullPrompt);
-
-		if (!response) {
-			return null;
-		}
-
-		// TODO: validate more fields, amount, assetId, etc.
-		let beneficiaryAddresses: string[] = [];
-		let proposerAddress: string = '';
-
-		// check if response is a valid JSON
-		try {
-			// extract js object via regex in case there is noise in the response
-			const jsonRegex = /{[\s\S]*?}/;
-			const jsonResponse = response.match(jsonRegex)?.[0];
-
-			if (!jsonResponse) {
-				return null;
-			}
-
-			const { beneficiaries = null, proposer = null } = JSON.parse(jsonResponse);
-
-			if (
-				!beneficiaries ||
-				!Array.isArray(beneficiaries) ||
-				!proposer ||
-				typeof proposer !== 'string' ||
-				!ValidatorService.isValidWeb3Address(proposer) ||
-				!beneficiaries.every((address) => ValidatorService.isValidWeb3Address(address))
-			) {
-				// invalid response from LLM
-				return null;
-			}
-
-			if (beneficiaries && Array.isArray(beneficiaries)) {
-				beneficiaryAddresses = beneficiaries.map((address) => (address.startsWith('0x') ? address : getSubstrateAddress(address))).filter((address) => address !== null);
-			}
-
-			if (proposer && typeof proposer === 'string' && ValidatorService.isValidWeb3Address(proposer)) {
-				proposerAddress = proposer.startsWith('0x') ? proposer : getSubstrateAddress(proposer) || '';
-			}
-		} catch {
-			// if response is not a valid JSON or the fields returned by the LLM are not valid, discard the response
-			return null;
-		}
-
-		const validationResult: ICrossValidationResult = {
-			beneficiaries: '',
-			proposer: ''
-		};
-
-		if (beneficiaryAddresses.length !== (onChainPostInfo.beneficiaries?.length || 0)) {
-			validationResult.beneficiaries += `Beneficiary addresses count mismatch. Found ${beneficiaryAddresses.length} in content but ${onChainPostInfo.beneficiaries?.length || 0} on-chain.`;
-		}
-
-		if (beneficiaryAddresses.some((address) => !onChainPostInfo.beneficiaries?.some((beneficiary) => beneficiary.address === address))) {
-			const mismatchedAddresses = beneficiaryAddresses.filter((address) => !onChainPostInfo.beneficiaries?.some((beneficiary) => beneficiary.address === address));
-			validationResult.beneficiaries += `Beneficiary addresses mismatch: ${mismatchedAddresses.join(', ')} not found in on-chain data.`;
-		}
-
-		if (proposerAddress !== onChainPostInfo.proposer) {
-			validationResult.proposer += `Proposer address mismatch: found "${proposerAddress}" in content but "${onChainPostInfo.proposer}" on-chain.`;
-		}
-
-		return {
-			beneficiaries: validationResult.beneficiaries || 'Valid',
-			proposer: validationResult.proposer || 'Valid'
-		};
-	}
-
 	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType, getDefaultContent: false });
 
@@ -466,17 +363,10 @@ export class AIService {
 			});
 		}
 
-		const crossValidationResult = onChainPostInfo
-			? await this.validatePostContent({
-					mdContent: offChainPostData.content,
-					onChainPostInfo
-				})
-			: null;
-
 		// if neither of AI generated stuff is usable, don't update anything
-		if (!postSummary?.trim() && !isSpam && !crossValidationResult) return null;
+		if (!postSummary?.trim() && !isSpam) return null;
 
-		// TODO: send appropriate notifications if content is spam or cross validation fails
+		// TODO: send appropriate notifications if content is spam
 
 		// check if content summary already exists
 		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
@@ -490,8 +380,7 @@ export class AIService {
 			...(isSpam && { isSpam }),
 			...(existingContentSummary?.commentsSummary && { commentsSummary: existingContentSummary.commentsSummary }),
 			createdAt: existingContentSummary?.createdAt || new Date(),
-			updatedAt: new Date(),
-			...(crossValidationResult && { crossValidationResult })
+			updatedAt: new Date()
 		};
 
 		await OffChainDbService.UpdateContentSummary(updatedContentSummary);
