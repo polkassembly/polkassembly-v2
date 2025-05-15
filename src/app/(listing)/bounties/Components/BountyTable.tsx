@@ -101,7 +101,7 @@ function BountyTable({ filteredItems }: { filteredItems: IPostListing[] }) {
 									status={item.onChainInfo?.status}
 								/>
 							</TableCell>
-							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? item.tags.join(', ') : 'N/A'}</TableCell>
+							<TableCell className={styles.tableCell}>{item.tags && item.tags.length > 0 ? item.tags?.map((tag) => tag.value).join(', ') : 'N/A'}</TableCell>
 						</TableRow>
 						{expandChildBounties.isExpanded && expandChildBounties.parentIndex === item.index && <ChildBountiesRow parentIndex={expandChildBounties.parentIndex} />}
 					</Fragment>
