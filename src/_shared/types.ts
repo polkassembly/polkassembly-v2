@@ -1248,3 +1248,12 @@ export enum EHttpHeaderKey {
 	TOOLS_PASSPHRASE = 'x-tools-passphrase',
 	NETWORK = 'x-network'
 }
+
+export type PostListingResponse = IGenericListingResponse<IPostListing>;
+
+export interface IUserPosts {
+	/** Posts created directly on Polkassembly (off-chain) */
+	offchainPostsResponse: PostListingResponse;
+	/** Posts related to on-chain proposals/referenda */
+	onchainPostsResponse: PostListingResponse;
+}
