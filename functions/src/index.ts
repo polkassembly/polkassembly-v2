@@ -123,7 +123,7 @@ export const onUserWritten = onDocumentWritten(
 	async (event) => {
 		try {
 			// If document was deleted or doesn't exist or is being updated after write, no need to process
-			if (!event.data?.after || event.data.before.exists) {
+			if (!event?.data?.after || event?.data?.before?.exists) {
 				logger.info('User document was deleted or does not exist or is being updated, no action needed');
 				return;
 			}
