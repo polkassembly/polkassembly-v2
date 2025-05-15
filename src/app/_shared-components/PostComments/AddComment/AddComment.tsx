@@ -7,8 +7,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ECommentActions, EDataSource, ENotificationStatus, EProposalType, IComment, IPublicUser } from '@/_shared/types';
-import { useAtomValue } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
@@ -19,6 +17,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { createId as createCuid } from '@paralleldrive/cuid2';
 import { useToast } from '@/hooks/useToast';
+import { useUser } from '@/hooks/useUser';
 import classes from './AddComment.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
@@ -46,8 +45,7 @@ function AddComment({
 	const [content, setContent] = useState<string | null>(savedContent);
 	const [loading, setLoading] = useState<boolean>(false);
 	const { getOnChainIdentity } = useIdentityService();
-
-	const user = useAtomValue(userAtom);
+	const { user } = useUser();
 
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
@@ -80,19 +78,18 @@ function AddComment({
 		if (!content?.trim() || !user) return;
 
 		const publicUser = {
-			username: user.username,
-			id: user.id,
-			addresses: user.addresses,
-			profileScore: user.id,
-			profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
+			username: user?.username,
+			id: user?.id,
+			addresses: user?.addresses,
+			profileScore: user?.id,
+			profileDetails: user?.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
 		};
 
 		setLoading(true);
 
-		const id = createCuid();
 		const comment: IComment = {
 			content,
-			id,
+			id: createCuid(),
 			createdAt: new Date(),
 			userId: user.id,
 			network,
