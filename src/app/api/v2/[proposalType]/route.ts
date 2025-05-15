@@ -11,6 +11,7 @@ import { ValidatorService } from '@shared/_services/validator_service';
 import {
 	EAllowedCommentor,
 	EDataSource,
+	EHttpHeaderKey,
 	EOffChainPostTopic,
 	EPostOrigin,
 	EProposalStatus,
@@ -26,11 +27,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { headers } from 'next/headers';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { RedisService } from '../../_api-services/redis_service';
 import { AIService } from '../../_api-services/ai_service';
+import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -44,19 +47,25 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
 		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional(),
-		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional() // max 30 tags because of firestore query limit
+		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional(),
+		userId: z.coerce.number().optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, status: statuses, origin: origins, tags } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, status: statuses, origin: origins, tags, userId } = zodQuerySchema.parse(searchParamsObject);
 
-	const network = await getNetworkFromHeaders();
+	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
+	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
 
-	// Try to get from cache first
-	const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
-	if (cachedData) {
-		return NextResponse.json(cachedData);
+	// Only get from cache if not skipping cache
+	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags, userId });
+
+		if (cachedData) {
+			return NextResponse.json(cachedData);
+		}
 	}
 
 	let posts: IPostListing[] = [];
@@ -141,7 +150,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 			proposalType,
 			limit,
 			page,
-			tags
+			tags,
+			userId
 		});
 
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
@@ -214,6 +224,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
+	await RedisService.DeleteOverviewPageData({ network });
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

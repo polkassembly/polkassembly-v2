@@ -1,0 +1,55 @@
+.delegationsCard {
+	@apply rounded-xl bg-bg_modal px-5 py-6;
+}
+
+.delegationsCardHeader {
+	@apply mb-4 flex flex-col gap-y-1 text-text_primary;
+}
+
+.delegationsCardHeaderTitle {
+	@apply flex items-center gap-x-2 text-xl font-semibold text-text_primary;
+}
+
+.delegationsCardContent {
+	@apply mt-4 flex flex-col gap-y-4;
+}
+
+.delegationsCardContentItem {
+	@apply flex flex-col items-center justify-between gap-y-2 rounded-xl bg-page_background py-3;
+}
+
+.delegationsCardContentItemTitle {
+	@apply text-xs font-semibold capitalize text-text_primary;
+}
+
+.collapsible {
+	@apply flex w-full flex-col gap-y-0;
+}
+
+.collapsibleTrigger {
+	@apply w-full border-[1px] border-solid border-border_grey bg-transparent p-3;
+}
+
+.collapsibleTriggerContent {
+	@apply flex w-full items-start justify-between text-text_primary;
+}
+
+.collapsibleTriggerContentInner {
+	@apply flex items-start gap-x-2;
+}
+
+.collapsibleTriggerContentInnerText {
+	@apply flex flex-col items-end;
+}
+
+.collapsibleContent {
+	@apply border-[1px] border-t-0 border-solid border-border_grey bg-transparent;
+}
+
+.innerCollapsibleTrigger {
+	@apply border-0 border-t-[1px] border-solid border-border_grey bg-transparent p-4;
+}
+
+.innerCollapsibleContent {
+	@apply border-0 border-t-[1px] border-dashed border-border_grey bg-transparent;
+}

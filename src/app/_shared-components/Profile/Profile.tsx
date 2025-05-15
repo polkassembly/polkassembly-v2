@@ -15,6 +15,7 @@ import UserActivity from './UserActivity/UserActivity';
 import Accounts from './Accounts/Accounts';
 import Overview from './Overview/Overview';
 import Settings from './Settings/Settings';
+import Posts from './Posts/Posts';
 import Votes from './Votes/Votes';
 
 function Profile({ profileData }: { profileData: IPublicUser }) {
@@ -43,6 +44,9 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 			<div className={classes.contentWrapper}>
 				<TabsContent value={EProfileTabs.OVERVIEW}>
 					<Overview profileData={profileData} />
+				</TabsContent>
+				<TabsContent value={EProfileTabs.POSTS}>
+					<Posts addresses={profileData.addresses} />
 				</TabsContent>
 				<TabsContent value={EProfileTabs.VOTES}>
 					<Votes addresses={profileData.addresses} />

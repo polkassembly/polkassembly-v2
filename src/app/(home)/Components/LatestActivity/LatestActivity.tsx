@@ -36,6 +36,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 	const network = getCurrentNetwork();
 	const tabsListRef = useRef<HTMLDivElement>(null);
 	const TAB_TRIGGER_CLASS = 'text-xm border-b border-b-border_grey font-medium text-text_primary data-[state=active]:border-b-0';
+
 	const ACTIVE_DROPDOWN_ITEM_CLASS = 'bg-sidebar_menu_bg text-text_pink';
 
 	const DATE_FORMAT = "Do MMM 'YY";

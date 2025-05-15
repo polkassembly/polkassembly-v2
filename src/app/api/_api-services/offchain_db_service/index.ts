@@ -167,7 +167,8 @@ export class OffChainDbService {
 			network,
 			metrics: postMetrics,
 			allowedCommentor: EAllowedCommentor.ALL,
-			isDeleted: false
+			isDeleted: false,
+			isDefaultContent: getDefaultContent
 		} as IOffChainPost;
 	}
 
@@ -176,15 +177,17 @@ export class OffChainDbService {
 		proposalType,
 		limit,
 		page,
-		tags
+		tags,
+		userId
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
 		tags?: string[];
+		userId?: number;
 	}): Promise<IOffChainPost[]> {
-		const posts = await FirestoreService.GetOffChainPostsListing({ network, proposalType, limit, page, tags });
+		const posts = await FirestoreService.GetOffChainPostsListing({ network, proposalType, limit, page, tags, userId });
 		if (posts.length) return posts;
 
 		if (tags?.length) {
@@ -903,5 +906,9 @@ export class OffChainDbService {
 
 	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
 		return FirestoreService.DeleteOffChainPost({ network, proposalType, indexOrHash });
+	}
+
+	static async GetPostsByUserId({ userId, network, page, limit, proposalType }: { userId: number; network: ENetwork; page: number; limit: number; proposalType: EProposalType }) {
+		return FirestoreService.GetPostsByUserId({ userId, network, page, limit, proposalType });
 	}
 }

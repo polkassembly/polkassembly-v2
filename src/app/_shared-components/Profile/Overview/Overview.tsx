@@ -16,6 +16,7 @@ import Address from '../Address/Address';
 import LinkAddress from './LinkAddress/LinkAddress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import classes from './Overview.module.scss';
+import Delegations from '../Delegations/Delegations';
 
 function Overview({ profileData }: { profileData: IPublicUser }) {
 	const [userProfile, setUserProfile] = useState<IPublicUser>(profileData);
@@ -32,6 +33,7 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 	return (
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
+				<Delegations addresses={profileData.addresses} />
 				{/* <div className={classes.overviewCard}>
 					<div className={classes.overviewCardHeader}>
 						<p className={classes.overviewCardHeaderTitle}>{t('Profile.overview')}</p>

@@ -153,6 +153,8 @@
 		"loginToPolkassembly": "Polkassemblyにログイン",
 		"profile": "プロフィール",
 		"activity": "アクティビティ",
+		"votes": "投票",
+		"posts": "投稿",
 		"accounts": "アカウント",
 		"delegate": "委任",
 		"follow": "フォロー",
@@ -172,6 +174,23 @@
 			"viewVote": "投票を表示",
 			"openGov": "OpenGov",
 			"gov1": "Gov1"
+		},
+		"Delegations": {
+			"noDelegations": "委任が見つかりません",
+			"delegation": "委任",
+			"receivedDelegations": "受け取った委任",
+			"delegatedDelegations": "委任した委任",
+			"delegatedBy": "委任した",
+			"delegatedTo": "委任された",
+			"votingPower": "投票力",
+			"capital": "資本",
+			"tracks": "トラック",
+			"votes": "投票",
+			"multiple": "複数",
+			"VP": "VP",
+			"CA": "CA",
+			"CO": "CO",
+			"index": "インデックス"
 		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
@@ -228,6 +247,12 @@
 			"unlinked_multiple_addresses": "複数のアドレスのリンクを解除",
 			"followed_user": "ユーザーをフォロー",
 			"unfollowed_user": "ユーザーをフォロー解除"
+		},
+		"Posts": {
+			"posts": "投稿",
+			"discussions": "議論",
+			"openGov": "OpenGov",
+			"noData": "投稿が見つかりません"
 		},
 		"overview": "概要",
 		"onchainIdentity": "オンチェーンID",
@@ -643,21 +668,25 @@
 		"createDiscussionTitle": "ディスカッションを作成",
 		"title": "タイトル",
 		"description": "説明",
-		"addTagsPlaceholder": "タグを追加 (Enterまたはカンマを押して追加)",
 		"create": "作成",
 		"createTag": "タグを作成",
 		"addTags": "タグを追加",
+		"addTagsPlaceholder": "タグを追加（Enterまたはカンマで追加）",
+		"remainingTagsPlaceholder": "残り{remaining}個のタグ",
 		"searchTags": "タグを検索",
 		"noTagsFound": "タグが見つかりません。",
 		"selectTags": "タグを選択",
 		"selectTopic": "トピックを選択",
 		"tagsLeftText": "残りのタグ",
+		"titleTooShort": "有効なタイトルを入力してください。",
+		"titlePlaceholder": "タイトルを入力",
+		"descriptionRequired": "有効な説明を入力してください。",
 		"AllowedCommentors": {
 			"title": "誰がコメントできますか？",
-			"all": "すべて",
-			"onchainVerified": "オンチェーンで確認済み",
+			"all": "全員",
+			"onchainVerified": "オンチェーン認証済み",
 			"none": "なし",
-			"tooltip": "この投稿にコメントおよび返信できる人を選択"
+			"tooltip": "この投稿にコメントや返信ができる人を選択"
 		},
 		"Topic": {
 			"general": "一般",
@@ -666,19 +695,19 @@
 			"governance": "ガバナンス",
 			"root": "ルート",
 			"stakingadmin": "ステーキング管理者",
-			"treasury": "財務",
+			"treasury": "トレジャリー",
 			"fellowship": "フェローシップ",
-			"council": "評議会",
-			"democracy": "民主主義",
+			"council": "カウンシル",
+			"democracy": "デモクラシー",
 			"whitelist": "ホワイトリスト"
 		},
-		"titleTooShort": "有効なタイトルを入力してください。",
-		"titlePlaceholder": "タイトルを入力",
-		"descriptionRequired": "有効な説明を入力してください。",
 		"please": "お願いします",
 		"login": "ログイン",
-		"toCreateProposal": "提案を作成するために",
-		"toCreateDiscussion": "ディスカッションを作成するために"
+		"toCreateProposal": "提案を作成するには",
+		"toCreateDiscussion": "ディスカッションを作成するには",
+		"discussionCreatedSuccessfully": "ディスカッションが正常に作成されました",
+		"discussionCreationFailed": "ディスカッションの作成に失敗しました",
+		"discussionCreationFailedDescription": "ディスカッションの作成中にエラーが発生しました"
 	},
 	"ProposalType": {
 		"discussion": "ディスカッション",
@@ -1134,6 +1163,24 @@
 		"bountyAmount": "バウンティ金額",
 		"proposeBounty": "バウンティを提案"
 	},
+	"Parachains": {
+		"projects": "プロジェクト",
+		"index": "インデックス",
+		"status": "ステータス",
+		"token": "トークン",
+		"w3f": "W3F",
+		"investors": "インベスター",
+		"github": "GitHub",
+		"inAuction": "オークション中",
+		"testing": "テスト中",
+		"announced": "発表済み",
+		"live": "ライブ",
+		"parachainsDirectory": "PolkadotとKusamaのエコシステムとディレクトリ",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "ParachainsとCrowdloansでロックされた総供給量",
+		"auction": "オークション",
+		"crowdloans": "クラウドローン",
+		"parachains": "平行鎖"
+	},
 	"TrackAnalytics": {
 		"proposalsCreated": "作成された提案",
 		"activeProposals": "アクティブな提案",
@@ -1151,5 +1198,18 @@
 		"votes": "投票",
 		"voteDetails": "投票詳細",
 		"target": "ターゲット"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "ディスカッションをリンク",
+		"noDiscussionsFound": "リンクできるディスカッションが見つかりませんでした！",
+		"noPostFound": "投稿が見つかりません",
+		"notAuthorized": "この投稿をリンクする権限がありません。",
+		"discussionPostLinkedSuccessfully": "ディスカッション投稿が正常にリンクされました",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "ディスカッション投稿が提案にリンクされました",
+		"errorLinkingDiscussionPost": "ディスカッション投稿のリンクエラー",
+		"pleaseTryAgain": "もう一度お試しください",
+		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
+		"yourDiscussions": "あなたのディスカッション",
+		"confirm": "確認"
 	}
 }

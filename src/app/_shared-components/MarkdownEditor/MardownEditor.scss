@@ -223,7 +223,7 @@
 	-ms-overflow-style: none;
 	scrollbar-width: none;
 
-	@apply h-9;
+	@apply h-9 overflow-y-hidden;
 	/* Add styling for toolbar buttons */
 	button {
 		@apply flex cursor-pointer items-center justify-center;

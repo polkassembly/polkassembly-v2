@@ -24,7 +24,8 @@ export enum ESocial {
 	RIOT = 'riot',
 	TWITTER = 'twitter',
 	TELEGRAM = 'telegram',
-	DISCORD = 'discord'
+	DISCORD = 'discord',
+	GITHUB = 'github'
 }
 
 export interface ITrackCounts {
@@ -39,12 +40,12 @@ export interface IUserSocialDetails {
 export enum EUserBadge {
 	DECENTRALISED_VOICE = 'decentralised_voice',
 	FELLOW = 'fellow',
-	COUNCIL = 'council',
+	COUNCIL = 'council_member',
 	ACTIVE_VOTER = 'active_voter',
-	WHALE = 'whale'
-	// STEADFAST_COMMENTOR = 'Steadfast Commentor',
-	// GM_VOTER = 'GM Voter',
-	// POPULAR_DELEGATE = 'Popular Delegate'
+	WHALE = 'whale',
+	STEADFAST_COMMENTOR = 'steadfast_commentor',
+	GM_VOTER = 'gm_voter',
+	POPULAR_DELEGATE = 'popular_delegate'
 }
 
 export interface IUserBadgeDetails {
@@ -426,6 +427,7 @@ export interface IOffChainPost {
 	publicUser?: IPublicUser;
 	topic?: EOffChainPostTopic;
 	history?: IOffChainContentHistoryItem[];
+	isDefaultContent?: boolean;
 }
 
 export enum EProposalStatus {
@@ -862,7 +864,8 @@ export enum EProfileTabs {
 	ACTIVITY = 'activity',
 	ACCOUNTS = 'accounts',
 	SETTINGS = 'settings',
-	VOTES = 'votes'
+	VOTES = 'votes',
+	POSTS = 'posts'
 }
 
 export interface IPreimage {
@@ -1119,12 +1122,6 @@ export enum EDelegationStatus {
 	UNDELEGATED = 'undelegated'
 }
 
-export interface ITrackDelegationStats {
-	trackId: number;
-	status: EDelegationStatus;
-	activeProposalsCount: number;
-}
-
 export interface IPostWithDelegateVote extends IPostListing {
 	delegateVote?: IVoteData;
 }
@@ -1137,6 +1134,12 @@ interface ITrackDelegation {
 	endsAt: Date;
 }
 
+export interface ITrackDelegationStats {
+	trackId: number;
+	status: EDelegationStatus;
+	activeProposalsCount: number;
+	delegations?: ITrackDelegation[];
+}
 export interface ITrackDelegationDetails {
 	receivedDelegations?: ITrackDelegation[];
 	delegatedTo?: ITrackDelegation[];
@@ -1233,4 +1236,38 @@ export interface ITrackAnalyticsDelegations {
 	totalDelegators: number;
 	delegateesData: ITrackAnalyticsDelegationsList;
 	delegatorsData: ITrackAnalyticsDelegationsList;
+}
+
+export interface IParachain {
+	id: number;
+	name: string;
+	chain: string;
+	status: string;
+	badges: string[];
+	token: string;
+	logoURL: string;
+	w3fGrant: {
+		received: number;
+		completed: number;
+		milestoneText: string;
+		terminated: boolean;
+		terminationReason: string;
+	};
+	investorsCount: number;
+	githubURL: string;
+}
+
+export enum EHttpHeaderKey {
+	SKIP_CACHE = 'x-skip-cache',
+	TOOLS_PASSPHRASE = 'x-tools-passphrase',
+	NETWORK = 'x-network'
+}
+
+export type PostListingResponse = IGenericListingResponse<IPostListing>;
+
+export interface IUserPosts {
+	/** Posts created directly on Polkassembly (off-chain) */
+	offchainPostsResponse: PostListingResponse;
+	/** Posts related to on-chain proposals/referenda */
+	onchainPostsResponse: PostListingResponse;
 }

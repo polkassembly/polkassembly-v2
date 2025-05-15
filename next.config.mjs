@@ -29,6 +29,23 @@ const nextConfig = {
 			}
 		];
 	},
+	async redirects() {
+		return [
+			{
+				source: '/opengov',
+				destination: '/',
+				permanent: true
+			}
+		];
+	},
+	async rewrites() {
+		return [
+			{
+				source: '/api/v1/:path*',
+				destination: 'https://polkadot-old.polkassembly.io/api/v1/:path*'
+			}
+		];
+	},
 	images: {
 		remotePatterns: [
 			{

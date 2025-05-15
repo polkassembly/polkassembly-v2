@@ -4,7 +4,7 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
-import { EWebhookEvent } from '../types';
+import { EHttpHeaderKey, EWebhookEvent } from '../types';
 import { CACHE_REFRESH_NETWORKS } from '../constants';
 
 export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase: string }) {
@@ -15,12 +15,12 @@ export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase
 
 				// TODO: `https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 				const response = await axios.post(
-					`https://test.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
+					`https://poladot.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 					{}, // Empty body
 					{
 						headers: {
-							'x-tools-passphrase': toolsPassphrase,
-							'x-network': network // Add network to headers
+							[EHttpHeaderKey.TOOLS_PASSPHRASE]: toolsPassphrase,
+							[EHttpHeaderKey.NETWORK]: network // Add network to headers
 						}
 					}
 				);

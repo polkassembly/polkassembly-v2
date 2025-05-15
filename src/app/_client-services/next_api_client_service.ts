@@ -38,15 +38,16 @@ import {
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
 	ISocialHandle,
-	IVoteHistoryData,
 	ITreasuryStats,
 	IContentSummary,
 	IAddressRelations,
 	IVoteCurve,
 	EGovType,
 	IUserVote,
-	ITrackAnalyticsDelegations,
-	ITrackAnalyticsStats
+	ITrackAnalyticsStats,
+	IVoteHistoryData,
+	IUserPosts,
+	ITrackAnalyticsDelegations
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -54,6 +55,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { getCookieHeadersServer } from '@/_shared/_utils/getCookieHeadersServer';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
@@ -120,11 +122,12 @@ enum EApiRoute {
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_USER_VOTES = 'GET_USER_VOTES',
-	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS'
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
+	GET_USER_POSTS = 'GET_USER_POSTS'
 }
 
 export class NextApiClientService {
@@ -194,6 +197,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 			case EApiRoute.GET_USER_VOTES:
+			case EApiRoute.GET_USER_POSTS:
 				path = '/users/address';
 				break;
 
@@ -438,7 +442,8 @@ export class NextApiClientService {
 		statuses,
 		origins = [],
 		tags = [],
-		limit = DEFAULT_LISTING_LIMIT
+		limit = DEFAULT_LISTING_LIMIT,
+		userId
 	}: {
 		proposalType: string;
 		page: number;
@@ -446,6 +451,7 @@ export class NextApiClientService {
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
+		userId?: number;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
 		if (this.isServerSide()) {
@@ -458,7 +464,8 @@ export class NextApiClientService {
 				limit,
 				statuses,
 				origins,
-				tags
+				tags,
+				userId
 			});
 
 			if (cachedData) {
@@ -470,6 +477,10 @@ export class NextApiClientService {
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
+
+		if (userId) {
+			queryParams.set('userId', userId.toString());
+		}
 
 		if (limit) {
 			queryParams.set('limit', limit.toString());
@@ -866,6 +877,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
 	}
 
+	static async getPADelegateManifesto({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_DELEGATES, routeSegments: [address] });
+		return this.nextApiClientFetch<IDelegateDetails>({ url, method });
+	}
+
 	static async getDelegateTracks({ address }: { address: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
@@ -976,5 +992,73 @@ export class NextApiClientService {
 	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
+	}
+
+	static async fetchOverviewData(): Promise<{
+		allTracks: { data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null };
+		treasuryStats: { data: ITreasuryStats[] | null; error: IErrorResponse | null };
+	}> {
+		const currentNetwork = await this.getCurrentNetwork();
+
+		if (this.isServerSide()) {
+			const cachedOverviewData = await redisServiceSSR('GetOverviewPageData', {
+				network: currentNetwork
+			});
+
+			if (cachedOverviewData) {
+				return {
+					allTracks: {
+						data: cachedOverviewData.allTracks,
+						error: null
+					},
+					treasuryStats: {
+						data: cachedOverviewData.treasuryStats,
+						error: null
+					}
+				};
+			}
+		}
+
+		const [allTracksResponse, treasuryStatsResponse] = await Promise.all([
+			this.fetchListingData({
+				proposalType: EProposalType.REFERENDUM_V2,
+				limit: DEFAULT_LISTING_LIMIT,
+				page: 1
+			}),
+			this.getTreasuryStats({
+				from: dayjs().subtract(1, 'hour').toDate(),
+				to: dayjs().toDate()
+			})
+		]);
+
+		if (allTracksResponse.data && treasuryStatsResponse.data) {
+			await redisServiceSSR('SetOverviewPageData', {
+				network: currentNetwork,
+				data: {
+					allTracks: allTracksResponse.data,
+					treasuryStats: treasuryStatsResponse.data
+				}
+			});
+		}
+
+		return {
+			allTracks: {
+				data: allTracksResponse.data,
+				error: allTracksResponse.error
+			},
+			treasuryStats: {
+				data: treasuryStatsResponse.data,
+				error: treasuryStatsResponse.error
+			}
+		};
+	}
+
+	static async getUserPosts({ address, page, limit }: { address: string; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
+		return this.nextApiClientFetch<IUserPosts>({ url, method });
 	}
 }

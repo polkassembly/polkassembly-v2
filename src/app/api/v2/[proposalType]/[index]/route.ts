@@ -7,7 +7,7 @@ import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { EAllowedCommentor, EProposalType, IPost } from '@shared/types';
+import { EAllowedCommentor, EHttpHeaderKey, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { RedisService } from '@/app/api/_api-services/redis_service';
@@ -17,6 +17,8 @@ import { updatePostServer } from '@/app/api/_api-utils/updatePostServer';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
+import { headers } from 'next/headers';
+import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -27,7 +29,10 @@ const zodParamsSchema = z.object({
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPost>> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
-	const network = await getNetworkFromHeaders();
+
+	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
+	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
 
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
@@ -47,8 +52,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		isUserAuthenticated = false;
 	}
 
-	// Get post data from cache
-	let post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
+	// Get post data from cache only if skipCache is not true or toolsPassphrase is not provided
+	let post = null;
+	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+		post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
+	}
 
 	if (post) {
 		const response = NextResponse.json(post);
@@ -150,6 +158,7 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network });
 	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
+	await RedisService.DeleteOverviewPageData({ network });
 
 	const response = NextResponse.json({ message: 'Post deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));

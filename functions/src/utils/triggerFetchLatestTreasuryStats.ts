@@ -4,6 +4,7 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
+import { EHttpHeaderKey } from '../types';
 import { TREASURY_STATS_NETWORKS } from '../constants';
 
 export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { toolsPassphrase: string }) {
@@ -14,12 +15,12 @@ export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { too
 
 				// TODO: `https://${network}.polkassembly.io/api/v2/meta/treasury-stats`,
 				const response = await axios.post(
-					'https://test.polkassembly.io/api/v2/meta/treasury-stats',
+					'https://polkadot.polkassembly.io/api/v2/meta/treasury-stats',
 					{}, // Empty body
 					{
 						headers: {
-							'x-tools-passphrase': toolsPassphrase,
-							'x-network': network // Add network to headers
+							[EHttpHeaderKey.TOOLS_PASSPHRASE]: toolsPassphrase,
+							[EHttpHeaderKey.NETWORK]: network // Add network to headers
 						}
 					}
 				);

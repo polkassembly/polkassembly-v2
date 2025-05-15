@@ -97,7 +97,7 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
-		"chooseLinkedAccount": "Choose Linked Account",
+		"chooseLinkedAccount": "Choose Account",
 		"noAccountsFound": "No Accounts Found",
 		"selectWallet": "Please Select Wallet",
 		"fetchingAddresses": "For fetching your addresses, Polkassembly needs access to your wallet extensions. Please authorize this transaction.",
@@ -153,6 +153,8 @@
 		"loginwithusername": "Login with Username",
 		"loginToPolkassembly": "Login to Polkassembly",
 		"profile": "Profile",
+		"votes": "Votes",
+		"posts": "Posts",
 		"activity": "Activity",
 		"accounts": "Accounts",
 		"delegate": "Delegate",
@@ -174,6 +176,25 @@
 			"viewVote": "View Vote",
 			"openGov": "OpenGov",
 			"gov1": "Gov1"
+		},
+		"Delegations": {
+			"noDelegations": "No Delegations Found",
+			"delegation": "Delegation",
+			"receivedDelegations": "Received Delegations",
+			"index": "Index",
+			"delegatedDelegations": "Delegated",
+			"delegatedBy": "Delegated By",
+			"delegatedTo": "Delegated To",
+			"votingPower": "Voting Power",
+			"conviction": "Conviction",
+			"manifesto": "Delegation Manifesto",
+			"capital": "Capital",
+			"tracks": "Tracks",
+			"votes": "Votes",
+			"multiple": "Multiple",
+			"VP": "VP",
+			"CA": "CA",
+			"CO": "CO"
 		},
 		"Activity": {
 			"voted_on_proposal": "Voted",
@@ -230,6 +251,12 @@
 			"unlinked_multiple_addresses": "Unlinked Multiple Addresses",
 			"followed_user": "Followed User",
 			"unfollowed_user": "Unfollowed User"
+		},
+		"Posts": {
+			"posts": "Posts",
+			"discussions": "Discussions",
+			"openGov": "OpenGov",
+			"noData": "No posts found"
 		},
 		"overview": "Overview",
 		"onchainIdentity": "Onchain Identity",
@@ -636,6 +663,19 @@
 		"save": "Save",
 		"editPostButton": "Edit"
 	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Link Discussion",
+		"noDiscussionsFound": "We couldn't find any discussion to be linked!",
+		"noPostFound": "No post found",
+		"notAuthorized": "You are not authorized to link this post.",
+		"discussionPostLinkedSuccessfully": "Discussion post linked successfully",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "The discussion post has been linked to the proposal",
+		"errorLinkingDiscussionPost": "Error linking discussion post",
+		"pleaseTryAgain": "Please try again",
+		"pasteURLorEnterPostID": "Paste URL or Enter Post ID",
+		"yourDiscussions": "Your Discussions",
+		"confirm": "Confirm"
+	},
 	"Footer": {
 		"helpCenter": "Help Center",
 		"reportAnIssue": "Report an Issue",
@@ -705,7 +745,10 @@
 		"please": "Please",
 		"login": "Login",
 		"toCreateProposal": "to create a Proposal",
-		"toCreateDiscussion": "to create a Discussion"
+		"toCreateDiscussion": "to create a Discussion",
+		"discussionCreatedSuccessfully": "Discussion created successfully",
+		"discussionCreationFailed": "Failed to create discussion",
+		"discussionCreationFailedDescription": "There was an error while creating the discussion"
 	},
 	"ProposalType": {
 		"discussion": "Discussion",
@@ -1161,6 +1204,24 @@
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
 		"clearFilters": "Clear Filters"
+	},
+	"Parachains": {
+		"projects": "Projects",
+		"index": "Index",
+		"status": "Status",
+		"token": "Token",
+		"w3f": "W3F",
+		"investors": "Investors",
+		"github": "Github",
+		"inAuction": "In Auction",
+		"testing": "Testing",
+		"announced": "Announced",
+		"live": "Live",
+		"parachainsDirectory": "Polkadot and Kusama ecosystem and directory",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "of Total Supply Locked in Parachains and Crowdloans",
+		"auction": "Auction",
+		"crowdloans": "Crowdloans",
+		"parachains": "Parachains"
 	},
 	"TrackAnalytics": {
 		"proposalsCreated": "Proposals Created",

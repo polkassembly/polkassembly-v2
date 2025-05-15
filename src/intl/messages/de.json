@@ -153,6 +153,8 @@
 		"loginToPolkassembly": "Bei Polkassembly anmelden",
 		"profile": "Profil",
 		"activity": "Aktivität",
+		"votes": "Abstimmungen",
+		"posts": "Beiträge",
 		"accounts": "Konten",
 		"delegate": "Delegieren",
 		"follow": "Folgen",
@@ -170,6 +172,22 @@
 			"viewVote": "Stimme anzeigen",
 			"openGov": "OpenGov",
 			"gov1": "Gov1"
+		},
+		"Delegations": {
+			"noDelegations": "Keine Delegationen gefunden",
+			"delegation": "Delegation",
+			"receivedDelegations": "Empfangene Delegationen",
+			"delegatedDelegations": "Delegierte Delegationen",
+			"delegatedBy": "Delegierte von",
+			"delegatedTo": "Delegierte an",
+			"votingPower": "Stimmen",
+			"capital": "Kapital",
+			"tracks": "Tracks",
+			"votes": "Stimmen",
+			"multiple": "Mehrere",
+			"VP": "VP",
+			"CA": "CA",
+			"CO": "CO"
 		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
@@ -226,6 +244,12 @@
 			"unlinked_multiple_addresses": "Mehrere Adressen getrennt",
 			"followed_user": "Benutzer folgen",
 			"unfollowed_user": "Benutzer entfolgen"
+		},
+		"Posts": {
+			"posts": "Beiträge",
+			"discussions": "Diskussionsbeiträge",
+			"OpenGov": "Offchain-Beiträge",
+			"noData": "Keine Beiträge gefunden"
 		},
 		"overview": "Übersicht",
 		"onchainIdentity": "Onchain-Identität",
@@ -643,21 +667,25 @@
 		"createDiscussionTitle": "Diskussion erstellen",
 		"title": "Titel",
 		"description": "Beschreibung",
-		"addTagsPlaceholder": "Tags hinzufügen (Enter oder Komma drücken)",
 		"create": "Erstellen",
 		"createTag": "Tag erstellen",
 		"addTags": "Tags hinzufügen",
+		"addTagsPlaceholder": "Tags hinzufügen (Enter oder Komma drücken zum Hinzufügen)",
+		"remainingTagsPlaceholder": "{remaining} Tags übrig",
 		"searchTags": "Tags suchen",
 		"noTagsFound": "Keine Tags gefunden.",
 		"selectTags": "Tags auswählen",
 		"selectTopic": "Thema auswählen",
-		"tagsLeftText": "Verbleibende Tags",
+		"tagsLeftText": "Tags übrig",
+		"titleTooShort": "Bitte geben Sie einen gültigen Titel ein.",
+		"titlePlaceholder": "Titel eingeben",
+		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
 			"onchainVerified": "Onchain verifiziert",
-			"none": "Keine",
-			"tooltip": "Wählen Sie, wer kommentieren und auf diesen Beitrag antworten kann"
+			"none": "Niemand",
+			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten kann"
 		},
 		"Topic": {
 			"general": "Allgemein",
@@ -672,13 +700,13 @@
 			"democracy": "Demokratie",
 			"whitelist": "Whitelist"
 		},
-		"titleTooShort": "Bitte geben Sie einen gültigen Titel an.",
-		"titlePlaceholder": "Titel eingeben",
-		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung an.",
 		"please": "Bitte",
 		"login": "Anmelden",
 		"toCreateProposal": "um einen Vorschlag zu erstellen",
-		"toCreateDiscussion": "um eine Diskussion zu erstellen"
+		"toCreateDiscussion": "um eine Diskussion zu erstellen",
+		"discussionCreatedSuccessfully": "Diskussion erfolgreich erstellt",
+		"discussionCreationFailed": "Diskussion konnte nicht erstellt werden",
+		"discussionCreationFailedDescription": "Beim Erstellen der Diskussion ist ein Fehler aufgetreten"
 	},
 	"ProposalType": {
 		"discussion": "Diskussion",
@@ -1136,6 +1164,24 @@
 		"bountyAmount": "Kopfgeld-Betrag",
 		"proposeBounty": "Kopfgeld vorschlagen"
 	},
+	"Parachains": {
+		"projects": "Projekte",
+		"index": "Index",
+		"status": "Status",
+		"token": "Token",
+		"w3f": "W3F",
+		"investors": "Investoren",
+		"github": "Github",
+		"inAuction": "In Auktion",
+		"testing": "Testen",
+		"announced": "Angekündigt",
+		"live": "Live",
+		"parachainsDirectory": "Polkadot und Kusama-Ökosystem und Verzeichnis",
+		"ofTotalSupplyLockedInParachainsAndCrowdloans": "von Gesamtversorgung in Parachains und Crowdloans gesperrt",
+		"auction": "Auktion",
+		"crowdloans": "Crowdloans",
+		"parachains": "Parachains"
+	},
 	"TrackAnalytics": {
 		"proposalsCreated": "Erstellte Vorschläge",
 		"activeProposals": "Aktive Vorschläge",
@@ -1153,5 +1199,18 @@
 		"votes": "Stimmen",
 		"voteDetails": "Abstimmungsdetails",
 		"target": "Ziel"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Diskussion verlinken",
+		"noDiscussionsFound": "Wir konnten keine zu verlinkende Diskussion finden!",
+		"noPostFound": "Kein Beitrag gefunden",
+		"notAuthorized": "Sie sind nicht berechtigt, diesen Beitrag zu verlinken.",
+		"discussionPostLinkedSuccessfully": "Diskussionsbeitrag erfolgreich verlinkt",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "Der Diskussionsbeitrag wurde mit dem Vorschlag verlinkt",
+		"errorLinkingDiscussionPost": "Fehler beim Verlinken des Diskussionsbeitrags",
+		"pleaseTryAgain": "Bitte versuchen Sie es erneut",
+		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
+		"yourDiscussions": "Ihre Diskussionen",
+		"confirm": "Bestätigen"
 	}
 }

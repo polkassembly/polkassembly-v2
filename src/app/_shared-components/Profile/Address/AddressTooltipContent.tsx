@@ -187,7 +187,8 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 						{isUserDataLoading ? (
 							<Skeleton className='mt-2 h-10 w-full rounded-3xl' />
 						) : (
-							userData && (
+							userData &&
+							userData.id !== currentUser?.id && (
 								<Button
 									size='lg'
 									className='mt-2 rounded-3xl'

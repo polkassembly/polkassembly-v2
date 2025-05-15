@@ -7,7 +7,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useWalletService } from '@/hooks/useWalletService';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { EWallet, EAccountType } from '@/_shared/types';
+import { EWallet } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { X } from 'lucide-react';
@@ -32,7 +32,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState('');
 
-	const { userPreferences, setUserPreferences } = useUserPreferences();
+	const { userPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
 
@@ -45,14 +45,6 @@ export default function AddressInput({ placeholder, onChange, className, disable
 		}
 
 		setAccounts(injectedAccounts);
-		setUserPreferences({
-			...userPreferences,
-			selectedAccount: {
-				...injectedAccounts[0],
-				wallet: chosenWallet,
-				accountType: EAccountType.REGULAR
-			}
-		});
 	};
 
 	useEffect(() => {
@@ -134,7 +126,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 						filteredOptions.map((account) => (
 							<button
 								key={account.address}
-								className='cursor-pointer p-2 hover:bg-gray-100'
+								className='cursor-pointer rounded-lg p-2 hover:bg-border_grey'
 								onClick={() => {
 									onAccountChange(account);
 									setIsOpen(false);

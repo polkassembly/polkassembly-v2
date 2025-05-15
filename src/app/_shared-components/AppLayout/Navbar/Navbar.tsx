@@ -61,10 +61,12 @@ function Navbar() {
 	return (
 		<nav className={classes.navbar}>
 			<div className='flex items-center pl-12 md:pl-0'>
-				<PaLogo
-					variant='full'
-					className='w-[120px] md:hidden'
-				/>
+				<Link href='/'>
+					<PaLogo
+						variant='full'
+						className='w-[120px] md:hidden'
+					/>
+				</Link>
 				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 

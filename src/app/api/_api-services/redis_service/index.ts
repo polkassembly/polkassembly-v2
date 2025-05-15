@@ -18,12 +18,24 @@ import {
 	IPost,
 	IPostListing,
 	ITrackAnalyticsDelegations,
-	ITrackAnalyticsStats
+	ITrackAnalyticsStats,
+	ITreasuryStats
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { FIVE_MIN, ONE_DAY, ONE_HOUR_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS } from '../../_api-constants/timeConstants';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import dayjs from 'dayjs';
+import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
+import {
+	FIVE_MIN,
+	HALF_HOUR_IN_SECONDS,
+	ONE_DAY,
+	ONE_HOUR_IN_SECONDS,
+	REFRESH_TOKEN_LIFE_IN_SECONDS,
+	SIX_HOURS_IN_SECONDS,
+	THREE_DAYS_IN_SECONDS
+} from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
@@ -45,7 +57,9 @@ enum ERedisKeys {
 	DELEGATION_STATS = 'DGS',
 	DELEGATE_DETAILS = 'DLD',
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
-	TRACK_ANALYTICS_STATS = 'TAS'
+	TRACK_ANALYTICS_STATS = 'TAS',
+	TREASURY_STATS = 'TRS',
+	OVERVIEW_PAGE_DATA = 'OPD'
 }
 
 export class RedisService {
@@ -75,8 +89,17 @@ export class RedisService {
 		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
 		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: string, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
-			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
+		[ERedisKeys.POSTS_LISTING]: (
+			network: string,
+			proposalType: string,
+			page: number,
+			limit: number,
+			statuses?: string[],
+			origins?: string[],
+			tags?: string[],
+			userId?: number
+		): string => {
+			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}-${userId}`;
 			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
@@ -96,7 +119,9 @@ export class RedisService {
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
-		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`
+		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
+		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
 	} as const;
 
 	// helper methods
@@ -272,10 +297,13 @@ export class RedisService {
 	}
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
+		const isActivePost = data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status);
+		const isActiveOffChainPost = ValidatorService.isValidOffChainProposalType(data.proposalType) && dayjs().diff(dayjs(data.createdAt), 'days') <= OFF_CHAIN_POST_ACTIVE_DAYS;
+
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status) ? ONE_HOUR_IN_SECONDS : ONE_DAY
+			ttlSeconds: isActivePost || isActiveOffChainPost ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
 		});
 	}
 
@@ -290,7 +318,8 @@ export class RedisService {
 		limit,
 		statuses,
 		origins,
-		tags
+		tags,
+		userId
 	}: {
 		network: string;
 		proposalType: string;
@@ -299,8 +328,9 @@ export class RedisService {
 		statuses?: string[];
 		origins?: string[];
 		tags?: string[];
+		userId?: number;
 	}): Promise<IGenericListingResponse<IPostListing> | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags, userId) });
 		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 
@@ -446,6 +476,11 @@ export class RedisService {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
 		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
+		// clear overview page data
+		await this.DeleteOverviewPageData({ network });
+
+		// clear treasury stats
+		await this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` });
 	}
 
 	// QR session caching methods
@@ -521,5 +556,39 @@ export class RedisService {
 
 	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
+	}
+
+	// Treasury stats caching methods
+	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<ITreasuryStats[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
+		return data ? (deepParseJson(data) as ITreasuryStats[]) : null;
+	}
+
+	static async SetTreasuryStats({ network, from, to, data }: { network: ENetwork; from: string; to: string; data?: ITreasuryStats[] }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
+	}
+
+	// Overview page caching methods
+	static async GetOverviewPageData({ network }: { network: ENetwork }): Promise<{ allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+		return data ? (deepParseJson(data) as { allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] }) : null;
+	}
+
+	static async SetOverviewPageData({
+		network,
+		data
+	}: {
+		network: ENetwork;
+		data: { allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] };
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
 	}
 }

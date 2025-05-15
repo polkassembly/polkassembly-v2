@@ -45,5 +45,23 @@ export const achievementBadges: Record<EUserBadge, IBadge> = {
 		image: Whale,
 		displayName: 'Whale',
 		description: ''
+	},
+	[EUserBadge.STEADFAST_COMMENTOR]: {
+		name: EUserBadge.STEADFAST_COMMENTOR,
+		image: Whale,
+		displayName: 'Steadfast Commentor',
+		description: ''
+	},
+	[EUserBadge.GM_VOTER]: {
+		name: EUserBadge.GM_VOTER,
+		image: Whale,
+		displayName: 'GM Voter',
+		description: ''
+	},
+	[EUserBadge.POPULAR_DELEGATE]: {
+		name: EUserBadge.POPULAR_DELEGATE,
+		image: Whale,
+		displayName: 'Popular Delegate',
+		description: ''
 	}
 };

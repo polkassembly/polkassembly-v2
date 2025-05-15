@@ -32,7 +32,8 @@ const SocialIcons = {
 	[ESocial.TWITTER]: TwitterIcon,
 	[ESocial.TELEGRAM]: TelegramIcon,
 	[ESocial.DISCORD]: TelegramIcon,
-	[ESocial.RIOT]: TelegramIcon
+	[ESocial.RIOT]: TelegramIcon,
+	[ESocial.GITHUB]: TelegramIcon
 };
 
 function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userProfileData: IPublicUser; handleUserProfileDataChange: (data: IPublicUser) => void }) {
@@ -269,15 +270,15 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 				</TabsTrigger>
 				<TabsTrigger
 					className='uppercase'
-					value={EProfileTabs.VOTES}
+					value={EProfileTabs.POSTS}
 				>
-					{t('Profile.Votes.votes')}
+					{t('Profile.Posts.posts')}
 				</TabsTrigger>
 				<TabsTrigger
 					className='uppercase'
-					value={EProfileTabs.ACTIVITY}
+					value={EProfileTabs.VOTES}
 				>
-					{t('Profile.activity')}
+					{t('Profile.Votes.votes')}
 				</TabsTrigger>
 				<TabsTrigger
 					className='uppercase'

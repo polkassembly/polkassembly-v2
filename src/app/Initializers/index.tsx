@@ -5,7 +5,7 @@
 'use client';
 
 import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
@@ -42,8 +42,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const currentRefreshTokenPayload = CookieClientService.getRefreshTokenPayload();
 
 	const [refreshTokenData, setRefreshTokenData] = useState<IRefreshTokenPayload | null>(currentRefreshTokenPayload);
+	const debounceTimeoutRef = useRef<number | null>(null);
 
-	const refreshAccessToken = async () => {
+	const refreshAccessToken = useCallback(async () => {
 		const { data, error } = await AuthClientService.refreshAccessToken();
 
 		if (error && !data) {
@@ -59,9 +60,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		if (newRefreshTokenPayload) {
 			setRefreshTokenData(newRefreshTokenPayload);
 		}
-	};
+	}, [setUser]);
 
-	const restablishConnections = () => {
+	const restablishConnections = useCallback(() => {
 		if (document.visibilityState === 'hidden') return;
 
 		polkadotApi?.reconnect();
@@ -76,17 +77,34 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 			AuthClientService.logout(() => setUser(null));
 		}
-	};
+	}, [assethubApi, identityApi, polkadotApi, refreshAccessToken, refreshTokenData, user, setUser]);
+
+	// Throttled with a 1 second delay
+	const throttledRestablishConnections = useCallback(() => {
+		let timeoutId: number;
+		return () => {
+			if (timeoutId) window.clearTimeout(timeoutId);
+			timeoutId = window.setTimeout(() => {
+				restablishConnections();
+			}, 1000);
+		};
+	}, [restablishConnections])();
 
 	// restablish connections
 	useEffect(() => {
-		document.addEventListener('visibilitychange', restablishConnections);
+		document.addEventListener('visibilitychange', throttledRestablishConnections);
+
+		// Capture ref value inside effect body
+		const timeoutId = debounceTimeoutRef.current;
 
 		return () => {
-			document.removeEventListener('visibilitychange', restablishConnections);
+			document.removeEventListener('visibilitychange', throttledRestablishConnections);
+			// Clean up using captured value
+			if (timeoutId !== null) {
+				window.clearTimeout(timeoutId);
+			}
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user]);
+	}, [throttledRestablishConnections]);
 
 	// init identity api
 	useEffect(() => {

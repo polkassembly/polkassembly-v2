@@ -1,0 +1,19 @@
+.parachainsPage {
+	@apply mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16;
+}
+
+.parachainsTable {
+	@apply max-h-[500px] overflow-y-auto;
+}
+
+.parachainBadge {
+	@apply bg-parachain_badge_bg text-[12px] text-btn_primary_text;
+}
+
+.parachainStatus {
+	@apply flex items-center gap-4 text-text_primary;
+}
+
+.tooltipContent {
+	@apply relative z-50 m-0 mt-5 rounded-md bg-address_tooltip_bg px-4 py-2 text-text_primary shadow-lg;
+}
