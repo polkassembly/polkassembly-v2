@@ -304,7 +304,7 @@ export class AIService {
 			return null;
 		}
 
-		console.log('spam check response', response);
+		console.log('spam check response: ', response);
 
 		return result.toLowerCase() === 'true';
 	}
@@ -330,7 +330,46 @@ export class AIService {
 	}
 
 	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
+		console.log('Updating post summary', { network, proposalType, indexOrHash });
+
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType, getDefaultContent: false });
+
+		// check if content summary already exists
+		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
+
+		let isSpam: boolean | null = null;
+
+		// only check for spam if post is off-chain
+		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
+			isSpam = await this.getContentSpamCheck({
+				mdContent: offChainPostData.content,
+				title: offChainPostData.title
+			});
+		}
+
+		// if post is spam, no need to generate post summary
+		if (isSpam) {
+			// TODO: send appropriate notifications if content is spam
+
+			// TODO: set isDeleted to true for the post
+			const contentSummary: IContentSummary = {
+				id: existingContentSummary?.id || '', // if new will be set by firestore
+				network,
+				indexOrHash,
+				proposalType,
+				isSpam: true,
+				postSummary: 'This post is spam/scam/fake news',
+				createdAt: existingContentSummary?.createdAt || new Date(),
+				updatedAt: new Date()
+			};
+
+			await OffChainDbService.UpdateContentSummary(contentSummary);
+
+			// clear cache for the content summary
+			await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
+
+			return contentSummary;
+		}
 
 		let onChainPostInfo: IOnChainPostInfo | null = null;
 		if (ValidatorService.isValidOnChainProposalType(proposalType)) {
@@ -353,23 +392,8 @@ export class AIService {
 			}
 		});
 
-		// only check for spam if post is off-chain
-		let isSpam = null;
-
-		if (!ValidatorService.isValidOnChainProposalType(proposalType)) {
-			isSpam = await this.getContentSpamCheck({
-				mdContent: offChainPostData.content,
-				title: offChainPostData.title
-			});
-		}
-
 		// if neither of AI generated stuff is usable, don't update anything
-		if (!postSummary?.trim() && !isSpam) return null;
-
-		// TODO: send appropriate notifications if content is spam
-
-		// check if content summary already exists
-		const existingContentSummary = await OffChainDbService.GetContentSummary({ network, indexOrHash, proposalType });
+		if (!postSummary?.trim()) return null;
 
 		const updatedContentSummary: IContentSummary = {
 			id: existingContentSummary?.id || '', // if new will be set by firestore
@@ -377,7 +401,6 @@ export class AIService {
 			indexOrHash,
 			proposalType,
 			...(postSummary && { postSummary }),
-			...(isSpam && { isSpam }),
 			...(existingContentSummary?.commentsSummary && { commentsSummary: existingContentSummary.commentsSummary }),
 			createdAt: existingContentSummary?.createdAt || new Date(),
 			updatedAt: new Date()
