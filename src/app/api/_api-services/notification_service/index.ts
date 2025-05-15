@@ -61,20 +61,7 @@ export class NotificationService {
 	}
 
 	static async SendVerificationEmail(user: IUser, token: string, email?: string): Promise<void> {
-		if (
-			!email ||
-			![
-				'aadarsh@polkassembly.io',
-				'aadarsh012@gmail.com',
-				'aadarshshaw24@gmail.com',
-				'mridul@polkassembly.io',
-				'bhavya@polkassembly.io',
-				'aditi@polkassembly.io',
-				'anurag@polkassembly.io',
-				'aleem@polkassembly.io'
-			].includes(email)
-		)
-			return;
+		if (!email) return;
 
 		await this.sendNotification({
 			network: user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK,
@@ -82,7 +69,6 @@ export class NotificationService {
 			args: {
 				email: email || user.email,
 				verifyUrl: `${VERIFICATION_CALLBACK_URL}?social=${ESocial.EMAIL}&token=${token}`
-				// verifyUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/verify-email?token=${token}`
 			}
 		});
 	}
