@@ -15,7 +15,7 @@ export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase
 
 				// TODO: `https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 				const response = await axios.post(
-					`https://test.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
+					`https://poladot.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
 					{}, // Empty body
 					{
 						headers: {

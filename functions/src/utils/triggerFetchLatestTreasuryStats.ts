@@ -15,7 +15,7 @@ export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { too
 
 				// TODO: `https://${network}.polkassembly.io/api/v2/meta/treasury-stats`,
 				const response = await axios.post(
-					'https://test.polkassembly.io/api/v2/meta/treasury-stats',
+					'https://polkadot.polkassembly.io/api/v2/meta/treasury-stats',
 					{}, // Empty body
 					{
 						headers: {
