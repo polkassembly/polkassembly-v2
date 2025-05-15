@@ -240,6 +240,12 @@
 			"followed_user": "Followed User",
 			"unfollowed_user": "Unfollowed User"
 		},
+		"Posts": {
+			"posts": "Posts",
+			"discussions": "Discussions",
+			"openGov": "OpenGov",
+			"noData": "No posts found"
+		},
 		"overview": "Overview",
 		"onchainIdentity": "Onchain Identity",
 		"linkAddress": "Link Address",

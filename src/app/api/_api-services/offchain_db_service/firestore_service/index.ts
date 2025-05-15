@@ -1526,4 +1526,19 @@ export class FirestoreService extends FirestoreUtils {
 			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
 		}
 	}
+
+	static async GetPostsByUserId({ userId, network, page, limit, proposalType }: { userId: number; network: ENetwork; page: number; limit: number; proposalType: EProposalType }) {
+		const postRef = this.postsCollectionRef().where('userId', '==', userId).where('network', '==', network).where('proposalType', '==', proposalType);
+		const totalCount = await postRef.count().get();
+		const posts = await postRef
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit)
+			.get();
+
+		return {
+			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
+			totalCount: totalCount.data().count
+		};
+	}
 }

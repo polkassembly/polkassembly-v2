@@ -233,6 +233,12 @@
 			"followed_user": "Benutzer folgen",
 			"unfollowed_user": "Benutzer entfolgen"
 		},
+		"Posts": {
+			"posts": "Beiträge",
+			"discussions": "Diskussionsbeiträge",
+			"OpenGov": "Offchain-Beiträge",
+			"noData": "Keine Beiträge gefunden"
+		},
 		"overview": "Übersicht",
 		"onchainIdentity": "Onchain-Identität",
 		"linkAddress": "Adresse verknüpfen",
