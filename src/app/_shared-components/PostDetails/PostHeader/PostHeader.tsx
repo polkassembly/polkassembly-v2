@@ -27,6 +27,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
+import { ArrowLeftIcon } from 'lucide-react';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -57,6 +58,18 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 
 	return (
 		<div className='mx-auto max-w-[100vw] lg:max-w-7xl'>
+			<Link
+				href={
+					postData.onChainInfo?.origin
+						? `/${postData.onChainInfo?.origin?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
+						: `/${postData.proposalType.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
+				}
+				className='mb-4 flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
+			>
+				<ArrowLeftIcon className='h-3 w-4' />
+				View all {postData.onChainInfo?.origin ? convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '') : `${postData.proposalType}s`}
+			</Link>
+
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
 					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (

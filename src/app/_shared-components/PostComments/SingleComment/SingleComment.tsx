@@ -159,7 +159,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 				)}
 			</div>
 			<div className={classes.innerWrapper}>
-				<div className='flex items-center gap-x-2'>
+				<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
 					<span className={classes.username}>
 						{comment.user.addresses[0] ? (
 							<Address
