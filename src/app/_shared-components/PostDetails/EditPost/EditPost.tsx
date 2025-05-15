@@ -31,16 +31,15 @@ function EditPost({
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const { user } = useUser();
 
+	const canEditOffChain = user && user.id === postData.userId;
+
+	const proposerAddress = postData.onChainInfo?.proposer && getSubstrateAddress(postData.onChainInfo?.proposer);
+	const canEditOnChain = user && proposerAddress && user.addresses.includes(proposerAddress);
+
+	const canEdit = canEditOffChain || canEditOnChain;
+
 	const editPost = async () => {
-		if (
-			!title.trim() ||
-			!content ||
-			!ValidatorService.isValidNumber(postData?.index) ||
-			!postData?.proposalType ||
-			!user ||
-			!user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')
-		)
-			return;
+		if (!title.trim() || !content || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;
 
 		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content)) return;
 
