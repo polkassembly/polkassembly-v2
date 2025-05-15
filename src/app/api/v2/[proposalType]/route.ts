@@ -61,7 +61,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 	// Only get from cache if not skipping cache
 	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
-		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags, userId });
+		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
 
 		if (cachedData) {
 			return NextResponse.json(cachedData);

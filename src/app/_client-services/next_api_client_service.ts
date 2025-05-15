@@ -450,7 +450,7 @@ export class NextApiClientService {
 		userId?: number;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
-		if (this.isServerSide()) {
+		if (this.isServerSide() && !ValidatorService.isValidNumber(userId)) {
 			const currentNetwork = await this.getCurrentNetwork();
 
 			const cachedData = await redisServiceSSR('GetPostsListing', {
@@ -460,8 +460,7 @@ export class NextApiClientService {
 				limit,
 				statuses,
 				origins,
-				tags,
-				userId
+				tags
 			});
 
 			if (cachedData) {
