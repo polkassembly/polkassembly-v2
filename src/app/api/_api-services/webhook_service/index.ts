@@ -14,6 +14,7 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import dayjs from 'dayjs';
 import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
@@ -163,8 +164,8 @@ export class WebhookService {
 			// 0. Prepare all URLs that need to be fetched
 			const fetchUrls: string[] = [];
 
-			// 1. Fetch and add active proposals details pages
-			const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
+			// 1. Fetch and add active refV2 details pages
+			const { items: activeRefV2Proposals } = await OnChainDbService.GetOnChainPostsListing({
 				network,
 				proposalType: EProposalType.REFERENDUM_V2,
 				limit: 100,
@@ -172,14 +173,31 @@ export class WebhookService {
 				statuses: ACTIVE_PROPOSAL_STATUSES
 			});
 
-			activeProposals.forEach((proposal) => {
+			// 2. Fetch and add active bounty details pages
+			const { items: activeBounties } = await OnChainDbService.GetOnChainPostsListing({
+				network,
+				proposalType: EProposalType.BOUNTY,
+				limit: 100,
+				page: 1,
+				statuses: ACTIVE_BOUNTY_STATUSES
+			});
+
+			activeRefV2Proposals.forEach((proposal) => {
 				const indexOrHash = proposal.index || proposal.hash;
 				const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
 
 				// proposal detail page
 				fetchUrls.push(proposalUrl);
 				// TODO: comments
-				fetchUrls.push(`${proposalUrl}/content-summary`);
+				// fetchUrls.push(`${proposalUrl}/content-summary`);
+			});
+
+			activeBounties.forEach((bounty) => {
+				const indexOrHash = bounty.index || bounty.hash;
+				const proposalUrl = `${baseUrl}/${EProposalType.BOUNTY}/${indexOrHash}`;
+
+				// proposal detail page
+				fetchUrls.push(proposalUrl);
 			});
 
 			// 2. add all active off-chain posts details pages
@@ -202,7 +220,7 @@ export class WebhookService {
 				// proposal detail page
 				fetchUrls.push(proposalUrl);
 				// TODO: comments
-				fetchUrls.push(`${proposalUrl}/content-summary`);
+				// fetchUrls.push(`${proposalUrl}/content-summary`);
 			});
 
 			// Add primary listing pages
@@ -248,7 +266,7 @@ export class WebhookService {
 			// 4. Execute all in parallel and ignore individual failures
 			await Promise.allSettled(fetchPromises);
 
-			console.log(`Cache refreshed for ${activeProposals.length} active proposals, all listing pages and track listing pages`);
+			console.log(`Cache refreshed for ${fetchUrls.length} proposals and listing pages.`);
 		} catch (error) {
 			console.error(`Error refreshing cache for network ${network}:`, error);
 		}
