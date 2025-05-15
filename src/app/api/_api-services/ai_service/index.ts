@@ -351,7 +351,8 @@ export class AIService {
 		if (isSpam) {
 			// TODO: send appropriate notifications if content is spam
 
-			// TODO: set isDeleted to true for the post
+			await OffChainDbService.DeleteOffChainPost({ network, proposalType, index: offChainPostData.index! });
+
 			const contentSummary: IContentSummary = {
 				id: existingContentSummary?.id || '', // if new will be set by firestore
 				network,

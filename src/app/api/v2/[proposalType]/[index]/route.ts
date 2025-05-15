@@ -151,7 +151,7 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 	}
 
-	await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash: index });
+	await OffChainDbService.DeleteOffChainPost({ network, proposalType, index: Number(index) });
 
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
