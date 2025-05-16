@@ -535,6 +535,20 @@ export class PolkadotApiService {
 		return this.api.tx.preimage.notePreimage(encodedTx);
 	}
 
+	getUnnotePreimageTx({ preimageHash }: { preimageHash: string }) {
+		if (!this.api || !preimageHash) {
+			return null;
+		}
+		return this.api.tx.preimage.unnotePreimage(preimageHash);
+	}
+
+	getUnRequestPreimageTx({ preimageHash }: { preimageHash: string }) {
+		if (!this.api || !preimageHash) {
+			return null;
+		}
+		return this.api.tx.preimage.unrequestPreimage(preimageHash);
+	}
+
 	async notePreimage({
 		address,
 		extrinsicFn,
@@ -559,6 +573,54 @@ export class PolkadotApiService {
 			tx: notePreimageTx,
 			address,
 			errorMessageFallback: 'Failed to note preimage',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: () => {
+				onFailed?.();
+			}
+		});
+	}
+
+	async unnotePreimage({ address, preimageHash, onSuccess, onFailed }: { address: string; preimageHash: string; onSuccess?: () => void; onFailed?: () => void }) {
+		if (!this.api) {
+			return;
+		}
+
+		const unnotePreimageTx = this.getUnnotePreimageTx({ preimageHash });
+		if (!unnotePreimageTx) {
+			onFailed?.();
+			return;
+		}
+		await this.executeTx({
+			tx: unnotePreimageTx,
+			address,
+			errorMessageFallback: 'Failed to unnote preimage',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: () => {
+				onFailed?.();
+			}
+		});
+	}
+
+	async unRequestPreimage({ address, preimageHash, onSuccess, onFailed }: { address: string; preimageHash: string; onSuccess?: () => void; onFailed?: () => void }) {
+		if (!this.api) {
+			return;
+		}
+
+		const unRequestPreimageTx = this.getUnRequestPreimageTx({ preimageHash });
+		if (!unRequestPreimageTx) {
+			onFailed?.();
+			return;
+		}
+		await this.executeTx({
+			tx: unRequestPreimageTx,
+			address,
+			errorMessageFallback: 'Failed to unrequest preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
 				onSuccess?.();

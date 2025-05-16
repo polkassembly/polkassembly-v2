@@ -650,7 +650,14 @@
 		"close": "Schließen",
 		"showAll": "Alle anzeigen",
 		"searchByHash": "Nach Hash suchen",
-		"preimageNotFound": "Vorabbild nicht gefunden"
+		"preimageNotFound": "Preimage nicht gefunden",
+		"unrequested": "Nicht angefordert",
+		"unrequested_description": "Das Preimage wurde nicht angefordert",
+		"unnoted": "Nicht notiert",
+		"unnoted_description": "Das Preimage wurde nicht notiert",
+		"failed": "Fehlgeschlagen",
+		"unrequest": "Anforderung zurückziehen",
+		"unnote": "Notiz entfernen"
 	},
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",

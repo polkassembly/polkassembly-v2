@@ -650,9 +650,16 @@
 		"copy": "Copiar",
 		"subscan": "Subscan",
 		"close": "Cerrar",
-		"showAll": "Mostrar todos",
+		"showAll": "Mostrar todo",
 		"searchByHash": "Buscar por hash",
-		"preimageNotFound": "Vorabbild nicht gefunden"
+		"preimageNotFound": "Preimage no encontrado",
+		"unrequested": "No solicitado",
+		"unrequested_description": "El preimage no ha sido solicitado",
+		"unnoted": "No anotado",
+		"unnoted_description": "El preimage no ha sido anotado",
+		"failed": "Fallido",
+		"unrequest": "Cancelar solicitud",
+		"unnote": "Eliminar anotación"
 	},
 	"Create": {
 		"createDiscussionTitle": "Crear Discusión",
