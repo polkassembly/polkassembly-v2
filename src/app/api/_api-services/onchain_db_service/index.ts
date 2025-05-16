@@ -16,7 +16,8 @@ import {
 	IBountyProposal,
 	IBountyUserActivity,
 	IDelegationStats,
-	EBountyStatus
+	EBountyStatus,
+	EVoteSortOptions
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -99,7 +100,8 @@ export class OnChainDbService {
 		page,
 		limit,
 		decision,
-		voterAddress
+		voterAddress,
+		orderBy
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -108,8 +110,9 @@ export class OnChainDbService {
 		limit: number;
 		decision?: EVoteDecision;
 		voterAddress?: string;
+		orderBy?: EVoteSortOptions;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy });
 		if (postVoteData) return postVoteData;
 
 		return {

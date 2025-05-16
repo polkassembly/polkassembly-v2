@@ -46,7 +46,8 @@ import {
 	IVoteHistoryData,
 	IUserPosts,
 	ITrackAnalyticsDelegations,
-	IOnChainMetadata
+	IOnChainMetadata,
+	EVoteSortOptions
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -575,11 +576,24 @@ export class NextApiClientService {
 	}
 
 	// votes
-	static async getVotesHistory({ proposalType, index, page, decision }: { proposalType: EProposalType; index: string; page: number; decision: EVoteDecision }) {
+	static async getVotesHistory({
+		proposalType,
+		index,
+		page,
+		decision,
+		orderBy
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		page: number;
+		decision: EVoteDecision;
+		orderBy: EVoteSortOptions;
+	}) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString(),
-			decision
+			decision,
+			orderBy
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });

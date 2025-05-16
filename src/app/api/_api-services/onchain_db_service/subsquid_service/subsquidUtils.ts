@@ -7,7 +7,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { ENetwork, EPostOrigin, EProposalStatus, EVoteDecision, IBeneficiary } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EVoteDecision, EVoteSortOptions, IBeneficiary } from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -197,5 +197,26 @@ export class SubsquidUtils extends SubsquidQueries {
 			return balance;
 		}
 		return new BN(balance).mul(!lockPeriod ? DEFAULT_LOCK_PERIOD : new BN(lockPeriod)).toString();
+	}
+
+	protected static getOrderByForSubsquid({ orderBy }: { orderBy?: EVoteSortOptions }): EVoteSortOptions[] {
+		switch (orderBy) {
+			case EVoteSortOptions.BalanceValueASC:
+				return [EVoteSortOptions.BalanceValueASC, EVoteSortOptions.IdASC];
+			case EVoteSortOptions.BalanceValueDESC:
+				return [EVoteSortOptions.BalanceValueDESC, EVoteSortOptions.IdDESC];
+			case EVoteSortOptions.SelfVotingPowerASC:
+				return [EVoteSortOptions.SelfVotingPowerASC, EVoteSortOptions.IdASC];
+			case EVoteSortOptions.SelfVotingPowerDESC:
+				return [EVoteSortOptions.SelfVotingPowerDESC, EVoteSortOptions.IdDESC];
+			case EVoteSortOptions.DelegatedVotingPowerASC:
+				return [EVoteSortOptions.DelegatedVotingPowerASC, EVoteSortOptions.IdASC];
+			case EVoteSortOptions.DelegatedVotingPowerDESC:
+				return [EVoteSortOptions.DelegatedVotingPowerDESC, EVoteSortOptions.IdDESC];
+			case EVoteSortOptions.TimestampASC:
+				return [EVoteSortOptions.TimestampASC, EVoteSortOptions.IdASC];
+			default:
+				return [EVoteSortOptions.CreatedAtBlockDESC, EVoteSortOptions.IdDESC];
+		}
 	}
 }
