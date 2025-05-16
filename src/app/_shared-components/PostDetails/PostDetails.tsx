@@ -103,7 +103,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</div>
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
-								{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
+								{canVote(postData?.onChainInfo?.status) && (
 									<VoteReferendumButton
 										iconClassName='hidden'
 										index={index}
@@ -133,7 +133,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									}}
 								/>
 							)}
-							{canVote(postData?.onChainInfo?.status, postData?.onChainInfo?.preparePeriodEndsAt) && (
+							{canVote(postData?.onChainInfo?.status) && (
 								<VoteReferendumButton
 									iconClassName='hidden'
 									index={index}
