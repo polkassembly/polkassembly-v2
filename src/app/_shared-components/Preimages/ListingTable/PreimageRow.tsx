@@ -24,6 +24,11 @@ import styles from './ListingTable.module.scss';
 import Address from '../../Profile/Address/Address';
 import { Button } from '../../Button';
 
+const EPreimageStatus = {
+	Noted: 'Noted',
+	Requested: 'Requested'
+};
+
 function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimage: IPreimage; handleDialogOpen: () => void; onUnnotePreimage: () => void }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations('Preimages');
@@ -53,7 +58,7 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 		if (!user || !substrateProposer || !user.addresses.includes(substrateProposer) || !apiService || !preimage.hash) return;
 		setLoading(true);
 
-		if (preimage.status === 'Noted') {
+		if (preimage.status === EPreimageStatus.Noted) {
 			await apiService.unnotePreimage({
 				address: substrateProposer,
 				preimageHash: preimage.hash,
@@ -74,7 +79,7 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 					});
 				}
 			});
-		} else if (preimage.status === 'Requested') {
+		} else if (preimage.status === EPreimageStatus.Requested) {
 			await apiService.unRequestPreimage({
 				address: substrateProposer,
 				preimageHash: preimage.hash,
@@ -175,7 +180,7 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 								</Button>
 							</TooltipTrigger>
 							<TooltipContent className='bg-grey_bg text-text_primary'>
-								{preimage.status === 'Noted' ? t('unnote') : preimage.status === 'Requested' ? t('unrequest') : '-'}
+								{preimage.status === EPreimageStatus.Noted ? t('unnote') : preimage.status === EPreimageStatus.Requested ? t('unrequest') : '-'}
 							</TooltipContent>
 						</Tooltip>
 					)}
