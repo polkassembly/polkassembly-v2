@@ -26,10 +26,25 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const modalarg = selectedPreimage?.proposedCall.args;
 	const t = useTranslations('Preimages');
 
+	const [preimages, setPreimages] = useState<IPreimage[]>(data?.items || []);
+
 	const hanldeDialogOpen = (preimage: IPreimage) => {
 		setSelectedPreimage(preimage);
 		setOpen(true);
 	};
+
+	const onUnnotePreimage = (preimage: IPreimage) => {
+		setPreimages((prev) => {
+			const index = prev.findIndex((p) => p.hash === preimage.hash && p.proposer === preimage.proposer);
+			if (index !== -1) {
+				const newPreimages = [...prev];
+				newPreimages[`${index}`] = { ...newPreimages[`${index}`], status: 'Unnoted' };
+				return newPreimages;
+			}
+			return prev;
+		});
+	};
+
 	return (
 		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
 			{data ? (
@@ -46,18 +61,20 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{Array.isArray(data?.items) ? (
-								data.items.map((preimage: IPreimage) => (
+							{Array.isArray(preimages) ? (
+								preimages.map((preimage: IPreimage) => (
 									<PreimageRow
 										key={preimage?.id}
 										preimage={preimage}
 										handleDialogOpen={() => hanldeDialogOpen(preimage)}
+										onUnnotePreimage={() => onUnnotePreimage(preimage)}
 									/>
 								))
 							) : (
 								<PreimageRow
 									preimage={data as unknown as IPreimage}
 									handleDialogOpen={() => hanldeDialogOpen(data as unknown as IPreimage)}
+									onUnnotePreimage={() => onUnnotePreimage(data as unknown as IPreimage)}
 								/>
 							)}
 						</TableBody>

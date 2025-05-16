@@ -8,7 +8,6 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
 import { Collapsible, CollapsibleContent } from '@/app/_shared-components/Collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
@@ -79,8 +78,6 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
-	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
-
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [openRow, setOpenRow] = useState<string | null>(null);
 
@@ -94,10 +91,6 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 			sorting
 		}
 	});
-
-	const formatBalance = (balance: string) => {
-		return formatter.format(Number(formatBnBalance(balance, { withThousandDelimitor: false }, network)));
-	};
 
 	return (
 		<div className={classes.tableContainer}>
@@ -122,28 +115,35 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 						const voteData = vote.original;
 						const isOpen = openRow === voteData.voterAddress;
 						const voterDelegations = Array.isArray(voteData.delegatedVotes) ? voteData.delegatedVotes : [];
-						const renderCollapsible = voterDelegations.length > 0;
+						const hasDelegatedVotes = voterDelegations.length > 0;
+
+						const lockPeriod = !voteData.lockPeriod || voteData.lockPeriod === 0 ? 0.1 : voteData.lockPeriod;
 
 						return (
 							<React.Fragment key={voteData.voterAddress}>
 								<TableRow
-									className={renderCollapsible ? 'cursor-pointer' : ''}
-									onClick={() => renderCollapsible && setOpenRow(isOpen ? null : voteData.voterAddress)}
+									className={hasDelegatedVotes ? 'cursor-pointer' : ''}
+									onClick={() => hasDelegatedVotes && setOpenRow(isOpen ? null : voteData.voterAddress)}
 								>
 									<TableCell className='max-w-[200px] py-4'>
 										<Address address={voteData.voterAddress} />
 									</TableCell>
 									<TableCell className='py-4'>
-										{formatBalance(voteData.balanceValue || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										<div className='flex items-center justify-between gap-x-4'>
+											{formatBnBalance(voteData.balanceValue || '0', { compactNotation: true, withUnit: true, numberAfterComma: 2 }, network)}
+											<span className='text-xs text-wallet_btn_text'>
+												{lockPeriod}x{hasDelegatedVotes && '/d'}
+											</span>
+										</div>
 									</TableCell>
 									<TableCell className='py-4'>
-										{formatBalance(voteData.selfVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										{formatBnBalance(voteData.selfVotingPower || '0', { compactNotation: true, withUnit: true, numberAfterComma: 2 }, network)}
 									</TableCell>
 									<TableCell className='py-4'>
-										{formatBalance(voteData.delegatedVotingPower || '0')} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+										{formatBnBalance(voteData.delegatedVotingPower || '0', { compactNotation: true, withUnit: true, numberAfterComma: 2 }, network)}
 									</TableCell>
 									<TableCell className='py-4'>
-										{renderCollapsible && (
+										{hasDelegatedVotes && (
 											<button
 												type='button'
 												className='collapsibleButton'
@@ -158,7 +158,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 									className='p-0'
 									colSpan={5}
 								>
-									{renderCollapsible && (
+									{hasDelegatedVotes && (
 										<Collapsible open={openRow === voteData.voterAddress}>
 											<CollapsibleContent asChild>
 												<DelegatedVotesDropdown

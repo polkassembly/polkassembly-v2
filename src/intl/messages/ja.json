@@ -641,17 +641,24 @@
 	},
 	"Preimages": {
 		"hash": "ハッシュ",
-		"author": "著者",
+		"author": "作成者",
 		"deposit": "デポジット",
 		"arguments": "引数",
 		"size": "サイズ",
 		"status": "ステータス",
 		"copy": "コピー",
-		"subscan": "サブスキャン",
+		"subscan": "Subscan",
 		"close": "閉じる",
 		"showAll": "すべて表示",
 		"searchByHash": "ハッシュで検索",
-		"preimageNotFound": "プレイメージが見つかりません"
+		"preimageNotFound": "プレイメージが見つかりません",
+		"unrequested": "未リクエスト",
+		"unrequested_description": "プレイメージはリクエストされていません",
+		"unnoted": "未記録",
+		"unnoted_description": "プレイメージは記録されていません",
+		"failed": "失敗",
+		"unrequest": "リクエストを取り消す",
+		"unnote": "記録を削除"
 	},
 	"Create": {
 		"createDiscussionTitle": "ディスカッションを作成",
