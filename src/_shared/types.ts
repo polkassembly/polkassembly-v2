@@ -382,6 +382,7 @@ export enum EOffChainPostTopic {
 	FELLOWSHIP = 'fellowship',
 	COUNCIL = 'council',
 	DEMOCRACY = 'democracy',
+	TECHNICAL_COMMITTEE = 'technicalCommittee',
 	WHITELIST = 'whitelist'
 }
 
