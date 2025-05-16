@@ -11,14 +11,13 @@ import { useState } from 'react';
 import { Tabs, TabsContent } from '../Tabs';
 import ProfileHeader from './ProfileHeader/ProfileHeader';
 import classes from './Profile.module.scss';
-import UserActivity from './UserActivity/UserActivity';
 import Accounts from './Accounts/Accounts';
 import Overview from './Overview/Overview';
 import Settings from './Settings/Settings';
 import Posts from './Posts/Posts';
 
-function Profile({ profileData }: { profileData: IPublicUser }) {
-	const [userProfileData, setUserProfileData] = useState<IPublicUser>(profileData);
+function Profile({ profileData, address }: { profileData?: IPublicUser; address?: string }) {
+	const [userProfileData, setUserProfileData] = useState<IPublicUser | undefined>(profileData);
 	const handleUserProfileDataChange = (data: IPublicUser) => {
 		setUserProfileData((prev) => ({ ...prev, ...data }));
 	};
@@ -27,7 +26,7 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 		<Tabs defaultValue={EProfileTabs.OVERVIEW}>
 			<div className='relative'>
 				<Image
-					src={userProfileData.profileDetails.coverImage || ProfileRect}
+					src={userProfileData?.profileDetails.coverImage || ProfileRect}
 					alt='profile-cover-image'
 					className='h-[150px] w-full'
 					width={100}
@@ -36,29 +35,35 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 			</div>
 			<div className={classes.headerWrapper}>
 				<ProfileHeader
+					address={address}
 					userProfileData={userProfileData}
 					handleUserProfileDataChange={handleUserProfileDataChange}
 				/>
 			</div>
 			<div className={classes.contentWrapper}>
 				<TabsContent value={EProfileTabs.OVERVIEW}>
-					<Overview profileData={profileData} />
-				</TabsContent>
-				<TabsContent value={EProfileTabs.POSTS}>
-					<Posts addresses={profileData.addresses} />
-				</TabsContent>
-				<TabsContent value={EProfileTabs.ACTIVITY}>
-					<UserActivity userId={profileData.id} />
-				</TabsContent>
-				<TabsContent value={EProfileTabs.ACCOUNTS}>
-					<Accounts addresses={profileData.addresses} />
-				</TabsContent>
-				<TabsContent value={EProfileTabs.SETTINGS}>
-					<Settings
-						userProfileData={userProfileData}
-						setUserProfileData={handleUserProfileDataChange}
+					<Overview
+						address={address}
+						profileData={profileData}
 					/>
 				</TabsContent>
+				<TabsContent value={EProfileTabs.POSTS}>
+					<Posts addresses={address ? [address] : profileData?.addresses || []} />
+				</TabsContent>
+				{/* <TabsContent value={EProfileTabs.ACTIVITY}>
+					<UserActivity userId={profileData.id} />
+				</TabsContent> */}
+				<TabsContent value={EProfileTabs.ACCOUNTS}>
+					<Accounts addresses={profileData?.addresses.length ? profileData.addresses : address ? [address] : []} />
+				</TabsContent>
+				{userProfileData && (
+					<TabsContent value={EProfileTabs.SETTINGS}>
+						<Settings
+							userProfileData={userProfileData}
+							setUserProfileData={handleUserProfileDataChange}
+						/>
+					</TabsContent>
+				)}
 			</div>
 		</Tabs>
 	);

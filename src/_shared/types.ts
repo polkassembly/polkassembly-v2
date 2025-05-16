@@ -37,15 +37,16 @@ export interface IUserSocialDetails {
 	url: string;
 }
 
+// FIXME: handle removed badges
 export enum EUserBadge {
 	DECENTRALISED_VOICE = 'decentralised_voice',
 	FELLOW = 'fellow',
 	COUNCIL = 'council_member',
 	ACTIVE_VOTER = 'active_voter',
-	WHALE = 'whale',
-	STEADFAST_COMMENTOR = 'steadfast_commentor',
-	GM_VOTER = 'gm_voter',
-	POPULAR_DELEGATE = 'popular_delegate'
+	WHALE = 'whale'
+	// STEADFAST_COMMENTOR = 'steadfast_commentor',
+	// GM_VOTER = 'gm_voter',
+	// POPULAR_DELEGATE = 'popular_delegate'
 }
 
 export interface IUserBadgeDetails {
