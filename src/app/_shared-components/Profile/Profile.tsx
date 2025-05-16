@@ -16,6 +16,7 @@ import Accounts from './Accounts/Accounts';
 import Overview from './Overview/Overview';
 import Settings from './Settings/Settings';
 import Posts from './Posts/Posts';
+import Votes from './Votes/Votes';
 
 function Profile({ profileData }: { profileData: IPublicUser }) {
 	const [userProfileData, setUserProfileData] = useState<IPublicUser>(profileData);
@@ -46,6 +47,9 @@ function Profile({ profileData }: { profileData: IPublicUser }) {
 				</TabsContent>
 				<TabsContent value={EProfileTabs.POSTS}>
 					<Posts addresses={profileData.addresses} />
+				</TabsContent>
+				<TabsContent value={EProfileTabs.VOTES}>
+					<Votes addresses={profileData.addresses} />
 				</TabsContent>
 				<TabsContent value={EProfileTabs.ACTIVITY}>
 					<UserActivity userId={profileData.id} />

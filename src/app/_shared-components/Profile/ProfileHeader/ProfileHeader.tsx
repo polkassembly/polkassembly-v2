@@ -276,6 +276,12 @@ function ProfileHeader({ userProfileData, handleUserProfileDataChange }: { userP
 				</TabsTrigger>
 				<TabsTrigger
 					className='uppercase'
+					value={EProfileTabs.VOTES}
+				>
+					{t('Profile.Votes.votes')}
+				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
 					value={EProfileTabs.ACCOUNTS}
 				>
 					{t('Profile.accounts')}

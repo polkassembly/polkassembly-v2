@@ -42,6 +42,8 @@ import {
 	IContentSummary,
 	IAddressRelations,
 	IVoteCurve,
+	EGovType,
+	IUserVote,
 	ITrackAnalyticsStats,
 	IVoteHistoryData,
 	IUserPosts,
@@ -123,6 +125,7 @@ enum EApiRoute {
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
+	GET_USER_VOTES = 'GET_USER_VOTES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
 	GET_USER_POSTS = 'GET_USER_POSTS'
@@ -194,6 +197,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+			case EApiRoute.GET_USER_VOTES:
 			case EApiRoute.GET_USER_POSTS:
 				path = '/users/address';
 				break;
@@ -968,6 +972,16 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_STATS, queryParams });
 		return this.nextApiClientFetch<ITreasuryStats[]>({ url, method });
+	}
+
+	static async getUserVotes({ address, page, limit, govType }: { address: string; page: number; limit: number; govType: EGovType }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			govType
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_VOTES, routeSegments: [address, 'votes'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IUserVote>>({ url, method });
 	}
 
 	static async getTrackAnalyticsStats({ origin }: { origin: EPostOrigin | 'all' }) {
