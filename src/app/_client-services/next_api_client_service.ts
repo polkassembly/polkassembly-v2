@@ -45,7 +45,8 @@ import {
 	ITrackAnalyticsStats,
 	IVoteHistoryData,
 	IUserPosts,
-	ITrackAnalyticsDelegations
+	ITrackAnalyticsDelegations,
+	IOnChainMetadata
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -83,7 +84,7 @@ enum EApiRoute {
 	PUBLIC_USER_DATA_BY_USERNAME = 'PUBLIC_USER_DATA_BY_USERNAME',
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
-	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
+	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
@@ -215,7 +216,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_CHILD_BOUNTIES:
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
-			case EApiRoute.GET_PREIMAGE_FOR_POST:
+			case EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
@@ -535,9 +536,9 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
 
-	static async getPreimageForPost(proposalType: EProposalType, index: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE_FOR_POST, routeSegments: [proposalType, index, 'preimage'] });
-		return this.nextApiClientFetch<IPreimage>({ url, method });
+	static async getOnChainMetadataForPost(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST, routeSegments: [proposalType, index, 'on-chain-metadata'] });
+		return this.nextApiClientFetch<IOnChainMetadata>({ url, method });
 	}
 
 	// comments

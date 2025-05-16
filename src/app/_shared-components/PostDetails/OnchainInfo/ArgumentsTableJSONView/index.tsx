@@ -4,7 +4,7 @@
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { ETheme } from '@/_shared/types';
+import { ETheme, IProposalArguments } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import ArgumentsTable from './ArgumentsTable';
@@ -16,7 +16,7 @@ const ReactJson = dynamic(() => import('react-json-view'), {
 
 interface Props {
 	className?: string;
-	postArguments: Record<string, unknown>;
+	postArguments: IProposalArguments;
 }
 
 enum Etabs {

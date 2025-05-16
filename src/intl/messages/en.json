@@ -495,7 +495,14 @@
 			"fee": "Fee",
 			"parentBountyIndex": "Parent Bounty Index",
 			"payee": "Payee",
-			"curator": "Curator"
+			"curator": "Curator",
+			"proposer": "Proposer",
+			"createdAt": "Created At",
+			"createdAtBlock": "Created At Block",
+			"updatedAtBlock": "Updated At Block",
+			"enactmentAtBlock": "Enactment At Block",
+			"enactmentAfterBlock": "Enactment After Block",
+			"trackNumber": "Track Number"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",

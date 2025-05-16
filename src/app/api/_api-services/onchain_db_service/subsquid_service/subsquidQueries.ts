@@ -591,7 +591,7 @@ export class SubsquidQueries {
 
 	// preimage queries
 
-	protected static GET_PREIMAGE_BY_PROPOSAL_INDEX_AND_TYPE = `
+	protected static GET_ON_CHAIN_METADATA_BY_PROPOSAL_INDEX_AND_TYPE = `
 		query GetPreimageByProposalIndexAndType($type_eq: ProposalType!, $index_eq: Int!) {
 			proposals(where: {type_eq: $type_eq, index_eq: $index_eq}) {
 				preimage {
@@ -614,11 +614,23 @@ export class SubsquidQueries {
 					updatedAt
 					updatedAtBlock
 				}
+				proposalArguments {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				trackNumber
+				updatedAtBlock
+				createdAt
+				createdAtBlock
+				hash
 			}
 		}
 	`;
 
-	protected static GET_PREIMAGE_BY_PROPOSAL_HASH_AND_TYPE = `
+	protected static GET_ON_CHAIN_METADATA_BY_PROPOSAL_HASH_AND_TYPE = `
 		query GetPreimageByProposalHashAndType($type_eq: ProposalType!, $hash_eq: String!) {
 			proposals(where: {type_eq: $type_eq, hash_eq: $hash_eq}) {
 				preimage {
@@ -641,6 +653,18 @@ export class SubsquidQueries {
 					updatedAt
 					updatedAtBlock
 				}
+				proposalArguments {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				trackNumber
+				updatedAtBlock
+				createdAt
+				createdAtBlock
+				hash
 			}
 		}
 	`;

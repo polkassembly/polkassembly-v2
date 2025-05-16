@@ -860,6 +860,13 @@ export enum EProfileTabs {
 	POSTS = 'posts'
 }
 
+export interface IProposalArguments {
+	args: Record<string, unknown>;
+	description: string;
+	method: string;
+	section: string;
+}
+
 export interface IPreimage {
 	createdAt: string;
 	createdAtBlock: number;
@@ -868,17 +875,25 @@ export interface IPreimage {
 	id: string;
 	length: number;
 	method: string;
-	proposedCall: {
-		args: Record<string, unknown>;
-		description: string;
-		method: string;
-		section: string;
-	};
+	proposedCall: IProposalArguments;
 	proposer: string;
 	section: string;
 	status: string;
 	updatedAt: string;
 	updatedAtBlock: number | null;
+}
+
+export interface IOnChainMetadata {
+	preimage?: IPreimage;
+	proposedCall?: IProposalArguments;
+	proposer?: string;
+	trackNumber?: number;
+	updatedAtBlock?: number;
+	enactmentAtBlock?: number;
+	enactmentAfterBlock?: number;
+	createdAt?: Date;
+	createdAtBlock?: number;
+	hash?: string;
 }
 
 export interface IQRSessionPayload {
