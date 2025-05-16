@@ -4,30 +4,30 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
-import { getTrackDays } from './getTrackDays';
+import { getTrackPeriodsTimeInMinutes } from './getTrackPeriodsTimeInMinutes';
 
 export const calculatePeriodProgress = ({ endAt, trackName, periodType }: { endAt?: Date; trackName: EPostOrigin; periodType: EPeriodType }): number => {
 	if (!endAt) return 0;
 
-	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
+	const { decisionMinutes, prepareMinutes, confirmMinutes } = getTrackPeriodsTimeInMinutes(trackName);
 
-	let totalDays: number | undefined;
+	let totalMinutes: number | undefined;
 	switch (periodType) {
 		case EPeriodType.PREPARE:
-			totalDays = prepareDays;
+			totalMinutes = prepareMinutes;
 			break;
 		case EPeriodType.CONFIRM:
-			totalDays = confirmDays;
+			totalMinutes = confirmMinutes;
 			break;
 		case EPeriodType.DECISION:
 		default:
-			totalDays = decisionDays;
+			totalMinutes = decisionMinutes;
 	}
 
-	if (!totalDays) return 0;
+	if (!totalMinutes) return 0;
 
 	const endDate = dayjs(endAt);
-	const startDate = endDate.subtract(totalDays, 'days');
+	const startDate = endDate.subtract(totalMinutes, 'minutes');
 	const now = dayjs();
 
 	if (now.isAfter(endDate)) return 100;
