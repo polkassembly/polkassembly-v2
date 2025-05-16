@@ -390,8 +390,8 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = ({ voter }: { voter?: string }) => `
-		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
-			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true ${voter ? `, voter_eq: "${voter}"` : ''}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $orderBy: [ConvictionVoteOrderByInput!] = createdAtBlock_DESC) {
+			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true ${voter ? `, voter_eq: "${voter}"` : ''}}, orderBy: $orderBy, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -498,8 +498,8 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = ({ voter }: { voter?: string }) => `
-		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_in: [VoteDecision!], $aye_not_eq: BigInt, $nay_not_eq: BigInt, $value_isNull: Boolean) {
-			votes: convictionVotes(where: {AND:{balance:{aye_not_eq: $aye_not_eq}, OR:{balance: {nay_not_eq: $nay_not_eq}, OR:{balance:{value_isNull: $value_isNull}}}},  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: $decision_in ${voter ? `, voter_eq: "${voter}"` : ''}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_in: [VoteDecision!], $aye_not_eq: BigInt, $nay_not_eq: BigInt, $value_isNull: Boolean, $orderBy: [ConvictionVoteOrderByInput!] = createdAtBlock_DESC) {
+			votes: convictionVotes(where: {AND:{balance:{aye_not_eq: $aye_not_eq}, OR:{balance: {nay_not_eq: $nay_not_eq}, OR:{balance:{value_isNull: $value_isNull}}}},  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: $decision_in ${voter ? `, voter_eq: "${voter}"` : ''}}, orderBy: $orderBy, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
