@@ -64,7 +64,7 @@ function Address({
 	const userProfileUrl = useMemo(() => {
 		if (!network || isUserDataLoading) return undefined;
 		const username = userData?.username;
-		return username && username.length > 0 ? `/user/username/${username}` : address && address.length > 0 ? `/user/address/${address}` : undefined;
+		return address && address.length > 0 ? `/user/address/${address}` : username && username.length > 0 ? `/user/username/${username}` : undefined;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, address, userData]);
 
@@ -81,8 +81,8 @@ function Address({
 						setDisplayText(identityInfo.display);
 					}
 				}
-			} catch (error) {
-				console.error('Error fetching identity:', error);
+			} catch {
+				// console.error('Error fetching identity:', error);
 			}
 		};
 
