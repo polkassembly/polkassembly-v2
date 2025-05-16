@@ -1265,3 +1265,17 @@ export interface IUserPosts {
 	/** Posts related to on-chain proposals/referenda */
 	onchainPostsResponse: PostListingResponse;
 }
+
+export enum EVoteSortOptions {
+	IdASC = 'id_ASC',
+	IdDESC = 'id_DESC',
+	BalanceValueASC = 'balance_value_ASC',
+	BalanceValueDESC = 'balance_value_DESC',
+	TimestampASC = 'timestamp_ASC',
+	TimestampDESC = 'timestamp_DESC',
+	CreatedAtBlockDESC = 'createdAtBlock_DESC',
+	SelfVotingPowerASC = 'selfVotingPower_ASC',
+	SelfVotingPowerDESC = 'selfVotingPower_DESC',
+	DelegatedVotingPowerASC = 'delegatedVotingPower_ASC',
+	DelegatedVotingPowerDESC = 'delegatedVotingPower_DESC'
+}

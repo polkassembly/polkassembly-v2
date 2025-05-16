@@ -8,6 +8,7 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	EVoteSortOptions,
 	IBountyProposal,
 	IDelegationStats,
 	IGenericListingResponse,
@@ -301,7 +302,8 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address
+		voterAddress: address,
+		orderBy
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -310,6 +312,7 @@ export class SubsquidService extends SubsquidUtils {
 		limit: number;
 		decision?: EVoteDecision;
 		voterAddress?: string;
+		orderBy?: EVoteSortOptions;
 	}) {
 		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
 
@@ -345,6 +348,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
 						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })

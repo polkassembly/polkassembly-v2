@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { IVoteData } from '@/_shared/types';
+import { EVoteSortOptions, IVoteData } from '@/_shared/types';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import React, { useState } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -18,7 +18,7 @@ import classes from './VoteHistory.module.scss';
 import DelegatedVotesDropdown from './DelegatedVotesDropdown/DelegatedVotesDropdown';
 
 function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
-	return sort === 'asc' ? (
+	return sort === 'desc' ? (
 		<ChevronUp
 			className='text-xs text-wallet_btn_text'
 			fill={THEME_COLORS.light.wallet_btn_text}
@@ -31,50 +31,62 @@ function SortingIcon({ sort }: { sort: 'asc' | 'desc' | false }) {
 	);
 }
 
-const columns = (t: (key: string) => string): ColumnDef<IVoteData>[] => [
+const columns = (t: (key: string) => string, orderBy: EVoteSortOptions, onOrderByChange: (orderBy: EVoteSortOptions) => void): ColumnDef<IVoteData>[] => [
 	{ header: t('PostDetails.account'), accessorKey: 'voterAddress' },
 	{
-		header: ({ column }) => (
+		header: () => (
 			<Button
 				variant='ghost'
 				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
-				onClick={() => column.toggleSorting()}
+				onClick={() => onOrderByChange(orderBy === EVoteSortOptions.BalanceValueDESC ? EVoteSortOptions.BalanceValueASC : EVoteSortOptions.BalanceValueDESC)}
 			>
 				{t('PostDetails.capital')}
-				<SortingIcon sort={column.getIsSorted()} />
+				<SortingIcon sort={orderBy === EVoteSortOptions.BalanceValueDESC ? 'desc' : 'asc'} />
 			</Button>
 		),
 		accessorKey: 'balanceValue'
 	},
 	{
-		header: ({ column }) => (
+		header: () => (
 			<Button
 				variant='ghost'
 				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
-				onClick={() => column.toggleSorting()}
+				onClick={() => onOrderByChange(orderBy === EVoteSortOptions.SelfVotingPowerDESC ? EVoteSortOptions.SelfVotingPowerASC : EVoteSortOptions.SelfVotingPowerDESC)}
 			>
 				{t('PostDetails.votingPower')}
-				<SortingIcon sort={column.getIsSorted()} />
+				<SortingIcon sort={orderBy === EVoteSortOptions.SelfVotingPowerDESC ? 'desc' : 'asc'} />
 			</Button>
 		),
 		accessorKey: 'selfVotingPower'
 	},
 	{
-		header: ({ column }) => (
+		header: () => (
 			<Button
 				variant='ghost'
 				className='flex items-center gap-x-2 p-0 text-xs font-medium text-wallet_btn_text'
-				onClick={() => column.toggleSorting()}
+				onClick={() =>
+					onOrderByChange(orderBy === EVoteSortOptions.DelegatedVotingPowerDESC ? EVoteSortOptions.DelegatedVotingPowerASC : EVoteSortOptions.DelegatedVotingPowerDESC)
+				}
 			>
 				{t('PostDetails.delegated')}
-				<SortingIcon sort={column.getIsSorted()} />
+				<SortingIcon sort={orderBy === EVoteSortOptions.DelegatedVotingPowerDESC ? 'desc' : 'asc'} />
 			</Button>
 		),
 		accessorKey: 'delegatedVotingPower'
 	}
 ];
 
-function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: boolean }) {
+function VoteHistoryTable({
+	votes,
+	loading,
+	orderBy,
+	onOrderByChange
+}: {
+	votes: IVoteData[];
+	loading?: boolean;
+	orderBy: EVoteSortOptions;
+	onOrderByChange: (orderBy: EVoteSortOptions) => void;
+}) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
@@ -83,7 +95,7 @@ function VoteHistoryTable({ votes, loading }: { votes: IVoteData[]; loading?: bo
 
 	const table = useReactTable({
 		data: votes,
-		columns: columns(t),
+		columns: columns(t, orderBy, onOrderByChange),
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		onSortingChange: setSorting,
