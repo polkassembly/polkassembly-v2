@@ -149,6 +149,26 @@ export class WebhookService {
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
 			RedisService.DeleteOverviewPageData({ network })
 		]);
+
+		// Refresh above caches
+		const baseUrl = await getBaseUrl();
+		const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
+
+		const fetchUrls = [];
+		// 1. fetch above post details page
+		fetchUrls.push(`${baseUrl}/${proposalType}/${indexOrHash}`);
+		// 2. fetch listing page for above post
+		fetchUrls.push(`${baseUrl}/${proposalType}`);
+		// 3. overview page
+		fetchUrls.push(`${baseUrl.replace('/api/v2', '')}`);
+
+		// Process URLs in batches to avoid overwhelming the server
+		const batchSize = 5; // Process 5 URLs at a time
+		const timeout = 30000; // Extend timeout to 30 seconds
+		const maxRetries = 2; // Allow up to 2 retries for failed requests
+
+		const processResults = await this.processBatchesWithRetries(fetchUrls, headers, batchSize, timeout, maxRetries);
+		console.log(`Cache refresh completed. Success: ${processResults.successCount}, Failed: ${processResults.failCount}`);
 	}
 
 	// refreshes caches for common endpoints and active proposals
