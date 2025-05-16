@@ -699,7 +699,14 @@
 		"close": "Close",
 		"showAll": "Show All",
 		"searchByHash": "Search by hash",
-		"preimageNotFound": "Preimage not found"
+		"preimageNotFound": "Preimage not found",
+		"unrequested": "Unrequested",
+		"unrequested_description": "The preimage has been unrequested",
+		"unnoted": "Unnoted",
+		"unnoted_description": "The preimage has been unnoted",
+		"failed": "Failed",
+		"unrequest": "Unrequest",
+		"unnote": "Unnote"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
