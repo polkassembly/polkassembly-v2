@@ -152,7 +152,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								voteMetrics={postData?.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{postData?.onChainInfo?.origin && postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.Deciding) && (
+							{postData?.onChainInfo?.origin && postData.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
 								<VoteCurvesData
 									proposalType={post.proposalType}
 									index={index}
