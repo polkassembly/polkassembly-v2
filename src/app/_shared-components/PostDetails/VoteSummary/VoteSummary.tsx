@@ -16,14 +16,13 @@ import { ChevronRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import Image from 'next/image';
-import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { THEME_COLORS } from '@/app/_style/theme';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './VoteSummary.module.scss';
 import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
-import { Skeleton } from '../../Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../Tooltip';
+import LoadingLayover from '../../LoadingLayover';
 
 const NONE_CHART_VALUE = 0;
 
@@ -83,8 +82,10 @@ function VoteSummary({
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [issuance, setIssuance] = useState<BN | null>(null);
+
+	const { userPreferences } = useUserPreferences();
 
 	const [tally, setTally] = useState<{ aye: string | null; nay: string | null; support: string | null }>({
 		aye: null,
@@ -94,6 +95,8 @@ function VoteSummary({
 
 	const getOngoingTally = useCallback(async () => {
 		if (!apiService) return;
+
+		setLoading(true);
 		const ongoingReferendaTally = await apiService.getOngoingReferendaTally({ postIndex: Number(index) });
 		if (!ongoingReferendaTally) {
 			setTally({
@@ -101,11 +104,11 @@ function VoteSummary({
 				nay: voteMetrics?.[EVoteDecision.NAY].value || null,
 				support: voteMetrics?.support?.value || null
 			});
-			setLoading(false);
 		} else {
 			setTally(ongoingReferendaTally);
-			setLoading(false);
 		}
+		setLoading(false);
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService]);
 
@@ -116,16 +119,14 @@ function VoteSummary({
 		const totalIssuanceBN = new BN(totalIssuance?.toString() || BN_ZERO.toString());
 		const inactiveIssuanceBN = new BN(inactiveIssuance?.toString() || BN_ZERO.toString());
 		const activeIssuance = totalIssuanceBN.sub(inactiveIssuanceBN);
+
 		setIssuance(activeIssuance.lte(BN_ZERO) ? null : activeIssuance);
 	}, [apiService]);
 
 	useEffect(() => {
-		if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return;
 		getIssuance();
 		getOngoingTally();
-	}, [getOngoingTally, getIssuance, voteMetrics]);
-
-	if (!voteMetrics?.[EVoteDecision.AYE].count && !voteMetrics?.[EVoteDecision.NAY].count) return null;
+	}, [getOngoingTally, getIssuance]);
 
 	const ayeVotesNumber = Number(formatBnBalance(tally.aye || BN_ZERO.toString(), { numberAfterComma: 6, withThousandDelimitor: false }, network));
 	const totalVotesNumber = Number(
@@ -142,88 +143,75 @@ function VoteSummary({
 	return (
 		<div className={classes.voteSummaryWrapper}>
 			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
-			{loading ? (
-				<Skeleton className='h-[220px] w-full' />
-			) : tally?.aye && tally?.nay && tally?.support ? (
-				<>
-					<div className={classes.voteSummaryPieChart}>
-						<div className={classes.voteSummaryPieChartAyeNay}>
-							<p className='text-xl font-semibold text-success'>{isAyeNaN ? 'N/A' : ayePercent.toFixed(1)}%</p>
-							<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
-						</div>
-						<div className='relative flex flex-col items-center justify-center'>
-							{!!approvalThreshold && (
-								<p className={classes.thresholdPercentage}>
-									{t('PostDetails.threshold')}
-									{`: ${approvalThreshold?.toFixed(1)}%`}
-								</p>
-							)}
-							<div className='flex w-full items-center justify-center'>
-								<PieChart
-									className='w-full'
-									center={[50, 75]}
-									startAngle={-180}
-									lengthAngle={180}
-									rounded
-									lineWidth={15}
-									data={[
-										{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
-										{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
-									]}
-								>
-									{!!approvalThreshold && <ThresholdPoint approvalThreshold={approvalThreshold} />}
-								</PieChart>
-							</div>
-						</div>
 
-						<div className={classes.voteSummaryPieChartAyeNay}>
-							<p className='text-xl font-semibold text-failure'>{isNayNaN ? 'N/A' : nayPercent.toFixed(1)}%</p>
-							<p className={classes.voteSummaryPieChartAyeNayTitle}>{NAY_TITLE}</p>
-						</div>
-					</div>
-
-					<div className={classes.voteSummaryTable}>
-						<div className={classes.voteSummaryTableItem}>
-							<p className={classes.voteSummaryTableItemTitle}>
-								<span>
-									{AYE_TITLE} ({voteMetrics[EVoteDecision.AYE].count})
-								</span>
-								<span>{formatUSDWithUnits(formatBnBalance(tally.aye, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
-							</p>
-							<p className={classes.voteSummaryTableItemTitle}>
-								<span>{t('PostDetails.support')}</span>
-								<span>{formatUSDWithUnits(formatBnBalance(tally.support, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
-							</p>
-						</div>
-						<div className={classes.voteSummaryTableItem}>
-							<p className={classes.voteSummaryTableItemTitle}>
-								<span>
-									{NAY_TITLE} ({voteMetrics[EVoteDecision.NAY].count})
-								</span>
-								<span>
-									{formatUSDWithUnits(formatBnBalance(tally.nay || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
-								</span>
-							</p>
-							{issuance && (
-								<p className={classes.voteSummaryTableItemTitle}>
-									<span>{t('PostDetails.issuance')}</span>
-									<span>{formatUSDWithUnits(formatBnBalance(issuance, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()), 1)}</span>
-								</p>
-							)}
-						</div>
-					</div>
-				</>
-			) : (
-				<div className={classes.voteSummaryTableNoActivity}>
-					<Image
-						src={NoActivity}
-						alt='no activity'
-						width={150}
-						height={150}
-					/>
-					<p className={classes.voteSummaryTableNoActivityTitle}>{t('PostDetails.noVotes')}</p>
+			<div className={classes.voteSummaryPieChart}>
+				{loading && <LoadingLayover />}
+				<div className={classes.voteSummaryPieChartAyeNay}>
+					<p className='text-xl font-semibold text-success'>{isAyeNaN ? '0' : ayePercent.toFixed(1)}%</p>
+					<p className={classes.voteSummaryPieChartAyeNayTitle}>{AYE_TITLE}</p>
 				</div>
-			)}
+				<div className='relative flex flex-col items-center justify-center'>
+					{!!approvalThreshold && (
+						<p className={classes.thresholdPercentage}>
+							{t('PostDetails.threshold')}
+							{`: ${approvalThreshold?.toFixed(1)}%`}
+						</p>
+					)}
+					<div className='flex w-full items-center justify-center'>
+						<PieChart
+							className='w-full'
+							center={[50, 75]}
+							startAngle={-180}
+							lengthAngle={180}
+							rounded
+							lineWidth={15}
+							background={THEME_COLORS[userPreferences?.theme || 'light'].border_grey}
+							data={[
+								{ color: THEME_COLORS.light.aye_color, title: AYE_TITLE, value: isAyeNaN ? NONE_CHART_VALUE : ayePercent },
+								{ color: THEME_COLORS.light.nay_color, title: NAY_TITLE, value: isNayNaN ? NONE_CHART_VALUE : nayPercent }
+							]}
+						>
+							{!!approvalThreshold && <ThresholdPoint approvalThreshold={approvalThreshold} />}
+						</PieChart>
+					</div>
+				</div>
+
+				<div className={classes.voteSummaryPieChartAyeNay}>
+					<p className='text-xl font-semibold text-failure'>{isNayNaN ? '0' : nayPercent.toFixed(1)}%</p>
+					<p className={classes.voteSummaryPieChartAyeNayTitle}>{NAY_TITLE}</p>
+				</div>
+			</div>
+
+			<div className={classes.voteSummaryTable}>
+				<div className={classes.voteSummaryTableItem}>
+					<p className={classes.voteSummaryTableItemTitle}>
+						<span>
+							{AYE_TITLE} ({voteMetrics?.[EVoteDecision.AYE]?.count})
+						</span>
+						<span>{formatUSDWithUnits(formatBnBalance(tally.aye || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
+					</p>
+					<p className={classes.voteSummaryTableItemTitle}>
+						<span>{t('PostDetails.support')}</span>
+						<span>
+							{formatUSDWithUnits(formatBnBalance(tally.support || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+						</span>
+					</p>
+				</div>
+				<div className={classes.voteSummaryTableItem}>
+					<p className={classes.voteSummaryTableItemTitle}>
+						<span>
+							{NAY_TITLE} ({voteMetrics?.[EVoteDecision.NAY]?.count})
+						</span>
+						<span>{formatUSDWithUnits(formatBnBalance(tally.nay || BN_ZERO.toString(), { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}</span>
+					</p>
+					{issuance && (
+						<p className={classes.voteSummaryTableItemTitle}>
+							<span>{t('PostDetails.issuance')}</span>
+							<span>{formatUSDWithUnits(formatBnBalance(issuance, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, getCurrentNetwork()), 1)}</span>
+						</p>
+					)}
+				</div>
+			</div>
 			<Dialog>
 				<DialogTrigger
 					asChild

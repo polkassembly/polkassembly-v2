@@ -7,7 +7,7 @@
 }
 
 .voteSummaryPieChart {
-	@apply mb-6 flex items-end justify-center gap-x-4;
+	@apply relative mb-6 flex items-end justify-center gap-x-4;
 }
 
 .voteSummaryTable {
