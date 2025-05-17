@@ -410,6 +410,12 @@ export class WebhookService {
 			roles: [ERole.USER]
 		};
 
+		const existingUser = await OffChainDbService.GetUserById(newUser.id);
+		if (existingUser) {
+			console.log(`User already exists: ${newUser.id}`);
+			return;
+		}
+
 		await OffChainDbService.AddNewUser(newUser);
 
 		if (isWeb3Signup && address) {
