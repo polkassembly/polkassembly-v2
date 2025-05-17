@@ -154,6 +154,7 @@ export class WebhookService {
 		network: ENetwork;
 		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>;
 	}) {
+		// TODO: add origin and clear cache for origin page too
 		const { indexOrHash, proposalType } = params;
 
 		// Invalidate caches
