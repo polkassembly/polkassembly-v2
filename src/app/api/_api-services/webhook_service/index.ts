@@ -96,8 +96,9 @@ export class WebhookService {
 			username: z.string().refine((username) => ValidatorService.isValidUsername(username), ERROR_MESSAGES.INVALID_USERNAME),
 			email: z
 				.string()
-				.refine((email) => ValidatorService.isValidEmail(email), ERROR_MESSAGES.INVALID_EMAIL)
-				.optional(),
+				.optional()
+				.transform((e) => (e === '' ? undefined : e))
+				.refine((email) => email === undefined || ValidatorService.isValidEmail(email), ERROR_MESSAGES.INVALID_EMAIL),
 			address: z
 				.string()
 				.refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
