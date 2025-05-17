@@ -261,14 +261,31 @@ export class WebhookService {
 			});
 
 			// Add primary listing pages
-			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.DISCUSSION}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.BOUNTY}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.CHILD_BOUNTY}`);
+
+			// 5 pages for /all page
+			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=3&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=4&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=5&limit=${DEFAULT_LISTING_LIMIT}`);
+
+			// 2 pages for /discussion page
+			fetchUrls.push(`${baseUrl}/${EProposalType.DISCUSSION}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.DISCUSSION}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
+
+			// 2 pages for /bounty page
+			fetchUrls.push(`${baseUrl}/${EProposalType.BOUNTY}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.BOUNTY}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
+
+			// 2 pages for /child-bounty page
+			fetchUrls.push(`${baseUrl}/${EProposalType.CHILD_BOUNTY}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
+			fetchUrls.push(`${baseUrl}/${EProposalType.CHILD_BOUNTY}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
 
 			// Add track listing pages
 			Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails).forEach((origin) => {
-				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}`);
+				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=1&limit=${DEFAULT_LISTING_LIMIT}`);
+				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=2&limit=${DEFAULT_LISTING_LIMIT}`);
+				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=3&limit=${DEFAULT_LISTING_LIMIT}`);
 			});
 
 			// Add treasury stats api
