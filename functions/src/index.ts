@@ -125,11 +125,6 @@ export const onUserWritten = onDocumentWritten(
 				return;
 			}
 
-			if (userData.isWeb3Signup) {
-				logger.info('User is web3 signup, no action needed');
-				return;
-			}
-
 			const payloadUser: IV1User = {
 				id: userData.id,
 				custom_username: !userData.isWeb3Signup,
