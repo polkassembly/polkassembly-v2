@@ -462,7 +462,7 @@ export class WebhookService {
 			isDefault,
 			network: addressNetwork,
 			userId,
-			wallet: wallet as EWallet
+			wallet: Object.values(EWallet).includes(wallet as EWallet) ? (wallet as EWallet) : EWallet.OTHER
 		});
 	}
 
