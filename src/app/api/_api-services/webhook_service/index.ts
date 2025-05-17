@@ -94,13 +94,16 @@ export class WebhookService {
 		[EWebhookEvent.USER_CREATED]: z.object({
 			id: z.number().refine((id) => ValidatorService.isValidUserId(id), ERROR_MESSAGES.INVALID_USER_ID),
 			username: z.string().refine((username) => ValidatorService.isValidUsername(username), ERROR_MESSAGES.INVALID_USERNAME),
-			email: z.string().refine((email) => ValidatorService.isValidEmail(email), ERROR_MESSAGES.INVALID_EMAIL),
+			email: z
+				.string()
+				.refine((email) => ValidatorService.isValidEmail(email), ERROR_MESSAGES.INVALID_EMAIL)
+				.optional(),
 			address: z
 				.string()
 				.refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
 				.optional(),
 			salt: z.string(),
-			isWeb3Signup: z.boolean(),
+			isWeb3Signup: z.boolean().optional(),
 			password: z.string()
 		}),
 		[EWebhookEvent.ADDRESS_CREATED]: z.object({
@@ -406,7 +409,7 @@ export class WebhookService {
 		const { id, username, email, salt, isWeb3Signup, address, password } = params;
 
 		const newUser: IUser = {
-			email,
+			email: email || '',
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isEmailVerified: false,
@@ -416,7 +419,7 @@ export class WebhookService {
 			profileScore: 0,
 			salt,
 			username,
-			isWeb3Signup,
+			isWeb3Signup: email ? false : isWeb3Signup || false,
 			primaryNetwork: network,
 			roles: [ERole.USER]
 		};
