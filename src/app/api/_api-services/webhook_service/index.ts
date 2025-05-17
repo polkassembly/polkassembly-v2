@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
@@ -39,7 +40,8 @@ enum EWebhookEvent {
 	UNDELEGATED = 'undelegated',
 	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated',
 	CACHE_REFRESH = 'cache_refresh',
-	USER_CREATED = 'user_created'
+	USER_CREATED = 'user_created',
+	ADDRESS_CREATED = 'address_created'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -100,6 +102,13 @@ export class WebhookService {
 			salt: z.string(),
 			isWeb3Signup: z.boolean(),
 			password: z.string()
+		}),
+		[EWebhookEvent.ADDRESS_CREATED]: z.object({
+			address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS),
+			default: z.boolean(),
+			network: z.nativeEnum(ENetwork),
+			userId: z.number().refine((userId) => ValidatorService.isValidUserId(userId), ERROR_MESSAGES.INVALID_USER_ID),
+			wallet: z.string()
 		})
 	} as const;
 
@@ -127,6 +136,8 @@ export class WebhookService {
 				return this.handleCacheRefresh({ network });
 			case EWebhookEvent.USER_CREATED:
 				return this.handleUserCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> });
+			case EWebhookEvent.ADDRESS_CREATED:
+				return this.handleAddressCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.ADDRESS_CREATED]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -427,6 +438,32 @@ export class WebhookService {
 				wallet: EWallet.OTHER
 			});
 		}
+	}
+
+	private static async handleAddressCreated({ params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.ADDRESS_CREATED]> }) {
+		const { address, default: isDefault, network: addressNetwork, userId, wallet } = params;
+
+		const substrateAddress = getSubstrateAddress(address);
+
+		if (!substrateAddress) {
+			console.log(`Address is not a valid substrate address: ${address}`);
+			return;
+		}
+
+		const existingAddress = await OffChainDbService.GetAddressDataByAddress(substrateAddress);
+
+		if (existingAddress) {
+			console.log(`Address already exists: ${address}`);
+			return;
+		}
+
+		await OffChainDbService.AddNewAddress({
+			address,
+			isDefault,
+			network: addressNetwork,
+			userId,
+			wallet: wallet as EWallet
+		});
 	}
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
