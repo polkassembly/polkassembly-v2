@@ -58,6 +58,10 @@ export class OffChainDbService {
 		return FirestoreService.GetTotalUsersCount();
 	}
 
+	static async GetNextUserId(): Promise<number> {
+		return FirestoreService.GetNextUserId();
+	}
+
 	static async IsEmailInUse(email: string): Promise<boolean> {
 		const userByEmail = await FirestoreService.GetUserByEmail(email);
 		return Boolean(userByEmail);

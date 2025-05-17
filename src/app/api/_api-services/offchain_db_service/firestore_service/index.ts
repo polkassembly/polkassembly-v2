@@ -54,6 +54,11 @@ export class FirestoreService extends FirestoreUtils {
 		return userDocSnapshot.docs.length;
 	}
 
+	static async GetNextUserId(): Promise<number> {
+		const userDocSnapshot = await this.usersCollectionRef().orderBy('id', 'desc').limit(1).get();
+		return userDocSnapshot.docs[0].data().id + 1;
+	}
+
 	static async GetUserByEmail(email: string): Promise<IUser | null> {
 		const userDocSnapshot = await this.usersCollectionRef().where('email', '==', email).limit(1).get();
 		if (userDocSnapshot.empty) {
