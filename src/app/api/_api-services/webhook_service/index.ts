@@ -240,7 +240,7 @@ export class WebhookService {
 			// 2. add all active off-chain posts details pages
 			const offChainPosts = await OffChainDbService.GetOffChainPostsListing({
 				network,
-				proposalType: EProposalType.REFERENDUM_V2,
+				proposalType: EProposalType.DISCUSSION,
 				limit: DEFAULT_LISTING_LIMIT * 2, // only refresh cache regularly for posts that are on the first 2 pages & are active (created in the last OFF_CHAIN_POST_ACTIVE_DAYS)
 				page: 1
 			});
