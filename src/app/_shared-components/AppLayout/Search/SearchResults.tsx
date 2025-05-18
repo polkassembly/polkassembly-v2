@@ -193,7 +193,7 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 
 	return (
 		<div>
-			<div className='h-[60vh] overflow-hidden'>
+			<div className='h-[50vh] overflow-hidden md:h-[60vh]'>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
