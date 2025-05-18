@@ -813,7 +813,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
-	protected static async generateQRSession() {
+	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
