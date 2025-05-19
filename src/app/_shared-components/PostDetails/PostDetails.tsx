@@ -54,7 +54,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		staleTime: FIVE_MIN_IN_MILLI,
 		placeholderData: (prev) => prev || postData,
 		retry: true,
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: true,
 		refetchOnMount: true
 	});
 

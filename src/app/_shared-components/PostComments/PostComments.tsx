@@ -43,7 +43,7 @@ function PostComments({
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: true,
 		refetchOnMount: true,
-		refetchOnWindowFocus: false
+		refetchOnWindowFocus: true
 	});
 
 	return (
