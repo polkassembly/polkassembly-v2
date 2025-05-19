@@ -634,7 +634,11 @@
 		"title": "标题",
 		"content": "内容",
 		"save": "保存",
-		"editPostButton": "编辑"
+		"editPostButton": "编辑",
+		"success": "帖子更新成功",
+		"successDescription": "您的帖子已成功更新",
+		"error": "更新帖子失败",
+		"errorDescription": "更新帖子时发生错误"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",
