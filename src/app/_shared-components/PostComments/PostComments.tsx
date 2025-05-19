@@ -62,7 +62,7 @@ function PostComments({
 				/>
 			</div>
 
-			{(data || [])?.length === 0 && isFetching ? (
+			{!data && isFetching ? (
 				<div className='flex flex-col gap-2 px-8'>
 					<Skeleton className='h-8' />
 					<Skeleton className='h-8' />
