@@ -6,6 +6,7 @@
 
 import { ENetwork, EProposalType, ICommentResponse } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { OffChainDbService } from '../_api-services/offchain_db_service';
 import { OnChainDbService } from '../_api-services/onchain_db_service';
 
@@ -37,18 +38,20 @@ export async function fetchCommentsVoteData({
 				];
 			}
 
-			const voteData = await Promise.all(
-				userAddresses.map(async (address) => {
-					return OnChainDbService.GetPostVoteData({
-						network,
-						proposalType,
-						indexOrHash: index,
-						voterAddress: address.address,
-						page: 1,
-						limit: DEFAULT_LISTING_LIMIT
-					});
-				})
-			);
+			const voteData = ValidatorService.isValidOnChainProposalType(proposalType)
+				? await Promise.all(
+						userAddresses.map(async (address) => {
+							return OnChainDbService.GetPostVoteData({
+								network,
+								proposalType,
+								indexOrHash: index,
+								voterAddress: address.address,
+								page: 1,
+								limit: DEFAULT_LISTING_LIMIT
+							});
+						})
+					)
+				: [];
 
 			return {
 				...comment,
