@@ -6,7 +6,7 @@
 
 import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType } from '@/_shared/types';
 import { cn } from '@/lib/utils';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
@@ -76,29 +76,22 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post?.proposalType ?? postData.proposalType);
 
-	const canPlaceDecisionDeposit = useMemo(
-		() =>
-			(post?.proposalType === EProposalType.REFERENDUM_V2 && post?.onChainInfo?.status === EProposalStatus.Submitted) ||
-			(postData.proposalType === EProposalType.REFERENDUM_V2 && postData.onChainInfo?.status === EProposalStatus.Submitted),
-		[post?.proposalType, post?.onChainInfo?.status, postData.proposalType, postData.onChainInfo?.status]
-	);
-
-	const parentBountyIndex = useMemo(() => {
-		return post?.onChainInfo?.parentBountyIndex ?? postData.onChainInfo?.parentBountyIndex;
-	}, [post?.onChainInfo?.parentBountyIndex, postData.onChainInfo?.parentBountyIndex]);
+	if (!post) {
+		return <div className='text-center text-text_primary'>Post not found</div>;
+	}
 
 	return (
 		<>
 			<SpamPostModal
 				open={showSpamModal}
 				setOpen={setShowSpamModal}
-				proposalType={post?.proposalType ?? postData.proposalType}
+				proposalType={post.proposalType}
 			/>
 			<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
 				<div className={classes.headerWrapper}>
 					<PostHeader
 						isModalOpen={isModalOpen ?? false}
-						postData={post ?? postData}
+						postData={post}
 					/>
 				</div>
 				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
@@ -106,37 +99,37 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
 								<PostContent
-									postData={post ?? postData}
+									postData={post}
 									isModalOpen={isModalOpen ?? false}
 									onEditPostSuccess={onEditPostSuccess}
 								/>
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.TIMELINE}>
 								<Timeline
-									proposalType={post?.proposalType ?? postData.proposalType}
-									timeline={post?.onChainInfo?.timeline}
-									createdAt={post?.createdAt}
+									proposalType={post.proposalType}
+									timeline={post.onChainInfo?.timeline}
+									createdAt={post.createdAt}
 								/>
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
 								<OnchainInfo
-									proposalType={post?.proposalType ?? postData.proposalType}
+									proposalType={post.proposalType}
 									index={index}
-									onchainInfo={post?.onChainInfo}
+									onchainInfo={post.onChainInfo}
 								/>
 							</TabsContent>
 						</div>
 						<div className={classes.commentsBox}>
 							<PostComments
-								proposalType={post?.proposalType ?? postData.proposalType}
+								proposalType={post.proposalType}
 								index={index}
-								contentSummary={post?.contentSummary ?? postData.contentSummary}
-								comments={post?.comments ?? postData.comments}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
 							/>
 						</div>
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
-								{canVote(post?.onChainInfo?.status) && (
+								{canVote(post.onChainInfo?.status) && (
 									<VoteReferendumButton
 										iconClassName='hidden'
 										index={index}
@@ -145,54 +138,58 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</div>
 						)}
 					</div>
-					{!isModalOpen && !isOffchainPost && (post?.proposalType === EProposalType.REFERENDUM_V2 || postData.proposalType === EProposalType.REFERENDUM_V2) && (
+					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
-							{canPlaceDecisionDeposit && post?.index && post?.onChainInfo?.origin && post?.onChainInfo?.status && (
-								<PlaceDecisionDeposit
-									postId={post?.index}
-									track={post?.onChainInfo?.origin}
-									status={post?.onChainInfo?.status}
-									onSuccess={() => {
-										queryClient.setQueryData(['postDetails', index], (prev: IPost) => {
-											if (!prev.onChainInfo) return prev;
-											return {
-												...prev,
-												onChainInfo: {
-													...prev.onChainInfo,
-													status: EProposalStatus.DecisionDepositPlaced
-												}
-											};
-										});
-									}}
-								/>
-							)}
-							{canVote(post?.onChainInfo?.status) && (
+							{post.proposalType === EProposalType.REFERENDUM_V2 &&
+								post.onChainInfo?.status &&
+								post.onChainInfo?.status === EProposalStatus.Submitted &&
+								post.index &&
+								post.onChainInfo?.origin && (
+									<PlaceDecisionDeposit
+										postId={post.index}
+										track={post.onChainInfo?.origin}
+										status={post.onChainInfo?.status}
+										onSuccess={() => {
+											queryClient.setQueryData(['postDetails', index], (prev: IPost) => {
+												if (!prev.onChainInfo) return prev;
+												return {
+													...prev,
+													onChainInfo: {
+														...prev.onChainInfo,
+														status: EProposalStatus.DecisionDepositPlaced
+													}
+												};
+											});
+										}}
+									/>
+								)}
+							{canVote(post.onChainInfo?.status) && (
 								<VoteReferendumButton
 									iconClassName='hidden'
 									index={index}
 								/>
 							)}
-							<ClaimPayout beneficiaries={post?.onChainInfo?.beneficiaries || []} />
+							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
-								confirmationPeriodEndsAt={post?.onChainInfo?.confirmationPeriodEndsAt}
-								decisionPeriodEndsAt={post?.onChainInfo?.decisionPeriodEndsAt}
-								preparePeriodEndsAt={post?.onChainInfo?.preparePeriodEndsAt}
-								status={post?.onChainInfo?.status || EProposalStatus.Unknown}
-								trackName={post?.onChainInfo?.origin || EPostOrigin.ROOT}
+								confirmationPeriodEndsAt={post.onChainInfo?.confirmationPeriodEndsAt}
+								decisionPeriodEndsAt={post.onChainInfo?.decisionPeriodEndsAt}
+								preparePeriodEndsAt={post.onChainInfo?.preparePeriodEndsAt}
+								status={post.onChainInfo?.status || EProposalStatus.Unknown}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post?.proposalType ?? postData.proposalType}
+								proposalType={post.proposalType}
 								index={index}
-								voteMetrics={post?.onChainInfo?.voteMetrics}
+								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post?.onChainInfo?.origin && post?.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
+							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
 								<VoteCurvesData
-									proposalType={post?.proposalType ?? postData.proposalType}
+									proposalType={post.proposalType}
 									index={index}
-									createdAt={post?.createdAt}
-									trackName={post?.onChainInfo?.origin}
-									timeline={post?.onChainInfo?.timeline}
+									createdAt={post.createdAt}
+									trackName={post.onChainInfo?.origin}
+									timeline={post.onChainInfo?.timeline}
 									setThresholdValues={setThresholdValues}
 									thresholdValues={thresholdValues}
 								/>
@@ -200,21 +197,19 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</div>
 					)}
 
-					{(post?.proposalType === EProposalType.BOUNTY || postData.proposalType === EProposalType.BOUNTY) && (
+					{post.proposalType === EProposalType.BOUNTY && (
 						<div className={classes.rightWrapper}>
 							<ChildBountiesCard parentIndex={index} />
 						</div>
 					)}
 
-					{(post?.proposalType === EProposalType.CHILD_BOUNTY || postData.proposalType === EProposalType.CHILD_BOUNTY) &&
-						parentBountyIndex &&
-						ValidatorService.isValidNumber(parentBountyIndex) && (
-							<div className={classes.rightWrapper}>
-								<div className={classes.parentBountyCardWrapper}>
-									<ParentBountyCard parentBountyIndex={parentBountyIndex} />
-								</div>
+					{post.proposalType === EProposalType.CHILD_BOUNTY && post?.onChainInfo?.parentBountyIndex && ValidatorService.isValidNumber(post?.onChainInfo?.parentBountyIndex) && (
+						<div className={classes.rightWrapper}>
+							<div className={classes.parentBountyCardWrapper}>
+								<ParentBountyCard parentBountyIndex={post.onChainInfo?.parentBountyIndex} />
 							</div>
-						)}
+						</div>
+					)}
 				</div>
 			</Tabs>
 		</>
