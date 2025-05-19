@@ -41,7 +41,7 @@ function PostComments({
 		queryFn: () => fetchComments(),
 		placeholderData: (previousData) => previousData || comments,
 		staleTime: FIVE_MIN_IN_MILLI,
-		retry: false,
+		retry: true,
 		refetchOnMount: true,
 		refetchOnWindowFocus: false
 	});
