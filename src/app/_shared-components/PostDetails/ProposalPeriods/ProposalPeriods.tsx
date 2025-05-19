@@ -5,12 +5,11 @@ import React from 'react';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin, EProposalStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
+import { FAILED_PROPOSAL_STATUSES } from '@/_shared/_constants/failedProposalStatuses';
 import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
 
 const TOTAL_PERIODS = 3;
-
-const FAILED_STATUSES = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Killed, EProposalStatus.ExecutionFailed, EProposalStatus.Cancelled];
 
 const PASSED_STATUSES = [EProposalStatus.Passed, EProposalStatus.Executed];
 
@@ -31,7 +30,7 @@ function ProposalPeriods({
 	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;
 	const decisionPeriodEnded = decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(dayjs()) : false;
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
-	const proposalHasFailed = FAILED_STATUSES.includes(status);
+	const proposalHasFailed = FAILED_PROPOSAL_STATUSES.includes(status);
 	const proposalHasPassed = PASSED_STATUSES.includes(status);
 
 	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
