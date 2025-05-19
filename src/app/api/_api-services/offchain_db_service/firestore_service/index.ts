@@ -295,7 +295,15 @@ export class FirestoreService extends FirestoreUtils {
 		return {
 			...postData,
 			content: postData.content || '',
-			tags: postData.tags?.map((tag: { value: string; lastUsedAt: Timestamp }) => ({ value: tag.value, lastUsedAt: tag.lastUsedAt.toDate() || new Date(), network })) || [],
+			tags:
+				postData.tags?.map((tag: { value: string; lastUsedAt: unknown }) => ({
+					value: tag.value,
+					lastUsedAt:
+						typeof tag.lastUsedAt === 'object' && tag.lastUsedAt !== null && typeof (tag.lastUsedAt as Timestamp).toDate === 'function'
+							? (tag.lastUsedAt as Timestamp).toDate()
+							: new Date(tag.lastUsedAt as string) || new Date(),
+					network
+				})) || [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
