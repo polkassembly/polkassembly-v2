@@ -125,7 +125,9 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 
 			return {
 				...prev,
-				selectedStatuses: newStatuses
+				selectedStatuses: newStatuses,
+				// Reset the page to 1 when a new status is selected
+				currentPage: 1
 			};
 		});
 	};
@@ -146,7 +148,9 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 
 			return {
 				...prev,
-				selectedTags: newTags
+				selectedTags: newTags,
+				// Reset the page to 1 when a new tag is selected
+				currentPage: 1
 			};
 		});
 	};
