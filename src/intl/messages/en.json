@@ -549,6 +549,18 @@
 			"decisionDeposit": "Decision Deposit",
 			"payDecisionDeposit": "Pay Decision Deposit",
 			"continue": "Continue"
+		},
+		"ClaimPayout": {
+			"claim": "Claim",
+			"index": "Index",
+			"beneficiary": "Beneficiary",
+			"amount": "Amount",
+			"expireIn": "Expires in",
+			"claimPayout": "Claim Payout",
+			"payoutClaimedSuccessfully": "Payout claimed successfully",
+			"payoutClaimFailed": "Payout claim failed",
+			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
+			"payoutClaimFailedDescription": "Please try again"
 		}
 	},
 	"ListingPage_Status": {

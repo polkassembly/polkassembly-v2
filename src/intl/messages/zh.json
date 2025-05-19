@@ -520,6 +520,18 @@
 			"decisionDeposit": "决策保证金",
 			"payDecisionDeposit": "支付决策保证金",
 			"continue": "继续"
+		},
+		"ClaimPayout": {
+			"claim": "认领",
+			"index": "索引",
+			"beneficiary": "受益人",
+			"amount": "金额",
+			"expireIn": "到期于",
+			"claimPayout": "认领支付",
+			"payoutClaimedSuccessfully": "支付认领成功",
+			"payoutClaimFailed": "支付认领失败",
+			"payoutClaimedSuccessfullyDescription": "您的支付已成功认领",
+			"payoutClaimFailedDescription": "请再试一次"
 		}
 	},
 	"ListingPage_Status": {

@@ -25,6 +25,7 @@ import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
+import ClaimPayout from './ClaimPayout/ClaimPayout';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [post, setPost] = useState<IPost>(postData);
@@ -140,6 +141,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									index={index}
 								/>
 							)}
+							<ClaimPayout beneficiaries={postData.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
 								confirmationPeriodEndsAt={postData?.onChainInfo?.confirmationPeriodEndsAt}
 								decisionPeriodEndsAt={postData?.onChainInfo?.decisionPeriodEndsAt}
