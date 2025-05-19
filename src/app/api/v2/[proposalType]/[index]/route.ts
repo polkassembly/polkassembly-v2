@@ -19,6 +19,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
+import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -53,7 +54,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	// Get post data from cache only if skipCache is not true or toolsPassphrase is not provided
-	let post = null;
+	let post: IPost | null = null;
 	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
 		post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 	}
@@ -72,6 +73,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	post = await fetchPostData({ network, proposalType, indexOrHash: index });
+
+	// fetch post comments
+	const comments = await OffChainDbService.GetPostComments({ network, proposalType, indexOrHash: index });
+	const commentsWithVoteData = await fetchCommentsVoteData({ comments, network, proposalType, index });
+	post = { ...post, comments: commentsWithVoteData };
 
 	// fetch and add reactions to post
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });

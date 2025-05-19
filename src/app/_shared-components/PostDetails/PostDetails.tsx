@@ -99,6 +99,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								proposalType={post.proposalType}
 								index={index}
 								contentSummary={post.contentSummary}
+								comments={post.comments}
 							/>
 						</div>
 						{isModalOpen && !isOffchainPost && (

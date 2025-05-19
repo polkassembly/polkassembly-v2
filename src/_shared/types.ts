@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable no-use-before-define */
+
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
@@ -561,6 +563,7 @@ export interface IPost extends IOffChainPost {
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 	contentSummary?: IContentSummary;
+	comments?: ICommentResponse[];
 }
 
 export interface IOnChainPostListing {

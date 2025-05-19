@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, IContentSummary } from '@/_shared/types';
+import { EProposalType, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +14,17 @@ import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
-function PostComments({ proposalType, index, contentSummary }: { proposalType: EProposalType; index: string; contentSummary?: IContentSummary }) {
+function PostComments({
+	proposalType,
+	index,
+	contentSummary,
+	comments
+}: {
+	proposalType: EProposalType;
+	index: string;
+	contentSummary?: IContentSummary;
+	comments?: ICommentResponse[];
+}) {
 	const t = useTranslations();
 
 	const fetchComments = async () => {
@@ -29,10 +39,10 @@ function PostComments({ proposalType, index, contentSummary }: { proposalType: E
 	const { data, isFetching } = useQuery({
 		queryKey: ['comments', proposalType, index],
 		queryFn: () => fetchComments(),
-		placeholderData: (previousData) => previousData,
+		placeholderData: (previousData) => previousData || comments,
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: false,
-		refetchOnMount: false,
+		refetchOnMount: true,
 		refetchOnWindowFocus: false
 	});
 
@@ -52,7 +62,7 @@ function PostComments({ proposalType, index, contentSummary }: { proposalType: E
 				/>
 			</div>
 
-			{isFetching ? (
+			{(data || [])?.length === 0 && isFetching ? (
 				<div className='flex flex-col gap-2 px-8'>
 					<Skeleton className='h-8' />
 					<Skeleton className='h-8' />
