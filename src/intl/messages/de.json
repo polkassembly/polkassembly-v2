@@ -633,7 +633,11 @@
 		"title": "Titel",
 		"content": "Inhalt",
 		"save": "Speichern",
-		"editPostButton": "Bearbeiten"
+		"editPostButton": "Bearbeiten",
+		"success": "Beitrag erfolgreich aktualisiert",
+		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
+		"error": "Beitrag konnte nicht aktualisiert werden",
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",

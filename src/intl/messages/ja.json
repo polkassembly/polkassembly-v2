@@ -634,7 +634,11 @@
 		"title": "タイトル",
 		"content": "内容",
 		"save": "保存",
-		"editPostButton": "編集"
+		"editPostButton": "編集",
+		"success": "投稿が正常に更新されました",
+		"successDescription": "あなたの投稿は正常に更新されました",
+		"error": "投稿の更新に失敗しました",
+		"errorDescription": "投稿の更新中にエラーが発生しました"
 	},
 	"Footer": {
 		"helpCenter": "ヘルプセンター",
