@@ -10,7 +10,7 @@ import { IBeneficiary, IPayout } from '@/_shared/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { dayjs } from '@/_shared/_utils/dayjsRelativeTime';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -137,7 +137,7 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 										<p className='col-span-1'>
 											{formatBnBalance(treasurySpend.treasurySpendData.amount, { withUnit: true, compactNotation: true }, network, treasurySpend.treasurySpendData.generalIndex)}
 										</p>
-										<p className='col-span-1'>{dayjs(treasurySpend.treasurySpendData.expiresAt).diff(dayjs(), 'days')}</p>
+										<p className='col-span-1'>{dayjs(treasurySpend.treasurySpendData.expiresAt).fromNow(true)}</p>
 									</div>
 								)
 						)}
