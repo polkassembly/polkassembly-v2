@@ -1088,10 +1088,10 @@ export class PolkadotApiService {
 			.filter((payout) => payout !== null);
 	}
 
-	async claimTreasuryPayout({ payout, address, onSuccess, onFailed }: { payout: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
-		if (!this.api || !payout || payout.length === 0) return;
+	async claimTreasuryPayout({ payouts, address, onSuccess, onFailed }: { payouts: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api || !payouts || payouts.length === 0) return;
 
-		const tx = payout.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
+		const tx = payouts.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
 
 		const batchTx = tx.length > 1 ? this.api.tx.utility.batch(tx) : tx[0];
 

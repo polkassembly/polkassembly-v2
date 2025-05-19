@@ -73,7 +73,7 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 		setLoading(true);
 
 		await apiService.claimTreasuryPayout({
-			payout: pendingTreasurySpendsByBeneficiary.filter((treasurySpend) => treasurySpend !== null),
+			payouts: pendingTreasurySpendsByBeneficiary,
 			address: userPreferences?.selectedAccount?.address,
 			onSuccess: () => {
 				setLoading(false);
