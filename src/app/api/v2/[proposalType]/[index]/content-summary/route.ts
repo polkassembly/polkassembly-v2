@@ -4,7 +4,6 @@
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { EHttpHeaderKey, EProposalType, IContentSummary } from '@/_shared/types';
-import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { SubsquareOffChainService } from '@/app/api/_api-services/offchain_db_service/subsquare_offchain_service';
@@ -28,14 +27,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	let contentSummary: IContentSummary | null = null;
 
 	// Try to get from cache first
 	let cachedData = null;
-	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+	if (!skipCache) {
 		cachedData = await RedisService.GetContentSummary({ network, indexOrHash: index, proposalType });
 	}
 

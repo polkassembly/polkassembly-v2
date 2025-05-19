@@ -18,7 +18,6 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
-import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
 
 const SET_COOKIE = 'Set-Cookie';
@@ -32,8 +31,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
@@ -53,9 +51,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		isUserAuthenticated = false;
 	}
 
-	// Get post data from cache only if skipCache is not true or toolsPassphrase is not provided
+	// Get post data from cache only if skipCache is not true
 	let post: IPost | null = null;
-	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+	if (!skipCache) {
 		post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 	}
 

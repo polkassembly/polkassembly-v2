@@ -168,7 +168,7 @@ export class WebhookService {
 
 		// Refresh above caches
 		const baseUrl = await getBaseUrl();
-		const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
+		const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true' };
 
 		const fetchUrls = [];
 		// 1. fetch above post details page
@@ -195,7 +195,7 @@ export class WebhookService {
 
 			console.log(`Clearing cache with baseUrl: ${baseUrl}`);
 
-			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
+			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true' };
 
 			// 0. Prepare all URLs that need to be fetched
 			const fetchUrls: string[] = [];
