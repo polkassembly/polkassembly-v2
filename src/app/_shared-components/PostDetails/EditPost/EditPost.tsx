@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useRef, useState } from 'react';
-import { EProposalType, IPost, IPostListing } from '@/_shared/types';
+import { ENotificationStatus, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -11,6 +11,7 @@ import { LocalStorageClientService } from '@/app/_client-services/local_storage_
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { useToast } from '@/hooks/useToast';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
@@ -30,6 +31,8 @@ function EditPost({
 	const [isLoading, setIsLoading] = useState(false);
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const { user } = useUser();
+
+	const { toast } = useToast();
 
 	const canEditOffChain = user && user.id === postData.userId;
 
@@ -51,11 +54,24 @@ function EditPost({
 			data: { title, content }
 		});
 
-		if (!error && data) {
-			onEditPostSuccess?.(title, content);
-			LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
-			onClose?.();
+		if (error || !data) {
+			toast({
+				title: t('EditPost.error'),
+				description: t('EditPost.errorDescription'),
+				status: ENotificationStatus.ERROR
+			});
+			setIsLoading(false);
+			return;
 		}
+
+		onEditPostSuccess?.(title, content);
+		LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
+		onClose?.();
+		toast({
+			title: t('EditPost.success'),
+			description: t('EditPost.successDescription'),
+			status: ENotificationStatus.SUCCESS
+		});
 		setIsLoading(false);
 	};
 

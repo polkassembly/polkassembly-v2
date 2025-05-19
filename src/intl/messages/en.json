@@ -669,7 +669,11 @@
 		"title": "Title",
 		"content": "Content",
 		"save": "Save",
-		"editPostButton": "Edit"
+		"editPostButton": "Edit",
+		"success": "Post updated successfully",
+		"successDescription": "Your post has been updated successfully",
+		"error": "Failed to update post",
+		"errorDescription": "There was an error while updating your post"
 	},
 	"LinkDiscussionPost": {
 		"linkDiscussion": "Link Discussion",

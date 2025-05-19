@@ -635,7 +635,11 @@
 		"title": "Título",
 		"content": "Contenido",
 		"save": "Guardar",
-		"editPostButton": "Editar"
+		"editPostButton": "Editar",
+		"success": "Publicación actualizada con éxito",
+		"successDescription": "Tu publicación ha sido actualizada con éxito",
+		"error": "Error al actualizar la publicación",
+		"errorDescription": "Hubo un error al actualizar tu publicación"
 	},
 	"Footer": {
 		"helpCenter": "Centro de Ayuda",
