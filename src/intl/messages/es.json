@@ -521,6 +521,18 @@
 			"decisionDeposit": "Depósito de decisión",
 			"payDecisionDeposit": "Pagar depósito de decisión",
 			"continue": "Continuar"
+		},
+		"ClaimPayout": {
+			"claim": "Reclamar",
+			"index": "Índice",
+			"beneficiary": "Beneficiario",
+			"amount": "Cantidad",
+			"expireIn": "Expira en",
+			"claimPayout": "Reclamar pago",
+			"payoutClaimedSuccessfully": "Pago reclamado con éxito",
+			"payoutClaimFailed": "Error al reclamar el pago",
+			"payoutClaimedSuccessfullyDescription": "Su pago ha sido reclamado con éxito",
+			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
 		}
 	},
 	"ListingPage_Status": {

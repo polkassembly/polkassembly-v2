@@ -520,6 +520,18 @@
 			"decisionDeposit": "決定デポジット",
 			"payDecisionDeposit": "決定デポジットを支払う",
 			"continue": "続行"
+		},
+		"ClaimPayout": {
+			"claim": "請求",
+			"index": "インデックス",
+			"beneficiary": "受益者",
+			"amount": "金額",
+			"expireIn": "有効期限",
+			"claimPayout": "支払いを請求",
+			"payoutClaimedSuccessfully": "支払いが正常に請求されました",
+			"payoutClaimFailed": "支払いの請求に失敗しました",
+			"payoutClaimedSuccessfullyDescription": "支払いが正常に請求されました",
+			"payoutClaimFailedDescription": "もう一度お試しください"
 		}
 	},
 	"ListingPage_Status": {
