@@ -1047,45 +1047,46 @@ export class PolkadotApiService {
 
 		const proposals = await this.api?.query?.treasury?.spends?.entries();
 
-		return proposals
-			.map((proposal) => {
-				const indexData = proposal[0].toHuman();
-				const spendData = proposal[1].toHuman();
+		const treasuryPendingSpends: IPayout[] = [];
 
-				if (!indexData || !spendData) return null;
+		proposals?.forEach((proposal) => {
+			const indexData = proposal?.[0]?.toHuman();
+			const spendData = proposal?.[1]?.toHuman();
 
-				const expiresAt = Number(((spendData as any)?.expireAt as string).split(',').join(''));
-				const startsAt = Number(((spendData as any)?.validFrom as string).split(',').join(''));
+			if (indexData && spendData) {
+				const expiresAt = Number(((spendData as any)?.expireAt as string)?.split(',')?.join(''));
+				const startsAt = Number(((spendData as any)?.validFrom as string)?.split(',')?.join(''));
 
-				if (new BN(currentBlockHeight).lt(new BN(startsAt)) || new BN(currentBlockHeight).gt(new BN(expiresAt)) || (spendData as any).status !== 'Pending') return null;
+				if (new BN(currentBlockHeight).gt(new BN(startsAt)) && new BN(currentBlockHeight).lt(new BN(expiresAt)) && (spendData as any).status === 'Pending') {
+					const payout: IPayout = {
+						treasurySpendIndex: Number(((indexData as any)?.[0] as string)?.split(',')?.join('')),
+						treasurySpendData: {
+							beneficiary:
+								getSubstrateAddressFromAccountId(
+									(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
+								) || '',
+							generalIndex:
+								(
+									(spendData as any)?.assetKind?.V4?.assetId?.interior?.X2?.[1]?.GeneralIndex ||
+									(spendData as any)?.assetKind?.V3?.assetId?.Concrete.interior?.X2?.[1]?.GeneralIndex ||
+									''
+								)
+									.split(',')
+									?.join('') || '',
+							amount: (spendData as any)?.amount?.toString()?.split(',')?.join('') || '',
+							expiresAt: BlockCalculationsService.getDateFromBlockNumber({
+								currentBlockNumber: new BN(currentBlockHeight),
+								targetBlockNumber: new BN(expiresAt),
+								network: this.network
+							})
+						}
+					};
+					treasuryPendingSpends.push(payout);
+				}
+			}
+		});
 
-				const payout: IPayout = {
-					treasurySpendIndex: Number(((indexData as any)[0] as string).split(',').join('')),
-					treasurySpendData: {
-						beneficiary:
-							getSubstrateAddressFromAccountId(
-								(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
-							) || '',
-						generalIndex:
-							(
-								(spendData as any)?.assetKind?.V4?.assetId?.interior?.X2?.[1]?.GeneralIndex ||
-								(spendData as any)?.assetKind?.V3?.assetId?.Concrete.interior?.X2?.[1]?.GeneralIndex ||
-								''
-							)
-								.split(',')
-								?.join('') || '',
-						amount: (spendData as any)?.amount?.toString().split(',').join(''),
-						expiresAt: BlockCalculationsService.getDateFromBlockNumber({
-							currentBlockNumber: new BN(currentBlockHeight),
-							targetBlockNumber: new BN(expiresAt),
-							network: this.network
-						})
-					}
-				};
-
-				return payout;
-			})
-			.filter((payout) => payout !== null);
+		return treasuryPendingSpends;
 	}
 
 	async claimTreasuryPayout({ payouts, address, onSuccess, onFailed }: { payouts: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
