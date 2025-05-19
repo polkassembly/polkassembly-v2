@@ -8,6 +8,12 @@ import { useTranslations } from 'next-intl';
 import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
 
+const TOTAL_PERIODS = 3;
+
+const FAILED_STATUSES = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Killed, EProposalStatus.ExecutionFailed, EProposalStatus.Cancelled];
+
+const PASSED_STATUSES = [EProposalStatus.Passed, EProposalStatus.Executed];
+
 function ProposalPeriods({
 	confirmationPeriodEndsAt,
 	decisionPeriodEndsAt,
@@ -25,29 +31,38 @@ function ProposalPeriods({
 	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;
 	const decisionPeriodEnded = decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(dayjs()) : false;
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
+	const proposalHasFailed = FAILED_STATUSES.includes(status);
+	const proposalHasPassed = PASSED_STATUSES.includes(status);
 
 	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
 
-	return (
-		<div className={classes.proposalPeriodsWrapper}>
-			<div className={classes.proposalPeriodsHeader}>
-				<p className={classes.proposalPeriodsHeaderTitle}>
-					{confirmationPeriodEnded
-						? status === EProposalStatus.Passed || EProposalStatus.Executed
-							? t('PostDetails.proposalPassed')
-							: t('PostDetails.proposalFailed')
-						: decisionPeriodEnded
-							? t('PostDetails.confirmationPeriod')
-							: preparePeriodEnded
-								? t('PostDetails.votingStarted')
-								: t('PostDetails.preparePeriod')}
-				</p>
-				<div className={classes.proposalPeriodsHeaderPeriods}>
-					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{periodsEnded.length + 1 > 3 ? 3 : periodsEnded.length + 1}</p>
-					<span className='pl-1 pr-2'>of 3</span>
-				</div>
-			</div>
-			{confirmationPeriodEnded ? null : preparePeriodEnded ? (
+	const getStatusText = () => {
+		if (proposalHasFailed) {
+			return t('PostDetails.proposalFailed');
+		}
+
+		if (confirmationPeriodEnded) {
+			return proposalHasPassed ? t('PostDetails.proposalPassed') : t('PostDetails.proposalFailed');
+		}
+
+		if (decisionPeriodEnded) {
+			return t('PostDetails.confirmationPeriod');
+		}
+
+		if (preparePeriodEnded) {
+			return t('PostDetails.votingStarted');
+		}
+
+		return t('PostDetails.preparePeriod');
+	};
+
+	const renderPeriodProgress = () => {
+		if (confirmationPeriodEnded || proposalHasFailed) {
+			return null;
+		}
+
+		if (preparePeriodEnded) {
+			return (
 				<div className='flex flex-col gap-y-6'>
 					<PeriodProgress
 						periodEndsAt={decisionPeriodEndsAt}
@@ -62,16 +77,31 @@ function ProposalPeriods({
 						periodType={EPeriodType.CONFIRM}
 					/>
 				</div>
-			) : (
-				<div>
-					<PeriodProgress
-						periodEndsAt={preparePeriodEndsAt}
-						periodName={t('PostDetails.preparePeriod')}
-						trackName={trackName}
-						periodType={EPeriodType.PREPARE}
-					/>
+			);
+		}
+
+		return (
+			<div>
+				<PeriodProgress
+					periodEndsAt={preparePeriodEndsAt}
+					periodName={t('PostDetails.preparePeriod')}
+					trackName={trackName}
+					periodType={EPeriodType.PREPARE}
+				/>
+			</div>
+		);
+	};
+
+	return (
+		<div className={classes.proposalPeriodsWrapper}>
+			<div className={classes.proposalPeriodsHeader}>
+				<p className={classes.proposalPeriodsHeaderTitle}>{getStatusText()}</p>
+				<div className={classes.proposalPeriodsHeaderPeriods}>
+					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{Math.min(periodsEnded.length + 1, TOTAL_PERIODS)}</p>
+					<span className='pl-1 pr-2'>of {TOTAL_PERIODS}</span>
 				</div>
-			)}
+			</div>
+			{renderPeriodProgress()}
 		</div>
 	);
 }
