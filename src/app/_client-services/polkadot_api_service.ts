@@ -18,7 +18,9 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
+import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -1032,6 +1034,71 @@ export class PolkadotApiService {
 			tx,
 			address,
 			errorMessageFallback: 'Failed to submit decision deposit',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async getTreasurySpendsData() {
+		if (!this.api) return null;
+
+		const currentBlockHeight = await this.getBlockHeight();
+
+		const proposals = await this.api?.query?.treasury?.spends?.entries();
+
+		return proposals
+			.map((proposal) => {
+				const indexData = proposal[0].toHuman();
+				const spendData = proposal[1].toHuman();
+
+				if (!indexData || !spendData) return null;
+
+				const expiresAt = Number(((spendData as any)?.expireAt as string).split(',').join(''));
+				const startsAt = Number(((spendData as any)?.validFrom as string).split(',').join(''));
+
+				if (new BN(currentBlockHeight).lt(new BN(startsAt)) || new BN(currentBlockHeight).gt(new BN(expiresAt)) || (spendData as any).status !== 'Pending') return null;
+
+				const payout: IPayout = {
+					treasurySpendIndex: Number(((indexData as any)[0] as string).split(',').join('')),
+					treasurySpendData: {
+						beneficiary:
+							getSubstrateAddressFromAccountId(
+								(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
+							) || '',
+						generalIndex:
+							(
+								(spendData as any)?.assetKind?.V4?.assetId?.interior?.X2?.[1]?.GeneralIndex ||
+								(spendData as any)?.assetKind?.V3?.assetId?.Concrete.interior?.X2?.[1]?.GeneralIndex ||
+								''
+							)
+								.split(',')
+								?.join('') || '',
+						amount: (spendData as any)?.amount?.toString().split(',').join(''),
+						expiresAt: BlockCalculationsService.getDateFromBlockNumber({
+							currentBlockNumber: new BN(currentBlockHeight),
+							targetBlockNumber: new BN(expiresAt),
+							network: this.network
+						})
+					}
+				};
+
+				return payout;
+			})
+			.filter((payout) => payout !== null);
+	}
+
+	async claimTreasuryPayout({ payout, address, onSuccess, onFailed }: { payout: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api || !payout || payout.length === 0) return;
+
+		const tx = payout.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
+
+		const batchTx = tx.length > 1 ? this.api.tx.utility.batch(tx) : tx[0];
+
+		await this.executeTx({
+			tx: batchTx,
+			address,
+			errorMessageFallback: 'Failed to claim treasury payout',
 			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true

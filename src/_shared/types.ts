@@ -553,6 +553,7 @@ export interface IOnChainPostInfo {
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
 	curator?: string;
+	treasurySpendIndex?: number;
 }
 
 export interface IPost extends IOffChainPost {
@@ -1279,4 +1280,14 @@ export enum EVoteSortOptions {
 	SelfVotingPowerDESC = 'selfVotingPower_DESC',
 	DelegatedVotingPowerASC = 'delegatedVotingPower_ASC',
 	DelegatedVotingPowerDESC = 'delegatedVotingPower_DESC'
+}
+
+export interface IPayout {
+	treasurySpendIndex: number;
+	treasurySpendData: {
+		beneficiary: string;
+		amount: string;
+		expiresAt: Date;
+		generalIndex: string;
+	};
 }

@@ -519,6 +519,18 @@
 			"decisionDeposit": "Entscheidungskaution",
 			"payDecisionDeposit": "Entscheidungskaution zahlen",
 			"continue": "Weiter"
+		},
+		"ClaimPayout": {
+			"claim": "Beanspruchen",
+			"index": "Index",
+			"beneficiary": "Begünstigter",
+			"amount": "Betrag",
+			"expireIn": "Läuft ab in",
+			"claimPayout": "Auszahlung beanspruchen",
+			"payoutClaimedSuccessfully": "Auszahlung erfolgreich beansprucht",
+			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
+			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
+			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
 		}
 	},
 	"ListingPage_Status": {
