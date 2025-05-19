@@ -79,3 +79,10 @@ export interface IV1UserAddress {
 	isMultisig?: boolean;
 	proxy_for?: unknown[];
 }
+
+export enum ECacheRefreshType {
+	OFF_CHAIN_POSTS = 'off_chain_posts',
+	REFERENDA_V2 = 'referenda_v2',
+	BOUNTY = 'bounty',
+	LISTING = 'listing'
+}
