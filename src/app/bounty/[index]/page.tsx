@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
 import { EProposalType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	// Use post title in description if available
 	if (data) {
 		title = `Polkassembly - Bounty #${index}`;
-		description = `Bounty #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+		description = `Bounty #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`;
 	}
 
 	return {

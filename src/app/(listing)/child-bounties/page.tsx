@@ -8,11 +8,57 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { z } from 'zod';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
 const zodQuerySchema = z.object({
 	page: z.coerce.number().min(1).optional().default(1),
 	status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional()
 });
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title, description } = OPENGRAPH_METADATA;
+	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
+	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+
+	return {
+		title: `${title} - Child Bounties`,
+		description,
+		metadataBase: new URL(`https://${network}.polkassembly.io`),
+		icons: [{ url: '/favicon.ico' }],
+		openGraph: {
+			title: `${title} - Child Bounties`,
+			description,
+			images: [
+				{
+					url: image || '',
+					width: 600,
+					height: 600,
+					alt: 'Polkassembly Child Bounties'
+				},
+				{
+					url: smallImage || '',
+					width: 1200,
+					height: 600,
+					alt: 'Polkassembly Child Bounties'
+				}
+			],
+			siteName: 'Polkassembly',
+			type: 'website',
+			url: `https://${network}.polkassembly.io/child-bounties`
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: `${title} - Child Bounties`,
+			description,
+			images: image ? [image] : [smallImage || ''],
+			site: '@polkassembly'
+		}
+	};
+}
 
 async function ChildBountiesPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
 	const searchParamsValue = await searchParams;

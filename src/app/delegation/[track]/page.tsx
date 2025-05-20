@@ -9,12 +9,57 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { Metadata } from 'next';
 import DelegationTrack from './Component/DelegationTrack/DelegationTrack';
 
 interface Props {
 	params: Promise<{ track: string }>;
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const { track } = await params;
+	const network = await getNetworkFromHeaders();
+	const { title, description } = OPENGRAPH_METADATA;
+	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
+	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+
+	return {
+		title: `${title} - Delegation Track`,
+		description,
+		metadataBase: new URL(`https://${network}.polkassembly.io`),
+		icons: [{ url: '/favicon.ico' }],
+		openGraph: {
+			title: `${title} - Delegation Track`,
+			description,
+			images: [
+				{
+					url: image || '',
+					width: 600,
+					height: 600,
+					alt: 'Polkassembly Delegation Track'
+				},
+				{
+					url: smallImage || '',
+					width: 1200,
+					height: 600,
+					alt: 'Polkassembly Delegation Track'
+				}
+			],
+			siteName: 'Polkassembly',
+			type: 'website',
+			url: `https://${network}.polkassembly.io/delegation/${track}`
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: `${title} - Delegation Track`,
+			description,
+			images: image ? [image] : [smallImage || ''],
+			site: '@polkassembly'
+		}
+	};
+}
 async function DelegationTrackPage({ params }: Props) {
 	const { track } = await params;
 	const user = await CookieService.getUserFromCookie();

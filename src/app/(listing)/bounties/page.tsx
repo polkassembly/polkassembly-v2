@@ -13,6 +13,11 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import BountiesListingPage from './Components/BountiesListingPage';
 
+const zodQuerySchema = z.object({
+	page: z.coerce.number().min(1).optional().default(1),
+	status: z.nativeEnum(EBountyStatus).optional().default(EBountyStatus.ALL)
+});
+
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
 	const { title, description } = OPENGRAPH_METADATA;
@@ -54,11 +59,6 @@ export async function generateMetadata(): Promise<Metadata> {
 		}
 	};
 }
-
-const zodQuerySchema = z.object({
-	page: z.coerce.number().min(1).optional().default(1),
-	status: z.nativeEnum(EBountyStatus).optional().default(EBountyStatus.ALL)
-});
 
 const convertStatusToStatusesArray = (status: EBountyStatus): EProposalStatus[] => {
 	switch (status) {
