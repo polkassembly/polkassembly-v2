@@ -33,40 +33,29 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	const url = `https://polkassembly.com/referenda/${index}`;
 
 	return {
-		metadataBase: new URL('https://polkassembly.com'),
 		title,
 		description,
+		icons: [{ url: 'favicon.ico' }],
 		openGraph: {
 			title,
 			description,
 			images: [
 				{
 					url: image || '',
-					width: 1200,
-					height: 630,
+					width: 750,
+					height: 500,
 					alt: `Polkassembly Referendum #${index}`
 				},
 				{
 					url: smallImage || '',
 					width: 600,
-					height: 315,
+					height: 600,
 					alt: `Polkassembly Referendum #${index}`
 				}
 			],
 			siteName: 'Polkassembly',
 			type: 'website',
 			url
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title,
-			description,
-			images: [image || ''],
-			site: '@polkassembly'
-		},
-		other: {
-			'og:image:width': '1200',
-			'og:image:height': '630'
 		}
 	};
 }
