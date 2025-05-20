@@ -43,13 +43,13 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 			images: [
 				{
 					url: image || '',
-					width: 1200,
-					height: 630,
+					width: 600,
+					height: 600,
 					alt: `Polkassembly Referendum #${index}`
 				},
 				{
 					url: smallImage || '',
-					width: 600,
+					width: 1200,
 					height: 600,
 					alt: `Polkassembly Referendum #${index}`
 				}
