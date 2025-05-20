@@ -21,7 +21,8 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 
 	// Default description and title
 	let { description, title } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage;
+	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
+	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
 
 	// Use post title in description if available
 	if (data) {
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 		title,
 		description,
 		openGraph: {
-			images: [{ url: image || '' }]
+			images: [{ url: image || '' }, { url: smallImage || '' }]
 		}
 	};
 }

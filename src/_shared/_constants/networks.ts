@@ -125,7 +125,10 @@ interface INetworkDetails {
 	palletInstance?: string;
 	parachain?: string;
 	convictionVotingPeriodInBlocks: BN;
-	openGraphImage?: string;
+	openGraphImage?: {
+		large: string;
+		small: string;
+	};
 }
 
 enum ENetworkSocial {
@@ -1665,8 +1668,11 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		socialLinks: networkSocialLinks[ENetwork.POLKADOT],
 		assethubDetails: ASSETHUB_DETAILS[ENetwork.POLKADOT],
 		convictionVotingPeriodInBlocks: new BN('100800'),
-		openGraphImage:
-			'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
+		openGraphImage: {
+			large: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkadot.png?alt=media&token=02231f8b-5206-4bff-ad78-9a64d81d6580',
+			small:
+				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
+		}
 	},
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
