@@ -11,6 +11,7 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 
 	// Use post title in description if available
 	if (data) {
-		description = `Discussion #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+		description = `Discussion #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`;
 	}
 
 	const url = `https://${network}.polkassembly.io/post/${index}`;
