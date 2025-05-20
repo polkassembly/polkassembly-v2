@@ -30,11 +30,43 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 		description = `Referendum #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
 	}
 
+	const url = `https://polkassembly.com/referenda/${index}`;
+
 	return {
+		metadataBase: new URL('https://polkassembly.com'),
 		title,
 		description,
 		openGraph: {
-			images: [{ url: image || '' }, { url: smallImage || '' }]
+			title,
+			description,
+			images: [
+				{
+					url: image || '',
+					width: 1200,
+					height: 630,
+					alt: `Polkassembly Referendum #${index}`
+				},
+				{
+					url: smallImage || '',
+					width: 600,
+					height: 315,
+					alt: `Polkassembly Referendum #${index}`
+				}
+			],
+			siteName: 'Polkassembly',
+			type: 'website',
+			url
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title,
+			description,
+			images: [image || ''],
+			site: '@polkassembly'
+		},
+		other: {
+			'og:image:width': '1200',
+			'og:image:height': '630'
 		}
 	};
 }
