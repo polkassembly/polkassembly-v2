@@ -22,7 +22,6 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	// Default description and title
 	let { description, title } = OPENGRAPH_METADATA;
 	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
 
 	// Use post title in description if available
 	if (data) {
@@ -35,27 +34,31 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	return {
 		title,
 		description,
-		icons: [{ url: 'favicon.ico' }],
+		metadataBase: new URL('https://polkassembly.com'),
+		icons: [{ url: '/favicon.ico' }],
 		openGraph: {
 			title,
 			description,
-			images: [
-				{
-					url: image || '',
-					width: 750,
-					height: 500,
-					alt: `Polkassembly Referendum #${index}`
-				},
-				{
-					url: smallImage || '',
-					width: 600,
-					height: 600,
-					alt: `Polkassembly Referendum #${index}`
-				}
-			],
+			images: image
+				? [
+						{
+							url: image,
+							width: 1200,
+							height: 630,
+							alt: `Polkassembly Referendum #${index}`
+						}
+					]
+				: [],
 			siteName: 'Polkassembly',
 			type: 'website',
 			url
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title,
+			description,
+			images: image ? [image] : [],
+			site: '@polkassembly'
 		}
 	};
 }
