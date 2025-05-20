@@ -43,6 +43,31 @@ const nextConfig = {
 			{
 				source: '/api/v1/:path*',
 				destination: 'https://polkadot-old.polkassembly.io/api/v1/:path*'
+			},
+			// Archive proposal types reroutes
+			{
+				source: '/proposal/:id',
+				destination: 'https://polkadot-old.polkassembly.io/proposal/:id'
+			},
+			{
+				source: '/referendum/:id',
+				destination: 'https://polkadot-old.polkassembly.io/referendum/:id'
+			},
+			{
+				source: '/treasury/:id',
+				destination: 'https://polkadot-old.polkassembly.io/treasury/:id'
+			},
+			{
+				source: '/tip/:id',
+				destination: 'https://polkadot-old.polkassembly.io/tip/:id'
+			},
+			{
+				source: '/motion/:id',
+				destination: 'https://polkadot-old.polkassembly.io/motion/:id'
+			},
+			{
+				source: '/tech/:id',
+				destination: 'https://polkadot-old.polkassembly.io/tech/:id'
 			}
 		];
 	},
