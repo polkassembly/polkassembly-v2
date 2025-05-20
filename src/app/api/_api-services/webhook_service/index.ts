@@ -250,13 +250,23 @@ export class WebhookService {
 			page: 1
 		});
 
+		// content-summary cache for posts
+		const contentSummaryPromises: Promise<void>[] = [];
+
 		offChainPosts.forEach((post) => {
 			const indexOrHash = post.index || post.hash;
-			const proposalUrl = `${baseUrl}/${post.proposalType}/${indexOrHash}`;
+			if (indexOrHash) {
+				const proposalUrl = `${baseUrl}/${post.proposalType}/${indexOrHash}`;
 
-			// proposal detail page
-			fetchUrls.push(proposalUrl);
+				// proposal detail page
+				fetchUrls.push(proposalUrl);
+
+				// content-summary cache for posts
+				contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: post.proposalType }));
+			}
 		});
+
+		await Promise.allSettled(contentSummaryPromises);
 
 		return fetchUrls;
 	}
@@ -273,12 +283,20 @@ export class WebhookService {
 			statuses: ACTIVE_PROPOSAL_STATUSES
 		});
 
+		// content-summary cache for refV2
+		const contentSummaryPromises: Promise<void>[] = [];
+
 		activeRefV2Proposals.forEach((proposal) => {
 			const indexOrHash = proposal.index || proposal.hash;
 			const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
 
 			fetchUrls.push(proposalUrl);
+
+			// content-summary cache for refV2
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.REFERENDUM_V2 }));
 		});
+
+		await Promise.allSettled(contentSummaryPromises);
 		return fetchUrls;
 	}
 
@@ -304,11 +322,17 @@ export class WebhookService {
 
 		const [activeBounties, activeChildBounties] = await Promise.all([activeBountyPromises, activeChildBountyPromises]);
 
+		// content-summary cache for bounty
+		const contentSummaryPromises: Promise<void>[] = [];
+
 		activeBounties.items.forEach((bounty) => {
 			const indexOrHash = bounty.index;
 			const proposalUrl = `${baseUrl}/${EProposalType.BOUNTY}/${indexOrHash}`;
 
 			fetchUrls.push(proposalUrl);
+
+			// content-summary cache for bounty
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.BOUNTY }));
 		});
 
 		activeChildBounties.items.forEach((bounty) => {
@@ -316,7 +340,12 @@ export class WebhookService {
 			const proposalUrl = `${baseUrl}/${EProposalType.CHILD_BOUNTY}/${indexOrHash}`;
 
 			fetchUrls.push(proposalUrl);
+
+			// content-summary cache for bounty
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.CHILD_BOUNTY }));
 		});
+
+		await Promise.allSettled(contentSummaryPromises);
 
 		return fetchUrls;
 	}
