@@ -5,57 +5,23 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { privacyPolicyContent } from './privacy-policy';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	return {
+	return getGeneratedContentMetadata({
 		title: `${title} - Privacy Policy`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - Privacy Policy`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Privacy Policy'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Privacy Policy'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/privacy`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - Privacy Policy`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+		description: 'Explore Polkassembly Privacy Policy',
+		network,
+		url: `https://${network}.polkassembly.io/privacy`,
+		imageAlt: 'Polkassembly Privacy Policy'
+	});
 }
-
-export const metadata: Metadata = {
-	title: 'Privacy Policy - Polkassembly',
-	description: 'Privacy Policy for Polkassembly'
-};
 
 export default async function PrivacyPolicyPage() {
 	const network = await getNetworkFromHeaders();

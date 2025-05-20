@@ -11,50 +11,21 @@ import { z } from 'zod';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 const origin = EPostOrigin.TREASURER;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	return {
+	return getGeneratedContentMetadata({
 		title: `${title} - Treasurer Proposals`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - Treasurer Proposals`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Treasurer Proposals'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Treasurer Proposals'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/treasurer`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - Treasurer Proposals`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+		description: 'Explore all Treasurer Proposals on Polkassembly',
+		url: `https://${network}.polkassembly.io/treasurer`,
+		imageAlt: 'Polkassembly Treasurer Proposals',
+		network
+	});
 }
 
 const zodQuerySchema = z.object({

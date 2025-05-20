@@ -10,48 +10,19 @@ import { z } from 'zod';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	return {
+	return getGeneratedContentMetadata({
 		title: `${title} - Technical Committee Proposals`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - Technical Committee Proposals`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Technical Committee Proposals'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Technical Committee Proposals'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/tech-comm-proposals`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - Technical Committee Proposals`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+		description: 'Explore all Technical Committee proposals on Polkassembly',
+		url: `https://${network}.polkassembly.io/tech-comm-proposals`,
+		imageAlt: 'Polkassembly Technical Committee Proposals',
+		network
+	});
 }
 
 const zodQuerySchema = z.object({

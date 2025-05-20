@@ -4,53 +4,24 @@
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Suspense } from 'react';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
-import BountyDashboard from './Components';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
+import BountyDashboard from './Components';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	return {
+	return getGeneratedContentMetadata({
 		title: `${title} - Bounty Dashboard`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - Bounty Dashboard`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Bounty Dashboard'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Bounty Dashboard'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/bounty-dashboard`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - Bounty Dashboard`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+		description: 'Explore all Bounty Proposals on Polkassembly',
+		network,
+		url: `https://${network}.polkassembly.io/bounty-dashboard`,
+		imageAlt: 'Polkassembly Bounty Dashboard'
+	});
 }
 
 async function BountyDashboardPage() {

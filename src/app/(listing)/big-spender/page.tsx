@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 const origin = EPostOrigin.BIG_SPENDER;
 const zodQuerySchema = z.object({
@@ -21,44 +21,15 @@ const zodQuerySchema = z.object({
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	return {
+	return getGeneratedContentMetadata({
 		title: `${title} - Big Spender Proposals`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - Big Spender Proposals`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Big Spender Proposals'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Big Spender Proposals'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/big-spender`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - Big Spender Proposals`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+		description: 'Explore all Big Spender proposals on Polkassembly',
+		url: `https://${network}.polkassembly.io/big-spender`,
+		imageAlt: 'Polkassembly Big Spender Proposals',
+		network
+	});
 }
 
 async function BigSpenderPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {

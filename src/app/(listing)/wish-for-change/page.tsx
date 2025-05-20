@@ -10,51 +10,22 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { z } from 'zod';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Metadata } from 'next';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 const origin = EPostOrigin.WISH_FOR_CHANGE;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	return {
+	return getGeneratedContentMetadata({
 		title: `${title} - Wish for Change Proposals`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - Wish for Change Proposals`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Wish for Change Proposals'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Wish for Change Proposals'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/wish-for-change`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - Wish for Change Proposals`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+		description: 'Explore all Wish for Change Proposals on Polkassembly',
+		url: `https://${network}.polkassembly.io/wish-for-change`,
+		imageAlt: 'Polkassembly Wish for Change Proposals',
+		network
+	});
 }
 
 const zodQuerySchema = z.object({

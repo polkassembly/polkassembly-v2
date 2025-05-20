@@ -8,62 +8,24 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { Metadata } from 'next';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
 	const network = await getNetworkFromHeaders();
 	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
-	const { title: baseTitle, description: baseDescription } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
-	// Default description and title
-	const title = `${baseTitle} - Child Bounty #${index}`;
-	let description = baseDescription;
-
-	// Use post title in description if available
-	if (data) {
-		description = `Bounty #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`;
-	}
-
-	const url = `https://${network}.polkassembly.io/child-bounty/${index}`;
-
-	return {
-		title,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Child Bounty'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Child Bounty'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+	return getGeneratedContentMetadata({
+		network,
+		title: `${title} - Child Bounty #${index}`,
+		description: data
+			? `Bounty #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			: 'Explore all Child Bounty Proposals on Polkassembly',
+		url: `https://${network}.polkassembly.io/child-bounty/${index}`,
+		imageAlt: `Polkassembly Child Bounty #${index}`
+	});
 }
 
 async function ChildBounty({ params }: { params: Promise<{ index: string }> }) {

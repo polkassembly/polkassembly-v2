@@ -7,52 +7,23 @@ import Profile from '@/app/_shared-components/Profile/Profile';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
 	const { id } = await params;
 	const network = await getNetworkFromHeaders();
-	const { title, description } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title } = OPENGRAPH_METADATA;
 
 	const { data } = await UserProfileClientService.fetchPublicUserById({ userId: Number(id) });
 	const userName = data?.username || `User #${id}`;
 
-	return {
-		title: `${title} - ${userName}'s Profile`,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title: `${title} - ${userName}'s Profile`,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: `${userName}'s Profile`
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: `${userName}'s Profile`
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url: `https://${network}.polkassembly.io/user/id/${id}`
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${title} - ${userName}'s Profile`,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+	return getGeneratedContentMetadata({
+		title: `${title} - ${userName}`,
+		description: `View ${userName}'s profile, posts, and activity on Polkassembly`,
+		network,
+		url: `https://${network}.polkassembly.io/user/id/${id}`,
+		imageAlt: `${userName}'s Profile`
+	});
 }
 
 async function UserProfile({ params }: { params: Promise<{ id: string }> }) {

@@ -10,62 +10,25 @@ import React from 'react';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
 	const network = await getNetworkFromHeaders();
 	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.DISCUSSION, indexOrHash: index });
-	const { title: baseTitle, description: baseDescription } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+	const { title: baseTitle } = OPENGRAPH_METADATA;
 
 	// Default description and title
-	const title = `${baseTitle} - Discussion #${index}`;
-	let description = baseDescription;
-
-	// Use post title in description if available
-	if (data) {
-		description = `Discussion #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`;
-	}
-
-	const url = `https://${network}.polkassembly.io/post/${index}`;
-
-	return {
-		title,
-		description,
-		metadataBase: new URL(`https://${network}.polkassembly.io`),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: 'Polkassembly Discussion'
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: 'Polkassembly Discussion'
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title,
-			description,
-			images: image ? [image] : [smallImage || ''],
-			site: '@polkassembly'
-		}
-	};
+	return getGeneratedContentMetadata({
+		title: `${baseTitle} - ${data?.title} #${index}`,
+		description: data
+			? `Discussion #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			: `Explore Polkassembly Discussion #${index}`,
+		network,
+		url: `https://${network}.polkassembly.io/post/${index}`,
+		imageAlt: 'Polkassembly Post'
+	});
 }
 
 async function DiscussionPost({ params }: { params: Promise<{ index: string }> }) {
