@@ -103,7 +103,7 @@ export const callCacheRefresh = onRequest(async (request, response) => {
 			triggerCacheRefresh({ toolsPassphrase: TOOLS_PASSPHRASE, cacheRefreshType });
 		});
 
-		response.json({ message: 'Cache refresh complete' });
+		response.json({ message: 'Cache refresh triggered successfully, please check vercel logs for more details' });
 	} catch (error) {
 		logger.error('Error in callCacheRefresh:', error);
 		throw new HttpsError('internal', 'Error in callCacheRefresh');
