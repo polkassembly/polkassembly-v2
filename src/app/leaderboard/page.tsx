@@ -4,9 +4,55 @@
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { NextApiClientService } from '../_client-services/next_api_client_service';
-import { ClientError } from '../_client-utils/clientError';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import Leaderboard from './Components/index';
+import { ClientError } from '../_client-utils/clientError';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title, description } = OPENGRAPH_METADATA;
+	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
+	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+
+	return {
+		title: `${title} - Leaderboard`,
+		description,
+		metadataBase: new URL(`https://${network}.polkassembly.io`),
+		icons: [{ url: '/favicon.ico' }],
+		openGraph: {
+			title: `${title} - Leaderboard`,
+			description,
+			images: [
+				{
+					url: image || '',
+					width: 600,
+					height: 600,
+					alt: 'Polkassembly Leaderboard'
+				},
+				{
+					url: smallImage || '',
+					width: 1200,
+					height: 600,
+					alt: 'Polkassembly Leaderboard'
+				}
+			],
+			siteName: 'Polkassembly',
+			type: 'website',
+			url: `https://${network}.polkassembly.io/leaderboard`
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: `${title} - Leaderboard`,
+			description,
+			images: image ? [image] : [smallImage || ''],
+			site: '@polkassembly'
+		}
+	};
+}
 
 async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
 	const searchParamsValue = await searchParams;

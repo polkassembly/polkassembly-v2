@@ -8,6 +8,52 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { z } from 'zod';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title, description } = OPENGRAPH_METADATA;
+	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
+	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
+
+	return {
+		title: `${title} - Proposals`,
+		description,
+		metadataBase: new URL(`https://${network}.polkassembly.io`),
+		icons: [{ url: '/favicon.ico' }],
+		openGraph: {
+			title: `${title} - Proposals`,
+			description,
+			images: [
+				{
+					url: image || '',
+					width: 600,
+					height: 600,
+					alt: 'Polkassembly Proposals'
+				},
+				{
+					url: smallImage || '',
+					width: 1200,
+					height: 600,
+					alt: 'Polkassembly Proposals'
+				}
+			],
+			siteName: 'Polkassembly',
+			type: 'website',
+			url: `https://${network}.polkassembly.io/proposals`
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: `${title} - Proposals`,
+			description,
+			images: image ? [image] : [smallImage || ''],
+			site: '@polkassembly'
+		}
+	};
+}
 
 const zodQuerySchema = z.object({
 	page: z.coerce.number().min(1).optional().default(1),

@@ -12,6 +12,7 @@ import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import PollForProposal from '@/app/_shared-components/PollForProposal';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
@@ -27,15 +28,15 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	// Use post title in description if available
 	if (data) {
 		title = `Polkassembly - Referendum #${index}`;
-		description = `Referendum #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
+		description = `Referendum #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`;
 	}
 
-	const url = `https://polkassembly.com/referenda/${index}`;
+	const url = `https://${network}.polkassembly.io/referenda/${index}`;
 
 	return {
 		title,
 		description,
-		metadataBase: new URL('https://polkassembly.com'),
+		metadataBase: new URL(`https://${network}.polkassembly.io`),
 		icons: [{ url: '/favicon.ico' }],
 		openGraph: {
 			title,
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 			card: 'summary_large_image',
 			title,
 			description,
-			images: image ? [image] : [],
+			images: image ? [image] : [smallImage || ''],
 			site: '@polkassembly'
 		}
 	};
