@@ -35,15 +35,16 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	return {
 		title,
 		description,
-		icons: 'favicon.ico',
+		metadataBase: new URL('https://polkassembly.com'),
+		icons: [{ url: '/favicon.ico' }],
 		openGraph: {
 			title,
 			description,
 			images: [
 				{
 					url: image || '',
-					width: 750,
-					height: 500,
+					width: 1200,
+					height: 630,
 					alt: `Polkassembly Referendum #${index}`
 				},
 				{
@@ -56,6 +57,13 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 			siteName: 'Polkassembly',
 			type: 'website',
 			url
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title,
+			description,
+			images: image ? [image] : [],
+			site: '@polkassembly'
 		}
 	};
 }
