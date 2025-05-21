@@ -9,7 +9,21 @@ import Profile from '@/app/_shared-components/Profile/Profile';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { generateMetadata as generatePageMetadata } from '@/_shared/_utils/generateMetadata';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
+
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+	const { username } = await params;
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - ${username || ''}`,
+		description: `View ${username || ''} profile, posts, and activity on Polkassembly`,
+		url: `https://${network}.polkassembly.io/user/${username || ''}`,
+		imageAlt: `${username || ''} Profile on Polkassembly`,
+		network
+	});
+}
 
 async function UserProfile({ params }: { params: Promise<{ username: string }> }) {
 	const { username } = await params;
@@ -22,20 +36,6 @@ async function UserProfile({ params }: { params: Promise<{ username: string }> }
 			<Profile profileData={data} />
 		</div>
 	);
-}
-
-export async function generateMetadata({ params }: { params: { username: string } }): Promise<Metadata> {
-	const network = await getNetworkFromHeaders();
-	const { title } = OPENGRAPH_METADATA;
-	const { username } = params;
-
-	return generatePageMetadata({
-		title: `${title} - ${username}`,
-		description: `View ${username}'s profile, posts, and activity on Polkassembly`,
-		url: `https://${network}.polkassembly.io/user/${username}`,
-		imageAlt: `${username}'s Profile on Polkassembly`,
-		network
-	});
 }
 
 export default UserProfile;
