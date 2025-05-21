@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
+import { QueryDocumentSnapshot, QuerySnapshot, Timestamp, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -52,6 +52,11 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetTotalUsersCount(): Promise<number> {
 		const userDocSnapshot = await this.usersCollectionRef().get();
 		return userDocSnapshot.docs.length;
+	}
+
+	static async GetNextUserId(): Promise<number> {
+		const userDocSnapshot = await this.usersCollectionRef().orderBy('id', 'desc').limit(1).get();
+		return userDocSnapshot.docs[0].data().id + 1;
 	}
 
 	static async GetUserByEmail(email: string): Promise<IUser | null> {
@@ -290,7 +295,15 @@ export class FirestoreService extends FirestoreUtils {
 		return {
 			...postData,
 			content: postData.content || '',
-			tags: postData.tags?.map((tag: ITag) => ({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })) || [],
+			tags:
+				postData.tags?.map((tag: { value: string; lastUsedAt: unknown }) => ({
+					value: tag.value,
+					lastUsedAt:
+						typeof tag.lastUsedAt === 'object' && tag.lastUsedAt !== null && typeof (tag.lastUsedAt as Timestamp).toDate === 'function'
+							? (tag.lastUsedAt as Timestamp).toDate()
+							: new Date(tag.lastUsedAt as string) || new Date(),
+					network
+				})) || [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
@@ -1519,8 +1532,8 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
-	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
-		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash).limit(1).get();
+	static async DeleteOffChainPost({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
 
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });

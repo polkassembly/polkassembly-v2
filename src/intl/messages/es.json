@@ -523,6 +523,18 @@
 			"decisionDeposit": "Depósito de decisión",
 			"payDecisionDeposit": "Pagar depósito de decisión",
 			"continue": "Continuar"
+		},
+		"ClaimPayout": {
+			"claim": "Reclamar",
+			"index": "Índice",
+			"beneficiary": "Beneficiario",
+			"amount": "Cantidad",
+			"expireIn": "Expira en",
+			"claimPayout": "Reclamar pago",
+			"payoutClaimedSuccessfully": "Pago reclamado con éxito",
+			"payoutClaimFailed": "Error al reclamar el pago",
+			"payoutClaimedSuccessfullyDescription": "Su pago ha sido reclamado con éxito",
+			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
 		}
 	},
 	"ListingPage_Status": {
@@ -590,7 +602,8 @@
 		"created": "Creado",
 		"curatorassigned": "Curador Asignado",
 		"curatorunassigned": "Curador No Asignado",
-		"curatorproposed": "Curador Propuesto",
+		"curatorproposed": "Curador propuesto",
+		"tabled": "Presentado",
 		"undefined": "Indefinido"
 	},
 	"Pagination": {
@@ -624,7 +637,11 @@
 		"title": "Título",
 		"content": "Contenido",
 		"save": "Guardar",
-		"editPostButton": "Editar"
+		"editPostButton": "Editar",
+		"success": "Publicación actualizada con éxito",
+		"successDescription": "Tu publicación ha sido actualizada con éxito",
+		"error": "Error al actualizar la publicación",
+		"errorDescription": "Hubo un error al actualizar tu publicación"
 	},
 	"Footer": {
 		"helpCenter": "Centro de Ayuda",
@@ -651,9 +668,16 @@
 		"copy": "Copiar",
 		"subscan": "Subscan",
 		"close": "Cerrar",
-		"showAll": "Mostrar todos",
+		"showAll": "Mostrar todo",
 		"searchByHash": "Buscar por hash",
-		"preimageNotFound": "Vorabbild nicht gefunden"
+		"preimageNotFound": "Preimage no encontrado",
+		"unrequested": "No solicitado",
+		"unrequested_description": "El preimage no ha sido solicitado",
+		"unnoted": "No anotado",
+		"unnoted_description": "El preimage no ha sido anotado",
+		"failed": "Fallido",
+		"unrequest": "Cancelar solicitud",
+		"unnote": "Eliminar anotación"
 	},
 	"Create": {
 		"createDiscussionTitle": "Crear Discusión",
@@ -898,22 +922,24 @@
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
 		"amount": "Cantidad",
-		"track": "Pista",
+		"track": "Track",
 		"createProposal": "Crear Propuesta",
 		"create": "Crear",
 		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
 		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
 		"proposalCreationFailed": "Error al crear la propuesta",
 		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
-		"preimageNotedSuccessfully": "Preimage registrada exitosamente",
-		"preimageNotedSuccessfullyDescription": "La preimage ha sido registrada exitosamente",
-		"preimageNoteFailed": "Error al registrar preimage",
-		"preimageNoteFailedDescription": "Hubo un error al registrar la preimage",
-		"selectTrack": "Seleccionar Pista",
+		"preimageNotedSuccessfully": "Preimage anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimage ha sido anotada exitosamente",
+		"preimageNoteFailed": "Error al anotar la preimage",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimage",
+		"selectTrack": "Seleccionar Track",
 		"validFrom": "Válido Desde",
 		"addValidFrom": "Agregar Válido Desde",
 		"invalidBlockHeight": "Por favor ingrese una altura de bloque válida",
-		"enterFutureBlockHeight": "Por favor ingrese una altura de bloque futura"
+		"enterFutureBlockHeight": "Por favor ingrese una altura de bloque futura",
+		"invalidParameters": "Parámetros inválidos",
+		"invalidParametersDescription": "Por favor revise los parámetros e intente nuevamente"
 	},
 	"CreatePreimage": {
 		"addItem": "Agregar Beneficiario/Pagos",
@@ -1148,12 +1174,18 @@
 		"viewAllChildBounties": "Ver todas"
 	},
 	"CreateBounty": {
-		"bountyProposedSuccessfully": "Recompensa propuesta con éxito",
-		"bountyProposedSuccessfullyDescription": "La recompensa ha sido propuesta con éxito",
+		"bountyProposedSuccessfully": "Recompensa propuesta exitosamente",
+		"bountyProposedSuccessfullyDescription": "La recompensa ha sido propuesta exitosamente",
 		"bountyProposalFailed": "Error al proponer la recompensa",
 		"bountyProposalFailedDescription": "Hubo un error al proponer la recompensa",
 		"bountyAmount": "Cantidad de la recompensa",
-		"proposeBounty": "Proponer recompensa"
+		"proposeBounty": "Proponer recompensa",
+		"enterBountyId": "Ingrese el ID de la recompensa",
+		"yes": "Sí",
+		"no": "No",
+		"createProposal": "Crear propuesta",
+		"haveYouCreatedABountyAlready": "¿Ya has creado una recompensa?",
+		"yourAreNotTheProposer": "No eres el proponente de esta recompensa"
 	},
 	"Parachains": {
 		"projects": "Proyectos",

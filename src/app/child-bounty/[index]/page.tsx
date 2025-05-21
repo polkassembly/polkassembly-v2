@@ -34,7 +34,7 @@ async function ChildBounty({ params }: { params: Promise<{ index: string }> }) {
 	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
 
 	return (
-		<div className='mx-auto h-full w-full max-w-7xl'>
+		<div className='h-full w-full'>
 			<PostDetails
 				index={index}
 				postData={data}

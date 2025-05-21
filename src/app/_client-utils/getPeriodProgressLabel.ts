@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin } from '@shared/types';
-import { getTrackDays } from './getTrackDays';
+import { getTrackPeriodsTimeInMinutes } from './getTrackPeriodsTimeInMinutes';
 
 const getLabel = (passed: number, totalMinutes: number) => {
 	if (totalMinutes < 60) {
@@ -16,29 +16,28 @@ const getLabel = (passed: number, totalMinutes: number) => {
 };
 
 export const getPeriodProgressLabel = ({ endAt, trackName, periodType }: { endAt?: Date; trackName: EPostOrigin; periodType: EPeriodType }): string => {
-	const { decisionDays, prepareDays, confirmDays } = getTrackDays(trackName);
+	const { decisionMinutes, prepareMinutes, confirmMinutes } = getTrackPeriodsTimeInMinutes(trackName);
 
-	let totalDays = 0;
+	let totalMinutes = 0;
 	switch (periodType) {
 		case EPeriodType.PREPARE:
-			totalDays = prepareDays || 0;
+			totalMinutes = prepareMinutes || 0;
 			break;
 		case EPeriodType.CONFIRM:
-			totalDays = confirmDays || 0;
+			totalMinutes = confirmMinutes || 0;
 			break;
 		case EPeriodType.DECISION:
 		default:
-			totalDays = decisionDays || 0;
+			totalMinutes = decisionMinutes || 0;
 			break;
 	}
-	const totalMinutes = totalDays * 24 * 60;
 
 	if (!endAt) {
 		return getLabel(0, totalMinutes);
 	}
 
 	const endDate = dayjs(endAt);
-	const startDate = endDate.subtract(totalDays, 'days');
+	const startDate = endDate.subtract(totalMinutes, 'minutes');
 	const now = dayjs();
 
 	const diffMinutes = now.diff(startDate, 'minutes');

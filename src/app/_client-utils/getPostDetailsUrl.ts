@@ -14,17 +14,17 @@ export const getPostDetailsUrl = ({ proposalType, proposalId, network }: PostDet
 	// eslint-disable-next-line sonarjs/no-small-switch
 	switch (proposalType) {
 		case EProposalType.DEMOCRACY_PROPOSAL:
-			return `https://${network}.polkassembly.io/proposal/${proposalId}`;
+			return `https://${network}-old.polkassembly.io/proposal/${proposalId}`;
 		case EProposalType.REFERENDUM:
-			return `https://${network}.polkassembly.io/referendum/${proposalId}`;
+			return `https://${network}-old.polkassembly.io/referendum/${proposalId}`;
 		case EProposalType.TREASURY_PROPOSAL:
-			return `https://${network}.polkassembly.io/treasury/${proposalId}`;
+			return `https://${network}-old.polkassembly.io/treasury/${proposalId}`;
 		case EProposalType.TIP:
-			return `https://${network}.polkassembly.io/tip/${proposalId}`;
+			return `https://${network}-old.polkassembly.io/tip/${proposalId}`;
 		case EProposalType.COUNCIL_MOTION:
-			return `https://${network}.polkassembly.io/motion/${proposalId}`;
+			return `https://${network}-old.polkassembly.io/motion/${proposalId}`;
 		case EProposalType.TECH_COMMITTEE_PROPOSAL:
-			return `https://${network}.polkassembly.io/tech/${proposalId}`;
+			return `https://${network}-old.polkassembly.io/tech/${proposalId}`;
 		case EProposalType.DISCUSSION:
 			return `/post/${proposalId}`;
 		case EProposalType.BOUNTY:

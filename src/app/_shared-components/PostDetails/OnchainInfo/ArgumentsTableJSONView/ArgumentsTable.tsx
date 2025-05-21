@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ReactElement } from 'react';
+import { IProposalArguments } from '@/_shared/types';
 import classes from './ArgumentsTable.module.scss';
 
 const urlRegex = /\b(https?):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|]/gi;
@@ -45,7 +46,7 @@ function UrlText({ text }: { text: string }) {
 	return <span className='inline'>{parts}</span>;
 }
 
-function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unknown> }) {
+function ArgumentsTable({ argumentsJSON }: { argumentsJSON: IProposalArguments }) {
 	if (!argumentsJSON) return null;
 	return (
 		<tbody>
@@ -63,7 +64,7 @@ function ArgumentsTable({ argumentsJSON }: { argumentsJSON: Record<string, unkno
 						) : (
 							<td>
 								<table className='w-full'>
-									<ArgumentsTable argumentsJSON={value as Record<string, unknown>} />
+									<ArgumentsTable argumentsJSON={value as IProposalArguments} />
 								</table>
 							</td>
 						)}

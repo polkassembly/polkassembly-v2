@@ -140,7 +140,7 @@ function ActivityFeedPostItem({
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
 				<div className='hidden lg:block'>
-					{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					{voteButton && canVote(postData.onChainInfo?.status) && (
 						<div className='relative z-50'>
 							<VoteReferendumButton
 								index={postData?.index?.toString() || ''}
@@ -247,7 +247,7 @@ function ActivityFeedPostItem({
 			)}
 
 			<div className='block lg:hidden'>
-				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+				{voteButton && canVote(postData.onChainInfo?.status) && (
 					<div className='relative z-50 pt-5'>
 						<VoteReferendumButton
 							index={postData?.index?.toString() || ''}

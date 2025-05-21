@@ -32,8 +32,6 @@ import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { RedisService } from '../../_api-services/redis_service';
-import { AIService } from '../../_api-services/ai_service';
-import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -56,12 +54,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 	const { page, limit, status: statuses, origin: origins, tags, userId } = zodQuerySchema.parse(searchParamsObject);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	// Only get from cache if not skipping cache
-	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
-		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags, userId });
+	if (!skipCache) {
+		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
 
 		if (cachedData) {
 			return NextResponse.json(cachedData);
@@ -219,7 +216,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		allowedCommentor
 	});
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
+	// await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });

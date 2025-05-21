@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable no-use-before-define */
+
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
@@ -37,15 +39,16 @@ export interface IUserSocialDetails {
 	url: string;
 }
 
+// FIXME: handle removed badges
 export enum EUserBadge {
 	DECENTRALISED_VOICE = 'decentralised_voice',
 	FELLOW = 'fellow',
 	COUNCIL = 'council_member',
 	ACTIVE_VOTER = 'active_voter',
-	WHALE = 'whale',
-	STEADFAST_COMMENTOR = 'steadfast_commentor',
-	GM_VOTER = 'gm_voter',
-	POPULAR_DELEGATE = 'popular_delegate'
+	WHALE = 'whale'
+	// STEADFAST_COMMENTOR = 'steadfast_commentor',
+	// GM_VOTER = 'gm_voter',
+	// POPULAR_DELEGATE = 'popular_delegate'
 }
 
 export interface IUserBadgeDetails {
@@ -359,13 +362,6 @@ export interface IPostLink {
 	indexOrHash: string;
 	proposalType: EProposalType;
 }
-
-// stores the reason for invalidity or "Valid" if valid
-export interface ICrossValidationResult {
-	beneficiaries: string | 'Valid';
-	proposer: string | 'Valid';
-}
-
 export interface IContentSummary {
 	id: string;
 	network: ENetwork;
@@ -376,7 +372,6 @@ export interface IContentSummary {
 	isSpam?: boolean;
 	createdAt: Date;
 	updatedAt: Date;
-	crossValidationResult?: ICrossValidationResult;
 }
 
 export enum EOffChainPostTopic {
@@ -390,6 +385,7 @@ export enum EOffChainPostTopic {
 	FELLOWSHIP = 'fellowship',
 	COUNCIL = 'council',
 	DEMOCRACY = 'democracy',
+	TECHNICAL_COMMITTEE = 'technicalCommittee',
 	WHITELIST = 'whitelist'
 }
 
@@ -559,6 +555,7 @@ export interface IOnChainPostInfo {
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
 	curator?: string;
+	treasurySpendIndex?: number;
 }
 
 export interface IPost extends IOffChainPost {
@@ -567,6 +564,7 @@ export interface IPost extends IOffChainPost {
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 	contentSummary?: IContentSummary;
+	comments?: ICommentResponse[];
 }
 
 export interface IOnChainPostListing {
@@ -868,6 +866,13 @@ export enum EProfileTabs {
 	POSTS = 'posts'
 }
 
+export interface IProposalArguments {
+	args: Record<string, unknown>;
+	description: string;
+	method: string;
+	section: string;
+}
+
 export interface IPreimage {
 	createdAt: string;
 	createdAtBlock: number;
@@ -876,17 +881,25 @@ export interface IPreimage {
 	id: string;
 	length: number;
 	method: string;
-	proposedCall: {
-		args: Record<string, unknown>;
-		description: string;
-		method: string;
-		section: string;
-	};
+	proposedCall: IProposalArguments;
 	proposer: string;
 	section: string;
 	status: string;
 	updatedAt: string;
 	updatedAtBlock: number | null;
+}
+
+export interface IOnChainMetadata {
+	preimage?: IPreimage;
+	proposedCall?: IProposalArguments;
+	proposer?: string;
+	trackNumber?: number;
+	updatedAtBlock?: number;
+	enactmentAtBlock?: number;
+	enactmentAfterBlock?: number;
+	createdAt?: Date;
+	createdAtBlock?: number;
+	hash?: string;
 }
 
 export interface IQRSessionPayload {
@@ -1261,4 +1274,28 @@ export interface IUserPosts {
 export enum ECommentActions {
 	ADD = 'add',
 	DELETE = 'delete'
+}
+
+export enum EVoteSortOptions {
+	IdASC = 'id_ASC',
+	IdDESC = 'id_DESC',
+	BalanceValueASC = 'balance_value_ASC',
+	BalanceValueDESC = 'balance_value_DESC',
+	TimestampASC = 'timestamp_ASC',
+	TimestampDESC = 'timestamp_DESC',
+	CreatedAtBlockDESC = 'createdAtBlock_DESC',
+	SelfVotingPowerASC = 'selfVotingPower_ASC',
+	SelfVotingPowerDESC = 'selfVotingPower_DESC',
+	DelegatedVotingPowerASC = 'delegatedVotingPower_ASC',
+	DelegatedVotingPowerDESC = 'delegatedVotingPower_DESC'
+}
+
+export interface IPayout {
+	treasurySpendIndex: number;
+	treasurySpendData: {
+		beneficiary: string;
+		amount: string;
+		expiresAt: Date;
+		generalIndex: string;
+	};
 }

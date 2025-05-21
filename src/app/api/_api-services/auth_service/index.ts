@@ -87,7 +87,7 @@ export class AuthService {
 
 		const { password, salt } = await this.GetSaltAndHashedPassword(newPassword);
 
-		const newUserId = (await OffChainDbService.GetTotalUsersCount()) + 1;
+		const newUserId = await OffChainDbService.GetNextUserId();
 		const newUser: IUser = {
 			createdAt: new Date(),
 			email,

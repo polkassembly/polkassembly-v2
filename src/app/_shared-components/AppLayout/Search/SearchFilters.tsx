@@ -145,7 +145,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 
 	return (
 		<div>
-			<div className='mt-3 flex justify-between gap-6'>
+			<div className='mt-3 flex flex-wrap justify-between gap-6'>
 				<div>
 					<RadioGroup
 						value={activeIndex || ESearchType.POSTS}
@@ -173,7 +173,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 				</div>
 				<div>
 					{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && results.nbHits > 0 && (
-						<div className='flex items-center gap-x-4'>
+						<div className='flex items-center gap-x-2 md:gap-x-4'>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>{t('date')}</DropdownMenuTrigger>
 								<DropdownMenuContent>
@@ -274,7 +274,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 					)}
 				</div>
 			</div>
-			<div className='mt-3 flex items-center gap-x-4'>
+			<div className='mt-3 flex flex-wrap items-center gap-x-4'>
 				{refinedDateItems.length > 0 && (
 					<div className='flex items-center gap-x-1 text-xs text-wallet_btn_text'>
 						<span className='text-text_pink'>{t('date')}:</span>

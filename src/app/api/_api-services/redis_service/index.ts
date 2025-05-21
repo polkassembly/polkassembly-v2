@@ -24,9 +24,6 @@ import {
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import dayjs from 'dayjs';
-import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import {
 	FIVE_MIN,
 	HALF_HOUR_IN_SECONDS,
@@ -85,21 +82,15 @@ export class RedisService {
 		[ERedisKeys.PASSWORD_RESET_TOKEN]: (token: string): string => `${ERedisKeys.PASSWORD_RESET_TOKEN}-${token}`,
 		[ERedisKeys.EMAIL_VERIFICATION_TOKEN]: (token: string): string => `${ERedisKeys.EMAIL_VERIFICATION_TOKEN}-${token}`,
 		[ERedisKeys.TWO_FACTOR_AUTH_TOKEN]: (tfaToken: string): string => `${ERedisKeys.TWO_FACTOR_AUTH_TOKEN}-${tfaToken}`,
-		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
+		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string, body?: Record<string, unknown>): string => {
+			const bodyPart = body ? `-b:${JSON.stringify(body)}` : '';
+			return `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}${bodyPart}`;
+		},
 		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
 		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POSTS_LISTING]: (
-			network: string,
-			proposalType: string,
-			page: number,
-			limit: number,
-			statuses?: string[],
-			origins?: string[],
-			tags?: string[],
-			userId?: number
-		): string => {
-			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}-${userId}`;
+		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: string, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
+			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
 			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
@@ -115,7 +106,8 @@ export class RedisService {
 			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
-		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
+		[ERedisKeys.CONTENT_SUMMARY]: ({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): string =>
+			`${ERedisKeys.CONTENT_SUMMARY}-${network}-${proposalType}-${indexOrHash}`,
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
@@ -269,12 +261,12 @@ export class RedisService {
 		return this.Get({ key: this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), forceCache: true });
 	}
 
-	static async GetSubscanData({ network, url }: { network: string; url: string }): Promise<string | null> {
-		return this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url) });
+	static async GetSubscanData({ network, url, body }: { network: string; url: string; body?: Record<string, unknown> }): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url, body) });
 	}
 
-	static async SetSubscanData({ network, url, data }: { network: string; url: string; data: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), value: data, ttlSeconds: SIX_HOURS_IN_SECONDS });
+	static async SetSubscanData({ network, url, body, data }: { network: string; url: string; body?: Record<string, unknown>; data: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url, body), value: data, ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async SetResetPasswordToken({ token, userId }: { token: string; userId: number }): Promise<void> {
@@ -298,12 +290,11 @@ export class RedisService {
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
 		const isActivePost = data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status);
-		const isActiveOffChainPost = ValidatorService.isValidOffChainProposalType(data.proposalType) && dayjs().diff(dayjs(data.createdAt), 'days') <= OFF_CHAIN_POST_ACTIVE_DAYS;
 
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost || isActiveOffChainPost ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
 		});
 	}
 
@@ -318,8 +309,7 @@ export class RedisService {
 		limit,
 		statuses,
 		origins,
-		tags,
-		userId
+		tags
 	}: {
 		network: string;
 		proposalType: string;
@@ -328,9 +318,8 @@ export class RedisService {
 		statuses?: string[];
 		origins?: string[];
 		tags?: string[];
-		userId?: number;
 	}): Promise<IGenericListingResponse<IPostListing> | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags, userId) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags) });
 		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
 	}
 
@@ -365,7 +354,7 @@ export class RedisService {
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<IContentSummary | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 		return data ? (deepParseJson(data) as IContentSummary) : null;
 	}
 
@@ -380,11 +369,11 @@ export class RedisService {
 		proposalType: string;
 		data: IContentSummary;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
-		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}` });
+		await this.DeleteKeys({ pattern: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 	}
 
 	// Activity feed caching methods

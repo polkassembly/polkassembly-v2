@@ -35,10 +35,8 @@ export class ValidatorService {
 	}
 
 	static isValidUsername(username: string): boolean {
-		// eslint-disable-next-line no-useless-escape
-		const regexp = /^[A-Za-z0-9_]{1}[A-Za-z0-9._/@>\-]{2,29}$/;
 		// check if username is not blacklisted and matches the regex
-		return regexp.test(username) && !BLACKLISTED_USERNAMES.includes(username.toLowerCase());
+		return username.length >= 2 && username.length <= 40 && !BLACKLISTED_USERNAMES.includes(username.toLowerCase());
 	}
 
 	static isValidPassword(password: string): boolean {

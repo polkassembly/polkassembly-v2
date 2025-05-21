@@ -187,7 +187,7 @@ function DelegationStatusCollaps({
 														<span className='text-text_secondary'>({delegationItems?.length})</span>
 													</div>
 													<div className={cn('flex items-end justify-end gap-y-1 text-right', !allSameVotingPowerAndLockPeriod ? 'flex-col' : 'flex-wrap gap-x-1')}>
-														{delegationItems?.map((item) => {
+														{delegationItems?.map((item, i) => {
 															const trackName = getTrackName({ trackId: item.trackId, network });
 															return (
 																<div
@@ -195,6 +195,7 @@ function DelegationStatusCollaps({
 																	key={item.trackId}
 																>
 																	<span className='capitalize'>{trackName}</span>
+																	{i !== delegationItems.length - 1 && <span>,</span>}
 																	{!allSameVotingPowerAndLockPeriod ? (
 																		<span className='flex'>
 																			(

@@ -82,7 +82,7 @@ function PostHit({ hit }: { hit: Post }) {
 				</div>
 				<h2 className='text-lg font-medium'>
 					<p className='text-sm font-medium'>
-						#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
+						#{hit.id} {hit.title?.length > 90 ? `${hit.title?.slice(0, 90)}...` : hit?.title}
 					</p>
 				</h2>
 				<div className={styles.post_content}>
@@ -193,7 +193,7 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 
 	return (
 		<div>
-			<div className='h-[60vh] overflow-hidden'>
+			<div className='h-[50vh] overflow-hidden md:h-[60vh]'>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image

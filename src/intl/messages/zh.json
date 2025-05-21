@@ -522,6 +522,18 @@
 			"decisionDeposit": "决策保证金",
 			"payDecisionDeposit": "支付决策保证金",
 			"continue": "继续"
+		},
+		"ClaimPayout": {
+			"claim": "认领",
+			"index": "索引",
+			"beneficiary": "受益人",
+			"amount": "金额",
+			"expireIn": "到期于",
+			"claimPayout": "认领支付",
+			"payoutClaimedSuccessfully": "支付认领成功",
+			"payoutClaimFailed": "支付认领失败",
+			"payoutClaimedSuccessfullyDescription": "您的支付已成功认领",
+			"payoutClaimFailedDescription": "请再试一次"
 		}
 	},
 	"ListingPage_Status": {
@@ -589,7 +601,8 @@
 		"created": "已创建",
 		"curatorassigned": "已分配 curator",
 		"curatorunassigned": "未分配 curator",
-		"curatorproposed": "已提议 curator",
+		"curatorproposed": "已提议策展人",
+		"tabled": "已提交",
 		"undefined": "未定义"
 	},
 	"Pagination": {
@@ -623,7 +636,11 @@
 		"title": "标题",
 		"content": "内容",
 		"save": "保存",
-		"editPostButton": "编辑"
+		"editPostButton": "编辑",
+		"success": "帖子更新成功",
+		"successDescription": "您的帖子已成功更新",
+		"error": "更新帖子失败",
+		"errorDescription": "更新帖子时发生错误"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",
@@ -643,16 +660,23 @@
 	"Preimages": {
 		"hash": "哈希",
 		"author": "作者",
-		"deposit": "存款",
+		"deposit": "押金",
 		"arguments": "参数",
 		"size": "大小",
 		"status": "状态",
 		"copy": "复制",
-		"subscan": "子扫描",
+		"subscan": "Subscan",
 		"close": "关闭",
 		"showAll": "显示全部",
 		"searchByHash": "按哈希搜索",
-		"preimageNotFound": "预映像未找到"
+		"preimageNotFound": "未找到原像",
+		"unrequested": "未请求",
+		"unrequested_description": "原像未被请求",
+		"unnoted": "未记录",
+		"unnoted_description": "原像未被记录",
+		"failed": "失败",
+		"unrequest": "取消请求",
+		"unnote": "删除记录"
 	},
 	"Create": {
 		"createDiscussionTitle": "创建讨论",
@@ -934,7 +958,9 @@
 		"validFrom": "生效时间",
 		"addValidFrom": "添加生效时间",
 		"invalidBlockHeight": "请输入有效的区块高度",
-		"enterFutureBlockHeight": "请输入未来的区块高度"
+		"enterFutureBlockHeight": "请输入未来的区块高度",
+		"invalidParameters": "无效的参数",
+		"invalidParametersDescription": "请检查参数并重试"
 	},
 	"CreatePreimage": {
 		"addItem": "添加受益人/支付",
@@ -1149,9 +1175,15 @@
 		"bountyProposedSuccessfully": "赏金提案成功",
 		"bountyProposedSuccessfullyDescription": "赏金已成功提案",
 		"bountyProposalFailed": "赏金提案失败",
-		"bountyProposalFailedDescription": "赏金提案过程中出现错误",
-		"bountyAmount": "赏金金额",
-		"proposeBounty": "提案赏金"
+		"bountyProposalFailedDescription": "提案赏金时出现错误",
+		"bountyAmount": "赏金数额",
+		"proposeBounty": "提案赏金",
+		"enterBountyId": "输入赏金ID",
+		"yes": "是",
+		"no": "否",
+		"createProposal": "创建提案",
+		"haveYouCreatedABountyAlready": "您是否已经创建了赏金？",
+		"yourAreNotTheProposer": "您不是此赏金的提案人"
 	},
 	"Parachains": {
 		"projects": "项目",

@@ -65,7 +65,7 @@ function Search() {
 			>
 				<SearchIcon className='h-6 w-6 cursor-pointer hover:text-text_pink' />
 			</DialogTrigger>
-			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
+			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-screen-md md:max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>
 					<DialogTitle className={styles.search_dialog_title}>
 						{t('search')}

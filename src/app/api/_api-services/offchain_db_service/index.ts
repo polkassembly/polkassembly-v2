@@ -58,6 +58,10 @@ export class OffChainDbService {
 		return FirestoreService.GetTotalUsersCount();
 	}
 
+	static async GetNextUserId(): Promise<number> {
+		return FirestoreService.GetNextUserId();
+	}
+
 	static async IsEmailInUse(email: string): Promise<boolean> {
 		const userByEmail = await FirestoreService.GetUserByEmail(email);
 		return Boolean(userByEmail);
@@ -904,8 +908,8 @@ export class OffChainDbService {
 		return FirestoreService.UpdateSocialHandleByToken({ token, status });
 	}
 
-	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
-		return FirestoreService.DeleteOffChainPost({ network, proposalType, indexOrHash });
+	static async DeleteOffChainPost({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		return FirestoreService.DeleteOffChainPost({ network, proposalType, index });
 	}
 
 	static async GetPostsByUserId({ userId, network, page, limit, proposalType }: { userId: number; network: ENetwork; page: number; limit: number; proposalType: EProposalType }) {

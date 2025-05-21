@@ -8,6 +8,7 @@ import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
 import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import LinkDiscussionPost from './LinkDiscussionPost';
@@ -17,9 +18,10 @@ function LinkPostButton({ postData, onSuccess, className }: { postData: IPostLis
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
 
-	const canEdit = user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '');
+	const proposerAddress = postData.onChainInfo?.proposer && getSubstrateAddress(postData.onChainInfo?.proposer);
+	const canLink = user && proposerAddress && user.addresses.includes(proposerAddress) && !OFF_CHAIN_PROPOSAL_TYPES.includes(postData.proposalType);
 
-	if (!canEdit) return null;
+	if (!canLink) return null;
 
 	return (
 		<Dialog
@@ -32,7 +34,7 @@ function LinkPostButton({ postData, onSuccess, className }: { postData: IPostLis
 					size='sm'
 					className={cn('bg-grey_bg text-xs font-medium text-wallet_btn_text', className)}
 					leftIcon={<Link size={16} />}
-					disabled={!canEdit}
+					disabled={!canLink}
 				>
 					{t('LinkDiscussionPost.linkDiscussion')}
 				</Button>

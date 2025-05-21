@@ -70,19 +70,22 @@ function Navbar() {
 				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
-			<div
-				aria-hidden
-				className='block rounded-md border border-border_grey bg-network_dropdown_bg p-2 md:hidden'
-				onClick={() => {
-					setModalOpen(!isModalOpen);
-					if (!isModalOpen) {
-						handleModalOpen();
-					} else {
-						handleModalClose();
-					}
-				}}
-			>
-				{isModalOpen ? <IoMdClose className='text-text_primary' /> : <FaBars className='text-text_primary' />}
+			<div className='flex items-center gap-x-2 md:hidden'>
+				<Search />
+				<div
+					aria-hidden
+					className='block rounded-md border border-border_grey bg-network_dropdown_bg p-2 md:hidden'
+					onClick={() => {
+						setModalOpen(!isModalOpen);
+						if (!isModalOpen) {
+							handleModalOpen();
+						} else {
+							handleModalClose();
+						}
+					}}
+				>
+					{isModalOpen ? <IoMdClose className='text-text_primary' /> : <FaBars className='text-text_primary' />}
+				</div>
 			</div>
 
 			<div className='hidden items-center gap-x-4 md:flex'>
@@ -142,7 +145,7 @@ function Navbar() {
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Link
 										className='w-full'
-										href={`/user/id/${user.id}`}
+										href={`/user/${user.username}`}
 									>
 										{t('Profile.profile')}
 									</Link>
@@ -250,7 +253,7 @@ function Navbar() {
 										<DropdownMenuItem>
 											<Link
 												className='w-full'
-												href={`/user/id/${user.id}`}
+												href={`/user/${user.username}`}
 											>
 												{t('Profile.profile')}
 											</Link>
