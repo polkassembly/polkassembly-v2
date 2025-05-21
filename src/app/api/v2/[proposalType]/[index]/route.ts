@@ -18,7 +18,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
-import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
+import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -31,8 +31,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	let isUserAuthenticated = false;
 	let accessToken: string | undefined;
@@ -52,9 +51,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		isUserAuthenticated = false;
 	}
 
-	// Get post data from cache only if skipCache is not true or toolsPassphrase is not provided
-	let post = null;
-	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+	// Get post data from cache only if skipCache is not true
+	let post: IPost | null = null;
+	if (!skipCache) {
 		post = await RedisService.GetPostData({ network, proposalType, indexOrHash: index });
 	}
 
@@ -72,6 +71,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	post = await fetchPostData({ network, proposalType, indexOrHash: index });
+
+	// fetch post comments
+	const comments = await OffChainDbService.GetPostComments({ network, proposalType, indexOrHash: index });
+	const commentsWithVoteData = await fetchCommentsVoteData({ comments, network, proposalType, index });
+	post = { ...post, comments: commentsWithVoteData };
 
 	// fetch and add reactions to post
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });
@@ -151,7 +155,7 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
 	}
 
-	await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash: index });
+	await OffChainDbService.DeleteOffChainPost({ network, proposalType, index: Number(index) });
 
 	// Invalidate caches
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });

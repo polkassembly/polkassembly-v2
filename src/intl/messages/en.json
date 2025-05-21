@@ -501,7 +501,14 @@
 			"fee": "Fee",
 			"parentBountyIndex": "Parent Bounty Index",
 			"payee": "Payee",
-			"curator": "Curator"
+			"curator": "Curator",
+			"proposer": "Proposer",
+			"createdAt": "Created At",
+			"createdAtBlock": "Created At Block",
+			"updatedAtBlock": "Updated At Block",
+			"enactmentAtBlock": "Enactment At Block",
+			"enactmentAfterBlock": "Enactment After Block",
+			"trackNumber": "Track Number"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",
@@ -548,6 +555,18 @@
 			"decisionDeposit": "Decision Deposit",
 			"payDecisionDeposit": "Pay Decision Deposit",
 			"continue": "Continue"
+		},
+		"ClaimPayout": {
+			"claim": "Claim",
+			"index": "Index",
+			"beneficiary": "Beneficiary",
+			"amount": "Amount",
+			"expireIn": "Expires in",
+			"claimPayout": "Claim Payout",
+			"payoutClaimedSuccessfully": "Payout claimed successfully",
+			"payoutClaimFailed": "Payout claim failed",
+			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
+			"payoutClaimFailedDescription": "Please try again"
 		}
 	},
 	"ListingPage_Status": {
@@ -656,7 +675,11 @@
 		"title": "Title",
 		"content": "Content",
 		"save": "Save",
-		"editPostButton": "Edit"
+		"editPostButton": "Edit",
+		"success": "Post updated successfully",
+		"successDescription": "Your post has been updated successfully",
+		"error": "Failed to update post",
+		"errorDescription": "There was an error while updating your post"
 	},
 	"LinkDiscussionPost": {
 		"linkDiscussion": "Link Discussion",
@@ -698,7 +721,14 @@
 		"close": "Close",
 		"showAll": "Show All",
 		"searchByHash": "Search by hash",
-		"preimageNotFound": "Preimage not found"
+		"preimageNotFound": "Preimage not found",
+		"unrequested": "Unrequested",
+		"unrequested_description": "The preimage has been unrequested",
+		"unnoted": "Unnoted",
+		"unnoted_description": "The preimage has been unnoted",
+		"failed": "Failed",
+		"unrequest": "Unrequest",
+		"unnote": "Unnote"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -981,7 +1011,9 @@
 		"validFrom": "Valid From",
 		"addValidFrom": "Add Valid From",
 		"invalidBlockHeight": "Please enter a valid block height",
-		"enterFutureBlockHeight": "Please enter a future block height"
+		"enterFutureBlockHeight": "Please enter a future block height",
+		"invalidParameters": "Invalid parameters",
+		"invalidParametersDescription": "Please check the parameters and try again"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Beneficiary/Payouts",
@@ -1006,7 +1038,13 @@
 		"bountyProposalFailed": "Failed to propose bounty",
 		"bountyProposalFailedDescription": "There was an error while proposing the bounty",
 		"bountyAmount": "Bounty Amount",
-		"proposeBounty": "Propose Bounty"
+		"proposeBounty": "Propose Bounty",
+		"enterBountyId": "Enter the bounty ID",
+		"yes": "Yes",
+		"no": "No",
+		"createProposal": "Create Proposal",
+		"haveYouCreatedABountyAlready": "Have you created a bounty already?",
+		"yourAreNotTheProposer": "You are not the proposer of this bounty"
 	},
 	"KillCancelReferendum": {
 		"referendumId": "Enter Referendum Index",

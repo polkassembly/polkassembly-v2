@@ -8,9 +8,11 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	EVoteSortOptions,
 	IBountyProposal,
 	IDelegationStats,
 	IGenericListingResponse,
+	IOnChainMetadata,
 	IOnChainPostInfo,
 	IOnChainPostListing,
 	IPreimage,
@@ -300,7 +302,8 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address
+		voterAddress: address,
+		orderBy
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -309,6 +312,7 @@ export class SubsquidService extends SubsquidUtils {
 		limit: number;
 		decision?: EVoteDecision;
 		voterAddress?: string;
+		orderBy?: EVoteSortOptions;
 	}) {
 		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
 
@@ -344,6 +348,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
 						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
@@ -423,10 +428,18 @@ export class SubsquidService extends SubsquidUtils {
 		return subsquidData.curveData as IVoteCurve[];
 	}
 
-	static async GetPostPreimage({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPreimage | null> {
+	static async GetPostOnChainMetadata({
+		network,
+		indexOrHash,
+		proposalType
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+	}): Promise<IOnChainMetadata | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = proposalType === EProposalType.TIP ? this.GET_PREIMAGE_BY_PROPOSAL_HASH_AND_TYPE : this.GET_PREIMAGE_BY_PROPOSAL_INDEX_AND_TYPE;
+		const query = proposalType === EProposalType.TIP ? this.GET_ON_CHAIN_METADATA_BY_PROPOSAL_HASH_AND_TYPE : this.GET_ON_CHAIN_METADATA_BY_PROPOSAL_INDEX_AND_TYPE;
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
 			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType })
@@ -437,12 +450,21 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post preimage from Subsquid');
 		}
 
-		const proposer = subsquidData.proposals[0].preimage.proposer ? getSubstrateAddress(subsquidData.proposals[0].preimage.proposer) : '';
+		const data = subsquidData.proposals[0];
 
-		return {
-			...subsquidData.proposals[0].preimage,
-			proposer
-		} as IPreimage;
+		const proposer = data.preimage?.proposer || data.proposer;
+
+		const metadata: IOnChainMetadata = {
+			preimage: data.preimage,
+			proposedCall: data.proposalArguments,
+			proposer: getSubstrateAddress(proposer) || undefined,
+			trackNumber: data.trackNumber,
+			updatedAtBlock: data.updatedAtBlock,
+			enactmentAtBlock: data.enactmentAtBlock,
+			enactmentAfterBlock: data.enactmentAfterBlock
+		};
+
+		return metadata;
 	}
 
 	static async GetPreimageListing({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<IPreimage>> {

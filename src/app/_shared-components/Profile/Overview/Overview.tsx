@@ -18,22 +18,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/D
 import classes from './Overview.module.scss';
 import Delegations from '../Delegations/Delegations';
 
-function Overview({ profileData }: { profileData: IPublicUser }) {
-	const [userProfile, setUserProfile] = useState<IPublicUser>(profileData);
+function Overview({ address, profileData }: { address?: string; profileData?: IPublicUser }) {
+	const [userProfile, setUserProfile] = useState<IPublicUser | undefined>(profileData);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const t = useTranslations();
 	const { user } = useUser();
 
 	const userBadges = {} as Record<EUserBadge, IUserBadgeDetails>;
 
-	userProfile.profileDetails.achievementBadges?.forEach((badge) => {
+	userProfile?.profileDetails.achievementBadges?.forEach((badge) => {
 		userBadges[badge.name] = badge;
 	});
 
 	return (
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
-				<Delegations addresses={profileData.addresses} />
+				{address || profileData?.addresses?.length ? <Delegations addresses={address ? [address] : profileData?.addresses || []} /> : null}
 				{/* <div className={classes.overviewCard}>
 					<div className={classes.overviewCardHeader}>
 						<p className={classes.overviewCardHeaderTitle}>{t('Profile.overview')}</p>
@@ -49,7 +49,9 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 								height={24}
 							/>
 							<span className='text-xl font-semibold'>{t('Profile.badges')}</span>
-							<span className='text-sm'>({Object.keys(achievementBadges || []).length})</span>
+							<span className='text-sm'>
+								({userProfile?.profileDetails.achievementBadges?.length || 0} / {Object.keys(achievementBadges).length})
+							</span>
 						</p>
 						<p className='text-sm'>{t('Profile.badgesDescription')}</p>
 					</div>
@@ -79,7 +81,7 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 				<div className={classes.onchainIdentityCard}>
 					<div className={classes.onchainIdentityCardHeader}>
 						<p className={classes.onchainIdentityCardHeaderTitle}>{t('Profile.onchainIdentity')}</p>
-						{user && profileData.id === user.id && (
+						{user && userProfile && userProfile?.id === user.id && (
 							<Dialog
 								open={isModalOpen}
 								onOpenChange={setIsModalOpen}
@@ -98,11 +100,11 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 										<DialogTitle>{t('Profile.linkAddress')}</DialogTitle>
 									</DialogHeader>
 									<LinkAddress
-										onSuccess={(address) => {
+										onSuccess={(a) => {
 											setIsModalOpen(false);
 											setUserProfile({
 												...userProfile,
-												addresses: [...userProfile.addresses, address]
+												addresses: [...userProfile.addresses, a]
 											});
 										}}
 									/>
@@ -111,10 +113,10 @@ function Overview({ profileData }: { profileData: IPublicUser }) {
 						)}
 					</div>
 					<div className={classes.onchainIdentityCardContent}>
-						{userProfile.addresses.map((address) => (
+						{userProfile?.addresses.map((a) => (
 							<Address
-								key={address}
-								address={address}
+								key={a}
+								address={a}
 							/>
 						))}
 					</div>

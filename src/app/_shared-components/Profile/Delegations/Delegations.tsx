@@ -77,13 +77,18 @@ export const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]
 
 function Delegations({ addresses }: { addresses: string[] }) {
 	const t = useTranslations('Profile');
+
 	const { user } = useUser();
+
 	const getDelegations = async () => {
 		if (!addresses) return getUpdatedDelegationData([]);
+
 		const { data: delegationData, error: delegationError } = await NextApiClientService.getDelegateTracks({ address: addresses[0] });
+
 		if (delegationError || !delegationData) {
 			throw new ClientError(delegationError?.message || 'Failed to fetch data');
 		}
+
 		return getUpdatedDelegationData(delegationData.delegationStats || []);
 	};
 
@@ -92,8 +97,10 @@ function Delegations({ addresses }: { addresses: string[] }) {
 		queryFn: () => getDelegations(),
 		placeholderData: (previousData) => previousData,
 		retry: false,
-		refetchOnMount: false
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
 	});
+
 	const getManifesto = async () => {
 		const { data: manifestoData, error: manifestoError } = await NextApiClientService.getPADelegateManifesto({ address: addresses[0] });
 		if (manifestoError || !manifestoData) {
@@ -107,7 +114,8 @@ function Delegations({ addresses }: { addresses: string[] }) {
 		queryFn: () => getManifesto(),
 		placeholderData: (previousData) => previousData,
 		retry: false,
-		refetchOnMount: false
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
 	});
 
 	return (

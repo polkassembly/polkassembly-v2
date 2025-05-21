@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { EProposalType } from '@/_shared/types';
+import { EProposalType, IOnChainMetadata } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -17,16 +17,18 @@ const zodParamsSchema = z.object({
 	index: z.string()
 });
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
-	const { proposalType, index } = zodParamsSchema.parse(await params);
+export const GET = withErrorHandling(
+	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IOnChainMetadata>> => {
+		const { proposalType, index } = zodParamsSchema.parse(await params);
 
-	const network = await getNetworkFromHeaders();
+		const network = await getNetworkFromHeaders();
 
-	const preimage = await OnChainDbService.GetPostPreimage({ network, indexOrHash: index, proposalType });
+		const onChainMetadata = await OnChainDbService.GetPostOnChainMetadata({ network, indexOrHash: index, proposalType });
 
-	if (!preimage) {
-		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Preimage not found');
+		if (!onChainMetadata) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'On-chain metadata not found');
+		}
+
+		return NextResponse.json(onChainMetadata);
 	}
-
-	return NextResponse.json(preimage);
-});
+);

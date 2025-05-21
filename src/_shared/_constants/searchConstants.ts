@@ -17,5 +17,6 @@ export const POST_TOPIC_MAP: Record<EOffChainPostTopic, number> = {
 	[EOffChainPostTopic.ROOT]: 6,
 	[EOffChainPostTopic.STAKING_ADMIN]: 7,
 	[EOffChainPostTopic.TREASURY]: 4,
-	[EOffChainPostTopic.WHITELIST]: 11
+	[EOffChainPostTopic.WHITELIST]: 11,
+	[EOffChainPostTopic.TECHNICAL_COMMITTEE]: 3
 };

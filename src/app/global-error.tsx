@@ -4,18 +4,17 @@
 
 'use client';
 
-import { Button } from '@ui/Button';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
+import React, { useEffect } from 'react';
 
-function RootError({ error, reset }: { error: Error; reset: () => void }) {
+export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
 	useEffect(() => {
 		Sentry.captureException(error);
 	}, [error]);
 
 	return (
-		<section className='flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border border-primary_border p-8'>
+		<section className='flex min-h-screen flex-col items-center justify-center gap-3 bg-[#1C1D1F] p-8 text-white'>
 			<h2 className='font-semibold'>There was a problem :(</h2>
 			<p className='text-danger py-4'>{error.message || 'Please try again.'}</p>
 			<small>
@@ -29,13 +28,6 @@ function RootError({ error, reset }: { error: Error; reset: () => void }) {
 				if the problem persists.
 			</small>
 			<div className='flex flex-col items-center gap-3'>
-				<Button
-					onClick={reset}
-					color='primary'
-					size='sm'
-				>
-					Try again
-				</Button>
 				<Link
 					href='/'
 					className='text-sm underline'
@@ -46,5 +38,3 @@ function RootError({ error, reset }: { error: Error; reset: () => void }) {
 		</section>
 	);
 }
-
-export default RootError;

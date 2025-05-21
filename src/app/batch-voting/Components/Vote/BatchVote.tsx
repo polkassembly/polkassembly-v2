@@ -59,7 +59,7 @@ function BatchVote({
 	const filteredProposals = useMemo(() => {
 		return proposals.filter((proposal) => {
 			return (
-				canVote(proposal.onChainInfo?.status, proposal.onChainInfo?.preparePeriodEndsAt) &&
+				canVote(proposal.onChainInfo?.status) &&
 				(voteCart ? !voteCart.some((item) => Number(item.postIndexOrHash) === proposal.index || item.postIndexOrHash === proposal.hash) : true) &&
 				!skippedProposals.some((skippedProposal) => skippedProposal.index === proposal.index || (skippedProposal.hash && skippedProposal.hash === proposal.hash))
 			);

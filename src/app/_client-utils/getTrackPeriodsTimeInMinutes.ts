@@ -7,12 +7,12 @@ import { EPostOrigin } from '@shared/types';
 import { BlockCalculationsService } from '../_client-services/block_calculations_service';
 
 interface TrackPeriodOutput {
-	prepareDays?: number;
-	decisionDays?: number;
-	confirmDays?: number;
+	prepareMinutes?: number;
+	decisionMinutes?: number;
+	confirmMinutes?: number;
 }
 
-export function getTrackDays(trackName: EPostOrigin): TrackPeriodOutput {
+export function getTrackPeriodsTimeInMinutes(trackName: EPostOrigin): TrackPeriodOutput {
 	const network = getCurrentNetwork();
 
 	const track = NETWORKS_DETAILS[`${network}`]?.trackDetails?.[`${trackName}`];
@@ -21,11 +21,11 @@ export function getTrackDays(trackName: EPostOrigin): TrackPeriodOutput {
 		return {};
 	}
 
-	const toDays = (blocks: number) => blocks / BlockCalculationsService.getBlocksPerDay(network);
+	const toMinutes = (blocks: number) => (blocks / BlockCalculationsService.getBlocksPerDay(network)) * 24 * 60;
 
 	return {
-		prepareDays: toDays(track.preparePeriod),
-		decisionDays: toDays(track.decisionPeriod),
-		confirmDays: toDays(track.confirmPeriod)
+		prepareMinutes: toMinutes(track.preparePeriod),
+		decisionMinutes: toMinutes(track.decisionPeriod),
+		confirmMinutes: toMinutes(track.confirmPeriod)
 	};
 }

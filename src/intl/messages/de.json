@@ -525,6 +525,18 @@
 			"decisionDeposit": "Entscheidungskaution",
 			"payDecisionDeposit": "Entscheidungskaution zahlen",
 			"continue": "Weiter"
+		},
+		"ClaimPayout": {
+			"claim": "Beanspruchen",
+			"index": "Index",
+			"beneficiary": "Begünstigter",
+			"amount": "Betrag",
+			"expireIn": "Läuft ab in",
+			"claimPayout": "Auszahlung beanspruchen",
+			"payoutClaimedSuccessfully": "Auszahlung erfolgreich beansprucht",
+			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
+			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
+			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
 		}
 	},
 	"ListingPage_Status": {
@@ -627,7 +639,11 @@
 		"title": "Titel",
 		"content": "Inhalt",
 		"save": "Speichern",
-		"editPostButton": "Bearbeiten"
+		"editPostButton": "Bearbeiten",
+		"success": "Beitrag erfolgreich aktualisiert",
+		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
+		"error": "Beitrag konnte nicht aktualisiert werden",
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",
@@ -656,7 +672,14 @@
 		"close": "Schließen",
 		"showAll": "Alle anzeigen",
 		"searchByHash": "Nach Hash suchen",
-		"preimageNotFound": "Vorabbild nicht gefunden"
+		"preimageNotFound": "Preimage nicht gefunden",
+		"unrequested": "Nicht angefordert",
+		"unrequested_description": "Das Preimage wurde nicht angefordert",
+		"unnoted": "Nicht notiert",
+		"unnoted_description": "Das Preimage wurde nicht notiert",
+		"failed": "Fehlgeschlagen",
+		"unrequest": "Anforderung zurückziehen",
+		"unnote": "Notiz entfernen"
 	},
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
@@ -939,7 +962,9 @@
 		"validFrom": "Gültig ab",
 		"addValidFrom": "Gültig ab hinzufügen",
 		"invalidBlockHeight": "Bitte geben Sie eine gültige Blockhöhe ein",
-		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
+		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein",
+		"invalidParameters": "Ungültige Parameter",
+		"invalidParametersDescription": "Bitte überprüfen Sie die Parameter und versuchen Sie es erneut"
 	},
 	"CreatePreimage": {
 		"addItem": "Begünstigten/Auszahlungen hinzufügen",
@@ -1157,7 +1182,13 @@
 		"bountyProposalFailed": "Kopfgeld-Vorschlag fehlgeschlagen",
 		"bountyProposalFailedDescription": "Beim Vorschlagen des Kopfgeldes ist ein Fehler aufgetreten",
 		"bountyAmount": "Kopfgeld-Betrag",
-		"proposeBounty": "Kopfgeld vorschlagen"
+		"proposeBounty": "Kopfgeld vorschlagen",
+		"enterBountyId": "Geben Sie die Kopfgeld-ID ein",
+		"yes": "Ja",
+		"no": "Nein",
+		"createProposal": "Vorschlag erstellen",
+		"haveYouCreatedABountyAlready": "Haben Sie bereits ein Kopfgeld erstellt?",
+		"yourAreNotTheProposer": "Sie sind nicht der Vorschlagende dieses Kopfgeldes"
 	},
 	"Parachains": {
 		"projects": "Projekte",
