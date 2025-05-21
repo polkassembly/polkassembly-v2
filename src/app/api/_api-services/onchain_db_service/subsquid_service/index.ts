@@ -37,7 +37,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
 
-const VOTING_POWER_MULTIPLIER = new BN('10');
+const VOTING_POWER_DIVISOR = new BN('10');
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -53,7 +53,7 @@ export class SubsquidService extends SubsquidUtils {
 	};
 
 	private static getVotingPower(balance: string, lockPeriod: number): BN {
-		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_MULTIPLIER);
+		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_DIVISOR);
 	}
 
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
