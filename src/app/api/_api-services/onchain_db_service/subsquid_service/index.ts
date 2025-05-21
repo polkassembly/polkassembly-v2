@@ -53,8 +53,6 @@ export class SubsquidService extends SubsquidUtils {
 	};
 
 	private static getVotingPower(balance: string, lockPeriod: number): BN {
-		console.log('balance', balance);
-		console.log('lockPeriod', lockPeriod);
 		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_MULTIPLIER);
 	}
 
