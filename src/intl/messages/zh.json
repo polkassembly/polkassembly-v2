@@ -623,7 +623,16 @@
 		"voteSuccess": "您的投票已成功投出",
 		"voteFailed": "您的投票未成功投出",
 		"voteSuccessTitle": "投票成功",
-		"voteFailedTitle": "投票失败"
+		"voteFailedTitle": "投票失败",
+		"delegatedPower": "委托权重",
+		"commentSuccessTitle": "评论添加成功",
+		"commentSuccess": "您的评论已成功添加",
+		"voted": "已投票",
+		"successfully": "成功",
+		"with": "与",
+		"yourVoteIsIn": "您的投票已提交！愿意在评论中分享您支持的原因吗？",
+		"your": "您的",
+		"voteIsIn": "投票已提交！愿意在评论中分享您支持的原因吗？"
 	},
 	"Balance": {
 		"voteBalance": "投票余额",

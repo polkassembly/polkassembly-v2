@@ -4,21 +4,130 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount } from '@/_shared/types';
+import {
+	EVoteDecision,
+	ENotificationStatus,
+	ISelectedAccount,
+	EPostOrigin,
+	IComment,
+	IPublicUser,
+	EProposalType,
+	ICommentResponse,
+	IVoteData,
+	EReactQueryKeys
+} from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { cn } from '@/lib/utils';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
 import ConvictionSelector from './ConvictionSelector/ConvictionSelector';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
+import Address from '../../Profile/Address/Address';
+import AddComment from '../../PostComments/AddComment/AddComment';
 
-function VoteReferendum({ index }: { index: string }) {
+function VoteSuccessContent({
+	decision,
+	balance,
+	address,
+	conviction,
+	proposalType,
+	index,
+	onClose
+}: {
+	decision: EVoteDecision;
+	balance: BN;
+	address: string;
+	conviction: number;
+	proposalType: EProposalType;
+	index: string;
+	onClose: () => void;
+}) {
+	const network = getCurrentNetwork();
+
+	const queryClient = useQueryClient();
+
+	const { toast } = useToast();
+
+	const t = useTranslations();
+
+	const onAddCommentAfterVoteSuccess = (newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
+		if (!index || !proposalType) return;
+
+		const voteData: IVoteData = {
+			decision,
+			balanceValue: balance.toString(),
+			voterAddress: address,
+			lockPeriod: conviction,
+			createdAt: new Date()
+		};
+
+		queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...prev, { ...newComment, user: publicUser, voteData: [voteData] }]);
+		toast({
+			title: t('VoteReferendum.commentSuccessTitle'),
+			description: t('VoteReferendum.commentSuccess'),
+			status: ENotificationStatus.SUCCESS
+		});
+		onClose();
+	};
+
+	return (
+		<div className='max-w-full'>
+			<div className='mb-6 flex flex-col items-center gap-y-2'>
+				<p className='flex items-center gap-x-2 text-sm font-medium text-text_primary'>
+					<span className='text-xl font-semibold'>{t('VoteReferendum.voted')}</span>
+					<span
+						className={cn(
+							'text-xl font-semibold capitalize',
+							decision === EVoteDecision.AYE ? 'text-success' : decision === EVoteDecision.NAY ? 'text-failure' : 'text-text_primary'
+						)}
+					>
+						{decision === EVoteDecision.SPLIT_ABSTAIN ? EVoteDecision.ABSTAIN : decision}
+					</span>
+					<span className='text-xl font-semibold'>{t('VoteReferendum.successfully')}</span>
+					<span className='text-wallet_btn_text'>{t('VoteReferendum.with')}</span>
+					<Address address={address} />
+				</p>
+				<p className='flex items-center gap-x-2 text-sm font-medium text-text_primary'>
+					<span className='text-base font-semibold text-text_primary'>
+						{conviction !== 0 ? `${conviction}x` : '0.1x'} {t('VoteReferendum.conviction')}
+					</span>
+					<span className='text-wallet_btn_text'>{t('VoteReferendum.with')}</span>
+					<span className='text-xl font-semibold text-text_pink'>{formatBnBalance(balance, { withUnit: true, compactNotation: true }, network)}</span>
+				</p>
+			</div>
+			<div className='max-w-full'>
+				<p className='mb-1 flex flex-wrap items-center gap-x-1 whitespace-break-spaces text-sm text-wallet_btn_text'>
+					{t('VoteReferendum.your')} <span className='font-medium capitalize text-text_pink'>{decision === EVoteDecision.SPLIT_ABSTAIN ? EVoteDecision.ABSTAIN : decision}</span>{' '}
+					{t('VoteReferendum.voteIsIn')}
+				</p>
+				<div className='max-w-[80vw]'>
+					<AddComment
+						proposalIndex={index}
+						proposalType={proposalType}
+						onConfirm={onAddCommentAfterVoteSuccess}
+						id='new-comment-after-vote'
+					/>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function VoteReferendum({ index, track, onClose, proposalType }: { index: string; track?: EPostOrigin; onClose: () => void; proposalType: EProposalType }) {
 	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
@@ -29,8 +138,45 @@ function VoteReferendum({ index }: { index: string }) {
 	const [conviction, setConviction] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { toast } = useToast();
+	const network = getCurrentNetwork();
+
+	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
+
+	const trackId = track ? NETWORKS_DETAILS[`${network}`].trackDetails[`${track}`]?.trackId : undefined;
 
 	const { apiService } = usePolkadotApiService();
+
+	const fetchReceivedDelegation = async () => {
+		if (!userPreferences.selectedAccount?.address || !trackId) return null;
+
+		const { data, error } = await NextApiClientService.getDelegateTrack({ address: userPreferences.selectedAccount.address, trackId });
+
+		if (error || !data) {
+			throw new Error(error?.message || 'Failed to get delegations');
+		}
+
+		return data.receivedDelegations;
+	};
+
+	const { data: receivedDelegations } = useQuery({
+		queryKey: ['receivedDelegation', userPreferences.selectedAccount?.address, trackId],
+		queryFn: fetchReceivedDelegation,
+		enabled: !!userPreferences.selectedAccount?.address && !!trackId,
+		placeholderData: (prev) => prev,
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
+		refetchOnReconnect: true
+	});
+
+	const delegatedVotingPower = useMemo(() => {
+		if (!receivedDelegations) return BN_ZERO;
+		return receivedDelegations.reduce((acc, curr) => {
+			const delegatedBalance = new BN(curr.balance);
+			return acc.add(curr.lockPeriod ? delegatedBalance.mul(new BN(curr.lockPeriod)) : delegatedBalance.div(new BN('10')));
+		}, BN_ZERO);
+	}, [receivedDelegations]);
 
 	const isInvalidAmount = useMemo(() => {
 		return (
@@ -63,6 +209,21 @@ function VoteReferendum({ index }: { index: string }) {
 						status: ENotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
+					onClose();
+					setOpenSuccessModal(true);
+					setSuccessModalContent(
+						<VoteSuccessContent
+							decision={voteDecision}
+							balance={balance}
+							address={userPreferences.selectedAccount ? getRegularAddress(userPreferences.selectedAccount) : ''}
+							conviction={conviction}
+							proposalType={proposalType}
+							index={index}
+							onClose={() => {
+								setOpenSuccessModal(false);
+							}}
+						/>
+					);
 				},
 				onFailed: () => {
 					toast({
@@ -92,8 +253,15 @@ function VoteReferendum({ index }: { index: string }) {
 				small
 				customAddressSelector={<AddressRelationsPicker withBalance />}
 			/>
+			{delegatedVotingPower && delegatedVotingPower.gt(BN_ZERO) && (
+				<BalanceInput
+					defaultValue={new BN(delegatedVotingPower.toString())}
+					disabled
+					label={t('VoteReferendum.delegatedPower')}
+				/>
+			)}
 			<div>
-				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
+				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.delegatedPower')}</p>
 				<div className='flex flex-col gap-y-3'>
 					<ChooseVote
 						voteDecision={voteDecision}

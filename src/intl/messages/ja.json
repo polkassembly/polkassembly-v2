@@ -623,7 +623,16 @@
 		"voteSuccess": "投票が成功しました",
 		"voteFailed": "投票が失敗しました",
 		"voteSuccessTitle": "投票成功",
-		"voteFailedTitle": "投票失敗"
+		"voteFailedTitle": "投票失敗",
+		"delegatedPower": "委任された投票力",
+		"commentSuccessTitle": "コメントが正常に追加されました",
+		"commentSuccess": "コメントが正常に追加されました",
+		"voted": "投票済み",
+		"successfully": "正常に",
+		"with": "で",
+		"yourVoteIsIn": "あなたの投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？",
+		"your": "あなたの",
+		"voteIsIn": "投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？"
 	},
 	"Balance": {
 		"voteBalance": "投票残高",

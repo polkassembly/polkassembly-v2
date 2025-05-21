@@ -965,8 +965,10 @@ export interface IPostSubscription {
 	userId: number;
 }
 
+// react query keys
 export enum EReactQueryKeys {
-	BATCH_VOTE_CART = 'batch-vote-cart'
+	BATCH_VOTE_CART = 'batch-vote-cart',
+	COMMENTS = 'comments'
 }
 
 export interface IParamDef {

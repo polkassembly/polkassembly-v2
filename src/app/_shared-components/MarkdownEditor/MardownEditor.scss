@@ -187,6 +187,8 @@
 .mdxeditor-popup-container {
 	z-index: 100 !important;
 
+	border: none !important;
+
 	[role='dialog'],
 	svg {
 		background-color: var(--baseBg);
