@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
+import { QueryDocumentSnapshot, QuerySnapshot, Timestamp, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -295,7 +295,15 @@ export class FirestoreService extends FirestoreUtils {
 		return {
 			...postData,
 			content: postData.content || '',
-			tags: postData.tags?.map((tag: ITag) => ({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })) || [],
+			tags:
+				postData.tags?.map((tag: { value: string; lastUsedAt: unknown }) => ({
+					value: tag.value,
+					lastUsedAt:
+						typeof tag.lastUsedAt === 'object' && tag.lastUsedAt !== null && typeof (tag.lastUsedAt as Timestamp).toDate === 'function'
+							? (tag.lastUsedAt as Timestamp).toDate()
+							: new Date(tag.lastUsedAt as string) || new Date(),
+					network
+				})) || [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),

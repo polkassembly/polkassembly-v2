@@ -11,8 +11,6 @@ import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalSta
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import dayjs from 'dayjs';
-import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -42,6 +40,13 @@ enum EWebhookEvent {
 	CACHE_REFRESH = 'cache_refresh',
 	USER_CREATED = 'user_created',
 	ADDRESS_CREATED = 'address_created'
+}
+
+enum ECacheRefreshType {
+	OFF_CHAIN_POSTS = 'off_chain_posts',
+	REFERENDA_V2 = 'referenda_v2',
+	BOUNTY = 'bounty',
+	LISTING = 'listing'
 }
 
 // TODO: add handling for on-chain reputation scores
@@ -90,7 +95,9 @@ export class WebhookService {
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
 			proposalType: z.nativeEnum(EProposalType)
 		}),
-		[EWebhookEvent.CACHE_REFRESH]: z.object({}),
+		[EWebhookEvent.CACHE_REFRESH]: z.object({
+			cacheRefreshType: z.nativeEnum(ECacheRefreshType)
+		}),
 		[EWebhookEvent.USER_CREATED]: z.object({
 			id: z.number().refine((id) => ValidatorService.isValidUserId(id), ERROR_MESSAGES.INVALID_USER_ID),
 			username: z.string().refine((username) => ValidatorService.isValidUsername(username), ERROR_MESSAGES.INVALID_USERNAME),
@@ -137,7 +144,7 @@ export class WebhookService {
 			case EWebhookEvent.UNDELEGATED:
 				return this.handleOtherEvent({ network, params });
 			case EWebhookEvent.CACHE_REFRESH:
-				return this.handleCacheRefresh({ network });
+				return this.handleCacheRefresh({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.CACHE_REFRESH]> });
 			case EWebhookEvent.USER_CREATED:
 				return this.handleUserCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> });
 			case EWebhookEvent.ADDRESS_CREATED:
@@ -168,7 +175,7 @@ export class WebhookService {
 
 		// Refresh above caches
 		const baseUrl = await getBaseUrl();
-		const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
+		const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true' };
 
 		const fetchUrls = [];
 		// 1. fetch above post details page
@@ -188,115 +195,35 @@ export class WebhookService {
 	}
 
 	// refreshes caches for common endpoints and active proposals
-	private static async handleCacheRefresh({ network }: { network: ENetwork }) {
+	private static async handleCacheRefresh({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.CACHE_REFRESH]> }) {
+		const { cacheRefreshType } = params;
 		try {
-			console.log(`Starting cache refresh for network: ${network}`);
-			const baseUrl = await getBaseUrl();
+			console.log(`Starting ${cacheRefreshType} cache refresh for network: ${network}`);
 
+			const baseUrl = await getBaseUrl();
 			console.log(`Clearing cache with baseUrl: ${baseUrl}`);
 
-			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true', [EHttpHeaderKey.TOOLS_PASSPHRASE]: TOOLS_PASSPHRASE };
+			const headers = { [EHttpHeaderKey.NETWORK]: network, [EHttpHeaderKey.SKIP_CACHE]: 'true' };
 
 			// 0. Prepare all URLs that need to be fetched
-			const fetchUrls: string[] = [];
+			let fetchUrls: string[] = [];
 
-			// 1. Fetch and add active refV2 details pages
-			const { items: activeRefV2Proposals } = await OnChainDbService.GetOnChainPostsListing({
-				network,
-				proposalType: EProposalType.REFERENDUM_V2,
-				limit: 100,
-				page: 1,
-				statuses: ACTIVE_PROPOSAL_STATUSES
-			});
-
-			// 2. Fetch and add active bounty details pages
-			const { items: activeBounties } = await OnChainDbService.GetOnChainPostsListing({
-				network,
-				proposalType: EProposalType.BOUNTY,
-				limit: 100,
-				page: 1,
-				statuses: ACTIVE_BOUNTY_STATUSES
-			});
-
-			// TODO: child bounties
-
-			activeRefV2Proposals.forEach((proposal) => {
-				const indexOrHash = proposal.index || proposal.hash;
-				const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
-
-				// proposal detail page
-				fetchUrls.push(proposalUrl);
-				// TODO: comments
-				// fetchUrls.push(`${proposalUrl}/content-summary`);
-			});
-
-			activeBounties.forEach((bounty) => {
-				const indexOrHash = bounty.index || bounty.hash;
-				const proposalUrl = `${baseUrl}/${EProposalType.BOUNTY}/${indexOrHash}`;
-
-				// proposal detail page
-				fetchUrls.push(proposalUrl);
-			});
-
-			// 2. add all active off-chain posts details pages
-			const offChainPosts = await OffChainDbService.GetOffChainPostsListing({
-				network,
-				proposalType: EProposalType.DISCUSSION,
-				limit: DEFAULT_LISTING_LIMIT * 2, // only refresh cache regularly for posts that are on the first 2 pages & are active (created in the last OFF_CHAIN_POST_ACTIVE_DAYS)
-				page: 1
-			});
-
-			// filter out posts that are not active
-			const activeOffChainPosts = offChainPosts.filter((post) => {
-				return dayjs().diff(dayjs(post.createdAt), 'days') <= OFF_CHAIN_POST_ACTIVE_DAYS;
-			});
-
-			activeOffChainPosts.forEach((post) => {
-				const indexOrHash = post.index || post.hash;
-				const proposalUrl = `${baseUrl}/${post.proposalType}/${indexOrHash}`;
-
-				// proposal detail page
-				fetchUrls.push(proposalUrl);
-				// TODO: comments
-				// fetchUrls.push(`${proposalUrl}/content-summary`);
-			});
-
-			// Add primary listing pages
-
-			// 5 pages for /all page
-			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=3&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=4&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?page=5&limit=${DEFAULT_LISTING_LIMIT}`);
-
-			// 2 pages for /discussion page
-			fetchUrls.push(`${baseUrl}/${EProposalType.DISCUSSION}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.DISCUSSION}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
-
-			// 2 pages for /bounty page
-			fetchUrls.push(`${baseUrl}/${EProposalType.BOUNTY}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.BOUNTY}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
-
-			// 2 pages for /child-bounty page
-			fetchUrls.push(`${baseUrl}/${EProposalType.CHILD_BOUNTY}?page=1&limit=${DEFAULT_LISTING_LIMIT}`);
-			fetchUrls.push(`${baseUrl}/${EProposalType.CHILD_BOUNTY}?page=2&limit=${DEFAULT_LISTING_LIMIT}`);
-
-			// Add track listing pages
-			Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails).forEach((origin) => {
-				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=1&limit=${DEFAULT_LISTING_LIMIT}`);
-				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=2&limit=${DEFAULT_LISTING_LIMIT}`);
-				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=3&limit=${DEFAULT_LISTING_LIMIT}`);
-			});
-
-			// Add treasury stats api
-			fetchUrls.push(`${baseUrl}/meta/treasury-stats`);
-
-			// Overview page refresh
-			await RedisService.DeleteOverviewPageData({ network });
-
-			// fetch overview page
-			fetchUrls.push(`${baseUrl.replace('/api/v2', '')}`);
+			switch (cacheRefreshType) {
+				case ECacheRefreshType.OFF_CHAIN_POSTS:
+					fetchUrls = await this.getOffChainPostsRefreshUrls({ network, baseUrl });
+					break;
+				case ECacheRefreshType.REFERENDA_V2:
+					fetchUrls = await this.getReferendaV2RefreshUrls({ network, baseUrl });
+					break;
+				case ECacheRefreshType.BOUNTY:
+					fetchUrls = await this.getBountyRefreshUrls({ network, baseUrl });
+					break;
+				case ECacheRefreshType.LISTING:
+					fetchUrls = await this.getListingRefreshUrls({ network, baseUrl });
+					break;
+				default:
+					throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported cache refresh type: ${cacheRefreshType}`);
+			}
 
 			// 3. Process URLs in batches to avoid overwhelming the server
 			const batchSize = 5; // Process 5 URLs at a time
@@ -310,6 +237,155 @@ export class WebhookService {
 		} catch (error) {
 			console.error(`Error refreshing cache for network ${network}:`, error);
 		}
+	}
+
+	private static async getOffChainPostsRefreshUrls({ network, baseUrl }: { network: ENetwork; baseUrl: string }) {
+		const fetchUrls: string[] = [];
+
+		// 2. add all active off-chain posts details pages
+		const offChainPosts = await OffChainDbService.GetOffChainPostsListing({
+			network,
+			proposalType: EProposalType.DISCUSSION,
+			limit: DEFAULT_LISTING_LIMIT * 2, // only refresh cache regularly for posts that are on the first 2 pages & are active (created in the last OFF_CHAIN_POST_ACTIVE_DAYS)
+			page: 1
+		});
+
+		// content-summary cache for posts
+		const contentSummaryPromises: Promise<void>[] = [];
+
+		offChainPosts.forEach((post) => {
+			const indexOrHash = post.index || post.hash;
+			if (indexOrHash) {
+				const proposalUrl = `${baseUrl}/${post.proposalType}/${indexOrHash}`;
+
+				// proposal detail page
+				fetchUrls.push(proposalUrl);
+
+				// content-summary cache for posts
+				contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: post.proposalType }));
+			}
+		});
+
+		await Promise.allSettled(contentSummaryPromises);
+
+		return fetchUrls;
+	}
+
+	private static async getReferendaV2RefreshUrls({ network, baseUrl }: { network: ENetwork; baseUrl: string }) {
+		const fetchUrls: string[] = [];
+
+		// 1. Fetch and add active refV2 details pages
+		const { items: activeRefV2Proposals } = await OnChainDbService.GetOnChainPostsListing({
+			network,
+			proposalType: EProposalType.REFERENDUM_V2,
+			limit: 100,
+			page: 1,
+			statuses: ACTIVE_PROPOSAL_STATUSES
+		});
+
+		// content-summary cache for refV2
+		const contentSummaryPromises: Promise<void>[] = [];
+
+		activeRefV2Proposals.forEach((proposal) => {
+			const indexOrHash = proposal.index || proposal.hash;
+			const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
+
+			fetchUrls.push(proposalUrl);
+
+			// content-summary cache for refV2
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.REFERENDUM_V2 }));
+		});
+
+		await Promise.allSettled(contentSummaryPromises);
+		return fetchUrls;
+	}
+
+	private static async getBountyRefreshUrls({ network, baseUrl }: { network: ENetwork; baseUrl: string }) {
+		const fetchUrls: string[] = [];
+
+		// 1. Fetch and add active bounty details pages
+		const activeBountyPromises = OnChainDbService.GetOnChainPostsListing({
+			network,
+			proposalType: EProposalType.BOUNTY,
+			limit: 100,
+			page: 1,
+			statuses: ACTIVE_BOUNTY_STATUSES
+		});
+
+		const activeChildBountyPromises = OnChainDbService.GetOnChainPostsListing({
+			network,
+			proposalType: EProposalType.CHILD_BOUNTY,
+			limit: 100,
+			page: 1,
+			statuses: ACTIVE_BOUNTY_STATUSES
+		});
+
+		const [activeBounties, activeChildBounties] = await Promise.all([activeBountyPromises, activeChildBountyPromises]);
+
+		// content-summary cache for bounty
+		const contentSummaryPromises: Promise<void>[] = [];
+
+		activeBounties.items.forEach((bounty) => {
+			const indexOrHash = bounty.index;
+			const proposalUrl = `${baseUrl}/${EProposalType.BOUNTY}/${indexOrHash}`;
+
+			fetchUrls.push(proposalUrl);
+
+			// content-summary cache for bounty
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.BOUNTY }));
+		});
+
+		activeChildBounties.items.forEach((bounty) => {
+			const indexOrHash = bounty.index;
+			const proposalUrl = `${baseUrl}/${EProposalType.CHILD_BOUNTY}/${indexOrHash}`;
+
+			fetchUrls.push(proposalUrl);
+
+			// content-summary cache for bounty
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.CHILD_BOUNTY }));
+		});
+
+		await Promise.allSettled(contentSummaryPromises);
+
+		return fetchUrls;
+	}
+
+	private static async getListingRefreshUrls({ network, baseUrl }: { network: ENetwork; baseUrl: string }) {
+		const fetchUrls: string[] = [];
+
+		// Define listing types and their page counts
+		const listingTypes = [
+			{ type: EProposalType.REFERENDUM_V2, pages: 5 }, // listing page for /all
+			{ type: EProposalType.DISCUSSION, pages: 2 },
+			{ type: EProposalType.BOUNTY, pages: 3 },
+			{ type: EProposalType.CHILD_BOUNTY, pages: 2 }
+		];
+
+		// Generate paginated URLs for each listing type
+		listingTypes.forEach(({ type, pages }) => {
+			for (let page = 1; page <= pages; page += 1) {
+				fetchUrls.push(`${baseUrl}/${type}?page=${page}&limit=${DEFAULT_LISTING_LIMIT}`);
+			}
+		});
+
+		// Add track listing pages for REFERENDUM_V2
+		const trackOrigins = Object.keys(NETWORKS_DETAILS[network as ENetwork].trackDetails);
+		trackOrigins.forEach((origin) => {
+			for (let page = 1; page <= 3; page += 1) {
+				fetchUrls.push(`${baseUrl}/${EProposalType.REFERENDUM_V2}?origin=${origin as EPostOrigin}&page=${page}&limit=${DEFAULT_LISTING_LIMIT}`);
+			}
+		});
+
+		// Add treasury stats api
+		fetchUrls.push(`${baseUrl}/meta/treasury-stats`);
+
+		// Overview page refresh
+		await RedisService.DeleteOverviewPageData({ network });
+
+		// fetch overview page
+		fetchUrls.push(`${baseUrl.replace('/api/v2', '')}`);
+
+		return fetchUrls;
 	}
 
 	// Helper method to process batches with retries

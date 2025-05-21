@@ -4,10 +4,10 @@
 
 import * as logger from 'firebase-functions/logger';
 import axios from 'axios';
-import { EHttpHeaderKey, EWebhookEvent } from '../types';
+import { EHttpHeaderKey, EWebhookEvent, ECacheRefreshType } from '../types';
 import { CACHE_REFRESH_NETWORKS } from '../constants';
 
-export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase: string }) {
+export async function triggerCacheRefresh({ toolsPassphrase, cacheRefreshType }: { toolsPassphrase: string; cacheRefreshType: ECacheRefreshType }) {
 	return Promise.all(
 		CACHE_REFRESH_NETWORKS.map(async (network) => {
 			try {
@@ -16,7 +16,9 @@ export async function triggerCacheRefresh({ toolsPassphrase }: { toolsPassphrase
 				// Use the network variable in the URL
 				const response = await axios.post(
 					`https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.CACHE_REFRESH}`,
-					{}, // Empty body
+					{
+						cacheRefreshType
+					}, // Empty body
 					{
 						headers: {
 							[EHttpHeaderKey.TOOLS_PASSPHRASE]: toolsPassphrase,

@@ -11,7 +11,7 @@ import axios from 'axios';
 import { triggerFetchLatestTreasuryStats } from './utils/triggerFetchLatestTreasuryStats';
 import { ERROR_MESSAGES } from './constants';
 import { triggerCacheRefresh } from './utils/triggerCacheRefresh';
-import { EWallet, IV1User, IV1UserAddress, IV2User, IV2UserAddress } from './types';
+import { ECacheRefreshType, EWallet, IV1User, IV1UserAddress, IV2User, IV2UserAddress } from './types';
 
 // Load environment variables
 dotenv.config();
@@ -67,7 +67,7 @@ export const scheduledCacheRefresh = onSchedule(
 		schedule: 'every 45 minutes',
 		timeZone: 'UTC',
 		retryCount: 3,
-		timeoutSeconds: 300 // 5 minutes
+		timeoutSeconds: 540 // 9 minutes
 	},
 	async () => {
 		try {
@@ -78,7 +78,9 @@ export const scheduledCacheRefresh = onSchedule(
 				throw new Error(ERROR_MESSAGES.TOOLS_PASSPHRASE_NOT_DEFINED);
 			}
 
-			await triggerCacheRefresh({ toolsPassphrase: TOOLS_PASSPHRASE });
+			Object.values(ECacheRefreshType).forEach((cacheRefreshType) => {
+				triggerCacheRefresh({ toolsPassphrase: TOOLS_PASSPHRASE, cacheRefreshType });
+			});
 		} catch (error) {
 			logger.error('Error in scheduled cache refresh function:', error);
 		}
@@ -97,9 +99,11 @@ export const callCacheRefresh = onRequest(async (request, response) => {
 			throw new HttpsError('invalid-argument', ERROR_MESSAGES.INVALID_TOOLS_PASSPHRASE);
 		}
 
-		await triggerCacheRefresh({ toolsPassphrase });
+		Object.values(ECacheRefreshType).forEach((cacheRefreshType) => {
+			triggerCacheRefresh({ toolsPassphrase: TOOLS_PASSPHRASE, cacheRefreshType });
+		});
 
-		response.json({ message: 'Cache refresh complete' });
+		response.json({ message: 'Cache refresh triggered successfully, please check vercel logs for more details' });
 	} catch (error) {
 		logger.error('Error in callCacheRefresh:', error);
 		throw new HttpsError('internal', 'Error in callCacheRefresh');

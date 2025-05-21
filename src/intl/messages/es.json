@@ -521,6 +521,18 @@
 			"decisionDeposit": "Depósito de decisión",
 			"payDecisionDeposit": "Pagar depósito de decisión",
 			"continue": "Continuar"
+		},
+		"ClaimPayout": {
+			"claim": "Reclamar",
+			"index": "Índice",
+			"beneficiary": "Beneficiario",
+			"amount": "Cantidad",
+			"expireIn": "Expira en",
+			"claimPayout": "Reclamar pago",
+			"payoutClaimedSuccessfully": "Pago reclamado con éxito",
+			"payoutClaimFailed": "Error al reclamar el pago",
+			"payoutClaimedSuccessfullyDescription": "Su pago ha sido reclamado con éxito",
+			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
 		}
 	},
 	"ListingPage_Status": {
@@ -623,7 +635,11 @@
 		"title": "Título",
 		"content": "Contenido",
 		"save": "Guardar",
-		"editPostButton": "Editar"
+		"editPostButton": "Editar",
+		"success": "Publicación actualizada con éxito",
+		"successDescription": "Tu publicación ha sido actualizada con éxito",
+		"error": "Error al actualizar la publicación",
+		"errorDescription": "Hubo un error al actualizar tu publicación"
 	},
 	"Footer": {
 		"helpCenter": "Centro de Ayuda",
