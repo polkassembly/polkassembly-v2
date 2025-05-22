@@ -107,7 +107,6 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 					<AddComment
 						proposalType={proposalType}
 						proposalIndex={index}
-						id='new-comment'
 						onConfirm={(newComment, publicUser) => {
 							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...prev, { ...newComment, user: publicUser }]);
 						}}

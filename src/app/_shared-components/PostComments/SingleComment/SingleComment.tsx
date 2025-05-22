@@ -255,7 +255,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						onConfirm={handleConfirmReply}
 						isReply
 						replyTo={comment?.user}
-						id='new-reply'
 					/>
 				)}
 

@@ -12,8 +12,7 @@ enum ELocalStorageKeys {
 export class LocalStorageClientService {
 	private static readonly localStorageKeysMap = {
 		[ELocalStorageKeys.DISCUSSION_POST_DATA]: (): string => `${ELocalStorageKeys.DISCUSSION_POST_DATA}`,
-		[ELocalStorageKeys.COMMENT_DATA]: (postId: string, id: string, parentCommentId?: string): string =>
-			`${ELocalStorageKeys.COMMENT_DATA}-${postId}-${id}-${parentCommentId || ''}`,
+		[ELocalStorageKeys.COMMENT_DATA]: (postId: string, parentCommentId?: string): string => `${ELocalStorageKeys.COMMENT_DATA}-${postId}-${parentCommentId || ''}`,
 		[ELocalStorageKeys.EDIT_POST_DATA]: (postId: string): string => `${ELocalStorageKeys.EDIT_POST_DATA}-${postId}`
 	} as const;
 
@@ -47,16 +46,16 @@ export class LocalStorageClientService {
 	}
 
 	// Comment Data
-	static setCommentData({ postId, id, parentCommentId, data }: { postId: string; id: string; parentCommentId?: string; data: string }) {
-		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, id, parentCommentId), data);
+	static setCommentData({ postId, parentCommentId, data }: { postId: string; parentCommentId?: string; data: string }) {
+		this.setItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId), data);
 	}
 
-	static getCommentData({ postId, id, parentCommentId }: { postId: string; id: string; parentCommentId?: string }) {
-		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, id, parentCommentId)) || null;
+	static getCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
+		return this.getItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId)) || null;
 	}
 
-	static deleteCommentData({ postId, id, parentCommentId }: { postId: string; id: string; parentCommentId?: string }) {
-		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, id, parentCommentId));
+	static deleteCommentData({ postId, parentCommentId }: { postId: string; parentCommentId?: string }) {
+		this.removeItem(this.localStorageKeysMap[ELocalStorageKeys.COMMENT_DATA](postId, parentCommentId));
 	}
 
 	// Edit Post Data

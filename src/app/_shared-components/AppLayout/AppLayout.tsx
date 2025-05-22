@@ -8,7 +8,6 @@ import React from 'react';
 import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
 import Footer from './Footer/Footer';
 import AppSidebar from './AppSidebar/AppSidebar';
-import SuccessModal from '../SuccessModal/SuccessModal';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -16,8 +15,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 			<AppSidebar />
 
 			<CustomSidebarTrigger />
-
-			<SuccessModal />
 
 			<SidebarInset>
 				<Navbar />

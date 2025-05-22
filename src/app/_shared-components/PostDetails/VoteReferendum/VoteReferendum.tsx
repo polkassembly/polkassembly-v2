@@ -119,7 +119,6 @@ function VoteSuccessContent({
 						proposalIndex={index}
 						proposalType={proposalType}
 						onConfirm={onAddCommentAfterVoteSuccess}
-						id='new-comment-after-vote'
 					/>
 				</div>
 			</div>

@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
+import SuccessModal from '../SuccessModal/SuccessModal';
 
 interface VoteReferendumButtonProps {
 	index: string;
@@ -48,37 +49,40 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 			</Button>
 		</Link>
 	) : (
-		<Dialog
-			open={openModal}
-			onOpenChange={setOpenModal}
-		>
-			<DialogTrigger asChild>
-				<Button
-					className={cn('w-full', btnClassName)}
-					size={size}
-				>
-					<div className='flex items-center gap-1'>
-						<Image
-							src={VoteIcon}
-							alt='Vote Icon'
-							width={20}
-							height={20}
-							className={iconClassName}
-						/>
-						{t('PostDetails.castVote')}
-					</div>
-				</Button>
-			</DialogTrigger>
-			<DialogContent className='max-w-xl p-3 sm:p-6'>
-				<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
-				<VoteReferendum
-					index={index}
-					track={track}
-					onClose={() => setOpenModal(false)}
-					proposalType={proposalType}
-				/>
-			</DialogContent>
-		</Dialog>
+		<div>
+			<SuccessModal />
+			<Dialog
+				open={openModal}
+				onOpenChange={setOpenModal}
+			>
+				<DialogTrigger asChild>
+					<Button
+						className={cn('w-full', btnClassName)}
+						size={size}
+					>
+						<div className='flex items-center gap-1'>
+							<Image
+								src={VoteIcon}
+								alt='Vote Icon'
+								width={20}
+								height={20}
+								className={iconClassName}
+							/>
+							{t('PostDetails.castVote')}
+						</div>
+					</Button>
+				</DialogTrigger>
+				<DialogContent className='max-w-xl p-3 sm:p-6'>
+					<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+					<VoteReferendum
+						index={index}
+						track={track}
+						onClose={() => setOpenModal(false)}
+						proposalType={proposalType}
+					/>
+				</DialogContent>
+			</Dialog>
+		</div>
 	);
 }
 

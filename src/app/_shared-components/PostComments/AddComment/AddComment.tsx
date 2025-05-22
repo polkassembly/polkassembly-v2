@@ -21,7 +21,6 @@ import classes from './AddComment.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 function AddComment({
-	id,
 	proposalType,
 	proposalIndex,
 	parentCommentId,
@@ -30,7 +29,6 @@ function AddComment({
 	isReply,
 	replyTo
 }: {
-	id: string;
 	proposalType: EProposalType;
 	proposalIndex: string;
 	parentCommentId?: string;
@@ -41,7 +39,7 @@ function AddComment({
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, id, parentCommentId });
+	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, parentCommentId });
 	const [content, setContent] = useState<string | null>(savedContent);
 	const [loading, setLoading] = useState<boolean>(false);
 	const { getOnChainIdentity } = useIdentityService();
@@ -104,7 +102,7 @@ function AddComment({
 				onConfirm?.({ ...data, content }, publicUser);
 
 				setContent(null);
-				LocalStorageClientService.deleteCommentData({ postId: proposalIndex, id, parentCommentId });
+				LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
 				markdownEditorRef.current?.setMarkdown('');
 			}
 			setLoading(false);
@@ -121,7 +119,7 @@ function AddComment({
 					markdown={content || ''}
 					onChange={(data) => {
 						setContent(data);
-						LocalStorageClientService.setCommentData({ postId: proposalIndex, id, parentCommentId, data });
+						LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data });
 					}}
 					ref={markdownEditorRef}
 				/>
