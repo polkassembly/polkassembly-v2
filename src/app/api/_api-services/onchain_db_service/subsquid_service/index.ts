@@ -37,6 +37,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
 
+const VOTING_POWER_DIVISOR = new BN('10');
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -50,6 +51,10 @@ export class SubsquidService extends SubsquidUtils {
 			exchanges: [cacheExchange, fetchExchange]
 		});
 	};
+
+	private static getVotingPower(balance: string, lockPeriod: number): BN {
+		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_DIVISOR);
+	}
 
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
 		const gqlClient = this.subsquidGqlClient(network);
@@ -718,7 +723,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number }) => {
 			result[delegation.to] = {
-				votingPower: result[delegation.to]?.votingPower ? new BN(result[delegation.to].votingPower).add(new BN(delegation.balance)).toString() : delegation.balance,
+				votingPower: result[delegation.to]?.votingPower
+					? new BN(result[delegation.to].votingPower).add(this.getVotingPower(delegation.balance, delegation.lockPeriod)).toString()
+					: this.getVotingPower(delegation.balance, delegation.lockPeriod).toString(),
 				receivedDelegationsCount: result[delegation.to]?.receivedDelegationsCount ? result[delegation.to].receivedDelegationsCount + 1 : 1
 			};
 		});
