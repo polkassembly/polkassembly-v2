@@ -16,6 +16,7 @@ import { IconType } from '@react-icons/all-files/lib';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
+import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 import { StaticImageData } from 'next/image';
 import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
@@ -2227,7 +2228,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.PASEO]: {
 		key: ENetwork.PASEO,
-		logo: PolkadotLogo,
+		logo: PaseoLogo,
 		submissionDeposit: new BN('10000000000'),
 		name: 'Paseo',
 		govtype: EGovType.OPENGOV,
