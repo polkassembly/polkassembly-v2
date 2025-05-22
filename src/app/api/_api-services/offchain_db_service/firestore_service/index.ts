@@ -1554,4 +1554,17 @@ export class FirestoreService extends FirestoreUtils {
 			totalCount: totalCount.data().count
 		};
 	}
+
+	static async DeleteContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const contentSummary = await this.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.get();
+
+		if (contentSummary.docs.length) {
+			// sometimes multiple content summaries are generated for the same post
+			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
+		}
+	}
 }

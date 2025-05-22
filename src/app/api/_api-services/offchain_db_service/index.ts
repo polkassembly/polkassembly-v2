@@ -915,4 +915,8 @@ export class OffChainDbService {
 	static async GetPostsByUserId({ userId, network, page, limit, proposalType }: { userId: number; network: ENetwork; page: number; limit: number; proposalType: EProposalType }) {
 		return FirestoreService.GetPostsByUserId({ userId, network, page, limit, proposalType });
 	}
+
+	static async DeleteContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		return FirestoreService.DeleteContentSummary({ network, proposalType, indexOrHash });
+	}
 }
