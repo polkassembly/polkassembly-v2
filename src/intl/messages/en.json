@@ -658,7 +658,16 @@
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",
-		"voteFailedTitle": "Vote Failed"
+		"voteFailedTitle": "Vote Failed",
+		"delegatedPower": "Delegated Power",
+		"commentSuccessTitle": "Comment Added Successfully",
+		"commentSuccess": "Your comment has been added successfully",
+		"voted": "Voted",
+		"successfully": "successfully",
+		"with": "with",
+		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
+		"your": "Your",
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",

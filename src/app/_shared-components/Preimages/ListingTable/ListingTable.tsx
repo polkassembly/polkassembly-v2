@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ETheme, IGenericListingResponse, IPreimage } from '@/_shared/types';
+import { ETheme, IPreimage } from '@/_shared/types';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import ReactJson from 'react-json-view';
 import { useTranslations } from 'next-intl';
@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogTitle } from '../../Dialog/Dialog';
 import styles from './ListingTable.module.scss';
 import PreimageRow from './PreimageRow';
 
-function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
+function ListingTable({ data, totalCount }: { data: IPreimage[]; totalCount: number }) {
 	const searchParams = useSearchParams();
 	const page = searchParams?.get('page') || 1;
 	const { userPreferences } = useUserPreferences();
@@ -26,7 +26,7 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const modalarg = selectedPreimage?.proposedCall.args;
 	const t = useTranslations('Preimages');
 
-	const [preimages, setPreimages] = useState<IPreimage[]>(data?.items || []);
+	const [preimages, setPreimages] = useState<IPreimage[]>(data);
 
 	const hanldeDialogOpen = (preimage: IPreimage) => {
 		setSelectedPreimage(preimage);
@@ -46,8 +46,8 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	};
 
 	return (
-		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
-			{data ? (
+		<div className='mt-5 w-full rounded-lg bg-bg_modal p-6'>
+			{data && data.length > 0 ? (
 				<>
 					<Table>
 						<TableHeader>
@@ -79,12 +79,12 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							)}
 						</TableBody>
 					</Table>
-					{data?.totalCount && data?.totalCount > PREIMAGES_LISTING_LIMIT && (
+					{totalCount && totalCount > PREIMAGES_LISTING_LIMIT && (
 						<div className='mt-5 flex w-full justify-end'>
 							<PaginationWithLinks
 								page={Number(page)}
 								pageSize={PREIMAGES_LISTING_LIMIT}
-								totalCount={data?.totalCount || 0}
+								totalCount={totalCount}
 								pageSearchParam='page'
 							/>
 						</div>

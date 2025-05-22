@@ -133,6 +133,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									<VoteReferendumButton
 										iconClassName='hidden'
 										index={index}
+										track={post.onChainInfo?.origin}
+										proposalType={post.proposalType}
 									/>
 								)}
 							</div>
@@ -167,6 +169,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								<VoteReferendumButton
 									iconClassName='hidden'
 									index={index}
+									track={post.onChainInfo?.origin}
+									proposalType={post.proposalType}
 								/>
 							)}
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />

@@ -4,11 +4,10 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IContentSummary } from '@/_shared/types';
+import { EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
@@ -36,11 +35,10 @@ function PostComments({
 		return data;
 	};
 
-	const { data, isFetching } = useQuery({
-		queryKey: ['comments', proposalType, index],
+	const { data, isLoading } = useQuery({
+		queryKey: [EReactQueryKeys.COMMENTS, proposalType, index],
 		queryFn: () => fetchComments(),
 		placeholderData: (previousData) => previousData || comments,
-		staleTime: FIVE_MIN_IN_MILLI,
 		retry: true,
 		refetchOnMount: true,
 		refetchOnWindowFocus: true
@@ -62,7 +60,7 @@ function PostComments({
 				/>
 			</div>
 
-			{!data && isFetching ? (
+			{isLoading ? (
 				<div className='flex flex-col gap-2 px-8'>
 					<Skeleton className='h-8' />
 					<Skeleton className='h-8' />

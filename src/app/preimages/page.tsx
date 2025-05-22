@@ -4,7 +4,6 @@
 
 import React from 'react';
 import Header from '@ui/Preimages/Header/Header';
-import { IGenericListingResponse, IPreimage } from '@/_shared/types';
 import ListingTable from '@/app/_shared-components/Preimages/ListingTable/ListingTable';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
@@ -20,9 +19,12 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 	}
 
 	return (
-		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-			<Header data={data as IGenericListingResponse<IPreimage>} />
-			<ListingTable data={data as IGenericListingResponse<IPreimage>} />
+		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+			<Header data={{ totalCount: data.totalCount }} />
+			<ListingTable
+				data={data.items}
+				totalCount={data.totalCount}
+			/>
 		</div>
 	);
 }

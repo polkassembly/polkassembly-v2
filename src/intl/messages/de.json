@@ -622,7 +622,16 @@
 		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
 		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
-		"voteFailedTitle": "Abstimmung fehlgeschlagen"
+		"voteFailedTitle": "Abstimmung fehlgeschlagen",
+		"delegatedPower": "Delegierte Macht",
+		"commentSuccessTitle": "Kommentar erfolgreich hinzugefügt",
+		"commentSuccess": "Ihr Kommentar wurde erfolgreich hinzugefügt",
+		"voted": "Abgestimmt",
+		"successfully": "erfolgreich",
+		"with": "mit",
+		"yourVoteIsIn": "Ihre Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?",
+		"your": "Ihre",
+		"voteIsIn": "Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
