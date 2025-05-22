@@ -4,19 +4,21 @@
 
 import React from 'react';
 import Header from '@ui/Preimages/Header/Header';
-import { IGenericListingResponse, IPreimage } from '@/_shared/types';
 import ListingTable from '@/app/_shared-components/Preimages/ListingTable/ListingTable';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
 	const paramsValue = await params;
 	const hash = paramsValue.hash || '';
-	const hashData = await NextApiClientService.fetchPreimageByHash({ hash });
+	const { data } = await NextApiClientService.fetchPreimageByHash({ hash });
 
 	return (
-		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-			<Header data={hashData?.data as unknown as IGenericListingResponse<IPreimage>} />
-			<ListingTable data={hashData?.data as unknown as IGenericListingResponse<IPreimage>} />
+		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+			<Header data={{ totalCount: data ? 1 : 0 }} />
+			<ListingTable
+				data={data ? [data] : []}
+				totalCount={data ? 1 : 0}
+			/>
 		</div>
 	);
 }
