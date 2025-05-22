@@ -123,7 +123,7 @@ interface INetworkDetails {
 	trackDetails: Partial<Record<EPostOrigin, ITrackInfo>>;
 	socialLinks?: ISocialLink[];
 	palletInstance?: string;
-	parachain?: string;
+	assetHubParaId?: string;
 	convictionVotingPeriodInBlocks: BN;
 	openGraphImage?: {
 		large: string;
@@ -210,6 +210,23 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://westend-people-rpc.polkadot.io'
 			}
 		]
+	},
+	[ENetwork.PASEO]: {
+		identityMinDeposit: new BN('1000000000000'),
+		rpcEndpoints: [
+			{
+				name: 'via IBP 1',
+				url: 'wss://sys.ibp.network/people-paseo'
+			},
+			{
+				name: 'via IBP 2',
+				url: 'wss://people-paseo.dotters.network'
+			},
+			{
+				name: 'via Armfoc',
+				url: 'wss://people-paseo.rpc.amforc.com'
+			}
+		]
 	}
 } as const;
 
@@ -260,7 +277,8 @@ const TREASURER_DESCRIPTION = 'Origin for spending (any amount of) funds until t
 const NETWORK_TOKEN_DECIMALS: Record<ENetwork, number> = {
 	[ENetwork.POLKADOT]: 10,
 	[ENetwork.KUSAMA]: 12,
-	[ENetwork.WESTEND]: 12
+	[ENetwork.WESTEND]: 12,
+	[ENetwork.PASEO]: 10
 } as const;
 
 // TODO: update for other networks than polkadot
@@ -1509,6 +1527,430 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 				}
 			}
 		}
+	},
+	[ENetwork.PASEO]: {
+		[EPostOrigin.ROOT]: {
+			trackId: 0,
+			description: ROOT_ORIGIN_DESCRIPTION,
+			group: 'Origin',
+			name: 'root',
+			maxDeciding: 1,
+			decisionDeposit: new BN('1000000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 0,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.WISH_FOR_CHANGE]: {
+			trackId: 2,
+			description: WISH_FOR_CHANGE_DESCRIPTION,
+			group: 'Origin',
+			name: 'wish_for_change',
+			maxDeciding: 10,
+			decisionDeposit: new BN('200000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 0,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.BIG_SPENDER]: {
+			trackId: 34,
+			description: 'Origin able to spend up to 1,000,000 DOT from the treasury at once',
+			group: 'Treasury',
+			name: 'big_spender',
+			maxSpend: new BN('1000000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
+			maxDeciding: 50,
+			decisionDeposit: new BN('4000000000000'),
+			preparePeriod: 2400,
+			decisionPeriod: 403200,
+			confirmPeriod: 100800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 28326977,
+					xOffset: 53763445,
+					yOffset: -26881723
+				}
+			}
+		},
+		[EPostOrigin.MEDIUM_SPENDER]: {
+			trackId: 33,
+			description: 'Origin able to spend up to 100,000 DOT from the treasury at once',
+			group: 'Treasury',
+			name: 'medium_spender',
+			maxSpend: new BN('100000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
+			maxDeciding: 50,
+			decisionDeposit: new BN('2000000000000'),
+			preparePeriod: 2400,
+			decisionPeriod: 403200,
+			confirmPeriod: 57600,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 821428571,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 14377233,
+					xOffset: 27972031,
+					yOffset: -13986016
+				}
+			}
+		},
+		[EPostOrigin.SMALL_SPENDER]: {
+			trackId: 32,
+			description: 'Origin able to spend up to 10,000 DOT from the treasury at once',
+			group: 'Treasury',
+			name: 'small_spender',
+			maxSpend: new BN('10000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
+			maxDeciding: 50,
+			decisionDeposit: new BN('1000000000000'),
+			preparePeriod: 2400,
+			decisionPeriod: 403200,
+			confirmPeriod: 28800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.BIG_TIPPER]: {
+			trackId: 31,
+			description: 'Origin able to spend up to 1000 DOT from the treasury at once',
+			group: 'Treasury',
+			name: 'big_tipper',
+			maxSpend: new BN('1000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
+			maxDeciding: 100,
+			decisionDeposit: new BN('100000000000'),
+			preparePeriod: 100,
+			decisionPeriod: 100800,
+			confirmPeriod: 600,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 357142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 4149097,
+					xOffset: 8230453,
+					yOffset: -4115227
+				}
+			}
+		},
+		[EPostOrigin.SMALL_TIPPER]: {
+			trackId: 30,
+			description: 'Origin able to spend up to 250 DOT from the treasury at once',
+			maxSpend: new BN('250').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
+			group: 'Treasury',
+			name: 'small_tipper',
+			maxDeciding: 200,
+			decisionDeposit: new BN('10000000000'),
+			preparePeriod: 10,
+			decisionPeriod: 100800,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 10,
+			minApproval: {
+				linearDecreasing: {
+					length: 357142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 1620729,
+					xOffset: 3231018,
+					yOffset: -1615509
+				}
+			}
+		},
+		[EPostOrigin.TREASURER]: {
+			trackId: 11,
+			description: TREASURER_DESCRIPTION,
+			group: 'Origin',
+			name: 'treasurer',
+			maxSpend: new BN('10000000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
+			maxDeciding: 10,
+			decisionDeposit: new BN('10000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 100800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 0,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.WHITELISTED_CALLER]: {
+			trackId: 1,
+			description: WHITELISTED_CALLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'whitelisted_caller',
+			maxDeciding: 100,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 300,
+			decisionPeriod: 403200,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 270899180,
+					xOffset: 389830523,
+					yOffset: 305084738
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 8650766,
+					xOffset: 18867926,
+					yOffset: 41509433
+				}
+			}
+		},
+		[EPostOrigin.STAKING_ADMIN]: {
+			trackId: 10,
+			description: STAKING_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'staking_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('50000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.LEASE_ADMIN]: {
+			trackId: 12,
+			description: LEASE_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'lease_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('50000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.FELLOWSHIP_ADMIN]: {
+			trackId: 13,
+			description: FELLOWSHIP_ADMIN_DESCRIPTION,
+			group: 'Origin',
+			name: 'fellowship_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('50000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.GENERAL_ADMIN]: {
+			trackId: 14,
+			description: GENERAL_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'general_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('50000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 49586777,
+					xOffset: 90909091,
+					yOffset: -45454546
+				}
+			}
+		},
+		[EPostOrigin.AUCTION_ADMIN]: {
+			trackId: 15,
+			description: AUCTION_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'auction_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('50000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 49586777,
+					xOffset: 90909091,
+					yOffset: -45454546
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_CANCELLER]: {
+			trackId: 20,
+			description: REFERENDUM_CANCELLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'referendum_canceller',
+			maxDeciding: 1000,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 100800,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_KILLER]: {
+			trackId: 21,
+			description: REFERENDUM_KILLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'referendum_killer',
+			maxDeciding: 1000,
+			decisionDeposit: new BN('500000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		}
 	}
 } as const;
 
@@ -1588,7 +2030,8 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			label: 'Twitter'
 		}
 	],
-	[ENetwork.WESTEND]: []
+	[ENetwork.WESTEND]: [],
+	[ENetwork.PASEO]: []
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
@@ -1599,7 +2042,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		submissionDeposit: new BN('10000000000'),
 		name: 'Polkadot',
 		govtype: EGovType.OPENGOV,
-		parachain: '1000',
+		assetHubParaId: '1000',
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
@@ -1679,8 +2122,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
 		govtype: EGovType.OPENGOV,
-		parachain: '1000',
-		palletInstance: '50',
 		name: 'Kusama',
 		blockTime: 6000,
 		ss58Format: 2,
@@ -1742,11 +2183,11 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'WND',
 		rpcEndpoints: [
 			{
-				name: 'via Dwellir',
+				name: VIA_DWELLIR,
 				url: 'wss://westend-rpc.dwellir.com'
 			},
 			{
-				name: 'via Dwellir Tunisia',
+				name: `${VIA_DWELLIR} Tunisia`,
 				url: 'wss://westend-rpc-tn.dwellir.com'
 			},
 			{
@@ -1783,5 +2224,52 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.WESTEND],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.WESTEND],
 		convictionVotingPeriodInBlocks: new BN('100800')
+	},
+	[ENetwork.PASEO]: {
+		key: ENetwork.PASEO,
+		logo: PolkadotLogo,
+		submissionDeposit: new BN('10000000000'),
+		name: 'Paseo',
+		govtype: EGovType.OPENGOV,
+		assetHubParaId: '1000',
+		palletInstance: '50',
+		blockTime: 6000,
+		ss58Format: 0,
+		subsquidUrl: 'https://polkassembly.squids.live/paseo-polkassembly@v1/api/graphql',
+		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.PASEO],
+		tokenSymbol: 'PAS',
+		rpcEndpoints: [
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://paseo-rpc.dwellir.com'
+			},
+			{
+				name: 'via Amforc',
+				url: 'wss://paseo.rpc.amforc.com'
+			},
+			{
+				name: 'via IBP 1',
+				url: 'wss://rpc.ibp.network/paseo'
+			},
+			{
+				name: 'via IBP 2',
+				url: 'wss://rpc.dotters.network/paseo'
+			},
+			{
+				name: 'via Stakeworld',
+				url: 'wss://pas-rpc.stakeworld.io'
+			}
+		],
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.PASEO],
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.PASEO],
+		socialLinks: networkSocialLinks[ENetwork.PASEO],
+		convictionVotingPeriodInBlocks: new BN('100800'),
+		openGraphImage: {
+			large: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpaseo.png?alt=media&token=02231f8b-5206-4bff-ad78-9a64d81d6580',
+			small:
+				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
+		},
+		supportedAssets: {},
+		foreignAssets: {}
 	}
 } as const;

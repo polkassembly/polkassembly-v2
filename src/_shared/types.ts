@@ -13,7 +13,8 @@ import { StatusCodes } from 'http-status-codes';
 export enum ENetwork {
 	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot',
-	WESTEND = 'westend'
+	WESTEND = 'westend',
+	PASEO = 'paseo'
 }
 
 export enum EGovType {

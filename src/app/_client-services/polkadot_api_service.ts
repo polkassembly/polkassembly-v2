@@ -706,7 +706,7 @@ export class PolkadotApiService {
 									location: {
 										parents: 0,
 										interior: {
-											X1: { Parachain: NETWORKS_DETAILS[this.network]?.parachain }
+											X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
 										}
 									}
 								}
@@ -726,7 +726,7 @@ export class PolkadotApiService {
 										interior: {
 											X1: [
 												{
-													Parachain: NETWORKS_DETAILS[this.network]?.parachain
+													Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
 												}
 											]
 										}
