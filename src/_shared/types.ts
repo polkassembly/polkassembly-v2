@@ -1272,6 +1272,11 @@ export interface IUserPosts {
 	onchainPostsResponse: PostListingResponse;
 }
 
+export enum ECommentActions {
+	ADD = 'add',
+	DELETE = 'delete'
+}
+
 export enum EVoteSortOptions {
 	IdASC = 'id_ASC',
 	IdDESC = 'id_DESC',

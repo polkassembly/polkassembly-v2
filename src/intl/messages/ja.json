@@ -466,6 +466,8 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"commentNotSent": "コメントが送信されませんでした",
+		"commentNotSentDescription": "もう一度試してください",
 		"OnchainInfo": {
 			"metadata": "メタデータ",
 			"table": "テーブル",
