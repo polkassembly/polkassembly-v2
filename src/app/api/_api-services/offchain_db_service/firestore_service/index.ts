@@ -591,6 +591,7 @@ export class FirestoreService extends FirestoreUtils {
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
+			.orderBy('createdAt', 'desc') // just in case there are multiple summaries for the same post
 			.limit(1);
 
 		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
