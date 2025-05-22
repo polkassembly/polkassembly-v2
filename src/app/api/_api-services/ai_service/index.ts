@@ -159,6 +159,13 @@ export class AIService {
 					.split('\n')
 					.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
 					.join('\n');
+				// Ensure the response starts with the 'Main objective/purpose' bullet point
+				const mainObjectiveIndex = cleanedResponse.toLowerCase().indexOf('main objective/purpose');
+				if (mainObjectiveIndex !== -1) {
+					// Find the start of the bullet point containing 'Main objective/purpose'
+					const before = cleanedResponse.toLowerCase().lastIndexOf('\n', mainObjectiveIndex);
+					cleanedResponse = cleanedResponse.substring(before === -1 ? 0 : before + 1);
+				}
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
 				// Extract just the single word response
 				const match = cleanedResponse.match(/\b(against|slightly_against|neutral|slightly_for|for)\b/i);
