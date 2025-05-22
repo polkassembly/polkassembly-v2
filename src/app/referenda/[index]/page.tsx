@@ -8,10 +8,10 @@ import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React, { Suspense } from 'react';
 import { headers } from 'next/headers';
 import { Metadata } from 'next';
-import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import PollForProposal from '@/app/_shared-components/PollForProposal';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
@@ -19,53 +19,15 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	const network = await getNetworkFromHeaders();
 	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: index });
 
-	// Default description and title
-	let { description, title } = OPENGRAPH_METADATA;
-	const image = NETWORKS_DETAILS[`${network}`].openGraphImage?.large;
-	const smallImage = NETWORKS_DETAILS[`${network}`].openGraphImage?.small;
-
-	// Use post title in description if available
-	if (data) {
-		title = `Polkassembly - Referendum #${index}`;
-		description = `Referendum #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
-	}
-
-	const url = `https://polkassembly.com/referenda/${index}`;
-
-	return {
-		title,
-		description,
-		metadataBase: new URL('https://polkassembly.com'),
-		icons: [{ url: '/favicon.ico' }],
-		openGraph: {
-			title,
-			description,
-			images: [
-				{
-					url: image || '',
-					width: 600,
-					height: 600,
-					alt: `Polkassembly Referendum #${index}`
-				},
-				{
-					url: smallImage || '',
-					width: 1200,
-					height: 600,
-					alt: `Polkassembly Referendum #${index}`
-				}
-			],
-			siteName: 'Polkassembly',
-			type: 'website',
-			url
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title,
-			description,
-			images: image ? [image] : [],
-			site: '@polkassembly'
-		}
-	};
+	return getGeneratedContentMetadata({
+		title: `Polkassembly - Referendum #${index}`,
+		description: data
+			? `Referendum #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			: `Explore Polkassembly Referendum #${index}`,
+		network,
+		url: `https://${network}.polkassembly.io/referenda/${index}`,
+		imageAlt: `Polkassembly Referendum #${index}`
+	});
 }
 
 async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {

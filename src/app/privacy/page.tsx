@@ -5,13 +5,23 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { privacyPolicyContent } from './privacy-policy';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
-export const metadata: Metadata = {
-	title: 'Privacy Policy - Polkassembly',
-	description: 'Privacy Policy for Polkassembly'
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Privacy Policy`,
+		description: 'Explore Polkassembly Privacy Policy',
+		network,
+		url: `https://${network}.polkassembly.io/privacy`,
+		imageAlt: 'Polkassembly Privacy Policy'
+	});
+}
 
 export default async function PrivacyPolicyPage() {
 	const network = await getNetworkFromHeaders();

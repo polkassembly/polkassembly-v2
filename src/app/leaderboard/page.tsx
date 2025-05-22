@@ -4,9 +4,26 @@
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { NextApiClientService } from '../_client-services/next_api_client_service';
-import { ClientError } from '../_client-utils/clientError';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import Leaderboard from './Components/index';
+import { ClientError } from '../_client-utils/clientError';
+import { NextApiClientService } from '../_client-services/next_api_client_service';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Leaderboard`,
+		description: 'Explore the Polkassembly Leaderboard',
+		network,
+		url: `https://${network}.polkassembly.io/leaderboard`,
+		imageAlt: 'Polkassembly Leaderboard'
+	});
+}
 
 async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
 	const searchParamsValue = await searchParams;

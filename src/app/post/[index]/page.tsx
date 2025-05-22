@@ -9,24 +9,26 @@ import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React from 'react';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
+	const network = await getNetworkFromHeaders();
 	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.DISCUSSION, indexOrHash: index });
+	const { title: baseTitle } = OPENGRAPH_METADATA;
 
 	// Default description and title
-	let { description, title } = OPENGRAPH_METADATA;
-
-	// Use post title in description if available
-	if (data) {
-		title = `Polkassembly - Discussion #${index}`;
-		description = `Discussion #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
-	}
-
-	return {
-		title,
-		description
-	};
+	return getGeneratedContentMetadata({
+		title: `${baseTitle} - ${data?.title} #${index}`,
+		description: data
+			? `Discussion #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			: `Explore Polkassembly Discussion #${index}`,
+		network,
+		url: `https://${network}.polkassembly.io/post/${index}`,
+		imageAlt: 'Polkassembly Post'
+	});
 }
 
 async function DiscussionPost({ params }: { params: Promise<{ index: string }> }) {

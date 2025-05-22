@@ -4,8 +4,25 @@
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Suspense } from 'react';
-import BountyDashboard from './Components';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { LoadingSpinner } from '../_shared-components/LoadingSpinner';
+import BountyDashboard from './Components';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Bounty Dashboard`,
+		description: 'Explore all Bounty Proposals on Polkassembly',
+		network,
+		url: `https://${network}.polkassembly.io/bounty-dashboard`,
+		imageAlt: 'Polkassembly Bounty Dashboard'
+	});
+}
 
 async function BountyDashboardPage() {
 	const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
