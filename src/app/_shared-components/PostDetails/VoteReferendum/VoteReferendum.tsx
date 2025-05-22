@@ -75,7 +75,10 @@ function VoteSuccessContent({
 			createdAt: new Date()
 		};
 
-		queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...prev, { ...newComment, user: publicUser, voteData: [voteData] }]);
+		queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [
+			...(prev || []),
+			{ ...newComment, user: publicUser, voteData: [voteData] }
+		]);
 		toast({
 			title: t('VoteReferendum.commentSuccessTitle'),
 			description: t('VoteReferendum.commentSuccess'),
@@ -260,7 +263,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 				/>
 			)}
 			<div>
-				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.delegatedPower')}</p>
+				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
 				<div className='flex flex-col gap-y-3'>
 					<ChooseVote
 						voteDecision={voteDecision}

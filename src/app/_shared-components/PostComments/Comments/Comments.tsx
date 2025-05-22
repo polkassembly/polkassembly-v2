@@ -108,7 +108,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						proposalType={proposalType}
 						proposalIndex={index}
 						onConfirm={(newComment, publicUser) => {
-							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...prev, { ...newComment, user: publicUser }]);
+							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
 						}}
 					/>
 				</div>
