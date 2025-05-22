@@ -4,7 +4,8 @@
 
 export enum ENetwork {
 	POLKADOT = 'polkadot',
-	KUSAMA = 'kusama'
+	KUSAMA = 'kusama',
+	PASEO = 'paseo'
 }
 
 export enum EWebhookEvent {
