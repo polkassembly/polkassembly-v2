@@ -216,8 +216,6 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		allowedCommentor
 	});
 
-	// await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
-
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
