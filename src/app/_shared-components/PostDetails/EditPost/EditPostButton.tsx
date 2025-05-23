@@ -12,15 +12,7 @@ import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import EditPost from './EditPost';
 
-function EditPostButton({
-	postData,
-	onEditPostSuccess,
-	className
-}: {
-	postData: IPostListing | IPost;
-	onEditPostSuccess: (title: string, content: string) => void;
-	className?: string;
-}) {
+function EditPostButton({ postData, className }: { postData: IPostListing | IPost; className?: string }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +48,6 @@ function EditPostButton({
 				<div className='max-w-3xl'>
 					<EditPost
 						postData={postData}
-						onEditPostSuccess={onEditPostSuccess}
 						onClose={() => setIsOpen(false)}
 					/>
 				</div>

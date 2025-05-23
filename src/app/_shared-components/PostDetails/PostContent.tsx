@@ -4,7 +4,6 @@
 
 'use client';
 
-import React from 'react';
 import { IPost } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -18,7 +17,7 @@ import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 import LinkPostButton from './LinkDiscussionPost/LinkPostButton';
 
-function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: IPost; isModalOpen: boolean; onEditPostSuccess: (title: string, content: string) => void }) {
+function PostContent({ postData, isModalOpen }: { postData: IPost; isModalOpen: boolean }) {
 	const { content } = postData;
 
 	const { user } = useUser();
@@ -43,12 +42,10 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 					<p className='text-base font-semibold text-text_primary'>No context provided!</p>
 					<EditPostButton
 						postData={postData}
-						onEditPostSuccess={onEditPostSuccess}
 						className='h-10 w-64 bg-bg_pink text-sm font-medium text-white'
 					/>
 					<LinkPostButton
 						postData={postData}
-						onSuccess={onEditPostSuccess}
 						className='h-10 w-64 border border-navbar_border bg-bg_modal text-sm font-medium text-text_pink'
 					/>
 				</div>
@@ -65,14 +62,8 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 				<PostActions postData={postData} />
 				{!postData.isDefaultContent && (
 					<div className='flex items-center gap-x-4'>
-						<EditPostButton
-							postData={postData}
-							onEditPostSuccess={onEditPostSuccess}
-						/>
-						<LinkPostButton
-							postData={postData}
-							onSuccess={onEditPostSuccess}
-						/>
+						<EditPostButton postData={postData} />
+						<LinkPostButton postData={postData} />
 					</div>
 				)}
 			</div>

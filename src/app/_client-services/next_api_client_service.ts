@@ -48,7 +48,8 @@ import {
 	ITrackAnalyticsDelegations,
 	IOnChainMetadata,
 	EVoteSortOptions,
-	EHttpHeaderKey
+	EHttpHeaderKey,
+	IPostLink
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -536,7 +537,15 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method, skipCache });
 	}
 
-	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
+	static async editProposalDetails({
+		proposalType,
+		index,
+		data
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		data: { title: string; content: string; linkedPost?: IPostLink };
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
