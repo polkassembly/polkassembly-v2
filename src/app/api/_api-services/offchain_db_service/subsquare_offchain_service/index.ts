@@ -58,8 +58,11 @@ export class SubsquareOffChainService {
 
 			let content = data?.content;
 
+			let isDefaultContent = false;
+
 			if (!content) {
 				content = getDefaultPostContent(proposalType, data?.proposer);
+				isDefaultContent = true;
 			} else {
 				content = data?.contentType === 'markdown' ? data.content : htmlToMarkdown(data.content);
 			}
@@ -81,7 +84,8 @@ export class SubsquareOffChainService {
 				network,
 				dataSource: EDataSource.SUBSQUARE,
 				allowedCommentor: EAllowedCommentor.ALL,
-				isDeleted: false
+				isDeleted: false,
+				isDefaultContent
 			};
 		} catch {
 			return null;

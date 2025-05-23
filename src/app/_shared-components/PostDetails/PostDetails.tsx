@@ -59,7 +59,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	});
 
 	const onEditPostSuccess = (title: string, content: string) => {
-		queryClient.setQueryData(['postDetails', index], (prev: IPost) => ({ ...prev, title, content }));
+		queryClient.setQueryData(['postDetails', index], (prev: IPost) => ({ ...prev, title, content, isDefaultContent: false }));
 	};
 
 	const { data: aiSummary } = useAISummary({
