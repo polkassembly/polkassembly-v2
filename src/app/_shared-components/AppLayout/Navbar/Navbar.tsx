@@ -18,6 +18,7 @@ import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
 import Image from 'next/image';
+import MobileIcon from '@assets/icons/mobile-icon.svg';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -26,6 +27,7 @@ import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
 import PaLogo from '../PaLogo';
 import ThemeToggleButton from '../../ThemeToggleButton';
 import Search from '../Search/Search';
+import AppQrLogin from '../../Profile/Settings/AppQrLogin';
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -175,6 +177,24 @@ function Navbar() {
 						</Link>
 					)}
 				</span>
+				{user?.id && (
+					<DropdownMenu>
+						<DropdownMenuTrigger
+							noArrow
+							className='relative flex max-w-max items-center gap-3 rounded-md border border-border_grey bg-network_dropdown_bg p-1'
+						>
+							<Image
+								src={MobileIcon}
+								alt='mobile'
+								width={24}
+								height={24}
+							/>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className='flex max-h-max flex-col bg-bg_modal p-2'>
+							<AppQrLogin />
+						</DropdownMenuContent>
+					</DropdownMenu>
+				)}
 				<RPCSwitchDropdown />
 				<span>
 					<ThemeToggleButton />

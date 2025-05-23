@@ -273,6 +273,10 @@
 			"newEmail": "新しいメール",
 			"type": "タイプ",
 			"belowToConfirm": "確認するには下",
+			"appQrLogin": "アプリQRログイン",
+			"scanToLoginInApp": "スキャンしてログイン",
+			"generateQr": "QRを生成",
+			"appQrLoginDescription": "モバイルアプリでスキャンしてWeb3アカウントに直接アクセス",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Google Authenticatorを設定",
 				"installGoogleAuthenticator": "1. Google Authenticatorをインストール（iOS/Android）。",

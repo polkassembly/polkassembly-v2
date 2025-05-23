@@ -273,6 +273,10 @@
 			"newEmail": "新电子邮件",
 			"type": "类型",
 			"belowToConfirm": "在下方确认",
+			"appQrLogin": "应用QR码登录",
+			"scanToLoginInApp": "扫描登录",
+			"generateQr": "生成QR码",
+			"appQrLoginDescription": "通过移动应用扫描，直接访问您的web3账户",
 			"TFA": {
 				"configuringGoogleAuthenticator": "配置Google Authenticator",
 				"installGoogleAuthenticator": "1. 安装Google Authenticator（iOS/Android）。",

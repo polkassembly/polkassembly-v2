@@ -274,6 +274,10 @@
 			"newEmail": "Nuevo correo electrónico",
 			"type": "Tipo",
 			"belowToConfirm": "abajo para confirmar",
+			"appQrLogin": "Inicio de sesión QR de la aplicación",
+			"scanToLoginInApp": "Escanear para iniciar sesión",
+			"generateQr": "Generar QR",
+			"appQrLoginDescription": "Escanee a través de la aplicación móvil para acceso directo a su cuenta web3",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configurando Google Authenticator",
 				"installGoogleAuthenticator": "1. Instale Google Authenticator (iOS/Android).",
