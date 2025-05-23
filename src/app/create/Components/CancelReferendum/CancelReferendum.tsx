@@ -29,7 +29,7 @@ import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddres
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function CancelReferendum({ onProposalCreationSuccess }: { onProposalCreationSuccess: (proposalId: number) => void }) {
+function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 
 	const { apiService } = usePolkadotApiService();
@@ -113,7 +113,7 @@ function CancelReferendum({ onProposalCreationSuccess }: { onProposalCreationSuc
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
-				onProposalCreationSuccess(postId);
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {

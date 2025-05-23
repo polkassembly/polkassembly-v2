@@ -24,7 +24,7 @@ import Link from 'next/link';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function ExistingPreimage({ createdPreimageHash, onProposalCreationSuccess }: { createdPreimageHash?: string; onProposalCreationSuccess: (proposalId: number) => void }) {
+function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageHash?: string; onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -98,7 +98,7 @@ function ExistingPreimage({ createdPreimageHash, onProposalCreationSuccess }: { 
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
-				onProposalCreationSuccess(postId);
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {

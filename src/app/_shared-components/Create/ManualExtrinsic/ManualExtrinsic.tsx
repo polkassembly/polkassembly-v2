@@ -27,7 +27,7 @@ import TxFeesDetailsView from '../TxFeesDetailsView/TxFeesDetailsView';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 
-function ManualExtrinsic({ onPreimageNoteSuccess }: { onPreimageNoteSuccess: (preimageHash: string) => void }) {
+function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => void }) {
 	const t = useTranslations();
 	const [extrinsicFn, setExtrinsicFn] = useState<SubmittableExtrinsic<'promise'> | null>();
 	const { apiService } = usePolkadotApiService();
@@ -112,7 +112,7 @@ function ManualExtrinsic({ onPreimageNoteSuccess }: { onPreimageNoteSuccess: (pr
 						<Button
 							size='lg'
 							className='w-32'
-							onClick={() => onPreimageNoteSuccess(extrinsicDetails.preimageHash)}
+							onClick={() => onSuccess(extrinsicDetails.preimageHash)}
 						>
 							{t('CreatePreimage.CreateProposal')}
 						</Button>
