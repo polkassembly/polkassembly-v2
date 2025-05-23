@@ -1120,6 +1120,29 @@ export class FirestoreService extends FirestoreUtils {
 		await this.postsCollectionRef()
 			.doc(String(id))
 			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
+
+		// add back link to linkedPost for linkedPost if it exists
+		if (linkedPost) {
+			const updatedPostData = (await this.postsCollectionRef().doc(String(id)).get()).data() as IOffChainPost;
+
+			const linkedPostSnapshot = await this.postsCollectionRef()
+				.where('network', '==', updatedPostData.network)
+				.where('proposalType', '==', linkedPost.proposalType)
+				.where('indexOrHash', '==', linkedPost.indexOrHash)
+				.limit(1)
+				.get();
+
+			const linkedPostDoc = !linkedPostSnapshot.empty ? linkedPostSnapshot.docs[0] : null;
+
+			const backLink: IPostLink = {
+				proposalType: updatedPostData.proposalType,
+				indexOrHash: String(updatedPostData.index || updatedPostData.hash)
+			};
+
+			if (linkedPostDoc && backLink.indexOrHash) {
+				await linkedPostDoc.ref.set({ linkedPost: backLink }, { merge: true });
+			}
+		}
 	}
 
 	static async CreatePost({
