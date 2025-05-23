@@ -994,7 +994,12 @@
 		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
 		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
 		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
-		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal.",
+		"Congratulations": "Congratulations!",
+		"proposal": "Proposal",
+		"createdSuccessfully": "created successfully!",
+		"redirectingToProposal": "Redirecting to proposal...",
+		"addContextToProposal": "Add Context to Proposal"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",

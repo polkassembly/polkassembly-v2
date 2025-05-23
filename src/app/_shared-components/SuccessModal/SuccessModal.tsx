@@ -17,7 +17,7 @@ function SuccessModal() {
 			open={open}
 			onOpenChange={setOpenSuccessModal}
 		>
-			<DialogContent className='relative max-w-2xl p-6'>
+			<DialogContent className='max-w-2xl p-6'>
 				<DialogHeader className='border-none' />
 				<div className='relative max-w-full'>
 					<Image
