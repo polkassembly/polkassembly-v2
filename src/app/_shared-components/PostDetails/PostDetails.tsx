@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType, EReactQueryKeys } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -50,7 +50,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	};
 
 	const { data: post } = useQuery({
-		queryKey: ['postDetails', index],
+		queryKey: [EReactQueryKeys.POST_DETAILS, index],
 		queryFn: fetchPostDetails,
 		enabled: !!index,
 		placeholderData: (prev) => prev || postData,
@@ -58,10 +58,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		refetchOnWindowFocus: true,
 		refetchOnMount: true
 	});
-
-	const onEditPostSuccess = (title: string, content: string) => {
-		queryClient.setQueryData(['postDetails', index], (prev: IPost) => ({ ...prev, title, content, isDefaultContent: false }));
-	};
 
 	const { data: aiSummary } = useAISummary({
 		initialData: post?.contentSummary,
@@ -106,7 +102,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								<PostContent
 									postData={post}
 									isModalOpen={isModalOpen ?? false}
-									onEditPostSuccess={onEditPostSuccess}
 								/>
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.TIMELINE}>
@@ -114,6 +109,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 									timeline={post.onChainInfo?.timeline}
 									createdAt={post.createdAt}
+									linkedPost={post.linkedPost}
 								/>
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
