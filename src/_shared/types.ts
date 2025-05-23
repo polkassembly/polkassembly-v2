@@ -969,7 +969,8 @@ export interface IPostSubscription {
 // react query keys enum TODO: add other keys
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
-	COMMENTS = 'comments'
+	COMMENTS = 'comments',
+	POST_DETAILS = 'postDetails'
 }
 
 export interface IParamDef {
