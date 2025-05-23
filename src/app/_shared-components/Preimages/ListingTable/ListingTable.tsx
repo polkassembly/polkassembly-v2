@@ -38,7 +38,7 @@ function ListingTable({ data, totalCount }: { data: IPreimage[]; totalCount: num
 			const index = prev.findIndex((p) => p.hash === preimage.hash && p.proposer === preimage.proposer);
 			if (index !== -1) {
 				const newPreimages = [...prev];
-				newPreimages[`${index}`] = { ...newPreimages[`${index}`], status: 'Unnoted' };
+				newPreimages[`${index}`] = { ...newPreimages[`${index}`], status: 'Cleared' };
 				return newPreimages;
 			}
 			return prev;

@@ -731,7 +731,8 @@
 		"unnoted_description": "The preimage has been unnoted",
 		"failed": "Failed",
 		"unrequest": "Unrequest",
-		"unnote": "Unnote"
+		"unnote": "Unnote",
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -999,7 +1000,9 @@
 		"proposal": "Proposal",
 		"createdSuccessfully": "created successfully!",
 		"redirectingToProposal": "Redirecting to proposal...",
-		"addContextToProposal": "Add Context to Proposal"
+		"addContextToProposal": "Add Context to Proposal",
+		"redirectingToPost": "Redirecting to post...",
+		"discussion": "Discussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",

@@ -929,7 +929,9 @@
 		"proposal": "Propuesta",
 		"createdSuccessfully": "¡creada exitosamente!",
 		"redirectingToProposal": "Redirigiendo a la propuesta...",
-		"addContextToProposal": "Agregar contexto a la propuesta"
+		"addContextToProposal": "Agregar contexto a la propuesta",
+		"redirectingToPost": "Redirigiendo a la publicación...",
+		"discussion": "Discusión"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
