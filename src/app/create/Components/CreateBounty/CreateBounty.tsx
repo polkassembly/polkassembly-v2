@@ -35,7 +35,7 @@ enum ECreateBountyOptions {
 	NEW_BOUNTY = 'newBounty'
 }
 
-function CreateBounty({ onProposalCreationSuccess }: { onProposalCreationSuccess: (proposalId: number) => void }) {
+function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 
 	const { apiService } = usePolkadotApiService();
@@ -155,7 +155,7 @@ function CreateBounty({ onProposalCreationSuccess }: { onProposalCreationSuccess
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
-				onProposalCreationSuccess(postId);
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {

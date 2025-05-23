@@ -33,7 +33,6 @@ import CancelReferendaIcon from '@assets/icons/cancel-referenda-icon.svg';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
-import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
@@ -116,11 +115,6 @@ function SuccessModalContent({ proposalId }: { proposalId: number }) {
 				<Link
 					href={`/referenda/${proposalId}?created=true`}
 					className='text-base font-semibold text-text_pink underline'
-					onClick={(e) => {
-						e.stopPropagation();
-						e.preventDefault();
-						redirectFromServer(`/referenda/${proposalId}?created=true`);
-					}}
 				>
 					{t('CreateProposal.proposal')} #{proposalId}
 				</Link>{' '}
@@ -133,11 +127,6 @@ function SuccessModalContent({ proposalId }: { proposalId: number }) {
 			<Link
 				href={`/referenda/${proposalId}?created=true`}
 				className='flex w-full items-center justify-center gap-x-2 rounded-lg bg-bg_pink p-3 text-sm font-medium text-white hover:bg-bg_pink/90'
-				onClick={(e) => {
-					e.stopPropagation();
-					e.preventDefault();
-					redirectFromServer(`/referenda/${proposalId}?created=true`);
-				}}
 			>
 				<Pencil className='h-4 w-4' />
 				{t('CreateProposal.addContextToProposal')}
@@ -258,7 +247,7 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 					<>
 						{step === EProposalStep.CREATE_PREIMAGE && (
 							<ManualExtrinsic
-								onPreimageNoteSuccess={(preimageHash) => {
+								onSuccess={(preimageHash) => {
 									setStep(EProposalStep.EXISTING_PREIMAGE);
 									setNewPreimageHash(preimageHash);
 								}}
@@ -267,14 +256,14 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						{step === EProposalStep.EXISTING_PREIMAGE && (
 							<ExistingPreimage
 								createdPreimageHash={newPreimageHash}
-								onProposalCreationSuccess={onProposalCreationSuccess}
+								onSuccess={onProposalCreationSuccess}
 							/>
 						)}
-						{step === EProposalStep.CREATE_TREASURY_PROPOSAL && <TreasuryProposalLocal onProposalCreationSuccess={onProposalCreationSuccess} />}
-						{step === EProposalStep.CREATE_USDX_PROPOSAL && <TreasuryProposalAssethub onProposalCreationSuccess={onProposalCreationSuccess} />}
-						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum onProposalCreationSuccess={onProposalCreationSuccess} />}
-						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum onProposalCreationSuccess={onProposalCreationSuccess} />}
-						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty onProposalCreationSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_TREASURY_PROPOSAL && <TreasuryProposalLocal onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_USDX_PROPOSAL && <TreasuryProposalAssethub onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty onSuccess={onProposalCreationSuccess} />}
 						{!step && (
 							<div className='flex flex-col gap-y-4'>
 								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.trendingNow')}</p>
