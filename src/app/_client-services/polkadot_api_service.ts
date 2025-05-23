@@ -900,8 +900,6 @@ export class PolkadotApiService {
 			return;
 		}
 
-		console.log('preimageDetails', preimageDetails);
-
 		const preimageExists = await this.getPreimageLengthFromPreimageHash({ preimageHash: preimageDetails.preimageHash });
 		const tx = preimageExists ? submitProposalTx : this.getBatchAllTx([notePreimageTx, submitProposalTx]);
 
