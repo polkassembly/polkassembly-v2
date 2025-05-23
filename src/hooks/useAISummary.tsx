@@ -18,7 +18,11 @@ export const useAISummary = ({ initialData, proposalType, indexOrHash }: Props) 
 	return useQuery<IContentSummary, Error>({
 		queryKey: ['ai-summary', proposalType, indexOrHash],
 		enabled: Boolean(proposalType) && ValidatorService.isValidIndexOrHash(indexOrHash),
-		initialData,
+		placeholderData: (previousData) => previousData || initialData,
+		retry: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		refetchOnMount: true,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchContentSummary({ proposalType, indexOrHash });
 
