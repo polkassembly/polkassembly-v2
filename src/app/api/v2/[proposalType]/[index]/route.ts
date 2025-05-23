@@ -118,15 +118,42 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
-	const zodBodySchema = z.object({
-		title: z.string().min(1, 'Title is required'),
-		content: z.string().min(1, 'Content is required'),
-		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL)
-	});
+	const zodBodySchema = z
+		.object({
+			title: z.string().min(1, 'Title is required'),
+			content: z.string().min(1, 'Content is required'),
+			allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
+			linkedPost: z
+				.object({
+					proposalType: z.nativeEnum(EProposalType),
+					indexOrHash: z.string()
+				})
+				.optional()
+		})
+		.refine(
+			(data) => {
+				if (data.linkedPost) {
+					return data.linkedPost.proposalType !== proposalType;
+				}
+				return true;
+			},
+			{
+				message: 'Linked post proposal type cannot be the same as the current proposal type',
+				path: ['linkedPost', 'proposalType']
+			}
+		);
 
-	const { content, title, allowedCommentor } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor, linkedPost } = zodBodySchema.parse(await getReqBody(req));
 
-	await updatePostServer({ network, proposalType, indexOrHash: index, content, title, allowedCommentor, userId: AuthService.GetUserIdFromAccessToken(newAccessToken) });
+	// check if linked post exists
+	if (linkedPost) {
+		const linkedPostData = await OffChainDbService.GetOffChainPostData({ network, proposalType: linkedPost.proposalType, indexOrHash: linkedPost.indexOrHash });
+		if (!linkedPostData) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Linked post not found');
+		}
+	}
+
+	await updatePostServer({ network, proposalType, indexOrHash: index, content, title, allowedCommentor, userId: AuthService.GetUserIdFromAccessToken(newAccessToken), linkedPost });
 
 	const response = NextResponse.json({ message: 'Post updated successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));
