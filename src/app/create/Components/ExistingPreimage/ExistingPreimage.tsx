@@ -88,7 +88,8 @@ function ExistingPreimage({ createdPreimageHash, onProposalCreationSuccess }: { 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
 			track: selectedTrack.name,
-			extrinsicFn: submitProposalTx,
+			preimageHash: debouncedPreimageHash,
+			preimageLength,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
