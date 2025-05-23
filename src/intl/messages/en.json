@@ -731,7 +731,8 @@
 		"unnoted_description": "The preimage has been unnoted",
 		"failed": "Failed",
 		"unrequest": "Unrequest",
-		"unnote": "Unnote"
+		"unnote": "Unnote",
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -994,7 +995,14 @@
 		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
 		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
 		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
-		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal.",
+		"Congratulations": "Congratulations!",
+		"proposal": "Proposal",
+		"createdSuccessfully": "created successfully!",
+		"redirectingToProposal": "Redirecting to proposal...",
+		"addContextToProposal": "Add Context to Proposal",
+		"redirectingToPost": "Redirecting to post...",
+		"discussion": "Discussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1033,7 +1041,13 @@
 		"length": "Length",
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
-		"on": "on"
+		"on": "on",
+		"Congratulations": "Congratulations!",
+		"createProposalFromPreimage": "You can now create a proposal from the preimage",
+		"CreateProposal": "Create Proposal",
+		"goBack": "Go Back",
+		"Preimage": "Preimage",
+		"createSuccessfully": "created successfully!"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Bounty proposed successfully",

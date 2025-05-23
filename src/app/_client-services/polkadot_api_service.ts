@@ -649,8 +649,10 @@ export class PolkadotApiService {
 		if (!this.api || !track || !preimageHash || !preimageLength || !enactmentValue) {
 			return null;
 		}
+
+		const isRoot = track === EPostOrigin.ROOT;
 		return this.api.tx.referenda.submit(
-			{ Origins: track },
+			isRoot ? { system: track } : { Origins: track },
 			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
 			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
 		);
@@ -820,14 +822,18 @@ export class PolkadotApiService {
 		track,
 		enactment,
 		enactmentValue,
+		preimageHash,
+		preimageLength,
 		onSuccess,
 		onFailed
 	}: {
 		address: string;
-		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
+		extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult>;
+		preimageHash?: string;
+		preimageLength?: number;
 		onSuccess?: (postId: number) => void;
 		onFailed?: () => void;
 	}) {
@@ -838,6 +844,41 @@ export class PolkadotApiService {
 			return;
 		}
 
+		if (!extrinsicFn) {
+			if (!preimageHash || !preimageLength) {
+				onFailed?.();
+				return;
+			}
+
+			const submitProposalTx = this.getSubmitProposalTx({
+				track,
+				preimageHash,
+				preimageLength,
+				enactment,
+				enactmentValue
+			});
+			if (!submitProposalTx) {
+				onFailed?.();
+				return;
+			}
+
+			const postId = Number(await this.api.query.referenda.referendumCount());
+			await this.executeTx({
+				tx: submitProposalTx,
+				address,
+				errorMessageFallback: 'Failed to create treasury proposal',
+				waitTillFinalizedHash: true,
+				onSuccess: () => {
+					onSuccess?.(postId);
+				},
+				onFailed: () => {
+					onFailed?.();
+				}
+			});
+
+			return;
+		}
+
 		const preimageDetails = this.getPreimageTxDetails({ extrinsicFn });
 
 		if (!preimageDetails || !address) {
@@ -845,7 +886,7 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn });
+		const notePreimageTx = extrinsicFn ? this.getNotePreimageTx({ extrinsicFn }) : null;
 		const submitProposalTx = this.getSubmitProposalTx({
 			track,
 			preimageHash: preimageDetails.preimageHash,

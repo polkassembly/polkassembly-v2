@@ -61,11 +61,10 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 			)}
 
 			<Separator className='my-4 bg-border_grey' />
-			<PostActions postData={postData} />
-			{!postData.isDefaultContent && (
-				<div className='mt-1 flex items-center justify-between'>
-					<div />
-					<div className='flex items-center gap-x-2'>
+			<div className='flex items-center gap-x-4'>
+				<PostActions postData={postData} />
+				{!postData.isDefaultContent && (
+					<div className='flex items-center gap-x-4'>
 						<EditPostButton
 							postData={postData}
 							onEditPostSuccess={onEditPostSuccess}
@@ -75,8 +74,8 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 							onSuccess={onEditPostSuccess}
 						/>
 					</div>
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 }

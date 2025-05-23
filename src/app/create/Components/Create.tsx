@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 import DiscussionIcon from '@assets/icons/create-discussion.svg';
 import QuickActionsIcon from '@assets/icons/quick-actions-icon.svg';
 import PreimageIcon from '@assets/icons/create-preimage.svg';
@@ -30,7 +30,9 @@ import SpendAssethubIcon from '@assets/icons/spend-assethub-icon.svg';
 import CreateTreasuryIcon from '@assets/icons/create-treasury-icon.svg';
 import KillReferendaIcon from '@assets/icons/kill-referenda-icon.svg';
 import CancelReferendaIcon from '@assets/icons/cancel-referenda-icon.svg';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
@@ -103,17 +105,52 @@ function CreateOption({
 	);
 }
 
+function SuccessModalContent({ proposalId }: { proposalId: number }) {
+	const t = useTranslations();
+
+	return (
+		<div className='flex flex-col items-center gap-y-4'>
+			<p className='text-xl font-semibold text-text_primary'>{t('CreateProposal.Congratulations')}</p>
+			<p className='flex items-center gap-x-2 text-sm font-medium text-wallet_btn_text'>
+				<Link
+					href={`/referenda/${proposalId}?created=true`}
+					className='text-base font-semibold text-text_pink underline'
+				>
+					{t('CreateProposal.proposal')} #{proposalId}
+				</Link>{' '}
+				{t('CreateProposal.createdSuccessfully')}
+			</p>
+			<div className='flex items-center gap-x-2'>
+				<p className='text-sm font-medium text-wallet_btn_text'>{t('CreateProposal.redirectingToProposal')}</p>
+				<LoadingSpinner size='small' />
+			</div>
+			<Link
+				href={`/referenda/${proposalId}?created=true`}
+				className='flex w-full items-center justify-center gap-x-2 rounded-lg bg-bg_pink p-3 text-sm font-medium text-white hover:bg-bg_pink/90'
+			>
+				<Pencil className='h-4 w-4' />
+				{t('CreateProposal.addContextToProposal')}
+			</Link>
+		</div>
+	);
+}
+
 const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?: EProposalStep) => void }>(({ isModal = false, onStepChange }, ref) => {
 	const searchParams = useSearchParams();
 	const open = searchParams.get('open');
+	const router = useRouter();
 
 	const [step, setStep] = useState<EProposalStep | undefined>(open && Object.values(EProposalStep).includes(open as EProposalStep) ? (open as EProposalStep) : undefined);
 	const { user } = useUser();
 	const t = useTranslations();
 
+	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
+
 	const network = getCurrentNetwork();
 
 	const isAssetHubEnabled = Object.keys(NETWORKS_DETAILS[`${network}`]?.supportedAssets).length > 0;
+
+	const [newPreimageHash, setNewPreimageHash] = useState<string>();
 
 	const titles = {
 		create: t('CreateProposal.quickActions'),
@@ -152,6 +189,15 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 		onStepChange?.(step);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [step]);
+
+	const onProposalCreationSuccess = (proposalId: number) => {
+		if (isModal) {
+			router.back();
+		}
+
+		setSuccessModalContent(<SuccessModalContent proposalId={proposalId} />);
+		setOpenSuccessModal(true);
+	};
 
 	return (
 		<>
@@ -199,13 +245,25 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 					</p>
 				) : (
 					<>
-						{step === EProposalStep.CREATE_PREIMAGE && <ManualExtrinsic />}
-						{step === EProposalStep.EXISTING_PREIMAGE && <ExistingPreimage />}
-						{step === EProposalStep.CREATE_TREASURY_PROPOSAL && <TreasuryProposalLocal />}
-						{step === EProposalStep.CREATE_USDX_PROPOSAL && <TreasuryProposalAssethub />}
-						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum />}
-						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum />}
-						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty />}
+						{step === EProposalStep.CREATE_PREIMAGE && (
+							<ManualExtrinsic
+								onSuccess={(preimageHash) => {
+									setStep(EProposalStep.EXISTING_PREIMAGE);
+									setNewPreimageHash(preimageHash);
+								}}
+							/>
+						)}
+						{step === EProposalStep.EXISTING_PREIMAGE && (
+							<ExistingPreimage
+								createdPreimageHash={newPreimageHash}
+								onSuccess={onProposalCreationSuccess}
+							/>
+						)}
+						{step === EProposalStep.CREATE_TREASURY_PROPOSAL && <TreasuryProposalLocal onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_USDX_PROPOSAL && <TreasuryProposalAssethub onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty onSuccess={onProposalCreationSuccess} />}
 						{!step && (
 							<div className='flex flex-col gap-y-4'>
 								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.trendingNow')}</p>

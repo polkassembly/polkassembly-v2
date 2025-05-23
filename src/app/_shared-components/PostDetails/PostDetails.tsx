@@ -12,6 +12,7 @@ import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSuccessModal } from '@/hooks/useSuccessModal';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -36,6 +37,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 	const queryClient = useQueryClient();
 
+	const { setOpenSuccessModal, open: openSuccessModal } = useSuccessModal();
+
 	const fetchPostDetails = async () => {
 		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: postData.proposalType, indexOrHash: index, skipCache: true });
 
@@ -57,7 +60,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	});
 
 	const onEditPostSuccess = (title: string, content: string) => {
-		queryClient.setQueryData(['postDetails', index], (prev: IPost) => ({ ...prev, title, content }));
+		queryClient.setQueryData(['postDetails', index], (prev: IPost) => ({ ...prev, title, content, isDefaultContent: false }));
 	};
 
 	const { data: aiSummary } = useAISummary({
@@ -67,9 +70,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	});
 
 	useEffect(() => {
+		if (openSuccessModal) {
+			setOpenSuccessModal(false);
+		}
 		if (aiSummary?.isSpam) {
 			setShowSpamModal(true);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [aiSummary]);
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post?.proposalType ?? postData.proposalType);

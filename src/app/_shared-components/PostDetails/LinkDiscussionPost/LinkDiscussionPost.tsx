@@ -43,15 +43,14 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 		return data.items;
 	};
 
-	const { data: userDiscussionPosts, isFetching: isFetchingUserDiscussionPosts } = useQuery({
+	const { data: userDiscussionPosts, isLoading: isFetchingUserDiscussionPosts } = useQuery({
 		queryKey: ['userDiscussionPosts', user?.id],
 		queryFn: fetchAllPostsByUser,
 		enabled: !!user?.id,
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI,
-		retry: false,
-		retryOnMount: false,
-		refetchOnWindowFocus: false
+		retry: true,
+		retryOnMount: true,
+		refetchOnWindowFocus: true
 	});
 
 	const fetchDiscussionPost = async () => {

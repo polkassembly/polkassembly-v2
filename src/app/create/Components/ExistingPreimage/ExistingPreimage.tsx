@@ -24,7 +24,7 @@ import Link from 'next/link';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function ExistingPreimage() {
+function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageHash?: string; onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -33,7 +33,7 @@ function ExistingPreimage() {
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
 
-	const { value: preimageHash, debouncedValue: debouncedPreimageHash, setValue: setPreimageHash } = useDebounce('', 500);
+	const { value: preimageHash, debouncedValue: debouncedPreimageHash, setValue: setPreimageHash } = useDebounce(createdPreimageHash || '', 500);
 	const [preimageLength, setPreimageLength] = useState(0);
 	const [isValidPreimageHash, setIsValidPreimageHash] = useState(false);
 
@@ -88,7 +88,8 @@ function ExistingPreimage() {
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
 			track: selectedTrack.name,
-			extrinsicFn: submitProposalTx,
+			preimageHash: debouncedPreimageHash,
+			preimageLength,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -97,6 +98,7 @@ function ExistingPreimage() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {

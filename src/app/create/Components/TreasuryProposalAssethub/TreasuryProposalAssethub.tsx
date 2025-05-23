@@ -23,7 +23,7 @@ import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function TreasuryProposalAssethub() {
+function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 
 	const { apiService } = usePolkadotApiService();
@@ -86,6 +86,7 @@ function TreasuryProposalAssethub() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {
