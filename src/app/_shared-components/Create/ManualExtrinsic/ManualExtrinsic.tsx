@@ -22,7 +22,7 @@ import TxFeesDetailsView from '../TxFeesDetailsView/TxFeesDetailsView';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 
-function ManualExtrinsic() {
+function ManualExtrinsic({ onPreimageNoteSuccess }: { onPreimageNoteSuccess: (preimageHash: string) => void }) {
 	const t = useTranslations();
 	const [extrinsicFn, setExtrinsicFn] = useState<SubmittableExtrinsic<'promise'> | null>();
 	const { apiService } = usePolkadotApiService();
@@ -54,6 +54,7 @@ function ManualExtrinsic() {
 					title: t('CreatePreimage.preimageNotedSuccessfully'),
 					description: t('CreatePreimage.preimageNotedSuccessfullyDescription')
 				});
+				onPreimageNoteSuccess(extrinsicDetails?.preimageHash || '');
 			},
 			onFailed: () => {
 				setIsLoading(false);
