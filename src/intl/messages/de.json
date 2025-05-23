@@ -989,7 +989,13 @@
 		"length": "Länge",
 		"beneficiary": "Begünstigter",
 		"noBeneficiarySelected": "Kein Begünstigter ausgewählt",
-		"on": "an"
+		"on": "an",
+		"Congratulations": "Glückwunsch!",
+		"createProposalFromPreimage": "Sie können jetzt einen Vorschlag aus dem Preimage erstellen",
+		"CreateProposal": "Vorschlag erstellen",
+		"goBack": "Zurück",
+		"Preimage": "Preimage",
+		"createSuccessfully": "erfolgreich erstellt!"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",

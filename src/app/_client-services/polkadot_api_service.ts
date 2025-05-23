@@ -649,8 +649,10 @@ export class PolkadotApiService {
 		if (!this.api || !track || !preimageHash || !preimageLength || !enactmentValue) {
 			return null;
 		}
+
+		const isRoot = track === EPostOrigin.ROOT;
 		return this.api.tx.referenda.submit(
-			{ Origins: track },
+			isRoot ? { system: track } : { Origins: track },
 			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
 			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
 		);
