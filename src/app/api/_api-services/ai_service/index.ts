@@ -46,6 +46,8 @@ export class AIService {
     - Use technical/blockchain terminology appropriately.
     - Keep information factual and objective.
     - Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries.
+		- Give strict priority to the '### Beneficiaries' section over the '### Technical Preimage Arguments' section.
+		- The '### Technical Preimage Arguments' section should only be used if the '### Beneficiaries' section is not available because the Technical Preimage Arguments do not contain formatted values.
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
@@ -225,7 +227,7 @@ export class AIService {
 		}
 
 		if (additionalData.preimageArgs && Object.keys(additionalData.preimageArgs).length) {
-			fullPrompt += `### Technical Preimage Args:\n${JSON.stringify(additionalData.preimageArgs)}\n\n`;
+			fullPrompt += `### Technical Preimage Arguments:\n${JSON.stringify(additionalData.preimageArgs)}\n\n`;
 		}
 
 		if (additionalData.beneficiaries?.length) {
@@ -343,7 +345,15 @@ export class AIService {
 		return sentiment as ECommentSentiment;
 	}
 
-	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
+	static async GenerateAndUpdatePostSummary({
+		network,
+		proposalType,
+		indexOrHash
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+	}): Promise<IContentSummary | null> {
 		console.log('Updating post summary', { network, proposalType, indexOrHash });
 
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType, getDefaultContent: false });
