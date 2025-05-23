@@ -30,7 +30,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'No addresses found for user');
 	}
 
-	const encodedAddresses = addresses.map((address) => encodeAddress(address.address, NETWORKS_DETAILS[network as ENetwork].ss58Format));
+	const encodedAddresses = addresses
+		.filter((address) => ValidatorService.isValidSubstrateAddress(address.address))
+		.map((address) => encodeAddress(address.address, NETWORKS_DETAILS[network as ENetwork].ss58Format));
 
 	const { activeProposalsCount, votedProposalsCount } = await OnChainDbService.GetActiveVotedProposalsCount({
 		addresses: encodedAddresses,

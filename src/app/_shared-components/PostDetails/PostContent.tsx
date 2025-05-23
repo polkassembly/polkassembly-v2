@@ -29,7 +29,7 @@ function PostContent({ postData, isModalOpen, onEditPostSuccess }: { postData: I
 				indexOrHash={String(postData?.index ?? postData?.hash)}
 				proposalType={postData.proposalType}
 				summaryType='content'
-				initialData={(postData as IPost)?.contentSummary}
+				initialData={postData?.contentSummary}
 			/>
 
 			{user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '') && postData.isDefaultContent ? (

@@ -12,7 +12,6 @@ import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -54,7 +53,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		queryKey: ['postDetails', index],
 		queryFn: fetchPostDetails,
 		enabled: !!index,
-		staleTime: FIVE_MIN_IN_MILLI,
 		placeholderData: (prev) => prev || postData,
 		retry: true,
 		refetchOnWindowFocus: true,

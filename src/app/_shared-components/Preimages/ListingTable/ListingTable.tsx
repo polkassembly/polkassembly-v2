@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { ETheme, IPreimage } from '@/_shared/types';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import ReactJson from 'react-json-view';
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -16,6 +16,12 @@ import { PaginationWithLinks } from '../../PaginationWithLinks';
 import { Dialog, DialogContent, DialogTitle } from '../../Dialog/Dialog';
 import styles from './ListingTable.module.scss';
 import PreimageRow from './PreimageRow';
+
+// Dynamically import ReactJson to prevent SSR issues
+const ReactJson = dynamic(() => import('react-json-view'), {
+	ssr: false,
+	loading: () => <div className='flex items-center justify-center p-4'>Loading...</div>
+});
 
 function ListingTable({ data, totalCount }: { data: IPreimage[]; totalCount: number }) {
 	const searchParams = useSearchParams();
