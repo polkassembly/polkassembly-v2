@@ -1038,7 +1038,13 @@
 		"length": "Length",
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
-		"on": "on"
+		"on": "on",
+		"Congratulations": "Congratulations!",
+		"createProposalFromPreimage": "You can now create a proposal from the preimage",
+		"CreateProposal": "Create Proposal",
+		"goBack": "Go Back",
+		"Preimage": "Preimage",
+		"createSuccessfully": "created successfully!"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Bounty proposed successfully",
