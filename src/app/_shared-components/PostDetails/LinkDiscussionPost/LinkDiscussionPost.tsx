@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import NoContextGIF from '@assets/gifs/no-context.gif';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../../Input';
 import { Skeleton } from '../../Skeleton';
 import { Separator } from '../../Separator';
@@ -108,25 +109,25 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 	const handleLinkDiscussion = async () => {
 		if (
 			!selectedDiscussionPost ||
-			!selectedDiscussionPost.index ||
+			!ValidatorService.isValidNumber(selectedDiscussionPost.index) ||
 			!user ||
 			user.id !== selectedDiscussionPost.userId ||
 			!selectedDiscussionPost.title ||
 			!selectedDiscussionPost.content ||
-			!postData.index
+			!ValidatorService.isValidNumber(postData.index)
 		)
 			return;
 
 		setIsLoading(true);
 		const { data, error } = await NextApiClientService.editProposalDetails({
 			proposalType: postData.proposalType,
-			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index.toString(),
+			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index!.toString(),
 			data: {
 				title: selectedDiscussionPost.title,
 				content: selectedDiscussionPost.content,
 				linkedPost: {
 					proposalType: EProposalType.DISCUSSION,
-					indexOrHash: selectedDiscussionPost.index.toString()
+					indexOrHash: selectedDiscussionPost.index!.toString()
 				}
 			}
 		});
@@ -149,7 +150,7 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 			status: ENotificationStatus.SUCCESS
 		});
 
-		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index.toString()], (prev: IPost) => ({
+		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index!.toString()], (prev: IPost) => ({
 			...prev,
 			title: selectedDiscussionPost.title,
 			content: selectedDiscussionPost.content,

@@ -37,7 +37,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 	const canEdit = canEditOffChain || canEditOnChain;
 
 	const editPost = async () => {
-		if (!title.trim() || !content || !postData.index || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;
+		if (!title.trim() || !content || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;
 
 		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content)) return;
 
@@ -59,7 +59,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 			return;
 		}
 
-		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index.toString()], (prev: IPost) => ({
+		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index!.toString()], (prev: IPost) => ({
 			...prev,
 			title,
 			content,

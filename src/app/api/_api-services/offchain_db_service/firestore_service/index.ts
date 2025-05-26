@@ -1136,7 +1136,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			const backLink: IPostLink = {
 				proposalType: updatedPostData.proposalType,
-				indexOrHash: String(updatedPostData.index || updatedPostData.hash)
+				indexOrHash: String(updatedPostData.index ?? updatedPostData.hash)
 			};
 
 			if (linkedPostDoc && backLink.indexOrHash) {
