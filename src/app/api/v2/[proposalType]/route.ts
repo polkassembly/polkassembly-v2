@@ -127,7 +127,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 						proposer: onChainPostInfo.proposer,
 						status: onChainPostInfo.status,
 						description: onChainPostInfo.description || '',
-						index: onChainPostInfo.index || post.index,
+						index: onChainPostInfo.index ?? post.index,
 						origin: onChainPostInfo.origin || '',
 						type: proposalType,
 						hash: onChainPostInfo.hash || post.hash || '',

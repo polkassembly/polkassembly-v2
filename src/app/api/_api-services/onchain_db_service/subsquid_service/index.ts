@@ -123,7 +123,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		const proposal = subsquidData.proposals[0];
 
-		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
+		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index ?? proposal.hash) });
 
 		const allPeriodEnds =
 			proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
@@ -890,7 +890,7 @@ export class SubsquidService extends SubsquidUtils {
 							}
 						: undefined;
 
-					const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index || proposal.hash)! });
+					const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index ?? proposal.hash)! });
 
 					return {
 						createdAt: new Date(proposal.createdAt),

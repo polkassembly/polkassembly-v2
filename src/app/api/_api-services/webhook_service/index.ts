@@ -254,7 +254,7 @@ export class WebhookService {
 		const contentSummaryPromises: Promise<void>[] = [];
 
 		offChainPosts.forEach((post) => {
-			const indexOrHash = post.index || post.hash;
+			const indexOrHash = post.index ?? post.hash;
 			if (indexOrHash) {
 				const proposalUrl = `${baseUrl}/${post.proposalType}/${indexOrHash}`;
 
@@ -287,7 +287,7 @@ export class WebhookService {
 		const contentSummaryPromises: Promise<void>[] = [];
 
 		activeRefV2Proposals.forEach((proposal) => {
-			const indexOrHash = proposal.index || proposal.hash;
+			const indexOrHash = proposal.index ?? proposal.hash;
 			const proposalUrl = `${baseUrl}/${EProposalType.REFERENDUM_V2}/${indexOrHash}`;
 
 			fetchUrls.push(proposalUrl);
