@@ -59,7 +59,7 @@ export class SubsquidService extends SubsquidUtils {
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
+		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM, EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)
 			? this.GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX
 			: this.GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX;
 
@@ -331,7 +331,7 @@ export class SubsquidService extends SubsquidUtils {
 				? subsquidDecision
 					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
 					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
-				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
+				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM, EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)
 					? subsquidDecision
 						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
 						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
