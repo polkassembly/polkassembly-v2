@@ -56,10 +56,14 @@ export class SubsquidService extends SubsquidUtils {
 		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_DIVISOR);
 	}
 
-	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
+	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics | null> {
+		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)) {
+			return null;
+		}
+
 		const gqlClient = this.subsquidGqlClient(network);
 
-		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM, EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)
+		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
 			? this.GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX
 			: this.GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX;
 
@@ -135,7 +139,7 @@ export class SubsquidService extends SubsquidUtils {
 			hash: proposal.hash,
 			origin: proposal.origin,
 			description: proposal.description || '',
-			voteMetrics,
+			...(voteMetrics && { voteMetrics }),
 			...(proposal.reward && { reward: proposal.reward }),
 			...(proposal.fee && { fee: proposal.fee }),
 			...(proposal.deposit && { deposit: proposal.deposit }),
@@ -331,7 +335,7 @@ export class SubsquidService extends SubsquidUtils {
 				? subsquidDecision
 					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
 					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
-				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM, EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)
+				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
 					? subsquidDecision
 						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
 						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
@@ -886,6 +890,8 @@ export class SubsquidService extends SubsquidUtils {
 							}
 						: undefined;
 
+					const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index || proposal.hash)! });
+
 					return {
 						createdAt: new Date(proposal.createdAt),
 						description: proposal.description || '',
@@ -895,7 +901,7 @@ export class SubsquidService extends SubsquidUtils {
 						status: proposal.status || EProposalStatus.Unknown,
 						type: EProposalType.REFERENDUM_V2,
 						hash: proposal.hash || '',
-						voteMetrics: await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index || proposal.hash)! }),
+						...(voteMetrics && { voteMetrics }),
 						beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 						decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 						preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
