@@ -120,13 +120,78 @@ export const W3F_DELEGATES: IDelegate[] = [
 		network: ENetwork.POLKADOT,
 		sources: [EDelegateSource.W3F],
 		manifesto: 'A global multi-disciplinary collective of incorporated and individual contributors committed to the growth of Polkadot.'
+	},
+	// Kusama dele
+	{
+		address: 'GqC37KSFFeGAoL7YxSeP1YDwr85WJvLmDDQiSaprTDAm8Jj',
+		name: 'Adam_Clay_Steeber',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'Dm4uKxZJZHJbpZpfnYPiHnbgyHWKMU1s5h6X7kqjfYv1Xkk',
+		name: 'PromoTeam | Web3 Uzbekistan',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'EocabFvqttEamwQKoFyQxLPnx9HWDdVDS9wwrUX1aKKbJ5g',
+		name: 'Alzymologist',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'FDL99LDYERjevxPnXBjNGHZv13FxCGHrqh2N5zWQXx1finf',
+		name: 'Georgii / Space Invader',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'HyLisujX7Cr6D7xzb6qadFdedLt8hmArB6ZVGJ6xsCUHqmx',
+		name: 'Ivy voter collective',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'FcjmeNzPk3vgdENm1rHeiMCxFK96beUoi2kb59FmCoZtkGF',
+		name: 'Staker Space',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'HYmYudY1cxN6XyY98dd82TckYF2YiPFc6sXmHqMoKifGAje',
+		name: 'Le Nexus',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'JHTfbt39EL1CcbKteN6hG5L5pWo9XWi9XFiyuS9q24cAc8u',
+		name: 'KusDAO',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'Hgm7ELPfRmPKbHgGZCYEZGTjJX8VicXEnFKec7YAeFgAd4d',
+		name: 'Polkadot Hungary DAO',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F]
+	},
+	{
+		address: 'EicAs5s99x17qZcQzJMiBCfada9rGyEC6njfiBX3j2EPr9W',
+		image: 'https://i.ibb.co/7NYxpxWs/mdx-Editor-khushy1234-k-1745921355318.jpg',
+		name: 'PERMANENCE DAO/HQ',
+		network: ENetwork.KUSAMA,
+		sources: [EDelegateSource.W3F],
+		manifesto: 'A global multi-disciplinary collective of incorporated and individual contributors committed to the growth of Kusama.'
 	}
 ];
 
 export const NOVA_DELEGATES: Record<string, URL> = {
-	[ENetwork.POLKADOT]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/polkadot.json')
+	[ENetwork.POLKADOT]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/polkadot.json'),
+	[ENetwork.KUSAMA]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/kusama.json')
 };
 
 export const PARITY_DELEGATES: Record<string, URL> = {
-	[ENetwork.POLKADOT]: new URL('https://paritytech.github.io/governance-ui/data/polkadot/delegates.json')
+	[ENetwork.POLKADOT]: new URL('https://paritytech.github.io/governance-ui/data/polkadot/delegates.json'),
+	[ENetwork.KUSAMA]: new URL('https://paritytech.github.io/governance-ui/data/kusama/delegates.json')
 };

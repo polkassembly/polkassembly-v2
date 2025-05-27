@@ -720,7 +720,8 @@
 			"fellowship": "研究员",
 			"council": "理事会",
 			"democracy": "民主",
-			"whitelist": "白名单"
+			"whitelist": "白名单",
+			"technicalcommittee": "技术委员会"
 		},
 		"please": "请",
 		"login": "登录",
