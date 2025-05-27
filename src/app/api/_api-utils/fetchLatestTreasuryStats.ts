@@ -9,11 +9,23 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
+import { type WsProvider as IWsProvider } from '@polkadot/api';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
 	[network: string]: { usd: number; usd_24h_change: number };
 }
+
+const getTotalInUsd = (network: ENetwork, treasuryStats: ITreasuryStats) => {
+	const chainTokenWithoutDecimals = treasuryStats.total?.totalChainToken ? new BN(treasuryStats.total?.totalChainToken || '0') : BN_ZERO;
+	const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice || '0');
+	const chainTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
+	const totalChainTokenInUsd = chainTokenWithoutDecimals
+		.mul(nativeTokenPriceBN.value)
+		.div(new BN(10).pow(chainTokenDecimals))
+		.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
+	return totalChainTokenInUsd.toString();
+};
 
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
 	try {
@@ -30,14 +42,14 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			network,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			relayChain: { dot: '', nextBurn: '' },
+			relayChain: { chainToken: '', nextBurn: '' },
 			ambassador: { usdt: '' },
-			assetHub: { dot: '', usdc: '', usdt: '', myth: '' },
-			hydration: { dot: '', usdc: '', usdt: '' },
-			bounties: { dot: '' },
-			fellowship: { dot: '', usdt: '' },
+			assetHub: { chainToken: '', usdc: '', usdt: '', myth: '' },
+			hydration: { chainToken: '', usdc: '', usdt: '' },
+			bounties: { chainToken: '' },
+			fellowship: { chainToken: '', usdt: '' },
 			loans: config.loanAmounts,
-			total: { totalDot: '', totalUsdc: '', totalUsdt: '', totalMyth: '' }
+			total: { totalChainToken: '', totalUsdc: '', totalUsdt: '', totalMyth: '' }
 		};
 
 		// Helper function to safely extract balance from results
@@ -69,16 +81,18 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		};
 
 		// Initialize all API connections
-		const apiProviders = {
+		const apiProviders: { relayChain: IWsProvider; assetHub: IWsProvider; hydration?: IWsProvider } = {
 			relayChain: new WsProvider(config.relayChainRpc),
-			assetHub: new WsProvider(config.assetHubRpc),
-			hydration: new WsProvider(config.hydrationRpc)
+			assetHub: new WsProvider(config.assetHubRpc)
 		};
+		if (config.hydrationRpc) {
+			apiProviders.hydration = new WsProvider(config.hydrationRpc);
+		}
 
 		const [relayChainApi, assetHubApi, hydrationApi] = await Promise.all([
 			ApiPromise.create({ provider: apiProviders.relayChain }),
 			ApiPromise.create({ provider: apiProviders.assetHub }),
-			ApiPromise.create({ provider: apiProviders.hydration })
+			apiProviders.hydration ? ApiPromise.create({ provider: apiProviders.hydration }) : null
 		]);
 
 		// Fetch relay chain data
@@ -92,7 +106,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					...treasuryStats,
 					relayChain: {
 						...treasuryStats.relayChain,
-						dot: treasuryBalance,
+						chainToken: treasuryBalance,
 						nextBurn
 					}
 				};
@@ -176,7 +190,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						...treasuryStats,
 						bounties: {
 							...treasuryStats.bounties,
-							dot: totalBalance.toString()
+							chainToken: totalBalance.toString()
 						}
 					};
 				} catch (error) {
@@ -185,7 +199,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						...treasuryStats,
 						bounties: {
 							...treasuryStats.bounties,
-							dot: ''
+							chainToken: ''
 						}
 					};
 				}
@@ -193,99 +207,112 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		];
 
 		// Fetch asset hub data
-		const assetHubTasks = [
-			// Relay chain assethub DOT balance
-			assetHubApi.query.system.account(config.assetHubTreasuryAddress).then((treasuryAddressInfo) => {
-				treasuryStats = {
-					...treasuryStats,
-					assetHub: {
-						...treasuryStats.assetHub,
-						dot: (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
-					}
-				};
-			}),
+		const getAssetHubTasks = () => {
+			if (!assetHubApi) return [];
+			const assetHubTasks = [];
 
-			// Fellowship assethub DOT balance
-			assetHubApi.query.system.account(config.assetHubFellowshipAddress).then((fellowshipAddressInfo) => {
-				treasuryStats = {
-					...treasuryStats,
-					fellowship: {
-						...treasuryStats.fellowship,
-						dot: (fellowshipAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
-					}
-				};
-			}),
-
-			// Asset Hub USDT balance
-			assetHubApi.query.assets.account(config.usdtIndex, config.assetHubTreasuryAddress).then((balance) => {
-				treasuryStats = {
-					...treasuryStats,
-					assetHub: {
-						...treasuryStats.assetHub,
-						usdt: getBalanceIfExists(balance)
-					}
-				};
-			}),
-
-			// Fellowship USDT balance
-			assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress).then((balance) => {
-				treasuryStats = {
-					...treasuryStats,
-					fellowship: {
-						...treasuryStats.fellowship,
-						usdt: getBalanceIfExists(balance)
-					}
-				};
-			}),
-
-			// Ambassador USDT balance
-			assetHubApi.query.assets.account(config.usdtIndex, config.assetHubAmbassadorAddress).then((balance) => {
-				treasuryStats = {
-					...treasuryStats,
-					ambassador: {
-						...treasuryStats.ambassador,
-						usdt: getBalanceIfExists(balance)
-					}
-				};
-			}),
-
-			// Asset Hub USDC balance
-			assetHubApi.query.assets.account(config.usdcIndex, config.assetHubTreasuryAddress).then((balance) => {
-				treasuryStats = {
-					...treasuryStats,
-					assetHub: {
-						...treasuryStats.assetHub,
-						usdc: getBalanceIfExists(balance)
-					}
-				};
-			}),
-
-			// Mythos assets
-			assetHubApi.query.foreignAssets
-				.account(
-					{
-						parents: 1,
-						interior: {
-							X1: [{ Parachain: config.mythosParachainId }]
-						}
-					},
-					config.assetHubMythAddress
-				)
-				.then((balance) => {
+			if (config.assetHubTreasuryAddress) {
+				assetHubTasks.push(
+					assetHubApi.query.system.account(config.assetHubTreasuryAddress).then((treasuryAddressInfo) => {
+						treasuryStats = {
+							...treasuryStats,
+							assetHub: {
+								...treasuryStats.assetHub,
+								chainToken: (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
+							}
+						};
+					}),
+					assetHubApi.query.assets.account(config.usdtIndex, config.assetHubTreasuryAddress).then((balance) => {
+						treasuryStats = {
+							...treasuryStats,
+							assetHub: {
+								...treasuryStats.assetHub,
+								usdt: getBalanceIfExists(balance)
+							}
+						};
+					}),
+					assetHubApi.query.assets.account(config.usdcIndex, config.assetHubTreasuryAddress).then((balance) => {
+						treasuryStats = {
+							...treasuryStats,
+							assetHub: {
+								...treasuryStats.assetHub,
+								usdc: getBalanceIfExists(balance)
+							}
+						};
+					})
+				);
+			}
+			if (config.assetHubFellowshipAddress) {
+				assetHubTasks.push(
+					assetHubApi.query.system.account(config.assetHubFellowshipAddress).then((fellowshipAddressInfo) => {
+						treasuryStats = {
+							...treasuryStats,
+							fellowship: {
+								...treasuryStats.fellowship,
+								chainToken: (fellowshipAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
+							}
+						};
+					})
+				);
+			}
+			if (config.assetHubFellowshipUsdtAddress) {
+				assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress).then((balance) => {
 					treasuryStats = {
 						...treasuryStats,
-						assetHub: {
-							...treasuryStats.assetHub,
-							myth: getBalanceIfExists(balance)
+						fellowship: {
+							...treasuryStats.fellowship,
+							usdt: getBalanceIfExists(balance)
 						}
 					};
-				})
-		];
+				});
+			}
+			if (config.assetHubAmbassadorAddress) {
+				assetHubTasks.push(
+					assetHubApi.query.assets.account(config.usdtIndex, config.assetHubAmbassadorAddress).then((balance) => {
+						treasuryStats = {
+							...treasuryStats,
+							ambassador: {
+								...treasuryStats.ambassador,
+								usdt: getBalanceIfExists(balance)
+							}
+						};
+					})
+				);
+			}
+			if (config.assetHubMythAddress) {
+				assetHubTasks.push(
+					assetHubApi.query.foreignAssets
+						.account(
+							{
+								parents: 1,
+								interior: {
+									X1: [{ Parachain: config.mythosParachainId }]
+								}
+							},
+							config.assetHubMythAddress
+						)
+						.then((balance) => {
+							treasuryStats = {
+								...treasuryStats,
+								assetHub: {
+									...treasuryStats.assetHub,
+									myth: getBalanceIfExists(balance)
+								}
+							};
+						})
+				);
+			}
+
+			return assetHubTasks;
+		};
+		const assetHubTasks = getAssetHubTasks();
 
 		// Fetch hydration data
 		const fetchHydrationBalances = async () => {
+			if (!hydrationApi) return;
+
 			const ZERO_BN = new BN(0);
-			let hydrationDotBalance = ZERO_BN;
+			let hydrationChainTokenBalance = ZERO_BN;
 			let hydrationUsdcBalance = ZERO_BN;
 			let hydrationUsdtBalance = ZERO_BN;
 
@@ -312,13 +339,13 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					};
 
 					// Get all token balances for each address
-					const [dotBalance, usdcBalance, usdtBalance] = await Promise.all([
-						getTokenBalance(config.hydrationDotAssetId),
+					const [chainTokenBalance, usdcBalance, usdtBalance] = await Promise.all([
+						getTokenBalance(config.hydrationChainTokenAssetId),
 						getTokenBalance(config.hydrationUsdcAssetId),
 						getTokenBalance(config.hydrationUsdtAssetId)
 					]);
 
-					hydrationDotBalance = hydrationDotBalance.add(dotBalance.free).add(dotBalance.reserved);
+					hydrationChainTokenBalance = hydrationChainTokenBalance.add(chainTokenBalance.free).add(chainTokenBalance.reserved);
 					hydrationUsdcBalance = hydrationUsdcBalance.add(usdcBalance.free).add(usdcBalance.reserved);
 					hydrationUsdtBalance = hydrationUsdtBalance.add(usdtBalance.free).add(usdtBalance.reserved);
 				})
@@ -327,7 +354,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			treasuryStats = {
 				...treasuryStats,
 				hydration: {
-					dot: hydrationDotBalance.isZero() ? '' : hydrationDotBalance.toString(),
+					chainToken: hydrationChainTokenBalance.isZero() ? '' : hydrationChainTokenBalance.toString(),
 					usdc: hydrationUsdcBalance.isZero() ? '' : hydrationUsdcBalance.toString(),
 					usdt: hydrationUsdtBalance.isZero() ? '' : hydrationUsdtBalance.toString()
 				}
@@ -355,7 +382,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// TODO: add cross network handling
 		// Calculate totals after all data is fetched
-		const calculateTotal = (propertyName: 'dot' | 'usdc' | 'usdt' | 'myth'): string => {
+		const calculateTotal = (propertyName: 'chainToken' | 'usdc' | 'usdt' | 'myth'): string => {
 			let total = new BN(0);
 
 			Object.entries(treasuryStats).forEach(([sectionKey, section]) => {
@@ -387,10 +414,11 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		treasuryStats = {
 			...treasuryStats,
 			total: {
-				totalDot: calculateTotal('dot'),
+				totalChainToken: calculateTotal('chainToken'),
 				totalUsdc: calculateTotal('usdc'),
 				totalUsdt: calculateTotal('usdt'),
-				totalMyth: calculateTotal('myth')
+				totalMyth: calculateTotal('myth'),
+				totalInUsd: getTotalInUsd(network, { ...treasuryStats, total: { totalChainToken: calculateTotal('chainToken') } })
 			}
 		};
 
@@ -400,26 +428,26 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
 		const mythPriceInUsd = mythPrice?.mythos?.usd;
 
-		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice) {
+		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice && network === ENetwork.POLKADOT) {
 			const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice);
 			const mythPriceBN = decimalToBN(mythPriceInUsd);
 
 			// Convert token amounts to BN with proper decimal handling
-			const dotWithoutDecimals = treasuryStats.total?.totalDot ? new BN(treasuryStats.total?.totalDot || '0') : BN_ZERO;
+			const chainTokenWithoutDecimals = treasuryStats.total?.totalChainToken ? new BN(treasuryStats.total?.totalChainToken || '0') : BN_ZERO;
 			const mythWithoutDecimals = treasuryStats.total?.totalMyth ? new BN(treasuryStats.total?.totalMyth || '0') : BN_ZERO;
 			const usdcWithoutDecimals = treasuryStats.total?.totalUsdc ? new BN(treasuryStats.total?.totalUsdc || '0') : BN_ZERO;
 			const usdtWithoutDecimals = treasuryStats.total?.totalUsdt ? new BN(treasuryStats.total?.totalUsdt || '0') : BN_ZERO;
 
 			// Calculate USD values with proper decimal handling
-			const dotDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
+			const chainTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
 			const mythDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].foreignAssets[EAssets.MYTH].tokenDecimal);
 			const usdcDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdcIndex].tokenDecimal);
 			const usdtDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdtIndex].tokenDecimal);
 
 			// Calculate total values in USD with proper decimal handling
-			const totalDotInUsd = dotWithoutDecimals
+			const totalChainTokenInUsd = chainTokenWithoutDecimals
 				.mul(nativeTokenPriceBN.value)
-				.div(new BN(10).pow(dotDecimals))
+				.div(new BN(10).pow(chainTokenDecimals))
 				.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
 
 			const totalMythInUsd = mythWithoutDecimals
@@ -431,7 +459,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			const totalUsdcInUsd = usdcWithoutDecimals.div(new BN(10).pow(usdcDecimals));
 			const totalUsdtInUsd = usdtWithoutDecimals.div(new BN(10).pow(usdtDecimals));
 
-			const totalInUsd = totalDotInUsd.add(totalMythInUsd).add(totalUsdcInUsd).add(totalUsdtInUsd);
+			const totalInUsd = totalChainTokenInUsd.add(totalMythInUsd).add(totalUsdcInUsd).add(totalUsdtInUsd);
 
 			treasuryStats = {
 				...treasuryStats,
@@ -443,7 +471,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		}
 
 		// Disconnect all APIs
-		await Promise.all([relayChainApi.disconnect(), assetHubApi.disconnect(), hydrationApi.disconnect()]);
+		await Promise.all([relayChainApi.disconnect(), assetHubApi.disconnect(), hydrationApi?.disconnect()]);
 
 		return treasuryStats;
 	} catch (error) {
