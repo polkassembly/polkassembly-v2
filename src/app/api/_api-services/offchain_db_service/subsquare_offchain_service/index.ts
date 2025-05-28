@@ -117,9 +117,28 @@ export class SubsquareOffChainService {
 		mappedUrl = `${mappedUrl}/comments`;
 
 		try {
-			const commentsData = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
+			const allComments: any[] = [];
+			let page = 1;
+			let hasMorePages = true;
 
-			if (!commentsData?.items?.length) {
+			// Fetch comments page by page until we get an empty response
+			while (hasMorePages) {
+				const url = new URL(mappedUrl);
+				url.searchParams.set('page', page.toString());
+
+				// eslint-disable-next-line no-await-in-loop
+				const commentsData = await fetchWithTimeout(url).then((res) => res.json());
+
+				if (!commentsData?.items?.length) {
+					hasMorePages = false;
+				} else {
+					// Add all comments from this page to our collection
+					allComments.push(...commentsData.items);
+					page += 1;
+				}
+			}
+
+			if (!allComments.length) {
 				return [];
 			}
 
@@ -161,7 +180,7 @@ export class SubsquareOffChainService {
 				return [...mainComments, ...replies.flat()];
 			};
 
-			return await processCommentsWithReplies(commentsData.items);
+			return await processCommentsWithReplies(allComments);
 		} catch {
 			return [];
 		}
