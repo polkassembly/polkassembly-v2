@@ -118,6 +118,7 @@ export class SubsquareOffChainService {
 
 		try {
 			const allComments: any[] = [];
+			const MAX_COMMENTS_PER_PAGE = 100;
 			let page = 1;
 			let hasMorePages = true;
 
@@ -125,6 +126,7 @@ export class SubsquareOffChainService {
 			while (hasMorePages) {
 				const url = new URL(mappedUrl);
 				url.searchParams.set('page', page.toString());
+				url.searchParams.set('page_size', MAX_COMMENTS_PER_PAGE.toString());
 
 				// eslint-disable-next-line no-await-in-loop
 				const commentsData = await fetchWithTimeout(url).then((res) => res.json());
@@ -148,18 +150,29 @@ export class SubsquareOffChainService {
 
 				const content = comment.contentType === 'markdown' ? comment.content : htmlToMarkdown(comment.content);
 
+				// Convert comment author address to substrate format if needed
+				const authorAddress = comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address);
+
+				// Combine and deduplicate addresses with authorAddress first
+				const addresses = publicUser?.addresses ? [authorAddress, ...new Set(publicUser.addresses.filter((addr) => addr !== authorAddress))] : [authorAddress];
+
 				return {
 					// eslint-disable-next-line no-underscore-dangle
 					id: comment._id,
 					content,
 					userId: publicUser?.id ?? 0,
-					user: publicUser ?? {
-						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
-						id: -1,
-						username: '',
-						profileScore: 0,
-						profileDetails: DEFAULT_PROFILE_DETAILS
-					},
+					user: publicUser
+						? {
+								...publicUser,
+								addresses
+							}
+						: {
+								addresses,
+								id: -1,
+								username: '',
+								profileScore: 0,
+								profileDetails: DEFAULT_PROFILE_DETAILS
+							},
 					createdAt: new Date(comment.createdAt),
 					updatedAt: new Date(comment.updatedAt),
 					isDeleted: false,
