@@ -12,3 +12,5 @@ export const ERROR_MESSAGES = {
 	INVALID_TOOLS_PASSPHRASE: 'Invalid tools password, please check the tools password in environment variables',
 	TOOLS_PASSPHRASE_REQUIRED: 'Tools password is required'
 };
+
+export const ALGOLIA_MAX_RECORD_SIZE = 100000; // 100KB limit in bytes

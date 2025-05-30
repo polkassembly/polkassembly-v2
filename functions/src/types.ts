@@ -87,3 +87,62 @@ export enum ECacheRefreshType {
 	BOUNTY = 'bounty',
 	LISTING = 'listing'
 }
+
+export enum EProposalType {
+	ALLIANCE_MOTION = 'AllianceMotion',
+	ANNOUNCEMENT = 'Announcement',
+	DEMOCRACY_PROPOSAL = 'DemocracyProposal',
+	TECH_COMMITTEE_PROPOSAL = 'TechCommitteeProposal',
+	TREASURY_PROPOSAL = 'TreasuryProposal',
+	REFERENDUM = 'Referendum',
+	FELLOWSHIP_REFERENDUM = 'FellowshipReferendum',
+	COUNCIL_MOTION = 'CouncilMotion',
+	BOUNTY = 'Bounty',
+	TIP = 'Tip',
+	CHILD_BOUNTY = 'ChildBounty',
+	REFERENDUM_V2 = 'ReferendumV2',
+	TECHNICAL_COMMITTEE = 'TechnicalCommittee',
+	COMMUNITY = 'Community',
+	UPGRADE_COMMITTEE = 'UpgradeCommittee',
+	ADVISORY_COMMITTEE = 'AdvisoryCommittee',
+	DISCUSSION = 'Discussion',
+	GRANT = 'Grant'
+}
+
+export enum EDataSource {
+	POLKASSEMBLY = 'polkassembly',
+	SUBSQUARE = 'subsquare'
+}
+
+export enum EOffChainPostTopic {
+	GENERAL = 'general',
+	AUCTION_ADMIN = 'auctionAdmin',
+	GENERAL_ADMIN = 'generalAdmin',
+	GOVERNANCE = 'governance',
+	ROOT = 'root',
+	STAKING_ADMIN = 'stakingAdmin',
+	TREASURY = 'treasury',
+	FELLOWSHIP = 'fellowship',
+	COUNCIL = 'council',
+	DEMOCRACY = 'democracy',
+	TECHNICAL_COMMITTEE = 'technicalCommittee',
+	WHITELIST = 'whitelist'
+}
+
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash: string;
+	index: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+}
