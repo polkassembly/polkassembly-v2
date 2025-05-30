@@ -346,6 +346,7 @@ export interface IReaction {
 	createdAt: Date;
 	updatedAt: Date;
 	commentId?: string;
+	publicUser?: IPublicUser;
 }
 
 export interface IPostOffChainMetrics {

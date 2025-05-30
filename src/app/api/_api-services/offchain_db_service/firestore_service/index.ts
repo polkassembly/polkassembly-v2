@@ -491,14 +491,20 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
 		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+			const publicUser = await this.GetPublicUserById(data.userId);
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
 			} as IReaction;
 		});
+
+		const reactions = await Promise.allSettled(reactionPromises);
+
+		return reactions.map((reaction) => (reaction.status === 'fulfilled' ? reaction.value : null)).filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetCommentReactions({
@@ -519,10 +525,13 @@ export class FirestoreService extends FirestoreUtils {
 			.where('commentId', '==', id);
 
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
-			return { ...data, createdAt: data.createdAt?.toDate(), updatedAt: data.updatedAt?.toDate() } as IReaction;
+			const publicUser = await this.GetPublicUserById(data.userId);
+			return { ...data, createdAt: data.createdAt?.toDate(), updatedAt: data.updatedAt?.toDate(), publicUser } as IReaction;
 		});
+
+		return (await Promise.all(reactionPromises)).filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetReactionById(id: string): Promise<IReaction | null> {

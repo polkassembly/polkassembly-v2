@@ -70,8 +70,12 @@ export const handleReactions = (reactions: IReaction[]) => {
 	reactions.forEach((reaction) => {
 		if (reaction.reaction === EReaction.like) {
 			updatedReactions['👍'].count += 1;
+			updatedReactions['👍'].userIds.push(reaction.userId);
+			updatedReactions['👍'].usernames.push(reaction.publicUser?.username || '');
 		} else if (reaction.reaction === EReaction.dislike) {
 			updatedReactions['👎'].count += 1;
+			updatedReactions['👎'].userIds.push(reaction.userId);
+			updatedReactions['👎'].usernames.push(reaction.publicUser?.username || '');
 		}
 	});
 	return updatedReactions;
