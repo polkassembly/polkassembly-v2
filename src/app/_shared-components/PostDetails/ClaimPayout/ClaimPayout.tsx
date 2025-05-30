@@ -10,7 +10,7 @@ import { IBeneficiary, IPayout } from '@/_shared/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { dayjs } from '@/_shared/_utils/dayjsRelativeTime';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
