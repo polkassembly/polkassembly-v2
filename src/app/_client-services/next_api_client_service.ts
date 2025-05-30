@@ -499,7 +499,7 @@ export class NextApiClientService {
 		if (origins?.length) {
 			origins.forEach((origin) => queryParams.append('origin', origin));
 		}
-
+		console.log('queryParams', queryParams.toString());
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
 
 		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
@@ -1031,6 +1031,7 @@ export class NextApiClientService {
 				};
 			}
 		}
+		console.log('fetching overview data');
 
 		const [allTracksResponse, treasuryStatsResponse] = await Promise.all([
 			this.fetchListingData({

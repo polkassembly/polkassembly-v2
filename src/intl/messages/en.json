@@ -769,7 +769,8 @@
 			"fellowship": "Fellowship",
 			"council": "Council",
 			"democracy": "Democracy",
-			"whitelist": "Whitelist"
+			"whitelist": "Whitelist",
+			"technicalcommittee": "Technical Committee"
 		},
 		"please": "Please",
 		"login": "Login",

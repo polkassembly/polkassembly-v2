@@ -4,6 +4,7 @@
 
 import { BN } from '@polkadot/util';
 import { ENetwork } from '../types';
+import { NETWORKS_DETAILS } from './networks';
 
 interface NetworkTreasuryConfig {
 	relayChainRpc: string;
@@ -19,21 +20,30 @@ interface NetworkTreasuryConfig {
 	mythosParachainId: string;
 	hydrationRpc: string;
 	hydrationAddresses: string[];
-	hydrationDotAssetId: number;
+	hydrationChainTokenAssetId: number;
+	fellowshipAddress: {
+		treasury: string;
+		salary: string;
+	};
 	hydrationUsdcAssetId: number;
 	hydrationUsdtAssetId: number;
+	ambassadorAddress: string;
 	loanAmounts: {
 		centrifuge: {
 			usdc: string;
+			link?: string;
 		};
 		bifrost: {
-			dot: string;
+			chainToken: string;
+			link?: string;
 		};
 		pendulum: {
-			dot: string;
+			chainToken: string;
+			link?: string;
 		};
 		hydration: {
-			dot: string;
+			chainToken?: string;
+			link?: string;
 		};
 	};
 	burnPercentage: {
@@ -45,9 +55,9 @@ interface NetworkTreasuryConfig {
 
 export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | undefined> = {
 	[ENetwork.POLKADOT]: {
-		relayChainRpc: 'wss://rpc.ibp.network/polkadot',
+		relayChainRpc: NETWORKS_DETAILS[ENetwork.POLKADOT].rpcEndpoints[0].url,
 		treasuryAccount: '13UVJyLnbVp9RBZYFwFGyDvVd1y27Tt8tkntv6Q7JVPhFsTB',
-		assetHubRpc: 'wss://dot-rpc.stakeworld.io/assethub',
+		assetHubRpc: NETWORKS_DETAILS[ENetwork.POLKADOT].assethubDetails?.rpcEndpoints[0].url || 'wss://statemint.api.onfinality.io/public-ws',
 		assetHubTreasuryAddress: '14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk',
 		assetHubFellowshipAddress: '16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos',
 		assetHubFellowshipUsdtAddress: '13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS',
@@ -62,21 +72,30 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			'7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY',
 			'7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
 		],
-		hydrationDotAssetId: 5,
+		hydrationChainTokenAssetId: 5,
+		fellowshipAddress: {
+			treasury: '16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos',
+			salary: '13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS'
+		},
 		hydrationUsdcAssetId: 22,
 		hydrationUsdtAssetId: 10,
+		ambassadorAddress: '13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX',
 		loanAmounts: {
 			bifrost: {
-				dot: '5000000000000000'
+				chainToken: '5000000000000000',
+				link: 'https://polkadot.polkassembly.io/referenda/432'
 			},
 			pendulum: {
-				dot: '500000000000000'
+				chainToken: '500000000000000',
+				link: 'https://polkadot.polkassembly.io/referenda/748'
 			},
 			hydration: {
-				dot: '10000000000000000'
+				chainToken: '10000000000000000',
+				link: 'https://polkadot.polkassembly.io/referenda/560'
 			},
 			centrifuge: {
-				usdc: '1500000000000'
+				usdc: '1500000000000',
+				link: 'https://polkadot.polkassembly.io/referenda/1122'
 			}
 		},
 		burnPercentage: {
@@ -85,7 +104,49 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		}, // 1% of the treasury balance
 		spendPeriodInBlocks: new BN(345600)
 	},
-	[ENetwork.KUSAMA]: undefined, // Add Kusama specific configuration when needed
+	[ENetwork.KUSAMA]: {
+		relayChainRpc: NETWORKS_DETAILS[ENetwork.KUSAMA].rpcEndpoints[0].url,
+		assetHubRpc: NETWORKS_DETAILS[ENetwork.KUSAMA].assethubDetails?.rpcEndpoints[0].url || 'wss://rpc-asset-hub-kusama.luckyfriday.io',
+		treasuryAccount: '0x6d6f646c70792f74727372790000000000000000000000000000000000000000000000000000000000000000',
+		assetHubTreasuryAddress: 'HWZmQq6zMMk7TxixHfseFT2ewicT6UofPa68VCn3gkXrdJF',
+		ambassadorAddress: '',
+		fellowshipAddress: {
+			treasury: '',
+			salary: ''
+		},
+		loanAmounts: {
+			bifrost: {
+				chainToken: ''
+			},
+			pendulum: {
+				chainToken: ''
+			},
+			hydration: {
+				chainToken: '33333000000000000',
+				link: 'https://kusama.polkassembly.io/referenda/490'
+			},
+			centrifuge: {
+				usdc: ''
+			}
+		},
+		burnPercentage: {
+			numerator: new BN(0),
+			denominator: new BN(1)
+		}, // 0% of the treasury balance
+		spendPeriodInBlocks: new BN(86400),
+		hydrationRpc: '',
+		hydrationAddresses: [],
+		hydrationChainTokenAssetId: 0,
+		hydrationUsdcAssetId: 0,
+		hydrationUsdtAssetId: 0,
+		assetHubFellowshipAddress: '',
+		assetHubFellowshipUsdtAddress: '',
+		assetHubMythAddress: '',
+		assetHubAmbassadorAddress: '',
+		usdtIndex: '',
+		usdcIndex: '',
+		mythosParachainId: ''
+	}, // Add Kusama specific configuration when needed
 	[ENetwork.WESTEND]: undefined, // Add Westend specific configuration when needed
 	[ENetwork.PASEO]: undefined // Add Paseo specific configuration when needed
 };
