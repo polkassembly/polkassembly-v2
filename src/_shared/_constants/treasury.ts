@@ -4,6 +4,7 @@
 
 import { BN } from '@polkadot/util';
 import { ENetwork } from '../types';
+import { NETWORKS_DETAILS } from './networks';
 
 interface NetworkTreasuryConfig {
 	relayChainRpc: string;
@@ -54,9 +55,9 @@ interface NetworkTreasuryConfig {
 
 export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | undefined> = {
 	[ENetwork.POLKADOT]: {
-		relayChainRpc: 'wss://rpc.ibp.network/polkadot',
+		relayChainRpc: NETWORKS_DETAILS[ENetwork.POLKADOT].rpcEndpoints[0].url,
 		treasuryAccount: '13UVJyLnbVp9RBZYFwFGyDvVd1y27Tt8tkntv6Q7JVPhFsTB',
-		assetHubRpc: 'wss://dot-rpc.stakeworld.io/assethub',
+		assetHubRpc: NETWORKS_DETAILS[ENetwork.POLKADOT].assethubDetails?.rpcEndpoints[0].url || 'wss://statemint.api.onfinality.io/public-ws',
 		assetHubTreasuryAddress: '14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk',
 		assetHubFellowshipAddress: '16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos',
 		assetHubFellowshipUsdtAddress: '13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS',
@@ -104,8 +105,8 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		spendPeriodInBlocks: new BN(345600)
 	},
 	[ENetwork.KUSAMA]: {
-		relayChainRpc: 'wss://kusama-rpc.dwellir.com',
-		assetHubRpc: 'wss://asset-hub-kusama.dotters.network',
+		relayChainRpc: NETWORKS_DETAILS[ENetwork.KUSAMA].rpcEndpoints[0].url,
+		assetHubRpc: NETWORKS_DETAILS[ENetwork.KUSAMA].assethubDetails?.rpcEndpoints[0].url || 'wss://rpc-asset-hub-kusama.luckyfriday.io',
 		treasuryAccount: '0x6d6f646c70792f74727372790000000000000000000000000000000000000000000000000000000000000000',
 		assetHubTreasuryAddress: 'HWZmQq6zMMk7TxixHfseFT2ewicT6UofPa68VCn3gkXrdJF',
 		ambassadorAddress: '',

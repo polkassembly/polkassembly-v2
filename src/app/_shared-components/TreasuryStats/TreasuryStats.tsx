@@ -163,7 +163,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 							network === ENetwork.POLKADOT ? 'grid grid-cols-2' : 'flex items-center justify-center xl:ml-0 2xl:ml-0'
 						)}
 					>
-						<div>
+						<div className={cn(network !== ENetwork.POLKADOT ? 'mt-2 text-lg' : 'w-full')}>
 							<AssetDisplay
 								icon={NETWORKS_DETAILS[`${network}`].logo}
 								alt={network}
