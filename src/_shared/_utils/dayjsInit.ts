@@ -9,6 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import updateLocale from 'dayjs/plugin/updateLocale';
 import 'dayjs/locale/de';
 import 'dayjs/locale/es';
 import 'dayjs/locale/ja';
@@ -20,5 +21,26 @@ dayjs.extend(relativeTime);
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
 dayjs.extend(advancedFormat);
+dayjs.extend(relativeTime);
+dayjs.extend(updateLocale);
+
+// Customize the relative time thresholds and formats
+dayjs.updateLocale('en', {
+	relativeTime: {
+		future: '%s',
+		past: '%s ago',
+		s: 'a few seconds',
+		m: 'a minute',
+		mm: '%d minutes',
+		h: 'an hour',
+		hh: '%d hours',
+		d: 'a day',
+		dd: '%d days',
+		M: '%d days',
+		MM: '%d months',
+		y: 'a year',
+		yy: '%d years'
+	}
+});
 
 export { dayjs };
