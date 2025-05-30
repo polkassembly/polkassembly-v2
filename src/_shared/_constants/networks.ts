@@ -182,6 +182,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		identityMinDeposit: new BN('6672333321'),
 		rpcEndpoints: [
 			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-people-kusama.luckyfriday.io'
+			},
+			{
 				name: VIA_DWELLIR,
 				url: 'wss://people-kusama-rpc.dwellir.com'
 			},
@@ -235,12 +239,12 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 	[ENetwork.POLKADOT]: {
 		rpcEndpoints: [
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
-			},
-			{
 				name: VIA_PARITY,
 				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
 			},
 			{
 				name: VIA_ONFINALITY,
@@ -257,6 +261,14 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+			}
+		]
+	},
+	[ENetwork.KUSAMA]: {
+		rpcEndpoints: [
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
 			}
 		]
 	}
@@ -2203,6 +2215,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
 		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800')
