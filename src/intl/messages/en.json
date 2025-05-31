@@ -297,6 +297,12 @@
 			"newEmail": "New Email",
 			"type": "Type",
 			"belowToConfirm": "below to confirm",
+			"emailUpdatedSuccessfully": "Email Updated Successfully",
+			"emailUpdatedSuccessfullyDescription": "Your email has been updated successfully.",
+			"emailUpdateFailed": "Email Update Failed",
+			"emailUpdateFailedDescription": "Please try again.",
+			"invalidEmail": "Invalid Email",
+			"invalidEmailDescription": "Please enter a valid email address.",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configuring Google Authenticator",
 				"installGoogleAuthenticator": "1. Install Google Authenticator (iOS/Android).",
