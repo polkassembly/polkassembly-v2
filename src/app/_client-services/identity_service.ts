@@ -128,7 +128,7 @@ export class IdentityService {
 
 		return infoCall
 			? infoCall.some(([index, judgement]: any[]) => {
-					return NETWORKS_DETAILS[this.network].peopleChainDetails.polkassemblyRegistrarIndex === index && ['KnownGood', 'Reasonable'].includes(judgement);
+					return NETWORKS_DETAILS[this.network].peopleChainDetails.polkassemblyRegistrarIndex === Number(index) && ['KnownGood', 'Reasonable'].includes(judgement);
 				})
 			: false;
 	}
@@ -232,8 +232,9 @@ export class IdentityService {
 			.catch((error: unknown) => {
 				console.log(':( transaction failed');
 				setStatus?.(':( transaction failed');
-				console.error('ERROR:', error);
+				console.log(error?.toString?.(), 'error?.toString?.()', errorMessageFallback, 'errorMessageFallback22');
 				onFailed(error?.toString?.() || errorMessageFallback);
+				console.error('ERROR:', error);
 			});
 	}
 
@@ -306,7 +307,7 @@ export class IdentityService {
 		matrix?: string;
 		registrarFee: BN;
 		onSuccess?: () => void;
-		onFailed?: () => void;
+		onFailed?: (errorMessageFallback?: string) => void;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		const setIdentityTx = this.getSetIdentityTx({
@@ -331,8 +332,9 @@ export class IdentityService {
 			onSuccess: () => {
 				onSuccess?.();
 			},
-			onFailed: () => {
-				onFailed?.();
+			onFailed: (errorMessageFallback: string) => {
+				console.log(errorMessageFallback, 'errorMessageFallback');
+				onFailed?.(errorMessageFallback);
 			}
 		});
 	}
@@ -384,5 +386,42 @@ export class IdentityService {
 			lockedBalance,
 			totalBalance
 		};
+	}
+
+	async getGasFee({
+		address,
+		registrarFee,
+		displayName,
+		email,
+		legalName,
+		twitter,
+		matrix
+	}: {
+		address: string;
+		registrarFee: BN;
+		displayName: string;
+		email: string;
+		legalName?: string;
+		twitter?: string;
+		matrix?: string;
+	}) {
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		const setIdentityTx = this.getSetIdentityTx({
+			displayName,
+			email,
+			legalName,
+			twitter,
+			matrix
+		});
+
+		const { polkassemblyRegistrarIndex } = NETWORKS_DETAILS[`${this.network}`].peopleChainDetails;
+
+		const requestedJudgementTx = this.peopleChainApi.tx?.identity?.requestJudgement(polkassemblyRegistrarIndex, registrarFee.toString());
+
+		const tx = registrarFee && !registrarFee.isZero() ? this.peopleChainApi.tx.utility.batchAll([setIdentityTx, requestedJudgementTx]) : setIdentityTx;
+
+		const paymentInfo = await tx?.paymentInfo(encodedAddress);
+
+		return paymentInfo?.partialFee;
 	}
 }

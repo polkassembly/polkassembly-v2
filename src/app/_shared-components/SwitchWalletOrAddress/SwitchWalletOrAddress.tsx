@@ -19,6 +19,7 @@ interface Props {
 	customAddressSelector?: ReactNode; // this pattern is to avoid cyclic dependencies
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
+	usedInIdentityFlow?: boolean;
 }
 
 function SwitchWalletOrAddress({
@@ -29,7 +30,8 @@ function SwitchWalletOrAddress({
 	disabled = false,
 	customAddressSelector,
 	withRadioSelect,
-	onRadioSelect
+	onRadioSelect,
+	usedInIdentityFlow = false
 }: Props) {
 	return (
 		<>
@@ -45,6 +47,7 @@ function SwitchWalletOrAddress({
 					disabled={disabled}
 					withRadioSelect={withRadioSelect}
 					onRadioSelect={onRadioSelect}
+					usedInIdentityFlow={usedInIdentityFlow}
 				/>
 			)}
 		</>

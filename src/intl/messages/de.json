@@ -635,7 +635,7 @@
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
-		"Balance": "Guthaben"
+		"balance": "Guthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -788,8 +788,9 @@
 		"requestJudgement": "Beurteilung anfordern",
 		"minimumDeposit": "Mindesteinzahlung",
 		"registrarFee": "Registrierungsgebühr",
-		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
-		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
+		"gasFee": "Gebühr",
+		"totalAmountRequired": "Gesamtbetrag erforderlich",
+		"viewAmountBreakup": "Betragsaufschlüsselung anzeigen",
 		"registrarFees": "Registrierungsgebühren",
 		"success": "Identität erfolgreich festgelegt",
 		"successDescription": "Ihre Identität wurde erfolgreich festgelegt",
