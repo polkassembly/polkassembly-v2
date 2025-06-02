@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ENetwork, EPostOrigin } from '@/_shared/types';
+import { ENetwork } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Separator } from '@/app/_shared-components/Separator';
@@ -17,24 +17,24 @@ import ApprovedProposals from '@assets/icons/approved-proposals.svg';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
-function GovStats({ origin = EPostOrigin.BIG_SPENDER }: { origin?: EPostOrigin }) {
+function GovStats() {
 	const t = useTranslations('GovAnalytics');
 	const network = getCurrentNetwork();
 
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 
 	const fetchStats = async () => {
-		const { data, error } = await NextApiClientService.getTrackAnalyticsStats({ origin: origin || 'all' });
-		if (error || !data) {
-			console.error(error?.message || 'Failed to fetch data');
+		const response = await NextApiClientService.getGovAnalyticsStats();
+		if (!response) {
+			console.error('Failed to fetch data');
 			return null;
 		}
 
-		return data;
+		return response;
 	};
 
 	const { data, isFetching } = useQuery({
-		queryKey: ['all-track-analytics-stats'],
+		queryKey: ['gov-analytics-stats'],
 		queryFn: fetchStats,
 		retry: false,
 		refetchOnMount: false,
@@ -53,7 +53,7 @@ function GovStats({ origin = EPostOrigin.BIG_SPENDER }: { origin?: EPostOrigin }
 				/>
 				<div className='flex flex-col gap-y-1'>
 					<p className='text-xs text-wallet_btn_text'>{t('totalProposals')}</p>
-					{isFetching ? <Skeleton className='h-4 w-20' /> : <p className='text-lg font-semibold text-text_primary'>{data?.totalProposalCount}</p>}
+					{isFetching ? <Skeleton className='h-4 w-20' /> : <p className='text-lg font-semibold text-text_primary'>{data?.data?.totalProposals}</p>}
 				</div>
 			</div>
 			<Separator
@@ -71,7 +71,7 @@ function GovStats({ origin = EPostOrigin.BIG_SPENDER }: { origin?: EPostOrigin }
 				/>
 				<div className='flex flex-col'>
 					<p className='text-xs text-wallet_btn_text'>{t('approvedProposals')}</p>
-					{isFetching ? <Skeleton className='mb-1 h-4 w-20' /> : <p className='text-lg font-semibold text-text_primary'>{data?.totalActiveProposals}</p>}
+					{isFetching ? <Skeleton className='mb-1 h-4 w-20' /> : <p className='text-lg font-semibold text-text_primary'>{data?.data?.approvedProposals}</p>}
 				</div>
 			</div>
 			<Separator
@@ -95,5 +95,4 @@ function GovStats({ origin = EPostOrigin.BIG_SPENDER }: { origin?: EPostOrigin }
 		</div>
 	);
 }
-
 export default GovStats;

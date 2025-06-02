@@ -20,6 +20,7 @@ import {
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsDelegationsList,
 	ITrackAnalyticsStats,
+	IGovAnalyticsStats,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -937,6 +938,24 @@ export class SubsquidService extends SubsquidUtils {
 			totalActiveProposals: subsquidData.totalActiveProposals.totalCount,
 			totalProposalCount: subsquidData.totalProposalCount.totalCount,
 			changeInActiveProposals
+		};
+	}
+
+	static async GetGovAnalyticsStats({ network }: { network: ENetwork }): Promise<IGovAnalyticsStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_GOV_ANALYTICS_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching network governance analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching network governance analytics stats from Subsquid');
+		}
+
+		return {
+			totalProposals: subsquidData.totalProposals.totalCount,
+			approvedProposals: subsquidData.approvedProposals.totalCount
 		};
 	}
 

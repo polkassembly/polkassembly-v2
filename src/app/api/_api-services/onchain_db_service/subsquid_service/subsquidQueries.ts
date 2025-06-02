@@ -955,6 +955,26 @@ export class SubsquidQueries {
 
 	`;
 
+	protected static GET_GOV_ANALYTICS_STATS = `
+		query GetGovAnalyticsStats {
+			totalProposals: proposalsConnection(
+				where: { type_eq: ReferendumV2 }
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+			approvedProposals: proposalsConnection(
+				where: { 
+					type_eq: ReferendumV2,
+					status_in: [Approved, Executed]
+				}
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+		}
+	`;
+
 	protected static GET_TRACK_ANALYTICS_DELEGATIONS = `
 		query DelegationStats($track_num: Int) {
   votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, track_eq: $track_num}) {
