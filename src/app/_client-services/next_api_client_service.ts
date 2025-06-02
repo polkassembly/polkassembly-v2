@@ -49,7 +49,8 @@ import {
 	IOnChainMetadata,
 	EVoteSortOptions,
 	EHttpHeaderKey,
-	IPostLink
+	IPostLink,
+	IGovAnalyticsStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -128,7 +129,8 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS'
+	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS'
 }
 
 export class NextApiClientService {
@@ -228,6 +230,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
+				break;
+			case EApiRoute.GET_GOV_ANALYTICS:
+				path = '/gov-analytics';
 				break;
 
 			// post routes
@@ -1005,6 +1010,11 @@ export class NextApiClientService {
 	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
+	}
+
+	static async getGovAnalyticsStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<IGovAnalyticsStats>({ url, method });
 	}
 
 	static async fetchOverviewData(): Promise<{

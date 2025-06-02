@@ -1219,6 +1219,11 @@ export interface ITrackAnalyticsStats {
 	changeInActiveProposals: number;
 }
 
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
 export interface ITrackAnalyticsDelegationsList {
 	[key: string]: {
 		count: number;
