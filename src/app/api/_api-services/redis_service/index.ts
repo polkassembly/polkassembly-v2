@@ -32,10 +32,10 @@ import {
 	FIVE_MIN,
 	HALF_HOUR_IN_SECONDS,
 	ONE_DAY,
-	ONE_HOUR_IN_SECONDS,
 	REFRESH_TOKEN_LIFE_IN_SECONDS,
 	SIX_HOURS_IN_SECONDS,
-	THREE_DAYS_IN_SECONDS
+	THIRTY_DAYS_IN_SECONDS,
+	THREE_HOURS_IN_SECONDS
 } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -304,7 +304,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? THREE_HOURS_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
