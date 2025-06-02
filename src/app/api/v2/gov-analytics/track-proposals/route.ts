@@ -1,0 +1,70 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { NextRequest } from 'next/server';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { EHttpHeaderKey, ENetwork } from '@/_shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+
+export async function GET(req: NextRequest) {
+	try {
+		const networkHeader = req.headers.get(EHttpHeaderKey.NETWORK);
+		const network = (networkHeader as ENetwork) || (await getCurrentNetwork());
+		const skipCache = req.headers.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
+
+		// Try to get from cache first
+		if (!skipCache) {
+			const cachedData = await RedisService.GetTrackLevelProposalsAnalytics(network);
+			if (cachedData) {
+				console.log('Returning cached track level proposals analytics data');
+				return Response.json(cachedData);
+			}
+		}
+
+		// Get all track IDs from network details
+		const trackIds = Object.values(NETWORKS_DETAILS[network].trackDetails).map((track) => track.trackId);
+
+		// Fetch counts for each track
+		const trackProposals: Record<number, number> = {};
+		let totalProposals = 0;
+
+		const promises = trackIds.map(async (trackId) => {
+			try {
+				const stats = await SubsquidService.GetTrackAnalyticsStats({
+					network,
+					trackId
+				});
+
+				trackProposals[trackId] = stats.totalProposalCount;
+				totalProposals += stats.totalProposalCount;
+			} catch (error) {
+				console.error(`Error fetching count for track ${trackId}:`, error);
+				trackProposals[trackId] = 0;
+			}
+		});
+
+		await Promise.all(promises);
+
+		const data = {
+			data: trackProposals,
+			totalProposals
+		};
+
+		// Cache the data
+		await RedisService.SetTrackLevelProposalsAnalytics({ network, data });
+
+		return Response.json(data);
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error('Error details:', {
+				message: error.message,
+				stack: error.stack,
+				name: error.name
+			});
+		}
+		return Response.json({ error: 'Failed to fetch track level proposals analytics data' }, { status: 500 });
+	}
+}

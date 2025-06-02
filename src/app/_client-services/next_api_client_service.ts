@@ -1145,4 +1145,19 @@ export class NextApiClientService {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
 	}
+
+	static async getTrackLevelProposalsAnalytics() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['track-proposals']
+		});
+
+		return this.nextApiClientFetch<{
+			data: Record<number, number>;
+			totalProposals: number;
+		}>({
+			method,
+			url
+		});
+	}
 }
