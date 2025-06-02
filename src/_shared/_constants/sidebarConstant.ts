@@ -9,7 +9,7 @@ import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
 import Bounty from '@assets/sidebar/bounty.svg';
 import BatchVoting from '@assets/sidebar/batch-voting.svg';
-// import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
+import GovAnalytics from '@assets/sidebar/gov-analytics-icon.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
 // import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
 // import CommunityIcon from '@assets/sidebar/community-icon.svg';
@@ -182,7 +182,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				),
 				endItems: ActiveItems(
 					[
-						// { title: t('Sidebar.govAnalytics'), url: '#', icon: GovAnalytics },
+						{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics', icon: GovAnalytics },
 						// { title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
 						// {
 						// title: t('Sidebar.community'),
