@@ -1224,6 +1224,14 @@ export interface IGovAnalyticsStats {
 	approvedProposals: number;
 }
 
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
 export interface ITrackAnalyticsDelegationsList {
 	[key: string]: {
 		count: number;

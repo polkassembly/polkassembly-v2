@@ -975,6 +975,82 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_GOV_ANALYTICS_REFERENDUM_OUTCOME = `
+		query GetGovAnalyticsReferendumOutcome($trackNo: Int) {
+			timeout: proposalsConnection(
+				where: {
+					status_in: [TimedOut],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			ongoing: proposalsConnection(
+				where: {
+					status_in: [
+						DecisionDepositPlaced,
+						Deciding,
+						ConfirmAborted,
+						ConfirmStarted,
+						Submitted
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			approved: proposalsConnection(
+				where: {
+					status_in: [
+						Executed,
+						Approved,
+						Confirmed
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			rejected: proposalsConnection(
+				where: {
+					status_in: [
+						Rejected,
+						Killed,
+						ExecutionFailed
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			cancelled: proposalsConnection(
+				where: {
+					status_in: [
+						Cancelled,
+						ConfirmAborted
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+		}
+	`;
+
 	protected static GET_TRACK_ANALYTICS_DELEGATIONS = `
 		query DelegationStats($track_num: Int) {
   votingDelegations(where: {endedAtBlock_isNull: true, type_eq: OpenGov, track_eq: $track_num}) {
