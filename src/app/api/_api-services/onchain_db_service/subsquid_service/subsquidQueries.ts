@@ -966,7 +966,7 @@ export class SubsquidQueries {
 			approvedProposals: proposalsConnection(
 				where: { 
 					type_eq: ReferendumV2,
-					status_in: [Approved, Executed]
+					status_in: [Confirmed, Approved, Executed]
 				}
 				orderBy: id_ASC
 			) {
