@@ -1254,5 +1254,12 @@
 		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
 		"yourDiscussions": "あなたのディスカッション",
 		"confirm": "確認"
+	},
+	"GovAnalytics": {
+		"overview": "概要",
+		"voting": "投票",
+		"totalProposals": "総提案数",
+		"approvedProposals": "承認された提案",
+		"monitoredTracks": "監視中のトラック"
 	}
 }

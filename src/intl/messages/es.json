@@ -1255,5 +1255,12 @@
 		"pasteURLorEnterPostID": "Pega la URL o ingresa el ID de la publicación",
 		"yourDiscussions": "Tus Discusiones",
 		"confirm": "Confirmar"
+	},
+	"GovAnalytics": {
+		"overview": "Resumen",
+		"voting": "Votación",
+		"totalProposals": "Propuestas Totales",
+		"approvedProposals": "Propuestas Aprobadas",
+		"monitoredTracks": "Tracks Monitoreados"
 	}
 }
