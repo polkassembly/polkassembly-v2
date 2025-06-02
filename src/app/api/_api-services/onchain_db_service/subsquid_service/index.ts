@@ -37,6 +37,7 @@ import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalSta
 import { BN, BN_ZERO } from '@polkadot/util';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import { TRACK_GROUPS } from '@/_shared/_constants/trackGroups';
 import { SubsquidUtils } from './subsquidUtils';
 
 const VOTING_POWER_DIVISOR = new BN('10');
@@ -1096,6 +1097,55 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			items: postsResult.map((post) => (post.status === 'fulfilled' ? post.value : null))?.filter((post) => post !== null),
 			totalCount: subsquidData.proposalsConnection.totalCount || 0
+		};
+	}
+
+	static async GetGovAnalyticsReferendumCount({
+		network
+	}: {
+		network: ENetwork;
+	}): Promise<{ categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } }> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_TOTAL_CATEGORY_PROPOSALS;
+
+		const promises = Object.entries(TRACK_GROUPS).map(async ([group, trackIds]) => {
+			try {
+				const response = await gqlClient
+					.query(query, {
+						trackIds
+					})
+					.toPromise();
+
+				return {
+					group,
+					count: response.data.count.totalCount
+				};
+			} catch (error) {
+				console.error(`Error fetching count for group ${group}:`, error);
+				return {
+					group,
+					count: null
+				};
+			}
+		});
+
+		const results = await Promise.all(promises);
+		const groupResults = results.reduce(
+			(acc, { group, count }) => {
+				acc[group] = count;
+				return acc;
+			},
+			{} as Record<string, number | null>
+		);
+
+		return {
+			categoryCounts: {
+				governance: groupResults.Governance ?? null,
+				main: groupResults.Main ?? null,
+				treasury: groupResults.Treasury ?? null,
+				whiteList: groupResults.Whitelist ?? null
+			}
 		};
 	}
 }
