@@ -27,7 +27,7 @@
 }
 
 .beneficiaryTooltipContent {
-	@apply flex flex-col gap-y-2 bg-bg_modal shadow-lg;
+	@apply flex max-h-[300px] flex-col gap-y-2 overflow-y-auto bg-bg_modal shadow-lg;
 }
 
 .originStyle {
