@@ -645,4 +645,15 @@ export class RedisService {
 			ttlSeconds: ONE_DAY
 		});
 	}
+
+	static async GetTrackLevelProposalsAnalytics(network: ENetwork) {
+		const key = `track_level_proposals_analytics:${network}`;
+		const data = await this.client.get(key);
+		return data ? JSON.parse(data) : null;
+	}
+
+	static async SetTrackLevelProposalsAnalytics({ network, data }: { network: ENetwork; data: { data: Record<number, number>; totalProposals: number } }) {
+		const key = `track_level_proposals_analytics:${network}`;
+		await this.client.set(key, JSON.stringify(data), 'EX', SIX_HOURS_IN_SECONDS);
+	}
 }
