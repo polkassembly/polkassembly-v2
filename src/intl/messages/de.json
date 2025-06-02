@@ -1254,5 +1254,12 @@
 		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
 		"yourDiscussions": "Ihre Diskussionen",
 		"confirm": "Bestätigen"
+	},
+	"GovAnalytics": {
+		"overview": "Übersicht",
+		"voting": "Abstimmung",
+		"totalProposals": "Gesamte Vorschläge",
+		"approvedProposals": "Genehmigte Vorschläge",
+		"monitoredTracks": "Überwachte Tracks"
 	}
 }

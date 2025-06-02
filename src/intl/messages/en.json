@@ -1290,5 +1290,12 @@
 		"votes": "Votes",
 		"voteDetails": "Vote Details",
 		"target": "Target"
+	},
+	"GovAnalytics": {
+		"overview": "Overview",
+		"voting": "Voting",
+		"totalProposals": "Total Proposals",
+		"approvedProposals": "Approved Proposals",
+		"monitoredTracks": "Monitored Tracks"
 	}
 }
