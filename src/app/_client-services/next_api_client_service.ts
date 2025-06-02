@@ -1034,10 +1034,12 @@ export class NextApiClientService {
 		});
 
 		return this.nextApiClientFetch<{
-			governance: number | null;
-			main: number | null;
-			treasury: number | null;
-			whiteList: number | null;
+			categoryCounts: {
+				governance: number | null;
+				main: number | null;
+				treasury: number | null;
+				whiteList: number | null;
+			};
 		}>({
 			method,
 			url

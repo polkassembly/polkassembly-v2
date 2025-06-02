@@ -1073,4 +1073,12 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_TOTAL_CATEGORY_PROPOSALS = `
+		query GetTotalCategoryProposals($trackIds: [Int!]) {
+			count: proposalsConnection(where: { trackNumber_in: $trackIds, type_eq: ReferendumV2 }, orderBy: id_ASC) {
+				totalCount
+			}
+		}
+	`;
 }

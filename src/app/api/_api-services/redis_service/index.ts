@@ -60,7 +60,8 @@ enum ERedisKeys {
 	TREASURY_STATS = 'TRS',
 	OVERVIEW_PAGE_DATA = 'OPD',
 	GOV_ANALYTICS_STATS = 'GAS',
-	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR'
+	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
+	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC'
 }
 
 export class RedisService {
@@ -119,7 +120,8 @@ export class RedisService {
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
-		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`
 	} as const;
 
 	// helper methods
@@ -621,5 +623,26 @@ export class RedisService {
 
 	static async DeleteGovAnalyticsReferendumOutcome(network: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+	}
+
+	static async GetGovAnalyticsReferendumCount(
+		network: string
+	): Promise<{ categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network) });
+		return data ? (deepParseJson(data) as { categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } }) : null;
+	}
+
+	static async SetGovAnalyticsReferendumCount({
+		network,
+		data
+	}: {
+		network: string;
+		data: { categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } };
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY
+		});
 	}
 }
