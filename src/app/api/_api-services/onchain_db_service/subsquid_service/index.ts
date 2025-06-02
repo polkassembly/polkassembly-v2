@@ -21,6 +21,7 @@ import {
 	ITrackAnalyticsDelegationsList,
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics
@@ -956,6 +957,27 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			totalProposals: subsquidData.totalProposals.totalCount,
 			approvedProposals: subsquidData.approvedProposals.totalCount
+		};
+	}
+
+	static async GetGovAnalyticsReferendumOutcome({ network, trackNo }: { network: ENetwork; trackNo?: number }): Promise<IGovAnalyticsReferendumOutcome> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_GOV_ANALYTICS_REFERENDUM_OUTCOME;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { trackNo }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching referendum outcome data from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching referendum outcome data from Subsquid');
+		}
+
+		return {
+			approved: subsquidData.approved.totalCount,
+			rejected: subsquidData.rejected.totalCount,
+			timeout: subsquidData.timeout.totalCount,
+			ongoing: subsquidData.ongoing.totalCount,
+			cancelled: subsquidData.cancelled.totalCount
 		};
 	}
 

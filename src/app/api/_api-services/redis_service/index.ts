@@ -20,7 +20,8 @@ import {
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
 	ITreasuryStats,
-	IGovAnalyticsStats
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -58,7 +59,8 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
 	OVERVIEW_PAGE_DATA = 'OPD',
-	GOV_ANALYTICS_STATS = 'GAS'
+	GOV_ANALYTICS_STATS = 'GAS',
+	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR'
 }
 
 export class RedisService {
@@ -116,7 +118,8 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
-		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`
+		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`
 	} as const;
 
 	// helper methods
@@ -600,5 +603,23 @@ export class RedisService {
 
 	static async DeleteGovAnalyticsStats(network: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network) });
+	}
+
+	// Referendum outcome caching methods
+	static async GetGovAnalyticsReferendumOutcome(network: string): Promise<IGovAnalyticsReferendumOutcome | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+		return data ? (deepParseJson(data) as IGovAnalyticsReferendumOutcome) : null;
+	}
+
+	static async SetGovAnalyticsReferendumOutcome({ network, data }: { network: string; data: IGovAnalyticsReferendumOutcome }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY
+		});
+	}
+
+	static async DeleteGovAnalyticsReferendumOutcome(network: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
 	}
 }

@@ -50,7 +50,8 @@ import {
 	EVoteSortOptions,
 	EHttpHeaderKey,
 	IPostLink,
-	IGovAnalyticsStats
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1015,6 +1016,64 @@ export class NextApiClientService {
 	static async getGovAnalyticsStats() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['stats'] });
 		return this.nextApiClientFetch<IGovAnalyticsStats>({ url, method });
+	}
+
+	static async getGovAnalyticsReferendumOutcome({ trackNo }: { trackNo?: number }) {
+		const queryParams = new URLSearchParams();
+		if (trackNo) {
+			queryParams.set('trackNo', trackNo.toString());
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome'], queryParams });
+		return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
+	}
+
+	static async getGovAnalyticsReferendumCount() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['referendum-count']
+		});
+
+		return this.nextApiClientFetch<{
+			governance: number | null;
+			main: number | null;
+			treasury: number | null;
+			whiteList: number | null;
+		}>({
+			method,
+			url
+		});
+	}
+
+	static async getGovAnalyticsMonthlySpend() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['monthly-spend']
+		});
+
+		return this.nextApiClientFetch<{
+			currentMonth: string;
+			lastMonth: string;
+			totalSpent: string;
+		}>({
+			method,
+			url
+		});
+	}
+
+	static async getGovAnalyticsTurnoutPercentage() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['turnout-percentage']
+		});
+
+		return this.nextApiClientFetch<{
+			currentMonth: number;
+			lastMonth: number;
+			average: number;
+		}>({
+			method,
+			url
+		});
 	}
 
 	static async fetchOverviewData(): Promise<{
