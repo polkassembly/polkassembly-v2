@@ -27,7 +27,7 @@ function AppQrLogin() {
 	};
 
 	const {
-		data: qrSessionId,
+		data: qrSession,
 		isLoading,
 		error
 	} = useQuery({
@@ -45,10 +45,10 @@ function AppQrLogin() {
 		<div className='relative flex flex-col items-center gap-y-2 p-2'>
 			{isLoading && <LoadingLayover />}
 			{error && <p className='text-sm text-failure'>{error.message}</p>}
-			{qrSessionId && (
+			{qrSession && (
 				<div className='relative max-w-max rounded-lg bg-white p-2'>
 					<QrCode
-						value={JSON.stringify(qrSessionId)}
+						value={JSON.stringify(qrSession)}
 						size={160}
 					/>
 				</div>
