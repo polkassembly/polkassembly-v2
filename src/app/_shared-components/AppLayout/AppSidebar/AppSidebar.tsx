@@ -24,7 +24,7 @@ import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
 import { ComponentProps } from 'react';
-import { LEADERBOARD_SUPPORTED_NETWORKS } from '@/_shared/_constants/leaderBoardSupportedNetwork';
+import { LEADERBOARD_SUPPORTED_NETWORKS } from '@/_shared/_constants/leaderBoardSupportedNetworks';
 import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateButton from '../CreateButton/CreateButton';
