@@ -11,23 +11,23 @@ interface NetworkTreasuryConfig {
 	treasuryAccount: string;
 	assetHubRpc: string;
 	assetHubTreasuryAddress: string;
-	assetHubFellowshipAddress: string;
-	assetHubFellowshipUsdtAddress: string;
-	assetHubMythAddress: string;
-	assetHubAmbassadorAddress: string;
-	usdtIndex: string;
-	usdcIndex: string;
-	mythosParachainId: string;
-	hydrationRpc: string;
-	hydrationAddresses: string[];
-	hydrationNativeTokenAssetId: number;
-	fellowshipAddress: {
+	assetHubFellowshipAddress?: string;
+	assetHubFellowshipUsdtAddress?: string;
+	assetHubMythAddress?: string;
+	assetHubAmbassadorAddress?: string;
+	usdtIndex?: string;
+	usdcIndex?: string;
+	mythosParachainId?: string;
+	hydrationRpc?: string;
+	hydrationAddresses?: string[];
+	hydrationNativeTokenAssetId?: number;
+	fellowshipAddress?: {
 		treasury: string;
 		salary: string;
 	};
-	hydrationUsdcAssetId: number;
-	hydrationUsdtAssetId: number;
-	ambassadorAddress: string;
+	hydrationUsdcAssetId?: number;
+	hydrationUsdtAssetId?: number;
+	ambassadorAddress?: string;
 	loanAmounts: {
 		centrifuge?: {
 			usdc: string;
@@ -107,13 +107,8 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 	[ENetwork.KUSAMA]: {
 		relayChainRpc: NETWORKS_DETAILS[ENetwork.KUSAMA].rpcEndpoints[0].url,
 		assetHubRpc: NETWORKS_DETAILS[ENetwork.KUSAMA].assethubDetails?.rpcEndpoints[0].url || 'wss://rpc-asset-hub-kusama.luckyfriday.io',
-		treasuryAccount: '0x6d6f646c70792f74727372790000000000000000000000000000000000000000000000000000000000000000',
+		treasuryAccount: 'F3opxRbN5ZbjJNU511Kj2TLuzFcDq9BGduA9TgiECafpg29',
 		assetHubTreasuryAddress: 'HWZmQq6zMMk7TxixHfseFT2ewicT6UofPa68VCn3gkXrdJF',
-		ambassadorAddress: '',
-		fellowshipAddress: {
-			treasury: '',
-			salary: ''
-		},
 		loanAmounts: {
 			hydration: {
 				nativeToken: '33333000000000000',
@@ -124,19 +119,7 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			numerator: new BN(0),
 			denominator: new BN(1)
 		}, // 0% of the treasury balance
-		spendPeriodInBlocks: new BN(86400),
-		hydrationRpc: '',
-		hydrationAddresses: [],
-		hydrationNativeTokenAssetId: 0,
-		hydrationUsdcAssetId: 0,
-		hydrationUsdtAssetId: 0,
-		assetHubFellowshipAddress: '',
-		assetHubFellowshipUsdtAddress: '',
-		assetHubMythAddress: '',
-		assetHubAmbassadorAddress: '',
-		usdtIndex: '',
-		usdcIndex: '',
-		mythosParachainId: ''
+		spendPeriodInBlocks: new BN(86400)
 	}, // Add Kusama specific configuration when needed
 	[ENetwork.WESTEND]: undefined, // Add Westend specific configuration when needed
 	[ENetwork.PASEO]: undefined // Add Paseo specific configuration when needed

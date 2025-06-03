@@ -9,7 +9,6 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
-import { type WsProvider as IWsProvider } from '@polkadot/api';
 import { APIError } from './apiError';
 
 interface CoinGeckoResponse {
@@ -17,14 +16,14 @@ interface CoinGeckoResponse {
 }
 
 const getTotalInUsd = (network: ENetwork, treasuryStats: ITreasuryStats) => {
-	const chainTokenWithoutDecimals = treasuryStats.total?.totalChainToken ? new BN(treasuryStats.total?.totalChainToken || '0') : BN_ZERO;
+	const nativeTokenWithoutDecimals = treasuryStats.total?.totalNativeToken ? new BN(treasuryStats.total?.totalNativeToken) : BN_ZERO;
 	const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice || '0');
-	const chainTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
-	const totalChainTokenInUsd = chainTokenWithoutDecimals
+	const nativeTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
+	const totalNativeTokenInUsd = nativeTokenWithoutDecimals
 		.mul(nativeTokenPriceBN.value)
-		.div(new BN(10).pow(chainTokenDecimals))
+		.div(new BN(10).pow(nativeTokenDecimals))
 		.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
-	return totalChainTokenInUsd.toString();
+	return totalNativeTokenInUsd.toString();
 };
 
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
@@ -42,14 +41,14 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			network,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			relayChain: { chainToken: '', nextBurn: '' },
+			relayChain: { nativeToken: '', nextBurn: '' },
 			ambassador: { usdt: '' },
-			assetHub: { chainToken: '', usdc: '', usdt: '', myth: '' },
-			hydration: { chainToken: '', usdc: '', usdt: '' },
-			bounties: { chainToken: '' },
-			fellowship: { chainToken: '', usdt: '' },
+			assetHub: { nativeToken: '', usdc: '', usdt: '', myth: '' },
+			hydration: { nativeToken: '', usdc: '', usdt: '' },
+			bounties: { nativeToken: '' },
+			fellowship: { nativeToken: '', usdt: '' },
 			loans: config.loanAmounts,
-			total: { totalChainToken: '', totalUsdc: '', totalUsdt: '', totalMyth: '' }
+			total: { totalNativeToken: '', totalUsdc: '', totalUsdt: '', totalMyth: '' }
 		};
 
 		// Helper function to safely extract balance from results
@@ -81,13 +80,11 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		};
 
 		// Initialize all API connections
-		const apiProviders: { relayChain: IWsProvider; assetHub: IWsProvider; hydration?: IWsProvider } = {
+		const apiProviders = {
 			relayChain: new WsProvider(config.relayChainRpc),
-			assetHub: new WsProvider(config.assetHubRpc)
+			assetHub: new WsProvider(config.assetHubRpc),
+			hydration: config.hydrationRpc ? new WsProvider(config.hydrationRpc) : undefined
 		};
-		if (config.hydrationRpc) {
-			apiProviders.hydration = new WsProvider(config.hydrationRpc);
-		}
 
 		const [relayChainApi, assetHubApi, hydrationApi] = await Promise.all([
 			ApiPromise.create({ provider: apiProviders.relayChain }),
@@ -106,7 +103,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					...treasuryStats,
 					relayChain: {
 						...treasuryStats.relayChain,
-						chainToken: treasuryBalance,
+						nativeToken: treasuryBalance,
 						nextBurn
 					}
 				};
@@ -190,7 +187,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						...treasuryStats,
 						bounties: {
 							...treasuryStats.bounties,
-							chainToken: totalBalance.toString()
+							nativeToken: totalBalance.toString()
 						}
 					};
 				} catch (error) {
@@ -199,7 +196,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						...treasuryStats,
 						bounties: {
 							...treasuryStats.bounties,
-							chainToken: ''
+							nativeToken: ''
 						}
 					};
 				}
@@ -218,7 +215,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 							...treasuryStats,
 							assetHub: {
 								...treasuryStats.assetHub,
-								chainToken: (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
+								nativeToken: (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
 							}
 						};
 					}),
@@ -249,7 +246,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 							...treasuryStats,
 							fellowship: {
 								...treasuryStats.fellowship,
-								chainToken: (fellowshipAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
+								nativeToken: (fellowshipAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
 							}
 						};
 					})
@@ -314,13 +311,13 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			if (!hydrationApi) return;
 
 			const ZERO_BN = new BN(0);
-			let hydrationChainTokenBalance = ZERO_BN;
+			let hydrationNativeTokenBalance = ZERO_BN;
 			let hydrationUsdcBalance = ZERO_BN;
 			let hydrationUsdtBalance = ZERO_BN;
 
 			// Process all hydration addresses
 			await Promise.all(
-				config.hydrationAddresses.map(async (address) => {
+				(config.hydrationAddresses || []).map(async (address) => {
 					// Helper function to safely get token balance
 					const getTokenBalance = async (assetId: number) => {
 						try {
@@ -341,22 +338,22 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					};
 
 					// Get all token balances for each address
-					const [chainTokenBalance, usdcBalance, usdtBalance] = await Promise.all([
-						getTokenBalance(config.hydrationNativeTokenAssetId),
-						getTokenBalance(config.hydrationUsdcAssetId),
-						getTokenBalance(config.hydrationUsdtAssetId)
+					const [nativeTokenBalance, usdcBalance, usdtBalance] = await Promise.all([
+						config.hydrationNativeTokenAssetId ? getTokenBalance(config.hydrationNativeTokenAssetId) : null,
+						config.hydrationUsdcAssetId ? getTokenBalance(config.hydrationUsdcAssetId) : null,
+						config.hydrationUsdtAssetId ? getTokenBalance(config.hydrationUsdtAssetId) : null
 					]);
 
-					hydrationChainTokenBalance = hydrationChainTokenBalance.add(chainTokenBalance.free).add(chainTokenBalance.reserved);
-					hydrationUsdcBalance = hydrationUsdcBalance.add(usdcBalance.free).add(usdcBalance.reserved);
-					hydrationUsdtBalance = hydrationUsdtBalance.add(usdtBalance.free).add(usdtBalance.reserved);
+					hydrationNativeTokenBalance = !nativeTokenBalance ? ZERO_BN : hydrationNativeTokenBalance.add(nativeTokenBalance.free).add(nativeTokenBalance.reserved);
+					hydrationUsdcBalance = !usdcBalance ? ZERO_BN : hydrationUsdcBalance.add(usdcBalance.free).add(usdcBalance.reserved);
+					hydrationUsdtBalance = !usdtBalance ? ZERO_BN : hydrationUsdtBalance.add(usdtBalance.free).add(usdtBalance.reserved);
 				})
 			);
 
 			treasuryStats = {
 				...treasuryStats,
 				hydration: {
-					chainToken: hydrationChainTokenBalance.isZero() ? '' : hydrationChainTokenBalance.toString(),
+					nativeToken: hydrationNativeTokenBalance.isZero() ? '' : hydrationNativeTokenBalance.toString(),
 					usdc: hydrationUsdcBalance.isZero() ? '' : hydrationUsdcBalance.toString(),
 					usdt: hydrationUsdtBalance.isZero() ? '' : hydrationUsdtBalance.toString()
 				}
@@ -382,9 +379,8 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		// Execute all tasks
 		await Promise.all([...relayChainTasks, ...assetHubTasks, fetchHydrationBalances(), fetchNativeTokenPriceInUsd()]);
 
-		// TODO: add cross network handling
 		// Calculate totals after all data is fetched
-		const calculateTotal = (propertyName: 'chainToken' | 'usdc' | 'usdt' | 'myth'): string => {
+		const calculateTotal = (propertyName: 'nativeToken' | 'usdc' | 'usdt' | 'myth'): string => {
 			let total = new BN(0);
 
 			Object.entries(treasuryStats).forEach(([sectionKey, section]) => {
@@ -416,11 +412,11 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		treasuryStats = {
 			...treasuryStats,
 			total: {
-				totalChainToken: calculateTotal('chainToken'),
+				totalNativeToken: calculateTotal('nativeToken'),
 				totalUsdc: calculateTotal('usdc'),
 				totalUsdt: calculateTotal('usdt'),
 				totalMyth: calculateTotal('myth'),
-				totalInUsd: getTotalInUsd(network, { ...treasuryStats, total: { totalChainToken: calculateTotal('chainToken') } })
+				totalInUsd: getTotalInUsd(network, { ...treasuryStats, total: { totalNativeToken: calculateTotal('nativeToken') } })
 			}
 		};
 
@@ -430,26 +426,26 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
 		const mythPriceInUsd = mythPrice?.mythos?.usd;
 
-		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice && network === ENetwork.POLKADOT) {
+		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice && network === ENetwork.POLKADOT && config.usdcIndex && config.usdtIndex) {
 			const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice);
 			const mythPriceBN = decimalToBN(mythPriceInUsd);
 
 			// Convert token amounts to BN with proper decimal handling
-			const chainTokenWithoutDecimals = treasuryStats.total?.totalChainToken ? new BN(treasuryStats.total?.totalChainToken || '0') : BN_ZERO;
+			const nativeTokenWithoutDecimals = treasuryStats.total?.totalNativeToken ? new BN(treasuryStats.total?.totalNativeToken || '0') : BN_ZERO;
 			const mythWithoutDecimals = treasuryStats.total?.totalMyth ? new BN(treasuryStats.total?.totalMyth || '0') : BN_ZERO;
 			const usdcWithoutDecimals = treasuryStats.total?.totalUsdc ? new BN(treasuryStats.total?.totalUsdc || '0') : BN_ZERO;
 			const usdtWithoutDecimals = treasuryStats.total?.totalUsdt ? new BN(treasuryStats.total?.totalUsdt || '0') : BN_ZERO;
 
 			// Calculate USD values with proper decimal handling
-			const chainTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
+			const nativeTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
 			const mythDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].foreignAssets[EAssets.MYTH].tokenDecimal);
 			const usdcDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdcIndex].tokenDecimal);
 			const usdtDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdtIndex].tokenDecimal);
 
 			// Calculate total values in USD with proper decimal handling
-			const totalChainTokenInUsd = chainTokenWithoutDecimals
+			const totalNativeTokenInUsd = nativeTokenWithoutDecimals
 				.mul(nativeTokenPriceBN.value)
-				.div(new BN(10).pow(chainTokenDecimals))
+				.div(new BN(10).pow(nativeTokenDecimals))
 				.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
 
 			const totalMythInUsd = mythWithoutDecimals
@@ -461,7 +457,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			const totalUsdcInUsd = usdcWithoutDecimals.div(new BN(10).pow(usdcDecimals));
 			const totalUsdtInUsd = usdtWithoutDecimals.div(new BN(10).pow(usdtDecimals));
 
-			const totalInUsd = totalChainTokenInUsd.add(totalMythInUsd).add(totalUsdcInUsd).add(totalUsdtInUsd);
+			const totalInUsd = totalNativeTokenInUsd.add(totalMythInUsd).add(totalUsdcInUsd).add(totalUsdtInUsd);
 
 			treasuryStats = {
 				...treasuryStats,
