@@ -51,7 +51,8 @@ import {
 	EHttpHeaderKey,
 	IPostLink,
 	IGovAnalyticsStats,
-	IGovAnalyticsReferendumOutcome
+	IGovAnalyticsReferendumOutcome,
+	ITurnoutPercentageData
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1068,11 +1069,7 @@ export class NextApiClientService {
 			routeSegments: ['turnout-percentage']
 		});
 
-		return this.nextApiClientFetch<{
-			currentMonth: number;
-			lastMonth: number;
-			average: number;
-		}>({
+		return this.nextApiClientFetch<ITurnoutPercentageData>({
 			method,
 			url
 		});

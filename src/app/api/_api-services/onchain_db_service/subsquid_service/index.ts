@@ -24,7 +24,8 @@ import {
 	IGovAnalyticsReferendumOutcome,
 	IVoteCurve,
 	IVoteData,
-	IVoteMetrics
+	IVoteMetrics,
+	ITurnoutPercentageData
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -39,8 +40,15 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { TRACK_GROUPS } from '@/_shared/_constants/trackGroups';
 import { SubsquidUtils } from './subsquidUtils';
+import { SubsquidQueries } from './subsquidQueries';
 
 const VOTING_POWER_DIVISOR = new BN('10');
+
+const getTrackName = ({ trackId, network }: { trackId: number; network: ENetwork }) => {
+	const trackName = Object.entries(NETWORKS_DETAILS[`${network}`].trackDetails).find(([, details]) => details?.trackId === trackId)?.[1]?.name;
+	return trackName?.replace(/_/g, ' ');
+};
+
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -1147,5 +1155,76 @@ export class SubsquidService extends SubsquidUtils {
 				whiteList: groupResults.Whitelist ?? null
 			}
 		};
+	}
+
+	static async GetTurnoutPercentageData({ network }: { network: ENetwork }): Promise<ITurnoutPercentageData> {
+		try {
+			console.error('=== TURNOUT PERCENTAGE DEBUG START ===');
+			console.error('Network:', network);
+			console.error('Query:', SubsquidQueries.GET_TURNOUT_PERCENTAGE_DATA);
+
+			const { data: subsquidData, error: subsquidErr } = await this.subsquidGqlClient(network).query(SubsquidQueries.GET_TURNOUT_PERCENTAGE_DATA, {}).toPromise();
+
+			if (subsquidErr) {
+				console.error('Subsquid Error:', subsquidErr);
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching turnout percentage data from Subsquid');
+			}
+
+			console.error('Subsquid Response:', JSON.stringify(subsquidData, null, 2));
+
+			if (!subsquidData?.proposals) {
+				console.error('No proposals found in response');
+				return { averageSupportPercentages: {} };
+			}
+
+			interface Proposal {
+				trackNumber?: number;
+				tally?: {
+					support?: string;
+				};
+			}
+
+			interface TrackData {
+				totalSupport: number;
+				count: number;
+			}
+
+			// Group support percentages by track number using reduce
+			const trackSupportPercentages = subsquidData.proposals.reduce((acc: Record<string, TrackData>, proposal: Proposal) => {
+				if (!proposal.trackNumber || !proposal.tally?.support) return acc;
+
+				const trackNumber = proposal.trackNumber.toString();
+				const { support } = proposal.tally;
+				const supportPercentage = Number(support) / 1e16;
+
+				if (!acc[trackNumber]) {
+					acc[trackNumber] = { totalSupport: 0, count: 0 };
+				}
+
+				acc[trackNumber].totalSupport += supportPercentage;
+				acc[trackNumber].count += 1;
+
+				return acc;
+			}, {});
+
+			// Calculate average support percentages and convert track numbers to track names using Object.entries and reduce
+			const averageSupportPercentages = Object.entries(trackSupportPercentages as Record<string, TrackData>).reduce<Record<string, number>>((acc, [trackNumber, data]) => {
+				if (data.count > 0) {
+					const trackName = getTrackName({ trackId: parseInt(trackNumber, 10), network });
+					if (trackName) {
+						acc[trackName] = Number((data.totalSupport / data.count).toFixed(16));
+					}
+				}
+				return acc;
+			}, {});
+
+			console.error('Final Results:', averageSupportPercentages);
+			console.error('=== TURNOUT PERCENTAGE DEBUG END ===');
+
+			return { averageSupportPercentages };
+		} catch (error) {
+			console.error('Error in GetTurnoutPercentageData:', error);
+			throw error;
+		}
 	}
 }
