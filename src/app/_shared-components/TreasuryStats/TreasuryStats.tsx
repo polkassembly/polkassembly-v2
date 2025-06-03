@@ -111,7 +111,7 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 
 	return {
 		totalInUsd: formatUSDWithUnits(data?.[0]?.total?.totalInUsd || BN_ZERO?.toString(), 2),
-		chainTokenBalance: formatAssetBalance(data?.[0]?.total?.totalChainToken || BN_ZERO),
+		nativeTokenBalance: formatAssetBalance(data?.[0]?.total?.totalNativeToken || BN_ZERO),
 		usdcBalance: formatAssetBalance(data?.[0]?.total?.totalUsdc || BN_ZERO?.toString(), EAssets.USDC),
 		usdtBalance: formatAssetBalance(data?.[0]?.total?.totalUsdt || BN_ZERO?.toString(), EAssets.USDT),
 		mythBalance: formatMythBalance(data?.[0]?.total?.totalMyth || BN_ZERO?.toString())
@@ -167,7 +167,7 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 							<AssetDisplay
 								icon={NETWORKS_DETAILS[`${network}`].logo}
 								alt={network}
-								value={treasuryData.chainTokenBalance}
+								value={treasuryData.nativeTokenBalance}
 								inActivityFeed={isActivityFeed}
 							/>
 						</div>

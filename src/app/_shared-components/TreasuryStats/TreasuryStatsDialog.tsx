@@ -110,14 +110,14 @@ function RelayChainSection({ data, network, currentTokenPrice, title }: { data: 
 				<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 					~ $
 					{formatedAmountWithUSD({
-						amountsDetails: [{ amount: data.relayChain?.chainToken || null, asset: null }],
+						amountsDetails: [{ amount: data.relayChain?.nativeToken || null, asset: null }],
 						currentTokenPrice,
 						network
 					})}
 				</span>
-				{data.relayChain?.chainToken && (
+				{data.relayChain?.nativeToken && (
 					<AssetRow
-						amount={data.relayChain.chainToken}
+						amount={data.relayChain.nativeToken}
 						network={network}
 					/>
 				)}
@@ -148,7 +148,7 @@ function AssetHubSection({
 				~ $
 				{formatedAmountWithUSD({
 					amountsDetails: [
-						{ amount: data.assetHub?.chainToken || null, asset: null },
+						{ amount: data.assetHub?.nativeToken || null, asset: null },
 						{ amount: data.assetHub?.usdc || null, asset: EAssets.USDC },
 						{ amount: data.assetHub?.usdt || null, asset: EAssets.USDT }
 					],
@@ -157,9 +157,9 @@ function AssetHubSection({
 				})}
 			</span>
 			<div className='flex flex-wrap gap-2'>
-				{data.assetHub?.chainToken && (
+				{data.assetHub?.nativeToken && (
 					<AssetRow
-						amount={data.assetHub.chainToken}
+						amount={data.assetHub.nativeToken}
 						network={network}
 					/>
 				)}
@@ -212,7 +212,7 @@ function HydrationSection({
 				~ $
 				{formatedAmountWithUSD({
 					amountsDetails: [
-						{ amount: data.hydration?.chainToken || null, asset: null },
+						{ amount: data.hydration?.nativeToken || null, asset: null },
 						{ amount: data.hydration?.usdc || null, asset: EAssets.USDC },
 						{ amount: data.hydration?.usdt || null, asset: EAssets.USDT }
 					],
@@ -222,9 +222,9 @@ function HydrationSection({
 			</span>
 			<div className='flex flex-col gap-2'>
 				<div className='flex flex-wrap gap-2'>
-					{data.hydration?.chainToken && (
+					{data.hydration?.nativeToken && (
 						<AssetRow
-							amount={data.hydration.chainToken}
+							amount={data.hydration.nativeToken}
 							network={network}
 						/>
 					)}
@@ -268,15 +268,15 @@ function BountiesSection({ data, network, currentTokenPrice, title }: { data: IT
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
 				{formatedAmountWithUSD({
-					amountsDetails: [{ amount: data.bounties?.chainToken || null, asset: null }],
+					amountsDetails: [{ amount: data.bounties?.nativeToken || null, asset: null }],
 					currentTokenPrice,
 					network
 				})}
 			</span>
 			<div className='flex flex-wrap gap-2'>
-				{data.bounties?.chainToken && (
+				{data.bounties?.nativeToken && (
 					<AssetRow
-						amount={data.bounties.chainToken}
+						amount={data.bounties.nativeToken}
 						network={network}
 					/>
 				)}
@@ -364,7 +364,7 @@ function FellowshipSection({
 				~ $
 				{formatedAmountWithUSD({
 					amountsDetails: [
-						{ amount: data.fellowship?.chainToken || null, asset: null },
+						{ amount: data.fellowship?.nativeToken || null, asset: null },
 						{ amount: data.fellowship?.usdt || null, asset: EAssets.USDT }
 					],
 					currentTokenPrice,
@@ -381,9 +381,9 @@ function FellowshipSection({
 						>
 							{t('treasury')} <ExternalLink className='h-4 w-4' />
 						</Link>
-						{data.fellowship?.chainToken && (
+						{data.fellowship?.nativeToken && (
 							<AssetRow
-								amount={data.fellowship.chainToken}
+								amount={data.fellowship.nativeToken}
 								network={network}
 							/>
 						)}
