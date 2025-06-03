@@ -5,7 +5,7 @@
 import { Separator } from '@/app/_shared-components/Separator';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, ChevronRight, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, Pencil, ScanLine } from 'lucide-react';
 import ShieldUser from '@assets/icons/shield-user.svg';
 import AccountPin from '@assets/icons/account-pin.svg';
 import DeleteIcon from '@assets/icons/delete-icon.svg';
@@ -164,9 +164,9 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 					<CollapsibleTrigger className='w-full'>
 						<div className={classes.collapsibleTrigger}>
 							<p className={classes.collapsibleTriggerText}>
-								<Image
-									src={ShieldUser}
-									alt='shield-user'
+								<ScanLine
+									size={24}
+									className='text-text_primary'
 								/>
 								{t('Profile.Settings.appQrLogin')}
 							</p>
