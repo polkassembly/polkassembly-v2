@@ -1260,6 +1260,11 @@
 		"voting": "投票",
 		"totalProposals": "总提案数",
 		"approvedProposals": "已批准提案",
-		"monitoredTracks": "监控轨道"
+		"monitoredTracks": "监控轨道",
+		"referendumCount": "公投数量",
+		"referendumCountByStatus": "公投数量（状态）",
+		"referendumCountByCategory": "公投数量（类别）",
+		"monthlySpend": "每月支出",
+		"averageTurnoutPercentage": "平均投票率"
 	}
 }

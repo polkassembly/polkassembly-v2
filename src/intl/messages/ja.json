@@ -1260,6 +1260,11 @@
 		"voting": "投票",
 		"totalProposals": "総提案数",
 		"approvedProposals": "承認された提案",
-		"monitoredTracks": "監視中のトラック"
+		"monitoredTracks": "監視中のトラック",
+		"referendumCount": "レファレンダム数",
+		"referendumCountByStatus": "レファレンダム数（ステータス別）",
+		"referendumCountByCategory": "レファレンダム数（カテゴリ別）",
+		"monthlySpend": "月間支出",
+		"averageTurnoutPercentage": "平均投票率"
 	}
 }
