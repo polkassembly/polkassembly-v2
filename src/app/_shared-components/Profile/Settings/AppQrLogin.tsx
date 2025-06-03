@@ -23,7 +23,7 @@ function AppQrLogin() {
 			throw new Error(error?.message || 'Failed to generate QR session');
 		}
 
-		return data.sessionId;
+		return data;
 	};
 
 	const {
@@ -48,7 +48,7 @@ function AppQrLogin() {
 			{qrSessionId && (
 				<div className='relative max-w-max rounded-lg bg-white p-2'>
 					<QrCode
-						value={qrSessionId}
+						value={JSON.stringify(qrSessionId)}
 						size={160}
 					/>
 				</div>
