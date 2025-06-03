@@ -15,15 +15,92 @@ interface CoinGeckoResponse {
 	[network: string]: { usd: number; usd_24h_change: number };
 }
 
-const getTotalInUsd = (network: ENetwork, treasuryStats: ITreasuryStats) => {
-	const nativeTokenWithoutDecimals = treasuryStats.total?.totalNativeToken ? new BN(treasuryStats.total?.totalNativeToken) : BN_ZERO;
-	const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice || '0');
+const getAssetDecimals = (network: ENetwork, assetIndex: string, assetName: string): number => {
+	const asset = NETWORKS_DETAILS[network as ENetwork].supportedAssets[String(assetIndex)];
+	if (!asset?.tokenDecimal) {
+		throw new Error(`${assetName} token decimal not found for network: ${network}, index: ${assetIndex}`);
+	}
+	return asset.tokenDecimal;
+};
+
+const calculateStablecoinValue = (network: ENetwork, usdcAmount: BN, usdtAmount: BN, config?: { usdcIndex?: string; usdtIndex?: string }): BN => {
+	if (usdcAmount.isZero() && usdtAmount.isZero()) {
+		return BN_ZERO;
+	}
+
+	// Validate configuration for non-zero amounts
+	if (!usdcAmount.isZero() && !config?.usdcIndex) {
+		throw new Error(`USDC index not found in treasury config for network: ${network}`);
+	}
+	if (!usdtAmount.isZero() && !config?.usdtIndex) {
+		throw new Error(`USDT index not found in treasury config for network: ${network}`);
+	}
+
+	let totalStablecoinValue = BN_ZERO;
+
+	// Calculate USDC value
+	if (!usdcAmount.isZero() && config?.usdcIndex) {
+		const usdcDecimals = getAssetDecimals(network, config.usdcIndex, 'USDC');
+		const usdcValue = usdcAmount.div(new BN(10).pow(new BN(usdcDecimals)));
+		totalStablecoinValue = totalStablecoinValue.add(usdcValue);
+	}
+
+	// Calculate USDT value
+	if (!usdtAmount.isZero() && config?.usdtIndex) {
+		const usdtDecimals = getAssetDecimals(network, config.usdtIndex, 'USDT');
+		const usdtValue = usdtAmount.div(new BN(10).pow(new BN(usdtDecimals)));
+		totalStablecoinValue = totalStablecoinValue.add(usdtValue);
+	}
+
+	return totalStablecoinValue;
+};
+
+const calculateNativeTokenValue = (network: ENetwork, nativeTokenAmount: BN, tokenPriceBN: { value: BN; decimals: number }): BN => {
 	const nativeTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
-	const totalNativeTokenInUsd = nativeTokenWithoutDecimals
-		.mul(nativeTokenPriceBN.value)
+
+	return nativeTokenAmount
+		.mul(tokenPriceBN.value)
 		.div(new BN(10).pow(nativeTokenDecimals))
-		.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
-	return totalNativeTokenInUsd.toString();
+		.div(new BN(10).pow(new BN(tokenPriceBN.decimals)));
+};
+
+const calculateMythValue = (network: ENetwork, mythAmount: BN, mythPriceInUsd?: number): BN => {
+	if (!mythPriceInUsd || mythAmount.isZero()) {
+		return BN_ZERO;
+	}
+
+	const mythPriceBN = decimalToBN(mythPriceInUsd);
+	const mythDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].foreignAssets[EAssets.MYTH].tokenDecimal);
+
+	return mythAmount
+		.mul(mythPriceBN.value)
+		.div(new BN(10).pow(mythDecimals))
+		.div(new BN(10).pow(new BN(mythPriceBN.decimals)));
+};
+
+const calculateTotalInUsd = (network: ENetwork, treasuryStats: ITreasuryStats, mythPriceInUsd?: number, config?: { usdcIndex?: string; usdtIndex?: string }): string => {
+	// Only calculate if we have native token price
+	if (!treasuryStats.nativeTokenUsdPrice) {
+		return '0';
+	}
+
+	const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice);
+
+	// Convert token amounts to BN
+	const nativeTokenAmount = treasuryStats.total?.totalNativeToken ? new BN(treasuryStats.total.totalNativeToken) : BN_ZERO;
+	const usdcAmount = treasuryStats.total?.totalUsdc ? new BN(treasuryStats.total.totalUsdc) : BN_ZERO;
+	const usdtAmount = treasuryStats.total?.totalUsdt ? new BN(treasuryStats.total.totalUsdt) : BN_ZERO;
+	const mythAmount = treasuryStats.total?.totalMyth ? new BN(treasuryStats.total.totalMyth) : BN_ZERO;
+
+	// Calculate values for each asset type
+	const nativeTokenValue = calculateNativeTokenValue(network, nativeTokenAmount, nativeTokenPriceBN);
+	const stablecoinValue = calculateStablecoinValue(network, usdcAmount, usdtAmount, config);
+	const mythValue = calculateMythValue(network, mythAmount, mythPriceInUsd);
+
+	// Sum all values
+	const totalInUsd = nativeTokenValue.add(stablecoinValue).add(mythValue);
+
+	return totalInUsd.toString();
 };
 
 export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITreasuryStats | null> {
@@ -376,8 +453,20 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			};
 		};
 
+		// Fetch MYTH price from CoinGecko
+		const fetchMythPriceInUsd = async (): Promise<number | undefined> => {
+			try {
+				const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
+				return mythPrice?.mythos?.usd;
+			} catch (error) {
+				console.error('Error fetching MYTH price:', error);
+				return undefined;
+			}
+		};
+
 		// Execute all tasks
-		await Promise.all([...relayChainTasks, ...assetHubTasks, fetchHydrationBalances(), fetchNativeTokenPriceInUsd()]);
+		const mythPriceInUsd = await fetchMythPriceInUsd();
+		await Promise.all([Promise.all(relayChainTasks), Promise.all(assetHubTasks), fetchHydrationBalances(), fetchNativeTokenPriceInUsd()]);
 
 		// Calculate totals after all data is fetched
 		const calculateTotal = (propertyName: 'nativeToken' | 'usdc' | 'usdt' | 'myth'): string => {
@@ -415,58 +504,18 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				totalNativeToken: calculateTotal('nativeToken'),
 				totalUsdc: calculateTotal('usdc'),
 				totalUsdt: calculateTotal('usdt'),
-				totalMyth: calculateTotal('myth'),
-				totalInUsd: getTotalInUsd(network, { ...treasuryStats, total: { totalNativeToken: calculateTotal('nativeToken') } })
+				totalMyth: calculateTotal('myth')
 			}
 		};
 
-		// calculate all above values' addition in usd
-
-		// get myth price from coingecko
-		const mythPrice = (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=mythos&vs_currencies=usd')).json()) as CoinGeckoResponse;
-		const mythPriceInUsd = mythPrice?.mythos?.usd;
-
-		if (mythPriceInUsd && treasuryStats.nativeTokenUsdPrice && network === ENetwork.POLKADOT && config.usdcIndex && config.usdtIndex) {
-			const nativeTokenPriceBN = decimalToBN(treasuryStats.nativeTokenUsdPrice);
-			const mythPriceBN = decimalToBN(mythPriceInUsd);
-
-			// Convert token amounts to BN with proper decimal handling
-			const nativeTokenWithoutDecimals = treasuryStats.total?.totalNativeToken ? new BN(treasuryStats.total?.totalNativeToken || '0') : BN_ZERO;
-			const mythWithoutDecimals = treasuryStats.total?.totalMyth ? new BN(treasuryStats.total?.totalMyth || '0') : BN_ZERO;
-			const usdcWithoutDecimals = treasuryStats.total?.totalUsdc ? new BN(treasuryStats.total?.totalUsdc || '0') : BN_ZERO;
-			const usdtWithoutDecimals = treasuryStats.total?.totalUsdt ? new BN(treasuryStats.total?.totalUsdt || '0') : BN_ZERO;
-
-			// Calculate USD values with proper decimal handling
-			const nativeTokenDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].tokenDecimals);
-			const mythDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].foreignAssets[EAssets.MYTH].tokenDecimal);
-			const usdcDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdcIndex].tokenDecimal);
-			const usdtDecimals = new BN(NETWORKS_DETAILS[network as ENetwork].supportedAssets[config.usdtIndex].tokenDecimal);
-
-			// Calculate total values in USD with proper decimal handling
-			const totalNativeTokenInUsd = nativeTokenWithoutDecimals
-				.mul(nativeTokenPriceBN.value)
-				.div(new BN(10).pow(nativeTokenDecimals))
-				.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)));
-
-			const totalMythInUsd = mythWithoutDecimals
-				.mul(mythPriceBN.value)
-				.div(new BN(10).pow(mythDecimals))
-				.div(new BN(10).pow(new BN(mythPriceBN.decimals)));
-
-			// USDC and USDT are already in USD, just need to handle their decimals
-			const totalUsdcInUsd = usdcWithoutDecimals.div(new BN(10).pow(usdcDecimals));
-			const totalUsdtInUsd = usdtWithoutDecimals.div(new BN(10).pow(usdtDecimals));
-
-			const totalInUsd = totalNativeTokenInUsd.add(totalMythInUsd).add(totalUsdcInUsd).add(totalUsdtInUsd);
-
-			treasuryStats = {
-				...treasuryStats,
-				total: {
-					...treasuryStats.total,
-					totalInUsd: totalInUsd.toString()
-				}
-			};
-		}
+		// Calculate total in USD using the unified function
+		treasuryStats = {
+			...treasuryStats,
+			total: {
+				...treasuryStats.total,
+				totalInUsd: calculateTotalInUsd(network, treasuryStats, mythPriceInUsd, config)
+			}
+		};
 
 		// Disconnect all APIs
 		await Promise.all([relayChainApi.disconnect(), assetHubApi.disconnect(), hydrationApi?.disconnect()]);
