@@ -256,15 +256,17 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				);
 			}
 			if (config.assetHubFellowshipUsdtAddress) {
-				assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress).then((balance) => {
-					treasuryStats = {
-						...treasuryStats,
-						fellowship: {
-							...treasuryStats.fellowship,
-							usdt: getBalanceIfExists(balance)
-						}
-					};
-				});
+				assetHubTasks.push(
+					assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress).then((balance) => {
+						treasuryStats = {
+							...treasuryStats,
+							fellowship: {
+								...treasuryStats.fellowship,
+								usdt: getBalanceIfExists(balance)
+							}
+						};
+					})
+				);
 			}
 			if (config.assetHubAmbassadorAddress) {
 				assetHubTasks.push(
@@ -340,7 +342,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 					// Get all token balances for each address
 					const [chainTokenBalance, usdcBalance, usdtBalance] = await Promise.all([
-						getTokenBalance(config.hydrationChainTokenAssetId),
+						getTokenBalance(config.hydrationNativeTokenAssetId),
 						getTokenBalance(config.hydrationUsdcAssetId),
 						getTokenBalance(config.hydrationUsdtAssetId)
 					]);
