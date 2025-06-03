@@ -10,8 +10,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { ESearchType } from '@/_shared/types';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
 import styles from './Search.module.scss';
 import { Checkbox } from '../../Checkbox';
 import { Button } from '../../Button';
@@ -34,7 +33,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 	const now = dayjs.utc();
 
 	const { items: dateItems, refine: refineDate } = useNumericMenu({
-		attribute: 'created_at',
+		attribute: 'createdAtTimestamp',
 		items: [
 			{
 				label: 'Today',
@@ -72,13 +71,12 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 	});
 
 	const { items: trackItems, refine: refineTrack } = useRefinementList({
-		attribute: 'track_number'
+		attribute: 'origin'
 	});
 
 	const { refine: clearRefinements } = useClearRefinements();
 
 	const { results } = useInstantSearch();
-	const network = getCurrentNetwork();
 
 	const options = [
 		{ value: ESearchType.POSTS, label: t('referenda') },
@@ -88,34 +86,22 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 
 	const trackItemsList = useMemo(() => {
 		return trackItems.map((item: RefinementItem) => {
-			const trackDetails = NETWORKS_DETAILS[`${network}`]?.trackDetails;
-			const trackInfo = Object.values(trackDetails || {}).find((track) => track.trackId?.toString() === item.value);
-			const trackName = trackInfo?.name || item.label;
-			const formattedTrackName = trackName
-				.replace(/_/g, ' ')
-				.toLowerCase()
-				.replace(/^\w/, (c) => c.toUpperCase());
+			const trackName = item.value;
+			const formattedTrackName = parseCamelCase(trackName);
 
 			return {
 				...item,
 				label: `${formattedTrackName} (${item.count})`
 			};
 		});
-	}, [network, trackItems]);
+	}, [trackItems]);
 
 	const topicItemsList = useMemo(() => {
 		return topicItems.map((item: RefinementItem) => {
 			const topicName = Object.entries(POST_TOPIC_MAP).find(([, value]) => value === Number(item.value))?.[0];
 			return {
 				...item,
-				label: `${
-					topicName
-						? topicName
-								.replace(/_/g, ' ')
-								.toLowerCase()
-								.replace(/^\w/, (c) => c.toUpperCase())
-						: item.label
-				} (${item.count})`
+				label: `${topicName ? parseCamelCase(topicName) : item.label} (${item.count})`
 			};
 		});
 	}, [topicItems]);
@@ -204,7 +190,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 													key={item.value}
 													id={item.value}
 													checked={item.isRefined}
-													onCheckedChange={(checked) => !!checked && refineTrack(item.value)}
+													onCheckedChange={() => refineTrack(item.value)}
 												/>
 												<label
 													htmlFor={item.value}
@@ -230,7 +216,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 													key={item.value}
 													id={item.value}
 													checked={item.isRefined}
-													onCheckedChange={(checked) => !!checked && refineTopic(item.value)}
+													onCheckedChange={() => refineTopic(item.value)}
 												/>
 												<label
 													htmlFor={item.value}
@@ -257,7 +243,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 													key={item.value}
 													id={item.value}
 													checked={item.isRefined}
-													onCheckedChange={(checked) => !!checked && refineTag(item.value)}
+													onCheckedChange={() => refineTag(item.value)}
 												/>
 												<label
 													htmlFor={item.value}
@@ -291,7 +277,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 				{refinedTrackItems?.length > 0 && (
 					<div className='flex items-center gap-x-1 text-xs text-wallet_btn_text'>
 						<span className='text-text_pink'>{t('tracks')}:</span>
-						<div className='flex'>
+						<div className='flex flex-wrap gap-x-1'>
 							{refinedTrackItems.map((item, index) => (
 								<span key={item.value}>
 									{index !== 0 ? ', ' : ''}

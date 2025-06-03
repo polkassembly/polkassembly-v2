@@ -129,6 +129,36 @@ export enum EOffChainPostTopic {
 	WHITELIST = 'whitelist'
 }
 
+export enum EPostOrigin {
+	AUCTION_ADMIN = 'AuctionAdmin',
+	BIG_SPENDER = 'BigSpender',
+	BIG_TIPPER = 'BigTipper',
+	CANDIDATES = 'Candidates',
+	EXPERTS = 'Experts',
+	FELLOWS = 'Fellows',
+	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
+	GENERAL_ADMIN = 'GeneralAdmin',
+	GRAND_MASTERS = 'GrandMasters',
+	LEASE_ADMIN = 'LeaseAdmin',
+	MASTERS = 'Masters',
+	MEDIUM_SPENDER = 'MediumSpender',
+	MEMBERS = 'Members',
+	PROFICIENTS = 'Proficients',
+	REFERENDUM_CANCELLER = 'ReferendumCanceller',
+	REFERENDUM_KILLER = 'ReferendumKiller',
+	ROOT = 'Root',
+	SENIOR_EXPERTS = 'SeniorExperts',
+	SENIOR_FELLOWS = 'SeniorFellows',
+	SENIOR_MASTERS = 'SeniorMasters',
+	SMALL_SPENDER = 'SmallSpender',
+	SMALL_TIPPER = 'SmallTipper',
+	STAKING_ADMIN = 'StakingAdmin',
+	TREASURER = 'Treasurer',
+	WHITELISTED_CALLER = 'WhitelistedCaller',
+	WISH_FOR_CHANGE = 'WishForChange',
+	FAST_GENERAL_ADMIN = 'FastGeneralAdmin'
+}
+
 export interface IAlgoliaPost extends Record<string, unknown> {
 	objectID: string;
 	title: string;
@@ -145,4 +175,6 @@ export interface IAlgoliaPost extends Record<string, unknown> {
 	index: number;
 	parsedContent: string;
 	titleAndContentHash: string;
+	proposer: string;
+	origin: EPostOrigin;
 }

@@ -146,18 +146,10 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 			if (searchText.length > 0) {
 				const queries = [
 					{
-						indexName: 'polkassembly_users',
+						indexName: 'polkassembly_v2_users',
 						params: {
 							hitsPerPage: MAX_MENTION_SUGGESTIONS,
 							restrictSearchableAttributes: ['username']
-						},
-						query: searchText
-					},
-					{
-						indexName: 'polkassembly_addresses',
-						params: {
-							hitsPerPage: MAX_MENTION_SUGGESTIONS,
-							restrictSearchableAttributes: ['address']
 						},
 						query: searchText
 					}
@@ -165,18 +157,19 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 				// Using any type for algolia response as the types don't match the actual structure
 				algoliaClient.search(queries as any).then((response: any) => {
-					const usernameHits = response.results[0]?.hits || [];
-					const addressHits = response.results[1]?.hits || [];
+					const userHits = response.results[0]?.hits || [];
 
-					const usernameResults = usernameHits.map((user: Record<string, any>) => ({
+					const usernameResults = userHits.map((user: Record<string, any>) => ({
 						text: `@${user.username}`,
 						value: `[@${user.username}](${typeof window !== 'undefined' ? window.location.origin : ''}/user/${user.username})&nbsp;`
 					}));
 
-					const addressResults = addressHits.map((user: Record<string, any>) => ({
-						text: `@${user.address}`,
-						value: `[@${user.address}](${typeof window !== 'undefined' ? window.location.origin : ''}/user/address/${user.address})&nbsp;`
-					}));
+					const addressResults = userHits.flatMap((user: Record<string, any>) =>
+						(user.addresses || []).map((address: string) => ({
+							text: `@${address}`,
+							value: `[@${address}](${typeof window !== 'undefined' ? window.location.origin : ''}/user/address/${address})&nbsp;`
+						}))
+					);
 
 					const suggestions = [...usernameResults, ...addressResults];
 					if (suggestions.length > 0) {
