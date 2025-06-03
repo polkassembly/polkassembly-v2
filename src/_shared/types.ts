@@ -1081,7 +1081,7 @@ export interface ITreasuryStats {
 		totalUsdc?: string;
 		totalUsdt?: string;
 		totalMyth?: string;
-		[key: string]: string | undefined;
+		totalInUsd?: string;
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
