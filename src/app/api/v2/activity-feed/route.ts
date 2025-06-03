@@ -79,7 +79,9 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	// Fetch user addresses if authenticated (needed for filtering posts not voted by user)
 	const userAddressesPromise =
 		isUserAuthenticated && userId
-			? OffChainDbService.GetAddressesForUserId(userId).then((addresses) => addresses.map((a) => encodeAddress(a.address, NETWORKS_DETAILS[network as ENetwork].ss58Format)))
+			? OffChainDbService.GetAddressesForUserId(userId).then((addresses) =>
+					addresses.filter((a) => ValidatorService.isValidSubstrateAddress(a.address)).map((a) => encodeAddress(a.address, NETWORKS_DETAILS[network as ENetwork].ss58Format))
+				)
 			: Promise.resolve([]);
 
 	// Fetch user addresses first, then use them for on-chain posts query

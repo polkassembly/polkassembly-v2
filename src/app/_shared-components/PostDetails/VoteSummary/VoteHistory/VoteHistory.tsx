@@ -4,7 +4,6 @@
 
 import { EProposalType, EVoteDecision, EVoteSortOptions } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
@@ -32,14 +31,13 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 		}
 		return data;
 	};
-	const { data, isFetching } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: ['voteHistory', proposalType, index, page, tab, sortBy],
 		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision, queryKey[5] as EVoteSortOptions),
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI,
-		retry: false,
-		refetchOnWindowFocus: false,
-		refetchOnMount: false
+		retry: true,
+		refetchOnWindowFocus: true,
+		refetchOnMount: true
 	});
 
 	return (
@@ -93,7 +91,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				<TabsContent value={EVoteDecision.AYE}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isFetching}
+						loading={isLoading}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
 					/>
@@ -101,7 +99,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				<TabsContent value={EVoteDecision.NAY}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isFetching}
+						loading={isLoading}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
 					/>
@@ -109,7 +107,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 				<TabsContent value={EVoteDecision.SPLIT_ABSTAIN}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isFetching}
+						loading={isLoading}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
 					/>

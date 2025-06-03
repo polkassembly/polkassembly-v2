@@ -47,7 +47,9 @@ import {
 	IUserPosts,
 	ITrackAnalyticsDelegations,
 	IOnChainMetadata,
-	EVoteSortOptions
+	EVoteSortOptions,
+	EHttpHeaderKey,
+	IPostLink
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -355,11 +357,13 @@ export class NextApiClientService {
 	private static async nextApiClientFetch<T>({
 		url,
 		method,
-		data
+		data,
+		skipCache = false
 	}: {
 		url: URL;
 		method: Method;
 		data?: Record<string, unknown>;
+		skipCache?: boolean;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
@@ -370,7 +374,8 @@ export class NextApiClientService {
 				...(!global.window ? await getCookieHeadersServer() : {}),
 				'Content-Type': 'application/json',
 				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
-				'x-network': currentNetwork
+				'x-network': currentNetwork,
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
 			},
 			method
 		});
@@ -513,8 +518,8 @@ export class NextApiClientService {
 	}
 
 	// details
-	static async fetchProposalDetails({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
-		if (this.isServerSide()) {
+	static async fetchProposalDetails({ proposalType, indexOrHash, skipCache = false }: { proposalType: EProposalType; indexOrHash: string; skipCache?: boolean }) {
+		if (this.isServerSide() && !skipCache) {
 			const currentNetwork = await this.getCurrentNetwork();
 
 			const cachedData = await redisServiceSSR('GetPostData', {
@@ -529,10 +534,18 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROPOSAL_DETAILS, routeSegments: [proposalType, indexOrHash] });
-		return this.nextApiClientFetch<IPost>({ url, method });
+		return this.nextApiClientFetch<IPost>({ url, method, skipCache });
 	}
 
-	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
+	static async editProposalDetails({
+		proposalType,
+		index,
+		data
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		data: { title: string; content: string; linkedPost?: IPostLink };
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}

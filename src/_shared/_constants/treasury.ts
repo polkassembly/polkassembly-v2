@@ -86,5 +86,6 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		spendPeriodInBlocks: new BN(345600)
 	},
 	[ENetwork.KUSAMA]: undefined, // Add Kusama specific configuration when needed
-	[ENetwork.WESTEND]: undefined // Add Westend specific configuration when needed
+	[ENetwork.WESTEND]: undefined, // Add Westend specific configuration when needed
+	[ENetwork.PASEO]: undefined // Add Paseo specific configuration when needed
 };

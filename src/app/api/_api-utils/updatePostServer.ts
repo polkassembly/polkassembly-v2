@@ -50,13 +50,16 @@ export async function updatePostServer({
 		});
 	}
 
-	// await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
+	// delete post summary and invalidate cache
+	await OffChainDbService.DeleteContentSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate caches
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash });
-	await RedisService.DeletePostsListing({ network, proposalType });
-	await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
-	await RedisService.DeleteActivityFeed({ network });
-	await RedisService.DeleteAllSubscriptionFeedsForNetwork(network);
-	await RedisService.DeleteOverviewPageData({ network });
+	Promise.all([
+		RedisService.DeletePostData({ network, proposalType, indexOrHash }),
+		RedisService.DeletePostsListing({ network, proposalType }),
+		RedisService.DeleteContentSummary({ network, indexOrHash, proposalType }),
+		RedisService.DeleteActivityFeed({ network }),
+		RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
+		RedisService.DeleteOverviewPageData({ network })
+	]);
 }

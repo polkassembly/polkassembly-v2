@@ -10,17 +10,16 @@ import { IoBookmark } from '@react-icons/all-files/io5/IoBookmark';
 import { IoBookmarkOutline } from '@react-icons/all-files/io5/IoBookmarkOutline';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import ReactionButton from '@/app/(home)/activity-feed/Components/ReactionButton/ReactionButton';
 import { useMemo, useCallback } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import styles from './PostActions.module.scss';
+import { Button } from '../../Button';
 
 function PostActions({ postData }: { postData: IPost }) {
 	const { user } = useUser();
 	const router = useRouter();
 	const pathname = usePathname();
-	const t = useTranslations('ActivityFeed');
 	// usememo
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
 		reactions: postData?.reactions,
@@ -43,7 +42,7 @@ function PostActions({ postData }: { postData: IPost }) {
 
 	const subscribeButtonClasses = useMemo(() => cn(styles.post_actions_container, isSubscribed && styles.selected_text), [isSubscribed, subscriptionKey]);
 
-	const buttonText = useMemo(() => (isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribed, subscriptionKey, t]);
+	// const buttonText = useMemo(() => (isSubscribed ? t('unsubscribe') : t('subscribe')), [isSubscribed, subscriptionKey, t]);
 
 	const handleShare = () => {
 		const titlePart = postData?.title ? `for "${postData.title}"` : '';
@@ -57,7 +56,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const handleDislike = () => handleAuthenticatedAction(() => handleReaction(EReaction.dislike));
 
 	return (
-		<div className='flex items-center justify-between'>
+		<div className='flex w-full items-center justify-between'>
 			<div className='flex items-center gap-4'>
 				<div className={cn(reactionState.isLiked ? styles.selected_text : 'text-basic_text', styles.post_actions_container)}>
 					<ReactionButton
@@ -84,22 +83,22 @@ function PostActions({ postData }: { postData: IPost }) {
 			</div>
 
 			<div className='flex items-center gap-4 text-basic_text'>
-				<button
-					type='button'
+				<Button
+					variant='ghost'
+					size='sm'
 					onClick={() => handleAuthenticatedAction(() => handleSubscribe())}
 					className={subscribeButtonClasses}
 				>
 					{isSubscribed ? <IoBookmark className='h-4 w-4' /> : <IoBookmarkOutline className='h-4 w-4' />}
-					<span className='text-xs font-medium'>{buttonText}</span>
-				</button>
-				<button
-					type='button'
+				</Button>
+				<Button
+					variant='ghost'
+					size='sm'
 					onClick={handleShare}
 					className={styles.post_actions_container}
 				>
 					<Share2 className='h-4 w-4' />
-					<span className='text-xs font-medium'>{t('share')}</span>
-				</button>
+				</Button>
 			</div>
 		</div>
 	);

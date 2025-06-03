@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse } from '@/_shared/types';
-import { useState } from 'react';
+import { EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
+import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
@@ -15,20 +15,22 @@ import { FaChevronDown } from '@react-icons/all-files/fa/FaChevronDown';
 import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
 
 import { useTranslations } from 'next-intl';
+import { useQueryClient } from '@tanstack/react-query';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
 import classes from './Comments.module.scss';
 
 function Comments({ comments, proposalType, index }: { comments: ICommentResponse[]; proposalType: EProposalType; index: string }) {
 	const t = useTranslations();
-	const [allComments, setAllComments] = useState<ICommentResponse[]>(comments);
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
 	const [showSpam, setShowSpam] = useState(false);
 
-	const regularComments = allComments.filter((comment) => !comment.isSpam);
-	const spamComments = allComments.filter((comment) => comment.isSpam);
+	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
+	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
 	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
+
+	const queryClient = useQueryClient();
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -106,13 +108,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 						proposalType={proposalType}
 						proposalIndex={index}
 						onConfirm={(newComment, publicUser) => {
-							setAllComments((prev) => [
-								...prev,
-								{
-									...newComment,
-									user: publicUser
-								}
-							]);
+							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
 						}}
 					/>
 				</div>

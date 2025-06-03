@@ -553,6 +553,18 @@
 			"decisionDeposit": "Decision Deposit",
 			"payDecisionDeposit": "Pay Decision Deposit",
 			"continue": "Continue"
+		},
+		"ClaimPayout": {
+			"claim": "Claim",
+			"index": "Index",
+			"beneficiary": "Beneficiary",
+			"amount": "Amount",
+			"expireIn": "Expires in",
+			"claimPayout": "Claim Payout",
+			"payoutClaimedSuccessfully": "Payout claimed successfully",
+			"payoutClaimFailed": "Payout claim failed",
+			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
+			"payoutClaimFailedDescription": "Please try again"
 		}
 	},
 	"ListingPage_Status": {
@@ -650,7 +662,16 @@
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",
-		"voteFailedTitle": "Vote Failed"
+		"voteFailedTitle": "Vote Failed",
+		"delegatedPower": "Delegated Power",
+		"commentSuccessTitle": "Comment Added Successfully",
+		"commentSuccess": "Your comment has been added successfully",
+		"voted": "Voted",
+		"successfully": "successfully",
+		"with": "with",
+		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
+		"your": "Your",
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
@@ -661,7 +682,11 @@
 		"title": "Title",
 		"content": "Content",
 		"save": "Save",
-		"editPostButton": "Edit"
+		"editPostButton": "Edit",
+		"success": "Post updated successfully",
+		"successDescription": "Your post has been updated successfully",
+		"error": "Failed to update post",
+		"errorDescription": "There was an error while updating your post"
 	},
 	"LinkDiscussionPost": {
 		"linkDiscussion": "Link Discussion",
@@ -710,7 +735,8 @@
 		"unnoted_description": "The preimage has been unnoted",
 		"failed": "Failed",
 		"unrequest": "Unrequest",
-		"unnote": "Unnote"
+		"unnote": "Unnote",
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -973,7 +999,14 @@
 		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
 		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
 		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
-		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal.",
+		"Congratulations": "Congratulations!",
+		"proposal": "Proposal",
+		"createdSuccessfully": "created successfully!",
+		"redirectingToProposal": "Redirecting to proposal...",
+		"addContextToProposal": "Add Context to Proposal",
+		"redirectingToPost": "Redirecting to post...",
+		"discussion": "Discussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1012,7 +1045,13 @@
 		"length": "Length",
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
-		"on": "on"
+		"on": "on",
+		"Congratulations": "Congratulations!",
+		"createProposalFromPreimage": "You can now create a proposal from the preimage",
+		"CreateProposal": "Create Proposal",
+		"goBack": "Go Back",
+		"Preimage": "Preimage",
+		"createSuccessfully": "created successfully!"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Bounty proposed successfully",

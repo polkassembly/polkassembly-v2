@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable no-use-before-define */
+
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
@@ -11,7 +13,8 @@ import { StatusCodes } from 'http-status-codes';
 export enum ENetwork {
 	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot',
-	WESTEND = 'westend'
+	WESTEND = 'westend',
+	PASEO = 'paseo'
 }
 
 export enum EGovType {
@@ -553,6 +556,7 @@ export interface IOnChainPostInfo {
 	timeline?: IStatusHistoryItem[];
 	preimageArgs?: Record<string, unknown>;
 	curator?: string;
+	treasurySpendIndex?: number;
 }
 
 export interface IPost extends IOffChainPost {
@@ -561,6 +565,7 @@ export interface IPost extends IOffChainPost {
 	reactions?: IReaction[];
 	userSubscriptionId?: string;
 	contentSummary?: IContentSummary;
+	comments?: ICommentResponse[];
 }
 
 export interface IOnChainPostListing {
@@ -961,8 +966,11 @@ export interface IPostSubscription {
 	userId: number;
 }
 
+// react query keys enum TODO: add other keys
 export enum EReactQueryKeys {
-	BATCH_VOTE_CART = 'batch-vote-cart'
+	BATCH_VOTE_CART = 'batch-vote-cart',
+	COMMENTS = 'comments',
+	POST_DETAILS = 'postDetails'
 }
 
 export interface IParamDef {
@@ -1279,4 +1287,14 @@ export enum EVoteSortOptions {
 	SelfVotingPowerDESC = 'selfVotingPower_DESC',
 	DelegatedVotingPowerASC = 'delegatedVotingPower_ASC',
 	DelegatedVotingPowerDESC = 'delegatedVotingPower_DESC'
+}
+
+export interface IPayout {
+	treasurySpendIndex: number;
+	treasurySpendData: {
+		beneficiary: string;
+		amount: string;
+		expiresAt: Date;
+		generalIndex: string;
+	};
 }

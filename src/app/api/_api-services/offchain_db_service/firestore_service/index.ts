@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
+import { QueryDocumentSnapshot, QuerySnapshot, Timestamp, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -295,7 +295,15 @@ export class FirestoreService extends FirestoreUtils {
 		return {
 			...postData,
 			content: postData.content || '',
-			tags: postData.tags?.map((tag: ITag) => ({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })) || [],
+			tags:
+				postData.tags?.map((tag: { value: string; lastUsedAt: unknown }) => ({
+					value: tag.value,
+					lastUsedAt:
+						typeof tag.lastUsedAt === 'object' && tag.lastUsedAt !== null && typeof (tag.lastUsedAt as Timestamp).toDate === 'function'
+							? (tag.lastUsedAt as Timestamp).toDate()
+							: new Date(tag.lastUsedAt as string) || new Date(),
+					network
+				})) || [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
@@ -583,6 +591,7 @@ export class FirestoreService extends FirestoreUtils {
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
+			.orderBy('createdAt', 'desc') // just in case there are multiple summaries for the same post
 			.limit(1);
 
 		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
@@ -1111,6 +1120,29 @@ export class FirestoreService extends FirestoreUtils {
 		await this.postsCollectionRef()
 			.doc(String(id))
 			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
+
+		// add back link to linkedPost for linkedPost if it exists
+		if (linkedPost) {
+			const updatedPostData = (await this.postsCollectionRef().doc(String(id)).get()).data() as IOffChainPost;
+
+			const linkedPostSnapshot = await this.postsCollectionRef()
+				.where('network', '==', updatedPostData.network)
+				.where('proposalType', '==', linkedPost.proposalType)
+				.where('indexOrHash', '==', linkedPost.indexOrHash)
+				.limit(1)
+				.get();
+
+			const linkedPostDoc = !linkedPostSnapshot.empty ? linkedPostSnapshot.docs[0] : null;
+
+			const backLink: IPostLink = {
+				proposalType: updatedPostData.proposalType,
+				indexOrHash: String(updatedPostData.index ?? updatedPostData.hash)
+			};
+
+			if (linkedPostDoc && backLink.indexOrHash) {
+				await linkedPostDoc.ref.set({ linkedPost: backLink }, { merge: true });
+			}
+		}
 	}
 
 	static async CreatePost({
@@ -1545,5 +1577,18 @@ export class FirestoreService extends FirestoreUtils {
 			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
 			totalCount: totalCount.data().count
 		};
+	}
+
+	static async DeleteContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const contentSummary = await this.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.get();
+
+		if (contentSummary.docs.length) {
+			// sometimes multiple content summaries are generated for the same post
+			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
+		}
 	}
 }

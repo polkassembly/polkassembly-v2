@@ -8,8 +8,25 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { z } from 'zod';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 const origin = EPostOrigin.TREASURER;
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Treasurer Proposals`,
+		description: 'Explore all Treasurer Proposals on Polkassembly',
+		url: `https://${network}.polkassembly.io/treasurer`,
+		imageAlt: 'Polkassembly Treasurer Proposals',
+		network
+	});
+}
 
 const zodQuerySchema = z.object({
 	page: z.coerce.number().min(1).optional().default(1),

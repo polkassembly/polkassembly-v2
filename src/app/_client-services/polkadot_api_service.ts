@@ -18,7 +18,9 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
+import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -647,8 +649,10 @@ export class PolkadotApiService {
 		if (!this.api || !track || !preimageHash || !preimageLength || !enactmentValue) {
 			return null;
 		}
+
+		const isRoot = track === EPostOrigin.ROOT;
 		return this.api.tx.referenda.submit(
-			{ Origins: track },
+			isRoot ? { system: track } : { Origins: track },
 			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
 			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
 		);
@@ -704,7 +708,7 @@ export class PolkadotApiService {
 									location: {
 										parents: 0,
 										interior: {
-											X1: { Parachain: NETWORKS_DETAILS[this.network]?.parachain }
+											X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
 										}
 									}
 								}
@@ -724,7 +728,7 @@ export class PolkadotApiService {
 										interior: {
 											X1: [
 												{
-													Parachain: NETWORKS_DETAILS[this.network]?.parachain
+													Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
 												}
 											]
 										}
@@ -818,14 +822,18 @@ export class PolkadotApiService {
 		track,
 		enactment,
 		enactmentValue,
+		preimageHash,
+		preimageLength,
 		onSuccess,
 		onFailed
 	}: {
 		address: string;
-		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
+		extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult>;
+		preimageHash?: string;
+		preimageLength?: number;
 		onSuccess?: (postId: number) => void;
 		onFailed?: () => void;
 	}) {
@@ -836,6 +844,41 @@ export class PolkadotApiService {
 			return;
 		}
 
+		if (!extrinsicFn) {
+			if (!preimageHash || !preimageLength) {
+				onFailed?.();
+				return;
+			}
+
+			const submitProposalTx = this.getSubmitProposalTx({
+				track,
+				preimageHash,
+				preimageLength,
+				enactment,
+				enactmentValue
+			});
+			if (!submitProposalTx) {
+				onFailed?.();
+				return;
+			}
+
+			const postId = Number(await this.api.query.referenda.referendumCount());
+			await this.executeTx({
+				tx: submitProposalTx,
+				address,
+				errorMessageFallback: 'Failed to create treasury proposal',
+				waitTillFinalizedHash: true,
+				onSuccess: () => {
+					onSuccess?.(postId);
+				},
+				onFailed: () => {
+					onFailed?.();
+				}
+			});
+
+			return;
+		}
+
 		const preimageDetails = this.getPreimageTxDetails({ extrinsicFn });
 
 		if (!preimageDetails || !address) {
@@ -843,7 +886,7 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn });
+		const notePreimageTx = extrinsicFn ? this.getNotePreimageTx({ extrinsicFn }) : null;
 		const submitProposalTx = this.getSubmitProposalTx({
 			track,
 			preimageHash: preimageDetails.preimageHash,
@@ -1032,6 +1075,72 @@ export class PolkadotApiService {
 			tx,
 			address,
 			errorMessageFallback: 'Failed to submit decision deposit',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
+	async getTreasurySpendsData() {
+		if (!this.api) return null;
+
+		const currentBlockHeight = await this.getBlockHeight();
+
+		const proposals = await this.api?.query?.treasury?.spends?.entries();
+
+		const treasuryPendingSpends: IPayout[] = [];
+
+		proposals?.forEach((proposal) => {
+			const indexData = proposal?.[0]?.toHuman();
+			const spendData = proposal?.[1]?.toHuman();
+
+			if (indexData && spendData) {
+				const expiresAt = Number(((spendData as any)?.expireAt as string)?.split(',')?.join(''));
+				const startsAt = Number(((spendData as any)?.validFrom as string)?.split(',')?.join(''));
+
+				if (new BN(currentBlockHeight).gt(new BN(startsAt)) && new BN(currentBlockHeight).lt(new BN(expiresAt)) && (spendData as any).status === 'Pending') {
+					const payout: IPayout = {
+						treasurySpendIndex: Number(((indexData as any)?.[0] as string)?.split(',')?.join('')),
+						treasurySpendData: {
+							beneficiary:
+								getSubstrateAddressFromAccountId(
+									(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
+								) || '',
+							generalIndex:
+								(
+									(spendData as any)?.assetKind?.V4?.assetId?.interior?.X2?.[1]?.GeneralIndex ||
+									(spendData as any)?.assetKind?.V3?.assetId?.Concrete.interior?.X2?.[1]?.GeneralIndex ||
+									''
+								)
+									.split(',')
+									?.join('') || '',
+							amount: (spendData as any)?.amount?.toString()?.split(',')?.join('') || '',
+							expiresAt: BlockCalculationsService.getDateFromBlockNumber({
+								currentBlockNumber: new BN(currentBlockHeight),
+								targetBlockNumber: new BN(expiresAt),
+								network: this.network
+							})
+						}
+					};
+					treasuryPendingSpends.push(payout);
+				}
+			}
+		});
+
+		return treasuryPendingSpends;
+	}
+
+	async claimTreasuryPayout({ payouts, address, onSuccess, onFailed }: { payouts: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+		if (!this.api || !payouts || payouts.length === 0) return;
+
+		const tx = payouts.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
+
+		const batchTx = tx.length > 1 ? this.api.tx.utility.batch(tx) : tx[0];
+
+		await this.executeTx({
+			tx: batchTx,
+			address,
+			errorMessageFallback: 'Failed to claim treasury payout',
 			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true

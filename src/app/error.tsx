@@ -6,9 +6,14 @@
 
 import { Button } from '@ui/Button';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 function RootError({ error, reset }: { error: Error; reset: () => void }) {
+	useEffect(() => {
+		Sentry.captureException(error);
+	}, [error]);
+
 	return (
 		<section className='flex min-h-[25vh] flex-col items-center justify-center gap-3 rounded-3xl border border-primary_border p-8'>
 			<h2 className='font-semibold'>There was a problem :(</h2>

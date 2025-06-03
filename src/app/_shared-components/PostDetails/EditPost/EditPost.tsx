@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useRef, useState } from 'react';
-import { EProposalType, IPost, IPostListing } from '@/_shared/types';
+import { ENotificationStatus, EProposalType, EReactQueryKeys, IPost, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -11,18 +11,12 @@ import { LocalStorageClientService } from '@/app/_client-services/local_storage_
 import { MarkdownEditor } from '@/app/_shared-components/MarkdownEditor/MarkdownEditor';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { useToast } from '@/hooks/useToast';
+import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 
-function EditPost({
-	postData,
-	onEditPostSuccess,
-	onClose
-}: {
-	postData: IPostListing | IPost;
-	onEditPostSuccess?: (title: string, content: string) => void;
-	onClose?: () => void;
-}) {
+function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClose?: () => void }) {
 	const t = useTranslations();
 	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
 	const [content, setContent] = useState<string | null>(savedContent || postData?.content || null);
@@ -30,6 +24,10 @@ function EditPost({
 	const [isLoading, setIsLoading] = useState(false);
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const { user } = useUser();
+
+	const { toast } = useToast();
+
+	const queryClient = useQueryClient();
 
 	const canEditOffChain = user && user.id === postData.userId;
 
@@ -51,11 +49,30 @@ function EditPost({
 			data: { title, content }
 		});
 
-		if (!error && data) {
-			onEditPostSuccess?.(title, content);
-			LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
-			onClose?.();
+		if (error || !data) {
+			toast({
+				title: t('EditPost.error'),
+				description: t('EditPost.errorDescription'),
+				status: ENotificationStatus.ERROR
+			});
+			setIsLoading(false);
+			return;
 		}
+
+		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index!.toString()], (prev: IPost) => ({
+			...prev,
+			title,
+			content,
+			isDefaultContent: false
+		}));
+
+		LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
+		onClose?.();
+		toast({
+			title: t('EditPost.success'),
+			description: t('EditPost.successDescription'),
+			status: ENotificationStatus.SUCCESS
+		});
 		setIsLoading(false);
 	};
 

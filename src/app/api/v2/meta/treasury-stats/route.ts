@@ -34,11 +34,10 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const fromFormatted = dayjs(from).format('YYYY-MM-DD-HH');
 	const toFormatted = dayjs(to).format('YYYY-MM-DD-HH');
 
-	const skipCache = readonlyHeaders.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = readonlyHeaders.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = readonlyHeaders.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	let treasuryStats = await RedisService.GetTreasuryStats({ network, from: fromFormatted, to: toFormatted });
-	if (treasuryStats && !(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+	if (treasuryStats && !skipCache) {
 		return NextResponse.json(treasuryStats);
 	}
 

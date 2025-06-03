@@ -5,12 +5,23 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { termsAndConditionsContent } from './terms-and-conditions';
+import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 
-export const metadata: Metadata = {
-	title: 'Terms and Conditions - Polkassembly',
-	description: 'Terms and Conditions for Polkassembly'
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Terms and Conditions`,
+		description: 'Explore Polkassembly Terms and Conditions',
+		network,
+		url: `https://${network}.polkassembly.io/terms-and-conditions`,
+		imageAlt: 'Polkassembly Terms and Conditions'
+	});
+}
 
 export default async function TermsAndConditionsPage() {
 	return (

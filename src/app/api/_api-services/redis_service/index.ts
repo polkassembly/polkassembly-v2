@@ -24,17 +24,14 @@ import {
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { ValidatorService } from '@/_shared/_services/validator_service';
-import dayjs from 'dayjs';
-import { OFF_CHAIN_POST_ACTIVE_DAYS } from '@/_shared/_constants/offChainPostActiveDays';
 import {
 	FIVE_MIN,
 	HALF_HOUR_IN_SECONDS,
 	ONE_DAY,
-	ONE_HOUR_IN_SECONDS,
 	REFRESH_TOKEN_LIFE_IN_SECONDS,
 	SIX_HOURS_IN_SECONDS,
-	THREE_DAYS_IN_SECONDS
+	THIRTY_DAYS_IN_SECONDS,
+	THREE_HOURS_IN_SECONDS
 } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -109,7 +106,8 @@ export class RedisService {
 			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
-		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
+		[ERedisKeys.CONTENT_SUMMARY]: ({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): string =>
+			`${ERedisKeys.CONTENT_SUMMARY}-${network}-${proposalType}-${indexOrHash}`,
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
@@ -292,12 +290,11 @@ export class RedisService {
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
 		const isActivePost = data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status);
-		const isActiveOffChainPost = ValidatorService.isValidOffChainProposalType(data.proposalType) && dayjs().diff(dayjs(data.createdAt), 'days') <= OFF_CHAIN_POST_ACTIVE_DAYS;
 
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost || isActiveOffChainPost ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? THREE_HOURS_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
@@ -357,7 +354,7 @@ export class RedisService {
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<IContentSummary | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 		return data ? (deepParseJson(data) as IContentSummary) : null;
 	}
 
@@ -372,11 +369,11 @@ export class RedisService {
 		proposalType: string;
 		data: IContentSummary;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
-		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}` });
+		await this.DeleteKeys({ pattern: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 	}
 
 	// Activity feed caching methods

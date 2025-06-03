@@ -147,7 +147,7 @@ function Navbar() {
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Link
 										className='w-full'
-										href={`/user/id/${user.id}`}
+										href={`/user/${user.username}`}
 									>
 										{t('Profile.profile')}
 									</Link>
@@ -273,7 +273,7 @@ function Navbar() {
 										<DropdownMenuItem>
 											<Link
 												className='w-full'
-												href={`/user/id/${user.id}`}
+												href={`/user/${user.username}`}
 											>
 												{t('Profile.profile')}
 											</Link>

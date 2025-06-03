@@ -5,9 +5,9 @@
 'use client';
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ENotificationStatus, EProposalType, IOffChainPost, IPost, IPostListing } from '@/_shared/types';
+import { ENotificationStatus, EProposalType, EReactQueryKeys, IOffChainPost, IPost, IPostListing } from '@/_shared/types';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useUser } from '@/hooks/useUser';
 import { useState } from 'react';
@@ -16,12 +16,13 @@ import { cn } from '@/lib/utils';
 import NoContextGIF from '@assets/gifs/no-context.gif';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../../Input';
 import { Skeleton } from '../../Skeleton';
 import { Separator } from '../../Separator';
 import { Button } from '../../Button';
 
-function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostListing | IPost; onSuccess: (title: string, content: string) => void; onClose?: () => void }) {
+function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IPost; onClose?: () => void }) {
 	const t = useTranslations();
 
 	const { user } = useUser();
@@ -29,6 +30,8 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [selectedDiscussionPost, setSelectedDiscussionPost] = useState<IOffChainPost>();
+
+	const queryClient = useQueryClient();
 
 	const { toast } = useToast();
 
@@ -43,15 +46,14 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 		return data.items;
 	};
 
-	const { data: userDiscussionPosts, isFetching: isFetchingUserDiscussionPosts } = useQuery({
+	const { data: userDiscussionPosts, isLoading: isFetchingUserDiscussionPosts } = useQuery({
 		queryKey: ['userDiscussionPosts', user?.id],
 		queryFn: fetchAllPostsByUser,
 		enabled: !!user?.id,
 		placeholderData: (previousData) => previousData,
-		staleTime: FIVE_MIN_IN_MILLI,
-		retry: false,
-		retryOnMount: false,
-		refetchOnWindowFocus: false
+		retry: true,
+		retryOnMount: true,
+		refetchOnWindowFocus: true
 	});
 
 	const fetchDiscussionPost = async () => {
@@ -105,13 +107,29 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 	});
 
 	const handleLinkDiscussion = async () => {
-		if (!selectedDiscussionPost || !user || user.id !== selectedDiscussionPost.userId || !selectedDiscussionPost.title || !selectedDiscussionPost.content) return;
+		if (
+			!selectedDiscussionPost ||
+			!ValidatorService.isValidNumber(selectedDiscussionPost.index) ||
+			!user ||
+			user.id !== selectedDiscussionPost.userId ||
+			!selectedDiscussionPost.title ||
+			!selectedDiscussionPost.content ||
+			!ValidatorService.isValidNumber(postData.index)
+		)
+			return;
 
 		setIsLoading(true);
 		const { data, error } = await NextApiClientService.editProposalDetails({
 			proposalType: postData.proposalType,
 			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index!.toString(),
-			data: { title: selectedDiscussionPost.title, content: selectedDiscussionPost.content }
+			data: {
+				title: selectedDiscussionPost.title,
+				content: selectedDiscussionPost.content,
+				linkedPost: {
+					proposalType: EProposalType.DISCUSSION,
+					indexOrHash: selectedDiscussionPost.index!.toString()
+				}
+			}
 		});
 
 		if (error || !data) {
@@ -132,7 +150,14 @@ function LinkDiscussionPost({ postData, onSuccess, onClose }: { postData: IPostL
 			status: ENotificationStatus.SUCCESS
 		});
 
-		onSuccess(selectedDiscussionPost.title, selectedDiscussionPost.content);
+		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index!.toString()], (prev: IPost) => ({
+			...prev,
+			title: selectedDiscussionPost.title,
+			content: selectedDiscussionPost.content,
+			isDefaultContent: false,
+			linkedPost: { ...(postData.linkedPost || prev.linkedPost), proposalType: EProposalType.DISCUSSION, indexOrHash: selectedDiscussionPost?.index?.toString() }
+		}));
+
 		onClose?.();
 	};
 

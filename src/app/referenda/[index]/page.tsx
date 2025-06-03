@@ -8,26 +8,26 @@ import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import React, { Suspense } from 'react';
 import { headers } from 'next/headers';
 import { Metadata } from 'next';
-import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import PollForProposal from '@/app/_shared-components/PollForProposal';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
+
+	const network = await getNetworkFromHeaders();
 	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.REFERENDUM_V2, indexOrHash: index });
 
-	// Default description and title
-	let { description, title } = OPENGRAPH_METADATA;
-
-	// Use post title in description if available
-	if (data) {
-		title = `Polkassembly - Referendum #${index}`;
-		description = `Referendum #${index}: ${data.contentSummary?.postSummary ? data.contentSummary.postSummary : data.title}`;
-	}
-
-	return {
-		title,
-		description
-	};
+	return getGeneratedContentMetadata({
+		title: `Polkassembly - Referendum #${index}`,
+		description: data
+			? `Referendum #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			: `Explore Polkassembly Referendum #${index}`,
+		network,
+		url: `https://${network}.polkassembly.io/referenda/${index}`,
+		imageAlt: `Polkassembly Referendum #${index}`
+	});
 }
 
 async function Referenda({ params, searchParams }: { params: Promise<{ index: string }>; searchParams: Promise<{ created?: string }> }) {

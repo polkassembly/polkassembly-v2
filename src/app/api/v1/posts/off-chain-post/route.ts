@@ -17,7 +17,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const zodQuerySchema = z.object({
 		postId: z.string(),
 		proposalType: z.nativeEnum(EV1ProposalType).transform(v1ToV2ProposalType).default(EV1ProposalType.DISCUSSIONS),
-		noComments: z.coerce.boolean().optional().default(true)
+		noComments: z.coerce.boolean().optional().default(false)
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key, value]) => [key, value]));

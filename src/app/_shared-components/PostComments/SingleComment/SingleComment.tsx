@@ -21,6 +21,8 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { EVM_NETWORKS } from '@/_shared/_constants/evmNetworks';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -106,6 +108,11 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		return null;
 	}
 
+	const network = getCurrentNetwork();
+	const userAddresses = !EVM_NETWORKS.includes(network) ? comment.user.addresses.filter((address) => !address.startsWith('0x')) : comment.user.addresses;
+
+	const addressToDisplay = userAddresses?.[0] || comment.user.addresses?.[0];
+
 	return (
 		<div className={classes.wrapper}>
 			<Dialog
@@ -134,10 +141,10 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 				</DialogContent>
 			</Dialog>
 			<div>
-				{comment.user.addresses[0] ? (
+				{addressToDisplay ? (
 					<Identicon
 						size={30}
-						value={comment.user.addresses[0]}
+						value={addressToDisplay}
 						theme='polkadot'
 					/>
 				) : comment.user.profileDetails?.image ? (
@@ -161,9 +168,9 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 			<div className={classes.innerWrapper}>
 				<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
 					<span className={classes.username}>
-						{comment.user.addresses[0] ? (
+						{addressToDisplay ? (
 							<Address
-								address={comment.user.addresses[0]}
+								address={addressToDisplay}
 								showIdenticon={false}
 							/>
 						) : (

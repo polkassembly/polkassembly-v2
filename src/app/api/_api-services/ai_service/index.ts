@@ -7,6 +7,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { NON_SPAM_POSTS, SPAM_POSTS } from '@/_shared/_constants/spamDetectionExamples';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
@@ -45,6 +46,8 @@ export class AIService {
     - Use technical/blockchain terminology appropriately.
     - Keep information factual and objective.
     - Give priority to other sections over the user provided description for factual information like proposer, amounts, beneficiaries.
+		- Give strict priority to the '### Beneficiaries' section over the '### Technical Preimage Arguments' section.
+		- The '### Technical Preimage Arguments' section should only be used if the '### Beneficiaries' section is not available because the Technical Preimage Arguments do not contain formatted values.
     `,
 		COMMENTS_SUMMARY: `
     You are a helpful assistant that summarizes discussions on Polkadot governance proposals.
@@ -72,7 +75,7 @@ export class AIService {
     You are a helpful assistant that evaluates Polkadot governance content for spam and scam.
     Return ONLY the word 'true' if the content matches any spam criteria, or ONLY the word 'false' if it's legitimate content.
 
-    Check for:
+    CHECK FOR:
     - Irrelevant promotional content
     - Off-topic discussions
     - Malicious links
@@ -88,6 +91,14 @@ export class AIService {
 		- Illegal content
 		- known spoof/fake/scam news websites
 		- Known fake/scam news social media accounts
+		- Airdrop and giveaway promises with no valid backing
+
+		EXAMPLES FOR SPAM POSTS:
+		${SPAM_POSTS.join('\n\n')}
+
+		EXAMPLES FOR NON-SPAM POSTS:
+		${NON_SPAM_POSTS.join('\n\n')}
+
 		
     STRICT RULES:
     - Consider the technical nature of governance and funding discussions when evaluating.
@@ -150,6 +161,13 @@ export class AIService {
 					.split('\n')
 					.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
 					.join('\n');
+				// Ensure the response starts with the 'Main objective/purpose' bullet point
+				const mainObjectiveIndex = cleanedResponse.toLowerCase().indexOf('main objective/purpose');
+				if (mainObjectiveIndex !== -1) {
+					// Find the start of the bullet point containing 'Main objective/purpose'
+					const before = cleanedResponse.toLowerCase().lastIndexOf('\n', mainObjectiveIndex);
+					cleanedResponse = cleanedResponse.substring(before === -1 ? 0 : before + 1);
+				}
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
 				// Extract just the single word response
 				const match = cleanedResponse.match(/\b(against|slightly_against|neutral|slightly_for|for)\b/i);
@@ -209,7 +227,7 @@ export class AIService {
 		}
 
 		if (additionalData.preimageArgs && Object.keys(additionalData.preimageArgs).length) {
-			fullPrompt += `### Technical Preimage Args:\n${JSON.stringify(additionalData.preimageArgs)}\n\n`;
+			fullPrompt += `### Technical Preimage Arguments:\n${JSON.stringify(additionalData.preimageArgs)}\n\n`;
 		}
 
 		if (additionalData.beneficiaries?.length) {
@@ -304,8 +322,6 @@ export class AIService {
 			return null;
 		}
 
-		console.log('spam check response: ', response);
-
 		return result.toLowerCase() === 'true';
 	}
 
@@ -329,7 +345,15 @@ export class AIService {
 		return sentiment as ECommentSentiment;
 	}
 
-	static async UpdatePostSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IContentSummary | null> {
+	static async GenerateAndUpdatePostSummary({
+		network,
+		proposalType,
+		indexOrHash
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+	}): Promise<IContentSummary | null> {
 		console.log('Updating post summary', { network, proposalType, indexOrHash });
 
 		const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType, getDefaultContent: false });
@@ -345,11 +369,15 @@ export class AIService {
 				mdContent: offChainPostData.content,
 				title: offChainPostData.title
 			});
+
+			console.log(`SPAM DETECTED for ${proposalType} post ${offChainPostData.index}`);
 		}
 
 		// if post is spam, no need to generate post summary
 		if (isSpam) {
 			// TODO: send appropriate notifications if content is spam
+
+			console.log(`SPAM DETECTED and DELETING for ${proposalType} post ${offChainPostData.index}`);
 
 			await OffChainDbService.DeleteOffChainPost({ network, proposalType, index: offChainPostData.index! });
 
@@ -359,7 +387,7 @@ export class AIService {
 				indexOrHash,
 				proposalType,
 				isSpam: true,
-				postSummary: 'This post is spam/scam/fake news',
+				postSummary: 'This post is likely spam/scam/fake news',
 				createdAt: existingContentSummary?.createdAt || new Date(),
 				updatedAt: new Date()
 			};
@@ -367,6 +395,7 @@ export class AIService {
 			await OffChainDbService.UpdateContentSummary(contentSummary);
 
 			// Invalidate caches
+			await RedisService.DeletePostData({ network, indexOrHash, proposalType });
 			await RedisService.DeletePostsListing({ network, proposalType });
 			await RedisService.DeleteActivityFeed({ network });
 			await RedisService.DeleteOverviewPageData({ network });

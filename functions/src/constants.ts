@@ -5,10 +5,12 @@
 import { ENetwork } from './types';
 
 export const TREASURY_STATS_NETWORKS = [ENetwork.POLKADOT];
-export const CACHE_REFRESH_NETWORKS = [ENetwork.POLKADOT];
+export const CACHE_REFRESH_NETWORKS = [ENetwork.POLKADOT, ENetwork.PASEO];
 
 export const ERROR_MESSAGES = {
 	TOOLS_PASSPHRASE_NOT_DEFINED: 'TOOLS_PASSPHRASE is not defined in environment variables',
 	INVALID_TOOLS_PASSPHRASE: 'Invalid tools password, please check the tools password in environment variables',
 	TOOLS_PASSPHRASE_REQUIRED: 'Tools password is required'
 };
+
+export const ALGOLIA_MAX_RECORD_SIZE = 100000; // 100KB limit in bytes

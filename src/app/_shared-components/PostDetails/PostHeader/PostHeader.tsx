@@ -62,7 +62,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				href={
 					postData.onChainInfo?.origin
 						? `/${postData.onChainInfo?.origin?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
-						: `/${postData.proposalType.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
+						: `/${postData.proposalType?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
 				}
 				className='mb-4 flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
 			>
@@ -187,7 +187,10 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 												key={beneficiary.amount}
 												className='flex flex-wrap items-center gap-x-1 gap-y-2'
 											>
-												<Address address={beneficiary.address} />
+												<Address
+													disableTooltip
+													address={beneficiary.address}
+												/>
 												<span className='text-xs text-wallet_btn_text'>
 													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 												</span>

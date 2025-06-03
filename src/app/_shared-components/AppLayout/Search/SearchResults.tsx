@@ -82,7 +82,7 @@ function PostHit({ hit }: { hit: Post }) {
 				</div>
 				<h2 className='text-lg font-medium'>
 					<p className='text-sm font-medium'>
-						#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
+						#{hit.id} {hit.title?.length > 90 ? `${hit.title?.slice(0, 90)}...` : hit?.title}
 					</p>
 				</h2>
 				<div className={styles.post_content}>

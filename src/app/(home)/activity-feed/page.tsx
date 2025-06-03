@@ -12,7 +12,24 @@ import { z } from 'zod';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import ActivityFeed from './Components/ActivityFeed';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Activity Feed`,
+		description: 'Explore the latest activity on Polkassembly',
+		url: `https://${network}.polkassembly.io/activity-feed`,
+		imageAlt: 'Polkassembly Activity Feed',
+		network
+	});
+}
 
 const zodParamsSchema = z.object({
 	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.EXPLORE)
