@@ -16,7 +16,6 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
-import { getNetworkUrl } from '@/_shared/_utils/getNetworkUrl';
 import { Separator } from '../Separator';
 
 // Component for displaying a single asset row
@@ -282,7 +281,7 @@ function BountiesSection({ data, network, currentTokenPrice, title }: { data: IT
 					/>
 				)}
 				<Link
-					href={getNetworkUrl(network, '/bounty-dashboard')}
+					href={`https://${network}.polkassembly.io/bounty-dashboard`}
 					className='flex items-center gap-1 text-xs text-text_pink'
 					target='_blank'
 				>
@@ -423,20 +422,20 @@ function LoansSection({
 	network: ENetwork;
 	currentTokenPrice: string;
 	loanAmounts: {
-		centrifuge: {
+		centrifuge?: {
 			usdc: string;
 			link?: string;
 		};
-		bifrost: {
-			chainToken: string;
+		bifrost?: {
+			nativeToken: string;
 			link?: string;
 		};
-		pendulum: {
-			chainToken: string;
+		pendulum?: {
+			nativeToken: string;
 			link?: string;
 		};
-		hydration: {
-			chainToken?: string;
+		hydration?: {
+			nativeToken?: string;
 			link?: string;
 		};
 	} | null;
@@ -448,17 +447,17 @@ function LoansSection({
 				~ $
 				{formatedAmountWithUSD({
 					amountsDetails: [
-						{ amount: loanAmounts?.bifrost?.chainToken || null, asset: null },
+						{ amount: loanAmounts?.bifrost?.nativeToken || null, asset: null },
 						{ amount: loanAmounts?.centrifuge?.usdc || null, asset: EAssets.USDC },
-						{ amount: loanAmounts?.pendulum?.chainToken || null, asset: null },
-						{ amount: loanAmounts?.hydration?.chainToken || null, asset: null }
+						{ amount: loanAmounts?.pendulum?.nativeToken || null, asset: null },
+						{ amount: loanAmounts?.hydration?.nativeToken || null, asset: null }
 					],
 					currentTokenPrice,
 					network
 				})}
 			</span>
 			<div className='flex flex-wrap gap-2'>
-				{loanAmounts?.bifrost?.chainToken && loanAmounts.bifrost.chainToken.trim() !== '' && (
+				{loanAmounts?.bifrost?.nativeToken && loanAmounts.bifrost.nativeToken.trim() !== '' && (
 					<div className='flex flex-wrap gap-2'>
 						<Link
 							href={loanAmounts?.bifrost?.link || ''}
@@ -468,7 +467,7 @@ function LoansSection({
 							Bifrost <ExternalLink className='h-4 w-4' />
 						</Link>
 						<AssetRow
-							amount={loanAmounts.bifrost.chainToken}
+							amount={loanAmounts.bifrost.nativeToken}
 							network={network}
 						/>
 					</div>
@@ -489,7 +488,7 @@ function LoansSection({
 						/>
 					</div>
 				)}
-				{loanAmounts?.pendulum?.chainToken && loanAmounts.pendulum.chainToken.trim() !== '' && (
+				{loanAmounts?.pendulum?.nativeToken && loanAmounts.pendulum.nativeToken.trim() !== '' && (
 					<div className='flex gap-2'>
 						<Link
 							href={loanAmounts?.pendulum?.link || ''}
@@ -499,12 +498,12 @@ function LoansSection({
 							Pendulum <ExternalLink className='h-4 w-4' />
 						</Link>
 						<AssetRow
-							amount={loanAmounts.pendulum.chainToken}
+							amount={loanAmounts.pendulum.nativeToken}
 							network={network}
 						/>
 					</div>
 				)}
-				{loanAmounts?.hydration?.chainToken && loanAmounts.hydration.chainToken.trim() !== '' && (
+				{loanAmounts?.hydration?.nativeToken && loanAmounts.hydration.nativeToken.trim() !== '' && (
 					<div className='flex gap-2'>
 						<Link
 							href={loanAmounts?.hydration?.link || ''}
@@ -514,7 +513,7 @@ function LoansSection({
 							Hydration <ExternalLink className='h-4 w-4' />
 						</Link>
 						<AssetRow
-							amount={loanAmounts.hydration.chainToken}
+							amount={loanAmounts.hydration.nativeToken}
 							network={network}
 						/>
 					</div>
