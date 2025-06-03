@@ -1296,6 +1296,11 @@
 		"voting": "Voting",
 		"totalProposals": "Total Proposals",
 		"approvedProposals": "Approved Proposals",
-		"monitoredTracks": "Monitored Tracks"
+		"monitoredTracks": "Monitored Tracks",
+		"referendumCount": "Referendum Count",
+		"referendumCountByStatus": "Referendum Count by Status",
+		"referendumCountByCategory": "Referendum Count by Category",
+		"monthlySpend": "Monthly Spend",
+		"averageTurnoutPercentage": "Average Turnout Percentage"
 	}
 }

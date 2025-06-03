@@ -61,7 +61,7 @@ function AnalyticsReferendumOutcome() {
 	if (isLoading) {
 		return (
 			<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
-				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumOutcome')}</h3>
+				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByStatus')}</h3>
 				<div className='flex h-[200px] items-center justify-center'>
 					<Skeleton className='h-full w-full' />
 				</div>
@@ -72,7 +72,7 @@ function AnalyticsReferendumOutcome() {
 	return (
 		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
 			<div className='flex items-center justify-between'>
-				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumOutcome')}</h3>
+				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByStatus')}</h3>
 				<div className='relative'>
 					<select
 						className='appearance-none rounded-md border border-border_grey bg-transparent px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'

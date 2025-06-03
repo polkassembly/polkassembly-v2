@@ -1261,6 +1261,11 @@
 		"voting": "Votación",
 		"totalProposals": "Propuestas Totales",
 		"approvedProposals": "Propuestas Aprobadas",
-		"monitoredTracks": "Tracks Monitoreados"
+		"monitoredTracks": "Tracks Monitoreados",
+		"referendumCount": "Cantidad de Referendos",
+		"referendumCountByStatus": "Cantidad de Referendos por Estado",
+		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
+		"monthlySpend": "Gasto Mensual",
+		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	}
 }

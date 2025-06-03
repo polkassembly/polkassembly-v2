@@ -63,7 +63,7 @@ function AnalyticsReferendumCount() {
 	if (isLoading) {
 		return (
 			<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
-				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCount')}</h3>
+				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByCategory')}</h3>
 				<div className='flex flex-col gap-2'>
 					<Skeleton className='h-8 w-full' />
 					<Skeleton className='h-8 w-full' />
@@ -75,7 +75,7 @@ function AnalyticsReferendumCount() {
 
 	return (
 		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
-			<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCount')}</h3>
+			<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByCategory')}</h3>
 			<div className='flex flex-col items-center justify-center gap-10 sm:flex-row sm:justify-around'>
 				<PieChart
 					data={chartData}

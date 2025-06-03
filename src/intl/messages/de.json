@@ -1260,6 +1260,11 @@
 		"voting": "Abstimmung",
 		"totalProposals": "Gesamte Vorschläge",
 		"approvedProposals": "Genehmigte Vorschläge",
-		"monitoredTracks": "Überwachte Tracks"
+		"monitoredTracks": "Überwachte Tracks",
+		"referendumCount": "Referendum-Anzahl",
+		"referendumCountByStatus": "Referendum-Anzahl nach Status",
+		"referendumCountByCategory": "Referendum-Anzahl nach Kategorie",
+		"monthlySpend": "Monatliche Ausgaben",
+		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
 	}
 }
