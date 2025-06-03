@@ -49,7 +49,7 @@ function AppQrLogin() {
 				<div className='relative max-w-max rounded-lg bg-white p-2'>
 					<QrCode
 						value={JSON.stringify(qrSession)}
-						size={160}
+						size={200}
 					/>
 				</div>
 			)}
