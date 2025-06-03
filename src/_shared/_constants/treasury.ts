@@ -20,7 +20,7 @@ interface NetworkTreasuryConfig {
 	mythosParachainId: string;
 	hydrationRpc: string;
 	hydrationAddresses: string[];
-	hydrationChainTokenAssetId: number;
+	hydrationNativeTokenAssetId: number;
 	fellowshipAddress: {
 		treasury: string;
 		salary: string;
@@ -29,20 +29,20 @@ interface NetworkTreasuryConfig {
 	hydrationUsdtAssetId: number;
 	ambassadorAddress: string;
 	loanAmounts: {
-		centrifuge: {
+		centrifuge?: {
 			usdc: string;
 			link?: string;
 		};
-		bifrost: {
-			chainToken: string;
+		bifrost?: {
+			nativeToken: string;
 			link?: string;
 		};
-		pendulum: {
-			chainToken: string;
+		pendulum?: {
+			nativeToken: string;
 			link?: string;
 		};
-		hydration: {
-			chainToken?: string;
+		hydration?: {
+			nativeToken?: string;
 			link?: string;
 		};
 	};
@@ -72,7 +72,7 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			'7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY',
 			'7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
 		],
-		hydrationChainTokenAssetId: 5,
+		hydrationNativeTokenAssetId: 5,
 		fellowshipAddress: {
 			treasury: '16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos',
 			salary: '13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS'
@@ -82,15 +82,15 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		ambassadorAddress: '13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX',
 		loanAmounts: {
 			bifrost: {
-				chainToken: '5000000000000000',
+				nativeToken: '5000000000000000',
 				link: 'https://polkadot.polkassembly.io/referenda/432'
 			},
 			pendulum: {
-				chainToken: '500000000000000',
+				nativeToken: '500000000000000',
 				link: 'https://polkadot.polkassembly.io/referenda/748'
 			},
 			hydration: {
-				chainToken: '10000000000000000',
+				nativeToken: '10000000000000000',
 				link: 'https://polkadot.polkassembly.io/referenda/560'
 			},
 			centrifuge: {
@@ -115,18 +115,9 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			salary: ''
 		},
 		loanAmounts: {
-			bifrost: {
-				chainToken: ''
-			},
-			pendulum: {
-				chainToken: ''
-			},
 			hydration: {
-				chainToken: '33333000000000000',
+				nativeToken: '33333000000000000',
 				link: 'https://kusama.polkassembly.io/referenda/490'
-			},
-			centrifuge: {
-				usdc: ''
 			}
 		},
 		burnPercentage: {
@@ -136,7 +127,7 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		spendPeriodInBlocks: new BN(86400),
 		hydrationRpc: '',
 		hydrationAddresses: [],
-		hydrationChainTokenAssetId: 0,
+		hydrationNativeTokenAssetId: 0,
 		hydrationUsdcAssetId: 0,
 		hydrationUsdtAssetId: 0,
 		assetHubFellowshipAddress: '',
