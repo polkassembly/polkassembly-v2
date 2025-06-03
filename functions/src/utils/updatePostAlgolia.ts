@@ -10,6 +10,14 @@ import { markdownToPlainText } from './markdownToText';
 import { IAlgoliaPost } from '../types';
 import { ALGOLIA_MAX_RECORD_SIZE } from '../constants';
 
+// Interface for the API response containing post details
+interface IPostApiResponse {
+	onChainInfo?: {
+		proposer: string;
+		origin: string;
+	};
+}
+
 // Function to calculate the size of an object in bytes
 function getObjectSizeInBytes(obj: Record<string, unknown>): number {
 	return new TextEncoder().encode(JSON.stringify(obj)).length;
@@ -63,6 +71,29 @@ export const updatePostAlgolia = async (post?: DocumentData): Promise<void> => {
 
 	const tags = post.tags ? post.tags.map((tag: string | { value: string }) => (typeof tag === 'string' ? tag : tag.value)) : [];
 
+	// Fetch post details from API to get proposer and origin
+	let proposer = '';
+	let origin = '';
+
+	if (post.proposalType && post.index !== undefined && post.network) {
+		try {
+			const apiUrl = `https://${post.network}.polkassembly.io/api/v2/${post.proposalType}/${post.index}`;
+			const response = await fetch(apiUrl);
+
+			if (response.ok) {
+				const postData: IPostApiResponse = await response.json();
+				if (postData.onChainInfo) {
+					proposer = postData.onChainInfo.proposer || '';
+					origin = postData.onChainInfo.origin || '';
+				}
+			} else {
+				logger.warn(`Failed to fetch post details from API for ${post.proposalType}/${post.index}: ${response.status}`);
+			}
+		} catch (error) {
+			logger.error(`Error fetching post details from API for ${post.proposalType}/${post.index}:`, error);
+		}
+	}
+
 	const algoliaPost: IAlgoliaPost = {
 		objectID: post.id,
 		title: post.title,
@@ -78,7 +109,9 @@ export const updatePostAlgolia = async (post?: DocumentData): Promise<void> => {
 		hash: post.hash,
 		index: post.index,
 		parsedContent,
-		titleAndContentHash: ''
+		titleAndContentHash: '',
+		...(proposer && { proposer }),
+		...(origin && { origin })
 	};
 
 	// Truncate content if the object is too large for Algolia

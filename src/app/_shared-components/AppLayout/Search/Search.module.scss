@@ -47,11 +47,11 @@
 }
 
 .radio_label {
-	@apply flex cursor-pointer flex-row items-center gap-1;
+	@apply flex cursor-pointer flex-row items-center gap-1 p-2;
 }
 
 .radio_label_active {
-	@apply rounded-full bg-progress_pink_bg p-2;
+	@apply rounded-full bg-progress_pink_bg;
 }
 
 .date_filter_label {
