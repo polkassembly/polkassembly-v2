@@ -134,7 +134,8 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 							key='username'
 							rules={{
 								validate: (value) => {
-									if (!ValidatorService.isValidUsername(value) && step === ESignupSteps.USERNAME) return 'Invalid username';
+									if (step !== ESignupSteps.USERNAME) return true;
+									if (!ValidatorService.isValidUsername(value)) return 'Invalid username';
 									return true;
 								},
 								required: step === ESignupSteps.USERNAME
@@ -163,7 +164,8 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 							key='email'
 							rules={{
 								validate: (value) => {
-									if (!ValidatorService.isValidEmail(value) && step === ESignupSteps.USERNAME) return 'Invalid Email';
+									if (step !== ESignupSteps.USERNAME) return true;
+									if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
 									return true;
 								},
 								required: step === ESignupSteps.USERNAME
@@ -193,7 +195,8 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 							key='password'
 							rules={{
 								validate: (value) => {
-									if (!ValidatorService.isValidPassword(value) && step === ESignupSteps.PASSWORD) return 'Invalid Password';
+									if (step !== ESignupSteps.PASSWORD) return true;
+									if (!ValidatorService.isValidPassword(value)) return 'Invalid Password';
 									return true;
 								},
 								required: step === ESignupSteps.PASSWORD
@@ -222,7 +225,8 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 							rules={{
 								required: step === ESignupSteps.PASSWORD,
 								validate: (value, allFields) => {
-									if (value !== allFields.password && step === ESignupSteps.PASSWORD) return "Password don't match";
+									if (step !== ESignupSteps.PASSWORD) return true;
+									if (value !== allFields.password) return "Password don't match";
 									return true;
 								}
 							}}
