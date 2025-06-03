@@ -1045,7 +1045,7 @@ export interface ITreasuryStats {
 	createdAt: Date;
 	updatedAt: Date;
 	relayChain: {
-		chainToken?: string;
+		nativeToken?: string;
 		myth?: string;
 		nextBurn?: string;
 		nextSpendAt?: Date;
@@ -1056,28 +1056,28 @@ export interface ITreasuryStats {
 		[key: string]: string | undefined;
 	};
 	assetHub?: {
-		chainToken?: string;
+		nativeToken?: string;
 		usdc?: string;
 		usdt?: string;
 		[key: string]: string | undefined;
 	};
 	hydration?: {
-		chainToken?: string;
+		nativeToken?: string;
 		usdc?: string;
 		usdt?: string;
 		[key: string]: string | undefined;
 	};
 	bounties?: {
-		chainToken?: string;
+		nativeToken?: string;
 		[key: string]: string | undefined;
 	};
 	fellowship?: {
-		chainToken?: string;
+		nativeToken?: string;
 		usdt?: string;
 		[key: string]: string | undefined;
 	};
 	total?: {
-		totalChainToken?: string;
+		totalNativeToken?: string;
 		totalUsdc?: string;
 		totalUsdt?: string;
 		totalMyth?: string;
