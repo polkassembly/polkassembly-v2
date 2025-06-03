@@ -52,7 +52,8 @@ import {
 	IPostLink,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	ITurnoutPercentageData
+	ITurnoutPercentageData,
+	IGovAnalyticsDelegationStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1073,6 +1074,11 @@ export class NextApiClientService {
 			method,
 			url
 		});
+	}
+
+	static async getTrackDelegationAnalyticsStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['track-delegation'] });
+		return this.nextApiClientFetch<IGovAnalyticsDelegationStats[]>({ url, method });
 	}
 
 	static async fetchOverviewData(): Promise<{
