@@ -1092,4 +1092,16 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA = `
+		query GetAllTrackLevelAnalyticsDelegationData {
+			votingDelegations(where: { endedAtBlock_isNull: true, type_eq: OpenGov }) {
+				from
+				to
+				balance
+				lockPeriod
+				track
+			}
+		}
+	`;
 }

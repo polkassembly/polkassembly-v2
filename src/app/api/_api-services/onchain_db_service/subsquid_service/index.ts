@@ -25,7 +25,8 @@ import {
 	IVoteCurve,
 	IVoteData,
 	IVoteMetrics,
-	ITurnoutPercentageData
+	ITurnoutPercentageData,
+	IGovAnalyticsDelegationStats
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -39,15 +40,11 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { TRACK_GROUPS } from '@/_shared/_constants/trackGroups';
+import { getTrackNameFromId } from '@/_shared/_utils/getTrackNameFromId';
 import { SubsquidUtils } from './subsquidUtils';
 import { SubsquidQueries } from './subsquidQueries';
 
 const VOTING_POWER_DIVISOR = new BN('10');
-
-const getTrackName = ({ trackId, network }: { trackId: number; network: ENetwork }) => {
-	const trackName = Object.entries(NETWORKS_DETAILS[`${network}`].trackDetails).find(([, details]) => details?.trackId === trackId)?.[1]?.name;
-	return trackName?.replace(/_/g, ' ');
-};
 
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -1210,7 +1207,7 @@ export class SubsquidService extends SubsquidUtils {
 			// Calculate average support percentages and convert track numbers to track names using Object.entries and reduce
 			const averageSupportPercentages = Object.entries(trackSupportPercentages as Record<string, TrackData>).reduce<Record<string, number>>((acc, [trackNumber, data]) => {
 				if (data.count > 0) {
-					const trackName = getTrackName({ trackId: parseInt(trackNumber, 10), network });
+					const trackName = getTrackNameFromId({ trackId: parseInt(trackNumber, 10), network });
 					if (trackName) {
 						acc[trackName] = Number((data.totalSupport / data.count).toFixed(16));
 					}
@@ -1226,5 +1223,73 @@ export class SubsquidService extends SubsquidUtils {
 			console.error('Error in GetTurnoutPercentageData:', error);
 			throw error;
 		}
+	}
+
+	static async GetTrackDelegationAnalyticsStats({ network }: { network: ENetwork }): Promise<Record<string, IGovAnalyticsDelegationStats>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(SubsquidQueries.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching track delegation analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching track delegation analytics stats from Subsquid');
+		}
+
+		const trackStats: Record<
+			string,
+			{
+				totalCapital: string;
+				totalVotesBalance: string;
+				totalDelegates: number;
+				totalDelegators: number;
+				delegateesData: Record<string, { count: number }>;
+				delegatorsData: Record<string, { count: number }>;
+			}
+		> = {};
+
+		if (subsquidData.votingDelegations?.length) {
+			subsquidData.votingDelegations.forEach((delegation: { lockPeriod: number; balance: string; from: string; to: string; track: number }) => {
+				const { track } = delegation;
+				const bnBalance = new BN(delegation.balance);
+				const bnConviction = new BN(delegation.lockPeriod || 1);
+				const vote = delegation.lockPeriod ? bnBalance.mul(bnConviction) : bnBalance.div(VOTING_POWER_DIVISOR);
+
+				if (!trackStats[track]) {
+					trackStats[track] = {
+						totalCapital: '0',
+						totalDelegates: 0,
+						totalDelegators: 0,
+						totalVotesBalance: '0',
+						delegateesData: {},
+						delegatorsData: {}
+					};
+				}
+
+				trackStats[track].totalVotesBalance = new BN(trackStats[track].totalVotesBalance).add(vote).toString();
+				trackStats[track].totalCapital = new BN(trackStats[track].totalCapital).add(bnBalance).toString();
+
+				// Handle delegates
+				if (!trackStats[track].delegateesData[delegation.to]) {
+					trackStats[track].delegateesData[delegation.to] = {
+						count: 1
+					};
+					trackStats[track].totalDelegates += 1;
+				} else {
+					trackStats[track].delegateesData[delegation.to].count += 1;
+				}
+
+				// Handle delegators
+				if (!trackStats[track].delegatorsData[delegation.from]) {
+					trackStats[track].delegatorsData[delegation.from] = {
+						count: 1
+					};
+					trackStats[track].totalDelegators += 1;
+				} else {
+					trackStats[track].delegatorsData[delegation.from].count += 1;
+				}
+			});
+		}
+
+		return trackStats;
 	}
 }

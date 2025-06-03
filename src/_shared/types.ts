@@ -1316,11 +1316,9 @@ export interface IPayout {
 	};
 }
 
-export interface ITrackDelegationAnalytics {
+export interface IGovAnalyticsDelegationStats {
 	totalCapital: string;
 	totalVotesBalance: string;
 	totalDelegates: number;
 	totalDelegators: number;
-	delegateesData: Record<string, { count: number }>;
-	delegatorsData: Record<string, { count: number }>;
 }
