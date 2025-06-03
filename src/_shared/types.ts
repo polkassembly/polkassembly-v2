@@ -1232,6 +1232,10 @@ export interface IGovAnalyticsReferendumOutcome {
 	cancelled: number;
 }
 
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
 export interface ITrackAnalyticsDelegationsList {
 	[key: string]: {
 		count: number;
@@ -1310,4 +1314,13 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+
+export interface ITrackDelegationAnalytics {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+	delegateesData: Record<string, { count: number }>;
+	delegatorsData: Record<string, { count: number }>;
 }

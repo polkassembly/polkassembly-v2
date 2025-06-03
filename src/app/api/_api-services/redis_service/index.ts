@@ -21,7 +21,8 @@ import {
 	ITrackAnalyticsStats,
 	ITreasuryStats,
 	IGovAnalyticsStats,
-	IGovAnalyticsReferendumOutcome
+	IGovAnalyticsReferendumOutcome,
+	ITurnoutPercentageData
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -655,5 +656,16 @@ export class RedisService {
 	static async SetTrackLevelProposalsAnalytics({ network, data }: { network: ENetwork; data: { data: Record<number, number>; totalProposals: number } }) {
 		const key = `track_level_proposals_analytics:${network}`;
 		await this.client.set(key, JSON.stringify(data), 'EX', SIX_HOURS_IN_SECONDS);
+	}
+
+	static async GetTurnoutPercentageAnalytics(network: ENetwork): Promise<ITurnoutPercentageData | null> {
+		const key = `turnout_percentage_analytics:${network}`;
+		const cachedData = await this.client.get(key);
+		return cachedData ? JSON.parse(cachedData) : null;
+	}
+
+	static async SetTurnoutPercentageAnalytics({ network, data }: { network: ENetwork; data: ITurnoutPercentageData }): Promise<void> {
+		const key = `turnout_percentage_analytics:${network}`;
+		await this.client.set(key, JSON.stringify(data), 'EX', 21600); // Cache for 6 hours
 	}
 }

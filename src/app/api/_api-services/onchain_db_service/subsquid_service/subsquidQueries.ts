@@ -1081,4 +1081,15 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_TURNOUT_PERCENTAGE_DATA = `
+		query GetTurnoutPercentageData {
+			proposals(where: {type_eq: ReferendumV2}, orderBy: createdAt_DESC) {
+				trackNumber
+				tally {
+					support
+				}
+			}
+		}
+	`;
 }
