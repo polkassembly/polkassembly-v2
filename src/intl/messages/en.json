@@ -1300,7 +1300,7 @@
 		"referendumCount": "Referendum Count",
 		"referendumCountByStatus": "Referendum Count by Status",
 		"referendumCountByCategory": "Referendum Count by Category",
-		"monthlySpend": "Monthly Spend",
+		"monthlySpend": "Monthly DOT Spent",
 		"averageTurnoutPercentage": "Average Turnout Percentage"
 	}
 }

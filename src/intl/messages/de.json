@@ -1264,7 +1264,7 @@
 		"referendumCount": "Referendum-Anzahl",
 		"referendumCountByStatus": "Referendum-Anzahl nach Status",
 		"referendumCountByCategory": "Referendum-Anzahl nach Kategorie",
-		"monthlySpend": "Monatliche Ausgaben",
+		"monthlySpend": "Monatliche DOT-Ausgaben",
 		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
 	}
 }

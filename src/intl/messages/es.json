@@ -1265,7 +1265,7 @@
 		"referendumCount": "Cantidad de Referendos",
 		"referendumCountByStatus": "Cantidad de Referendos por Estado",
 		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
-		"monthlySpend": "Gasto Mensual",
+		"monthlySpend": "Gasto Mensual de DOT",
 		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	}
 }

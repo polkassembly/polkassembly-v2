@@ -1264,7 +1264,7 @@
 		"referendumCount": "レファレンダム数",
 		"referendumCountByStatus": "レファレンダム数（ステータス別）",
 		"referendumCountByCategory": "レファレンダム数（カテゴリ別）",
-		"monthlySpend": "月間支出",
+		"monthlySpend": "月間DOT支出",
 		"averageTurnoutPercentage": "平均投票率"
 	}
 }
