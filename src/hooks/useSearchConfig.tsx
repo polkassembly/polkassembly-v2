@@ -19,18 +19,18 @@ export const useSearchConfig = ({ network, activeIndex }: { network: string; act
 
 		switch (activeIndex) {
 			case ESearchType.POSTS:
-				return `${baseFilter}(NOT post_type:discussions AND NOT post_type:grants)`;
+				return `${baseFilter}(NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS)`;
 			case ESearchType.DISCUSSIONS:
-				return `${baseFilter}(post_type:discussions OR post_type:grants)`;
+				return `${baseFilter}(proposalType:DISCUSSION OR proposalType:GRANTS)`;
 			default:
 				return '';
 		}
 	}, [activeIndex, networkFilterQuery]);
 
 	const indexName = useMemo(() => {
-		if (activeIndex === ESearchType.USERS) return 'polkassembly_users';
+		if (activeIndex === ESearchType.USERS) return 'polkassembly_v2_users';
 
-		return 'polkassembly_posts';
+		return 'polkassembly_v2_posts';
 	}, [activeIndex]);
 
 	return {
