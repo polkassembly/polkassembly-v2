@@ -721,7 +721,8 @@
 			"fellowship": "Fellowship",
 			"council": "Consejo",
 			"democracy": "Democracia",
-			"whitelist": "Lista blanca"
+			"whitelist": "Lista blanca",
+			"technicalcommittee": "Comité Técnico"
 		},
 		"please": "Por favor",
 		"login": "Iniciar sesión",

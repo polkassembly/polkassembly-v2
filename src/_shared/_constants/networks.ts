@@ -182,6 +182,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		identityMinDeposit: new BN('6672333321'),
 		rpcEndpoints: [
 			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-people-kusama.luckyfriday.io'
+			},
+			{
 				name: VIA_DWELLIR,
 				url: 'wss://people-kusama-rpc.dwellir.com'
 			},
@@ -235,12 +239,12 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 	[ENetwork.POLKADOT]: {
 		rpcEndpoints: [
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
-			},
-			{
 				name: VIA_PARITY,
 				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
 			},
 			{
 				name: VIA_ONFINALITY,
@@ -257,6 +261,26 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+			}
+		]
+	},
+	[ENetwork.KUSAMA]: {
+		rpcEndpoints: [
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://sys.ibp.network/people-kusama'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://people-kusama.dotters.network'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://people-kusama.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
 			}
 		]
 	}
@@ -475,7 +499,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.TREASURER]: {
 			trackId: 11,
 			description: TREASURER_DESCRIPTION,
-			group: 'Origin',
+			group: 'Treasury',
 			name: 'treasurer',
 			maxSpend: new BN('10000000').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT]))),
 			maxDeciding: 10,
@@ -712,7 +736,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.ROOT]: {
 			trackId: 0,
 			description: ROOT_ORIGIN_DESCRIPTION,
-			group: 'Main',
+			group: 'Origin',
 			name: 'root',
 			maxDeciding: 1,
 			decisionDeposit: new BN('3333333333300000'),
@@ -735,36 +759,10 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 				}
 			}
 		},
-		[EPostOrigin.WHITELISTED_CALLER]: {
-			trackId: 1,
-			description: WHITELISTED_CALLER_DESCRIPTION,
-			group: 'Whitelist',
-			name: 'whitelisted_caller',
-			maxDeciding: 100,
-			decisionDeposit: new BN('333333333330000'),
-			preparePeriod: 300,
-			decisionPeriod: 201600,
-			confirmPeriod: 100,
-			minEnactmentPeriod: 100,
-			minApproval: {
-				reciprocal: {
-					factor: 270899180,
-					xOffset: 389830523,
-					yOffset: 305084738
-				}
-			},
-			minSupport: {
-				reciprocal: {
-					factor: 8650766,
-					xOffset: 18867926,
-					yOffset: 41509433
-				}
-			}
-		},
 		[EPostOrigin.WISH_FOR_CHANGE]: {
 			trackId: 2,
 			description: WISH_FOR_CHANGE_DESCRIPTION,
-			group: 'Main',
+			group: 'Origin',
 			name: 'wish_for_change',
 			maxDeciding: 10,
 			decisionDeposit: new BN('666666666660000'),
@@ -784,6 +782,32 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 					length: 1000000000,
 					floor: 0,
 					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.WHITELISTED_CALLER]: {
+			trackId: 1,
+			description: WHITELISTED_CALLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'whitelisted_caller',
+			maxDeciding: 100,
+			decisionDeposit: new BN('333333333330000'),
+			preparePeriod: 300,
+			decisionPeriod: 201600,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 270899180,
+					xOffset: 389830523,
+					yOffset: 305084738
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 8650766,
+					xOffset: 18867926,
+					yOffset: 41509433
 				}
 			}
 		},
@@ -843,7 +867,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.LEASE_ADMIN]: {
 			trackId: 12,
 			description: LEASE_ADMIN_DESCRIPTION,
-			group: 'Governance',
+			group: 'Main',
 			name: 'lease_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('166666666665000'),
@@ -869,7 +893,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.FELLOWSHIP_ADMIN]: {
 			trackId: 13,
 			description: FELLOWSHIP_ADMIN_DESCRIPTION,
-			group: 'Whitelist',
+			group: 'Origin',
 			name: 'fellowship_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('166666666665000'),
@@ -895,7 +919,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.GENERAL_ADMIN]: {
 			trackId: 14,
 			description: GENERAL_ADMIN_DESCRIPTION,
-			group: 'Governance',
+			group: 'Main',
 			name: 'general_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('166666666665000'),
@@ -947,7 +971,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.REFERENDUM_CANCELLER]: {
 			trackId: 20,
 			description: REFERENDUM_CANCELLER_DESCRIPTION,
-			group: 'Governance',
+			group: 'Origin',
 			name: 'referendum_canceller',
 			maxDeciding: 1000,
 			decisionDeposit: new BN('333333333330000'),
@@ -973,7 +997,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.REFERENDUM_KILLER]: {
 			trackId: 21,
 			description: REFERENDUM_KILLER_DESCRIPTION,
-			group: 'Governance',
+			group: 'Origin',
 			name: 'referendum_killer',
 			maxDeciding: 1000,
 			decisionDeposit: new BN('1666666666650000'),
@@ -2029,6 +2053,42 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			icon: SocialIcons.Twitter,
 			href: 'https://twitter.com/kusamanetwork',
 			label: 'Twitter'
+		},
+		{
+			id: ENetworkSocial.DISCORD,
+			icon: SocialIcons.Discord,
+			href: 'https://discord.com/invite/kusama',
+			label: 'Discord'
+		},
+		{
+			id: ENetworkSocial.GITHUB,
+			icon: SocialIcons.Github,
+			href: 'https://github.com/paritytech/polkadot',
+			label: 'GitHub'
+		},
+		{
+			id: ENetworkSocial.YOUTUBE,
+			icon: SocialIcons.Youtube,
+			href: 'https://www.youtube.com/channel/UCq4MRrQhdoIR0b44GxcCPxw',
+			label: 'YouTube'
+		},
+		{
+			id: ENetworkSocial.REDDIT,
+			icon: SocialIcons.Reddit,
+			href: 'https://www.reddit.com/r/Kusama/',
+			label: 'Reddit'
+		},
+		{
+			id: ENetworkSocial.TELEGRAM,
+			icon: SocialIcons.Telegram,
+			href: 'https://t.me/kusamanetworkofficial',
+			label: 'Telegram'
+		},
+		{
+			id: ENetworkSocial.SUBSCAN,
+			icon: SocialIcons.Subscan,
+			href: 'https://kusama.subscan.io/',
+			label: 'Subscan'
 		}
 	],
 	[ENetwork.WESTEND]: [],
@@ -2167,6 +2227,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			}
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
 		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800')
