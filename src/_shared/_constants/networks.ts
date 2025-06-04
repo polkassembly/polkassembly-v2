@@ -268,15 +268,19 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 		rpcEndpoints: [
 			{
 				name: VIA_IBP_GEODNS1,
-				url: 'wss://sys.ibp.network/people-kusama'
+				url: 'wss://sys.ibp.network/asset-hub-kusama'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-asset-hub-rpc.polkadot.io'
 			},
 			{
 				name: VIA_IBP_GEODNS2,
-				url: 'wss://people-kusama.dotters.network'
+				url: 'wss://asset-hub-kusama.dotters.network'
 			},
 			{
-				name: VIA_ONFINALITY,
-				url: 'wss://people-kusama.api.onfinality.io/public-ws'
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-kusama-rpc.dwellir.com'
 			},
 			{
 				name: VIA_LUCKYFRIDAY,
