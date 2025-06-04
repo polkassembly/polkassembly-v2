@@ -62,8 +62,10 @@ function AnalyticsReferendumOutcome() {
 		return (
 			<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
 				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByStatus')}</h3>
-				<div className='flex h-[200px] items-center justify-center'>
-					<Skeleton className='h-full w-full' />
+				<div className='flex flex-col gap-2'>
+					<Skeleton className='h-8 w-full' />
+					<Skeleton className='h-8 w-full' />
+					<Skeleton className='h-8 w-full' />
 				</div>
 			</div>
 		);
