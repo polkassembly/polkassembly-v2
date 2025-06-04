@@ -65,7 +65,7 @@ function AnalyticTurnOutPercentage() {
 						maintainAspectRatio: false,
 						plugins: {
 							legend: {
-								position: 'top'
+								display: false
 							}
 						},
 						elements: {

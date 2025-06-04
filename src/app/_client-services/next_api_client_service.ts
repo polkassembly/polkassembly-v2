@@ -1048,22 +1048,6 @@ export class NextApiClientService {
 		});
 	}
 
-	static async getGovAnalyticsMonthlySpend() {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_GOV_ANALYTICS,
-			routeSegments: ['monthly-spend']
-		});
-
-		return this.nextApiClientFetch<{
-			currentMonth: string;
-			lastMonth: string;
-			totalSpent: string;
-		}>({
-			method,
-			url
-		});
-	}
-
 	static async getGovAnalyticsTurnoutPercentage() {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_GOV_ANALYTICS,
