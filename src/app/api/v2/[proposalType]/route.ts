@@ -176,8 +176,10 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		totalCount
 	};
 
-	// Cache the response
-	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
+	// Cache the response if there are items
+	if (response.items.length > 0) {
+		await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
+	}
 
 	// 3. return the data
 	return NextResponse.json(response);
