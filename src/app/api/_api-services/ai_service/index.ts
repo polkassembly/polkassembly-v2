@@ -370,7 +370,7 @@ export class AIService {
 				title: offChainPostData.title
 			});
 
-			console.log(`SPAM DETECTED for ${proposalType} post ${offChainPostData.index}`);
+			console.log(`SPAM RESULT for ${proposalType} post ${offChainPostData.index} is ${isSpam}`);
 		}
 
 		// if post is spam, no need to generate post summary
