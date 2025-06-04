@@ -49,7 +49,11 @@ import {
 	IOnChainMetadata,
 	EVoteSortOptions,
 	EHttpHeaderKey,
-	IPostLink
+	IPostLink,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
+	ITurnoutPercentageData,
+	IGovAnalyticsDelegationStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -128,7 +132,8 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS'
+	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS'
 }
 
 export class NextApiClientService {
@@ -228,6 +233,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
+				break;
+			case EApiRoute.GET_GOV_ANALYTICS:
+				path = '/gov-analytics';
 				break;
 
 			// post routes
@@ -1007,6 +1015,56 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
 	}
 
+	static async getGovAnalyticsStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<IGovAnalyticsStats>({ url, method });
+	}
+
+	static async getGovAnalyticsReferendumOutcome({ trackNo }: { trackNo?: number }) {
+		const queryParams = new URLSearchParams();
+		if (trackNo) {
+			queryParams.set('trackNo', trackNo.toString());
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome'], queryParams });
+		return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
+	}
+
+	static async getGovAnalyticsReferendumCount() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['referendum-count']
+		});
+
+		return this.nextApiClientFetch<{
+			categoryCounts: {
+				governance: number | null;
+				main: number | null;
+				treasury: number | null;
+				whiteList: number | null;
+			};
+		}>({
+			method,
+			url
+		});
+	}
+
+	static async getGovAnalyticsTurnoutPercentage() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['turnout-percentage']
+		});
+
+		return this.nextApiClientFetch<ITurnoutPercentageData>({
+			method,
+			url
+		});
+	}
+
+	static async getTrackDelegationAnalyticsStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['track-delegation'] });
+		return this.nextApiClientFetch<IGovAnalyticsDelegationStats[]>({ url, method });
+	}
+
 	static async fetchOverviewData(): Promise<{
 		allTracks: { data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null };
 		treasuryStats: { data: ITreasuryStats[] | null; error: IErrorResponse | null };
@@ -1073,5 +1131,20 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async getTrackLevelProposalsAnalytics() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['track-proposals']
+		});
+
+		return this.nextApiClientFetch<{
+			data: Record<number, number>;
+			totalProposals: number;
+		}>({
+			method,
+			url
+		});
 	}
 }

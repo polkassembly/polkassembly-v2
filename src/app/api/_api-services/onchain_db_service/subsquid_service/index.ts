@@ -20,9 +20,13 @@ import {
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsDelegationsList,
 	ITrackAnalyticsStats,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
 	IVoteCurve,
 	IVoteData,
-	IVoteMetrics
+	IVoteMetrics,
+	ITurnoutPercentageData,
+	IGovAnalyticsDelegationStats
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -35,9 +39,13 @@ import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalSta
 import { BN, BN_ZERO } from '@polkadot/util';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import { TRACK_GROUPS } from '@/_shared/_constants/trackGroups';
+import { getTrackNameFromId } from '@/_shared/_utils/getTrackNameFromId';
 import { SubsquidUtils } from './subsquidUtils';
+import { SubsquidQueries } from './subsquidQueries';
 
 const VOTING_POWER_DIVISOR = new BN('10');
+
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -940,6 +948,45 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	static async GetGovAnalyticsStats({ network }: { network: ENetwork }): Promise<IGovAnalyticsStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_GOV_ANALYTICS_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching network governance analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching network governance analytics stats from Subsquid');
+		}
+
+		return {
+			totalProposals: subsquidData.totalProposals.totalCount,
+			approvedProposals: subsquidData.approvedProposals.totalCount
+		};
+	}
+
+	static async GetGovAnalyticsReferendumOutcome({ network, trackNo }: { network: ENetwork; trackNo?: number }): Promise<IGovAnalyticsReferendumOutcome> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_GOV_ANALYTICS_REFERENDUM_OUTCOME;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { trackNo }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching referendum outcome data from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching referendum outcome data from Subsquid');
+		}
+
+		return {
+			approved: subsquidData.approved.totalCount,
+			rejected: subsquidData.rejected.totalCount,
+			timeout: subsquidData.timeout.totalCount,
+			ongoing: subsquidData.ongoing.totalCount,
+			cancelled: subsquidData.cancelled.totalCount
+		};
+	}
+
 	static async GetTrackAnalyticsDelegations({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsDelegations> {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -1056,5 +1103,193 @@ export class SubsquidService extends SubsquidUtils {
 			items: postsResult.map((post) => (post.status === 'fulfilled' ? post.value : null))?.filter((post) => post !== null),
 			totalCount: subsquidData.proposalsConnection.totalCount || 0
 		};
+	}
+
+	static async GetGovAnalyticsReferendumCount({
+		network
+	}: {
+		network: ENetwork;
+	}): Promise<{ categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } }> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_TOTAL_CATEGORY_PROPOSALS;
+
+		const promises = Object.entries(TRACK_GROUPS).map(async ([group, trackIds]) => {
+			try {
+				const response = await gqlClient
+					.query(query, {
+						trackIds
+					})
+					.toPromise();
+
+				return {
+					group,
+					count: response.data.count.totalCount
+				};
+			} catch (error) {
+				console.error(`Error fetching count for group ${group}:`, error);
+				return {
+					group,
+					count: null
+				};
+			}
+		});
+
+		const results = await Promise.all(promises);
+		const groupResults = results.reduce(
+			(acc, { group, count }) => {
+				acc[group] = count;
+				return acc;
+			},
+			{} as Record<string, number | null>
+		);
+
+		return {
+			categoryCounts: {
+				governance: groupResults.Governance ?? null,
+				main: groupResults.Main ?? null,
+				treasury: groupResults.Treasury ?? null,
+				whiteList: groupResults.Whitelist ?? null
+			}
+		};
+	}
+
+	static async GetTurnoutPercentageData({ network }: { network: ENetwork }): Promise<ITurnoutPercentageData> {
+		try {
+			console.error('=== TURNOUT PERCENTAGE DEBUG START ===');
+			console.error('Network:', network);
+			console.error('Query:', SubsquidQueries.GET_TURNOUT_PERCENTAGE_DATA);
+
+			const { data: subsquidData, error: subsquidErr } = await this.subsquidGqlClient(network).query(SubsquidQueries.GET_TURNOUT_PERCENTAGE_DATA, {}).toPromise();
+
+			if (subsquidErr) {
+				console.error('Subsquid Error:', subsquidErr);
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching turnout percentage data from Subsquid');
+			}
+
+			console.error('Subsquid Response:', JSON.stringify(subsquidData, null, 2));
+
+			if (!subsquidData?.proposals) {
+				console.error('No proposals found in response');
+				return { averageSupportPercentages: {} };
+			}
+
+			interface Proposal {
+				trackNumber?: number;
+				tally?: {
+					support?: string;
+				};
+			}
+
+			interface TrackData {
+				totalSupport: number;
+				count: number;
+			}
+
+			// Group support percentages by track number using reduce
+			const trackSupportPercentages = subsquidData.proposals.reduce((acc: Record<string, TrackData>, proposal: Proposal) => {
+				if (!proposal.trackNumber || !proposal.tally?.support) return acc;
+
+				const trackNumber = proposal.trackNumber.toString();
+				const { support } = proposal.tally;
+				const supportPercentage = Number(support) / 1e16;
+
+				if (!acc[trackNumber]) {
+					acc[trackNumber] = { totalSupport: 0, count: 0 };
+				}
+
+				acc[trackNumber].totalSupport += supportPercentage;
+				acc[trackNumber].count += 1;
+
+				return acc;
+			}, {});
+
+			// Calculate average support percentages and convert track numbers to track names using Object.entries and reduce
+			const averageSupportPercentages = Object.entries(trackSupportPercentages as Record<string, TrackData>).reduce<Record<string, number>>((acc, [trackNumber, data]) => {
+				if (data.count > 0) {
+					const trackName = getTrackNameFromId({ trackId: parseInt(trackNumber, 10), network });
+					if (trackName) {
+						acc[trackName] = Number((data.totalSupport / data.count).toFixed(16));
+					}
+				}
+				return acc;
+			}, {});
+
+			console.error('Final Results:', averageSupportPercentages);
+			console.error('=== TURNOUT PERCENTAGE DEBUG END ===');
+
+			return { averageSupportPercentages };
+		} catch (error) {
+			console.error('Error in GetTurnoutPercentageData:', error);
+			throw error;
+		}
+	}
+
+	static async GetTrackDelegationAnalyticsStats({ network }: { network: ENetwork }): Promise<Record<string, IGovAnalyticsDelegationStats>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(SubsquidQueries.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching track delegation analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching track delegation analytics stats from Subsquid');
+		}
+
+		const trackStats: Record<
+			string,
+			{
+				totalCapital: string;
+				totalVotesBalance: string;
+				totalDelegates: number;
+				totalDelegators: number;
+				delegateesData: Record<string, { count: number }>;
+				delegatorsData: Record<string, { count: number }>;
+			}
+		> = {};
+
+		if (subsquidData.votingDelegations?.length) {
+			subsquidData.votingDelegations.forEach((delegation: { lockPeriod: number; balance: string; from: string; to: string; track: number }) => {
+				const { track } = delegation;
+				const bnBalance = new BN(delegation.balance);
+				const bnConviction = new BN(delegation.lockPeriod || 1);
+				const vote = delegation.lockPeriod ? bnBalance.mul(bnConviction) : bnBalance.div(VOTING_POWER_DIVISOR);
+
+				if (!trackStats[track]) {
+					trackStats[track] = {
+						totalCapital: '0',
+						totalDelegates: 0,
+						totalDelegators: 0,
+						totalVotesBalance: '0',
+						delegateesData: {},
+						delegatorsData: {}
+					};
+				}
+
+				trackStats[track].totalVotesBalance = new BN(trackStats[track].totalVotesBalance).add(vote).toString();
+				trackStats[track].totalCapital = new BN(trackStats[track].totalCapital).add(bnBalance).toString();
+
+				// Handle delegates
+				if (!trackStats[track].delegateesData[delegation.to]) {
+					trackStats[track].delegateesData[delegation.to] = {
+						count: 1
+					};
+					trackStats[track].totalDelegates += 1;
+				} else {
+					trackStats[track].delegateesData[delegation.to].count += 1;
+				}
+
+				// Handle delegators
+				if (!trackStats[track].delegatorsData[delegation.from]) {
+					trackStats[track].delegatorsData[delegation.from] = {
+						count: 1
+					};
+					trackStats[track].totalDelegators += 1;
+				} else {
+					trackStats[track].delegatorsData[delegation.from].count += 1;
+				}
+			});
+		}
+
+		return trackStats;
 	}
 }
