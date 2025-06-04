@@ -295,26 +295,38 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 								nativeToken: (treasuryAddressInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString()
 							}
 						};
-					}),
-					assetHubApi.query.assets.account(config.usdtIndex, config.assetHubTreasuryAddress).then((balance) => {
-						treasuryStats = {
-							...treasuryStats,
-							assetHub: {
-								...treasuryStats.assetHub,
-								usdt: getBalanceIfExists(balance)
-							}
-						};
-					}),
-					assetHubApi.query.assets.account(config.usdcIndex, config.assetHubTreasuryAddress).then((balance) => {
-						treasuryStats = {
-							...treasuryStats,
-							assetHub: {
-								...treasuryStats.assetHub,
-								usdc: getBalanceIfExists(balance)
-							}
-						};
 					})
 				);
+
+				// Only query USDT if usdtIndex is configured
+				if (config.usdtIndex) {
+					assetHubTasks.push(
+						assetHubApi.query.assets.account(config.usdtIndex, config.assetHubTreasuryAddress).then((balance) => {
+							treasuryStats = {
+								...treasuryStats,
+								assetHub: {
+									...treasuryStats.assetHub,
+									usdt: getBalanceIfExists(balance)
+								}
+							};
+						})
+					);
+				}
+
+				// Only query USDC if usdcIndex is configured
+				if (config.usdcIndex) {
+					assetHubTasks.push(
+						assetHubApi.query.assets.account(config.usdcIndex, config.assetHubTreasuryAddress).then((balance) => {
+							treasuryStats = {
+								...treasuryStats,
+								assetHub: {
+									...treasuryStats.assetHub,
+									usdc: getBalanceIfExists(balance)
+								}
+							};
+						})
+					);
+				}
 			}
 			if (config.assetHubFellowshipAddress) {
 				assetHubTasks.push(
@@ -329,7 +341,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					})
 				);
 			}
-			if (config.assetHubFellowshipUsdtAddress) {
+			if (config.assetHubFellowshipUsdtAddress && config.usdtIndex) {
 				assetHubTasks.push(
 					assetHubApi.query.assets.account(config.usdtIndex, config.assetHubFellowshipUsdtAddress).then((balance) => {
 						treasuryStats = {
@@ -342,7 +354,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					})
 				);
 			}
-			if (config.assetHubAmbassadorAddress) {
+			if (config.assetHubAmbassadorAddress && config.usdtIndex) {
 				assetHubTasks.push(
 					assetHubApi.query.assets.account(config.usdtIndex, config.assetHubAmbassadorAddress).then((balance) => {
 						treasuryStats = {
@@ -355,7 +367,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 					})
 				);
 			}
-			if (config.assetHubMythAddress) {
+			if (config.assetHubMythAddress && config.mythosParachainId) {
 				assetHubTasks.push(
 					assetHubApi.query.foreignAssets
 						.account(
