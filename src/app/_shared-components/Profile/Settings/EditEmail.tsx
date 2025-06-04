@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
+import { useToast } from '@/hooks/useToast';
+import { ENotificationStatus } from '@/_shared/types';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Button } from '../../Button';
 import { Input } from '../../Input';
 
@@ -13,16 +16,38 @@ function EditEmail({ oldEmail, onSuccess, userId, onClose }: { oldEmail: string;
 	const { user } = useUser();
 	const [newEmail, setNewEmail] = useState<string>('');
 	const [loading, setLoading] = useState<boolean>(false);
+	const { toast } = useToast();
 
 	const handleEditEmail = async () => {
 		if (!newEmail || !user?.id || user.id !== userId) return;
+		if (!ValidatorService.isValidEmail(newEmail)) {
+			toast({
+				title: t('Profile.Settings.invalidEmail'),
+				description: t('Profile.Settings.invalidEmailDescription'),
+				status: ENotificationStatus.ERROR
+			});
+			return;
+		}
 		setLoading(true);
 
 		const { data, error } = await UserProfileClientService.editUserProfile({ userId: user.id, email: newEmail });
 
 		if (data && !error) {
 			onSuccess?.(newEmail);
+
+			toast({
+				title: t('Profile.Settings.emailUpdatedSuccessfully'),
+				description: t('Profile.Settings.emailUpdatedSuccessfullyDescription'),
+				status: ENotificationStatus.SUCCESS
+			});
+
 			onClose?.();
+		} else {
+			toast({
+				title: t('Profile.Settings.emailUpdateFailed'),
+				description: t('Profile.Settings.emailUpdateFailedDescription'),
+				status: ENotificationStatus.ERROR
+			});
 		}
 
 		setLoading(false);
