@@ -643,7 +643,8 @@
 	},
 	"Balance": {
 		"voteBalance": "Balance de Votos",
-		"Balance": "Balance"
+		"Balance": "Balance",
+		"PeopleChainBalance": "Balance de People Chain"
 	},
 	"EditPost": {
 		"edit": "Editar",

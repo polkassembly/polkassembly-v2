@@ -641,7 +641,8 @@
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
-		"Balance": "Guthaben"
+		"Balance": "Guthaben",
+		"PeopleChainBalance": "People Chain Guthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",

@@ -642,7 +642,8 @@
 	},
 	"Balance": {
 		"voteBalance": "投票余额",
-		"Balance": "余额"
+		"Balance": "余额",
+		"PeopleChainBalance": "人民链余额"
 	},
 	"EditPost": {
 		"edit": "编辑",
