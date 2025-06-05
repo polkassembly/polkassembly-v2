@@ -494,6 +494,8 @@
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
 		"delete": "Eliminar",
+		"save": "Guardar",
+		"edit": "Editar",
 		"hideReplies": "Ocultar respuestas",
 		"viewReplies": "Ver respuestas",
 		"commentSummary": "Resumen del comentario",

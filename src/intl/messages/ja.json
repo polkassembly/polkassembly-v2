@@ -493,6 +493,8 @@
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
 		"delete": "削除",
+		"save": "保存",
+		"edit": "編集",
 		"hideReplies": "返信を非表示",
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
