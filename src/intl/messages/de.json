@@ -492,6 +492,8 @@
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
 		"delete": "Löschen",
+		"save": "Speichern",
+		"edit": "Bearbeiten",
 		"hideReplies": "Antworten ausblenden",
 		"viewReplies": "Antworten anzeigen",
 		"commentSummary": "Kommentar Zusammenfassung",
