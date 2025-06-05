@@ -642,7 +642,8 @@
 	},
 	"Balance": {
 		"voteBalance": "投票残高",
-		"Balance": "残高"
+		"Balance": "残高",
+		"PeopleChainBalance": "ピープルチェーン残高"
 	},
 	"EditPost": {
 		"edit": "編集",
