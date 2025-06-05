@@ -677,7 +677,8 @@
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
-		"Balance": "Balance"
+		"Balance": "Balance",
+		"PeopleChainBalance": "People Chain Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
