@@ -65,7 +65,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	}, [comment, user]);
 
 	const handleDeleteComment = useCallback(async () => {
-		if (!user || !comment || user.id !== comment.user.id) {
+		if (!user || !comment || user.id !== comment.userId) {
 			toast({
 				title: 'Failed!',
 				description: 'You are not the owner of this comment',
