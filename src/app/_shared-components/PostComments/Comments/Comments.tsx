@@ -26,12 +26,14 @@ function Comments({
 	comments,
 	proposalType,
 	index,
-	allowedCommentor
+	allowedCommentor,
+	postUserId
 }: {
 	comments: ICommentResponse[];
 	proposalType: EProposalType;
 	index: string;
 	allowedCommentor: EAllowedCommentor;
+	postUserId?: number;
 }) {
 	const t = useTranslations();
 	const user = useAtomValue(userAtom);
@@ -70,6 +72,7 @@ function Comments({
 	});
 
 	const { canComment, commentDisabledMessage } = useMemo(() => {
+		if (user && postUserId && user.id === postUserId) return { canComment: true, commentDisabledMessage: '' };
 		if (allowedCommentor === EAllowedCommentor.ALL) return { canComment: true, commentDisabledMessage: '' };
 		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED)
 			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };

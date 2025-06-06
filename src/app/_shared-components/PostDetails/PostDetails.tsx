@@ -127,6 +127,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								contentSummary={post.contentSummary}
 								comments={post.comments}
 								allowedCommentor={post.allowedCommentor}
+								postUserId={post.userId}
 							/>
 						</div>
 						{isModalOpen && !isOffchainPost && (

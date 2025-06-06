@@ -18,13 +18,15 @@ function PostComments({
 	index,
 	contentSummary,
 	comments,
-	allowedCommentor
+	allowedCommentor,
+	postUserId
 }: {
 	proposalType: EProposalType;
 	index: string;
 	contentSummary?: IContentSummary;
 	comments?: ICommentResponse[];
 	allowedCommentor: EAllowedCommentor;
+	postUserId?: number;
 }) {
 	const t = useTranslations();
 
@@ -74,6 +76,7 @@ function PostComments({
 					index={index}
 					comments={data || []}
 					allowedCommentor={allowedCommentor}
+					postUserId={postUserId}
 				/>
 			)}
 		</div>
