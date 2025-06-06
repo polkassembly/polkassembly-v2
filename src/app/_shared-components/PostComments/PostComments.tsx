@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
+import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -17,12 +17,14 @@ function PostComments({
 	proposalType,
 	index,
 	contentSummary,
-	comments
+	comments,
+	allowedCommentor
 }: {
 	proposalType: EProposalType;
 	index: string;
 	contentSummary?: IContentSummary;
 	comments?: ICommentResponse[];
+	allowedCommentor: EAllowedCommentor;
 }) {
 	const t = useTranslations();
 
@@ -71,6 +73,7 @@ function PostComments({
 					proposalType={proposalType}
 					index={index}
 					comments={data || []}
+					allowedCommentor={allowedCommentor}
 				/>
 			)}
 		</div>
