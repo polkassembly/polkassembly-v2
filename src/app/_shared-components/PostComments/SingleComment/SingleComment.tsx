@@ -190,7 +190,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	}
 
 	const network = getCurrentNetwork();
-	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
+	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
 	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
 
