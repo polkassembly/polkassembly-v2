@@ -459,7 +459,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...commentData,
-				user,
+				publicUser: user,
 				children: []
 			} as ICommentResponse;
 		});
