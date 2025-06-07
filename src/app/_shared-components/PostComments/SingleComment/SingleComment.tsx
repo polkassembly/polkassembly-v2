@@ -228,7 +228,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						value={addressToDisplay}
 						theme='polkadot'
 					/>
-				) : comment.publicUser.profileDetails?.image ? (
+				) : comment?.publicUser?.profileDetails?.image ? (
 					<Image
 						src={comment.publicUser.profileDetails.image}
 						alt='profile'
@@ -255,7 +255,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 								showIdenticon={false}
 							/>
 						) : (
-							<span className='text-text_primary'>{comment.publicUser.username}</span>
+							<span className='text-text_primary'>{comment?.publicUser?.username}</span>
 						)}
 					</span>
 					<Separator
