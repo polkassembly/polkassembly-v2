@@ -161,7 +161,7 @@ export class SubsquareOffChainService {
 					id: comment._id,
 					content,
 					userId: publicUser?.id ?? 0,
-					user: publicUser
+					publicUser: publicUser
 						? {
 								...publicUser,
 								addresses

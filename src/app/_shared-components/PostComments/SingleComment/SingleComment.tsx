@@ -167,7 +167,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback((newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
+	const handleConfirmReply = useCallback((newComment: IComment, publicUser: IPublicUser) => {
 		setComment((prev) => {
 			if (!prev) return null;
 			return {
@@ -176,7 +176,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					...(prev.children || []),
 					{
 						...newComment,
-						user: publicUser
+						publicUser
 					}
 				]
 			};
@@ -190,9 +190,9 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	}
 
 	const network = getCurrentNetwork();
-	const userAddresses = !EVM_NETWORKS.includes(network) ? comment.user.addresses.filter((address) => !address.startsWith('0x')) : comment.user.addresses;
+	const userAddresses = !EVM_NETWORKS.includes(network) ? comment.publicUser.addresses.filter((address) => !address.startsWith('0x')) : comment.publicUser.addresses;
 
-	const addressToDisplay = userAddresses?.[0] || comment.user.addresses?.[0];
+	const addressToDisplay = userAddresses?.[0] || comment.publicUser.addresses?.[0];
 
 	return (
 		<div className={classes.wrapper}>
@@ -228,9 +228,9 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						value={addressToDisplay}
 						theme='polkadot'
 					/>
-				) : comment.user.profileDetails?.image ? (
+				) : comment.publicUser.profileDetails?.image ? (
 					<Image
-						src={comment.user.profileDetails.image}
+						src={comment.publicUser.profileDetails.image}
 						alt='profile'
 						className='rounded-full'
 						width={30}
@@ -255,7 +255,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 								showIdenticon={false}
 							/>
 						) : (
-							<span className='text-text_primary'>{comment.user.username}</span>
+							<span className='text-text_primary'>{comment.publicUser.username}</span>
 						)}
 					</span>
 					<Separator
@@ -376,7 +376,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						onCancel={handleCancelReply}
 						onConfirm={handleConfirmReply}
 						isReply
-						replyTo={comment?.user}
+						replyTo={comment?.publicUser}
 					/>
 				)}
 

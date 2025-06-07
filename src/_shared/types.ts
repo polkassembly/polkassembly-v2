@@ -137,7 +137,7 @@ export interface IPublicUser {
 	username: string;
 	profileScore: number;
 	addresses: string[];
-	rank: number;
+	rank?: number;
 	profileDetails: IProfileDetails;
 }
 
@@ -685,7 +685,7 @@ export interface IComment {
 }
 
 export interface ICommentResponse extends IComment {
-	user: Omit<IPublicUser, 'rank'>;
+	publicUser: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
 	reactions?: IReaction[];
 	voteData?: IVoteData[];
