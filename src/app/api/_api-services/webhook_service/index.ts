@@ -39,7 +39,8 @@ enum EWebhookEvent {
 	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated',
 	CACHE_REFRESH = 'cache_refresh',
 	USER_CREATED = 'user_created',
-	ADDRESS_CREATED = 'address_created'
+	ADDRESS_CREATED = 'address_created',
+	CLEAR_CACHE = 'clear_cache'
 }
 
 enum ECacheRefreshType {
@@ -120,7 +121,8 @@ export class WebhookService {
 			network: z.nativeEnum(ENetwork),
 			userId: z.number().refine((userId) => ValidatorService.isValidUserId(userId), ERROR_MESSAGES.INVALID_USER_ID),
 			wallet: z.string()
-		})
+		}),
+		[EWebhookEvent.CLEAR_CACHE]: z.object({})
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
@@ -149,9 +151,15 @@ export class WebhookService {
 				return this.handleUserCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> });
 			case EWebhookEvent.ADDRESS_CREATED:
 				return this.handleAddressCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.ADDRESS_CREATED]> });
+			case EWebhookEvent.CLEAR_CACHE:
+				return this.handleClearCache();
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
+	}
+
+	private static async handleClearCache() {
+		await Promise.allSettled(Object.values(ENetwork).map((network) => RedisService.DeleteAllCacheForNetwork(network)));
 	}
 
 	private static async handleProposalStatusChanged({
