@@ -160,6 +160,7 @@ export class WebhookService {
 
 	private static async handleClearCache() {
 		await Promise.allSettled(Object.values(ENetwork).map((network) => RedisService.DeleteAllCacheForNetwork(network)));
+		console.log('Cache cleared for all networks');
 	}
 
 	private static async handleProposalStatusChanged({
