@@ -491,14 +491,19 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
 		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+			const publicUser = await this.GetPublicUserById(data.userId);
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
 			} as IReaction;
 		});
+
+		return Promise.all(reactionPromises);
 	}
 
 	static async GetCommentReactions({
@@ -519,10 +524,19 @@ export class FirestoreService extends FirestoreUtils {
 			.where('commentId', '==', id);
 
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
-			return { ...data, createdAt: data.createdAt?.toDate(), updatedAt: data.updatedAt?.toDate() } as IReaction;
+			const publicUser = await this.GetPublicUserById(data.userId);
+
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
+			} as IReaction;
 		});
+
+		return Promise.all(reactionPromises);
 	}
 
 	static async GetReactionById(id: string): Promise<IReaction | null> {
@@ -537,10 +551,13 @@ export class FirestoreService extends FirestoreUtils {
 			return null;
 		}
 
+		const publicUser = await this.GetPublicUserById(data.userId);
+
 		return {
 			...data,
 			createdAt: data.createdAt?.toDate(),
-			updatedAt: data.updatedAt?.toDate()
+			updatedAt: data.updatedAt?.toDate(),
+			publicUser
 		} as IReaction;
 	}
 
@@ -583,7 +600,19 @@ export class FirestoreService extends FirestoreUtils {
 
 		const reactionQuerySnapshot = await reactionQuery.get();
 
-		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
+		const publicUser = await this.GetPublicUserById(userId);
+		const data = reactionQuerySnapshot.docs?.[0]?.data?.();
+
+		if (!data) return null;
+
+		const reaction: IReaction = {
+			...reactionQuerySnapshot.docs?.[0]?.data?.(),
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate(),
+			publicUser
+		} as IReaction;
+
+		return reaction;
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
