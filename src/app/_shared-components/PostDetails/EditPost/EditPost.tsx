@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useRef, useState } from 'react';
-import { ENotificationStatus, EProposalType, EReactQueryKeys, IPost, IPostListing } from '@/_shared/types';
+import { EAllowedCommentor, ENotificationStatus, EProposalType, EReactQueryKeys, IPost, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -15,12 +15,15 @@ import { useToast } from '@/hooks/useToast';
 import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
+import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
+import { Label } from '../../Label';
 
 function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClose?: () => void }) {
 	const t = useTranslations();
 	const savedContent = postData.index && LocalStorageClientService.getEditPostData({ postId: postData.index.toString() });
 	const [content, setContent] = useState<string | null>(savedContent || postData?.content || null);
 	const [title, setTitle] = useState<string>(postData?.title || '');
+	const [allowedCommentor, setAllowedCommentor] = useState<EAllowedCommentor>(postData?.allowedCommentor || EAllowedCommentor.ALL);
 	const [isLoading, setIsLoading] = useState(false);
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const { user } = useUser();
@@ -28,6 +31,21 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 	const { toast } = useToast();
 
 	const queryClient = useQueryClient();
+
+	const allowedCommentorsOptions = [
+		{
+			label: t('Create.AllowedCommentors.all'),
+			value: EAllowedCommentor.ALL
+		},
+		{
+			label: t('Create.AllowedCommentors.onchainVerified'),
+			value: EAllowedCommentor.ONCHAIN_VERIFIED
+		},
+		{
+			label: t('Create.AllowedCommentors.none'),
+			value: EAllowedCommentor.NONE
+		}
+	];
 
 	const canEditOffChain = user && user.id === postData.userId;
 
@@ -46,7 +64,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 		const { data, error } = await NextApiClientService.editProposalDetails({
 			proposalType: postData.proposalType,
 			index: postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index!.toString(),
-			data: { title, content }
+			data: { title, content, allowedCommentor }
 		});
 
 		if (error || !data) {
@@ -101,6 +119,37 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 						}}
 						ref={markdownEditorRef}
 					/>
+				</div>
+
+				<div>
+					<p className='mb-1 text-sm font-medium text-text_primary'>{t('EditPost.whoCanComment')}</p>
+					<RadioGroup
+						defaultValue={allowedCommentor}
+						className='flex items-center gap-x-2'
+						onValueChange={(e) => setAllowedCommentor(e as EAllowedCommentor)}
+					>
+						<div className='flex flex-row gap-2'>
+							{allowedCommentorsOptions?.map((option) => {
+								return (
+									<div
+										key={option.value}
+										className='flex items-center space-x-2'
+									>
+										<RadioGroupItem
+											value={option.value}
+											id={option.value}
+										/>
+										<Label
+											htmlFor={option.value}
+											className='text-sm text-allowed_commentor_text'
+										>
+											{option.label}
+										</Label>
+									</div>
+								);
+							})}
+						</div>
+					</RadioGroup>
 				</div>
 			</div>
 			<div className='flex justify-end'>
