@@ -10,6 +10,7 @@ import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentRespon
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { htmlToMarkdown } from '@/_shared/_utils/htmlToMarkdown';
+import dayjs from 'dayjs';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -42,7 +43,9 @@ export class SubsquareOffChainService {
 		try {
 			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-			if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
+			const MIGRATION_DATE = dayjs('2025-06-08');
+
+			if ((!data || data?.dataSource === EDataSource.POLKASSEMBLY) && proposalType !== EProposalType.BOUNTY && dayjs(data?.createdAt).isBefore(MIGRATION_DATE)) {
 				return null;
 			}
 
