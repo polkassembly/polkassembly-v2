@@ -159,8 +159,31 @@ export class WebhookService {
 	}
 
 	private static async handleClearCache() {
-		await Promise.allSettled(Object.values(ENetwork).map((network) => RedisService.DeleteAllCacheForNetwork(network)));
-		console.log('Cache cleared for all networks');
+		try {
+			console.log('Starting cache clear for all networks...');
+
+			const networks = Object.values(ENetwork);
+			console.log(`Clearing cache for networks: ${networks.join(', ')}`);
+
+			// Use Promise.all to ensure all operations complete and throw on any failure
+			await Promise.all(
+				networks.map(async (network) => {
+					try {
+						console.log(`Clearing cache for network: ${network}`);
+						await RedisService.DeleteAllCacheForNetwork(network);
+						console.log(`Successfully cleared cache for network: ${network}`);
+					} catch (error) {
+						console.error(`Failed to clear cache for network ${network}:`, error);
+						throw error; // Re-throw to fail the entire operation
+					}
+				})
+			);
+
+			console.log('Cache cleared successfully for all networks');
+		} catch (error) {
+			console.error('Failed to clear cache for some networks:', error);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to clear cache completely');
+		}
 	}
 
 	private static async handleProposalStatusChanged({
