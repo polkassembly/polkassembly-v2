@@ -5,7 +5,7 @@
 import { Separator } from '@/app/_shared-components/Separator';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, ChevronRight, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, Pencil, ScanLine } from 'lucide-react';
 import ShieldUser from '@assets/icons/shield-user.svg';
 import AccountPin from '@assets/icons/account-pin.svg';
 import DeleteIcon from '@assets/icons/delete-icon.svg';
@@ -22,6 +22,7 @@ import EditUsername from './EditUsername';
 import LinkAddress from '../Overview/LinkAddress/LinkAddress';
 import EditEmail from './EditEmail';
 import DeleteAccount from './DeleteAccount';
+import AppQrLogin from './AppQrLogin';
 
 function Settings({ userProfileData, setUserProfileData }: { userProfileData: IPublicUser; setUserProfileData: (data: IPublicUser) => void }) {
 	const t = useTranslations();
@@ -154,6 +155,46 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 									<ActivateTfa />
 								</DialogContent>
 							</Dialog>
+						</div>
+					</CollapsibleContent>
+				</Collapsible>
+
+				{/* App QR login */}
+				<Collapsible className={classes.settingsCollapsible}>
+					<CollapsibleTrigger className='w-full'>
+						<div className={classes.collapsibleTrigger}>
+							<p className={classes.collapsibleTriggerText}>
+								<ScanLine
+									size={24}
+									className='text-text_primary'
+								/>
+								{t('Profile.Settings.appQrLogin')}
+							</p>
+							<ChevronDown className={classes.collapsibleTriggerIcon} />
+						</div>
+					</CollapsibleTrigger>
+					<CollapsibleContent>
+						<Separator />
+						<div className={classes.collapsibleContent}>
+							<div className='flex items-center gap-x-2'>
+								<Dialog>
+									<DialogTrigger>
+										<Button
+											variant='ghost'
+											className='text-sm font-medium text-text_pink'
+										>
+											{t('Profile.Settings.generateQr')}
+										</Button>
+									</DialogTrigger>
+									<DialogContent className='max-w-xl p-3 sm:p-6'>
+										<DialogHeader>
+											<DialogTitle>{t('Profile.Settings.scanToLoginInApp')}</DialogTitle>
+										</DialogHeader>
+										<AppQrLogin />
+									</DialogContent>
+								</Dialog>
+								<p className='text-xs text-text_primary'>{t('Profile.Settings.appQrLoginDescription')}</p>
+							</div>
 						</div>
 					</CollapsibleContent>
 				</Collapsible>

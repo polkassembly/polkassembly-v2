@@ -12,6 +12,9 @@ import { triggerFetchLatestTreasuryStats } from './utils/triggerFetchLatestTreas
 import { ERROR_MESSAGES } from './constants';
 import { triggerCacheRefresh } from './utils/triggerCacheRefresh';
 import { ECacheRefreshType, EWallet, IV1User, IV1UserAddress, IV2User, IV2UserAddress } from './types';
+import { updatePostAlgolia } from './utils/updatePostAlgolia';
+import { updateUserAlgolia } from './utils/updateUserAlgolia';
+import { updateUserAddressesAlgolia } from './utils/updateUserAddressesAlgolia';
 
 // Load environment variables
 dotenv.config();
@@ -61,10 +64,10 @@ export const callTreasuryStatsFetch = onRequest(async (request, response) => {
 	}
 });
 
-// renew caches every 45 minutes
+// renew caches every 3 hours
 export const scheduledCacheRefresh = onSchedule(
 	{
-		schedule: 'every 45 minutes',
+		schedule: 'every 3 hours',
 		timeZone: 'UTC',
 		retryCount: 3,
 		timeoutSeconds: 540 // 9 minutes
@@ -118,8 +121,15 @@ export const onUserWritten = onDocumentWritten(
 	},
 	async (event) => {
 		try {
-			if (!event?.data?.after || event?.data?.before?.exists) {
+			if (!event?.data?.after) {
 				logger.info('User document was deleted or does not exist or is being updated, no action needed');
+				return;
+			}
+
+			await updateUserAlgolia(event.data.after.data());
+
+			if (event?.data?.before?.exists) {
+				logger.info('User document was updated, no action needed');
 				return;
 			}
 
@@ -217,6 +227,48 @@ export const onAddressWritten = onDocumentWritten(
 			logger.info(`Address successfully created with ID: ${event.data.after.id}`);
 		} catch (error) {
 			logger.error('Error in onAddressWritten function:', error);
+		}
+	}
+);
+
+export const onPostWritten = onDocumentWritten(
+	{
+		document: 'posts/{postId}',
+		maxInstances: 10,
+		timeoutSeconds: 300
+	},
+	async (event) => {
+		try {
+			if (!event?.data?.after) {
+				logger.info('Post document was deleted or does not exist or is being updated, no action needed');
+				return;
+			}
+
+			await updatePostAlgolia(event.data.after.data());
+		} catch (error) {
+			logger.error('Error in onPostWritten function:', error);
+		}
+	}
+);
+
+export const onUserAddressWritten = onDocumentWritten(
+	{
+		document: 'addresses/{address}',
+		maxInstances: 10,
+		timeoutSeconds: 300
+	},
+	async (event) => {
+		try {
+			if (!event?.data?.after) {
+				logger.info('Address document was deleted or does not exist or is being updated, no action needed');
+				return;
+			}
+
+			const addressData = event.data.after.data() as IV2UserAddress;
+
+			await updateUserAddressesAlgolia(addressData);
+		} catch (error) {
+			logger.error('Error in onUserAddressWritten function:', error);
 		}
 	}
 );

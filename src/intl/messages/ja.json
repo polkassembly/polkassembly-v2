@@ -273,6 +273,10 @@
 			"newEmail": "新しいメール",
 			"type": "タイプ",
 			"belowToConfirm": "確認するには下",
+			"appQrLogin": "アプリQRログイン",
+			"scanToLoginInApp": "スキャンしてログイン",
+			"generateQr": "QRを生成",
+			"appQrLoginDescription": "モバイルアプリでスキャンしてWeb3アカウントに直接アクセス",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Google Authenticatorを設定",
 				"installGoogleAuthenticator": "1. Google Authenticatorをインストール（iOS/Android）。",
@@ -518,6 +522,8 @@
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
 		"delete": "削除",
+		"save": "保存",
+		"edit": "編集",
 		"hideReplies": "返信を非表示",
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
@@ -665,7 +671,8 @@
 	},
 	"Balance": {
 		"voteBalance": "投票残高",
-		"Balance": "残高"
+		"Balance": "残高",
+		"PeopleChainBalance": "ピープルチェーン残高"
 	},
 	"EditPost": {
 		"edit": "編集",
@@ -749,7 +756,8 @@
 			"fellowship": "フェローシップ",
 			"council": "カウンシル",
 			"democracy": "デモクラシー",
-			"whitelist": "ホワイトリスト"
+			"whitelist": "ホワイトリスト",
+			"technicalcommittee": "技術委員会"
 		},
 		"please": "お願いします",
 		"login": "ログイン",

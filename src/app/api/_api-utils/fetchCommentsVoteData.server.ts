@@ -26,11 +26,11 @@ export async function fetchCommentsVoteData({
 		comments.map(async (comment) => {
 			let userAddresses = await OffChainDbService.GetAddressesForUserId(comment.userId);
 
-			if (comment.user.addresses.length > 0 && !userAddresses.some((address) => comment.user.addresses.includes(address.address))) {
+			if (comment.publicUser.addresses.length > 0 && !userAddresses.some((address) => comment.publicUser.addresses.includes(address.address))) {
 				userAddresses = [
 					...userAddresses,
 					{
-						address: comment.user.addresses[0],
+						address: comment.publicUser.addresses[0],
 						network,
 						userId: comment.userId,
 						default: true

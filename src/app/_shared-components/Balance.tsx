@@ -9,6 +9,7 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { useIdentityService } from '@/hooks/useIdentityService';
 import { formatBnBalance } from '../_client-utils/formatBnBalance';
 import { Skeleton } from './Skeleton';
 
@@ -18,19 +19,20 @@ interface Props {
 	isBalanceUpdated?: boolean;
 	setAvailableBalance?: (pre: string) => void;
 	classname?: string;
-	usedInIdentityFlow?: boolean;
+	showPeopleChainBalance?: boolean;
 }
-function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBalance, classname, usedInIdentityFlow = false }: Props) {
+function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBalance, classname, showPeopleChainBalance = false }: Props) {
 	const t = useTranslations();
 	const [balance, setBalance] = useState<string>('0');
 	const [loading, setLoading] = useState(false);
 
 	const { apiService } = usePolkadotApiService();
+	const { identityService } = useIdentityService();
 
 	const network = getCurrentNetwork();
 
 	useEffect(() => {
-		if (!apiService || !address) return;
+		if (!apiService || !address || showPeopleChainBalance) return;
 		setLoading(true);
 
 		(async () => {
@@ -45,11 +47,28 @@ function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBala
 		})();
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [address, isBalanceUpdated, usedInIdentityFlow]);
+	}, [address, isBalanceUpdated]);
+
+	useEffect(() => {
+		if (!identityService || !address || !showPeopleChainBalance) return;
+		setLoading(true);
+
+		(async () => {
+			const { freeBalance } = await identityService.getUserBalances({
+				address
+			});
+
+			setAvailableBalance?.(freeBalance.toString());
+			setBalance?.(freeBalance.toString());
+			onChange?.(freeBalance.toString());
+			setLoading(false);
+		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [address, showPeopleChainBalance]);
 
 	return (
 		<div className={cn('flex items-center gap-x-1 text-xs', classname)}>
-			<span className={cn('text-placeholder', classname)}>{t('Balance.Balance')}: </span>
+			<span className={cn('text-placeholder', classname)}>{showPeopleChainBalance ? t('Balance.PeopleChainBalance') : t('Balance.Balance')}: </span>
 			<span className={cn('text-text_pink', classname)}>
 				{loading ? <Skeleton className='h-4 w-[20px]' /> : formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}
 			</span>

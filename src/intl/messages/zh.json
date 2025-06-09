@@ -273,6 +273,10 @@
 			"newEmail": "新电子邮件",
 			"type": "类型",
 			"belowToConfirm": "在下方确认",
+			"appQrLogin": "应用QR码登录",
+			"scanToLoginInApp": "扫描登录",
+			"generateQr": "生成QR码",
+			"appQrLoginDescription": "通过移动应用扫描，直接访问您的web3账户",
 			"TFA": {
 				"configuringGoogleAuthenticator": "配置Google Authenticator",
 				"installGoogleAuthenticator": "1. 安装Google Authenticator（iOS/Android）。",
@@ -518,6 +522,8 @@
 		"deleteComment": "删除评论",
 		"deleteCommentConfirmation": "您确定要删除此评论吗？",
 		"delete": "删除",
+		"save": "保存",
+		"edit": "编辑",
 		"hideReplies": "隐藏回复",
 		"viewReplies": "查看回复",
 		"commentSummary": "评论摘要",
@@ -665,7 +671,8 @@
 	},
 	"Balance": {
 		"voteBalance": "投票余额",
-		"Balance": "余额"
+		"Balance": "余额",
+		"PeopleChainBalance": "人民链余额"
 	},
 	"EditPost": {
 		"edit": "编辑",
@@ -749,7 +756,8 @@
 			"fellowship": "研究员",
 			"council": "理事会",
 			"democracy": "民主",
-			"whitelist": "白名单"
+			"whitelist": "白名单",
+			"technicalcommittee": "技术委员会"
 		},
 		"please": "请",
 		"login": "登录",

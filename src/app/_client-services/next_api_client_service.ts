@@ -91,6 +91,7 @@ enum EApiRoute {
 	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
+	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
 	LINK_ADDRESS = 'LINK_ADDRESS',
@@ -307,6 +308,7 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+			case EApiRoute.EDIT_COMMENT:
 				method = 'PATCH';
 				break;
 
@@ -591,6 +593,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
+	protected static async editCommentFromPostApi({ id, proposalType, index, content }: { id: string; proposalType: EProposalType; index: string; content: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_COMMENT, routeSegments: [proposalType, index, 'comments', id] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { content } });
+	}
+
 	// votes
 	static async getVotesHistory({
 		proposalType,
@@ -808,7 +815,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
-	protected static async generateQRSession() {
+	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}

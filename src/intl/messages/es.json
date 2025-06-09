@@ -274,6 +274,10 @@
 			"newEmail": "Nuevo correo electrónico",
 			"type": "Tipo",
 			"belowToConfirm": "abajo para confirmar",
+			"appQrLogin": "Inicio de sesión QR de la aplicación",
+			"scanToLoginInApp": "Escanear para iniciar sesión",
+			"generateQr": "Generar QR",
+			"appQrLoginDescription": "Escanee a través de la aplicación móvil para acceso directo a su cuenta web3",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configurando Google Authenticator",
 				"installGoogleAuthenticator": "1. Instale Google Authenticator (iOS/Android).",
@@ -519,6 +523,8 @@
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
 		"delete": "Eliminar",
+		"save": "Guardar",
+		"edit": "Editar",
 		"hideReplies": "Ocultar respuestas",
 		"viewReplies": "Ver respuestas",
 		"commentSummary": "Resumen del comentario",
@@ -666,7 +672,8 @@
 	},
 	"Balance": {
 		"voteBalance": "Balance de Votos",
-		"Balance": "Balance"
+		"Balance": "Balance",
+		"PeopleChainBalance": "Balance de People Chain"
 	},
 	"EditPost": {
 		"edit": "Editar",
@@ -750,7 +757,8 @@
 			"fellowship": "Fellowship",
 			"council": "Consejo",
 			"democracy": "Democracia",
-			"whitelist": "Lista blanca"
+			"whitelist": "Lista blanca",
+			"technicalcommittee": "Comité Técnico"
 		},
 		"please": "Por favor",
 		"login": "Iniciar sesión",

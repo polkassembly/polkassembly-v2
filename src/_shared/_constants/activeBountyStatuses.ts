@@ -14,6 +14,7 @@ export const ACTIVE_BOUNTY_STATUSES = [
 	EProposalStatus.Added,
 	EProposalStatus.Approved,
 	EProposalStatus.Active,
+	EProposalStatus.CuratorUnassigned,
 	EProposalStatus.CuratorAssigned,
 	EProposalStatus.CuratorProposed,
 	EProposalStatus.Proposed,

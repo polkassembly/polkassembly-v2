@@ -102,11 +102,456 @@ function CategorySection({ title, children }: CategorySectionProps) {
 	);
 }
 
+// Relay Chain Section Component
+function RelayChainSection({ data, network, currentTokenPrice, title }: { data: ITreasuryStats; network: ENetwork; currentTokenPrice: string; title: string }) {
+	return (
+		<CategorySection title={title}>
+			<div className='flex flex-col gap-1'>
+				<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+					~ $
+					{formatedAmountWithUSD({
+						amountsDetails: [{ amount: data.relayChain?.nativeToken || null, asset: null }],
+						currentTokenPrice,
+						network
+					})}
+				</span>
+				{data.relayChain?.nativeToken && (
+					<AssetRow
+						amount={data.relayChain.nativeToken}
+						network={network}
+					/>
+				)}
+			</div>
+		</CategorySection>
+	);
+}
+
+// Asset Hub Section Component
+function AssetHubSection({
+	data,
+	network,
+	currentTokenPrice,
+	assetHubTreasuryAddress,
+	title
+}: {
+	data: ITreasuryStats;
+	network: ENetwork;
+	currentTokenPrice: string;
+	assetHubTreasuryAddress: string;
+	title: string;
+}) {
+	if (!assetHubTreasuryAddress || assetHubTreasuryAddress.trim() === '') return null;
+
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{formatedAmountWithUSD({
+					amountsDetails: [
+						{ amount: data.assetHub?.nativeToken || null, asset: null },
+						{ amount: data.assetHub?.usdc || null, asset: EAssets.USDC },
+						{ amount: data.assetHub?.usdt || null, asset: EAssets.USDT }
+					],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-wrap gap-2'>
+				{data.assetHub?.nativeToken && (
+					<AssetRow
+						amount={data.assetHub.nativeToken}
+						network={network}
+					/>
+				)}
+				{data.assetHub?.usdc && (
+					<AssetRow
+						amount={data.assetHub.usdc}
+						asset={EAssets.USDC}
+						network={network}
+					/>
+				)}
+				{data.assetHub?.usdt && (
+					<AssetRow
+						amount={data.assetHub.usdt}
+						asset={EAssets.USDT}
+						network={network}
+					/>
+				)}
+				<Link
+					href={`https://assethub-${network}.subscan.io/account/${assetHubTreasuryAddress}`}
+					className='flex items-center gap-1 text-xs text-text_pink'
+					target='_blank'
+				>
+					<ExternalLink className='h-4 w-4' />
+				</Link>
+			</div>
+		</CategorySection>
+	);
+}
+
+// Hydration Section Component
+function HydrationSection({
+	data,
+	network,
+	currentTokenPrice,
+	hydrationAddresses,
+	title
+}: {
+	data: ITreasuryStats;
+	network: ENetwork;
+	currentTokenPrice: string;
+	hydrationAddresses: string[] | undefined;
+	title: string;
+}) {
+	const t = useTranslations('TreasuryStats');
+	if (!hydrationAddresses || hydrationAddresses.length === 0 || hydrationAddresses.every((addr) => !addr || addr.trim() === '')) return null;
+
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{formatedAmountWithUSD({
+					amountsDetails: [
+						{ amount: data.hydration?.nativeToken || null, asset: null },
+						{ amount: data.hydration?.usdc || null, asset: EAssets.USDC },
+						{ amount: data.hydration?.usdt || null, asset: EAssets.USDT }
+					],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-col gap-2'>
+				<div className='flex flex-wrap gap-2'>
+					{data.hydration?.nativeToken && (
+						<AssetRow
+							amount={data.hydration.nativeToken}
+							network={network}
+						/>
+					)}
+					{data.hydration?.usdc && (
+						<AssetRow
+							amount={data.hydration.usdc}
+							asset={EAssets.USDC}
+							network={network}
+						/>
+					)}
+					{data.hydration?.usdt && (
+						<AssetRow
+							amount={data.hydration.usdt}
+							asset={EAssets.USDT}
+							network={network}
+						/>
+					)}
+				</div>
+				<div className='flex gap-2'>
+					{hydrationAddresses?.map((address, index) => (
+						<Link
+							key={address}
+							href={`https://hydration.subscan.io/account/${address}`}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							{t('address')} #{index + 1}
+							<ExternalLink className='h-4 w-4' />
+						</Link>
+					))}
+				</div>
+			</div>
+		</CategorySection>
+	);
+}
+
+// Bounties Section Component
+function BountiesSection({ data, network, currentTokenPrice, title }: { data: ITreasuryStats; network: ENetwork; currentTokenPrice: string; title: string }) {
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{formatedAmountWithUSD({
+					amountsDetails: [{ amount: data.bounties?.nativeToken || null, asset: null }],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-wrap gap-2'>
+				{data.bounties?.nativeToken && (
+					<AssetRow
+						amount={data.bounties.nativeToken}
+						network={network}
+					/>
+				)}
+				<Link
+					href={`https://${network}.polkassembly.io/bounty-dashboard`}
+					className='flex items-center gap-1 text-xs text-text_pink'
+					target='_blank'
+				>
+					<ExternalLink className='h-4 w-4' />
+				</Link>
+			</div>
+		</CategorySection>
+	);
+}
+
+// Ambassador Section Component
+function AmbassadorSection({
+	data,
+	network,
+	currentTokenPrice,
+	ambassadorAddress,
+	title
+}: {
+	data: ITreasuryStats;
+	network: ENetwork;
+	currentTokenPrice: string;
+	ambassadorAddress: string | undefined;
+	title: string;
+}) {
+	if (!ambassadorAddress || ambassadorAddress.trim() === '') return null;
+
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{formatedAmountWithUSD({
+					amountsDetails: [{ amount: data.ambassador?.usdt || null, asset: EAssets.USDT }],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-wrap gap-2'>
+				{data.ambassador?.usdt && (
+					<AssetRow
+						amount={data.ambassador.usdt}
+						asset={EAssets.USDT}
+						network={network}
+					/>
+				)}
+				<Link
+					href={`https://assethub-${network}.subscan.io/account/${ambassadorAddress}`}
+					className='flex items-center gap-1 text-xs text-text_pink'
+					target='_blank'
+				>
+					<ExternalLink className='h-4 w-4' />
+				</Link>
+			</div>
+		</CategorySection>
+	);
+}
+
+// Fellowship Section Component
+function FellowshipSection({
+	data,
+	network,
+	currentTokenPrice,
+	fellowshipAddress,
+	title
+}: {
+	data: ITreasuryStats;
+	network: ENetwork;
+	currentTokenPrice: string;
+	fellowshipAddress: { treasury?: string; salary?: string } | undefined;
+	title: string;
+}) {
+	const t = useTranslations('TreasuryStats');
+	const hasTreasury = fellowshipAddress?.treasury && fellowshipAddress.treasury.trim() !== '';
+	const hasSalary = fellowshipAddress?.salary && fellowshipAddress.salary.trim() !== '';
+
+	if (!hasTreasury && !hasSalary) return null;
+
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{formatedAmountWithUSD({
+					amountsDetails: [
+						{ amount: data.fellowship?.nativeToken || null, asset: null },
+						{ amount: data.fellowship?.usdt || null, asset: EAssets.USDT }
+					],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-wrap gap-2'>
+				{hasTreasury && (
+					<>
+						<Link
+							href={`https://assethub-${network}.subscan.io/account/${fellowshipAddress?.treasury}`}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							{t('treasury')} <ExternalLink className='h-4 w-4' />
+						</Link>
+						{data.fellowship?.nativeToken && (
+							<AssetRow
+								amount={data.fellowship.nativeToken}
+								network={network}
+							/>
+						)}
+					</>
+				)}
+				{hasSalary && (
+					<>
+						<Link
+							href={`https://assethub-${network}.subscan.io/account/${fellowshipAddress?.salary}`}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							{t('salary')} <ExternalLink className='h-4 w-4' />
+						</Link>
+						{data.fellowship?.usdt && (
+							<AssetRow
+								amount={data.fellowship.usdt}
+								asset={EAssets.USDT}
+								network={network}
+							/>
+						)}
+					</>
+				)}
+			</div>
+		</CategorySection>
+	);
+}
+
+// Loans Section Component
+function LoansSection({
+	network,
+	currentTokenPrice,
+	loanAmounts,
+	title
+}: {
+	network: ENetwork;
+	currentTokenPrice: string;
+	loanAmounts: {
+		centrifuge?: {
+			usdc: string;
+			link?: string;
+		};
+		bifrost?: {
+			nativeToken: string;
+			link?: string;
+		};
+		pendulum?: {
+			nativeToken: string;
+			link?: string;
+		};
+		hydration?: {
+			nativeToken?: string;
+			link?: string;
+		};
+	} | null;
+	title: string;
+}) {
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{formatedAmountWithUSD({
+					amountsDetails: [
+						{ amount: loanAmounts?.bifrost?.nativeToken || null, asset: null },
+						{ amount: loanAmounts?.centrifuge?.usdc || null, asset: EAssets.USDC },
+						{ amount: loanAmounts?.pendulum?.nativeToken || null, asset: null },
+						{ amount: loanAmounts?.hydration?.nativeToken || null, asset: null }
+					],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-wrap gap-2'>
+				{loanAmounts?.bifrost?.nativeToken && loanAmounts.bifrost.nativeToken.trim() !== '' && (
+					<div className='flex flex-wrap gap-2'>
+						<Link
+							href={loanAmounts?.bifrost?.link || ''}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							Bifrost <ExternalLink className='h-4 w-4' />
+						</Link>
+						<AssetRow
+							amount={loanAmounts.bifrost.nativeToken}
+							network={network}
+						/>
+					</div>
+				)}
+				{loanAmounts?.centrifuge?.usdc && loanAmounts.centrifuge.usdc.trim() !== '' && (
+					<div className='flex flex-wrap gap-2'>
+						<Link
+							href={loanAmounts?.centrifuge?.link || ''}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							Centrifuge <ExternalLink className='h-4 w-4' />
+						</Link>
+						<AssetRow
+							amount={loanAmounts.centrifuge.usdc}
+							asset={EAssets.USDC}
+							network={network}
+						/>
+					</div>
+				)}
+				{loanAmounts?.pendulum?.nativeToken && loanAmounts.pendulum.nativeToken.trim() !== '' && (
+					<div className='flex gap-2'>
+						<Link
+							href={loanAmounts?.pendulum?.link || ''}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							Pendulum <ExternalLink className='h-4 w-4' />
+						</Link>
+						<AssetRow
+							amount={loanAmounts.pendulum.nativeToken}
+							network={network}
+						/>
+					</div>
+				)}
+				{loanAmounts?.hydration?.nativeToken && loanAmounts.hydration.nativeToken.trim() !== '' && (
+					<div className='flex gap-2'>
+						<Link
+							href={loanAmounts?.hydration?.link || ''}
+							className='flex items-center gap-1 text-xs text-text_pink'
+							target='_blank'
+						>
+							Hydration <ExternalLink className='h-4 w-4' />
+						</Link>
+						<AssetRow
+							amount={loanAmounts.hydration.nativeToken}
+							network={network}
+						/>
+					</div>
+				)}
+			</div>
+		</CategorySection>
+	);
+}
+
 // Component for displaying the treasury details
 export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boolean; onClose: () => void; data: ITreasuryStats }): ReactElement {
 	const t = useTranslations('TreasuryStats');
 	const network = getCurrentNetwork();
-	const loanAmounts = TREASURY_NETWORK_CONFIG[`${network}`]?.loanAmounts;
+	const treasuryConfig = TREASURY_NETWORK_CONFIG[`${network}`];
+
+	// Early return if treasury config is not available for this network
+	if (!treasuryConfig) {
+		return (
+			<Dialog
+				open={isOpen}
+				onOpenChange={() => onClose()}
+			>
+				<DialogContent className='max-w-screen-md bg-bg_modal p-4 lg:p-6'>
+					<DialogHeader>
+						<DialogTitle className='text-lg font-semibold text-muted-foreground'>{t('treasuryDistribution')}</DialogTitle>
+					</DialogHeader>
+					<div className='text-center text-muted-foreground'>{t('treasuryNotSupported')}</div>
+				</DialogContent>
+			</Dialog>
+		);
+	}
+
+	const { loanAmounts } = treasuryConfig;
+	const { ambassadorAddress } = treasuryConfig;
+	const { fellowshipAddress } = treasuryConfig;
+	const { assetHubTreasuryAddress } = treasuryConfig;
+	const { hydrationAddresses } = treasuryConfig;
+	const currentTokenPrice = data.nativeTokenUsdPrice || BN_ZERO?.toString();
 
 	return (
 		<Dialog
@@ -119,316 +564,63 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 				</DialogHeader>
 
 				<div className='max-h-[70vh] overflow-y-auto'>
-					{/* Relay Chain */}
-					<CategorySection title={t('relayChain')}>
-						<div className='flex flex-col gap-1'>
-							<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-								~ $
-								{formatedAmountWithUSD({
-									amountsDetails: [{ amount: data.relayChain?.dot || null, asset: null }],
-									currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-									network
-								})}
-							</span>
-							{data.relayChain?.dot && (
-								<AssetRow
-									amount={data.relayChain.dot}
-									network={network}
-								/>
-							)}
-						</div>
-					</CategorySection>
+					<RelayChainSection
+						data={data}
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						title={t('relayChain')}
+					/>
 
-					{/* Asset Hub */}
-					<CategorySection title={t('assetHub')}>
-						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-							~ $
-							{formatedAmountWithUSD({
-								amountsDetails: [
-									{ amount: data.assetHub?.dot || null, asset: null },
-									{ amount: data.assetHub?.usdc || null, asset: EAssets.USDC },
-									{ amount: data.assetHub?.usdt || null, asset: EAssets.USDT }
-								],
-								currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-								network
-							})}
-						</span>
-						<div className='flex flex-wrap gap-2'>
-							{data.assetHub?.dot && (
-								<AssetRow
-									amount={data.assetHub.dot}
-									network={network}
-								/>
-							)}
-							{data.assetHub?.usdc && (
-								<AssetRow
-									amount={data.assetHub.usdc}
-									asset={EAssets.USDC}
-									network={network}
-								/>
-							)}
+					<AssetHubSection
+						data={data}
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						assetHubTreasuryAddress={assetHubTreasuryAddress!}
+						title={t('assetHub')}
+					/>
 
-							{data.assetHub?.usdt && (
-								<AssetRow
-									amount={data.assetHub.usdt}
-									asset={EAssets.USDT}
-									network={network}
-								/>
-							)}
-							<Link
-								href='https://assethub-polkadot.subscan.io/account/14xmwinmCEz6oRrFdczHKqHgWNMiCysE2KrA4jXXAAM1Eogk'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								<ExternalLink className='h-4 w-4' />
-							</Link>
-						</div>
-					</CategorySection>
-
-					{/* Hydration */}
-					<CategorySection title={t('hydration')}>
-						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-							~ $
-							{formatedAmountWithUSD({
-								amountsDetails: [
-									{ amount: data.hydration?.dot || null, asset: null },
-									{ amount: data.hydration?.usdc || null, asset: EAssets.USDC },
-									{ amount: data.hydration?.usdt || null, asset: EAssets.USDT }
-								],
-								currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-								network
-							})}
-						</span>
-						<div className='flex flex-col gap-2'>
-							<div className='flex flex-wrap gap-2'>
-								{data.hydration?.dot && (
-									<AssetRow
-										amount={data.hydration.dot}
-										network={network}
-									/>
-								)}
-
-								{data.hydration?.usdc && (
-									<AssetRow
-										amount={data.hydration.usdc}
-										asset={EAssets.USDC}
-										network={network}
-									/>
-								)}
-
-								{data.hydration?.usdt && (
-									<AssetRow
-										amount={data.hydration.usdt}
-										asset={EAssets.USDT}
-										network={network}
-									/>
-								)}
-							</div>
-
-							<div className='flex gap-2'>
-								<Link
-									href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									{t('address')} #1
-									<ExternalLink className='h-4 w-4' />
-								</Link>
-								<Link
-									href='https://hydration.subscan.io/account/7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									{t('address')} #2
-									<ExternalLink className='h-4 w-4' />
-								</Link>
-								<Link
-									href='https://hydration.subscan.io/account/7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									{t('address')} #3
-									<ExternalLink className='h-4 w-4' />
-								</Link>
-							</div>
-						</div>
-					</CategorySection>
+					<HydrationSection
+						data={data}
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						hydrationAddresses={hydrationAddresses}
+						title={t('hydration')}
+					/>
 
 					<Separator
 						className='my-4 w-full'
 						orientation='horizontal'
 					/>
 
-					{/* Bounties */}
-					<CategorySection title={t('bounties')}>
-						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-							~ $
-							{formatedAmountWithUSD({
-								amountsDetails: [{ amount: data.bounties?.dot || null, asset: null }],
-								currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-								network
-							})}
-						</span>
-						<div className='flex flex-wrap gap-2'>
-							{data.bounties?.dot && (
-								<AssetRow
-									amount={data.bounties.dot}
-									network={network}
-								/>
-							)}
-							<Link
-								href='https://polkadot.polkassembly.io/bounty-dashboard'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								<ExternalLink className='h-4 w-4' />
-							</Link>
-						</div>
-					</CategorySection>
+					<BountiesSection
+						data={data}
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						title={t('bounties')}
+					/>
 
-					{/* Ambassador */}
-					<CategorySection title={t('ambassador')}>
-						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-							~ $
-							{formatedAmountWithUSD({
-								amountsDetails: [{ amount: data.ambassador?.usdt || null, asset: EAssets.USDT }],
-								currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-								network
-							})}
-						</span>
-						<div className='flex flex-wrap gap-2'>
-							{data.ambassador?.usdt && (
-								<AssetRow
-									amount={data.ambassador.usdt}
-									asset={EAssets.USDT}
-									network={network}
-								/>
-							)}
-							<Link
-								href='https://assethub-polkadot.subscan.io/account/13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								<ExternalLink className='h-4 w-4' />
-							</Link>
-						</div>
-					</CategorySection>
+					<AmbassadorSection
+						data={data}
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						ambassadorAddress={ambassadorAddress}
+						title={t('ambassador')}
+					/>
 
-					{/* Fellowship */}
-					<CategorySection title={t('fellowship')}>
-						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-							~ $
-							{formatedAmountWithUSD({
-								amountsDetails: [
-									{ amount: data.fellowship?.dot || null, asset: null },
-									{ amount: data.fellowship?.usdt || null, asset: EAssets.USDT }
-								],
-								currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-								network
-							})}
-						</span>
-						<div className='flex flex-wrap gap-2'>
-							<Link
-								href='https://assethub-polkadot.subscan.io/account/16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								{t('treasury')} <ExternalLink className='h-4 w-4' />
-							</Link>
-							{data.fellowship?.dot && (
-								<AssetRow
-									amount={data.fellowship.dot}
-									network={network}
-								/>
-							)}
+					<FellowshipSection
+						data={data}
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						fellowshipAddress={fellowshipAddress}
+						title={t('fellowship')}
+					/>
 
-							<Link
-								href='https://assethub-polkadot.subscan.io/account/13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS'
-								className='flex items-center gap-1 text-xs text-text_pink'
-							>
-								{t('salary')} <ExternalLink className='h-4 w-4' />
-							</Link>
-							{data.fellowship?.usdt && (
-								<AssetRow
-									amount={data.fellowship.usdt}
-									asset={EAssets.USDT}
-									network={network}
-								/>
-							)}
-						</div>
-					</CategorySection>
-
-					{/* Loans */}
-					<CategorySection title={t('loans')}>
-						<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
-							~ $
-							{formatedAmountWithUSD({
-								amountsDetails: [
-									{ amount: loanAmounts?.bifrost?.dot || null, asset: null },
-									{ amount: loanAmounts?.centrifuge?.usdc || null, asset: EAssets.USDC },
-									{ amount: loanAmounts?.pendulum?.dot || null, asset: null },
-									{ amount: loanAmounts?.hydration?.dot || null, asset: null }
-								],
-								currentTokenPrice: data.nativeTokenUsdPrice || BN_ZERO?.toString(),
-								network
-							})}
-						</span>
-						<div className='flex flex-wrap gap-2'>
-							<div className='flex flex-wrap gap-2'>
-								<Link
-									href='https://polkadot.polkassembly.io/referenda/432'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									Bifrost <ExternalLink className='h-4 w-4' />
-								</Link>
-								{loanAmounts?.bifrost?.dot && (
-									<AssetRow
-										amount={loanAmounts.bifrost.dot}
-										network={network}
-									/>
-								)}
-							</div>
-
-							<div className='flex flex-wrap gap-2'>
-								<Link
-									href='https://polkadot.polkassembly.io/referenda/1122'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									Centrifuge <ExternalLink className='h-4 w-4' />
-								</Link>
-								{loanAmounts?.centrifuge?.usdc && (
-									<AssetRow
-										amount={loanAmounts.centrifuge.usdc}
-										asset={EAssets.USDC}
-										network={network}
-									/>
-								)}
-							</div>
-							<div className='flex gap-2'>
-								<Link
-									href='https://polkadot.polkassembly.io/referenda/748'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									Pendulum <ExternalLink className='h-4 w-4' />
-								</Link>
-
-								{loanAmounts?.pendulum?.dot && (
-									<AssetRow
-										amount={loanAmounts.pendulum.dot}
-										network={network}
-									/>
-								)}
-							</div>
-							<div className='flex gap-2'>
-								<Link
-									href='https://polkadot.polkassembly.io/referenda/560'
-									className='flex items-center gap-1 text-xs text-text_pink'
-								>
-									Hydration <ExternalLink className='h-4 w-4' />
-								</Link>
-
-								{loanAmounts?.hydration?.dot && (
-									<AssetRow
-										amount={loanAmounts.hydration.dot}
-										network={network}
-									/>
-								)}
-							</div>
-						</div>
-					</CategorySection>
+					<LoansSection
+						network={network}
+						currentTokenPrice={currentTokenPrice}
+						loanAmounts={loanAmounts || null}
+						title={t('loans')}
+					/>
 				</div>
 			</DialogContent>
 		</Dialog>
