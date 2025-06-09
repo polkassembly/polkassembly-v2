@@ -29,6 +29,7 @@ import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
 import ClaimPayout from './ClaimPayout/ClaimPayout';
+import PostAnalytics from './Analytics/PostAnalytics';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
@@ -117,6 +118,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 									index={index}
 									onchainInfo={post.onChainInfo}
+								/>
+							</TabsContent>
+							<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+								<PostAnalytics
+									proposalType={post.proposalType}
+									index={Number(index)}
 								/>
 							</TabsContent>
 						</div>

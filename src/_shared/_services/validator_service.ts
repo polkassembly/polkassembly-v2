@@ -14,6 +14,7 @@ import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 import { BN, isHex } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '../_constants/networks';
+import { ANALYTICS_PROPOSAL_TYPES } from '../_constants/analyticsProposalType';
 
 const TAG_MAX_LENGTH = 20;
 const TAG_MIN_LENGTH = 1;
@@ -53,6 +54,10 @@ export class ValidatorService {
 
 	static isValidOffChainProposalType(proposalType: string): boolean {
 		return OFF_CHAIN_PROPOSAL_TYPES.includes(proposalType as EProposalType);
+	}
+
+	static isValidAnalyticsProposalType(proposalType: string): boolean {
+		return ANALYTICS_PROPOSAL_TYPES.includes(proposalType as EProposalType);
 	}
 
 	static isValidOnChainProposalType(proposalType: string): boolean {

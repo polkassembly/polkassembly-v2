@@ -11,11 +11,13 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import {
 	ENetwork,
+	EProposalStatus,
 	IContentSummary,
 	IDelegateDetails,
 	IDelegationStats,
 	IGenericListingResponse,
 	IPost,
+	IPostAnalytics,
 	IPostListing,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
@@ -56,7 +58,8 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
-	OVERVIEW_PAGE_DATA = 'OPD'
+	OVERVIEW_PAGE_DATA = 'OPD',
+	POST_ANALYTICS_DATA = 'PAD'
 }
 
 export class RedisService {
@@ -113,7 +116,9 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
-		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.POST_ANALYTICS_DATA]: (network: string, proposalType: string, indexOrHash: string): string =>
+			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${indexOrHash}`
 	} as const;
 
 	// helper methods
@@ -579,5 +584,32 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Post analytics caching methods
+	static async SetPostAnalyticsData({
+		network,
+		proposalType,
+		indexOrHash,
+		data
+	}: {
+		network: string;
+		proposalType: string;
+		indexOrHash: string;
+		data: IPostAnalytics;
+	}): Promise<void> {
+		const isActivePost = data.proposal.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
+
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, indexOrHash),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
+		});
+	}
+
+	// Posts caching methods
+	static async GetPostAnalyticsData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<IPostAnalytics | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, indexOrHash) });
+		return data ? (deepParseJson(data) as IPostAnalytics) : null;
 	}
 }

@@ -53,6 +53,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
+	const isAnalyticsProposalType = ValidatorService.isValidAnalyticsProposalType(postData.proposalType);
 
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
 
@@ -222,6 +223,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
 				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
 				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
+				{isAnalyticsProposalType && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
 			</TabsList>
 		</div>
 	);

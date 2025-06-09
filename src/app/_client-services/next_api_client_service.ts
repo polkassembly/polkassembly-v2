@@ -49,7 +49,8 @@ import {
 	IOnChainMetadata,
 	EVoteSortOptions,
 	EHttpHeaderKey,
-	IPostLink
+	IPostLink,
+	IPostAnalytics
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -128,7 +129,8 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS'
+	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS'
 }
 
 export class NextApiClientService {
@@ -225,6 +227,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
+			case EApiRoute.GET_POST_ANALYTICS:
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -1073,5 +1076,10 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_ANALYTICS, routeSegments: [proposalType, index, 'analytics'] });
+		return this.nextApiClientFetch<IPostAnalytics>({ url, method });
 	}
 }

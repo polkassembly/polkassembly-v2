@@ -22,6 +22,9 @@
 		"@joplin/turndown-plugin-gfm": "^1.0.62",
 		"@mdxeditor/editor": "^3.29.1",
 		"@metamask/eth-sig-util": "^7.0.3",
+		"@nivo/bar": "^0.99.0",
+		"@nivo/line": "^0.99.0",
+		"@nivo/pie": "^0.99.0",
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@polkadot/api": "^13.0.1",
 		"@polkadot/api-augment": "^13.0.1",
@@ -145,8 +148,13 @@
 		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
-		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
+		"**/*.(ts|tsx|js|jsx)": [
+			"yarn eslint --fix",
+			"yarn prettier --write"
+		],
+		"**/*.(md|css|scss|html)": [
+			"yarn prettier --write"
+		]
 	},
 	"resolutions": {
 		"@types/react": "npm:types-react@19.0.0-rc.1",

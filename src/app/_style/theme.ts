@@ -142,6 +142,10 @@ export const THEME_COLORS = {
 		read_more_txt: '#2563eb',
 		aye_color: '#6DE1A2',
 		nay_color: '#FF778F',
+		abstain_color: '#407BFF',
+		turnout_color: '#796EEC',
+		issuance_color: '#B6B0FB',
+		time_split_color: '#4064FF',
 		not_voted_bg: '#fff0f3',
 		voted_bg: '#fff6ee',
 		bg_code: '#fbfbfd',
@@ -159,7 +163,9 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#ededed',
 		tag_input_bg: '#f4f6f8',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		nivo_fill_color: '#595959',
+		analytics_description_bg: '#efeefe'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -298,6 +304,10 @@ export const THEME_COLORS = {
 		read_more_txt: '#2563eb',
 		aye_color: '#6DE1A2',
 		nay_color: '#FF778F',
+		abstain_color: '#407BFF',
+		turnout_color: '#796EEC',
+		issuance_color: '#B6B0FB',
+		time_split_color: '#4064FF',
 		not_voted_bg: '#1e160d',
 		voted_bg: '#1e1113',
 		bg_code: '#222222',
@@ -315,6 +325,8 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#343744',
 		tag_input_bg: '#222222',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		nivo_fill_color: '#fff',
+		analytics_description_bg: '#efeefe'
 	}
 };

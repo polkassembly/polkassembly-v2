@@ -7,7 +7,7 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { ENetwork, EPostOrigin, EProposalStatus, EVoteDecision, EVoteSortOptions, IBeneficiary } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalStatus, EVoteDecision, EVoteSortOptions, IAccountAnalytics, IAnalytics, IBeneficiary, IFlattenedConvictionVote } from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -63,6 +63,157 @@ export class SubsquidUtils extends SubsquidQueries {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Helper to process conviction votes
+	 */
+	private static processConvictionVote({ vote, balance, convictionsVotes }: { vote: IFlattenedConvictionVote; balance: BN; convictionsVotes: IAnalytics['votesByConviction'] }) {
+		const sameLockedPeriod = convictionsVotes.find((value) => [vote.lockPeriod || 0].includes(value.lockPeriod));
+		if (sameLockedPeriod) {
+			if (vote.decision === EVoteDecision.AYE) {
+				sameLockedPeriod[EVoteDecision.AYE] = new BN(sameLockedPeriod[EVoteDecision.AYE] || '0').add(balance).toString();
+			} else if (vote.decision === EVoteDecision.NAY) {
+				sameLockedPeriod[EVoteDecision.NAY] = new BN(sameLockedPeriod[EVoteDecision.NAY] || '0').add(balance).toString();
+			} else if (vote.decision === EVoteDecision.ABSTAIN) {
+				sameLockedPeriod[EVoteDecision.ABSTAIN] = new BN(sameLockedPeriod[EVoteDecision.ABSTAIN] || '0').add(balance).toString();
+			}
+		} else {
+			convictionsVotes.push({
+				[EVoteDecision.ABSTAIN]: vote.decision === EVoteDecision.ABSTAIN ? balance?.toString() : '0',
+				[EVoteDecision.AYE]: vote.decision === EVoteDecision.AYE ? balance?.toString() : '0',
+				[EVoteDecision.NAY]: vote.decision === EVoteDecision.NAY ? balance?.toString() : '0',
+				lockPeriod: vote.lockPeriod || 0
+			});
+		}
+		return convictionsVotes.sort((a, b) => a.lockPeriod - b.lockPeriod);
+	}
+
+	/**
+	 * Helper to process delegation votes
+	 */
+	private static processDelegationVote({
+		vote,
+		balance,
+		delegationVotes
+	}: {
+		vote: IFlattenedConvictionVote;
+		balance: BN;
+		delegationVotes: IAnalytics['delegationVotesByConviction'];
+	}) {
+		const sameLockedPeriod = delegationVotes.find((value) => [vote.lockPeriod || 0].includes(value.lockPeriod));
+		if (sameLockedPeriod) {
+			if (vote.isDelegated) {
+				sameLockedPeriod.delegated = new BN(sameLockedPeriod.delegated || '0').add(balance).toString();
+			} else {
+				sameLockedPeriod.solo = new BN(sameLockedPeriod.solo || '0').add(balance).toString();
+			}
+		} else {
+			delegationVotes.push({
+				delegated: vote.isDelegated ? balance?.toString() : '0',
+				solo: vote.isDelegated ? '0' : balance?.toString(),
+				lockPeriod: vote.lockPeriod || 0
+			});
+		}
+		return delegationVotes.sort((a, b) => a.lockPeriod - b.lockPeriod);
+	}
+
+	/**
+	 * Helper to process conviction votes for account
+	 */
+	private static processConvictionVotesForAccount({ vote, convictionVotes }: { vote: IFlattenedConvictionVote; convictionVotes: IAccountAnalytics['votesByConviction'] }) {
+		const sameLockedPeriod = convictionVotes.find((value) => [vote.lockPeriod || 0].includes(value.lockPeriod));
+		if (sameLockedPeriod) {
+			if (vote.decision === EVoteDecision.AYE) {
+				sameLockedPeriod[EVoteDecision.AYE] += 1;
+			} else if (vote.decision === EVoteDecision.NAY) {
+				sameLockedPeriod[EVoteDecision.NAY] += 1;
+			} else if (vote.decision === EVoteDecision.ABSTAIN) {
+				sameLockedPeriod[EVoteDecision.ABSTAIN] += 1;
+			}
+		} else {
+			convictionVotes.push({
+				[EVoteDecision.ABSTAIN]: vote.decision === EVoteDecision.ABSTAIN ? 1 : 0,
+				[EVoteDecision.AYE]: vote.decision === EVoteDecision.AYE ? 1 : 0,
+				[EVoteDecision.NAY]: vote.decision === EVoteDecision.NAY ? 1 : 0,
+				lockPeriod: vote.lockPeriod || 0
+			});
+		}
+		return convictionVotes.sort((a, b) => a.lockPeriod - b.lockPeriod);
+	}
+
+	/**
+	 * Helper to process delegation votes for account
+	 */
+	private static processDelegationVotesForAccount({
+		vote,
+		delegationVotes
+	}: {
+		vote: IFlattenedConvictionVote;
+		delegationVotes: IAccountAnalytics['delegationVotesByConviction'];
+	}) {
+		const sameLockedPeriod = delegationVotes.find((value) => [vote.lockPeriod || 0].includes(value.lockPeriod));
+		if (sameLockedPeriod) {
+			if (vote.isDelegated) {
+				sameLockedPeriod.delegated += 1;
+			} else {
+				sameLockedPeriod.solo += 1;
+			}
+		} else {
+			delegationVotes.push({
+				delegated: vote.isDelegated ? 1 : 0,
+				solo: vote.isDelegated ? 0 : 1,
+				lockPeriod: vote.lockPeriod || 0
+			});
+		}
+		return delegationVotes.sort((a, b) => a.lockPeriod - b.lockPeriod);
+	}
+
+	/**
+	 * Helper to process time split votes
+	 */
+	private static processTimeSplitVotes({
+		vote,
+		convictionVote,
+		timeSplitVotes
+	}: {
+		vote: IFlattenedConvictionVote;
+		convictionVote: BN;
+		timeSplitVotes: IAnalytics['timeSplitVotes'];
+	}) {
+		const proposalCreatedAt = dayjs(vote.proposal.createdAt);
+		const voteCreatedAt = dayjs(vote.createdAt);
+		const timeSplit = voteCreatedAt.diff(proposalCreatedAt, 'day');
+
+		// 0-28 days
+		if (timeSplit > 0 && timeSplit <= 28) {
+			const sameIndex = timeSplitVotes.find((timeSplitVote) => timeSplitVote.index === timeSplit);
+			if (sameIndex) {
+				sameIndex.value = new BN(sameIndex.value).add(convictionVote).toString();
+			} else {
+				timeSplitVotes.push({ index: timeSplit, value: convictionVote.toString() });
+			}
+		}
+		return timeSplitVotes.sort((a, b) => a.index - b.index);
+	}
+
+	/**
+	 * Helper to process time split votes for account
+	 */
+	private static processTimeSplitVotesForAccount({ vote, timeSplitVotes }: { vote: IFlattenedConvictionVote; timeSplitVotes: IAccountAnalytics['timeSplitVotes'] }) {
+		const proposalCreatedAt = dayjs(vote.proposal.createdAt);
+		const voteCreatedAt = dayjs(vote.createdAt);
+		const timeSplit = voteCreatedAt.diff(proposalCreatedAt, 'day');
+
+		if (timeSplit > 0 && timeSplit <= 28) {
+			const sameIndex = timeSplitVotes.find((timeSplitVote) => timeSplitVote.index === timeSplit);
+			if (sameIndex) {
+				sameIndex.value += 1;
+			} else {
+				timeSplitVotes.push({ index: timeSplit, value: 1 });
+			}
+		}
+		return timeSplitVotes.sort((a, b) => a.index - b.index);
 	}
 
 	/**
@@ -218,5 +369,145 @@ export class SubsquidUtils extends SubsquidQueries {
 			default:
 				return [EVoteSortOptions.CreatedAtBlockDESC, EVoteSortOptions.IdDESC];
 		}
+	}
+
+	protected static getVotingPower(balance: string, lockPeriod: number): BN {
+		return new BN(balance).mul(new BN(lockPeriod || DEFAULT_LOCK_PERIOD));
+	}
+
+	protected static getVotesAnalytics({ votes, type }: { votes: IFlattenedConvictionVote[]; type: 'convictionsAnalytics' | 'votesAnalytics' }): IAnalytics {
+		const analytics: IAnalytics = {
+			aye: '0',
+			nay: '0',
+			abstain: '0',
+			delegated: '0',
+			solo: '0',
+			support: '0',
+			timeSplitVotes: [],
+			votesByConviction: [],
+			delegationVotesByConviction: [],
+			votesDistribution: {
+				abstain: [],
+				aye: [],
+				nay: []
+			}
+		};
+
+		let totalAye = BN_ZERO;
+		let totalNay = BN_ZERO;
+
+		votes.forEach((vote) => {
+			const balance = new BN(vote.balance?.value || '0');
+			const voteBalance = type === 'convictionsAnalytics' ? this.getVotingPower(vote.balance?.value || '0', vote.lockPeriod) : balance;
+
+			if (vote.decision === EVoteDecision.AYE) {
+				analytics.aye = new BN(analytics.aye).add(new BN(voteBalance)).toString();
+
+				totalAye = totalAye.add(balance);
+
+				analytics.support = new BN(analytics.support).add(balance).toString();
+
+				analytics.votesDistribution?.aye?.push({
+					balance: balance.toString(),
+					voter: vote.voter,
+					votingPower: voteBalance.toString()
+				});
+			} else {
+				if (vote.decision === EVoteDecision.NAY) {
+					analytics.nay = new BN(analytics.nay).add(new BN(voteBalance)).toString();
+
+					analytics.votesDistribution?.nay?.push({
+						balance: balance.toString(),
+						voter: vote.voter,
+						votingPower: voteBalance.toString()
+					});
+				} else if (vote.decision === EVoteDecision.ABSTAIN) {
+					analytics.abstain = new BN(analytics.abstain).add(new BN(voteBalance)).toString();
+
+					analytics.support = new BN(analytics.support).add(balance).toString();
+
+					analytics.votesDistribution?.abstain?.push({
+						balance: balance.toString(),
+						voter: vote.voter,
+						votingPower: voteBalance.toString()
+					});
+				}
+				totalNay = totalNay.add(balance);
+			}
+
+			// delegation votes
+			if (vote.isDelegated) {
+				analytics.delegated = new BN(analytics.delegated).add(new BN(voteBalance)).toString();
+			} else {
+				analytics.solo = new BN(analytics.solo).add(new BN(voteBalance)).toString();
+			}
+
+			// time split votes
+			analytics.timeSplitVotes = this.processTimeSplitVotes({ vote, convictionVote: voteBalance, timeSplitVotes: analytics.timeSplitVotes });
+
+			// conviction votes
+			analytics.votesByConviction = this.processConvictionVote({ vote, balance: voteBalance, convictionsVotes: analytics.votesByConviction });
+			analytics.delegationVotesByConviction = this.processDelegationVote({ vote, balance: voteBalance, delegationVotes: analytics.delegationVotesByConviction });
+		});
+		// turnout //todo:
+		// analytics.turnout = new BN(totalAye).add(new BN(totalNay)).toString();
+
+		return analytics;
+	}
+
+	protected static getAccountsAnalytics({ votes }: { votes: IFlattenedConvictionVote[] }): IAccountAnalytics {
+		const analytics: IAccountAnalytics = {
+			abstain: 0,
+			aye: 0,
+			nay: 0,
+			delegated: 0,
+			solo: 0,
+			support: '0',
+			timeSplitVotes: [],
+			votesByConviction: [],
+			delegationVotesByConviction: []
+		};
+
+		let totalAye = BN_ZERO;
+		let totalNay = BN_ZERO;
+
+		votes.forEach((vote) => {
+			const balance = new BN(vote.balance?.value || '0');
+			const increment = vote.isDelegated ? 0 : 1;
+
+			if (vote.decision === EVoteDecision.AYE) {
+				analytics.aye += increment;
+
+				totalAye = totalAye.add(balance);
+
+				analytics.support = new BN(analytics.support).add(balance).toString();
+			} else {
+				if (vote.decision === EVoteDecision.NAY) {
+					analytics.nay += increment;
+				} else if (vote.decision === EVoteDecision.ABSTAIN) {
+					analytics.abstain += increment;
+				}
+				totalNay = totalNay.add(balance);
+			}
+
+			// delegation votes
+			if (vote.isDelegated) {
+				analytics.delegated += 1;
+			} else {
+				analytics.solo += 1;
+			}
+
+			// time split votes
+			analytics.timeSplitVotes = this.processTimeSplitVotesForAccount({ vote, timeSplitVotes: analytics.timeSplitVotes });
+
+			// conviction votes
+			analytics.votesByConviction = this.processConvictionVotesForAccount({ vote, convictionVotes: analytics.votesByConviction });
+			analytics.delegationVotesByConviction = this.processDelegationVotesForAccount({ vote, delegationVotes: analytics.delegationVotesByConviction });
+		});
+
+		// turnout todo:
+		// analytics.turnout = new BN(totalAye).add(new BN(totalNay)).toString();
+
+		return analytics;
 	}
 }
