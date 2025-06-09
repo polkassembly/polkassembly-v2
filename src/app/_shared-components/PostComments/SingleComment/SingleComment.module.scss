@@ -33,3 +33,17 @@
 .viewBtn {
 	@apply p-0 text-xs text-small_btn_text;
 }
+
+.highlighted {
+	@apply animate-[highlight_3s_ease-in-out];
+	animation: highlight 3s ease-in-out;
+}
+
+@keyframes highlight {
+	0% {
+		@apply bg-bg_pink/10;
+	}
+	100% {
+		@apply bg-transparent;
+	}
+}

@@ -5,7 +5,7 @@
 'use client';
 
 import { EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
@@ -39,6 +39,27 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	const handleShowLess = () => {
 		setShowMore(false);
 	};
+
+	// Handle comment link navigation
+	useEffect(() => {
+		const { hash } = window.location;
+		if (!hash) return;
+
+		const commentId = hash.replace('#comment-', '');
+		const comment = regularComments.find((c) => c.id === commentId);
+
+		if (comment && !showMore && regularComments.indexOf(comment) >= 2) {
+			handleShowMore();
+		}
+
+		// Scroll to comment after a short delay to ensure it's rendered
+		setTimeout(() => {
+			const element = document.getElementById(hash.substring(1));
+			if (element) {
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		}, 100);
+	}, [regularComments, showMore]);
 
 	return (
 		<div className={classes.wrapper}>

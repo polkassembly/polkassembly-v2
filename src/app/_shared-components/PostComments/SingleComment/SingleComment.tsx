@@ -185,6 +185,29 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		setShowReplies(true);
 	}, []);
 
+	const handleCopyCommentLink = useCallback(() => {
+		let url = '';
+		switch (proposalType) {
+			case EProposalType.DISCUSSION:
+				url = `${window.location.origin}/post/${index}#comment-${comment?.id}`;
+				break;
+			case EProposalType.BOUNTY:
+				url = `${window.location.origin}/bounty/${index}#comment-${comment?.id}`;
+				break;
+			case EProposalType.CHILD_BOUNTY:
+				url = `${window.location.origin}/child-bounty/${index}#comment-${comment?.id}`;
+				break;
+			default:
+				url = `${window.location.origin}/referenda/${index}#comment-${comment?.id}`;
+		}
+		navigator.clipboard.writeText(url);
+		toast({
+			title: 'Success!',
+			description: 'Comment link copied to clipboard',
+			status: ENotificationStatus.SUCCESS
+		});
+	}, [comment, index, proposalType, toast]);
+
 	if (!comment) {
 		return null;
 	}
@@ -193,9 +216,14 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
 	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const isHighlighted = window.location.hash === `#comment-${comment.id}`;
+	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			id={`comment-${comment.id}`}
+			className={wrapperClassName}
+		>
 			<Dialog
 				open={openDeleteModal}
 				onOpenChange={setOpenDeleteModal}
@@ -323,6 +351,14 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							}
 						>
 							{t('PostDetails.reply')}
+						</Button>
+						<Button
+							variant='ghost'
+							className={classes.replyButton}
+							onClick={handleCopyCommentLink}
+							size='sm'
+						>
+							Copy Link
 						</Button>
 						<div>
 							{comment.userId === user.id && (
