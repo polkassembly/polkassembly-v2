@@ -12,8 +12,9 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { useTranslations } from 'next-intl';
 import { THEME_COLORS } from '@/app/_style/theme';
 import Image from 'next/image';
-import Icon from '@/_assets/analytics/support_or_turnout.svg';
+import Icon from '@/_assets/analytics/support-or-turnout.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ETheme } from '@/_shared/types';
 import classes from './PostAnalytics.module.scss';
 
 interface IVotesTurnoutProps {
@@ -80,6 +81,7 @@ function TurnoutOrSupportCard({ turnout, support }: IVotesTurnoutProps) {
 					alt='turnout or support'
 					width={20}
 					height={20}
+					className={theme === ETheme.DARK ? 'darkIcon' : ''}
 				/>
 				<h2 className='text-base font-bold text-text_primary'>
 					{turnout ? t('turnout') : t('support')} {t('percentage')}

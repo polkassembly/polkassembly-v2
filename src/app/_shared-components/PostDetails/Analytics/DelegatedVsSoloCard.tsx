@@ -10,9 +10,10 @@ import { useTranslations } from 'next-intl';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import Icon from '@/_assets/analytics/delegated_vs_solo.svg';
 import Image from 'next/image';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import Icon from '@/_assets/analytics/delegated-vs-solo.svg';
+import { ETheme } from '@/_shared/types';
 import classes from './PostAnalytics.module.scss';
 
 function DelegatedVsSoloCard({
@@ -56,6 +57,7 @@ function DelegatedVsSoloCard({
 					alt='delegated vs solo'
 					width={20}
 					height={20}
+					className={theme === ETheme.DARK ? 'darkIcon' : ''}
 				/>
 				<h2 className='text-base font-bold text-text_primary'>{t('delegatedVsSolo')}</h2>
 			</div>
@@ -122,7 +124,7 @@ function DelegatedVsSoloCard({
 						`${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol}`
 					}
 				/>
-				<p className='absolute mt-4 flex items-end gap-2 text-lg font-bold dark:text-white'>
+				<p className='absolute mt-4 flex items-center gap-1 text-lg font-bold dark:text-white'>
 					{isAccountsAnalytics
 						? maxValue
 						: formatUSDWithUnits(formatBnBalance(maxValue.toString(), { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network), 1)}{' '}

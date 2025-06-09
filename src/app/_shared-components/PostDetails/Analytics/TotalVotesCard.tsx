@@ -3,16 +3,16 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React from 'react';
 import { ResponsivePie } from '@nivo/pie';
-import { IAccountAnalytics, IAnalytics } from '@/_shared/types';
+import { ETheme, IAccountAnalytics, IAnalytics } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslations } from 'next-intl';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import Icon from '@/_assets/analytics/total_casted_votes.svg';
 import Image from 'next/image';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import Icon from '@/_assets/analytics/total-casted-votes.svg';
 import classes from './PostAnalytics.module.scss';
 
 function TotalVotesCard({ analytics, isAccountsAnalytics = false }: { analytics: IAccountAnalytics | IAnalytics; isAccountsAnalytics?: boolean }) {
@@ -54,6 +54,7 @@ function TotalVotesCard({ analytics, isAccountsAnalytics = false }: { analytics:
 					alt='total votes casted'
 					width={20}
 					height={20}
+					className={theme === ETheme.DARK ? 'darkIcon' : ''}
 				/>
 				<h2 className='text-base font-bold text-text_primary'>{t('totalVotesCasted')}</h2>
 			</div>
@@ -120,7 +121,7 @@ function TotalVotesCard({ analytics, isAccountsAnalytics = false }: { analytics:
 						`${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol}`
 					}
 				/>
-				<p className='absolute mt-4 flex items-end gap-1 text-lg font-bold dark:text-white'>
+				<p className='absolute mt-4 flex items-center gap-1 text-lg font-bold dark:text-white'>
 					{isAccountsAnalytics
 						? maxValue
 						: formatUSDWithUnits(formatBnBalance(maxValue.toString(), { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network), 1)}

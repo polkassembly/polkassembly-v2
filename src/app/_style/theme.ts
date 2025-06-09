@@ -327,6 +327,6 @@ export const THEME_COLORS = {
 		tag_input_bg: '#222222',
 		parachain_badge_bg: '#ea729d',
 		nivo_fill_color: '#fff',
-		analytics_description_bg: '#efeefe'
+		analytics_description_bg: '#262535'
 	}
 };
