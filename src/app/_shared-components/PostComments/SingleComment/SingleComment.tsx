@@ -15,7 +15,7 @@ import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
-import { Ellipsis } from 'lucide-react';
+import { CopyIcon, Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
@@ -357,6 +357,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							className={classes.replyButton}
 							onClick={handleCopyCommentLink}
 							size='sm'
+							leftIcon={<CopyIcon className='darkIcon' />}
 						>
 							Copy Link
 						</Button>

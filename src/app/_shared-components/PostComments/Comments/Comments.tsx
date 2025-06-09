@@ -5,7 +5,7 @@
 'use client';
 
 import { EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useCallback, useLayoutEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
 
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
+import { Button } from '@ui/Button';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
 import classes from './Comments.module.scss';
@@ -41,7 +42,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	};
 
 	// Handle comment link navigation
-	useEffect(() => {
+	const handleCommentLink = useCallback(() => {
 		const { hash } = window.location;
 		if (!hash) return;
 
@@ -52,14 +53,19 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 			handleShowMore();
 		}
 
-		// Scroll to comment after a short delay to ensure it's rendered
-		setTimeout(() => {
+		// Use requestAnimationFrame to ensure the DOM is ready
+		requestAnimationFrame(() => {
 			const element = document.getElementById(hash.substring(1));
 			if (element) {
 				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
-		}, 100);
+		});
 	}, [regularComments, showMore]);
+
+	// Call handleCommentLink when the component mounts
+	useLayoutEffect(() => {
+		handleCommentLink();
+	}, [handleCommentLink]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -96,8 +102,8 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 
 				{spamComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
-						<button
-							type='button'
+						<Button
+							variant='ghost'
 							onClick={() => setShowSpam(!showSpam)}
 							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-pink-500'
 							aria-expanded={showSpam}
@@ -106,7 +112,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							{showSpam ? t('PostDetails.hideLikelySpam') : t('PostDetails.showLikelySpam')}
 							<span className='text-pink-500'>({spamComments.length})</span>
 							{showSpam ? <FaChevronUp className='text-base' /> : <FaChevronDown className='text-base' />}
-						</button>
+						</Button>
 						{showSpam && (
 							<div className='mt-4 flex flex-col gap-y-4'>
 								{spamComments.map((item) => (
