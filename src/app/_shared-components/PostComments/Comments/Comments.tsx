@@ -43,7 +43,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
-		const { hash } = window.location;
+		const { hash } = window?.location || {};
 		if (!hash) return;
 
 		const commentId = hash.replace('#comment-', '');

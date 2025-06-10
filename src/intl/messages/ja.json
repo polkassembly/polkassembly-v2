@@ -434,6 +434,7 @@
 	"PostDetails": {
 		"castVote": "投票する",
 		"castYourVote": "投票してください",
+		"copyLink": "リンクをコピー",
 		"loginToVote": "投票するにはログイン",
 		"requested": "リクエスト済み",
 		"beneficiary": "受益者",

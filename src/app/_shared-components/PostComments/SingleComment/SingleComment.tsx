@@ -190,16 +190,16 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		let url = '';
 		switch (proposalType) {
 			case EProposalType.DISCUSSION:
-				url = `${window.location.origin}/post/${index}#comment-${comment?.id}`;
+				url = `${window?.location?.origin}/post/${index}#comment-${comment?.id}`;
 				break;
 			case EProposalType.BOUNTY:
-				url = `${window.location.origin}/bounty/${index}#comment-${comment?.id}`;
+				url = `${window?.location?.origin}/bounty/${index}#comment-${comment?.id}`;
 				break;
 			case EProposalType.CHILD_BOUNTY:
-				url = `${window.location.origin}/child-bounty/${index}#comment-${comment?.id}`;
+				url = `${window?.location?.origin}/child-bounty/${index}#comment-${comment?.id}`;
 				break;
 			default:
-				url = `${window.location.origin}/referenda/${index}#comment-${comment?.id}`;
+				url = `${window?.location?.origin}/referenda/${index}#comment-${comment?.id}`;
 		}
 		navigator.clipboard.writeText(url);
 		toast({
@@ -217,7 +217,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
 	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
-	const isHighlighted = window.location.hash === `#comment-${comment.id}`;
+	const isHighlighted = window?.location?.hash === `#comment-${comment.id}`;
 	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
 	return (
@@ -409,7 +409,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							/>
 						</TooltipTrigger>
 						<TooltipContent className={classes.tooltipContent}>
-							<span>Copy Link</span>
+							<span>{t('PostDetails.copyLink')}</span>
 						</TooltipContent>
 					</Tooltip>
 				</div>
