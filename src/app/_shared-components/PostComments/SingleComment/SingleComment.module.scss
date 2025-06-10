@@ -3,7 +3,7 @@
 }
 
 .innerWrapper {
-	@apply flex min-w-0 flex-col gap-y-1;
+	@apply flex w-full min-w-0 flex-col gap-y-1;
 }
 
 .username {
@@ -37,6 +37,10 @@
 .highlighted {
 	@apply animate-[highlight_3s_ease-in-out];
 	animation: highlight 3s ease-in-out;
+}
+
+.tooltipContent {
+	@apply relative rounded-md bg-tooltip_background px-2 py-1 text-btn_primary_text shadow-lg dark:bg-social_tooltip_background;
 }
 
 @keyframes highlight {

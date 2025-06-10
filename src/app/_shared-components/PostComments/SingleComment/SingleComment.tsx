@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
@@ -335,75 +336,83 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					/>
 				)}
 
-				{user && (
-					<div className={classes.tools}>
-						<Button
-							variant='ghost'
-							className={classes.replyButton}
-							onClick={handleToggleReply}
-							size='sm'
-							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
-									className='darkIcon'
-								/>
-							}
-						>
-							{t('PostDetails.reply')}
-						</Button>
-						<Button
-							variant='ghost'
-							className={classes.replyButton}
-							onClick={handleCopyCommentLink}
-							size='sm'
-							leftIcon={<CopyIcon className='darkIcon' />}
-						>
-							Copy Link
-						</Button>
-						<div>
-							{comment.userId === user.id && (
-								<DropdownMenu>
-									<DropdownMenuTrigger
-										noArrow
-										className='border-none'
-									>
-										<Ellipsis
-											className='text-text_primary/[0.8]'
-											size={14}
-										/>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
-												onClick={toggleEditComment}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.edit')}
-											</Button>
-										</DropdownMenuItem>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
-												onClick={handleOpenDeleteModal}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.delete')}
-											</Button>
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							)}
+				<div className={classes.tools}>
+					{user && (
+						<div className={classes.tools}>
+							<Button
+								variant='ghost'
+								className={classes.replyButton}
+								onClick={handleToggleReply}
+								size='sm'
+								leftIcon={
+									<Image
+										src={ReplyIcon}
+										alt='reply'
+										className='darkIcon'
+									/>
+								}
+							>
+								{t('PostDetails.reply')}
+							</Button>
+							<div>
+								{comment.userId === user.id && (
+									<DropdownMenu>
+										<DropdownMenuTrigger
+											noArrow
+											className='border-none'
+										>
+											<Ellipsis
+												className='text-text_primary/[0.8]'
+												size={14}
+											/>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id}
+													onClick={toggleEditComment}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.edit')}
+												</Button>
+											</DropdownMenuItem>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id}
+													onClick={handleOpenDeleteModal}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.delete')}
+												</Button>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								)}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant='ghost'
+								className='ml-auto'
+								onClick={handleCopyCommentLink}
+								size='sm'
+								leftIcon={<CopyIcon className='darkIcon' />}
+							/>
+						</TooltipTrigger>
+						<TooltipContent className={classes.tooltipContent}>
+							<span>Copy Link</span>
+						</TooltipContent>
+					</Tooltip>
+				</div>
 
 				{reply && (
 					<AddComment
