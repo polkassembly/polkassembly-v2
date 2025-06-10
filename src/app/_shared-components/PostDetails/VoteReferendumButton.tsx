@@ -49,7 +49,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 			if (!data) return null;
 			return data;
 		},
-		enabled: !!user?.id,
+		enabled: !!user?.addresses[0],
 		retry: 1,
 		staleTime: 30000
 	});
