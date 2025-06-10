@@ -434,6 +434,7 @@
 	},
 	"PostDetails": {
 		"castVote": "Emitir Voto",
+		"castVoteAgain": "Emitir Voto de Nuevo",
 		"castYourVote": "Emita su Voto",
 		"loginToVote": "Inicie sesión para Votar",
 		"requested": "Solicitado",

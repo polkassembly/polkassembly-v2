@@ -80,6 +80,7 @@ enum EApiRoute {
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
+	GET_POST_VOTES_BY_ADDRESS = 'GET_POST_VOTES_BY_ADDRESS',
 	ADD_POST_REACTION = 'ADD_POST_REACTION',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
@@ -223,6 +224,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_POST_VOTES_BY_ADDRESS:
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
@@ -616,6 +618,19 @@ export class NextApiClientService {
 			orderBy
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
+		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
+	}
+
+	static async getPostVotesByAddress({ proposalType, index, address }: { proposalType: EProposalType; index: string; address: string }) {
+		const queryParams = new URLSearchParams({
+			page: '1',
+			limit: '1'
+		});
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
+			routeSegments: [proposalType, index, 'votes', 'user', 'address', address],
+			queryParams
+		});
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 

@@ -5,6 +5,9 @@
 'use client';
 
 import { useUser } from '@/hooks/useUser';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import VoteIcon from '@assets/activityfeed/vote.svg';
@@ -29,6 +32,25 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
+	const { userPreferences } = useUserPreferences();
+
+	const { data: voteData } = useQuery({
+		queryKey: ['userVotes', proposalType, index, userPreferences.selectedAccount?.address],
+		queryFn: async () => {
+			if (!userPreferences.selectedAccount?.address) return null;
+			const { data, error } = await NextApiClientService.getPostVotesByAddress({
+				proposalType,
+				index,
+				address: userPreferences.selectedAccount.address
+			});
+			if (error || !data) return null;
+			return data;
+		},
+		enabled: !!userPreferences.selectedAccount?.address
+	});
+
+	const hasVoted = voteData?.votes && voteData.votes.length > 0;
+
 	return !user ? (
 		<Link href='/login'>
 			<Button
@@ -65,7 +87,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 							height={20}
 							className={iconClassName}
 						/>
-						{t('PostDetails.castVote')}
+						{hasVoted ? t('PostDetails.castVoteAgain') : t('PostDetails.castVote')}
 					</div>
 				</Button>
 			</DialogTrigger>

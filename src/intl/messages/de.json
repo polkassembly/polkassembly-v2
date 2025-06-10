@@ -432,6 +432,7 @@
 	},
 	"PostDetails": {
 		"castVote": "Abstimmen",
+		"castVoteAgain": "Erneut abstimmen",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
 		"loginToVote": "Zum Abstimmen anmelden",
 		"requested": "Angefordert",
