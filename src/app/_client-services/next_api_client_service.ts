@@ -626,12 +626,12 @@ export class NextApiClientService {
 			page: '1',
 			limit: '1'
 		});
-		const { url, method } = await this.getRouteConfig({
+		const { url, method } = await NextApiClientService.getRouteConfig({
 			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
 			routeSegments: [proposalType, index, 'votes', 'user', 'address', address],
 			queryParams
 		});
-		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
+		return NextApiClientService.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
 	// activity feed

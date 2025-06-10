@@ -5,7 +5,6 @@
 'use client';
 
 import { useUser } from '@/hooks/useUser';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -32,24 +31,30 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
-	const { userPreferences } = useUserPreferences();
 
-	const { data: voteData } = useQuery({
-		queryKey: ['userVotes', proposalType, index, userPreferences.selectedAccount?.address],
+	const {
+		data: voteData,
+		isLoading,
+		isError
+	} = useQuery({
+		queryKey: ['userVotes', proposalType, index, user?.addresses[0]],
 		queryFn: async () => {
-			if (!userPreferences.selectedAccount?.address) return null;
+			if (!user) return null;
 			const { data, error } = await NextApiClientService.getPostVotesByAddress({
 				proposalType,
 				index,
-				address: userPreferences.selectedAccount.address
+				address: user?.addresses[0]
 			});
-			if (error || !data) return null;
+			if (error) throw new Error(error.message || 'Failed to fetch vote data');
+			if (!data) return null;
 			return data;
 		},
-		enabled: !!userPreferences.selectedAccount?.address
+		enabled: !!user?.id,
+		retry: 1,
+		staleTime: 30000
 	});
 
-	const hasVoted = voteData?.votes && voteData.votes.length > 0;
+	const hasVoted = Array.isArray(voteData?.votes) && voteData.votes.length > 0;
 
 	return !user ? (
 		<Link href='/login'>
@@ -78,6 +83,8 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 				<Button
 					className={cn('w-full', btnClassName)}
 					size={size}
+					disabled={isLoading || isError}
+					isLoading={isLoading}
 				>
 					<div className='flex items-center gap-1'>
 						<Image
