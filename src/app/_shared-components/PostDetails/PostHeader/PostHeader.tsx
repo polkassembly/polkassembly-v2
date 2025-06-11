@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, IPost, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, EProposalType, IPost, IPostListing } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -53,7 +53,6 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(postData.proposalType);
-	const isAnalyticsProposalType = ValidatorService.isValidAnalyticsProposalType(postData.proposalType);
 
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
 
@@ -226,7 +225,9 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
 				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
 				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
-				{isAnalyticsProposalType && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
+				{[EProposalType.REFERENDUM, EProposalType.REFERENDUM_V2].includes(postData.proposalType) && (
+					<TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>
+				)}
 			</TabsList>
 		</div>
 	);

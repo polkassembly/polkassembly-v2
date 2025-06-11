@@ -8,9 +8,13 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { useTranslations } from 'next-intl';
-import { ResponsiveBar } from '@nivo/bar';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, TooltipItem } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import classes from './PostAnalytics.module.scss';
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface IVoteConvictionProps {
 	delegationVotesByConviction: IAccountAnalytics['delegationVotesByConviction'] | IAnalytics['delegationVotesByConviction'];
@@ -23,137 +27,131 @@ function DelegationVotesByConvictions({ delegationVotesByConviction, isAccountsA
 	const t = useTranslations('PostDetails.Analytics');
 	const { theme } = userPreferences;
 
-	const colors: { [key: string]: string } = {
+	const colors = {
 		[t('delegated')]: THEME_COLORS.light.turnout_color,
 		[t('solo')]: THEME_COLORS.light.issuance_color
 	};
 
-	const chartData = delegationVotesByConviction.map((vote) => {
+	const labels = delegationVotesByConviction.map((vote) => {
 		const convictionValue = vote?.lockPeriod === 0 ? 0.1 : vote?.lockPeriod;
-		return {
-			[t('delegated')]: isAccountsAnalytics
-				? vote?.delegated
-				: formatBnBalance(vote?.delegated as unknown as string, { numberAfterComma: 0, withThousandDelimitor: false }, network),
-			[t('solo')]: isAccountsAnalytics ? vote?.solo : formatBnBalance(vote?.solo as unknown as string, { numberAfterComma: 0, withThousandDelimitor: false }, network),
-			conviction: `${convictionValue}x`
-		};
+		return `${convictionValue}x`;
 	});
+
+	const chartData = {
+		labels,
+		datasets: [
+			{
+				label: t('delegated'),
+				data: delegationVotesByConviction.map((vote) =>
+					isAccountsAnalytics ? vote?.delegated : formatBnBalance(vote?.delegated as unknown as string, { numberAfterComma: 0, withThousandDelimitor: false }, network)
+				),
+				backgroundColor: colors[t('delegated')],
+				borderColor: colors[t('delegated')],
+				borderWidth: 1,
+				borderRadius: 3
+			},
+			{
+				label: t('solo'),
+				data: delegationVotesByConviction.map((vote) =>
+					isAccountsAnalytics ? vote?.solo : formatBnBalance(vote?.solo as unknown as string, { numberAfterComma: 0, withThousandDelimitor: false }, network)
+				),
+				backgroundColor: colors[t('solo')],
+				borderColor: colors[t('solo')],
+				borderWidth: 1,
+				borderRadius: 3
+			}
+		]
+	};
+
+	const chartOptions = {
+		responsive: true,
+		maintainAspectRatio: false,
+		scales: {
+			x: {
+				type: 'category' as const,
+				stacked: true,
+				grid: {
+					display: false
+				},
+				ticks: {
+					color: theme === 'dark' ? THEME_COLORS.dark.nivo_fill_color : THEME_COLORS.light.nivo_fill_color,
+					font: {
+						size: 11
+					}
+				},
+				border: {
+					color: theme === 'dark' ? THEME_COLORS.dark.primary_border : THEME_COLORS.light.primary_border
+				}
+			},
+			y: {
+				type: 'linear' as const,
+				stacked: true,
+				grid: {
+					color: theme === 'dark' ? THEME_COLORS.dark.primary_border : THEME_COLORS.light.primary_border,
+					borderDash: [2, 2]
+				},
+				ticks: {
+					color: theme === 'dark' ? THEME_COLORS.dark.nivo_fill_color : THEME_COLORS.light.nivo_fill_color,
+					font: {
+						size: 11
+					},
+					callback(value: string | number) {
+						return isAccountsAnalytics ? value : formatUSDWithUnits(value.toString(), 1);
+					}
+				},
+				border: {
+					color: theme === 'dark' ? THEME_COLORS.dark.primary_border : THEME_COLORS.light.primary_border
+				}
+			}
+		},
+		plugins: {
+			legend: {
+				display: true,
+				position: 'bottom' as const,
+				labels: {
+					usePointStyle: true,
+					pointStyle: 'circle',
+					padding: 10,
+					font: {
+						size: 10
+					},
+					color: theme === 'dark' ? THEME_COLORS.dark.basic_text : THEME_COLORS.light.basic_text
+				}
+			},
+			tooltip: {
+				backgroundColor: theme === 'dark' ? THEME_COLORS.dark.bg_code : THEME_COLORS.light.bg_code,
+				titleColor: theme === 'dark' ? THEME_COLORS.dark.basic_text : THEME_COLORS.light.basic_text,
+				bodyColor: theme === 'dark' ? THEME_COLORS.dark.basic_text : THEME_COLORS.light.basic_text,
+				borderColor: theme === 'dark' ? THEME_COLORS.dark.basic_text : THEME_COLORS.light.basic_text,
+				borderWidth: 1,
+				cornerRadius: 4,
+				titleFont: {
+					size: 12,
+					weight: 500
+				},
+				bodyFont: {
+					size: 12,
+					weight: 500
+				},
+				callbacks: {
+					label(context: TooltipItem<'bar'>) {
+						const value = context.parsed.y;
+						const { label } = context.dataset;
+						const conviction = context.label;
+						return `${label}: ${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol} in conviction: ${conviction}`;
+					}
+				}
+			}
+		}
+	};
 
 	return (
 		<div className={classes.cardWithFullWidth}>
 			<h2 className='text-base font-bold text-text_primary'>{t('delegationVotesByConviction')}</h2>
 			<div className={classes.barChartWrapper}>
-				<ResponsiveBar
-					colors={(bar) => {
-						const id = bar.id.toString();
-						return colors?.[id];
-					}}
+				<Bar
 					data={chartData}
-					indexBy='conviction'
-					indexScale={{ round: true, type: 'band' }}
-					keys={[t('delegated'), t('solo')]}
-					margin={{ bottom: 50, left: 50, right: 10, top: 10 }}
-					padding={0.5}
-					valueScale={{ type: 'linear' }}
-					borderRadius={3}
-					borderColor={{
-						from: 'color',
-						modifiers: [['darker', 1.6]]
-					}}
-					axisTop={null}
-					axisRight={null}
-					axisBottom={{
-						tickPadding: 5,
-						tickRotation: 0,
-						tickSize: 5,
-						truncateTickAt: 0
-					}}
-					axisLeft={{
-						format: (value: number | string) => (!isAccountsAnalytics ? formatUSDWithUnits(value as string, 1) : value),
-						tickPadding: 5,
-						tickRotation: 0,
-						tickSize: 5,
-						truncateTickAt: 0
-					}}
-					enableLabel={false}
-					labelSkipWidth={6}
-					labelSkipHeight={12}
-					labelTextColor={{
-						from: 'color',
-						modifiers: [['darker', 1.6]]
-					}}
-					legends={[
-						{
-							anchor: 'bottom',
-							dataFrom: 'keys',
-							direction: 'row',
-							effects: [
-								{
-									on: 'hover',
-									style: {
-										itemOpacity: 1
-									}
-								}
-							],
-							itemDirection: 'left-to-right',
-							itemHeight: 20,
-							itemOpacity: 0.85,
-							itemTextColor: theme === 'dark' ? THEME_COLORS.dark.basic_text : THEME_COLORS.light.basic_text,
-							itemWidth: 80,
-							itemsSpacing: 2,
-							justify: false,
-							symbolShape: 'circle',
-							symbolSize: 6,
-							translateX: -20,
-							translateY: 50
-						}
-					]}
-					role='application'
-					theme={{
-						axis: {
-							domain: {
-								line: {
-									stroke: theme === 'dark' ? THEME_COLORS.dark.primary_border : THEME_COLORS.light.primary_border,
-									strokeWidth: 1
-								}
-							},
-							ticks: {
-								text: {
-									fill: theme === 'dark' ? THEME_COLORS.dark.nivo_fill_color : THEME_COLORS.light.nivo_fill_color,
-									fontSize: 11,
-									outlineColor: 'transparent',
-									outlineWidth: 0
-								}
-							}
-						},
-						grid: {
-							line: {
-								stroke: theme === 'dark' ? THEME_COLORS.dark.primary_border : THEME_COLORS.light.primary_border,
-								strokeDasharray: '2 2',
-								strokeWidth: 1
-							}
-						},
-						legends: {
-							text: {
-								fontSize: 12,
-								textTransform: 'capitalize'
-							}
-						},
-						tooltip: {
-							container: {
-								background: theme === 'dark' ? THEME_COLORS.dark.bg_code : THEME_COLORS.light.bg_code,
-								color: theme === 'dark' ? THEME_COLORS.dark.basic_text : THEME_COLORS.light.basic_text,
-								fontSize: 12,
-								textTransform: 'capitalize',
-								fontWeight: 500
-							}
-						}
-					}}
-					ariaLabel='Nivo bar chart demo'
-					valueFormat={(value) =>
-						`${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol}`
-					}
-					barAriaLabel={(e) => `${e.id}: ${e.formattedValue} in conviction: ${e.indexValue}`}
+					options={chartOptions}
 				/>
 			</div>
 		</div>

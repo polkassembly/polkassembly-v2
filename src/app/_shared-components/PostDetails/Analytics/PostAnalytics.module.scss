@@ -5,13 +5,13 @@
 	@apply mx-auto max-h-[500px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text lg:max-w-[512px];
 }
 .chartWrapper {
-	@apply relative -mt-2 flex h-[180px] items-center justify-center;
+	@apply relative flex h-[180px] items-center justify-center;
 }
 .barChartWrapper {
 	@apply relative mt-2 flex h-[250px] items-center justify-center;
 }
 .timeSplitChartWrapper {
-	@apply relative -mt-2 flex h-[250px] items-center justify-center;
+	@apply relative mt-4 flex h-[250px] items-center justify-center;
 }
 .chartWrapper > div,
 .barChartWrapper > div,
