@@ -90,19 +90,9 @@ export class PolkadotApiService {
 				return;
 			}
 
-			const signPayload: any = await injected?.signer?.signPayload?.({
-				address,
-				method: tx.method.toHex()
-			} as any);
-
-			const method = this.api.registry.createType('Call', signPayload.payload.method);
-
-			const multisigTx = this.api.tx[method.section][method.method](...method.args);
-			multisigTx.addSignature(signPayload.signer, signPayload.signature, signPayload.payload);
-
-			multisigTx
+			tx
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.send(async ({ status, events, txHash }) => {
+				.signAndSend(address, { signer: injected.signer as any, withSignedTransaction: true }, async ({ status, events, txHash }) => {
 					if (status.isInvalid) {
 						console.log('Transaction invalid');
 						setStatus?.('Transaction invalid');
