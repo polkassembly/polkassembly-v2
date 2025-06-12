@@ -13,6 +13,8 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { ClientError } from '@/app/_client-utils/clientError';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -64,6 +66,21 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		initialData: post?.contentSummary,
 		proposalType: post?.proposalType || postData.proposalType,
 		indexOrHash: String(post?.index ?? postData.index ?? post?.hash ?? postData.hash)
+	});
+
+	const getPostAnalytics = async () => {
+		const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType: post?.proposalType as EProposalType, index: index.toString() });
+		if (error || !data) {
+			throw new ClientError(error?.message || 'Failed to fetch data');
+		}
+		return data;
+	};
+
+	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
+		queryKey: ['postAnalytics', post?.proposalType, index],
+		queryFn: getPostAnalytics,
+		enabled: !!post?.proposalType && !!index,
+		staleTime: FIVE_MIN_IN_MILLI
 	});
 
 	useEffect(() => {
@@ -122,8 +139,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
 								<PostAnalytics
-									proposalType={post.proposalType}
-									index={Number(index)}
+									analytics={analytics}
+									isFetching={isAnalyticsFetching}
 								/>
 							</TabsContent>
 						</div>

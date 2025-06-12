@@ -21,6 +21,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
 	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
+
 	if (!skipCache) {
 		const analytics = await RedisService.GetPostAnalyticsData({ network, proposalType, indexOrHash: index });
 		if (analytics) {

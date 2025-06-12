@@ -385,12 +385,7 @@ export class SubsquidUtils extends SubsquidQueries {
 			support: '0',
 			timeSplitVotes: [],
 			votesByConviction: [],
-			delegationVotesByConviction: [],
-			votesDistribution: {
-				abstain: [],
-				aye: [],
-				nay: []
-			}
+			delegationVotesByConviction: []
 		};
 
 		let totalAye = BN_ZERO;
@@ -406,31 +401,13 @@ export class SubsquidUtils extends SubsquidQueries {
 				totalAye = totalAye.add(balance);
 
 				analytics.support = new BN(analytics.support).add(balance).toString();
-
-				analytics.votesDistribution?.aye?.push({
-					balance: balance.toString(),
-					voter: vote.voter,
-					votingPower: voteBalance.toString()
-				});
 			} else {
 				if (vote.decision === EVoteDecision.NAY) {
 					analytics.nay = new BN(analytics.nay).add(new BN(voteBalance)).toString();
-
-					analytics.votesDistribution?.nay?.push({
-						balance: balance.toString(),
-						voter: vote.voter,
-						votingPower: voteBalance.toString()
-					});
 				} else if (vote.decision === EVoteDecision.ABSTAIN) {
 					analytics.abstain = new BN(analytics.abstain).add(new BN(voteBalance)).toString();
 
 					analytics.support = new BN(analytics.support).add(balance).toString();
-
-					analytics.votesDistribution?.abstain?.push({
-						balance: balance.toString(),
-						voter: vote.voter,
-						votingPower: voteBalance.toString()
-					});
 				}
 				totalNay = totalNay.add(balance);
 			}

@@ -2,14 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useTranslations } from 'next-intl';
-import { EAnalyticsType, EProposalType, ETheme } from '@/_shared/types';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
-import { useQuery } from '@tanstack/react-query';
+import { EAnalyticsType, ETheme, IPostAnalytics } from '@/_shared/types';
 import { useState } from 'react';
 import Image from 'next/image';
 import NudgeIcon from '@/_assets/analytics/nudge-icon.svg';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './PostAnalytics.module.scss';
 import { Skeleton } from '../../Skeleton';
@@ -18,25 +14,11 @@ import ConvictionsAnalytics from './ConvictionsAnalytics';
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from '../../Select/Select';
 import VotesAnalytics from './VotesAnalytics';
 
-function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: number }) {
+function PostAnalytics({ analytics, isFetching }: { analytics?: IPostAnalytics; isFetching: boolean }) {
 	const t = useTranslations('PostDetails');
 	const { userPreferences } = useUserPreferences();
 	const { theme } = userPreferences;
 	const [selectedAnalytics, setSelectedAnalytics] = useState<EAnalyticsType>(EAnalyticsType.CONVICTIONS);
-	const getPostAnalytics = async () => {
-		const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType: proposalType as EProposalType, index: index.toString() });
-		if (error || !data) {
-			throw new ClientError(error?.message || 'Failed to fetch data');
-		}
-		return data;
-	};
-
-	const { data: analytics, isFetching } = useQuery({
-		queryKey: ['postAnalytics', proposalType, index],
-		queryFn: getPostAnalytics,
-		enabled: !!proposalType && !!index,
-		staleTime: FIVE_MIN_IN_MILLI
-	});
 
 	const options = [
 		{ label: t('Analytics.convictionsAnalytics'), value: EAnalyticsType.CONVICTIONS },
@@ -47,7 +29,20 @@ function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; i
 	return (
 		<div>
 			{isFetching ? (
-				<Skeleton className='h-[500px] w-full' />
+				<div className='flex flex-col gap-4'>
+					<Skeleton className='h-[50px] w-[100px] rounded-lg' />
+					<Skeleton className='h-[50px] w-full rounded-lg' />
+					<div className='flex gap-4'>
+						<Skeleton className='h-[180px] w-full rounded-lg' />
+						<Skeleton className='h-[180px] w-full rounded-lg' />
+						<Skeleton className='h-[180px] w-full rounded-lg' />
+					</div>
+					<Skeleton className='h-[250px] w-full rounded-lg' />
+					<div className='flex gap-4'>
+						<Skeleton className='h-[250px] w-full rounded-lg' />
+						<Skeleton className='h-[250px] w-full rounded-lg' />
+					</div>
+				</div>
 			) : (
 				<div>
 					{/* Analytics type selector */}

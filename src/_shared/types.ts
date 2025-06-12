@@ -1300,13 +1300,6 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
-
-export interface IVotesDistribution {
-	balance: string;
-	voter: string;
-	votingPower: string;
-}
-
 export interface IAnalytics {
 	abstain: string;
 	aye: string;
@@ -1315,9 +1308,6 @@ export interface IAnalytics {
 	solo: string;
 	support: string;
 	turnout?: string;
-	votesDistribution: {
-		[key in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVotesDistribution[];
-	};
 	timeSplitVotes: Array<{ index: number; value: string }>;
 	votesByConviction: Array<{ [key in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: string } & { lockPeriod: number }>;
 	delegationVotesByConviction: Array<{ delegated: string; solo: string; lockPeriod: number }>;
