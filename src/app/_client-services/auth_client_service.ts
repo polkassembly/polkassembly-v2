@@ -35,6 +35,13 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
+	static async mimirLogin({ address, wallet }: { address: string; wallet: EWallet }) {
+		return this.mimirLoginApi({
+			address,
+			wallet
+		});
+	}
+
 	static async checkForUsernameAndEmail({ email, username }: { email: string; username: string }) {
 		return this.checkForUsernameAndEmailApi({
 			username,

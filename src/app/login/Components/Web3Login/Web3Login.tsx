@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ENotificationStatus } from '@/_shared/types';
+import { ENotificationStatus, EWallet, IAuthResponse, IErrorResponse } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -47,31 +47,40 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 			setLoading(true);
 
-			const signature = await walletService.signMessage({
-				data: WEB3_AUTH_SIGN_MESSAGE,
-				address,
-				selectedWallet: userPreferences.wallet
-			});
+			let result: { data: IAuthResponse | null; error: IErrorResponse | null } = { data: null, error: null };
 
-			if (!signature) {
+			if (userPreferences.wallet === EWallet.MIMIR) {
+				result = await AuthClientService.mimirLogin({
+					address: getSubstrateAddress(address) || address,
+					wallet: userPreferences.wallet
+				});
+			} else {
+				const signature = await walletService.signMessage({
+					data: WEB3_AUTH_SIGN_MESSAGE,
+					address,
+					selectedWallet: userPreferences.wallet
+				});
+
+				if (!signature) {
+					setLoading(false);
+					return;
+				}
+
+				result = await AuthClientService.web3LoginOrSignup({
+					address: getSubstrateAddress(address) || address,
+					signature,
+					wallet: userPreferences.wallet
+				});
+			}
+
+			if (result.error || !result.data) {
+				setErrorMessage(result.error?.message || t('Profile.loginFailed'));
 				setLoading(false);
 				return;
 			}
 
-			const { data, error } = await AuthClientService.web3LoginOrSignup({
-				address: getSubstrateAddress(address) || address,
-				signature,
-				wallet: userPreferences.wallet
-			});
-
-			if (error || !data) {
-				setErrorMessage(error?.message || t('Profile.loginFailed'));
-				setLoading(false);
-				return;
-			}
-
-			if (data.isTFAEnabled && data.tfaToken) {
-				onTfaEnabled(data.tfaToken);
+			if (result.data.isTFAEnabled && result.data.tfaToken) {
+				onTfaEnabled(result.data.tfaToken);
 				return;
 			}
 

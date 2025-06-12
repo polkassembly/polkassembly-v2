@@ -8,7 +8,8 @@ import { Signer } from '@polkadot/types/types';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
-import { isWeb3Injected } from '@polkadot/extension-dapp';
+import { isWeb3Injected, web3Enable, web3FromSource } from '@polkadot/extension-dapp';
+import { inject, isMimirReady, MIMIR_REGEXP } from '@mimirdev/apps-inject';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
 
@@ -38,6 +39,14 @@ export class WalletClientService {
 				await identityService.ready();
 			}
 
+			const openInIframe = window !== window.parent;
+
+			const origin = await isMimirReady();
+
+			if (origin && MIMIR_REGEXP.test(origin) && openInIframe) {
+				inject();
+			}
+
 			return new WalletClientService(injectedWindow, apiService, network, identityService);
 		};
 
@@ -58,23 +67,28 @@ export class WalletClientService {
 
 		let injected: Injected | undefined;
 		try {
-			injected = await new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					reject(new Error('Wallet Timeout'));
-				}, 60000); // wait 60 sec
+			if (selectedWallet === EWallet.MIMIR) {
+				await web3Enable(APPNAME);
+				injected = await web3FromSource('mimir');
+			} else {
+				injected = await new Promise((resolve, reject) => {
+					const timeoutId = setTimeout(() => {
+						reject(new Error('Wallet Timeout'));
+					}, 60000); // wait 60 sec
 
-				if (wallet && wallet.enable) {
-					wallet
-						.enable(APPNAME)
-						.then((value) => {
-							clearTimeout(timeoutId);
-							resolve(value);
-						})
-						.catch((error) => {
-							reject(error);
-						});
-				}
-			});
+					if (wallet && wallet.enable) {
+						wallet
+							.enable(APPNAME)
+							.then((value) => {
+								clearTimeout(timeoutId);
+								resolve(value);
+							})
+							.catch((error) => {
+								reject(error);
+							});
+					}
+				});
+			}
 			if (!injected) {
 				return [];
 			}

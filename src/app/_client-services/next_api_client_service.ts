@@ -68,6 +68,7 @@ enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
 	WEB3_LOGIN = 'WEB3_LOGIN',
+	MIMIR_LOGIN = 'MIMIR_LOGIN',
 	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
 	USER_EXISTS = 'USER_EXISTS',
 	TFA_LOGIN = 'TFA_LOGIN',
@@ -260,6 +261,10 @@ export class NextApiClientService {
 				path = '/auth/web2-auth/signup';
 				method = 'POST';
 				break;
+			case EApiRoute.MIMIR_LOGIN:
+				path = '/auth/web3-auth/mimir-auth';
+				method = 'POST';
+				break;
 			case EApiRoute.WEB3_LOGIN:
 				path = '/auth/web3-auth';
 				method = 'POST';
@@ -409,6 +414,11 @@ export class NextApiClientService {
 	protected static async web3LoginOrSignupApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.WEB3_LOGIN });
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, signature, wallet } });
+	}
+
+	protected static async mimirLoginApi({ address, wallet }: { address: string; wallet: EWallet }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.MIMIR_LOGIN });
+		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet } });
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {

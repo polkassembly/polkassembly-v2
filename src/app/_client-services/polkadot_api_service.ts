@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
@@ -18,8 +19,10 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, EWallet, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
+import { APPNAME } from '@/_shared/_constants/appName';
+import { web3Enable, web3FromSource } from '@polkadot/extension-dapp';
 import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
@@ -60,7 +63,8 @@ export class PolkadotApiService {
 		setStatus,
 		setIsTxFinalized,
 		waitTillFinalizedHash = false,
-		selectedAccount
+		selectedAccount,
+		wallet
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
@@ -73,9 +77,95 @@ export class PolkadotApiService {
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
 		selectedAccount?: ISelectedAccount;
+		wallet?: EWallet;
 	}) {
 		let isFailed = false;
 		if (!this.api || !tx) return;
+
+		if (wallet === EWallet.MIMIR) {
+			await web3Enable(APPNAME);
+			const injected = await web3FromSource('mimir');
+			const isMimir = injected.name === 'mimir';
+			if (!isMimir) {
+				return;
+			}
+
+			const signPayload: any = await injected?.signer?.signPayload?.({
+				address,
+				method: tx.method.toHex()
+			} as any);
+
+			const method = this.api.registry.createType('Call', signPayload.payload.method);
+
+			const multisigTx = this.api.tx[method.section][method.method](...method.args);
+			multisigTx.addSignature(signPayload.signer, signPayload.signature, signPayload.payload);
+
+			multisigTx
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.send(async ({ status, events, txHash }) => {
+					if (status.isInvalid) {
+						console.log('Transaction invalid');
+						setStatus?.('Transaction invalid');
+					} else if (status.isReady) {
+						console.log('Transaction is ready');
+						setStatus?.('Transaction is ready');
+					} else if (status.isBroadcast) {
+						console.log('Transaction has been broadcasted');
+						setStatus?.('Transaction has been broadcasted');
+						onBroadcast?.();
+					} else if (status.isInBlock) {
+						console.log('Transaction is in block');
+						setStatus?.('Transaction is in block');
+
+						// eslint-disable-next-line no-restricted-syntax
+						for (const { event } of events) {
+							if (event.method === 'ExtrinsicSuccess') {
+								setStatus?.('Transaction Success');
+								isFailed = false;
+								if (!waitTillFinalizedHash) {
+									// eslint-disable-next-line no-await-in-loop
+									await onSuccess(txHash);
+								}
+							} else if (event.method === 'ExtrinsicFailed') {
+								// eslint-disable-next-line sonarjs/no-duplicate-string
+								setStatus?.('Transaction failed');
+								console.log('Transaction failed');
+								setStatus?.('Transaction failed');
+								const dispatchError = (event.data as any)?.dispatchError;
+								isFailed = true;
+
+								if (dispatchError?.isModule) {
+									const errorModule = (event.data as any)?.dispatchError?.asModule;
+									const { method, section, docs } = this.api.registry.findMetaError(errorModule);
+									// eslint-disable-next-line no-param-reassign
+									errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
+									console.log(errorMessageFallback, 'error module');
+									await onFailed(errorMessageFallback);
+								} else if (dispatchError?.isToken) {
+									console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
+									await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
+								} else {
+									await onFailed(`${dispatchError.type}` || errorMessageFallback);
+								}
+							}
+						}
+					} else if (status.isFinalized) {
+						console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
+						console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
+						setIsTxFinalized?.(txHash.toString());
+						if (!isFailed && waitTillFinalizedHash) {
+							await onSuccess(txHash);
+						}
+					}
+				})
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+			return;
+		}
 
 		let extrinsic = tx;
 
@@ -309,7 +399,8 @@ export class PolkadotApiService {
 		ayeVoteValue,
 		nayVoteValue,
 		abstainVoteValue,
-		selectedAccount
+		selectedAccount,
+		wallet
 	}: {
 		address: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -322,6 +413,7 @@ export class PolkadotApiService {
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
 		selectedAccount?: ISelectedAccount;
+		wallet?: EWallet;
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
@@ -343,7 +435,8 @@ export class PolkadotApiService {
 				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed,
-				selectedAccount
+				selectedAccount,
+				wallet
 			});
 		}
 	}

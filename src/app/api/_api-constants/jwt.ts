@@ -12,7 +12,7 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 	httpOnly: false,
 	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS,
 	path: '/',
-	sameSite: true,
+	sameSite: 'none',
 	secure: NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION
 };
 
@@ -20,6 +20,6 @@ export const ACCESS_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 	httpOnly: false,
 	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS,
 	path: '/',
-	sameSite: true,
+	sameSite: 'none',
 	secure: NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION
 };

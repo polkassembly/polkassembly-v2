@@ -379,6 +379,71 @@ export class AuthService {
 		};
 	}
 
+	static async MimirWalletLogin({ address, wallet, network }: { address: string; wallet: EWallet; network: ENetwork }): Promise<IAuthResponse> {
+		if (!ValidatorService.isValidNetwork(network)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
+		}
+
+		if (wallet !== EWallet.MIMIR) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Not a Mimir wallet');
+		}
+
+		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
+
+		if (!isEvmAddress && !ValidatorService.isValidSubstrateAddress(address)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid address');
+		}
+
+		const formattedAddress = isEvmAddress ? address : getSubstrateAddress(address)!;
+
+		// find if user exists
+		const user = await OffChainDbService.GetUserByAddress(formattedAddress);
+
+		// if user exists, login
+		if (user) {
+			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
+
+			if (isTFAEnabled) {
+				const tfaToken = createCuid();
+				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
+
+				return {
+					isTFAEnabled,
+					tfaToken
+				};
+			}
+
+			return {
+				isTFAEnabled,
+				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: formattedAddress, loginWallet: wallet }),
+				accessToken: await this.GetSignedAccessToken({
+					...user,
+					loginAddress: formattedAddress,
+					loginWallet: wallet
+				})
+			};
+		}
+
+		// user does not exist, register
+		const username = `${formattedAddress.substring(0, 6)}...${formattedAddress.substring(formattedAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
+		const password = createCuid();
+
+		const newUser = await this.CreateUser({
+			email: '',
+			newPassword: password,
+			username,
+			isWeb3Signup: true,
+			network,
+			address: formattedAddress,
+			wallet
+		});
+
+		return {
+			accessToken: await this.GetSignedAccessToken(newUser),
+			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
+		};
+	}
+
 	static async IsValidRefreshToken(token: string) {
 		try {
 			if (!token.trim()) {
