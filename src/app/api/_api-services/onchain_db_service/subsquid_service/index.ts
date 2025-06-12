@@ -15,6 +15,7 @@ import {
 	IOnChainMetadata,
 	IOnChainPostInfo,
 	IOnChainPostListing,
+	IPostAnalytics,
 	IPreimage,
 	IStatusHistoryItem,
 	ITrackAnalyticsDelegations,
@@ -37,7 +38,6 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
 
-const VOTING_POWER_DIVISOR = new BN('10');
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -51,10 +51,6 @@ export class SubsquidService extends SubsquidUtils {
 			exchanges: [cacheExchange, fetchExchange]
 		});
 	};
-
-	private static getVotingPower(balance: string, lockPeriod: number): BN {
-		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_DIVISOR);
-	}
 
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics | null> {
 		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)) {
@@ -1055,6 +1051,40 @@ export class SubsquidService extends SubsquidUtils {
 		return {
 			items: postsResult.map((post) => (post.status === 'fulfilled' ? post.value : null))?.filter((post) => post !== null),
 			totalCount: subsquidData.proposalsConnection.totalCount || 0
+		};
+	}
+
+	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_TOTAL_VOTES_FOR_POST;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
+		}
+
+		const votes = subsquidData.flattenedConvictionVotes?.map((vote: { decision: string }) => {
+			return {
+				...vote,
+				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision })
+			};
+		});
+
+		const convictionsAnalytics = this.getVotesAnalytics({ votes, type: 'convictionsAnalytics' });
+		const votesAnalytics = this.getVotesAnalytics({ votes, type: 'votesAnalytics' });
+		const accountsAnalytics = this.getAccountsAnalytics({ votes });
+
+		return {
+			convictionsAnalytics,
+			votesAnalytics,
+			accountsAnalytics,
+			proposal: {
+				index,
+				status: subsquidData?.flattenedConvictionVotes?.[0]?.proposal.status as EProposalStatus
+			}
 		};
 	}
 }

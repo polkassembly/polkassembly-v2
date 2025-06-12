@@ -977,4 +977,66 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_TOTAL_VOTES_FOR_POST = `
+		query GetTotalVotesForPost($type_eq: VoteType, $index_eq: Int) {
+			flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true}, orderBy: voter_DESC) {
+			proposal {
+			    tally {
+				ayes
+				nays
+				support
+				bareAyes
+				}
+				createdAt
+				status
+			}
+				type
+				voter
+				lockPeriod
+				decision
+				balance {
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				createdAt
+				createdAtBlock
+				proposalIndex
+				delegatedTo
+				isDelegated
+				parentVote {
+					extrinsicIndex
+					selfVotingPower
+					type
+					voter
+					lockPeriod
+					delegatedVotingPower
+					delegatedVotes(where: { removedAtBlock_isNull: true }) {
+						voter
+						balance {
+							... on StandardVoteBalance {
+								value
+							}
+							... on SplitVoteBalance {
+								aye
+								nay
+								abstain
+							}
+						}
+						lockPeriod
+						votingPower
+					}
+				}
+			}
+			flattenedConvictionVotesConnection(orderBy: id_ASC,where: { type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true}){
+				totalCount
+			}
+		}
+	`;
 }

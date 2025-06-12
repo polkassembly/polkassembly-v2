@@ -309,4 +309,8 @@ export class OnChainDbService {
 	}) {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
 	}
+
+	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		return SubsquidService.getPostAnalytics({ network, proposalType, index });
+	}
 }
