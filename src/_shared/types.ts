@@ -1301,9 +1301,9 @@ export interface IPayout {
 	};
 }
 export interface IAnalytics {
-	abstain: string;
-	aye: string;
-	nay: string;
+	[EVoteDecision.ABSTAIN]: string;
+	[EVoteDecision.AYE]: string;
+	[EVoteDecision.NAY]: string;
 	delegated: string;
 	solo: string;
 	support: string;
@@ -1314,9 +1314,9 @@ export interface IAnalytics {
 }
 
 export interface IAccountAnalytics {
-	abstain: number;
-	aye: number;
-	nay: number;
+	[EVoteDecision.ABSTAIN]: number;
+	[EVoteDecision.AYE]: number;
+	[EVoteDecision.NAY]: number;
 	delegated: number;
 	solo: number;
 	support: string;
@@ -1351,7 +1351,8 @@ export interface IFlattenedConvictionVote {
 	lockPeriod: number;
 	decision: EVoteDecision;
 	balance: {
-		value: string;
+		value?: string;
+		abstain?: string;
 	};
 	createdAt: string;
 	createdAtBlock: number;
@@ -1373,4 +1374,27 @@ export enum EAnalyticsType {
 	ACCOUNTS = 'accounts',
 	CONVICTIONS = 'convictions',
 	VOTES = 'votes'
+}
+
+export interface IVotesDistribution {
+	balance: string;
+	voter: string;
+	votingPower: string | null;
+	delegatorsCount?: number;
+	isDelegated: boolean;
+	lockPeriod: number;
+}
+
+export type IPostTilesVotes = {
+	votes: {
+		[K in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVotesDistribution[];
+	};
+	proposal?: {
+		status: EProposalStatus;
+	};
+};
+
+export enum EPostTilesVotesType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
 }

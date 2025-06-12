@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useTranslations } from 'next-intl';
-import { EAnalyticsType, ETheme, IPostAnalytics } from '@/_shared/types';
+import { EAnalyticsType, EProposalType, ETheme, IPostAnalytics } from '@/_shared/types';
 import { useState } from 'react';
 import Image from 'next/image';
 import NudgeIcon from '@/_assets/analytics/nudge-icon.svg';
@@ -14,7 +14,7 @@ import ConvictionsAnalytics from './ConvictionsAnalytics';
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from '../../Select/Select';
 import VotesAnalytics from './VotesAnalytics';
 
-function PostAnalytics({ analytics, isFetching }: { analytics?: IPostAnalytics; isFetching: boolean }) {
+function PostAnalytics({ analytics, isFetching, proposalType, index }: { analytics?: IPostAnalytics; isFetching: boolean; proposalType: EProposalType; index: number }) {
 	const t = useTranslations('PostDetails');
 	const { userPreferences } = useUserPreferences();
 	const { theme } = userPreferences;
@@ -30,7 +30,7 @@ function PostAnalytics({ analytics, isFetching }: { analytics?: IPostAnalytics; 
 		<div>
 			{isFetching ? (
 				<div className='flex flex-col gap-4'>
-					<Skeleton className='h-[50px] w-[100px] rounded-lg' />
+					<Skeleton className='h-[40px] w-[150px] rounded-lg' />
 					<Skeleton className='h-[50px] w-full rounded-lg' />
 					<div className='flex gap-4'>
 						<Skeleton className='h-[180px] w-full rounded-lg' />
@@ -38,6 +38,7 @@ function PostAnalytics({ analytics, isFetching }: { analytics?: IPostAnalytics; 
 						<Skeleton className='h-[180px] w-full rounded-lg' />
 					</div>
 					<Skeleton className='h-[250px] w-full rounded-lg' />
+					<Skeleton className='h-[300px] w-full rounded-lg' />
 					<div className='flex gap-4'>
 						<Skeleton className='h-[250px] w-full rounded-lg' />
 						<Skeleton className='h-[250px] w-full rounded-lg' />
@@ -87,10 +88,26 @@ function PostAnalytics({ analytics, isFetching }: { analytics?: IPostAnalytics; 
 							<div className={classes.analyticsItem}>{analytics?.accountsAnalytics && <AccountsAnalytics accountsAnalytics={analytics.accountsAnalytics} />}</div>
 						)}
 						{selectedAnalytics === EAnalyticsType.CONVICTIONS && (
-							<div className={classes.analyticsItem}>{analytics?.convictionsAnalytics && <ConvictionsAnalytics convictionsAnalytics={analytics.convictionsAnalytics} />}</div>
+							<div className={classes.analyticsItem}>
+								{analytics?.convictionsAnalytics && (
+									<ConvictionsAnalytics
+										convictionsAnalytics={analytics.convictionsAnalytics}
+										proposalType={proposalType}
+										index={index}
+									/>
+								)}
+							</div>
 						)}
 						{selectedAnalytics === EAnalyticsType.VOTES && (
-							<div className={classes.analyticsItem}>{analytics?.votesAnalytics && <VotesAnalytics votesAnalytics={analytics.votesAnalytics} />}</div>
+							<div className={classes.analyticsItem}>
+								{analytics?.votesAnalytics && (
+									<VotesAnalytics
+										votesAnalytics={analytics.votesAnalytics}
+										index={index}
+										proposalType={proposalType}
+									/>
+								)}
+							</div>
 						)}
 					</div>
 				</div>

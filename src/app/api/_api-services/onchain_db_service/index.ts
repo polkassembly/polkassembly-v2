@@ -17,7 +17,9 @@ import {
 	IBountyUserActivity,
 	IDelegationStats,
 	EBountyStatus,
-	EVoteSortOptions
+	EVoteSortOptions,
+	EAnalyticsType,
+	EPostTilesVotesType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -312,5 +314,21 @@ export class OnChainDbService {
 
 	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
 		return SubsquidService.getPostAnalytics({ network, proposalType, index });
+	}
+
+	static async getPostTillesVotes({
+		network,
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		analyticsType?: EAnalyticsType;
+		votesType: EPostTilesVotesType;
+	}) {
+		return SubsquidService.getPostTillesVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 }

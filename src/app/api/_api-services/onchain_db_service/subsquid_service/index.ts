@@ -3,19 +3,23 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import {
+	EAnalyticsType,
 	ENetwork,
 	EPostOrigin,
+	EPostTilesVotesType,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
 	EVoteSortOptions,
 	IBountyProposal,
 	IDelegationStats,
+	IFlattenedConvictionVote,
 	IGenericListingResponse,
 	IOnChainMetadata,
 	IOnChainPostInfo,
 	IOnChainPostListing,
 	IPostAnalytics,
+	IPostTilesVotes,
 	IPreimage,
 	IStatusHistoryItem,
 	ITrackAnalyticsDelegations,
@@ -1057,7 +1061,7 @@ export class SubsquidService extends SubsquidUtils {
 	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_TOTAL_VOTES_FOR_POST;
+		const query = this.GET_ALL_FLATTENED_VOTES_FOR_POST;
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
 
@@ -1073,8 +1077,8 @@ export class SubsquidService extends SubsquidUtils {
 			};
 		});
 
-		const convictionsAnalytics = this.getVotesAnalytics({ votes, type: 'convictionsAnalytics' });
-		const votesAnalytics = this.getVotesAnalytics({ votes, type: 'votesAnalytics' });
+		const convictionsAnalytics = this.getVotesAnalytics({ votes, type: EAnalyticsType.CONVICTIONS });
+		const votesAnalytics = this.getVotesAnalytics({ votes, type: EAnalyticsType.VOTES });
 		const accountsAnalytics = this.getAccountsAnalytics({ votes });
 
 		return {
@@ -1086,5 +1090,77 @@ export class SubsquidService extends SubsquidUtils {
 				status: subsquidData?.flattenedConvictionVotes?.[0]?.proposal.status as EProposalStatus
 			}
 		};
+	}
+
+	static async getPostTillesVotes({
+		network,
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		analyticsType?: EAnalyticsType;
+		votesType: EPostTilesVotesType;
+	}): Promise<IPostTilesVotes> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = votesType === EPostTilesVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
+		}
+
+		const data = votesType === EPostTilesVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
+
+		const votesData: IPostTilesVotes = {
+			votes: {
+				[EVoteDecision.AYE]: [],
+				[EVoteDecision.NAY]: [],
+				[EVoteDecision.ABSTAIN]: []
+			},
+			proposal: {
+				status: data?.[0]?.proposal?.status as EProposalStatus
+			}
+		};
+
+		data?.forEach(
+			(vote: {
+				decision: string;
+				balance: { value: string; abstain: string };
+				voter: string;
+				isDelegated?: boolean;
+				delegatedVotingPower?: string;
+				selfVotingPower?: string;
+				parentVote: { delegatedVotingPower?: string; selfVotingPower?: string };
+				delegatedVotes: IFlattenedConvictionVote[];
+				lockPeriod: number;
+			}) => {
+				const decision = this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision });
+				const balance = new BN(vote.balance.value || vote.balance.abstain || BN_ZERO.toString());
+				const votingPower =
+					analyticsType === EAnalyticsType.CONVICTIONS
+						? votesType === EPostTilesVotesType.FLATTENED
+							? this.getVotingPower(balance?.toString(), vote?.lockPeriod)
+							: this.getNestedVoteVotingPower(
+									vote?.parentVote?.delegatedVotingPower || vote?.delegatedVotingPower || BN_ZERO.toString(),
+									vote?.parentVote?.selfVotingPower || vote?.selfVotingPower || BN_ZERO.toString()
+								)
+						: null;
+				votesData.votes[decision as keyof typeof votesData.votes]?.push({
+					balance: balance.toString(),
+					voter: vote.voter,
+					lockPeriod: vote?.lockPeriod || 0,
+					votingPower: votingPower?.toString() || null,
+					isDelegated: vote?.isDelegated || false,
+					delegatorsCount: vote?.delegatedVotes?.length || 0
+				});
+			}
+		);
+		return votesData;
 	}
 }

@@ -13,7 +13,6 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { ClientError } from '@/app/_client-utils/clientError';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -79,8 +78,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
 		queryKey: ['postAnalytics', post?.proposalType, index],
 		queryFn: getPostAnalytics,
-		enabled: !!post?.proposalType && !!index,
-		staleTime: FIVE_MIN_IN_MILLI
+		enabled: !!post?.proposalType && !!index
 	});
 
 	useEffect(() => {
@@ -141,6 +139,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								<PostAnalytics
 									analytics={analytics}
 									isFetching={isAnalyticsFetching}
+									proposalType={post.proposalType}
+									index={Number(index)}
 								/>
 							</TabsContent>
 						</div>

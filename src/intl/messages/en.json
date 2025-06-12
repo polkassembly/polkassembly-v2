@@ -484,6 +484,19 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"VotesTiles": {
+			"nested": "Nested",
+			"flattened": "Flattened",
+			"votesDistribution": "Voter Distribution",
+			"others": "Others",
+			"capital": "Capital",
+			"delegators": "Delegators",
+			"lockPeriod": "Lock Period",
+			"votes": "Votes",
+			"aye": "Aye",
+			"nay": "Nay",
+			"abstain": "Abstain"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
 			"delegatedVsSolo": "Delegated Vs Solo",
@@ -494,6 +507,7 @@
 			"support": "Support",
 			"percentage": "Percentage",
 			"issuance": "Issuance",
+			"others": "Others",
 			"users": "Users",
 			"delegated": "Delegated",
 			"solo": "Solo",

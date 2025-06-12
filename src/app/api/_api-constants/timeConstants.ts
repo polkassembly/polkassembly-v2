@@ -16,4 +16,4 @@ export const HALF_HOUR_IN_SECONDS = 1800;
 export const THREE_HOURS_IN_SECONDS = 10800;
 export const SIX_HOURS_IN_SECONDS = 21600;
 export const THIRTY_DAYS_IN_SECONDS = 24 * 30 * 60 * 60;
-export const THREE_DAYS_IN_SECONDS = 24 * 3 * 60 * 60; // 3 days
+export const TEN_DAYS_IN_SECONDS = 24 * 10 * 60 * 60; // 3 days

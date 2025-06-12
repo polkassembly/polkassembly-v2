@@ -1,0 +1,27 @@
+.heading {
+	@apply mb-2 text-lg font-semibold text-text_primary;
+}
+
+.chartWrapper {
+	@apply relative mt-4 flex h-[300px] items-center justify-center;
+}
+
+.chartWrapper > div {
+	height: 100% !important;
+	width: 100% !important;
+}
+.card {
+	@apply mx-auto max-h-[400px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
+}
+
+.description {
+	@apply my-4 flex items-center gap-2 rounded-lg border-[1px] border-solid border-turnout_color bg-analytics_description_bg px-4 py-2 text-sm font-medium text-text_primary dark:text-white;
+}
+
+.chartWrapper {
+	rect {
+		// border-radius: 4px !important;
+		rx: 4 !important;
+		ry: 4 !important;
+	}
+}

@@ -50,7 +50,10 @@ import {
 	EVoteSortOptions,
 	EHttpHeaderKey,
 	IPostLink,
-	IPostAnalytics
+	IPostAnalytics,
+	IPostTilesVotes,
+	EAnalyticsType,
+	EPostTilesVotesType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -131,7 +134,8 @@ enum EApiRoute {
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
 	GET_USER_POSTS = 'GET_USER_POSTS',
-	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS'
+	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
+	GET_POST_TILES_VOTES = 'GET_POST_TILES_VOTES'
 }
 
 export class NextApiClientService {
@@ -229,6 +233,7 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
 			case EApiRoute.GET_POST_ANALYTICS:
+			case EApiRoute.GET_POST_TILES_VOTES:
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -1088,5 +1093,24 @@ export class NextApiClientService {
 	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_ANALYTICS, routeSegments: [proposalType, index, 'analytics'] });
 		return this.nextApiClientFetch<IPostAnalytics>({ url, method });
+	}
+
+	static async getPostTilesVotes({
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		analyticsType?: EAnalyticsType;
+		votesType: EPostTilesVotesType;
+	}) {
+		const queryParams = new URLSearchParams({
+			analyticsType: analyticsType ? analyticsType.toString() : '',
+			votesType: votesType.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_TILES_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-tiles'], queryParams });
+		return this.nextApiClientFetch<IPostTilesVotes>({ url, method });
 	}
 }

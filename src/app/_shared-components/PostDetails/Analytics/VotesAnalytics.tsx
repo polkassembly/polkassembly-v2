@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { IAnalytics } from '@/_shared/types';
+import { EAnalyticsType, EProposalType, IAnalytics } from '@/_shared/types';
 import TotalVotesCard from './TotalVotesCard';
 import DelegatedVsSoloCard from './DelegatedVsSoloCard';
 import TurnoutOrSupportCard from './TurnoutOrSupportCard';
@@ -9,8 +9,9 @@ import TimeSplitCard from './TimeSplitCard';
 import VotesByConvictions from './VotesByConviction';
 import DelegationVotesByConvictions from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
+import VotesTiles from '../VotesTiles/VotesTiles';
 
-function VotesAnalytics({ votesAnalytics }: { votesAnalytics: IAnalytics }) {
+function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytics: IAnalytics; index: number; proposalType: EProposalType }) {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex gap-4'>
@@ -23,6 +24,11 @@ function VotesAnalytics({ votesAnalytics }: { votesAnalytics: IAnalytics }) {
 			</div>
 			<div className='flex w-full flex-col gap-4'>
 				<TimeSplitCard timeSplitVotes={votesAnalytics?.timeSplitVotes || []} />
+				<VotesTiles
+					proposalType={proposalType}
+					analyticsType={EAnalyticsType.VOTES}
+					index={index}
+				/>
 			</div>
 			<Separator className='dashed my-4' />
 			<div className='flex gap-4'>

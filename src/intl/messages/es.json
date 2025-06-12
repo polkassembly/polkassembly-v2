@@ -472,6 +472,19 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"VotesTiles": {
+			"nested": "Anidado",
+			"flattened": "Aplanado",
+			"votesDistribution": "Distribución de votantes",
+			"others": "Otros",
+			"capital": "Capital",
+			"delegators": "Delegadores",
+			"lockPeriod": "Período de bloqueo",
+			"votes": "Votos",
+			"aye": "Sí",
+			"nay": "No",
+			"abstain": "Abstención"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Total de votos emitidos",
 			"delegatedVsSolo": "Delegado vs. Solo",

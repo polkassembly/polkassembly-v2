@@ -13,8 +13,12 @@
 .timeSplitChartWrapper {
 	@apply relative mt-4 flex h-[250px] items-center justify-center;
 }
+.votesDistributionChartWrapper {
+	@apply relative -mt-2 flex h-[300px] items-center justify-center;
+}
 .chartWrapper > div,
 .barChartWrapper > div,
+.votesDistributionChartWrapper > div,
 .timeSplitChartWrapper > div {
 	height: 100% !important;
 	width: 100% !important;
@@ -25,4 +29,12 @@
 
 .description {
 	@apply my-4 flex items-center gap-2 rounded-lg border-[1px] border-solid border-turnout_color bg-analytics_description_bg px-4 py-2 text-sm font-medium text-text_primary dark:text-white;
+}
+
+.votesDistributionChartWrapper {
+	rect {
+		// border-radius: 4px !important;
+		rx: 4 !important;
+		ry: 4 !important;
+	}
 }

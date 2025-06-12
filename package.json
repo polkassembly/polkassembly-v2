@@ -22,6 +22,7 @@
 		"@joplin/turndown-plugin-gfm": "^1.0.62",
 		"@mdxeditor/editor": "^3.29.1",
 		"@metamask/eth-sig-util": "^7.0.3",
+		"@nivo/treemap": "^0.99.0",
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@polkadot/api": "^13.0.1",
 		"@polkadot/api-augment": "^13.0.1",

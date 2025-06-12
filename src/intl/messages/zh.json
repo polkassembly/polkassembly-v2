@@ -470,6 +470,19 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"VotesTiles": {
+			"nested": "嵌套",
+			"flattened": "扁平",
+			"votesDistribution": "投票者分布",
+			"others": "其他",
+			"capital": "资本",
+			"delegators": "委托者",
+			"lockPeriod": "锁定周期",
+			"votes": "投票",
+			"aye": "赞成",
+			"nay": "反对",
+			"abstain": "弃权"
+		},
 		"Analytics": {
 			"totalVotesCasted": "总投票数",
 			"delegatedVsSolo": "委托 vs. 单人",

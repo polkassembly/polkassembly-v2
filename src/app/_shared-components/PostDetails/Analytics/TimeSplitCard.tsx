@@ -39,15 +39,15 @@ function TimeSplitCard({
 				data: timeSplitVotes.map(({ value }) => {
 					return isAccountsAnalytics ? Number(value) : formatBnBalance(value as unknown as string, { withUnit: false, numberAfterComma: 1 }, network).replace(/,/g, '');
 				}),
-				borderColor: '#4064FF',
-				backgroundColor: '#4064FF',
+				borderColor: THEME_COLORS.light.time_split_color,
+				backgroundColor: THEME_COLORS.light.time_split_color,
 				borderWidth: 2,
 				fill: false,
 				tension: 0.1,
 				pointRadius: 0,
 				pointHoverRadius: 5,
-				pointBackgroundColor: '#4064FF',
-				pointBorderColor: '#4064FF',
+				pointBackgroundColor: THEME_COLORS.light.time_split_color,
+				pointBorderColor: THEME_COLORS.light.time_split_color,
 				pointBorderWidth: 2
 			}
 		]

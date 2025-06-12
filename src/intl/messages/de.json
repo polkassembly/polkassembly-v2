@@ -470,6 +470,19 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"VotesTiles": {
+			"nested": "Verschachtelt",
+			"flattened": "Eben",
+			"votesDistribution": "Wählerverteilung",
+			"others": "Andere",
+			"capital": "Kapital",
+			"delegators": "Delegierende",
+			"lockPeriod": "Sperrzeitraum",
+			"votes": "Abstimmungen",
+			"aye": "Ja",
+			"nay": "Nein",
+			"abstain": "Enthaltung"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",
 			"delegatedVsSolo": "Delegiert vs. Einzel",

@@ -7,7 +7,18 @@
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
-import { ENetwork, EPostOrigin, EProposalStatus, EVoteDecision, EVoteSortOptions, IAccountAnalytics, IAnalytics, IBeneficiary, IFlattenedConvictionVote } from '@/_shared/types';
+import {
+	EAnalyticsType,
+	ENetwork,
+	EPostOrigin,
+	EProposalStatus,
+	EVoteDecision,
+	EVoteSortOptions,
+	IAccountAnalytics,
+	IAnalytics,
+	IBeneficiary,
+	IFlattenedConvictionVote
+} from '@/_shared/types';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -25,7 +36,7 @@ interface IPeriodEndDates {
 	preparePeriodEnd: Date | null;
 	confirmationPeriodEnd: Date | null;
 }
-const DEFAULT_LOCK_PERIOD = new BN('10').div(new BN('100'));
+const DEFAULT_LOCK_PERIOD_DIVISOR = new BN('10');
 
 export class SubsquidUtils extends SubsquidQueries {
 	/**
@@ -347,7 +358,7 @@ export class SubsquidUtils extends SubsquidQueries {
 		if (lockPeriod === null) {
 			return balance;
 		}
-		return new BN(balance).mul(!lockPeriod ? DEFAULT_LOCK_PERIOD : new BN(lockPeriod)).toString();
+		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)).toString() : new BN(balance).div(DEFAULT_LOCK_PERIOD_DIVISOR).toString();
 	}
 
 	protected static getOrderByForSubsquid({ orderBy }: { orderBy?: EVoteSortOptions }): EVoteSortOptions[] {
@@ -372,10 +383,14 @@ export class SubsquidUtils extends SubsquidQueries {
 	}
 
 	protected static getVotingPower(balance: string, lockPeriod: number): BN {
-		return new BN(balance).mul(new BN(lockPeriod || DEFAULT_LOCK_PERIOD));
+		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(DEFAULT_LOCK_PERIOD_DIVISOR);
 	}
 
-	protected static getVotesAnalytics({ votes, type }: { votes: IFlattenedConvictionVote[]; type: 'convictionsAnalytics' | 'votesAnalytics' }): IAnalytics {
+	protected static getNestedVoteVotingPower(delegatedVotingPower: string, selfVotingPower: string): BN {
+		return new BN(selfVotingPower || BN_ZERO?.toString()).add(new BN(delegatedVotingPower || BN_ZERO?.toString()));
+	}
+
+	protected static getVotesAnalytics({ votes, type }: { votes: IFlattenedConvictionVote[]; type: Exclude<EAnalyticsType, EAnalyticsType.ACCOUNTS> }): IAnalytics {
 		const analytics: IAnalytics = {
 			aye: '0',
 			nay: '0',
@@ -392,8 +407,8 @@ export class SubsquidUtils extends SubsquidQueries {
 		let totalNay = BN_ZERO;
 
 		votes.forEach((vote) => {
-			const balance = new BN(vote.balance?.value || '0');
-			const voteBalance = type === 'convictionsAnalytics' ? this.getVotingPower(vote.balance?.value || '0', vote.lockPeriod) : balance;
+			const balance = new BN(vote.balance?.value || vote.balance.abstain || '0');
+			const voteBalance = type === EAnalyticsType.CONVICTIONS ? this.getVotingPower(balance.toString(), vote.lockPeriod) : balance;
 
 			if (vote.decision === EVoteDecision.AYE) {
 				analytics.aye = new BN(analytics.aye).add(new BN(voteBalance)).toString();
@@ -449,7 +464,7 @@ export class SubsquidUtils extends SubsquidQueries {
 		let totalNay = BN_ZERO;
 
 		votes.forEach((vote) => {
-			const balance = new BN(vote.balance?.value || '0');
+			const balance = new BN(vote.balance?.value || vote.balance.abstain || '0');
 			const increment = vote.isDelegated ? 0 : 1;
 
 			if (vote.decision === EVoteDecision.AYE) {
