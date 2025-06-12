@@ -146,26 +146,45 @@ export class RedisService {
 	}
 
 	private static async DeleteKeys({ pattern, forceCache = false }: { pattern: string; forceCache?: boolean }): Promise<void> {
-		if (!IS_CACHE_ENABLED && !forceCache) return;
+		if (!IS_CACHE_ENABLED && !forceCache) return Promise.resolve();
 
-		const stream = this.client.scanStream({
-			count: 200,
-			match: pattern
-		});
+		return new Promise((resolve, reject) => {
+			const stream = this.client.scanStream({
+				count: 200,
+				match: pattern
+			});
 
-		stream.on('data', async (keys) => {
-			if (keys.length) {
-				const pipeline = this.client.pipeline();
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				keys.forEach((key: any) => {
-					pipeline.del(key);
-				});
-				await pipeline.exec();
-			}
-		});
+			let hasError = false;
 
-		stream.on('end', () => {
-			console.log('All keys matching pattern deleted.');
+			stream.on('data', async (keys) => {
+				if (keys.length && !hasError) {
+					try {
+						const pipeline = this.client.pipeline();
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						keys.forEach((key: any) => {
+							pipeline.del(key);
+						});
+						await pipeline.exec();
+					} catch (error) {
+						hasError = true;
+						console.error('Error deleting keys:', error);
+						reject(error);
+					}
+				}
+			});
+
+			stream.on('end', () => {
+				if (!hasError) {
+					console.log(`All keys matching pattern ${pattern} deleted.`);
+					resolve();
+				}
+			});
+
+			stream.on('error', (error) => {
+				hasError = true;
+				console.error('Stream error:', error);
+				reject(error);
+			});
 		});
 	}
 
@@ -188,7 +207,7 @@ export class RedisService {
 	}
 
 	static async DeleteAllCacheForNetwork(network: ENetwork): Promise<void> {
-		await Promise.allSettled([
+		await Promise.all([
 			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCAN_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` }),
@@ -482,17 +501,19 @@ export class RedisService {
 	// toolkit methods
 
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
-		// clear everything posts related
-		await this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
-		// clear overview page data
-		await this.DeleteOverviewPageData({ network });
+		await Promise.all([
+			// clear everything posts related
+			this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+			// clear overview page data
+			this.DeleteOverviewPageData({ network }),
 
-		// clear treasury stats
-		await this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` });
+			// clear treasury stats
+			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` })
+		]);
 	}
 
 	// QR session caching methods
