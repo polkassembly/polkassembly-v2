@@ -14,6 +14,8 @@ import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
 import ListingTab from '../ListingTab/ListingTab';
 import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
@@ -69,6 +71,23 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 	const t = useTranslations();
 	const searchParams = useSearchParams();
 	const { user } = useUser();
+
+	const fetchListingData = async () => {
+		const { data, error } = await NextApiClientService.fetchListingData({ proposalType, page, statuses, origins: origin ? [origin] : undefined });
+		if (error || !data) {
+			return initialData;
+		}
+		return data;
+	};
+
+	const { data: listingData } = useQuery({
+		queryKey: ['listingData', proposalType, page, statuses.join(','), origin],
+		queryFn: () => fetchListingData(),
+		placeholderData: (previousData) => previousData || initialData,
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true
+	});
 
 	const STATUSES = getStatuses(proposalType)?.map((status) => t(`ListingPage_Status.${status}`));
 
@@ -155,7 +174,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 		<div className={styles.header}>
 			<div>
 				<h1 className={styles.title}>
-					{proposalType === EProposalType.REFERENDUM_V2 && !origin ? t('ListingPage.AllProposals') : t(`ListingPage.${origin || proposalType}`)} ({initialData?.totalCount || 0})
+					{proposalType === EProposalType.REFERENDUM_V2 && !origin ? t('ListingPage.AllProposals') : t(`ListingPage.${origin || proposalType}`)} ({listingData?.totalCount || 0})
 				</h1>
 				{proposalType !== EProposalType.REFERENDUM_V2 && !origin && <p className={`${styles.subtitle} dark:text-white`}>{t(`ListingPage.${origin || proposalType}Description`)}</p>}
 			</div>
@@ -273,8 +292,8 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 				<div>
 					{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
 						<ListingTab
-							data={initialData?.items || []}
-							totalCount={initialData?.totalCount || 0}
+							data={listingData?.items || []}
+							totalCount={listingData?.totalCount || 0}
 							currentPage={state.currentPage}
 						/>
 					) : proposalType === EProposalType.REFERENDUM_V2 ? (
