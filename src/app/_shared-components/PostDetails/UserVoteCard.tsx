@@ -168,6 +168,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', track, 
 						track={track}
 						onClose={() => setOpenModal(false)}
 						proposalType={proposalType}
+						existingVote={myVote}
 					/>
 				</DialogContent>
 			</Dialog>

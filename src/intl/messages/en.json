@@ -672,6 +672,8 @@
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
 		"confirm": "Confirm",
+		"existingVote": "Existing Vote",
+		"existingVoteDescription": "You have already voted on this proposal, Resubmitting the vote will override the current voting record",
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",

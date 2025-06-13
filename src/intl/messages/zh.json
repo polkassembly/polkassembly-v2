@@ -637,6 +637,8 @@
 		"ayeVoteValue": "赞成票值",
 		"nayVoteValue": "反对票值",
 		"confirm": "确认",
+		"existingVote": "已投票",
+		"existingVoteDescription": "您已经投票了，重新投票将覆盖当前投票记录",
 		"voteSuccess": "您的投票已成功投出",
 		"voteFailed": "您的投票未成功投出",
 		"voteSuccessTitle": "投票成功",

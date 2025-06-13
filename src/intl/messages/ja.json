@@ -637,6 +637,8 @@
 		"ayeVoteValue": "賛成票の値",
 		"nayVoteValue": "反対票の値",
 		"confirm": "確認",
+		"existingVote": "既存の投票",
+		"existingVoteDescription": "すでにこの提案に投票しています。投票を再送信すると、現在の投票記録が上書きされます。",
 		"voteSuccess": "投票が成功しました",
 		"voteFailed": "投票が失敗しました",
 		"voteSuccessTitle": "投票成功",

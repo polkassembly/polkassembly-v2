@@ -636,6 +636,8 @@
 		"ayeVoteValue": "Ja-Stimmwert",
 		"nayVoteValue": "Nein-Stimmwert",
 		"confirm": "Bestätigen",
+		"existingVote": "Bestehende Stimme",
+		"existingVoteDescription": "Sie haben bereits auf diesen Vorschlag abgestimmt. Das erneute Abstimmen überschreibt die aktuelle Abstimmung.",
 		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
 		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",

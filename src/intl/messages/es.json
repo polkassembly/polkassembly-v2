@@ -638,6 +638,8 @@
 		"ayeVoteValue": "Valor de Voto Sí",
 		"nayVoteValue": "Valor de Voto No",
 		"confirm": "Confirmar",
+		"existingVote": "Voto Existente",
+		"existingVoteDescription": "Ya ha votado en esta propuesta. Reenviar el voto anulará el voto actual.",
 		"voteSuccess": "Su voto ha sido emitido correctamente",
 		"voteFailed": "Su voto no ha sido emitido correctamente",
 		"voteSuccessTitle": "Voto exitoso",
