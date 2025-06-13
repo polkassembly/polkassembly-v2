@@ -1234,7 +1234,7 @@ export class PolkadotApiService {
 	async loginWithRemark({ address, onSuccess, onFailed, wallet }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void; wallet: EWallet }) {
 		if (!this.api) return;
 
-		const tx = this.api.tx.remark.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
+		const tx = this.api.tx.system.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
 
 		await this.executeTx({
 			tx,

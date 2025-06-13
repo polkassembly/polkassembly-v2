@@ -126,7 +126,8 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			} else {
 				router.back();
 			}
-		} catch {
+		} catch (error) {
+			console.log('error', error);
 			// TODO: add to language files
 			toast({
 				status: ENotificationStatus.ERROR,
