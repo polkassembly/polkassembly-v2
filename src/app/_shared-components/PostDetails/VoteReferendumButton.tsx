@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
+import UserVoteCard from './UserVoteCard';
 
 interface VoteReferendumButtonProps {
 	index: string;
@@ -56,24 +57,39 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 
 	const hasVoted = Array.isArray(voteData?.votes) && voteData.votes.length > 0;
 
-	return !user ? (
-		<Link href='/login'>
-			<Button
-				className={cn('w-full', btnClassName)}
-				size={size}
-			>
-				<div className='flex items-center gap-1.5'>
-					<Image
-						src={VoteIcon}
-						alt='Vote Icon'
-						width={20}
-						height={20}
-						className={iconClassName}
-					/>
-					<span>{t('PostDetails.loginToVote')}</span>
-				</div>
-			</Button>
-		</Link>
+	if (!user)
+		return (
+			<Link href='/login'>
+				<Button
+					className={cn('w-full', btnClassName)}
+					size={size}
+				>
+					<div className='flex items-center gap-1.5'>
+						<Image
+							src={VoteIcon}
+							alt='Vote Icon'
+							width={20}
+							height={20}
+							className={iconClassName}
+						/>
+						<span>{t('PostDetails.loginToVote')}</span>
+					</div>
+				</Button>
+			</Link>
+		);
+
+	return hasVoted ? (
+		<UserVoteCard
+			index={index}
+			iconClassName={iconClassName}
+			size={size}
+			track={track}
+			proposalType={proposalType}
+			voteData={voteData}
+			isLoading={isLoading}
+			isError={isError}
+			btnClassName={btnClassName}
+		/>
 	) : (
 		<Dialog
 			open={openModal}
@@ -83,8 +99,6 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 				<Button
 					className={cn('w-full', btnClassName)}
 					size={size}
-					disabled={isLoading || isError}
-					isLoading={isLoading}
 				>
 					<div className='flex items-center gap-1'>
 						<Image
@@ -94,7 +108,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 							height={20}
 							className={iconClassName}
 						/>
-						{hasVoted ? t('PostDetails.castVoteAgain') : t('PostDetails.castVote')}
+						{t('PostDetails.castVote')}
 					</div>
 				</Button>
 			</DialogTrigger>
