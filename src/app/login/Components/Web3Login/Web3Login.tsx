@@ -60,8 +60,8 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				await apiService.loginWithRemark({
 					address,
 					onSuccess: (hash) => {
-						console.log('remark hash', hash);
-						remarkHash = hash as string;
+						console.log('remark hash', hash?.toString());
+						remarkHash = hash?.toString() || '';
 					},
 					onFailed: (error) => {
 						setErrorMessage(error);
@@ -74,6 +74,8 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 					setLoading(false);
 					return;
 				}
+
+				console.log('sending request to mimir login');
 
 				result = await AuthClientService.mimirLogin({
 					address: getSubstrateAddress(address) || address,
