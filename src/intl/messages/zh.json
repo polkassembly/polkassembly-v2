@@ -470,6 +470,13 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"VotesData": {
+			"Votes": "投票",
+			"tile": "平铺",
+			"graph": "图表",
+			"voteHistory": "投票历史 (平铺, 嵌套, 调用)",
+			"votes": "投票"
+		},
 		"VotesTiles": {
 			"nested": "嵌套",
 			"flattened": "扁平",

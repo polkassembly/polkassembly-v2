@@ -27,10 +27,10 @@ import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
-import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
 import ClaimPayout from './ClaimPayout/ClaimPayout';
 import PostAnalytics from './Analytics/PostAnalytics';
+import VotesData from './VotesData/VotesData';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
@@ -140,7 +140,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									analytics={analytics}
 									isFetching={isAnalyticsFetching}
 									proposalType={post.proposalType}
-									index={Number(index)}
+									index={index}
 								/>
 							</TabsContent>
 						</div>
@@ -207,22 +207,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-								<VoteCurvesData
-									proposalType={post.proposalType}
-									index={index}
-									createdAt={post.createdAt}
-									trackName={post.onChainInfo?.origin}
-									timeline={post.onChainInfo?.timeline}
-									setThresholdValues={setThresholdValues}
-									thresholdValues={thresholdValues}
-								/>
-							)}
+
+							<VotesData
+								proposalType={post.proposalType}
+								index={index}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
+								createdAt={post.createdAt}
+								timeline={post.onChainInfo?.timeline}
+								setThresholdValues={setThresholdValues}
+								thresholdValues={thresholdValues}
+							/>
 						</div>
 					)}
 

@@ -53,7 +53,6 @@ function VoteCurvesData({ proposalType, index, trackName, createdAt, timeline, s
 
 	return (
 		<section className={styles.voteDataContainer}>
-			<h2 className={styles.heading}>{t('votingData')}</h2>
 			<div className='relative mt-4'>
 				{isFetching && <LoadingLayover />}
 				<VoteCurves

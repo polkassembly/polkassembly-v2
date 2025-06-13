@@ -497,6 +497,13 @@
 			"nay": "Nay",
 			"abstain": "Abstain"
 		},
+		"VotesData": {
+			"Votes": "Votes",
+			"tile": "Tile",
+			"graph": "Graph",
+			"voteHistory": "Vote History (Flattened, Nested, Calls)",
+			"votes": "Votes"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
 			"delegatedVsSolo": "Delegated Vs Solo",

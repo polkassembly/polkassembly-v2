@@ -472,6 +472,13 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"VotesData": {
+			"Votes": "Votos",
+			"tile": "Eben",
+			"graph": "Gráfico",
+			"voteHistory": "Historial de votos (Aplanado, Anidado, Llamadas)",
+			"votes": "Votos"
+		},
 		"VotesTiles": {
 			"nested": "Anidado",
 			"flattened": "Aplanado",

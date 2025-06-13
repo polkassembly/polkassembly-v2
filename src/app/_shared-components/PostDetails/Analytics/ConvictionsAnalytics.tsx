@@ -9,9 +9,9 @@ import TimeSplitCard from './TimeSplitCard';
 import VotesByConvictions from './VotesByConviction';
 import DelegationVotesByConvictions from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
-import VotesTiles from '../VotesTiles/VotesTiles';
+import VotesDistributionTiles from '../VotesDistributionTiles/VotesDistributionTiles';
 
-function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { convictionsAnalytics: IAnalytics; proposalType: EProposalType; index: number }) {
+function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { convictionsAnalytics: IAnalytics; proposalType: EProposalType; index: string }) {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex gap-4'>
@@ -24,9 +24,10 @@ function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { c
 			</div>
 			<div className='flex w-full flex-col gap-4'>
 				<TimeSplitCard timeSplitVotes={convictionsAnalytics?.timeSplitVotes || []} />
-				<VotesTiles
+				<VotesDistributionTiles
 					proposalType={proposalType}
 					analyticsType={EAnalyticsType.CONVICTIONS}
+					usedInPostAnalytics
 					index={index}
 				/>
 			</div>

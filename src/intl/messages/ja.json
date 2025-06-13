@@ -471,6 +471,13 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"VotesData": {
+			"Votes": "投票",
+			"tile": "タイル",
+			"graph": "グラフ",
+			"voteHistory": "投票履歴 (フラット, ネスト, 呼び出し)",
+			"votes": "投票"
+		},
 		"VotesTiles": {
 			"nested": "ネスト",
 			"flattened": "フラット",

@@ -1,0 +1,31 @@
+.card {
+	@apply flex flex-col rounded-xl bg-bg_modal shadow-lg;
+}
+.header {
+	@apply px-6 pt-6 text-xl font-semibold text-text_primary;
+}
+.tabs {
+	@apply mx-6 mt-2 flex items-center gap-1 rounded-sm bg-bg_code p-1.5;
+}
+.tab {
+	@apply h-7 w-full rounded-sm px-3 text-sm font-bold tracking-wide transition-all;
+}
+.activeTab {
+	@apply bg-bg_modal text-text_pink shadow-sm;
+}
+.inactiveTab {
+	@apply bg-transparent text-toggle_btn_inactive_text hover:bg-primary_border;
+}
+
+.voteHistoryButtonIcon {
+	@apply h-4 w-4 text-sm font-semibold text-text_pink;
+}
+.voteHistoryDialogHeader {
+	@apply text-xl font-semibold text-text_primary;
+}
+.voteHistoryContainer {
+	@apply -mt-1 px-6 pb-6;
+}
+.voteHistoryDialogContent {
+	@apply max-w-2xl p-3 sm:p-6;
+}

@@ -15,8 +15,9 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import Address from '../../Profile/Address/Address';
-import classes from './VotesTiles.module.scss';
+import classes from './VotesDistributionTiles.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { Button } from '../../Button';
 
@@ -49,7 +50,6 @@ interface IChartNode {
 }
 
 // Constants
-const MIN_VOTING_POWER_PERCENTAGE = 1;
 
 const DEFAULT_LOCK_PERIOD = 0.1;
 // Utility functions
@@ -81,9 +81,16 @@ const calculatePerVotePercentage = ({
 };
 
 // Custom hooks
-const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVotes['votes'] }): IVoteDistribution[] => {
+const useVotesDistribution = ({
+	votesTilesData,
+	usedInPostAnalytics = false
+}: {
+	votesTilesData: IPostTilesVotes['votes'];
+	usedInPostAnalytics?: boolean;
+}): IVoteDistribution[] => {
 	return useMemo(() => {
 		const votes: IVoteDistribution[] = [];
+		const MIN_VOTING_POWER_PERCENTAGE = usedInPostAnalytics ? 1 : 3;
 		const decisions: Array<Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>> = [EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN];
 
 		decisions.forEach((decision) => {
@@ -188,15 +195,25 @@ const useChartData = ({ allVotes, t, network }: { allVotes: IVoteDistribution[];
 };
 
 // Component
-function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: number; analyticsType: EAnalyticsType }) {
+function VotesDistributionTiles({
+	proposalType,
+	index,
+	analyticsType,
+	usedInPostAnalytics = false
+}: {
+	proposalType: EProposalType;
+	index: string;
+	analyticsType?: EAnalyticsType;
+	usedInPostAnalytics?: boolean;
+}) {
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
-	const [votesType, setVotesType] = useState<EPostTilesVotesType>(EPostTilesVotesType.FLATTENED);
+	const [votesType, setVotesType] = useState<EPostTilesVotesType>(EPostTilesVotesType.NESTED);
 
 	const getPostAnalytics = async () => {
 		const { data, error } = await NextApiClientService.getPostTilesVotes({
 			proposalType: proposalType as EProposalType,
-			index: index.toString(),
+			index,
 			analyticsType,
 			votesType
 		});
@@ -212,7 +229,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 		enabled: !!proposalType && !!index
 	});
 
-	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });
+	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] }, usedInPostAnalytics });
 	const chartData = useChartData({ allVotes, t, network });
 
 	const renderTooltip = useCallback(
@@ -230,11 +247,11 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 			);
 
 			return (
-				<div className='flex flex-col items-center justify-center rounded-md bg-bg_code p-4'>
+				<div className={classes.tooltip}>
 					{voteType === EVoteType.OTHERS ? (
-						<div className='flex flex-col items-center justify-center gap-1 text-xs text-text_primary'>
-							<span className='text-primary_text text-sm font-bold dark:text-white'>{t('others')}</span>
-							<div className='flex items-center justify-center gap-1 text-xs text-text_primary'>
+						<div className={classes.tooltipContent}>
+							<span className={classes.tooltipTitle}>{t('others')}</span>
+							<div className={classes.tooltipContent}>
 								<span className='font-bold text-basic_text'>
 									{formattedValue} {NETWORKS_DETAILS[network].tokenSymbol}
 								</span>
@@ -242,14 +259,14 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 							</div>
 						</div>
 					) : (
-						<div className='flex flex-col items-center justify-center gap-1 text-xs text-text_primary'>
+						<div className={classes.tooltipContent}>
 							<Address
 								address={id}
 								textClassName='text-sm'
 							/>
 							{votesType === EPostTilesVotesType.NESTED ? (
-								<div className='flex flex-col items-center justify-center gap-1 text-xs text-text_primary'>
-									<div className='flex flex-col items-center gap-1 font-bold text-basic_text'>
+								<div className={classes.tooltipContent}>
+									<div className={classes.tooltipNestedContent}>
 										<span className='text-basic_text'>
 											{t('votes')}: {formattedValue} {NETWORKS_DETAILS[network].tokenSymbol}
 										</span>
@@ -260,9 +277,9 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 									<span className='text-basic_text'>{percentage}%</span>
 								</div>
 							) : (
-								<div className='flex flex-col items-center justify-center gap-1 text-xs text-text_primary'>
-									<div className='flex flex-col items-center gap-1 font-bold text-basic_text'>
-										<div className='flex items-center gap-1'>
+								<div className={classes.tooltipContent}>
+									<div className={classes.tooltipNestedContent}>
+										<div className={classes.tooltipFlattenedContent}>
 											<span className='text-basic_text'>{t('capital')}:</span>
 											<span className='font-bold text-basic_text'>{formattedBalance}</span>
 											<span className='text-basic_text'>{isDelegated ? `(${lockPeriod}x/d) ` : `(${lockPeriod}x)`}</span>
@@ -283,20 +300,16 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	);
 
 	return (
-		<div className={classes.card}>
-			<div className='flex items-center justify-between'>
-				<h2 className='text-base font-bold'>{t('votesDistribution')}</h2>
-				<div className='flex items-center gap-1 rounded-sm bg-bg_code p-1'>
+		<div className={usedInPostAnalytics ? classes.card : 'mt-4'}>
+			<div className={classes.header}>
+				{usedInPostAnalytics ? <h2 className={classes.heading}>{t('votesDistribution')}</h2> : <div />}
+				<div className={classes.tabs}>
 					<Button
 						variant='ghost'
 						size='sm'
 						disabled={isFetching}
 						onClick={() => setVotesType(EPostTilesVotesType.NESTED)}
-						className={`h-7 px-3 text-xs font-medium transition-all ${
-							votesType === EPostTilesVotesType.NESTED
-								? 'bg-toggle_btn_active_bg text-toggle_btn_active_text shadow-sm'
-								: 'bg-toggle_btn_inactive_bg text-toggle_btn_inactive_text hover:bg-primary_border'
-						}`}
+						className={cn(classes.tab, 'h-5', votesType === EPostTilesVotesType.NESTED ? classes.activeTab : classes.inactiveTab)}
 					>
 						{t('nested')}
 					</Button>
@@ -305,23 +318,19 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 						size='sm'
 						disabled={isFetching}
 						onClick={() => setVotesType(EPostTilesVotesType.FLATTENED)}
-						className={`h-7 px-3 text-xs font-medium transition-all ${
-							votesType === EPostTilesVotesType.FLATTENED
-								? 'bg-toggle_btn_active_bg text-toggle_btn_active_text shadow-sm'
-								: 'bg-toggle_btn_inactive_bg text-toggle_btn_inactive_text hover:bg-primary_border'
-						}`}
+						className={cn(classes.tab, 'h-5', votesType === EPostTilesVotesType.FLATTENED ? classes.activeTab : classes.inactiveTab)}
 					>
 						{t('flattened')}
 					</Button>
 				</div>
 			</div>
 			{isFetching ? (
-				<Skeleton className='mt-4 h-[280px] w-full' />
+				<Skeleton className={classes.skeleton} />
 			) : (
 				<div className={classes.chartWrapper}>
 					<ResponsiveTreeMap
 						data={chartData}
-						tile='binary'
+						tile='squarify'
 						colorBy='color'
 						identity='name'
 						colors={(bar) => {
@@ -345,7 +354,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 						theme={{
 							text: { fontSize: 12, fontWeight: 500, fontStyle: 'initial' }
 						}}
-						margin={{ top: 4, right: 4, bottom: 4, left: 4 }}
+						margin={{ top: 0, right: 0, bottom: 4, left: 0 }}
 						labelSkipSize={40}
 						parentLabelPosition='left'
 					/>
@@ -355,4 +364,4 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	);
 }
 
-export default VotesTiles;
+export default VotesDistributionTiles;
