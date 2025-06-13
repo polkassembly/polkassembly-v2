@@ -93,7 +93,7 @@ export class PolkadotApiService {
 
 			tx
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend(injected.signer as any, { signer: injected.signer as any, withSignedTransaction: true }, async ({ status, events, txHash }) => {
+				.signAndSend('5CSKEeQw1e84JSy4dkrwZ5KW63vV8gbmB9WsezNE8kRQ4qc3', { signer: injected.signer as any, withSignedTransaction: true }, async ({ status, events, txHash }) => {
 					if (status.isInvalid) {
 						console.log('Transaction invalid');
 						setStatus?.('Transaction invalid');
