@@ -11,6 +11,7 @@ import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Providers } from './_shared-components/Providers';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
@@ -81,6 +82,7 @@ export default async function RootLayout({
 					{modal}
 					<AppLayout>{children}</AppLayout>
 				</Providers>
+				<SpeedInsights />
 			</body>
 		</html>
 	);
