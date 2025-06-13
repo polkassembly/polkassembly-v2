@@ -24,7 +24,14 @@ import {
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { FIVE_MIN, HALF_HOUR_IN_SECONDS, ONE_DAY, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS, THIRTY_DAYS_IN_SECONDS } from '../../_api-constants/timeConstants';
+import {
+	FIVE_MIN,
+	HALF_HOUR_IN_SECONDS,
+	ONE_DAY_IN_SECONDS,
+	REFRESH_TOKEN_LIFE_IN_SECONDS,
+	SIX_HOURS_IN_SECONDS,
+	THIRTY_DAYS_IN_SECONDS
+} from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
@@ -211,7 +218,7 @@ export class RedisService {
 
 	// auth and third party methods
 	static async SetEmailVerificationToken({ token, email }: { token: string; email: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), value: email, ttlSeconds: ONE_DAY, forceCache: true });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), value: email, ttlSeconds: ONE_DAY_IN_SECONDS, forceCache: true });
 	}
 
 	static async SetRefreshToken({ userId, refreshToken }: { userId: number; refreshToken: string }): Promise<void> {
@@ -298,7 +305,7 @@ export class RedisService {
 	}
 
 	static async SetResetPasswordToken({ token, userId }: { token: string; userId: number }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), value: userId.toString(), ttlSeconds: ONE_DAY, forceCache: true });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), value: userId.toString(), ttlSeconds: ONE_DAY_IN_SECONDS, forceCache: true });
 	}
 
 	static async GetUserIdFromResetPasswordToken(token: string): Promise<number | null> {
@@ -322,7 +329,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? SIX_HOURS_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
@@ -373,7 +380,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags),
 			value: JSON.stringify(data),
-			ttlSeconds: SIX_HOURS_IN_SECONDS
+			ttlSeconds: ONE_DAY_IN_SECONDS
 		});
 	}
 
@@ -397,7 +404,7 @@ export class RedisService {
 		proposalType: string;
 		data: IContentSummary;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
@@ -437,7 +444,7 @@ export class RedisService {
 		userId?: number;
 		origins?: string[];
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
@@ -473,7 +480,7 @@ export class RedisService {
 		data: IGenericListingResponse<IPostListing>;
 		userId: number;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteSubscriptionFeed({ network, userId }: { network: string; userId: number }): Promise<void> {
@@ -524,7 +531,7 @@ export class RedisService {
 	}
 
 	static async SetDelegationStats(network: ENetwork, data: IDelegationStats): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteDelegationStats(network: ENetwork): Promise<void> {
@@ -538,7 +545,7 @@ export class RedisService {
 	}
 
 	static async SetDelegateDetails(network: ENetwork, data: IDelegateDetails[]): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteDelegateDetails(network: ENetwork): Promise<void> {
@@ -555,7 +562,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin),
 			value: JSON.stringify(data),
-			ttlSeconds: ONE_DAY
+			ttlSeconds: ONE_DAY_IN_SECONDS
 		});
 	}
 
@@ -570,7 +577,7 @@ export class RedisService {
 	}
 
 	static async SetTrackAnalyticsStats({ network, origin, data }: { network: string; origin: string; data: ITrackAnalyticsStats }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<void> {
