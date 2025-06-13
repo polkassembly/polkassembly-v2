@@ -5,20 +5,24 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import VoteIcon from '@assets/activityfeed/vote.svg';
-import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
-import DelegateIcon from '@assets/icons/delegate_plus.svg';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import { EPostOrigin, EProposalType, IVoteHistoryData } from '@/_shared/types';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import Image from 'next/image';
+import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
+import VoteIcon from '@assets/activityfeed/vote.svg';
+import DelegateIcon from '@assets/icons/delegate_plus.svg';
+import { cn } from '@/lib/utils';
+import { EPostOrigin, EProposalType, IVoteHistoryData, ENotificationStatus } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import classes from './PostDetails.module.scss';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
-import VoteReferendum from './VoteReferendum/VoteReferendum';
 import { Separator } from '../Separator';
+import VoteReferendum from './VoteReferendum/VoteReferendum';
+import classes from './PostDetails.module.scss';
 
 interface VoteReferendumButtonProps {
 	index: string;
@@ -36,6 +40,11 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
 	const network = getCurrentNetwork();
+	const { apiService } = usePolkadotApiService();
+	const { userPreferences } = useUserPreferences();
+	const { toast } = useToast();
+	const queryClient = useQueryClient();
+	const [isRemoving, setIsRemoving] = useState(false);
 
 	const myVote = voteData.votes[0];
 
@@ -45,8 +54,41 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 		compactNotation: true
 	};
 
-	const handleRemoveVote = () => {
-		console.log('remove vote');
+	const handleRemoveVote = async () => {
+		if (!apiService || !userPreferences.selectedAccount?.address) return;
+
+		try {
+			setIsRemoving(true);
+			await apiService.removeVoteReferendum({
+				address: userPreferences.selectedAccount.address,
+				referendumId: Number(index),
+				selectedAccount: userPreferences.selectedAccount,
+				onSuccess: () => {
+					toast({
+						title: t('PostDetails.voteRemovedTitle'),
+						description: t('PostDetails.voteRemoved'),
+						status: ENotificationStatus.SUCCESS
+					});
+					queryClient.invalidateQueries({ queryKey: ['userVotes', proposalType, index, userPreferences.selectedAccount?.address] });
+				},
+				onFailed: (errorMessage) => {
+					toast({
+						title: t('PostDetails.voteRemoveFailedTitle'),
+						description: errorMessage || t('PostDetails.voteRemoveFailed'),
+						status: ENotificationStatus.ERROR
+					});
+				}
+			});
+		} catch (error) {
+			console.error('Error removing vote:', error);
+			toast({
+				title: t('PostDetails.voteRemoveFailedTitle'),
+				description: t('PostDetails.voteRemoveFailed'),
+				status: ENotificationStatus.ERROR
+			});
+		} finally {
+			setIsRemoving(false);
+		}
 	};
 
 	return (
@@ -57,8 +99,9 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 					type='button'
 					className={classes.userVoteCardRemoveButton}
 					onClick={handleRemoveVote}
+					disabled={isRemoving}
 				>
-					{t('PostDetails.remove')}
+					{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
 				</button>
 			</div>
 			<div className={classes.userVoteCardLayout}>
