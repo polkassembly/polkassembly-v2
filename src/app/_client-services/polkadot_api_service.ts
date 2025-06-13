@@ -1232,18 +1232,25 @@ export class PolkadotApiService {
 	}
 
 	async loginWithRemark({ address, onSuccess, onFailed, wallet }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void; wallet: EWallet }) {
-		if (!this.api) return;
+		if (!this.api) return '';
 
 		const tx = this.api.tx.system.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
+
+		let hash = '';
 
 		await this.executeTx({
 			tx,
 			address,
 			errorMessageFallback: 'Failed to login with remark',
-			onSuccess,
+			onSuccess: (pre) => {
+				hash = pre?.toString() || '';
+				onSuccess(hash);
+			},
 			onFailed,
 			waitTillFinalizedHash: true,
 			wallet
 		});
+
+		return hash;
 	}
 }

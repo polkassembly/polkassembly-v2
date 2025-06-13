@@ -55,13 +55,10 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			if (userPreferences.wallet === EWallet.MIMIR) {
 				if (!apiService) return;
 
-				let remarkHash: string = '';
-
-				await apiService.loginWithRemark({
+				const remarkHash = await apiService.loginWithRemark({
 					address,
 					onSuccess: (hash) => {
 						console.log('remark hash', hash?.toString());
-						remarkHash = hash?.toString() || '';
 					},
 					onFailed: (error) => {
 						setErrorMessage(error);
